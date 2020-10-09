@@ -13,6 +13,7 @@ RUN set -x \
     make \
     autoconf \
     automake \
+    bridge-utils \
     libtool \
     pkg-config \
     g++ \
@@ -21,10 +22,12 @@ RUN set -x \
     clang-tidy \
     cmake \
     lcov \
+    net-tools \
     shellcheck \
     libssl-dev \
     unzip \
     wget \
+    iproute2 \
     libmbedtls-dev \
     openjdk-11-jdk \
     python3 \
@@ -49,6 +52,7 @@ RUN set -x \
     systemd \
     udev \
     ninja-build \
+    strace \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 

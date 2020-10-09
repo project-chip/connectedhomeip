@@ -70,8 +70,17 @@ ChipDeviceController::ChipDeviceController()
     mPairingDelegate   = nullptr;
     mDeviceAddr        = IPAddress::Any;
     mDevicePort        = CHIP_PORT;
+    mInterface         = INET_NULL_INTERFACEID;
     mLocalDeviceId     = 0;
     memset(&mOnComplete, 0, sizeof(mOnComplete));
+}
+
+ChipDeviceController::~ChipDeviceController()
+{
+    if (mTestSecurePairingSecret != nullptr)
+    {
+        delete mTestSecurePairingSecret;
+    }
 }
 
 CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId)
@@ -122,6 +131,8 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    ChipLogProgress(Controller, "Shutting down the controller\n");
+
     VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     mState = kState_NotInitialized;
@@ -164,7 +175,7 @@ exit:
 
 CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, RendezvousParameters & params, void * appReqState,
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                               ErrorHandler onError)
+                                               ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
     CHIP_ERROR err                        = CHIP_NO_ERROR;
     RendezvousSession * rendezvousSession = nullptr;
@@ -179,13 +190,13 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     }
 #endif // CONFIG_DEVICE_LAYER
 
-    rendezvousSession = new RendezvousSession(this);
-    err               = rendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
+    mRendezvousSession = new RendezvousSession(this);
+    err                = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
     SuccessOrExit(err);
 
-    mRendezvousSession = rendezvousSession;
-
     mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
+    mDevicePort      = devicePort;
+    mInterface       = interfaceId;
     mAppReqState     = appReqState;
     mOnNewConnection = onConnected;
 
@@ -196,31 +207,57 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     mOnError             = onError;
 
 exit:
-    if (err != CHIP_NO_ERROR && rendezvousSession != nullptr)
+    if (err != CHIP_NO_ERROR && mRendezvousSession != nullptr)
     {
-        delete rendezvousSession;
+        delete mRendezvousSession;
+        mRendezvousSession = nullptr;
     }
 
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId, void * appReqState,
-                                                           NewConnectionHandler onConnected,
-                                                           MessageReceiveHandler onMessageReceived, ErrorHandler onError,
-                                                           uint16_t devicePort, Inet::InterfaceId interfaceId,
-                                                           SecurePairingSession * pairing)
+CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const IPAddress & deviceAddr,
+                                                                   void * appReqState, NewConnectionHandler onConnected,
+                                                                   MessageReceiveHandler onMessageReceived, ErrorHandler onError,
+                                                                   uint16_t devicePort, Inet::InterfaceId interfaceId)
+{
+    if (mTestSecurePairingSecret != nullptr)
+    {
+        delete mTestSecurePairingSecret;
+    }
+
+    mTestSecurePairingSecret = new SecurePairingUsingTestSecret(Optional<NodeId>::Value(remoteDeviceId), 0, 0);
+
+    mSecurePairingSession = mTestSecurePairingSecret;
+
+    mDeviceAddr      = deviceAddr;
+    mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
+    mDevicePort      = devicePort;
+    mInterface       = interfaceId;
+    mAppReqState     = appReqState;
+    mOnNewConnection = onConnected;
+
+    mConState = kConnectionState_Connected;
+
+    mOnComplete.Response = onMessageReceived;
+    mOnError             = onError;
+
+    if (mOnNewConnection)
+    {
+        mOnNewConnection(this, nullptr, mAppReqState);
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ChipDeviceController::EstablishSecureSession()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mState != kState_Initialized || mSessionManager != nullptr || mConState != kConnectionState_NotConnected)
+    if (mState != kState_Initialized || mSessionManager != nullptr || mConState != kConnectionState_Connected)
     {
-        return CHIP_ERROR_INCORRECT_STATE;
+        ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
-
-    mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
-    mDevicePort      = devicePort;
-    mAppReqState     = appReqState;
-    mOnNewConnection = onConnected;
 
     mSessionManager = new SecureSessionMgr<Transport::UDP>();
 
@@ -232,19 +269,12 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceUsingPairing(NodeId remoteDeviceId
 
     mConState = kConnectionState_SecureConnected;
 
-    mOnComplete.Response = onMessageReceived;
-    mOnError             = onError;
-
     err = mSessionManager->NewPairing(
-        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, devicePort, interfaceId)), pairing);
+        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)),
+        mSecurePairingSession);
     SuccessOrExit(err);
 
     mMessageNumber = 1;
-
-    if (mOnNewConnection)
-    {
-        mOnNewConnection(this, nullptr, mAppReqState);
-    }
 
 exit:
 
@@ -260,23 +290,33 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, const IPAddress & deviceAddr, void * appReqState,
-                                               NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
-                                               ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
+CHIP_ERROR ChipDeviceController::ResumeSecureSession()
 {
-    return ConnectDeviceUsingPairing(remoteDeviceId, appReqState, onConnected, onMessageReceived, onError, devicePort, interfaceId,
-                                     &mPairingSession);
-}
+    if (mConState == kConnectionState_SecureConnected)
+    {
+        mConState = kConnectionState_Connected;
+    }
 
-CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const IPAddress & deviceAddr,
-                                                                   void * appReqState, NewConnectionHandler onConnected,
-                                                                   MessageReceiveHandler onMessageReceived, ErrorHandler onError,
-                                                                   uint16_t devicePort, Inet::InterfaceId interfaceId)
-{
-    SecurePairingUsingTestSecret pairing(Optional<NodeId>::Value(remoteDeviceId), 0, 0);
-    mDeviceAddr = deviceAddr;
-    return ConnectDeviceUsingPairing(remoteDeviceId, appReqState, onConnected, onMessageReceived, onError, devicePort, interfaceId,
-                                     &pairing);
+    if (mSessionManager != nullptr)
+    {
+        delete mSessionManager;
+        mSessionManager = nullptr;
+    }
+
+    uint32_t currentMessageNumber = mMessageNumber;
+
+    CHIP_ERROR err = EstablishSecureSession();
+    SuccessOrExit(err);
+
+    mMessageNumber = currentMessageNumber;
+
+exit:
+
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "ResumeSecureSession returning error %d\n", err);
+    }
+    return err;
 }
 
 CHIP_ERROR ChipDeviceController::PopulatePeerAddress(Transport::PeerAddress & peerAddress)
@@ -295,12 +335,13 @@ exit:
 
 bool ChipDeviceController::IsConnected()
 {
-    return kState_Initialized && (mConState == kConnectionState_Connected || mConState == kConnectionState_SecureConnected);
+    return mState == kState_Initialized &&
+        (mConState == kConnectionState_Connected || mConState == kConnectionState_SecureConnected);
 }
 
 bool ChipDeviceController::IsSecurelyConnected()
 {
-    return kState_Initialized && mConState == kConnectionState_SecureConnected;
+    return mState == kState_Initialized && mConState == kConnectionState_SecureConnected;
 }
 
 CHIP_ERROR ChipDeviceController::DisconnectDevice()
@@ -332,10 +373,9 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mRemoteDeviceId.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(IsSecurelyConnected(), err = CHIP_ERROR_INCORRECT_STATE);
-
     mAppReqState = appReqState;
+
+    VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     if (mRendezvousSession != nullptr)
     {
@@ -343,7 +383,43 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     }
     else
     {
+        bool trySessionResumption = true;
+        VerifyOrExit(mRemoteDeviceId.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+
+        // If there is no secure connection to the device, try establishing it
+        if (!IsSecurelyConnected())
+        {
+            // For now, it's expected that the device is connected
+            VerifyOrExit(IsConnected(), err = CHIP_ERROR_INCORRECT_STATE);
+            err = EstablishSecureSession();
+            SuccessOrExit(err);
+
+            trySessionResumption = false;
+        }
+
+        // Hold on to the buffer, in case a session resumption and resend is needed
+        buffer->AddRef();
+
         err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
+        ChipLogProgress(Controller, "SendMessage returned %d\n", err);
+
+        // The send could fail due to network timeouts (e.g. broken pipe)
+        // Try sesion resumption if needed
+        if (err != CHIP_NO_ERROR && trySessionResumption)
+        {
+            err = ResumeSecureSession();
+            // If session resumption failed, let's free the extra reference to
+            // the buffer. If not, SendMessage would free it.
+            VerifyOrExit(err == CHIP_NO_ERROR, PacketBuffer::Free(buffer));
+
+            err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
+            SuccessOrExit(err);
+        }
+        else
+        {
+            // Free the extra reference to the buffer
+            PacketBuffer::Free(buffer);
+        }
     }
 exit:
 
@@ -413,11 +489,25 @@ void ChipDeviceController::OnMessageReceived(const PacketHeader & header, Transp
     }
 }
 
+void ChipDeviceController::OnRendezvousComplete()
+{
+    if (mRendezvousSession != nullptr)
+    {
+        delete mRendezvousSession;
+        mRendezvousSession = nullptr;
+    }
+}
+
 void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
 {
-    if (mOnComplete.Response)
+    // TODO: this is a stop gap solution to clean up RendezvouSession.
+    // Once the Network provisioning code changes to using delegate calls, this
+    // function would be removed. At that time, OnRendezvousComplete() would be used
+    // to clean up the session
+    if (mRendezvousSession != nullptr)
     {
-        mOnComplete.Response(this, mAppReqState, buffer);
+        delete mRendezvousSession;
+        mRendezvousSession = nullptr;
     }
 }
 
@@ -432,8 +522,8 @@ void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::S
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
         ChipLogProgress(Controller, "Remote device completed SPAKE2+ handshake\n");
-        mPairingSession = mRendezvousSession->GetPairingSession();
-        mConState       = kConnectionState_SecureConnected;
+        mPairingSession       = mRendezvousSession->GetPairingSession();
+        mSecurePairingSession = &mPairingSession;
 
         if (mOnNewConnection)
         {

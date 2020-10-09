@@ -15,7 +15,7 @@
 import("//build/config/arm.gni")
 import("//build_overrides/chip.gni")
 
-import("${chip_root}/gn/chip/buildconfig_header.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 
 declare_args() {
   # Size of SEGGER RTT up buffer.

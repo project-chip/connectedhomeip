@@ -244,7 +244,6 @@ public:
     typedef void (*BleConnectionReceivedFunct)(BLEEndPoint * newEndPoint);
     BleConnectionReceivedFunct OnChipBleConnectReceived;
 
-public:
     // Public functions:
     BleLayer();
 
@@ -253,7 +252,7 @@ public:
                    BleApplicationDelegate * appDelegate, chip::System::Layer * systemLayer);
     BLE_ERROR Shutdown();
 
-    BLE_ERROR NewBleConnection(void * appState, const uint16_t connDiscriminator,
+    BLE_ERROR NewBleConnection(void * appState, uint16_t connDiscriminator,
                                BleConnectionDelegate::OnConnectionCompleteFunct onConnectionComplete,
                                BleConnectionDelegate::OnConnectionErrorFunct onConnectionError);
     BLE_ERROR NewBleEndPoint(BLEEndPoint ** retEndPoint, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose);
@@ -344,7 +343,6 @@ private:
     BleApplicationDelegate * mApplicationDelegate;
     chip::System::Layer * mSystemLayer;
 
-private:
     // Private functions:
     void HandleDataReceived(BLE_CONNECTION_OBJECT connObj, PacketBuffer * pBuf);
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);

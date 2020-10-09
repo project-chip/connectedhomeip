@@ -53,7 +53,7 @@ protected:
     bool _IsInProgress();
     SoftwareUpdateManager::State _GetState();
 
-    void _SetRetryPolicyCallback(const SoftwareUpdateManager::RetryPolicyCallback aRetryPolicyCallback);
+    void _SetRetryPolicyCallback(SoftwareUpdateManager::RetryPolicyCallback aRetryPolicyCallback);
 
     static void _DefaultEventHandler(void * apAppState, SoftwareUpdateManager::EventType aEvent,
                                      const SoftwareUpdateManager::InEventParam & aInParam,
@@ -64,7 +64,7 @@ protected:
     CHIP_ERROR _PrepareImageStorageComplete(CHIP_ERROR aError);
     CHIP_ERROR _ImageInstallComplete(CHIP_ERROR aError);
     CHIP_ERROR _SetQueryIntervalWindow(uint32_t aMinWaitTimeMs, uint32_t aMaxWaitTimeMs);
-    CHIP_ERROR _SetEventCallback(void * const aAppState, const SoftwareUpdateManager::EventCallback aEventCallback);
+    CHIP_ERROR _SetEventCallback(void * aAppState, SoftwareUpdateManager::EventCallback aEventCallback);
 
     // ===== Members for use by the implementation subclass.
 
@@ -96,10 +96,9 @@ private:
     static void PrepareBinding(intptr_t arg);
     static void StartDownload(intptr_t arg);
     static void HandleHoldOffTimerExpired(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
-    static void DefaultRetryPolicyCallback(void * const aAppState, SoftwareUpdateManager::RetryParam & aRetryParam,
+    static void DefaultRetryPolicyCallback(void * aAppState, SoftwareUpdateManager::RetryParam & aRetryParam,
                                            uint32_t & aOutIntervalMsec);
 
-private:
     SoftwareUpdateManager::State mState;
 
     void * mAppState;

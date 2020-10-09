@@ -22,8 +22,8 @@ import("//build_overrides/pigweed.gni")
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
 
-import("${chip_root}/gn/chip/tests.gni")
-import("${chip_root}/gn/chip/tools.gni")
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/build/chip/tools.gni")
 
 if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   declare_args() {
@@ -91,7 +91,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   }
 } else {
   # This is the unified build. Configure various real toolchains.
-  import("${chip_root}/gn/chip/chip_build.gni")
+  import("${chip_root}/build/chip/chip_build.gni")
   declare_args() {
     # Set this to false to disable all builds by default.
     enable_default_builds = true

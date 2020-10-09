@@ -36,9 +36,9 @@
 #if CONFIG_NETWORK_LAYER_BLE
 #include <core/CHIPConfig.h>
 
+#include <support/BitFlags.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
-#include <support/FlagUtils.hpp>
 #include <support/logging/CHIPLogging.h>
 
 #include <ble/BLEEndPoint.h>
@@ -551,7 +551,7 @@ BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, 
     //
     // Beware this line should we ever use virtuals in this class or its
     // super(s). See similar lines in chip::System::Layer end points.
-    memset((void *) this, 0, sizeof(*this));
+    memset(this, 0, sizeof(*this));
 
     // If end point plays peripheral role, expect ack for indication sent as last step of BTP handshake.
     // If central, periperal's handshake indication 'ack's write sent by central to kick off the BTP handshake.

@@ -26,4 +26,4 @@
 
 int TestPlatformTime();
 
-#endif // TESTCONFIGURATIONMGR_H
+#endif // TESTPLATFORMTIME_H

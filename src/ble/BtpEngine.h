@@ -38,7 +38,7 @@
 #include <ble/BleConfig.h>
 
 #include <ble/BleError.h>
-#include <support/FlagUtils.hpp>
+#include <support/BitFlags.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -90,11 +90,7 @@ public:
     static const uint16_t sDefaultFragmentSize;
     static const uint16_t sMaxFragmentSize;
 
-public:
     // Public functions:
-    BtpEngine() {}
-    ~BtpEngine() {}
-
     BLE_ERROR Init(void * an_app_state, bool expect_first_ack);
 
     inline void SetTxFragmentSize(uint8_t size) { mTxFragmentSize = size; }
@@ -183,7 +179,6 @@ private:
     uint16_t mTxCharCount;
     uint16_t mTxPacketCount;
 
-private:
     // Private functions:
     bool IsValidAck(SequenceNumber_t ack_num) const;
     BLE_ERROR HandleAckReceived(SequenceNumber_t ack_num);

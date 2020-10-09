@@ -57,7 +57,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
 #endif // CONFIG_NETWORK_LAYER_BLE
     SuccessOrExit(err);
 
-    if (!mParams.HasDiscriminator())
+    if (!mParams.IsController())
     {
         err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
         SuccessOrExit(err);
@@ -123,7 +123,7 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
     SuccessOrExit(err);
 
     msgBuf->ConsumeHead(headerSize);
-    err = mTransport->SendMessage(header, Header::Flags::None(), Transport::PeerAddress::BLE(), msgBuf);
+    err = mTransport->SendMessage(header, Header::Flags(), Transport::PeerAddress::BLE(), msgBuf);
     SuccessOrExit(err);
 
 exit:
@@ -190,7 +190,7 @@ void RendezvousSession::OnPairingError(CHIP_ERROR err)
 
 void RendezvousSession::OnPairingComplete()
 {
-    CHIP_ERROR err = mPairingSession.DeriveSecureSession((const unsigned char *) kSpake2pI2RSessionInfo,
+    CHIP_ERROR err = mPairingSession.DeriveSecureSession(reinterpret_cast<const unsigned char *>(kSpake2pI2RSessionInfo),
                                                          strlen(kSpake2pI2RSessionInfo), mSecureSession);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Ble, "Failed to initialize a secure session: %s", ErrorStr(err)));
 
@@ -211,7 +211,7 @@ void RendezvousSession::OnNetworkProvisioningComplete()
 
 void RendezvousSession::OnRendezvousConnectionOpened()
 {
-    if (mParams.HasDiscriminator())
+    if (mParams.IsController())
     {
         CHIP_ERROR err = Pair(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
         VerifyOrExit(err == CHIP_NO_ERROR, OnPairingError(err));
@@ -223,7 +223,7 @@ exit:
 
 void RendezvousSession::OnRendezvousConnectionClosed()
 {
-    if (!mParams.HasDiscriminator() && !mParams.HasConnectionObject())
+    if (!mParams.IsController())
     {
         mSecureSession.Reset();
         CHIP_ERROR err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
@@ -345,6 +345,8 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
        allocated as an inline buffer to PacketBuffer structure */
     origMsg = msgBuf;
     msgBuf  = PacketBuffer::NewWithAvailableSize(len);
+    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     msgBuf->SetDataLength(len, msgBuf);
 #endif
     plainText = msgBuf->Start();
@@ -389,15 +391,17 @@ exit:
 CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
-    return mPairingSession.WaitForPairing(setupPINCode, kSpake2p_Iteration_Count, (const unsigned char *) kSpake2pKeyExchangeSalt,
+    return mPairingSession.WaitForPairing(setupPINCode, kSpake2p_Iteration_Count,
+                                          reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt),
                                           strlen(kSpake2pKeyExchangeSalt), nodeId, 0, this);
 }
 
 CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
-    return mPairingSession.Pair(setupPINCode, kSpake2p_Iteration_Count, (const unsigned char *) kSpake2pKeyExchangeSalt,
-                                strlen(kSpake2pKeyExchangeSalt), nodeId, mNextKeyId++, this);
+    return mPairingSession.Pair(setupPINCode, kSpake2p_Iteration_Count,
+                                reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt),
+                                nodeId, mNextKeyId++, this);
 }
 
 void RendezvousSession::SendNetworkCredentials(const char * ssid, const char * passwd)

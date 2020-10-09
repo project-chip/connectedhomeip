@@ -18,8 +18,10 @@
 
 #include "commands/common/Commands.h"
 
+#include "commands/clusters/BarrierControl/Commands.h"
 #include "commands/clusters/Basic/Commands.h"
 #include "commands/clusters/ColorControl/Commands.h"
+#include "commands/clusters/DoorLock/Commands.h"
 #include "commands/clusters/Identify/Commands.h"
 #include "commands/clusters/OnOff/Commands.h"
 #include "commands/clusters/TemperatureMeasurement/Commands.h"
@@ -39,8 +41,10 @@ int main(int argc, char * argv[])
     Commands commands;
 
     registerCommandsEcho(commands);
+    registerClusterBarrierControl(commands);
     registerClusterBasic(commands);
     registerClusterColorControl(commands);
+    registerClusterDoorLock(commands);
     registerClusterIdentify(commands);
     registerClusterOnOff(commands);
     registerClusterTemperatureMeasurement(commands);

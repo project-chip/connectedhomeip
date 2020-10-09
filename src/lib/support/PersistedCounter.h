@@ -74,7 +74,7 @@ public:
      *          CHIP_ERROR_INVALID_INTEGER_VALUE if aEpoch is 0.
      *          CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Init(const chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch);
+    CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch);
 
     /**
      *  @brief

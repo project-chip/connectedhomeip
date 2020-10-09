@@ -26,7 +26,7 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
 include(nrfconnect-app)
 
 project(chip-nrf52840-lighting-example)
-target_include_directories(app PRIVATE main/include ${LIGHTING_COMMON} ${NRFCONNECT_COMMON}/util/include ${CHIP_APP_SERVER}/include)
+target_include_directories(app PRIVATE main/include ${LIGHTING_COMMON} ${NRFCONNECT_COMMON}/util/include ${NRFCONNECT_COMMON}/app/include ${CHIP_APP_SERVER}/include)
 target_sources(app PRIVATE
                main/AppTask.cpp
                main/LightingManager.cpp
@@ -37,6 +37,7 @@ target_sources(app PRIVATE
                ${LIGHTING_COMMON}/gen/znet-bookkeeping.c
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
+               ${NRFCONNECT_COMMON}/app/Service.cpp
                ${CHIP_APP_SERVER}/DataModelHandler.cpp
                ${CHIP_APP_SERVER}/Server.cpp
                ${CHIP_APP_SERVER}/QRCodeUtil.cpp

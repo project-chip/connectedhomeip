@@ -173,7 +173,7 @@ void PacketBuffer::SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead)
     ptrdiff_t lDelta = static_cast<ptrdiff_t>(aNewLen) - static_cast<ptrdiff_t>(this->len);
 
     this->len     = aNewLen;
-    this->tot_len = (uint16_t)(this->tot_len + lDelta);
+    this->tot_len = static_cast<uint16_t>(this->tot_len + lDelta);
 
     while (aChainHead != nullptr && aChainHead != this)
     {
@@ -304,7 +304,7 @@ void PacketBuffer::CompactHead()
 
         memcpy(static_cast<uint8_t *>(this->payload) + this->len, lNextPacket.payload, lMoveLength);
 
-        lNextPacket.payload = (uint8_t *) lNextPacket.payload + lMoveLength;
+        lNextPacket.payload = static_cast<uint8_t *>(lNextPacket.payload) + lMoveLength;
         this->len           = static_cast<uint16_t>(this->len + lMoveLength);
         lAvailLength        = static_cast<uint16_t>(lAvailLength - lMoveLength);
         lNextPacket.len     = static_cast<uint16_t>(lNextPacket.len - lMoveLength);

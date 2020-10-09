@@ -20,7 +20,6 @@
 extern NSString * const kCHIPToolDefaultsDomain;
 extern NSString * const kNetworkSSIDDefaultsKey;
 extern NSString * const kNetworkPasswordDefaultsKey;
-extern NSString * const kIPKey;
 
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
 void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);

@@ -23,8 +23,9 @@
 #include <ble/BleLayer.h>
 #include <ble/BlePlatformDelegate.h>
 
-typedef bool (*WriteBleCharacteristicCBFunct)(void * connObj, void * svcId, void * charId, void * buffer, uint16_t length);
-typedef bool (*SubscribeBleCharacteristicCBFunct)(void * connObj, void * svcId, void * charId, bool subscribe);
+typedef bool (*WriteBleCharacteristicCBFunct)(void * connObj, const void * svcId, const void * charId, const void * buffer,
+                                              uint16_t length);
+typedef bool (*SubscribeBleCharacteristicCBFunct)(void * connObj, const void * svcId, const void * charId, bool subscribe);
 typedef bool (*CloseBleCBFunct)(void * connObj);
 
 class DeviceController_BlePlatformDelegate : public chip::Ble::BlePlatformDelegate

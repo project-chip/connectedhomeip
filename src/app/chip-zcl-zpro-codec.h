@@ -352,6 +352,49 @@ uint16_t encodeStopMoveStepCommand(uint8_t * buffer, uint16_t buf_length, uint8_
  * */
 uint16_t encodeResetToFactoryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
+/**
+ * DoorLock cluster commands
+ */
+
+/**
+ * @brief Encode a lock-door command for the Door lock cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param pin                   A short string with the PIN to lock the door
+ * */
+uint16_t encodeLockDoorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, const char * pin);
+
+/**
+ * @brief Encode a unlock-door command for the Door lock cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param pin                   A short string with the PIN to unlock the door
+ * */
+uint16_t encodeUnlockDoorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, const char * pin);
+
+/**
+ * Barrier Control cluster commands
+ */
+
+/**
+ * @brief Encode a move-to-percent command for the Barrier Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * @param percent               The percent to open the barrier to
+ * */
+uint16_t encodeMoveToPercentCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t percent);
+
+/**
+ * @brief Encode a stop-move-to-percent command for the Barrier Control cluster
+ * @param buffer                Buffer to encode into
+ * @param buf_length            Length of buffer
+ * @param destination_endpoint  Destination endpoint
+ * */
+uint16_t encodeStopMoveToPercentCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
 #ifdef __cplusplus
 }
 #endif

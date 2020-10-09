@@ -222,8 +222,7 @@ public:
 
     static void DefaultEventHandler(void * apAppState, EventType aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
 
-    CHIP_ERROR AllocateRightSizedBuffer(PacketBuffer *& buf, const uint32_t desiredSize, const uint32_t minSize,
-                                        uint32_t & outMaxPayloadSize);
+    CHIP_ERROR AllocateRightSizedBuffer(PacketBuffer *& buf, uint32_t desiredSize, uint32_t minSize, uint32_t & outMaxPayloadSize);
 
 private:
     friend class ChipExchangeManager;
@@ -326,7 +325,7 @@ private:
     static void OnSecureSessionFailed(ChipSecurityManager * sm, ChipConnection * con, void * reqState, CHIP_ERROR localErr,
                                       uint64_t peerNodeId, Protocols::StatusReporting::StatusReport * statusReport);
     void OnSecureSessionReady(uint64_t peerNodeId, uint8_t encType, ChipAuthMode authMode, uint16_t keyId);
-    void OnKeyError(const uint32_t aKeyId, const uint64_t aPeerNodeId, const CHIP_ERROR aKeyErr);
+    void OnKeyError(uint32_t aKeyId, uint64_t aPeerNodeId, CHIP_ERROR aKeyErr);
 
     static void OnResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, Inet::IPAddress * addrArray);
     static void OnConnectionComplete(ChipConnection * con, CHIP_ERROR conErr);

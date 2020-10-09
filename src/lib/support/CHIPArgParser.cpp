@@ -500,7 +500,7 @@ bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet *
         return false;
     }
 
-    argc = SplitArgs(argStrCopy, argv, (char *) progName);
+    argc = SplitArgs(argStrCopy, argv, const_cast<char *>(progName));
     if (argc < 0)
     {
         PrintArgError("%s: Memory allocation failure\n", progName);
@@ -1177,7 +1177,7 @@ static char * MakeShortOptions(OptionSet ** optSets)
     // The buffer needs to be big enough to hold up to 3 characters per short option plus an initial
     // ":" and a terminating null.
     size_t arraySize = 2 + (totalOptions * 3);
-    char * shortOpts = (char *) malloc(arraySize);
+    char * shortOpts = static_cast<char *>(malloc(arraySize));
     if (shortOpts == nullptr)
         return nullptr;
 
@@ -1196,7 +1196,7 @@ static char * MakeShortOptions(OptionSet ** optSets)
             // is optional.
             if (IsShortOptionChar(optDef->Id))
             {
-                shortOpts[i++] = (char) optDef->Id;
+                shortOpts[i++] = static_cast<char>(optDef->Id);
                 if (optDef->ArgType != kNoArgument)
                     shortOpts[i++] = ':';
                 if (optDef->ArgType == kArgumentOptional)
@@ -1217,7 +1217,7 @@ static struct option * MakeLongOptions(OptionSet ** optSets)
 
     // Allocate an array to hold the list of long options.
     size_t arraySize         = (sizeof(struct option) * (totalOptions + 1));
-    struct option * longOpts = (struct option *) malloc(arraySize);
+    struct option * longOpts = static_cast<struct option *>(malloc(arraySize));
     if (longOpts == nullptr)
         return nullptr;
 
@@ -1229,7 +1229,7 @@ static struct option * MakeLongOptions(OptionSet ** optSets)
         for (OptionDef * optDef = (*optSets)->OptionDefs; optDef->Name != nullptr; optDef++)
         {
             longOpts[i].name    = optDef->Name;
-            longOpts[i].has_arg = (int) optDef->ArgType;
+            longOpts[i].has_arg = static_cast<int>(optDef->ArgType);
             longOpts[i].flag    = nullptr;
             longOpts[i].val     = optDef->Id;
             i++;
@@ -1252,7 +1252,7 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
     int32_t argCount    = 0;
 
     // Allocate an array to hold pointers to the arguments.
-    argList = (char **) malloc(sizeof(char *) * InitialArgListSize);
+    argList = static_cast<char **>(malloc(sizeof(char *) * InitialArgListSize));
     if (argList == nullptr)
         return -1;
     argListSize = InitialArgListSize;
@@ -1260,7 +1260,7 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
     // If an initial argument was supplied, make it the first argument in the array.
     if (initialArg != nullptr)
     {
-        argList[0] = (char *) initialArg;
+        argList[0] = initialArg;
         argCount   = 1;
     }
 
@@ -1278,7 +1278,7 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
         if (argListSize == argCount + 1)
         {
             argListSize *= 2;
-            argList = (char **) realloc(argList, argListSize);
+            argList = static_cast<char **>(realloc(argList, argListSize));
             if (argList == nullptr)
                 return -1;
         }
@@ -1403,7 +1403,7 @@ static const char ** MakeUniqueHelpGroupNamesList(OptionSet * optSets[])
     size_t numOptSets = CountOptionSets(optSets);
     size_t numGroups  = 0;
 
-    const char ** groupNames = (const char **) malloc(sizeof(const char *) * (numOptSets + 1));
+    const char ** groupNames = static_cast<const char **>(malloc(sizeof(const char *) * (numOptSets + 1)));
     if (groupNames == nullptr)
         return nullptr;
 

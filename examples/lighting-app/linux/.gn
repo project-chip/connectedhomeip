@@ -18,9 +18,6 @@ buildconfig = "//build/config/BUILDCONFIG.gn"
 # CHIP uses angle bracket includes.
 check_system_includes = true
 
-# Allow loading paths relative to //gn.
-secondary_source = "//third_party/connectedhomeip/gn/"
-
 default_args = {
   import("//args.gni")
 }

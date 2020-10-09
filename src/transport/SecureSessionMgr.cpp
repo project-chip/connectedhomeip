@@ -201,8 +201,8 @@ CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddres
 
     if (state != nullptr)
     {
-        err = pairing->DeriveSecureSession((const uint8_t *) kSpake2pI2RSessionInfo, strlen(kSpake2pI2RSessionInfo),
-                                           state->GetSecureSession());
+        err = pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo),
+                                           strlen(kSpake2pI2RSessionInfo), state->GetSecureSession());
     }
 
 exit:
@@ -266,6 +266,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
            allocated as an inline buffer to PacketBuffer structure */
         origMsg = msg;
         msg     = PacketBuffer::NewWithAvailableSize(len);
+        VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Insufficient memory for packet buffer."));
         msg->SetDataLength(len, msg);
 #endif
         plainText = msg->Start();

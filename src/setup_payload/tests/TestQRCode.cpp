@@ -125,7 +125,7 @@ void TestBase41(nlTestSuite * inSuite, void * inContext)
     string hello_world;
     for (uint8_t b : decoded)
     {
-        hello_world += (char) b;
+        hello_world += static_cast<char>(b);
     }
     NL_TEST_ASSERT(inSuite, hello_world == "Hello World!");
 

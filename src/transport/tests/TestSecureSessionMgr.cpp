@@ -43,7 +43,7 @@ using TestContext = chip::Test::IOContext;
 
 TestContext sContext;
 
-static const char PAYLOAD[]         = "Hello!";
+const char PAYLOAD[]                = "Hello!";
 constexpr NodeId kSourceNodeId      = 123654;
 constexpr NodeId kDestinationNodeId = 111222333;
 
@@ -112,6 +112,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
+    NL_TEST_ASSERT(inSuite, buffer != nullptr);
+
     memmove(buffer->Start(), PAYLOAD, payload_len);
     buffer->SetDataLength(payload_len);
 

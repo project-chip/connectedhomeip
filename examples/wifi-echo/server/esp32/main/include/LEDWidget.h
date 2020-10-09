@@ -57,4 +57,4 @@ private:
     friend void ClearErrorState(TimerHandle_t);
 };
 
-#endif // TITLE_WIDGET_H
+#endif // LED_WIDGET_H

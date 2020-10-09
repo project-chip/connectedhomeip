@@ -25,7 +25,11 @@
 
 #include "TestSupport.h"
 
+#include <support/CHIPMem.h>
+
 int main()
 {
-    return (TestCHIPArgParser());
+    chip::Platform::MemoryInit();
+
+    return TestCHIPArgParser();
 }

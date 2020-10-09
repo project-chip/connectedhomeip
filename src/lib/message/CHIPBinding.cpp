@@ -893,7 +893,7 @@ void Binding::HandleBindingFailed(CHIP_ERROR err, Protocols::StatusReporting::St
  */
 void Binding::OnResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray)
 {
-    Binding * _this = (Binding *) appState;
+    Binding * _this = static_cast<Binding *>(appState);
 
     // It is legal for a DNS entry to exist but contain no A/AAAA records. If this happens, return a reasonable error
     // to the user.
@@ -921,7 +921,7 @@ void Binding::OnResolveComplete(void * appState, INET_ERROR err, uint8_t addrCou
  */
 void Binding::OnConnectionComplete(ChipConnection * con, CHIP_ERROR conErr)
 {
-    Binding * _this = (Binding *) con->AppState;
+    Binding * _this = static_cast<Binding *>(con->AppState);
 
     VerifyOrDie(_this->mState == kState_PreparingTransport_TCPConnect);
     VerifyOrDie(_this->mCon == con);
@@ -995,7 +995,7 @@ exit:
 void Binding::OnSecureSessionReady(ChipSecurityManager * sm, ChipConnection * con, void * reqState, uint16_t keyId,
                                    uint64_t peerNodeId, uint8_t encType)
 {
-    Binding * _this = (Binding *) reqState;
+    Binding * _this = static_cast<Binding *>(reqState);
 
     // Verify the state of the binding.
     VerifyOrDie(_this->mState == kState_PreparingSecurity_EstablishSession);
@@ -1017,7 +1017,7 @@ void Binding::OnSecureSessionReady(ChipSecurityManager * sm, ChipConnection * co
 void Binding::OnSecureSessionFailed(ChipSecurityManager * sm, ChipConnection * con, void * reqState, CHIP_ERROR localErr,
                                     uint64_t peerNodeId, Protocols::StatusReporting::StatusReport * statusReport)
 {
-    Binding * _this = (Binding *) reqState;
+    Binding * _this = static_cast<Binding *>(reqState);
 
     // Verify the state of the binding.
     VerifyOrDie(_this->mState == kState_PreparingSecurity_EstablishSession);
@@ -1445,7 +1445,7 @@ Binding::Configuration & Binding::Configuration::TargetAddress_IP(const char * a
     {
         mBinding.mAddressingOption = Binding::kAddressing_HostName;
         mBinding.mHostName         = aHostName;
-        mBinding.mHostNameLen      = (uint8_t) aHostNameLen;
+        mBinding.mHostNameLen      = static_cast<uint8_t>(aHostNameLen);
         mBinding.mPeerPort         = (aPeerPort != 0) ? aPeerPort : CHIP_PORT;
         mBinding.mInterfaceId      = aInterfaceId;
     }

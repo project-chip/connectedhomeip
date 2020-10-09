@@ -4,6 +4,8 @@ import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCallback
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattDescriptor
 import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
@@ -12,6 +14,8 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
+import chip.devicecontroller.AndroidChipStack
+import chip.devicecontroller.ChipDeviceController
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,7 +53,7 @@ class BluetoothManager {
                 val scanFilter = ScanFilter.Builder()
                     .setServiceData(
                       ParcelUuid(UUID.fromString(CHIP_UUID)),
-                      discriminator.toByteArray(3)
+                      byteArrayOf(0, discriminator.toByte(), (discriminator shr 8).toByte())
                     )
                     .build()
                 val scanSettings = ScanSettings.Builder()
@@ -68,7 +72,7 @@ class BluetoothManager {
      */
     suspend fun connect(context: Context, device: BluetoothDevice): BluetoothGatt? {
         return suspendCancellableCoroutine { continuation ->
-            val bluetoothGattCallback = object : BluetoothGattCallback() {
+            val bluetoothGattCallback = object : AndroidChipStack.ChipGattCallback() {
                 override fun onConnectionStateChange(
                   gatt: BluetoothGatt?,
                   status: Int,
@@ -93,14 +97,9 @@ class BluetoothManager {
             }
 
             Log.i(TAG, "Connecting")
-            val gatt = device.connectGatt(context, false, bluetoothGattCallback)
+            val gatt = device.connectGatt(context, false, bluetoothGattCallback, BluetoothDevice.TRANSPORT_LE)
             continuation.invokeOnCancellation { gatt.disconnect() }
         }
-    }
-
-    /** Converts an integer to a ByteArray with the first [size] bytes of the [Int]. */
-    private fun Int.toByteArray(size: Int): ByteArray {
-        return ByteArray(size) { i -> (this shr (8 * i)).toByte() }
     }
 
     companion object {

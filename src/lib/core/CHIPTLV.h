@@ -427,7 +427,6 @@ public:
 private:
     void AdjustInternalWriterFreeSpace();
 
-private:
     TLVWriter mUpdaterWriter;
     TLVReader mUpdaterReader;
     const uint8_t * mElementStartAddr;

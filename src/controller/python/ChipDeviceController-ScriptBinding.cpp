@@ -273,7 +273,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
 
             if (GetBleEventCB)
             {
-                evu.ev = (const BleEventBase *) GetBleEventCB();
+                evu.ev = static_cast<const BleEventBase *>(GetBleEventCB());
 
                 if (evu.ev)
                 {

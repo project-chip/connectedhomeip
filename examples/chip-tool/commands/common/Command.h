@@ -46,6 +46,7 @@ typedef std::initializer_list<movable_initializer_list> commands_list;
 enum ArgumentType
 {
     Number,
+    String,
     Attribute,
     Address
 };
@@ -82,14 +83,28 @@ public:
     size_t GetArgumentsCount(void) const { return mArgs.size(); }
 
     bool InitArguments(int argc, char * argv[]);
+    template <class T>
+    size_t AddArgument(const char * name, int64_t min, int64_t max, T * out)
+    {
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out));
+    }
     size_t AddArgument(const char * name, const char * value);
-    size_t AddArgument(const char * name, uint32_t min, uint32_t max, uint32_t * out);
+    /**
+     * @brief
+     *   Add a string command argument
+     *
+     * @param name  The name that will be displayed in the command help
+     * @param value A pointer to a `char *` where the argv value will be stored
+     * @returns The number of arguments currently added to the command
+     */
+    size_t AddArgument(const char * name, char ** value);
     size_t AddArgument(const char * name, AddressWithInterface * out);
 
     virtual CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) = 0;
 
 private:
     bool InitArgument(size_t argIndex, const char * argValue);
+    size_t AddArgument(const char * name, int64_t min, int64_t max, void * out);
 
     const char * mName = nullptr;
     std::vector<Argument> mArgs;

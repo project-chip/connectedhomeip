@@ -27,9 +27,7 @@
 
 namespace chip {
 
-PersistedCounter::PersistedCounter() :
-    MonotonicallyIncreasingCounter(), mId(chip::Platform::PersistedStorage::kEmptyKey), mEpoch(0), mNextEpoch(0)
-{}
+PersistedCounter::PersistedCounter() : mId(chip::Platform::PersistedStorage::kEmptyKey), mEpoch(0), mNextEpoch(0) {}
 
 PersistedCounter::~PersistedCounter()
 {

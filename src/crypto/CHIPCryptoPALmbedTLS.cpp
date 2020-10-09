@@ -582,13 +582,13 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
     bbuf.Put(mPublicKey, mPublicKey.Length());
 
     VerifyOrExit(bbuf.Available() == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(mbedtls_mpi_size(&keypair->d) == bbuf.Available(), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(mbedtls_mpi_size(&keypair->d) <= bbuf.Available(), error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_mpi_write_binary(&keypair->d, Uint8::to_uchar(privkey), sizeof(privkey));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     bbuf.Put(privkey, sizeof(privkey));
-    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     output.SetLength(bbuf.Written());
 

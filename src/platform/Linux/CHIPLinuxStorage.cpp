@@ -152,11 +152,11 @@ CHIP_ERROR ChipLinuxStorage::WriteValue(const char * key, bool val)
 
     if (val)
     {
-        retval = WriteValue(key, (uint32_t) 1);
+        retval = WriteValue(key, static_cast<uint32_t>(1));
     }
     else
     {
-        retval = WriteValue(key, (uint32_t) 0);
+        retval = WriteValue(key, static_cast<uint32_t>(0));
     }
 
     return retval;
