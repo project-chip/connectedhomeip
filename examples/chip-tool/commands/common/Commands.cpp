@@ -29,7 +29,7 @@ void Commands::Register(const char * clusterName, commands_list commandsList)
     }
 }
 
-int Commands::Run(NodeId localId, NodeId remoteId, int argc, char * argv[])
+int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipDeviceController dc;
