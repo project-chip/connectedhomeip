@@ -16,7 +16,7 @@
  *
  */
 
-package com.google.chip.chiptool.commissioner;
+package com.google.chip.chiptool.commissioner.thread;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -30,21 +30,18 @@ public class BorderAgentInfo implements Parcelable {
   public byte[] extendedPanId;
   public InetAddress host;
   public int port;
-  public byte[] pskc;
 
   public BorderAgentInfo(
       @NonNull String discriminator,
       @NonNull String networkName,
       @NonNull byte[] extendedPanId,
       @NonNull InetAddress host,
-      @NonNull int port,
-      @NonNull byte[] pskc) {
+      @NonNull int port) {
     this.discriminator = discriminator;
     this.networkName = networkName;
     this.extendedPanId = extendedPanId;
     this.host = host;
     this.port = port;
-    this.pskc = pskc;
   }
 
   protected BorderAgentInfo(Parcel in) {
@@ -56,7 +53,6 @@ public class BorderAgentInfo implements Parcelable {
     } catch (UnknownHostException e) {
     }
     port = in.readInt();
-    pskc = in.createByteArray();
   }
 
   @Override
@@ -66,12 +62,15 @@ public class BorderAgentInfo implements Parcelable {
     dest.writeByteArray(extendedPanId);
     dest.writeByteArray(host.getAddress());
     dest.writeInt(port);
-    dest.writeByteArray(pskc);
   }
 
   @Override
   public int describeContents() {
     return 0;
+  }
+
+  public boolean equals(BorderAgentInfo other) {
+    return this.discriminator.equals(other.discriminator);
   }
 
   public static final Creator<BorderAgentInfo> CREATOR =

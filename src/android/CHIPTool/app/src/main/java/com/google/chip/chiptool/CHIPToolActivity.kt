@@ -21,9 +21,9 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.commissioner.CommissionerActivity
 import com.google.chip.chiptool.echoclient.EchoClientFragment
-import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
@@ -70,9 +70,10 @@ class CHIPToolActivity :
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
     super.onActivityResult(requestCode, resultCode, data)
 
-    // Simply ignore the commissioning result.
-
-    // TODO: tracking commissioned devices.
+    if (requestCode == REQUEST_CODE_COMMISSIONING) {
+      // Simply ignore the commissioning result.
+      // TODO: tracking commissioned devices.
+    }
   }
 
   private fun showFragment(fragment: Fragment) {

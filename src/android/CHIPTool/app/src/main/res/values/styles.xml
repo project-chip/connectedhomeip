@@ -9,4 +9,5 @@
 
     <style name="title_text" parent="TextAppearance.AppCompat.Title" />
     <style name="info_text" parent="TextAppearance.AppCompat.Medium" />
+    <style name="mini_info_text" parent="TextAppearance.AppCompat.Small" />
 </resources>
