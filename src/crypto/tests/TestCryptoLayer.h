@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef TESTCRYPTOLAYER_H
-#define TESTCRYPTOLAYER_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -35,4 +34,3 @@ int TestCHIPCryptoPAL(void);
 }
 #endif
 
-#endif // TESTCRYPTOLAYER_H

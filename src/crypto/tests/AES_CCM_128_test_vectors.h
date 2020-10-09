@@ -19,8 +19,7 @@
  * @file - This file contains AES-CCM test vectors.
  */
 
-#ifndef _AES_CCM_128_TEST_VECTORS_H_
-#define _AES_CCM_128_TEST_VECTORS_H_
+#pragma once
 
 #include <stddef.h>
 
@@ -967,4 +966,3 @@ static const struct ccm_128_test_vector * ccm_128_test_vectors[]              = 
     &chiptest_dac9e1195a0d_test_vector_238, &chiptest_dac9e1195a0d_test_vector_245, &chiptest_dac9e1195a0d_test_vector_252
 };
 
-#endif // _AES_CCM_128_TEST_VECTORS_H_
