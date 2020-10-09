@@ -189,7 +189,7 @@ After a successful build, the binary will be available under
 
 ### Supported nRF Connect SDK versions
 
-It is recommended to use the same nRF Connect version as is being verified as
+It is recommended to use the nRF Connect version which is being verified as a
 part of CHIP Continuous Integration testing, which happens to be `83764f` at the
 moment. You may verify that the revision is used in
 [chip-build-nrf-platform](https://github.com/project-chip/connectedhomeip/blob/master/integrations/docker/images/chip-build-nrf-platform/Dockerfile)
