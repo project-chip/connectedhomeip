@@ -15,14 +15,11 @@
  *    limitations under the License.
  */
 
-#include <support/logging/CHIPLogging.h>
+#ifndef _SERVICE_PROVISIONING_H
+#define _SERVICE_PROVISIONING_H
 
-#include "DeviceNetworkProvisioningDelegate.h"
-#include "ServiceProvisioning.h"
+#include <core/CHIPError.h>
 
-using namespace ::chip;
+CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key);
 
-void ESP32NetworkProvisioningDelegate::ProvisionNetwork(const char * ssid, const char * key)
-{
-    ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
-}
+#endif // _SERVICE_PROVISIONING_H

@@ -18,9 +18,6 @@
 #import "CHIPError.h"
 #import <Foundation/Foundation.h>
 
-//#include <controller/CHIPDeviceController.h>
-//#include <transport/RendezvousSessionDelegate.h>
-
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^SendNetworkCredentials)(NSString * ssid, NSString * password);

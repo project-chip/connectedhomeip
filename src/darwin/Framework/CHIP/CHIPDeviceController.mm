@@ -110,6 +110,8 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
             CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
             delete _cppController;
             _cppController = NULL;
+            delete _pairingDelegateBridge;
+            _pairingDelegateBridge = NULL;
             return nil;
         }
     }

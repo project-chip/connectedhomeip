@@ -21,6 +21,8 @@
 
 #include "esp_wifi.h"
 
+#include "ServiceProvisioning.h"
+
 using namespace ::chip::DeviceLayer;
 
 CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
