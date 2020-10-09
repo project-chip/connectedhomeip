@@ -266,6 +266,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
            allocated as an inline buffer to PacketBuffer structure */
         origMsg = msg;
         msg     = PacketBuffer::NewWithAvailableSize(len);
+        VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Insufficient memory for packet buffer."));
         msg->SetDataLength(len, msg);
 #endif
         plainText = msg->Start();

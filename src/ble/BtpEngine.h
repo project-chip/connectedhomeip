@@ -38,7 +38,7 @@
 #include <ble/BleConfig.h>
 
 #include <ble/BleError.h>
-#include <support/FlagUtils.hpp>
+#include <support/BitFlags.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {

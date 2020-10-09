@@ -415,7 +415,7 @@ exit:
     return;
 }
 
-CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, IPAddress peerAddr, uint16_t peerPort)
+CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

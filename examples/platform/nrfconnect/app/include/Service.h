@@ -1,4 +1,4 @@
-/**
+/*
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -15,26 +15,9 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_ONOFF_H
-#define CHIP_ONOFF_H
+#ifndef NRFCONNECT_COMMON_SERVICE_H
+#define NRFCONNECT_COMMON_SERVICE_H
 
-#import "CHIPDeviceController.h"
-#import <Foundation/Foundation.h>
+void PublishService();
 
-NS_ASSUME_NONNULL_BEGIN
-
-@interface CHIPOnOff : NSObject
-
-- (nullable instancetype)initWithDeviceController:(CHIPDeviceController *)deviceController;
-- (BOOL)lightOn;
-- (BOOL)lightOff;
-- (BOOL)toggleLight;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-NS_ASSUME_NONNULL_END
-
-#endif /* CHIP_ONOFF_H */
+#endif // NRFCONNECT_COMMON_SERVICE_H

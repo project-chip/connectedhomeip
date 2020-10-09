@@ -142,7 +142,7 @@ protected:
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     InterfaceId mBoundIntfId;
 
-    INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, InterfaceId aInterfaceId);
+    INET_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, InterfaceId aInterfaceId);
     INET_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
     INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
     INET_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
@@ -205,4 +205,4 @@ inline struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInt
 } // namespace Inet
 } // namespace chip
 
-#endif // !defined(IPENDPOINT_H)
+#endif // !defined(IPENDPOINTBASIS_H)

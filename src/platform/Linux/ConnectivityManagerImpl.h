@@ -36,7 +36,6 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
-#include <support/FlagUtils.hpp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/Linux/dbus/wpa/DBusWpa.h>

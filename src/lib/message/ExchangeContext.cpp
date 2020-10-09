@@ -39,9 +39,9 @@
 #include <message/CHIPSecurityMgr.h>
 #include <protocols/CHIPProtocols.h>
 #include <protocols/common/CommonProtocol.h>
+#include <support/BitFlags.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
-#include <support/FlagUtils.hpp>
 #include <support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemStats.h>

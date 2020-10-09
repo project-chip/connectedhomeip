@@ -57,7 +57,7 @@ static void printWeekdayScheduleTable(void)
         if (entry->inUse)
         {
             emberAfDoorLockClusterPrintln("%x %2x  %x %4x   %4x   %4x  %4x", i, entry->userId, entry->daysMask, entry->startHour,
-                                          entry->stopHour, entry->stopMinute);
+                                          entry->startMinute, entry->stopHour, entry->stopMinute);
         }
     }
 }

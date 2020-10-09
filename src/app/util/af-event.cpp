@@ -134,7 +134,7 @@ const char * emberAfGetEventString(uint8_t index)
 static EmberAfEventContext * findEventContext(uint8_t endpoint, EmberAfClusterId clusterId, bool isClient)
 {
 #if defined(EMBER_AF_GENERATED_EVENT_CONTEXT)
-    uint8_t i;
+    uint16_t i;
     for (i = 0; i < emAfAppEventContextLength; i++)
     {
         EmberAfEventContext * context = &(emAfAppEventContext[i]);

@@ -203,7 +203,7 @@ private:
     CHIP_ERROR NewMsgCounterSyncExchange(const ChipMessageInfo * rcvdMsgInfo, const Inet::IPPacketInfo * rcvdMsgPacketInfo,
                                          ExchangeContext *& ec);
 #endif
-    CHIP_ERROR NewSessionExchange(uint64_t peerNodeId, Inet::IPAddress peerAddr, uint16_t peerPort);
+    CHIP_ERROR NewSessionExchange(uint64_t peerNodeId, const Inet::IPAddress & peerAddr, uint16_t peerPort);
     CHIP_ERROR HandleSessionEstablished();
     void HandleSessionComplete();
     void HandleSessionError(CHIP_ERROR err, System::PacketBuffer * statusReportMsgBuf);

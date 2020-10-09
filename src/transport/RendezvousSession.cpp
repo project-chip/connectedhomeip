@@ -57,7 +57,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
 #endif // CONFIG_NETWORK_LAYER_BLE
     SuccessOrExit(err);
 
-    if (!mParams.HasDiscriminator())
+    if (!mParams.IsController())
     {
         err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
         SuccessOrExit(err);
@@ -123,7 +123,7 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
     SuccessOrExit(err);
 
     msgBuf->ConsumeHead(headerSize);
-    err = mTransport->SendMessage(header, Header::Flags::None(), Transport::PeerAddress::BLE(), msgBuf);
+    err = mTransport->SendMessage(header, Header::Flags(), Transport::PeerAddress::BLE(), msgBuf);
     SuccessOrExit(err);
 
 exit:
@@ -211,7 +211,7 @@ void RendezvousSession::OnNetworkProvisioningComplete()
 
 void RendezvousSession::OnRendezvousConnectionOpened()
 {
-    if (mParams.HasDiscriminator())
+    if (mParams.IsController())
     {
         CHIP_ERROR err = Pair(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
         VerifyOrExit(err == CHIP_NO_ERROR, OnPairingError(err));
@@ -223,7 +223,7 @@ exit:
 
 void RendezvousSession::OnRendezvousConnectionClosed()
 {
-    if (!mParams.HasDiscriminator() && !mParams.HasConnectionObject())
+    if (!mParams.IsController())
     {
         mSecureSession.Reset();
         CHIP_ERROR err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
@@ -345,6 +345,8 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
        allocated as an inline buffer to PacketBuffer structure */
     origMsg = msgBuf;
     msgBuf  = PacketBuffer::NewWithAvailableSize(len);
+    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     msgBuf->SetDataLength(len, msgBuf);
 #endif
     plainText = msgBuf->Start();

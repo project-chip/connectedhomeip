@@ -190,11 +190,9 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     }
 #endif // CONFIG_DEVICE_LAYER
 
-    rendezvousSession = new RendezvousSession(this);
-    err               = rendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
+    mRendezvousSession = new RendezvousSession(this);
+    err                = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
     SuccessOrExit(err);
-
-    mRendezvousSession = rendezvousSession;
 
     mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
     mDevicePort      = devicePort;
@@ -209,16 +207,17 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     mOnError             = onError;
 
 exit:
-    if (err != CHIP_NO_ERROR && rendezvousSession != nullptr)
+    if (err != CHIP_NO_ERROR && mRendezvousSession != nullptr)
     {
-        delete rendezvousSession;
+        delete mRendezvousSession;
+        mRendezvousSession = nullptr;
     }
 
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, IPAddress deviceAddr, void * appReqState,
-                                                                   NewConnectionHandler onConnected,
+CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const IPAddress & deviceAddr,
+                                                                   void * appReqState, NewConnectionHandler onConnected,
                                                                    MessageReceiveHandler onMessageReceived, ErrorHandler onError,
                                                                    uint16_t devicePort, Inet::InterfaceId interfaceId)
 {

@@ -33,6 +33,8 @@ class RendezvousParameters
 public:
     RendezvousParameters() = default;
 
+    bool IsController() const { return HasDiscriminator() || HasConnectionObject(); }
+
     bool HasSetupPINCode() const { return mSetupPINCode != 0; }
     uint32_t GetSetupPINCode() const { return mSetupPINCode; }
     RendezvousParameters & SetSetupPINCode(uint32_t setupPINCode)
@@ -73,6 +75,8 @@ public:
         mConnectionObject = connObj;
         return *this;
     }
+#else
+    bool HasConnectionObject() const { return false; }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
