@@ -25,6 +25,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
@@ -92,12 +93,17 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
             scope.launch {
                 val deviceController = ChipClient.getDeviceController()
                 val bluetoothManager = BluetoothManager()
+
+                showMessage(requireContext().getString(R.string.rendezvous_over_ble_scanning_text) + " " + deviceInfo.discriminator.toString())
                 val device = bluetoothManager.getBluetoothDevice(deviceInfo.discriminator) ?: run {
-                    Log.i(TAG, "No device found")
+                    showMessage(requireContext().getString(R.string.rendezvous_over_ble_scanning_failed_text))
                     return@launch
                 }
 
+                showMessage(requireContext().getString(R.string.rendezvous_over_ble_connecting_text) + " " + (device.name ?: device.address.toString()))
                 gatt = bluetoothManager.connect(requireContext(), device)
+
+                showMessage(requireContext().getString(R.string.rendezvous_over_ble_pairing_text))
                 deviceController.setCompletionListener(this@CHIPDeviceDetailsFragment)
                 deviceController.beginConnectDeviceBle(gatt, deviceInfo.setupPinCode);
             }
@@ -105,7 +111,7 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
     }
 
     override fun onConnectDeviceComplete() {
-        Log.d(TAG, "TODO: Retrieve Wi-Fi/Thread credentials and send to device.")
+        showMessage(requireContext().getString(R.string.rendezvous_over_ble_success_text))
     }
 
     override fun onCloseBleComplete() {
@@ -117,7 +123,7 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
     }
 
     override fun onSendMessageComplete(message: String?) {
-        Log.d(TAG, "Echo message received: $message")
+        Log.d(TAG, "Message received: $message")
     }
 
     override fun onError(error: Throwable?) {
@@ -126,6 +132,12 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
 
     private fun onRendezvousSoftApClicked() {
         // TODO: once rendezvous over hotspot is ready in CHIP
+    }
+
+    private fun showMessage(msg: String) {
+        requireActivity().runOnUiThread {
+            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+        }
     }
 
     companion object {
