@@ -85,9 +85,7 @@ source_set("chip_config_header") {
     "${chip_root}/src/system:system_config_header",
   ]
 
-  allow_circular_includes_from = [
-    "${chip_root}/src/ble:ble_config_header",
-  ]
+  allow_circular_includes_from = [ "${chip_root}/src/ble:ble_config_header" ]
 }
 
 static_library("core") {
