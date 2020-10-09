@@ -20,8 +20,7 @@
  *      Utility header to encode an input into a Base41 String
  */
 
-#ifndef _SETUP_CODE_UTILS_H_
-#define _SETUP_CODE_UTILS_H_
+#pragma once
 
 #include <core/CHIPError.h>
 
@@ -36,4 +35,3 @@ std::string base41Encode(const uint8_t * buf, size_t buf_len);
 
 } // namespace chip
 
-#endif /* _SETUP_CODE_UTILS_H_ */

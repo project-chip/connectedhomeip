@@ -21,9 +21,7 @@
  *
  */
 
-#ifndef TESTQRCODETLV_H
-#define TESTQRCODETLV_H
+#pragma once
 
 int TestQRCodeTLV();
 
-#endif // TESTQRCODETLV_H

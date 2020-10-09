@@ -21,9 +21,7 @@
  *
  */
 
-#ifndef TESTMANUALCODE_H
-#define TESTMANUALCODE_H
+#pragma once
 
 int TestManualSetupCode();
 
-#endif // TESTMANUALCODE_H
