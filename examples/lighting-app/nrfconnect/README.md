@@ -81,9 +81,9 @@ cancelled by releasing the button at any point before the 6 second limit.
 to mimick a user manually switching the lighting. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
-**Button #3** can be used to start Thread networking using default 
-configuration which was selected to match OpenThread Border Router default
-settings and network credentials.
+**Button #3** can be used to start Thread networking using default configuration
+which was selected to match OpenThread Border Router default settings and
+network credentials.
 
 The remaining two LEDs (#3 and #4) and button #4 are unused.
 
@@ -95,7 +95,11 @@ The remaining two LEDs (#3 and #4) and button #4 are unused.
 
 > **Important**:
 >
-> Due to [certain limitations of Docker for MacOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container) it is impossible to use the Docker container to communicate with a USB device such as nRF 52840 DK. Therefore, MacOS users are advised to follow the [Using Native shell](#using-native-shell) instruction.
+> Due to
+> [certain limitations of Docker for MacOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container)
+> it is impossible to use the Docker container to communicate with a USB device
+> such as nRF 52840 DK. Therefore, MacOS users are advised to follow the
+> [Using Native shell](#using-native-shell) instruction.
 
 The easiest way to get started with the example is to use nRF Connect SDK Docker
 image for CHIP applications. Run the following commands to start a Docker
@@ -142,7 +146,10 @@ be done in the container.
 ### Using native shell
 
 Before building the example,
-[download the nRF Connect SDK and install all requirements](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html). Please read the [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions) section to learn which version to use to avoid unexpected compatibility issues.
+[download the nRF Connect SDK and install all requirements](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html).
+Please read the
+[Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
+section to learn which version to use to avoid unexpected compatibility issues.
 
 If you don't want to use SEGGER Embedded Studio, you may skip the part about
 installing and configuring it.
@@ -182,13 +189,13 @@ After a successful build, the binary will be available under
 
 ### Supported nRF Connect SDK versions
 
-It is recommended to use the same nRF Connect version as is being verified
-as part of CHIP Continuous Integration testing, which happens to be `83764f`
-at the moment. You may verify that the revision is used in
+It is recommended to use the same nRF Connect version as is being verified as
+part of CHIP Continuous Integration testing, which happens to be `83764f` at the
+moment. You may verify that the revision is used in
 [chip-build-nrf-platform](https://github.com/project-chip/connectedhomeip/blob/master/integrations/docker/images/chip-build-nrf-platform/Dockerfile)
 Docker image in case of doubt.
 
-Please refer to 
+Please refer to
 [this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories)
 in the user guide to learn how to update nRF Connect SDK repository.
 
