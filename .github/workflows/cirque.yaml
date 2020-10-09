@@ -32,6 +32,7 @@ jobs:
             env:
                 LOG_DIR: /tmp/cirque_test_output/
                 CLEANUP_DOCKER_FOR_CI: 1
+            options: "--privileged"
 
         steps:
             - name: Checkout
