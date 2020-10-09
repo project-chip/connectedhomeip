@@ -115,9 +115,6 @@ private:
     pthread_mutex_t * mMutex;
 };
 
-} // namespace
-
-namespace {
 // Use StackUnlockGuard to temporarily unlock the CHIP BLE stack, e.g. when calling application
 // or Android BLE code as a result of a BLE event.
 struct StackUnlockGuard
