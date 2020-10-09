@@ -159,7 +159,7 @@ static void UseStdoutLineBuffering()
     constexpr char * buf = nullptr;
 #else
     static char buf[512];
-#endif  // CHIP_CONFIG_MEMORY_MGMT_MALLOC
+#endif // CHIP_CONFIG_MEMORY_MGMT_MALLOC
     setvbuf(stdout, buf, _IOLBF, 512);
 }
 
