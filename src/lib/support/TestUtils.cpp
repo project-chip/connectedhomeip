@@ -21,7 +21,7 @@
 
 namespace chip {
 
-const size_t kTestSuitesMax = 32;
+const size_t kTestSuitesMax = 64;
 
 typedef struct
 {

@@ -84,13 +84,13 @@ namespace Layer {
 #endif
 #endif // HAVE_CLOCK_GETTIME
 
-uint64_t GetClock_Monotonic(void)
+uint64_t GetClock_Monotonic()
 {
 #if HAVE_CLOCK_GETTIME
     struct timespec ts;
     int res = clock_gettime(MONOTONIC_CLOCK_ID, &ts);
     VerifyOrDie(res == 0);
-    return (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
+    return (static_cast<uint64_t>(ts.tv_sec) * UINT64_C(1000000)) + (static_cast<uint64_t>(ts.tv_nsec) / 1000);
 #else  // HAVE_CLOCK_GETTIME
     struct timeval tv;
     int res = gettimeofday(&tv, NULL);
@@ -99,12 +99,12 @@ uint64_t GetClock_Monotonic(void)
 #endif // HAVE_CLOCK_GETTIME
 }
 
-uint64_t GetClock_MonotonicMS(void)
+uint64_t GetClock_MonotonicMS()
 {
     return GetClock_Monotonic() / 1000;
 }
 
-uint64_t GetClock_MonotonicHiRes(void)
+uint64_t GetClock_MonotonicHiRes()
 {
 #if HAVE_CLOCK_GETTIME && defined(MONOTONIC_RAW_CLOCK_ID)
     struct timespec ts;
@@ -129,7 +129,7 @@ Error GetClock_RealTime(uint64_t & curTime)
     {
         return CHIP_SYSTEM_ERROR_REAL_TIME_NOT_SYNCED;
     }
-    curTime = (ts.tv_sec * UINT64_C(1000000)) + (ts.tv_nsec / 1000);
+    curTime = (static_cast<uint64_t>(ts.tv_sec) * UINT64_C(1000000)) + (static_cast<uint64_t>(ts.tv_nsec) / 1000);
     return CHIP_SYSTEM_NO_ERROR;
 #else  // HAVE_CLOCK_GETTIME
     struct timeval tv;

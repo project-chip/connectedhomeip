@@ -32,13 +32,6 @@
         return 0;                                                                                                                  \
     }
 
-#define CHECK_COMMAND_LENGTH(value, name)                                                                                          \
-    if (value == 0)                                                                                                                \
-    {                                                                                                                              \
-        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
-        return 0;                                                                                                                  \
-    }
-
 using namespace chip;
 extern "C" {
 
@@ -125,8 +118,8 @@ uint16_t _encodeGlobalCommand(BufBound & buf, uint8_t destination_endpoint, uint
     return _encodeCommand(buf, destination_endpoint, cluster_id, command, frame_control);
 }
 
-uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t cluster_id,
-                                     uint16_t * attr_ids, uint16_t attr_id_count)
+uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t cluster_id,
+                                     const uint16_t * attr_ids, uint16_t attr_id_count)
 {
     BufBound buf = BufBound(buffer, buf_length);
     if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x00))
@@ -141,75 +134,317 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
     return buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
 }
 
+#define READ_ATTRIBUTES(name, cluster_id)                                                                                          \
+    uint16_t attr_id_count = sizeof(attr_ids) / sizeof(attr_ids[0]);                                                               \
+    uint16_t result = encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, cluster_id, attr_ids, attr_id_count);  \
+    if (result == 0)                                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
+        return 0;                                                                                                                  \
+    }                                                                                                                              \
+    return result;
+
+#define COMMAND_HEADER(name, cluster_id, command_id)                                                                               \
+    BufBound buf    = BufBound(buffer, buf_length);                                                                                \
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, cluster_id, command_id);                            \
+    if (result == 0)                                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
+        return 0;                                                                                                                  \
+    }
+
+#define COMMAND_FOOTER(name)                                                                                                       \
+    result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;                           \
+    if (result == 0)                                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
+        return 0;                                                                                                                  \
+    }                                                                                                                              \
+    return result;
+
+#define COMMAND_INSERT_STRING(name, str)                                                                                           \
+    size_t length = strlen(str);                                                                                                   \
+    if (!CanCastTo<uint8_t>(length))                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", name, length);                                         \
+        return 0;                                                                                                                  \
+    }                                                                                                                              \
+    uint8_t str_length = static_cast<uint8_t>(length);                                                                             \
+    buf.Put(str_length);                                                                                                           \
+    buf.Put(str);
+
+#define COMMAND(name, cluster_id, command_id)                                                                                      \
+    COMMAND_HEADER(name, cluster_id, command_id);                                                                                  \
+    COMMAND_FOOTER(name);
+
+#define BARRIERCONTROL_CLUSTER_ID 0x0103
+#define BASIC_CLUSTER_ID 0x0000
+#define ONOFF_CLUSTER_ID 0x0006
+#define IDENTIFY_CLUSTER_ID 0x0003
+#define TEMP_MEASUREMENT_CLUSTER_ID 0x0402
+#define COLORCONTROL_CLUSTER_ID 0x0300
+#define DOORLOCK_CLUSTER_ID 0x0101
+
 /*
  * On/Off Cluster commands
- *
- * Pick cluster id as 0x0006 for now
  */
 
 uint16_t encodeOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    BufBound buf    = BufBound(buffer, buf_length);
-    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x00);
-    CHECK_COMMAND_LENGTH(result, "Off");
-    return result;
+    COMMAND("Off", ONOFF_CLUSTER_ID, 0x00);
 };
 
 uint16_t encodeOnCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    BufBound buf    = BufBound(buffer, buf_length);
-    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x01);
-    CHECK_COMMAND_LENGTH(result, "On");
-    return result;
+    COMMAND("On", ONOFF_CLUSTER_ID, 0x01);
 }
 
 uint16_t encodeToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    BufBound buf    = BufBound(buffer, buf_length);
-    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0006, 0x02);
-    CHECK_COMMAND_LENGTH(result, "Toggle");
-    return result;
+    COMMAND("Toggle", ONOFF_CLUSTER_ID, 0x02);
 }
 
 uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    uint16_t attr_id       = 0x0000; /* OnOff attribute */
-    uint16_t attr_id_count = 1;
-
-    uint16_t result = encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, 0x0006, &attr_id, attr_id_count);
-    CHECK_COMMAND_LENGTH(result, "ReadOnOff");
-    return result;
+    uint16_t attr_ids[] = { 0x0000 }; /* OnOff attribute */
+    READ_ATTRIBUTES("ReadOnOff", ONOFF_CLUSTER_ID);
 }
 
-uint16_t _encodeIdentifyClusterCommand(uint8_t * buffer, uint16_t buf_length, uint8_t command_id, uint8_t destination_endpoint,
-                                       uint16_t * identify_duration)
+/*
+ * Identify Cluster commands
+ */
+
+uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration)
 {
-
-    BufBound buf    = BufBound(buffer, buf_length);
-    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, 0x0003, command_id);
-
-    if (identify_duration)
-    {
-        buf.PutLE16(*identify_duration);
-    }
-
-    result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
-
-    return result;
+    COMMAND_HEADER("Identify", IDENTIFY_CLUSTER_ID, 0x00);
+    buf.PutLE16(duration);
+    COMMAND_FOOTER("Identify");
 }
 
 uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 1, destination_endpoint, nullptr);
-    CHECK_COMMAND_LENGTH(result, "Identify Query");
-    return result;
+    COMMAND("IdentifyQuery", IDENTIFY_CLUSTER_ID, 0x01);
 }
 
-uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration)
+/*
+ * Temperature Measurement Cluster commands
+ */
+uint16_t encodeReadCurrentTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
-    uint16_t result = _encodeIdentifyClusterCommand(buffer, buf_length, 0, destination_endpoint, &duration);
-    CHECK_COMMAND_LENGTH(result, "Identify");
-    return result;
+    uint16_t attr_ids[] = { 0x0000 }; /* Current Temperature attribute */
+    READ_ATTRIBUTES("ReadCurrentTemperature", TEMP_MEASUREMENT_CLUSTER_ID);
+}
+
+/*
+ * Color Control Cluster commands
+ */
+
+uint16_t encodeMoveToHueCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t hue, uint8_t direction,
+                                uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveToHue", COLORCONTROL_CLUSTER_ID, 0x00);
+    buf.Put(hue);
+    buf.Put(direction);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveToHue");
+}
+
+uint16_t encodeMoveHueCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t moveMode, uint8_t rate,
+                              uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveHue", COLORCONTROL_CLUSTER_ID, 0x01);
+    buf.Put(moveMode);
+    buf.Put(rate);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveHue");
+}
+
+uint16_t encodeStepHueCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t stepMode,
+                              uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("StepHue", COLORCONTROL_CLUSTER_ID, 0x02);
+    buf.Put(stepMode);
+    buf.Put(stepSize);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("StepHue");
+}
+
+uint16_t encodeMoveToSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t saturation,
+                                       uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveToSaturation", COLORCONTROL_CLUSTER_ID, 0x03);
+    buf.Put(saturation);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveToSaturation");
+}
+
+uint16_t encodeMoveSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t moveMode,
+                                     uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveSaturation", COLORCONTROL_CLUSTER_ID, 0x04);
+    buf.Put(moveMode);
+    buf.Put(rate);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveSaturation");
+}
+
+uint16_t encodeStepSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t stepMode,
+                                     uint8_t stepSize, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("StepSaturation", COLORCONTROL_CLUSTER_ID, 0x05);
+    buf.Put(stepMode);
+    buf.Put(stepSize);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("StepSaturation");
+}
+
+uint16_t encodeMoveToHueSaturationCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t hue,
+                                          uint8_t saturation, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveToHueSaturation", COLORCONTROL_CLUSTER_ID, 0x06);
+    buf.Put(hue);
+    buf.Put(saturation);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveToHueSaturation");
+}
+
+uint16_t encodeMoveToColorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t colorX,
+                                  uint16_t colorY, uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveToColor", COLORCONTROL_CLUSTER_ID, 0x07);
+    buf.PutLE16(colorX);
+    buf.PutLE16(colorY);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveToColor");
+}
+
+uint16_t encodeMoveColorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t rateX, uint16_t rateY,
+                                uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveColor", COLORCONTROL_CLUSTER_ID, 0x08);
+    buf.PutLE16(rateX);
+    buf.PutLE16(rateY);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveColor");
+}
+
+uint16_t encodeStepColorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t stepX, uint16_t stepY,
+                                uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("StepColor", COLORCONTROL_CLUSTER_ID, 0x09);
+    buf.PutLE16(stepX);
+    buf.PutLE16(stepY);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("StepColor");
+}
+
+uint16_t encodeMoveToColorTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                             uint16_t colorTemperature, uint16_t transitionTime, uint8_t optionMask,
+                                             uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveToColorTemperature", COLORCONTROL_CLUSTER_ID, 0x0A);
+    buf.PutLE16(colorTemperature);
+    buf.PutLE16(transitionTime);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveToColorTemperature");
+}
+
+uint16_t encodeMoveColorTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t moveMode,
+                                           uint16_t rate, uint16_t colorTemperatureMin, uint16_t colorTemperatureMax,
+                                           uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("MoveColorTemperature", COLORCONTROL_CLUSTER_ID, 0x4B);
+    buf.Put(moveMode);
+    buf.PutLE16(rate);
+    buf.PutLE16(colorTemperatureMin);
+    buf.PutLE16(colorTemperatureMax);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("MoveColorTemperature");
+}
+
+uint16_t encodeStepColorTemperatureCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t stepMode,
+                                           uint16_t stepSize, uint16_t transitionTime, uint16_t colorTemperatureMin,
+                                           uint16_t colorTemperatureMax, uint8_t optionMask, uint8_t optionOverride)
+{
+    COMMAND_HEADER("StepColorTemperature", COLORCONTROL_CLUSTER_ID, 0x4C);
+    buf.Put(stepMode);
+    buf.PutLE16(stepSize);
+    buf.PutLE16(transitionTime);
+    buf.PutLE16(colorTemperatureMin);
+    buf.PutLE16(colorTemperatureMax);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("StepColorTemperature");
+}
+
+uint16_t encodeStopMoveStepCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t optionMask,
+                                   uint8_t optionOverride)
+{
+    COMMAND_HEADER("StopMoveStep", COLORCONTROL_CLUSTER_ID, 0x47);
+    buf.Put(optionMask);
+    buf.Put(optionOverride);
+    COMMAND_FOOTER("StopMoveStep");
+}
+
+/*
+ * Basic Cluster commands
+ */
+
+uint16_t encodeResetToFactoryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    COMMAND("ResetToFactory", BASIC_CLUSTER_ID, 0x00);
+}
+
+/*
+ * DoorLock Cluster commands
+ */
+uint16_t encodeLockDoorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, const char * pin)
+{
+    COMMAND_HEADER("LockDoor", DOORLOCK_CLUSTER_ID, 0x00);
+    COMMAND_INSERT_STRING("LockDoor", pin);
+    COMMAND_FOOTER("LockDoor");
+}
+
+uint16_t encodeUnlockDoorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, const char * pin)
+{
+    COMMAND_HEADER("UnlockDoor", DOORLOCK_CLUSTER_ID, 0x01);
+    COMMAND_INSERT_STRING("UnlockDoor", pin);
+    COMMAND_FOOTER("UnlockDoor");
+}
+
+/*
+ * Barrier Control Cluster commands
+ */
+
+uint16_t encodeMoveToPercentCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t percent)
+{
+    COMMAND_HEADER("MoveToPercent", BARRIERCONTROL_CLUSTER_ID, 0x00);
+    buf.Put(percent);
+    COMMAND_FOOTER("MoveToPercent");
+}
+
+uint16_t encodeStopMoveToPercentCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    COMMAND("StopMoveToPercent", BARRIERCONTROL_CLUSTER_ID, 0x01);
 }
 
 } // extern "C"

@@ -145,7 +145,7 @@ bool Verhoeff36::ValidateCheckChar(const char * str, size_t strLen)
 int Verhoeff36::CharToVal(char ch)
 {
     if (ch >= '0' && ch <= 'z')
-        return sCharToValTable[(int) ch - '0'];
+        return sCharToValTable[static_cast<int>(ch) - '0'];
     return -1;
 }
 

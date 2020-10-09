@@ -66,15 +66,13 @@ using namespace chip::System;
 namespace chip {
 namespace System {
 
-using chip::ErrorStr;
-
 static int Initialize(void * aContext);
 static int Finalize(void * aContext);
 
 class TestObject : public Object
 {
 public:
-    Error Init(void);
+    Error Init();
 
     static void CheckRetention(nlTestSuite * inSuite, void * aContext);
     static void CheckConcurrency(nlTestSuite * inSuite, void * aContext);
@@ -111,7 +109,7 @@ private:
 
 ObjectPool<TestObject, TestObject::kPoolSize> TestObject::sPool;
 
-Error TestObject::Init(void)
+Error TestObject::Init()
 {
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
     this->mDelay = kMaxDelayIterations > 0 ? 1 : 0;
@@ -212,7 +210,7 @@ void TestObject::Delay(volatile unsigned int & aAccumulator)
     {
         for (unsigned int z = 0; z < this->mDelay; ++z)
         {
-            lSum += rand();
+            lSum += static_cast<unsigned int>(rand());
         }
 
         lSum = lSum / this->mDelay;
@@ -321,14 +319,14 @@ void * TestObject::CheckHighWatermarkThread(void * aContext)
 
     i = (rand() % CHIP_SYS_STATS_COUNT_MAX);
 
-    sPool.UpdateHighWatermark(i);
+    sPool.UpdateHighWatermark(static_cast<unsigned int>(i));
 
     sPool.GetStatistics(lNumInUse, lHighWatermark);
 
     NL_TEST_ASSERT(lContext.mTestSuite, lHighWatermark >= i);
     if (lHighWatermark < i)
     {
-        printf("hwm: %d, i: %u\n", lHighWatermark, i);
+        printf("hwm: %d, i: %d\n", lHighWatermark, i);
     }
 
     return aContext;
@@ -348,9 +346,9 @@ void TestObject::MultithreadedTest(nlTestSuite * inSuite, void * aContext, void 
         NL_TEST_ASSERT(lContext.mTestSuite, lError == 0);
     }
 
-    for (unsigned int i = 0; i < kNumThreads; ++i)
+    for (pthread_t thread : lThread)
     {
-        int lError = pthread_join(lThread[i], nullptr);
+        int lError = pthread_join(thread, nullptr);
 
         NL_TEST_ASSERT(lContext.mTestSuite, lError == 0);
     }
@@ -418,7 +416,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 
     for (int i = 0; i < kNumObjects; ++i)
     {
-        lObject = sPool.Get(lLayer, i);
+        lObject = sPool.Get(lLayer, static_cast<size_t>(i));
 
         NL_TEST_ASSERT(lContext.mTestSuite, lObject != nullptr);
 
@@ -449,7 +447,7 @@ void TestObject::CheckHighWatermark(nlTestSuite * inSuite, void * aContext)
 
     // Cleanup
 
-    for (int i = 0; i < kPoolSize; ++i)
+    for (size_t i = 0; i < kPoolSize; ++i)
     {
         lObject = sPool.Get(lLayer, i);
 

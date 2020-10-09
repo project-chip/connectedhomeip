@@ -79,9 +79,9 @@ public:
     /** Test whether this object is retained by \c aLayer. Concurrency safe. */
     bool IsRetained(const Layer & aLayer) const;
 
-    void Retain(void);
-    void Release(void);
-    Layer & SystemLayer(void) const;
+    void Retain();
+    void Release();
+    Layer & SystemLayer() const;
 
 protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -97,8 +97,8 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
-    Object(void);
-    ~Object(void);
+    Object();
+    ~Object();
     Object(const Object &) = delete;
     Object & operator=(const Object &) = delete;
 
@@ -130,7 +130,7 @@ inline bool Object::IsRetained(const Layer & aLayer) const
  *  @brief
  *      Increments the reference count for the CHIP System Layer object. The object is assumed to be live.
  */
-inline void Object::Retain(void)
+inline void Object::Retain()
 {
     __sync_fetch_and_add(&this->mRefCount, 1);
 }
@@ -140,16 +140,16 @@ inline void Object::Retain(void)
  *      Returns a reference to the CHIP System Layer object provided when the object was initially retained from its corresponding
  *      object pool instance. The object is assumed to be live.
  */
-inline Layer & Object::SystemLayer(void) const
+inline Layer & Object::SystemLayer() const
 {
     return *this->mSystemLayer;
 }
 
 /** Deleted. */
-inline Object::Object(void) {}
+inline Object::Object() {}
 
 /** Deleted. */
-inline Object::~Object(void) {}
+inline Object::~Object() {}
 
 /**
  *  @brief
@@ -176,7 +176,7 @@ template <class T, unsigned int N>
 class ObjectPool
 {
 public:
-    static size_t Size(void);
+    static size_t Size();
 
     T * Get(const Layer & aLayer, size_t aIndex);
     T * TryCreate(Layer & aLayer);
@@ -199,7 +199,7 @@ private:
  *      Returns the number of objects that can be simultaneously retained from a pool.
  */
 template <class T, unsigned int N>
-inline size_t ObjectPool<T, N>::Size(void)
+inline size_t ObjectPool<T, N>::Size()
 {
     return N;
 }

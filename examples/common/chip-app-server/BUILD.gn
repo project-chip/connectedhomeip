@@ -21,6 +21,11 @@ config("includes") {
   ]
 }
 
+declare_args() {
+  # By pass provision and secure session
+  bypass_rendezvous = false
+}
+
 static_library("chip-app-server") {
   output_name = "chip-app-server"
 
@@ -28,7 +33,14 @@ static_library("chip-app-server") {
   # so we can't compile it into this static library.  It needs to be compiled
   # directly by someone who knows where the generated files for the app we're
   # compiling live.
-  sources = [ "Server.cpp" ]
+  sources = [
+    "RendezvousServer.cpp",
+    "Server.cpp",
+  ]
+
+  if (bypass_rendezvous) {
+    defines = [ "BYPASS_RENDEZVOUS=1" ]
+  }
 
   deps = [ "${chip_root}/src/lib" ]
 

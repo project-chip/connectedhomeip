@@ -49,7 +49,7 @@ int shell_line_read(char * buffer, size_t max)
     char * inptr = buffer;
 
     // Read in characters until we get a new line or we hit our max size.
-    while (((inptr - buffer) < (int) max) && !done)
+    while (((inptr - buffer) < static_cast<int>(max)) && !done)
     {
         if (read == 0)
         {
@@ -80,7 +80,7 @@ int shell_line_read(char * buffer, size_t max)
                 }
                 break;
             default:
-                if (isprint((int) *inptr) || *inptr == '\t')
+                if (isprint(static_cast<int>(*inptr)) || *inptr == '\t')
                 {
                     streamer_printf(streamer_get(), "%c", *inptr);
                 }
@@ -211,7 +211,7 @@ void Shell::TaskLoop(void * arg)
 
     theShellRoot.RegisterDefaultCommands();
 
-    while (1)
+    while (true)
     {
         streamer_printf(streamer_get(), CHIP_SHELL_PROMPT);
 

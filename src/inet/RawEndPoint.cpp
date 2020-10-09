@@ -375,7 +375,7 @@ ret:
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired
  */
-INET_ERROR RawEndPoint::Listen(void)
+INET_ERROR RawEndPoint::Listen()
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -440,7 +440,7 @@ exit:
  *  On LwIP systems, this method must not be called with the LwIP stack
  *  lock already acquired.
  */
-void RawEndPoint::Close(void)
+void RawEndPoint::Close()
 {
     if (mState != kState_Closed)
     {
@@ -496,7 +496,7 @@ void RawEndPoint::Close(void)
  *  On LwIP systems, this method must not be called with the LwIP stack
  *  lock already acquired.
  */
-void RawEndPoint::Free(void)
+void RawEndPoint::Free()
 {
     Close();
 
@@ -864,7 +864,7 @@ void RawEndPoint::Init(InetLayer * inetLayer, IPVersion ipVer, IPProtocol ipProt
  *
  * @return InterfaceId   The bound interface id.
  */
-InterfaceId RawEndPoint::GetBoundInterface(void)
+InterfaceId RawEndPoint::GetBoundInterface()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if HAVE_LWIP_RAW_BIND_NETIF
@@ -1102,12 +1102,12 @@ exit:
     return (lRetval);
 }
 
-SocketEvents RawEndPoint::PrepareIO(void)
+SocketEvents RawEndPoint::PrepareIO()
 {
     return (IPEndPointBasis::PrepareIO());
 }
 
-void RawEndPoint::HandlePendingIO(void)
+void RawEndPoint::HandlePendingIO()
 {
     if (mState == kState_Listening && OnMessageReceived != nullptr && mPendingIO.IsReadable())
     {

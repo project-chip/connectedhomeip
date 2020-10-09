@@ -114,7 +114,7 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBuffer
  *                         or by the TLVReader.
  *
  */
-CHIP_ERROR CHIPCircularTLVBuffer::EvictHead(void)
+CHIP_ERROR CHIPCircularTLVBuffer::EvictHead()
 {
     CircularTLVReader reader;
     uint8_t * newHead;
@@ -329,7 +329,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNewBufferFunct(TLVWriter & ioWriter, uintpt
 
     VerifyOrExit(inBufHandle != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    buf = static_cast<CHIPCircularTLVBuffer *>((void *) inBufHandle);
+    buf = reinterpret_cast<CHIPCircularTLVBuffer *>(inBufHandle);
 
     err = buf->GetNewBuffer(ioWriter, outBufStart, outBufLen);
 
@@ -361,7 +361,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBufferFunct(TLVWriter & ioWriter, uint
 
     VerifyOrExit(inBufHandle != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    buf = static_cast<CHIPCircularTLVBuffer *>((void *) inBufHandle);
+    buf = reinterpret_cast<CHIPCircularTLVBuffer *>(inBufHandle);
 
     err = buf->FinalizeBuffer(ioWriter, inBufStart, inBufLen);
 
@@ -394,7 +394,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNextBufferFunct(TLVReader & ioReader, uintp
 
     VerifyOrExit(inBufHandle != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    buf = static_cast<CHIPCircularTLVBuffer *>((void *) inBufHandle);
+    buf = reinterpret_cast<CHIPCircularTLVBuffer *>(inBufHandle);
 
     err = buf->GetNextBuffer(ioReader, outBufStart, outBufLen);
 
@@ -419,7 +419,7 @@ exit:
  */
 void CircularTLVWriter::Init(CHIPCircularTLVBuffer * buf)
 {
-    mBufHandle     = (uintptr_t) buf;
+    mBufHandle     = reinterpret_cast<uintptr_t>(buf);
     mLenWritten    = 0;
     mMaxLen        = UINT32_MAX;
     mContainerType = kTLVType_NotSpecified;
@@ -450,7 +450,7 @@ void CircularTLVReader::Init(CHIPCircularTLVBuffer * buf)
 {
     uint32_t bufLen = 0;
 
-    mBufHandle    = (uintptr_t) buf;
+    mBufHandle    = reinterpret_cast<uintptr_t>(buf);
     GetNextBuffer = CHIPCircularTLVBuffer::GetNextBufferFunct;
     mLenRead      = 0;
     mReadPoint    = nullptr;

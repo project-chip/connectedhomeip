@@ -43,10 +43,10 @@ public:
         mNumMessageSend++;
         if (peer != nullptr)
         {
-            MessageHeader hdr;
-            size_t headerSize = 0;
+            PacketHeader hdr;
+            uint16_t headerSize = 0;
 
-            hdr.packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+            hdr.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
             msgBuf->ConsumeHead(headerSize);
 
             return peer->HandlePeerMessage(hdr, msgBuf);

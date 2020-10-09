@@ -15,7 +15,6 @@
 		B204A62C244E1D0700C7C0E1 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B204A62B244E1D0700C7C0E1 /* Assets.xcassets */; };
 		B204A632244E1D0700C7C0E1 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A631244E1D0700C7C0E1 /* main.m */; };
 		B232D8BA2514BD0800792CB4 /* CHIPUIViewUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B232D8B92514BD0800792CB4 /* CHIPUIViewUtils.m */; };
-		B232D8BD2518E4AD00792CB4 /* CHIPConnectivityManager.m in Sources */ = {isa = PBXBuildFile; fileRef = B232D8BC2518E4AD00792CB4 /* CHIPConnectivityManager.m */; };
 		B243A6692513A73600E56FEA /* RootViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B243A6682513A73600E56FEA /* RootViewController.m */; };
 		B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A4124C99D53005C87D0 /* WifiViewController.m */; };
 		B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */; };
@@ -67,8 +66,6 @@
 		B204A63D244E1D0700C7C0E1 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B232D8B82514BD0800792CB4 /* CHIPUIViewUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPUIViewUtils.h; sourceTree = "<group>"; };
 		B232D8B92514BD0800792CB4 /* CHIPUIViewUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPUIViewUtils.m; sourceTree = "<group>"; };
-		B232D8BB2518E4AD00792CB4 /* CHIPConnectivityManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CHIPConnectivityManager.h; sourceTree = "<group>"; };
-		B232D8BC2518E4AD00792CB4 /* CHIPConnectivityManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPConnectivityManager.m; sourceTree = "<group>"; };
 		B243A6672513A73600E56FEA /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		B243A6682513A73600E56FEA /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
 		B2946A4024C99D53005C87D0 /* WifiViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WifiViewController.h; sourceTree = "<group>"; };
@@ -205,8 +202,6 @@
 			children = (
 				B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */,
 				B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */,
-				B232D8BB2518E4AD00792CB4 /* CHIPConnectivityManager.h */,
-				B232D8BC2518E4AD00792CB4 /* CHIPConnectivityManager.m */,
 			);
 			path = "Framework Helpers";
 			sourceTree = "<group>";
@@ -329,7 +324,6 @@
 				B204A632244E1D0700C7C0E1 /* main.m in Sources */,
 				B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */,
 				B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */,
-				B232D8BD2518E4AD00792CB4 /* CHIPConnectivityManager.m in Sources */,
 				0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

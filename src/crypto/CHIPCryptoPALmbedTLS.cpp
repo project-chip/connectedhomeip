@@ -582,13 +582,13 @@ CHIP_ERROR P256Keypair::Serialize(P256SerializedKeypair & output)
     bbuf.Put(mPublicKey, mPublicKey.Length());
 
     VerifyOrExit(bbuf.Available() == sizeof(privkey), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(mbedtls_mpi_size(&keypair->d) == bbuf.Available(), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(mbedtls_mpi_size(&keypair->d) <= bbuf.Available(), error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_mpi_write_binary(&keypair->d, Uint8::to_uchar(privkey), sizeof(privkey));
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     bbuf.Put(privkey, sizeof(privkey));
-    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(bbuf.Fit(), error = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     output.SetLength(bbuf.Written());
 
@@ -668,9 +668,8 @@ CHIP_ERROR P256Keypair::NewCertificateSigningRequest(uint8_t * out_csr, size_t &
     mbedtls_x509write_csr_set_md_alg(&csr, MBEDTLS_MD_SHA256);
 
     result = mbedtls_x509write_csr_pem(&csr, out_csr, length, CryptoRNG, nullptr);
-    VerifyOrExit(result >= 0, error = CHIP_ERROR_INTERNAL);
-    csr_length = static_cast<unsigned int>(result);
-    result     = 0;
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+    csr_length = strlen(Uint8::to_const_char(out_csr));
 
 exit:
     keypair = nullptr;

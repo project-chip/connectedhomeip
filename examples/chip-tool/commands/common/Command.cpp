@@ -90,6 +90,13 @@ bool Command::InitArgument(size_t argIndex, const char * argValue)
         break;
     }
 
+    case ArgumentType::String: {
+        const char ** value = reinterpret_cast<const char **>(arg.value);
+        *value              = const_cast<char *>(argValue);
+        isValidArgument     = (strcmp(argValue, *value) == 0);
+        break;
+    }
+
     case ArgumentType::Number: {
         uint32_t * value = reinterpret_cast<uint32_t *>(arg.value);
         // stringstream treats uint8_t as char, which is not what we want here.
@@ -125,6 +132,17 @@ size_t Command::AddArgument(const char * name, const char * value)
     return mArgs.size();
 }
 
+size_t Command::AddArgument(const char * name, char ** value)
+{
+    Argument arg;
+    arg.type  = ArgumentType::String;
+    arg.name  = name;
+    arg.value = reinterpret_cast<void *>(value);
+
+    mArgs.push_back(arg);
+    return mArgs.size();
+}
+
 size_t Command::AddArgument(const char * name, AddressWithInterface * out)
 {
     Argument arg;
@@ -136,12 +154,12 @@ size_t Command::AddArgument(const char * name, AddressWithInterface * out)
     return mArgs.size();
 }
 
-size_t Command::AddArgument(const char * name, uint32_t min, uint32_t max, uint32_t * out)
+size_t Command::AddArgument(const char * name, int64_t min, int64_t max, void * out)
 {
     Argument arg;
     arg.type  = ArgumentType::Number;
     arg.name  = name;
-    arg.value = reinterpret_cast<void *>(out);
+    arg.value = out;
     arg.min   = min;
     arg.max   = max;
 

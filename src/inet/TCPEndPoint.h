@@ -207,7 +207,7 @@ public:
      *  Disable all event handlers. Data sent to an endpoint that disables
      *  reception will be acknowledged until the receive window is exhausted.
      */
-    void DisableReceive(void);
+    void DisableReceive();
 
     /**
      * @brief   Enable reception.
@@ -216,12 +216,12 @@ public:
      *  Enable all event handlers. Data sent to an endpoint that disables
      *  reception will be acknowledged until the receive window is exhausted.
      */
-    void EnableReceive(void);
+    void EnableReceive();
 
     /**
      *  @brief EnableNoDelay
      */
-    INET_ERROR EnableNoDelay(void);
+    INET_ERROR EnableNoDelay();
 
     /**
      * @brief
@@ -269,7 +269,7 @@ public:
      *
      * @retval  other                   another system or platform error
      */
-    INET_ERROR DisableKeepAlive(void);
+    INET_ERROR DisableKeepAlive();
 
     /**
      * @brief   Set the TCP TCP_USER_TIMEOUT socket option.
@@ -331,7 +331,7 @@ public:
      *
      * @return  Number of untransmitted bytes in the transmit queue.
      */
-    uint32_t PendingSendLength(void);
+    uint32_t PendingSendLength();
 
     /**
      * @brief   Extract the length of the unacknowledged receive data.
@@ -339,7 +339,7 @@ public:
      * @return  Number of bytes in the receive queue that have not yet been
      *      acknowledged with <tt>AckReceive(uint16_t len)</tt>.
      */
-    uint32_t PendingReceiveLength(void);
+    uint32_t PendingReceiveLength();
 
     /**
      * @brief   Initiate TCP half close, in other words, finished with sending.
@@ -349,7 +349,7 @@ public:
      *
      * @retval  other                   another system or platform error
      */
-    INET_ERROR Shutdown(void);
+    INET_ERROR Shutdown();
 
     /**
      * @brief   Initiate TCP full close, in other words, finished with both send and
@@ -360,12 +360,12 @@ public:
      *
      * @retval  other                   another system or platform error
      */
-    INET_ERROR Close(void);
+    INET_ERROR Close();
 
     /**
      * @brief   Abortively close the endpoint, in other words, send RST packets.
      */
-    void Abort(void);
+    void Abort();
 
     /**
      * @brief   Initiate (or continue) TCP full close, ignoring errors.
@@ -374,14 +374,14 @@ public:
      *  The object is returned to the free pool, and all remaining user
      *  references are subsequently invalid.
      */
-    void Free(void);
+    void Free();
 
     /**
      * @brief   Extract whether TCP connection is established.
      */
-    bool IsConnected(void) const;
+    bool IsConnected() const;
 
-    void SetConnectTimeout(const uint32_t connTimeoutMsecs);
+    void SetConnectTimeout(uint32_t connTimeoutMsecs);
 
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
     /**
@@ -402,14 +402,14 @@ public:
      * @details
      *  Reset the idle timer to zero.
      */
-    void MarkActive(void);
+    void MarkActive();
 
     /**
      * @brief   Obtain an identifier for the endpoint.
      *
      * @return  Returns an opaque unique identifier for use logs.
      */
-    uint16_t LogId(void);
+    uint16_t LogId();
 
     /**
      * @brief   Type of connection establishment event handling function.
@@ -594,11 +594,11 @@ private:
 
     static void TCPUserTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError);
 
-    void StartTCPUserTimeoutTimer(void);
+    void StartTCPUserTimeoutTimer();
 
-    void StopTCPUserTimeoutTimer(void);
+    void StopTCPUserTimeoutTimer();
 
-    void RestartTCPUserTimeoutTimer(void);
+    void RestartTCPUserTimeoutTimer();
 
     void ScheduleNextTCPUserTimeoutPoll(uint32_t aTimeOut);
 
@@ -617,13 +617,13 @@ private:
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-    TCPEndPoint(void);                // not defined
+    TCPEndPoint();                    // not defined
     TCPEndPoint(const TCPEndPoint &); // not defined
-    ~TCPEndPoint(void);               // not defined
+    ~TCPEndPoint();                   // not defined
 
     void Init(InetLayer * inetLayer);
-    INET_ERROR DriveSending(void);
-    void DriveReceiving(void);
+    INET_ERROR DriveSending();
+    void DriveReceiving();
     void HandleConnectComplete(INET_ERROR err);
     void HandleAcceptError(INET_ERROR err);
     INET_ERROR DoClose(INET_ERROR err, bool suppressCallback);
@@ -631,8 +631,8 @@ private:
 
     static void TCPConnectTimeoutHandler(chip::System::Layer * aSystemLayer, void * aAppState, chip::System::Error aError);
 
-    void StartConnectTimerIfSet(void);
-    void StopConnectTimer(void);
+    void StartConnectTimerIfSet();
+    void StopConnectTimer();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     chip::System::PacketBuffer * mUnsentQueue;
@@ -654,10 +654,10 @@ private:
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     INET_ERROR GetSocket(IPAddressType addrType);
-    SocketEvents PrepareIO(void);
-    void HandlePendingIO(void);
-    void ReceiveData(void);
-    void HandleIncomingConnection(void);
+    SocketEvents PrepareIO();
+    void HandlePendingIO();
+    void ReceiveData();
+    void HandleIncomingConnection();
     INET_ERROR BindSrcAddrFromIntf(IPAddressType addrType, InterfaceId intfId);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 };
@@ -672,17 +672,17 @@ inline uint16_t TCPEndPoint::MaxTCPSendQueuePolls(void)
 }
 #endif // INET_CONFIG_ENABLE_TCP_SEND_IDLE_CALLBACKS && INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
 
-inline bool TCPEndPoint::IsConnected(void) const
+inline bool TCPEndPoint::IsConnected() const
 {
     return IsConnected(State);
 }
 
-inline uint16_t TCPEndPoint::LogId(void)
+inline uint16_t TCPEndPoint::LogId()
 {
     return static_cast<uint16_t>(reinterpret_cast<intptr_t>(this));
 }
 
-inline void TCPEndPoint::MarkActive(void)
+inline void TCPEndPoint::MarkActive()
 {
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
     mRemainingIdleTime = mIdleTimeout;

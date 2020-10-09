@@ -51,7 +51,7 @@ static CHIP_ERROR checkDecimalStringValidity(string decimalString, string & deci
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR checkCodeLengthValidity(string decimalString, bool isLongCode)
+static CHIP_ERROR checkCodeLengthValidity(const string & decimalString, bool isLongCode)
 {
     size_t expectedCharLength = isLongCode ? kManualSetupLongCodeCharLength : kManualSetupShortCodeCharLength;
     if (decimalString.length() != expectedCharLength)
@@ -75,25 +75,26 @@ static CHIP_ERROR extractBits(uint32_t number, uint64_t & dest, int index, int n
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR toNumber(string decimalString, uint64_t & dest)
+static CHIP_ERROR toNumber(const string & decimalString, uint64_t & dest)
 {
     uint64_t number = 0;
-    for (size_t i = 0; i < decimalString.length(); i++)
+    for (char c : decimalString)
     {
-        if (!isdigit(decimalString[i]))
+        if (!isdigit(c))
         {
-            ChipLogError(SetupPayload, "Failed decoding base10. Character was invalid %c", decimalString[i]);
+            ChipLogError(SetupPayload, "Failed decoding base10. Character was invalid %c", c);
             return CHIP_ERROR_INVALID_INTEGER_VALUE;
         }
         number *= 10;
-        number += decimalString[i] - '0';
+        number += c - '0';
     }
     dest = number;
     return CHIP_NO_ERROR;
 }
 
 // Populate numberOfChars into dest from decimalString starting at startIndex (least significant digit = left-most digit)
-static CHIP_ERROR readDigitsFromDecimalString(string decimalString, int & index, uint64_t & dest, size_t numberOfCharsToRead)
+static CHIP_ERROR readDigitsFromDecimalString(const string & decimalString, int & index, uint64_t & dest,
+                                              size_t numberOfCharsToRead)
 {
     if (decimalString.length() < numberOfCharsToRead || (numberOfCharsToRead + index > decimalString.length()))
     {

@@ -36,6 +36,8 @@ int TestMemAlloc(void);
 int TestBufBound(void);
 int TestCHIPCounter(void);
 int TestPersistedCounter(int argc, char * argv[]);
+int TestScopedBuffer(void);
+int TestSafeInt();
 
 #ifdef __cplusplus
 }

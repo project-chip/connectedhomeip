@@ -16,36 +16,38 @@
  *
  */
 
-#include "commands/Commands.h"
+#include "commands/common/Commands.h"
 
-using namespace ::chip;
-using namespace ::chip::DeviceController;
+#include "commands/clusters/BarrierControl/Commands.h"
+#include "commands/clusters/Basic/Commands.h"
+#include "commands/clusters/ColorControl/Commands.h"
+#include "commands/clusters/DoorLock/Commands.h"
+#include "commands/clusters/Identify/Commands.h"
+#include "commands/clusters/OnOff/Commands.h"
+#include "commands/clusters/TemperatureMeasurement/Commands.h"
+#include "commands/echo/Commands.h"
 
 // NOTE: Remote device ID is in sync with the echo server device id
 //       At some point, we may want to add an option to connect to a device without
 //       knowing its id, because the ID can be learned on the first response that is received.
-constexpr NodeId kLocalDeviceId  = 112233;
-constexpr NodeId kRemoteDeviceId = 12344321;
+constexpr chip::NodeId kLocalDeviceId  = 112233;
+constexpr chip::NodeId kRemoteDeviceId = 12344321;
 
 // ================================================================================
 // Main Code
 // ================================================================================
 int main(int argc, char * argv[])
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipDeviceController dc;
+    Commands commands;
 
-    err = dc.Init(kLocalDeviceId);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure: %s", ErrorStr(err)));
+    registerCommandsEcho(commands);
+    registerClusterBarrierControl(commands);
+    registerClusterBasic(commands);
+    registerClusterColorControl(commands);
+    registerClusterDoorLock(commands);
+    registerClusterIdentify(commands);
+    registerClusterOnOff(commands);
+    registerClusterTemperatureMeasurement(commands);
 
-    err = dc.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Run Loop failure: %s", ErrorStr(err)));
-
-    err = RunCommand(&dc, kRemoteDeviceId, argc, argv);
-    SuccessOrExit(err);
-
-exit:
-    dc.ServiceEventSignal();
-    dc.Shutdown();
-    return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
+    return commands.Run(kLocalDeviceId, kRemoteDeviceId, argc, argv);
 }

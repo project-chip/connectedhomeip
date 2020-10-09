@@ -83,7 +83,7 @@ INET_ERROR AsyncDNSResolverSockets::Init(InetLayer * aInet)
  *  @retval #INET_NO_ERROR                   if shutdown is successful.
  *  @retval other appropriate POSIX network or OS error.
  */
-INET_ERROR AsyncDNSResolverSockets::Shutdown(void)
+INET_ERROR AsyncDNSResolverSockets::Shutdown()
 {
     INET_ERROR err = INET_NO_ERROR;
     int pthreadErr;
@@ -98,9 +98,9 @@ INET_ERROR AsyncDNSResolverSockets::Shutdown(void)
     AsyncMutexUnlock();
 
     // Have the CHIP thread join the thread pool for asynchronous DNS resolution.
-    for (int i = 0; i < INET_CONFIG_DNS_ASYNC_MAX_THREAD_COUNT; i++)
+    for (pthread_t thread : mAsyncDNSThreadHandle)
     {
-        pthreadErr = pthread_join(mAsyncDNSThreadHandle[i], nullptr);
+        pthreadErr = pthread_join(thread, nullptr);
         VerifyOrDie(pthreadErr == 0);
     }
 
@@ -349,7 +349,7 @@ exit:
     return nullptr;
 }
 
-void AsyncDNSResolverSockets::AsyncMutexLock(void)
+void AsyncDNSResolverSockets::AsyncMutexLock()
 {
     int pthreadErr;
 
@@ -357,7 +357,7 @@ void AsyncDNSResolverSockets::AsyncMutexLock(void)
     VerifyOrDie(pthreadErr == 0);
 }
 
-void AsyncDNSResolverSockets::AsyncMutexUnlock(void)
+void AsyncDNSResolverSockets::AsyncMutexUnlock()
 {
     int pthreadErr;
 

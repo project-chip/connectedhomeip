@@ -16,6 +16,7 @@
 
 import argparse
 import errno
+import locale
 import os
 import stat
 import subprocess
@@ -27,13 +28,15 @@ import textwrap
 
 OPTIONS = {
     # Configuration options define properties used in flashing operations.
+    # (The outer level of an options definition corresponds to option groups
+    # in the command-line help message.)
     'configuration': {
         # Script configuration options.
         'verbose': {
             'help': 'Report more verbosely',
             'default': 0,
-            'short-option': 'v',
-            'argument': {
+            'alias': ['-v'],
+            'argparse': {
                 'action': 'count',
             },
             # Levels:
@@ -51,21 +54,21 @@ OPTIONS = {
         'erase': {
             'help': 'Erase device',
             'default': False,
-            'argument': {
+            'argparse': {
                 'action': 'store_true'
             },
         },
         'application': {
             'help': 'Flash an image',
             'default': None,
-            'argument': {
+            'argparse': {
                 'metavar': 'FILE'
             },
         },
-        'verify-application': {
+        'verify_application': {
             'help': 'Verify the image after flashing',
             'default': False,
-            'argument': {
+            'argparse': {
                 'action': 'store_true'
             },
         },
@@ -75,18 +78,32 @@ OPTIONS = {
         'reset': {
             'help': 'Reset device after flashing',
             'default': None,  # None = Reset iff application was flashed.
-            'argument': {
+            'argparse': {
                 'action': 'store_true'
             },
         },
-        'skip-reset': {
+        'skip_reset': {
             'help': 'Do not reset device after flashing',
             'default': None,  # None = Reset iff application was flashed.
-            'argument': {
+            'argparse': {
                 'dest': 'reset',
                 'action': 'store_false'
             },
         }
+    },
+
+    # Internal; these properties do not have command line options
+    # (because they don't have an `argparse` key).
+    'internal': {
+        # Script configuration options.
+        'platform': {
+            'help': 'Short name of the current platform',
+            'default': None,
+        },
+        'module': {
+            'help': 'Invoking Python module, for generating scripts',
+            'default': None,
+        },
     },
 }
 
@@ -94,17 +111,38 @@ OPTIONS = {
 class Flasher:
     """Manage flashing."""
 
-    def __init__(self, options=None, platform=None):
-        self.options = options or {}
-        self.platform = platform
-        self.parser = argparse.ArgumentParser(
-            description='Flash {} device'.format(platform or 'a'))
-        self.group = {}
+    def __init__(self, **options):
+        # An integer giving the current Flasher status.
+        # 0 if OK, and normally an errno value if positive.
         self.err = 0
-        self.define_options(OPTIONS)
-        self.module = __name__
+
+        # Namespace of option values.
+        self.option = argparse.Namespace(**options)
+
+        # Namespace of option metadata. This contains the option specification
+        # information one level down from `define_options()`, i.e. without the
+        # group; the keys are mostly the same as those of `self.option`.
+        # (Exceptions include options with no metadata and only defined when
+        # constructing the Flasher, and options where different command line
+        # options (`info` keys) affect a single attribute (e.g. `reset` and
+        # `skip-reset` have distinct `info` entries but one option).
+        self.info = argparse.Namespace()
+
+        # `argv[0]` from the most recent call to parse_argv(); that is,
+        # the path used to invoke the script. This is used to find files
+        # relative to the script.
         self.argv0 = None
-        self.tool = {}
+
+        # Argument parser for `parse_argv()`. Normally defines command-line
+        # options for most of the `self.option` keys.
+        self.parser = argparse.ArgumentParser(
+            description='Flash {} device'.format(self.option.platform or 'a'))
+
+        # Argument parser groups.
+        self.group = {}
+
+        # Construct the global options for all Flasher()s.
+        self.define_options(OPTIONS)
 
     def define_options(self, options):
         """Define options, including setting defaults and argument parsing."""
@@ -112,58 +150,76 @@ class Flasher:
             if group not in self.group:
                 self.group[group] = self.parser.add_argument_group(group)
             for key, info in group_options.items():
-                argument = info.get('argument', {})
-                option = argument.get('dest', key)
+                setattr(self.info, key, info)
+                if 'argparse' not in info:
+                    continue
+                argument = info['argparse']
+                attribute = argument.get('dest', key)
                 # Set default value.
-                if option not in self.options:
-                    self.options[option] = info['default']
+                if attribute not in self.option:
+                    setattr(self.option, attribute, info['default'])
                 # Add command line argument.
                 names = ['--' + key]
-                if 'short-option' in info:
-                    names += ['-' + info['short-option']]
+                if '_' in key:
+                    names.append('--' + key.replace('_', '-'))
+                if 'alias' in info:
+                    names += info['alias']
                 self.group[group].add_argument(
                     *names,
                     help=info['help'],
-                    default=self.options[option],
+                    default=getattr(self.option, attribute),
                     **argument)
-                # Record tool options.
-                if 'tool' in info:
-                    self.tool[option] = info['tool']
+        return self
 
     def status(self):
         """Return the current error code."""
         return self.err
 
     def actions(self):
-        """Perform actions on the device according to self.options."""
+        """Perform actions on the device according to self.option."""
         raise NotImplementedError()
 
     def log(self, level, *args):
         """Optionally log a message to stderr."""
-        if self.options['verbose'] >= level:
+        if self.option.verbose >= level:
             print(*args, file=sys.stderr)
 
-    def run_tool_logging(self,
-                         tool,
-                         arguments,
-                         name,
-                         pass_message=None,
-                         fail_message=None,
-                         fail_level=0):
-        """Run a tool with log messages."""
-        self.log(1, name)
-        if self.run_tool(tool, arguments).err:
-            self.log(fail_level, fail_message or ('FAILED: ' + name))
-        else:
-            self.log(2, pass_message or (name + ' complete'))
-        return self
-
-    def run_tool(self, tool, arguments):
+    def run_tool(self,
+                 tool,
+                 arguments,
+                 options=None,
+                 name=None,
+                 pass_message=None,
+                 fail_message=None,
+                 fail_level=0,
+                 capture_output=False):
         """Run an external tool."""
-        command = [self.options[tool]] + arguments
+        if name is None:
+            name = 'Run ' + tool
+        self.log(1, name)
+
+        option_map = vars(self.option)
+        if options:
+            option_map.update(options)
+        arguments = self.format_command(arguments, opt=option_map)
+        if not getattr(self.option, tool, None):
+            setattr(self.option, tool, self.locate_tool(tool))
+        tool_info = getattr(self.info, tool)
+        command_template = tool_info.get('command', ['{' + tool + '}', ()])
+        command = self.format_command(command_template, arguments, option_map)
         self.log(3, 'Execute:', *command)
+
         try:
-            self.err = subprocess.call(command)
+            if capture_output:
+                result = None
+                result = subprocess.run(
+                    command,
+                    check=True,
+                    encoding=locale.getpreferredencoding(),
+                    capture_output=True)
+            else:
+                result = self
+                self.err = subprocess.call(command)
         except FileNotFoundError as exception:
             self.err = exception.errno
             if self.err == errno.ENOENT:
@@ -171,26 +227,140 @@ class Flasher:
                 # But if it seems OK, rethrow the exception.
                 if self.verify_tool(tool):
                     raise exception
-        return self
+
+        if self.err:
+            self.log(fail_level, fail_message or ('FAILED: ' + name))
+        else:
+            self.log(2, pass_message or (name + ' complete'))
+        return result
+
+    def locate_tool(self, tool):
+        """Called to find an undefined tool. (Override in platform.)"""
+        return tool
 
     def verify_tool(self, tool):
         """Run a command to verify that an external tool is available.
 
         Prints a configurable error and returns False if not.
         """
-        command = [i.format(**self.options) for i in self.tool[tool]['verify']]
+        tool_info = getattr(self.info, tool)
+        command_template = tool_info.get('verify')
+        if not command_template:
+            return True
+        command = self.format_command(command_template, opt=vars(self.option))
         try:
-            err = subprocess.call(command)
+            self.err = subprocess.call(command)
         except OSError as ex:
-            err = ex.errno
-        if err:
-            note = self.tool[tool].get('error', 'Unable to execute {tool}.')
-            note = textwrap.dedent(note).format(tool=tool, **self.options)
+            self.err = ex.errno
+        if self.err:
+            note = tool_info.get('error', 'Unable to execute {tool}.')
+            note = textwrap.dedent(note).format(tool=tool, **vars(self.option))
             # textwrap.fill only handles single paragraphs:
             note = '\n\n'.join((textwrap.fill(p) for p in note.split('\n\n')))
             print(note, file=sys.stderr)
             return False
         return True
+
+    def format_command(self, template, args=None, opt=None):
+        """Construct a tool command line.
+
+        This provides a few conveniences over a simple list of fixed strings,
+        that in most cases eliminates any need for custom code to build a tool
+        command line. In this description, φ(τ) is the result of formatting a
+        template τ.
+
+            template  ::= list | () | str | dict
+
+        Typically the caller provides a list, and `format_command()` returns a
+        formatted list. The results of formatting sub-elements get interpolated
+        into the end result.
+
+            list      ::= [τ₀, …, τₙ]
+                        ↦ φ(τ₀) + … + φ(τₙ)
+
+        An empty tuple returns the supplied `args`. Typically this would be
+        used for things like subcommands or file names at the end of a command.
+
+            ()          ↦ args or []
+
+        Formatting a string uses the Python string formatter with the `opt`
+        map as arguments. Typically used to interpolate an option value into
+        the command line, e.g. ['--flag', '{flag}'] or ['--flag={flag}'].
+
+            str       ::= σ
+                        ↦ [σ.format_map(opt)]
+
+        A dictionary element provides a convenience feature. For any dictionary
+        template, if it contains an optional 'expand' key that tests true, the
+        result is recursively passed to format_command(); otherwise it is taken
+        as is.
+
+        The simplest case is an option propagated to the tool command line,
+        as a single option if the value is exactly boolean True or as an
+        option-argument pair if otherwise set.
+
+            optional  ::= {'optional': name}
+                        ↦ ['--name'] if opt[name] is True
+                          ['--name', opt[name]] if opt[name] tests true
+                          [] otherwise
+
+        A dictionary with an 'option' can insert command line arguments based
+        on the value of an option. The 'result' is optional defaults to the
+        option value itself, and 'else' defaults to nothing.
+
+            option    ::= {'option': name, 'result': ρ, 'else': δ}
+                        ↦ ρ if opt[name]
+                          δ otherwise
+
+        A dictionary with a 'match' key returns a result comparing the value of
+        an option against a 'test' list of tuples. The 'else' is optional and
+        defaults to nothing.
+
+            match     ::= {'match': name, 'test': [(σᵢ, ρᵢ), …], 'else': ρ}
+                        ↦ ρᵢ if opt[name]==σᵢ
+                          ρ otherwise
+        """
+        if isinstance(template, str):
+            result = [template.format_map(opt)]
+        elif isinstance(template, list):
+            result = []
+            for i in template:
+                result += self.format_command(i, args, opt)
+        elif template == ():
+            result = args or []
+        elif isinstance(template, dict):
+            if 'optional' in template:
+                name = template['optional']
+                value = opt.get(name)
+                if value is True:
+                    result = ['--' + name]
+                elif value:
+                    result = ['--' + name, value]
+                else:
+                    result = []
+            elif 'option' in template:
+                name = template['option']
+                value = opt.get(name)
+                if value:
+                    result = template.get('result', value)
+                else:
+                    result = template.get('else')
+            elif 'match' in template:
+                value = template['match']
+                for compare, result in template['test']:
+                    if value == compare:
+                        break
+                else:
+                    result = template.get('else')
+            if result and template.get('expand'):
+                result = self.format_command(result, args, opt)
+            elif result is None:
+                result = []
+            elif not isinstance(result, list):
+                result = [result]
+        else:
+            raise ValueError('Unknown: {}'.format(template))
+        return result
 
     def find_file(self, filename, dirs=None):
         """Resolve a file name; also checks the script directory."""
@@ -199,8 +369,8 @@ class Flasher:
         dirs = dirs or []
         if self.argv0:
             dirs.append(os.path.dirname(self.argv0))
-        for d in dirs:
-            name = os.path.join(d, filename)
+        for directory in dirs:
+            name = os.path.join(directory, filename)
             if os.path.exists(name):
                 return name
         raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT),
@@ -215,14 +385,19 @@ class Flasher:
     def parse_argv(self, argv):
         """Handle command line options."""
         self.argv0 = argv[0]
-        args = self.parser.parse_args(argv[1:])
-        for key, value in vars(args).items():
-            self.options[key.replace('_', '-')] = value
+        self.parser.parse_args(argv[1:], namespace=self.option)
+        self._postprocess_argv()
         return self
+
+    def _postprocess_argv(self):
+        """Called after parse_argv() for platform-specific processing."""
 
     def flash_command(self, argv):
         """Perform device actions according to the command line."""
         return self.parse_argv(argv).actions().status()
+
+    def _platform_wrapper_args(self, args):
+        """Called from make_wrapper() to optionally manipulate arguments."""
 
     def make_wrapper(self, argv):
         """Generate script to flash a device.
@@ -242,12 +417,15 @@ class Flasher:
         self.argv0 = argv[0]
         args = self.parser.parse_args(argv[1:])
 
+        # Give platform-specific code a chance to manipulate the arguments
+        # for the wrapper script.
+        self._platform_wrapper_args(args)
+
         # Find any option values that differ from the class defaults.
         # These will be inserted into the wrapper script.
         defaults = []
         for key, value in vars(args).items():
-            key = key.replace('_', '-')
-            if key in self.options and value != self.options[key]:
+            if key in self.option and value != getattr(self.option, key):
                 defaults.append('  {}: {},'.format(repr(key), repr(value)))
 
         script = """
@@ -260,18 +438,18 @@ class Flasher:
             import {module}
 
             if __name__ == '__main__':
-                sys.exit({module}.Flasher(DEFAULTS).flash_command(sys.argv))
+                sys.exit({module}.Flasher(**DEFAULTS).flash_command(sys.argv))
         """
 
         script = ('#!/usr/bin/env python3' + textwrap.dedent(script).format(
-            module=self.module, defaults='\n'.join(defaults)))
+            module=self.option.module, defaults='\n'.join(defaults)))
 
         try:
             with open(args.output, 'w') as script_file:
                 script_file.write(script)
             os.chmod(args.output, (stat.S_IXUSR | stat.S_IRUSR | stat.S_IWUSR
-                                   | stat.S_IXGRP | stat.S_IRGRP
-                                   | stat.S_IXOTH | stat.S_IROTH))
+                                 | stat.S_IXGRP | stat.S_IRGRP
+                                 | stat.S_IXOTH | stat.S_IROTH))
         except OSError as exception:
             print(exception, sys.stderr)
             return 1

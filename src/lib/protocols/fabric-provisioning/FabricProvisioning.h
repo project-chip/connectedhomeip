@@ -118,7 +118,7 @@ public:
      * @retval other           Other CHIP or platform-specific error codes indicating that an error
      *                         occurred preventing the device from creating a fabric.
      */
-    virtual CHIP_ERROR HandleCreateFabric(void) = 0;
+    virtual CHIP_ERROR HandleCreateFabric() = 0;
 
     /**
      * Indicates that the device has joined an existing Fabric.
@@ -127,7 +127,7 @@ public:
      * @retval other           Other CHIP or platform-specific error codes indicating that an error
      *                         occurred preventing the device from joining the fabric.
      */
-    virtual CHIP_ERROR HandleJoinExistingFabric(void) = 0;
+    virtual CHIP_ERROR HandleJoinExistingFabric() = 0;
 
     /**
      * Indicates that the device has left a Fabric.
@@ -136,7 +136,7 @@ public:
      * @retval other           Other CHIP or platform-specific error codes indicating that an error
      *                         occurred preventing the device from leaving the fabric.
      */
-    virtual CHIP_ERROR HandleLeaveFabric(void) = 0;
+    virtual CHIP_ERROR HandleLeaveFabric() = 0;
 
     /**
      * Indicates that the configuration of the current CHIP Fabric has been
@@ -146,7 +146,7 @@ public:
      * @retval other           Other CHIP or platform-specific error codes indicating that an error
      *                         occurred preventing the device from returning the fabric config.
      */
-    virtual CHIP_ERROR HandleGetFabricConfig(void) = 0;
+    virtual CHIP_ERROR HandleGetFabricConfig() = 0;
 
     /**
      * Enforce message-level access control for an incoming Fabric Provisioning request message.
@@ -179,19 +179,19 @@ public:
 class DLL_EXPORT FabricProvisioningServer : public ChipServerBase
 {
 public:
-    FabricProvisioningServer(void);
+    FabricProvisioningServer();
     FabricProvisioningServer(const FabricProvisioningServer &) = delete;
     FabricProvisioningServer & operator=(const FabricProvisioningServer &) = delete;
 
     CHIP_ERROR Init(ChipExchangeManager * exchangeMgr);
-    CHIP_ERROR Shutdown(void);
+    CHIP_ERROR Shutdown();
 
     void SetDelegate(FabricProvisioningDelegate * delegate);
 
     // Check if the session is marked as privileged to retrieve fabric config information.
     bool SessionHasFabricConfigAccessPrivilege(uint16_t keyId, uint64_t peerNodeId) const;
 
-    virtual CHIP_ERROR SendSuccessResponse(void);
+    virtual CHIP_ERROR SendSuccessResponse();
     virtual CHIP_ERROR SendStatusReport(uint32_t statusProfileId, uint16_t statusCode, CHIP_ERROR sysError = CHIP_NO_ERROR);
 
 protected:
@@ -199,16 +199,16 @@ protected:
     ExchangeContext * mCurClientOp;
 
 private:
-    static void HandleClientRequest(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
+    static void HandleClientRequest(ExchangeContext * ec, const Inet::IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
                                     uint32_t profileId, uint8_t msgType, PacketBuffer * payload);
 
     // Utility functions for managing registration with/notification from ChipFabricState
     // about whether the current security session is privileged to
     // access fabric config information.
     void GrantFabricConfigAccessPrivilege(uint16_t keyId, uint64_t peerNodeId);
-    void ClearFabricConfigAccessPrivilege(void);
+    void ClearFabricConfigAccessPrivilege();
     static void HandleSessionEnd(uint16_t keyId, uint64_t peerNodeId, void * context);
-    CHIP_ERROR RegisterSessionEndCallbackWithFabricState(void);
+    CHIP_ERROR RegisterSessionEndCallbackWithFabricState();
 
     // Indicates the session that is privileged to
     // retrieve fabric config information.

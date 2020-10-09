@@ -2337,4 +2337,4 @@
 
 #include "mbedtls/check_config.h"
 
-#endif /* MBEDTLS_CONFIG_H */
+#endif /* ESP_CONFIG_H */

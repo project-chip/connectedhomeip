@@ -25,9 +25,12 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/BLE.h>
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
+
+using namespace chip::Ble;
+using namespace chip::System;
 
 namespace chip {
 namespace Transport {
@@ -63,10 +66,6 @@ CHIP_ERROR BLE::Init(RendezvousSessionDelegate * delegate, const RendezvousParam
     else if (params.HasConnectionObject())
     {
         err = InitInternal(params.GetConnectionObject());
-    }
-    else
-    {
-        err = CHIP_ERROR_INVALID_ARGUMENT;
     }
     SuccessOrExit(err);
 
@@ -136,9 +135,9 @@ exit:
 CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                             System::PacketBuffer * msgBuf)
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    const size_t headerSize = header.EncodeSizeBytes();
-    size_t actualEncodedHeaderSize;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    const uint16_t headerSize = header.EncodeSizeBytes();
+    uint16_t actualEncodedHeaderSize;
 
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);

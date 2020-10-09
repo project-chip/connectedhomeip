@@ -72,19 +72,11 @@ void emAfInitEvents(void);
 
 /** @brief Sets this ::EmberEventControl as inactive (no pending event).
  */
-#define emberEventControlSetInactive(control)                                                                                      \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        (control).status = EMBER_EVENT_INACTIVE;                                                                                   \
-    } while (0)
+void emberEventControlSetInactive(EmberEventControl * control);
 
-/** @brief Sets this ::EmberEventControl as inactive (no pending event).
+/** @brief Sets this ::EmberEventControl to run as soon as possible.
  */
-#define emberEventControlSetActive(control)                                                                                        \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        (control).status = EMBER_EVENT_ZERO_DELAY;                                                                                 \
-    } while (0)
+void emberEventControlSetActive(EmberEventControl * control);
 
 #ifdef __cplusplus
 }

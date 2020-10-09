@@ -49,10 +49,10 @@ static const Name sFaultNames[] = {
     "AsyncEvent",
 };
 
-static int32_t (*sGetNumEventsAvailable)(void);
+static int32_t (*sGetNumEventsAvailable)();
 static void (*sInjectAsyncEvent)(int32_t index);
 
-Manager & GetManager(void)
+Manager & GetManager()
 {
     if (0 == sManager.GetNumFaults())
     {
@@ -67,7 +67,7 @@ Manager & GetManager(void)
     return sManager;
 }
 
-void InjectAsyncEvent(void)
+void InjectAsyncEvent()
 {
     int32_t numEventsAvailable               = 0;
     chip::System::FaultInjection::Id faultID = kFault_AsyncEvent;
@@ -99,7 +99,7 @@ void InjectAsyncEvent(void)
     }
 }
 
-void SetAsyncEventCallbacks(int32_t (*aGetNumEventsAvailable)(void), void (*aInjectAsyncEvent)(int32_t index))
+void SetAsyncEventCallbacks(int32_t (*aGetNumEventsAvailable)(), void (*aInjectAsyncEvent)(int32_t index))
 {
     sGetNumEventsAvailable = aGetNumEventsAvailable;
     sInjectAsyncEvent      = aInjectAsyncEvent;

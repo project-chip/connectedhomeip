@@ -1,0 +1,16 @@
+pip-tools
+
+# esp-idf
+pyelftools>=0.22
+click>=5.0
+pyserial>=3.0
+future>=0.15.2
+cryptography>=2.1.4
+pyparsing>=2.0.3,<2.4.0
+pyelftools>=0.22
+
+# cirque tests
+requests>=2.24.0
+
+# device controller wheel package
+wheel>=0.34.2

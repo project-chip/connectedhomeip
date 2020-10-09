@@ -92,7 +92,7 @@ exit:
 /**
  * Register a text error formatter for Device Layer errors.
  */
-void RegisterDeviceLayerErrorFormatter(void)
+void RegisterDeviceLayerErrorFormatter()
 {
     static ErrorFormatter sDeviceLayerErrorFormatter = { FormatDeviceLayerError, nullptr };
 
@@ -137,7 +137,7 @@ bool FormatDeviceLayerError(char * buf, uint16_t bufSize, int32_t err)
     return true;
 }
 
-const char * CharacterizeIPv6Address(const IPAddress & ipAddr)
+const char * CharacterizeIPv6Address(const chip::Inet::IPAddress & ipAddr)
 {
     if (ipAddr.IsIPv6LinkLocal())
     {

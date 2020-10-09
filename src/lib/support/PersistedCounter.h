@@ -57,8 +57,8 @@ namespace chip {
 class PersistedCounter : public MonotonicallyIncreasingCounter
 {
 public:
-    PersistedCounter(void);
-    ~PersistedCounter(void) override;
+    PersistedCounter();
+    ~PersistedCounter() override;
 
     /**
      *  @brief
@@ -74,7 +74,7 @@ public:
      *          CHIP_ERROR_INVALID_INTEGER_VALUE if aEpoch is 0.
      *          CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Init(const chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch);
+    CHIP_ERROR Init(chip::Platform::PersistedStorage::Key aId, uint32_t aEpoch);
 
     /**
      *  @brief
@@ -83,7 +83,7 @@ public:
      *
      *  @return Any error returned by a write to persisted storage.
      */
-    CHIP_ERROR Advance(void) override;
+    CHIP_ERROR Advance() override;
 
 private:
     /**

@@ -140,14 +140,13 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
-protected:
     InterfaceId mBoundIntfId;
 
     INET_ERROR Bind(IPAddressType aAddressType, IPAddress aAddress, uint16_t aPort, InterfaceId aInterfaceId);
     INET_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
     INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
     INET_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
-    SocketEvents PrepareIO(void);
+    SocketEvents PrepareIO();
     void HandlePendingIO(uint16_t aPort);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
@@ -176,9 +175,9 @@ protected:
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 private:
-    IPEndPointBasis(void)                    = delete;
+    IPEndPointBasis()                        = delete;
     IPEndPointBasis(const IPEndPointBasis &) = delete;
-    ~IPEndPointBasis(void)                   = delete;
+    ~IPEndPointBasis()                       = delete;
 };
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -206,4 +205,4 @@ inline struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInt
 } // namespace Inet
 } // namespace chip
 
-#endif // !defined(IPENDPOINT_H)
+#endif // !defined(IPENDPOINTBASIS_H)

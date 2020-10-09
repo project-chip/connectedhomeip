@@ -16,6 +16,7 @@
  */
 
 #include "RendezvousDeviceDelegate.h"
+
 #include "BluetoothWidget.h"
 #include "RendezvousMessageHandler.h"
 #include "esp_log.h"
@@ -24,29 +25,29 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 
+using namespace ::chip;
+using namespace ::chip::Inet;
+using namespace ::chip::System;
+
 extern BluetoothWidget bluetoothLED;
 extern NodeId kLocalNodeId;
 extern void PairingComplete(SecurePairingSession * pairing);
 
 static const char * TAG = "rendezvous-devicedelegate";
 
-using namespace ::chip;
-
 RendezvousDeviceDelegate::RendezvousDeviceDelegate()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    RendezvousParameters * params;
+    RendezvousParameters params;
 
     uint32_t setupPINCode;
     err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(setupPINCode);
     SuccessOrExit(err);
 
-    params = new RendezvousParameters(setupPINCode);
-    params->SetLocalNodeId(kLocalNodeId);
-    params->SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+    params.SetSetupPINCode(setupPINCode).SetLocalNodeId(kLocalNodeId).SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
 
-    mRendezvousSession = new RendezvousSession(this, *params);
-    err                = mRendezvousSession->Init();
+    mRendezvousSession = new RendezvousSession(this, &mDeviceNetworkProvisioningDelegate);
+    err                = mRendezvousSession->Init(params);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -55,41 +56,30 @@ exit:
     }
 }
 
-CHIP_ERROR RendezvousDeviceDelegate::Send(const char * msg)
+void RendezvousDeviceDelegate::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBuffer * buffer;
-    const size_t msgLen = strlen(msg);
+    if (err != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "OnRendezvousStatusUpdate: %s, status %d", ErrorStr(err), status);
+    }
 
-    VerifyOrExit(mRendezvousSession, err = CHIP_ERROR_INCORRECT_STATE);
+    switch (status)
+    {
+    case RendezvousSessionDelegate::SecurePairingSuccess:
+        ESP_LOGI(TAG, "Device completed SPAKE2+ handshake\n");
+        PairingComplete(&mRendezvousSession->GetPairingSession());
+        bluetoothLED.Set(true);
+        break;
 
-    buffer = System::PacketBuffer::NewWithAvailableSize(msgLen);
-    memcpy(buffer->Start(), msg, msgLen);
-    buffer->SetDataLength(msgLen);
+    case RendezvousSessionDelegate::NetworkProvisioningSuccess:
 
-    err = mRendezvousSession->SendMessage(buffer);
+        ESP_LOGI(TAG, "Device was assigned an ip address\n");
+        bluetoothLED.Set(false);
+        break;
 
-exit:
-    return err;
-}
-
-void RendezvousDeviceDelegate::OnRendezvousError(CHIP_ERROR err)
-{
-    ESP_LOGI(TAG, "OnRendezvousError: %s", ErrorStr(err));
-}
-
-void RendezvousDeviceDelegate::OnRendezvousConnectionOpened()
-{
-    ESP_LOGI(TAG, "OnRendezvousConnectionOpened");
-
-    PairingComplete(&mRendezvousSession->GetPairingSession());
-    bluetoothLED.Set(true);
-}
-
-void RendezvousDeviceDelegate::OnRendezvousConnectionClosed()
-{
-    ESP_LOGI(TAG, "OnRendezvousConnectionClosed");
-    bluetoothLED.Set(false);
+    default:
+        break;
+    };
 }
 
 void RendezvousDeviceDelegate::OnRendezvousMessageReceived(PacketBuffer * buffer)

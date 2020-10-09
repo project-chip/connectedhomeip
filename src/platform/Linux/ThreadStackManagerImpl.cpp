@@ -32,9 +32,7 @@
 using chip::DeviceLayer::Internal::DeviceNetworkInfo;
 using otbr::DBus::ClientError;
 using otbr::DBus::DeviceRole;
-using otbr::DBus::IpCounters;
 using otbr::DBus::LinkModeConfig;
-using otbr::DBus::MacCounters;
 using otbr::DBus::NeighborInfo;
 
 #ifndef CHIP_CONFIG_OTBR_CLIENT_ERROR_MIN
@@ -413,17 +411,17 @@ exit:
     return OTBR_TO_CHIP_ERROR(error);
 }
 
-CHIP_ERROR ThreadStackManagerImpl::_JoinerStart(void)
+CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-ThreadStackManager & ThreadStackMgr(void)
+ThreadStackManager & ThreadStackMgr()
 {
     return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
 }
 
-ThreadStackManagerImpl & ThreadStackMgrImpl(void)
+ThreadStackManagerImpl & ThreadStackMgrImpl()
 {
     return chip::DeviceLayer::ThreadStackManagerImpl::sInstance;
 }

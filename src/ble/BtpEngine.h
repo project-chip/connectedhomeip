@@ -38,7 +38,7 @@
 #include <ble/BleConfig.h>
 
 #include <ble/BleError.h>
-#include <support/FlagUtils.hpp>
+#include <support/BitFlags.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -90,29 +90,25 @@ public:
     static const uint16_t sDefaultFragmentSize;
     static const uint16_t sMaxFragmentSize;
 
-public:
     // Public functions:
-    BtpEngine(void) {}
-    ~BtpEngine(void) {}
-
     BLE_ERROR Init(void * an_app_state, bool expect_first_ack);
 
     inline void SetTxFragmentSize(uint8_t size) { mTxFragmentSize = size; }
     inline void SetRxFragmentSize(uint8_t size) { mRxFragmentSize = size; }
 
-    uint16_t GetRxFragmentSize(void) { return mRxFragmentSize; }
-    uint16_t GetTxFragmentSize(void) { return mTxFragmentSize; }
+    uint16_t GetRxFragmentSize() { return mRxFragmentSize; }
+    uint16_t GetTxFragmentSize() { return mTxFragmentSize; }
 
-    SequenceNumber_t GetAndIncrementNextTxSeqNum(void);
-    SequenceNumber_t GetAndRecordRxAckSeqNum(void);
+    SequenceNumber_t GetAndIncrementNextTxSeqNum();
+    SequenceNumber_t GetAndRecordRxAckSeqNum();
 
-    inline SequenceNumber_t GetLastReceivedSequenceNumber(void) { return mRxNewestUnackedSeqNum; }
-    inline SequenceNumber_t GetNewestUnackedSentSequenceNumber(void) { return mTxNewestUnackedSeqNum; }
+    inline SequenceNumber_t GetLastReceivedSequenceNumber() { return mRxNewestUnackedSeqNum; }
+    inline SequenceNumber_t GetNewestUnackedSentSequenceNumber() { return mTxNewestUnackedSeqNum; }
 
-    inline bool ExpectingAck(void) const { return mExpectingAck; }
+    inline bool ExpectingAck() const { return mExpectingAck; }
 
-    inline State_t RxState(void) { return mRxState; }
-    inline State_t TxState(void) { return mTxState; }
+    inline State_t RxState() { return mRxState; }
+    inline State_t TxState() { return mTxState; }
 #if CHIP_ENABLE_CHIPOBLE_TEST
     inline PacketType_t SetTxPacketType(PacketType_t type) { return (mTxPacketType = type); }
     inline PacketType_t SetRxPacketType(PacketType_t type) { return (mRxPacketType = type); }
@@ -137,20 +133,20 @@ public:
     }
 #endif // CHIP_ENABLE_CHIPOBLE_TEST
 
-    bool HasUnackedData(void) const;
+    bool HasUnackedData() const;
 
     BLE_ERROR HandleCharacteristicReceived(PacketBuffer * data, SequenceNumber_t & receivedAck, bool & didReceiveAck);
     bool HandleCharacteristicSend(PacketBuffer * data, bool send_ack);
     BLE_ERROR EncodeStandAloneAck(PacketBuffer * data);
 
-    PacketBuffer * RxPacket(void);
-    PacketBuffer * TxPacket(void);
+    PacketBuffer * RxPacket();
+    PacketBuffer * TxPacket();
 
-    bool ClearRxPacket(void);
-    bool ClearTxPacket(void);
+    bool ClearRxPacket();
+    bool ClearTxPacket();
 
-    void LogState(void) const;
-    void LogStateDebug(void) const;
+    void LogState() const;
+    void LogStateDebug() const;
 
 private:
     // Private data members:
@@ -183,7 +179,6 @@ private:
     uint16_t mTxCharCount;
     uint16_t mTxPacketCount;
 
-private:
     // Private functions:
     bool IsValidAck(SequenceNumber_t ack_num) const;
     BLE_ERROR HandleAckReceived(SequenceNumber_t ack_num);

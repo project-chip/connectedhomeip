@@ -427,7 +427,7 @@ INET_ERROR DNSResolver::ProcessGetAddrInfoResult(int returnCode, struct addrinfo
         // when attempting to communicate with the host.
         if (numAddrs > MaxAddrs && MaxAddrs > 1 && numPrimaryAddrs > 0 && numSecondaryAddrs > 0)
         {
-            numPrimaryAddrs = ::chip::min(numPrimaryAddrs, (uint8_t)(MaxAddrs - 1));
+            numPrimaryAddrs = ::chip::min(numPrimaryAddrs, static_cast<uint8_t>(MaxAddrs - 1));
         }
 
         // Copy the primary addresses into the beginning of the application's output array,
@@ -521,7 +521,7 @@ uint8_t DNSResolver::CountAddresses(int family, const struct addrinfo * addrs)
 
 #if INET_CONFIG_ENABLE_ASYNC_DNS_SOCKETS
 
-void DNSResolver::HandleAsyncResolveComplete(void)
+void DNSResolver::HandleAsyncResolveComplete()
 {
     // Copy the resolved address to the application supplied buffer, but only if the request hasn't been canceled.
     if (OnComplete && mState != kState_Canceled)

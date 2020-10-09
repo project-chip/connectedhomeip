@@ -187,26 +187,24 @@ static void TestResolveHostAddress(nlTestSuite * inSuite, void * inContext)
 // Test Inet ParseHostPortAndInterface
 static void TestParseHost(nlTestSuite * inSuite, void * inContext)
 {
-    char correctHostName[7][30] = {
+    char correctHostNames[7][30] = {
         "10.0.0.1", "10.0.0.1:3000", "www.google.com", "www.google.com:3000", "[fd00:0:1:1::1]:3000", "[fd00:0:1:1::1]:300%wpan0",
         "%wpan0"
     };
-    char invalidHostName[4][30] = { "[fd00::1]5", "[fd00:0:1:1::1:3000", "10.0.0.1:1234567", "10.0.0.1:er31" };
+    char invalidHostNames[4][30] = { "[fd00::1]5", "[fd00:0:1:1::1:3000", "10.0.0.1:1234567", "10.0.0.1:er31" };
     const char * host;
     const char * intf;
     uint16_t port, hostlen, intflen;
     INET_ERROR err;
 
-    for (int i = 0; i < 7; i++)
+    for (char * correctHostName : correctHostNames)
     {
-        err =
-            ParseHostPortAndInterface(correctHostName[i], uint16_t(strlen(correctHostName[i])), host, hostlen, port, intf, intflen);
+        err = ParseHostPortAndInterface(correctHostName, uint16_t(strlen(correctHostName)), host, hostlen, port, intf, intflen);
         NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
     }
-    for (int i = 0; i < 4; i++)
+    for (char * invalidHostName : invalidHostNames)
     {
-        err =
-            ParseHostPortAndInterface(invalidHostName[i], uint16_t(strlen(invalidHostName[i])), host, hostlen, port, intf, intflen);
+        err = ParseHostPortAndInterface(invalidHostName, uint16_t(strlen(invalidHostName)), host, hostlen, port, intf, intflen);
         NL_TEST_ASSERT(inSuite, err == INET_ERROR_INVALID_HOST_NAME);
     }
 }
@@ -254,7 +252,12 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
         err = intIterator.GetInterfaceName(intName, sizeof(intName));
         NL_TEST_ASSERT(inSuite, err == INET_NO_ERROR);
         printf("     interface id: 0x%" PRIxPTR ", interface name: %s, interface state: %s, %s multicast, %s broadcast addr\n",
-               (uintptr_t)(intId), intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+               reinterpret_cast<uintptr_t>(intId),
+#else
+               static_cast<uintptr_t>(intId),
+#endif
+               intName, intIterator.IsUp() ? "UP" : "DOWN", intIterator.SupportsMulticast() ? "supports" : "no",
                intIterator.HasBroadcastAddress() ? "has" : "no");
 
         gInet.GetLinkLocalAddr(intId, &addr);
@@ -281,8 +284,14 @@ static void TestInetInterface(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, intName[0] != '\0' && memchr(intName, '\0', sizeof(intName)) != nullptr);
         printf("     %s/%d, interface id: 0x%" PRIxPTR
                ", interface name: %s, interface state: %s, %s multicast, %s broadcast addr\n",
-               addrStr, addrWithPrefix.Length, (uintptr_t)(intId), intName, addrIterator.IsUp() ? "UP" : "DOWN",
-               addrIterator.SupportsMulticast() ? "supports" : "no", addrIterator.HasBroadcastAddress() ? "has" : "no");
+               addrStr, addrWithPrefix.Length,
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+               reinterpret_cast<uintptr_t>(intId),
+#else
+               static_cast<uintptr_t>(intId),
+#endif
+               intName, addrIterator.IsUp() ? "UP" : "DOWN", addrIterator.SupportsMulticast() ? "supports" : "no",
+               addrIterator.HasBroadcastAddress() ? "has" : "no");
     }
     NL_TEST_ASSERT(inSuite, !addrIterator.Next());
     addrIterator.GetAddressWithPrefix(addrWithPrefix);
@@ -547,7 +556,7 @@ static int TestTeardown(void * inContext)
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-int TestInetEndPointInternal(void)
+int TestInetEndPointInternal()
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
     // clang-format off

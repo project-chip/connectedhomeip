@@ -25,8 +25,9 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
-#include <lib/support/CodeUtils.h>
 #include <setup_payload/SetupPayload.h>
+#include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 
 namespace chip {
@@ -77,6 +78,9 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
         break;
     }
 
+    err = Platform::MemoryInit();
+    SuccessOrExit(err);
+
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
     PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
@@ -90,15 +94,25 @@ exit:
 }
 
 extern "C" {
-void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+void emberAfPostAttributeChangeCallback(uint8_t endpointId, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     CHIPDeviceManagerCallbacks * cb = CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
     if (cb != nullptr)
     {
-        cb->PostAttributeChangeCallback(endpoint, clusterId, attributeId, mask, manufacturerCode, type, size, value);
+        cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, mask, manufacturerCode, type, size, value);
     }
 }
+
+void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpointId)
+{
+    CHIPDeviceManagerCallbacks * cb = CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
+    if (cb != nullptr)
+    {
+        cb->PluginBasicResetToFactoryDefaultsCallback(endpointId);
+    }
+}
+
 } // extern "C"
 
 } // namespace DeviceManager

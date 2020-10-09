@@ -71,13 +71,13 @@ public:
 class DLL_EXPORT SecurePairingSession
 {
 public:
-    SecurePairingSession(void);
+    SecurePairingSession();
     SecurePairingSession(SecurePairingSession &&)      = default;
     SecurePairingSession(const SecurePairingSession &) = delete;
     SecurePairingSession & operator=(const SecurePairingSession &) = default;
     SecurePairingSession & operator=(SecurePairingSession &&) = default;
 
-    virtual ~SecurePairingSession(void);
+    virtual ~SecurePairingSession();
 
     /**
      * @brief
@@ -130,11 +130,11 @@ public:
      * @brief
      *   Handler for peer's messages, exchanged during pairing handshake.
      *
-     * @param header      Message header for the received message
+     * @param packetHeader      Message header for the received message
      * @param msg         Message sent by the peer
      * @return CHIP_ERROR The result of message processing
      */
-    CHIP_ERROR HandlePeerMessage(MessageHeader & header, System::PacketBuffer * msg);
+    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg);
 
     /**
      * @brief
@@ -164,14 +164,13 @@ private:
     CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
                     uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
-    CHIP_ERROR HandleCompute_pA(const MessageHeader & header, System::PacketBuffer * msg);
-    CHIP_ERROR HandleCompute_pB_cB(const MessageHeader & header, System::PacketBuffer * msg);
-    CHIP_ERROR HandleCompute_cA(const MessageHeader & header, System::PacketBuffer * msg);
+    CHIP_ERROR HandleCompute_pA(const PacketHeader & header, System::PacketBuffer * msg);
+    CHIP_ERROR HandleCompute_pB_cB(const PacketHeader & header, System::PacketBuffer * msg);
+    CHIP_ERROR HandleCompute_cA(const PacketHeader & header, System::PacketBuffer * msg);
 
     CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgBuf);
 
-    static constexpr uint16_t kSecurePairingProtocol = 1;
-    static constexpr size_t kSpake2p_WS_Length       = kP256_FE_Length + 8;
+    static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 
     enum Spake2pMsgType : uint8_t
     {
@@ -217,15 +216,15 @@ protected:
 class SecurePairingUsingTestSecret : public SecurePairingSession
 {
 public:
-    SecurePairingUsingTestSecret() : SecurePairingSession() {}
-    SecurePairingUsingTestSecret(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId) : SecurePairingSession()
+    SecurePairingUsingTestSecret() {}
+    SecurePairingUsingTestSecret(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId)
     {
         mPeerNodeId = peerNodeId;
         mPeerKeyId  = peerKeyId;
         mLocalKeyId = localKeyId;
     }
 
-    ~SecurePairingUsingTestSecret(void) override {}
+    ~SecurePairingUsingTestSecret() override {}
 
     CHIP_ERROR WaitForPairing(uint32_t mySetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
                               Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
@@ -243,11 +242,11 @@ public:
     {
         const char * secret = "Test secret for key derivation";
         size_t secretLen    = strlen(secret);
-        return session.InitFromSecret((const uint8_t *) secret, secretLen, (const uint8_t *) "", 0, (const uint8_t *) secret,
-                                      secretLen);
+        return session.InitFromSecret(reinterpret_cast<const uint8_t *>(secret), secretLen, reinterpret_cast<const uint8_t *>(""),
+                                      0, reinterpret_cast<const uint8_t *>(secret), secretLen);
     }
 
-    CHIP_ERROR HandlePeerMessage(const MessageHeader & header, System::PacketBuffer * msg) { return CHIP_NO_ERROR; }
+    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg) override { return CHIP_NO_ERROR; }
 };
 
 } // namespace chip

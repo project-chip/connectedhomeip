@@ -48,8 +48,10 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
 
     // Allow the generic implementation base classes to call helper methods on
     // this class.
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
     friend Internal::GenericThreadStackManagerImpl_Zephyr<ThreadStackManagerImpl>;
+#endif
 
 private:
     // ===== Members for internal use by the following friends.

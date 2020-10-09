@@ -48,11 +48,12 @@
 #include <system/SystemStats.h>
 #include <system/SystemTimer.h>
 
-namespace chip {
-
-using namespace chip;
-using namespace chip::Protocols;
 using namespace chip::Encoding;
+using namespace chip::Inet;
+using namespace chip::Protocols;
+using namespace chip::System;
+
+namespace chip {
 
 /**
  *  Constructor for the ChipExchangeManager class.
@@ -289,7 +290,7 @@ ExchangeContext * ChipExchangeManager::NewContext(ChipConnection * con, void * a
  */
 ExchangeContext * ChipExchangeManager::FindContext(uint64_t peerNodeId, ChipConnection * con, void * appState, bool isInitiator)
 {
-    ExchangeContext * ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
         if (ec->ExchangeMgr != nullptr && ec->PeerNodeId == peerNodeId && ec->Con == con && ec->AppState == appState &&
             ec->IsInitiator() == isInitiator)
@@ -314,7 +315,7 @@ ExchangeContext * ChipExchangeManager::FindContext(uint64_t peerNodeId, ChipConn
 CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler,
                                                                   void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) -1, nullptr, false, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(-1), nullptr, false, handler, appState);
 }
 
 /**
@@ -336,7 +337,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
 CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, ExchangeContext::MessageReceiveFunct handler,
                                                                   bool allowDups, void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) -1, nullptr, allowDups, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(-1), nullptr, allowDups, handler, appState);
 }
 
 /**
@@ -357,7 +358,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
 CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType,
                                                                   ExchangeContext::MessageReceiveFunct handler, void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) msgType, nullptr, false, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(msgType), nullptr, false, handler, appState);
 }
 
 /**
@@ -382,7 +383,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
                                                                   ExchangeContext::MessageReceiveFunct handler, bool allowDups,
                                                                   void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) msgType, nullptr, allowDups, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(msgType), nullptr, allowDups, handler, appState);
 }
 
 /**
@@ -407,7 +408,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
 CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con,
                                                                   ExchangeContext::MessageReceiveFunct handler, void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) msgType, con, false, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(msgType), con, false, handler, appState);
 }
 
 /**
@@ -436,7 +437,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
                                                                   ExchangeContext::MessageReceiveFunct handler, bool allowDups,
                                                                   void * appState)
 {
-    return RegisterUMH(profileId, (int16_t) msgType, con, allowDups, handler, appState);
+    return RegisterUMH(profileId, static_cast<int16_t>(msgType), con, allowDups, handler, appState);
 }
 
 /**
@@ -450,7 +451,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t profi
  */
 CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId)
 {
-    return UnregisterUMH(profileId, (int16_t) -1, nullptr);
+    return UnregisterUMH(profileId, static_cast<int16_t>(-1), nullptr);
 }
 
 /**
@@ -466,7 +467,7 @@ CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t pro
  */
 CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType)
 {
-    return UnregisterUMH(profileId, (int16_t) msgType, nullptr);
+    return UnregisterUMH(profileId, static_cast<int16_t>(msgType), nullptr);
 }
 
 /**
@@ -485,7 +486,7 @@ CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t pro
  */
 CHIP_ERROR ChipExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t profileId, uint8_t msgType, ChipConnection * con)
 {
-    return UnregisterUMH(profileId, (int16_t) msgType, con);
+    return UnregisterUMH(profileId, static_cast<int16_t>(msgType), con);
 }
 
 void ChipExchangeManager::HandleAcceptError(ChipMessageLayer * msgLayer, CHIP_ERROR err)
@@ -506,14 +507,14 @@ void ChipExchangeManager::HandleConnectionClosed(ChipConnection * con, CHIP_ERRO
         BindingPool[i].OnConnectionClosed(con, conErr);
     }
 
-    ExchangeContext * ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
         if (ec->ExchangeMgr != nullptr && ec->Con == con)
         {
             ec->HandleConnectionClosed(conErr);
         }
 
-    UnsolicitedMessageHandler * umh = (UnsolicitedMessageHandler *) UMHandlerPool;
+    UnsolicitedMessageHandler * umh = UMHandlerPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         if (umh->Handler != nullptr && umh->Con == con)
         {
@@ -529,10 +530,10 @@ void ChipExchangeManager::HandleConnectionClosed(ChipConnection * con, CHIP_ERRO
  * @return Number of timers found running.
  */
 #if CHIP_CONFIG_TEST
-size_t ChipExchangeManager::ExpireExchangeTimers(void)
+size_t ChipExchangeManager::ExpireExchangeTimers()
 {
     size_t retval        = 0;
-    ExchangeContext * ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != nullptr)
@@ -552,7 +553,7 @@ size_t ChipExchangeManager::ExpireExchangeTimers(void)
 
 ExchangeContext * ChipExchangeManager::AllocContext()
 {
-    ExchangeContext * ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = ContextPool;
 
     CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return nullptr);
 
@@ -715,7 +716,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     } // If delayed delivery Msg
 
     // Search for an existing exchange that the message applies to. If a match is found...
-    ec = (ExchangeContext *) ContextPool;
+    ec = ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->ExchangeMgr != nullptr && ec->MatchExchange(msgCon, msgInfo, &exchangeHeader))
@@ -747,7 +748,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     {
         // Search for an unsolicited message handler that can handle the message. Prefer handlers that can explicitly
         // handle the message type over handlers that handle all messages for a profile.
-        umh = (UnsolicitedMessageHandler *) UMHandlerPool;
+        umh = UMHandlerPool;
 
         matchingUMH = nullptr;
 
@@ -894,7 +895,7 @@ exit:
 CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con, bool allowDups,
                                             ExchangeContext::MessageReceiveFunct handler, void * appState)
 {
-    UnsolicitedMessageHandler * umh      = (UnsolicitedMessageHandler *) UMHandlerPool;
+    UnsolicitedMessageHandler * umh      = UMHandlerPool;
     UnsolicitedMessageHandler * selected = nullptr;
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
@@ -928,7 +929,7 @@ CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType,
 
 CHIP_ERROR ChipExchangeManager::UnregisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con)
 {
-    UnsolicitedMessageHandler * umh = (UnsolicitedMessageHandler *) UMHandlerPool;
+    UnsolicitedMessageHandler * umh = UMHandlerPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
         if (umh->Handler != nullptr && umh->ProfileId == profileId && umh->MessageType == msgType && umh->Con == con)
@@ -1077,7 +1078,7 @@ void ChipExchangeManager::AllowUnsolicitedMessages(ChipConnection * con)
  */
 void ChipExchangeManager::NotifyKeyFailed(uint64_t peerNodeId, uint16_t keyId, CHIP_ERROR keyErr)
 {
-    ExchangeContext * ec = (ExchangeContext *) ContextPool;
+    ExchangeContext * ec = ContextPool;
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
@@ -1127,7 +1128,7 @@ void ChipExchangeManager::NotifySecurityManagerAvailable()
  */
 void ChipExchangeManager::ClearMsgCounterSyncReq(uint64_t peerNodeId)
 {
-    RetransTableEntry * re = (RetransTableEntry *) RetransTable;
+    RetransTableEntry * re = RetransTable;
 
     // Find all retransmit entries (re) matching peerNodeId and using application group key.
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++, re++)
@@ -1152,7 +1153,7 @@ void ChipExchangeManager::ClearMsgCounterSyncReq(uint64_t peerNodeId)
  */
 void ChipExchangeManager::RetransPendingAppGroupMsgs(uint64_t peerNodeId)
 {
-    RetransTableEntry * re = (RetransTableEntry *) RetransTable;
+    RetransTableEntry * re = RetransTable;
 
     // Find all retransmit entries (re) matching peerNodeId and using application group key.
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++, re++)
@@ -1227,12 +1228,12 @@ void ChipExchangeManager::TicklessDebugDumpRetransTable(const char * log)
  * that action.
  *
  */
-void ChipExchangeManager::RMPExecuteActions(void)
+void ChipExchangeManager::RMPExecuteActions()
 {
     ExchangeContext * ec = nullptr;
 
     // Process Ack Tables for all ExchangeContexts
-    ec = (ExchangeContext *) ContextPool;
+    ec = ContextPool;
 
 #if defined(RMP_TICKLESS_DEBUG)
     ChipLogProgress(ExchangeManager, "RMPExecuteActions");
@@ -1321,14 +1322,14 @@ void ChipExchangeManager::RMPExecuteActions(void)
  * RMP timer tick expiry.
  *
  */
-void ChipExchangeManager::RMPExpireTicks(void)
+void ChipExchangeManager::RMPExpireTicks()
 {
     uint64_t now         = 0;
     ExchangeContext * ec = nullptr;
     uint32_t deltaTicks;
 
     // Process Ack Tables for all ExchangeContexts
-    ec = (ExchangeContext *) ContextPool;
+    ec = ContextPool;
 
     now = System::Timer::GetCurrentEpoch();
 
@@ -1665,7 +1666,7 @@ void ChipExchangeManager::RMPStartTimer()
     ExchangeContext * ec  = nullptr;
 
     // When do we need to next wake up to send an ACK?
-    ec = (ExchangeContext *) ContextPool;
+    ec = ContextPool;
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
@@ -1730,7 +1731,7 @@ void ChipExchangeManager::RMPStartTimer()
             ChipLogProgress(ExchangeManager, "RMPStartTimer set timer for %d %" PRIu64, timerArmValue, timerExpiryEpoch);
 #endif
             RMPStopTimer();
-            res = MessageLayer->SystemLayer->StartTimer((uint32_t) timerArmValue, RMPTimeout, this);
+            res = MessageLayer->SystemLayer->StartTimer(static_cast<uint32_t>(timerArmValue), RMPTimeout, this);
 
             VerifyOrDieWithMsg(res == CHIP_NO_ERROR, ExchangeManager, "Cannot start RMPTimeout\n");
             mRMPCurrentTimerExpiry = timerExpiryEpoch;
@@ -1762,7 +1763,7 @@ void ChipExchangeManager::RMPStopTimer()
  *  Initialize the shared pool of Bindings.
  *
  */
-void ChipExchangeManager::InitBindingPool(void)
+void ChipExchangeManager::InitBindingPool()
 {
     memset(BindingPool, 0, sizeof(BindingPool));
     for (size_t i = 0; i < CHIP_CONFIG_MAX_BINDINGS; ++i)
@@ -1779,7 +1780,7 @@ void ChipExchangeManager::InitBindingPool(void)
  *  @return  A pointer to the newly allocated Binding, or NULL if the pool has been exhausted
  *
  */
-Binding * ChipExchangeManager::AllocBinding(void)
+Binding * ChipExchangeManager::AllocBinding()
 {
     Binding * pResult = nullptr;
 

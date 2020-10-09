@@ -24,6 +24,6 @@
 #ifndef TESTCONFIGURATIONMGR_H
 #define TESTCONFIGURATIONMGR_H
 
-int TestConfigurationMgr(void);
+int TestConfigurationMgr();
 
 #endif // TESTCONFIGURATIONMGR_H

@@ -2,86 +2,63 @@
 	path = third_party/nlassert/repo
 	url = https://github.com/nestlabs/nlassert.git
 	branch = master
-	ignore = dirty
-	commit = bd2f082102d4456ca750189ee853fa8c7443af59
 [submodule "nlfaultinjection"]
 	path = third_party/nlfaultinjection/repo
 	url = https://github.com/nestlabs/nlfaultinjection.git
 	branch = master
-	ignore = dirty
-	commit = 79f92f309de58c4591f53a9b492600550b473c84
 [submodule "nlio"]
 	path = third_party/nlio/repo
 	url = https://github.com/nestlabs/nlio.git
 	branch = master
-	ignore = dirty
-	commit = 8a4048faf7c84c6c9e3c9b3e79f7dc48d5d69f71
 [submodule "nlunit-test"]
 	path = third_party/nlunit-test/repo
 	url = https://github.com/nestlabs/nlunit-test.git
 	branch = master
-	ignore = dirty
-	commit = ef5a2b9a8b71ad592fcf3681968fd63c844e3d81
 [submodule "mbedtls"]
 	path = third_party/mbedtls/repo
 	url = https://github.com/ARMmbed/mbedtls.git
 	branch = mbedtls-2.18
-	ignore = dirty
-	commit = ca933c7e0c9e84738b168b6b0feb89af4183a60a
 [submodule "qrcode"]
 	path = examples/common/QRCode/repo
 	url = https://github.com/nayuki/QR-Code-generator.git
 	branch = master
-	ignore = dirty
-	commit = 455e0b24272f164cfc1b2a1b47fe3903b821dc39
 [submodule "m5stack-tft"]
 	path = examples/common/m5stack-tft/repo
 	url = https://github.com/jeremyjh/ESP32_TFT_library.git
 	branch = master
-	ignore = dirty
-	commit = a1ece2c500cf179db8f0c7dbc7bb8f3ace562142
 [submodule "pigweed"]
 	path = third_party/pigweed/repo
 	url = https://pigweed.googlesource.com/pigweed/pigweed
 	branch = master
-	ignore = dirty
-	commit = fbd4a11583798365618375fd705fe1fd5c70ff9e
 [submodule "openthread"]
 	path = third_party/openthread/repo
 	url = https://github.com/openthread/openthread.git
 	branch = master
-	ignore = dirty
-	commit = c9004a6f3f129778fcab7dfcf9060f0f168c06b8
 [submodule "ot-br-posix"]
 	path = third_party/ot-br-posix/repo
 	url = https://github.com/openthread/ot-br-posix.git
 	branch = master
-	ignore = dirty
-	commit = 47ba8653be21ed4d1cc75b7eebd0047b1945a820
 [submodule "bluez"]
 	path = third_party/bluez/repo
 	url = git://git.kernel.org/pub/scm/bluetooth/bluez.git
 	branch = master
-	ignore = dirty
-	commit = 81bcf6a61b67c933c84011ce998e4dc10f267024
 [submodule "ot-commissioner"]
 	path = third_party/ot-commissioner/repo
 	url = https://github.com/openthread/ot-commissioner
 	branch = master
-	ignore = dirty
-	commit = ad96e6f6f5b1915844ba4481bf8d0b66af91175e
 [submodule "cirque"]
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
 	branch = master
-	ignore = dirty
-	commit = bc42efe2e0e8f4e0eed7bd08a51e046943a11b98
 [submodule "happy"]
 	path = third_party/happy/repo
 	url = https://github.com/openweave/happy.git
 	branch = master
-	ignore = dirty
-	commit = 72102da049234815ba2c0184a7a13f1cb5ab4263
 [submodule "nanopb"]
 	path = third_party/nanopb/repo
 	url = https://github.com/nanopb/nanopb.git
+	branch = master
+[submodule "qpg_sdk"]
+	path = third_party/qpg_sdk/repo
+	url = https://github.com/Qorvo/qpg-connectedhomeip
+	branch = master

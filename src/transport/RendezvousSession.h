@@ -25,11 +25,18 @@
 #define __TRANSPORT_RENDEZVOUSSESSION_H__
 
 #include <core/CHIPCore.h>
+#include <protocols/CHIPProtocols.h>
+#include <support/BufBound.h>
+#include <transport/NetworkProvisioning.h>
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecurePairingSession.h>
 
 namespace chip {
+
+namespace DeviceLayer {
+class CHIPDeviceEvent;
+}
 
 /**
  * RendezvousSession establishes and maintains the first connection between
@@ -53,11 +60,22 @@ namespace chip {
  *
  * @dotfile dots/Rendezvous/RendezvousSessionInit.dot
  */
-class RendezvousSession : public SecurePairingSessionDelegate, public RendezvousSessionDelegate
+class RendezvousSession : public SecurePairingSessionDelegate,
+                          public RendezvousSessionDelegate,
+                          public RendezvousDeviceCredentialsDelegate,
+                          public NetworkProvisioningDelegate
 {
 public:
-    RendezvousSession(RendezvousSessionDelegate * delegate, const RendezvousParameters & params) :
-        mDelegate(delegate), mParams(params)
+    enum State : uint8_t
+    {
+        kInit = 0,
+        kSecurePairing,
+        kNetworkProvisioning,
+        kRendezvousComplete,
+    };
+
+    RendezvousSession(RendezvousSessionDelegate * delegate, DeviceNetworkProvisioningDelegate * networkDelegate = nullptr) :
+        mDelegate(delegate), mDeviceNetworkProvisionDelegate(networkDelegate)
     {}
     ~RendezvousSession() override;
 
@@ -67,7 +85,7 @@ public:
      *
      * @ return CHIP_ERROR  The result of the initialization
      */
-    CHIP_ERROR Init();
+    CHIP_ERROR Init(const RendezvousParameters & params);
 
     /**
      * @brief
@@ -86,7 +104,25 @@ public:
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(System::/*  */ PacketBuffer * buffer) override;
+
+    //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
+    void SendNetworkCredentials(const char * ssid, const char * passwd) override;
+    void SendOperationalCredentials() override;
+
+    //////////// NetworkProvisioningDelegate Implementation ///////////////
+    CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBug) override;
+    void OnNetworkProvisioningError(CHIP_ERROR error) override;
+    void OnNetworkProvisioningComplete() override;
+
+    /**
+     * @brief
+     *  Get the IP address assigned to the device during network provisioning
+     *  process.
+     *
+     * @return The IP address of the device
+     */
+    const Inet::IPAddress & GetIPAddress() const { return mNetworkProvision.GetIPAddress(); }
 
 private:
     CHIP_ERROR SendPairingMessage(System::PacketBuffer * msgBug);
@@ -94,18 +130,20 @@ private:
     CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
 
-    CHIP_ERROR SendSecureMessage(System::PacketBuffer * msgBug);
     CHIP_ERROR HandleSecureMessage(System::PacketBuffer * msgBuf);
-
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
-    const RendezvousParameters mParams;              ///< Rendezvous configuration
+    RendezvousParameters mParams;                    ///< Rendezvous configuration
 
     SecurePairingSession mPairingSession;
+    NetworkProvisioning mNetworkProvision;
+    DeviceNetworkProvisioningDelegate * mDeviceNetworkProvisionDelegate = nullptr;
     SecureSession mSecureSession;
-    bool mPairingInProgress      = false;
     uint32_t mSecureMessageIndex = 0;
     uint16_t mNextKeyId          = 0;
+
+    RendezvousSession::State mCurrentState = State::kInit;
+    void UpdateState(RendezvousSession::State newState);
 };
 
 } // namespace chip

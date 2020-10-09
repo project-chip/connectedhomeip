@@ -176,7 +176,7 @@ protected:
  * chip application should use this to access features of the ConfigurationManager object
  * that are common to all platforms.
  */
-extern ConfigurationManager & ConfigurationMgr(void);
+extern ConfigurationManager & ConfigurationMgr();
 
 /**
  * Returns the platform-specific implementation of the ConfigurationManager singleton object.
@@ -184,7 +184,7 @@ extern ConfigurationManager & ConfigurationMgr(void);
  * chip applications can use this to gain access to features of the ConfigurationManager
  * that are specific to the selected platform.
  */
-extern ConfigurationManagerImpl & ConfigurationMgrImpl(void);
+extern ConfigurationManagerImpl & ConfigurationMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip

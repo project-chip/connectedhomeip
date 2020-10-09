@@ -76,6 +76,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 using namespace chip;
+using namespace chip::Inet;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static sys_mbox_t * sLwIPEventQueue   = NULL;
@@ -106,7 +107,7 @@ struct RestartCallbackContext
     char ** mArgv;
 };
 
-static void RebootCallbackFn(void);
+static void RebootCallbackFn();
 static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::FaultInjection::Identifier aId,
                                     nl::FaultInjection::Record * aFaultRecord);
 
@@ -168,7 +169,7 @@ static void ExitOnSIGUSR1Handler(int signum)
 }
 
 // We set a hook to exit when we receive SIGUSR1, SIGTERM or SIGHUP
-void SetSIGUSR1Handler(void)
+void SetSIGUSR1Handler()
 {
     SetSignalHandler(ExitOnSIGUSR1Handler);
 }
@@ -643,7 +644,7 @@ void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t
             printf("   ");
 
         for (j = i; j < rowEnd && j < len; j++)
-            if (isprint((char) mem[j]))
+            if (isprint(static_cast<char>(mem[j])))
                 printf("%c", mem[j]);
             else
                 printf(".");
@@ -658,7 +659,7 @@ void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix)
 
     DumpMemory(mem, len, prefix, kRowWidth);
 }
-static void RebootCallbackFn(void)
+static void RebootCallbackFn()
 {
     char * lArgv[sRestartCallbackCtx.mArgc + 2];
     int i;
@@ -762,7 +763,7 @@ void SetupFaultInjectionContext(int argc, char * argv[])
     SetupFaultInjectionContext(argc, argv, nullptr, nullptr);
 }
 
-void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(void),
+void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(),
                                 void (*aInjectAsyncEvents)(int32_t index))
 {
     nl::FaultInjection::Manager & weavemgr  = chip::FaultInjection::GetManager();

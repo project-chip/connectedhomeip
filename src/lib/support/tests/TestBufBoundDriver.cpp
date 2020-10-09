@@ -25,7 +25,7 @@
 
 #include "TestSupport.h"
 
-int main(void)
+int main()
 {
     return TestBufBound();
 }

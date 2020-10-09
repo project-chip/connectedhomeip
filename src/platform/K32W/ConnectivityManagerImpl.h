@@ -33,7 +33,6 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
-#include <support/FlagUtils.hpp>
 
 namespace chip {
 namespace DeviceLayer {

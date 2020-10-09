@@ -107,7 +107,7 @@ void InetLayer::UpdateSnapshot(chip::System::Stats::Snapshot & aSnapshot)
  *  method must be called successfully prior to using the object.
  *
  */
-InetLayer::InetLayer(void)
+InetLayer::InetLayer()
 {
     State = kState_NotInitialized;
 
@@ -308,7 +308,7 @@ exit:
  *          the reason for shutdown failure.
  *
  */
-INET_ERROR InetLayer::Shutdown(void)
+INET_ERROR InetLayer::Shutdown()
 {
     INET_ERROR err;
 
@@ -388,7 +388,7 @@ exit:
  *         otherwise, NULL.
  *
  */
-void * InetLayer::GetPlatformData(void)
+void * InetLayer::GetPlatformData()
 {
     return mPlatformData;
 }
@@ -406,7 +406,7 @@ void InetLayer::SetPlatformData(void * aPlatformData)
 }
 
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT && INET_TCP_IDLE_CHECK_INTERVAL > 0
-bool InetLayer::IsIdleTimerRunning(void)
+bool InetLayer::IsIdleTimerRunning()
 {
     bool timerRunning = false;
 
@@ -495,10 +495,11 @@ INET_ERROR InetLayer::GetLinkLocalAddr(InterfaceId link, IPAddress * llAddr)
                 if ((ifaddr_iter->ifa_addr->sa_family == AF_INET6) &&
                     ((link == INET_NULL_INTERFACEID) || (if_nametoindex(ifaddr_iter->ifa_name) == link)))
                 {
-                    struct in6_addr * sin6_addr = &((struct sockaddr_in6 *) ifaddr_iter->ifa_addr)->sin6_addr;
+                    struct in6_addr * sin6_addr = &(reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr;
                     if (sin6_addr->s6_addr[0] == 0xfe && (sin6_addr->s6_addr[1] & 0xc0) == 0x80) // Link Local Address
                     {
-                        (*llAddr) = IPAddress::FromIPv6(((struct sockaddr_in6 *) ifaddr_iter->ifa_addr)->sin6_addr);
+                        (*llAddr) =
+                            IPAddress::FromIPv6((reinterpret_cast<struct sockaddr_in6 *>(ifaddr_iter->ifa_addr))->sin6_addr);
                         break;
                     }
                 }

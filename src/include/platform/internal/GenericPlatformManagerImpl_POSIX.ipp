@@ -49,19 +49,11 @@ namespace DeviceLayer {
 namespace Internal {
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack(void)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_InitChipStack()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     mChipStackLock = PTHREAD_MUTEX_INITIALIZER;
-
-    // Initialize the Configuration Manager object.
-    err = ConfigurationMgr().Init();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(DeviceLayer, "Configuration Manager initialization failed: %s", ErrorStr(err));
-    }
-    SuccessOrExit(err);
 
     // Call up to the base class _InitChipStack() to perform the bulk of the initialization.
     err = GenericPlatformManagerImpl<ImplClass>::_InitChipStack();
@@ -74,21 +66,23 @@ exit:
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack(void)
+void GenericPlatformManagerImpl_POSIX<ImplClass>::_LockChipStack()
 {
-    assert(pthread_mutex_lock(&mChipStackLock) == 0);
+    int err = pthread_mutex_lock(&mChipStackLock);
+    assert(err == 0);
 }
 
 template <class ImplClass>
-bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack(void)
+bool GenericPlatformManagerImpl_POSIX<ImplClass>::_TryLockChipStack()
 {
     return pthread_mutex_trylock(&mChipStackLock) == 0;
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack(void)
+void GenericPlatformManagerImpl_POSIX<ImplClass>::_UnlockChipStack()
 {
-    assert(pthread_mutex_unlock(&mChipStackLock) == 0);
+    int err = pthread_mutex_unlock(&mChipStackLock);
+    assert(err == 0);
 }
 
 template <class ImplClass>
@@ -182,7 +176,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
 }
 
 template <class ImplClass>
-void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop(void)
+void GenericPlatformManagerImpl_POSIX<ImplClass>::_RunEventLoop()
 {
     Impl()->LockChipStack();
 
@@ -205,7 +199,7 @@ void * GenericPlatformManagerImpl_POSIX<ImplClass>::EventLoopTaskMain(void * arg
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask(void)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_StartEventLoopTask()
 {
     int err;
     err = pthread_attr_init(&mChipTaskAttr);
@@ -221,7 +215,7 @@ exit:
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown(void)
+CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
 {
     int err = 0;
     mShouldRunEventLoop.store(false, std::memory_order_relaxed);

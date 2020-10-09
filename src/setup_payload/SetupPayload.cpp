@@ -29,6 +29,7 @@
 #include <core/CHIPTLVUtilities.hpp>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <utility>
 
 using namespace chip;
 using namespace std;
@@ -105,7 +106,7 @@ CHIP_ERROR SetupPayload::addOptionalVendorData(uint8_t tag, string data)
     OptionalQRCodeInfo info;
     info.tag  = tag;
     info.type = optionalQRCodeInfoTypeString;
-    info.data = data;
+    info.data = std::move(data);
 
     err = addOptionalVendorData(info);
     SuccessOrExit(err);
@@ -132,9 +133,9 @@ exit:
 vector<OptionalQRCodeInfo> SetupPayload::getAllOptionalVendorData()
 {
     vector<OptionalQRCodeInfo> returnedOptionalInfo;
-    for (map<uint8_t, OptionalQRCodeInfo>::iterator it = optionalVendorData.begin(); it != optionalVendorData.end(); ++it)
+    for (auto & entry : optionalVendorData)
     {
-        returnedOptionalInfo.push_back(it->second);
+        returnedOptionalInfo.push_back(entry.second);
     }
     return returnedOptionalInfo;
 }
@@ -156,7 +157,7 @@ CHIP_ERROR SetupPayload::addSerialNumber(string serialNumber)
     OptionalQRCodeInfoExtension info;
     info.tag  = kSerialNumberTag;
     info.type = optionalQRCodeInfoTypeString;
-    info.data = serialNumber;
+    info.data = std::move(serialNumber);
 
     err = addOptionalExtensionData(info);
     SuccessOrExit(err);
@@ -203,7 +204,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SetupPayload::removeSerialNumber(void)
+CHIP_ERROR SetupPayload::removeSerialNumber()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(optionalExtensionData.find(kSerialNumberTag) != optionalExtensionData.end(), err = CHIP_ERROR_KEY_NOT_FOUND);
@@ -272,10 +273,9 @@ optionalQRCodeInfoType SetupPayload::getNumericTypeFor(uint8_t tag)
 vector<OptionalQRCodeInfoExtension> SetupPayload::getAllOptionalExtensionData()
 {
     vector<OptionalQRCodeInfoExtension> returnedOptionalInfo;
-    for (map<uint8_t, OptionalQRCodeInfoExtension>::iterator it = optionalExtensionData.begin(); it != optionalExtensionData.end();
-         ++it)
+    for (auto & entry : optionalExtensionData)
     {
-        returnedOptionalInfo.push_back(it->second);
+        returnedOptionalInfo.push_back(entry.second);
     }
     return returnedOptionalInfo;
 }
@@ -295,7 +295,7 @@ bool SetupPayload::operator==(SetupPayload & input)
     inputOptionalVendorData = input.getAllOptionalVendorData();
     VerifyOrExit(optionalVendorData.size() == inputOptionalVendorData.size(), isIdentical = false);
 
-    for (OptionalQRCodeInfo inputInfo : inputOptionalVendorData)
+    for (const OptionalQRCodeInfo & inputInfo : inputOptionalVendorData)
     {
         OptionalQRCodeInfo info;
         CHIP_ERROR err = getOptionalVendorData(inputInfo.tag, info);
@@ -308,7 +308,7 @@ bool SetupPayload::operator==(SetupPayload & input)
     inputOptionalExtensionData = input.getAllOptionalExtensionData();
     VerifyOrExit(optionalExtensionData.size() == inputOptionalExtensionData.size(), isIdentical = false);
 
-    for (OptionalQRCodeInfoExtension inputInfo : inputOptionalExtensionData)
+    for (const OptionalQRCodeInfoExtension & inputInfo : inputOptionalExtensionData)
     {
         OptionalQRCodeInfoExtension info;
         CHIP_ERROR err = getOptionalExtensionData(inputInfo.tag, info);

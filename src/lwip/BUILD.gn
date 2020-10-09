@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/lwip.gni")
 
-import("${chip_root}/gn/chip/buildconfig_header.gni")
+import("${chip_root}/build/chip/buildconfig_header.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${lwip_root}/lwip.gni")
 
@@ -28,7 +28,8 @@ if (lwip_platform == "") {
 }
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
-           lwip_platform == "nrf5" || lwip_platform == "efr32",
+           lwip_platform == "nrf5" || lwip_platform == "efr32" ||
+           lwip_platform == "qpg6100",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -42,6 +43,8 @@ if (lwip_platform == "nrf5") {
   import("//build_overrides/nrf5_sdk.gni")
 } else if (lwip_platform == "efr32") {
   import("//build_overrides/efr32_sdk.gni")
+} else if (lwip_platform == "qpg6100") {
+  import("//build_overrides/qpg6100_sdk.gni")
 }
 
 buildconfig_header("lwip_buildconfig") {
@@ -50,8 +53,10 @@ buildconfig_header("lwip_buildconfig") {
 
   defines = [ "HAVE_LWIP_UDP_BIND_NETIF=1" ]
   if (lwip_platform != "external") {
-    # Automatically enable LWIP_DEBUG for internal is_debug builds.
-    defines += [ "LWIP_DEBUG=${is_debug}" ]
+    if (is_debug) {
+      # Automatically enable LWIP_DEBUG for internal is_debug builds.
+      defines += [ "LWIP_DEBUG=1" ]
+    }
 
     if (current_os == "android") {
       defines += [ "LWIP_NO_STDINT_H=1" ]
@@ -104,6 +109,8 @@ if (current_os == "zephyr") {
       public_deps += [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
     } else if (lwip_platform == "efr32") {
       public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
+    } else if (lwip_platform == "qpg6100") {
+      public_deps += [ "${qpg6100_sdk_build_root}:qpg6100_sdk" ]
     }
 
     public_configs = [

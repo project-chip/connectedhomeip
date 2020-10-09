@@ -28,9 +28,33 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "sdkconfig.h"
+
+#if CONFIG_BT_BLUEDROID_ENABLED
+
 #include "esp_bt.h"
 #include "esp_gap_ble_api.h"
 #include "esp_gatts_api.h"
+#elif CONFIG_BT_NIMBLE_ENABLED
+
+/* min max macros in NimBLE can cause build issues with generic min max
+ * functions defined in CHIP.*/
+#define min
+#define max
+#include "host/ble_hs.h"
+#undef min
+#undef max
+
+/* GATT context */
+struct ble_gatt_char_context
+{
+    uint16_t conn_handle;
+    uint16_t attr_handle;
+    struct ble_gatt_access_ctxt * ctxt;
+    void * arg;
+};
+
+#endif
 
 namespace chip {
 namespace DeviceLayer {
@@ -40,9 +64,9 @@ namespace Internal {
  * Concrete implementation of the NetworkProvisioningServer singleton object for the ESP32 platform.
  */
 class BLEManagerImpl final : public BLEManager,
-                             private ::chip::Ble::BleLayer,
-                             private BlePlatformDelegate,
-                             private BleApplicationDelegate
+                             private Ble::BleLayer,
+                             private Ble::BlePlatformDelegate,
+                             private Ble::BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -62,22 +86,24 @@ class BLEManagerImpl final : public BLEManager,
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    ::chip::Ble::BleLayer * _GetBleLayer(void) const;
+    ::chip::Ble::BleLayer * _GetBleLayer(void);
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
-    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
-    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId) override;
+    bool SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                 const Ble::ChipBleUUID * charId) override;
+    bool UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId,
+                                   const Ble::ChipBleUUID * charId) override;
     bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
-    bool SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                        PacketBuffer * pBuf) override;
-    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                          PacketBuffer * pBuf) override;
-    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                         PacketBuffer * pBuf) override;
-    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,
-                          const ChipBleUUID * charId) override;
+    bool SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                        System::PacketBuffer * pBuf) override;
+    bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                          System::PacketBuffer * pBuf) override;
+    bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
+                         System::PacketBuffer * pBuf) override;
+    bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
+                          const Ble::ChipBleUUID * charId) override;
 
     // ===== Members that implement virtual methods on BleApplicationDelegate.
 
@@ -114,9 +140,13 @@ class BLEManagerImpl final : public BLEManager,
         kMaxDeviceNameLength = 16
     };
 
+#if CONFIG_BT_NIMBLE_ENABLED
+    uint16_t mSubscribedConIds[kMaxConnections];
+#endif
+
     struct CHIPoBLEConState
     {
-        PacketBuffer * PendingIndBuf;
+        System::PacketBuffer * PendingIndBuf;
         uint16_t ConId;
         uint16_t MTU : 10;
         uint16_t Allocated : 1;
@@ -126,7 +156,11 @@ class BLEManagerImpl final : public BLEManager,
 
     CHIPoBLEConState mCons[kMaxConnections];
     CHIPoBLEServiceMode mServiceMode;
+#if CONFIG_BT_BLUEDROID_ENABLED
     esp_gatt_if_t mAppIf;
+#elif CONFIG_BT_NIMBLE_ENABLED
+    uint16_t mNumGAPCons;
+#endif
     uint16_t mServiceAttrHandle;
     uint16_t mRXCharAttrHandle;
     uint16_t mTXCharAttrHandle;
@@ -138,6 +172,8 @@ class BLEManagerImpl final : public BLEManager,
     CHIP_ERROR InitESPBleLayer(void);
     CHIP_ERROR ConfigureAdvertisingData(void);
     CHIP_ERROR StartAdvertising(void);
+
+#if CONFIG_BT_BLUEDROID_ENABLED
     void HandleGATTControlEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     void HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     void HandleRXCharWrite(esp_ble_gatts_cb_param_t * param);
@@ -151,6 +187,30 @@ class BLEManagerImpl final : public BLEManager,
 
     static void HandleGATTEvent(esp_gatts_cb_event_t event, esp_gatt_if_t gatts_if, esp_ble_gatts_cb_param_t * param);
     static void HandleGAPEvent(esp_gap_ble_cb_event_t event, esp_ble_gap_cb_param_t * param);
+
+#elif CONFIG_BT_NIMBLE_ENABLED
+    void HandleRXCharRead(struct ble_gatt_char_context * param);
+    void HandleRXCharWrite(struct ble_gatt_char_context * param);
+    void HandleTXCharWrite(struct ble_gatt_char_context * param);
+    void HandleTXCharRead(struct ble_gatt_char_context * param);
+    void HandleTXCharCCCDRead(void * param);
+    void HandleTXCharCCCDWrite(struct ble_gap_event * gapEvent);
+    CHIP_ERROR HandleTXComplete(struct ble_gap_event * gapEvent);
+    CHIP_ERROR HandleGAPConnect(struct ble_gap_event * gapEvent);
+    CHIP_ERROR HandleGAPDisconnect(struct ble_gap_event * gapEvent);
+    CHIP_ERROR SetSubscribed(uint16_t conId);
+    bool UnsetSubscribed(uint16_t conId);
+    bool IsSubscribed(uint16_t conId);
+
+    static void bleprph_host_task(void * param);
+    static void bleprph_on_sync(void);
+    static void bleprph_on_reset(int);
+    static const struct ble_gatt_svc_def CHIPoBLEGATTAttrs[];
+    static int ble_svr_gap_event(struct ble_gap_event * event, void * arg);
+
+    static int gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_handle, struct ble_gatt_access_ctxt * ctxt, void * arg);
+#endif
+
     static void DriveBLEState(intptr_t arg);
 };
 
@@ -176,9 +236,9 @@ inline BLEManagerImpl & BLEMgrImpl(void)
     return BLEManagerImpl::sInstance;
 }
 
-inline ::chip::Ble::BleLayer * BLEManagerImpl::_GetBleLayer() const
+inline ::chip::Ble::BleLayer * BLEManagerImpl::_GetBleLayer()
 {
-    return (BleLayer *) (this);
+    return this;
 }
 
 inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)

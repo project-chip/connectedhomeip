@@ -22,10 +22,14 @@ import("//build_overrides/pigweed.gni")
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
 
-import("${chip_root}/gn/chip/tests.gni")
-import("${chip_root}/gn/chip/tools.gni")
+import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/build/chip/tools.gni")
 
 if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
+  declare_args() {
+    chip_enable_python_modules = true
+  }
+
   # This is a real toolchain. Build CHIP.
   group("default") {
     deps = [ ":all" ]
@@ -67,6 +71,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
       ]
+      if (chip_enable_python_modules) {
+        deps += [ "${chip_root}/src/controller/python" ]
+      }
     }
 
     if (current_os == "android") {
@@ -84,7 +91,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   }
 } else {
   # This is the unified build. Configure various real toolchains.
-  import("${chip_root}/gn/chip/chip_build.gni")
+  import("${chip_root}/build/chip/chip_build.gni")
   declare_args() {
     # Set this to false to disable all builds by default.
     enable_default_builds = true
@@ -97,6 +104,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     # Set this to true to enable efr32 builds by default.
     enable_efr32_builds = false
+
+    # Set this to true to enable qpg6100 builds by default.
+    enable_qpg6100_builds = false
   }
 
   declare_args() {
@@ -121,8 +131,14 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Build the nRF5 lighting app example.
     enable_nrf5_lighting_app_build = enable_nrf5_builds
 
+    # Build the nRF5 pigweed app example.
+    enable_nrf5_pigweed_app_build = enable_nrf5_builds
+
     # Build the efr32 lock app example.
     enable_efr32_lock_app_build = enable_efr32_builds
+
+    # Build the qpg6100 lock app example.
+    enable_qpg6100_lock_app_build = enable_qpg6100_builds
 
     # Build the efr32 lighting app example.
     enable_efr32_lighting_app_build = enable_efr32_builds
@@ -180,9 +196,21 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_nrf5_pigweed_app_build) {
+    group("nrf5_pigweed_app") {
+      deps = [ "${chip_root}/examples/pigweed-app/nrf5(${chip_root}/config/nrf5/toolchain:nrf5_pigweed_app)" ]
+    }
+  }
+
   if (enable_efr32_lock_app_build) {
     group("efr32_lock_app") {
       deps = [ "${chip_root}/examples/lock-app/efr32(${chip_root}/config/efr32/toolchain:efr32_lock_app)" ]
+    }
+  }
+
+  if (enable_qpg6100_lock_app_build) {
+    group("qpg6100_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/qpg6100(${chip_root}/config/qpg6100/toolchain:qpg6100_lock_app)" ]
     }
   }
 
@@ -222,6 +250,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_nrf5_lighting_app_build) {
       deps += [ ":nrf5_lighting_app" ]
+    }
+    if (enable_nrf5_pigweed_app_build) {
+      deps += [ ":nrf5_pigweed_app" ]
     }
     if (enable_efr32_lock_app_build) {
       deps += [ ":efr32_lock_app" ]

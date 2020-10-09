@@ -37,13 +37,21 @@ jobs:
             image: connectedhomeip/chip-build:0.4.8
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
-            options: --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
+            options:
+                --sysctl "net.ipv6.conf.all.disable_ipv6=0
+                net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1"
 
         steps:
             - name: Checkout
               uses: actions/checkout@v2
               with:
                   submodules: true
+            - name: Initialize CodeQL
+              uses: github/codeql-action/init@v1
+              with:
+                  languages: "cpp, python"
+                  queries: +security-and-quality
+
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build
@@ -68,3 +76,14 @@ jobs:
             # - name: Upload Code Coverage
             #   if: ${{ contains('main', env.BUILD_TYPE) }}
             #   run: bash <(curl -s https://codecov.io/bash)
+            - name: Show tree
+              run: find .
+            - name: Remove third_party binaries for CodeQL Analysis
+              run: find out -type d -name "third_party" -exec rm -rf {} +
+            - name: Remove dbus binaries for CodeQL Analysis
+              run: find out -type d -name "dbus" -exec rm -rf {} +
+            # - name: Remove nrfxlib binaries for CodeQL Analysis
+            #   run: find . -type d -name "nrfxlib" -exec rm -rf {} +
+            - name: Perform CodeQL Analysis
+              if: ${{ github.event_name == 'push' }}
+              uses: github/codeql-action/analyze@v1

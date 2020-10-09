@@ -24,7 +24,7 @@
 
 #include "TestQRCodeTLV.h"
 
-int main(void)
+int main()
 {
     return (TestQRCodeTLV());
 }

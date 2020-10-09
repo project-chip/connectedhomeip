@@ -228,7 +228,7 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
-    err = storage->WriteValue(key.Name, val ? true : false);
+    err = storage->WriteValue(key.Name, val);
     SuccessOrExit(err);
 
     // Commit the value to the persistent store.
@@ -459,7 +459,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PosixConfig::FactoryResetConfig(void)
+CHIP_ERROR PosixConfig::FactoryResetConfig()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLinuxStorage * storage;

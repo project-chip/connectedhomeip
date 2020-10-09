@@ -50,7 +50,7 @@ int streamer_write(streamer_t * self, const char * buf, size_t len);
 int streamer_vprintf(streamer_t * self, const char * fmt, va_list ap);
 int streamer_printf(streamer_t * self, const char * fmt, ...);
 void streamer_print_hex(streamer_t * self, const uint8_t * data, int len);
-streamer_t * streamer_get(void);
+streamer_t * streamer_get();
 
 } // namespace Shell
 } // namespace chip

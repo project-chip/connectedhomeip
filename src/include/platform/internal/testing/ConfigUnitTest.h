@@ -28,7 +28,7 @@ namespace DeviceLayer {
 namespace Internal {
 
 template <class ConfigClass>
-void RunConfigUnitTest(void)
+void RunConfigUnitTest()
 {
     CHIP_ERROR err;
 

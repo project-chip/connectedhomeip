@@ -132,18 +132,18 @@ class DLL_EXPORT RetainedPacketBuffer
 {
 public:
     // Con/destructors
-    RetainedPacketBuffer(void);
+    RetainedPacketBuffer();
     RetainedPacketBuffer(const RetainedPacketBuffer & aRetainedPacketBuffer);
-    ~RetainedPacketBuffer(void);
+    ~RetainedPacketBuffer();
 
     RetainedPacketBuffer & operator=(const RetainedPacketBuffer & aRetainedPacketBuffer);
 
-    virtual bool IsRetaining(void) const;
+    virtual bool IsRetaining() const;
 
     void Retain(System::PacketBuffer * aBuffer);
-    virtual void Release(void);
+    virtual void Release();
 
-    inline System::PacketBuffer * GetBuffer(void) { return (mBuffer); }
+    inline System::PacketBuffer * GetBuffer() { return (mBuffer); }
 
 protected:
     System::PacketBuffer * mBuffer; ///< A pointer to the retained packet buffer.
@@ -172,18 +172,18 @@ public:
     CHIP_ERROR writeString(uint16_t, char *);
     CHIP_ERROR writeBytes(uint16_t, uint8_t *);
     // standard iterator operations
-    MessageIterator & operator++(void);
+    MessageIterator & operator++();
     MessageIterator & operator+(uint16_t);
     MessageIterator & operator-(uint16_t);
     bool operator==(const MessageIterator &);
     bool operator!=(const MessageIterator &);
-    uint8_t & operator*(void);
-    void append(void);
+    uint8_t & operator*();
+    void append();
     // size checking
     bool hasData(uint16_t);
     bool hasRoom(uint16_t);
     // finishing
-    void finishWriting(void);
+    void finishWriting();
     // data members
     uint8_t * thePoint;
 };
@@ -195,7 +195,7 @@ class DLL_EXPORT ReferencedString : public RetainedPacketBuffer
 {
 public:
     // constructor
-    ReferencedString(void);
+    ReferencedString();
     // initializers
     CHIP_ERROR init(uint16_t aLength, char * aString, System::PacketBuffer * aBuffer);
     CHIP_ERROR init(uint16_t aLength, char * aString);
@@ -207,7 +207,7 @@ public:
     // comparison
     bool operator==(const ReferencedString &) const;
     // print string generation (for testing)
-    char * printString(void);
+    char * printString();
     // data members
     uint16_t theLength;
     char * theString;
@@ -241,7 +241,7 @@ public:
 
     // constructor
 
-    ReferencedTLVData(void);
+    ReferencedTLVData();
 
     // initializers
 
@@ -256,9 +256,9 @@ public:
      * left to lose.
      */
 
-    void free(void);
+    void free();
 
-    bool isFree(void);
+    bool isFree();
 
     /**
      * Check if a ReferencedTLVData object has anything in it.
@@ -271,7 +271,7 @@ public:
      * callback in hand, false otherwise.
      */
 
-    inline bool isEmpty(void) { return (theLength == 0 && theWriteCallback == nullptr); }
+    inline bool isEmpty() { return (theLength == 0 && theWriteCallback == nullptr); }
 
     // packing and parsing
 
@@ -302,7 +302,7 @@ public:
      * @return the integer length of the packed data.
      */
 
-    inline uint16_t packedLength(void) { return theLength; }
+    inline uint16_t packedLength() { return theLength; }
 
     /**
      * @fn CHIP_ERROR parse(System::PacketBuffer *buff, ReferencedTLVData &aTarget)

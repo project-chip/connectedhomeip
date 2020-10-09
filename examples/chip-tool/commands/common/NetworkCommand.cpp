@@ -20,6 +20,7 @@
 
 using namespace ::chip;
 using namespace ::chip::DeviceController;
+using namespace ::chip::System;
 
 static void onConnect(ChipDeviceController * dc, Transport::PeerConnectionState * state, void * appReqState)
 {
@@ -29,7 +30,7 @@ static void onConnect(ChipDeviceController * dc, Transport::PeerConnectionState 
     command->OnConnect(dc);
 }
 
-static void onError(ChipDeviceController * dc, void * appReqState, CHIP_ERROR err, const IPPacketInfo * pi)
+static void onError(ChipDeviceController * dc, void * appReqState, CHIP_ERROR err, const Inet::IPPacketInfo * pi)
 {
     ChipLogError(chipTool, "OnError: %s", ErrorStr(err));
 
@@ -79,7 +80,7 @@ CHIP_ERROR NetworkCommand::ConnectBLE(ChipDeviceController * dc, NodeId remoteId
 {
     snprintf(mName, sizeof(mName), "BLE:%u", mDiscriminator);
 
-    RendezvousParameters params = RendezvousParameters(mSetupPINCode).SetDiscriminator(mDiscriminator);
+    RendezvousParameters params = RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator);
     return dc->ConnectDevice(remoteId, params, NULL, onConnect, onMessage, onError);
 }
 
