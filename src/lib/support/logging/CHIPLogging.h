@@ -32,8 +32,7 @@
  *
  */
 
-#ifndef CHIPLOGGING_H_
-#define CHIPLOGGING_H_
+#pragma once
 
 #include <core/CHIPConfig.h>
 
@@ -442,5 +441,3 @@ extern bool IsCategoryEnabled(uint8_t CAT);
 
 } // namespace Logging
 } // namespace chip
-
-#endif /* CHIPLOGGING_H_ */

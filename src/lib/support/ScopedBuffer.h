@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef CHIP_SCOPED_BUFFER_H_
-#define CHIP_SCOPED_BUFFER_H_
+#pragma once
 
 #include <lib/support/CHIPMem.h>
 
@@ -176,5 +175,3 @@ public:
 
 } // namespace Platform
 } // namespace chip
-
-#endif // CHIP_SCOPED_BUFFER_H_

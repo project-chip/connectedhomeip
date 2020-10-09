@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef TESTSUPPORT_H
-#define TESTSUPPORT_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -42,5 +41,3 @@ int TestSafeInt();
 #ifdef __cplusplus
 }
 #endif
-
-#endif // TESTSUPPORT_H

@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef CODEUTILS_H_
-#define CODEUTILS_H_
+#pragma once
 
 #include <core/CHIPError.h>
 #include <support/ErrorStr.h>
@@ -411,5 +410,3 @@ inline void chipDie(void)
 #else
 #define CHECK_RETURN_VALUE
 #endif
-
-#endif /* CODEUTILS_H_ */
