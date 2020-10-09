@@ -24,8 +24,7 @@ public class ThreadCommissionerException extends Exception {
 
   private final int code;
 
-  @NonNull
-  private final String message;
+  @NonNull private final String message;
 
   public ThreadCommissionerException(int code, String message) {
     this.code = code;

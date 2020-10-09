@@ -33,11 +33,9 @@ public class CommissionerUtils {
   /**
    * This method returns the ByteArray equivalent of byte[].
    *
-   * Type ByteArray is the SWIG-generated Java mapping of C++ std::vector<uint8_t>.
-   * Since Java has no unsigned integers, SWIG needs to store uint8_t in a Java short
-   * integer. This methods cast Java bytes to shorts with leading zero
-   * (e.g. 0xFF is casted to 0x00FF).
-   *
+   * <p>Type ByteArray is the SWIG-generated Java mapping of C++ std::vector<uint8_t>. Since Java
+   * has no unsigned integers, SWIG needs to store uint8_t in a Java short integer. This methods
+   * cast Java bytes to shorts with leading zero (e.g. 0xFF is casted to 0x00FF).
    */
   public static ByteArray getByteArray(byte[] byteArray) {
     ByteArray ret = new ByteArray();

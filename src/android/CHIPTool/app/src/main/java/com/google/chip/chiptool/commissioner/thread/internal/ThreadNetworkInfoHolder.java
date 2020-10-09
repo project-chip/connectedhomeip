@@ -26,11 +26,9 @@ import com.google.chip.chiptool.commissioner.thread.ThreadNetworkInfo;
 import java.util.ArrayList;
 
 class ThreadNetworkInfoHolder implements Parcelable {
-  @NonNull
-  private final ThreadNetworkInfo networkInfo;
+  @NonNull private final ThreadNetworkInfo networkInfo;
 
-  @NonNull
-  private final ArrayList<BorderAgentInfo> borderAgents;
+  @NonNull private final ArrayList<BorderAgentInfo> borderAgents;
 
   public ThreadNetworkInfoHolder(BorderAgentInfo borderAgent) {
     networkInfo = new ThreadNetworkInfo(borderAgent.networkName, borderAgent.extendedPanId);

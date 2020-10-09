@@ -25,8 +25,7 @@ import com.google.chip.chiptool.commissioner.NetworkCredential;
 
 public class ThreadNetworkCredential implements NetworkCredential, Parcelable {
 
-  @NonNull
-  private final byte[] activeOperationalDataset;
+  @NonNull private final byte[] activeOperationalDataset;
 
   public ThreadNetworkCredential(@NonNull byte[] activeOperationalDataset) {
     this.activeOperationalDataset = activeOperationalDataset;

@@ -24,11 +24,9 @@ import androidx.annotation.NonNull;
 
 public class ThreadNetworkInfo implements Parcelable {
 
-  @NonNull
-  private final String networkName;
+  @NonNull private final String networkName;
 
-  @NonNull
-  private final byte[] extendedPanId;
+  @NonNull private final byte[] extendedPanId;
 
   public ThreadNetworkInfo(@NonNull String networkName, @NonNull byte[] extendedPanId) {
     this.networkName = networkName;
