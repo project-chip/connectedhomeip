@@ -27,7 +27,6 @@
 #include <climits>
 #include <stdint.h>
 #include <string.h>
-#include <support/SafeInt.h>
 
 namespace chip {
 
@@ -66,16 +65,7 @@ public:
         static_assert(CHAR_BIT == 8, "We're assuming char and uint8_t are the same size");
         while (*s != 0)
         {
-            if (!CanCastTo<uint8_t>(*s))
-            {
-                // This means char is signed and our value is negative.
-                Put(static_cast<uint8_t>(0xff + *s));
-            }
-            else
-            {
-                Put(static_cast<uint8_t>(*s));
-            }
-            ++s;
+            Put(static_cast<uint8_t>(*s++));
         }
         return mWritten;
     }
@@ -150,4 +140,4 @@ public:
 
 } // namespace chip
 
-#endif /* CHIP_BUFBOUND */
+#endif /* CHIP_BUFBOUND_H */

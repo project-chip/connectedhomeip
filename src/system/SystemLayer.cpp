@@ -216,10 +216,9 @@ Error Layer::NewTimer(Timer *& aTimerPtr)
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-static bool TimerReady(void * p, const Cancelable * timer)
+static bool TimerReady(const Timer::Epoch epoch, const Cancelable * timer)
 {
-    const Timer::Epoch * kCurrentEpoch = static_cast<const Timer::Epoch *>(p);
-    return !Timer::IsEarlierEpoch(*kCurrentEpoch, timer->mInfoScalar);
+    return !Timer::IsEarlierEpoch(epoch, timer->mInfoScalar);
 }
 
 static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
@@ -565,7 +564,7 @@ Error Layer::SetClock_RealTime(uint64_t newCurTime)
 void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
 {
     // dispatch TimerCallbacks
-    Cancelable ready = mTimerCallbacks.DequeueBy(TimerReady, (void *) &kCurrentEpoch);
+    Cancelable ready = mTimerCallbacks.DequeueBy(TimerReady, kCurrentEpoch);
     while (ready.mNext != &ready)
     {
         // one-shot

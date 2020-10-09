@@ -162,6 +162,17 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
     }                                                                                                                              \
     return result;
 
+#define COMMAND_INSERT_STRING(name, str)                                                                                           \
+    size_t length = strlen(str);                                                                                                   \
+    if (!CanCastTo<uint8_t>(length))                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command. String too long: %d", name, length);                                         \
+        return 0;                                                                                                                  \
+    }                                                                                                                              \
+    uint8_t str_length = static_cast<uint8_t>(length);                                                                             \
+    buf.Put(str_length);                                                                                                           \
+    buf.Put(str);
+
 #define COMMAND(name, cluster_id, command_id)                                                                                      \
     COMMAND_HEADER(name, cluster_id, command_id);                                                                                  \
     COMMAND_FOOTER(name);
@@ -171,6 +182,7 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
 #define IDENTIFY_CLUSTER_ID 0x0003
 #define TEMP_MEASUREMENT_CLUSTER_ID 0x0402
 #define COLORCONTROL_CLUSTER_ID 0x0300
+#define DOORLOCK_CLUSTER_ID 0x0101
 
 /*
  * On/Off Cluster commands
@@ -399,6 +411,23 @@ uint16_t encodeStopMoveStepCommand(uint8_t * buffer, uint16_t buf_length, uint8_
 uint16_t encodeResetToFactoryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
 {
     COMMAND("ResetToFactory", BASIC_CLUSTER_ID, 0x00);
+}
+
+/*
+ * DoorLock Cluster commands
+ */
+uint16_t encodeLockDoorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, const char * pin)
+{
+    COMMAND_HEADER("LockDoor", DOORLOCK_CLUSTER_ID, 0x00);
+    COMMAND_INSERT_STRING("LockDoor", pin);
+    COMMAND_FOOTER("LockDoor");
+}
+
+uint16_t encodeUnlockDoorCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, const char * pin)
+{
+    COMMAND_HEADER("UnlockDoor", DOORLOCK_CLUSTER_ID, 0x01);
+    COMMAND_INSERT_STRING("UnlockDoor", pin);
+    COMMAND_FOOTER("UnlockDoor");
 }
 
 } // extern "C"

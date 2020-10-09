@@ -123,7 +123,7 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
     SuccessOrExit(err);
 
     msgBuf->ConsumeHead(headerSize);
-    err = mTransport->SendMessage(header, Header::Flags::None(), Transport::PeerAddress::BLE(), msgBuf);
+    err = mTransport->SendMessage(header, Header::Flags(), Transport::PeerAddress::BLE(), msgBuf);
     SuccessOrExit(err);
 
 exit:
@@ -345,6 +345,8 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
        allocated as an inline buffer to PacketBuffer structure */
     origMsg = msgBuf;
     msgBuf  = PacketBuffer::NewWithAvailableSize(len);
+    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     msgBuf->SetDataLength(len, msgBuf);
 #endif
     plainText = msgBuf->Start();

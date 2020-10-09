@@ -181,23 +181,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
 - (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    [self.lock lock];
-    chip::Inet::IPAddress addr;
-    chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
-    err = self.cppController->ConnectDevice(
-        kRemoteDeviceId, addr, (__bridge void *) self, nil, onMessageReceived, onInternalError, CHIP_PORT);
-    [self.lock unlock];
-
-    if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, connect failed", err, [CHIPError errorForCHIPErrorCode:err]);
-        if (error) {
-            *error = [CHIPError errorForCHIPErrorCode:err];
-        }
-        return NO;
-    }
-
     // Start the IO pump
     dispatch_async(_chipSelectQueue, ^() {
         self.cppController->ServiceEvents();
@@ -289,10 +272,14 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     const void * messageChars = [message bytes];
 
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(messageLen);
-    buffer->SetDataLength(messageLen);
+    if (!buffer) {
+        err = CHIP_ERROR_NO_MEMORY;
+    } else {
+        buffer->SetDataLength(messageLen);
 
-    memcpy(buffer->Start(), messageChars, messageLen);
-    err = self.cppController->SendMessage((__bridge void *) self, buffer);
+        memcpy(buffer->Start(), messageChars, messageLen);
+        err = self.cppController->SendMessage((__bridge void *) self, buffer);
+    }
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
@@ -312,11 +299,14 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
     // FIXME: This needs a better buffersizing setup!
     static const size_t bufferSize = 1024;
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(bufferSize);
+    if (!buffer) {
+        err = CHIP_ERROR_NO_MEMORY;
+    } else {
+        uint32_t dataLength = encodeCommandBlock(buffer, (uint16_t) bufferSize);
+        buffer->SetDataLength(dataLength);
 
-    uint32_t dataLength = encodeCommandBlock(buffer, (uint16_t) bufferSize);
-    buffer->SetDataLength(dataLength);
-
-    err = self.cppController->SendMessage((__bridge void *) self, buffer);
+        err = self.cppController->SendMessage((__bridge void *) self, buffer);
+    }
     [self.lock unlock];
     if (err != CHIP_NO_ERROR) {
         CHIP_LOG_ERROR("Error(%d): %@, send failed", err, [CHIPError errorForCHIPErrorCode:err]);

@@ -288,3 +288,52 @@ jobs:
             # - name: Perform CodeQL Analysis
             #   if: ${{ github.event_name == 'push' }}
             #   uses: github/codeql-action/analyze@v1
+            - name: Perform CodeQL Analysis
+              if: ${{ github.event_name == 'push' }}
+              uses: github/codeql-action/analyze@v1
+    
+    qpg6100:
+        name: QPG6100
+        env:
+            BUILD_TYPE: gn_qpg6100
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: connectedhomeip/chip-build:0.4.8
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+                - "/tmp/output_binaries:/tmp/output_binaries"
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                  fetch-depth: 0
+                  submodules: true
+            - name: Initialize CodeQL
+              uses: github/codeql-action/init@v1
+              with:
+                  languages: "cpp"
+                  queries: +security-and-quality
+            - name: Build example QPG6100 Lock App
+              run: scripts/examples/gn_build_example.sh
+                   examples/lock-app/qpg6100 out/lock_app_debug
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v2
+              with:
+                  name:
+                      ${{ env.BUILD_TYPE }}-example-build-${{
+                      steps.outsuffix.outputs.value }}
+                  path: |
+                      out/lock_app_debug/chip-qpg6100-lock-example.out
+            - name: Perform CodeQL Analysis
+              if: ${{ github.event_name == 'push' }}
+              uses: github/codeql-action/analyze@v1

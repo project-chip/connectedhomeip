@@ -28,6 +28,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -172,7 +173,7 @@ void TLVReader::Init(const uint8_t * data, uint32_t dataLen)
  */
 void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen)
 {
-    mBufHandle = (uintptr_t) buf;
+    mBufHandle = reinterpret_cast<uintptr_t>(buf);
     mReadPoint = buf->Start();
     mBufEnd    = mReadPoint + buf->DataLength();
     mLenRead   = 0;
@@ -204,7 +205,7 @@ void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen)
  */
 void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguousBuffers)
 {
-    mBufHandle = (uintptr_t) buf;
+    mBufHandle = reinterpret_cast<uintptr_t>(buf);
     mReadPoint = buf->Start();
     mBufEnd    = mReadPoint + buf->DataLength();
     mLenRead   = 0;
@@ -370,7 +371,7 @@ CHIP_ERROR TLVReader::Get(int8_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(static_cast<uint8_t>(v64));
     return err;
 }
 
@@ -391,7 +392,7 @@ CHIP_ERROR TLVReader::Get(int16_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(static_cast<uint16_t>(v64));
     return err;
 }
 
@@ -412,7 +413,7 @@ CHIP_ERROR TLVReader::Get(int32_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(static_cast<uint32_t>(v64));
     return err;
 }
 
@@ -433,7 +434,7 @@ CHIP_ERROR TLVReader::Get(int64_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(v64);
     return err;
 }
 
@@ -520,13 +521,13 @@ CHIP_ERROR TLVReader::Get(uint64_t & v)
     switch (ElementType())
     {
     case kTLVElementType_Int8:
-        v = static_cast<int64_t>(static_cast<int8_t>(mElemLenOrVal));
+        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint8_t>(mElemLenOrVal))));
         break;
     case kTLVElementType_Int16:
-        v = static_cast<int64_t>(static_cast<int16_t>(mElemLenOrVal));
+        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint16_t>(mElemLenOrVal))));
         break;
     case kTLVElementType_Int32:
-        v = static_cast<int64_t>(static_cast<int32_t>(mElemLenOrVal));
+        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint32_t>(mElemLenOrVal))));
         break;
     case kTLVElementType_Int64:
     case kTLVElementType_UInt8:
@@ -1557,7 +1558,7 @@ TLVElementType TLVReader::ElementType() const
 
 CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen)
 {
-    PacketBuffer *& buf = (PacketBuffer *&) bufHandle;
+    PacketBuffer *& buf = reinterpret_cast<PacketBuffer *&>(bufHandle);
 
     if (buf != nullptr)
         buf = buf->Next();

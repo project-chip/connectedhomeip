@@ -187,7 +187,7 @@ public:
     /**
      * @brief dequeue, but don't cancel, all cas that match the by()
      */
-    Cancelable DequeueBy(bool (*by)(void *, const Cancelable *), void * p)
+    Cancelable DequeueBy(bool (*by)(uint64_t, const Cancelable *), uint64_t p)
     {
         Cancelable dequeued;
 

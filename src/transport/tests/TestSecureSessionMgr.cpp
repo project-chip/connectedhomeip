@@ -112,6 +112,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
+    NL_TEST_ASSERT(inSuite, buffer != nullptr);
+
     memmove(buffer->Start(), PAYLOAD, payload_len);
     buffer->SetDataLength(payload_len);
 

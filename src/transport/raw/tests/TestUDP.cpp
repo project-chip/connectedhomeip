@@ -104,6 +104,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     uint16_t payload_len = sizeof(PAYLOAD);
 
     chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
+    NL_TEST_ASSERT(inSuite, buffer != nullptr);
+
     memmove(buffer->Start(), PAYLOAD, payload_len);
     buffer->SetDataLength(payload_len);
 
@@ -121,7 +123,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
     // Should be able to send a message to itself by just calling send.
-    err = udp.SendMessage(header, Header::Flags::None(), Transport::PeerAddress::UDP(addr), buffer);
+    err = udp.SendMessage(header, Header::Flags(), Transport::PeerAddress::UDP(addr), buffer);
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO(#2698): the underlying system does not support IPV6. This early return

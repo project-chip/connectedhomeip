@@ -26,13 +26,9 @@
 @property (weak, nonatomic) IBOutlet UIButton * toggleButton;
 @property (readwrite) CHIPOnOff * onOff;
 
-@property (strong, nonatomic) UITextField * serverIPTextField;
-@property (strong, nonatomic) UIButton * serverIPDoneButton;
-
 @property (nonatomic, strong) UILabel * resultLabel;
 
 @property (readwrite) CHIPDeviceController * chipController;
-@property (readwrite) CHIPConnectivityManager * connectivityManager;
 
 @end
 
@@ -45,23 +41,11 @@
     [super viewDidLoad];
     [self setupUIElements];
 
-    // listen for taps to dismiss the keyboard
-    UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
-    [self.view addGestureRecognizer:tap];
-
     // initialize the device controller
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
-    self.connectivityManager = [CHIPConnectivityManager sharedManager];
-    [self.connectivityManager setDelegate:self queue:callbackQueue];
-
     self.onOff = [[CHIPOnOff alloc] initWithDeviceController:self.chipController];
-}
-
-- (void)dismissKeyboard
-{
-    [self.serverIPTextField resignFirstResponder];
 }
 
 // MARK: UI Setup
@@ -85,23 +69,6 @@
     [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-
-    // IP
-    UILabel * serverIPLabel = [UILabel new];
-    serverIPLabel.text = @"Server IP";
-    _serverIPTextField = [UITextField new];
-    _serverIPTextField.placeholder = @"Server IP";
-    NSString * savedServerIP = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey);
-    if ([savedServerIP length] > 0) {
-        _serverIPTextField.text = savedServerIP;
-    }
-    _serverIPDoneButton = [UIButton new];
-    [_serverIPDoneButton setTitle:@"Save" forState:UIControlStateNormal];
-    [_serverIPDoneButton addTarget:self action:@selector(saveServerID:) forControlEvents:UIControlEventTouchUpInside];
-    UIView * serverIPView = [CHIPUIViewUtils viewWithUITextField:_serverIPTextField button:_serverIPDoneButton];
-    [stackView addArrangedSubview:serverIPView];
-    serverIPView.translatesAutoresizingMaskIntoConstraints = false;
-    [serverIPView.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
     // Button stack view
     UIStackView * stackViewButtons = [UIStackView new];
@@ -158,32 +125,18 @@
 
 // MARK: UIButton actions
 
-- (IBAction)saveServerID:(id)sender
-{
-    NSString * serverIP = [self.serverIPTextField text];
-    if ([serverIP length] > 0) {
-        CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kIPKey, serverIP);
-    }
-}
-
 - (IBAction)onButtonTapped:(id)sender
 {
-    [self.connectivityManager reconnectIfNeeded];
-
     [self.onOff lightOn];
 }
 
 - (IBAction)offButtonTapped:(id)sender
 {
-    [self.connectivityManager reconnectIfNeeded];
-
     [self.onOff lightOff];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
 {
-    [self.connectivityManager reconnectIfNeeded];
-
     [self.onOff toggleLight];
 }
 
@@ -216,30 +169,6 @@
     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
         [self updateResult:resultMessage];
     });
-}
-
-// MARK: CHIPConnectivityManagerDelegate
-
-- (void)didReceiveConnectionError:(nonnull NSError *)error
-{
-    NSLog(@"Status: Connection error %@", [error description]);
-    if (error) {
-        NSString * stringError = [@"Error: " stringByAppendingString:error.description];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-            [self updateResult:stringError];
-        });
-    }
-}
-
-- (void)didReceiveDisconnectionError:(nonnull NSError *)error
-{
-    NSLog(@"Status: Disconnection error %@", [error description]);
-    if (error) {
-        NSString * stringError = [@"Error: " stringByAppendingString:error.description];
-        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-            [self updateResult:stringError];
-        });
-    }
 }
 
 @end

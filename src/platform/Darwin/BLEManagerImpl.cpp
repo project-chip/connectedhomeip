@@ -110,9 +110,9 @@ CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
-BleLayer * BLEManagerImpl::_GetBleLayer() const
+BleLayer * BLEManagerImpl::_GetBleLayer()
 {
-    return (BleLayer *) (this);
+    return this;
 }
 
 uint16_t BLEManagerImpl::_NumConnections(void)

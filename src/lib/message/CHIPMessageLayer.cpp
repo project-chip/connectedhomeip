@@ -814,7 +814,7 @@ void ChipMessageLayer::GetConnectionPoolStats(chip::System::Stats::count_t & aOu
 {
     aOutInUse = 0;
 
-    const ChipConnection * con = (ChipConnection *) mConPool;
+    const ChipConnection * con = mConPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_CONNECTIONS; i++, con++)
     {
         if (con->mRefCount != 0)
@@ -833,7 +833,7 @@ void ChipMessageLayer::GetConnectionPoolStats(chip::System::Stats::count_t & aOu
  */
 ChipConnection * ChipMessageLayer::NewConnection()
 {
-    ChipConnection * con = (ChipConnection *) mConPool;
+    ChipConnection * con = mConPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_CONNECTIONS; i++, con++)
     {
         if (con->mRefCount == 0)
@@ -852,7 +852,7 @@ void ChipMessageLayer::GetIncomingTCPConCount(const IPAddress & peerAddr, uint16
     count       = 0;
     countFromIP = 0;
 
-    ChipConnection * con = (ChipConnection *) mConPool;
+    ChipConnection * con = mConPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_CONNECTIONS; i++, con++)
     {
         if (con->mRefCount > 0 && con->NetworkType == ChipConnection::kNetworkType_IP && con->IsIncoming())

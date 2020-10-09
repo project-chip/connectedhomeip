@@ -41,3 +41,6 @@ __pycache__
 
 # Doxygen outputs
 docs/html
+
+# VSCode java extensions
+.project

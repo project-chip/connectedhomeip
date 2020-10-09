@@ -23,6 +23,8 @@
 #include <sstream>
 #include <string>
 
+#include <support/SafeInt.h>
+
 using namespace ::chip;
 using namespace ::chip::DeviceController;
 
@@ -83,7 +85,14 @@ void ModelCommand::SendCommand(ChipDeviceController * dc)
     // Make sure our buffer is big enough, but this will need a better setup!
     static const size_t bufferSize = 1024;
     auto * buffer                  = PacketBuffer::NewWithAvailableSize(bufferSize);
-    uint16_t dataLength            = EncodeCommand(buffer, bufferSize, mEndPointId);
+
+    if (buffer == nullptr)
+    {
+        ChipLogError(chipTool, "Failed to allocate memory for packet data.");
+        return;
+    }
+
+    uint16_t dataLength = EncodeCommand(buffer, bufferSize, mEndPointId);
     buffer->SetDataLength(dataLength);
     ChipLogProgress(chipTool, "Encoded data of length %d", dataLength);
 
@@ -220,8 +229,8 @@ void ModelCommand::ParseReadAttributeResponseCommandSuccess(uint16_t attrId, uin
     case 0x29: { // "Int16"
         int16_t value;
         CHECK_MESSAGE_LENGTH(messageLen == 2);
-        value = chip::Encoding::LittleEndian::Read16(message);
-        ChipLogProgress(chipTool, "Attribute value: '0x%04x'", value);
+        value = CastToSigned(chip::Encoding::LittleEndian::Read16(message));
+        ChipLogProgress(chipTool, "Attribute value: '0x%d'", value);
         break;
     }
     }

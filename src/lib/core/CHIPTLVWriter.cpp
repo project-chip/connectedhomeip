@@ -198,7 +198,7 @@ NO_INLINE void TLVWriter::Init(uint8_t * buf, uint32_t maxLen)
  */
 void TLVWriter::Init(PacketBuffer * buf, uint32_t maxLen)
 {
-    mBufHandle = (uintptr_t) buf;
+    mBufHandle = reinterpret_cast<uintptr_t>(buf);
     mBufStart = mWritePoint = buf->Start() + buf->DataLength();
     mRemainingLen           = buf->AvailableDataLength();
     if (mRemainingLen > maxLen)
@@ -1279,7 +1279,7 @@ CHIP_ERROR TLVWriter::CloseContainer(TLVWriter & containerWriter)
     SetContainerOpen(false);
 
     // Reset the container writer so that it can't accidentally be used again.
-    containerWriter.Init((uint8_t *) nullptr, 0);
+    containerWriter.Init(static_cast<uint8_t *>(nullptr), 0);
 
     return WriteElementHead(kTLVElementType_EndOfContainer, AnonymousTag, 0);
 }
@@ -1843,7 +1843,7 @@ exit:
  */
 CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHandle, uint8_t *& bufStart, uint32_t & bufLen)
 {
-    PacketBuffer * buf = (PacketBuffer *) bufHandle;
+    PacketBuffer * buf = reinterpret_cast<PacketBuffer *>(bufHandle);
 
     PacketBuffer * newBuf = buf->Next();
     if (newBuf == nullptr)
@@ -1855,7 +1855,7 @@ CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHand
 
     if (newBuf != nullptr)
     {
-        bufHandle = (uintptr_t) newBuf;
+        bufHandle = reinterpret_cast<uintptr_t>(newBuf);
         bufStart  = newBuf->Start();
         bufLen    = newBuf->MaxDataLength();
     }
@@ -1880,7 +1880,7 @@ CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHand
  */
 CHIP_ERROR TLVWriter::FinalizePacketBuffer(TLVWriter & writer, uintptr_t bufHandle, uint8_t * bufStart, uint32_t dataLen)
 {
-    PacketBuffer * buf = (PacketBuffer *) bufHandle;
+    PacketBuffer * buf = reinterpret_cast<PacketBuffer *>(bufHandle);
     uint8_t * endPtr   = bufStart + dataLen;
 
     buf->SetDataLength(endPtr - buf->Start());

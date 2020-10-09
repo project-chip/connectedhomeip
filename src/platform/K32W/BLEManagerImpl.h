@@ -67,7 +67,7 @@ private:
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    BleLayer * _GetBleLayer(void) const;
+    BleLayer * _GetBleLayer(void);
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -162,9 +162,9 @@ inline BLEManagerImpl & BLEMgrImpl(void)
     return BLEManagerImpl::sInstance;
 }
 
-inline ::nl::Ble::BleLayer * BLEManagerImpl::_GetBleLayer() const
+inline ::nl::Ble::BleLayer * BLEManagerImpl::_GetBleLayer()
 {
-    return (BleLayer *) (this);
+    return this;
 }
 
 inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
