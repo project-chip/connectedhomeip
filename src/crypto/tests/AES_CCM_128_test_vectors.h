@@ -965,4 +965,3 @@ static const struct ccm_128_test_vector * ccm_128_test_vectors[]              = 
     &chiptest_dac9e1195a0d_test_vector_217, &chiptest_dac9e1195a0d_test_vector_224, &chiptest_dac9e1195a0d_test_vector_231,
     &chiptest_dac9e1195a0d_test_vector_238, &chiptest_dac9e1195a0d_test_vector_245, &chiptest_dac9e1195a0d_test_vector_252
 };
-

@@ -108,4 +108,3 @@ private:
 
 } // namespace DeviceLayer
 } // namespace chip
-

@@ -75,4 +75,3 @@ private:
     uint32_t mEndPointId;
     uint16_t mClusterId;
 };
-

@@ -103,4 +103,3 @@ extern template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

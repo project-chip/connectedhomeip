@@ -131,4 +131,3 @@ inline void GenericThreadStackManagerImpl_OpenThread<ImplClass>::_OnWoBLEAdverti
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

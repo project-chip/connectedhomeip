@@ -42,4 +42,3 @@ private:
 
     std::map<const char *, std::vector<std::unique_ptr<Command>>> clusters;
 };
-

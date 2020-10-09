@@ -119,4 +119,3 @@ inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 
 } // namespace DeviceLayer
 } // namespace chip
-

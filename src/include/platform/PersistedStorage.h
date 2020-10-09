@@ -90,4 +90,3 @@ CHIP_ERROR Write(Key aKey, uint32_t aValue);
 } // namespace PersistedStorage
 } // namespace Platform
 } // namespace chip
-

@@ -25,4 +25,3 @@ void cmd_device_init(void);
 void cmd_misc_init(void);
 void cmd_otcli_init(void);
 }
-

@@ -56,4 +56,3 @@
 // it cannot use "openthread" in the path to the included file.
 //
 #include "openthread-core-nrf52840-config.h"
-

@@ -86,4 +86,3 @@ inline PlatformManagerImpl & PlatformMgrImpl(void)
 
 } // namespace DeviceLayer
 } // namespace chip
-

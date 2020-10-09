@@ -130,4 +130,3 @@ private:
 
 } // namespace DeviceManager
 } // namespace chip
-

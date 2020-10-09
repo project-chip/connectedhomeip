@@ -157,4 +157,3 @@ GenericConnectivityManagerImpl_NoBLE<ImplClass>::_CHIPoBLEServiceModeToStr(Conne
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

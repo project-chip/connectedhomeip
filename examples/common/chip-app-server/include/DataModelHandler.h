@@ -38,4 +38,3 @@ void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::Pac
                             chip::SecureSessionMgrBase * mgr);
 void InitDataModelHandler();
 }
-

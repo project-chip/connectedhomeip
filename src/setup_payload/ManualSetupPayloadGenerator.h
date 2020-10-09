@@ -54,4 +54,3 @@ public:
 };
 
 } // namespace chip
-

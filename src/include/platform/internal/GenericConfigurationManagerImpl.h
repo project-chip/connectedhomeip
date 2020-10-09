@@ -158,4 +158,3 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductId(uint
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

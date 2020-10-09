@@ -34,4 +34,3 @@ CHIP_ERROR base41Decode(std::string base41, std::vector<uint8_t> & out);
 std::string base41Encode(const uint8_t * buf, size_t buf_len);
 
 } // namespace chip
-

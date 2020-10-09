@@ -250,4 +250,3 @@ inline CHIP_ERROR PlatformManager::Shutdown()
 
 } // namespace DeviceLayer
 } // namespace chip
-

@@ -36,4 +36,3 @@ extern CHIP_ERROR InitChipEventLogging();
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

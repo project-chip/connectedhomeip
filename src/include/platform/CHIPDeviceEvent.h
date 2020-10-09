@@ -394,4 +394,3 @@ struct ChipDeviceEvent final
 
 } // namespace DeviceLayer
 } // namespace chip
-

@@ -60,4 +60,3 @@ void registerClusterDoorLock(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-

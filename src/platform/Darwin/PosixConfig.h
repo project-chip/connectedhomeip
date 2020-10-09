@@ -119,4 +119,3 @@ inline bool PosixConfig::Key::operator==(const Key & other) const
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

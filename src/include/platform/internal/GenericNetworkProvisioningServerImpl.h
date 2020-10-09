@@ -124,4 +124,3 @@ inline bool GenericNetworkProvisioningServerImpl<ImplClass>::_ScanInProgress(voi
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

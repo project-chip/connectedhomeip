@@ -40,4 +40,3 @@ void freertos_mbedtls_mutex_free(void);
 #ifdef __cplusplus
 }
 #endif
-

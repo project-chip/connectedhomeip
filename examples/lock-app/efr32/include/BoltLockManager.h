@@ -81,4 +81,3 @@ inline BoltLockManager & BoltLockMgr(void)
 {
     return BoltLockManager::sLock;
 }
-

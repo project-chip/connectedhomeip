@@ -44,4 +44,3 @@
 #undef EMBER_AF_BOARD_TYPE
 #endif
 #define EMBER_AF_BOARD_TYPE BOARD_ID
-

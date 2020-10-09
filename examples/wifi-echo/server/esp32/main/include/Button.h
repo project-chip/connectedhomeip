@@ -111,4 +111,3 @@ inline uint32_t Button::GetPrevStateDuration()
 {
     return mPrevStateDur * portTICK_PERIOD_MS;
 }
-

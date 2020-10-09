@@ -163,4 +163,3 @@ inline bool GenericBLEManagerImpl_Zephyr<ImplClass>::_IsAdvertising(void)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

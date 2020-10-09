@@ -214,4 +214,3 @@ extern uint32_t SystemCoreClock;
  * RTOS go out of sync but could be convenient for debugging.
  */
 #define configUSE_DISABLE_TICK_AUTO_CORRECTION_DEBUG 0
-

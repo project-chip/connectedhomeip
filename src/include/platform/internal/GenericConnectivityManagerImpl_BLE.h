@@ -158,4 +158,3 @@ inline uint16_t GenericConnectivityManagerImpl_BLE<ImplClass>::_NumBLEConnection
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

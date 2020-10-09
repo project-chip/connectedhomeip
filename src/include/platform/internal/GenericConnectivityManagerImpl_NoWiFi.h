@@ -223,4 +223,3 @@ inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPMod
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

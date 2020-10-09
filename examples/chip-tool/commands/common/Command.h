@@ -109,4 +109,3 @@ private:
     const char * mName = nullptr;
     std::vector<Argument> mArgs;
 };
-

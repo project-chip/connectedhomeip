@@ -176,4 +176,3 @@ inline ConnectivityManagerImpl & ConnectivityMgrImpl()
 
 } // namespace DeviceLayer
 } // namespace chip
-

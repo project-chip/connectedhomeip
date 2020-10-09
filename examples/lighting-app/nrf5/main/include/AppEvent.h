@@ -57,4 +57,3 @@ struct AppEvent
 
     EventHandler Handler;
 };
-

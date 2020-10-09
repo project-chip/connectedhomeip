@@ -37,4 +37,3 @@ private:
 
     void DoSet(bool state);
 };
-

@@ -62,4 +62,3 @@
 #ifndef RADIO_CONFIG_DMP_SUPPORT
 #define RADIO_CONFIG_DMP_SUPPORT 0 /// Set to 1 to enable Dynamic Multi-Protocol support in radio.c
 #endif
-

@@ -233,4 +233,3 @@
 // clang-format on
 
 #include <core/CHIPConfig.h>
-

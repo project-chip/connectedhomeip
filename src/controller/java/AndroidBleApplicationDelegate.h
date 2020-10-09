@@ -33,4 +33,3 @@ public:
 
     void SetNotifyChipConnectionClosedCallback(NotifyChipConnectionClosedCallback cb);
 };
-

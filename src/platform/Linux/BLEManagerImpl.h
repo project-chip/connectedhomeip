@@ -247,4 +247,3 @@ inline bool BLEManagerImpl::_IsAdvertising()
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-

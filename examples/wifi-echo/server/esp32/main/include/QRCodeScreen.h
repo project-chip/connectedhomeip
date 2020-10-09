@@ -47,4 +47,3 @@ public:
 };
 
 #endif // CONFIG_HAVE_DISPLAY
-

@@ -170,4 +170,3 @@ static const struct pbkdf2_test_vector * pbkdf2_sha256_test_vectors[] = {
     &chiptest_test_vector_5, &chiptest_test_vector_6, &chiptest_test_vector_7, &chiptest_test_vector_8, &chiptest_test_vector_9,
     &chiptest_test_vector_10, &chiptest_test_vector_11
 };
-

@@ -44,4 +44,3 @@
  *     This namespace includes all interfaces within chip for
  *     Bluetooth Low Energy (BLE), also known as Bluetooth Smart.
  */
-

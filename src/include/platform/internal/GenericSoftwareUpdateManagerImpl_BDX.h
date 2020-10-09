@@ -92,4 +92,3 @@ extern template class GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManager
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

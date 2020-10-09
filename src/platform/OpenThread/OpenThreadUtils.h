@@ -90,4 +90,3 @@ inline Inet::IPPrefix ToIPPrefix(const otIp6Prefix & otPrefix)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

@@ -244,4 +244,3 @@ void * pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
 #endif /* USE_RTOS*/
 /**************************** KSDK end ****************************************/
 #endif /* MBEDTLS_AES_ALT || MBEDTLS_SHA256_ALT */
-

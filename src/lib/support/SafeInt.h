@@ -142,4 +142,3 @@ typename std::enable_if<std::is_unsigned<T>::value, typename std::make_signed<T>
 }
 
 } // namespace chip
-

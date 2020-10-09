@@ -33,4 +33,3 @@ int TestCHIPCryptoPAL(void);
 #ifdef __cplusplus
 }
 #endif
-

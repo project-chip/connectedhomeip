@@ -61,4 +61,3 @@ public:
     void SetCloseConnectionCallback(CloseConnectionCallback cb);
     void SetGetMTUCallback(GetMTUCallback cb);
 };
-

@@ -188,4 +188,3 @@ inline const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiAPModeT
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

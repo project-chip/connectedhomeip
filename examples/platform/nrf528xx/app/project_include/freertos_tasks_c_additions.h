@@ -69,4 +69,3 @@ const uint8_t FreeRTOSDebugConfig[] __attribute__((section(".rodata"))) = {
     configMAX_PRIORITIES,
     0 /* padding */
 };
-

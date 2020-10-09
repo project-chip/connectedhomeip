@@ -68,4 +68,3 @@ void initOtSysEFR(void);
 #ifdef __cplusplus
 }
 #endif
-

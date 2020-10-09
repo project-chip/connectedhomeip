@@ -18,4 +18,3 @@
 #pragma once
 
 void StartDefaultThreadNetwork(void);
-

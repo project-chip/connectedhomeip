@@ -31,4 +31,3 @@ namespace chip {
 CHIP_ERROR generateQRCodeFromFilePath(std::string filePath, std::string & outCode);
 CHIP_ERROR generateManualCodeFromFilePath(std::string filePath, std::string & outCode);
 } // namespace chip
-

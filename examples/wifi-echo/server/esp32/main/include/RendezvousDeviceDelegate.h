@@ -35,4 +35,3 @@ private:
     chip::RendezvousSession * mRendezvousSession;
     ESP32NetworkProvisioningDelegate mDeviceNetworkProvisioningDelegate;
 };
-

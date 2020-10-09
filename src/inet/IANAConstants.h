@@ -112,4 +112,3 @@ enum IPV6MulticastGroup
 
 } // namespace Inet
 } // namespace chip
-

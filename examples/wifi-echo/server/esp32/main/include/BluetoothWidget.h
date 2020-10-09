@@ -34,4 +34,3 @@ private:
     int mVLED;
     bool mState;
 };
-

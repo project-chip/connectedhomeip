@@ -312,4 +312,3 @@ inline CHIP_ERROR ThreadStackManager::JoinerStart()
 
 } // namespace DeviceLayer
 } // namespace chip
-

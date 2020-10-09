@@ -59,4 +59,3 @@ private:
     SubscribeBleCharacteristicCBFunct subscribeCB;
     CloseBleCBFunct closeCB;
 };
-

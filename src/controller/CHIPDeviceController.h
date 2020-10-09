@@ -284,4 +284,3 @@ private:
 
 } // namespace DeviceController
 } // namespace chip
-

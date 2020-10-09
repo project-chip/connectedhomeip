@@ -342,4 +342,3 @@ extern INET_ERROR ParseHostPortAndInterface(const char * aString, uint16_t aStri
 
 } // namespace Inet
 } // namespace chip
-

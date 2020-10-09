@@ -103,4 +103,3 @@ inline void NetworkProvisioningServer::OnPlatformEvent(const CHIPDeviceEvent * e
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

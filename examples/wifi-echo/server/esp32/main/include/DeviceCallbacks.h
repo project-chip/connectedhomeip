@@ -43,4 +43,3 @@ private:
     void OnOnOffPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value);
     void OnIdentifyPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value);
 };
-

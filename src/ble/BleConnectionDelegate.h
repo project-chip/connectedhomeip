@@ -55,4 +55,3 @@ public:
 
 } /* namespace Ble */
 } /* namespace chip */
-

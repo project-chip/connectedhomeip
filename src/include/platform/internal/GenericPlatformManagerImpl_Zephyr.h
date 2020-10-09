@@ -98,4 +98,3 @@ extern template class GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

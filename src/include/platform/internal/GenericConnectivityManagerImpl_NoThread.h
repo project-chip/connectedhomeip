@@ -134,4 +134,3 @@ inline bool GenericConnectivityManagerImpl_NoThread<ImplClass>::_HaveServiceConn
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

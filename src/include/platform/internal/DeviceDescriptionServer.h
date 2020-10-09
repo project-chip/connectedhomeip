@@ -92,4 +92,3 @@ inline DeviceDescriptionServer & DeviceDescriptionSvr(void)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

@@ -355,4 +355,3 @@ private:
 } /* namespace chip */
 
 #include "BLEEndPoint.h"
-

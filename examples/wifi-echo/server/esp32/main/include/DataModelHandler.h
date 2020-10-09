@@ -49,4 +49,3 @@ void InitDataModelHandler();
  */
 void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::PacketBuffer * buffer,
                             chip::SecureSessionMgrBase * mgr);
-

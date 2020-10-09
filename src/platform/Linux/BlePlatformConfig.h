@@ -37,4 +37,3 @@ struct BluezConnection;
 // ========== Platform-specific Configuration Overrides =========
 
 /* none so far */
-

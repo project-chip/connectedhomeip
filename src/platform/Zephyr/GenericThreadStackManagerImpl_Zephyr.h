@@ -142,4 +142,3 @@ void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_OnCHIPoBLEAdvertisingStop
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

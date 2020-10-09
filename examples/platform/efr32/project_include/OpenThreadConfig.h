@@ -53,4 +53,3 @@
 // it cannot use "openthread" in the path to the included file.
 //
 #include "openthread-core-efr32-config.h"
-

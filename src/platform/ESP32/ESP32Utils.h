@@ -50,4 +50,3 @@ public:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

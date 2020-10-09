@@ -24,4 +24,3 @@
 #pragma once
 
 int TestQuickResponseCode();
-

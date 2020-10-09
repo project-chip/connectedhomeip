@@ -295,4 +295,3 @@ inline uint8_t InterfaceAddressIterator::GetIPv6PrefixLength()
 
 } // namespace Inet
 } // namespace chip
-

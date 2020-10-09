@@ -49,4 +49,3 @@
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
 #include <inet/UDPEndPoint.h>
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-

@@ -33,4 +33,3 @@ void LCDWriteQRCode(uint8_t * text);
 #ifdef __cplusplus
 }
 #endif
-

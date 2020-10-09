@@ -509,4 +509,3 @@
 #define INET_CONFIG_IP_MULTICAST_HOP_LIMIT                 (64)
 #endif // INET_CONFIG_IP_MULTICAST_HOP_LIMIT
 // clang-format on
-

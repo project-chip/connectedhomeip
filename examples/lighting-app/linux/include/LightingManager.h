@@ -65,4 +65,3 @@ inline LightingManager & LightingMgr(void)
 {
     return LightingManager::sLight;
 }
-

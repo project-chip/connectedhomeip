@@ -97,4 +97,3 @@ extern void DisplayStatusMessage(char * msg, uint16_t vpos);
 extern bool WakeDisplay();
 
 #endif // #if CONFIG_HAVE_DISPLAY
-

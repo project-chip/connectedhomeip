@@ -540,4 +540,3 @@ inline void ConfigurationManager::UseManufacturerCredentialsAsOperational(bool v
 #endif // CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
 } // namespace DeviceLayer
 } // namespace chip
-

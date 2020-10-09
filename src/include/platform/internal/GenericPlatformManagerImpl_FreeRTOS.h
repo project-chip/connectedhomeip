@@ -91,4 +91,3 @@ extern template class GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

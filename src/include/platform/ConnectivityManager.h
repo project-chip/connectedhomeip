@@ -549,4 +549,3 @@ inline void ConnectivityManager::OnWiFiStationProvisionChange()
 
 } // namespace DeviceLayer
 } // namespace chip
-

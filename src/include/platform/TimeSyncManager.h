@@ -137,4 +137,3 @@ inline TimeSyncManager & TimeSyncMgr()
 
 } // namespace DeviceLayer
 } // namespace chip
-

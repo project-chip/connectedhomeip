@@ -24,4 +24,3 @@ class DeviceController_BleApplicationDelegate : public chip::Ble::BleApplication
 {
     void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 };
-

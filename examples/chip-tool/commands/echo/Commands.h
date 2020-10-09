@@ -43,4 +43,3 @@ void registerCommandsEcho(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-

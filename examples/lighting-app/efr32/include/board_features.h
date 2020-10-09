@@ -247,4 +247,3 @@
 // #define FEATURE_EFP
 // #define FEATURE_BOARD_DETECTED
 #endif
-

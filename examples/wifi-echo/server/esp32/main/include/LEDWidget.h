@@ -55,4 +55,3 @@ private:
 
     friend void ClearErrorState(TimerHandle_t);
 };
-

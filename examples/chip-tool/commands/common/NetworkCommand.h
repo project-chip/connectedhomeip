@@ -64,4 +64,3 @@ private:
     uint32_t mDiscriminator;
     uint32_t mSetupPINCode;
 };
-

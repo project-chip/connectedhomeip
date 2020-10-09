@@ -73,4 +73,3 @@ inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
 }
-

@@ -44,4 +44,3 @@ extern Inet::InetLayer InetLayer;
 
 } // namespace DeviceLayer
 } // namespace chip
-

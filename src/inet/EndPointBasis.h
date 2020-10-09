@@ -188,4 +188,3 @@ inline void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErr
 
 } // namespace Inet
 } // namespace chip
-

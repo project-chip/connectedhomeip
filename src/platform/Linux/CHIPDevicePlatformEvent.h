@@ -92,4 +92,3 @@ struct ChipDevicePlatformEvent
 
 } // namespace DeviceLayer
 } // namespace chip
-

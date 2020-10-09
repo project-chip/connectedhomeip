@@ -203,4 +203,3 @@ inline constexpr uint16_t NRF5Config::FDSWords(size_t s)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

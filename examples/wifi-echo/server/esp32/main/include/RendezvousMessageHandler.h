@@ -29,4 +29,3 @@ public:
     // - Some other error encountered processing a specific message type.
     static CHIP_ERROR HandleMessageReceived(chip::System::PacketBuffer * buffer);
 };
-

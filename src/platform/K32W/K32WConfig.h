@@ -171,4 +171,3 @@ inline constexpr uint8_t K32WConfig::GetRecordKey(Key key)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

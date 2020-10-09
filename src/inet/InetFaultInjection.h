@@ -72,4 +72,3 @@ DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 #define INET_FAULT_INJECT(aFaultID, aStatement)
 
 #endif // INET_CONFIG_TEST
-

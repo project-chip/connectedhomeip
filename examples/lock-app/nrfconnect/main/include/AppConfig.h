@@ -32,4 +32,3 @@
 
 // Time it takes in ms for the simulated actuator to move from one state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 2000
-

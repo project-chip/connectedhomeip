@@ -95,4 +95,3 @@ inline struct netif * GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

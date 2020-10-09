@@ -20,4 +20,3 @@
 #include <setup_payload/SetupPayload.h>
 
 void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags);
-

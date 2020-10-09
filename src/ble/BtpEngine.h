@@ -185,4 +185,3 @@ private:
 
 } /* namespace Ble */
 } /* namespace chip */
-

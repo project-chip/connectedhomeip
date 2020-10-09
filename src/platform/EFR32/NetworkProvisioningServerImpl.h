@@ -77,4 +77,3 @@ inline NetworkProvisioningServerImpl & NetworkProvisioningSvrImpl(void)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

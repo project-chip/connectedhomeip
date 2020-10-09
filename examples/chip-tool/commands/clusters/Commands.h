@@ -3676,4 +3676,3 @@ void registerClusters(Commands & commands)
     registerClusterScenes(commands);
     registerClusterTemperatureMeasurement(commands);
 }
-

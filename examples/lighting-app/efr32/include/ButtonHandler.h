@@ -35,4 +35,3 @@ private:
     static void EventHelper(uint8_t btnIdx, bool isrContext);
     static void TimerCallback(TimerHandle_t xTimer);
 };
-

@@ -37,4 +37,3 @@ int TestInetLayerDNS(void);
 #ifdef __cplusplus
 }
 #endif
-

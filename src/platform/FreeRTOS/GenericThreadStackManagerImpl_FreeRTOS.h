@@ -90,4 +90,3 @@ extern template class GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerI
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

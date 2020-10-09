@@ -42,4 +42,3 @@ bool ParseIPAddress(const char * str, chip::Inet::IPAddress & output);
 } // namespace chip
 
 #endif // CHIP_CONFIG_ENABLE_ARG_PARSER
-

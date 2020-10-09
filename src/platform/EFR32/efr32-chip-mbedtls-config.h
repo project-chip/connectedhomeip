@@ -259,4 +259,3 @@ typedef void mbedtls_ecp_restart_ctx;
 #if defined(MBEDTLS_USER_CONFIG_FILE)
 #include MBEDTLS_USER_CONFIG_FILE
 #endif
-

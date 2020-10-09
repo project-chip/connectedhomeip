@@ -95,4 +95,3 @@ inline ConfigurationManagerImpl & ConfigurationMgrImpl()
 
 } // namespace DeviceLayer
 } // namespace chip
-

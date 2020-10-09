@@ -100,4 +100,3 @@ inline CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * 
 
 } // namespace DeviceLayer
 } // namespace chip
-

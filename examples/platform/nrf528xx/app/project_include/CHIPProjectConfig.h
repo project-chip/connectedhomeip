@@ -137,4 +137,3 @@
 #else
 #define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Debug
 #endif // BUILD_RELEASE
-

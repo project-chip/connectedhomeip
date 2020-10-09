@@ -39,4 +39,3 @@ bool StringToUUID(const char * str, ChipBleUUID & uuid);
 
 } /* namespace Ble */
 } /* namespace chip */
-

@@ -84,4 +84,3 @@ struct ChipBLEDeviceIdentificationInfo
 
 } /* namespace Ble */
 } /* namespace chip */
-

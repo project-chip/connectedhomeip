@@ -51,4 +51,3 @@
 // it cannot use "openthread" in the path to the included file.
 //
 #include "openthread-core-k32w061-config.h"
-

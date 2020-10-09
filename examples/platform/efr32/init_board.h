@@ -46,4 +46,3 @@ void initVcomEnable(void);
 #ifdef __cplusplus
 }
 #endif
-

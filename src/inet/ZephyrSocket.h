@@ -45,4 +45,3 @@ static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
 
     return ret;
 }
-

@@ -186,4 +186,3 @@ inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-

@@ -91,4 +91,3 @@ inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
 
 } // namespace DeviceLayer
 } // namespace chip
-

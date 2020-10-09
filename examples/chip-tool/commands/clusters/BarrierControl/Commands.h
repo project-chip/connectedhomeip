@@ -60,4 +60,3 @@ void registerClusterBarrierControl(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-

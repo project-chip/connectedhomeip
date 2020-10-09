@@ -199,4 +199,3 @@ void RunConfigUnitTest()
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

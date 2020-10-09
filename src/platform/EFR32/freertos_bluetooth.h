@@ -78,4 +78,3 @@ BaseType_t vSendToQueueBasedOnContext(QueueHandle_t xQueue, void * xItemToQueue,
 #if __cplusplus
 }
 #endif
-

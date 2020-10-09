@@ -40,4 +40,3 @@ extern const uint16_t TestDevicePrivateKeyLength;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

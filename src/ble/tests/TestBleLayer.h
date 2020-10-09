@@ -26,4 +26,3 @@
 
 int TestBleErrorStr();
 int TestBleUUID();
-

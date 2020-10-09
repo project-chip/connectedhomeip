@@ -203,4 +203,3 @@ inline struct netif * IPEndPointBasis::FindNetifFromInterfaceId(InterfaceId aInt
 
 } // namespace Inet
 } // namespace chip
-

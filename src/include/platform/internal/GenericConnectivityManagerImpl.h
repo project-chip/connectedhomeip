@@ -74,4 +74,3 @@ inline void GenericConnectivityManagerImpl<ImplClass>::_SetUserSelectedModeTimeo
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-

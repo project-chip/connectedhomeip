@@ -690,4 +690,3 @@ inline void TCPEndPoint::MarkActive()
 
 } // namespace Inet
 } // namespace chip
-

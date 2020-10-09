@@ -50,4 +50,3 @@
 #define K32W_LOG(...) k32wLog(__VA_ARGS__);
 
 void k32wLog(const char * aFormat, ...);
-
