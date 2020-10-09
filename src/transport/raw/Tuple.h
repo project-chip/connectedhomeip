@@ -21,8 +21,7 @@
  * Defines a compound transport type (tuple) that can merge several transports
  * to look like a single one.
  */
-#ifndef TRANSPORT_TUPLE_H_
-#define TRANSPORT_TUPLE_H_
+#pragma once
 
 #include <tuple>
 #include <type_traits>
@@ -238,5 +237,3 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // TRANSPORT_TUPLE_H_

@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef __SECURESESSIONMGR_H__
-#define __SECURESESSIONMGR_H__
+#pragma once
 
 #include <utility>
 
@@ -217,5 +216,3 @@ private:
 };
 
 } // namespace chip
-
-#endif // __SECURESESSIONMGR_H__

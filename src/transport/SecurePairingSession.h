@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef __SECUREPAIRINGSESSION_H__
-#define __SECUREPAIRINGSESSION_H__
+#pragma once
 
 #include <core/ReferenceCounted.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -250,5 +249,3 @@ public:
 };
 
 } // namespace chip
-
-#endif // __SECUREPAIRINGSESSION_H__

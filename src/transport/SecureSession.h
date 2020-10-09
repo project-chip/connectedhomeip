@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef __SECURESESSION_H__
-#define __SECURESESSION_H__
+#pragma once
 
 #include <core/CHIPCore.h>
 #include <crypto/CHIPCryptoPAL.h>
@@ -134,5 +133,3 @@ private:
 };
 
 } // namespace chip
-
-#endif // __SECURESESSION_H__

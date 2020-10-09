@@ -21,8 +21,7 @@
  *    classes (UDP, TCP, BLE, ....)
  */
 
-#ifndef TRANSPORT_BASE_H_
-#define TRANSPORT_BASE_H_
+#pragma once
 
 #include <core/CHIPError.h>
 #include <core/ReferenceCounted.h>
@@ -118,5 +117,3 @@ protected:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // TRANSPORT_BASE_H_

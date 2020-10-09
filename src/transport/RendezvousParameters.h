@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef __TRANSPORT_RENDEZVOUSPARAMETERS_H__
-#define __TRANSPORT_RENDEZVOUSPARAMETERS_H__
+#pragma once
 
 #include <transport/raw/Base.h>
 
@@ -91,5 +90,3 @@ private:
 };
 
 } // namespace chip
-
-#endif // __TRANSPORT_RENDEZVOUSPARAMETERS_H__
