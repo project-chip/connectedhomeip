@@ -26,8 +26,7 @@
  *        - template<class T, unsigned int N> class chip::System::ObjectPool
  */
 
-#ifndef SYSTEMOBJECT_H
-#define SYSTEMOBJECT_H
+#pragma once
 
 // Include configuration headers
 #include <system/SystemConfig.h>
@@ -333,5 +332,3 @@ inline void ObjectPool<T, N>::GetStatistics(chip::System::Stats::count_t & aNumI
 
 } // namespace System
 } // namespace chip
-
-#endif // defined(SYSTEMOBJECT_H)

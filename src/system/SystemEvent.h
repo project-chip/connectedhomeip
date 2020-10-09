@@ -22,8 +22,7 @@
  *      generated at the CHIP System Layer.
  */
 
-#ifndef SYSTEMEVENT_H
-#define SYSTEMEVENT_H
+#pragma once
 
 // Include headers
 #include <system/SystemConfig.h>
@@ -111,5 +110,3 @@ typedef CHIP_SYSTEM_CONFIG_EVENT_OBJECT_TYPE Event;
 
 } // namespace System
 } // namespace chip
-
-#endif // defined(SYSTEMEVENT_H)

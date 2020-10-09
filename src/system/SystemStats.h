@@ -22,8 +22,8 @@
  *  on the state of CHIP, Inet and System resources
  */
 
-#ifndef SYSTEMSTATS_H
-#define SYSTEMSTATS_H
+#pragma once
+
 // Include standard C library limit macros
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
@@ -170,5 +170,3 @@ const Label * GetStrings();
 #define SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS()
 
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-
-#endif // defined(SYSTEMSTATS_H)

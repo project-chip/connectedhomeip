@@ -19,8 +19,8 @@
  * @brief defines a generic time source interface that uses a real clock
  *        at runtime but can be substituted by a test one for unit tests.
  */
-#ifndef TIME_SOURCE_H_
-#define TIME_SOURCE_H_
+
+#pragma once
 
 #include <stdlib.h>
 #include <system/SystemClock.h>
@@ -90,5 +90,3 @@ private:
 
 } // namespace Time
 } // namespace chip
-
-#endif // TIME_SOURCE_H_

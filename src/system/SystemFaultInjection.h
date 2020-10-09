@@ -21,8 +21,7 @@
  *      Header file for the fault-injection utilities for CHIP System Layer.
  */
 
-#ifndef SYSTEMFAULTINJECTION_H
-#define SYSTEMFAULTINJECTION_H
+#pragma once
 
 #include <system/SystemConfig.h>
 
@@ -127,5 +126,3 @@ DLL_EXPORT void InjectAsyncEvent();
 #define CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT()
 
 #endif // CHIP_SYSTEM_CONFIG_TEST
-
-#endif // SYSTEMFAULTINJECTION_H

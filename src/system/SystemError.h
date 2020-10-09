@@ -29,8 +29,7 @@
  *      C-language programs.
  */
 
-#ifndef SYSTEMERROR_H
-#define SYSTEMERROR_H
+#pragma once
 
 // Include headers
 #include <system/SystemConfig.h>
@@ -198,4 +197,3 @@ extern bool FormatLwIPError(char * buf, uint16_t bufSize, int32_t err);
 } // namespace chip
 
 #endif // !defined(__cplusplus)
-#endif // defined(SYSTEMERROR_H)
