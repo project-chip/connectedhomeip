@@ -372,7 +372,6 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceContr
         }
         else
         {
-
             // Hardcode endpoint to 1 for now
             uint8_t endpoint = 1;
 
@@ -380,13 +379,13 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceContr
             switch (commandID)
             {
             case 0:
-                dataLength = encodeOffCommand(buffer->Start(), bufferSize, endpoint);
+                dataLength = encodeOnOffClusterOffCommand(buffer->Start(), bufferSize, endpoint);
                 break;
             case 1:
-                dataLength = encodeOnCommand(buffer->Start(), bufferSize, endpoint);
+                dataLength = encodeOnOffClusterOnCommand(buffer->Start(), bufferSize, endpoint);
                 break;
             case 2:
-                dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
+                dataLength = encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, endpoint);
                 break;
             default:
                 ChipLogError(Controller, "Unknown command: %d", commandID);

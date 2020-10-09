@@ -319,7 +319,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
         // Hardcode endpoint to 1 for now
-        return encodeOnCommand(buffer->Start(), bufferSize, 1);
+        return encodeOnOffClusterOnCommand(buffer->Start(), bufferSize, 1);
     }];
 }
 
@@ -327,7 +327,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
         // Hardcode endpoint to 1 for now
-        return encodeOffCommand(buffer->Start(), bufferSize, 1);
+        return encodeOnOffClusterOffCommand(buffer->Start(), bufferSize, 1);
     }];
 }
 
@@ -335,7 +335,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
         // Hardcode endpoint to 1 for now
-        return encodeToggleCommand(buffer->Start(), bufferSize, 1);
+        return encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, 1);
     }];
 }
 
@@ -347,7 +347,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 
     return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
         // Hardcode endpoint to 1 for now
-        return encodeIdentifyCommand(buffer->Start(), bufferSize, 1, duration);
+        return encodeIdentifyClusterIdentifyCommand(buffer->Start(), bufferSize, 1, duration);
     }];
 }
 
