@@ -102,7 +102,8 @@ void CHIPDevicePairingDelegateBridge::OnPairingComplete(CHIP_ERROR error)
     if ([strongDelegate respondsToSelector:@selector(onPairingComplete:)]) {
         if (strongDelegate && mQueue) {
             dispatch_async(mQueue, ^{
-                [strongDelegate onPairingComplete:error];
+                NSError * nsError = [CHIPError errorForCHIPErrorCode:error];
+                [strongDelegate onPairingComplete:nsError];
             });
         }
     }
@@ -116,7 +117,8 @@ void CHIPDevicePairingDelegateBridge::OnPairingDeleted(CHIP_ERROR error)
     if ([strongDelegate respondsToSelector:@selector(onPairingDeleted:)]) {
         if (strongDelegate && mQueue) {
             dispatch_async(mQueue, ^{
-                [strongDelegate onPairingDeleted:error];
+                NSError * nsError = [CHIPError errorForCHIPErrorCode:error];
+                [strongDelegate onPairingDeleted:nsError];
             });
         }
     }

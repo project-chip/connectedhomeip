@@ -23,7 +23,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^SendNetworkCredentials)(NSString * ssid, NSString * passwd);
+typedef void (^SendNetworkCredentials)(NSString * ssid, NSString * password);
 
 typedef NS_ENUM(NSUInteger, PairingStatus) {
     kSecurePairingSuccess = 0,
@@ -57,13 +57,13 @@ typedef NS_ENUM(NSUInteger, PairingStatus) {
  * Notify the delegate when pairing is completed
  *
  */
-- (void)onPairingComplete:(CHIP_ERROR)error;
+- (void)onPairingComplete:(NSError *)error;
 
 /**
  * Notify the delegate when pairing is deleted
  *
  */
-- (void)onPairingDeleted:(CHIP_ERROR)error;
+- (void)onPairingDeleted:(NSError *)error;
 @end
 
 NS_ASSUME_NONNULL_END
