@@ -112,7 +112,7 @@ using chip::System::PacketBuffer;
 
 chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> TCPEndPoint::sPool;
 
-INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t port, bool reuseAddr)
+INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -223,7 +223,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
             sa.sin6_addr     = addr.ToIPv6();
             sa.sin6_scope_id = 0;
 
-            if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof(sa)) != 0)
+            if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
                 res = chip::System::MapErrorPOSIX(errno);
         }
 #if INET_CONFIG_ENABLE_IPV4
@@ -235,7 +235,7 @@ INET_ERROR TCPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t po
             sa.sin_port   = htons(port);
             sa.sin_addr   = addr.ToIPv4();
 
-            if (bind(mSocket, (const sockaddr *) &sa, (unsigned) sizeof(sa)) != 0)
+            if (bind(mSocket, reinterpret_cast<const sockaddr *>(&sa), static_cast<unsigned>(sizeof(sa))) != 0)
                 res = chip::System::MapErrorPOSIX(errno);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -295,7 +295,7 @@ INET_ERROR TCPEndPoint::Listen(uint16_t backlog)
     return res;
 }
 
-INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intfId)
+INET_ERROR TCPEndPoint::Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -413,7 +413,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intfI
             // If the permission is denied(EACCES) because CHIP is running in a context
             // that does not have privileged access, choose a source address on the
             // interface to bind the connetion to.
-            int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, (void *) &ifr, sizeof(ifr));
+            int r = setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, &ifr, sizeof(ifr));
             if (r < 0 && errno != EACCES)
             {
                 return res = chip::System::MapErrorPOSIX(errno);
@@ -463,7 +463,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intfI
         sa.in6.sin6_addr     = addr.ToIPv6();
         sa.in6.sin6_scope_id = intfId;
         sockaddrsize         = sizeof(sockaddr_in6);
-        sockaddrptr          = (const sockaddr *) &sa.in6;
+        sockaddrptr          = reinterpret_cast<const sockaddr *>(&sa.in6);
     }
 #if INET_CONFIG_ENABLE_IPV4
     else if (addrType == kIPAddressType_IPv4)
@@ -472,7 +472,7 @@ INET_ERROR TCPEndPoint::Connect(IPAddress addr, uint16_t port, InterfaceId intfI
         sa.in.sin_port   = htons(port);
         sa.in.sin_addr   = addr.ToIPv4();
         sockaddrsize     = sizeof(sockaddr_in);
-        sockaddrptr      = (const sockaddr *) &sa.in;
+        sockaddrptr      = reinterpret_cast<const sockaddr *>(&sa.in);
     }
 #endif // INET_CONFIG_ENABLE_IPV4
     else
@@ -523,7 +523,7 @@ void TCPEndPoint::SetConnectTimeout(const uint32_t connTimeoutMsecs)
     mConnectTimeoutMsecs = connTimeoutMsecs;
 }
 
-void TCPEndPoint::StartConnectTimerIfSet(void)
+void TCPEndPoint::StartConnectTimerIfSet()
 {
     if (mConnectTimeoutMsecs > 0)
     {
@@ -533,7 +533,7 @@ void TCPEndPoint::StartConnectTimerIfSet(void)
     }
 }
 
-void TCPEndPoint::StopConnectTimer(void)
+void TCPEndPoint::StopConnectTimer()
 {
     chip::System::Layer & lSystemLayer = SystemLayer();
 
@@ -764,7 +764,7 @@ void TCPEndPoint::EnableReceive()
  *
  */
 
-INET_ERROR TCPEndPoint::EnableNoDelay(void)
+INET_ERROR TCPEndPoint::EnableNoDelay()
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -2227,7 +2227,7 @@ INET_ERROR TCPEndPoint::GetSocket(IPAddressType addrType)
         if (family == PF_INET6)
         {
             int one = 1;
-            setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, (void *) &one, sizeof(one));
+            setsockopt(mSocket, IPPROTO_IPV6, IPV6_V6ONLY, &one, sizeof(one));
         }
 #endif // defined(IPV6_V6ONLY)
 

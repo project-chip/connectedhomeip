@@ -119,6 +119,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_COLOR_CONTROL_CLUSTER_ID:
             result = status(false, true, cmd->mfgSpecific);
             break;
+        case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
+            result = status(false, true, cmd->mfgSpecific);
+            break;
         case ZCL_IAS_ZONE_CLUSTER_ID:
             result = emberAfIasZoneClusterClientCommandParse(cmd);
             break;
@@ -161,6 +164,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_COLOR_CONTROL_CLUSTER_ID:
             result = emberAfColorControlClusterServerCommandParse(cmd);
+            break;
+        case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
+            result = status(false, true, cmd->mfgSpecific);
             break;
         case ZCL_IAS_ZONE_CLUSTER_ID:
             result = emberAfIasZoneClusterServerCommandParse(cmd);

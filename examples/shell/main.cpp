@@ -24,6 +24,8 @@
 #include <lib/support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+#include <ChipShellCollection.h>
+
 #if CHIP_DEVICE_LAYER_TARGET_NRF5
 #ifdef SOFTDEVICE_PRESENT
 #include "nrf_sdh.h"
@@ -40,12 +42,6 @@ extern "C" {
 
 using namespace chip;
 using namespace chip::Shell;
-
-void cmd_misc_init();
-void cmd_base64_init();
-void cmd_btp_init();
-void cmd_device_init();
-void cmd_otcli_init();
 
 #if defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
 // TODO: Move softdevice initialization behind platform interface.
@@ -89,7 +85,7 @@ exit:
 }
 #endif // defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
 
-int main(void)
+int main()
 {
 #if defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
     soft_device_init();

@@ -104,69 +104,69 @@ public:
     struct ThreadPollingConfig;
 
     // WiFi station methods
-    WiFiStationMode GetWiFiStationMode(void);
+    WiFiStationMode GetWiFiStationMode();
     CHIP_ERROR SetWiFiStationMode(WiFiStationMode val);
-    bool IsWiFiStationEnabled(void);
-    bool IsWiFiStationApplicationControlled(void);
-    bool IsWiFiStationConnected(void);
-    uint32_t GetWiFiStationReconnectIntervalMS(void);
+    bool IsWiFiStationEnabled();
+    bool IsWiFiStationApplicationControlled();
+    bool IsWiFiStationConnected();
+    uint32_t GetWiFiStationReconnectIntervalMS();
     CHIP_ERROR SetWiFiStationReconnectIntervalMS(uint32_t val);
-    bool IsWiFiStationProvisioned(void);
-    void ClearWiFiStationProvision(void);
-    CHIP_ERROR GetAndLogWifiStatsCounters(void);
+    bool IsWiFiStationProvisioned();
+    void ClearWiFiStationProvision();
+    CHIP_ERROR GetAndLogWifiStatsCounters();
 
     // WiFi AP methods
-    WiFiAPMode GetWiFiAPMode(void);
+    WiFiAPMode GetWiFiAPMode();
     CHIP_ERROR SetWiFiAPMode(WiFiAPMode val);
-    bool IsWiFiAPActive(void);
-    bool IsWiFiAPApplicationControlled(void);
-    void DemandStartWiFiAP(void);
-    void StopOnDemandWiFiAP(void);
-    void MaintainOnDemandWiFiAP(void);
-    uint32_t GetWiFiAPIdleTimeoutMS(void);
+    bool IsWiFiAPActive();
+    bool IsWiFiAPApplicationControlled();
+    void DemandStartWiFiAP();
+    void StopOnDemandWiFiAP();
+    void MaintainOnDemandWiFiAP();
+    uint32_t GetWiFiAPIdleTimeoutMS();
     void SetWiFiAPIdleTimeoutMS(uint32_t val);
 
     // Thread Methods
-    ThreadMode GetThreadMode(void);
+    ThreadMode GetThreadMode();
     CHIP_ERROR SetThreadMode(ThreadMode val);
-    bool IsThreadEnabled(void);
-    bool IsThreadApplicationControlled(void);
-    ThreadDeviceType GetThreadDeviceType(void);
+    bool IsThreadEnabled();
+    bool IsThreadApplicationControlled();
+    ThreadDeviceType GetThreadDeviceType();
     CHIP_ERROR SetThreadDeviceType(ThreadDeviceType deviceType);
     void GetThreadPollingConfig(ThreadPollingConfig & pollingConfig);
     CHIP_ERROR SetThreadPollingConfig(const ThreadPollingConfig & pollingConfig);
-    bool IsThreadAttached(void);
-    bool IsThreadProvisioned(void);
-    void ErasePersistentInfo(void);
-    bool HaveServiceConnectivityViaThread(void);
+    bool IsThreadAttached();
+    bool IsThreadProvisioned();
+    void ErasePersistentInfo();
+    bool HaveServiceConnectivityViaThread();
 
     // Internet connectivity methods
-    bool HaveIPv4InternetConnectivity(void);
-    bool HaveIPv6InternetConnectivity(void);
+    bool HaveIPv4InternetConnectivity();
+    bool HaveIPv6InternetConnectivity();
 
     // Service connectivity methods
-    bool HaveServiceConnectivity(void);
+    bool HaveServiceConnectivity();
 
     // CHIPoBLE service methods
     Ble::BleLayer * GetBleLayer();
     typedef void (*BleConnectionReceivedFunct)(Ble::BLEEndPoint * endpoint);
     void AddCHIPoBLEConnectionHandler(BleConnectionReceivedFunct handler);
-    void RemoveCHIPoBLEConnectionHandler(void);
-    CHIPoBLEServiceMode GetCHIPoBLEServiceMode(void);
+    void RemoveCHIPoBLEConnectionHandler();
+    CHIPoBLEServiceMode GetCHIPoBLEServiceMode();
     CHIP_ERROR SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val);
-    bool IsBLEAdvertisingEnabled(void);
+    bool IsBLEAdvertisingEnabled();
     CHIP_ERROR SetBLEAdvertisingEnabled(bool val);
-    bool IsBLEFastAdvertisingEnabled(void);
+    bool IsBLEFastAdvertisingEnabled();
     CHIP_ERROR SetBLEFastAdvertisingEnabled(bool val);
-    bool IsBLEAdvertising(void);
+    bool IsBLEAdvertising();
     CHIP_ERROR GetBLEDeviceName(char * buf, size_t bufSize);
     CHIP_ERROR SetBLEDeviceName(const char * deviceName);
-    uint16_t NumBLEConnections(void);
+    uint16_t NumBLEConnections();
 
     // User selected mode methods
-    bool IsUserSelectedModeActive(void);
+    bool IsUserSelectedModeActive();
     void SetUserSelectedMode(bool val);
-    uint16_t GetUserSelectedModeTimeout(void);
+    uint16_t GetUserSelectedModeTimeout();
     void SetUserSelectedModeTimeout(uint16_t val);
 
     // Support methods
@@ -188,11 +188,11 @@ private:
     template <class>
     friend class Internal::GenericNetworkProvisioningServerImpl;
 
-    CHIP_ERROR Init(void);
+    CHIP_ERROR Init();
     void OnPlatformEvent(const ChipDeviceEvent * event);
-    bool CanStartWiFiScan(void);
-    void OnWiFiScanDone(void);
-    void OnWiFiStationProvisionChange(void);
+    bool CanStartWiFiScan();
+    void OnWiFiScanDone();
+    void OnWiFiStationProvisionChange();
 
 protected:
     // Construction/destruction limited to subclasses.
@@ -227,7 +227,7 @@ struct ConnectivityManager::ThreadPollingConfig
  * chip applications should use this to access features of the ConnectivityManager object
  * that are common to all platforms.
  */
-extern ConnectivityManager & ConnectivityMgr(void);
+extern ConnectivityManager & ConnectivityMgr();
 
 /**
  * Returns the platform-specific implementation of the ConnectivityManager singleton object.
@@ -235,7 +235,7 @@ extern ConnectivityManager & ConnectivityMgr(void);
  * chip applications can use this to gain access to features of the ConnectivityManager
  * that are specific to the selected platform.
  */
-extern ConnectivityManagerImpl & ConnectivityMgrImpl(void);
+extern ConnectivityManagerImpl & ConnectivityMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip
@@ -248,11 +248,12 @@ extern ConnectivityManagerImpl & ConnectivityMgrImpl(void);
 #elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define CONNECTIVITYMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/ConnectivityManagerImpl.h>
 #include CONNECTIVITYMANAGERIMPL_HEADER
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 namespace chip {
 namespace DeviceLayer {
 
-inline ConnectivityManager::WiFiStationMode ConnectivityManager::GetWiFiStationMode(void)
+inline ConnectivityManager::WiFiStationMode ConnectivityManager::GetWiFiStationMode()
 {
     return static_cast<ImplClass *>(this)->_GetWiFiStationMode();
 }
@@ -262,22 +263,22 @@ inline CHIP_ERROR ConnectivityManager::SetWiFiStationMode(WiFiStationMode val)
     return static_cast<ImplClass *>(this)->_SetWiFiStationMode(val);
 }
 
-inline bool ConnectivityManager::IsWiFiStationEnabled(void)
+inline bool ConnectivityManager::IsWiFiStationEnabled()
 {
     return static_cast<ImplClass *>(this)->_IsWiFiStationEnabled();
 }
 
-inline bool ConnectivityManager::IsWiFiStationApplicationControlled(void)
+inline bool ConnectivityManager::IsWiFiStationApplicationControlled()
 {
     return static_cast<ImplClass *>(this)->_IsWiFiStationApplicationControlled();
 }
 
-inline bool ConnectivityManager::IsWiFiStationConnected(void)
+inline bool ConnectivityManager::IsWiFiStationConnected()
 {
     return static_cast<ImplClass *>(this)->_IsWiFiStationConnected();
 }
 
-inline uint32_t ConnectivityManager::GetWiFiStationReconnectIntervalMS(void)
+inline uint32_t ConnectivityManager::GetWiFiStationReconnectIntervalMS()
 {
     return static_cast<ImplClass *>(this)->_GetWiFiStationReconnectIntervalMS();
 }
@@ -287,17 +288,17 @@ inline CHIP_ERROR ConnectivityManager::SetWiFiStationReconnectIntervalMS(uint32_
     return static_cast<ImplClass *>(this)->_SetWiFiStationReconnectIntervalMS(val);
 }
 
-inline bool ConnectivityManager::IsWiFiStationProvisioned(void)
+inline bool ConnectivityManager::IsWiFiStationProvisioned()
 {
     return static_cast<ImplClass *>(this)->_IsWiFiStationProvisioned();
 }
 
-inline void ConnectivityManager::ClearWiFiStationProvision(void)
+inline void ConnectivityManager::ClearWiFiStationProvision()
 {
     static_cast<ImplClass *>(this)->_ClearWiFiStationProvision();
 }
 
-inline ConnectivityManager::WiFiAPMode ConnectivityManager::GetWiFiAPMode(void)
+inline ConnectivityManager::WiFiAPMode ConnectivityManager::GetWiFiAPMode()
 {
     return static_cast<ImplClass *>(this)->_GetWiFiAPMode();
 }
@@ -307,32 +308,32 @@ inline CHIP_ERROR ConnectivityManager::SetWiFiAPMode(WiFiAPMode val)
     return static_cast<ImplClass *>(this)->_SetWiFiAPMode(val);
 }
 
-inline bool ConnectivityManager::IsWiFiAPActive(void)
+inline bool ConnectivityManager::IsWiFiAPActive()
 {
     return static_cast<ImplClass *>(this)->_IsWiFiAPActive();
 }
 
-inline bool ConnectivityManager::IsWiFiAPApplicationControlled(void)
+inline bool ConnectivityManager::IsWiFiAPApplicationControlled()
 {
     return static_cast<ImplClass *>(this)->_IsWiFiAPApplicationControlled();
 }
 
-inline void ConnectivityManager::DemandStartWiFiAP(void)
+inline void ConnectivityManager::DemandStartWiFiAP()
 {
     static_cast<ImplClass *>(this)->_DemandStartWiFiAP();
 }
 
-inline void ConnectivityManager::StopOnDemandWiFiAP(void)
+inline void ConnectivityManager::StopOnDemandWiFiAP()
 {
     static_cast<ImplClass *>(this)->_StopOnDemandWiFiAP();
 }
 
-inline void ConnectivityManager::MaintainOnDemandWiFiAP(void)
+inline void ConnectivityManager::MaintainOnDemandWiFiAP()
 {
     static_cast<ImplClass *>(this)->_MaintainOnDemandWiFiAP();
 }
 
-inline uint32_t ConnectivityManager::GetWiFiAPIdleTimeoutMS(void)
+inline uint32_t ConnectivityManager::GetWiFiAPIdleTimeoutMS()
 {
     return static_cast<ImplClass *>(this)->_GetWiFiAPIdleTimeoutMS();
 }
@@ -342,27 +343,27 @@ inline void ConnectivityManager::SetWiFiAPIdleTimeoutMS(uint32_t val)
     static_cast<ImplClass *>(this)->_SetWiFiAPIdleTimeoutMS(val);
 }
 
-inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters(void)
+inline CHIP_ERROR ConnectivityManager::GetAndLogWifiStatsCounters()
 {
     return static_cast<ImplClass *>(this)->_GetAndLogWifiStatsCounters();
 }
 
-inline bool ConnectivityManager::HaveIPv4InternetConnectivity(void)
+inline bool ConnectivityManager::HaveIPv4InternetConnectivity()
 {
     return static_cast<ImplClass *>(this)->_HaveIPv4InternetConnectivity();
 }
 
-inline bool ConnectivityManager::HaveIPv6InternetConnectivity(void)
+inline bool ConnectivityManager::HaveIPv6InternetConnectivity()
 {
     return static_cast<ImplClass *>(this)->_HaveIPv6InternetConnectivity();
 }
 
-inline bool ConnectivityManager::HaveServiceConnectivity(void)
+inline bool ConnectivityManager::HaveServiceConnectivity()
 {
     return static_cast<ImplClass *>(this)->_HaveServiceConnectivity();
 }
 
-inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode(void)
+inline ConnectivityManager::ThreadMode ConnectivityManager::GetThreadMode()
 {
     return static_cast<ImplClass *>(this)->_GetThreadMode();
 }
@@ -372,17 +373,17 @@ inline CHIP_ERROR ConnectivityManager::SetThreadMode(ThreadMode val)
     return static_cast<ImplClass *>(this)->_SetThreadMode(val);
 }
 
-inline bool ConnectivityManager::IsThreadEnabled(void)
+inline bool ConnectivityManager::IsThreadEnabled()
 {
     return static_cast<ImplClass *>(this)->_IsThreadEnabled();
 }
 
-inline bool ConnectivityManager::IsThreadApplicationControlled(void)
+inline bool ConnectivityManager::IsThreadApplicationControlled()
 {
     return static_cast<ImplClass *>(this)->_IsThreadApplicationControlled();
 }
 
-inline ConnectivityManager::ThreadDeviceType ConnectivityManager::GetThreadDeviceType(void)
+inline ConnectivityManager::ThreadDeviceType ConnectivityManager::GetThreadDeviceType()
 {
     return static_cast<ImplClass *>(this)->_GetThreadDeviceType();
 }
@@ -402,27 +403,27 @@ inline CHIP_ERROR ConnectivityManager::SetThreadPollingConfig(const ThreadPollin
     return static_cast<ImplClass *>(this)->_SetThreadPollingConfig(pollingConfig);
 }
 
-inline bool ConnectivityManager::IsThreadAttached(void)
+inline bool ConnectivityManager::IsThreadAttached()
 {
     return static_cast<ImplClass *>(this)->_IsThreadAttached();
 }
 
-inline bool ConnectivityManager::IsThreadProvisioned(void)
+inline bool ConnectivityManager::IsThreadProvisioned()
 {
     return static_cast<ImplClass *>(this)->_IsThreadProvisioned();
 }
 
-inline void ConnectivityManager::ErasePersistentInfo(void)
+inline void ConnectivityManager::ErasePersistentInfo()
 {
     static_cast<ImplClass *>(this)->_ErasePersistentInfo();
 }
 
-inline bool ConnectivityManager::HaveServiceConnectivityViaThread(void)
+inline bool ConnectivityManager::HaveServiceConnectivityViaThread()
 {
     return static_cast<ImplClass *>(this)->_HaveServiceConnectivityViaThread();
 }
 
-inline Ble::BleLayer * ConnectivityManager::GetBleLayer(void)
+inline Ble::BleLayer * ConnectivityManager::GetBleLayer()
 {
     return static_cast<ImplClass *>(this)->_GetBleLayer();
 }
@@ -432,12 +433,12 @@ inline void ConnectivityManager::AddCHIPoBLEConnectionHandler(BleConnectionRecei
     return static_cast<ImplClass *>(this)->_AddCHIPoBLEConnectionHandler(handler);
 }
 
-inline void ConnectivityManager::RemoveCHIPoBLEConnectionHandler(void)
+inline void ConnectivityManager::RemoveCHIPoBLEConnectionHandler()
 {
     return static_cast<ImplClass *>(this)->_RemoveCHIPoBLEConnectionHandler();
 }
 
-inline ConnectivityManager::CHIPoBLEServiceMode ConnectivityManager::GetCHIPoBLEServiceMode(void)
+inline ConnectivityManager::CHIPoBLEServiceMode ConnectivityManager::GetCHIPoBLEServiceMode()
 {
     return static_cast<ImplClass *>(this)->_GetCHIPoBLEServiceMode();
 }
@@ -447,7 +448,7 @@ inline CHIP_ERROR ConnectivityManager::SetCHIPoBLEServiceMode(CHIPoBLEServiceMod
     return static_cast<ImplClass *>(this)->_SetCHIPoBLEServiceMode(val);
 }
 
-inline bool ConnectivityManager::IsBLEAdvertisingEnabled(void)
+inline bool ConnectivityManager::IsBLEAdvertisingEnabled()
 {
     return static_cast<ImplClass *>(this)->_IsBLEAdvertisingEnabled();
 }
@@ -457,7 +458,7 @@ inline CHIP_ERROR ConnectivityManager::SetBLEAdvertisingEnabled(bool val)
     return static_cast<ImplClass *>(this)->_SetBLEAdvertisingEnabled(val);
 }
 
-inline bool ConnectivityManager::IsBLEFastAdvertisingEnabled(void)
+inline bool ConnectivityManager::IsBLEFastAdvertisingEnabled()
 {
     return static_cast<ImplClass *>(this)->_IsBLEFastAdvertisingEnabled();
 }
@@ -467,7 +468,7 @@ inline CHIP_ERROR ConnectivityManager::SetBLEFastAdvertisingEnabled(bool val)
     return static_cast<ImplClass *>(this)->_SetBLEFastAdvertisingEnabled(val);
 }
 
-inline bool ConnectivityManager::IsBLEAdvertising(void)
+inline bool ConnectivityManager::IsBLEAdvertising()
 {
     return static_cast<ImplClass *>(this)->_IsBLEAdvertising();
 }
@@ -482,12 +483,12 @@ inline CHIP_ERROR ConnectivityManager::SetBLEDeviceName(const char * deviceName)
     return static_cast<ImplClass *>(this)->_SetBLEDeviceName(deviceName);
 }
 
-inline uint16_t ConnectivityManager::NumBLEConnections(void)
+inline uint16_t ConnectivityManager::NumBLEConnections()
 {
     return static_cast<ImplClass *>(this)->_NumBLEConnections();
 }
 
-inline bool ConnectivityManager::IsUserSelectedModeActive(void)
+inline bool ConnectivityManager::IsUserSelectedModeActive()
 {
     return static_cast<ImplClass *>(this)->_IsUserSelectedModeActive();
 }
@@ -497,7 +498,7 @@ inline void ConnectivityManager::SetUserSelectedMode(bool val)
     static_cast<ImplClass *>(this)->_SetUserSelectedMode(val);
 }
 
-inline uint16_t ConnectivityManager::GetUserSelectedModeTimeout(void)
+inline uint16_t ConnectivityManager::GetUserSelectedModeTimeout()
 {
     return static_cast<ImplClass *>(this)->_GetUserSelectedModeTimeout();
 }
@@ -522,7 +523,7 @@ inline const char * ConnectivityManager::CHIPoBLEServiceModeToStr(CHIPoBLEServic
     return ImplClass::_CHIPoBLEServiceModeToStr(mode);
 }
 
-inline CHIP_ERROR ConnectivityManager::Init(void)
+inline CHIP_ERROR ConnectivityManager::Init()
 {
     return static_cast<ImplClass *>(this)->_Init();
 }
@@ -532,22 +533,22 @@ inline void ConnectivityManager::OnPlatformEvent(const ChipDeviceEvent * event)
     static_cast<ImplClass *>(this)->_OnPlatformEvent(event);
 }
 
-inline bool ConnectivityManager::CanStartWiFiScan(void)
+inline bool ConnectivityManager::CanStartWiFiScan()
 {
     return static_cast<ImplClass *>(this)->_CanStartWiFiScan();
 }
 
-inline void ConnectivityManager::OnWiFiScanDone(void)
+inline void ConnectivityManager::OnWiFiScanDone()
 {
     static_cast<ImplClass *>(this)->_OnWiFiScanDone();
 }
 
-inline void ConnectivityManager::OnWiFiStationProvisionChange(void)
+inline void ConnectivityManager::OnWiFiStationProvisionChange()
 {
     static_cast<ImplClass *>(this)->_OnWiFiStationProvisionChange();
 }
 
 } // namespace DeviceLayer
 } // namespace chip
-#endif // defined(CHIP_DEVICE_LAYER_TARGET)
+
 #endif // CONNECTIVITY_MANAGER_H

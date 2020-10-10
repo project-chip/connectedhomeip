@@ -32,6 +32,7 @@
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/ScopedBuffer.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
@@ -245,12 +246,12 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevisio
     err = Impl()->ReadConfigValue(ImplClass::kConfigKey_ProductRevision, val);
     if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        productRev = (uint16_t) CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION;
+        productRev = static_cast<uint16_t>(CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION);
         err        = CHIP_NO_ERROR;
     }
     else
     {
-        productRev = (uint16_t) val;
+        productRev = static_cast<uint16_t>(val);
     }
 
     return err;
@@ -259,7 +260,7 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductRevisio
 template <class ImplClass>
 inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreProductRevision(uint16_t productRev)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductRevision, (uint32_t) productRev);
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_ProductRevision, static_cast<uint32_t>(productRev));
 }
 
 template <class ImplClass>
@@ -591,7 +592,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSetupDiscriminator(ui
 #endif // defined(CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR) && CHIP_DEVICE_CONFIG_USE_TEST_SETUP_DISCRIMINATOR
     SuccessOrExit(err);
 
-    setupDiscriminator = (uint16_t) val;
+    setupDiscriminator = static_cast<uint16_t>(val);
 
 exit:
     return err;
@@ -600,7 +601,7 @@ exit:
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupDiscriminator(uint16_t setupDiscriminator)
 {
-    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupDiscriminator, (uint32_t) setupDiscriminator);
+    return Impl()->WriteConfigValue(ImplClass::kConfigKey_SetupDiscriminator, static_cast<uint32_t>(setupDiscriminator));
 }
 
 template <class ImplClass>
@@ -867,7 +868,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
     using HashAlgo = chip::Crypto::Hash_SHA256_stream;
 
     HashAlgo hash;
-    uint8_t * dataBuf = NULL;
+    chip::Platform::ScopedMemoryBuffer dataBuf;
     size_t dataBufSize;
     constexpr uint16_t kLenFieldLen = 4; // 4 hex characters
 
@@ -920,11 +921,10 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // Create a temporary buffer to hold the certificate.  (This will also be used for
         // the private key).
         dataBufSize = certLen;
-        dataBuf     = (uint8_t *) chip::Platform::MemoryAlloc(dataBufSize);
-        VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+        VerifyOrExit(dataBuf.Alloc(dataBufSize), err = CHIP_ERROR_NO_MEMORY);
 
         // Read the certificate.
-        err = Impl()->_GetManufacturerDeviceCertificate(dataBuf, certLen, certLen);
+        err = Impl()->_GetManufacturerDeviceCertificate(dataBuf.Ptr<uint8_t>(), certLen, certLen);
         SuccessOrExit(err);
     }
 
@@ -941,15 +941,12 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // (This will also be used for the private key).
         if (certsLen > dataBufSize)
         {
-            chip::Platform::MemoryFree(dataBuf);
-
             dataBufSize = certsLen;
-            dataBuf     = (uint8_t *) chip::Platform::MemoryAlloc(dataBufSize);
-            VerifyOrExit(dataBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+            VerifyOrExit(dataBuf.Alloc(dataBufSize), err = CHIP_ERROR_NO_MEMORY);
         }
 
         // Read the device intermediate CA certificates.
-        err = Impl()->_GetManufacturerDeviceIntermediateCACerts(dataBuf, certsLen, certsLen);
+        err = Impl()->_GetManufacturerDeviceIntermediateCACerts(dataBuf.Ptr<uint8_t>(), certsLen, certsLen);
         SuccessOrExit(err);
     }
 
@@ -964,7 +961,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
         // Read the private key.  (Note that we presume the buffer allocated to hold the certificate
         // is big enough to hold the private key.  _GetDevicePrivateKey() will return an error in the
         // unlikely event that this is not the case.)
-        err = Impl()->_GetManufacturerDevicePrivateKey(dataBuf, dataBufSize, keyLen);
+        err = Impl()->_GetManufacturerDevicePrivateKey(dataBuf.Ptr<uint8_t>(), dataBufSize, keyLen);
         SuccessOrExit(err);
     }
 
@@ -991,10 +988,9 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_ComputeProvisioningHash(
     hash.Finish(hashBuf);
 
 exit:
-    if (dataBuf != NULL)
+    if (dataBuf)
     {
-        chip::Crypto::ClearSecretData(dataBuf, dataBufSize);
-        chip::Platform::MemoryFree(dataBuf);
+        chip::Crypto::ClearSecretData(dataBuf.Ptr(), dataBufSize);
     }
 #endif // CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH
 

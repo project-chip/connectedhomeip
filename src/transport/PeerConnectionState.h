@@ -19,12 +19,11 @@
  * @brief Defines state relevant for an active connection to a peer.
  */
 
-#ifndef PEER_CONNCTION_STATE_H_
-#define PEER_CONNCTION_STATE_H_
+#pragma once
 
-#include <transport/MessageHeader.h>
-#include <transport/PeerAddress.h>
 #include <transport/SecureSession.h>
+#include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 namespace Transport {
@@ -64,11 +63,11 @@ public:
     uint32_t GetSendMessageIndex() const { return mSendMessageIndex; }
     void IncrementSendMessageIndex() { mSendMessageIndex++; }
 
-    uint32_t GetPeerKeyID() const { return mPeerKeyID; }
-    void SetPeerKeyID(uint32_t id) { mPeerKeyID = id; }
+    uint16_t GetPeerKeyID() const { return mPeerKeyID; }
+    void SetPeerKeyID(uint16_t id) { mPeerKeyID = id; }
 
-    uint32_t GetLocalKeyID() const { return mLocalKeyID; }
-    void SetLocalKeyID(uint32_t id) { mLocalKeyID = id; }
+    uint16_t GetLocalKeyID() const { return mLocalKeyID; }
+    void SetLocalKeyID(uint16_t id) { mLocalKeyID = id; }
 
     uint64_t GetLastActivityTimeMs() const { return mLastActityTimeMs; }
     void SetLastActivityTimeMs(uint64_t value) { mLastActityTimeMs = value; }
@@ -78,8 +77,8 @@ public:
 
     bool IsInitialized()
     {
-        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerKeyID != UINT32_MAX ||
-                mLocalKeyID != UINT32_MAX);
+        return (mPeerAddress.IsInitialized() || mPeerNodeId != kUndefinedNodeId || mPeerKeyID != UINT16_MAX ||
+                mLocalKeyID != UINT16_MAX);
     }
 
     /**
@@ -98,13 +97,11 @@ private:
     PeerAddress mPeerAddress;
     NodeId mPeerNodeId         = kUndefinedNodeId;
     uint32_t mSendMessageIndex = 0;
-    uint32_t mPeerKeyID        = UINT32_MAX;
-    uint32_t mLocalKeyID       = UINT32_MAX;
+    uint16_t mPeerKeyID        = UINT16_MAX;
+    uint16_t mLocalKeyID       = UINT16_MAX;
     uint64_t mLastActityTimeMs = 0;
     SecureSession mSecureSession;
 };
 
 } // namespace Transport
 } // namespace chip
-
-#endif // PEER_CONNCTION_STATE_H_

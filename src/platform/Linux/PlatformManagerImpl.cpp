@@ -44,7 +44,7 @@ static void GDBus_Thread()
 }
 #endif
 
-CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
+CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     CHIP_ERROR err;
 

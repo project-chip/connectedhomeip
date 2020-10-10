@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
-import("${chip_root}/gn/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
   output_name = "libSystemLayerTests"
@@ -29,6 +29,8 @@ chip_test_suite("tests") {
     "TestSystemWakeEvent.cpp",
     "TestTimeSource.cpp",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/inet",

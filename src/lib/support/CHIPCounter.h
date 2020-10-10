@@ -24,8 +24,7 @@
  *   Class declarations for a Counter base class, and a monotonically-increasing counter.
  */
 
-#ifndef CHIP_COUNTER_H
-#define CHIP_COUNTER_H
+#pragma once
 
 #include <core/CHIPError.h>
 
@@ -41,8 +40,8 @@ namespace chip {
 class Counter
 {
 public:
-    Counter(void) {}
-    virtual ~Counter(void) {}
+    Counter() {}
+    virtual ~Counter() {}
 
     /**
      *  @brief
@@ -50,7 +49,7 @@ public:
      *
      *  @return A CHIP error code if anything failed, CHIP_NO_ERROR otherwise.
      */
-    virtual CHIP_ERROR Advance(void) = 0;
+    virtual CHIP_ERROR Advance() = 0;
 
     /**
      *  @brief
@@ -58,7 +57,7 @@ public:
      *
      *  @return The current value of the counter.
      */
-    virtual uint32_t GetValue(void) = 0;
+    virtual uint32_t GetValue() = 0;
 };
 
 /**
@@ -71,8 +70,8 @@ public:
 class MonotonicallyIncreasingCounter : public Counter
 {
 public:
-    MonotonicallyIncreasingCounter(void);
-    ~MonotonicallyIncreasingCounter(void) override;
+    MonotonicallyIncreasingCounter();
+    ~MonotonicallyIncreasingCounter() override;
 
     /**
      *  @brief
@@ -90,7 +89,7 @@ public:
      *
      *  @return A CHIP error code if something fails, CHIP_NO_ERROR otherwise
      */
-    CHIP_ERROR Advance(void) override;
+    CHIP_ERROR Advance() override;
 
     /**
      *  @brief
@@ -98,12 +97,10 @@ public:
      *
      *  @return The current value of the counter.
      */
-    uint32_t GetValue(void) override;
+    uint32_t GetValue() override;
 
 protected:
     uint32_t mCounterValue;
 };
 
 } // namespace chip
-
-#endif // CHIP_COUNTER_H

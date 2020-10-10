@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef TESTSUPPORT_H
-#define TESTSUPPORT_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -36,9 +35,9 @@ int TestMemAlloc(void);
 int TestBufBound(void);
 int TestCHIPCounter(void);
 int TestPersistedCounter(int argc, char * argv[]);
+int TestScopedBuffer(void);
+int TestSafeInt();
 
 #ifdef __cplusplus
 }
 #endif
-
-#endif // TESTSUPPORT_H

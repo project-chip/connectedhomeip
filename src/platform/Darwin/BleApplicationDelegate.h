@@ -20,13 +20,11 @@
 
 #include <ble/BleApplicationDelegate.h>
 
-using namespace ::chip::Ble;
-
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-class BleApplicationDelegateImpl : public BleApplicationDelegate
+class BleApplicationDelegateImpl : public Ble::BleApplicationDelegate
 {
 public:
     virtual void NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);

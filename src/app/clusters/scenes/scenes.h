@@ -37,6 +37,9 @@
  *******************************************************************************
  ******************************************************************************/
 
+#ifndef SILABS_SCENES_PLUGIN_H
+#define SILABS_SCENES_PLUGIN_H
+
 #include <app/util/af-types.h>
 #include <stdint.h>
 
@@ -80,3 +83,5 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, uint16_t groupId, uint8_t sceneId,
                                             uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets);
 bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, uint16_t groupId, uint8_t sceneId);
+
+#endif // SILABS_SCENES_PLUGIN_H

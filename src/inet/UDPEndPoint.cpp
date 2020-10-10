@@ -154,7 +154,7 @@ static INET_ERROR LwIPBindInterface(struct udp_pcb * aUDP, InterfaceId intfId)
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired.
  */
-INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, IPAddress addr, uint16_t port, InterfaceId intfId)
+INET_ERROR UDPEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -305,7 +305,7 @@ exit:
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired
  */
-INET_ERROR UDPEndPoint::Listen(void)
+INET_ERROR UDPEndPoint::Listen()
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -377,7 +377,7 @@ exit:
  *  On LwIP systems, this method must not be called with the LwIP stack
  *  lock already acquired.
  */
-void UDPEndPoint::Close(void)
+void UDPEndPoint::Close()
 {
     if (mState != kState_Closed)
     {
@@ -437,7 +437,7 @@ void UDPEndPoint::Close(void)
  *  On LwIP systems, this method must not be called with the LwIP stack
  *  lock already acquired.
  */
-void UDPEndPoint::Free(void)
+void UDPEndPoint::Free()
 {
     Close();
 
@@ -451,7 +451,7 @@ void UDPEndPoint::Free(void)
 /**
  *  A synonym for <tt>SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags)</tt>.
  */
-INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags)
 {
     return SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags);
 }
@@ -495,7 +495,7 @@ INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, chip::System::Pack
  *      method deep-copies \c msg into a fresh object, and queues that for
  *      transmission, leaving the original \c msg available after return.
  */
-INET_ERROR UDPEndPoint::SendTo(IPAddress addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg,
+INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg,
                                uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
@@ -793,7 +793,7 @@ void UDPEndPoint::Init(InetLayer * inetLayer)
  *
  * @return InterfaceId   The bound interface id.
  */
-InterfaceId UDPEndPoint::GetBoundInterface(void)
+InterfaceId UDPEndPoint::GetBoundInterface()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if HAVE_LWIP_UDP_BIND_NETIF
@@ -812,7 +812,7 @@ InterfaceId UDPEndPoint::GetBoundInterface(void)
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 }
 
-uint16_t UDPEndPoint::GetBoundPort(void)
+uint16_t UDPEndPoint::GetBoundPort()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     return mUDP->local_port;
@@ -972,12 +972,12 @@ exit:
     return (lRetval);
 }
 
-SocketEvents UDPEndPoint::PrepareIO(void)
+SocketEvents UDPEndPoint::PrepareIO()
 {
     return (IPEndPointBasis::PrepareIO());
 }
 
-void UDPEndPoint::HandlePendingIO(void)
+void UDPEndPoint::HandlePendingIO()
 {
     if (mState == kState_Listening && OnMessageReceived != nullptr && mPendingIO.IsReadable())
     {

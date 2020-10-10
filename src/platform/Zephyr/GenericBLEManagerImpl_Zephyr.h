@@ -64,7 +64,7 @@ private:
     CHIP_ERROR _SetDeviceName(const char * deviceName);
     uint16_t _NumConnections(void);
     void _OnPlatformEvent(const ChipDeviceEvent * event);
-    BleLayer * _GetBleLayer(void) const;
+    BleLayer * _GetBleLayer(void);
 
     // ===== Members that implement virtual methods on BlePlatformDelegate.
 
@@ -94,6 +94,8 @@ private:
             0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
     };
 
+    struct ServiceData;
+
     uint16_t mFlags;
     uint16_t mGAPConns;
     CHIPoBLEServiceMode mServiceMode;
@@ -113,6 +115,7 @@ private:
     bool IsSubscribed(bt_conn * conn);
     bool SetSubscribed(bt_conn * conn);
     bool UnsetSubscribed(bt_conn * conn);
+    uint32_t GetAdvertisingInterval();
 
     static void DriveBLEState(intptr_t arg);
 
@@ -129,9 +132,9 @@ public:
 };
 
 template <class ImplClass>
-inline BleLayer * GenericBLEManagerImpl_Zephyr<ImplClass>::_GetBleLayer() const
+inline BleLayer * GenericBLEManagerImpl_Zephyr<ImplClass>::_GetBleLayer()
 {
-    return (BleLayer *) (this);
+    return this;
 }
 
 template <class ImplClass>

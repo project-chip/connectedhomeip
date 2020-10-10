@@ -35,6 +35,7 @@
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
 
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/TestUtils.h>
@@ -211,14 +212,14 @@ void TestString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const c
     uint32_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char * val = (char *) malloc(expectedLen + 1);
+    char * val = static_cast<char *>(chip::Platform::MemoryAlloc(expectedLen + 1));
 
     CHIP_ERROR err = reader.GetString(val, expectedLen + 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
 
-    free(val);
+    chip::Platform::MemoryFree(val);
 }
 
 void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const char * expectedVal)
@@ -229,14 +230,14 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, cons
     uint32_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char * val = (char *) malloc(expectedLen + 1);
+    char * val = static_cast<char *>(chip::Platform::MemoryAlloc(expectedLen + 1));
 
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
 
-    free(val);
+    chip::Platform::MemoryFree(val);
 }
 
 void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const uint8_t * expectedVal, uint32_t expectedLen)
@@ -246,13 +247,13 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const
 
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    uint8_t * val  = (uint8_t *) malloc(expectedLen);
+    uint8_t * val  = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(expectedLen));
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
 
-    free(val);
+    chip::Platform::MemoryFree(val);
 }
 
 void TestBufferContents(nlTestSuite * inSuite, PacketBuffer * buf, const uint8_t * expectedVal, uint32_t expectedLen)
@@ -435,10 +436,10 @@ void WriteEncoding1(nlTestSuite * inSuite, TLVWriter & writer)
     err = writer2.PutString(ProfileTag(TestProfile_1, 5), "This is a test");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = writer2.Put(ProfileTag(TestProfile_2, 65535), (float) 17.9);
+    err = writer2.Put(ProfileTag(TestProfile_2, 65535), static_cast<float>(17.9));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = writer2.Put(ProfileTag(TestProfile_2, 65536), (double) 17.9);
+    err = writer2.Put(ProfileTag(TestProfile_2, 65536), 17.9);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.CloseContainer(writer2);
@@ -581,11 +582,12 @@ void ReadEncoding1(nlTestSuite * inSuite, TLVReader & reader)
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), (float) 17.9);
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535),
+                                   static_cast<float>(17.9));
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536), (double) 17.9);
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536), 17.9);
 
         TestEndAndCloseContainer(inSuite, reader, reader2);
     }
@@ -2636,13 +2638,13 @@ void PreserveSizeWrite(nlTestSuite * inSuite, TLVWriter & writer, bool preserveS
     TLVWriter writer2;
 
     // kTLVTagControl_FullyQualified_8Bytes
-    err = writer.Put(ProfileTag(TestProfile_1, 4000000000ULL), (int64_t) 40000000000ULL, true);
+    err = writer.Put(ProfileTag(TestProfile_1, 4000000000ULL), static_cast<int64_t>(40000000000ULL), true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = writer.Put(ProfileTag(TestProfile_1, 4000000000ULL), (int16_t) 12345, true);
+    err = writer.Put(ProfileTag(TestProfile_1, 4000000000ULL), static_cast<int16_t>(12345), true);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = writer.Put(ProfileTag(TestProfile_1, 4000000000ULL), (float) 1.0);
+    err = writer.Put(ProfileTag(TestProfile_1, 4000000000ULL), static_cast<float>(1.0));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = writer.OpenContainer(ProfileTag(TestProfile_1, 1), kTLVType_Structure, writer2);
@@ -2654,38 +2656,38 @@ void PreserveSizeWrite(nlTestSuite * inSuite, TLVWriter & writer, bool preserveS
         err = writer2.OpenContainer(ContextTag(0), kTLVType_Array, writer3);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (uint8_t) 42, preserveSize);
+        err = writer3.Put(AnonymousTag, static_cast<uint8_t>(42), preserveSize);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (uint16_t) 42, preserveSize);
+        err = writer3.Put(AnonymousTag, static_cast<uint16_t>(42), preserveSize);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (uint32_t) 42, preserveSize);
+        err = writer3.Put(AnonymousTag, static_cast<uint32_t>(42), preserveSize);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (uint64_t) 40000000000ULL, preserveSize);
+        err = writer3.Put(AnonymousTag, static_cast<uint64_t>(40000000000ULL), preserveSize);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (int8_t) -17, preserveSize);
+        err = writer3.Put(AnonymousTag, static_cast<int8_t>(-17), preserveSize);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (int16_t) -17, preserveSize);
+        err = writer3.Put(AnonymousTag, static_cast<int16_t>(-17), preserveSize);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (int32_t) -170000, preserveSize);
+        err = writer3.Put(AnonymousTag, static_cast<int32_t>(-170000), preserveSize);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (int64_t) -170000, preserveSize);
+        err = writer3.Put(AnonymousTag, static_cast<int64_t>(-170000), preserveSize);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         // the below cases are for full coverage of PUTs
-        err = writer3.Put(AnonymousTag, (uint64_t) 65535, false);
+        err = writer3.Put(AnonymousTag, static_cast<uint64_t>(65535), false);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (int64_t) 32767, false);
+        err = writer3.Put(AnonymousTag, static_cast<int64_t>(32767), false);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        err = writer3.Put(AnonymousTag, (int64_t) 40000000000ULL, false);
+        err = writer3.Put(AnonymousTag, static_cast<int64_t>(40000000000ULL), false);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = writer2.CloseContainer(writer3);
@@ -2958,15 +2960,16 @@ void TestCHIPTLVReaderDup(nlTestSuite * inSuite)
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestDupBytes(inSuite, reader2, ProfileTag(TestProfile_1, 5), (uint8_t *) ("This is a test"), 14);
+        TestDupBytes(inSuite, reader2, ProfileTag(TestProfile_1, 5), reinterpret_cast<const uint8_t *>("This is a test"), 14);
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535), (float) 17.9);
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65535),
+                                   static_cast<float>(17.9));
 
         TestNext<TLVReader>(inSuite, reader2);
 
-        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536), (double) 17.9);
+        TestGet<TLVReader, double>(inSuite, reader2, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_2, 65536), 17.9);
 
         TestEndAndCloseContainer(inSuite, reader, reader2);
     }
@@ -3025,16 +3028,16 @@ void TestCHIPTLVReaderErrorHandling(nlTestSuite * inSuite)
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_INCORRECT_STATE);
 
     // DupString()
-    char * str = (char *) malloc(16);
+    char * str = static_cast<char *>(chip::Platform::MemoryAlloc(16));
     err        = reader.DupString(str);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
-    free(str);
+    chip::Platform::MemoryFree(str);
 
     // GetDataPtr()
-    const uint8_t * data = (uint8_t *) malloc(16);
+    const uint8_t * data = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(16));
     err                  = reader.GetDataPtr(data);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_WRONG_TLV_TYPE);
-    free((void *) data);
+    chip::Platform::MemoryFree(const_cast<uint8_t *>(data));
 }
 /**
  *  Test CHIP TLV Reader in a use case
@@ -3055,16 +3058,17 @@ void TestCHIPTLVReaderInPractice(nlTestSuite * inSuite)
     TestNext<TLVReader>(inSuite, reader);
 
     TestGet<TLVReader, int64_t>(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL),
-                                (int64_t) 40000000000ULL);
+                                static_cast<int64_t>(40000000000ULL));
 
     TestNext<TLVReader>(inSuite, reader);
 
-    TestGet<TLVReader, int64_t>(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL), (int16_t) 12345);
+    TestGet<TLVReader, int64_t>(inSuite, reader, kTLVType_SignedInteger, ProfileTag(TestProfile_1, 4000000000ULL),
+                                static_cast<int16_t>(12345));
 
     TestNext<TLVReader>(inSuite, reader);
 
     TestGet<TLVReader, double>(inSuite, reader, kTLVType_FloatingPointNumber, ProfileTag(TestProfile_1, 4000000000ULL),
-                               (float) 1.0);
+                               static_cast<float>(1.0));
 }
 
 void TestCHIPTLVReader_NextOverContainer_ProcessElement(nlTestSuite * inSuite, TLVReader & reader, void * context)
@@ -3760,8 +3764,8 @@ static void TLVReaderFuzzTest(nlTestSuite * inSuite, void * inContext)
 
             if (readRes == CHIP_NO_ERROR)
             {
-                printf("Unexpected success of fuzz test: offset %u, original value 0x%02X, mutated value 0x%02X\n", (unsigned) i,
-                       (unsigned) origVal, (unsigned) fuzzedData[i]);
+                printf("Unexpected success of fuzz test: offset %u, original value 0x%02X, mutated value 0x%02X\n",
+                       static_cast<unsigned>(i), static_cast<unsigned>(origVal), static_cast<unsigned>(fuzzedData[i]));
                 ExitNow();
             }
 
@@ -3814,6 +3818,26 @@ static const nlTest sTests[] =
 };
 // clang-format on
 
+/**
+ *  Set up the test suite.
+ */
+int TestCHIPTLV_Setup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int TestCHIPTLV_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 int TestCHIPTLV(void)
 {
     // clang-format off
@@ -3821,8 +3845,8 @@ int TestCHIPTLV(void)
     {
         "chip-tlv",
         &sTests[0],
-        nullptr,
-        nullptr
+        TestCHIPTLV_Setup,
+        TestCHIPTLV_Teardown
     };
     // clang-format on
     TestTLVContext context;

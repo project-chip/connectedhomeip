@@ -30,14 +30,10 @@
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/UDP.h>
+#include <transport/raw/UDP.h>
 
-#include <DataModelHandler.h>
-
-#if CHIP_ENABLE_OPENTHREAD
-#include <platform/ThreadStackManager.h>
-#include <platform/internal/DeviceNetworkInfo.h>
-#endif
+#include "DataModelHandler.h"
+#include "RendezvousServer.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -63,94 +59,10 @@ SecureSessionMgrBase & SessionManager()
 
 namespace {
 
-void HandleBLEConnectionClosed(chip::Ble::BLEEndPoint * endPoint, BLE_ERROR err)
-{
-    if (err != BLE_NO_ERROR)
-    {
-        ChipLogError(AppServer, "BLE Error: %d", err);
-    }
-    ChipLogProgress(AppServer, "BLE Connection closed");
-}
-
-void HandleBLEMessageReceived(chip::Ble::BLEEndPoint * endPoint, chip::System::PacketBuffer * buffer)
-{
-#if CHIP_ENABLE_OPENTHREAD
-    uint16_t bufferLen = buffer->DataLength();
-    uint8_t * data     = buffer->Start();
-    chip::DeviceLayer::Internal::DeviceNetworkInfo networkInfo;
-    ChipLogProgress(AppServer, "Receive BLE message size=%u", bufferLen);
-
-    VerifyOrExit(bufferLen >= sizeof(networkInfo.ThreadNetworkName),
-                 ChipLogProgress(AppServer, "Invalid network provision message"));
-    memcpy(networkInfo.ThreadNetworkName, data, sizeof(networkInfo.ThreadNetworkName));
-    data += sizeof(networkInfo.ThreadNetworkName);
-    bufferLen -= sizeof(networkInfo.ThreadNetworkName);
-
-    VerifyOrExit(bufferLen >= sizeof(networkInfo.ThreadExtendedPANId),
-                 ChipLogProgress(AppServer, "Invalid network provision message"));
-    memcpy(networkInfo.ThreadExtendedPANId, data, sizeof(networkInfo.ThreadExtendedPANId));
-    data += sizeof(networkInfo.ThreadExtendedPANId);
-    bufferLen -= sizeof(networkInfo.ThreadExtendedPANId);
-
-    VerifyOrExit(bufferLen >= sizeof(networkInfo.ThreadMeshPrefix),
-                 ChipLogProgress(AppServer, "Invalid network provision message"));
-    memcpy(networkInfo.ThreadMeshPrefix, data, sizeof(networkInfo.ThreadMeshPrefix));
-    data += sizeof(networkInfo.ThreadMeshPrefix);
-    bufferLen -= sizeof(networkInfo.ThreadMeshPrefix);
-
-    VerifyOrExit(bufferLen >= sizeof(networkInfo.ThreadNetworkKey),
-                 ChipLogProgress(AppServer, "Invalid network provision message"));
-    memcpy(networkInfo.ThreadNetworkKey, data, sizeof(networkInfo.ThreadNetworkKey));
-    data += sizeof(networkInfo.ThreadNetworkKey);
-    bufferLen -= sizeof(networkInfo.ThreadNetworkKey);
-
-    VerifyOrExit(bufferLen >= sizeof(networkInfo.ThreadPSKc), ChipLogProgress(AppServer, "Invalid network provision message"));
-    memcpy(networkInfo.ThreadPSKc, data, sizeof(networkInfo.ThreadPSKc));
-    data += sizeof(networkInfo.ThreadPSKc);
-    bufferLen -= sizeof(networkInfo.ThreadPSKc);
-
-    VerifyOrExit(bufferLen >= sizeof(networkInfo.ThreadPANId), ChipLogProgress(AppServer, "Invalid network provision message"));
-    networkInfo.ThreadPANId = data[0] | (data[1] << 8);
-    data += sizeof(networkInfo.ThreadPANId);
-    bufferLen -= sizeof(networkInfo.ThreadPANId);
-
-    VerifyOrExit(bufferLen >= sizeof(networkInfo.ThreadChannel), ChipLogProgress(AppServer, "Invalid network provision message"));
-    networkInfo.ThreadChannel = data[0];
-    data += sizeof(networkInfo.ThreadChannel);
-    bufferLen -= sizeof(networkInfo.ThreadChannel);
-
-    VerifyOrExit(bufferLen >= 3, ChipLogProgress(AppServer, "Invalid network provision message"));
-    networkInfo.FieldPresent.ThreadExtendedPANId = *data;
-    data++;
-    networkInfo.FieldPresent.ThreadMeshPrefix = *data;
-    data++;
-    networkInfo.FieldPresent.ThreadPSKc = *data;
-    data++;
-    networkInfo.NetworkId              = 0;
-    networkInfo.FieldPresent.NetworkId = true;
-
-    ThreadStackMgr().SetThreadEnabled(false);
-    ThreadStackMgr().SetThreadProvision(networkInfo);
-    ThreadStackMgr().SetThreadEnabled(true);
-
-#endif
-exit:
-    endPoint->Close();
-    chip::System::PacketBuffer::Free(buffer);
-}
-
-void HandleBLEConnectionOpened(chip::Ble::BLEEndPoint * endPoint)
-{
-    ChipLogProgress(AppServer, "BLE Connection opened");
-
-    endPoint->OnMessageReceived  = HandleBLEMessageReceived;
-    endPoint->OnConnectionClosed = HandleBLEConnectionClosed;
-}
-
 class ServerCallback : public SecureSessionMgrCallback
 {
 public:
-    void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
+    void OnMessageReceived(const PacketHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
                            SecureSessionMgrBase * mgr) override
     {
         const size_t data_len = buffer->DataLength();
@@ -186,6 +98,7 @@ public:
 
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
+RendezvousServer gRendezvousServer;
 
 } // namespace
 
@@ -202,13 +115,25 @@ void InitServer()
                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
-    // TODO: ESP32 echo server supports actual pairing, needs to investigate how to share this with ESP32
+    // This flag is used to bypass BLE in the cirque test
+    // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
+#ifndef BYPASS_RENDEZVOUS
+    {
+        RendezvousParameters params;
+        uint32_t pinCode;
+
+        SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
+        params.SetSetupPINCode(pinCode)
+            .SetLocalNodeId(EXAMPLE_SERVER_NODEID)
+            .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+        SuccessOrExit(err = gRendezvousServer.Init(params));
+    }
+#endif
+
     err = sessions.NewPairing(peer, &gTestPairing);
     SuccessOrExit(err);
 
     sessions.SetDelegate(&gCallbacks);
-
-    chip::DeviceLayer::ConnectivityMgr().AddCHIPoBLEConnectionHandler(HandleBLEConnectionOpened);
 
 exit:
     if (err != CHIP_NO_ERROR)

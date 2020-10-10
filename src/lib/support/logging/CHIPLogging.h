@@ -32,8 +32,7 @@
  *
  */
 
-#ifndef CHIPLOGGING_H_
-#define CHIPLOGGING_H_
+#pragma once
 
 #include <core/CHIPConfig.h>
 
@@ -191,7 +190,7 @@ enum LogCategory
 
 extern void LogV(uint8_t module, uint8_t category, const char * msg, va_list args);
 extern void Log(uint8_t module, uint8_t category, const char * msg, ...);
-extern uint8_t GetLogFilter(void);
+extern uint8_t GetLogFilter();
 extern void SetLogFilter(uint8_t category);
 
 #ifndef CHIP_ERROR_LOGGING
@@ -442,5 +441,3 @@ extern bool IsCategoryEnabled(uint8_t CAT);
 
 } // namespace Logging
 } // namespace chip
-
-#endif /* CHIPLOGGING_H_ */

@@ -21,9 +21,9 @@
 
 namespace chip {
 
-MonotonicallyIncreasingCounter::MonotonicallyIncreasingCounter(void) : mCounterValue(0) {}
+MonotonicallyIncreasingCounter::MonotonicallyIncreasingCounter() : mCounterValue(0) {}
 
-MonotonicallyIncreasingCounter::~MonotonicallyIncreasingCounter(void) {}
+MonotonicallyIncreasingCounter::~MonotonicallyIncreasingCounter() {}
 
 CHIP_ERROR
 MonotonicallyIncreasingCounter::Init(uint32_t aStartValue)
@@ -36,7 +36,7 @@ MonotonicallyIncreasingCounter::Init(uint32_t aStartValue)
 }
 
 CHIP_ERROR
-MonotonicallyIncreasingCounter::Advance(void)
+MonotonicallyIncreasingCounter::Advance()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -45,7 +45,7 @@ MonotonicallyIncreasingCounter::Advance(void)
     return err;
 }
 
-uint32_t MonotonicallyIncreasingCounter::GetValue(void)
+uint32_t MonotonicallyIncreasingCounter::GetValue()
 {
     return mCounterValue;
 }

@@ -65,7 +65,7 @@ exit:
     return err;
 }
 
-static CHIP_ERROR populateTLVBits(uint8_t * bits, int & offset, uint8_t * tlvBuf, size_t tlvBufSizeInBytes,
+static CHIP_ERROR populateTLVBits(uint8_t * bits, int & offset, const uint8_t * tlvBuf, size_t tlvBufSizeInBytes,
                                   int totalPayloadDataSizeInBits)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -135,7 +135,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload
     CHIP_ERROR err                                            = CHIP_NO_ERROR;
     vector<OptionalQRCodeInfo> optionalData                   = outPayload.getAllOptionalVendorData();
     vector<OptionalQRCodeInfoExtension> optionalExtensionData = outPayload.getAllOptionalExtensionData();
-    VerifyOrExit(optionalData.size() != 0 || optionalExtensionData.size() != 0, err = CHIP_NO_ERROR);
+    VerifyOrExit(!optionalData.empty() || !optionalExtensionData.empty(), err = CHIP_NO_ERROR);
 
     TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);
@@ -198,7 +198,7 @@ static CHIP_ERROR generateBitSet(SetupPayload & payload, uint8_t * bits, uint8_t
     err = populateBits(bits, offset, payload.vendorID, kVendorIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.productID, kProductIDFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.requiresCustomFlow, kCustomFlowRequiredFieldLengthInBits, kTotalPayloadDataSizeInBits);
-    err = populateBits(bits, offset, (uint16_t) payload.rendezvousInformation, kRendezvousInfoFieldLengthInBits,
+    err = populateBits(bits, offset, static_cast<uint16_t>(payload.rendezvousInformation), kRendezvousInfoFieldLengthInBits,
                        kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.discriminator, kPayloadDiscriminatorFieldLengthInBits, kTotalPayloadDataSizeInBits);
     err = populateBits(bits, offset, payload.setUpPINCode, kSetupPINCodeFieldLengthInBits, kTotalPayloadDataSizeInBits);

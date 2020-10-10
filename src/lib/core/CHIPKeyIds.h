@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef CHIPKEYS_H_
-#define CHIPKEYS_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -349,5 +348,3 @@ public:
 };
 
 } // namespace chip
-
-#endif /* CHIPKEYS_H_ */

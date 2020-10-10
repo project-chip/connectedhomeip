@@ -18,10 +18,9 @@ buildconfig = "//build/config/BUILDCONFIG.gn"
 # CHIP uses angle bracket includes.
 check_system_includes = true
 
-# Allow loading paths relative to //gn.
-secondary_source = "//gn/"
+import("//build_overrides/pigweed.gni")
 
-import("//gn/build_overrides/pigweed.gni")
+script_executable = "python3"
 
 default_args = {
   pw_unit_test_AUTOMATIC_RUNNER = "$dir_pigweed/targets/host/run_test"

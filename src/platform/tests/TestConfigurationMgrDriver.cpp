@@ -24,7 +24,7 @@
 
 #include "TestConfigurationMgr.h"
 
-int main(void)
+int main()
 {
     return (TestConfigurationMgr());
 }

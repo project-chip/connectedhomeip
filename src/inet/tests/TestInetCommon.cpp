@@ -48,6 +48,7 @@
 
 #include <inet/InetFaultInjection.h>
 #include <support/CHIPFaultInjection.h>
+#include <support/CHIPMem.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemTimer.h>
 
@@ -76,6 +77,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 using namespace chip;
+using namespace chip::Inet;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 static sys_mbox_t * sLwIPEventQueue   = NULL;
@@ -106,7 +108,7 @@ struct RestartCallbackContext
     char ** mArgv;
 };
 
-static void RebootCallbackFn(void);
+static void RebootCallbackFn();
 static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::FaultInjection::Identifier aId,
                                     nl::FaultInjection::Record * aFaultRecord);
 
@@ -153,7 +155,12 @@ static void UseStdoutLineBuffering()
 {
     // Set stdout to be line buffered with a buffer of 512 (will flush on new line
     // or when the buffer of 512 is exceeded).
-    setvbuf(stdout, nullptr, _IOLBF, 512);
+#if CHIP_CONFIG_MEMORY_MGMT_MALLOC
+    constexpr char * buf = nullptr;
+#else
+    static char buf[512];
+#endif // CHIP_CONFIG_MEMORY_MGMT_MALLOC
+    setvbuf(stdout, buf, _IOLBF, 512);
 }
 
 void InitTestInetCommon()
@@ -168,7 +175,7 @@ static void ExitOnSIGUSR1Handler(int signum)
 }
 
 // We set a hook to exit when we receive SIGUSR1, SIGTERM or SIGHUP
-void SetSIGUSR1Handler(void)
+void SetSIGUSR1Handler()
 {
     SetSignalHandler(ExitOnSIGUSR1Handler);
 }
@@ -281,7 +288,7 @@ void InitNetwork()
         for (size_t j = 0; j < gNetworkOptions.LocalIPv6Addr.size(); j++)
         {
             uint64_t iid    = gNetworkOptions.LocalIPv6Addr[j].InterfaceId();
-            char * tap_name = (char *) malloc(sizeof(gDefaultTapDeviceName));
+            char * tap_name = (char *) chip::Platform::MemoryAlloc(sizeof(gDefaultTapDeviceName));
             snprintf(tap_name, sizeof(gDefaultTapDeviceName), "chip-dev-%" PRIx64, iid & 0xFFFF);
             tap_name[sizeof(gDefaultTapDeviceName) - 1] = 0;
             gNetworkOptions.TapDeviceName.push_back(tap_name);
@@ -643,7 +650,7 @@ void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix, uint32_t
             printf("   ");
 
         for (j = i; j < rowEnd && j < len; j++)
-            if (isprint((char) mem[j]))
+            if (isprint(static_cast<char>(mem[j])))
                 printf("%c", mem[j]);
             else
                 printf(".");
@@ -658,7 +665,7 @@ void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix)
 
     DumpMemory(mem, len, prefix, kRowWidth);
 }
-static void RebootCallbackFn(void)
+static void RebootCallbackFn()
 {
     char * lArgv[sRestartCallbackCtx.mArgc + 2];
     int i;
@@ -762,7 +769,7 @@ void SetupFaultInjectionContext(int argc, char * argv[])
     SetupFaultInjectionContext(argc, argv, nullptr, nullptr);
 }
 
-void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(void),
+void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(),
                                 void (*aInjectAsyncEvents)(int32_t index))
 {
     nl::FaultInjection::Manager & weavemgr  = chip::FaultInjection::GetManager();

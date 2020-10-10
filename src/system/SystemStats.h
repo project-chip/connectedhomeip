@@ -22,8 +22,8 @@
  *  on the state of CHIP, Inet and System resources
  */
 
-#ifndef SYSTEMSTATS_H
-#define SYSTEMSTATS_H
+#pragma once
+
 // Include standard C library limit macros
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
@@ -93,15 +93,15 @@ public:
 
 bool Difference(Snapshot & result, Snapshot & after, Snapshot & before);
 void UpdateSnapshot(Snapshot & aSnapshot);
-count_t * GetResourcesInUse(void);
-count_t * GetHighWatermarks(void);
+count_t * GetResourcesInUse();
+count_t * GetHighWatermarks();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_STATS && MEMP_STATS
 void UpdateLwipPbufCounts(void);
 #endif
 
 typedef const char * Label;
-const Label * GetStrings(void);
+const Label * GetStrings();
 
 } // namespace Stats
 } // namespace System
@@ -170,5 +170,3 @@ const Label * GetStrings(void);
 #define SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS()
 
 #endif // CHIP_SYSTEM_CONFIG_PROVIDE_STATISTICS
-
-#endif // defined(SYSTEMSTATS_H)

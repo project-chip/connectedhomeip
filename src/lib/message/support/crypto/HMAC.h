@@ -48,8 +48,8 @@ public:
         kDigestLength = H::kHashLength
     };
 
-    HMAC(void);
-    ~HMAC(void);
+    HMAC();
+    ~HMAC();
 
     void Begin(const uint8_t * keyData, uint16_t keyLen);
     void AddData(const uint8_t * msgData, uint16_t dataLen);
@@ -57,7 +57,7 @@ public:
     void AddData(const BIGNUM & num);
 #endif
     void Finish(uint8_t * hashBuf);
-    void Reset(void);
+    void Reset();
 
 private:
     enum

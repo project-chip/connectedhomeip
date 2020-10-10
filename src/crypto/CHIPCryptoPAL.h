@@ -108,7 +108,8 @@ class ECPKey
 public:
     virtual SupportedECPKeyTypes Type() const = 0;
     virtual size_t Length() const             = 0;
-    virtual operator uint8_t *() const        = 0;
+    virtual operator const uint8_t *() const  = 0;
+    virtual operator uint8_t *()              = 0;
 
     virtual CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length, const Sig & signature) const
     {
@@ -143,7 +144,8 @@ public:
 
     /** @brief Returns buffer pointer
      **/
-    operator uint8_t *() const { return (uint8_t *) bytes; }
+    operator uint8_t *() { return bytes; }
+    operator const uint8_t *() const { return bytes; }
 
 private:
     uint8_t bytes[Cap];
@@ -159,9 +161,10 @@ class P256PublicKey : public ECPKey<P256ECDSASignature>
 public:
     SupportedECPKeyTypes Type() const override { return SupportedECPKeyTypes::ECP256R1; }
     size_t Length() const override { return kP256_PublicKey_Length; }
-    operator uint8_t *() const override { return (uint8_t *) bytes; }
+    operator uint8_t *() override { return bytes; }
+    operator const uint8_t *() const override { return bytes; }
 
-    CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
+    CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,
                                             const P256ECDSASignature & signature) const override;
 
 private:
@@ -188,7 +191,7 @@ public:
      *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, Sig & out_signature) = 0;
+    virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) = 0;
 
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
@@ -246,7 +249,7 @@ public:
      *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, const size_t msg_length, P256ECDSASignature & out_signature) override;
+    CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) override;
 
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
@@ -314,7 +317,7 @@ CHIP_ERROR AES_CCM_decrypt(const uint8_t * ciphertext, size_t ciphertext_length,
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
-CHIP_ERROR Hash_SHA256(const uint8_t * data, const size_t data_length, uint8_t * out_buffer);
+CHIP_ERROR Hash_SHA256(const uint8_t * data, size_t data_length, uint8_t * out_buffer);
 
 /**
  * @brief A class that defines stream based implementation of SHA-256 hash
@@ -328,13 +331,13 @@ struct HashSHA256OpaqueContext
 class Hash_SHA256_stream
 {
 public:
-    Hash_SHA256_stream(void);
-    ~Hash_SHA256_stream(void);
+    Hash_SHA256_stream();
+    ~Hash_SHA256_stream();
 
-    CHIP_ERROR Begin(void);
-    CHIP_ERROR AddData(const uint8_t * data, const size_t data_length);
+    CHIP_ERROR Begin();
+    CHIP_ERROR AddData(const uint8_t * data, size_t data_length);
     CHIP_ERROR Finish(uint8_t * out_buffer);
-    void Clear(void);
+    void Clear();
 
 private:
     HashSHA256OpaqueContext mContext;
@@ -353,8 +356,8 @@ private:
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
 
-CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                       const uint8_t * info, const size_t info_length, uint8_t * out_buffer, size_t out_length);
+CHIP_ERROR HKDF_SHA256(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,
+                       size_t info_length, uint8_t * out_buffer, size_t out_length);
 
 /**
  * @brief A cryptographically secure random number generator based on NIST SP800-90A
@@ -362,7 +365,7 @@ CHIP_ERROR HKDF_SHA256(const uint8_t * secret, const size_t secret_length, const
  * @param out_length Number of random bytes to generate
  * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
  **/
-CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, const size_t out_length);
+CHIP_ERROR DRBG_get_bytes(uint8_t * out_buffer, size_t out_length);
 
 /** @brief Entropy callback function
  * @param data Callback-specific data pointer
@@ -419,7 +422,7 @@ class Spake2p
 {
 public:
     Spake2p(size_t fe_size, size_t point_size, size_t hash_size);
-    virtual ~Spake2p(void) {}
+    virtual ~Spake2p() {}
 
     /**
      * @brief Initialize Spake2+ with some context specific information.
@@ -510,8 +513,8 @@ public:
     CHIP_ERROR GetKeys(uint8_t * out, size_t * out_len);
 
     CHIP_ERROR InternalHash(const uint8_t * in, size_t in_len);
-    CHIP_ERROR WriteMN(void);
-    CHIP_ERROR GenerateKeys(void);
+    CHIP_ERROR WriteMN();
+    CHIP_ERROR GenerateKeys();
 
     /**
      * @brief Load a field element.
@@ -646,7 +649,7 @@ public:
 
     void * M;
     void * N;
-    void * G;
+    const void * G;
     void * X;
     void * Y;
     void * L;
@@ -747,8 +750,8 @@ protected:
      *
      * @return Returns a CHIP_ERROR when the MAC doesn't validate, CHIP_NO_ERROR otherwise.
      **/
-    virtual CHIP_ERROR KDF(const uint8_t * ikm, const size_t ikm_len, const uint8_t * salt, const size_t salt_len,
-                           const uint8_t * info, const size_t info_len, uint8_t * out, size_t out_len) = 0;
+    virtual CHIP_ERROR KDF(const uint8_t * ikm, size_t ikm_len, const uint8_t * salt, size_t salt_len, const uint8_t * info,
+                           size_t info_len, uint8_t * out, size_t out_len) = 0;
 
     CHIP_SPAKE2P_ROLE role;
     CHIP_SPAKE2P_STATE state;
@@ -771,12 +774,12 @@ struct Spake2pOpaqueContext
 class Spake2p_P256_SHA256_HKDF_HMAC : public Spake2p
 {
 public:
-    Spake2p_P256_SHA256_HKDF_HMAC(void) : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length)
+    Spake2p_P256_SHA256_HKDF_HMAC() : Spake2p(kP256_FE_Length, kP256_Point_Length, kSHA256_Hash_Length)
     {
         memset(&mSpake2pContext, 0, sizeof(mSpake2pContext));
     }
 
-    ~Spake2p_P256_SHA256_HKDF_HMAC(void) override { FreeImpl(); }
+    ~Spake2p_P256_SHA256_HKDF_HMAC() override { FreeImpl(); }
 
     CHIP_ERROR Mac(const uint8_t * key, size_t key_len, const uint8_t * in, size_t in_len, uint8_t * out) override;
     CHIP_ERROR MacVerify(const uint8_t * key, size_t key_len, const uint8_t * mac, size_t mac_len, const uint8_t * in,
@@ -799,8 +802,8 @@ protected:
     CHIP_ERROR InitImpl() override;
     CHIP_ERROR Hash(const uint8_t * in, size_t in_len) override;
     CHIP_ERROR HashFinalize(uint8_t * out) override;
-    CHIP_ERROR KDF(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                   const uint8_t * info, const size_t info_length, uint8_t * out, size_t out_length) override;
+    CHIP_ERROR KDF(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,
+                   size_t info_length, uint8_t * out, size_t out_length) override;
 
 private:
     /**

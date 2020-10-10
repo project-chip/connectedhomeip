@@ -428,7 +428,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(uint8_t endpoint, uint16_
         else if (networkState == EMBER_JOINED_NETWORK)
         {
             resetCurrentQueueRetryParams();
-            emberEventControlSetActive(emberAfPluginIasZoneServerManageQueueEventControl);
+            emberEventControlSetActive(&emberAfPluginIasZoneServerManageQueueEventControl);
         }
 
         return EMBER_SUCCESS;
@@ -474,7 +474,7 @@ void emberAfPluginIasZoneServerManageQueueEventHandler(void)
     // If the queue was emptied without our interaction, do nothing
     if (messageQueue.entriesInQueue == 0)
     {
-        emberEventControlSetInactive(emberAfPluginIasZoneServerManageQueueEventControl);
+        emberEventControlSetInactive(&emberAfPluginIasZoneServerManageQueueEventControl);
         return;
     }
 
@@ -501,10 +501,10 @@ void emberAfPluginIasZoneServerManageQueueEventHandler(void)
                                      bufferStart->status, bufferStart->eventTimeMs / MILLISECOND_TICKS_PER_SECOND, elapsedTimeQs,
                                      queueRetryParams.currentRetryCount);
         sendZoneUpdate(status, elapsedTimeQs, bufferStart->endpoint);
-        emberEventControlSetInactive(emberAfPluginIasZoneServerManageQueueEventControl);
+        emberEventControlSetInactive(&emberAfPluginIasZoneServerManageQueueEventControl);
     }
 #else
-    emberEventControlSetInactive(emberAfPluginIasZoneServerManageQueueEventControl);
+    emberEventControlSetInactive(&emberAfPluginIasZoneServerManageQueueEventControl);
 #endif
 }
 
@@ -645,7 +645,7 @@ void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status)
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
         // If we're reconnecting, send any items still in the queue
         emberAfIasZoneClusterPrintln("Rejoined network, retransmiting any queued event");
-        emberEventControlSetActive(emberAfPluginIasZoneServerManageQueueEventControl);
+        emberEventControlSetActive(&emberAfPluginIasZoneServerManageQueueEventControl);
 #endif
     }
 }
@@ -690,7 +690,7 @@ void emberAfIasZoneServerSetStatusQueueRetryParamsToDefault(void)
 
 void emberAfIasZoneServerDiscardPendingEventsInStatusQueue(void)
 {
-    emberEventControlSetInactive(emberAfPluginIasZoneServerManageQueueEventControl);
+    emberEventControlSetInactive(&emberAfPluginIasZoneServerManageQueueEventControl);
     bufferInit(&messageQueue);
     resetCurrentQueueRetryParams();
 }
@@ -814,7 +814,7 @@ void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType typ
 
         if (messageQueue.entriesInQueue)
         {
-            emberEventControlSetActive(emberAfPluginIasZoneServerManageQueueEventControl);
+            emberEventControlSetActive(&emberAfPluginIasZoneServerManageQueueEventControl);
         }
     }
 #endif

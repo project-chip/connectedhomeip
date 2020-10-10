@@ -20,6 +20,7 @@
 #include "AppTask.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
+#include "LightingCLI.h"
 #include "LightingManager.h"
 #include "Server.h"
 #include "Service.h"
@@ -43,6 +44,9 @@
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+
+#include "attribute-storage.h"
+#include "gen/cluster-id.h"
 
 APP_TIMER_DEF(sFunctionTimer);
 
@@ -95,12 +99,16 @@ int AppTask::StartAppTask()
         ret = NRF_ERROR_NULL;
     }
 
+    NRF_LOG_INFO("App Task Started");
+
     return ret;
 }
 
 int AppTask::Init()
 {
     ret_code_t ret;
+
+    StartShellTask();
 
     // Init ZCL Data Model and start server
     InitServer();
@@ -219,6 +227,8 @@ void AppTask::AppTaskMain(void * pvParameter)
 
     SetDeviceName("LightingDemo._chip._udp.local.");
 
+    GetAppTask().UpdateClusterState();
+
     while (true)
     {
         BaseType_t eventReceived = xQueueReceive(sAppEventQueue, &event, pdMS_TO_TICKS(10));
@@ -282,6 +292,7 @@ void AppTask::AppTaskMain(void * pvParameter)
         sStatusLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
+        GetAppTask().UpdateClusterState();
 
         uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
         uint64_t nextChangeTimeUS = mLastChangeTimeUS + 5 * 1000 * 1000UL;
@@ -522,6 +533,7 @@ void AppTask::PostEvent(const AppEvent * aEvent)
 
 void AppTask::DispatchEvent(AppEvent * aEvent)
 {
+
     if (aEvent->Handler)
     {
         aEvent->Handler(aEvent);
@@ -529,5 +541,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         NRF_LOG_INFO("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState(void)
+{
+    uint8_t newValue = LightingMgr().IsTurnedOn();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        NRF_LOG_INFO("ERR: updating on/off %x", status);
     }
 }

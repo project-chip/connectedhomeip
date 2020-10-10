@@ -72,9 +72,8 @@ static void CheckSystemErrorStr(nlTestSuite * inSuite, void * inContext)
     System::RegisterLayerErrorFormatter();
 
     // For each defined error...
-    for (size_t i = 0; i < kTestElements; i++)
+    for (int err : sContext)
     {
-        int32_t err         = sContext[i];
         const char * errStr = ErrorStr(err);
         char expectedText[9];
 

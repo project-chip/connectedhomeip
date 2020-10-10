@@ -35,7 +35,7 @@ namespace Shell {
 
 static struct termios the_original_stdin_termios;
 
-static void streamer_restore_termios(void)
+static void streamer_restore_termios()
 {
     int in_fd = fileno(stdin);
     tcsetattr(in_fd, TCSAFLUSH, &the_original_stdin_termios);
@@ -77,7 +77,7 @@ static streamer_t streamer_stdio = {
     .write_cb = streamer_stdio_write,
 };
 
-streamer_t * streamer_get(void)
+streamer_t * streamer_get()
 {
     return &streamer_stdio;
 }

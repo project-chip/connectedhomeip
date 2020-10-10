@@ -15,23 +15,32 @@
  *    limitations under the License.
  */
 
-#ifndef __TRANSPORT_RENDEZVOUSPARAMETERS_H__
-#define __TRANSPORT_RENDEZVOUSPARAMETERS_H__
+#pragma once
 
-#include <transport/Base.h>
+#include <transport/raw/Base.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
+
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 
 class RendezvousParameters
 {
 public:
-    explicit RendezvousParameters(uint32_t setupPINCode) : mSetupPINCode(setupPINCode) {}
+    RendezvousParameters() = default;
 
+    bool IsController() const { return HasDiscriminator() || HasConnectionObject(); }
+
+    bool HasSetupPINCode() const { return mSetupPINCode != 0; }
     uint32_t GetSetupPINCode() const { return mSetupPINCode; }
+    RendezvousParameters & SetSetupPINCode(uint32_t setupPINCode)
+    {
+        mSetupPINCode = setupPINCode;
+        return *this;
+    }
 
     bool HasDiscriminator() const { return mDiscriminator != 0; }
     uint16_t GetDiscriminator() const { return mDiscriminator; }
@@ -45,7 +54,7 @@ public:
     const Optional<NodeId> GetLocalNodeId() const { return mLocalNodeId; }
     RendezvousParameters & SetLocalNodeId(NodeId nodeId)
     {
-        mLocalNodeId = Optional<NodeId>::Value(nodeId);
+        mLocalNodeId.SetValue(nodeId);
         return *this;
     }
 
@@ -65,6 +74,8 @@ public:
         mConnectionObject = connObj;
         return *this;
     }
+#else
+    bool HasConnectionObject() const { return false; }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
@@ -79,5 +90,3 @@ private:
 };
 
 } // namespace chip
-
-#endif // __TRANSPORT_RENDEZVOUSPARAMETERS_H__

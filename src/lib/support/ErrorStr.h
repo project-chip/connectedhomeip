@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef ERRORSTR_H_
-#define ERRORSTR_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -48,5 +47,3 @@ extern void FormatError(char * buf, uint16_t bufSize, const char * subsys, int32
 extern const char * StatusReportStr(uint32_t profileId, uint16_t statusCode);
 
 } // namespace chip
-
-#endif /* ERRORSTR_H_ */

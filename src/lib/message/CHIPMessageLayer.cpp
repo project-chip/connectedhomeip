@@ -54,10 +54,13 @@
 #include <support/crypto/HashAlgos.h>
 #include <support/logging/CHIPLogging.h>
 
-namespace chip {
-
+using namespace chip::Ble;
 using namespace chip::Crypto;
 using namespace chip::Encoding;
+using namespace chip::Inet;
+using namespace chip::System;
+
+namespace chip {
 
 /**
  *  @def CHIP_BIND_DETAIL_LOGGING
@@ -193,7 +196,7 @@ CHIP_ERROR ChipMessageLayer::Init(InitContext * context)
     }
     else
     {
-        ChipLogProgress(MessageLayer, "WoBLE disabled%s", (mBle != NULL) ? " by application" : " (BLE layer not initialized)");
+        ChipLogProgress(MessageLayer, "CHIPoBLE disabled%s", (mBle != NULL) ? " by application" : " (BLE layer not initialized)");
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
@@ -811,7 +814,7 @@ void ChipMessageLayer::GetConnectionPoolStats(chip::System::Stats::count_t & aOu
 {
     aOutInUse = 0;
 
-    const ChipConnection * con = (ChipConnection *) mConPool;
+    const ChipConnection * con = mConPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_CONNECTIONS; i++, con++)
     {
         if (con->mRefCount != 0)
@@ -830,7 +833,7 @@ void ChipMessageLayer::GetConnectionPoolStats(chip::System::Stats::count_t & aOu
  */
 ChipConnection * ChipMessageLayer::NewConnection()
 {
-    ChipConnection * con = (ChipConnection *) mConPool;
+    ChipConnection * con = mConPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_CONNECTIONS; i++, con++)
     {
         if (con->mRefCount == 0)
@@ -849,7 +852,7 @@ void ChipMessageLayer::GetIncomingTCPConCount(const IPAddress & peerAddr, uint16
     count       = 0;
     countFromIP = 0;
 
-    ChipConnection * con = (ChipConnection *) mConPool;
+    ChipConnection * con = mConPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_CONNECTIONS; i++, con++)
     {
         if (con->mRefCount > 0 && con->NetworkType == ChipConnection::kNetworkType_IP && con->IsIncoming())
@@ -872,7 +875,7 @@ CHIP_ERROR ChipMessageLayer::SetUnsecuredConnectionListener(ConnectionReceiveFun
     ChipLogProgress(ExchangeManager, "Entered SetUnsecuredConnectionReceived, cb = %p, %p", newOnUnsecuredConnectionReceived,
                     newOnUnsecuredConnectionCallbacksRemoved);
 
-    if (UnsecuredListenEnabled() == false)
+    if (!UnsecuredListenEnabled())
     {
         err = EnableUnsecuredListen();
         SuccessOrExit(err);
@@ -883,7 +886,7 @@ CHIP_ERROR ChipMessageLayer::SetUnsecuredConnectionListener(ConnectionReceiveFun
 
     if (OnUnsecuredConnectionReceived != nullptr)
     {
-        if (force == false)
+        if (!force)
         {
             err = CHIP_ERROR_INCORRECT_STATE;
             ExitNow();
@@ -924,7 +927,7 @@ CHIP_ERROR ChipMessageLayer::ClearUnsecuredConnectionListener(ConnectionReceiveF
         ExitNow();
     }
 
-    if (UnsecuredListenEnabled() == true)
+    if (UnsecuredListenEnabled())
     {
         err = DisableUnsecuredListen();
         SuccessOrExit(err);
@@ -960,17 +963,21 @@ CHIP_ERROR ChipMessageLayer::SelectDestNodeIdAndAddress(uint64_t & destNodeId, I
 // Encode and return message header field value.
 static uint16_t EncodeHeaderField(const ChipMessageInfo * msgInfo)
 {
-    return ((((uint16_t) msgInfo->Flags) << kMsgHeaderField_FlagsShift) & kMsgHeaderField_FlagsMask) |
-        ((((uint16_t) msgInfo->EncryptionType) << kMsgHeaderField_EncryptionTypeShift) & kMsgHeaderField_EncryptionTypeMask) |
-        ((((uint16_t) msgInfo->MessageVersion) << kMsgHeaderField_MessageVersionShift) & kMsgHeaderField_MessageVersionMask);
+    return (((static_cast<uint16_t>(msgInfo->Flags)) << kMsgHeaderField_FlagsShift) & kMsgHeaderField_FlagsMask) |
+        (((static_cast<uint16_t>(msgInfo->EncryptionType)) << kMsgHeaderField_EncryptionTypeShift) &
+         kMsgHeaderField_EncryptionTypeMask) |
+        (((static_cast<uint16_t>(msgInfo->MessageVersion)) << kMsgHeaderField_MessageVersionShift) &
+         kMsgHeaderField_MessageVersionMask);
 }
 
 // Decode message header field value.
 static void DecodeHeaderField(const uint16_t headerField, ChipMessageInfo * msgInfo)
 {
-    msgInfo->Flags          = (uint16_t)((headerField & kMsgHeaderField_FlagsMask) >> kMsgHeaderField_FlagsShift);
-    msgInfo->EncryptionType = (uint8_t)((headerField & kMsgHeaderField_EncryptionTypeMask) >> kMsgHeaderField_EncryptionTypeShift);
-    msgInfo->MessageVersion = (uint8_t)((headerField & kMsgHeaderField_MessageVersionMask) >> kMsgHeaderField_MessageVersionShift);
+    msgInfo->Flags = static_cast<uint16_t>((headerField & kMsgHeaderField_FlagsMask) >> kMsgHeaderField_FlagsShift);
+    msgInfo->EncryptionType =
+        static_cast<uint8_t>((headerField & kMsgHeaderField_EncryptionTypeMask) >> kMsgHeaderField_EncryptionTypeShift);
+    msgInfo->MessageVersion =
+        static_cast<uint8_t>((headerField & kMsgHeaderField_MessageVersionMask) >> kMsgHeaderField_MessageVersionShift);
 }
 
 /**
@@ -1469,7 +1476,7 @@ CHIP_ERROR ChipMessageLayer::DecodeMessageWithLength(PacketBuffer * msgBuf, uint
 void ChipMessageLayer::HandleUDPMessage(UDPEndPoint * endPoint, PacketBuffer * msg, const IPPacketInfo * pktInfo)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
-    ChipMessageLayer * msgLayer = (ChipMessageLayer *) endPoint->AppState;
+    ChipMessageLayer * msgLayer = static_cast<ChipMessageLayer *>(endPoint->AppState);
     ChipMessageInfo msgInfo;
     uint64_t sourceNodeId;
     uint8_t * payload;
@@ -1564,7 +1571,7 @@ void ChipMessageLayer::HandleUDPReceiveError(UDPEndPoint * endPoint, INET_ERROR 
 {
     ChipLogError(MessageLayer, "HandleUDPReceiveError Error %s", ErrorStr(err));
 
-    ChipMessageLayer * msgLayer = (ChipMessageLayer *) endPoint->AppState;
+    ChipMessageLayer * msgLayer = static_cast<ChipMessageLayer *>(endPoint->AppState);
     if (msgLayer->OnReceiveError != nullptr)
         msgLayer->OnReceiveError(msgLayer, err, pktInfo);
 }
@@ -1572,7 +1579,7 @@ void ChipMessageLayer::HandleUDPReceiveError(UDPEndPoint * endPoint, INET_ERROR 
 #if CONFIG_NETWORK_LAYER_BLE
 void ChipMessageLayer::HandleIncomingBleConnection(BLEEndPoint * bleEP)
 {
-    ChipMessageLayer * msgLayer = (ChipMessageLayer *) bleEP->mAppState;
+    ChipMessageLayer * msgLayer = static_cast<ChipMessageLayer *>(bleEP->mAppState);
 
     // Immediately close the connection if there's no callback registered.
     if (msgLayer->OnConnectionReceived == nullptr && msgLayer->ExchangeMgr == nullptr)
@@ -1626,7 +1633,7 @@ void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint * listeningEP, TC
     uint16_t localPort;
     uint16_t incomingTCPConCount;
     uint16_t incomingTCPConCountFromIP;
-    ChipMessageLayer * msgLayer = (ChipMessageLayer *) listeningEP->AppState;
+    ChipMessageLayer * msgLayer = static_cast<ChipMessageLayer *>(listeningEP->AppState);
 
     // Immediately close the connection if there's no callback registered.
     if (msgLayer->OnConnectionReceived == nullptr && msgLayer->ExchangeMgr == nullptr)
@@ -1701,7 +1708,7 @@ void ChipMessageLayer::HandleIncomingTcpConnection(TCPEndPoint * listeningEP, TC
 
 void ChipMessageLayer::HandleAcceptError(TCPEndPoint * ep, INET_ERROR err)
 {
-    ChipMessageLayer * msgLayer = (ChipMessageLayer *) ep->AppState;
+    ChipMessageLayer * msgLayer = static_cast<ChipMessageLayer *>(ep->AppState);
     if (msgLayer->OnAcceptError != nullptr)
         msgLayer->OnAcceptError(msgLayer, err);
 }
@@ -1908,7 +1915,7 @@ exit:
 }
 
 CHIP_ERROR ChipMessageLayer::RefreshEndpoint(TCPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType,
-                                             IPAddress addr, uint16_t port)
+                                             const IPAddress & addr, uint16_t port)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1960,7 +1967,7 @@ exit:
 }
 
 CHIP_ERROR ChipMessageLayer::RefreshEndpoint(UDPEndPoint *& endPoint, bool enable, const char * name, IPAddressType addrType,
-                                             IPAddress addr, uint16_t port, InterfaceId intfId)
+                                             const IPAddress & addr, uint16_t port, InterfaceId intfId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -2093,7 +2100,7 @@ CHIP_ERROR ChipMessageLayer::CloseEndpoints()
     return CHIP_NO_ERROR;
 }
 
-void ChipMessageLayer::CloseListeningEndpoints(void)
+void ChipMessageLayer::CloseListeningEndpoints()
 {
     ChipBindLog("Closing endpoints");
 
@@ -2213,7 +2220,7 @@ void ChipMessageLayer::SetSignalMessageLayerActivityChanged(
     OnMessageLayerActivityChange = messageLayerActivityChangeHandler;
 }
 
-bool ChipMessageLayer::IsMessageLayerActive(void)
+bool ChipMessageLayer::IsMessageLayerActive()
 {
     return (ExchangeMgr->mContextsInUse != 0)
 #if CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
@@ -2232,7 +2239,7 @@ bool ChipMessageLayer::IsMessageLayerActive(void)
  *
  *  @retval None.
  */
-void ChipMessageLayer::SignalMessageLayerActivityChanged(void)
+void ChipMessageLayer::SignalMessageLayerActivityChanged()
 {
     if (OnMessageLayerActivityChange)
     {

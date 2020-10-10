@@ -18,25 +18,23 @@
 #ifndef __RENDEZVOUSDEVICEDELEGATE_H__
 #define __RENDEZVOUSDEVICEDELEGATE_H__
 
+#include "DeviceNetworkProvisioningDelegate.h"
+
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/RendezvousSession.h>
 
-using namespace ::chip;
-
-class RendezvousDeviceDelegate : public RendezvousSessionDelegate
+class RendezvousDeviceDelegate : public chip::RendezvousSessionDelegate
 {
 public:
     RendezvousDeviceDelegate();
-    CHIP_ERROR Send(const char * msg);
 
     //////////// RendezvousSession callback Implementation ///////////////
-    void OnRendezvousConnectionOpened() override;
-    void OnRendezvousConnectionClosed() override;
-    void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(chip::System::PacketBuffer * buffer) override;
+    void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
 
 private:
-    RendezvousSession * mRendezvousSession;
+    chip::RendezvousSession * mRendezvousSession;
+    ESP32NetworkProvisioningDelegate mDeviceNetworkProvisioningDelegate;
 };
 
 #endif // __RENDEZVOUSDEVICEDELEGATE_H__

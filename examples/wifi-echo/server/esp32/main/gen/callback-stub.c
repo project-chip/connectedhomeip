@@ -98,18 +98,6 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
  */
 void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
 
-/** @brief Basic Cluster Reset To Factory Defaults
- *
- * This function is called by the Basic server plugin when a request to
- * reset to factory defaults is received. The plugin will reset attributes
- * managed by the framework to their default values.
- * The application should perform any other necessary reset-related operations
- * in this callback, including resetting any externally-stored attributes.
- *
- * @param endpoint Endpoint that is being initialized  Ver.: always
- */
-void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint) {}
-
 /** @brief Add To Current App Tasks
  *
  * This function is only useful to sleepy end devices.  This function will note
@@ -1786,29 +1774,6 @@ int8_t emberAfPluginNetworkSteeringGetPowerForRadioChannelCallback(uint8_t chann
     return emberAfMaxPowerLevel();
 }
 
-// Ifdef out the attribute change callback, since we implement it in
-// DataModelHandler
-#if 0
-/** @brief Post Attribute Change
- *
- * This function is called by the application framework after it changes an
- * attribute value. The value passed into this callback is the value to which
- * the attribute was set by the framework.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param size   Ver.: always
- * @param value   Ver.: always
- */
-void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
-{}
-#endif
-
 /** @brief Post Em4 Reset
  *
  * A callback called by application framework, and implemented by em4 plugin
@@ -2402,3 +2367,15 @@ bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
     emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Stop identify callback on endpoint %d", endpoint);
     return false;
 }
+/** @brief Activate Door Lock Callback
+ * This function is provided by the door lock server plugin.
+ *
+ * @param activate True if the lock should move to the locked position,
+ *  false if it should move to the unlocked position Ver.: always
+ *
+ * @returns true if the callback was able to activate/deactivate the Lock.
+ */
+bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
+{
+    return false;
+};

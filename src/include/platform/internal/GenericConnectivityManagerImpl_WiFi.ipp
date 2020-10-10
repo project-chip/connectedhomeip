@@ -55,27 +55,9 @@ GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiStationModeToStr(Connectivi
 }
 
 template <class ImplClass>
-bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationEnabled(void)
+bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationEnabled()
 {
     return Impl()->GetWiFiStationMode() == ConnectivityManager::kWiFiStationMode_Enabled;
-}
-
-template <class ImplClass>
-CHIP_ERROR GenericConnectivityManagerImpl_WiFi<ImplClass>::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(val != ConnectivityManager::kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (mWiFiStationMode != val)
-    {
-        ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", Impl()->WiFiStationModeToStr(mWiFiStationMode),
-                        Impl()->WiFiStationModeToStr(val));
-    }
-
-    mWiFiStationMode = val;
-exit:
-    return err;
 }
 
 } // namespace Internal

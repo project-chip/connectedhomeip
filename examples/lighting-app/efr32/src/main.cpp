@@ -29,6 +29,7 @@
 #include <mbedtls/threading.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <support/CHIPPlatformMemory.h>
 
 #include <AppTask.h>
 
@@ -106,7 +107,7 @@ int main(void)
 #endif
 #endif
 
-    mbedtls_platform_set_calloc_free(calloc, free);
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 
     // Initialize mbedtls threading support on EFR32
     THREADING_setup();

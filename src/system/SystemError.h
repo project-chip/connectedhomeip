@@ -29,8 +29,7 @@
  *      C-language programs.
  */
 
-#ifndef SYSTEMERROR_H
-#define SYSTEMERROR_H
+#pragma once
 
 // Include headers
 #include <system/SystemConfig.h>
@@ -174,13 +173,13 @@ namespace System {
  */
 typedef CHIP_SYSTEM_CONFIG_ERROR_TYPE Error;
 
-extern void RegisterLayerErrorFormatter(void);
+extern void RegisterLayerErrorFormatter();
 extern bool FormatLayerError(char * buf, uint16_t bufSize, int32_t err);
 
 extern Error MapErrorPOSIX(int code);
 extern const char * DescribeErrorPOSIX(Error code);
 extern bool IsErrorPOSIX(Error code);
-extern void RegisterPOSIXErrorFormatter(void);
+extern void RegisterPOSIXErrorFormatter();
 extern bool FormatPOSIXError(char * buf, uint16_t bufSize, int32_t err);
 extern Error MapErrorZephyr(int code);
 
@@ -198,4 +197,3 @@ extern bool FormatLwIPError(char * buf, uint16_t bufSize, int32_t err);
 } // namespace chip
 
 #endif // !defined(__cplusplus)
-#endif // defined(SYSTEMERROR_H)

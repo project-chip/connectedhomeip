@@ -21,6 +21,7 @@
  *      or may not be present.
  *
  */
+#pragma once
 
 #include <assert.h>
 
@@ -49,10 +50,10 @@ public:
     }
 
     /** Invalidate the value inside the optional. Optional now has no value */
-    void ClearValue(void) { mHasValue = false; }
+    void ClearValue() { mHasValue = false; }
 
     /** Gets the current value of the optional. Valid IFF `HasValue`. */
-    const T & Value(void) const
+    const T & Value() const
     {
         assert(HasValue());
         return mValue;
@@ -71,7 +72,7 @@ public:
     bool operator!=(const Optional & other) const { return !(*this == other); }
 
     /** Convenience method to create an optional without a valid value. */
-    static Optional<T> Missing(void) { return Optional<T>(); }
+    static Optional<T> Missing() { return Optional<T>(); }
 
     /** Convenience method to create an optional containing the specified value. */
     static Optional<T> Value(const T & value) { return Optional(value); }

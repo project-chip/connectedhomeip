@@ -31,7 +31,7 @@ namespace chip {
 /**
  * Register a text error formatter for CHIP core errors.
  */
-void RegisterCHIPLayerErrorFormatter(void)
+void RegisterCHIPLayerErrorFormatter()
 {
     static ErrorFormatter sCHIPErrorFormatter = { FormatCHIPError, nullptr };
 

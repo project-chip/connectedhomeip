@@ -23,8 +23,7 @@
  *      functions.
  */
 
-#ifndef SYSTEMLAYER_H
-#define SYSTEMLAYER_H
+#pragma once
 
 // Include configuration headers
 #include <system/SystemConfig.h>
@@ -127,20 +126,20 @@ private:
 class DLL_EXPORT Layer
 {
 public:
-    Layer(void);
+    Layer();
 
     Error Init(void * aContext);
-    Error Shutdown(void);
+    Error Shutdown();
 
-    void * GetPlatformData(void) const;
+    void * GetPlatformData() const;
     void SetPlatformData(void * aPlatformData);
 
-    LayerState State(void) const;
+    LayerState State() const;
 
     Error NewTimer(Timer *& aTimerPtr);
 
     void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback);
-    void DispatchTimerCallbacks(const uint64_t kCurrentEpoch);
+    void DispatchTimerCallbacks(uint64_t kCurrentEpoch);
 
     typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
     Error StartTimer(uint32_t aMilliseconds, TimerCompleteFunct aComplete, void * aAppState);
@@ -151,7 +150,7 @@ public:
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     void PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet, struct timeval & aSleepTime);
     void HandleSelectResult(int aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet);
-    void WakeSelect(void);
+    void WakeSelect();
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -168,9 +167,9 @@ public:
     Error HandlePlatformTimer(void);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    static uint64_t GetClock_Monotonic(void);
-    static uint64_t GetClock_MonotonicMS(void);
-    static uint64_t GetClock_MonotonicHiRes(void);
+    static uint64_t GetClock_Monotonic();
+    static uint64_t GetClock_MonotonicMS();
+    static uint64_t GetClock_MonotonicHiRes();
     static Error GetClock_RealTime(uint64_t & curTime);
     static Error GetClock_RealTimeMS(uint64_t & curTimeMS);
     static Error SetClock_RealTime(uint64_t newCurTime);
@@ -209,8 +208,8 @@ private:
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     // Copy and assignment NOT DEFINED
-    Layer(const Layer &);
-    Layer & operator=(const Layer &);
+    Layer(const Layer &) = delete;
+    Layer & operator=(const Layer &) = delete;
 
     friend class Timer;
 };
@@ -218,12 +217,10 @@ private:
 /**
  * This returns the current state of the layer object.
  */
-inline LayerState Layer::State(void) const
+inline LayerState Layer::State() const
 {
     return this->mLayerState;
 }
 
 } // namespace System
 } // namespace chip
-
-#endif // defined(SYSTEMLAYER_H)

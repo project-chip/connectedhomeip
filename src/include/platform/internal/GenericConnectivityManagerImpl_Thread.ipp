@@ -53,7 +53,7 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::_OnPlatformEvent(const Ch
 }
 
 template <class ImplClass>
-ConnectivityManager::ThreadMode GenericConnectivityManagerImpl_Thread<ImplClass>::_GetThreadMode(void)
+ConnectivityManager::ThreadMode GenericConnectivityManagerImpl_Thread<ImplClass>::_GetThreadMode()
 {
     if (GetFlag(mFlags, kFlag_IsApplicationControlled))
     {
@@ -90,7 +90,7 @@ exit:
 }
 
 template <class ImplClass>
-void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity(void)
+void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity()
 {
     bool haveServiceConnectivity = false;
 

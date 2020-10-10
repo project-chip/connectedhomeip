@@ -408,7 +408,7 @@ static void TestDNSResolution_Cancel(nlTestSuite * testSuite, void * inContext)
     if (!testContext.callbackCalled)
     {
         // Cancel the resolution before it completes.
-        gInet.CancelResolveHostAddress(HandleResolutionComplete, (void *) &testContext);
+        gInet.CancelResolveHostAddress(HandleResolutionComplete, &testContext);
 
         // Service the network for awhile to see what happens (should timeout).
         ServiceNetworkUntilDone(DEFAULT_CANCEL_TEST_DURATION_MILLISECS);
@@ -521,7 +521,7 @@ static void StartTestCase(DNSResolutionTestContext & testContext)
 
     printf("Resolving hostname %s\n", testCase.hostName);
     err = gInet.ResolveHostAddress(testCase.hostName, strlen(testCase.hostName), testCase.dnsOptions, testCase.maxResults,
-                                   testContext.resultsBuf, HandleResolutionComplete, (void *) &testContext);
+                                   testContext.resultsBuf, HandleResolutionComplete, &testContext);
 
     if (err != INET_NO_ERROR)
     {
@@ -666,7 +666,7 @@ static void HandleSIGUSR1(int sig)
     exit(0);
 }
 
-int TestInetLayerDNSInternal(void)
+int TestInetLayerDNSInternal()
 {
     // clang-format off
     const nlTest DNSTests[] =

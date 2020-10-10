@@ -23,8 +23,7 @@
  *      octet-serialized data.
  */
 
-#ifndef SYSTEMPACKETBUFFER_H
-#define SYSTEMPACKETBUFFER_H
+#pragma once
 
 // Include configuration header
 #include <system/SystemConfig.h>
@@ -93,37 +92,37 @@ struct pbuf
 class DLL_EXPORT PacketBuffer : private pbuf
 {
 public:
-    size_t AllocSize(void) const;
+    uint16_t AllocSize() const;
 
-    uint8_t * Start(void) const;
+    uint8_t * Start() const;
     void SetStart(uint8_t * aNewStart);
 
-    uint16_t DataLength(void) const;
+    uint16_t DataLength() const;
     void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead = nullptr);
 
-    uint16_t TotalLength(void) const;
+    uint16_t TotalLength() const;
 
-    uint16_t MaxDataLength(void) const;
-    uint16_t AvailableDataLength(void) const;
+    uint16_t MaxDataLength() const;
+    uint16_t AvailableDataLength() const;
 
-    uint16_t ReservedSize(void) const;
+    uint16_t ReservedSize() const;
 
-    PacketBuffer * Next(void) const;
+    PacketBuffer * Next() const;
 
     void AddToEnd(PacketBuffer * aPacket);
-    PacketBuffer * DetachTail(void);
-    void CompactHead(void);
+    PacketBuffer * DetachTail();
+    void CompactHead();
     PacketBuffer * Consume(uint16_t aConsumeLength);
     void ConsumeHead(uint16_t aConsumeLength);
     bool EnsureReservedSize(uint16_t aReservedSize);
     bool AlignPayload(uint16_t aAlignBytes);
 
-    void AddRef(void);
+    void AddRef();
 
-    static PacketBuffer * NewWithAvailableSize(size_t aAvailableSize);
-    static PacketBuffer * NewWithAvailableSize(uint16_t aReservedSize, size_t aAvailableSize);
+    static PacketBuffer * NewWithAvailableSize(uint16_t aAvailableSize);
+    static PacketBuffer * NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize);
 
-    static PacketBuffer * New(void);
+    static PacketBuffer * New();
     static PacketBuffer * New(uint16_t aReservedSize);
 
     static PacketBuffer * RightSize(PacketBuffer * aPacket);
@@ -135,10 +134,10 @@ private:
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
     static PacketBuffer * sFreeList;
 
-    static PacketBuffer * BuildFreeList(void);
+    static PacketBuffer * BuildFreeList();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
-    void Clear(void);
+    void Clear();
 };
 
 } // namespace System
@@ -207,7 +206,7 @@ typedef union
  *
  *  @return     size of the allocation
  */
-inline size_t PacketBuffer::AllocSize(void) const
+inline uint16_t PacketBuffer::AllocSize() const
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if LWIP_PBUF_FROM_CUSTOM_POOLS
@@ -221,7 +220,7 @@ inline size_t PacketBuffer::AllocSize(void) const
 #endif // !LWIP_PBUF_FROM_CUSTOM_POOLS
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
 #if CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
-    return static_cast<size_t>(this->alloc_size);
+    return this->alloc_size;
 #else  // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
     extern BufferPoolElement gDummyBufferPoolElement;
     return sizeof(gDummyBufferPoolElement.Block) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
@@ -231,5 +230,3 @@ inline size_t PacketBuffer::AllocSize(void) const
 
 } // namespace System
 } // namespace chip
-
-#endif // defined(SYSTEMPACKETBUFFER_H)

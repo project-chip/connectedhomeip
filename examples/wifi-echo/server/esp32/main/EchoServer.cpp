@@ -42,8 +42,8 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/Tuple.h>
-#include <transport/UDP.h>
+#include <transport/raw/Tuple.h>
+#include <transport/raw/UDP.h>
 
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
@@ -123,7 +123,7 @@ static size_t odc(const uint8_t * bytes, size_t bytes_len, char * out, size_t ou
 class EchoServerCallback : public SecureSessionMgrCallback
 {
 public:
-    void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
+    void OnMessageReceived(const PacketHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
                            SecureSessionMgrBase * mgr) override
     {
         CHIP_ERROR err;

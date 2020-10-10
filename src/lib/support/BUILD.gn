@@ -17,8 +17,8 @@ import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlfaultinjection.gni")
 import("//build_overrides/nlio.gni")
 
-import("${chip_root}/gn/chip/chip_version.gni")
-import("${chip_root}/gn/chip/tests.gni")
+import("${chip_root}/build/chip/chip_version.gni")
+import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
 action("gen_chip_version") {
@@ -43,6 +43,7 @@ source_set("chip_version_header") {
 
 support_headers = [
   "Base64.h",
+  "BitFlags.h",
   "BufBound.h",
   "CHIPCounter.h",
   "CodeUtils.h",
@@ -57,6 +58,8 @@ support_headers = [
   "logging/CHIPLogging.h",
   "verhoeff/Verhoeff.h",
   "CHIPMem.h",
+  "CHIPMemString.h",
+  "CHIPPlatformMemory.h",
 ]
 
 static_library("support") {
@@ -66,6 +69,8 @@ static_library("support") {
     "Base64.cpp",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
+    "CHIPMemString.cpp",
+    "CHIPPlatformMemory.cpp",
     "ErrorStr.cpp",
     "FibonacciUtils.cpp",
     "PersistedCounter.cpp",
@@ -114,6 +119,11 @@ static_library("support") {
     sources += [ "CHIPFaultInjection.cpp" ]
     public += [ "CHIPFaultInjection.h" ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
+  }
+
+  libs = []
+  if (chip_logging_style == "android") {
+    libs += [ "log" ]
   }
 }
 

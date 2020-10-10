@@ -21,8 +21,7 @@
  *      resuming task from select system call.
  */
 
-#ifndef SYSTEMWAKEEVENT_H
-#define SYSTEMWAKEEVENT_H
+#pragma once
 
 // Include configuration headers
 #include <system/SystemConfig.h>
@@ -65,5 +64,3 @@ private:
 
 } // namespace System
 } // namespace chip
-
-#endif // SYSTEMWAKEEVENT_H

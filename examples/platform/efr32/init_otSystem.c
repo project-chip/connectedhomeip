@@ -17,6 +17,8 @@
  *    limitations under the License.
  */
 
+#include <support/CHIPPlatformMemory.h>
+
 #include <mbedtls/platform.h>
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
@@ -65,17 +67,25 @@ void halInitChipSpecific(void);
 void initOtSysEFR(void)
 {
     sl_status_t status;
+    uint32_t PrioGoupPos = 0;
+    uint32_t SubPrio     = 0;
+#if defined(EFR32MG21)
+    // FreeRTOS recommends a lower configuration for CortexM3 and asserts
+    // in some places if using default PRIGROUP_POSITION.
+    SubPrio = 1;
+#endif
 
     __disable_irq();
 
 #undef FIXED_EXCEPTION
 #define FIXED_EXCEPTION(vectorNumber, functionName, deviceIrqn, deviceIrqHandler)
 #define EXCEPTION(vectorNumber, functionName, deviceIrqn, deviceIrqHandler, priorityLevel, subpriority)                            \
-    NVIC_SetPriority(deviceIrqn, NVIC_EncodePriority(PRIGROUP_POSITION, priorityLevel, subpriority));
+    PrioGoupPos = PRIGROUP_POSITION - SubPrio;                                                                                     \
+    NVIC_SetPriority(deviceIrqn, NVIC_EncodePriority(PrioGoupPos, priorityLevel, subpriority));
 #include NVIC_CONFIG
 #undef EXCEPTION
 
-    NVIC_SetPriorityGrouping(PRIGROUP_POSITION);
+    NVIC_SetPriorityGrouping(PrioGoupPos);
     CHIP_Init();
     halInitChipSpecific();
 #if DISPLAY_ENABLED
@@ -83,8 +93,14 @@ void initOtSysEFR(void)
 #endif
     BSP_Init(BSP_INIT_BCC);
 
+#if defined(EFR32MG12)
     CMU_ClockSelectSet(cmuClock_LFE, cmuSelect_LFRCO);
     CMU_ClockEnable(cmuClock_CORELE, true);
+#elif defined(EFR32MG21)
+    CMU_OscillatorEnable(cmuOsc_LFRCO, true, true);
+#else
+#error "Enable Clocks for the used board"
+#endif /* EFR32 PLATFORM */
     CMU_ClockEnable(cmuClock_RTCC, true);
     status = sl_sleeptimer_init();
     assert(status == SL_STATUS_OK);
@@ -102,6 +118,8 @@ void initOtSysEFR(void)
     efr32RadioInit();
     efr32AlarmInit();
     efr32MiscInit();
+#ifndef EFR32MG21
     efr32RandomInit();
-    otHeapSetCAllocFree(calloc, free);
+#endif /* EFR32 PLATFORM */
+    otHeapSetCAllocFree(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
 }

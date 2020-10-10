@@ -56,14 +56,16 @@ namespace Security {
 
 #endif // CHIP_CONFIG_SECURITY_MGR_TIME_ALERTS_DUMMY
 
+using namespace chip::Encoding;
+using namespace chip::Inet;
 using namespace chip::Protocols;
 using namespace chip::Protocols::Common;
-using namespace chip::Protocols::StatusReporting;
 using namespace chip::Protocols::Security;
 using namespace chip::Protocols::Security::AppKeys;
-using namespace chip::Encoding;
+using namespace chip::Protocols::StatusReporting;
+using namespace chip::System;
 
-ChipSecurityManager::ChipSecurityManager(void)
+ChipSecurityManager::ChipSecurityManager()
 {
     State        = kState_NotInitialized;
     mSystemLayer = nullptr;
@@ -109,7 +111,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipSecurityManager::Shutdown(void)
+CHIP_ERROR ChipSecurityManager::Shutdown()
 {
     if (State != kState_NotInitialized)
     {
@@ -131,7 +133,7 @@ void ChipSecurityManager::HandleUnsolicitedMessage(ExchangeContext * ec, const I
                                                    PacketBuffer * msgBuf)
 {
     CHIP_ERROR err               = CHIP_NO_ERROR;
-    ChipSecurityManager * secMgr = (ChipSecurityManager *) ec->AppState;
+    ChipSecurityManager * secMgr = static_cast<ChipSecurityManager *>(ec->AppState);
 
     // Handle Key Error Messages.
     if (profileId == kChipProtocol_Security && msgType == kMsgType_KeyError)
@@ -413,7 +415,7 @@ exit:
     return;
 }
 
-CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, IPAddress peerAddr, uint16_t peerPort)
+CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -587,7 +589,7 @@ exit:
 
 #endif // CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
 
-CHIP_ERROR ChipSecurityManager::HandleSessionEstablished(void)
+CHIP_ERROR ChipSecurityManager::HandleSessionEstablished()
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     uint64_t peerNodeId   = mEC->PeerNodeId;
@@ -610,7 +612,7 @@ exit:
     return err;
 }
 
-void ChipSecurityManager::HandleSessionComplete(void)
+void ChipSecurityManager::HandleSessionComplete()
 {
     ChipConnection * con                   = mCon;
     uint64_t peerNodeId                    = mEC->PeerNodeId;
@@ -707,7 +709,7 @@ void ChipSecurityManager::HandleSessionError(CHIP_ERROR err, PacketBuffer * stat
 
 void ChipSecurityManager::HandleConnectionClosed(ExchangeContext * ec, ChipConnection * con, CHIP_ERROR conErr)
 {
-    ChipSecurityManager * secMgr = (ChipSecurityManager *) ec->AppState;
+    ChipSecurityManager * secMgr = static_cast<ChipSecurityManager *>(ec->AppState);
 
     if (conErr == CHIP_NO_ERROR)
         conErr = CHIP_ERROR_CONNECTION_CLOSED_UNEXPECTEDLY;
@@ -822,7 +824,7 @@ exit:
     return err;
 }
 
-void ChipSecurityManager::Reset(void)
+void ChipSecurityManager::Reset()
 {
     if (mEC != nullptr)
     {
@@ -850,7 +852,7 @@ void ChipSecurityManager::Reset(void)
     mStartSecureSession_ReqState   = nullptr;
 }
 
-void ChipSecurityManager::StartSessionTimer(void)
+void ChipSecurityManager::StartSessionTimer()
 {
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
 
@@ -860,7 +862,7 @@ void ChipSecurityManager::StartSessionTimer(void)
     }
 }
 
-void ChipSecurityManager::CancelSessionTimer(void)
+void ChipSecurityManager::CancelSessionTimer()
 {
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
     mSystemLayer->CancelTimer(HandleSessionTimeout, this);
@@ -877,7 +879,7 @@ void ChipSecurityManager::HandleSessionTimeout(System::Layer * aSystemLayer, voi
     }
 }
 
-void ChipSecurityManager::StartIdleSessionTimer(void)
+void ChipSecurityManager::StartIdleSessionTimer()
 {
     if (IdleSessionTimeout != 0 && !GetFlag(mFlags, kFlag_IdleSessionTimerRunning))
     {
@@ -891,7 +893,7 @@ void ChipSecurityManager::StartIdleSessionTimer(void)
     }
 }
 
-void ChipSecurityManager::StopIdleSessionTimer(void)
+void ChipSecurityManager::StopIdleSessionTimer()
 {
     System::Layer * systemLayer = FabricState->MessageLayer->SystemLayer;
     systemLayer->CancelTimer(HandleIdleSessionTimeout, this);
@@ -901,7 +903,7 @@ void ChipSecurityManager::StopIdleSessionTimer(void)
 
 void ChipSecurityManager::HandleIdleSessionTimeout(System::Layer * aLayer, void * aAppState, System::Error aError)
 {
-    ChipSecurityManager * _this = (ChipSecurityManager *) aAppState;
+    ChipSecurityManager * _this = static_cast<ChipSecurityManager *>(aAppState);
     bool unreservedSessionsExist;
 
     ClearFlag(_this->mFlags, kFlag_IdleSessionTimerRunning);
@@ -927,7 +929,7 @@ void ChipSecurityManager::RMPHandleAckRcvd(ExchangeContext * ec, void * msgCtxt)
 void ChipSecurityManager::RMPHandleSendError(ExchangeContext * ec, CHIP_ERROR err, void * msgCtxt)
 {
     ChipLogProgress(SecurityManager, "%s", __FUNCTION__);
-    ChipSecurityManager * secMgr = (ChipSecurityManager *) ec->AppState;
+    ChipSecurityManager * secMgr = static_cast<ChipSecurityManager *>(ec->AppState);
 
     secMgr->HandleSessionError(err, nullptr);
 }
@@ -939,7 +941,7 @@ void ChipSecurityManager::AsyncNotifySecurityManagerAvailable()
 
 void ChipSecurityManager::DoNotifySecurityManagerAvailable(System::Layer * systemLayer, void * appState, System::Error err)
 {
-    ChipSecurityManager * _this = (ChipSecurityManager *) appState;
+    ChipSecurityManager * _this = static_cast<ChipSecurityManager *>(appState);
     if (_this->State == kState_Idle)
     {
         _this->ExchangeManager->NotifySecurityManagerAvailable();

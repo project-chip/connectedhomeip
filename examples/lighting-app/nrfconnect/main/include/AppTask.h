@@ -38,7 +38,6 @@ private:
     friend AppTask & GetAppTask(void);
 
     int Init();
-    void PrintQRCode() const;
 
     static void ActionInitiated(LightingManager::Action_t aAction);
     static void ActionCompleted(LightingManager::Action_t aAction);
@@ -49,7 +48,7 @@ private:
 
     static void FunctionTimerEventHandler(AppEvent * aEvent);
     static void FunctionHandler(AppEvent * aEvent);
-    static void JoinerHandler(AppEvent * aEvent);
+    static void StartThreadHandler(AppEvent * aEvent);
     static void LightingActionEventHandler(AppEvent * aEvent);
 
     static void ButtonEventHandler(uint32_t button_state, uint32_t has_changed);

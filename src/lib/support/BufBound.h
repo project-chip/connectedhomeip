@@ -21,9 +21,9 @@
  *     of an object
  */
 
-#ifndef CHIP_BUFBOUND_H
-#define CHIP_BUFBOUND_H
+#pragma once
 
+#include <climits>
 #include <stdint.h>
 #include <string.h>
 
@@ -61,9 +61,10 @@ public:
      */
     size_t Put(const char * s)
     {
+        static_assert(CHAR_BIT == 8, "We're assuming char and uint8_t are the same size");
         while (*s != 0)
         {
-            Put(*s++);
+            Put(static_cast<uint8_t>(*s++));
         }
         return mWritten;
     }
@@ -137,5 +138,3 @@ public:
 };
 
 } // namespace chip
-
-#endif /* CHIP_BUFBOUND */

@@ -25,8 +25,8 @@
 #include <core/CHIPEncoding.h>
 #include <support/BufBound.h>
 #include <support/CodeUtils.h>
-#include <transport/MessageHeader.h>
 #include <transport/SecureSession.h>
+#include <transport/raw/MessageHeader.h>
 
 #include <string.h>
 
@@ -93,13 +93,13 @@ exit:
     return error;
 }
 
-void SecureSession::Reset(void)
+void SecureSession::Reset()
 {
     mKeyAvailable = false;
     memset(mKey, 0, sizeof(mKey));
 }
 
-CHIP_ERROR SecureSession::GetIV(const MessageHeader & header, uint8_t * iv, size_t len)
+CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_t len)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     uint64_t nodeID = 0;
@@ -121,16 +121,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSession::GetAdditionalAuthData(const MessageHeader & header, uint8_t * aad, size_t & len)
+CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, const Header::Flags payloadEncodeFlags, uint8_t * aad,
+                                                size_t & len)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    size_t actualEncodedHeaderSize;
+    uint16_t actualEncodedHeaderSize;
 
     VerifyOrExit(len >= header.EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Use unencrypted part of header as AAD. This will help
     // integrity protect the whole message
-    err = header.Encode(aad, len, &actualEncodedHeaderSize);
+    err = header.Encode(aad, len, &actualEncodedHeaderSize, payloadEncodeFlags);
     SuccessOrExit(err);
 
     VerifyOrExit(len >= actualEncodedHeaderSize, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -140,16 +141,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, MessageHeader & header)
+CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                                  Header::Flags payloadFlags, MessageAuthenticationCode & mac)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
     size_t aadLen = sizeof(AAD);
 
-    MessageHeader::EncryptionType encType = MessageHeader::EncryptionType::kAESCCMTagLen16;
+    constexpr Header::EncryptionType encType = Header::EncryptionType::kAESCCMTagLen16;
 
-    const size_t taglen = header.TagLenForEncryptionType(encType);
+    const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(encType);
     uint8_t tag[taglen];
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
@@ -160,23 +162,24 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     error = GetIV(header, IV, sizeof(IV));
     SuccessOrExit(error);
 
-    error = GetAdditionalAuthData(header, AAD, aadLen);
+    error = GetAdditionalAuthData(header, payloadFlags, AAD, aadLen);
     SuccessOrExit(error);
 
     error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output, tag, taglen);
     SuccessOrExit(error);
 
-    header.SetTag(encType, tag, taglen);
+    mac.SetTag(&header, encType, tag, taglen);
 
 exit:
     return error;
 }
 
-CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const MessageHeader & header)
+CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                                  Header::Flags payloadFlags, const MessageAuthenticationCode & mac)
 {
     CHIP_ERROR error    = CHIP_NO_ERROR;
-    size_t taglen       = header.GetTagLength();
-    const uint8_t * tag = header.GetTag();
+    size_t taglen       = MessageAuthenticationCode::TagLenForEncryptionType(header.GetEncryptionType());
+    const uint8_t * tag = mac.GetTag();
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
     size_t aadLen = sizeof(AAD);
@@ -189,7 +192,7 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
     error = GetIV(header, IV, sizeof(IV));
     SuccessOrExit(error);
 
-    error = GetAdditionalAuthData(header, AAD, aadLen);
+    error = GetAdditionalAuthData(header, payloadFlags, AAD, aadLen);
     SuccessOrExit(error);
 
     error = AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey), IV, sizeof(IV), output);

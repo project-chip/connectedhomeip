@@ -24,7 +24,7 @@
 
 #include "TestPlatformTime.h"
 
-int main(void)
+int main()
 {
     return (TestPlatformTime());
 }

@@ -36,7 +36,7 @@ namespace Inet {
 /**
  * Register a text error formatter for Inet Layer errors.
  */
-void RegisterLayerErrorFormatter(void)
+void RegisterLayerErrorFormatter()
 {
     static chip::ErrorFormatter sInetLayerErrorFormatter = { FormatLayerError, nullptr };
 

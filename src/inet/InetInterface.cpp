@@ -32,6 +32,7 @@
 #include "InetLayer.h"
 #include "InetLayerEvents.h"
 
+#include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 
@@ -200,7 +201,7 @@ static int sIOCTLSocket = -1;
  *
  * This function is thread-safe on all platforms.
  */
-int GetIOCTLSocket(void)
+int GetIOCTLSocket()
 {
     if (sIOCTLSocket == -1)
     {
@@ -231,7 +232,7 @@ int GetIOCTLSocket(void)
  *
  *   NB: This function is NOT thread-safe with respect to \c GetIOCTLSocket.
  */
-void CloseIOCTLSocket(void)
+void CloseIOCTLSocket()
 {
     if (sIOCTLSocket == -1)
     {
@@ -391,12 +392,12 @@ exit:
 
 #endif // __ANDROID__ && __ANDROID_API__ < 24
 
-InterfaceIterator::InterfaceIterator(void)
+InterfaceIterator::InterfaceIterator()
 {
     mIntfArray       = nullptr;
     mCurIntf         = 0;
     mIntfFlags       = 0;
-    mIntfFlagsCached = 0;
+    mIntfFlagsCached = false;
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
@@ -416,7 +417,7 @@ InterfaceIterator::InterfaceIterator() : mCurrentInterface(net_if_get_by_index(m
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
-InterfaceIterator::~InterfaceIterator(void)
+InterfaceIterator::~InterfaceIterator()
 {
     if (mIntfArray != nullptr)
     {
@@ -441,7 +442,7 @@ InterfaceIterator::~InterfaceIterator(void)
  */
 
 #if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-bool InterfaceIterator::HasCurrent(void)
+bool InterfaceIterator::HasCurrent()
 {
     return (mIntfArray != nullptr) ? mIntfArray[mCurIntf].if_index != 0 : Next();
 }
@@ -474,7 +475,7 @@ bool InterfaceIterator::HasCurrent(void)
  *     interfaces, *except* in the case of LwIP systems when the currently selected
  *     interface is removed from the list, which causes iteration to end immediately.
  */
-bool InterfaceIterator::Next(void)
+bool InterfaceIterator::Next()
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
@@ -540,7 +541,7 @@ bool InterfaceIterator::Next(void)
  */
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-InterfaceId InterfaceIterator::GetInterfaceId(void)
+InterfaceId InterfaceIterator::GetInterfaceId()
 {
     return (HasCurrent()) ? mIntfArray[mCurIntf].if_index : INET_NULL_INTERFACEID;
 }
@@ -600,7 +601,7 @@ exit:
  * @return  \c true if current network interface is up, \c false if not
  *          or if the iterator is positioned beyond the end of the list.
  */
-bool InterfaceIterator::IsUp(void)
+bool InterfaceIterator::IsUp()
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     return (GetFlags() & IFF_UP) != 0;
@@ -621,7 +622,7 @@ bool InterfaceIterator::IsUp(void)
  * @return  \c true if current network interface supports multicast, \c false
  *          if not, or if the iterator is positioned beyond the end of the list.
  */
-bool InterfaceIterator::SupportsMulticast(void)
+bool InterfaceIterator::SupportsMulticast()
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     return (GetFlags() & IFF_MULTICAST) != 0;
@@ -647,7 +648,7 @@ bool InterfaceIterator::SupportsMulticast(void)
  * @return  \c true if current network interface has a broadcast address, \c false
  *          if not, or if the iterator is positioned beyond the end of the list.
  */
-bool InterfaceIterator::HasBroadcastAddress(void)
+bool InterfaceIterator::HasBroadcastAddress()
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     return (GetFlags() & IFF_BROADCAST) != 0;
@@ -670,7 +671,7 @@ bool InterfaceIterator::HasBroadcastAddress(void)
  *
  * @brief   Returns the ifr_flags value for the current interface.
  */
-short InterfaceIterator::GetFlags(void)
+short InterfaceIterator::GetFlags()
 {
     struct ifreq intfData;
 
@@ -702,7 +703,7 @@ short InterfaceIterator::GetFlags(void)
  *     Starts the iterator at the first network address. On some platforms,
  *     this constructor may allocate resources recycled by the destructor.
  */
-InterfaceAddressIterator::InterfaceAddressIterator(void)
+InterfaceAddressIterator::InterfaceAddressIterator()
 {
     mAddrsList = nullptr;
     mCurAddr   = nullptr;
@@ -723,7 +724,7 @@ InterfaceAddressIterator::InterfaceAddressIterator() = default;
  */
 
 #if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-InterfaceAddressIterator::~InterfaceAddressIterator(void)
+InterfaceAddressIterator::~InterfaceAddressIterator()
 {
     if (mAddrsList != nullptr)
     {
@@ -741,7 +742,7 @@ InterfaceAddressIterator::~InterfaceAddressIterator(void)
  * @return  \c true if the iterator is positioned on an interface address;
  *          \c false if positioned beyond the end of the address list.
  */
-bool InterfaceAddressIterator::HasCurrent(void)
+bool InterfaceAddressIterator::HasCurrent()
 {
 #if CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     return (mAddrsList != nullptr) ? (mCurAddr != nullptr) : Next();
@@ -772,7 +773,7 @@ bool InterfaceAddressIterator::HasCurrent(void)
  *     themselves are never destroyed.  Additionally, iteration on LwIP systems
  *     will terminate early if the current interface is removed from the list.
  */
-bool InterfaceAddressIterator::Next(void)
+bool InterfaceAddressIterator::Next()
 {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
     while (true)
@@ -870,7 +871,7 @@ bool InterfaceAddressIterator::Next(void)
  * @return  the current interface address or \c IPAddress::Any if the iterator
  *          is positioned beyond the end of the address list.
  */
-IPAddress InterfaceAddressIterator::GetAddress(void)
+IPAddress InterfaceAddressIterator::GetAddress()
 {
     if (HasCurrent())
     {
@@ -918,20 +919,20 @@ IPAddress InterfaceAddressIterator::GetAddress(void)
  *     something else. On most platforms, the system's interface address
  *     structure can represent arbitrary prefix lengths between 0 and 128.
  */
-uint8_t InterfaceAddressIterator::GetPrefixLength(void)
+uint8_t InterfaceAddressIterator::GetPrefixLength()
 {
     if (HasCurrent())
     {
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
         if (mCurAddr->ifa_addr->sa_family == AF_INET6)
         {
-            struct sockaddr_in6 & netmask = *(struct sockaddr_in6 *) (mCurAddr->ifa_netmask);
+            struct sockaddr_in6 & netmask = *reinterpret_cast<struct sockaddr_in6 *>(mCurAddr->ifa_netmask);
             return NetmaskToPrefixLength(netmask.sin6_addr.s6_addr, 16);
         }
         if (mCurAddr->ifa_addr->sa_family == AF_INET)
         {
-            struct sockaddr_in & netmask = *(struct sockaddr_in *) (mCurAddr->ifa_netmask);
-            return NetmaskToPrefixLength((const uint8_t *) &netmask.sin_addr.s_addr, 4);
+            struct sockaddr_in & netmask = *reinterpret_cast<struct sockaddr_in *>(mCurAddr->ifa_netmask);
+            return NetmaskToPrefixLength(reinterpret_cast<const uint8_t *>(&netmask.sin_addr.s_addr), 4);
         }
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS && CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
 
@@ -967,7 +968,7 @@ uint8_t InterfaceAddressIterator::GetPrefixLength(void)
  * @return  the interface id or \c INET_NULL_INTERFACEID if the iterator
  *          is positioned beyond the end of the address list.
  */
-InterfaceId InterfaceAddressIterator::GetInterfaceId(void)
+InterfaceId InterfaceAddressIterator::GetInterfaceId()
 {
     if (HasCurrent())
     {
@@ -1031,7 +1032,7 @@ exit:
  * @return  \c true if current network interface is up, \c false if not, or
  *          if the iterator is not positioned on an interface address.
  */
-bool InterfaceAddressIterator::IsUp(void)
+bool InterfaceAddressIterator::IsUp()
 {
     if (HasCurrent())
     {
@@ -1055,7 +1056,7 @@ bool InterfaceAddressIterator::IsUp(void)
  * @return  \c true if multicast is supported, \c false if not, or
  *          if the iterator is not positioned on an interface address.
  */
-bool InterfaceAddressIterator::SupportsMulticast(void)
+bool InterfaceAddressIterator::SupportsMulticast()
 {
     if (HasCurrent())
     {
@@ -1079,7 +1080,7 @@ bool InterfaceAddressIterator::SupportsMulticast(void)
  * @return  \c true if the interface has a broadcast address, \c false if not, or
  *          if the iterator is not positioned on an interface address.
  */
-bool InterfaceAddressIterator::HasBroadcastAddress(void)
+bool InterfaceAddressIterator::HasBroadcastAddress()
 {
     if (HasCurrent())
     {

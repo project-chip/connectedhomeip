@@ -58,6 +58,9 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    mWiFiStationMode                = kWiFiStationMode_Disabled;
+    mWiFiStationReconnectIntervalMS = CHIP_DEVICE_CONFIG_WIFI_STATION_RECONNECT_INTERVAL;
+
     // Initialize the generic base classes that require it.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
@@ -95,17 +98,61 @@ void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 uint16_t ConnectivityManagerImpl::mConnectivityFlag;
 struct GDBusWpaSupplicant ConnectivityManagerImpl::mWpaSupplicant;
 
-bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity(void)
+bool ConnectivityManagerImpl::_HaveIPv4InternetConnectivity()
 {
     return ((mConnectivityFlag & kFlag_HaveIPv4InternetConnectivity) != 0);
 }
 
-bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity(void)
+bool ConnectivityManagerImpl::_HaveIPv6InternetConnectivity()
 {
     return ((mConnectivityFlag & kFlag_HaveIPv6InternetConnectivity) != 0);
 }
 
-bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
+ConnectivityManager::WiFiStationMode ConnectivityManagerImpl::_GetWiFiStationMode()
+{
+    if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
+    {
+        mWiFiStationMode = (mWpaSupplicant.iface != nullptr) ? kWiFiStationMode_Enabled : kWiFiStationMode_Disabled;
+    }
+
+    return mWiFiStationMode;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationMode(ConnectivityManager::WiFiStationMode val)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(val != ConnectivityManager::kWiFiStationMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (mWiFiStationMode != val)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi station mode change: %s -> %s", WiFiStationModeToStr(mWiFiStationMode),
+                        WiFiStationModeToStr(val));
+    }
+
+    mWiFiStationMode = val;
+exit:
+    return err;
+}
+
+uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS(void)
+{
+    return mWiFiStationReconnectIntervalMS;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectIntervalMS(uint32_t val)
+{
+    mWiFiStationReconnectIntervalMS = val;
+
+    return CHIP_NO_ERROR;
+}
+
+bool ConnectivityManagerImpl::_IsWiFiStationEnabled()
+{
+    return GetWiFiStationMode() == kWiFiStationMode_Enabled;
+}
+
+bool ConnectivityManagerImpl::_IsWiFiStationConnected()
 {
     bool ret            = false;
     const gchar * state = nullptr;
@@ -117,17 +164,61 @@ bool ConnectivityManagerImpl::_IsWiFiStationConnected(void)
     }
 
     state = wpa_fi_w1_wpa_supplicant1_interface_get_state(mWpaSupplicant.iface);
-    ChipLogProgress(DeviceLayer, "wpa_supplicant: wpa_fi_w1_wpa_supplicant1_interface_get_state: %s", state);
-
     if (g_strcmp0(state, "completed") == 0)
     {
-        ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi already connected");
         SetFlag(mConnectivityFlag, kFlag_HaveIPv4InternetConnectivity, true);
         SetFlag(mConnectivityFlag, kFlag_HaveIPv6InternetConnectivity, true);
         ret = true;
     }
 
     return ret;
+}
+
+bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
+{
+    return mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled;
+}
+
+bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
+{
+    bool ret          = false;
+    const gchar * bss = nullptr;
+
+    if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: _IsWiFiStationProvisioned: interface not connected");
+        return false;
+    }
+
+    bss = wpa_fi_w1_wpa_supplicant1_interface_get_current_bss(mWpaSupplicant.iface);
+    if (g_str_match_string("BSSs", bss, true))
+    {
+        ret = true;
+    }
+
+    return ret;
+}
+
+void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
+{
+    if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: _ClearWiFiStationProvision: interface not connected");
+        return;
+    }
+
+    if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
+    {
+        GError * err = nullptr;
+        gboolean ret = wpa_fi_w1_wpa_supplicant1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface, nullptr, &err);
+
+        if (err != nullptr)
+        {
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to remove all networks with error: %s",
+                            err ? err->message : "unknown error");
+            g_error_free(err);
+        }
+    }
 }
 
 bool ConnectivityManagerImpl::_CanStartWiFiScan()

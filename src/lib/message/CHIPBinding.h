@@ -167,29 +167,29 @@ public:
 
     void * AppState;
 
-    void AddRef(void);
-    void Release(void);
-    void Close(void);
-    void Reset(void);
+    void AddRef();
+    void Release();
+    void Close();
+    void Reset();
 
     Configuration BeginConfiguration();
 
     CHIP_ERROR RequestPrepare();
 
-    State GetState(void) const;
-    bool IsPreparing(void) const;
-    bool IsReady(void) const;
-    bool CanBePrepared(void) const;
+    State GetState() const;
+    bool IsPreparing() const;
+    bool IsReady() const;
+    bool CanBePrepared() const;
 
-    uint16_t GetLogId(void) const;
+    uint16_t GetLogId() const;
 
-    uint64_t GetPeerNodeId(void) const;
-    void GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const;
-    uint32_t GetKeyId(void) const;
-    uint8_t GetEncryptionType(void) const;
+    uint64_t GetPeerNodeId() const;
+    void GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, Inet::InterfaceId & interfaceId) const;
+    uint32_t GetKeyId() const;
+    uint8_t GetEncryptionType() const;
     uint32_t GetDefaultResponseTimeout() const;
     void SetDefaultResponseTimeout(uint32_t msec);
-    const RMPConfig & GetDefaultRMPConfig(void) const;
+    const RMPConfig & GetDefaultRMPConfig() const;
     void SetDefaultRMPConfig(const RMPConfig & RMPConfig);
     EventCallback GetEventCallback() const;
     void SetEventCallback(EventCallback aEventCallback);
@@ -222,8 +222,7 @@ public:
 
     static void DefaultEventHandler(void * apAppState, EventType aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
 
-    CHIP_ERROR AllocateRightSizedBuffer(PacketBuffer *& buf, const uint32_t desiredSize, const uint32_t minSize,
-                                        uint32_t & outMaxPayloadSize);
+    CHIP_ERROR AllocateRightSizedBuffer(PacketBuffer *& buf, uint32_t desiredSize, uint32_t minSize, uint32_t & outMaxPayloadSize);
 
 private:
     friend class ChipExchangeManager;
@@ -283,7 +282,7 @@ private:
     uint64_t mPeerNodeId;
 
     // Addressing-specific configuration
-    InterfaceId mInterfaceId;
+    Inet::InterfaceId mInterfaceId;
     uint16_t mPeerPort;
 
     // Transport-specific configuration
@@ -308,27 +307,27 @@ private:
 
     CHIP_ERROR DoPrepare(CHIP_ERROR configErr);
     void DoReset(State newState);
-    void DoClose(void);
-    void ResetConfig(void);
-    void PrepareAddress(void);
-    void PrepareTransport(void);
-    void PrepareSecurity(void);
-    void HandleBindingReady(void);
+    void DoClose();
+    void ResetConfig();
+    void PrepareAddress();
+    void PrepareTransport();
+    void PrepareSecurity();
+    void HandleBindingReady();
     void HandleBindingFailed(CHIP_ERROR err, Protocols::StatusReporting::StatusReport * statusReport, bool raiseEvent);
     void OnKeyFailed(uint64_t peerNodeId, uint32_t keyId, CHIP_ERROR keyErr);
-    void OnSecurityManagerAvailable(void);
+    void OnSecurityManagerAvailable();
     void OnConnectionClosed(ChipConnection * con, CHIP_ERROR conErr);
-    uint32_t GetChipTrailerSize(void);
-    uint32_t GetChipHeaderSize(void);
+    uint32_t GetChipTrailerSize();
+    uint32_t GetChipHeaderSize();
 
     static void OnSecureSessionReady(ChipSecurityManager * sm, ChipConnection * con, void * reqState, uint16_t keyId,
                                      uint64_t peerNodeId, uint8_t encType);
     static void OnSecureSessionFailed(ChipSecurityManager * sm, ChipConnection * con, void * reqState, CHIP_ERROR localErr,
                                       uint64_t peerNodeId, Protocols::StatusReporting::StatusReport * statusReport);
     void OnSecureSessionReady(uint64_t peerNodeId, uint8_t encType, ChipAuthMode authMode, uint16_t keyId);
-    void OnKeyError(const uint32_t aKeyId, const uint64_t aPeerNodeId, const CHIP_ERROR aKeyErr);
+    void OnKeyError(uint32_t aKeyId, uint64_t aPeerNodeId, CHIP_ERROR aKeyErr);
 
-    static void OnResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, IPAddress * addrArray);
+    static void OnResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, Inet::IPAddress * addrArray);
     static void OnConnectionComplete(ChipConnection * con, CHIP_ERROR conErr);
 };
 
@@ -352,29 +351,29 @@ public:
     Configuration & Target_NodeId(uint64_t aPeerNodeId);
     Configuration & Target_ServiceEndpoint(uint64_t aPeerNodeId);
 
-    Configuration & TargetAddress_ChipService(void);
+    Configuration & TargetAddress_ChipService();
     Configuration & TargetAddress_ChipFabric(uint16_t aSubnetId);
-    Configuration & TargetAddress_IP(Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT,
-                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+    Configuration & TargetAddress_IP(const Inet::IPAddress & aPeerAddress, uint16_t aPeerPort = CHIP_PORT,
+                                     Inet::InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
     Configuration & TargetAddress_IP(const char * aHostName, uint16_t aPeerPort = CHIP_PORT,
-                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+                                     Inet::InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
     Configuration & TargetAddress_IP(const char * aHostName, size_t aHostNameLen, uint16_t aPeerPort = CHIP_PORT,
-                                     InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
+                                     Inet::InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
 
     Configuration & DNS_Options(uint8_t dnsOptions);
 
-    Configuration & Transport_TCP(void);
-    Configuration & Transport_UDP(void);
-    Configuration & Transport_UDP_RMP(void);
+    Configuration & Transport_TCP();
+    Configuration & Transport_UDP();
+    Configuration & Transport_UDP_RMP();
     Configuration & Transport_UDP_PathMTU(uint32_t aPathMTU);
     Configuration & Transport_DefaultRMPConfig(const RMPConfig & aRMPConfig);
     Configuration & Transport_ExistingConnection(ChipConnection * apConnection);
 
     Configuration & Exchange_ResponseTimeoutMsec(uint32_t aResponseTimeoutMsec);
 
-    Configuration & Security_None(void);
-    Configuration & Security_CASESession(void);
-    Configuration & Security_SharedCASESession(void);
+    Configuration & Security_None();
+    Configuration & Security_CASESession();
+    Configuration & Security_SharedCASESession();
     Configuration & Security_SharedCASESession(uint64_t aRouterNodeId);
     Configuration & Security_PASESession(uint8_t aPasswordSource);
     Configuration & Security_TAKESession();
@@ -385,9 +384,9 @@ public:
 
     Configuration & ConfigureFromMessage(const ChipMessageInfo * aMsgInfo, const Inet::IPPacketInfo * aPacketInfo);
 
-    CHIP_ERROR PrepareBinding(void);
+    CHIP_ERROR PrepareBinding();
 
-    CHIP_ERROR GetError(void) const;
+    CHIP_ERROR GetError() const;
 
 private:
     friend class Binding;
@@ -464,7 +463,7 @@ struct Binding::OutEventParam
  * Documentation for these functions can be found in the .cpp file.
  */
 
-inline Binding::State Binding::GetState(void) const
+inline Binding::State Binding::GetState() const
 {
     return mState;
 }
@@ -479,7 +478,7 @@ inline bool Binding::IsReady() const
     return mState == kState_Ready;
 }
 
-inline bool Binding::CanBePrepared(void) const
+inline bool Binding::CanBePrepared() const
 {
     return mState == kState_NotConfigured || mState == kState_Failed;
 }
@@ -489,19 +488,19 @@ inline uint64_t Binding::GetPeerNodeId() const
     return mPeerNodeId;
 }
 
-inline void Binding::GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, InterfaceId & interfaceId) const
+inline void Binding::GetPeerIPAddress(Inet::IPAddress & address, uint16_t & port, Inet::InterfaceId & interfaceId) const
 {
     address     = mPeerAddress;
     port        = mPeerPort;
     interfaceId = mInterfaceId;
 }
 
-inline uint32_t Binding::GetKeyId(void) const
+inline uint32_t Binding::GetKeyId() const
 {
     return mKeyId;
 }
 
-inline uint8_t Binding::GetEncryptionType(void) const
+inline uint8_t Binding::GetEncryptionType() const
 {
     return mEncType;
 }
@@ -516,7 +515,7 @@ inline void Binding::SetDefaultResponseTimeout(uint32_t timeout)
     mDefaultResponseTimeoutMsec = timeout;
 }
 
-inline const RMPConfig & Binding::GetDefaultRMPConfig(void) const
+inline const RMPConfig & Binding::GetDefaultRMPConfig() const
 {
     return mDefaultRMPConfig;
 }
@@ -598,12 +597,12 @@ inline Binding::Configuration Binding::BeginConfiguration()
     return Configuration(*this);
 }
 
-inline CHIP_ERROR Binding::Configuration::PrepareBinding(void)
+inline CHIP_ERROR Binding::Configuration::PrepareBinding()
 {
     return mBinding.DoPrepare(mError);
 }
 
-inline CHIP_ERROR Binding::Configuration::GetError(void) const
+inline CHIP_ERROR Binding::Configuration::GetError() const
 {
     return mError;
 }

@@ -36,7 +36,6 @@
 #else
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
 #endif
-#include <support/FlagUtils.hpp>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
 #include <platform/Linux/dbus/wpa/DBusWpa.h>
@@ -108,14 +107,22 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
 private:
     // ===== Members that implement the ConnectivityManager abstract interface.
 
-    bool _HaveIPv4InternetConnectivity(void);
-    bool _HaveIPv6InternetConnectivity(void);
-    bool _HaveServiceConnectivity(void);
-    CHIP_ERROR _Init(void);
+    bool _HaveIPv4InternetConnectivity();
+    bool _HaveIPv6InternetConnectivity();
+    bool _HaveServiceConnectivity();
+    CHIP_ERROR _Init();
     void _OnPlatformEvent(const ChipDeviceEvent * event);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    bool _IsWiFiStationConnected(void);
+    WiFiStationMode _GetWiFiStationMode();
+    CHIP_ERROR _SetWiFiStationMode(ConnectivityManager::WiFiStationMode val);
+    uint32_t _GetWiFiStationReconnectIntervalMS();
+    CHIP_ERROR _SetWiFiStationReconnectIntervalMS(uint32_t val);
+    bool _IsWiFiStationEnabled();
+    bool _IsWiFiStationConnected();
+    bool _IsWiFiStationApplicationControlled();
+    bool _IsWiFiStationProvisioned();
+    void _ClearWiFiStationProvision();
     bool _CanStartWiFiScan();
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
@@ -130,13 +137,18 @@ private:
 
     // ===== Members for internal use by the following friends.
 
-    friend ConnectivityManager & ConnectivityMgr(void);
-    friend ConnectivityManagerImpl & ConnectivityMgrImpl(void);
+    friend ConnectivityManager & ConnectivityMgr();
+    friend ConnectivityManagerImpl & ConnectivityMgrImpl();
 
     static ConnectivityManagerImpl sInstance;
+
+    // ===== Private members reserved for use by this class only.
+
+    ConnectivityManager::WiFiStationMode mWiFiStationMode;
+    uint32_t mWiFiStationReconnectIntervalMS;
 };
 
-inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
+inline bool ConnectivityManagerImpl::_HaveServiceConnectivity()
 {
     return _HaveServiceConnectivityViaThread();
 }
@@ -147,7 +159,7 @@ inline bool ConnectivityManagerImpl::_HaveServiceConnectivity(void)
  * chip applications should use this to access features of the ConnectivityManager object
  * that are common to all platforms.
  */
-inline ConnectivityManager & ConnectivityMgr(void)
+inline ConnectivityManager & ConnectivityMgr()
 {
     return ConnectivityManagerImpl::sInstance;
 }
@@ -158,7 +170,7 @@ inline ConnectivityManager & ConnectivityMgr(void)
  * chip applications can use this to gain access to features of the ConnectivityManager
  * that are specific to the ESP32 platform.
  */
-inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
+inline ConnectivityManagerImpl & ConnectivityMgrImpl()
 {
     return ConnectivityManagerImpl::sInstance;
 }

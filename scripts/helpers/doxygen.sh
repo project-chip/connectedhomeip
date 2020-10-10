@@ -33,8 +33,8 @@ install_doxygen() {
                 brew install doxygen
                 ;;
             "Linux")
-                apt-get update
-                apt-get install -y doxygen
+                sudo apt-get update
+                sudo apt-get install -y doxygen
                 ;;
             *)
                 die
@@ -51,8 +51,8 @@ install_graphviz() {
                 brew install graphviz
                 ;;
             "Linux")
-                apt-get update
-                apt-get install -y graphviz
+                sudo apt-get update
+                sudo apt-get install -y graphviz
                 ;;
             *)
                 die

@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef TESTSYSTEMLAYER_H
-#define TESTSYSTEMLAYER_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -39,5 +38,3 @@ int TestTimeSource(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // TESTSYSTEMLAYER_H

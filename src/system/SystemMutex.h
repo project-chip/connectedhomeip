@@ -22,8 +22,7 @@
  *      offered by the target platform.
  */
 
-#ifndef SYSTEMMUTEX_H
-#define SYSTEMMUTEX_H
+#pragma once
 
 // Include configuration headers
 #include <system/SystemConfig.h>
@@ -62,13 +61,13 @@ namespace System {
 class DLL_EXPORT Mutex
 {
 public:
-    Mutex(void);
-    ~Mutex(void);
+    Mutex();
+    ~Mutex();
 
     static Error Init(Mutex & aMutex);
 
-    void Lock(void);   /**< Acquire the mutual exclusion lock, blocking the current thread indefinitely if necessary. */
-    void Unlock(void); /**< Release the mutual exclusion lock (can block on some systems until scheduler completes). */
+    void Lock();   /**< Acquire the mutual exclusion lock, blocking the current thread indefinitely if necessary. */
+    void Unlock(); /**< Release the mutual exclusion lock (can block on some systems until scheduler completes). */
 
 private:
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
@@ -83,21 +82,21 @@ private:
     volatile int mInitialized;
 #endif // CHIP_SYSTEM_CONFIG_FREERTOS_LOCKING
 
-    Mutex(const Mutex &) /* = delete */;
-    Mutex & operator=(const Mutex &) /* = delete */;
+    Mutex(const Mutex &) = delete;
+    Mutex & operator=(const Mutex &) = delete;
 };
 
-inline Mutex::Mutex(void) {}
+inline Mutex::Mutex() {}
 
-inline Mutex::~Mutex(void) {}
+inline Mutex::~Mutex() {}
 
 #if CHIP_SYSTEM_CONFIG_POSIX_LOCKING
-inline void Mutex::Lock(void)
+inline void Mutex::Lock()
 {
     pthread_mutex_lock(&this->mPOSIXMutex);
 }
 
-inline void Mutex::Unlock(void)
+inline void Mutex::Unlock()
 {
     pthread_mutex_unlock(&this->mPOSIXMutex);
 }
@@ -114,5 +113,3 @@ inline void Mutex::Unlock(void)
 } // namespace chip
 
 #endif // !CHIP_SYSTEM_CONFIG_NO_LOCKING
-
-#endif // defined(SYSTEMMUTEX_H)

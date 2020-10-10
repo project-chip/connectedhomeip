@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
-import("${chip_root}/gn/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
   output_name = "libChipCryptoTests"
@@ -39,6 +39,8 @@ chip_test_suite("tests") {
     "SPAKE2P_RFC_test_vectors.h",
     "TestCryptoLayer.h",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/crypto",

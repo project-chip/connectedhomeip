@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef FIBONACCIUTILS_H_
-#define FIBONACCIUTILS_H_
+#pragma once
 
 namespace chip {
 
@@ -38,5 +37,3 @@ namespace chip {
 extern uint32_t GetFibonacciForIndex(uint32_t index);
 
 } // namespace chip
-
-#endif /* FIBONACCIUTILS_H_ */

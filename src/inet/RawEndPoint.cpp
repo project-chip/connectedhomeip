@@ -151,7 +151,7 @@ static INET_ERROR LwIPBindInterface(struct raw_pcb * aRaw, InterfaceId intfId)
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired.
  */
-INET_ERROR RawEndPoint::Bind(IPAddressType addrType, IPAddress addr, InterfaceId intfId)
+INET_ERROR RawEndPoint::Bind(IPAddressType addrType, const IPAddress & addr, InterfaceId intfId)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -263,7 +263,7 @@ exit:
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired.
  */
-INET_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intfId, IPAddress addr)
+INET_ERROR RawEndPoint::BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & addr)
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -375,7 +375,7 @@ ret:
  *  On LwIP, this method must not be called with the LwIP stack lock
  *  already acquired
  */
-INET_ERROR RawEndPoint::Listen(void)
+INET_ERROR RawEndPoint::Listen()
 {
     INET_ERROR res = INET_NO_ERROR;
 
@@ -440,7 +440,7 @@ exit:
  *  On LwIP systems, this method must not be called with the LwIP stack
  *  lock already acquired.
  */
-void RawEndPoint::Close(void)
+void RawEndPoint::Close()
 {
     if (mState != kState_Closed)
     {
@@ -496,7 +496,7 @@ void RawEndPoint::Close(void)
  *  On LwIP systems, this method must not be called with the LwIP stack
  *  lock already acquired.
  */
-void RawEndPoint::Free(void)
+void RawEndPoint::Free()
 {
     Close();
 
@@ -511,7 +511,7 @@ void RawEndPoint::Free(void)
  *  A synonym for <tt>SendTo(addr, INET_NULL_INTERFACEID, msg,
  *  sendFlags)</tt>.
  */
-INET_ERROR RawEndPoint::SendTo(IPAddress addr, chip::System::PacketBuffer * msg, uint16_t sendFlags)
+INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBuffer * msg, uint16_t sendFlags)
 {
     return SendTo(addr, INET_NULL_INTERFACEID, msg, sendFlags);
 }
@@ -551,7 +551,7 @@ INET_ERROR RawEndPoint::SendTo(IPAddress addr, chip::System::PacketBuffer * msg,
  *      method deep-copies \c msg into a fresh object, and queues that for
  *      transmission, leaving the original \c msg available after return.
  */
-INET_ERROR RawEndPoint::SendTo(IPAddress addr, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags)
+INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
     pktInfo.Clear();
@@ -864,7 +864,7 @@ void RawEndPoint::Init(InetLayer * inetLayer, IPVersion ipVer, IPProtocol ipProt
  *
  * @return InterfaceId   The bound interface id.
  */
-InterfaceId RawEndPoint::GetBoundInterface(void)
+InterfaceId RawEndPoint::GetBoundInterface()
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #if HAVE_LWIP_RAW_BIND_NETIF
@@ -1102,12 +1102,12 @@ exit:
     return (lRetval);
 }
 
-SocketEvents RawEndPoint::PrepareIO(void)
+SocketEvents RawEndPoint::PrepareIO()
 {
     return (IPEndPointBasis::PrepareIO());
 }
 
-void RawEndPoint::HandlePendingIO(void)
+void RawEndPoint::HandlePendingIO()
 {
     if (mState == kState_Listening && OnMessageReceived != nullptr && mPendingIO.IsReadable())
     {

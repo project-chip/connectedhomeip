@@ -22,8 +22,7 @@
  *      function for retrieving the current system time.
  */
 
-#ifndef SYSTEMTIME_H
-#define SYSTEMTIME_H
+#pragma once
 
 // Include configuration headers
 #include <system/SystemConfig.h>
@@ -69,7 +68,7 @@ namespace Layer {
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
  */
-extern uint64_t GetClock_Monotonic(void);
+extern uint64_t GetClock_Monotonic();
 
 /**
  * @brief
@@ -91,7 +90,7 @@ extern uint64_t GetClock_Monotonic(void);
  *
  * @returns             Elapsed time in milliseconds since an arbitrary, platform-defined epoch.
  */
-extern uint64_t GetClock_MonotonicMS(void);
+extern uint64_t GetClock_MonotonicMS();
 
 /**
  * @brief
@@ -117,7 +116,7 @@ extern uint64_t GetClock_MonotonicMS(void);
  *
  * @returns             Elapsed time in microseconds since an arbitrary, platform-defined epoch.
  */
-extern uint64_t GetClock_MonotonicHiRes(void);
+extern uint64_t GetClock_MonotonicHiRes();
 
 /**
  * @brief
@@ -218,5 +217,3 @@ extern Error SetClock_RealTime(uint64_t newCurTime);
 } // namespace Platform
 } // namespace System
 } // namespace chip
-
-#endif // SYSTEMTIME_H

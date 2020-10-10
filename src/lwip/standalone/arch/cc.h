@@ -57,6 +57,7 @@
 #endif
 
 /* Include some files for defining library routines */
+#include <inttypes.h>
 #include <limits.h>
 #include <string.h>
 #include <sys/time.h>
@@ -76,7 +77,7 @@ typedef signed short s16_t;
 typedef unsigned int u32_t;
 typedef signed int s32_t;
 
-typedef unsigned long mem_ptr_t;
+typedef uintptr_t mem_ptr_t;
 
 /* Define (sn)printf formatters for these lwIP types */
 #define X8_F "02x"

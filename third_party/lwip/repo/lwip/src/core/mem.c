@@ -430,14 +430,15 @@ mem_free(void *rmem)
   LWIP_ASSERT("mem_free: legal memory", (u8_t *)rmem >= (u8_t *)ram &&
     (u8_t *)rmem < (u8_t *)ram_end);
 
-  if ((u8_t *)rmem < (u8_t *)ram || (u8_t *)rmem >= (u8_t *)ram_end) {
-    SYS_ARCH_DECL_PROTECT(lev);
-    LWIP_DEBUGF(MEM_DEBUG | LWIP_DBG_LEVEL_SEVERE, ("mem_free: illegal memory\n"));
-    /* protect mem stats from concurrent access */
-    SYS_ARCH_PROTECT(lev);
-    MEM_STATS_INC(illegal);
-    SYS_ARCH_UNPROTECT(lev);
-    return;
+  if ((u8_t *) rmem < ram || (u8_t *) rmem >= (u8_t *) ram_end)
+  {
+      SYS_ARCH_DECL_PROTECT(lev);
+      LWIP_DEBUGF(MEM_DEBUG | LWIP_DBG_LEVEL_SEVERE, ("mem_free: illegal memory\n"));
+      /* protect mem stats from concurrent access */
+      SYS_ARCH_PROTECT(lev);
+      MEM_STATS_INC(illegal);
+      SYS_ARCH_UNPROTECT(lev);
+      return;
   }
   /* protect the heap from concurrent access */
   LWIP_MEM_FREE_PROTECT();
@@ -498,14 +499,15 @@ mem_trim(void *rmem, mem_size_t new_size)
   LWIP_ASSERT("mem_trim: legal memory", (u8_t *)rmem >= (u8_t *)ram &&
    (u8_t *)rmem < (u8_t *)ram_end);
 
-  if ((u8_t *)rmem < (u8_t *)ram || (u8_t *)rmem >= (u8_t *)ram_end) {
-    SYS_ARCH_DECL_PROTECT(lev);
-    LWIP_DEBUGF(MEM_DEBUG | LWIP_DBG_LEVEL_SEVERE, ("mem_trim: illegal memory\n"));
-    /* protect mem stats from concurrent access */
-    SYS_ARCH_PROTECT(lev);
-    MEM_STATS_INC(illegal);
-    SYS_ARCH_UNPROTECT(lev);
-    return rmem;
+  if ((u8_t *) rmem < ram || (u8_t *) rmem >= (u8_t *) ram_end)
+  {
+      SYS_ARCH_DECL_PROTECT(lev);
+      LWIP_DEBUGF(MEM_DEBUG | LWIP_DBG_LEVEL_SEVERE, ("mem_trim: illegal memory\n"));
+      /* protect mem stats from concurrent access */
+      SYS_ARCH_PROTECT(lev);
+      MEM_STATS_INC(illegal);
+      SYS_ARCH_UNPROTECT(lev);
+      return rmem;
   }
   /* Get the corresponding struct mem ... */
   /* cast through void* to get rid of alignment warnings */

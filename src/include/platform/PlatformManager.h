@@ -90,12 +90,12 @@ public:
     CHIP_ERROR AddEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void RemoveEventHandler(EventHandlerFunct handler, intptr_t arg = 0);
     void ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg = 0);
-    void RunEventLoop(void);
-    CHIP_ERROR StartEventLoopTask(void);
-    void LockChipStack(void);
-    bool TryLockChipStack(void);
-    void UnlockChipStack(void);
-    CHIP_ERROR Shutdown(void);
+    void RunEventLoop();
+    CHIP_ERROR StartEventLoopTask();
+    void LockChipStack();
+    bool TryLockChipStack();
+    void UnlockChipStack();
+    CHIP_ERROR Shutdown();
 
 private:
     // ===== Members for internal use by the following friends.
@@ -158,7 +158,7 @@ protected:
  * chip applications should use this to access features of the PlatformManager object
  * that are common to all platforms.
  */
-extern PlatformManager & PlatformMgr(void);
+extern PlatformManager & PlatformMgr();
 
 /**
  * Returns the platform-specific implementation of the PlatformManager singleton object.
@@ -166,7 +166,7 @@ extern PlatformManager & PlatformMgr(void);
  * chip applications can use this to gain access to features of the PlatformManager
  * that are specific to the selected platform.
  */
-extern PlatformManagerImpl & PlatformMgrImpl(void);
+extern PlatformManagerImpl & PlatformMgrImpl();
 
 } // namespace DeviceLayer
 } // namespace chip
@@ -179,6 +179,7 @@ extern PlatformManagerImpl & PlatformMgrImpl(void);
 #elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define PLATFORMMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/PlatformManagerImpl.h>
 #include PLATFORMMANAGERIMPL_HEADER
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 namespace chip {
 namespace DeviceLayer {
@@ -203,27 +204,27 @@ inline void PlatformManager::ScheduleWork(AsyncWorkFunct workFunct, intptr_t arg
     static_cast<ImplClass *>(this)->_ScheduleWork(workFunct, arg);
 }
 
-inline void PlatformManager::RunEventLoop(void)
+inline void PlatformManager::RunEventLoop()
 {
     static_cast<ImplClass *>(this)->_RunEventLoop();
 }
 
-inline CHIP_ERROR PlatformManager::StartEventLoopTask(void)
+inline CHIP_ERROR PlatformManager::StartEventLoopTask()
 {
     return static_cast<ImplClass *>(this)->_StartEventLoopTask();
 }
 
-inline void PlatformManager::LockChipStack(void)
+inline void PlatformManager::LockChipStack()
 {
     static_cast<ImplClass *>(this)->_LockChipStack();
 }
 
-inline bool PlatformManager::TryLockChipStack(void)
+inline bool PlatformManager::TryLockChipStack()
 {
     return static_cast<ImplClass *>(this)->_TryLockChipStack();
 }
 
-inline void PlatformManager::UnlockChipStack(void)
+inline void PlatformManager::UnlockChipStack()
 {
     static_cast<ImplClass *>(this)->_UnlockChipStack();
 }
@@ -243,7 +244,7 @@ inline CHIP_ERROR PlatformManager::StartChipTimer(uint32_t durationMS)
     return static_cast<ImplClass *>(this)->_StartChipTimer(durationMS);
 }
 
-inline CHIP_ERROR PlatformManager::Shutdown(void)
+inline CHIP_ERROR PlatformManager::Shutdown()
 {
     return static_cast<ImplClass *>(this)->_Shutdown();
 }
@@ -251,5 +252,4 @@ inline CHIP_ERROR PlatformManager::Shutdown(void)
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 #endif // PLATFORM_MANAGER_H

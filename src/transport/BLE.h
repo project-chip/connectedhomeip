@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef __TRANSPORT_BLE_H__
-#define __TRANSPORT_BLE_H__
+#pragma once
 
 #include <ble/BleConfig.h>
 
@@ -33,9 +32,9 @@
 #include <ble/BleLayer.h>
 #include <core/CHIPCore.h>
 #include <support/DLLUtil.h>
-#include <transport/Base.h>
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
+#include <transport/raw/Base.h>
 
 namespace chip {
 namespace Transport {
@@ -69,7 +68,7 @@ public:
      */
     CHIP_ERROR Init(RendezvousSessionDelegate * delegate, const RendezvousParameters & params);
 
-    CHIP_ERROR SendMessage(const MessageHeader & header, const Transport::PeerAddress & address,
+    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override
@@ -81,7 +80,7 @@ public:
 
 private:
     CHIP_ERROR InitInternal(BLE_CONNECTION_OBJECT connObj);
-    CHIP_ERROR DelegateConnection(const uint16_t connDiscriminator);
+    CHIP_ERROR DelegateConnection(uint16_t connDiscriminator);
     void SetupEvents(Ble::BLEEndPoint * endPoint);
 
     /**
@@ -99,17 +98,15 @@ private:
     static void OnBleConnectionError(void * appState, BLE_ERROR err);
 
     // Those functions are BLEEndPoint callbacks
-    static void OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBuffer * buffer);
-    static void OnBleEndPointConnectionComplete(BLEEndPoint * endPoint, BLE_ERROR err);
-    static void OnBleEndPointConnectionClosed(BLEEndPoint * endPoint, BLE_ERROR err);
+    static void OnBleEndPointReceive(Ble::BLEEndPoint * endPoint, System::PacketBuffer * buffer);
+    static void OnBleEndPointConnectionComplete(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
+    static void OnBleEndPointConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
 
     Ble::BleLayer * mBleLayer             = nullptr;          ///< Associated ble layer
     State mState                          = State::kNotReady; ///< State of the BLE transport
-    BLEEndPoint * mBleEndPoint            = nullptr;          ///< BLE endpoint used by transport
+    Ble::BLEEndPoint * mBleEndPoint       = nullptr;          ///< BLE endpoint used by transport
     RendezvousSessionDelegate * mDelegate = nullptr;          ///< BLE events from transport
 };
 
 } // namespace Transport
 } // namespace chip
-
-#endif // __TRANSPORT_BLE_H__

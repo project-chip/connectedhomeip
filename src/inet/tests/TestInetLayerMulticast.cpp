@@ -98,8 +98,8 @@ static bool ParseGroupOpt(const char * aProgram, const char * aValue, bool aIPv6
 static bool ParseAndUpdateExpectedGroupPackets(const char * aProgram, const char * aValue, uint32_t aGroup,
                                                const char * aDescription, uint32_t & aOutExpected);
 
-static void StartTest(void);
-static void CleanupTest(void);
+static void StartTest();
+static void CleanupTest();
 
 /* Global Variables */
 
@@ -726,7 +726,7 @@ static void HandleUDPReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError
     SetStatusFailed(sTestState.mStatus);
 }
 
-static bool IsTransportReadyForSend(void)
+static bool IsTransportReadyForSend()
 {
     bool lStatus = false;
 
@@ -742,7 +742,7 @@ static bool IsTransportReadyForSend(void)
     return (lStatus);
 }
 
-static INET_ERROR PrepareTransportForSend(void)
+static INET_ERROR PrepareTransportForSend()
 {
     INET_ERROR lStatus = INET_NO_ERROR;
 
@@ -837,7 +837,7 @@ exit:
     return (lStatus);
 }
 
-void DriveSend(void)
+void DriveSend()
 {
     INET_ERROR lStatus = INET_NO_ERROR;
 
@@ -870,7 +870,7 @@ exit:
     return;
 }
 
-static void StartTest(void)
+static void StartTest()
 {
     IPAddressType lIPAddressType = kIPAddressType_IPv6;
     IPProtocol lIPProtocol       = kIPProtocol_ICMPv6;
@@ -990,7 +990,7 @@ static void StartTest(void)
         DriveSend();
 }
 
-static void CleanupTest(void)
+static void CleanupTest()
 {
     IPEndPointBasis * lEndPoint = nullptr;
     INET_ERROR lStatus;

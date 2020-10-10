@@ -18,8 +18,7 @@
 #ifndef CHIP_ZCL_ZPRO_CODEC_H
 #define CHIP_ZCL_ZPRO_CODEC_H
 
-#include <stdbool.h>
-#include <stdint.h>
+#include "chip-zcl-zpro-codec-api.h"
 
 typedef uint16_t EmberApsOption;
 
@@ -48,33 +47,6 @@ typedef struct
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-/** @brief Encode an on command for on-off server into buffer including the APS frame
- */
-uint16_t encodeOnCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
-
-/** @brief Encode an off command for on-off server into buffer including the APS frame
- */
-
-uint16_t encodeOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
-
-/** @brief Encode a toggle command for on-off server into buffer including the APS frame
- */
-
-uint16_t encodeToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
-
-/**
- * @brief Encode a Read Attributes command for the given cluster and the given
- * list of attributes.
- */
-uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t cluster_id,
-                                     uint16_t * attr_ids, uint16_t attr_id_count);
-
-/**
- * @brief Encode a command to read the OnOff attribute from the on/off
- * cluster.
- */
-uint16_t encodeReadOnOffCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /** @brief Extracts an aps frame from buffer into outApsFrame
  * @param buffer Buffer to read from
@@ -106,34 +78,14 @@ void printApsFrame(EmberApsFrame * frame);
  * @param[in] apsFrame The frame to encode.
  *
  * @return
- *   - If buffer is null, the number of bytes needed to encode.
+ *   - If buffer is null, the number of bytes needed to encode.  If this number
+ *     does not fit in a uint16_t, 0 will be returned.
  *   - If buffer is non-null but buf_length is not enough to hold the
  *     EmberApsFrame, 0.
  *   - If buffer is non-null and buf_length is large enough, the number of bytes
  *     placed in buffer.
  */
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame);
-
-/**
- * Identify cluster commands
- * */
-
-/**
- * @brief Encode an identify query command for the identify cluster
- * @param buffer Buffer to encode into
- * @param buf_length Length of buffer
- * @param destination_endpoint destination endpoint
- * */
-uint16_t encodeIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
-
-/**
- * @brief Encode an identify command for the identify cluster
- * @param buffer Buffer to encode into
- * @param buf_length Length of buffer
- * @param destination_endpoint destination endpoint
- * @param duration The duration for which the device will identify itself
- * */
-uint16_t encodeIdentifyCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t duration);
 
 #ifdef __cplusplus
 }

@@ -21,8 +21,7 @@
  *      This file defines compile time configuration of the Event Logging profile
  */
 
-#ifndef CHIPEVENTLOGGINGCONFIG_H
-#define CHIPEVENTLOGGINGCONFIG_H
+#pragma once
 
 /**
  * @def CHIP_CONFIG_EVENT_SIZE_RESERVE
@@ -90,5 +89,3 @@
 #ifndef CHIP_CONFIG_EVENT_LOGGING_EXTERNAL_EVENT_SUPPORT
 #define CHIP_CONFIG_EVENT_LOGGING_EXTERNAL_EVENT_SUPPORT 0
 #endif
-
-#endif /* CHIPEVENTLOGGINGCONFIG_H */

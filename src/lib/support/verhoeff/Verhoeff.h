@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef _VERHOEFF_TEST_H
-#define _VERHOEFF_TEST_H
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -64,8 +63,8 @@ public:
     static char ValToChar(int val);
 
 private:
-    Verhoeff10(void);  // not defined
-    ~Verhoeff10(void); // not defined
+    Verhoeff10()  = delete;
+    ~Verhoeff10() = delete;
 
     static uint8_t sMultiplyTable[];
     static uint8_t sPermTable[];
@@ -101,8 +100,8 @@ public:
     static char ValToChar(int val);
 
 private:
-    Verhoeff16(void);  // not defined
-    ~Verhoeff16(void); // not defined
+    Verhoeff16()  = delete;
+    ~Verhoeff16() = delete;
 
     static uint8_t sMultiplyTable[];
     static uint8_t sPermTable[];
@@ -140,8 +139,8 @@ public:
     static char ValToChar(int val);
 
 private:
-    Verhoeff32(void);  // not defined
-    ~Verhoeff32(void); // not defined
+    Verhoeff32()  = delete;
+    ~Verhoeff32() = delete;
 
     static uint8_t sMultiplyTable[];
     static uint8_t sPermTable[];
@@ -175,8 +174,8 @@ public:
     static char ValToChar(int val);
 
 private:
-    Verhoeff36(void);  // not defined
-    ~Verhoeff36(void); // not defined
+    Verhoeff36()  = delete;
+    ~Verhoeff36() = delete;
 
     static uint8_t sMultiplyTable[];
     static uint8_t sPermTable[];
@@ -193,5 +192,3 @@ public:
     static int DihedralInvert(int val, int n);
     static int Permute(int val, uint8_t * permTable, int permTableLen, int iterCount);
 };
-
-#endif // _VERHOEFF_TEST_H

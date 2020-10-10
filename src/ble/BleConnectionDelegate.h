@@ -51,7 +51,7 @@ public:
 
     // Call this function to delegate the connection steps required to get a BLE_CONNECTION_OBJECT
     // out of a peripheral discriminator.
-    virtual void NewConnection(BleLayer * bleLayer, void * appState, const uint16_t connDiscriminator) = 0;
+    virtual void NewConnection(BleLayer * bleLayer, void * appState, uint16_t connDiscriminator) = 0;
 };
 
 } /* namespace Ble */

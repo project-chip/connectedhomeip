@@ -37,9 +37,11 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "../../include/af.h"
-#include "../../util/common.h"
+#include "af-event.h"
+#include "af.h"
+#include "common.h"
 #include "door-lock-server.h"
+#include "time-util.h"
 
 EmberEventControl emberAfPluginDoorLockServerLockoutEventControl;
 EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
@@ -168,7 +170,7 @@ static uint8_t setUser(uint16_t userId, uint8_t userStatus, uint8_t userType, ui
         EmberAfPluginDoorLockServerUser * user = &userTable[userId];
         user->status                           = userStatus;
         user->type                             = userType;
-        MEMMOVE(user->code.rfid, code,
+        memmove(user->code.rfid, code,
                 emberAfStringLength(code) + 1); // + 1 for Zigbee string length byte
 
         emberAfDoorLockClusterPrintln("***RX SET %s ***", (userTable == pinUserTable ? "PIN" : "RFID"));
@@ -200,7 +202,7 @@ static uint8_t clearUserPinOrRfid(uint16_t userId, EmberAfPluginDoorLockServerUs
     {
         // Since the rfid member of the struct is a Zigbee string, setting the first
         // byte to 0 will indicate that we have a 0-length pin.
-        MEMSET((userTable == pinUserTable ? userTable[userId].code.pin : userTable[userId].code.rfid), 0x00,
+        memset((userTable == pinUserTable ? userTable[userId].code.pin : userTable[userId].code.rfid), 0x00,
                sizeof(userTable[userId].code));
         success = true;
     }
@@ -265,10 +267,10 @@ bool emberAfDoorLockClusterSetPinCallback(uint16_t userId, uint8_t userStatus, u
                                (uint8_t *) &rfProgrammingEventMask, sizeof(rfProgrammingEventMask));
     if ((rfProgrammingEventMask & BIT(2)) && !status && (pin != NULL))
     {
-        emberAfFillCommandDoorLockClusterProgrammingEventNotification(EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF,
-                                                                      EMBER_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_ADDED, userId,
-                                                                      pin, userType, userStatus, emberAfGetCurrentTime(), pin);
-        SEND_COMMAND_UNICAST_TO_BINDINGS();
+        emberAfFillCommandDoorLockClusterProgrammingEventNotification(
+            EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF, EMBER_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_ADDED, userId, pin, userType,
+            userStatus, 0 /*emberAfGetCurrentTime() #2507*/, pin);
+        // SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
 
     return true;
@@ -332,12 +334,12 @@ bool emberAfDoorLockClusterClearPinCallback(uint16_t userId)
     if ((rfProgrammingEventMask & BIT(2)) && !status)
     {
         emberAfFillCommandDoorLockClusterProgrammingEventNotification(0x01, 0x03, userId, &userPin, 0x00, 0x00, 0x00, &userPin);
-        SEND_COMMAND_UNICAST_TO_BINDINGS();
+        // SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
     else if ((rfProgrammingEventMask & BIT(0)) && status)
     {
         emberAfFillCommandDoorLockClusterProgrammingEventNotification(0x01, 0x00, userId, &userPin, 0x00, 0x00, 0x00, &userPin);
-        SEND_COMMAND_UNICAST_TO_BINDINGS();
+        // SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
 
     return true;
@@ -475,7 +477,7 @@ static bool verifyPin(uint8_t * pin, uint8_t * userId)
     {
         EmberAfPluginDoorLockServerUser * user = &pinUserTable[i];
         uint8_t userPinLength                  = emberAfStringLength(user->code.pin);
-        if (userPinLength == emberAfStringLength(pin) && 0 == MEMCOMPARE(&user->code.pin[1], &pin[1], userPinLength))
+        if (userPinLength == emberAfStringLength(pin) && 0 == memcmp(&user->code.pin[1], &pin[1], userPinLength))
         {
             *userId = i;
             return true;
@@ -530,7 +532,7 @@ bool emberAfDoorLockClusterLockDoorCallback(uint8_t * PIN)
             emberAfFillCommandDoorLockClusterOperationEventNotification(0x01, 0x03, userId, PIN, 0x00, PIN);
         }
     }
-    SEND_COMMAND_UNICAST_TO_BINDINGS();
+    // SEND_COMMAND_UNICAST_TO_BINDINGS();
 
     return true;
 }
@@ -567,8 +569,8 @@ bool emberAfDoorLockClusterUnlockDoorCallback(uint8_t * pin)
     {
         emberAfFillCommandDoorLockClusterOperationEventNotification(EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF,
                                                                     EMBER_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK, userId, pin,
-                                                                    emberAfGetCurrentTime(), pin);
-        SEND_COMMAND_UNICAST_TO_BINDINGS();
+                                                                    0 /*emberAfGetCurrentTime() #2507 */, pin);
+        // SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
 
     return true;
@@ -620,7 +622,7 @@ static EmberAfStatus applyCode(uint8_t * code, uint8_t codeLength, EmberAfPlugin
     for (uint8_t i = 0; i < userTableLength; i++)
     {
         uint8_t * userCode = (userTable == pinUserTable ? userTable[i].code.pin : userTable[i].code.rfid);
-        if (code == NULL || (emberAfStringLength(userCode) == codeLength && MEMCOMPARE(code, userCode + 1, codeLength) == 0))
+        if (code == NULL || (emberAfStringLength(userCode) == codeLength && memcmp(code, userCode + 1, codeLength) == 0))
         {
             EmberAfDoorLockState state = EMBER_ZCL_DOOR_LOCK_STATE_UNLOCKED;
             return emberAfWriteServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_LOCK_STATE_ATTRIBUTE_ID,
@@ -638,7 +640,8 @@ static EmberAfStatus applyCode(uint8_t * code, uint8_t codeLength, EmberAfPlugin
 
 void emberAfPluginDoorLockServerLockoutEventHandler(void)
 {
-    emberEventControlSetInactive(emberAfPluginDoorLockServerLockoutEventControl);
+    emberEventControlSetInactive(&emberAfPluginDoorLockServerLockoutEventControl);
+
     emberAfDoorLockClusterPrintln("Door lock entering normal mode");
 }
 
@@ -674,7 +677,7 @@ static void scheduleAutoRelock(uint32_t autoRelockTimeS)
 
     if (autoRelockTimeS == 0)
     {
-        emberEventControlSetInactive(emberAfPluginDoorLockServerRelockEventControl);
+        emberEventControlSetInactive(&emberAfPluginDoorLockServerRelockEventControl);
     }
     else
     {
@@ -685,7 +688,7 @@ static void scheduleAutoRelock(uint32_t autoRelockTimeS)
 
 void emberAfPluginDoorLockServerRelockEventHandler(void)
 {
-    emberEventControlSetInactive(emberAfPluginDoorLockServerRelockEventControl);
+    emberEventControlSetInactive(&emberAfPluginDoorLockServerRelockEventControl);
 
     EmberAfStatus status = applyCode(NULL, 0, pinUserTable, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_PIN_USER_TABLE_SIZE);
     emberAfDoorLockClusterPrintln("Door automatically relocked: 0x%X", status);

@@ -18,6 +18,21 @@ mainmenu "CHIP application"
 
 source "Kconfig.zephyr"
 
+config CHIP
+	bool "Enable CHIP"
+	default n
+	select CPLUSPLUS
+	imply LIB_CPLUSPLUS
+	imply REBOOT
+	select ENTROPY_GENERATOR
+	imply NET_UDP
+	imply NET_IPV6
+	imply NET_CONFIG_NEED_IPV6
+	imply NET_SOCKETS
+	imply MULTIPROTOCOL
+	help
+	  Use the CHIP protocol.
+
 config CHIP_LIB_SHELL
 	bool "Enable CHIP's shell library"
 	help

@@ -27,7 +27,9 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPTLV.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -172,7 +174,7 @@ void TLVReader::Init(const uint8_t * data, uint32_t dataLen)
  */
 void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen)
 {
-    mBufHandle = (uintptr_t) buf;
+    mBufHandle = reinterpret_cast<uintptr_t>(buf);
     mReadPoint = buf->Start();
     mBufEnd    = mReadPoint + buf->DataLength();
     mLenRead   = 0;
@@ -204,7 +206,7 @@ void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen)
  */
 void TLVReader::Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguousBuffers)
 {
-    mBufHandle = (uintptr_t) buf;
+    mBufHandle = reinterpret_cast<uintptr_t>(buf);
     mReadPoint = buf->Start();
     mBufEnd    = mReadPoint + buf->DataLength();
     mLenRead   = 0;
@@ -269,8 +271,8 @@ TLVType TLVReader::GetType() const
     if (elemType == kTLVElementType_FloatingPointNumber32 || elemType == kTLVElementType_FloatingPointNumber64)
         return kTLVType_FloatingPointNumber;
     if (elemType == kTLVElementType_NotSpecified || elemType >= kTLVElementType_Null)
-        return (TLVType) elemType;
-    return (TLVType)(elemType & ~kTLVTypeSizeMask);
+        return static_cast<TLVType>(elemType);
+    return static_cast<TLVType>(elemType & ~kTLVTypeSizeMask);
 }
 
 /**
@@ -327,7 +329,7 @@ uint64_t TLVReader::GetTag() const
 uint32_t TLVReader::GetLength() const
 {
     if (TLVTypeHasLength(ElementType()))
-        return (uint32_t) mElemLenOrVal;
+        return static_cast<uint32_t>(mElemLenOrVal);
     return 0;
 }
 
@@ -370,7 +372,7 @@ CHIP_ERROR TLVReader::Get(int8_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(static_cast<uint8_t>(v64));
     return err;
 }
 
@@ -391,7 +393,7 @@ CHIP_ERROR TLVReader::Get(int16_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(static_cast<uint16_t>(v64));
     return err;
 }
 
@@ -412,7 +414,7 @@ CHIP_ERROR TLVReader::Get(int32_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(static_cast<uint32_t>(v64));
     return err;
 }
 
@@ -433,7 +435,7 @@ CHIP_ERROR TLVReader::Get(int64_t & v)
 {
     uint64_t v64   = 0;
     CHIP_ERROR err = Get(v64);
-    v              = v64;
+    v              = CastToSigned(v64);
     return err;
 }
 
@@ -520,13 +522,13 @@ CHIP_ERROR TLVReader::Get(uint64_t & v)
     switch (ElementType())
     {
     case kTLVElementType_Int8:
-        v = (int64_t)(int8_t) mElemLenOrVal;
+        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint8_t>(mElemLenOrVal))));
         break;
     case kTLVElementType_Int16:
-        v = (int64_t)(int16_t) mElemLenOrVal;
+        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint16_t>(mElemLenOrVal))));
         break;
     case kTLVElementType_Int32:
-        v = (int64_t)(int32_t) mElemLenOrVal;
+        v = static_cast<uint64_t>(static_cast<int64_t>(CastToSigned(static_cast<uint32_t>(mElemLenOrVal))));
         break;
     case kTLVElementType_Int64:
     case kTLVElementType_UInt8:
@@ -561,7 +563,7 @@ CHIP_ERROR TLVReader::Get(double & v)
             uint32_t u32;
             float f;
         } cvt;
-        cvt.u32 = (uint32_t) mElemLenOrVal;
+        cvt.u32 = static_cast<uint32_t>(mElemLenOrVal);
         v       = cvt.f;
         break;
     }
@@ -611,7 +613,7 @@ CHIP_ERROR TLVReader::GetBytes(uint8_t * buf, uint32_t bufSize)
     if (mElemLenOrVal > bufSize)
         return CHIP_ERROR_BUFFER_TOO_SMALL;
 
-    CHIP_ERROR err = ReadData(buf, (uint32_t) mElemLenOrVal);
+    CHIP_ERROR err = ReadData(buf, static_cast<uint32_t>(mElemLenOrVal));
     if (err != CHIP_NO_ERROR)
         return err;
 
@@ -652,7 +654,7 @@ CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
 
     buf[mElemLenOrVal] = 0;
 
-    return GetBytes((uint8_t *) buf, bufSize - 1);
+    return GetBytes(reinterpret_cast<uint8_t *>(buf), bufSize - 1);
 }
 
 /**
@@ -660,7 +662,8 @@ CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
  *
  * This method creates a buffer for and returns a copy of the data associated with the byte
  * or UTF-8 string element at the current position. Memory for the buffer is obtained with
- * malloc() and should be freed with free() by the caller when it is no longer needed.
+ * Platform::MemoryAlloc() and should be freed with Platform::MemoryFree() by the caller when
+ * it is no longer needed.
  *
  * @note The data returned by this method is NOT null-terminated.
  *
@@ -674,8 +677,6 @@ CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
  *                                      the reader is not positioned on an element.
  * @retval #CHIP_ERROR_NO_MEMORY       If memory could not be allocated for the output buffer.
  * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
- *                                      If the target platform does not support malloc() and free().
  * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer
  *                                      is non-NULL.
@@ -683,18 +684,17 @@ CHIP_ERROR TLVReader::GetString(char * buf, uint32_t bufSize)
  */
 CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
 {
-#if HAVE_MALLOC && HAVE_FREE
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
-    buf = (uint8_t *) malloc(mElemLenOrVal);
+    buf = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(mElemLenOrVal));
     if (buf == nullptr)
         return CHIP_ERROR_NO_MEMORY;
 
-    CHIP_ERROR err = ReadData(buf, (uint32_t) mElemLenOrVal);
+    CHIP_ERROR err = ReadData(buf, static_cast<uint32_t>(mElemLenOrVal));
     if (err != CHIP_NO_ERROR)
     {
-        free(buf);
+        chip::Platform::MemoryFree(buf);
         return err;
     }
 
@@ -702,9 +702,6 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
     mElemLenOrVal = 0;
 
     return CHIP_NO_ERROR;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // HAVE_MALLOC && HAVE_FREE
 }
 
 /**
@@ -713,7 +710,8 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
  *
  * This method creates a buffer for and returns a null-terminated copy of the data associated with
  * the byte or UTF-8 string element at the current position. Memory for the buffer is obtained with
- * malloc() and should be freed with free() by the caller when it is no longer needed.
+ * Platform::MemoryAlloc() and should be freed with chip::Platform::MemoryFree() by the caller when
+ * it is no longer needed.
  *
  * @param[out] buf                      A reference to a pointer to which a heap-allocated buffer of
  *                                      will be assigned on success.
@@ -723,8 +721,6 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
  *                                      the reader is not positioned on an element.
  * @retval #CHIP_ERROR_NO_MEMORY       If memory could not be allocated for the output buffer.
  * @retval #CHIP_ERROR_TLV_UNDERRUN    If the underlying TLV encoding ended prematurely.
- * @retval #CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE
- *                                      If the target platform does not support malloc() and free().
  * @retval other                        Other CHIP or platform error codes returned by the configured
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer
  *                                      is non-NULL.
@@ -732,18 +728,17 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
  */
 CHIP_ERROR TLVReader::DupString(char *& buf)
 {
-#if HAVE_MALLOC && HAVE_FREE
     if (!TLVTypeIsString(ElementType()))
         return CHIP_ERROR_WRONG_TLV_TYPE;
 
-    buf = (char *) malloc(mElemLenOrVal + 1);
+    buf = static_cast<char *>(chip::Platform::MemoryAlloc(mElemLenOrVal + 1));
     if (buf == nullptr)
         return CHIP_ERROR_NO_MEMORY;
 
-    CHIP_ERROR err = ReadData((uint8_t *) buf, (uint32_t) mElemLenOrVal);
+    CHIP_ERROR err = ReadData(reinterpret_cast<uint8_t *>(buf), static_cast<uint32_t>(mElemLenOrVal));
     if (err != CHIP_NO_ERROR)
     {
-        free(buf);
+        chip::Platform::MemoryFree(buf);
         return err;
     }
 
@@ -751,9 +746,6 @@ CHIP_ERROR TLVReader::DupString(char *& buf)
     mElemLenOrVal      = 0;
 
     return err;
-#else
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // HAVE_MALLOC && HAVE_FREE
 }
 
 /**
@@ -793,7 +785,7 @@ CHIP_ERROR TLVReader::GetDataPtr(const uint8_t *& data)
 
     // Verify that the entirety of the data is available in the buffer.
     // Note that this may not be possible if the reader is reading from a chain of buffers.
-    if (remainingLen < (uint32_t) mElemLenOrVal)
+    if (remainingLen < static_cast<uint32_t>(mElemLenOrVal))
         return CHIP_ERROR_TLV_UNDERRUN;
 
     data = mReadPoint;
@@ -851,7 +843,7 @@ CHIP_ERROR TLVReader::OpenContainer(TLVReader & containerReader)
     containerReader.mLenRead   = mLenRead;
     containerReader.mMaxLen    = mMaxLen;
     containerReader.ClearElementState();
-    containerReader.mContainerType = (TLVType) elemType;
+    containerReader.mContainerType = static_cast<TLVType>(elemType);
     containerReader.SetContainerOpen(false);
     containerReader.ImplicitProfileId = ImplicitProfileId;
     containerReader.AppData           = AppData;
@@ -902,7 +894,7 @@ CHIP_ERROR TLVReader::CloseContainer(TLVReader & containerReader)
     if (!IsContainerOpen())
         return CHIP_ERROR_INCORRECT_STATE;
 
-    if ((TLVElementType) containerReader.mContainerType != ElementType())
+    if (static_cast<TLVElementType>(containerReader.mContainerType) != ElementType())
         return CHIP_ERROR_INCORRECT_STATE;
 
     err = containerReader.SkipToEndOfContainer();
@@ -951,7 +943,7 @@ CHIP_ERROR TLVReader::EnterContainer(TLVType & outerContainerType)
         return CHIP_ERROR_INCORRECT_STATE;
 
     outerContainerType = mContainerType;
-    mContainerType     = (TLVType) elemType;
+    mContainerType     = static_cast<TLVType>(elemType);
 
     ClearElementState();
     SetContainerOpen(false);
@@ -1206,7 +1198,7 @@ CHIP_ERROR TLVReader::Skip()
  * This method is used to position the reader before the first TLV,
  * between TLVs or after the last TLV.
  */
-void TLVReader::ClearElementState(void)
+void TLVReader::ClearElementState()
 {
     mElemTag      = AnonymousTag;
     mControlByte  = kTLVControlByte_NotSpecified;
@@ -1223,7 +1215,7 @@ void TLVReader::ClearElementState(void)
  *                                      GetNextBuffer() function. Only possible when GetNextBuffer is
  *                                      non-NULL.
  */
-CHIP_ERROR TLVReader::SkipData(void)
+CHIP_ERROR TLVReader::SkipData()
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     TLVElementType elemType = ElementType();
@@ -1266,7 +1258,7 @@ CHIP_ERROR TLVReader::SkipToEndOfContainer()
         else if (TLVTypeIsContainer(elemType))
         {
             nestLevel++;
-            mContainerType = (TLVType) elemType;
+            mContainerType = static_cast<TLVType>(elemType);
         }
 
         err = SkipData();
@@ -1300,7 +1292,7 @@ CHIP_ERROR TLVReader::ReadElement()
         return CHIP_ERROR_INVALID_TLV_ELEMENT;
 
     // Extract the tag control from the control byte.
-    TLVTagControl tagControl = (TLVTagControl)(mControlByte & kTLVTagControlMask);
+    TLVTagControl tagControl = static_cast<TLVTagControl>(mControlByte & kTLVTagControlMask);
 
     // Determine the number of bytes in the element's tag, if any.
     uint8_t tagBytes = sTagSizes[tagControl >> kTLVTagControlShift];
@@ -1406,7 +1398,7 @@ CHIP_ERROR TLVReader::VerifyElement()
     if (TLVTypeHasLength(ElementType()))
     {
         uint32_t overallLenRemaining = mMaxLen - mLenRead;
-        if (overallLenRemaining < (uint32_t) mElemLenOrVal)
+        if (overallLenRemaining < static_cast<uint32_t>(mElemLenOrVal))
             return CHIP_ERROR_TLV_UNDERRUN;
     }
 
@@ -1524,7 +1516,7 @@ CHIP_ERROR TLVReader::GetElementHeadLength(uint8_t & elemHeadBytes) const
     VerifyOrExit(IsValidTLVType(elemType), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
 
     // Extract the tag control from the control byte.
-    tagControl = (TLVTagControl)(mControlByte & kTLVTagControlMask);
+    tagControl = static_cast<TLVTagControl>(mControlByte & kTLVTagControlMask);
 
     // Determine the number of bytes in the element's tag, if any.
     tagBytes = sTagSizes[tagControl >> kTLVTagControlShift];
@@ -1550,14 +1542,14 @@ exit:
  */
 TLVElementType TLVReader::ElementType() const
 {
-    if (mControlByte == (uint16_t) kTLVControlByte_NotSpecified)
+    if (mControlByte == static_cast<uint16_t>(kTLVControlByte_NotSpecified))
         return kTLVElementType_NotSpecified;
-    return (TLVElementType)(mControlByte & kTLVTypeMask);
+    return static_cast<TLVElementType>(mControlByte & kTLVTypeMask);
 }
 
 CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen)
 {
-    PacketBuffer *& buf = (PacketBuffer *&) bufHandle;
+    PacketBuffer *& buf = reinterpret_cast<PacketBuffer *&>(bufHandle);
 
     if (buf != nullptr)
         buf = buf->Next();

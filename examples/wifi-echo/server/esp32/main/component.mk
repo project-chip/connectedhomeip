@@ -21,24 +21,25 @@
 
 COMPONENT_DEPENDS := chip QRCode tft spidriver
 
-COMPONENT_SRCDIRS :=                                                      \
-  .                                                                       \
-  gen                                                                     \
-  ../third_party/connectedhomeip/src/app/util                             \
-  ../third_party/connectedhomeip/src/app/clusters/on-off-server           \
-  ../third_party/connectedhomeip/src/app/clusters/level-control           \
-  ../third_party/connectedhomeip/src/app/clusters/identify               \
-  ../third_party/connectedhomeip/src/app/clusters/barrier-control-server \
-  ../third_party/connectedhomeip/src/app/clusters/scenes-client          \
-  ../third_party/connectedhomeip/src/app/clusters/groups-client           \
-  ../third_party/connectedhomeip/src/app/clusters/groups-server           \
-  ../third_party/connectedhomeip/src/app/clusters/color-control-server    \
-  ../third_party/connectedhomeip/src/app/clusters/scenes                 \
- ../third_party/connectedhomeip/src/app/clusters/basic                  \
-  ../third_party/connectedhomeip/src/app/reporting                       \
-#  ../third_party/connectedhomeip/src/app/clusters/door-lock-server       \
-#  ../third_party/connectedhomeip/src/app/clusters/ias-zone-client        \
-#  ../third_party/connectedhomeip/src/app/clusters/ias-zone-server        \
+COMPONENT_SRCDIRS :=                                                                \
+  .                                                                                 \
+  gen                                                                               \
+  ../third_party/connectedhomeip/src/app/util                                       \
+  ../third_party/connectedhomeip/src/app/clusters/on-off-server                     \
+  ../third_party/connectedhomeip/src/app/clusters/level-control                     \
+  ../third_party/connectedhomeip/src/app/clusters/identify                          \
+  ../third_party/connectedhomeip/src/app/clusters/barrier-control-server            \
+  ../third_party/connectedhomeip/src/app/clusters/scenes-client                     \
+  ../third_party/connectedhomeip/src/app/clusters/groups-client                     \
+  ../third_party/connectedhomeip/src/app/clusters/groups-server                     \
+  ../third_party/connectedhomeip/src/app/clusters/color-control-server              \
+  ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server    \
+  ../third_party/connectedhomeip/src/app/clusters/scenes                            \
+  ../third_party/connectedhomeip/src/app/clusters/basic                             \
+  ../third_party/connectedhomeip/src/app/reporting                                  \
+  ../third_party/connectedhomeip/src/app/clusters/door-lock-server                  \
+#  ../third_party/connectedhomeip/src/app/clusters/ias-zone-client                  \
+#  ../third_party/connectedhomeip/src/app/clusters/ias-zone-server                  \
 
 
 COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/util \

@@ -877,6 +877,12 @@ typedef struct
  */
 #define EMBER_UNKNOWN_NODE_ID 0xFFFD
 
+/**
+ * @brief A distinguished network ID that will never be assigned
+ * to any node. Used to indicate the absence of a node ID.
+ */
+#define EMBER_NULL_NODE_ID 0xFFFF
+
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 enum EmberStatus
 #else
@@ -1946,7 +1952,7 @@ typedef struct
  * ChipNodeId that's compatible.
  */
 #ifdef __cplusplus
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
 // Make it easier to have unified function declarations across C and C++ source
 // files.

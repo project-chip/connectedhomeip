@@ -44,15 +44,15 @@ class SoftwareUpdateManagerImpl final : public SoftwareUpdateManager,
 public:
     // ===== Members for internal use by the following friends.
 
-    friend ::chip::DeviceLayer::SoftwareUpdateManager & SoftwareUpdateMgr(void);
-    friend SoftwareUpdateManagerImpl & SoftwareUpdateMgrImpl(void);
+    friend ::chip::DeviceLayer::SoftwareUpdateManager & SoftwareUpdateMgr();
+    friend SoftwareUpdateManagerImpl & SoftwareUpdateMgrImpl();
 
     static SoftwareUpdateManagerImpl sInstance;
 
 private:
     // ===== Members that implement the SoftwareUpdateManager abstract interface.
 
-    CHIP_ERROR _Init(void);
+    CHIP_ERROR _Init();
 };
 
 /**
@@ -61,7 +61,7 @@ private:
  * Internal components should use this to access features of the SoftwareUpdateManager object
  * that are common to all platforms.
  */
-inline SoftwareUpdateManager & SoftwareUpdateMgr(void)
+inline SoftwareUpdateManager & SoftwareUpdateMgr()
 {
     return SoftwareUpdateManagerImpl::sInstance;
 }
@@ -72,7 +72,7 @@ inline SoftwareUpdateManager & SoftwareUpdateMgr(void)
  * Internal components can use this to gain access to features of the SoftwareUpdateManager
  * that are specific to the nRF5 platform.
  */
-inline SoftwareUpdateManagerImpl & SoftwareUpdateMgrImpl(void)
+inline SoftwareUpdateManagerImpl & SoftwareUpdateMgrImpl()
 {
     return SoftwareUpdateManagerImpl::sInstance;
 }

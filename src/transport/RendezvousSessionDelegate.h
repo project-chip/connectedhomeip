@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef __TRANSPORT_RENDEZVOUSSESSIONCALLBACK_H__
-#define __TRANSPORT_RENDEZVOUSSESSIONCALLBACK_H__
+#pragma once
 
 #include <core/CHIPCore.h>
 
@@ -27,12 +26,28 @@ class RendezvousSessionDelegate
 public:
     virtual ~RendezvousSessionDelegate() {}
 
-    virtual void OnRendezvousConnectionOpened()                             = 0;
-    virtual void OnRendezvousConnectionClosed()                             = 0;
-    virtual void OnRendezvousError(CHIP_ERROR err)                          = 0;
+    enum Status : uint8_t
+    {
+        SecurePairingSuccess = 0,
+        SecurePairingFailed,
+        NetworkProvisioningSuccess,
+        NetworkProvisioningFailed,
+    };
+
+    virtual void OnRendezvousConnectionOpened() {}
+    virtual void OnRendezvousConnectionClosed() {}
+    virtual void OnRendezvousError(CHIP_ERROR err) {}
+    virtual void OnRendezvousComplete() {}
     virtual void OnRendezvousMessageReceived(System::PacketBuffer * buffer) = 0;
+
+    virtual void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) {}
+};
+
+class DLL_EXPORT RendezvousDeviceCredentialsDelegate
+{
+public:
+    virtual void SendNetworkCredentials(const char * ssid, const char * passwd) = 0;
+    virtual void SendOperationalCredentials()                                   = 0;
 };
 
 } // namespace chip
-
-#endif // __TRANSPORT_RENDEZVOUSSESSIONCALLBACK_H__

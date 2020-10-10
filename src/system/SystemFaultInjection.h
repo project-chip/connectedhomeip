@@ -21,8 +21,7 @@
  *      Header file for the fault-injection utilities for CHIP System Layer.
  */
 
-#ifndef SYSTEMFAULTINJECTION_H
-#define SYSTEMFAULTINJECTION_H
+#pragma once
 
 #include <system/SystemConfig.h>
 
@@ -55,7 +54,7 @@ typedef enum
     kFault_NumberOfFaultIdentifiers,
 } Id;
 
-DLL_EXPORT nl::FaultInjection::Manager & GetManager(void);
+DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 
 /**
  * Callback to the application that returns how many asynchronous events the application could
@@ -63,7 +62,7 @@ DLL_EXPORT nl::FaultInjection::Manager & GetManager(void);
  *
  * @return The number of events
  */
-typedef int32_t (*GetNumEventsAvailableCb)(void);
+typedef int32_t (*GetNumEventsAvailableCb)();
 
 /**
  * Callback to the application to inject the asynchronous event specified by argument.
@@ -86,7 +85,7 @@ DLL_EXPORT void SetAsyncEventCallbacks(GetNumEventsAvailableCb aGetNumEventsAvai
 /**
  * @see CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT
  */
-DLL_EXPORT void InjectAsyncEvent(void);
+DLL_EXPORT void InjectAsyncEvent();
 
 } // namespace FaultInjection
 } // namespace System
@@ -127,5 +126,3 @@ DLL_EXPORT void InjectAsyncEvent(void);
 #define CHIP_SYSTEM_FAULT_INJECT_ASYNC_EVENT()
 
 #endif // CHIP_SYSTEM_CONFIG_TEST
-
-#endif // SYSTEMFAULTINJECTION_H

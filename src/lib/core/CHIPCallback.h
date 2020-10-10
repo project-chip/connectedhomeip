@@ -21,8 +21,7 @@
  *     Clusters and the Device
  */
 
-#ifndef CHIP_CALLBACK_H_
-#define CHIP_CALLBACK_H_
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -187,7 +186,7 @@ public:
     /**
      * @brief dequeue, but don't cancel, all cas that match the by()
      */
-    Cancelable DequeueBy(bool (*by)(void *, const Cancelable *), void * p)
+    Cancelable DequeueBy(bool (*by)(uint64_t, const Cancelable *), uint64_t p)
     {
         Cancelable dequeued;
 
@@ -247,10 +246,8 @@ public:
      * @brief Dequeue all, return in a stub. does not cancel the cas, as the list
      *   members are still in use
      */
-    Cancelable DequeueAll()
+    void DequeueAll(Cancelable & ready)
     {
-        Cancelable ready;
-
         if (mNext != this)
         {
             ready.mNext        = mNext;
@@ -260,7 +257,6 @@ public:
 
             mNext = mPrev = this;
         }
-        return ready;
     }
 
     /**
@@ -296,5 +292,3 @@ private:
 
 } // namespace Callback
 } // namespace chip
-
-#endif /* CHIP_CALLBACK_H_ */

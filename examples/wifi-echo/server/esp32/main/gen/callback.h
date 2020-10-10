@@ -3303,6 +3303,17 @@ void emberAfOnOffClusterServerTickCallback(uint8_t endpoint);
  *
  */
 bool emberAfOnOffClusterToggleCallback(void);
+
+/** @brief Activate Door Lock Callback
+ * This function is provided by the door lock server plugin.
+ *
+ * @param activate True if the lock should move to the locked position,
+ *  false if it should move to the unlocked position Ver.: always
+ *
+ * @returns true if the callback was able to activate/deactivate the Lock.
+ */
+bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate);
+
 /** @brief On/off Cluster Set Value
  *
  * This function is called when the on/off value needs to be set, either through

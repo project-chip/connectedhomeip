@@ -34,8 +34,7 @@
  *      C-language programs.
  */
 
-#ifndef SYSTEMCONFIG_H
-#define SYSTEMCONFIG_H
+#pragma once
 
 /* Platform include headers */
 #if CHIP_SEPARATE_CONFIG_H
@@ -163,7 +162,7 @@
  *  @def CHIP_SYSTEM_CONFIG_NO_LOCKING
  *
  *  @brief
- *      Disable the use of locking within the system layer..
+ *      Disable the use of locking within the system layer.
  *
  *      Unless you are simulating an LwIP-based system on a Unix-style host, this value should be left at its default.
  */
@@ -671,5 +670,3 @@ struct LwIPEvent;
 #define CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS 1
 #endif
 #endif // CHIP_SYSTEM_CONFIG_USE_BSD_IFADDRS
-
-#endif // defined(SYSTEMCONFIG_H)

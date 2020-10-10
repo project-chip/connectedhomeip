@@ -685,11 +685,7 @@ CHIP_ERROR BLEManagerImpl::EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData
 
     // Initialize the CHIP BLE Device Identification Information block that will be sent as payload
     // within the BLE service advertisement data.
-    // TODO: retrive device configuration from the ConfigurationMgr()
-    // err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
-    deviceIdInfo.Init();
-    deviceIdInfo.SetVendorId(0xDEAD);
-    deviceIdInfo.SetProductId(0xBEEF);
+    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
     SuccessOrExit(err);
 
     // Form the contents of the scan response packet.

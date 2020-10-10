@@ -228,7 +228,7 @@ CHIP_ERROR PosixConfig::WriteConfigValue(Key key, bool val)
     storage = GetStorageForNamespace(key);
     VerifyOrExit(storage != nullptr, err = CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND);
 
-    err = storage->WriteValue(key.Name, val ? true : false);
+    err = storage->WriteValue(key.Name, val);
     SuccessOrExit(err);
 
     // Commit the value to the persistent store.
@@ -315,6 +315,7 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
+#if CHIP_CONFIG_MEMORY_MGMT_MALLOC
     CHIP_ERROR err;
     char * strCopy = nullptr;
 
@@ -332,6 +333,9 @@ exit:
         free(strCopy);
     }
     return err;
+#else
+#error "Unsupported CHIP_CONFIG_MEMORY_MGMT configuration"
+#endif
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)
@@ -459,7 +463,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PosixConfig::FactoryResetConfig(void)
+CHIP_ERROR PosixConfig::FactoryResetConfig()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLinuxStorage * storage;

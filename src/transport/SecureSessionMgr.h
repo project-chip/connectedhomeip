@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef __SECURESESSIONMGR_H__
-#define __SECURESESSIONMGR_H__
+#pragma once
 
 #include <utility>
 
@@ -34,15 +33,13 @@
 #include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
-#include <transport/Base.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecurePairingSession.h>
 #include <transport/SecureSession.h>
-#include <transport/Tuple.h>
+#include <transport/raw/Base.h>
+#include <transport/raw/Tuple.h>
 
 namespace chip {
-
-using namespace System;
 
 class SecureSessionMgrBase;
 
@@ -61,12 +58,12 @@ public:
      *   Called when a new message is received. The function must internally release the
      *   msgBuf after processing it.
      *
-     * @param header  messageheader
-     * @param state   connection state
-     * @param msgBuf  received message
-     * @param mgr     A pointer to the SecureSessionMgr
+     * @param packetHeader  The message header
+     * @param state         The connection state
+     * @param msgBuf        The received message
+     * @param mgr           A pointer to the SecureSessionMgr
      */
-    virtual void OnMessageReceived(const MessageHeader & header, Transport::PeerConnectionState * state,
+    virtual void OnMessageReceived(const PacketHeader & packetHeader, Transport::PeerConnectionState * state,
                                    System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
     {}
 
@@ -165,23 +162,13 @@ private:
     SecureSessionMgrCallback * mCB = nullptr;
 
     /** Schedules a new oneshot timer for checking connection expiry. */
-    void ScheduleExpiryTimer(void);
+    void ScheduleExpiryTimer();
 
     /** Cancels any active timers for connection expiry checks. */
-    void CancelExpiryTimer(void);
+    void CancelExpiryTimer();
 
-    /**
-     * Allocates a new connection for the given source.
-     *
-     * @param header The header that was received when the connection was established
-     * @param address Where the connection originated from
-     * @param state [out] the newly allocated connection state for the connection
-     */
-    CHIP_ERROR AllocateNewConnection(const MessageHeader & header, const Transport::PeerAddress & address,
-                                     Transport::PeerConnectionState ** state);
-
-    static void HandleDataReceived(MessageHeader & header, const Transport::PeerAddress & source, System::PacketBuffer * msgBuf,
-                                   SecureSessionMgrBase * transport);
+    static void HandleDataReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                                   System::PacketBuffer * msgBuf, SecureSessionMgrBase * transport);
 
     /**
      * Called when a specific connection expires.
@@ -229,5 +216,3 @@ private:
 };
 
 } // namespace chip
-
-#endif // __SECURESESSIONMGR_H__

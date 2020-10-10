@@ -677,20 +677,23 @@ exit:
 void BLEManagerImpl::UpdateMtu(volatile struct gecko_cmd_packet * evt)
 {
     CHIPoBLEConState * bleConnState = GetConnectionState(evt->data.evt_gatt_mtu_exchanged.connection);
-    // bleConnState->MTU is a 10-bit field inside a uint16_t.  We're
-    // assigning to it from a uint16_t, and compilers warn about
-    // possibly not fitting.  There's no way to suppress that warning
-    // via explicit cast; we have to disable the warning around the
-    // assignment.
-    //
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/2569
-    // tracks making this safe with a check or explaining why no check
-    // is needed.
+    if (bleConnState != NULL)
+    {
+        // bleConnState->MTU is a 10-bit field inside a uint16_t.  We're
+        // assigning to it from a uint16_t, and compilers warn about
+        // possibly not fitting.  There's no way to suppress that warning
+        // via explicit cast; we have to disable the warning around the
+        // assignment.
+        //
+        // TODO: https://github.com/project-chip/connectedhomeip/issues/2569
+        // tracks making this safe with a check or explaining why no check
+        // is needed.
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-    bleConnState->mtu = evt->data.evt_gatt_mtu_exchanged.mtu;
+        bleConnState->mtu = evt->data.evt_gatt_mtu_exchanged.mtu;
 #pragma GCC diagnostic pop
-    ;
+        ;
+    }
 }
 
 void BLEManagerImpl::HandleBootEvent(void)

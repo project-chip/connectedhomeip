@@ -225,11 +225,13 @@ int main(void)
     // Activate deep sleep mode
     SCB->SCR |= SCB_SCR_SLEEPDEEP_Msk;
 
+#if CHIP_CONFIG_MEMORY_MGMT_MALLOC && __GNU_LIBRARY__
     {
         struct mallinfo minfo = mallinfo();
         NRF_LOG_INFO("System Heap Utilization: heap size %" PRId32 ", arena size %" PRId32 ", in use %" PRId32 ", free %" PRId32,
                      GetHeapTotalSize(), minfo.arena, minfo.uordblks, minfo.fordblks);
     }
+#endif // CHIP_CONFIG_MEMORY_MGMT_MALLOC && __GNU_LIBRARY__
 
     NRF_LOG_INFO("Starting FreeRTOS scheduler");
 

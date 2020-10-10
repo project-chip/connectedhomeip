@@ -202,7 +202,7 @@ static const nlTest sTests[] = {
     NL_TEST_SENTINEL()
 };
 
-int TestPlatformTime(void)
+int TestPlatformTime()
 {
     nlTestSuite theSuite = { "CHIP DeviceLayer tests", &sTests[0], nullptr, nullptr };
 

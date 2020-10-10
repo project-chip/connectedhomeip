@@ -25,8 +25,7 @@
  *      more compact over the wire.
  */
 
-#ifndef CHIP_TLV_H_
-#define CHIP_TLV_H_
+#pragma once
 
 #include <core/CHIPError.h>
 #include <core/CHIPTLVTags.h>
@@ -104,13 +103,13 @@ public:
     void Init(PacketBuffer * buf, uint32_t maxLen = 0xFFFFFFFFUL);
     void Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguousBuffers);
 
-    CHIP_ERROR Next(void);
+    CHIP_ERROR Next();
     CHIP_ERROR Next(TLVType expectedType, uint64_t expectedTag);
 
-    TLVType GetType(void) const;
-    uint64_t GetTag(void) const;
-    uint32_t GetLength(void) const;
-    uint16_t GetControlByte(void) const;
+    TLVType GetType() const;
+    uint64_t GetTag() const;
+    uint32_t GetLength() const;
+    uint16_t GetControlByte() const;
 
     CHIP_ERROR Get(bool & v);
     CHIP_ERROR Get(int8_t & v);
@@ -133,16 +132,16 @@ public:
     CHIP_ERROR ExitContainer(TLVType outerContainerType);
     CHIP_ERROR OpenContainer(TLVReader & containerReader);
     CHIP_ERROR CloseContainer(TLVReader & containerReader);
-    TLVType GetContainerType(void) const;
-    CHIP_ERROR VerifyEndOfContainer(void);
+    TLVType GetContainerType() const;
+    CHIP_ERROR VerifyEndOfContainer();
 
-    uint32_t GetLengthRead(void) const { return mLenRead; }
-    uint32_t GetRemainingLength(void) const { return mMaxLen - mLenRead; }
+    uint32_t GetLengthRead() const { return mLenRead; }
+    uint32_t GetRemainingLength() const { return mMaxLen - mLenRead; }
 
-    const uint8_t * GetReadPoint(void) const { return mReadPoint; }
-    uintptr_t GetBufHandle(void) const { return mBufHandle; }
+    const uint8_t * GetReadPoint() const { return mReadPoint; }
+    uintptr_t GetBufHandle() const { return mBufHandle; }
 
-    CHIP_ERROR Skip(void);
+    CHIP_ERROR Skip();
 
     uint32_t ImplicitProfileId;
     void * AppData;
@@ -166,19 +165,19 @@ private:
     bool mContainerOpen;
 
 protected:
-    bool IsContainerOpen(void) const { return mContainerOpen; }
+    bool IsContainerOpen() const { return mContainerOpen; }
     void SetContainerOpen(bool aContainerOpen) { mContainerOpen = aContainerOpen; }
 
-    CHIP_ERROR ReadElement(void);
-    void ClearElementState(void);
-    CHIP_ERROR SkipData(void);
-    CHIP_ERROR SkipToEndOfContainer(void);
-    CHIP_ERROR VerifyElement(void);
+    CHIP_ERROR ReadElement();
+    void ClearElementState();
+    CHIP_ERROR SkipData();
+    CHIP_ERROR SkipToEndOfContainer();
+    CHIP_ERROR VerifyElement();
     uint64_t ReadTag(TLVTagControl tagControl, const uint8_t *& p);
     CHIP_ERROR EnsureData(CHIP_ERROR noDataErr);
     CHIP_ERROR ReadData(uint8_t * buf, uint32_t len);
     CHIP_ERROR GetElementHeadLength(uint8_t & elemHeadBytes) const;
-    TLVElementType ElementType(void) const;
+    TLVElementType ElementType() const;
 
     static CHIP_ERROR GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen);
     static CHIP_ERROR FailGetNextBuffer(TLVReader & reader, uintptr_t & bufHandle, const uint8_t *& bufStart, uint32_t & bufLen);
@@ -210,7 +209,7 @@ public:
     void Init(PacketBuffer * buf, uint32_t maxLen = 0xFFFFFFFFUL);
     void Init(PacketBuffer * buf, uint32_t maxLen, bool allowDiscontiguousBuffers);
 
-    CHIP_ERROR Finalize(void);
+    CHIP_ERROR Finalize();
 
     CHIP_ERROR Put(uint64_t tag, int8_t v);
     CHIP_ERROR Put(uint64_t tag, int8_t v, bool preserveSize);
@@ -248,9 +247,9 @@ public:
     CHIP_ERROR CopyContainer(TLVReader & container);
     CHIP_ERROR CopyContainer(uint64_t tag, TLVReader & container);
     CHIP_ERROR CopyContainer(uint64_t tag, const uint8_t * encodedContainer, uint16_t encodedContainerLen);
-    TLVType GetContainerType(void) const;
+    TLVType GetContainerType() const;
 
-    uint32_t GetLengthWritten(void);
+    uint32_t GetLengthWritten();
 
     uint32_t ImplicitProfileId;
     void * AppData;
@@ -280,7 +279,7 @@ private:
     bool mCloseContainerReserved;
 
 protected:
-    bool IsContainerOpen(void) const { return mContainerOpen; }
+    bool IsContainerOpen() const { return mContainerOpen; }
     void SetContainerOpen(bool aContainerOpen) { mContainerOpen = aContainerOpen; }
 
     enum
@@ -294,7 +293,7 @@ protected:
      *   CloseContainer symbol at the point of starting / opening the
      *   container.
      */
-    bool IsCloseContainerReserved(void) const { return mCloseContainerReserved; }
+    bool IsCloseContainerReserved() const { return mCloseContainerReserved; }
 
     /**
      * @brief
@@ -351,19 +350,19 @@ class DLL_EXPORT TLVUpdater
 public:
     CHIP_ERROR Init(uint8_t * buf, uint32_t dataLen, uint32_t maxLen);
     CHIP_ERROR Init(TLVReader & aReader, uint32_t freeLen);
-    CHIP_ERROR Finalize(void) { return mUpdaterWriter.Finalize(); }
+    CHIP_ERROR Finalize() { return mUpdaterWriter.Finalize(); }
 
     // Common methods
     void SetImplicitProfileId(uint32_t profileId);
-    uint32_t GetImplicitProfileId(void) { return mUpdaterReader.ImplicitProfileId; }
-    CHIP_ERROR Move(void);
-    void MoveUntilEnd(void);
+    uint32_t GetImplicitProfileId() { return mUpdaterReader.ImplicitProfileId; }
+    CHIP_ERROR Move();
+    void MoveUntilEnd();
     CHIP_ERROR EnterContainer(TLVType & outerContainerType);
     CHIP_ERROR ExitContainer(TLVType outerContainerType);
     void GetReader(TLVReader & containerReader) { containerReader = mUpdaterReader; }
 
     // Reader methods
-    CHIP_ERROR Next(void);
+    CHIP_ERROR Next();
 
     CHIP_ERROR Get(bool & v) { return mUpdaterReader.Get(v); }
     CHIP_ERROR Get(int8_t & v) { return mUpdaterReader.Get(v); }
@@ -381,14 +380,14 @@ public:
     CHIP_ERROR GetString(char * buf, uint32_t bufSize) { return mUpdaterReader.GetString(buf, bufSize); }
     CHIP_ERROR DupString(char *& buf) { return mUpdaterReader.DupString(buf); }
 
-    TLVType GetType(void) const { return mUpdaterReader.GetType(); }
-    uint64_t GetTag(void) const { return mUpdaterReader.GetTag(); }
-    uint32_t GetLength(void) const { return mUpdaterReader.GetLength(); }
+    TLVType GetType() const { return mUpdaterReader.GetType(); }
+    uint64_t GetTag() const { return mUpdaterReader.GetTag(); }
+    uint32_t GetLength() const { return mUpdaterReader.GetLength(); }
     CHIP_ERROR GetDataPtr(const uint8_t *& data) { return mUpdaterReader.GetDataPtr(data); }
-    CHIP_ERROR VerifyEndOfContainer(void) { return mUpdaterReader.VerifyEndOfContainer(); }
-    TLVType GetContainerType(void) const { return mUpdaterReader.GetContainerType(); }
-    uint32_t GetLengthRead(void) const { return mUpdaterReader.GetLengthRead(); }
-    uint32_t GetRemainingLength(void) const { return mUpdaterReader.GetRemainingLength(); }
+    CHIP_ERROR VerifyEndOfContainer() { return mUpdaterReader.VerifyEndOfContainer(); }
+    TLVType GetContainerType() const { return mUpdaterReader.GetContainerType(); }
+    uint32_t GetLengthRead() const { return mUpdaterReader.GetLengthRead(); }
+    uint32_t GetRemainingLength() const { return mUpdaterReader.GetRemainingLength(); }
 
     // Writer methods
     CHIP_ERROR Put(uint64_t tag, int8_t v) { return mUpdaterWriter.Put(tag, v); }
@@ -421,13 +420,12 @@ public:
         return mUpdaterWriter.StartContainer(tag, containerType, outerContainerType);
     }
     CHIP_ERROR EndContainer(TLVType outerContainerType) { return mUpdaterWriter.EndContainer(outerContainerType); }
-    uint32_t GetLengthWritten(void) { return mUpdaterWriter.GetLengthWritten(); }
-    uint32_t GetRemainingFreeLength(void) { return mUpdaterWriter.mRemainingLen; }
+    uint32_t GetLengthWritten() { return mUpdaterWriter.GetLengthWritten(); }
+    uint32_t GetRemainingFreeLength() { return mUpdaterWriter.mRemainingLen; }
 
 private:
-    void AdjustInternalWriterFreeSpace(void);
+    void AdjustInternalWriterFreeSpace();
 
-private:
     TLVWriter mUpdaterWriter;
     TLVReader mUpdaterReader;
     const uint8_t * mElementStartAddr;
@@ -435,5 +433,3 @@ private:
 
 } // namespace TLV
 } // namespace chip
-
-#endif /* CHIP_TLV_H_ */

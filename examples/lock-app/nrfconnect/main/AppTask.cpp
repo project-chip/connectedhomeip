@@ -20,7 +20,10 @@
 #include "AppConfig.h"
 #include "BoltLockManager.h"
 #include "LEDWidget.h"
+#include "QRCodeUtil.h"
 #include "Server.h"
+#include "Service.h"
+#include "ThreadUtil.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -38,6 +41,8 @@
 
 LOG_MODULE_DECLARE(app);
 K_MSGQ_DEFINE(sAppEventQueue, sizeof(AppEvent), APP_EVENT_QUEUE_SIZE, alignof(AppEvent));
+
+constexpr uint32_t kPublishServicePeriodUs = 5000000;
 
 static LEDWidget sStatusLED;
 static LEDWidget sLockLED;
@@ -86,68 +91,15 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
-    PrintQRCode();
+    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
 
     return 0;
 }
 
-void AppTask::PrintQRCode() const
-{
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    uint32_t setUpPINCode       = 0;
-    uint16_t setUpDiscriminator = 0;
-    uint16_t vendorId           = 0;
-    uint16_t productId          = 0;
-
-    err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_INF("ConfigurationMgr().GetSetupPinCode() failed: %s", log_strdup(chip::ErrorStr(err)));
-    }
-
-    err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_INF("ConfigurationMgr().GetSetupDiscriminator() failed: %s", log_strdup(chip::ErrorStr(err)));
-    }
-
-    err = ConfigurationMgr().GetVendorId(vendorId);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_INF("ConfigurationMgr().GetVendorId() failed: %s", log_strdup(chip::ErrorStr(err)));
-    }
-
-    err = ConfigurationMgr().GetProductId(productId);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_INF("ConfigurationMgr().GetProductId() failed: %s", log_strdup(chip::ErrorStr(err)));
-    }
-
-    chip::SetupPayload payload;
-    payload.version       = 1;
-    payload.vendorID      = vendorId;
-    payload.productID     = productId;
-    payload.setUpPINCode  = setUpPINCode;
-    payload.discriminator = setUpDiscriminator;
-    chip::QRCodeSetupPayloadGenerator generator(payload);
-
-    // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
-    // generating payload
-    std::string result;
-    err = generator.payloadBase41Representation(result);
-    if (err != CHIP_NO_ERROR)
-    {
-        LOG_ERR("Failed to generate QR Code");
-    }
-
-    LOG_INF("SetupPINCode: [%" PRIu32 "]", setUpPINCode);
-    // There might be whitespace in setup QRCode, add brackets to make it clearer.
-    LOG_INF("SetupQRCode:  [%s]", log_strdup(result.c_str()));
-}
-
 int AppTask::StartApp()
 {
-    int ret = Init();
+    int ret                            = Init();
+    uint64_t mLastPublishServiceTimeUS = 0;
 
     if (ret)
     {
@@ -223,6 +175,15 @@ int AppTask::StartApp()
         sLockLED.Animate();
         sUnusedLED.Animate();
         sUnusedLED_1.Animate();
+
+        uint64_t nowUS            = chip::System::Platform::Layer::GetClock_Monotonic();
+        uint64_t nextChangeTimeUS = mLastPublishServiceTimeUS + kPublishServicePeriodUs;
+
+        if (nowUS > nextChangeTimeUS)
+        {
+            PublishService();
+            mLastPublishServiceTimeUS = nowUS;
+        }
     }
 }
 
@@ -266,11 +227,11 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
         sAppTask.PostEvent(&button_event);
     }
 
-    if (JOINER_BUTTON_MASK & button_state & has_changed)
+    if (THREAD_START_BUTTON_MASK & button_state & has_changed)
     {
-        button_event.ButtonEvent.PinNo  = JOINER_BUTTON;
+        button_event.ButtonEvent.PinNo  = THREAD_START_BUTTON;
         button_event.ButtonEvent.Action = BUTTON_PUSH_EVENT;
-        button_event.Handler            = JoinerHandler;
+        button_event.Handler            = StartThreadHandler;
         sAppTask.PostEvent(&button_event);
     }
 }
@@ -363,18 +324,22 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     }
 }
 
-void AppTask::JoinerHandler(AppEvent * aEvent)
+void AppTask::StartThreadHandler(AppEvent * aEvent)
 {
-    if (aEvent->ButtonEvent.PinNo != JOINER_BUTTON)
+    if (aEvent->ButtonEvent.PinNo != THREAD_START_BUTTON)
         return;
 
-    CHIP_ERROR error = CHIP_ERROR_NOT_IMPLEMENTED;
-
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    error = ThreadStackMgr().JoinerStart();
+    if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+    {
+        StartDefaultThreadNetwork();
+        LOG_INF("Device is not commissioned to a Thread network. Starting with the default configuration.");
+    }
+    else
+    {
+        LOG_INF("Device is commissioned to a Thread network.");
+    }
 #endif
-
-    LOG_INF("Thread joiner triggering result: %s", log_strdup(chip::ErrorStr(error)));
 }
 
 void AppTask::CancelTimer()
@@ -434,7 +399,7 @@ void AppTask::PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aA
 
 void AppTask::PostEvent(AppEvent * aEvent)
 {
-    if (k_msgq_put(&sAppEventQueue, aEvent, K_TICKS(1)))
+    if (k_msgq_put(&sAppEventQueue, aEvent, K_NO_WAIT))
     {
         LOG_INF("Failed to post event to app task event queue");
     }

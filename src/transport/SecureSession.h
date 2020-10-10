@@ -23,19 +23,18 @@
  *
  */
 
-#ifndef __SECURESESSION_H__
-#define __SECURESESSION_H__
+#pragma once
 
 #include <core/CHIPCore.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <transport/MessageHeader.h>
+#include <transport/raw/MessageHeader.h>
 
 namespace chip {
 
 class DLL_EXPORT SecureSession
 {
 public:
-    SecureSession(void);
+    SecureSession();
     SecureSession(SecureSession &&)      = default;
     SecureSession(const SecureSession &) = default;
     SecureSession & operator=(const SecureSession &) = default;
@@ -55,7 +54,7 @@ public:
      * @return CHIP_ERROR        The result of key derivation
      */
     CHIP_ERROR Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
-                    const uint8_t * salt, const size_t salt_length, const uint8_t * info, const size_t info_length);
+                    const uint8_t * salt, size_t salt_length, const uint8_t * info, size_t info_length);
 
     /**
      * @brief
@@ -70,8 +69,8 @@ public:
      * @param info_length        Length of the initial info
      * @return CHIP_ERROR        The result of key derivation
      */
-    CHIP_ERROR InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt, const size_t salt_length,
-                              const uint8_t * info, const size_t info_length);
+    CHIP_ERROR InitFromSecret(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length,
+                              const uint8_t * info, size_t info_length);
 
     /**
      * @brief
@@ -80,10 +79,14 @@ public:
      * @param input Unencrypted input data
      * @param input_length Length of the input data
      * @param output Output buffer for encrypted data
-     * @param header message header structure
+     * @param header message header structure. Encryption type will be set on the header.
+     * @param payloadFlags extra flags for packet header encryption
+     * @param mac - output the resulting mac
+     *
      * @return CHIP_ERROR The result of encryption
      */
-    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, MessageHeader & header);
+    CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
+                       Header::Flags payloadFlags, MessageAuthenticationCode & mac);
 
     /**
      * @brief
@@ -93,9 +96,12 @@ public:
      * @param input_length Length of the input data
      * @param output Output buffer for decrypted data
      * @param header message header structure
+     * @param payloadFlags extra flags for packet header decryption
      * @return CHIP_ERROR The result of decryption
+     * @param mac Input mac
      */
-    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const MessageHeader & header);
+    CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
+                       Header::Flags payloadFlags, const MessageAuthenticationCode & mac);
 
     /**
      * @brief
@@ -104,12 +110,12 @@ public:
      *
      * @return number of bytes.
      */
-    size_t EncryptionOverhead(void);
+    size_t EncryptionOverhead();
 
     /**
      * Clears the internal state of secure session back to the state of a new object.
      */
-    void Reset(void);
+    void Reset();
 
 private:
     static constexpr size_t kAES_CCM128_Key_Length = 16;
@@ -117,14 +123,13 @@ private:
     bool mKeyAvailable;
     uint8_t mKey[kAES_CCM128_Key_Length];
 
-    static CHIP_ERROR GetIV(const MessageHeader & header, uint8_t * iv, size_t len);
+    static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);
 
     // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.
     // The encryption operations includes AAD when message authentication tag is generated. This tag
     // is used at the time of decryption to integrity check the received data.
-    static CHIP_ERROR GetAdditionalAuthData(const MessageHeader & header, uint8_t * aad, size_t & len);
+    static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, Header::Flags payloadEncodeFlags, uint8_t * aad,
+                                            size_t & len);
 };
 
 } // namespace chip
-
-#endif // __SECURESESSION_H__

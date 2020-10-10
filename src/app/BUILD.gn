@@ -39,6 +39,8 @@ static_library("app") {
     "${nlio_root}:nlio",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_configs = [
     ":app_config",
     "${chip_root}/src:includes",
