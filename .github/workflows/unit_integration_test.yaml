@@ -49,7 +49,7 @@ jobs:
               run: |
                   mkdir -p /tmp/happy_test_logs ;
                   mkdir -p /tmp/log_output ;
-                  HAPPY_LOG_DIR=/tmp/happy_test_logs scripts/tests/happy_tests.sh bootstrap ;
+                  HAPPY_LOG_DIR=/tmp/happy_test_logs HAPPY_STATE_FILE_PREFIX=/run/ scripts/tests/happy_tests.sh bootstrap ;
                   scripts/build/gn_bootstrap.sh ;
             - name: Artifact suffix
               id: outsuffix
