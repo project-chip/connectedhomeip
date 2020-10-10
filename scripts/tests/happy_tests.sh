@@ -59,6 +59,18 @@ function happytest_run() {
     "$REPO_DIR/scripts/tests/happy_test_wrapper.py" --test-bin-dir "$REPO_DIR/out/$BUILD_TYPE/tests" "$1"
 }
 
+function happytest_ninjarun() {
+    # This function is used for run happy tests under GN / Ninja
+    if [ "$(whoami)" != "root" ]; then
+        echo "ninjarun should be invoked under root / user namespace"
+        echo 'Try `unshare --map-root-user -n -m scripts/tests/happy_tests.sh ninjarun`'
+        return 1
+    fi
+    mount --make-private /
+    mount -t tmpfs tmpfs /run
+    ninja -v -C "$REPO_DIR/out/$BUILD_TYPE" -k 0 happy_tests
+}
+
 subcommand="$1"
 shift
 
