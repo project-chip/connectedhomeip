@@ -45,5 +45,7 @@ if __name__ == '__main__':
         test_environ["PATH"] = ":".join([s for s in test_environ.get(
             "PATH", "").split(":") if not os.path.realpath(s).startswith(os.path.realpath(os.path.join(CHIP_PATH, "third_party/pigweed/repo")))])
         test_environ["HAPPY_LOG_DIR"] = "/tmp/happy_test_logs"
+        test_environ["SUDO"] = os.path.realpath(
+            os.path.join(CHIP_PATH, "src/test_driver/happy/bin/fake_sudo.sh"))
     test_environ["TEST_BIN_DIR"] = args.bin_dir
     os.execvpe("python3", ["python3", args.test_script], test_environ)

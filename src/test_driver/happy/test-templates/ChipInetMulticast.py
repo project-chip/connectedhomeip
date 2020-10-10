@@ -226,8 +226,7 @@ class ChipInetMulticast(HappyNode, HappyNetwork, ChipTest):
         tag using the provided attributes and extra command line
         options.
         """
-        cmd = "sudo "
-        cmd += self.getChipInetLayerMulticastPath()
+        cmd = self.getChipInetLayerMulticastPath()
 
         # Generate and accumulate the multicast group-related command
         # line options.
