@@ -63,7 +63,7 @@ K32W_OPTIONS = {
                     Unable to execute {commander}.
 
                     Please ensure that this tool is installed and
-                    available. See the EFR32 example README for
+                    available. See the K32W example README for
                     installation instructions.
 
                     """,

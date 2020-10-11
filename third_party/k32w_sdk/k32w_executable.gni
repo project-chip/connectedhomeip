@@ -15,8 +15,7 @@
 import("//build/toolchain/flashable_executable.gni")
 
 template("k32w_executable") {
-  output_base_name = get_path_info(invoker.output_name, "name") #chip-k32w061-lock-example
-
+  output_base_name = get_path_info(invoker.output_name, "name")
   objcopy_image_name = output_base_name + ".hex"
   objcopy_image_format = "srec"
   objcopy = "arm-none-eabi-objcopy"
