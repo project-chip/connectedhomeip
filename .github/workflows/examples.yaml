@@ -288,10 +288,10 @@ jobs:
             # - name: Perform CodeQL Analysis
             #   if: ${{ github.event_name == 'push' }}
             #   uses: github/codeql-action/analyze@v1
-            - name: Perform CodeQL Analysis
-              if: ${{ github.event_name == 'push' }}
-              uses: github/codeql-action/analyze@v1
-    
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ github.event_name == 'push' }}
+            #   uses: github/codeql-action/analyze@v1
+
     qpg6100:
         name: QPG6100
         env:
