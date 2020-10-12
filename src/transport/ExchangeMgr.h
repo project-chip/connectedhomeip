@@ -262,7 +262,7 @@ private:
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer) override;
 
-    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, 
+    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            Transport::PeerConnectionState * state,
                            System::PacketBuffer * msgBuf,
                            SecureSessionMgrBase * msgLayer) override;
