@@ -185,35 +185,35 @@ const char * DecodeTagControl(const TLVTagControl aTagControl)
     switch (aTagControl)
     {
 
-    case kTLVTagControl_Anonymous:
+    case TLVTagControl::Anonymous:
         retval = "Anonymous";
         break;
 
-    case kTLVTagControl_ContextSpecific:
+    case TLVTagControl::ContextSpecific:
         retval = "Context Specific";
         break;
 
-    case kTLVTagControl_CommonProfile_2Bytes:
+    case TLVTagControl::CommonProfile_2Bytes:
         retval = "Common Profile (2 Bytes)";
         break;
 
-    case kTLVTagControl_CommonProfile_4Bytes:
+    case TLVTagControl::CommonProfile_4Bytes:
         retval = "Common Profile (4 Bytes)";
         break;
 
-    case kTLVTagControl_ImplicitProfile_2Bytes:
+    case TLVTagControl::ImplicitProfile_2Bytes:
         retval = "Implicit Profile (2 Bytes)";
         break;
 
-    case kTLVTagControl_ImplicitProfile_4Bytes:
+    case TLVTagControl::ImplicitProfile_4Bytes:
         retval = "Implicit Profile (4 Bytes)";
         break;
 
-    case kTLVTagControl_FullyQualified_6Bytes:
+    case TLVTagControl::FullyQualified_6Bytes:
         retval = "Fully Qualified (6 Bytes)";
         break;
 
-    case kTLVTagControl_FullyQualified_8Bytes:
+    case TLVTagControl::FullyQualified_8Bytes:
         retval = "Fully Qualified (8 Bytes)";
         break;
 
