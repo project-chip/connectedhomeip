@@ -391,4 +391,3 @@
  */
 #define CHIP_TLV_BYTE_STRING_8ByteLength(TagSpec, StringLength, ...)                                                               \
     chip::TLV::TLVElementType::ByteString_8ByteLength | TagSpec, CHIP_TLV_Serialize64((uint64_t)(StringLength)), ##__VA_ARGS__
-
