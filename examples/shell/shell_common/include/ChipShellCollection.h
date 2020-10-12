@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef EXAMPLES_SHELL_CHIP_SHELL_H
-#define EXAMPLES_SHELL_CHIP_SHELL_H
+#pragma once
 
 extern "C" {
 // A list of shell commands provided by ChipShell
@@ -26,5 +25,3 @@ void cmd_device_init(void);
 void cmd_misc_init(void);
 void cmd_otcli_init(void);
 }
-
-#endif // EXAMPLES_SHELL_CHIP_SHELL_H

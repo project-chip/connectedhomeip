@@ -22,8 +22,7 @@
  *      endpoint classes in the Inet layer, i.e. TCP, UDP, Raw and Tun.
  */
 
-#ifndef ENDPOINTBASIS_H
-#define ENDPOINTBASIS_H
+#pragma once
 
 #include <inet/InetConfig.h>
 
@@ -189,5 +188,3 @@ inline void EndPointBasis::DeferredFree(chip::System::Object::ReleaseDeferralErr
 
 } // namespace Inet
 } // namespace chip
-
-#endif // !defined(ENDPOINTBASIS_H)

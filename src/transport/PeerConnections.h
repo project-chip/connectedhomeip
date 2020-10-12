@@ -14,8 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef PEER_CONNECTIONS_H_
-#define PEER_CONNECTIONS_H_
+#pragma once
 
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
@@ -318,5 +317,3 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // PEER_CONNECTIONS_H_

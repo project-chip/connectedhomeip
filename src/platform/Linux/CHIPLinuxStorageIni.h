@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef CHIP_LINUX_STORAGE_INI_H
-#define CHIP_LINUX_STORAGE_INI_H
+#pragma once
 
 #include <inipp/inipp.h>
 #include <platform/PersistedStorage.h>
@@ -61,5 +60,3 @@ private:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_LINUX_STORAGE_INI_H

@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef APP_EVENT_H
-#define APP_EVENT_H
+#pragma once
 
 struct AppEvent;
 typedef void (*EventHandler)(AppEvent *);
@@ -54,5 +53,3 @@ struct AppEvent
 
     EventHandler Handler;
 };
-
-#endif // APP_EVENT_H

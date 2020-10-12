@@ -31,8 +31,7 @@
  *
  */
 
-#ifndef CHIP_LINUX_STORAGE_H
-#define CHIP_LINUX_STORAGE_H
+#pragma once
 
 #include <mutex>
 #include <platform/Linux/CHIPLinuxStorageIni.h>
@@ -94,5 +93,3 @@ private:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif /* CHIP_LINUX_STORAGE_H */

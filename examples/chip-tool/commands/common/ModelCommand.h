@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef __CHIPTOOL_MODELCOMMAND_H__
-#define __CHIPTOOL_MODELCOMMAND_H__
+#pragma once
 
 #include "NetworkCommand.h"
 
@@ -76,5 +75,3 @@ private:
     uint32_t mEndPointId;
     uint16_t mClusterId;
 };
-
-#endif // __CHIPTOOL_MODELCOMMAND_H__

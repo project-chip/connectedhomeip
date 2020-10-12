@@ -21,8 +21,7 @@
  *
  */
 
-#ifndef SAFEINT_H_
-#define SAFEINT_H_
+#pragma once
 
 #include <limits>
 #include <stdint.h>
@@ -143,5 +142,3 @@ typename std::enable_if<std::is_unsigned<T>::value, typename std::make_signed<T>
 }
 
 } // namespace chip
-
-#endif // SAFEINT_H_

@@ -21,9 +21,6 @@
  *
  */
 
-#ifndef TESTPLATFORMMGR_H
-#define TESTPLATFORMMGR_H
+#pragma once
 
 int TestPlatformMgr();
-
-#endif // TESTPLATFORMMGR_H

@@ -15,10 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef NRF5_COMMON_SERVICE_H
-#define NRF5_COMMON_SERVICE_H
+#pragma once
 
 void SetDeviceName(const char * newDeviceName);
 void PublishService();
-
-#endif // NRF5_COMMON_SERVICE_H

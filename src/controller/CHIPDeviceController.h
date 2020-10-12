@@ -26,8 +26,7 @@
  *
  */
 
-#ifndef __CHIPDEVICECONTROLLER_H
-#define __CHIPDEVICECONTROLLER_H
+#pragma once
 
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
@@ -285,5 +284,3 @@ private:
 
 } // namespace DeviceController
 } // namespace chip
-
-#endif // __CHIPDEVICECONTROLLER_H

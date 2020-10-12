@@ -21,8 +21,7 @@
  *          Utilities for working with the Nordic nRF5 SDK.
  */
 
-#ifndef NRF5_UTILS_H
-#define NRF5_UTILS_H
+#pragma once
 
 namespace chip {
 namespace DeviceLayer {
@@ -34,5 +33,3 @@ bool FormatNRFError(char * buf, uint16_t bufSize, int32_t err);
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // NRF5_UTILS_H

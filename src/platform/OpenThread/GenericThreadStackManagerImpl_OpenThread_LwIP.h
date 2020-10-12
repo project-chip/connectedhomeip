@@ -23,8 +23,7 @@
  *          for use on platforms that use OpenThread with LwIP.
  */
 
-#ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_LWIP_H
-#define GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_LWIP_H
+#pragma once
 
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 
@@ -96,5 +95,3 @@ inline struct netif * GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // GENERIC_THREAD_STACK_MANAGER_IMPL_OPENTHREAD_LWIP_H

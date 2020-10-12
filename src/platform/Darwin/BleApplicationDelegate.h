@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef BLE_APPLICATION_DELEGATE_H
-#define BLE_APPLICATION_DELEGATE_H
+#pragma once
 
 #include <ble/BleApplicationDelegate.h>
 
@@ -33,5 +32,3 @@ public:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // BLE_APPLICATION_DELEGATE_H

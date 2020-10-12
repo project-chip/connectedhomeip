@@ -23,8 +23,7 @@
  *          for the ESP32 platform.
  */
 
-#ifndef CONFIGURATION_MANAGER_IMPL_H
-#define CONFIGURATION_MANAGER_IMPL_H
+#pragma once
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConfigurationManagerImpl.h>
@@ -114,5 +113,3 @@ inline ConfigurationManagerImpl & ConfigurationMgrImpl(void)
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CONFIGURATION_MANAGER_IMPL_H

@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef SCREEN_MANAGER_H
-#define SCREEN_MANAGER_H
+#pragma once
 
 #include "Display.h"
 #include "Screen.h"
@@ -63,5 +62,3 @@ public:
 };
 
 #endif // CONFIG_HAVE_DISPLAY
-
-#endif // SCREEN_MANAGER_H

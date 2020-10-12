@@ -24,8 +24,7 @@
  *
  **/
 
-#ifndef BUTTON_H
-#define BUTTON_H
+#pragma once
 
 #include "driver/gpio.h"
 #include "esp_log.h"
@@ -112,5 +111,3 @@ inline uint32_t Button::GetPrevStateDuration()
 {
     return mPrevStateDur * portTICK_PERIOD_MS;
 }
-
-#endif // BUTTON_H

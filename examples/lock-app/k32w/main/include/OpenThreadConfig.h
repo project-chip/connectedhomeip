@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef OPENTHREAD_PLATFORM_CONFIG_H
-#define OPENTHREAD_PLATFORM_CONFIG_H
+#pragma once
 
 // Disable the Nxp-supplied OpenThread logging facilities and use
 // the facilities provided by the OpenWeave Device Layer (see
@@ -52,5 +51,3 @@
 // it cannot use "openthread" in the path to the included file.
 //
 #include "openthread-core-k32w061-config.h"
-
-#endif // OPENTHREAD_PLATFORM_CONFIG_H

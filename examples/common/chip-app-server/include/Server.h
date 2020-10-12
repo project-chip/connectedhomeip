@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_APP_SERVER_SERVER_H
-#define CHIP_APP_SERVER_SERVER_H
+#pragma once
 
 #include <inet/IPAddress.h>
 #include <inet/InetLayer.h>
@@ -33,5 +32,3 @@ using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
  * @param [in] sessions The demo's session manager.
  */
 void InitServer();
-
-#endif // CHIP_APP_SERVER_SERVER_H

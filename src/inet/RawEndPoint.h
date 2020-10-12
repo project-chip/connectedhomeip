@@ -26,8 +26,7 @@
  *      control blocks, as the system is configured accordingly.
  */
 
-#ifndef RAWENDPOINT_H
-#define RAWENDPOINT_H
+#pragma once
 
 #include "inet/IPEndPointBasis.h"
 #include <inet/IPAddress.h>
@@ -115,5 +114,3 @@ private:
 
 } // namespace Inet
 } // namespace chip
-
-#endif // !defined(RAWENDPOINT_H)

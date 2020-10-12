@@ -23,8 +23,7 @@
  *          for use on FreeRTOS platforms.
  */
 
-#ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_FREERTOS_H
-#define GENERIC_THREAD_STACK_MANAGER_IMPL_FREERTOS_H
+#pragma once
 
 #if defined(ESP_PLATFORM)
 #include "freertos/FreeRTOS.h"
@@ -91,5 +90,3 @@ extern template class GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerI
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // GENERIC_THREAD_STACK_MANAGER_IMPL_FREERTOS_H

@@ -25,8 +25,7 @@
  * 1 tab == 4 spaces!
  */
 
-#ifndef FREERTOS_CONFIG_H
-#define FREERTOS_CONFIG_H
+#pragma once
 
 /*-----------------------------------------------------------
  * Application specific definitions.
@@ -160,5 +159,3 @@ standard names. */
 #define vPortSVCHandler SVC_Handler
 #define xPortPendSVHandler PendSV_Handler
 #define xPortSysTickHandler SysTick_Handler
-
-#endif /* FREERTOS_CONFIG_H */

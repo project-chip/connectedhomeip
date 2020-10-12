@@ -21,8 +21,7 @@
  *      reasons have not (yet) been implemented or exposed in Zephyr.
  */
 
-#ifndef INET_ZEPHYR_SOCKET_H
-#define INET_ZEPHYR_SOCKET_H
+#pragma once
 
 #include <sys/socket.h>
 
@@ -46,5 +45,3 @@ static inline ssize_t recvmsg(int sock, struct msghdr * msg, int flags)
 
     return ret;
 }
-
-#endif // INET_ZEPHYR_SOCKET_H

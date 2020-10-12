@@ -21,8 +21,7 @@
  *          on Darwin platforms.
  */
 
-#ifndef CHIP_DEVICE_PLATFORM_CONFIG_H
-#define CHIP_DEVICE_PLATFORM_CONFIG_H
+#pragma once
 
 // ==================== Platform Adaptations ====================
 
@@ -81,5 +80,3 @@
 
 // TODO: CHIP has redesigned the crypto interface, pending on the final version of CHIP HASH APIs
 #define CHIP_DEVICE_CONFIG_LOG_PROVISIONING_HASH 0
-
-#endif // CHIP_DEVICE_PLATFORM_CONFIG_H

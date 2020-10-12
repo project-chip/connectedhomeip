@@ -24,8 +24,7 @@
  *      activities within the CHIP stack. This is a singleton object.
  */
 
-#ifndef CHIP_DEVICEMANAGER_H_
-#define CHIP_DEVICEMANAGER_H_
+#pragma once
 
 #include <core/CHIPCore.h>
 #include <core/CHIPError.h>
@@ -131,5 +130,3 @@ private:
 
 } // namespace DeviceManager
 } // namespace chip
-
-#endif /* CHIP_DEVICEMANAGER_H_ */

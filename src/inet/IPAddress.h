@@ -26,8 +26,7 @@
  *      internally in the V4COMPAT format, reserved for that purpose.)
  */
 
-#ifndef IPADDRESS_H
-#define IPADDRESS_H
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -677,5 +676,3 @@ public:
 
 } // namespace Inet
 } // namespace chip
-
-#endif // !defined(IPADDRESS_H)

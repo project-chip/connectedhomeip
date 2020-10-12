@@ -25,8 +25,7 @@
  *      address prefixes of both IPv4 and IPv6 address families.
  */
 
-#ifndef IPPREFIX_H
-#define IPPREFIX_H
+#pragma once
 
 #include <inet/IPAddress.h>
 
@@ -128,5 +127,3 @@ public:
 
 } // namespace Inet
 } // namespace chip
-
-#endif // !defined(IPPREFIX_H)

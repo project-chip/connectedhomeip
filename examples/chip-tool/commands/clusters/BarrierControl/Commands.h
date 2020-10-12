@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef __CHIPTOOL_BARRIERCONTROL_COMMANDS_H__
-#define __CHIPTOOL_BARRIERCONTROL_COMMANDS_H__
+#pragma once
 
 #include "../../common/ModelCommand.h"
 
@@ -61,5 +60,3 @@ void registerClusterBarrierControl(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-
-#endif // __CHIPTOOL_BARRIERCONTROL_COMMANDS_H__

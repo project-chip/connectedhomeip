@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef BLE_PLATFORM_DELEGATE_H
-#define BLE_PLATFORM_DELEGATE_H
+#pragma once
 
 #include <ble/BlePlatformDelegate.h>
 #include <system/SystemPacketBuffer.h>
@@ -48,5 +47,3 @@ public:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // BLE_PLATFORM_DELEGATE_H

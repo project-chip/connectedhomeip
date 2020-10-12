@@ -24,8 +24,7 @@
  *  of system interface addresses.
  */
 
-#ifndef INETINTERFACE_H
-#define INETINTERFACE_H
+#pragma once
 
 #include <inet/InetConfig.h>
 
@@ -296,5 +295,3 @@ inline uint8_t InterfaceAddressIterator::GetIPv6PrefixLength()
 
 } // namespace Inet
 } // namespace chip
-
-#endif /* INETINTERFACE_H */

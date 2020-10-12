@@ -21,8 +21,7 @@
  *          for the Linux platforms.
  */
 
-#ifndef BLE_MANAGER_IMPL_H
-#define BLE_MANAGER_IMPL_H
+#pragma once
 
 #include <ble/BleLayer.h>
 #include <platform/internal/BLEManager.h>
@@ -248,5 +247,3 @@ inline bool BLEManagerImpl::_IsAdvertising()
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-
-#endif // BLE_MANAGER_IMPL_H

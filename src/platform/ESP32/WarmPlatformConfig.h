@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef WARM_PLATFORM_CONFIG_H
-#define WARM_PLATFORM_CONFIG_H
+#pragma once
 
 // ==================== Platform Adaptations ====================
 
@@ -38,5 +37,3 @@
 // ========== Platform-specific Configuration Overrides =========
 
 /* none so far */
-
-#endif // WARM_PLATFORM_CONFIG_H

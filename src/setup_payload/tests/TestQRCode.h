@@ -21,9 +21,6 @@
  *
  */
 
-#ifndef TESTQRCODE_H
-#define TESTQRCODE_H
+#pragma once
 
 int TestQuickResponseCode();
-
-#endif // TESTQRCODE_H

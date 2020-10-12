@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef CHIP_TEST_INET_COMMON_OPTIONS_H_
-#define CHIP_TEST_INET_COMMON_OPTIONS_H_
+#pragma once
 
 #include <vector>
 
@@ -95,4 +94,3 @@ public:
 };
 
 extern FaultInjectionOptions gFaultInjectionOptions;
-#endif // CHIP_TEST_INET_COMMON_OPTIONS_H_
