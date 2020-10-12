@@ -28,6 +28,22 @@ export HAPPY_LOG_DIR="${HAPPY_LOG_DIR:-$(mktemp -d)}"
 set -x
 env
 
+function happytest_install_packages() {
+    if [ "$(whoami)" != "root" ]; then
+        echo "install_packages should be invoked under root"
+        return 1
+    fi
+    echo "Install packages: bridge-utils iproute2 net-tools python3-lockfile python3-pip python3-psutil python3-setuptools strace"
+    apt-get update && apt-get install -y bridge-utils \
+        iproute2 \
+        net-tools \
+        python3-lockfile \
+        python3-pip \
+        python3-psutil \
+        python3-setuptools \
+        strace
+}
+
 function happytest_bootstrap() {
     echo "Bootstrapping Happy Test"
     set -e
@@ -35,22 +51,12 @@ function happytest_bootstrap() {
     cd "$REPO_DIR/third_party/happy/repo"
 
     # Override happy log dir config.
-    python3 -c 'import json, os; file = open("happy/conf/main_config.json"); data = json.load(file); data["state_file_prefix"] = os.environ.get("HAPPY_STATE_FILE_PREFIX", data["state_file_prefix"]); data["log_directory"] = os.environ["HAPPY_LOG_DIR"]; data["default_happy_log_dir"] = os.environ["HAPPY_LOG_DIR"]; out = open("happy/conf/main_config.json", "w"); json.dump(data, out);'
+    # python3 -c 'import json, os; file = open("happy/conf/main_config.json"); data = json.load(file); data["state_file_prefix"] = os.environ.get("HAPPY_STATE_FILE_PREFIX", data["state_file_prefix"]); data["log_directory"] = os.environ["HAPPY_LOG_DIR"]; data["default_happy_log_dir"] = os.environ["HAPPY_LOG_DIR"]; out = open("happy/conf/main_config.json", "w"); json.dump(data, out);'
 
     echo "Happy Main Config"
     cat happy/conf/main_config.json
 
-    apt-get update
-    apt-get install -y bridge-utils \
-        iproute2 \
-        net-tools \
-        python3-lockfile \
-        python3-pip \
-        python3-psutil \
-        python3-setuptools \
-        strace \
-        sudo
-    make
+    python3 setup.py install --user
 
     echo "Happy Log dir set to $HAPPY_LOG_DIR"
 }
