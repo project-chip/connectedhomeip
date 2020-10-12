@@ -27,16 +27,16 @@ chip_test_suite("tests") {
   output_name = "libInetLayerTests"
 
   sources = [
+    "TestInetAddress.cpp",
     "TestInetCommon.cpp",
     "TestInetCommon.h",
     "TestInetCommonOptions.cpp",
     "TestInetCommonOptions.h",
-    "TestInetLayerCommon.cpp",
-    "TestInetAddress.cpp",
     "TestInetEndPoint.cpp",
     "TestInetErrorStr.cpp",
     "TestInetLayer.cpp",
     "TestInetLayer.h",
+    "TestInetLayerCommon.cpp",
   ]
 
   if (lwip_platform == "standalone") {
