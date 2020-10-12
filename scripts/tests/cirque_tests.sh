@@ -124,6 +124,7 @@ function cirquetest_run_all_tests() {
     # This is the workaround
     echo "Logs will be stored at $LOG_DIR"
     test_pass="1"
+    mkdir -p "$LOG_DIR"
     for i in "${!CIRQUE_TESTS[@]}"; do
         test_name="${CIRQUE_TESTS[$i]}"
         echo "[ RUN] $test_name"
