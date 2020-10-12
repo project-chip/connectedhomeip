@@ -23,9 +23,9 @@
 
 #pragma once
 
+#include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
-#include <support/BitFlags.h>
 #include <transport/SecureSessionMgr.h>
 
 #define EXCHANGE_CONTEXT_ID(x) ((x) + 1)
@@ -43,7 +43,8 @@ enum class ExFlagValues : uint16_t
     kFlagInitiator        = 0x0001, /// This context is the initiator of the exchange.
     kFlagConnectionClosed = 0x0002, /// This context was associated with a Connection.
     kFlagResponseExpected = 0x0004, /// If a response is expected for a message that is being sent.
-    kFlagMsgRcvdFromPeer =  0x0008, /// When set, signifies that at least one message has been received from peer on this exchange context.
+    kFlagMsgRcvdFromPeer =
+        0x0008, /// When set, signifies that at least one message has been received from peer on this exchange context.
 };
 
 /**
@@ -170,10 +171,10 @@ private:
     System::PacketBuffer * msg; // If we are re-transmitting, then this is the pointer to the message being retransmitted
 
     // Trickle-controlled retransmissions:
-    uint32_t backoff;             // backoff for sampling the numner of messages
-    uint8_t msgsReceived;         // number of messages heard during the backoff period
-    uint8_t rebroadcastThreshold; // re-broadcast threshold
-    BitFlags<uint16_t, ExFlagValues> mFlags;              // Internal state flags
+    uint32_t backoff;                        // backoff for sampling the numner of messages
+    uint8_t msgsReceived;                    // number of messages heard during the backoff period
+    uint8_t rebroadcastThreshold;            // re-broadcast threshold
+    BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
     CHIP_ERROR ResendMessage();
     bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
