@@ -106,13 +106,11 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Set this to true to enable efr32 builds by default.
     enable_efr32_builds = false
 
-<<<<<<< HEAD
     # Set this to true to enable qpg6100 builds by default.
     enable_qpg6100_builds = false
-=======
+
     # Set this to true to enable k32w builds by default.
     enable_k32w_builds = false
->>>>>>> [K32W] Add GN/Ninja build
   }
 
   declare_args() {
