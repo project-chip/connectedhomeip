@@ -24,5 +24,6 @@ if (mbedtls_target != "") {
 } else {
   import("mbedtls.gni")
 
-  mbedtls_target("mbedtls") {}
+  mbedtls_target("mbedtls") {
+  }
 }

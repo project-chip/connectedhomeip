@@ -17,14 +17,12 @@ import("//build_overrides/k32w_sdk.gni")
 import("//build_overrides/openthread.gni")
 
 config("openthread_k32w_config") {
-  include_dirs = [ 
+  include_dirs = [
     "${openthread_root}/examples/platforms/k32w/",
-    "${openthread_root}/examples/platforms/k32w/k32w061", 
-    ]
-
-  include_dirs += [
-    "${chip_root}/examples/platform/k32w",
+    "${openthread_root}/examples/platforms/k32w/k32w061",
   ]
+
+  include_dirs += [ "${chip_root}/examples/platform/k32w" ]
 }
 
 source_set("openthread_core_config_k32w") {

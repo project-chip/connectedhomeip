@@ -28,8 +28,8 @@ template("k32w_executable") {
   flashing_runtime_target = target_name + ".flashing_runtime"
   copy(flashing_runtime_target) {
     sources = [
-      "${chip_root}/scripts/flashing/k32w_firmware_utils.py",
       "${chip_root}/scripts/flashing/firmware_utils.py",
+      "${chip_root}/scripts/flashing/k32w_firmware_utils.py",
     ]
     outputs = [ "${root_out_dir}/{{source_file_part}}" ]
   }

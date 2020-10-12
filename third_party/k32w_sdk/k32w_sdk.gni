@@ -11,10 +11,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+import("//build_overrides/chip.gni")
 import("//build_overrides/k32w_sdk.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/openthread.gni")
-import("//build_overrides/chip.gni")
 
 declare_args() {
   # Location of the k32w SDK.
@@ -87,7 +87,6 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/middleware/wireless/framework/PDM/Library/libPDM.a",
       "${k32w_sdk_root}/middleware/wireless/framework/XCVR/lib/libRadio.a",
     ]
-    
 
     defines = [
       "CPU_K32W061HN",
@@ -118,16 +117,16 @@ template("k32w_sdk") {
       "CHIP_ENABLE_OPENTHREAD=1",
       "PoolsDetails_c=_block_size_ 512 _number_of_blocks_ 2 _pool_id_(0) _eol_ _block_size_ 768 _number_of_blocks_ 1 _pool_id_(0) _eol_",
       "OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE=1",
-      "SUPPORT_FOR_15_4=1"
+      "SUPPORT_FOR_15_4=1",
     ]
-    
+
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
 
     cflags = [
       "-Wno-unused-function",
-      "-Wno-conversion"
+      "-Wno-conversion",
     ]
 
     # Now add our "system-header" include dirs
@@ -177,22 +176,22 @@ template("k32w_sdk") {
       "${k32w_sdk_root}/middleware/wireless/framework/FunctionLib/FunctionLib.c",
       "${k32w_sdk_root}/middleware/wireless/framework/GPIO/GPIO_Adapter.c",
       "${k32w_sdk_root}/middleware/wireless/framework/Keyboard/Source/Keyboard.c",
-      "${k32w_sdk_root}/middleware/wireless/framework/MemManager/Source/MemManager.c",
       "${k32w_sdk_root}/middleware/wireless/framework/LED/Source/LED.c",
       "${k32w_sdk_root}/middleware/wireless/framework/Lists/GenericList.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/MemManager/Source/MemManager.c",
       "${k32w_sdk_root}/middleware/wireless/framework/OSAbstraction/Source/fsl_os_abstraction_free_rtos.c",
-      "${k32w_sdk_root}/middleware/wireless/framework/Panic/Source/Panic.c",
       "${k32w_sdk_root}/middleware/wireless/framework/PDM/pdm_port.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/Panic/Source/Panic.c",
       "${k32w_sdk_root}/middleware/wireless/framework/Reset/Reset.c",
-      "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Source/TimersManager.c",
       "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Source/TMR_Adapter.c",
+      "${k32w_sdk_root}/middleware/wireless/framework/TimersManager/Source/TimersManager.c",
       "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/event_groups.c",
       "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/list.c",
       "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/portable/GCC/ARM_CM3/port.c",
       "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/portable/MemMang/heap_3.c",
       "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/queue.c",
       "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/tasks.c",
-      "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/timers.c",      
+      "${k32w_sdk_root}/rtos/amazon-freertos/lib/FreeRTOS/timers.c",
     ]
 
     if (!defined(public_deps)) {
