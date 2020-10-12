@@ -56,11 +56,11 @@ public:
 
     ExchangeManager * ExchangeMgr; /**< [READ ONLY] Owning exchange manager. */
     uint64_t PeerNodeId;           /**< [READ ONLY] Node ID of peer node. */
-    uint16_t ExchangeId;      /**< [READ ONLY] Assigned exchange ID. */
-    void * AppState;          /**< Pointer to application-specific state object. */
-    bool AllowDuplicateMsgs;  /**< Boolean indicator of whether duplicate messages are allowed for a given exchange. */
-    uint32_t RetransInterval; /**< Time between retransmissions (in milliseconds); 0 disables retransmissions. */
-    Timeout ResponseTimeout;  /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */
+    uint16_t ExchangeId;           /**< [READ ONLY] Assigned exchange ID. */
+    void * AppState;               /**< Pointer to application-specific state object. */
+    bool AllowDuplicateMsgs;       /**< Boolean indicator of whether duplicate messages are allowed for a given exchange. */
+    uint32_t RetransInterval;      /**< Time between retransmissions (in milliseconds); 0 disables retransmissions. */
+    Timeout ResponseTimeout;       /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */
 
     enum
     {
@@ -106,8 +106,8 @@ public:
      *
      *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
      */
-    typedef void (*MessageReceiveFunct)(ExchangeContext * ec, const PacketHeader & packetHeader,
-                                        uint32_t protocolId, uint8_t msgType, System::PacketBuffer * payload);
+    typedef void (*MessageReceiveFunct)(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
+                                        uint8_t msgType, System::PacketBuffer * payload);
     MessageReceiveFunct OnMessageReceived;
 
     /**
@@ -181,10 +181,9 @@ private:
 
     uint32_t mPendingPeerAckId;
     void DoClose(bool clearRetransTable);
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             System::PacketBuffer * msgBuf);
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                             System::PacketBuffer * msgBuf, ExchangeContext::MessageReceiveFunct umhandler);
+    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf,
+                             ExchangeContext::MessageReceiveFunct umhandler);
 
     uint8_t mRefCount;
 };
@@ -223,7 +222,8 @@ public:
 
     ExchangeContext * FindContext(uint64_t peerNodeId, void * appState, bool isInitiator);
 
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContext::MessageReceiveFunct handler, void * appState);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContext::MessageReceiveFunct handler,
+                                                 void * appState);
     CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContext::MessageReceiveFunct handler, bool allowDups,
                                                  void * appState);
     CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContext::MessageReceiveFunct handler,
@@ -242,7 +242,7 @@ private:
         ExchangeContext::MessageReceiveFunct Handler;
         void * AppState;
         uint32_t ProtocolId;
-        int16_t MessageType;       // -1 represents any message type
+        int16_t MessageType; // -1 represents any message type
         bool AllowDuplicateMsgs;
     };
 
@@ -254,17 +254,15 @@ private:
 
     ExchangeContext * AllocContext();
 
-    void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                         System::PacketBuffer * msgBuf);
-    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, bool allowDups,
-                           ExchangeContext::MessageReceiveFunct handler, void * appState);
+    void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, bool allowDups, ExchangeContext::MessageReceiveFunct handler,
+                           void * appState);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           Transport::PeerConnectionState * state,
-                           System::PacketBuffer * msgBuf,
+                           Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
                            SecureSessionMgrBase * msgLayer) override;
 };
 } // namespace chip
