@@ -133,7 +133,6 @@ int main(void)
         appError(ret);
     }
 
-    // Configure device to operate as a Thread sleepy end-device.
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
     if (ret != CHIP_NO_ERROR)
     {
