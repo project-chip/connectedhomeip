@@ -56,7 +56,7 @@ public:
     virtual bool HandleClusterResponse(uint8_t * message, uint16_t messageLen) const { return false; }
 
 private:
-    void SendCommand(ChipDeviceController * dc);
+    bool SendCommand(ChipDeviceController * dc);
     void ReceiveCommandResponse(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) const;
 
     void ParseGlobalResponseCommand(uint8_t commandId, uint8_t * message, uint16_t messageLen) const;

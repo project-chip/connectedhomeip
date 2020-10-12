@@ -43,11 +43,11 @@ void EchoCommand::SendEcho() const
     CHIP_ERROR err = mController->SendMessage(NULL, buffer);
     if (err == CHIP_NO_ERROR)
     {
-        ChipLogProgress(chipTool, "Echo (%s): Message sent to server", GetName());
+        ChipLogProgress(chipTool, "Echo (%s): Message sent to server", GetNetworkName());
     }
     else
     {
-        ChipLogError(chipTool, "Echo (%s): %s", GetName(), ErrorStr(err));
+        ChipLogError(chipTool, "Echo (%s): %s", GetNetworkName(), ErrorStr(err));
     }
 }
 
@@ -62,11 +62,11 @@ void EchoCommand::ReceiveEcho(PacketBuffer * buffer) const
     bool isEchoIdenticalToMessage = strncmp(msg_buffer, PAYLOAD, data_len) == 0;
     if (isEchoIdenticalToMessage)
     {
-        ChipLogProgress(chipTool, "Echo (%s): Received expected message !", GetName());
+        ChipLogProgress(chipTool, "Echo (%s): Received expected message !", GetNetworkName());
     }
     else
     {
-        ChipLogProgress(chipTool, "Echo: (%s): Error \nSend: %s \nRecv: %s", GetName(), PAYLOAD, msg_buffer);
+        ChipLogProgress(chipTool, "Echo: (%s): Error \nSend: %s \nRecv: %s", GetNetworkName(), PAYLOAD, msg_buffer);
     }
 }
 
