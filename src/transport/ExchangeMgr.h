@@ -21,11 +21,11 @@
  *
  */
 
-#ifndef EXCHANGE_MGR_H
-#define EXCHANGE_MGR_H
+#pragma once
 
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
+#include <support/BitFlags.h>
 #include <transport/SecureSessionMgr.h>
 
 #define EXCHANGE_CONTEXT_ID(x) ((x) + 1)
@@ -37,6 +37,14 @@ namespace chip {
 using System::PacketBuffer;
 
 class ExchangeManager;
+
+enum class ExFlagValues : uint16_t
+{
+    kFlagInitiator        = 0x0001, /// This context is the initiator of the exchange.
+    kFlagConnectionClosed = 0x0002, /// This context was associated with a Connection.
+    kFlagResponseExpected = 0x0004, /// If a response is expected for a message that is being sent.
+    kFlagMsgRcvdFromPeer =  0x0008, /// When set, signifies that at least one message has been received from peer on this exchange context.
+};
 
 /**
  *  @class ExchangeContext
@@ -84,8 +92,6 @@ public:
     bool IsResponseExpected() const;
     void SetInitiator(bool inInitiator);
     void SetResponseExpected(bool inResponseExpected);
-    bool AutoRequestAck() const;
-    void SetAutoRequestAck(bool autoReqAck);
 
     CHIP_ERROR SendMessage(uint32_t protocolId, uint8_t msgType, System::PacketBuffer * msgPayload, uint16_t sendFlags = 0,
                            void * msgCtxt = nullptr);
@@ -94,7 +100,7 @@ public:
     void TeardownTrickleRetransmit();
 
     /**
-     * This function is the application callback for handling a received CHIP message.
+     * This function is the protocol callback for handling a received CHIP message.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      *
@@ -111,7 +117,7 @@ public:
     MessageReceiveFunct OnMessageReceived;
 
     /**
-     * This function is the application callback to invoke when the timeout for the receipt
+     * This function is the protocol callback to invoke when the timeout for the receipt
      * of a response message has expired.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
@@ -121,7 +127,7 @@ public:
     ResponseTimeoutFunct OnResponseTimeout;
 
     /**
-     * This function is the application callback to invoke when the timeout for the retransmission
+     * This function is the protocol callback to invoke when the timeout for the retransmission
      * of a previously sent message has expired.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
@@ -141,7 +147,7 @@ public:
     typedef void (*KeyErrorFunct)(ExchangeContext * ec, CHIP_ERROR keyErr);
 
     /**
-     * This function is the application callback to invoke when key error message has been received
+     * This function is the protocol callback to invoke when key error message has been received
      * from the peer.
      */
     KeyErrorFunct OnKeyError;
@@ -167,7 +173,7 @@ private:
     uint32_t backoff;             // backoff for sampling the numner of messages
     uint8_t msgsReceived;         // number of messages heard during the backoff period
     uint8_t rebroadcastThreshold; // re-broadcast threshold
-    uint16_t mFlags;              // Internal state flags
+    BitFlags<uint16_t, ExFlagValues> mFlags;              // Internal state flags
 
     CHIP_ERROR ResendMessage();
     bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
@@ -265,6 +271,5 @@ private:
                            Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
                            SecureSessionMgrBase * msgLayer) override;
 };
-} // namespace chip
 
-#endif // EXCHANGE_MGR_H
+} // namespace chip
