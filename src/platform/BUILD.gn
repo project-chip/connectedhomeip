@@ -271,6 +271,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       ]
     } else if (chip_device_platform == "k32w") {
       sources += [
+        "FreeRTOS/SystemTimeSupport.cpp",
         "K32W/BLEManagerImpl.cpp",
         "K32W/BLEManagerImpl.h",
         "K32W/CHIPDevicePlatformConfig.h",
@@ -286,17 +287,16 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "K32W/PlatformManagerImpl.cpp",
         "K32W/PlatformManagerImpl.h",
         "K32W/SoftwareUpdateManagerImpl.h",
-        "FreeRTOS/SystemTimeSupport.cpp",
       ]
-      
-      if (chip_enable_openthread) {
-      public_deps += [ "${openthread_root}:libopenthread-ftd" ]
 
-      sources += [
-        "K32W/ThreadStackManagerImpl.cpp",
-        "K32W/ThreadStackManagerImpl.h",
-        "OpenThread/OpenThreadUtils.cpp",
-      ]
+      if (chip_enable_openthread) {
+        public_deps += [ "${openthread_root}:libopenthread-ftd" ]
+
+        sources += [
+          "K32W/ThreadStackManagerImpl.cpp",
+          "K32W/ThreadStackManagerImpl.h",
+          "OpenThread/OpenThreadUtils.cpp",
+        ]
       }
     } else if (chip_device_platform == "linux") {
       sources += [
