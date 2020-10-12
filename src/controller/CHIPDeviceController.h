@@ -95,7 +95,7 @@ public:
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
 };
 
-class DLL_EXPORT ChipDeviceController : public SecureSessionMgrCallback, public RendezvousSessionDelegate
+class DLL_EXPORT ChipDeviceController : public SecureSessionMgrDelegate, public RendezvousSessionDelegate
 {
     friend class ChipDeviceControllerCallback;
 

@@ -63,7 +63,7 @@ public:
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
 };
 
-class TestSessMgrCallback : public SecureSessionMgrCallback
+class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, PeerConnectionState * state, System::PacketBuffer * msgBuf,

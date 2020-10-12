@@ -50,7 +50,7 @@ class SecureSessionMgrBase;
  *   is interested in receiving these callbacks, they can specialize this class and handle
  *   each trigger in their implementation of this class.
  */
-class DLL_EXPORT SecureSessionMgrCallback : public ReferenceCounted<SecureSessionMgrCallback>
+class DLL_EXPORT SecureSessionMgrDelegate : public ReferenceCounted<SecureSessionMgrDelegate>
 {
 public:
     /**
@@ -86,7 +86,7 @@ public:
      */
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
-    ~SecureSessionMgrCallback() override {}
+    ~SecureSessionMgrDelegate() override {}
 };
 
 class DLL_EXPORT SecureSessionMgrBase : public ReferenceCounted<SecureSessionMgrBase>
@@ -112,7 +112,7 @@ public:
      * @details
      *   Release if there was an existing callback object
      */
-    void SetDelegate(SecureSessionMgrCallback * cb)
+    void SetDelegate(SecureSessionMgrDelegate * cb)
     {
         if (mCB != nullptr)
         {
@@ -159,7 +159,7 @@ private:
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 
-    SecureSessionMgrCallback * mCB = nullptr;
+    SecureSessionMgrDelegate * mCB = nullptr;
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();

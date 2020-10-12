@@ -59,7 +59,7 @@ SecureSessionMgrBase & SessionManager()
 
 namespace {
 
-class ServerCallback : public SecureSessionMgrCallback
+class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
