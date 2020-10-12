@@ -427,6 +427,7 @@ void AppTask::UpdateClusterState()
     }
 }
 
-void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
+{
     GetAppTask().UpdateClusterState();
 }
