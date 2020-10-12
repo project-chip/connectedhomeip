@@ -26,8 +26,7 @@
  *
  */
 
-#ifndef RANDUTILS_H_
-#define RANDUTILS_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -66,5 +65,3 @@ extern uint16_t GetRandU16();
 extern uint8_t GetRandU8();
 
 } // namespace chip
-
-#endif /* RANDUTILS_H_ */

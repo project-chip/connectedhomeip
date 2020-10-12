@@ -17,8 +17,7 @@
  *    limitations under the License.
  */
 
-#ifndef DEVICE_NETWORK_INFO_H
-#define DEVICE_NETWORK_INFO_H
+#pragma once
 
 #include <stddef.h>
 #include <stdint.h>
@@ -110,5 +109,3 @@ public:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // DEVICE_NETWORK_INFO_H

@@ -27,8 +27,7 @@
  *          configuration option.
  */
 
-#ifndef FREERTOS_TASKS_C_ADDITIONS_H
-#define FREERTOS_TASKS_C_ADDITIONS_H
+#pragma once
 
 /*
  * Version of the FreeRTOSDebugConfig structure
@@ -70,5 +69,3 @@ const uint8_t FreeRTOSDebugConfig[] __attribute__((section(".rodata"))) = {
     configMAX_PRIORITIES,
     0 /* padding */
 };
-
-#endif /* FREERTOS_TASKS_C_ADDITIONS_H */

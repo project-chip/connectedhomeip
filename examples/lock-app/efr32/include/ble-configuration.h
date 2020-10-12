@@ -33,8 +33,7 @@
  *
  ******************************************************************************/
 
-#ifndef __BLE_CONFIG__
-#define __BLE_CONFIG__
+#pragma once
 
 // Top level macros
 #define SILABS_AF_DEVICE_NAME "lock-example"
@@ -45,5 +44,3 @@
 #undef EMBER_AF_BOARD_TYPE
 #endif
 #define EMBER_AF_BOARD_TYPE BOARD_ID
-
-#endif // __BLE_CONFIG__

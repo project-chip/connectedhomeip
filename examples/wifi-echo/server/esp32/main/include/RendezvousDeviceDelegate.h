@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef __RENDEZVOUSDEVICEDELEGATE_H__
-#define __RENDEZVOUSDEVICEDELEGATE_H__
+#pragma once
 
 #include "DeviceNetworkProvisioningDelegate.h"
 
@@ -36,5 +35,3 @@ private:
     chip::RendezvousSession * mRendezvousSession;
     ESP32NetworkProvisioningDelegate mDeviceNetworkProvisioningDelegate;
 };
-
-#endif // __RENDEZVOUSDEVICEDELEGATE_H__

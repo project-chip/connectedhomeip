@@ -10,7 +10,8 @@ An example application showing the use
     -   [Device UI](#device-ui)
     -   [Building](#building)
         -   [Using Docker container](#using-docker-container)
-        -   [Using Native Shell](#using-native-shell)
+        -   [Using Native shell](#using-native-shell)
+        -   [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
     -   [Configuring the example](#configuring-the-example)
     -   [Flashing and debugging](#flashing-and-debugging)
     -   [Accessing the command line](#accessing-the-command-line)
@@ -58,7 +59,7 @@ states are depicted:
 *   _Rapid Even Flashing (100ms on/100ms off)_ &mdash; The device is in an
     unprovisioned state and a commissioning application is connected via BLE.
 
--   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is full
+-   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
     provisioned, but does not yet have full network (Thread) or service
     connectivity.
 
@@ -80,8 +81,9 @@ cancelled by releasing the button at any point before the 6 second limit.
 to mimick a user manually switching the lighting. The button behaves as a
 toggle, swapping the state every time it is pressed.
 
-**Button #3** can be used to trigger a thread joiner. It should be use to
-commission to the thread network. Credentials will be presented in log messages.
+**Button #3** can be used to start Thread networking using default configuration
+which was selected to match OpenThread Border Router default settings and
+network credentials.
 
 The remaining two LEDs (#3 and #4) and button #4 are unused.
 
@@ -90,6 +92,14 @@ The remaining two LEDs (#3 and #4) and button #4 are unused.
 ## Building
 
 ### Using Docker container
+
+> **Important**:
+>
+> Due to
+> [certain limitations of Docker for MacOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container)
+> it is impossible to use the Docker container to communicate with a USB device
+> such as nRF 52840 DK. Therefore, MacOS users are advised to follow the
+> [Using Native shell](#using-native-shell) instruction.
 
 The easiest way to get started with the example is to use nRF Connect SDK Docker
 image for CHIP applications. Run the following commands to start a Docker
@@ -116,8 +126,8 @@ and CHIP sources downloaded yet, run `setup` command in the container to pull
 the sources into directories mounted as `/var/ncs` and `/var/chip`,
 respectively:
 
-        $ setup
-        /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [master]? [Y/N] y
+        $ setup --ncs 83764f
+        /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [83764f]? [Y/N] y
         ...
         /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
         ...
@@ -137,6 +147,9 @@ be done in the container.
 
 Before building the example,
 [download the nRF Connect SDK and install all requirements](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html).
+Please read the
+[Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
+section to learn which version to use to avoid unexpected compatibility issues.
 
 If you don't want to use SEGGER Embedded Studio, you may skip the part about
 installing and configuring it.
@@ -174,10 +187,15 @@ The following commands will build the `lighting-app` example:
 After a successful build, the binary will be available under
 `<example-dir>/build/zephyr/zephyr.hex`
 
-### Troubleshooting
+### Supported nRF Connect SDK versions
 
-If the example fails to build on your system make sure that you use a recent
-version of nRF Connect SDK. Please refer to
+It is recommended to use the nRF Connect version which is being verified as a
+part of CHIP Continuous Integration testing, which happens to be `83764f` at the
+moment. You may verify that the revision is used in
+[chip-build-nrf-platform](https://github.com/project-chip/connectedhomeip/blob/master/integrations/docker/images/chip-build-nrf-platform/Dockerfile)
+Docker image in case of doubt.
+
+Please refer to
 [this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories)
 in the user guide to learn how to update nRF Connect SDK repository.
 

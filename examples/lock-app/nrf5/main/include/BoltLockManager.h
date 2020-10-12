@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef LOCK_MANAGER_H
-#define LOCK_MANAGER_H
+#pragma once
 
 #include <AppEvent.h>
 #include <stdbool.h>
@@ -78,5 +77,3 @@ inline BoltLockManager & BoltLockMgr(void)
 {
     return BoltLockManager::sLock;
 }
-
-#endif // LOCK_MANAGER_H

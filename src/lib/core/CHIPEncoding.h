@@ -31,8 +31,7 @@
  *
  */
 
-#ifndef _CHIPENCODING_H
-#define _CHIPENCODING_H
+#pragma once
 
 #include <nlbyteorder.hpp>
 #include <nlio-byteorder.hpp>
@@ -921,5 +920,3 @@ inline void Write64(uint8_t *& p, uint64_t v)
 
 } // namespace Encoding
 } // namespace chip
-
-#endif // _CHIPENCODING_H

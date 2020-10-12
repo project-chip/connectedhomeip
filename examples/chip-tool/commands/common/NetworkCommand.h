@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef __CHIPTOOL_IPCOMMAND_H__
-#define __CHIPTOOL_IPCOMMAND_H__
+#pragma once
 
 #include "Command.h"
 
@@ -46,7 +45,7 @@ public:
         }
     }
 
-    const char * GetName(void) const { return mName; }
+    const char * GetNetworkName(void) const { return mName; }
 
     virtual void OnConnect(ChipDeviceController * dc)                                      = 0;
     virtual void OnError(ChipDeviceController * dc, CHIP_ERROR err)                        = 0;
@@ -65,5 +64,3 @@ private:
     uint32_t mDiscriminator;
     uint32_t mSetupPINCode;
 };
-
-#endif //__CHIPTOOL_IPCOMMAND_H__

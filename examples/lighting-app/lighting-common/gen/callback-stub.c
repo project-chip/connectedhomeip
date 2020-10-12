@@ -43,6 +43,16 @@
 //#include "hal/hal.h"
 //#include EMBER_AF_API_NETWORK_STEERING
 
+/** @brief On/off Cluster Server Post Init
+ *
+ * Following resolution of the On/Off state at startup for this endpoint,
+ * perform any additional initialization needed; e.g., synchronize hardware
+ * state.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
+
 /** @brief Add To Current App Tasks
  *
  * This function is only useful to sleepy end devices.  This function will note
@@ -2478,8 +2488,6 @@ void halSleepCallback(bool enter, SleepModes sleepMode) {}
 
 // These functions / constants are added to avoid ld failure when building with GN
 // They should be removed if we have zcl updates and nolonger need this or causing other errors
-void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
-
 bool emberAfIsCurrentSecurityProfileSmartEnergy(void)
 {
     return false;

@@ -866,7 +866,6 @@ CHIP_ERROR BLEManagerImpl::SetSubscribed(uint16_t conId)
         else if (mSubscribedConIds[i] == BLE_CONNECTION_UNINITIALIZED && i < freeIndex)
         {
             freeIndex = i;
-            break;
         }
     }
 

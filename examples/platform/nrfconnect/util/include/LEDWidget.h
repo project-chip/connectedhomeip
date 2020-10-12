@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef LED_WIDGET_H
-#define LED_WIDGET_H
+#pragma once
 
 #include <cstdint>
 
@@ -41,5 +40,3 @@ private:
 
     void DoSet(bool state);
 };
-
-#endif // LED_WIDGET_H

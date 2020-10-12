@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef CHIPARGPARSER_H_
-#define CHIPARGPARSER_H_
+#pragma once
 
 #include <core/CHIPCore.h>
 
@@ -159,5 +158,3 @@ public:
 } // namespace chip
 
 #endif // CHIP_CONFIG_ENABLE_ARG_PARSER
-
-#endif // CHIPARGPARSER_H_

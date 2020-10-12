@@ -29,6 +29,8 @@
 
 #include <core/CHIPEncoding.h>
 #include <platform/ESP32/ESP32Utils.h>
+#include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -367,7 +369,7 @@ CHIP_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str, size_t st
 
     if (str != NULL)
     {
-        strCopy = strndup(str, strLen);
+        strCopy = chip::Platform::MemoryAllocString(str, strLen);
         VerifyOrExit(strCopy != NULL, err = CHIP_ERROR_NO_MEMORY);
     }
 
@@ -376,7 +378,7 @@ CHIP_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str, size_t st
 exit:
     if (strCopy != NULL)
     {
-        free(strCopy);
+        chip::Platform::MemoryFree(strCopy);
     }
     return err;
 }

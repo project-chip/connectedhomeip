@@ -45,8 +45,7 @@
  *      stack.
  */
 
-#ifndef BLELAYER_H_
-#define BLELAYER_H_
+#pragma once
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
@@ -356,5 +355,3 @@ private:
 } /* namespace chip */
 
 #include "BLEEndPoint.h"
-
-#endif /* BLELAYER_H_ */

@@ -25,8 +25,7 @@
  *
  */
 
-#ifndef BLEENDPOINT_H_
-#define BLEENDPOINT_H_
+#pragma once
 
 #include <system/SystemMutex.h>
 
@@ -229,5 +228,3 @@ private:
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* BLEENDPOINT_H_ */

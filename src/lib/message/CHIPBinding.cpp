@@ -1396,7 +1396,7 @@ Binding::Configuration & Binding::Configuration::Target_ServiceEndpoint(uint64_t
  *
  * @return                              A reference to the binding object.
  */
-Binding::Configuration & Binding::Configuration::TargetAddress_IP(const Inet::IPAddress aPeerAddress, const uint16_t aPeerPort,
+Binding::Configuration & Binding::Configuration::TargetAddress_IP(const Inet::IPAddress & aPeerAddress, const uint16_t aPeerPort,
                                                                   const InterfaceId aInterfaceId)
 {
     mBinding.mAddressingOption = Binding::kAddressing_UnicastIP;

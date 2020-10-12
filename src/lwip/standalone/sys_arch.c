@@ -73,6 +73,8 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <support/CHIPPlatformMemory.h>
+
 #include "lwip/opt.h"
 #include "lwip/stats.h"
 #include "lwip/sys.h"
@@ -133,7 +135,7 @@ static struct sys_thread * introduce_thread(pthread_t id)
 {
     struct sys_thread * thread;
 
-    thread = (struct sys_thread *) malloc(sizeof(struct sys_thread));
+    thread = (struct sys_thread *) CHIPPlatformMemoryAlloc(sizeof(struct sys_thread));
 
     if (thread != NULL)
     {
@@ -179,7 +181,7 @@ static void finish_thread(struct sys_thread * thread)
         }
 
         pthread_mutex_unlock(&threads_mutex);
-        free(thread);
+        CHIPPlatformMemoryFree(thread);
     }
 }
 /*-----------------------------------------------------------------------------------*/
@@ -231,7 +233,7 @@ err_t sys_mbox_new(struct sys_mbox ** mb, int size)
     struct sys_mbox * mbox;
     LWIP_UNUSED_ARG(size);
 
-    mbox = (struct sys_mbox *) malloc(sizeof(struct sys_mbox));
+    mbox = (struct sys_mbox *) CHIPPlatformMemoryAlloc(sizeof(struct sys_mbox));
     if (mbox == NULL)
     {
         return ERR_MEM;
@@ -260,7 +262,7 @@ void sys_mbox_free(struct sys_mbox ** mb)
         sys_sem_free_internal(mbox->mutex);
         mbox->not_empty = mbox->not_full = mbox->mutex = NULL;
         /*  LWIP_DEBUGF("sys_mbox_free: mbox 0x%lx\n", mbox); */
-        free(mbox);
+        CHIPPlatformMemoryFree(mbox);
     }
 }
 /*-----------------------------------------------------------------------------------*/
@@ -441,7 +443,7 @@ static struct sys_sem * sys_sem_new_internal(u8_t count)
 {
     struct sys_sem * sem;
 
-    sem = (struct sys_sem *) malloc(sizeof(struct sys_sem));
+    sem = (struct sys_sem *) CHIPPlatformMemoryAlloc(sizeof(struct sys_sem));
     if (sem != NULL)
     {
         sem->c = count;
@@ -560,7 +562,7 @@ static void sys_sem_free_internal(struct sys_sem * sem)
 {
     pthread_cond_destroy(&(sem->cond));
     pthread_mutex_destroy(&(sem->mutex));
-    free(sem);
+    CHIPPlatformMemoryFree(sem);
 }
 /*-----------------------------------------------------------------------------------*/
 void sys_sem_free(struct sys_sem ** sem)

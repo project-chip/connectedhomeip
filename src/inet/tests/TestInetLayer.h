@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef TESTINETLAYER_H
-#define TESTINETLAYER_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -38,5 +37,3 @@ int TestInetLayerDNS(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // TESTINETLAYER_H

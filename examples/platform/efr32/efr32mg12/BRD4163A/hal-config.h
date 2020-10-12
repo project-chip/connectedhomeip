@@ -32,8 +32,7 @@
  *
  ******************************************************************************/
 
-#ifndef HAL_CONFIG_H
-#define HAL_CONFIG_H
+#pragma once
 
 #include "board_features.h"
 #include "hal-config-app-common.h"
@@ -102,5 +101,3 @@
 #define HAL_USART1_FREQUENCY (1000000UL)
 
 #define HAL_VCOM_ENABLE (1)
-
-#endif /* HAL_CONFIG_H */

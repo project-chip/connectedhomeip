@@ -26,8 +26,7 @@
  *
  */
 
-#ifndef __CHIPDEVICECONTROLLER_H
-#define __CHIPDEVICECONTROLLER_H
+#pragma once
 
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
@@ -154,7 +153,7 @@ public:
      * @return CHIP_ERROR           The connection status
      */
     [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
-    ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, Inet::IPAddress deviceAddr, void * appReqState,
+    ConnectDeviceWithoutSecurePairing(NodeId remoteDeviceId, const Inet::IPAddress & deviceAddr, void * appReqState,
                                       NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
                                       ErrorHandler onError, uint16_t devicePort = CHIP_PORT,
                                       Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
@@ -285,5 +284,3 @@ private:
 
 } // namespace DeviceController
 } // namespace chip
-
-#endif // __CHIPDEVICECONTROLLER_H

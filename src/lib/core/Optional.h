@@ -21,6 +21,7 @@
  *      or may not be present.
  *
  */
+#pragma once
 
 #include <assert.h>
 

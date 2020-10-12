@@ -29,8 +29,7 @@
  *
  */
 
-#ifndef CHIP_ERROR_H
-#define CHIP_ERROR_H
+#pragma once
 
 #include <core/CHIPConfig.h>
 // clang-format off
@@ -1707,5 +1706,3 @@ extern void RegisterCHIPLayerErrorFormatter();
 extern bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err);
 
 } // namespace chip
-
-#endif // CHIP_ERROR_H

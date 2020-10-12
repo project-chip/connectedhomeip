@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef LIGHTING_MANAGER_H
-#define LIGHTING_MANAGER_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -68,5 +67,3 @@ inline LightingManager & LightingMgr(void)
 {
     return LightingManager::sLight;
 }
-
-#endif // LIGHTING_MANAGER_H

@@ -353,7 +353,7 @@ public:
 
     Configuration & TargetAddress_ChipService();
     Configuration & TargetAddress_ChipFabric(uint16_t aSubnetId);
-    Configuration & TargetAddress_IP(Inet::IPAddress aPeerAddress, uint16_t aPeerPort = CHIP_PORT,
+    Configuration & TargetAddress_IP(const Inet::IPAddress & aPeerAddress, uint16_t aPeerPort = CHIP_PORT,
                                      Inet::InterfaceId aInterfaceId = INET_NULL_INTERFACEID);
     Configuration & TargetAddress_IP(const char * aHostName, uint16_t aPeerPort = CHIP_PORT,
                                      Inet::InterfaceId aInterfaceId = INET_NULL_INTERFACEID);

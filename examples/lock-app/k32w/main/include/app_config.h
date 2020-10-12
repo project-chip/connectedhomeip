@@ -18,8 +18,7 @@
 
 #include "LED.h"
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#pragma once
 
 // ---- Lock Example App Config ----
 
@@ -51,5 +50,3 @@
 #define K32W_LOG(...) k32wLog(__VA_ARGS__);
 
 void k32wLog(const char * aFormat, ...);
-
-#endif // APP_CONFIG_H

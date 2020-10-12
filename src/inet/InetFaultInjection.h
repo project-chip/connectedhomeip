@@ -21,8 +21,7 @@
  *      Header file for the fault-injection utilities for Inet.
  */
 
-#ifndef INET_FAULT_INJECTION_H_
-#define INET_FAULT_INJECTION_H_
+#pragma once
 
 #include <inet/InetConfig.h>
 
@@ -73,5 +72,3 @@ DLL_EXPORT nl::FaultInjection::Manager & GetManager();
 #define INET_FAULT_INJECT(aFaultID, aStatement)
 
 #endif // INET_CONFIG_TEST
-
-#endif // INET_FAULT_INJECTION_H_

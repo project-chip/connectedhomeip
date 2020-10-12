@@ -26,8 +26,7 @@
  *
  */
 
-#ifndef CHIP_TLV_DATA_H_
-#define CHIP_TLV_DATA_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -393,4 +392,3 @@
 #define CHIP_TLV_BYTE_STRING_8ByteLength(TagSpec, StringLength, ...)                                                               \
     chip::TLV::TLVElementType::ByteString_8ByteLength | TagSpec, CHIP_TLV_Serialize64((uint64_t)(StringLength)), ##__VA_ARGS__
 
-#endif /* CHIPTLVDATA_H_ */

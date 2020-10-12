@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef __CHIPTOOL_COMMANDS_H__
-#define __CHIPTOOL_COMMANDS_H__
+#pragma once
 
 #include "Command.h"
 #include <map>
@@ -31,7 +30,7 @@ public:
     using NodeId               = ::chip::NodeId;
 
     void Register(const char * clusterName, commands_list commandsList);
-    int Run(NodeId localId, NodeId remoteId, int argc, char * argv[]);
+    int Run(NodeId localId, NodeId remoteId, int argc, char ** argv);
 
 private:
     CHIP_ERROR RunCommand(ChipDeviceController & dc, NodeId remoteId, int argc, char * argv[]);
@@ -43,5 +42,3 @@ private:
 
     std::map<const char *, std::vector<std::unique_ptr<Command>>> clusters;
 };
-
-#endif // __CHIPTOOL_COMMANDS_H__

@@ -17,8 +17,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef DEVICEMANAGER_BLEPLATFORMDELEGATE_H_
-#define DEVICEMANAGER_BLEPLATFORMDELEGATE_H_
+#pragma once
 
 #include <ble/BleLayer.h>
 #include <ble/BlePlatformDelegate.h>
@@ -60,5 +59,3 @@ private:
     SubscribeBleCharacteristicCBFunct subscribeCB;
     CloseBleCBFunct closeCB;
 };
-
-#endif /* DEVICEMANAGER_BLEPLATFORMDELEGATE_H_ */

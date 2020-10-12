@@ -315,6 +315,7 @@ exit:
 
 CHIP_ERROR PosixConfig::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
+#if CHIP_CONFIG_MEMORY_MGMT_MALLOC
     CHIP_ERROR err;
     char * strCopy = nullptr;
 
@@ -332,6 +333,9 @@ exit:
         free(strCopy);
     }
     return err;
+#else
+#error "Unsupported CHIP_CONFIG_MEMORY_MGMT configuration"
+#endif
 }
 
 CHIP_ERROR PosixConfig::WriteConfigValueBin(Key key, const uint8_t * data, size_t dataLen)

@@ -21,8 +21,7 @@
  *      Header file for the fault-injection utilities for Inet.
  */
 
-#ifndef CHIP_FAULT_INJECTION_H_
-#define CHIP_FAULT_INJECTION_H_
+#pragma once
 
 #include <core/CHIPConfig.h>
 #include <core/CHIPEventLoggingConfig.h>
@@ -137,5 +136,3 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg);
 #define CHIP_FAULT_INJECT_MAX_ARG(aFaultID, aMaxArg, aProtectedStatements, aUnprotectedStatements)
 
 #endif // CHIP_CONFIG_TEST
-
-#endif // CHIP_FAULT_INJECTION_H_

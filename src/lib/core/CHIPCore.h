@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef CHIPCORE_H_
-#define CHIPCORE_H_
+#pragma once
 
 #include <core/CHIPConfig.h>
 
@@ -42,5 +41,3 @@
 #define CHIP_CORE_PREFIX CHIP_CORE_IDENTITY ": "
 
 #include <core/CHIPError.h>
-
-#endif /* CHIPCORE_H_ */

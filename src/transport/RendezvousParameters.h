@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef __TRANSPORT_RENDEZVOUSPARAMETERS_H__
-#define __TRANSPORT_RENDEZVOUSPARAMETERS_H__
+#pragma once
 
 #include <transport/raw/Base.h>
 
@@ -32,6 +31,8 @@ class RendezvousParameters
 {
 public:
     RendezvousParameters() = default;
+
+    bool IsController() const { return HasDiscriminator() || HasConnectionObject(); }
 
     bool HasSetupPINCode() const { return mSetupPINCode != 0; }
     uint32_t GetSetupPINCode() const { return mSetupPINCode; }
@@ -73,6 +74,8 @@ public:
         mConnectionObject = connObj;
         return *this;
     }
+#else
+    bool HasConnectionObject() const { return false; }
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
@@ -87,5 +90,3 @@ private:
 };
 
 } // namespace chip
-
-#endif // __TRANSPORT_RENDEZVOUSPARAMETERS_H__

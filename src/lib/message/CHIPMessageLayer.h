@@ -680,9 +680,9 @@ private:
     void CloseListeningEndpoints();
 
     CHIP_ERROR RefreshEndpoint(Inet::TCPEndPoint *& endPoint, bool enable, const char * name, Inet::IPAddressType addrType,
-                               Inet::IPAddress addr, uint16_t port);
+                               const Inet::IPAddress & addr, uint16_t port);
     CHIP_ERROR RefreshEndpoint(Inet::UDPEndPoint *& endPoint, bool enable, const char * name, Inet::IPAddressType addrType,
-                               Inet::IPAddress addr, uint16_t port, Inet::InterfaceId intfId);
+                               const Inet::IPAddress & addr, uint16_t port, Inet::InterfaceId intfId);
 
     CHIP_ERROR SendMessage(const Inet::IPAddress & destAddr, uint16_t destPort, Inet::InterfaceId sendIntfId,
                            PacketBuffer * payload, uint32_t msgFlags);

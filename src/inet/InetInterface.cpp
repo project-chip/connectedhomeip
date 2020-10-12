@@ -32,6 +32,7 @@
 #include "InetLayer.h"
 #include "InetLayerEvents.h"
 
+#include <support/CHIPMemString.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 

@@ -22,8 +22,7 @@
  *          for EFR32 platforms using the Silicon Labs SDK.
  */
 
-#ifndef PLATFORM_MANAGER_IMPL_H
-#define PLATFORM_MANAGER_IMPL_H
+#pragma once
 
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.h>
 
@@ -90,5 +89,3 @@ inline PlatformManagerImpl & PlatformMgrImpl(void)
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // PLATFORM_MANAGER_IMPL_H

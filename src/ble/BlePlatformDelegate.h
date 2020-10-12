@@ -22,8 +22,7 @@
  *      to a platform's BLE framework.
  */
 
-#ifndef BLEPLATFORMDELEGATE_H_
-#define BLEPLATFORMDELEGATE_H_
+#pragma once
 
 #include <ble/BleConfig.h>
 
@@ -93,5 +92,3 @@ public:
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* BLEPLATFORMDELEGATE_H_ */

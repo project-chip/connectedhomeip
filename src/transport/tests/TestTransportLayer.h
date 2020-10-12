@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef TESTTRANSPORTLAYER_H
-#define TESTTRANSPORTLAYER_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -40,5 +39,3 @@ int TestUDP(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // TESTTRANSPORTLAYER_H

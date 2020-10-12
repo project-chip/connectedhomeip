@@ -17,8 +17,7 @@
  *    limitations under the License.
  */
 
-#ifndef APP_TASK_H
-#define APP_TASK_H
+#pragma once
 
 #include "AppEvent.h"
 #include "BoltLockManager.h"
@@ -74,5 +73,3 @@ inline AppTask & GetAppTask(void)
 {
     return AppTask::sAppTask;
 }
-
-#endif // APP_TASK_H

@@ -48,8 +48,7 @@
  *          Provides Bluez dbus implementation for BLE
  */
 
-#ifndef CHIP_BLUEZ_HELPER_H
-#define CHIP_BLUEZ_HELPER_H
+#pragma once
 
 #include "BLEManagerImpl.h"
 #include <stdbool.h>
@@ -217,4 +216,3 @@ CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice);
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#endif // CHIP_BLUEZ_HELPER_H

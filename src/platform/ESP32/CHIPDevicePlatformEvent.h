@@ -23,8 +23,7 @@
  *          CHIP Device Layer on the ESP32.
  */
 
-#ifndef CHIP_DEVICE_PLATFORM_EVENT_H
-#define CHIP_DEVICE_PLATFORM_EVENT_H
+#pragma once
 
 #include <platform/CHIPDeviceEvent.h>
 
@@ -77,5 +76,3 @@ struct ChipDevicePlatformEvent final
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_PLATFORM_EVENT_H

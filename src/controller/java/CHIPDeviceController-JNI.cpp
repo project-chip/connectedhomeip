@@ -26,6 +26,7 @@
 #include "AndroidBleConnectionDelegate.h"
 #include "AndroidBlePlatformDelegate.h"
 
+#include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
 #include <jni.h>
 #include <pthread.h>
@@ -62,7 +63,7 @@ using namespace chip::DeviceController;
 
 static void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState);
 static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
-static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void * appReqState);
+static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, const char * operation);
 static void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 static bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
                                      const uint8_t * characteristicData, uint32_t characteristicDataLen);
@@ -114,9 +115,6 @@ private:
     pthread_mutex_t * mMutex;
 };
 
-} // namespace
-
-namespace {
 // Use StackUnlockGuard to temporarily unlock the CHIP BLE stack, e.g. when calling application
 // or Android BLE code as a result of a BLE event.
 struct StackUnlockGuard
@@ -304,8 +302,8 @@ JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong deviceC
 
     {
         ScopedPthreadLock lock(&sStackLock);
-        err = deviceController->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, (void *) "ConnectDevice",
-                                                                  HandleKeyExchange, HandleEchoResponse, HandleError, CHIP_PORT);
+        err = deviceController->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, nullptr, HandleKeyExchange,
+                                                                  HandleEchoResponse, HandleError, CHIP_PORT);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -374,7 +372,6 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceContr
         }
         else
         {
-
             // Hardcode endpoint to 1 for now
             uint8_t endpoint = 1;
 
@@ -382,13 +379,13 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceContr
             switch (commandID)
             {
             case 0:
-                dataLength = encodeOffCommand(buffer->Start(), bufferSize, endpoint);
+                dataLength = encodeOnOffClusterOffCommand(buffer->Start(), bufferSize, endpoint);
                 break;
             case 1:
-                dataLength = encodeOnCommand(buffer->Start(), bufferSize, endpoint);
+                dataLength = encodeOnOffClusterOnCommand(buffer->Start(), bufferSize, endpoint);
                 break;
             case 2:
-                dataLength = encodeToggleCommand(buffer->Start(), bufferSize, endpoint);
+                dataLength = encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, endpoint);
                 break;
             default:
                 ChipLogError(Controller, "Unknown command: %d", commandID);
@@ -407,6 +404,112 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceContr
         ChipLogError(Controller, "Failed to send CHIP command.");
         ThrowError(env, err);
     }
+}
+
+static bool JavaBytesToUUID(JNIEnv * env, jbyteArray value, chip::Ble::ChipBleUUID & uuid)
+{
+    const auto valueBegin  = env->GetByteArrayElements(value, nullptr);
+    const auto valueLength = env->GetArrayLength(value);
+    bool result            = true;
+
+    VerifyOrExit(valueBegin && valueLength == sizeof(uuid.bytes), result = false);
+    memcpy(uuid.bytes, valueBegin, valueLength);
+
+exit:
+    env->ReleaseByteArrayElements(value, valueBegin, 0);
+    return result;
+}
+
+JNI_METHOD(void, handleIndicationReceived)
+(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId, jbyteArray value)
+{
+    BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
+    const auto valueBegin               = env->GetByteArrayElements(value, nullptr);
+    const auto valueLength              = env->GetArrayLength(value);
+
+    chip::Ble::ChipBleUUID svcUUID;
+    chip::Ble::ChipBleUUID charUUID;
+    chip::System::PacketBuffer * buffer = nullptr;
+
+    VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
+                 ChipLogError(Controller, "handleIndicationReceived() called with invalid service ID"));
+    VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
+                 ChipLogError(Controller, "handleIndicationReceived() called with invalid characteristic ID"));
+
+    buffer = System::PacketBuffer::NewWithAvailableSize(valueLength);
+    VerifyOrExit(buffer, ChipLogError(Controller, "Failed to allocate packet buffer"));
+
+    memcpy(buffer->Start(), valueBegin, valueLength);
+    buffer->SetDataLength(valueLength);
+
+    pthread_mutex_lock(&sStackLock);
+    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, buffer);
+    pthread_mutex_unlock(&sStackLock);
+exit:
+    env->ReleaseByteArrayElements(value, valueBegin, 0);
+}
+
+JNI_METHOD(void, handleWriteConfirmation)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
+{
+    BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
+
+    chip::Ble::ChipBleUUID svcUUID;
+    chip::Ble::ChipBleUUID charUUID;
+    VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
+                 ChipLogError(Controller, "handleWriteConfirmation() called with invalid service ID"));
+    VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
+                 ChipLogError(Controller, "handleWriteConfirmation() called with invalid characteristic ID"));
+
+    pthread_mutex_lock(&sStackLock);
+    sBleLayer.HandleWriteConfirmation(connObj, &svcUUID, &charUUID);
+    pthread_mutex_unlock(&sStackLock);
+exit:
+    return;
+}
+
+JNI_METHOD(void, handleSubscribeComplete)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
+{
+    BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
+
+    chip::Ble::ChipBleUUID svcUUID;
+    chip::Ble::ChipBleUUID charUUID;
+    VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
+                 ChipLogError(Controller, "handleSubscribeComplete() called with invalid service ID"));
+    VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
+                 ChipLogError(Controller, "handleSubscribeComplete() called with invalid characteristic ID"));
+
+    pthread_mutex_lock(&sStackLock);
+    sBleLayer.HandleSubscribeComplete(connObj, &svcUUID, &charUUID);
+    pthread_mutex_unlock(&sStackLock);
+exit:
+    return;
+}
+
+JNI_METHOD(void, handleUnsubscribeComplete)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
+{
+    BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
+
+    chip::Ble::ChipBleUUID svcUUID;
+    chip::Ble::ChipBleUUID charUUID;
+    VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
+                 ChipLogError(Controller, "handleUnsubscribeComplete() called with invalid service ID"));
+    VerifyOrExit(JavaBytesToUUID(env, charId, charUUID),
+                 ChipLogError(Controller, "handleUnsubscribeComplete() called with invalid characteristic ID"));
+
+    pthread_mutex_lock(&sStackLock);
+    sBleLayer.HandleUnsubscribeComplete(connObj, &svcUUID, &charUUID);
+    pthread_mutex_unlock(&sStackLock);
+exit:
+    return;
+}
+
+JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
+{
+    BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
+
+    pthread_mutex_lock(&sStackLock);
+    sBleLayer.HandleConnectionError(connObj, BLE_ERROR_APP_CLOSED_CONNECTION);
+    pthread_mutex_unlock(&sStackLock);
 }
 
 JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
@@ -459,7 +562,7 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong devic
     }
 }
 
-void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void * appReqState)
+void HandleSimpleOperationComplete(ChipDeviceController * deviceController, const char * operation)
 {
     StackUnlockGuard unlockGuard;
     JNIEnv * env;
@@ -469,14 +572,14 @@ void HandleSimpleOperationComplete(ChipDeviceController * deviceController, void
     jobject self   = (jobject) deviceController->AppState;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "Received response to %s request", (const char *) appReqState);
+    ChipLogProgress(Controller, "Received response to %s request", operation);
 
     sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
     deviceControllerCls = env->GetObjectClass(self);
     VerifyOrExit(deviceControllerCls != NULL, err = CDC_JNI_ERROR_TYPE_NOT_FOUND);
 
-    snprintf(methodName, sizeof(methodName) - 1, "on%sComplete", (const char *) appReqState);
+    snprintf(methodName, sizeof(methodName) - 1, "on%sComplete", operation);
     methodName[sizeof(methodName) - 1] = 0;
     methodID                           = env->GetMethodID(deviceControllerCls, methodName, "()V");
     VerifyOrExit(methodID != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
@@ -523,7 +626,7 @@ exit:
 
 void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState)
 {
-    HandleSimpleOperationComplete(deviceController, appReqState);
+    HandleSimpleOperationComplete(deviceController, "ConnectDevice");
 }
 
 void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)

@@ -22,8 +22,7 @@
  *          stack.
  */
 
-#ifndef THREAD_STACK_MANAGER_IMPL_H
-#define THREAD_STACK_MANAGER_IMPL_H
+#pragma once
 
 #include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.h>
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.h>
@@ -117,5 +116,3 @@ inline ThreadStackManagerImpl & ThreadStackMgrImpl(void)
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // THREAD_STACK_MANAGER_IMPL_H

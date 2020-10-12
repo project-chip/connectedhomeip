@@ -24,8 +24,7 @@
  *   Class declarations for a Counter base class, and a monotonically-increasing counter.
  */
 
-#ifndef CHIP_COUNTER_H
-#define CHIP_COUNTER_H
+#pragma once
 
 #include <core/CHIPError.h>
 
@@ -105,5 +104,3 @@ protected:
 };
 
 } // namespace chip
-
-#endif // CHIP_COUNTER_H

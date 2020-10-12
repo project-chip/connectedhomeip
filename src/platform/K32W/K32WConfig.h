@@ -22,8 +22,7 @@
  *          platforms based on the NXP K32W SDK.
  */
 
-#ifndef K32W_CONFIG_H
-#define K32W_CONFIG_H
+#pragma once
 
 #include <functional>
 
@@ -172,5 +171,3 @@ inline constexpr uint8_t K32WConfig::GetRecordKey(Key key)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // K32W_CONFIG_H

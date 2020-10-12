@@ -20,9 +20,7 @@
  *    @file
  *      This header file includes common private definitions for the CHIP system layer.
  */
-
-#ifndef SYSTEMLAYERPRIVATE_H
-#define SYSTEMLAYERPRIVATE_H
+#pragma once
 
 #include <system/SystemConfig.h>
 
@@ -44,5 +42,3 @@
 #endif // LWIP_VERSION_MAJOR
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-#endif // defined(SYSTEMLAYERPRIVATE_H)

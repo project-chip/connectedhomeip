@@ -26,8 +26,7 @@
  *      control blocks, as the system is configured accordingly.
  */
 
-#ifndef UDPENDPOINT_H
-#define UDPENDPOINT_H
+#pragma once
 
 #include "inet/IPEndPointBasis.h"
 #include <inet/IPAddress.h>
@@ -53,13 +52,14 @@ class DLL_EXPORT UDPEndPoint : public IPEndPointBasis
     friend class InetLayer;
 
 public:
-    INET_ERROR Bind(IPAddressType addrType, IPAddress addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
+    INET_ERROR Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
     INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface();
     uint16_t GetBoundPort();
     INET_ERROR Listen();
-    INET_ERROR SendTo(IPAddress addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
-    INET_ERROR SendTo(IPAddress addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg,
+                      uint16_t sendFlags = 0);
     INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
     void Close();
     void Free();
@@ -94,5 +94,3 @@ private:
 
 } // namespace Inet
 } // namespace chip
-
-#endif // !defined(UDPENDPOINT_H)

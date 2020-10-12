@@ -27,8 +27,7 @@
  *      pre-existing elements.
  */
 
-#ifndef CHIP_CIRCULAR_TLV_BUFFER_H_
-#define CHIP_CIRCULAR_TLV_BUFFER_H_
+#pragma once
 
 #include <core/CHIPError.h>
 #include <core/CHIPTLV.h>
@@ -152,5 +151,3 @@ public:
 
 } // namespace TLV
 } // namespace chip
-
-#endif // CHIP_CIRCULAR_TLV_BUFFER_H_

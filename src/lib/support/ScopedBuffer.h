@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef CHIP_SCOPED_BUFFER_H_
-#define CHIP_SCOPED_BUFFER_H_
+#pragma once
 
 #include <lib/support/CHIPMem.h>
 
@@ -51,17 +50,15 @@ public:
     ScopedMemoryBufferBase(const ScopedMemoryBufferBase &) = delete;
     ScopedMemoryBufferBase & operator=(const ScopedMemoryBufferBase & other) = delete;
 
-    ScopedMemoryBufferBase(ScopedMemoryBufferBase && other)
-    {
-        if (this == &other)
-            return;
-        *this = std::move(other);
-    }
+    ScopedMemoryBufferBase(ScopedMemoryBufferBase && other) { *this = std::move(other); }
 
     ScopedMemoryBufferBase & operator=(ScopedMemoryBufferBase && other)
     {
-        mBuffer       = other.mBuffer;
-        other.mBuffer = nullptr;
+        if (this != &other)
+        {
+            mBuffer       = other.mBuffer;
+            other.mBuffer = nullptr;
+        }
         return *this;
     }
 
@@ -178,5 +175,3 @@ public:
 
 } // namespace Platform
 } // namespace chip
-
-#endif // CHIP_SCOPED_BUFFER_H_

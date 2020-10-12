@@ -26,8 +26,7 @@
  *      control blocks, as the system is configured accordingly.
  */
 
-#ifndef RAWENDPOINT_H
-#define RAWENDPOINT_H
+#pragma once
 
 #include "inet/IPEndPointBasis.h"
 #include <inet/IPAddress.h>
@@ -71,13 +70,13 @@ public:
      */
     IPProtocol IPProto; // This data member is read-only
 
-    INET_ERROR Bind(IPAddressType addrType, IPAddress addr, InterfaceId intfId = INET_NULL_INTERFACEID);
-    INET_ERROR BindIPv6LinkLocal(InterfaceId intfId, IPAddress addr);
+    INET_ERROR Bind(IPAddressType addrType, const IPAddress & addr, InterfaceId intfId = INET_NULL_INTERFACEID);
+    INET_ERROR BindIPv6LinkLocal(InterfaceId intfId, const IPAddress & addr);
     INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface();
     INET_ERROR Listen();
-    INET_ERROR SendTo(IPAddress addr, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
-    INET_ERROR SendTo(IPAddress addr, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(const IPAddress & addr, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
     INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
     INET_ERROR SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICMPTypes);
     void Close();
@@ -115,5 +114,3 @@ private:
 
 } // namespace Inet
 } // namespace chip
-
-#endif // !defined(RAWENDPOINT_H)

@@ -25,8 +25,7 @@
  *      control blocks, as the system is configured accordingly.
  */
 
-#ifndef TCPENDPOINT_H
-#define TCPENDPOINT_H
+#pragma once
 
 #include <inet/EndPointBasis.h>
 #include <inet/IPAddress.h>
@@ -107,7 +106,7 @@ public:
      *  On LwIP, this method must not be called with the LwIP stack lock
      *  already acquired.
      */
-    INET_ERROR Bind(IPAddressType addrType, IPAddress addr, uint16_t port, bool reuseAddr = false);
+    INET_ERROR Bind(IPAddressType addrType, const IPAddress & addr, uint16_t port, bool reuseAddr = false);
 
     /**
      * @brief   Prepare the endpoint to receive TCP messages.
@@ -153,7 +152,7 @@ public:
      *      destination \c addr (with \c intfId used as the scope
      *      identifier for IPv6 link-local destinations) and \c port.
      */
-    INET_ERROR Connect(IPAddress addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
+    INET_ERROR Connect(const IPAddress & addr, uint16_t port, InterfaceId intfId = INET_NULL_INTERFACEID);
 
     /**
      * @brief   Extract IP address and TCP port of remote endpoint.
@@ -691,5 +690,3 @@ inline void TCPEndPoint::MarkActive()
 
 } // namespace Inet
 } // namespace chip
-
-#endif // !defined(TCPENDPOINT_H)

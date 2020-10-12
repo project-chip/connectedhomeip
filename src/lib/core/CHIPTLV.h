@@ -25,8 +25,7 @@
  *      more compact over the wire.
  */
 
-#ifndef CHIP_TLV_H_
-#define CHIP_TLV_H_
+#pragma once
 
 #include <core/CHIPError.h>
 #include <core/CHIPTLVTags.h>
@@ -444,5 +443,3 @@ private:
 
 } // namespace TLV
 } // namespace chip
-
-#endif /* CHIP_TLV_H_ */

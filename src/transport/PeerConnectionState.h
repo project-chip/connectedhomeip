@@ -19,8 +19,7 @@
  * @brief Defines state relevant for an active connection to a peer.
  */
 
-#ifndef PEER_CONNCTION_STATE_H_
-#define PEER_CONNCTION_STATE_H_
+#pragma once
 
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
@@ -106,5 +105,3 @@ private:
 
 } // namespace Transport
 } // namespace chip
-
-#endif // PEER_CONNCTION_STATE_H_

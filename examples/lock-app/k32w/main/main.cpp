@@ -100,7 +100,6 @@ extern "C" void main_task(void const * argument)
         goto exit;
     }
 
-    // Configure device to operate as a Thread sleepy end-device.
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
     if (ret != CHIP_NO_ERROR)
     {

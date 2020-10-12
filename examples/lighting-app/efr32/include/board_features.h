@@ -32,8 +32,7 @@
  *
  ******************************************************************************/
 
-#ifndef BOARD_FEATURES_H
-#define BOARD_FEATURES_H
+#pragma once
 
 // Top level macros
 #define SILABS_AF_DEVICE_NAME "lighting-example"
@@ -248,5 +247,3 @@
 // #define FEATURE_EFP
 // #define FEATURE_BOARD_DETECTED
 #endif
-
-#endif /* BOARD_FEATURES_H */

@@ -1,6 +1,3 @@
-#ifndef LIGHTINGCLI_H
-#define LIGHTINGCLI_H
+#pragma once
 
 int StartShellTask();
-
-#endif // LIGHTINGCLI_H

@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef CHIPTLVTYPES_H_
-#define CHIPTLVTYPES_H_
+#pragma once
 
 namespace chip {
 namespace TLV {
@@ -188,5 +187,3 @@ inline uint8_t TLVFieldSizeToBytes(TLVFieldSize fieldSize)
 
 } // namespace TLV
 } // namespace chip
-
-#endif /* CHIPTLVTYPES_H_ */

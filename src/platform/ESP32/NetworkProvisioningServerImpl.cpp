@@ -252,7 +252,7 @@ void NetworkProvisioningServerImpl::HandleScanDone()
     scanResultCount = min(scanResultCount, (uint16_t) CHIP_DEVICE_CONFIG_MAX_SCAN_NETWORKS_RESULTS);
 
     // Allocate a buffer to hold the scan results array.
-    scanResults = (wifi_ap_record_t *) malloc(scanResultCount * sizeof(wifi_ap_record_t));
+    scanResults = (wifi_ap_record_t *) chip::Platform::MemoryAlloc(scanResultCount * sizeof(wifi_ap_record_t));
     VerifyOrExit(scanResults != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     // Collect the scan results from the ESP WiFi driver.  Note that this also *frees*

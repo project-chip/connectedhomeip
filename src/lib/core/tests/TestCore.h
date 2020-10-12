@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef TESTCORE_H
-#define TESTCORE_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -37,5 +36,3 @@ int TestReferenceCounted(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // TESTCORE_H

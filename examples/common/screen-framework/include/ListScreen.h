@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef LIST_SCREEN_H
-#define LIST_SCREEN_H
+#pragma once
 
 #include "Screen.h"
 #include "ScreenManager.h"
@@ -124,5 +123,3 @@ public:
 };
 
 #endif // CONFIG_HAVE_DISPLAY
-
-#endif // LIST_SCREEN_H

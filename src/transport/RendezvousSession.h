@@ -20,9 +20,7 @@
  *      This file defines the CHIP RendezvousSession object that maintains a Rendezvous session.
  *
  */
-
-#ifndef __TRANSPORT_RENDEZVOUSSESSION_H__
-#define __TRANSPORT_RENDEZVOUSSESSION_H__
+#pragma once
 
 #include <core/CHIPCore.h>
 #include <protocols/CHIPProtocols.h>
@@ -147,4 +145,3 @@ private:
 };
 
 } // namespace chip
-#endif // __TRANSPORT_RENDEZVOUSSESSION_H__

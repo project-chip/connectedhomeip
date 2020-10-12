@@ -38,6 +38,9 @@
  *******************************************************************************
  ******************************************************************************/
 
+#ifndef SILABS_DOOR_LOCK_SERVER_H
+#define SILABS_DOOR_LOCK_SERVER_H
+
 // ------------------------------------------------------------------------------
 // Core
 
@@ -247,3 +250,5 @@ bool emAfPluginDoorLockServerCheckForSufficientSpace(uint8_t spaceReq, uint8_t s
 
 #define EmberAfDoorLockScheduleEntry EmberAfPluginDoorLockServerWeekdayScheduleEntry
 #define EmberAfDoorLockUser EmberAfPluginDoorLockServerUser
+
+#endif // SILABS_DOOR_LOCK_SERVER_H

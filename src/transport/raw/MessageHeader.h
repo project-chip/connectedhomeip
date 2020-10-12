@@ -20,8 +20,7 @@
  * This file defines CHIP binary header encode/decode.
  */
 
-#ifndef MESSAGEHEADER_H_
-#define MESSAGEHEADER_H_
+#pragma once
 
 #include <cstddef>
 #include <cstdint>
@@ -447,5 +446,3 @@ private:
 };
 
 } // namespace chip
-
-#endif // MESSAGEHEADER_H_

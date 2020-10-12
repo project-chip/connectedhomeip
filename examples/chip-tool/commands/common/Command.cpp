@@ -25,7 +25,7 @@
 
 #include <support/CHIPLogging.h>
 
-bool Command::InitArguments(int argc, char * argv[])
+bool Command::InitArguments(int argc, char ** argv)
 {
     bool isValidCommand = false;
     size_t argsCount    = mArgs.size();

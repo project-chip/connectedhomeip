@@ -16,35 +16,47 @@
  *
  */
 
-#ifndef __CHIPTOOL_TEMPERATURE_MEASUREMENT_COMMANDS_H__
-#define __CHIPTOOL_TEMPERATURE_MEASUREMENT_COMMANDS_H__
+#pragma once
 
 #include "../../common/ModelCommand.h"
 
-class ReadCurrentTemperature : public ModelCommand
+class MoveToPercent : public ModelCommand
 {
 public:
-    ReadCurrentTemperature(const uint16_t clusterId) : ModelCommand("read", clusterId)
+    MoveToPercent(const uint16_t clusterId) : ModelCommand("move-to-percent", clusterId)
     {
-        AddArgument("attr-name", "current-temperature");
+        AddArgument("percent", 0, UINT8_MAX, &mPercent);
     }
 
     size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
     {
-        return encodeReadCurrentTemperatureCommand(buffer->Start(), bufferSize, endPointId);
+        return encodeMoveToPercentCommand(buffer->Start(), bufferSize, endPointId, mPercent);
+    }
+
+private:
+    uint8_t mPercent;
+};
+
+class StopMoveToPercent : public ModelCommand
+{
+public:
+    StopMoveToPercent(const uint16_t clusterId) : ModelCommand("stop-move-to-percent", clusterId) {}
+
+    size_t EncodeCommand(PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) override
+    {
+        return encodeStopMoveToPercentCommand(buffer->Start(), bufferSize, endPointId);
     }
 };
 
-void registerClusterTemperatureMeasurement(Commands & commands)
+void registerClusterBarrierControl(Commands & commands)
 {
-    const char * clusterName = "Temperature Measurement";
-    const uint16_t clusterId = 0x0402;
+    const char * clusterName = "BarrierControl";
+    const uint16_t clusterId = 0x0103;
 
     commands_list clusterCommands = {
-        make_unique<ReadCurrentTemperature>(clusterId),
+        make_unique<MoveToPercent>(clusterId),
+        make_unique<StopMoveToPercent>(clusterId),
     };
 
     commands.Register(clusterName, clusterCommands);
 }
-
-#endif // __CHIPTOOL_TEMPERATURE_MEASUREMENT_COMMANDS_H__

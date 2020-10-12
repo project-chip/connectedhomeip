@@ -21,8 +21,7 @@
  *   all references to it have been removed.
  */
 
-#ifndef REFERENCE_COUNTED_H_
-#define REFERENCE_COUNTED_H_
+#pragma once
 
 #include <limits>
 #include <stdlib.h>
@@ -75,5 +74,3 @@ private:
 };
 
 } // namespace chip
-
-#endif // REFERENCE_COUNTED_H_

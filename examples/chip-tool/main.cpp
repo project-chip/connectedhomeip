@@ -18,12 +18,7 @@
 
 #include "commands/common/Commands.h"
 
-#include "commands/clusters/Basic/Commands.h"
-#include "commands/clusters/ColorControl/Commands.h"
-#include "commands/clusters/DoorLock/Commands.h"
-#include "commands/clusters/Identify/Commands.h"
-#include "commands/clusters/OnOff/Commands.h"
-#include "commands/clusters/TemperatureMeasurement/Commands.h"
+#include "commands/clusters/Commands.h"
 #include "commands/echo/Commands.h"
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -40,12 +35,7 @@ int main(int argc, char * argv[])
     Commands commands;
 
     registerCommandsEcho(commands);
-    registerClusterBasic(commands);
-    registerClusterColorControl(commands);
-    registerClusterDoorLock(commands);
-    registerClusterIdentify(commands);
-    registerClusterOnOff(commands);
-    registerClusterTemperatureMeasurement(commands);
+    registerClusters(commands);
 
     return commands.Run(kLocalDeviceId, kRemoteDeviceId, argc, argv);
 }

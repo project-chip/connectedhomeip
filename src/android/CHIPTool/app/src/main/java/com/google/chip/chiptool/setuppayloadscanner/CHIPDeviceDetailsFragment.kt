@@ -27,6 +27,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipDeviceController
+import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.bluetooth.BluetoothManager
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.*
@@ -89,6 +90,7 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
     private fun onRendezvousBleClicked() {
         if (gatt == null) {
             scope.launch {
+                val deviceController = ChipClient.getDeviceController()
                 val bluetoothManager = BluetoothManager()
                 val device = bluetoothManager.getBluetoothDevice(deviceInfo.discriminator) ?: run {
                     Log.i(TAG, "No device found")
@@ -96,12 +98,14 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
                 }
 
                 gatt = bluetoothManager.connect(requireContext(), device)
+                deviceController.setCompletionListener(this@CHIPDeviceDetailsFragment)
+                deviceController.beginConnectDeviceBle(gatt, deviceInfo.setupPinCode);
             }
         }
     }
 
     override fun onConnectDeviceComplete() {
-        Log.d(TAG, "TODO: Retrieve Wi-Fi credentials and send to device.")
+        Log.d(TAG, "TODO: Retrieve Wi-Fi/Thread credentials and send to device.")
     }
 
     override fun onCloseBleComplete() {

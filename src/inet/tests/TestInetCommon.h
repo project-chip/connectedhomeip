@@ -28,8 +28,7 @@
  *
  */
 
-#ifndef CHIP_TEST_INET_COMMON_H_
-#define CHIP_TEST_INET_COMMON_H_
+#pragma once
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
@@ -97,4 +96,3 @@ inline static void ServiceNetwork(struct ::timeval & aSleepTime)
 extern void SetupFaultInjectionContext(int argc, char * argv[]);
 extern void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(),
                                        void (*aInjectAsyncEvents)(int32_t index));
-#endif /* CHIP_TEST_INET_COMMON_H_ */

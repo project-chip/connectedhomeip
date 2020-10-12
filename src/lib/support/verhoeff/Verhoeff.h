@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef _VERHOEFF_TEST_H
-#define _VERHOEFF_TEST_H
+#pragma once
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -193,5 +192,3 @@ public:
     static int DihedralInvert(int val, int n);
     static int Permute(int val, uint8_t * permTable, int permTableLen, int iterCount);
 };
-
-#endif // _VERHOEFF_TEST_H

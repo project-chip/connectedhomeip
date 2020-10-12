@@ -21,8 +21,7 @@
  *          Defines the public interface for the Device Layer ThreadStackManager object.
  */
 
-#ifndef THREAD_STACK_MANAGER_H
-#define THREAD_STACK_MANAGER_H
+#pragma once
 
 namespace chip {
 namespace DeviceLayer {
@@ -163,6 +162,7 @@ extern ThreadStackManagerImpl & ThreadStackMgrImpl();
 #elif defined(CHIP_DEVICE_LAYER_TARGET)
 #define THREADSTACKMANAGERIMPL_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/ThreadStackManagerImpl.h>
 #include THREADSTACKMANAGERIMPL_HEADER
+#endif // defined(CHIP_DEVICE_LAYER_TARGET)
 
 namespace chip {
 namespace DeviceLayer {
@@ -312,6 +312,3 @@ inline CHIP_ERROR ThreadStackManager::JoinerStart()
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // defined(CHIP_DEVICE_LAYER_TARGET)
-#endif // THREAD_STACK_MANAGER_H

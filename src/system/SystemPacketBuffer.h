@@ -23,8 +23,7 @@
  *      octet-serialized data.
  */
 
-#ifndef SYSTEMPACKETBUFFER_H
-#define SYSTEMPACKETBUFFER_H
+#pragma once
 
 // Include configuration header
 #include <system/SystemConfig.h>
@@ -231,5 +230,3 @@ inline uint16_t PacketBuffer::AllocSize() const
 
 } // namespace System
 } // namespace chip
-
-#endif // defined(SYSTEMPACKETBUFFER_H)

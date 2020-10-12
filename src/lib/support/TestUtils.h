@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef TEST_UTILS_H_
-#define TEST_UTILS_H_
+#pragma once
 
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
@@ -58,5 +57,3 @@ CHIP_ERROR RegisterUnitTests(UnitTestTriggerFunction tests);
 int RunRegisteredUnitTests();
 
 } // namespace chip
-
-#endif /* TEST_UTILS_H_ */

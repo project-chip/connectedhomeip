@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef INET_H
-#define INET_H
+#pragma once
 
 #include <inet/InetConfig.h>
 
@@ -50,5 +49,3 @@
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
 #include <inet/UDPEndPoint.h>
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
-
-#endif // !defined(INET_H)

@@ -17,8 +17,7 @@
  *    limitations under the License.
  */
 
-#ifndef LED_WIDGET_H
-#define LED_WIDGET_H
+#pragma once
 
 #include "Display.h"
 
@@ -56,5 +55,3 @@ private:
 
     friend void ClearErrorState(TimerHandle_t);
 };
-
-#endif // LED_WIDGET_H

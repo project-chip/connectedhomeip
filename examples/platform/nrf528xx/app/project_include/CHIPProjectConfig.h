@@ -25,8 +25,7 @@
  *
  */
 
-#ifndef CHIP_PROJECT_CONFIG_H
-#define CHIP_PROJECT_CONFIG_H
+#pragma once
 
 #if !BUILD_RELEASE // development build
 
@@ -138,5 +137,3 @@
 #else
 #define CHIP_CONFIG_EVENT_LOGGING_DEFAULT_IMPORTANCE chip::Profiles::DataManagement::Debug
 #endif // BUILD_RELEASE
-
-#endif // CHIP_PROJECT_CONFIG_H
