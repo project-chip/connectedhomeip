@@ -28,6 +28,9 @@ chip_inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
 
+mbedtls_target = "${chip_root}/third_party/k32w_sdk:mbedtls"
+openthread_external_mbedtls = mbedtls_target
+
 openthread_project_core_config_file = "openthread-core-k32w061-config.h"
 openthread_core_config_platform_check_file =
     "openthread-core-k32w061-config-check.h"

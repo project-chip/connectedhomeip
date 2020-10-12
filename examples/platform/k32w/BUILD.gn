@@ -25,7 +25,6 @@ source_set("openthread_core_config_k32w_chip_examples") {
   sources = [ "app/project_include/OpenThreadConfig.h" ]
   public_deps = [
     "${chip_root}/third_party/openthread/platforms/k32w:openthread_core_config_k32w",
-    "${k32w_sdk_build_root}:k32w_sdk",
   ]
   public_configs = [ ":chip_examples_project_config" ]
 }

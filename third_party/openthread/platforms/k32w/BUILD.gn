@@ -33,8 +33,6 @@ source_set("openthread_core_config_k32w") {
     "${openthread_root}/examples/platforms/k32w/k32w061/openthread-core-k32w061-config.h",
   ]
 
-  public_deps = [ "${k32w_sdk_build_root}:k32w_sdk" ]
-
   public_configs = [ ":openthread_k32w_config" ]
 }
 
@@ -58,6 +56,7 @@ source_set("libopenthread-k32w") {
 
   public_deps = [
     ":openthread_core_config_k32w",
+    "${k32w_sdk_build_root}:k32w_sdk",
     "${openthread_root}/src/core:libopenthread_core_headers",
     "..:libopenthread-platform",
     "..:libopenthread-platform-utils",
