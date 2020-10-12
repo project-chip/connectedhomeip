@@ -24,7 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
 #include <platform/ConfigurationManager.h>
 #include <platform/EFR32/EFR32Config.h>

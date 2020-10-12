@@ -24,7 +24,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.ipp>
+#include <platform/internal/GenericPlatformManagerImpl_Zephyr.cpp>
 
 #include <support/logging/CHIPLogging.h>
 

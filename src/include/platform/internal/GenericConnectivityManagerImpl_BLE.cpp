@@ -22,11 +22,10 @@
  *          for use on platforms that support BLE.
  */
 
-#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_IPP
-#define GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_IPP
+#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_CPP
+#define GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_CPP
 
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
-
 
 namespace chip {
 namespace DeviceLayer {
@@ -35,7 +34,7 @@ namespace Internal {
 // Fully instantiate the template class in whatever compilation unit includes this file.
 template class GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>;
 
-template<class ImplClass>
+template <class ImplClass>
 const char * GenericConnectivityManagerImpl_BLE<ImplClass>::_CHIPoBLEServiceModeToStr(ConnectivityManager::CHIPoBLEServiceMode mode)
 {
     switch (mode)
@@ -55,5 +54,4 @@ const char * GenericConnectivityManagerImpl_BLE<ImplClass>::_CHIPoBLEServiceMode
 } // namespace DeviceLayer
 } // namespace chip
 
-
-#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_IPP
+#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_BLE_CPP

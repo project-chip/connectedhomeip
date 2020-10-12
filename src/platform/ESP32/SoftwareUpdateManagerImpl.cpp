@@ -24,8 +24,8 @@
 #include <protocols/CHIPProtocols.h>
 #include <protocols/common/CommonProtocol.h>
 
-#include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl.ipp>
-#include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl_BDX.ipp>
+#include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl.cpp>
+#include <DeviceLayer/internal/GenericSoftwareUpdateManagerImpl_BDX.cpp>
 
 namespace chip {
 namespace DeviceLayer {

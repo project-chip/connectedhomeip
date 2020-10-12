@@ -23,8 +23,8 @@
  *          GenericNetworkProvisioningServerImpl<> template.
  */
 
-#ifndef GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_IPP
-#define GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_IPP
+#ifndef GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_CPP
+#define GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_CPP
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericNetworkProvisioningServerImpl.h>
@@ -1100,4 +1100,4 @@ void GenericNetworkProvisioningServerImpl<ImplClass>::HandleConnectivityTestTime
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_IPP
+#endif // GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_CPP

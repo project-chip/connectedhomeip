@@ -22,14 +22,14 @@
  *          GenericSoftwareUpdateManagerImpl<> template.
  */
 
-#ifndef GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_IPP
-#define GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_IPP
+#ifndef GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_CPP
+#define GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_CPP
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
 #include <core/CHIPCore.h>
-#include <platform/PlatformManager.h>
 #include <platform/ConnectivityManager.h>
+#include <platform/PlatformManager.h>
 #include <platform/SoftwareUpdateManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericSoftwareUpdateManagerImpl.h>
@@ -37,8 +37,8 @@
 #include <support/FibonacciUtils.h>
 #include <support/RandUtils.h>
 
-#include <support/logging/CHIPLogging.h>
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -53,30 +53,30 @@ using namespace ::chip::TLV;
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericSoftwareUpdateManagerImpl<SoftwareUpdateManagerImpl>;
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::DoInit()
 {
-    mShouldRetry = false;
+    mShouldRetry           = false;
     mScheduledCheckEnabled = false;
-    mIgnorePartialImage = false;
+    mIgnorePartialImage    = false;
 
     mEventHandlerCallback = NULL;
-    mRetryPolicyCallback = DefaultRetryPolicyCallback;
+    mRetryPolicyCallback  = DefaultRetryPolicyCallback;
 
-    mRetryCounter = 0;
+    mRetryCounter  = 0;
     mMinWaitTimeMs = 0;
     mMaxWaitTimeMs = 0;
 
     mState = SoftwareUpdateManager::kState_Idle;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_SetEventCallback(void * const aAppState,
-                                                                   const SoftwareUpdateManager::EventCallback aEventCallback)
+                                                                          const SoftwareUpdateManager::EventCallback aEventCallback)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mAppState = aAppState;
+    mAppState             = aAppState;
     mEventHandlerCallback = aEventCallback;
 
 #if DEBUG
@@ -100,16 +100,16 @@ exit:
 #endif
 
     return err;
-
 }
 
-template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::_SetRetryPolicyCallback(const SoftwareUpdateManager::RetryPolicyCallback aRetryPolicyCallback)
+template <class ImplClass>
+void GenericSoftwareUpdateManagerImpl<ImplClass>::_SetRetryPolicyCallback(
+    const SoftwareUpdateManager::RetryPolicyCallback aRetryPolicyCallback)
 {
     mRetryPolicyCallback = (aRetryPolicyCallback != NULL) ? aRetryPolicyCallback : DefaultRetryPolicyCallback;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareBinding(intptr_t arg)
 {
     CHIP_ERROR err;
@@ -130,7 +130,7 @@ exit:
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -142,7 +142,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     QueryBeginEvent ev;
     EventOptions evOptions(true);
 
-    char firmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength+1];
+    char firmwareRev[ConfigurationManager::kMaxFirmwareRevisionLength + 1];
 
     size_t firmwareRevLen;
 
@@ -166,10 +166,10 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
 
     NullifyAllEventFields(&ev);
     evOptions.relatedEventID = mEventId;
-    ev.currentSwVersion = firmwareRev;
-    ev.vendorId = imageQuery.productSpec.vendorId;
-    ev.vendorProductId = imageQuery.productSpec.productId;
-    ev.productRevision = imageQuery.productSpec.productRev;
+    ev.currentSwVersion      = firmwareRev;
+    ev.vendorId              = imageQuery.productSpec.vendorId;
+    ev.vendorProductId       = imageQuery.productSpec.productId;
+    ev.productRevision       = imageQuery.productSpec.productRev;
     ev.SetCurrentSwVersionPresent();
     ev.SetVendorIdPresent();
     ev.SetVendorProductIdPresent();
@@ -182,8 +182,8 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     SuccessOrExit(err);
 
     outParam.PrepareQuery.PackageSpecification = NULL;
-    outParam.PrepareQuery.DesiredLocale = NULL;
-    outParam.PrepareQuery.Error = CHIP_NO_ERROR;
+    outParam.PrepareQuery.DesiredLocale        = NULL;
+    outParam.PrepareQuery.Error                = CHIP_NO_ERROR;
 
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_PrepareQuery, inParam, outParam);
     VerifyOrExit(mState == SoftwareUpdateManager::kState_PrepareQuery, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
@@ -199,7 +199,8 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     // then skip over and move to the next field.
     if (outParam.PrepareQuery.DesiredLocale != NULL)
     {
-        err = imageQuery.localeSpec.init((uint8_t) strlen(outParam.PrepareQuery.DesiredLocale), (char *)outParam.PrepareQuery.DesiredLocale);
+        err = imageQuery.localeSpec.init((uint8_t) strlen(outParam.PrepareQuery.DesiredLocale),
+                                         (char *) outParam.PrepareQuery.DesiredLocale);
         SuccessOrExit(err);
 
         ev.locale = outParam.PrepareQuery.DesiredLocale;
@@ -210,7 +211,8 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     // provided by the application, skip and move to the next field.
     if (outParam.PrepareQuery.PackageSpecification != NULL)
     {
-        err = imageQuery.packageSpec.init((uint8_t) strlen(outParam.PrepareQuery.PackageSpecification), (char *)outParam.PrepareQuery.PackageSpecification);
+        err = imageQuery.packageSpec.init((uint8_t) strlen(outParam.PrepareQuery.PackageSpecification),
+                                          (char *) outParam.PrepareQuery.PackageSpecification);
         SuccessOrExit(err);
     }
 
@@ -230,7 +232,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareQuery(void)
     outParam.Clear();
 
     inParam.PrepareQuery_Metadata.MetaDataWriter = &writer;
-    outParam.PrepareQuery_Metadata.Error = CHIP_NO_ERROR;
+    outParam.PrepareQuery_Metadata.Error         = CHIP_NO_ERROR;
 
     // Call EventHandler Callback to allow application to write meta-data.
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_PrepareQuery_Metadata, inParam, outParam);
@@ -251,7 +253,7 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_CheckNow(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -270,7 +272,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_CheckNow(void)
             SoftwareUpdateStartEvent ev;
             EventOptions evOptions(true);
             ev.trigger = START_TRIGGER_USER_INITIATED;
-            mEventId = LogEvent(&ev, evOptions);
+            mEventId   = LogEvent(&ev, evOptions);
         }
 
         DriveState(SoftwareUpdateManager::kState_PrepareQuery);
@@ -280,36 +282,36 @@ exit:
     return err;
 }
 
-template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::GetEventState(int32_t& aEventState)
+template <class ImplClass>
+void GenericSoftwareUpdateManagerImpl<ImplClass>::GetEventState(int32_t & aEventState)
 {
     int32_t event_state = 0;
 
-    switch(mState)
+    switch (mState)
     {
-        case SoftwareUpdateManager::kState_Idle:
-        case SoftwareUpdateManager::kState_ScheduledHoldoff:
-            event_state = STATE_IDLE;
-            break;
-        case SoftwareUpdateManager::kState_PrepareQuery:
-        case SoftwareUpdateManager::kState_Query:
-            event_state = STATE_QUERYING;
-            break;
-        case SoftwareUpdateManager::kState_Download:
-            event_state = STATE_DOWNLOADING;
-            break;
-        case SoftwareUpdateManager::kState_Install:
-            event_state = STATE_INSTALLING;
-            break;
-        default:
-            event_state = 0;
-            break;
+    case SoftwareUpdateManager::kState_Idle:
+    case SoftwareUpdateManager::kState_ScheduledHoldoff:
+        event_state = STATE_IDLE;
+        break;
+    case SoftwareUpdateManager::kState_PrepareQuery:
+    case SoftwareUpdateManager::kState_Query:
+        event_state = STATE_QUERYING;
+        break;
+    case SoftwareUpdateManager::kState_Download:
+        event_state = STATE_DOWNLOADING;
+        break;
+    case SoftwareUpdateManager::kState_Install:
+        event_state = STATE_INSTALLING;
+        break;
+    default:
+        event_state = 0;
+        break;
     }
 
     aEventState = event_state;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(CHIP_ERROR aError)
 {
     SoftwareUpdateManager::InEventParam inParam;
@@ -360,10 +362,10 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFailed(CHIP_ERRO
     DriveState(SoftwareUpdateManager::kState_Idle);
 
 exit:
-    return ;
+    return;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFinished(CHIP_ERROR aError)
 {
     SoftwareUpdateManager::InEventParam inParam;
@@ -372,7 +374,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFinished(CHIP_ER
     inParam.Clear();
     outParam.Clear();
 
-    mShouldRetry = false;
+    mShouldRetry  = false;
     mRetryCounter = 0;
 
     if (aError == CHIP_ERROR_NO_SW_UPDATE_AVAILABLE)
@@ -396,11 +398,11 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFinished(CHIP_ER
         NullifyAllEventFields(&ev);
         GetEventState(ev.state);
         evOptions.relatedEventID = mEventId;
-        ev.platformReturnCode = aError;
+        ev.platformReturnCode    = aError;
         LogEvent(&ev, evOptions);
     }
 
-    inParam.Finished.Error = aError;
+    inParam.Finished.Error        = aError;
     inParam.Finished.StatusReport = NULL;
 
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_Finished, inParam, outParam);
@@ -408,19 +410,19 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::SoftwareUpdateFinished(CHIP_ER
     DriveState(SoftwareUpdateManager::kState_Idle);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 bool GenericSoftwareUpdateManagerImpl<ImplClass>::_IsInProgress(void)
 {
-    return ((mState == SoftwareUpdateManager::kState_Idle || mState == SoftwareUpdateManager::kState_ScheduledHoldoff) ?
-            false : true );
+    return ((mState == SoftwareUpdateManager::kState_Idle || mState == SoftwareUpdateManager::kState_ScheduledHoldoff) ? false
+                                                                                                                       : true);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::SendQuery(void)
 {
     CHIP_ERROR err;
 
-    SoftwareUpdateManager::InEventParam  inParam;
+    SoftwareUpdateManager::InEventParam inParam;
     SoftwareUpdateManager::OutEventParam outParam;
 
     inParam.Clear();
@@ -436,7 +438,7 @@ exit:
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleStatusReport(PacketBuffer * payload)
 {
     CHIP_ERROR err;
@@ -463,13 +465,13 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleStatusReport(PacketBuffe
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(PacketBuffer * payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     SoftwareUpdateManager::InEventParam inParam;
     SoftwareUpdateManager::OutEventParam outParam;
-    char versionString[ConfigurationManager::kMaxFirmwareRevisionLength+1];
+    char versionString[ConfigurationManager::kMaxFirmwareRevisionLength + 1];
 
     {
         ImageQueryResponse imageQueryResponse;
@@ -479,7 +481,8 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(Packe
         SuccessOrExit(err);
 
         // Copy URI and version string since the original payload will be freed after this.
-        VerifyOrExit(imageQueryResponse.uri.theLength < CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_URI_LEN, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        VerifyOrExit(imageQueryResponse.uri.theLength < CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_URI_LEN,
+                     err = CHIP_ERROR_BUFFER_TOO_SMALL);
         strncpy(mURI, imageQueryResponse.uri.theString, imageQueryResponse.uri.theLength);
         mURI[imageQueryResponse.uri.theLength] = 0;
         VerifyOrExit(imageQueryResponse.versionSpec.theLength < ArraySize(versionString), err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -490,11 +493,11 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(Packe
         mIntegritySpec = imageQueryResponse.integritySpec;
 
         // Arrange to pass query response information to the application.
-        inParam.SoftwareUpdateAvailable.Priority        = imageQueryResponse.updatePriority;
-        inParam.SoftwareUpdateAvailable.Condition       = imageQueryResponse.updateCondition;
-        inParam.SoftwareUpdateAvailable.IntegrityType   = imageQueryResponse.integritySpec.type;
-        inParam.SoftwareUpdateAvailable.Version         = versionString;
-        inParam.SoftwareUpdateAvailable.URI             = mURI;
+        inParam.SoftwareUpdateAvailable.Priority      = imageQueryResponse.updatePriority;
+        inParam.SoftwareUpdateAvailable.Condition     = imageQueryResponse.updateCondition;
+        inParam.SoftwareUpdateAvailable.IntegrityType = imageQueryResponse.integritySpec.type;
+        inParam.SoftwareUpdateAvailable.Version       = versionString;
+        inParam.SoftwareUpdateAvailable.URI           = mURI;
     }
 
     // Release the packet buffer.
@@ -507,8 +510,8 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(Packe
         EventOptions evOptions(true);
         NullifyAllEventFields(&ev);
         evOptions.relatedEventID = mEventId;
-        ev.imageUrl = mURI;
-        ev.imageVersion = versionString;
+        ev.imageUrl              = mURI;
+        ev.imageVersion          = versionString;
         ev.SetImageUrlPresent();
         ev.SetImageVersionPresent();
         LogEvent(&ev, evOptions);
@@ -547,7 +550,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleImageQueryResponse(Packe
             // Call the application to determine if a partially downloaded copy of the desired firmware image
             // already exists in local storage.  Pass the URI of the desired image, which must match the metadata
             // stored with the image.
-            inParam.FetchPartialImageInfo.URI = mURI;
+            inParam.FetchPartialImageInfo.URI              = mURI;
             outParam.FetchPartialImageInfo.PartialImageLen = 0;
             mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_FetchPartialImageInfo, inParam, outParam);
             VerifyOrExit(mState == SoftwareUpdateManager::kState_Query, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
@@ -586,9 +589,8 @@ exit:
     }
 }
 
-template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleHoldOffTimerExpired(::chip::System::Layer * aLayer,
-                                                                            void * aAppState,
+template <class ImplClass>
+void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleHoldOffTimerExpired(::chip::System::Layer * aLayer, void * aAppState,
                                                                             ::chip::System::Error aError)
 {
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
@@ -596,14 +598,14 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::HandleHoldOffTimerExpired(::ch
     {
         SoftwareUpdateStartEvent ev;
         EventOptions evOptions(true);
-        ev.trigger = START_TRIGGER_SCHEDULED;
+        ev.trigger     = START_TRIGGER_SCHEDULED;
         self->mEventId = LogEvent(&ev, evOptions);
     }
 
     self->DriveState(SoftwareUpdateManager::kState_PrepareQuery);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::DriveState(SoftwareUpdateManager::State aNextState)
 {
     if (mState != SoftwareUpdateManager::kState_Idle &&
@@ -614,59 +616,53 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DriveState(SoftwareUpdateManag
 
     mState = aNextState;
 
-    switch(mState)
+    switch (mState)
     {
-    case SoftwareUpdateManager::kState_Idle:
+    case SoftwareUpdateManager::kState_Idle: {
+        /* Compute the next wait time interval only if scheduled software update checks are
+         * enabled or when the previous attempt failed provided service connectivity is
+         * present. Start the timer once we have a valid interval. A Software Update Check
+         * will trigger on expiration of the timer unless service connectivity was lost or
+         * the application requested a manual software update check.
+         */
+        if (mScheduledCheckEnabled || mShouldRetry)
         {
-            /* Compute the next wait time interval only if scheduled software update checks are
-             * enabled or when the previous attempt failed provided service connectivity is
-             * present. Start the timer once we have a valid interval. A Software Update Check
-             * will trigger on expiration of the timer unless service connectivity was lost or
-             * the application requested a manual software update check.
-             */
-            if (mScheduledCheckEnabled || mShouldRetry)
-            {
-                uint32_t timeToNextQueryMS = GetNextWaitTimeInterval();
+            uint32_t timeToNextQueryMS = GetNextWaitTimeInterval();
 
-                // If timeToNextQueryMs is 0, then do nothing.
-                if (timeToNextQueryMS)
-                {
-                    mState = SoftwareUpdateManager::kState_ScheduledHoldoff;
-                    SystemLayer.StartTimer(timeToNextQueryMS, HandleHoldOffTimerExpired, NULL);
-                }
+            // If timeToNextQueryMs is 0, then do nothing.
+            if (timeToNextQueryMS)
+            {
+                mState = SoftwareUpdateManager::kState_ScheduledHoldoff;
+                SystemLayer.StartTimer(timeToNextQueryMS, HandleHoldOffTimerExpired, NULL);
             }
         }
-        break;
+    }
+    break;
 
-    case SoftwareUpdateManager::kState_PrepareQuery:
-        {
-            PlatformMgr().ScheduleWork(PrepareBinding);
-        }
-        break;
+    case SoftwareUpdateManager::kState_PrepareQuery: {
+        PlatformMgr().ScheduleWork(PrepareBinding);
+    }
+    break;
 
-    case SoftwareUpdateManager::kState_Query:
-        {
-            SendQuery();
-        }
-        break;
+    case SoftwareUpdateManager::kState_Query: {
+        SendQuery();
+    }
+    break;
 
-    case SoftwareUpdateManager::kState_PrepareImageStorage:
-        {
-            PrepareImageStorage();
-        }
-        break;
+    case SoftwareUpdateManager::kState_PrepareImageStorage: {
+        PrepareImageStorage();
+    }
+    break;
 
-    case SoftwareUpdateManager::kState_Download:
-        {
-            PlatformMgr().ScheduleWork(StartDownload);
-        }
-        break;
+    case SoftwareUpdateManager::kState_Download: {
+        PlatformMgr().ScheduleWork(StartDownload);
+    }
+    break;
 
-    case SoftwareUpdateManager::kState_Install:
-        {
-            StartImageInstall();
-        }
-        break;
+    case SoftwareUpdateManager::kState_Install: {
+        StartImageInstall();
+    }
+    break;
 
     default:
         break;
@@ -676,7 +672,7 @@ exit:
     return;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_SetQueryIntervalWindow(uint32_t aMinWaitTimeMs, uint32_t aMaxWaitTimeMs)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -702,7 +698,7 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 uint32_t GenericSoftwareUpdateManagerImpl<ImplClass>::GetNextWaitTimeInterval()
 {
     uint32_t timeOutMsecs;
@@ -738,7 +734,7 @@ uint32_t GenericSoftwareUpdateManagerImpl<ImplClass>::GetNextWaitTimeInterval()
     return timeOutMsecs;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 uint32_t GenericSoftwareUpdateManagerImpl<ImplClass>::ComputeNextScheduledWaitTimeInterval(void)
 {
     uint32_t timeOutMsecs = (mMinWaitTimeMs + (GetRandU32() % (mMaxWaitTimeMs - mMinWaitTimeMs)));
@@ -748,18 +744,17 @@ uint32_t GenericSoftwareUpdateManagerImpl<ImplClass>::ComputeNextScheduledWaitTi
     return timeOutMsecs;
 }
 
-template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl<ImplClass>::_DefaultEventHandler(void *apAppState,
-                                                                      SoftwareUpdateManager::EventType aEvent,
-                                                                      const SoftwareUpdateManager::InEventParam& aInParam,
-                                                                      SoftwareUpdateManager::OutEventParam& aOutParam)
+template <class ImplClass>
+void GenericSoftwareUpdateManagerImpl<ImplClass>::_DefaultEventHandler(void * apAppState, SoftwareUpdateManager::EventType aEvent,
+                                                                       const SoftwareUpdateManager::InEventParam & aInParam,
+                                                                       SoftwareUpdateManager::OutEventParam & aOutParam)
 {
     // No actions required for current implementation
     aOutParam.DefaultHandlerCalled = true;
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::StoreImageBlock(uint32_t aLength, uint8_t *aData)
+template <class ImplClass>
+CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::StoreImageBlock(uint32_t aLength, uint8_t * aData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -770,8 +765,8 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::StoreImageBlock(uint32_t
     outParam.Clear();
 
     inParam.StoreImageBlock.DataBlockLen = aLength;
-    inParam.StoreImageBlock.DataBlock = aData;
-    outParam.StoreImageBlock.Error = CHIP_NO_ERROR;
+    inParam.StoreImageBlock.DataBlock    = aData;
+    outParam.StoreImageBlock.Error       = CHIP_NO_ERROR;
 
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_StoreImageBlock, inParam, outParam);
     VerifyOrExit(mState == SoftwareUpdateManager::kState_Download, err = CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED);
@@ -787,7 +782,7 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareImageStorage(void)
 {
     SoftwareUpdateManager::InEventParam inParam;
@@ -797,7 +792,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareImageStorage(void)
     // image to be downloaded.
     inParam.Clear();
     outParam.Clear();
-    inParam.PrepareImageStorage.URI = mURI;
+    inParam.PrepareImageStorage.URI           = mURI;
     inParam.PrepareImageStorage.IntegrityType = mIntegritySpec.type;
     mEventHandlerCallback(mAppState, SoftwareUpdateManager::kEvent_PrepareImageStorage, inParam, outParam);
 
@@ -809,10 +804,10 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::PrepareImageStorage(void)
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::StartDownload(intptr_t arg)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                                     = CHIP_NO_ERROR;
     GenericSoftwareUpdateManagerImpl<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
     SoftwareUpdateManager::InEventParam inParam;
@@ -832,8 +827,8 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::StartDownload(intptr_t arg)
         EventOptions evOptions(true);
         NullifyAllEventFields(&ev);
         evOptions.relatedEventID = self->mEventId;
-        ev.imageUrl = self->mURI;
-        ev.offset = self->mStartOffset;
+        ev.imageUrl              = self->mURI;
+        ev.offset                = self->mStartOffset;
         ev.SetImageUrlPresent();
         ev.SetOffsetPresent();
         LogEvent(&ev, evOptions);
@@ -846,7 +841,7 @@ exit:
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::DownloadComplete()
 {
     DownloadFinishEvent ev;
@@ -859,11 +854,11 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DownloadComplete()
     CheckImageIntegrity();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::CheckImageIntegrity(void)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    int result = 0;
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    int result         = 0;
     uint8_t typeLength = 0;
 
     SoftwareUpdateManager::InEventParam inParam;
@@ -872,28 +867,28 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::CheckImageIntegrity(void)
     inParam.Clear();
     outParam.Clear();
 
-    switch(mIntegritySpec.type)
+    switch (mIntegritySpec.type)
     {
-        case kIntegrityType_SHA160:
-            typeLength = kLength_SHA160;
-            break;
-        case kIntegrityType_SHA256:
-            typeLength = kLength_SHA256;
-            break;
-        case kIntegrityType_SHA512:
-            typeLength = kLength_SHA512;
-            break;
-        default:
-            typeLength = 0;
-            break;
+    case kIntegrityType_SHA160:
+        typeLength = kLength_SHA160;
+        break;
+    case kIntegrityType_SHA256:
+        typeLength = kLength_SHA256;
+        break;
+    case kIntegrityType_SHA512:
+        typeLength = kLength_SHA512;
+        break;
+    default:
+        typeLength = 0;
+        break;
     }
 
     uint8_t computedIntegrityValue[typeLength];
 
-    inParam.ComputeImageIntegrity.IntegrityType = mIntegritySpec.type;
-    inParam.ComputeImageIntegrity.IntegrityValueBuf = computedIntegrityValue;
+    inParam.ComputeImageIntegrity.IntegrityType        = mIntegritySpec.type;
+    inParam.ComputeImageIntegrity.IntegrityValueBuf    = computedIntegrityValue;
     inParam.ComputeImageIntegrity.IntegrityValueBufLen = typeLength;
-    outParam.ComputeImageIntegrity.Error = CHIP_NO_ERROR;
+    outParam.ComputeImageIntegrity.Error               = CHIP_NO_ERROR;
 
     // Request the application to compute an integrity check value for the stored image.
     // Fail if the application returns an error.
@@ -943,7 +938,7 @@ exit:
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::StartImageInstall(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -991,12 +986,11 @@ exit:
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::Cleanup(void)
-{
-}
+{}
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_Abort(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1023,7 +1017,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_Abort(void)
 /**
  *  Default Policy:
  */
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl<ImplClass>::DefaultRetryPolicyCallback(void * const aAppState,
                                                                              SoftwareUpdateManager::RetryParam & aRetryParam,
                                                                              uint32_t & aOutIntervalMsec)
@@ -1044,7 +1038,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DefaultRetryPolicyCallback(voi
 
         if (self->mScheduledCheckEnabled && CHIP_DEVICE_CONFIG_SOFTWARE_UPDATE_MAX_WAIT_TIME_INTERVAL_MS > self->mMinWaitTimeMs)
         {
-            waitTimeInMsec = 0;
+            waitTimeInMsec    = 0;
             maxWaitTimeInMsec = 0;
         }
         else
@@ -1057,7 +1051,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DefaultRetryPolicyCallback(voi
     }
     else
     {
-       maxWaitTimeInMsec = 0;
+        maxWaitTimeInMsec = 0;
     }
 
     if (maxWaitTimeInMsec != 0)
@@ -1066,9 +1060,9 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DefaultRetryPolicyCallback(voi
         waitTimeInMsec    = minWaitTimeInMsec + (GetRandU32() % (maxWaitTimeInMsec - minWaitTimeInMsec));
 
         ChipLogDetail(DeviceLayer,
-               "Computing swu retry policy: attempts %" PRIu32 ", max wait time %" PRIu32 " ms, selected wait time %" PRIu32
-               " ms",
-               aRetryParam.NumRetries, maxWaitTimeInMsec, waitTimeInMsec);
+                      "Computing swu retry policy: attempts %" PRIu32 ", max wait time %" PRIu32 " ms, selected wait time %" PRIu32
+                      " ms",
+                      aRetryParam.NumRetries, maxWaitTimeInMsec, waitTimeInMsec);
     }
 
     aOutIntervalMsec = waitTimeInMsec;
@@ -1076,7 +1070,7 @@ void GenericSoftwareUpdateManagerImpl<ImplClass>::DefaultRetryPolicyCallback(voi
     return;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_PrepareImageStorageComplete(CHIP_ERROR aError)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1099,7 +1093,7 @@ exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_ImageInstallComplete(CHIP_ERROR aError)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1116,7 +1110,7 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::_ImageInstallComplete(CH
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::InstallImage(void)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
@@ -1127,4 +1121,4 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl<ImplClass>::InstallImage(void)
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-#endif // GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_IPP
+#endif // GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_CPP

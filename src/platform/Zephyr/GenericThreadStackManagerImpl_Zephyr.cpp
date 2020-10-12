@@ -25,7 +25,7 @@
 #ifndef GENERIC_THREAD_STACK_MANAGER_IMPL_ZEPHYR_IPP
 #define GENERIC_THREAD_STACK_MANAGER_IMPL_ZEPHYR_IPP
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.ipp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 #include <platform/Zephyr/GenericThreadStackManagerImpl_Zephyr.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 

@@ -34,7 +34,7 @@
 #include <openthread/netdata.h>
 #include <openthread/thread.h>
 
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.ipp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.cpp>
 
 namespace chip {
 namespace DeviceLayer {

@@ -28,7 +28,7 @@
 #include <core/CHIPKeyIds.h>
 #include <platform/ConfigurationManager.h>
 #include <platform/ESP32/ESP32Config.h>
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/internal/GenericConfigurationManagerImpl.cpp>
 #include <support/CodeUtils.h>
 
 #include "esp_wifi.h"

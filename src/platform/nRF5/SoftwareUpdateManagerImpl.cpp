@@ -20,7 +20,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <platform/internal/GenericSoftwareUpdateManagerImpl.ipp>
+#include <platform/internal/GenericSoftwareUpdateManagerImpl.cpp>
 
 namespace chip {
 namespace DeviceLayer {

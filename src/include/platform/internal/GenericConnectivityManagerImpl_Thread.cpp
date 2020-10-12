@@ -22,8 +22,8 @@
  *          for use on platforms that support Thread.
  */
 
-#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_IPP
-#define GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_IPP
+#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_CPP
+#define GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_CPP
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConnectivityManagerImpl_Thread.h>
@@ -108,7 +108,7 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity
             event.Type = DeviceEventType::kServiceConnectivityChange;
             event.ServiceConnectivityChange.ViaThread.Result =
                 (haveServiceConnectivity) ? kConnectivity_Established : kConnectivity_Lost;
-            event.ServiceConnectivityChange.Overall.Result   = event.ServiceConnectivityChange.ViaThread.Result;
+            event.ServiceConnectivityChange.Overall.Result = event.ServiceConnectivityChange.ViaThread.Result;
             PlatformMgr().PostEvent(&event);
         }
     }
@@ -118,4 +118,4 @@ void GenericConnectivityManagerImpl_Thread<ImplClass>::UpdateServiceConnectivity
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_IPP
+#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_THREAD_CPP

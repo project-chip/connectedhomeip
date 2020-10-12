@@ -22,8 +22,8 @@
  *          GenericPlatformManagerImpl<> template.
  */
 
-#ifndef GENERIC_PLATFORM_MANAGER_IMPL_IPP
-#define GENERIC_PLATFORM_MANAGER_IMPL_IPP
+#ifndef GENERIC_PLATFORM_MANAGER_IMPL_CPP
+#define GENERIC_PLATFORM_MANAGER_IMPL_CPP
 
 #include <new>
 #include <platform/PlatformManager.h>
@@ -280,4 +280,4 @@ template class GenericPlatformManagerImpl<PlatformManagerImpl>;
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_PLATFORM_MANAGER_IMPL_IPP
+#endif // GENERIC_PLATFORM_MANAGER_IMPL_CPP

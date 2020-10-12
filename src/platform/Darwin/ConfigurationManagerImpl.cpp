@@ -28,7 +28,7 @@
 #include <core/CHIPVendorIdentifiers.hpp>
 #include <platform/ConfigurationManager.h>
 #include <platform/Darwin/PosixConfig.h>
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>

@@ -22,8 +22,8 @@
  *          GenericSoftwareUpdateManagerImpl<> template.
  */
 
-#ifndef GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_IPP
-#define GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_IPP
+#ifndef GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_CPP
+#define GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_CPP
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
@@ -45,13 +45,13 @@ using namespace ::chip::Profiles::BulkDataTransfer;
 // Fully instantiate the generic implementation class in whatever compilation unit includes this file.
 template class GenericSoftwareUpdateManagerImpl_BDX<SoftwareUpdateManagerImpl>;
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::DoInit(void)
 {
     CHIP_ERROR err;
 
-    mBinding = NULL;
-    mURI = NULL;
+    mBinding     = NULL;
+    mURI         = NULL;
     mBDXTransfer = NULL;
     mStartOffset = 0;
 
@@ -60,43 +60,43 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::DoInit(void)
     return err;
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::StartImageDownload(char *aURI, uint64_t aStartOffset)
+template <class ImplClass>
+CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::StartImageDownload(char * aURI, uint64_t aStartOffset)
 {
     CHIP_ERROR err;
 
     VerifyOrExit(aURI != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    mURI = aURI;
+    mURI         = aURI;
     mStartOffset = aStartOffset;
 
     mBinding = ExchangeMgr.NewBinding(HandleBindingEvent, NULL);
     VerifyOrExit(mBinding != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     err = mBinding->BeginConfiguration()
-            .Target_ServiceEndpoint(CHIP_DEVICE_CONFIG_FILE_DOWNLOAD_ENDPOINT_ID)
-            .Transport_UDP_WRM()
-            .Exchange_ResponseTimeoutMsec(CHIP_DEVICE_CONFIG_FILE_DOWNLOAD_RESPOSNE_TIMEOUT)
-            .Security_SharedCASESession()
-            .PrepareBinding();
+              .Target_ServiceEndpoint(CHIP_DEVICE_CONFIG_FILE_DOWNLOAD_ENDPOINT_ID)
+              .Transport_UDP_WRM()
+              .Exchange_ResponseTimeoutMsec(CHIP_DEVICE_CONFIG_FILE_DOWNLOAD_RESPOSNE_TIMEOUT)
+              .Security_SharedCASESession()
+              .PrepareBinding();
 
 exit:
     return err;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::StartDownload(void)
 {
     CHIP_ERROR err;
 
     ReferencedString uri;
-    uri.init((uint16_t)strlen(mURI), mURI);
+    uri.init((uint16_t) strlen(mURI), mURI);
 
     BDXHandlers handlers = {
-        NULL,                     // SendAcceptHandler
+        NULL, // SendAcceptHandler
         ReceiveAcceptHandler,
         ReceiveRejectHandler,
-        NULL,                     // GetBlockHandler
+        NULL, // GetBlockHandler
         BlockReceiveHandler,
         XferErrorHandler,
         XferDoneHandler,
@@ -134,13 +134,14 @@ exit:
     return err;
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ReceiveAcceptHandler(BDXTransfer * aXfer, ReceiveAccept * aReceiveAcceptMsg)
+template <class ImplClass>
+CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ReceiveAcceptHandler(BDXTransfer * aXfer,
+                                                                                 ReceiveAccept * aReceiveAcceptMsg)
 {
     return CHIP_NO_ERROR;
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ReceiveRejectHandler(BDXTransfer * aXfer, StatusReport * aReport)
 {
     GenericSoftwareUpdateManagerImpl_BDX<ImplClass> * self = &SoftwareUpdateMgrImpl();
@@ -164,8 +165,9 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ReceiveRejectHandler(BDXTr
     }
 }
 
-template<class ImplClass>
-void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::BlockReceiveHandler(BDXTransfer * xfr, uint64_t aLength, uint8_t * aDataBlock, bool aIsLastBlock)
+template <class ImplClass>
+void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::BlockReceiveHandler(BDXTransfer * xfr, uint64_t aLength, uint8_t * aDataBlock,
+                                                                          bool aIsLastBlock)
 {
     CHIP_ERROR err;
     GenericSoftwareUpdateManagerImpl_BDX<ImplClass> * self = &SoftwareUpdateMgrImpl();
@@ -173,7 +175,7 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::BlockReceiveHandler(BDXTra
     err = self->Impl()->StoreImageBlock(aLength, aDataBlock);
     if (err == CHIP_DEVICE_ERROR_SOFTWARE_UPDATE_ABORTED)
     {
-        return ;
+        return;
     }
     else if (err != CHIP_NO_ERROR)
     {
@@ -182,7 +184,7 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::BlockReceiveHandler(BDXTra
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::XferErrorHandler(BDXTransfer * aXfer, StatusReport * aReport)
 {
     GenericSoftwareUpdateManagerImpl_BDX<ImplClass> * self = &SoftwareUpdateMgrImpl();
@@ -191,7 +193,7 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::XferErrorHandler(BDXTransf
     self->Impl()->SoftwareUpdateFailed(CHIP_ERROR_STATUS_REPORT_RECEIVED, aReport);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::XferDoneHandler(BDXTransfer * aXfer)
 {
     GenericSoftwareUpdateManagerImpl_BDX<ImplClass> * self = &SoftwareUpdateMgrImpl();
@@ -200,7 +202,7 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::XferDoneHandler(BDXTransfe
     self->Impl()->DownloadComplete();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ErrorHandler(BDXTransfer * aXfer, CHIP_ERROR aErrorCode)
 {
     GenericSoftwareUpdateManagerImpl_BDX<ImplClass> * self = &SoftwareUpdateMgrImpl();
@@ -209,39 +211,39 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ErrorHandler(BDXTransfer *
     self->Impl()->SoftwareUpdateFailed(aErrorCode, NULL);
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::HandleBindingEvent(void * appState, ::chip::Binding::EventType aEvent,
-    const ::chip::Binding::InEventParam & aInParam, ::chip::Binding::OutEventParam & aOutParam)
+                                                                         const ::chip::Binding::InEventParam & aInParam,
+                                                                         ::chip::Binding::OutEventParam & aOutParam)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    StatusReport *statusReport = NULL;
+    CHIP_ERROR err                                         = CHIP_NO_ERROR;
+    StatusReport * statusReport                            = NULL;
     GenericSoftwareUpdateManagerImpl_BDX<ImplClass> * self = &SoftwareUpdateMgrImpl();
 
     switch (aEvent)
     {
-        case chip::Binding::kEvent_PrepareFailed:
-            ChipLogProgress(DeviceLayer, "Failed to prepare Software Update BDX binding: %s",
-                    (aInParam.PrepareFailed.Reason == CHIP_ERROR_STATUS_REPORT_RECEIVED)
-                    ? StatusReportStr(aInParam.PrepareFailed.StatusReport->mProfileId,
-                                          aInParam.PrepareFailed.StatusReport->mStatusCode)
-                    : ErrorStr(aInParam.PrepareFailed.Reason));
-            statusReport = aInParam.PrepareFailed.StatusReport;
-            err = aInParam.PrepareFailed.Reason;
-            break;
+    case chip::Binding::kEvent_PrepareFailed:
+        ChipLogProgress(
+            DeviceLayer, "Failed to prepare Software Update BDX binding: %s",
+            (aInParam.PrepareFailed.Reason == CHIP_ERROR_STATUS_REPORT_RECEIVED)
+                ? StatusReportStr(aInParam.PrepareFailed.StatusReport->mProfileId, aInParam.PrepareFailed.StatusReport->mStatusCode)
+                : ErrorStr(aInParam.PrepareFailed.Reason));
+        statusReport = aInParam.PrepareFailed.StatusReport;
+        err          = aInParam.PrepareFailed.Reason;
+        break;
 
-        case chip::Binding::kEvent_BindingFailed:
-            ChipLogProgress(DeviceLayer, "Software Update BDX binding failed: %s",
-                    ErrorStr(aInParam.BindingFailed.Reason));
-            err = aInParam.PrepareFailed.Reason;
-            break;
+    case chip::Binding::kEvent_BindingFailed:
+        ChipLogProgress(DeviceLayer, "Software Update BDX binding failed: %s", ErrorStr(aInParam.BindingFailed.Reason));
+        err = aInParam.PrepareFailed.Reason;
+        break;
 
-        case chip::Binding::kEvent_BindingReady:
-            ChipLogProgress(DeviceLayer, "Software Update BDX binding ready");
-            err = self->StartDownload();
-            break;
+    case chip::Binding::kEvent_BindingReady:
+        ChipLogProgress(DeviceLayer, "Software Update BDX binding ready");
+        err = self->StartDownload();
+        break;
 
-        default:
-            chip::Binding::DefaultEventHandler(appState, aEvent, aInParam, aOutParam);
+    default:
+        chip::Binding::DefaultEventHandler(appState, aEvent, aInParam, aOutParam);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -251,13 +253,13 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::HandleBindingEvent(void * 
     }
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::AbortDownload(void)
 {
     ResetState();
 }
 
-template<class ImplClass>
+template <class ImplClass>
 void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ResetState(void)
 {
     if (mBinding != NULL)
@@ -274,8 +276,9 @@ void GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::ResetState(void)
     mStartOffset = 0;
 }
 
-template<class ImplClass>
-CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::GetUpdateSchemeList(::chip::Profiles::SoftwareUpdate::UpdateSchemeList * aUpdateSchemeList)
+template <class ImplClass>
+CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::GetUpdateSchemeList(
+    ::chip::Profiles::SoftwareUpdate::UpdateSchemeList * aUpdateSchemeList)
 {
     uint8_t supportedSchemes[] = { Profiles::SoftwareUpdate::kUpdateScheme_BDX };
     aUpdateSchemeList->init(ArraySize(supportedSchemes), supportedSchemes);
@@ -288,4 +291,4 @@ CHIP_ERROR GenericSoftwareUpdateManagerImpl_BDX<ImplClass>::GetUpdateSchemeList(
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-#endif // GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_IPP
+#endif // GENERIC_SOFTWARE_UPDATE_MANAGER_IMPL_BDX_CPP

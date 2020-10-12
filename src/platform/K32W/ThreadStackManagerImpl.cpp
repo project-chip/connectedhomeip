@@ -31,8 +31,8 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.ipp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.ipp>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
 
 namespace chip {
 namespace DeviceLayer {
