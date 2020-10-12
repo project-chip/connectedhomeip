@@ -101,28 +101,17 @@ demo-application was compiled on Ubuntu 20.04).
     should be similiar with the one from the image below.
     ![MCUXpresso SDK Download](../../platform/k32w/doc/images/mcux-sdk-download.JPG)
 
--   Download the suitable
-    [ARM GCC toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads/7-2018-q2-update)
-    for your Linux distribution
-
--   Set two Linux environmental variables based on the above downloaded
-    packages:
-
-```
-user@ubuntu:~/Desktop/git/connectedhomeip$ export K32W061_SDK_ROOT=/home/user/Desktop/git/SDK_2.6.1_K32W061DK6
-user@ubuntu:~/Desktop/git/connectedhomeip$ export GNU_INSTALL_ROOT=/home/user/Desktop/git/gcc-arm-none-eabi-7-2018-q2-update/bin/
-```
-
 -   You may start building the application
 
 ```
 user@ubuntu:~/Desktop/git/connectedhomeip$ cd examples/lock-app/k32w/
-user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ make
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ source third_party/connectedhomeip/scripts/activate.sh
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ gn gen out/debug --args="k32w_sdk_root=\"${K32W061_SDK_ROOT}\" is_debug=true"
+user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/debug
+user@ubuntu: $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
-In case OpenThread fails to compile due to some signing errors just follow the
-compilation logs and install the recommanded packages (python version > 3, pip3,
-pycrypto, pycryptodome):
+In case signing errors are encountered just follow the compilation logs and install the recommanded packages (python version > 3, pip3, pycrypto, pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
@@ -134,8 +123,7 @@ pycrypto               2.6.1
 pycryptodome           3.9.8
 ```
 
-The resulting elf file can be found in the build directory and it's named
-chip-k32w061-lock-example.elf.
+The resulting elf file can be found in out/debug/chip-k32w061-lock-example.elf.
 
 <a name="flashdebug"></a>
 

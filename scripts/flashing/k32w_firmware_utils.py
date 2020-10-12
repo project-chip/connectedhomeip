@@ -20,24 +20,28 @@ For `Flasher`, see the class documentation. For the parse_command()
 interface or standalone execution:
 
 usage: k32w_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
-                               [--verify-application] [--reset] [--skip-reset]
-                               [--commander FILE]
+                               [--verify_application] [--reset] [--skip_reset]
+                               [--commander FILE] [--serialno SERIAL]
 
-Flash device
+Flash K32W device
 
 optional arguments:
   -h, --help            show this help message and exit
 
 configuration:
-  --verbose             Report more verbosely
+  --verbose, -v         Report more verbosely
   --commander FILE      File name of the commander executable
+  --serialno SERIAL, -s SERIAL
+                        Serial number of device to flash
 
 operations:
   --erase               Erase device
   --application FILE    Flash an image
-  --verify-application  Verify the image after flashing
+  --verify_application, --verify-application
+                        Verify the image after flashing
   --reset               Reset device after flashing
-  --skip-reset          Do not reset device after flashing
+  --skip_reset, --skip-reset
+                        Do not reset device after flashing
 """
 
 import sys
@@ -53,21 +57,27 @@ K32W_OPTIONS = {
         'commander': {
             'help': 'File name of the commander executable',
             'default': 'commander',
-            'argument': {
+            'argparse': {
                 'metavar': 'FILE'
             },
-            'tool': {
-                'verify': ['{commander}', '--version'],
-                'error':
-                    """\
-                    Unable to execute {commander}.
+            'verify': ['{commander}', '--version'],
+            'error':
+                """\
+                Unable to execute {commander}.
 
-                    Please ensure that this tool is installed and
-                    available. See the K32W example README for
-                    installation instructions.
+                Please ensure that this tool is installed and
+                available. See the K32W example README for
+                installation instructions.
 
-                    """,
-            }
+                """,
+        },
+        'serialno': {
+            'help': 'Serial number of device to flash',
+            'default': None,
+            'alias': ['-s'],
+            'argparse': {
+                'metavar': 'SERIAL'
+            },
         },
     },
 }
@@ -76,49 +86,62 @@ K32W_OPTIONS = {
 class Flasher(firmware_utils.Flasher):
     """Manage k32w flashing."""
 
-    def __init__(self, options=None):
-        super().__init__(options, 'K32W')
+    def __init__(self, **options):
+        super().__init__(platform='K32W', module=__name__, **options)
         self.define_options(K32W_OPTIONS)
-        self.module = __name__
+
+    # Common command line arguments for commander device subcommands.
+    DEVICE_ARGUMENTS = [{'optional': 'serialno'}]
 
     def erase(self):
         """Perform `commander device masserase`."""
-        return self.run_tool_logging('commander', ['device', 'masserase'],
-                                     'Erase device')
+        return self.run_tool(
+            'commander', ['device', 'masserase', self.DEVICE_ARGUMENTS],
+            name='Erase device')
 
     def verify(self, image):
         """Verify image."""
-        return self.run_tool_logging('commander', ['verify', image], 'Verify',
-                                     'Verified', 'Not verified', 2)
+        return self.run_tool(
+            'commander',
+            ['verify', self.DEVICE_ARGUMENTS, image],
+            name='Verify',
+            pass_message='Verified',
+            fail_message='Not verified',
+            fail_level=2)
 
     def flash(self, image):
         """Flash image."""
-        return self.run_tool_logging('commander', ['flash', image], 'Flash',
-                                     'Flashed')
+        return self.run_tool(
+            'commander',
+            ['flash', self.DEVICE_ARGUMENTS, image],
+            name='Flash')
 
     def reset(self):
         """Reset the device."""
-        return self.run_tool_logging('commander', ['device', 'reset'], 'Reset')
+        return self.run_tool(
+                'commander',
+                ['device', 'reset', self.DEVICE_ARGUMENTS],
+                name='Reset')
 
     def actions(self):
-        """Perform actions on the device according to self.options."""
-        self.log(3, 'OPTIONS:', self.options)
+        """Perform actions on the device according to self.option."""
+        self.log(3, 'Options:', self.option)
 
-        if self.options['erase']:
+        if self.option.erase:
             if self.erase().err:
                 return self
 
-        application = self.optional_file(self.options['application'])
+        application = self.optional_file(self.option.application)
         if application:
             if self.flash(application).err:
                 return self
-            if self.options['verify-application']:
+            if self.option.verify_application:
                 if self.verify(application).err:
                     return self
-            if self.options['reset'] is None:
-                self.options['reset'] = True
+            if self.option.reset is None:
+                self.option.reset = True
 
-        if self.options['reset']:
+        if self.option.reset:
             if self.reset().err:
                 return self
 

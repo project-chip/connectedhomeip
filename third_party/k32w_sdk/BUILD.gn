@@ -46,6 +46,7 @@ config("mbedtls_k32w_config") {
     "MBEDTLS_BASE64_C",
     "MBEDTLS_HKDF_C",
     "MBEDTLS_ERROR_C",
+    "MBEDTLS_PKCS5_C",
   ]
 
   include_dirs = [ chip_root ]
