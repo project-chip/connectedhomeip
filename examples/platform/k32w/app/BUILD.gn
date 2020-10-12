@@ -18,8 +18,8 @@ config("chip_examples_project_config") {
   include_dirs = [ "app/project_include" ]
 }
 
-source_set("openthread_core_config_nrf52840_chip_examples") {
+source_set("openthread_core_config_k32w_chip_examples") {
   sources = [ "app/project_include/OpenThreadConfig.h" ]
-  public_deps = [ "${chip_root}/third_party/openthread/platforms/nrf528xx:openthread_core_config_nrf52840" ]
+  public_deps = [ "${chip_root}/third_party/openthread/platforms/k32w:openthread_core_config_k32w" ]
   public_configs = [ ":chip_examples_project_config" ]
 }

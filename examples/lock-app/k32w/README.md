@@ -111,7 +111,9 @@ user@ubuntu:~/Desktop/git/connectedhomeip/examples/lock-app/k32w$ ninja -C out/d
 user@ubuntu: $K32W061_SDK_ROOT/tools/imagetool/sign_images.sh out/debug/
 ```
 
-In case signing errors are encountered just follow the compilation logs and install the recommanded packages (python version > 3, pip3, pycrypto, pycryptodome):
+In case signing errors are encountered just follow the compilation logs and
+install the recommanded packages (python version > 3, pip3, pycrypto,
+pycryptodome):
 
 ```
 user@ubuntu:~$ python3 --version
