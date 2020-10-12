@@ -89,12 +89,11 @@ private:
 
     enum
     {
-        kFlag_AsyncInitCompleted     = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
-        kFlag_AdvertisingEnabled     = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
-        kFlag_FastAdvertisingEnabled = 0x0004, /**< The application has enabled fast advertising. */
-        kFlag_Advertising            = 0x0008, /**< The system is currently CHIPoBLE advertising. */
-        kFlag_AdvertisingRefreshNeeded =
-            0x0010, /**< The advertising state/configuration has changed, but the SoftDevice has yet to be updated. */
+        kFlag_AsyncInitCompleted        = 0x0001, /**< One-time asynchronous initialization actions have been performed. */
+        kFlag_AdvertisingEnabled        = 0x0002, /**< The application has enabled CHIPoBLE advertising. */
+        kFlag_FastAdvertisingEnabled    = 0x0004, /**< The application has enabled fast advertising. */
+        kFlag_Advertising               = 0x0008, /**< The system is currently CHIPoBLE advertising. */
+        kFlag_AdvertisingRefreshNeeded  = 0x0010, /**< The advertising state/configuration state in the BLE layer needs to be updated. */
     };
 
     enum
@@ -110,19 +109,29 @@ private:
     uint16_t mSubscribedConIds[kMaxConnections];
     uint8_t mAdvDataBuf[kMaxAdvertisementDataSetSize];
     uint8_t mScanRespDataBuf[kMaxAdvertisementDataSetSize];
+    qvCHIP_Ble_Callbacks_t appCbacks;
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertising(void);
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
-    CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleGAPDisconnect(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleTXCharCCCDWrite(const ChipDeviceEvent * event);
-    CHIP_ERROR HandleTXComplete(const ChipDeviceEvent * event);
     CHIP_ERROR SetSubscribed(uint16_t conId);
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
+
+    void HandleDmMsg(qvCHIP_Ble_DmEvt_t* pDmEvt);
+    void HandleAttMsg(qvCHIP_Ble_AttEvt_t* pAttEvt);
+    void HandleTXComplete(const ChipDeviceEvent * event);
+
+
+    /* Callbacks from BLE stack*/
+    static void ExternalCbHandler(qvCHIP_Ble_MsgHdr_t *pMsg);
+    static void HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t operation,
+                                 uint16_t offset, qvCHIP_Ble_Attr_t *pAttr);
+    static void HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t operation,
+                                 uint16_t offset, uint16_t len, uint8_t *pValue,
+                                 qvCHIP_Ble_Attr_t *pAttr);
+    static void HandleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * event);
 
     static void DriveBLEState(intptr_t arg);
 };
