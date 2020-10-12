@@ -33,6 +33,7 @@ public:
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
+    void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) override;
 
 private:
     RendezvousSession mRendezvousSession;
