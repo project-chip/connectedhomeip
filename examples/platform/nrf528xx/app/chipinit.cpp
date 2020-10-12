@@ -112,7 +112,6 @@ ret_code_t ChipInit()
         APP_ERROR_HANDLER(ret);
     }
 
-    // Configure device to operate as a Thread sleepy end-device.
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_Router);
     if (ret != CHIP_NO_ERROR)
     {
