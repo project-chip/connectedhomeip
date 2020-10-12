@@ -26,8 +26,7 @@
  *
  */
 
-#ifndef CHIP_PROJECT_CONFIG_H
-#define CHIP_PROJECT_CONFIG_H
+#pragma once
 
 /**
  * CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
@@ -122,5 +121,3 @@
  * A size, in bytes, of the individual debug event logging buffer.
  */
 #define CHIP_DEVICE_CONFIG_EVENT_LOGGING_DEBUG_BUFFER_SIZE (512)
-
-#endif // CHIP_PROJECT_CONFIG_H

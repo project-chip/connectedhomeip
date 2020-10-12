@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef ANDROID_BLE_PLATFORM_DELEGATE_H
-#define ANDROID_BLE_PLATFORM_DELEGATE_H
+#pragma once
 
 #include <ble/BlePlatformDelegate.h>
 #include <system/SystemPacketBuffer.h>
@@ -62,5 +61,3 @@ public:
     void SetCloseConnectionCallback(CloseConnectionCallback cb);
     void SetGetMTUCallback(GetMTUCallback cb);
 };
-
-#endif // ANDROID_BLE_PLATFORM_DELEGATE_H

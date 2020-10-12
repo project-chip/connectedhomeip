@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef ANDROID_BLE_CONNECTION_DELEGATE_H
-#define ANDROID_BLE_CONNECTION_DELEGATE_H
+#pragma once
 
 #include <ble/BleConnectionDelegate.h>
 
@@ -33,5 +32,3 @@ public:
 private:
     NotifyNewConnectionAvailable newConnectionCb = nullptr;
 };
-
-#endif // ANDROID_BLE_CONNECTION_DELEGATE_H

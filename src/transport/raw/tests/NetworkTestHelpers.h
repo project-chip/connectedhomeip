@@ -14,8 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef NETWORK_TEST_HELPERS_H_
-#define NETWORK_TEST_HELPERS_H_
+#pragma once
 
 #include <functional>
 
@@ -59,5 +58,3 @@ private:
 
 } // namespace Test
 } // namespace chip
-
-#endif // NETWORK_TEST_HELPERS_H_

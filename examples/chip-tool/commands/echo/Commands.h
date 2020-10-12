@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef __CHIPTOOL_ECHO_COMMANDS_H__
-#define __CHIPTOOL_ECHO_COMMANDS_H__
+#pragma once
 
 #include "../common/EchoCommand.h"
 
@@ -44,5 +43,3 @@ void registerCommandsEcho(Commands & commands)
 
     commands.Register(clusterName, clusterCommands);
 }
-
-#endif // __CHIPTOOL_ECHO_COMMANDS_H__

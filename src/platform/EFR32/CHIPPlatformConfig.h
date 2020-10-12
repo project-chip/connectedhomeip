@@ -22,8 +22,7 @@
  *          Silcon Labs EFR32 platforms.
  */
 
-#ifndef CHIP_PLATFORM_CONFIG_H
-#define CHIP_PLATFORM_CONFIG_H
+#pragma once
 
 #include <stdint.h>
 
@@ -128,5 +127,3 @@
 #ifndef CHIP_CONFIG_ENABLE_CASE_RESPONDER
 #define CHIP_CONFIG_ENABLE_CASE_RESPONDER 1
 #endif // CHIP_CONFIG_ENABLE_CASE_RESPONDER
-
-#endif /* CHIP_PLATFORM_CONFIG_H */

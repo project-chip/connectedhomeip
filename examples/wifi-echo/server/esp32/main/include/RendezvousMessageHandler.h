@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef _RENDEZVOUS_MESSAGE_HANDLER_H
-#define _RENDEZVOUS_MESSAGE_HANDLER_H
+#pragma once
 
 #include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -30,5 +29,3 @@ public:
     // - Some other error encountered processing a specific message type.
     static CHIP_ERROR HandleMessageReceived(chip::System::PacketBuffer * buffer);
 };
-
-#endif // _RENDEZVOUS_MESSAGE_HANDLER_H

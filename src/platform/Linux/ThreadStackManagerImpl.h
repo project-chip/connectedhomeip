@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_PLATFORM_LINUX_THREAD_STACK_MANAGER_IMPL_H
-#define CHIP_PLATFORM_LINUX_THREAD_STACK_MANAGER_IMPL_H
+#pragma once
 
 #include <memory>
 #include <thread>
@@ -109,5 +108,3 @@ private:
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_PLATFORM_LINUX_THREAD_STACK_MANAGER_IMPL_H

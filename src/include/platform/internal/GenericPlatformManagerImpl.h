@@ -22,8 +22,7 @@
  *          for use on various platforms.
  */
 
-#ifndef GENERIC_PLATFORM_MANAGER_IMPL_H
-#define GENERIC_PLATFORM_MANAGER_IMPL_H
+#pragma once
 
 namespace chip {
 namespace DeviceLayer {
@@ -77,5 +76,3 @@ extern template class GenericPlatformManagerImpl<PlatformManagerImpl>;
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // GENERIC_PLATFORM_MANAGER_IMPL_H

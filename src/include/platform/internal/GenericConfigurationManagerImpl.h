@@ -23,8 +23,7 @@
  *          for use on various platforms.
  */
 
-#ifndef GENERIC_CONFIGURATION_MANAGER_IMPL_H
-#define GENERIC_CONFIGURATION_MANAGER_IMPL_H
+#pragma once
 
 namespace chip {
 namespace DeviceLayer {
@@ -159,5 +158,3 @@ inline CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetProductId(uint
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // GENERIC_CONFIGURATION_MANAGER_IMPL_H

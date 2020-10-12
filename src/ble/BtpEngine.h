@@ -25,8 +25,7 @@
  *
  */
 
-#ifndef BTP_ENGINE_H_
-#define BTP_ENGINE_H_
+#pragma once
 
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
@@ -186,5 +185,3 @@ private:
 
 } /* namespace Ble */
 } /* namespace chip */
-
-#endif /* BTP_ENGINE_H_ */

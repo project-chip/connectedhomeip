@@ -23,8 +23,7 @@
  *          Utilities for interacting with the the ESP32 "NVS" key-value store.
  */
 
-#ifndef ESP32_CONFIG_H
-#define ESP32_CONFIG_H
+#pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -117,5 +116,3 @@ inline bool ESP32Config::Key::operator==(const Key & other) const
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // ESP32_CONFIG_H

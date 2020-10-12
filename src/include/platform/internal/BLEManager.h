@@ -22,8 +22,7 @@
  *          internal BLEManager object.
  */
 
-#ifndef BLE_MANAGER_H
-#define BLE_MANAGER_H
+#pragma once
 
 #include <platform/ConnectivityManager.h>
 #include <support/CodeUtils.h>
@@ -182,4 +181,3 @@ inline chip::Ble::BleLayer * BLEManager::GetBleLayer()
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#endif // BLE_MANAGER_H

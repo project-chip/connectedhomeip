@@ -21,8 +21,7 @@
  *          Defines the public interface for the Device Layer SoftwareUpdateManager object.
  */
 
-#ifndef SOFTWARE_UPDATE_MANAGER_H
-#define SOFTWARE_UPDATE_MANAGER_H
+#pragma once
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
@@ -510,4 +509,3 @@ inline void SoftwareUpdateManager::DefaultEventHandler(void * apAppState, EventT
 } // namespace chip
 
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
-#endif // SOFTWARE_UPDATE_MANAGER_H

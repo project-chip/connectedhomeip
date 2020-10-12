@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef INETLAYEREVENTS_H
-#define INETLAYEREVENTS_H
+#pragma once
 
 #include <inet/InetConfig.h>
 
@@ -68,4 +67,3 @@ static inline bool INET_IsInetEvent(chip::System::EventType aType)
 } // namespace chip
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-#endif // !defined(INETLAYEREVENTS_H)

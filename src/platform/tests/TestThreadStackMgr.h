@@ -21,9 +21,6 @@
  *
  */
 
-#ifndef CHIP_TEST_THREAD_STACK_MGR_H
-#define CHIP_TEST_THREAD_STACK_MGR_H
+#pragma once
 
 int TestThreadStackManager(void);
-
-#endif // CHIP_TEST_THREAD_STACK_MGR_H

@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef BLE_PLATFORM_CONFIG_H
-#define BLE_PLATFORM_CONFIG_H
+#pragma once
 
 #include "bg_errorcodes.h"
 
@@ -43,5 +42,3 @@
 // ========== Platform-specific Configuration Overrides =========
 
 /* none so far */
-
-#endif // BLE_PLATFORM_CONFIG_H

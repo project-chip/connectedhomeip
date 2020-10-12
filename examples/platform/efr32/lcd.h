@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef INIT_LCD_H
-#define INIT_LCD_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,5 +33,3 @@ void LCDWriteQRCode(uint8_t * text);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // INIT_LCD_H

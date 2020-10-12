@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef __CHIPTOOL_IPCOMMAND_H__
-#define __CHIPTOOL_IPCOMMAND_H__
+#pragma once
 
 #include "Command.h"
 
@@ -65,5 +64,3 @@ private:
     uint32_t mDiscriminator;
     uint32_t mSetupPINCode;
 };
-
-#endif //__CHIPTOOL_IPCOMMAND_H__

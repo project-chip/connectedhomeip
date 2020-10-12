@@ -33,8 +33,7 @@
  *
  */
 
-#ifndef INETCONFIG_H
-#define INETCONFIG_H
+#pragma once
 
 #if CHIP_SEPARATE_CONFIG_H
 #include <inet/InetBuildConfig.h>
@@ -510,5 +509,3 @@
 #define INET_CONFIG_IP_MULTICAST_HOP_LIMIT                 (64)
 #endif // INET_CONFIG_IP_MULTICAST_HOP_LIMIT
 // clang-format on
-
-#endif /* INETCONFIG_H */

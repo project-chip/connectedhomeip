@@ -21,8 +21,7 @@
  *      data enumerated from a byte stream
  */
 
-#ifndef _SETUP_PAYLOAD_H_
-#define _SETUP_PAYLOAD_H_
+#pragma once
 
 #include <map>
 #include <stdint.h>
@@ -242,5 +241,3 @@ private:
 };
 
 } // namespace chip
-
-#endif /* _SETUP_PAYLOAD_H_ */

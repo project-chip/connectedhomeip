@@ -22,8 +22,7 @@
  *          platforms based on the Silicon Labs SDK.
  */
 
-#ifndef EFR32_CONFIG_H
-#define EFR32_CONFIG_H
+#pragma once
 
 #include <functional>
 
@@ -145,5 +144,3 @@ private:
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // EFR32_CONFIG_H

@@ -17,8 +17,7 @@
  *    limitations under the License.
  */
 
-#ifndef GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_H
-#define GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_H
+#pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -125,5 +124,3 @@ inline bool GenericNetworkProvisioningServerImpl<ImplClass>::_ScanInProgress(voi
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // GENERIC_NETWORK_PROVISIONING_SERVER_IMPL_H

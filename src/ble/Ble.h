@@ -24,8 +24,7 @@
  *
  */
 
-#ifndef CHIP_BLE_H
-#define CHIP_BLE_H
+#pragma once
 
 #include <ble/BleConfig.h>
 
@@ -45,5 +44,3 @@
  *     This namespace includes all interfaces within chip for
  *     Bluetooth Low Energy (BLE), also known as Bluetooth Smart.
  */
-
-#endif // CHIP_BLE_H
