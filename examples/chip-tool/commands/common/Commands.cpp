@@ -19,13 +19,15 @@
 #include "Commands.h"
 
 #include "Command.h"
+
+#include <algorithm>
 #include <string>
 
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
     for (auto & command : commandsList)
     {
-        clusters[clusterName].push_back(std::move(command));
+        mClusters[clusterName].push_back(std::move(command));
     }
 }
 
@@ -49,196 +51,192 @@ exit:
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-CHIP_ERROR Commands::RunCommand(ChipDeviceController & dc, NodeId remoteId, int argc, char * argv[])
+CHIP_ERROR Commands::RunCommand(ChipDeviceController & dc, NodeId remoteId, int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    std::map<std::string, CommandsVector>::iterator cluster;
+    Command * command = nullptr;
 
-    VerifyOrExit(argc > 1, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    for (auto & cluster : clusters)
+    if (argc <= 1)
     {
-        for (auto & command : cluster.second)
+        ChipLogError(chipTool, "Missing cluster name");
+        ShowClusters(argv[0]);
+        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    cluster = GetCluster(argv[1]);
+    if (cluster == mClusters.end())
+    {
+        ChipLogError(chipTool, "Unknown cluster: %s", argv[1]);
+        ShowClusters(argv[0]);
+        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    if (argc <= 2)
+    {
+        ChipLogError(chipTool, "Missing command name");
+        ShowCluster(argv[0], argv[1], cluster->second);
+        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    if (strcmp(argv[2], "read") != 0)
+    {
+        command = GetCommand(cluster->second, argv[2]);
+        if (command == nullptr)
         {
-            if (strcmp(command->GetName(), argv[1]) == 0)
-            {
-                // If the command is a read command, ensure the target attribute value matches with the last argument
-                if (strcmp(command->GetName(), "read") == 0 && strcmp(command->GetAttribute(), argv[argc - 1]) != 0)
-                {
-                    continue;
-                }
+            ChipLogError(chipTool, "Unknown command: %s", argv[2]);
+            ShowCluster(argv[0], argv[1], cluster->second);
+            ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        }
+    }
+    else
+    {
+        if (argc <= 3)
+        {
+            ChipLogError(chipTool, "Missing attribute name");
+            ShowClusterAttributes(argv[0], argv[1], cluster->second);
+            ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+        }
 
-                VerifyOrExit(command->InitArguments(argc - 2, &argv[2]), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-                err = command->Run(&dc, remoteId);
-                SuccessOrExit(err);
-
-                return err;
-            }
+        command = GetReadCommand(cluster->second, argv[2], argv[3]);
+        if (command == nullptr)
+        {
+            ChipLogError(chipTool, "Unknown attribute: %s", argv[3]);
+            ShowClusterAttributes(argv[0], argv[1], cluster->second);
+            ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
 
-    // No command found.
-    ChipLogError(chipTool, "Unknown command: %s", argv[1]);
-    Commands::ShowUsage(argv[0]);
-    return CHIP_ERROR_NOT_IMPLEMENTED;
+    if (!command->InitArguments(argc - 3, &argv[3]))
+    {
+        ShowCommand(argv[0], argv[1], command);
+        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
-exit:
+    err = command->Run(&dc, remoteId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));
-        Commands::ShowUsage(argv[0]);
+        ExitNow();
     }
 
+exit:
     return err;
 }
 
-void Commands::ShowUsage(const char * executable)
+std::map<std::string, Commands::CommandsVector>::iterator Commands::GetCluster(std::string clusterName)
+{
+    for (auto & cluster : mClusters)
+    {
+        std::string key(cluster.first);
+        std::transform(key.begin(), key.end(), key.begin(), ::tolower);
+        if (key.compare(clusterName) == 0)
+        {
+            return mClusters.find(cluster.first);
+        }
+    }
+
+    return mClusters.end();
+}
+
+Command * Commands::GetCommand(CommandsVector & commands, std::string commandName)
+{
+    for (auto & command : commands)
+    {
+        if (commandName.compare(command->GetName()) == 0)
+        {
+            return command.get();
+        }
+    }
+
+    return nullptr;
+}
+
+Command * Commands::GetReadCommand(CommandsVector & commands, std::string commandName, std::string attributeName)
+{
+    for (auto & command : commands)
+    {
+        if (commandName.compare(command->GetName()) == 0 && attributeName.compare(command->GetAttribute()) == 0)
+        {
+            return command.get();
+        }
+    }
+
+    return nullptr;
+}
+
+void Commands::ShowClusters(std::string executable)
 {
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "  %s command [params]\n\n", executable);
-    fprintf(stderr, "  Supported commands and their parameters:\n");
-    fprintf(stderr, "\n");
-    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    fprintf(stderr, "  | Misc. Commands:                                                                     |\n");
-    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    PrintMiscCommands();
-    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    fprintf(stderr, "\n");
+    fprintf(stderr, "  %s cluster_name command_name [param1 param2 ...]\n", executable.c_str());
     fprintf(stderr, "\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Clusters:                                                                           |\n");
-    fprintf(stderr, "  |                                                                                     |\n");
-    fprintf(stderr, "  |   Usage:                                                                            |\n");
-    fprintf(stderr, "  |    command_name remote-ip remote-port endpoint-id [param1 param2 ...]               |\n");
-    fprintf(stderr, "  |                                                                                     |\n");
-    fprintf(stderr, "  | Available command names and command specific parameters:                            |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    PrintClustersCommands();
+    for (auto & cluster : mClusters)
+    {
+        fprintf(stderr, "  | * %-82s|\n", cluster.first.c_str());
+    }
+    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
+}
+
+void Commands::ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands)
+{
+    fprintf(stderr, "Usage:\n");
+    fprintf(stderr, "  %s %s command_name [param1 param2 ...]\n", executable.c_str(), clusterName.c_str());
     fprintf(stderr, "\n");
+    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
+    fprintf(stderr, "  | Commands:                                                                           |\n");
+    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
+    bool readCommand = false;
+    for (auto & command : commands)
+    {
+        if (strcmp(command->GetName(), "read") == 0)
+        {
+            if (readCommand == false)
+            {
+                fprintf(stderr, "  | * %-82s|\n", command->GetName());
+                readCommand = true;
+            }
+        }
+        else
+        {
+            fprintf(stderr, "  | * %-82s|\n", command->GetName());
+        }
+    }
+    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
+}
+
+void Commands::ShowClusterAttributes(std::string executable, std::string clusterName, CommandsVector & commands)
+{
+    fprintf(stderr, "Usage:\n");
+    fprintf(stderr, "  %s %s read attribute-name [param1 param2 ...]\n", executable.c_str(), clusterName.c_str());
     fprintf(stderr, "\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    fprintf(stderr, "  | Read Attributes:                                                                    |\n");
-    fprintf(stderr, "  |                                                                                     |\n");
-    fprintf(stderr, "  |   Usage:                                                                            |\n");
-    fprintf(stderr, "  |    read remote-ip remote-port endpoint-id attribute-name                            |\n");
-    fprintf(stderr, "  |                                                                                     |\n");
-    fprintf(stderr, "  | Available attribute names:                                                          |\n");
+    fprintf(stderr, "  | Attributes:                                                                         |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    PrintClustersAttributes();
-}
-
-void Commands::PrintMiscCommands()
-{
-    for (auto & cluster : clusters)
+    for (auto & command : commands)
     {
-        if (cluster.first[0] == '\0')
+        if (strcmp(command->GetName(), "read") == 0)
         {
-            for (auto & command : cluster.second)
-            {
-                std::string arguments = "";
-                arguments += command->GetName();
-
-                size_t argumentsCount = command->GetArgumentsCount();
-                for (size_t j = 0; j < argumentsCount; j++)
-                {
-                    arguments += " ";
-                    arguments += command->GetArgumentName(j);
-                }
-
-                fprintf(stderr, "  | %-84s|\n", arguments.c_str());
-            }
+            fprintf(stderr, "  | * %-82s|\n", command->GetAttribute());
         }
     }
-}
-
-void PrintClusterHeader(const char * name)
-{
-    fprintf(stderr, "  | * Cluster: %-73s|\n", name);
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
 }
 
-void PrintClusterFooter()
+void Commands::ShowCommand(std::string executable, std::string clusterName, Command * command)
 {
-    fprintf(stderr, "  | %-84s|\n", "");
-    fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-}
+    fprintf(stderr, "Usage:\n");
 
-void Commands::PrintClustersCommands()
-{
-    for (auto & cluster : clusters)
+    std::string arguments = "";
+    arguments += command->GetName();
+
+    size_t argumentsCount = command->GetArgumentsCount();
+    for (size_t i = 0; i < argumentsCount; i++)
     {
-        bool hasCommands = false;
-
-        if (cluster.first[0] != '\0')
-        {
-            for (auto & command : cluster.second)
-            {
-                if (strcmp("read", command->GetName()) != 0)
-                {
-                    if (!hasCommands)
-                    {
-                        PrintClusterHeader(cluster.first);
-                        hasCommands = true;
-                    }
-
-                    std::string arguments = "";
-                    arguments += command->GetName();
-
-                    size_t argumentsCount = command->GetArgumentsCount();
-
-                    // Skip the first 3 arguments since those are the common arguments for ModelCommands.
-                    if (argumentsCount > 3)
-                    {
-                        arguments += " [";
-                        for (size_t i = 3; i < argumentsCount; i++)
-                        {
-                            if (i != 3)
-                            {
-                                arguments += " ";
-                            }
-                            arguments += command->GetArgumentName(i);
-                        }
-                        arguments += "]";
-                    }
-
-                    fprintf(stderr, "  | %-84s|\n", arguments.c_str());
-                }
-            }
-        }
-
-        if (hasCommands)
-        {
-            PrintClusterFooter();
-        }
+        arguments += " ";
+        arguments += command->GetArgumentName(i);
     }
-}
-
-void Commands::PrintClustersAttributes()
-{
-    for (auto & cluster : clusters)
-    {
-        bool hasAttributes = false;
-
-        if (cluster.first[0] != '\0')
-        {
-            for (auto & command : cluster.second)
-            {
-                if (strcmp("read", command->GetName()) == 0)
-                {
-                    if (!hasAttributes)
-                    {
-                        PrintClusterHeader(cluster.first);
-                        hasAttributes = true;
-                    }
-
-                    fprintf(stderr, "  | %-84s|\n", command->GetAttribute());
-                }
-            }
-        }
-
-        if (hasAttributes)
-        {
-            PrintClusterFooter();
-        }
-    }
+    fprintf(stderr, "  %s %s %s\n", executable.c_str(), clusterName.c_str(), arguments.c_str());
 }

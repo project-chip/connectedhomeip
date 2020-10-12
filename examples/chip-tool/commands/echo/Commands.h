@@ -24,18 +24,18 @@
 class Echo : public EchoCommand
 {
 public:
-    Echo() : EchoCommand("echo", NetworkType::UDP) {}
+    Echo() : EchoCommand("ip", NetworkType::UDP) {}
 };
 
 class EchoBle : public EchoCommand
 {
 public:
-    EchoBle() : EchoCommand("echo-ble", NetworkType::BLE) {}
+    EchoBle() : EchoCommand("ble", NetworkType::BLE) {}
 };
 
 void registerCommandsEcho(Commands & commands)
 {
-    const char * clusterName = "";
+    const char * clusterName = "Echo";
 
     commands_list clusterCommands = {
         make_unique<Echo>(),

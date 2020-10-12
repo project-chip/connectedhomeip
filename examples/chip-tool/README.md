@@ -36,14 +36,14 @@ pass it the discriminator and pairing code of the remote device. The command
 below uses the default values hard-coded into the debug versions of the ESP32
 wifi-echo app:
 
-          $ chip-tool echo-ble 3840 12345678
+    $ chip-tool echo ble 3840 12345678
 
 ### Ping a device over IP
 
 To start the Client in echo mode, run the built executable and pass it the IP
 address and port of the server to talk to, as well as the command "echo".
 
-          $ chip-tool 192.168.0.30 8000 echo
+    $ chip-tool echo ip 192.168.0.30 8000
 
 If valid values are supplied, it will begin to periodically send messages to the
 server address provided.
@@ -55,12 +55,39 @@ Stop the Client at any time with `Ctrl + C`.
 
 ## Using the Client to Send CHIP Commands
 
-To use the Client to send a CHIP comands, run the built executable and pass it
-the IP address and port of the server to talk to, the name of the command to
-send, as well as an enpoint id. Right now the "off", "on", and "toggle" commands
-are supported, from the On/Off cluster. The endpoint id must be between 1
+To use the Client to send a CHIP commands, run the built executable and pass it
+the target cluster name, the target command name, an endpoint id as well as the
+IP address and port of the server to talk to. The endpoint id must be between 1
 and 240.
 
-          $ chip-tool 192.168.0.30 8000 on 1
+    $ chip-tool onoff on 1 192.168.0.30 11095
 
 The client will send a single command packet and then exit.
+
+### How to get the list of supported clusters
+
+To get the list of supported clusters, run the built executable without any
+arguments.
+
+    $ chip-tool
+
+### How to get the list of supported commands for a specific cluster
+
+To get the list of commands for a specific cluster, run the built executable
+with the target cluster name.
+
+    $ chip-tool onoff
+
+### How to get the list of supported attributes for a specific cluster
+
+To the the list of attributes for a specific cluster, run the built executable
+with the target cluster name and the `read` command name.
+
+    $ chip-tool onoff read
+
+### How to get the list of parameters for a command
+
+To get the list of parameters for a specific command, run the built executable
+with the target cluster name and the target command name
+
+    $ chip-tool onoff on
