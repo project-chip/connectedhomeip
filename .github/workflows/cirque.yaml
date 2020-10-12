@@ -24,15 +24,17 @@ jobs:
 
         runs-on: ubuntu-latest
 
-        container:
-            image: connectedhomeip/chip-build-cirque:0.4.10
-            volumes:
-                - "/tmp:/tmp"
-                - "/dev/pts:/dev/pts"
-            env:
-                LOG_DIR: /tmp/cirque_test_output/
-                CLEANUP_DOCKER_FOR_CI: 1
-            options: "--privileged"
+# need to run with privilege, which isn't supported by job.XXX.contaner
+#  https://github.com/actions/container-action/issues/2
+#         container:
+#             image: connectedhomeip/chip-build-cirque:0.4.10
+#             volumes:
+#                 - "/tmp:/tmp"
+#                 - "/dev/pts:/dev/pts"
+#             env:
+#                 LOG_DIR: /tmp/cirque_test_output/
+#                 CLEANUP_DOCKER_FOR_CI: 1
+#             options: "--privileged"
 
         steps:
             - name: Checkout
@@ -41,7 +43,7 @@ jobs:
                   submodules: true
             - name: Bootstrap
               run: |
-                  bash -x scripts/tests/cirque_tests.sh bootstrap
+                  integrations/docker/images/chip-build-cirque/run.sh scripts/tests/cirque_tests.sh bootstrap
             - name: Artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -51,8 +53,13 @@ jobs:
                   if_false: "pull-${{ github.event.pull_request.number }}"
             - name: Run Tests
               run: |
-                  mkdir -p /tmp/cirque_test_output
-                  bash -x scripts/tests/cirque_tests.sh run_all_tests
+                  integrations/docker/images/chip-build-cirque/run.sh \
+                     --env LOG_DIR=/tmp/cirque_test_output \
+                     --env CLEANUP_DOCKER_FOR_CI=1 \
+                     --privileged \
+                     --volume /tmp:/tmp \
+                     --volume /dev/pts:/dev/pts \
+                     -- scripts/tests/cirque_tests.sh run_all_tests
             - name: Uploading Binaries
               uses: actions/upload-artifact@v1
               if: ${{ always() }}
