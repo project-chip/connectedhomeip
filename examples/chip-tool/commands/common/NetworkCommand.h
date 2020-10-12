@@ -46,7 +46,7 @@ public:
         }
     }
 
-    const char * GetName(void) const { return mName; }
+    const char * GetNetworkName(void) const { return mName; }
 
     virtual void OnConnect(ChipDeviceController * dc)                                      = 0;
     virtual void OnError(ChipDeviceController * dc, CHIP_ERROR err)                        = 0;
