@@ -110,8 +110,7 @@ function cirquetest_run_test() {
         # TODO: Filter cirque containers
         cat /proc/1/cgroup >&2
         cat /proc/1/mountinfo >&2
-        IN_DOCKER=$(cat /proc/1/cgroup | grep docker)
-        if [ -z "$IN_DOCKER" ]; then
+        if ! grep docker.sock /proc/1/mountinfo; then
             docker ps -aq | xargs docker stop >/dev/null 2>&1
         fi
         docker container prune -f >/dev/null 2>&1
