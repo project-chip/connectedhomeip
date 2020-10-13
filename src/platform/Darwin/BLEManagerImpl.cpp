@@ -46,7 +46,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
 
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
 
     // Initialize the Chip BleLayer.
     BleApplicationDelegateImpl * appDelegate   = new BleApplicationDelegateImpl();
@@ -58,55 +58,55 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
 ConnectivityManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return ConnectivityManager::kCHIPoBLEServiceMode_NotSupported;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(ConnectivityManager::CHIPoBLEServiceMode val)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return false;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return false;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 bool BLEManagerImpl::_IsAdvertising(void)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return false;
 }
 
 CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 }
 
@@ -117,13 +117,13 @@ BleLayer * BLEManagerImpl::_GetBleLayer()
 
 uint16_t BLEManagerImpl::_NumConnections(void)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
     return 0;
 }
 
 void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
-    ChipLogProgress(DeviceLayer, "%s", __FUNCTION__);
+    ChipLogDetail(DeviceLayer, "%s", __FUNCTION__);
 }
 
 } // namespace Internal
