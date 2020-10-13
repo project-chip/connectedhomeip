@@ -564,7 +564,10 @@ Error Layer::SetClock_RealTime(uint64_t newCurTime)
 void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
 {
     // dispatch TimerCallbacks
-    Cancelable ready = mTimerCallbacks.DequeueBy(TimerReady, kCurrentEpoch);
+    Cancelable ready;
+
+    mTimerCallbacks.DequeueBy(TimerReady, kCurrentEpoch, ready);
+
     while (ready.mNext != &ready)
     {
         // one-shot

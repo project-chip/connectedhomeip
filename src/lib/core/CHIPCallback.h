@@ -82,6 +82,8 @@ public:
         return this;
     }
     ~Cancelable() { Cancel(); }
+
+    Cancelable(const Cancelable &) = delete;
 };
 
 typedef void (*CallFn)(void *);
@@ -186,10 +188,8 @@ public:
     /**
      * @brief dequeue, but don't cancel, all cas that match the by()
      */
-    Cancelable DequeueBy(bool (*by)(uint64_t, const Cancelable *), uint64_t p)
+    void DequeueBy(bool (*by)(uint64_t, const Cancelable *), uint64_t p, Cancelable & dequeued)
     {
-        Cancelable dequeued;
-
         for (Cancelable * ca = mNext; ca != this;)
         {
             Cancelable * next = ca->mNext;
@@ -200,7 +200,6 @@ public:
             }
             ca = next;
         }
-        return dequeued;
     }
 
     /**
