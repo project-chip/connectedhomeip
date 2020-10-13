@@ -109,7 +109,7 @@ void PublishService()
 
 void StartDefaultThreadNetwork(void)
 {
-    // Set default thread network Info and enable the etWORK
+    // Set default thread network Info and enable/start thread
 
     chip::DeviceLayer::Internal::DeviceNetworkInfo deviceNetworkInfo;
     memset(&deviceNetworkInfo, 0, sizeof(deviceNetworkInfo));

@@ -23,6 +23,7 @@ assert(current_os == "freertos")
 efr32_project_dir = "${chip_root}/examples/lighting-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
+chip_print_memory_usage = false
 show_qr_code = true
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
@@ -124,10 +125,14 @@ efr32_executable("lighting_app") {
   }
 
   ldflags = [
-    "-Wl,--print-memory-usage",
-    "-fstack-usage",
-    "-T" + rebase_path(ldscript, root_build_dir),
+    "-T" + rebase_path(ldscript, root_build_dir)
   ]
+
+  if (chip_print_memory_usage){
+    ldflags += [     
+      "-Wl,--print-memory-usage",
+      "-fstack-usage" ]
+  }
 }
 
 group("efr32") {
