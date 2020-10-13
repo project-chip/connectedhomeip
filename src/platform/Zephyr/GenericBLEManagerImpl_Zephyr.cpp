@@ -35,7 +35,7 @@
 #include <sys/byteorder.h>
 #include <sys/util.h>
 
-LOG_MODULE_DECLARE(chip, LOG_LEVEL_DBG);
+LOG_MODULE_DECLARE(chip);
 
 using namespace ::chip;
 using namespace ::chip::Ble;
