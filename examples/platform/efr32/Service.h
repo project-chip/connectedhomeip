@@ -20,5 +20,3 @@
 void SetDeviceName(const char * newDeviceName);
 void PublishService();
 void StartDefaultThreadNetwork(void);
-
-#endif // EFR32_SERVICE_H
