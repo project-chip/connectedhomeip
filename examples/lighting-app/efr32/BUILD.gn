@@ -123,7 +123,11 @@ efr32_executable("lighting_app") {
     ldscript = "${efr32_project_dir}/ldscripts/efr32-light-example-MG21.ld"
   }
 
-  ldflags = [ "-Wl,--print-memory-usage", "-fstack-usage", "-T" + rebase_path(ldscript, root_build_dir) ]
+  ldflags = [
+    "-Wl,--print-memory-usage",
+    "-fstack-usage",
+    "-T" + rebase_path(ldscript, root_build_dir),
+  ]
 }
 
 group("efr32") {

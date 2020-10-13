@@ -14,7 +14,6 @@
 
 import("efr32_board.gni")
 
-
 if (efr32_family == "efr32mg12") {
   arm_arch = "armv7e-m"
   arm_abi = "aapcs"
