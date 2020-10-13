@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<link
+			href="https://fonts.googleapis.com/css?family=Roboto&display=swap"
+			rel="stylesheet"
+		/>
+		<link rel="stylesheet" href="qrcode.css" />
+		<title>CHIP: QR Code</title>
+	</head>
+
+	<body>
+		<div class="wrapper">
+			<div class="container">
+				<h4>
+					Please scan with your CHIPTool app.
+				</h4>
+				<!-- <canvas id="qr"></canvas> -->
+				<div id="qrcode"></div>
+				<p id="error">Error, no data provided for the QR code</p>
+
+				<div id="payload-info">
+					<p id="payload"></p>
+					<p>
+						This QR code is unique for your device. You may print a
+						copy of this for subsequent use.
+					</p>
+
+					<button onclick="window.print()" class="noprint">
+						Print QR Code
+					</button>
+				</div>
+			</div>
+
+			<div class="footer">
+				<p>
+					This QR code is generated using
+					<a
+						href="https://davidshimjs.github.io/qrcodejs/"
+						target="_blank"
+						>qrcodejs</a
+					>
+				</p>
+			</div>
+		</div>
+		<script src="qrcode.min.js"></script>
+		<script type="text/javascript">
+			let link = new URLSearchParams(window.location.search);
+			let data = link.get('data')
+				? link.get('data')
+				: 'Data not added. Try again later.';
+			document.querySelector('#payload').innerHTML = link.get('data')
+				? `Payload: ${link.get('data')}`
+				: '';
+			link.get('data')
+				? (document.querySelector('#error').style.display = 'none')
+				: (document.querySelector('#payload-info').style.display =
+						'none');
+			var qrcode = new QRCode(document.getElementById('qrcode'), {
+				text: data,
+				width: 250,
+				height: 250,
+				colorDark: '#000000',
+				colorLight: '#ffffff',
+				correctLevel: QRCode.CorrectLevel.H,
+			});
+		</script>
+	</body>
+</html>
