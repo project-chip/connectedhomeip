@@ -19,6 +19,7 @@
 #include "Commands.h"
 
 #include "Command.h"
+#include "Logging.h"
 
 #include <algorithm>
 #include <string>
@@ -33,6 +34,8 @@ void Commands::Register(const char * clusterName, commands_list commandsList)
 
 int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
+    ConfigureChipLogging();
+
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipDeviceController dc;
 
