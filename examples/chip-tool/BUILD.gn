@@ -34,6 +34,8 @@ executable("chip-tool") {
     defines = [ "BUILD_RELEASE=1" ]
   }
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [ "${chip_root}/src/lib" ]
 
   output_dir = root_out_dir
