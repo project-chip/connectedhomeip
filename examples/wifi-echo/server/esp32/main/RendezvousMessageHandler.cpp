@@ -21,9 +21,9 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
-using namespace ::chip;
+#include "ServiceProvisioning.h"
 
-extern CHIP_ERROR SetWiFiStationProvisioning(char * ssid, char * key);
+using namespace ::chip;
 
 CHIP_ERROR RendezvousMessageHandler::HandleMessageReceived(System::PacketBuffer * buffer)
 {

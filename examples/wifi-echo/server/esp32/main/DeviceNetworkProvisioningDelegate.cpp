@@ -15,12 +15,14 @@
  *    limitations under the License.
  */
 
-#include "DeviceNetworkProvisioningDelegate.h"
 #include <support/logging/CHIPLogging.h>
+
+#include "DeviceNetworkProvisioningDelegate.h"
+#include "ServiceProvisioning.h"
 
 using namespace ::chip;
 
-void ESP32NetworkProvisioningDelegate::ProvisionNetwork(const char * ssid, const char * passwd)
+void ESP32NetworkProvisioningDelegate::ProvisionNetwork(const char * ssid, const char * key)
 {
-    ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: Received SSID and passwd\n");
+    ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
 }

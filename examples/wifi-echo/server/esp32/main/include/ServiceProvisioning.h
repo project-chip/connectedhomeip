@@ -1,4 +1,4 @@
-/**
+/*
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
-#import <AVFoundation/AVFoundation.h>
-#import <CHIP/CHIP.h>
-#import <UIKit/UIKit.h>
+#ifndef _SERVICE_PROVISIONING_H
+#define _SERVICE_PROVISIONING_H
 
-@interface QRCodeViewController
-    : UIViewController <AVCaptureMetadataOutputObjectsDelegate, CHIPDeviceControllerDelegate, CHIPDevicePairingDelegate>
+#include <core/CHIPError.h>
 
-@end
+CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key);
+
+#endif // _SERVICE_PROVISIONING_H

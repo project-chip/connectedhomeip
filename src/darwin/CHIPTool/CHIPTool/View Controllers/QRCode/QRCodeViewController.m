@@ -257,6 +257,7 @@
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
+    [self.chipController setPairingDelegate:self queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
@@ -281,6 +282,12 @@
 
 - (void)deviceControllerOnMessage:(nonnull NSData *)message
 {
+}
+
+// MARK: CHIPDevicePairingDelegate
+- (void)onNetworkCredentialsRequested:(SendNetworkCredentials)handler
+{
+    NSLog(@"Network credential requested for pairing");
 }
 
 // MARK: UI Helper methods

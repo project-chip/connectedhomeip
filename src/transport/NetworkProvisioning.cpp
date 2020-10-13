@@ -205,7 +205,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
     System::PacketBuffer * buffer = System::PacketBuffer::New();
-    BufBound bbuf(buffer->Start(), buffer->TotalLength());
+    BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
 
     ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

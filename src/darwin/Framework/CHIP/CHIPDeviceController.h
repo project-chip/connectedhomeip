@@ -28,6 +28,7 @@ typedef void (^ControllerOnMessageBlock)(NSData * message);
 typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @protocol CHIPDeviceControllerDelegate;
+@protocol CHIPDevicePairingDelegate;
 
 @interface AddressInfo : NSObject
 
@@ -43,7 +44,6 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 - (BOOL)connectWithoutSecurePairing:(NSString *)ipAddress
                               error:(NSError * __autoreleasing *)error
     __attribute__((deprecated("Available until Rendezvous is fully integrated")));
-- (nullable AddressInfo *)getAddressInfo;
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
 - (BOOL)sendOnCommand;
 - (BOOL)sendOffCommand;
@@ -79,6 +79,15 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
  * @param[in] queue The queue on which the Device Controller will deliver callbacks
  */
 - (void)setDelegate:(id<CHIPDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue;
+
+/**
+ * Set the Delegate for the Device Pairing  as well as the Queue on which the Delegate callbacks will be triggered
+ *
+ * @param[in] delegate The delegate the pairing process should use
+ *
+ * @param[in] queue The queue on which the callbacks will be delivered
+ */
+- (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 @end
 

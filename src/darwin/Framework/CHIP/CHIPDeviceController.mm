@@ -20,6 +20,7 @@
 #include <app/chip-zcl-zpro-codec.h>
 
 #import "CHIPDeviceController.h"
+#import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPError.h"
 #import "CHIPLogging.h"
 
@@ -63,6 +64,7 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
  */
 @property (readonly, nonatomic) dispatch_queue_t delegateQueue;
 @property (readonly) chip::DeviceController::ChipDeviceController * cppController;
+@property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
 
 @end
 
@@ -96,10 +98,20 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
             return nil;
         }
 
-        if (CHIP_NO_ERROR != _cppController->Init(kLocalDeviceId)) {
+        _pairingDelegateBridge = new CHIPDevicePairingDelegateBridge();
+        if (!_pairingDelegateBridge) {
+            CHIP_LOG_ERROR("Error: couldn't create pairing delegate");
+            delete _cppController;
+            _cppController = NULL;
+            return nil;
+        }
+
+        if (CHIP_NO_ERROR != _cppController->Init(kLocalDeviceId, _pairingDelegateBridge)) {
             CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
             delete _cppController;
             _cppController = NULL;
+            delete _pairingDelegateBridge;
+            _pairingDelegateBridge = NULL;
             return nil;
         }
     }
@@ -238,29 +250,6 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         self.cppController->ServiceEvents();
     });
     return YES;
-}
-
-- (AddressInfo *)getAddressInfo
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::Transport::PeerAddress peerAddr = chip::Transport::PeerAddress::Uninitialized();
-    [self.lock lock];
-    err = self.cppController->PopulatePeerAddress(peerAddr);
-    [self.lock unlock];
-    chip::Inet::IPAddress ipAddr = peerAddr.GetIPAddress();
-    uint16_t port = peerAddr.GetPort();
-
-    if (err != CHIP_NO_ERROR) {
-        return nil;
-    }
-
-    // ignore the unused port
-    (void) port;
-    // A buffer big enough to hold ipv4 and ipv6 addresses
-    char ipAddrStr[64];
-    ipAddr.ToString(ipAddrStr, sizeof(ipAddrStr));
-    NSString * ipAddress = [NSString stringWithUTF8String:ipAddrStr];
-    return [[AddressInfo alloc] initWithIP:ipAddress];
 }
 
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error
@@ -459,6 +448,13 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         self->_delegate = nil;
         self->_delegateQueue = NULL;
     }
+    [self.lock unlock];
+}
+
+- (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue
+{
+    [self.lock lock];
+    _pairingDelegateBridge->setDelegate(delegate, queue);
     [self.lock unlock];
 }
 
