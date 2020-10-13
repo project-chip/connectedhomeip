@@ -200,6 +200,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/ConnectivityManagerImpl.cpp",
         "Darwin/ConnectivityManagerImpl.h",
         "Darwin/InetPlatformConfig.h",
+        "Darwin/Logging.cpp",
         "Darwin/PlatformManagerImpl.cpp",
         "Darwin/PlatformManagerImpl.h",
         "Darwin/PosixConfig.cpp",
