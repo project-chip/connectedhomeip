@@ -46,4 +46,6 @@ if __name__ == '__main__':
             "PATH", "").split(":") if not os.path.realpath(s).startswith(os.path.realpath(os.path.join(CHIP_PATH, "third_party/pigweed/repo")))])
         test_environ["HAPPY_LOG_DIR"] = "/tmp/happy_test_logs"
     test_environ["TEST_BIN_DIR"] = args.bin_dir
+    test_environ["HAPPY_MAIN_CONFIG_FILE"] = os.path.realpath(
+        os.path.join(CHIP_PATH, "src/test_driver/happy/conf/main_conf.json"))
     os.execvpe("python3", ["python3", args.test_script], test_environ)

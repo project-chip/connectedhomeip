@@ -50,12 +50,6 @@ function happytest_bootstrap() {
     # Bootstrap Happy
     cd "$REPO_DIR/third_party/happy/repo"
 
-    # Override happy log dir config.
-    # python3 -c 'import json, os; file = open("happy/conf/main_config.json"); data = json.load(file); data["state_file_prefix"] = os.environ.get("HAPPY_STATE_FILE_PREFIX", data["state_file_prefix"]); data["log_directory"] = os.environ["HAPPY_LOG_DIR"]; data["default_happy_log_dir"] = os.environ["HAPPY_LOG_DIR"]; out = open("happy/conf/main_config.json", "w"); json.dump(data, out);'
-
-    echo "Happy Main Config"
-    cat happy/conf/main_config.json
-
     python3 setup.py install --user
 
     echo "Happy Log dir set to $HAPPY_LOG_DIR"
