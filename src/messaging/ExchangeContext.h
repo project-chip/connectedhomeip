@@ -228,6 +228,13 @@ public:
     bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     /**
+     *  Start the Trickle rebroadcast algorithm's periodic retransmission timer mechanism.
+     *
+     *  @return  #CHIP_NO_ERROR if successful, else an INET_ERROR mapped into a CHIP_ERROR.
+     */
+    CHIP_ERROR StartTimerT();
+
+    /**
      *  Tear down the Trickle retransmission mechanism by canceling the periodic timers
      *  within Trickle and freeing the message buffer holding the Weave
      *  message.
@@ -308,7 +315,6 @@ public:
     void Close();
     void Abort();
     void Release();
-    CHIP_ERROR StartTimerT();
     void SetRefCount(uint8_t value) { mRefCount = value; }
 
 private:
