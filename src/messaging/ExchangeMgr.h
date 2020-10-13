@@ -17,7 +17,8 @@
 
 /**
  *    @file
- *      This file defines the classes corresponding to CHIP Exchange management.
+ *      Defines the CHIP ExchangeManager class and its supporting types
+ *      for Exchange management.
  *
  */
 
@@ -250,6 +251,7 @@ private:
     ExchangeContext * AllocContext();
 
     void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, bool allowDups, ExchangeContext::MessageReceiveFunct handler,
                            void * appState);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
