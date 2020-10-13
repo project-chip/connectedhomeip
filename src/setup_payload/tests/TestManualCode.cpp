@@ -167,8 +167,7 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 
         SetupPayload outPayload;
         CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
-        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 1, payload.vendorID,
-                            payload.productID);
+        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 1, payload.vendorID, payload.productID);
     }
 
     payload.vendorID           = 1;
@@ -184,8 +183,7 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 
         SetupPayload outPayload;
         CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
-        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 2, payload.vendorID,
-                            payload.productID);
+        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 2, payload.vendorID, payload.productID);
     }
 }
 
