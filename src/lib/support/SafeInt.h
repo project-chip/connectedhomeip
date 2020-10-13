@@ -138,7 +138,7 @@ typename std::enable_if<std::is_unsigned<T>::value, typename std::make_signed<T>
     // then noting that both (numeric_limits<T>::max() - arg) and its negation
     // are guaranteed to fit in signed_type.
     signed_type diff = static_cast<signed_type>(numeric_limits<T>::max() - arg);
-    return -diff - 1;
+    return static_cast<signed_type>(-diff - 1);
 }
 
 } // namespace chip

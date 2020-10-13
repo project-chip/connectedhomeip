@@ -60,7 +60,7 @@ private:
 
     char mName[46];
     Command::AddressWithInterface mRemoteAddr;
-    uint32_t mRemotePort;
-    uint32_t mDiscriminator;
+    uint16_t mRemotePort;
+    uint16_t mDiscriminator;
     uint32_t mSetupPINCode;
 };
