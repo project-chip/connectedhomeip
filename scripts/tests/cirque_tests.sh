@@ -78,7 +78,6 @@ function __cirquetest_clean_flask() {
 function cirquetest_bootstrap() {
     set -e
     cd "$REPO_DIR"/third_party/cirque/repo
-    sudo apt-get install -y bazel socat psmisc tigervnc-standalone-server tigervnc-viewer python3-pip python3-venv python3-setuptools libdbus-glib-1-dev libgirepository1.0-dev
     pip3 install pycodestyle==2.5.0 wheel
     make NO_GRPC=1 install -j
     ./dependency_modules.sh
@@ -109,7 +108,11 @@ function cirquetest_run_test() {
     if [ "x$CLEANUP_DOCKER_FOR_CI" = "x1" ]; then
         echo "Do docker container and network prune"
         # TODO: Filter cirque containers
-        docker ps -aq | xargs docker stop >/dev/null 2>&1
+        cat /proc/1/cgroup >&2
+        cat /proc/1/mountinfo >&2
+        if ! grep docker.sock /proc/1/mountinfo; then
+            docker ps -aq | xargs docker stop >/dev/null 2>&1
+        fi
         docker container prune -f >/dev/null 2>&1
         docker network prune -f >/dev/null 2>&1
     fi
@@ -121,6 +124,7 @@ function cirquetest_run_all_tests() {
     # This is the workaround
     echo "Logs will be stored at $LOG_DIR"
     test_pass="1"
+    mkdir -p "$LOG_DIR"
     for i in "${!CIRQUE_TESTS[@]}"; do
         test_name="${CIRQUE_TESTS[$i]}"
         echo "[ RUN] $test_name"
