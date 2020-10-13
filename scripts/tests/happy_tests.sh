@@ -51,8 +51,6 @@ function happytest_bootstrap() {
     cd "$REPO_DIR/third_party/happy/repo"
 
     python3 setup.py install --user
-
-    echo "Happy Log dir set to $HAPPY_LOG_DIR"
 }
 
 function happytest_run() {
