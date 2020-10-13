@@ -31,17 +31,21 @@ namespace Platform {
 
 char * MemoryAllocString(const char * string, size_t length)
 {
-    if (length == 0)
+    if (string && !length)
     {
         length = strlen(string);
     }
-    char * copy = static_cast<char *>(MemoryAlloc(length + 1));
-    if (copy)
+    return CopyString(static_cast<char *>(MemoryAlloc(length + 1)), string, length);
+}
+
+char * CopyString(char * dest, const char * source, size_t length)
+{
+    if (dest)
     {
-        strncpy(copy, string, length);
-        copy[length] = 0;
+        strncpy(dest, source ? source : "", length);
+        dest[length] = 0;
     }
-    return copy;
+    return dest;
 }
 
 } // namespace Platform

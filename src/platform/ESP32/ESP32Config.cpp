@@ -365,21 +365,11 @@ exit:
 CHIP_ERROR ESP32Config::WriteConfigValueStr(Key key, const char * str, size_t strLen)
 {
     CHIP_ERROR err;
-    char * strCopy = NULL;
-
-    if (str != NULL)
-    {
-        strCopy = chip::Platform::MemoryAllocString(str, strLen);
-        VerifyOrExit(strCopy != NULL, err = CHIP_ERROR_NO_MEMORY);
-    }
-
-    err = ESP32Config::WriteConfigValueStr(key, strCopy);
+    chip::Platform::ScopedMemoryString strCopy(str, str ? strLen : 0);
+    VerifyOrExit(strCopy, err = CHIP_ERROR_NO_MEMORY);
+    err = ESP32Config::WriteConfigValueStr(key, strCopy.Get());
 
 exit:
-    if (strCopy != NULL)
-    {
-        chip::Platform::MemoryFree(strCopy);
-    }
     return err;
 }
 

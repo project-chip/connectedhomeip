@@ -21,10 +21,12 @@
  *      This file defines string operations that allocate heap memory.
  */
 
-#ifndef CHIP_MEM_STRING_H
-#define CHIP_MEM_STRING_H
+#pragma once
 
 #include <stdlib.h>
+#include <string.h>
+
+#include <support/ScopedBuffer.h>
 
 namespace chip {
 namespace Platform {
@@ -34,10 +36,11 @@ namespace Platform {
  *
  * @param[in]  string           String to be copied.
  *
- * @param[in]  length           Length of the string to be copied. If zero, `strlen(string)`
- *                              will be used. Like `strncpy()`, if the `string` is shorter
- *                              then the remaining space up to `length` will be filled with
- *                              null bytes.
+ * @param[in]  length           Length to be copied. If zero, `strlen(string)` will be used.
+ *                              Like `strncpy()`, if the `string` is shorter than `length`,
+ *                              then the remaining space will be filled with null bytes.
+ *                              Like `strndup()` but unlike `strncpy()`, the result is always
+ *                              null-terminated.
  *
  * @retval  Pointer to a null-terminated string in case of success.
  * @retval  `nullptr` if memory allocation fails.
@@ -45,7 +48,57 @@ namespace Platform {
  */
 extern char * MemoryAllocString(const char * string, size_t length = 0);
 
+/**
+ * Copies a C-style string.
+ *
+ * This differs from `strncpy()` in some important ways:
+ *  - `dest` can be nullptr, in which case no copy is attempted, and the function returns nullptr.
+ *  - `source` can be nullptr, in which case the destination is an empty string.
+ *  - A non-nullptr result is always null-terminated.
+ * Like `strncpy()`, if the `string` is shorter than `length` then the remaining space will be
+ * filled with null bytes.
+ *
+ * @param[in]  dest             Destination string buffer (which must be at least `length`+1 bytes)
+ *                              or nullptr.
+ *
+ * @param[in]  source           String to be copied.
+ *
+ * @param[in]  length           Length to be copied.
+ *
+ * @retval  Same as `dest`.
+ */
+extern char * CopyString(char * dest, const char * source, size_t length);
+
+/**
+ * Represents a C string in a ScopedMemoryBuffer.
+ */
+
+class ScopedMemoryString : public ScopedMemoryBuffer<char>
+{
+public:
+    /**
+     * Create a ScopedMemoryString.
+     *
+     * @param[in]  string           String to be copied. If `nullptr`, treated as a zero-length string.
+     *
+     * @param[in]  length           Length to be copied. If zero, `strlen(string)` will be used.
+     *                              Like `strncpy()`, if the `string` is shorter than `length`,
+     *                              then the remaining space will be filled with null bytes.
+     *                              Like `strndup()` but unlike `strncpy()`, the result is always
+     *                              null-terminated.
+     */
+    ScopedMemoryString(const char * string, size_t length = 0)
+    {
+        if (string && !length)
+        {
+            length = strlen(string);
+        }
+        if (string || length)
+        {
+            CopyString(Alloc(length + 1).Get(), string, length);
+        }
+    }
+};
+
 } // namespace Platform
 } // namespace chip
-
-#endif // CHIP_MEM_STRING_H

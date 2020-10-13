@@ -30,6 +30,7 @@
 
 #include "TestInetCommonOptions.h"
 
+#include <assert.h>
 #include <inttypes.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -258,9 +259,9 @@ bool FaultInjectionOptions::HandleOption(const char * progName, OptionSet * optS
     {
 #if CHIP_CONFIG_TEST || CHIP_SYSTEM_CONFIG_TEST || INET_CONFIG_TEST
     case kToolCommonOpt_FaultInjection: {
-        char * mutableArg = chip::Platform::MemoryAllocString(arg);
-        bool parseRes     = ParseFaultInjectionStr(mutableArg, faultMgrFnTable, faultMgrFnTableLen);
-        chip::Platform::MemoryFree(mutableArg);
+        chip::Platform::ScopedMemoryString mutableArg(arg);
+        assert(mutableArg);
+        bool parseRes = ParseFaultInjectionStr(mutableArg.Get(), faultMgrFnTable, faultMgrFnTableLen);
         if (!parseRes)
         {
             PrintArgError("%s: Invalid string specified for fault injection option: %s\n", progName, arg);

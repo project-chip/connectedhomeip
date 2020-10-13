@@ -38,6 +38,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <support/ScopedBuffer.h>
 #include <support/TestUtils.h>
 
 #include <string.h>
@@ -212,14 +213,13 @@ void TestString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const c
     uint32_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char * val = static_cast<char *>(chip::Platform::MemoryAlloc(expectedLen + 1));
+    chip::Platform::ScopedMemoryBuffer<char> valBuffer;
+    char * val = static_cast<char *>(valBuffer.Alloc(expectedLen + 1).Get());
 
     CHIP_ERROR err = reader.GetString(val, expectedLen + 1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
-
-    chip::Platform::MemoryFree(val);
 }
 
 void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const char * expectedVal)
@@ -230,14 +230,13 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, cons
     uint32_t expectedLen = strlen(expectedVal);
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    char * val = static_cast<char *>(chip::Platform::MemoryAlloc(expectedLen + 1));
+    chip::Platform::ScopedMemoryBuffer<char> valBuffer;
+    char * val = static_cast<char *>(valBuffer.Alloc(expectedLen + 1).Get());
 
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen + 1) == 0);
-
-    chip::Platform::MemoryFree(val);
 }
 
 void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const uint8_t * expectedVal, uint32_t expectedLen)
@@ -247,13 +246,12 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const
 
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
-    uint8_t * val  = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(expectedLen));
+    chip::Platform::ScopedMemoryBuffer<uint8_t> valBuffer;
+    uint8_t * val  = static_cast<uint8_t *>(valBuffer.Alloc(expectedLen).Get());
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
-
-    chip::Platform::MemoryFree(val);
 }
 
 void TestBufferContents(nlTestSuite * inSuite, PacketBuffer * buf, const uint8_t * expectedVal, uint32_t expectedLen)
