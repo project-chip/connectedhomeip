@@ -85,8 +85,8 @@ exit:
 bool ModelCommand::SendCommand(ChipDeviceController * dc)
 {
     // Make sure our buffer is big enough, but this will need a better setup!
-    static const size_t bufferSize = 1024;
-    auto * buffer                  = PacketBuffer::NewWithAvailableSize(bufferSize);
+    static const uint16_t bufferSize = 1024;
+    auto * buffer                    = PacketBuffer::NewWithAvailableSize(bufferSize);
 
     if (buffer == nullptr)
     {

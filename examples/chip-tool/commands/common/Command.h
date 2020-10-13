@@ -54,8 +54,8 @@ struct Argument
 {
     const char * name;
     ArgumentType type;
-    uint32_t min;
-    uint32_t max;
+    int64_t min;
+    int64_t max;
     void * value;
 };
 

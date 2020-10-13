@@ -26,19 +26,24 @@ static const char * PAYLOAD = "Message from Standalone CHIP echo client!";
 
 void EchoCommand::SendEcho() const
 {
-    size_t payload_len = strlen(PAYLOAD);
+    size_t payloadLen = strlen(PAYLOAD);
+    if (payloadLen > UINT16_MAX)
+    {
+        ChipLogError(chipTool, "PAYLOAD length too big for PacketBuffer (> UINT16_MAX)");
+        return;
+    }
 
     // Reallocate buffer on each run, as the secure transport encrypts and
     // overwrites the buffer from previous iteration.
-    auto * buffer = PacketBuffer::NewWithAvailableSize(payload_len);
+    auto * buffer = PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(payloadLen));
     if (buffer == nullptr)
     {
         ChipLogError(chipTool, "Failed to allocate memory for packet data.");
         return;
     }
 
-    memcpy(buffer->Start(), PAYLOAD, payload_len);
-    buffer->SetDataLength(payload_len);
+    memcpy(buffer->Start(), PAYLOAD, payloadLen);
+    buffer->SetDataLength(static_cast<uint16_t>(payloadLen));
 
     CHIP_ERROR err = mController->SendMessage(NULL, buffer);
     if (err == CHIP_NO_ERROR)
