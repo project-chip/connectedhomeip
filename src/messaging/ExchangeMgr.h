@@ -37,7 +37,7 @@ using System::PacketBuffer;
 
 class ExchangeContext;
 
-static constexpr int16_t ANY_MESSAGE_TYPE = -1; // represents any message type
+static constexpr int16_t ANY_MESSAGE_TYPE = -1;
 
 /**
  *  @brief
