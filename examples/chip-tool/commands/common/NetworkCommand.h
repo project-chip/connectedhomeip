@@ -34,14 +34,14 @@ public:
     {
         if (type == NetworkType::UDP || type == NetworkType::ALL)
         {
+            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("device-remote-ip", &mRemoteAddr);
-            AddArgument("device-remote-port", 0, 65536, &mRemotePort);
         }
 
         if (type == NetworkType::BLE || type == NetworkType::ALL)
         {
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
+            AddArgument("discriminator", 0, 4096, &mDiscriminator);
         }
     }
 

@@ -28,17 +28,21 @@ class Commands
 public:
     using ChipDeviceController = ::chip::DeviceController::ChipDeviceController;
     using NodeId               = ::chip::NodeId;
+    using CommandsVector       = ::std::vector<std::unique_ptr<Command>>;
 
     void Register(const char * clusterName, commands_list commandsList);
     int Run(NodeId localId, NodeId remoteId, int argc, char ** argv);
 
 private:
-    CHIP_ERROR RunCommand(ChipDeviceController & dc, NodeId remoteId, int argc, char * argv[]);
+    CHIP_ERROR RunCommand(ChipDeviceController & dc, NodeId remoteId, int argc, char ** argv);
+    std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
+    Command * GetCommand(CommandsVector & commands, std::string commandName);
+    Command * GetReadCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
 
-    void ShowUsage(const char * executable);
-    void PrintMiscCommands();
-    void PrintClustersCommands();
-    void PrintClustersAttributes();
+    void ShowClusters(std::string executable);
+    void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands);
+    void ShowClusterAttributes(std::string executable, std::string clusterName, CommandsVector & commands);
+    void ShowCommand(std::string executable, std::string clusterName, Command * command);
 
-    std::map<const char *, std::vector<std::unique_ptr<Command>>> clusters;
+    std::map<std::string, CommandsVector> mClusters;
 };
