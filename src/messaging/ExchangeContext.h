@@ -84,7 +84,7 @@ public:
     virtual void OnResponseTimeout(ExchangeContext * ec) = 0;
 
     /**
-     * @brief    
+     * @brief
      *   This function is the protocol callback to invoke when the timeout for the retransmission
      *   of a previously sent message has expired.
      *
@@ -115,7 +115,7 @@ public:
     void * AppState;               /**< Pointer to application-specific state object. */
     bool AllowDuplicateMsgs;       /**< Boolean indicator of whether duplicate messages are allowed for a given exchange. */
     uint32_t RetransInterval;      /**< Time between retransmissions (in milliseconds); 0 disables retransmissions. */
-    Timeout ResponseTimeout;       /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */       
+    Timeout ResponseTimeout;       /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */
 
     enum
     {
@@ -146,7 +146,7 @@ public:
      *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
      */
     typedef void (*MessageReceiveFunct)(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                        uint8_t msgType, System::PacketBuffer * payload);    
+                                        uint8_t msgType, System::PacketBuffer * payload);
 
     /**
      *  Determine whether the context is the initiator of the exchange.
@@ -161,7 +161,7 @@ public:
      *  this exchange.
      *
      *  @return Returns 'true' if response expected, else 'false'.
-     */    
+     */
     bool IsResponseExpected() const;
 
     /**
@@ -171,7 +171,7 @@ public:
      *  @param[in]  inInitiator  A Boolean indicating whether (true) or not
      *                           (false) the context is the initiator of
      *                           the exchange.
-     */    
+     */
     void SetInitiator(bool inInitiator);
 
     /**
@@ -240,7 +240,7 @@ public:
     ExchangeContextDelegate * GetDelegate()
     {
         return mDelegate;
-    } 
+    }
 
     /*
      * In order to use reference counting (see refCount below)
@@ -256,7 +256,7 @@ public:
 
 private:
     System::PacketBuffer * msg; // If we are re-transmitting, then this is the pointer to the message being retransmitted
-    ExchangeContextDelegate * mDelegate = nullptr;    
+    ExchangeContextDelegate * mDelegate = nullptr;
 
     // Trickle-controlled retransmissions:
     uint32_t backoff;                        // backoff for sampling the numner of messages

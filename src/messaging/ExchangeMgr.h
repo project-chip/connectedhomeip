@@ -88,7 +88,7 @@ public:
      *
      *  @return #CHIP_NO_ERROR unconditionally.
      *
-     */    
+     */
     CHIP_ERROR Shutdown();
 
     /**
@@ -115,7 +115,7 @@ public:
      *
      *  @return   A pointer to the ExchangeContext object matching the provided parameters On success, NULL on no match.
      *
-     */    
+     */
     ExchangeContext * FindContext(uint64_t peerNodeId, void * appState, bool isInitiator);
 
     /**
@@ -150,7 +150,7 @@ public:
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
-     */    
+     */
     CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContext::MessageReceiveFunct handler, bool allowDups,
                                                  void * appState);
 
@@ -168,7 +168,7 @@ public:
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
-     */    
+     */
     CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContext::MessageReceiveFunct handler,
                                                  void * appState);
 
@@ -189,7 +189,7 @@ public:
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
-     */    
+     */
     CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContext::MessageReceiveFunct handler,
                                                  bool allowDups, void * appState);
 
@@ -201,7 +201,7 @@ public:
      *  @retval #CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
      *                                                       is not found.
      *  @retval #CHIP_NO_ERROR On success.
-     */    
+     */
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId);
 
     /**
@@ -214,7 +214,7 @@ public:
      *  @retval #CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
      *                                                       is not found.
      *  @retval #CHIP_NO_ERROR On success.
-     */    
+     */
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType);
 
 private:
