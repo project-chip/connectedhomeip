@@ -67,7 +67,7 @@ class NetworkCredentialFetcher {
     config.setDomainName("TestDomain");
     config.setEnableCcm(false);
     config.setEnableDtlsDebugLogging(true);
-    config.setPSKc(CommissionerUtils.getByteArray(pskc));
+    config.setPSKc(new ByteArray(pskc));
     config.setLogger(new NativeCommissionerLogger());
 
     try {

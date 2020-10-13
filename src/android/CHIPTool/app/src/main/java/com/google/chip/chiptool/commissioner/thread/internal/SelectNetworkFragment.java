@@ -162,15 +162,10 @@ public class SelectNetworkFragment extends Fragment
   }
 
   private byte[] computePskc(ThreadNetworkInfo threadNetworkInfo, String password) {
-    short[] extendedPanId = new short[threadNetworkInfo.getExtendedPanId().length];
-    for (int i = 0; i < extendedPanId.length; ++i) {
-      extendedPanId[i] = (short) (((short) threadNetworkInfo.getExtendedPanId()[i]) & 0xff);
-    }
-
+    ByteArray extendedPanId = new ByteArray(threadNetworkInfo.getExtendedPanId());
     ByteArray pskc = new ByteArray();
     Error error =
-        Commissioner.generatePSKc(
-            pskc, password, threadNetworkInfo.getNetworkName(), new ByteArray(extendedPanId));
+        Commissioner.generatePSKc(pskc, password, threadNetworkInfo.getNetworkName(), extendedPanId);
     if (error.getCode() != ErrorCode.kNone) {
       Log.e(
           TAG,
