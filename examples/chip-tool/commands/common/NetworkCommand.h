@@ -20,7 +20,7 @@
 
 #include "Command.h"
 
-  enum NetworkType
+enum NetworkType
 {
     UDP,
     BLE,
