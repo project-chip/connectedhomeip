@@ -47,6 +47,52 @@ enum class ExFlagValues : uint16_t
         0x0008, /// When set, signifies that at least one message has been received from peer on this exchange context.
 };
 
+class ExchangeContext;
+
+/**
+ * @brief
+ *   This class provides a skeleton for the callback functions. The functions will be
+ *   called by ExchangeContext object on specific events. If the user of ExchangeContext
+ *   is interested in receiving these callbacks, they can specialize this class and handle
+ *   each trigger in their implementation of this class.
+ */
+class DLL_EXPORT ExchangeContextDelegate
+{
+public:
+    virtual ~ExchangeContextDelegate() {}
+
+    /**
+     * @brief
+     *   This function is the protocol callback for handling a received CHIP message.
+     *
+     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     *  @param[in]    packetHeader  A reference to the PacketHeader object.
+     *  @param[in]    protocolId    The protocol identifier of the received message.
+     *  @param[in]    msgType       The message type of the corresponding profile.
+     *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
+     */
+    virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
+                                        uint8_t msgType, System::PacketBuffer * payload) = 0;
+
+    /**
+     * @brief
+     *   This function is the protocol callback to invoke when the timeout for the receipt
+     *   of a response message has expired.
+     *
+     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     */
+    virtual void OnResponseTimeout(ExchangeContext * ec) = 0;
+
+    /**
+     * @brief    
+     *   This function is the protocol callback to invoke when the timeout for the retransmission
+     *   of a previously sent message has expired.
+     *
+     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     */
+    virtual void OnRetransmissionTimeout(ExchangeContext * ec) = 0;
+};
+
 /**
  *  @class ExchangeContext
  *
@@ -64,12 +110,12 @@ public:
     typedef uint32_t Timeout; /**< Type used to express the timeout in this ExchangeContext, in milliseconds */
 
     ExchangeManager * ExchangeMgr; /**< [READ ONLY] Owning exchange manager. */
-    uint64_t PeerNodeId;           /**< [READ ONLY] Node ID of peer node. */
+    uint64_t NodeId;               /**< [READ ONLY] Node ID of peer node. */
     uint16_t ExchangeId;           /**< [READ ONLY] Assigned exchange ID. */
     void * AppState;               /**< Pointer to application-specific state object. */
     bool AllowDuplicateMsgs;       /**< Boolean indicator of whether duplicate messages are allowed for a given exchange. */
     uint32_t RetransInterval;      /**< Time between retransmissions (in milliseconds); 0 disables retransmissions. */
-    Timeout ResponseTimeout;       /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */
+    Timeout ResponseTimeout;       /**< Maximum time to wait for response (in milliseconds); 0 disables response timeout. */       
 
     enum
     {
@@ -84,24 +130,10 @@ public:
         kSendFlag_FromInitiator    = 0x0200, /**< Used to indicate that the current message is the initiator of the exchange. */
         kSendFlag_RequestAck       = 0x0400, /**< Used to send a RMP message requesting an acknowledgment. */
         kSendFlag_NoAutoRequestAck = 0x0800, /**< Suppress the auto-request acknowledgment feature when sending a message. */
-
-        kSendFlag_MulticastFromLinkLocal = kSendFlag_DefaultMulticastSourceAddress,
-        /**< Deprecated alias for \c kSendFlag_DefaultMulticastSourceAddress */
     };
 
-    bool IsInitiator() const;
-    bool IsResponseExpected() const;
-    void SetInitiator(bool inInitiator);
-    void SetResponseExpected(bool inResponseExpected);
-
-    CHIP_ERROR SendMessage(uint32_t protocolId, uint8_t msgType, System::PacketBuffer * msgPayload, uint16_t sendFlags = 0,
-                           void * msgCtxt = nullptr);
-    CHIP_ERROR SendCommonNullMessage();
-
-    void TeardownTrickleRetransmit();
-
     /**
-     * This function is the protocol callback for handling a received CHIP message.
+     * This function is the protocol callback of an unsolicited message handler.
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      *
@@ -114,49 +146,104 @@ public:
      *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
      */
     typedef void (*MessageReceiveFunct)(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                        uint8_t msgType, System::PacketBuffer * payload);
-    MessageReceiveFunct OnMessageReceived;
+                                        uint8_t msgType, System::PacketBuffer * payload);    
 
     /**
-     * This function is the protocol callback to invoke when the timeout for the receipt
-     * of a response message has expired.
+     *  Determine whether the context is the initiator of the exchange.
      *
-     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     *  @return Returns 'true' if it is the initiator, else 'false'.
      *
      */
-    typedef void (*ResponseTimeoutFunct)(ExchangeContext * ec);
-    ResponseTimeoutFunct OnResponseTimeout;
+    bool IsInitiator() const;
 
     /**
-     * This function is the protocol callback to invoke when the timeout for the retransmission
-     * of a previously sent message has expired.
+     *  Determine whether a response is expected for messages sent over
+     *  this exchange.
      *
-     *  @param[in]    ec            A pointer to the ExchangeContext object.
-     *
-     */
-    typedef void (*RetransmissionTimeoutFunct)(ExchangeContext * ec);
-    RetransmissionTimeoutFunct OnRetransmissionTimeout;
+     *  @return Returns 'true' if response expected, else 'false'.
+     */    
+    bool IsResponseExpected() const;
 
     /**
-     * Type of key error message handling function.
-     *
-     *  @param[in]    ec            A pointer to the ExchangeContext object.
-     *
-     *  @param[in]    keyErr        The CHIP_ERROR type that was reported in the key error message.
-     *
-     */
-    typedef void (*KeyErrorFunct)(ExchangeContext * ec, CHIP_ERROR keyErr);
+     *  Set the kFlagInitiator flag bit. This flag is set by the node that
+     *  initiates an exchange.
+         *
+     *  @param[in]  inInitiator  A Boolean indicating whether (true) or not
+     *                           (false) the context is the initiator of
+     *                           the exchange.
+     */    
+    void SetInitiator(bool inInitiator);
 
     /**
-     * This function is the protocol callback to invoke when key error message has been received
-     * from the peer.
+     *  Set whether a response is expected on this exchange.
+     *
+     *  @param[in]  inResponseExpected  A Boolean indicating whether (true) or not
+     *                                  (false) a response is expected on this
+     *                                  exchange.
      */
-    KeyErrorFunct OnKeyError;
+    void SetResponseExpected(bool inResponseExpected);
 
+    /**
+     *  Send a CHIP message on this exchange.
+     *
+     *  @param[in]    protocolId     The profile identifier of the CHIP message to be sent.
+     *
+     *  @param[in]    msgType       The message type of the corresponding profile.
+     *
+         *  @param[in]    msgPayload    A pointer to the PacketBuffer object holding the CHIP message.
+     *
+     *  @param[in]    sendFlags     Flags set by the application for the CHIP message being sent.
+     *
+     *  @param[in]    msgCtxt       A pointer to an application-specific context object to be associated
+     *                              with the message being sent.
+
+     *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this SendMessage API.
+     *  @retval  #CHIP_ERROR_SEND_THROTTLED                 if this exchange context has been throttled when using the
+     *                                                       CHIP reliable messaging protocol.
+     *  @retval  #CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE if there is a mismatch in the specific send operation and the
+     *                                                       CHIP message protocol version that is supported. For example,
+     *                                                       this error would be generated if CHIP Reliable Messaging
+     *                                                       semantics are being attempted when the CHIP message protocol
+     *                                                       version is V1.
+     *  @retval  #CHIP_ERROR_NOT_CONNECTED                  if the context was associated with a connection that is now
+     *                                                       closed.
+     *  @retval  #CHIP_ERROR_INCORRECT_STATE                if the state of the exchange context is incorrect.
+     *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
+     *                                                       network layer.
+     */
+    CHIP_ERROR SendMessage(uint32_t protocolId, uint8_t msgType, System::PacketBuffer * msgPayload, uint16_t sendFlags = 0,
+                           void * msgCtxt = nullptr);
+
+    /**
+     *  Tear down the Trickle retransmission mechanism by canceling the periodic timers
+     *  within Trickle and freeing the message buffer holding the Weave
+     *  message.
+     */
+    void TeardownTrickleRetransmit();
+
+    /**
+     *  Cancel the Trickle retransmission mechanism.
+     */
     void CancelRetrans();
 
+    /**
+     *  Set delegate of the current ExchangeContext instance.
+     */
+    void SetDelegate(ExchangeContextDelegate * delegate)
+    {
+        mDelegate = delegate;
+    }
+
+    /**
+     *  Return the delegate pointer of the current ExchangeContext instance.
+     */
+    ExchangeContextDelegate * GetDelegate()
+    {
+        return mDelegate;
+    } 
+
     /*
-     * in order to use reference counting (see refCount below)
+     * In order to use reference counting (see refCount below)
      * we use a hold/free paradigm where users of the exchange
      * can hold onto it while it's out of their direct control
      * to make sure it isn't closed before everyone's ready.
@@ -169,6 +256,7 @@ public:
 
 private:
     System::PacketBuffer * msg; // If we are re-transmitting, then this is the pointer to the message being retransmitted
+    ExchangeContextDelegate * mDelegate = nullptr;    
 
     // Trickle-controlled retransmissions:
     uint32_t backoff;                        // backoff for sampling the numner of messages
@@ -186,91 +274,12 @@ private:
     void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
-    uint32_t mPendingPeerAckId;
     void DoClose(bool clearRetransTable);
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf,
                              ExchangeContext::MessageReceiveFunct umhandler);
 
     uint8_t mRefCount;
-};
-
-/**
- *  @class ExchangeManager
- *
- *  @brief
- *    This class is used to manage ExchangeContexts with other CHIP nodes.
- *    It works on behalf of higher layers, creating ExchangeContexts and
- *    handling the registration/unregistration of unsolicited message handlers.
- *
- */
-class DLL_EXPORT ExchangeManager : public SecureSessionMgrCallback
-{
-    friend class ExchangeContext;
-
-public:
-    enum State
-    {
-        kState_NotInitialized = 0, /**< Used to indicate that the ExchangeManager is not initialized */
-        kState_Initialized    = 1  /**< Used to indicate that the ExchangeManager is initialized */
-    };
-
-    ExchangeManager();
-    ExchangeManager(const ExchangeManager &) = delete;
-    ExchangeManager operator=(const ExchangeManager &) = delete;
-
-    SecureSessionMgrBase * MessageLayer; /**< [READ ONLY] The associated SecureSessionMgrBase object. */
-    uint8_t State;                       /**< [READ ONLY] The state of the ExchangeManager object. */
-
-    CHIP_ERROR Init(SecureSessionMgrBase * msgLayer);
-    CHIP_ERROR Shutdown();
-
-    ExchangeContext * NewContext(const uint64_t & peerNodeId, void * appState = nullptr);
-
-    ExchangeContext * FindContext(uint64_t peerNodeId, void * appState, bool isInitiator);
-
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContext::MessageReceiveFunct handler,
-                                                 void * appState);
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContext::MessageReceiveFunct handler, bool allowDups,
-                                                 void * appState);
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContext::MessageReceiveFunct handler,
-                                                 void * appState);
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContext::MessageReceiveFunct handler,
-                                                 bool allowDups, void * appState);
-    CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId);
-    CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType);
-
-private:
-    uint16_t NextExchangeId;
-
-    class UnsolicitedMessageHandler
-    {
-    public:
-        ExchangeContext::MessageReceiveFunct Handler;
-        void * AppState;
-        uint32_t ProtocolId;
-        int16_t MessageType; // -1 represents any message type
-        bool AllowDuplicateMsgs;
-    };
-
-    ExchangeContext ContextPool[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
-    size_t mContextsInUse;
-
-    UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
-    void (*OnExchangeContextChanged)(size_t numContextsInUse);
-
-    ExchangeContext * AllocContext();
-
-    void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
-    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, bool allowDups, ExchangeContext::MessageReceiveFunct handler,
-                           void * appState);
-    CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
-
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer) override;
-
-    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
-                           SecureSessionMgrBase * msgLayer) override;
 };
 
 } // namespace chip
