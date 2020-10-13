@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,26 +18,16 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the CHIP Inet
- *          Layer on Linux platforms.
+ *      TestInetLayerMulticast has its own main function, so we do not need
+ *    a seperate driver. This file is left blank intendedly.
  *
  */
 
-#pragma once
+namespace TestInetLayerMulticast {
+int main(int argc, char * argv[]);
+}
 
-// ==================== Platform Adaptations ====================
-
-#define INET_CONFIG_ENABLE_IPV4 1
-
-// ========== Platform-specific Configuration Overrides =========
-
-#ifndef INET_CONFIG_NUM_TCP_ENDPOINTS
-#define INET_CONFIG_NUM_TCP_ENDPOINTS 4
-#endif // INET_CONFIG_NUM_TCP_ENDPOINTS
-
-#ifndef INET_CONFIG_NUM_UDP_ENDPOINTS
-#define INET_CONFIG_NUM_UDP_ENDPOINTS 4
-#endif // INET_CONFIG_NUM_UDP_ENDPOINTS
-
-// On linux platform, we have sys/socket.h, so HAVE_SO_BINDTODEVICE should be set to 1
-#define HAVE_SO_BINDTODEVICE 1
+int main(int argc, char * argv[])
+{
+    return TestInetLayerMulticast::main(argc, argv);
+}

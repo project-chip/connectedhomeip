@@ -254,6 +254,7 @@ static void HandleSignal(int aSignal)
     }
 }
 
+namespace TestInetLayerMulticast {
 int main(int argc, char * argv[])
 {
     bool lSuccessful = true;
@@ -342,6 +343,7 @@ shutdown:
 exit:
     return (lSuccessful ? EXIT_SUCCESS : EXIT_FAILURE);
 }
+} // namespace TestInetLayerMulticast
 
 static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {

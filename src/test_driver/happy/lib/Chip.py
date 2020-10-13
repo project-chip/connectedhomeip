@@ -47,9 +47,9 @@ class Chip(ChipState):
             self.logger.debug("[localhost] Chip: %s" % (emsg))
 
         # Check if Chip build path is set
-        if "abs_builddir" in os.environ.keys():
-            self.chip_build_path = os.environ['abs_builddir']
-            emsg = "Found chip abs_builddir: %s." % (self.chip_build_path)
+        if "TEST_BIN_DIR" in os.environ.keys():
+            self.chip_build_path = os.environ['TEST_BIN_DIR']
+            emsg = "Found chip TEST_BIN_DIR: %s." % (self.chip_build_path)
             self.logger.debug("[localhost] Chip: %s" % (emsg))
 
         if self.chip_build_path is not None:

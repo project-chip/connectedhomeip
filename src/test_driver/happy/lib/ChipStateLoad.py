@@ -78,7 +78,7 @@ class ChipStateLoad(ChipState):
             with open(self.new_json_file, 'r') as jfile:
                 json_data = jfile.read()
 
-            self.weave_topology = json.loads(json_data)
+            self.chip_topology = json.loads(json_data)
 
         except Exception:
             emsg = "Failed to load JSON state file: {}".format(
@@ -99,13 +99,8 @@ class ChipStateLoad(ChipState):
 
         self.readState()
 
-    def __configure_network_gateway(self):
-        emsg = "Configuring Weave gateway."
-        self.logger.debug(LOG_TEXT_PREFIX + emsg)
-
     def __post_check(self):
-        emsg = "Loading Weave Fabric completed."
-        self.logger.debug(LOG_TEXT_PREFIX + emsg)
+        pass
 
     def run(self):
         with self.getStateLockManager():

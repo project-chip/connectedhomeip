@@ -48,12 +48,12 @@ class ChipStateUnload(ChipState):
     Deletes a Chip-enabled virtual network topology based on the state described
     in a JSON file. If the current Happy state does not match the specified JSON
     file, a partial deletion of the topology might occur.
-    weave-state-unload [-h --help] [-q --quiet] [-f --file <JSON_FILE>]
+    chip-state-unload [-h --help] [-q --quiet] [-f --file <JSON_FILE>]
         -f --file   Required. A valid JSON file with the topology to delete.
     Example:
-    $ weave-state-unload myweavestate.json
+    $ chip-state-unload mychipstate.json
         Deletes the Chip-enabled network topology based on the state described in
-        myweavestate.json.
+        mychipstate.json.
     return:
         0    success
         1    fail
@@ -92,7 +92,7 @@ class ChipStateUnload(ChipState):
             with open(self.old_json_file, 'r') as jfile:
                 json_data = jfile.read()
 
-            self.weave_topology = json.loads(json_data)
+            self.chip_topology = json.loads(json_data)
 
         except Exception:
             emsg = "Failed to load JSON state file: %s" % (self.old_json_file)

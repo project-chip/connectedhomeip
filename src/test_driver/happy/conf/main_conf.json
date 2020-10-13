@@ -1,0 +1,14 @@
+{
+    "configuration_file": "~/.happy_conf.json",
+    "log_directory": "/tmp/happy_test_logs",
+    "default_happy_log_dir": "/tmp/happy_test_logs",
+    "log_level_file": "DEBUG",
+    "log_level_console": "INFO",
+    "default_state": "happy",
+    "process_log_prefix": "%(happy_log_dir)s/%(state_id)s_",
+    "state_environ": "HAPPY_STATE_ID",
+    "state_file_prefix": "/run/",
+    "state_file_suffix": "_state.json",
+    "default_isp_suffix": "isp",
+    "default_rt_suffix": "rt"
+}

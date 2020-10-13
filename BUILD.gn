@@ -90,6 +90,13 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       deps = [ "//src:tests_run" ]
     }
   }
+
+  # We don't always want to run happy tests, make them a seperate group.
+  group("happy_tests") {
+    if (chip_link_tests) {
+      deps = [ "//src:happy_tests" ]
+    }
+  }
 } else {
   # This is the unified build. Configure various real toolchains.
   import("${chip_root}/build/chip/chip_build.gni")

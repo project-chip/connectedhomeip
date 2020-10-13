@@ -781,7 +781,7 @@ INET_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
         }
 
         if (lRetval == INET_NO_ERROR &&
-            setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, lInterfaceName, strlen(lInterfaceName)) == -1)
+            setsockopt(mSocket, SOL_SOCKET, SO_BINDTODEVICE, lInterfaceName, socklen_t(strlen(lInterfaceName))) == -1)
         {
             lRetval = chip::System::MapErrorPOSIX(errno);
         }

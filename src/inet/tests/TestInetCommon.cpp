@@ -165,6 +165,7 @@ static void UseStdoutLineBuffering()
 
 void InitTestInetCommon()
 {
+    chip::Platform::MemoryInit();
     UseStdoutLineBuffering();
 }
 
