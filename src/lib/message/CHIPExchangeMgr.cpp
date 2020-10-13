@@ -888,8 +888,6 @@ exit:
     {
         PacketBuffer::Free(msgBuf);
     }
-
-    return;
 }
 
 CHIP_ERROR ChipExchangeManager::RegisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con, bool allowDups,
@@ -1216,10 +1214,7 @@ void ChipExchangeManager::TicklessDebugDumpRetransTable(const char * log)
     }
 }
 #else
-void ChipExchangeManager::TicklessDebugDumpRetransTable(const char * log)
-{
-    return;
-}
+void ChipExchangeManager::TicklessDebugDumpRetransTable(const char * log) {}
 #endif // RMP_TICKLESS_DEBUG
 
 /**

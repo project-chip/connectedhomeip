@@ -1071,8 +1071,6 @@ void ChipFabricState::OnMsgCounterSyncRespRcvd(uint64_t peerNodeId, uint32_t pee
             MessageLayer->ExchangeMgr->ClearMsgCounterSyncReq(peerNodeId);
         }
     }
-
-    return;
 }
 
 // Start message counter synchronization timer.
@@ -1111,8 +1109,6 @@ void ChipFabricState::OnMsgCounterSyncReqSent(uint32_t messageId)
         // Enable fast-poll mode for SEDs if not already enabled.
         MessageLayer->SignalMessageLayerActivityChanged();
     }
-
-    return;
 }
 
 // Handle MsgCounterSyncRespTimeout.
@@ -1158,8 +1154,6 @@ void ChipFabricState::OnMsgCounterSyncRespTimeout(System::Layer * aSystemLayer, 
         // Disable fast-poll mode for SEDs if needed.
         fabricState->MessageLayer->SignalMessageLayerActivityChanged();
     }
-
-    return;
 }
 
 /**

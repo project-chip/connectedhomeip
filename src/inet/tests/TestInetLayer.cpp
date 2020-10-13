@@ -589,10 +589,7 @@ static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, INET_ERROR aError
     }
 }
 
-static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len)
-{
-    return;
-}
+static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len) {}
 
 static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBuffer * aBuffer)
 {
@@ -928,8 +925,6 @@ exit:
     {
         SetStatusFailed(sTestState.mStatus);
     }
-
-    return;
 }
 
 static void StartTest()

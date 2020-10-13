@@ -1078,9 +1078,7 @@ bool ParseHexString(const char * hexStr, uint32_t strLen, uint8_t * outBuf, uint
 
 HelpOptions::HelpOptions(const char * appName, const char * appUsage, const char * appVersion) :
     HelpOptions(appName, appUsage, appVersion, nullptr)
-{
-    return;
-}
+{}
 
 HelpOptions::HelpOptions(const char * appName, const char * appUsage, const char * appVersion, const char * appDesc)
 {

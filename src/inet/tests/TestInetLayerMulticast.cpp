@@ -866,8 +866,6 @@ exit:
     {
         SetStatusFailed(sTestState.mStatus);
     }
-
-    return;
 }
 
 static void StartTest()

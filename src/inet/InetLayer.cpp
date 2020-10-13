@@ -1338,8 +1338,6 @@ DLL_EXPORT void DidInit(Inet::InetLayer * aLayer, void * aContext, INET_ERROR an
     (void) aLayer;
     (void) aContext;
     (void) anError;
-
-    return;
 }
 
 /**
@@ -1386,8 +1384,6 @@ DLL_EXPORT void DidShutdown(Inet::InetLayer * aLayer, void * aContext, INET_ERRO
     (void) aLayer;
     (void) aContext;
     (void) anError;
-
-    return;
 }
 
 } // namespace InetLayer

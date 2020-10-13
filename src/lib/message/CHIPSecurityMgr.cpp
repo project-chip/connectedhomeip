@@ -411,8 +411,6 @@ exit:
 
     if (ec != nullptr)
         ec->Close();
-
-    return;
 }
 
 CHIP_ERROR ChipSecurityManager::NewSessionExchange(uint64_t peerNodeId, const IPAddress & peerAddr, uint16_t peerPort)
@@ -583,8 +581,6 @@ void ChipSecurityManager::HandleMsgCounterSyncRespMsg(ChipMessageInfo * msgInfo,
 
 exit:
     PacketBuffer::Free(msgBuf);
-
-    return;
 }
 
 #endif // CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC
