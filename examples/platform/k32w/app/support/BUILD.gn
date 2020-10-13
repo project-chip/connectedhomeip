@@ -12,18 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Use a different target, such as a prebuilt MbedTLS.
-  mbedtls_target = ""
+import("//build_overrides/chip.gni")
+import("//build_overrides/k32w_sdk.gni")
+
+config("support_config") {
+  include_dirs = [ "../../.." ]
 }
 
-if (mbedtls_target != "") {
-  group("mbedtls") {
-    public_deps = [ mbedtls_target ]
-  }
-} else {
-  import("mbedtls.gni")
+source_set("freertos_mbedtls_lock_support") {
+  sources = [
+    "FreeRtosMbedtlsMutex.c",
+    "FreeRtosMbedtlsMutex.h",
+  ]
 
-  mbedtls_target("mbedtls") {
-  }
+  #TODO: not sure this is required, maybe we should make this dependant on mbedtls
+  public_deps = [ "${k32w_sdk_build_root}:k32w_sdk" ]
+
+  public_configs = [ ":support_config" ]
 }

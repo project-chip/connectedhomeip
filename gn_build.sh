@@ -114,6 +114,23 @@ else
     echo "Hint: Set \$EFR32_SDK_ROOT to enable building for EFR32"
 fi
 
+# K32W SDK setup
+k32w_sdk_args=""
+
+if [[ -d "$K32W061_SDK_ROOT" ]]; then
+    k32w_sdk_args+="k32w_sdk_root=\"$K32W061_SDK_ROOT\""
+    extra_args+=" $k32w_sdk_args enable_k32w_builds=true"
+fi
+
+echo
+if [[ ! -d "$K32W061_SDK_ROOT" ]]; then
+    echo "Hint: Set \$K32W061_SDK_ROOT to enable building for K32W061"
+else
+    echo 'To build the K32W lock sample as a standalone project':
+    echo "(cd $CHIP_ROOT/examples/lock-app/k32w; gn gen out/debug --args='$k32w_sdk_args'; ninja -C out/debug)"
+fi
+echo
+
 echo
 
 _chip_banner "Build: GN configure"

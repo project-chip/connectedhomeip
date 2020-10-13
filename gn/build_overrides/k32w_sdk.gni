@@ -13,17 +13,6 @@
 # limitations under the License.
 
 declare_args() {
-  # Use a different target, such as a prebuilt MbedTLS.
-  mbedtls_target = ""
-}
-
-if (mbedtls_target != "") {
-  group("mbedtls") {
-    public_deps = [ mbedtls_target ]
-  }
-} else {
-  import("mbedtls.gni")
-
-  mbedtls_target("mbedtls") {
-  }
+  # Root directory for K32W SDK build files.
+  k32w_sdk_build_root = "//third_party/k32w_sdk"
 }

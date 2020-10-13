@@ -12,18 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Use a different target, such as a prebuilt MbedTLS.
-  mbedtls_target = ""
+import("//build_overrides/chip.gni")
+import("//build_overrides/k32w_sdk.gni")
+
+import("${k32w_sdk_build_root}/k32w_sdk.gni")
+
+config("chip_examples_project_config") {
+  include_dirs = [ "app/project_include" ]
 }
 
-if (mbedtls_target != "") {
-  group("mbedtls") {
-    public_deps = [ mbedtls_target ]
-  }
-} else {
-  import("mbedtls.gni")
-
-  mbedtls_target("mbedtls") {
-  }
+source_set("openthread_core_config_k32w_chip_examples") {
+  sources = [ "app/project_include/OpenThreadConfig.h" ]
+  public_deps = [ "${chip_root}/third_party/openthread/platforms/k32w:openthread_core_config_k32w" ]
+  public_configs = [ ":chip_examples_project_config" ]
 }

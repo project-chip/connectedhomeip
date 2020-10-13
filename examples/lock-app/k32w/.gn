@@ -12,18 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Use a different target, such as a prebuilt MbedTLS.
-  mbedtls_target = ""
-}
+# The location of the build configuration file.
+buildconfig = "//build/config/BUILDCONFIG.gn"
 
-if (mbedtls_target != "") {
-  group("mbedtls") {
-    public_deps = [ mbedtls_target ]
-  }
-} else {
-  import("mbedtls.gni")
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-  mbedtls_target("mbedtls") {
-  }
+# Allow loading paths relative to //gn.
+secondary_source = "//third_party/connectedhomeip/gn/"
+
+default_args = {
+  target_cpu = "arm"
+  target_os = "freertos"
+
+  import("//args.gni")
 }

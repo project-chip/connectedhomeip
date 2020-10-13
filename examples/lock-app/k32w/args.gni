@@ -12,18 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-declare_args() {
-  # Use a different target, such as a prebuilt MbedTLS.
-  mbedtls_target = ""
-}
+import("//build_overrides/chip.gni")
+import("${chip_root}/examples/platform/k32w/args.gni")
 
-if (mbedtls_target != "") {
-  group("mbedtls") {
-    public_deps = [ mbedtls_target ]
-  }
-} else {
-  import("mbedtls.gni")
-
-  mbedtls_target("mbedtls") {
-  }
-}
+# SDK target. This is overriden to add our SDK app_config.h & defines.
+k32w_sdk_target = get_label_info(":sdk", "label_no_toolchain")
