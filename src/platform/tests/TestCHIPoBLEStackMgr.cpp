@@ -17,24 +17,12 @@
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 #include <assert.h>
-#include <dbus/dbus.h>
 #include <memory>
 #include <support/CodeUtils.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include "platform/PlatformManager.h"
 #include "platform/internal/BLEManager.h"
-
-#if CHIP_DEVICE_LAYER_TARGET == LINUX
-#include <thread>
-
-struct DBusConnectionDeleter
-{
-    void operator()(DBusConnection * aConnection) { dbus_connection_unref(aConnection); }
-};
-
-using UniqueDBusConnection = std::unique_ptr<DBusConnection, DBusConnectionDeleter>;
-#endif
 
 void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg)
 {
