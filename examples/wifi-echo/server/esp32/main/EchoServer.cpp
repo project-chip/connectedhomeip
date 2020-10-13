@@ -120,7 +120,7 @@ static size_t odc(const uint8_t * bytes, size_t bytes_len, char * out, size_t ou
     return required;
 }
 
-class EchoServerCallback : public SecureSessionMgrCallback
+class EchoServerCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
