@@ -25,13 +25,13 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/ConfigurationManager.h>
-#include <platform/internal/GenericConfigurationManagerImpl.ipp>
+#include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
 #include <core/CHIPVendorIdentifiers.hpp>
 #include <platform/nRF5/nRF5Config.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
-#include <platform/internal/FactoryProvisioning.ipp>
+#include <platform/internal/FactoryProvisioning.cpp>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 
 #include <support/CodeUtils.h>

@@ -23,8 +23,8 @@
  *          GenericConfigurationManagerImpl<> template.
  */
 
-#ifndef GENERIC_CONFIGURATION_MANAGER_IMPL_IPP
-#define GENERIC_CONFIGURATION_MANAGER_IMPL_IPP
+#ifndef GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
+#define GENERIC_CONFIGURATION_MANAGER_IMPL_CPP
 
 #include <ble/CHIPBleServiceData.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -1092,4 +1092,4 @@ template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_CONFIGURATION_MANAGER_IMPL_IPP
+#endif // GENERIC_CONFIGURATION_MANAGER_IMPL_CPP

@@ -21,8 +21,8 @@
  *          GenericPlatformManagerImpl_POSIX<> template.
  */
 
-#ifndef GENERIC_PLATFORM_MANAGER_IMPL_POSIX_IPP
-#define GENERIC_PLATFORM_MANAGER_IMPL_POSIX_IPP
+#ifndef GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP
+#define GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP
 
 #include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -30,7 +30,7 @@
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_POSIX<> template inherits.
-#include <platform/internal/GenericPlatformManagerImpl.ipp>
+#include <platform/internal/GenericPlatformManagerImpl.cpp>
 
 #include <system/SystemLayer.h>
 
@@ -235,4 +235,4 @@ template class GenericPlatformManagerImpl_POSIX<PlatformManagerImpl>;
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_PLATFORM_MANAGER_IMPL_POSIX_IPP
+#endif // GENERIC_PLATFORM_MANAGER_IMPL_POSIX_CPP

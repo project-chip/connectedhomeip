@@ -30,11 +30,11 @@
 #include <lwip/netif.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
-#include <platform/internal/GenericConnectivityManagerImpl_BLE.ipp>
+#include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
 #endif
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-#include <platform/internal/GenericConnectivityManagerImpl_Thread.ipp>
+#include <platform/internal/GenericConnectivityManagerImpl_Thread.cpp>
 #endif
 
 using namespace ::chip;

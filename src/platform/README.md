@@ -55,7 +55,7 @@ goals.
 5. [Overriding Generic Behaviors](#Overriding-Generic-Behaviors)<br>
 6. [Multiple Inheritance and Subclassing of Generic Implementations](#Multiple-Inheritance-and-Subclassing-of-Generic-Implementations)<br>
 7. [Static Virtualization of Generic Implementation Behavior](#Static-Virtualization-of-Generic-Implementation-Behavior)<br>
-8. [.ipp Files and Explicit Template Instantiation](#-ipp-files-and-explicit-template-instantiation)<br>
+8. [.cpp Files and Explicit Template Instantiation](#-ipp-files-and-explicit-template-instantiation)<br>
 
 ---
 
@@ -506,7 +506,7 @@ void GenericPlatformManagerImpl<ImplClass>::DispatchEventToApplication(const CHI
 }
 ```
 
-### .ipp Files and Explicit Template Instantiation
+### .cpp Files and Explicit Template Instantiation
 
 The rules for C++ templates require that the compiler 'see' the full definition
 of a class template at the moment of its instantiation. (Instantiation in this
@@ -518,7 +518,7 @@ header file, which must then be included before the moment of instantiation.
 To provide a separation between the definition of a class template and the
 definitions of its members, the CHIP Device Layer places all non-inlined
 template member definitions into a separate file. This file has the same base
-name as the template header file, but with a `.ipp` suffix. This pattern reduces
+name as the template header file, but with a `.cpp` suffix. This pattern reduces
 clutter in the header file and makes it possible to include the non-inlined
 member definitions only when they are needed (more on this below).
 
@@ -535,7 +535,7 @@ protected:
 ```
 
 ```cpp
-/* contents of GenericConfigurationManagerImpl.ipp */
+/* contents of GenericConfigurationManagerImpl.cpp */
 
 template<class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetDeviceId(uint64_t & deviceId)
@@ -567,14 +567,14 @@ extern template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
 ...
 ```
 
-Then, within a corresponding .cpp file, the template's .ipp file is included and
+Then, within a corresponding .cpp file, the template's .cpp file is included and
 a `template class` definition is used to force an explicit instantiation of the
 template.
 
 ```cpp
 /* contents of ConfigurationManagerImpl.cpp */
 
-#include <CHIP/DeviceLayer/internal/GenericConfigurationManagerImpl.ipp>
+#include <CHIP/DeviceLayer/internal/GenericConfigurationManagerImpl.cpp>
 
 // Fully instantiate the GenericConfigurationManagerImpl<ConfigurationManagerImpl> class.
 template class GenericConfigurationManagerImpl<ConfigurationManagerImpl>;

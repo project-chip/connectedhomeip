@@ -25,7 +25,7 @@
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_POSIX.ipp>
+#include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 
 namespace chip {
 namespace DeviceLayer {

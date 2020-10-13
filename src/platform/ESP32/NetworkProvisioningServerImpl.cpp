@@ -19,7 +19,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/internal/GenericNetworkProvisioningServerImpl.ipp>
+#include <platform/internal/GenericNetworkProvisioningServerImpl.cpp>
 #include <platform/internal/NetworkProvisioningServer.h>
 
 #include <core/CHIPTLV.h>

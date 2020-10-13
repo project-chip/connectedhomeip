@@ -24,7 +24,7 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/Zephyr/GenericThreadStackManagerImpl_Zephyr.ipp>
+#include <platform/Zephyr/GenericThreadStackManagerImpl_Zephyr.cpp>
 
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>

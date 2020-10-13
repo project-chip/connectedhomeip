@@ -20,8 +20,8 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
-#include <platform/internal/GenericSoftwareUpdateManagerImpl.ipp>
-#include <platform/internal/GenericSoftwareUpdateManagerImpl_BDX.ipp>
+#include <platform/internal/GenericSoftwareUpdateManagerImpl.cpp>
+#include <platform/internal/GenericSoftwareUpdateManagerImpl_BDX.cpp>
 
 #include <platform/Profiles/CHIPProfiles.h>
 #include <platform/Profiles/common/CommonProfile.h>

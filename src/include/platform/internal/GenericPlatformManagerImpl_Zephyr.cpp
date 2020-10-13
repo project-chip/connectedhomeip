@@ -21,8 +21,8 @@
  *          GenericPlatformManagerImpl_Zephyr<> template.
  */
 
-#ifndef GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_IPP
-#define GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_IPP
+#ifndef GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_CPP
+#define GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_CPP
 
 #include <platform/PlatformManager.h>
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -30,7 +30,7 @@
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_Zephyr<> template inherits.
-#include <platform/internal/GenericPlatformManagerImpl.ipp>
+#include <platform/internal/GenericPlatformManagerImpl.cpp>
 
 #include <system/SystemLayer.h>
 
@@ -202,4 +202,4 @@ CHIP_ERROR GenericPlatformManagerImpl_Zephyr<ImplClass>::_StartEventLoopTask(voi
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_IPP
+#endif // GENERIC_PLATFORM_MANAGER_IMPL_ZEPHYR_CPP

@@ -25,7 +25,7 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
-#include <platform/Zephyr/GenericBLEManagerImpl_Zephyr.ipp>
+#include <platform/Zephyr/GenericBLEManagerImpl_Zephyr.cpp>
 
 namespace chip {
 namespace DeviceLayer {

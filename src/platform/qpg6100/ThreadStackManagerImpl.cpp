@@ -25,8 +25,8 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.ipp>
-#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.ipp>
+#include <platform/FreeRTOS/GenericThreadStackManagerImpl_FreeRTOS.cpp>
+#include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread_LwIP.cpp>
 
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>

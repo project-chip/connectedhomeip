@@ -21,8 +21,8 @@
  *          for use on platforms that support WiFi.
  */
 
-#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_IPP
-#define GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_IPP
+#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_CPP
+#define GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_CPP
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
@@ -36,8 +36,7 @@ namespace Internal {
 template class GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>;
 
 template <class ImplClass>
-const char *
-GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode)
+const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode)
 {
     switch (mode)
     {
@@ -64,4 +63,4 @@ bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationEnabled()
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_IPP
+#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_WIFI_CPP
