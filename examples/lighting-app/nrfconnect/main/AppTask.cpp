@@ -210,7 +210,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
         action = LightingMgr().IsTurnedOn() ? LightingManager::OFF_ACTION : LightingManager::ON_ACTION;
-        actor = AppEvent::kEventType_Button;
+        actor  = AppEvent::kEventType_Button;
     }
 
     if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor))

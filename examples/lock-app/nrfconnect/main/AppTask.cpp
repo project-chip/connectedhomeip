@@ -203,7 +203,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
         action = BoltLockMgr().IsUnlocked() ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION;
-        actor = AppEvent::kEventType_Button;
+        actor  = AppEvent::kEventType_Button;
     }
 
     if (action != BoltLockManager::INVALID_ACTION && !BoltLockMgr().InitiateAction(actor, action))

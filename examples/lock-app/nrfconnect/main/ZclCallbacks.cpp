@@ -18,8 +18,8 @@
 
 #include <support/logging/CHIPLogging.h>
 
-#include "BoltLockManager.h"
 #include "AppTask.h"
+#include "BoltLockManager.h"
 
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"

@@ -77,14 +77,14 @@ bool BoltLockManager::InitiateAction(int32_t aActor, Action_t aAction)
     if (mState == kState_LockingCompleted && aAction == UNLOCK_ACTION)
     {
         action_initiated = true;
-        mCurrentActor = aActor;
-        new_state = kState_UnlockingInitiated;
+        mCurrentActor    = aActor;
+        new_state        = kState_UnlockingInitiated;
     }
     else if (mState == kState_UnlockingCompleted && aAction == LOCK_ACTION)
     {
         action_initiated = true;
-        mCurrentActor = aActor;
-        new_state = kState_LockingInitiated;
+        mCurrentActor    = aActor;
+        new_state        = kState_LockingInitiated;
     }
 
     if (action_initiated)
