@@ -165,7 +165,8 @@ public class SelectNetworkFragment extends Fragment
     ByteArray extendedPanId = new ByteArray(threadNetworkInfo.getExtendedPanId());
     ByteArray pskc = new ByteArray();
     Error error =
-        Commissioner.generatePSKc(pskc, password, threadNetworkInfo.getNetworkName(), extendedPanId);
+        Commissioner.generatePSKc(
+            pskc, password, threadNetworkInfo.getNetworkName(), extendedPanId);
     if (error.getCode() != ErrorCode.kNone) {
       Log.e(
           TAG,
