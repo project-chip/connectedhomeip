@@ -29,7 +29,6 @@
 		B2F53AF2245B0DCF0010745E /* CHIPSetupPayloadParserTests.m in Sources */ = {isa = PBXBuildFile; fileRef = B2F53AF1245B0DCF0010745E /* CHIPSetupPayloadParserTests.m */; };
 		BA09EB43247477BA00605257 /* libCHIP.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA09EB3F2474762900605257 /* libCHIP.a */; };
 		BA107AEF2470CFBB004287EB /* chip_xcode_build_connector.sh in Resources */ = {isa = PBXBuildFile; fileRef = BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */; };
-		C4C222C02475A38700984173 /* CHIPLogging.mm in Sources */ = {isa = PBXBuildFile; fileRef = C4C222BF2475A38700984173 /* CHIPLogging.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -68,7 +67,6 @@
 		B2F53AF1245B0DCF0010745E /* CHIPSetupPayloadParserTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CHIPSetupPayloadParserTests.m; sourceTree = "<group>"; };
 		BA09EB3F2474762900605257 /* libCHIP.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libCHIP.a; path = lib/libCHIP.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA107AEE2470CFBB004287EB /* chip_xcode_build_connector.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = chip_xcode_build_connector.sh; sourceTree = "<group>"; };
-		C4C222BF2475A38700984173 /* CHIPLogging.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPLogging.mm; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -121,7 +119,6 @@
 				B2E0D7A8245B0B5C003C5B48 /* CHIP.h */,
 				B2E0D7AB245B0B5C003C5B48 /* CHIPError.h */,
 				B2E0D7AA245B0B5C003C5B48 /* CHIPError.mm */,
-				C4C222BF2475A38700984173 /* CHIPLogging.mm */,
 				991DC08A247704DC00C13860 /* CHIPLogging.h */,
 				B2E0D7A9245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h */,
 				B2E0D7AD245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm */,
@@ -301,7 +298,6 @@
 				515C401C2486BF43004C4DB3 /* CHIPOnOff.mm in Sources */,
 				991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */,
 				B2E0D7B7245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm in Sources */,
-				C4C222C02475A38700984173 /* CHIPLogging.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
 				B2E0D7B9245B0B5C003C5B48 /* CHIPSetupPayload.mm in Sources */,
 				B2E0D7B6245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.mm in Sources */,

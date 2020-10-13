@@ -27,6 +27,7 @@ buildconfig_header("chip_buildconfig") {
   chip_target_style_unix = chip_target_style == "unix"
   chip_target_style_embedded = chip_target_style == "embedded"
   chip_logging_style_android = chip_logging_style == "android"
+  chip_logging_style_darwin = chip_logging_style == "darwin"
   chip_logging_style_external = chip_logging_style == "external"
   chip_logging_style_stdio = chip_logging_style == "stdio"
   chip_logging_style_stdio_weak = chip_logging_style == "stdio_weak"
@@ -53,6 +54,7 @@ buildconfig_header("chip_buildconfig") {
     "CHIP_TARGET_STYLE_UNIX=${chip_target_style_unix}",
     "CHIP_TARGET_STYLE_EMBEDDED=${chip_target_style_embedded}",
     "CHIP_LOGGING_STYLE_ANDROID=${chip_logging_style_android}",
+    "CHIP_LOGGING_STYLE_DARWIN=${chip_logging_style_darwin}",
     "CHIP_LOGGING_STYLE_EXTERNAL=${chip_logging_style_external}",
     "CHIP_LOGGING_STYLE_STDIO=${chip_logging_style_stdio}",
     "CHIP_LOGGING_STYLE_STDIO_WEAK=${chip_logging_style_stdio_weak}",

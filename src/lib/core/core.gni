@@ -54,6 +54,8 @@ if (chip_target_style == "") {
 if (chip_logging_style == "") {
   if (current_os == "android") {
     chip_logging_style = "android"
+  } else if (current_os == "mac" || current_os == "ios") {
+    chip_logging_style = "darwin"
   } else if (current_os != "freertos") {
     chip_logging_style = "stdio"
   } else {
@@ -66,7 +68,8 @@ assert(chip_target_style == "unix" || chip_target_style == "embedded",
 
 assert(
     chip_logging_style == "android" || chip_logging_style == "external" ||
-        chip_logging_style == "stdio" || chip_logging_style == "stdio_weak",
+        chip_logging_style == "stdio" || chip_logging_style == "stdio_weak" ||
+        chip_logging_style == "darwin",
     "Please select a valid logging style: android, external, stdio, stdio_weak")
 
 assert(
