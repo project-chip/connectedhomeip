@@ -15,7 +15,6 @@ An example application showing the use
     -   [Configuring the example](#configuring-the-example)
     -   [Flashing and debugging](#flashing-and-debugging)
     -   [Accessing the command line](#accessing-the-command-line)
-    -   [Viewing Logging Output](#viewing-logging-output)
 
 <hr>
 
@@ -259,50 +258,3 @@ The UART interface is configured for `115200` baud rate.
 
 All OpenThread commands must be prefixed with `ot`, for example
 `ot thread start`.
-
-<a name="view-logging"></a>
-
-## Viewing Logging Output
-
-The example application is built to use the SEGGER Real Time Transfer (RTT)
-facility for log output. RTT is a feature built-in to the J-Link Interface MCU
-on the development kit board. It allows bi-directional communication with an
-embedded application without the need for a dedicated UART.
-
-Using the RTT facility requires downloading and installing the _SEGGER J-Link
-Software and Documentation Pack_
-([web site](https://www.segger.com/downloads/jlink#J-LinkSoftwareAndDocumentationPack)).
-
--   Download the J-Link installer by navigating to the appropriate URL and
-    agreeing to the license agreement.
-
-<p style="margin-left: 40px">Linux: <a href="https://www.segger.com/downloads/jlink/JLink_Linux_x86_64.deb">JLink_Linux_x86_64.deb</a></p>
-<p style="margin-left: 40px">MacOS: <a href="https://www.segger.com/downloads/jlink/JLink\_MacOSX.pkg">JLink_MacOSX.pkg</a></p>
-
--   Install the J-Link software
-
-          $ cd ~/Downloads
-          $ sudo dpkg -i JLink_Linux_V*_x86_64.deb
-
-*   In Linux, grant the logged in user the ability to talk to the development
-    hardware via the linux tty device (/dev/ttyACMx) by adding them to the
-    dialout group.
-
-          $ sudo usermod -a -G dialout ${USER}
-
-Once the above is complete, log output can be viewed using the JLinkExe tool in
-combination with JLinkRTTClient as follows:
-
--   Run the JLinkExe tool with arguments to autoconnect to the nRF82480 DK
-    board:
-
-          $ JLinkExe -device NRF52840_XXAA -if SWD -speed 4000 -autoconnect 1
-
--   In a second terminal, run the JLinkRTTClient:
-
-          $ JLinkRTTClient
-
-Logging output will appear in the second terminal.
-
-An alternate method for viewing log output is to use the J-Link GDB server
-described in the following section.
