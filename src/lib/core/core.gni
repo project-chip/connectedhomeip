@@ -57,7 +57,7 @@ if (chip_logging_style == "") {
   } else if (current_os == "ios") {
     chip_logging_style = "external"
   } else if (current_os == "mac" &&
-              current_toolchain == "//config/standalone/toolchain:standalone") {
+             current_toolchain == "//config/standalone/toolchain:standalone") {
     chip_logging_style = "external"
   } else if (current_os != "freertos") {
     chip_logging_style = "stdio"
