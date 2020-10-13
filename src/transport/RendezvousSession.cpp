@@ -28,7 +28,7 @@
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 static const size_t kMax_SecureSDU_Length          = 1024;
-static constexpr uint32_t kSpake2p_Iteration_Count = 50000;
+static constexpr uint32_t kSpake2p_Iteration_Count = 100;
 static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt";
 
 using namespace chip::Inet;
