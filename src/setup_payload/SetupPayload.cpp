@@ -83,7 +83,12 @@ bool SetupPayload::isValidQRCodePayload()
 
 bool SetupPayload::isValidManualCode()
 {
-    if (discriminator >= 1 << kManualSetupDiscriminatorFieldLengthInBits)
+    // The discriminator for manual setup code is 4 least significant bits
+    // in a regular 12 bit discriminator. Let's make sure that the provided
+    // discriminator fits within 12 bits (kPayloadDiscriminatorFieldLengthInBits).
+    // The manual setup code generator will only use 4 least significant bits from
+    // it.
+    if (discriminator >= 1 << kPayloadDiscriminatorFieldLengthInBits)
     {
         return false;
     }
