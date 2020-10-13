@@ -85,8 +85,8 @@ exit:
 bool ModelCommand::SendCommand(ChipDeviceController * dc)
 {
     // Make sure our buffer is big enough, but this will need a better setup!
-    static const size_t bufferSize = 1024;
-    auto * buffer                  = PacketBuffer::NewWithAvailableSize(bufferSize);
+    static const uint16_t bufferSize = 1024;
+    auto * buffer                    = PacketBuffer::NewWithAvailableSize(bufferSize);
 
     if (buffer == nullptr)
     {
@@ -137,7 +137,7 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     frameControl   = chip::Encoding::Read8(message);
     sequenceNumber = chip::Encoding::Read8(message);
     commandId      = chip::Encoding::Read8(message);
-    messageLen -= 3;
+    messageLen     = static_cast<uint16_t>(messageLen - 3);
 
     VerifyOrExit(isValidFrame(frameControl), ChipLogError(chipTool, "Unexpected frame control byte: 0x%02x", frameControl));
     VerifyOrExit(sequenceNumber == 1, ChipLogError(chipTool, "Unexpected sequence number: %d", sequenceNumber));
@@ -145,7 +145,7 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
         mEndPointId == frame.sourceEndpoint,
         ChipLogError(chipTool, "Invalid endpoint '0x%02x'. Expected endpoint '0x%02x'", frame.sourceEndpoint, mEndPointId));
     VerifyOrExit(mClusterId == frame.clusterId,
-                 ChipLogError(chipTool, "Invalid cluster '0x%02x'. Expected cluster '0x%02x'", frame.clusterId, mClusterId));
+                 ChipLogError(chipTool, "Invalid cluster '0x%04x'. Expected cluster '0x%04x'", frame.clusterId, mClusterId));
 
     isGlobalCommand = (frameControl == kZCLGlobalCmdFrameControlHeader);
     isGlobalCommand ? ParseGlobalResponseCommand(commandId, message, messageLen)
@@ -199,9 +199,9 @@ void ModelCommand::ParseReadAttributeResponseCommand(uint8_t * message, uint16_t
     // But for now we only support one attribute value, and that value is a boolean.
     CHECK_MESSAGE_LENGTH(messageLen >= 3);
 
-    attrId = chip::Encoding::LittleEndian::Read16(message);
-    status = chip::Encoding::Read8(message);
-    messageLen -= 3;
+    attrId     = chip::Encoding::LittleEndian::Read16(message);
+    status     = chip::Encoding::Read8(message);
+    messageLen = static_cast<uint16_t>(messageLen - 3);
 
     if (status == 0)
     {
@@ -261,7 +261,7 @@ exit:
 
 void ModelCommand::ParseSpecificClusterResponseCommand(uint8_t commandId, uint8_t * message, uint16_t messageLen) const
 {
-    ChipLogProgress(chipTool, "Parsing cluster id '0x%02x' response command '0x%02x'", mClusterId, commandId);
+    ChipLogProgress(chipTool, "Parsing cluster id '0x%04x' response command '0x%02x'", mClusterId, commandId);
     if (!HandleClusterResponse(message, messageLen))
     {
         ChipLogProgress(chipTool, "Not handling command '0x%02x'", commandId);

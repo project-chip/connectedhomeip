@@ -51,7 +51,7 @@ public:
     void OnError(ChipDeviceController * dc, CHIP_ERROR err) override;
     void OnMessage(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) override;
 
-    virtual size_t EncodeCommand(chip::System::PacketBuffer * buffer, size_t bufferSize, uint16_t endPointId) = 0;
+    virtual uint16_t EncodeCommand(chip::System::PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) = 0;
     virtual bool HandleClusterResponse(uint8_t * message, uint16_t messageLen) const { return false; }
 
 private:
@@ -72,6 +72,6 @@ private:
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;
     bool mWaitingForResponse{ false };
-    uint32_t mEndPointId;
     uint16_t mClusterId;
+    uint8_t mEndPointId;
 };
