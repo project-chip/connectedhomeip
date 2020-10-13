@@ -290,8 +290,8 @@ void InitNetwork()
         {
             uint64_t iid    = gNetworkOptions.LocalIPv6Addr[j].InterfaceId();
             char * tap_name = (char *) chip::Platform::MemoryAlloc(sizeof(gDefaultTapDeviceName));
-            assert(tap_name);
             snprintf(tap_name, sizeof(gDefaultTapDeviceName), "chip-dev-%" PRIx64, iid & 0xFFFF);
+            tap_name[sizeof(gDefaultTapDeviceName) - 1] = 0;
             gNetworkOptions.TapDeviceName.push_back(tap_name);
         }
     }

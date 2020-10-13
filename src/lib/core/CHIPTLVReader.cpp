@@ -695,7 +695,6 @@ CHIP_ERROR TLVReader::DupBytes(uint8_t *& buf, uint32_t & dataLen)
     if (err != CHIP_NO_ERROR)
     {
         chip::Platform::MemoryFree(buf);
-        buf = nullptr;
         return err;
     }
 
@@ -740,7 +739,6 @@ CHIP_ERROR TLVReader::DupString(char *& buf)
     if (err != CHIP_NO_ERROR)
     {
         chip::Platform::MemoryFree(buf);
-        buf = nullptr;
         return err;
     }
 
