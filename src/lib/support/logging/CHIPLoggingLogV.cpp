@@ -33,6 +33,10 @@
 #include <android/log.h>
 #endif
 
+#if CHIP_LOGGING_STYLE_DARWIN
+#include <os/log.h>
+#endif
+
 #if HAVE_SYS_TIME_H && CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
 #include <sys/time.h>
 #endif // HAVE_SYS_TIME_H && CHIP_LOGGING_STYLE_STDIO_WITH_TIMESTAMPS
@@ -105,6 +109,53 @@ DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void LogV(uint8_t module, uint8_t categ
         PrintMessagePrefix(module);
         vprintf(msg, v);
         printf("\n");
+
+#elif CHIP_LOGGING_STYLE_DARWIN
+
+        char moduleName[ChipLoggingModuleNameLen + 1];
+        GetModuleName(moduleName, module);
+
+        char formattedMsg[512];
+        int32_t prefixLen = snprintf(formattedMsg, sizeof(formattedMsg), "CHIP: [%s] ", moduleName);
+        if (prefixLen < 0)
+        {
+            // This should never happens.
+            return;
+        }
+
+        if (prefixLen >= sizeof(formattedMsg))
+        {
+            prefixLen = sizeof(formattedMsg) - 1;
+        }
+
+        vsnprintf(formattedMsg + prefixLen, sizeof(formattedMsg) - static_cast<size_t>(prefixLen), msg, v);
+
+        switch (category)
+        {
+        case kLogCategory_Error:
+            os_log_with_type(OS_LOG_DEFAULT, OS_LOG_TYPE_ERROR, "🔴 %{public}s", formattedMsg);
+#if TARGET_OS_MAC && TARGET_OS_IPHONE == 0
+            fprintf(stdout, "\033[1;31m");
+#endif
+            break;
+
+        case kLogCategory_Progress:
+            os_log_with_type(OS_LOG_DEFAULT, OS_LOG_TYPE_INFO, "🔵 %{public}s", formattedMsg);
+#if TARGET_OS_MAC && TARGET_OS_IPHONE == 0
+            fprintf(stdout, "\033[0;32m");
+#endif
+            break;
+
+        case kLogCategory_Detail:
+            os_log_with_type(OS_LOG_DEFAULT, OS_LOG_TYPE_DEBUG, "🟢 %{public}s", formattedMsg);
+#if TARGET_OS_MAC && TARGET_OS_IPHONE == 0
+            fprintf(stdout, "\033[0;34m");
+#endif
+            break;
+        }
+#if TARGET_OS_MAC && TARGET_OS_IPHONE == 0
+        fprintf(stdout, "%s\033[0m\n", formattedMsg);
+#endif
 
 #else
 

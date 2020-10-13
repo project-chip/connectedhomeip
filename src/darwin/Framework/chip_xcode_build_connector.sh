@@ -47,9 +47,6 @@ for define in "${DEFINES[@]}"; do
 
     # skip over those that GN does for us
     case "$define" in
-        CHIP_LOGGING_STYLE*)
-            continue
-            ;;
         CHIP_DEVICE_LAYER*)
             continue
             ;;
@@ -74,7 +71,6 @@ declare -a args=(
     'chip_crypto="mbedtls"'
     'chip_build_tools=false'
     'chip_build_tests=false'
-    'chip_logging_style="external"'
     'chip_ble_project_config_include=""'
     'chip_device_project_config_include=""'
     'chip_inet_project_config_include=""'
