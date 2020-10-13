@@ -217,7 +217,7 @@ public:
 
     /**
      *  Decrement current context in use by 1.
-     */    
+     */
     void DecrementContextsInUse();
 
 private:

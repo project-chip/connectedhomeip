@@ -206,12 +206,12 @@ public:
      *  @param[in]    msgBuf        A pointer to the PacketBuffer object holding the CHIP message.
      *
      *  @param[in]    umhandler     A unsolicited message callback handler.
-     *     
+     *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
      *  @retval  #CHIP_ERROR_INCORRECT_STATE                if the state of the exchange context is incorrect.
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
      *                                                       protocol layer.
-     */    
+     */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf,
                              ExchangeContext::MessageReceiveFunct umhandler);
 
@@ -224,7 +224,7 @@ public:
      *
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
-     */    
+     */
     bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     /**
@@ -302,7 +302,7 @@ public:
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
      * can hold onto it while it's out of their direct control to make sure it isn't closed before everyone's ready.
-     * A customized version of reference counting is used since there are some extra stuff to do within Release. 
+     * A customized version of reference counting is used since there are some extra stuff to do within Release.
      */
     void AddRef();
     void Close();
@@ -318,26 +318,26 @@ private:
         kSendFlag_RetainBuffer   = 0x0002, /**< Used to indicate that the message buffer should not be freed after sending. */
         kSendFlag_FromInitiator  = 0x0004, /**< Used to indicate that the current message is the initiator of the exchange. */
     };
-    
+
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
-    Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    Timeout mResponseTimeout;    // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     System::PacketBuffer * mMsg; // If we are re-transmitting, then this is the pointer to the message being retransmitted
     ExchangeContextDelegate * mDelegate = nullptr;
     ExchangeManager * mExchangeMgr;
     void * mAppState; // Pointer to application-specific state object.
 
-    uint64_t mNodeId;               // Node ID of peer node.
-    uint32_t mRetransInterval;      // Time between retransmissions (in milliseconds); 0 disables retransmissions.    
-    uint16_t mExchangeId;           // Assigned exchange ID.
-    bool mAllowDuplicateMsgs;       // Boolean indicator of whether duplicate messages are allowed for a given exchange.
+    uint64_t mNodeId;          // Node ID of peer node.
+    uint32_t mRetransInterval; // Time between retransmissions (in milliseconds); 0 disables retransmissions.
+    uint16_t mExchangeId;      // Assigned exchange ID.
+    bool mAllowDuplicateMsgs;  // Boolean indicator of whether duplicate messages are allowed for a given exchange.
 
     // Trickle-controlled retransmissions:
-    uint32_t mBackoff;                         // mBackoff for sampling the numner of messages
-    uint8_t  mRefCount;                        // Reference counter of the current instance
-    uint8_t  mMsgsReceived;                    // number of messages heard during the mBackoff period
-    uint8_t  mRebroadcastThreshold;            // re-broadcast threshold
-    BitFlags<uint16_t, ExFlagValues> mFlags;   // Internal state flags
+    uint32_t mBackoff;                       // mBackoff for sampling the numner of messages
+    uint8_t mRefCount;                       // Reference counter of the current instance
+    uint8_t mMsgsReceived;                   // number of messages heard during the mBackoff period
+    uint8_t mRebroadcastThreshold;           // re-broadcast threshold
+    BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
     CHIP_ERROR ResendMessage();
     static void CancelRetransmissionTimer(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
