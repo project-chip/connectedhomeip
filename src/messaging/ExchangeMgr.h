@@ -23,8 +23,8 @@
 
 #pragma once
 
-#include <support/DLLUtil.h>
 #include <messaging/ExchangeContext.h>
+#include <support/DLLUtil.h>
 #include <transport/SecureSessionMgr.h>
 
 #define EXCHANGE_CONTEXT_ID(x) ((x) + 1)
@@ -136,8 +136,8 @@ public:
                                                  void * appState);
 
     /**
-     *  Register an unsolicited message handler for a given profile identifier. This handler would be invoked for all messages of the
-     * given profile.
+     *  Register an unsolicited message handler for a given profile identifier. This handler would be invoked for all messages of
+     * the given profile.
      *
      *  @param[in]    protocolId     The profile identifier of the received message.
      *
@@ -219,8 +219,8 @@ public:
 
 private:
     uint16_t NextExchangeId;
-    uint8_t  mState;                      /**< [READ ONLY] The state of the ExchangeManager object. */
-    SecureSessionMgrBase * mSessionMgr;   /**< [READ ONLY] The associated SecureSessionMgrBase object. */
+    uint8_t mState;                     /**< [READ ONLY] The state of the ExchangeManager object. */
+    SecureSessionMgrBase * mSessionMgr; /**< [READ ONLY] The associated SecureSessionMgrBase object. */
 
     class UnsolicitedMessageHandler
     {

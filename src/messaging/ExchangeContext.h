@@ -71,8 +71,8 @@ public:
      *  @param[in]    msgType       The message type of the corresponding profile.
      *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
      */
-    virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                        uint8_t msgType, System::PacketBuffer * payload) = 0;
+    virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+                                   System::PacketBuffer * payload) = 0;
 
     /**
      * @brief
@@ -167,7 +167,7 @@ public:
     /**
      *  Set the kFlagInitiator flag bit. This flag is set by the node that
      *  initiates an exchange.
-         *
+     *
      *  @param[in]  inInitiator  A Boolean indicating whether (true) or not
      *                           (false) the context is the initiator of
      *                           the exchange.
@@ -229,18 +229,12 @@ public:
     /**
      *  Set delegate of the current ExchangeContext instance.
      */
-    void SetDelegate(ExchangeContextDelegate * delegate)
-    {
-        mDelegate = delegate;
-    }
+    void SetDelegate(ExchangeContextDelegate * delegate) { mDelegate = delegate; }
 
     /**
      *  Return the delegate pointer of the current ExchangeContext instance.
      */
-    ExchangeContextDelegate * GetDelegate()
-    {
-        return mDelegate;
-    }
+    ExchangeContextDelegate * GetDelegate() { return mDelegate; }
 
     /*
      * In order to use reference counting (see refCount below)
