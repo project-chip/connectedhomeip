@@ -23,7 +23,11 @@ assert(current_os == "freertos")
 efr32_project_dir = "${chip_root}/examples/lighting-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
-chip_print_memory_usage = false
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+}
+
 show_qr_code = true
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
