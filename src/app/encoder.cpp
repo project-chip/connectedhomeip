@@ -122,17 +122,17 @@ static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t cl
     if (isMeasuring)
     {
         result = buf.Written();
-        ChipLogProgress(Zcl, "Measured APS frame size %d", result);
+        ChipLogDetail(Zcl, "Measured APS frame size %d", result);
     }
     else
     {
         result = buf.Fit() ? buf.Written() : 0;
         CHECK_FRAME_LENGTH(result, "Buffer too small");
-        ChipLogProgress(Zcl, "Successfully encoded %d bytes", result);
+        ChipLogDetail(Zcl, "Successfully encoded %d bytes", result);
     }
     if (!CanCastTo<uint16_t>(result))
     {
-        ChipLogProgress(Zcl, "Can't fit our measured size in uint16_t");
+        ChipLogError(Zcl, "Can't fit our measured size in uint16_t");
         result = 0;
     }
 

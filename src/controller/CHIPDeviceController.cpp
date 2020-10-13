@@ -131,7 +131,7 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(Controller, "Shutting down the controller\n");
+    ChipLogDetail(Controller, "Shutting down the controller");
 
     VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -387,7 +387,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
         buffer->AddRef();
 
         err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
-        ChipLogProgress(Controller, "SendMessage returned %d\n", err);
+        ChipLogDetail(Controller, "SendMessage returned %d", err);
 
         // The send could fail due to network timeouts (e.g. broken pipe)
         // Try sesion resumption if needed
@@ -461,7 +461,7 @@ void ChipDeviceController::OnMessageReceived(const PacketHeader & header, Transp
     {
         if (!mRemoteDeviceId.HasValue())
         {
-            ChipLogProgress(Controller, "Learned remote device id");
+            ChipLogDetail(Controller, "Learned remote device id");
             mRemoteDeviceId = header.GetSourceNodeId();
         }
         else if (mRemoteDeviceId != header.GetSourceNodeId())
@@ -507,7 +507,7 @@ void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::S
     switch (status)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
-        ChipLogProgress(Controller, "Remote device completed SPAKE2+ handshake\n");
+        ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
         mPairingSession       = mRendezvousSession->GetPairingSession();
         mSecurePairingSession = &mPairingSession;
 
@@ -524,7 +524,7 @@ void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::S
 
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
 
-        ChipLogProgress(Controller, "Remote device was assigned an ip address\n");
+        ChipLogDetail(Controller, "Remote device was assigned an ip address\n");
         mDeviceAddr = mRendezvousSession->GetIPAddress();
         break;
 
