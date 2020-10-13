@@ -82,6 +82,8 @@ public:
         return this;
     }
     ~Cancelable() { Cancel(); }
+
+    Cancelable(const Cancelable &) = delete;
 };
 
 typedef void (*CallFn)(void *);
