@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
+import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -69,20 +70,22 @@ chip_test_suite("tests") {
   }
 }
 
-# The following binaries should be executed by happy.
-chip_test_suite("happy_tests") {
-  output_name = "libHappyTestInetCommon"
+if (chip_enable_happy_tests) {
+  # The following binaries should be executed by happy.
+  chip_test_suite("happy_tests") {
+    output_name = "libHappyTestInetCommon"
 
-  sources = [ "TestInetLayerMulticast.cpp" ]
+    sources = [ "TestInetLayerMulticast.cpp" ]
 
-  public_configs = [ ":tests_config" ]
+    public_configs = [ ":tests_config" ]
 
-  public_deps = [
-    ":tests_common",
-    "${chip_root}/src/inet",
-    "${chip_root}/src/lib/core",
-    "${nlunit_test_root}:nlunit-test",
-  ]
+    public_deps = [
+      ":tests_common",
+      "${chip_root}/src/inet",
+      "${chip_root}/src/lib/core",
+      "${nlunit_test_root}:nlunit-test",
+    ]
 
-  tests = [ "TestInetLayerMulticast" ]
+    tests = [ "TestInetLayerMulticast" ]
+  }
 }
