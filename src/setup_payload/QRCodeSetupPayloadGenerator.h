@@ -31,8 +31,7 @@
 
 #include <string>
 
-#ifndef _QR_CODE_SETUP_PAYLOAD_GENERATOR_
-#define _QR_CODE_SETUP_PAYLOAD_GENERATOR_
+#pragma once
 
 namespace chip {
 
@@ -89,5 +88,3 @@ private:
 };
 
 } // namespace chip
-
-#endif /* _QR_CODE_SETUP_PAYLOAD_GENERATOR_ */

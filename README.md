@@ -1,4 +1,4 @@
-# Connected Home over IP {#mainpage}
+# Connected Home over IP
 
 ![Main](https://github.com/project-chip/connectedhomeip/workflows/Builds/badge.svg)
 ![Examples](https://github.com/project-chip/connectedhomeip/workflows/Examples/badge.svg)

@@ -19,8 +19,7 @@
  * @file - This file contains PBKDF2 SHA256 test vectors.
  */
 
-#ifndef _PBKDF2_SHA256_TEST_VECTORS_H_
-#define _PBKDF2_SHA256_TEST_VECTORS_H_
+#pragma once
 
 #include <stddef.h>
 
@@ -171,5 +170,3 @@ static const struct pbkdf2_test_vector * pbkdf2_sha256_test_vectors[] = {
     &chiptest_test_vector_5, &chiptest_test_vector_6, &chiptest_test_vector_7, &chiptest_test_vector_8, &chiptest_test_vector_9,
     &chiptest_test_vector_10, &chiptest_test_vector_11
 };
-
-#endif // _PBKDF2_SHA256_TEST_VECTORS_H_

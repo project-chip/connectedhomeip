@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef OPENTHREAD_PLATFORM_CONFIG_H
-#define OPENTHREAD_PLATFORM_CONFIG_H
+#pragma once
 
 #include <em_device.h>
 
@@ -54,5 +53,3 @@
 // it cannot use "openthread" in the path to the included file.
 //
 #include "openthread-core-efr32-config.h"
-
-#endif // OPENTHREAD_PLATFORM_CONFIG_H

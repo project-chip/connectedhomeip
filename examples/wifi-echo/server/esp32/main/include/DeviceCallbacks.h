@@ -23,8 +23,7 @@
  *
  **/
 
-#ifndef DEVICE_CALLBACKS_H
-#define DEVICE_CALLBACKS_H
+#pragma once
 
 #include "CHIPDeviceManager.h"
 #include <app/util/af-types.h>
@@ -44,5 +43,3 @@ private:
     void OnOnOffPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value);
     void OnIdentifyPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value);
 };
-
-#endif // DEVICE_CALLBACKS_H

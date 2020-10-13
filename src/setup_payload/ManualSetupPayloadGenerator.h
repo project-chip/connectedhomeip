@@ -31,8 +31,7 @@
  *
  */
 
-#ifndef _MANUAL_SETUP_PAYLOAD_GENERATOR_H_
-#define _MANUAL_SETUP_PAYLOAD_GENERATOR_H_
+#pragma once
 
 #include "SetupPayload.h"
 
@@ -55,5 +54,3 @@ public:
 };
 
 } // namespace chip
-
-#endif // _MANUAL_SETUP_PAYLOAD_GENERATOR_H_

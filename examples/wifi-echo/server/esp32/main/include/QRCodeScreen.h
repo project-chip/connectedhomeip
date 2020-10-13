@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef QR_CODE_SCREEN_H
-#define QR_CODE_SCREEN_H
+#pragma once
 
 #include "Screen.h"
 #include "ScreenManager.h"
@@ -48,5 +47,3 @@ public:
 };
 
 #endif // CONFIG_HAVE_DISPLAY
-
-#endif // QR_CODE_SCREEN_H

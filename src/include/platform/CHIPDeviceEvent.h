@@ -22,8 +22,7 @@
  *          or changes in device state.
  */
 
-#ifndef CHIP_DEVICE_EVENT_H
-#define CHIP_DEVICE_EVENT_H
+#pragma once
 
 namespace chip {
 namespace DeviceLayer {
@@ -395,5 +394,3 @@ struct ChipDeviceEvent final
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_EVENT_H

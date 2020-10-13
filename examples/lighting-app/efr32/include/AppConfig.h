@@ -17,8 +17,7 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#pragma once
 
 // ---- Lighting Example App Config ----
 
@@ -67,4 +66,3 @@ void appError(int err);
 #ifdef __cplusplus
 }
 #endif
-#endif // APP_CONFIG_H

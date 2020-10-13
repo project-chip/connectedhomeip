@@ -23,8 +23,7 @@
  *          NXP K32W platforms.
  */
 
-#ifndef CHIP_PLATFORM_CONFIG_H
-#define CHIP_PLATFORM_CONFIG_H
+#pragma once
 
 #include <stdint.h>
 
@@ -137,5 +136,3 @@
 #ifndef WDM_PUBLISHER_MAX_NOTIFIES_IN_FLIGHT
 #define WDM_PUBLISHER_MAX_NOTIFIES_IN_FLIGHT 2
 #endif // WDM_PUBLISHER_MAX_NOTIFIES_IN_FLIGHT
-
-#endif /* CHIP_PLATFORM_CONFIG_H */

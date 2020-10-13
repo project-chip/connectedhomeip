@@ -16,8 +16,7 @@
  *
  */
 
-#ifndef __CHIPTOOL_COMMAND_H__
-#define __CHIPTOOL_COMMAND_H__
+#pragma once
 
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
@@ -110,5 +109,3 @@ private:
     const char * mName = nullptr;
     std::vector<Argument> mArgs;
 };
-
-#endif // __CHIPTOOL_COMMAND_H__

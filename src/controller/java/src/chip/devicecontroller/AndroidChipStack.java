@@ -253,6 +253,9 @@ public final class AndroidChipStack {
       return false;
     }
 
+    // Request acknowledgement (use ATT Write Request).
+    sendChar.setWriteType(BluetoothGattCharacteristic.WRITE_TYPE_DEFAULT);
+
     if (!bluetoothGatt.writeCharacteristic(sendChar)) {
       Log.e(TAG, "Failed writing char");
       return false;

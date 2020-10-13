@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef DNSRESOLVER_H
-#define DNSRESOLVER_H
+#pragma once
 
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
@@ -171,5 +170,3 @@ private:
 
 } // namespace Inet
 } // namespace chip
-
-#endif // !defined(DNSRESOLVER_H_)

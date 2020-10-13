@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef TESTRETRANSMIT_H
-#define TESTRETRANSMIT_H
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,5 +26,3 @@ int TestCache(void);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // TESTRETRANSMIT_H

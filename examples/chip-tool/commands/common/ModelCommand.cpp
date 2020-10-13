@@ -50,9 +50,11 @@ bool isValidFrame(uint8_t frameControl)
 
 void ModelCommand::OnConnect(ChipDeviceController * dc)
 {
-    SendCommand(dc);
-    UpdateWaitForResponse(true);
-    WaitForResponse();
+    if (SendCommand(dc))
+    {
+        UpdateWaitForResponse(true);
+        WaitForResponse();
+    }
 }
 
 void ModelCommand::OnError(ChipDeviceController * dc, CHIP_ERROR err)
@@ -80,7 +82,7 @@ exit:
     return err;
 }
 
-void ModelCommand::SendCommand(ChipDeviceController * dc)
+bool ModelCommand::SendCommand(ChipDeviceController * dc)
 {
     // Make sure our buffer is big enough, but this will need a better setup!
     static const size_t bufferSize = 1024;
@@ -89,10 +91,17 @@ void ModelCommand::SendCommand(ChipDeviceController * dc)
     if (buffer == nullptr)
     {
         ChipLogError(chipTool, "Failed to allocate memory for packet data.");
-        return;
+        return false;
     }
 
     uint16_t dataLength = EncodeCommand(buffer, bufferSize, mEndPointId);
+    if (dataLength == 0)
+    {
+        PacketBuffer::Free(buffer);
+        ChipLogError(chipTool, "Error while encoding data for command: %s", GetName());
+        return false;
+    }
+
     buffer->SetDataLength(dataLength);
     ChipLogProgress(chipTool, "Encoded data of length %d", dataLength);
 
@@ -101,6 +110,7 @@ void ModelCommand::SendCommand(ChipDeviceController * dc)
 #endif
 
     dc->SendMessage(NULL, buffer);
+    return true;
 }
 
 void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer) const

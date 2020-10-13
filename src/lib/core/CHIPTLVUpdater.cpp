@@ -121,7 +121,7 @@ CHIP_ERROR TLVUpdater::Init(TLVReader & aReader, uint32_t freeLen)
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // If reader is already on an element, reset it to start of element
-    if (aReader.ElementType() != kTLVElementType_NotSpecified)
+    if (aReader.ElementType() != TLVElementType::NotSpecified)
     {
         uint8_t elemHeadLen;
 
@@ -289,7 +289,8 @@ CHIP_ERROR TLVUpdater::Move()
     const uint8_t * elementEnd;
     uint32_t copyLen;
 
-    VerifyOrExit((mUpdaterReader.mControlByte & kTLVTypeMask) != kTLVElementType_EndOfContainer, err = CHIP_END_OF_TLV);
+    VerifyOrExit(static_cast<TLVElementType>((mUpdaterReader.mControlByte & kTLVTypeMask)) != TLVElementType::EndOfContainer,
+                 err = CHIP_END_OF_TLV);
 
     VerifyOrExit(mUpdaterReader.GetType() != kTLVType_NotSpecified, err = CHIP_ERROR_INVALID_TLV_ELEMENT);
 
@@ -397,7 +398,8 @@ CHIP_ERROR TLVUpdater::EnterContainer(TLVType & outerContainerType)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVType containerType;
 
-    VerifyOrExit(TLVTypeIsContainer(mUpdaterReader.mControlByte & kTLVTypeMask), err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(TLVTypeIsContainer(static_cast<TLVType>(mUpdaterReader.mControlByte & kTLVTypeMask)),
+                 err = CHIP_ERROR_INCORRECT_STATE);
 
     // Change the updater state
     AdjustInternalWriterFreeSpace();

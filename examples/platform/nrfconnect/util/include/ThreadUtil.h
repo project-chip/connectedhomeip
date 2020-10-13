@@ -15,9 +15,6 @@
  *    limitations under the License.
  */
 
-#ifndef THREAD_UTIL_H
-#define THREAD_UTIL_H
+#pragma once
 
 void StartDefaultThreadNetwork(void);
-
-#endif // THREAD_UTIL_H

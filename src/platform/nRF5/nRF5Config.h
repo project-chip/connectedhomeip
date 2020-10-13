@@ -23,8 +23,7 @@
  *          platforms based on the Nordic nRF5 SDK.
  */
 
-#ifndef NRF5_CONFIG_H
-#define NRF5_CONFIG_H
+#pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -204,5 +203,3 @@ inline constexpr uint16_t NRF5Config::FDSWords(size_t s)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // NRF5_CONFIG_H

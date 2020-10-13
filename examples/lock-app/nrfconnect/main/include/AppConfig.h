@@ -16,8 +16,7 @@
  *    limitations under the License.
  */
 
-#ifndef APP_CONFIG_H
-#define APP_CONFIG_H
+#pragma once
 
 // ---- Lock Example App Config ----
 
@@ -33,5 +32,3 @@
 
 // Time it takes in ms for the simulated actuator to move from one state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 2000
-
-#endif // APP_CONFIG_H

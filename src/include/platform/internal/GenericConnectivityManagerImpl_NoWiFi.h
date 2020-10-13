@@ -22,8 +22,7 @@
  *          for use on platforms that don't have WiFi.
  */
 
-#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_WIFI_H
-#define GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_WIFI_H
+#pragma once
 
 namespace chip {
 namespace DeviceLayer {
@@ -224,5 +223,3 @@ inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPMod
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_WIFI_H

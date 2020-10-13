@@ -22,8 +22,7 @@
  *          for use on platforms that don't have BLE.
  */
 
-#ifndef GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_BLE_H
-#define GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_BLE_H
+#pragma once
 
 namespace chip {
 namespace DeviceLayer {
@@ -158,5 +157,3 @@ GenericConnectivityManagerImpl_NoBLE<ImplClass>::_CHIPoBLEServiceModeToStr(Conne
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // GENERIC_CONNECTIVITY_MANAGER_IMPL_NO_BLE_H

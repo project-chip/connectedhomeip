@@ -21,8 +21,7 @@
  *          Device Layer on Linux platforms.
  */
 
-#ifndef CHIP_DEVICE_PLATFORM_EVENT_H
-#define CHIP_DEVICE_PLATFORM_EVENT_H
+#pragma once
 
 #include <platform/CHIPDeviceEvent.h>
 
@@ -93,5 +92,3 @@ struct ChipDevicePlatformEvent
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_DEVICE_PLATFORM_EVENT_H

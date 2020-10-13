@@ -21,9 +21,6 @@
  *
  */
 
-#ifndef TESTCONFIGURATIONMGR_H
-#define TESTCONFIGURATIONMGR_H
+#pragma once
 
 int TestConfigurationMgr();
-
-#endif // TESTCONFIGURATIONMGR_H

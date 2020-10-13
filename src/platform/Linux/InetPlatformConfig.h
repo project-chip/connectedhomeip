@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef INET_PLATFORM_CONFIG_H
-#define INET_PLATFORM_CONFIG_H
+#pragma once
 
 // ==================== Platform Adaptations ====================
 
@@ -41,5 +40,3 @@
 
 // On linux platform, we have sys/socket.h, so HAVE_SO_BINDTODEVICE should be set to 1
 #define HAVE_SO_BINDTODEVICE 1
-
-#endif // INET_PLATFORM_CONFIG_H
