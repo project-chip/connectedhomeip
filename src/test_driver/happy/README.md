@@ -27,12 +27,12 @@
 - Build CHIP
 
           $ scripts/build/gn_bootstrap.sh
-          $ scripts/build/gn_gen.sh
+          $ scripts/build/gn_gen.sh --args="chip_enable_happy_tests=true"
           $ scripts/build/gn_build.sh
 
 - Run Tests
 
-          $ RUN_HAPPY_TESTS=1 scripts/tests/gn_tests.sh --args="$GN_ARGS chip_enable_happy_tests=true"
+          $ RUN_HAPPY_TESTS=1 scripts/tests/gn_tests.sh
 
 - Run a single test
 
