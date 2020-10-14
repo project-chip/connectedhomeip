@@ -37,10 +37,11 @@
 class ModelCommand : public NetworkCommand
 {
 public:
-    ModelCommand(const char * commandName, const uint16_t clusterId) : NetworkCommand(commandName, NetworkType::UDP)
+    ModelCommand(const char * commandName, uint16_t clusterId, uint8_t commandId) : NetworkCommand(commandName, NetworkType::UDP)
     {
         AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
         mClusterId = clusterId;
+        mCommandId = commandId;
     }
 
     /////////// Command Interface /////////
@@ -52,18 +53,12 @@ public:
     void OnMessage(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) override;
 
     virtual uint16_t EncodeCommand(chip::System::PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) = 0;
-    virtual bool HandleClusterResponse(uint8_t * message, uint16_t messageLen) const { return false; }
+    virtual bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
+    virtual bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
 
 private:
     bool SendCommand(ChipDeviceController * dc);
     void ReceiveCommandResponse(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) const;
-
-    void ParseGlobalResponseCommand(uint8_t commandId, uint8_t * message, uint16_t messageLen) const;
-    void ParseDefaultResponseCommand(uint8_t * message, uint16_t messageLen) const;
-    void ParseReadAttributeResponseCommand(uint8_t * message, uint16_t messageLen) const;
-    void ParseReadAttributeResponseCommandSuccess(uint16_t attrId, uint8_t * message, uint16_t messageLen) const;
-    void ParseReadAttributeResponseCommandFailure(uint16_t attrId, uint8_t status, uint16_t messageLen) const;
-    void ParseSpecificClusterResponseCommand(uint8_t commandId, uint8_t * message, uint16_t messageLen) const;
 
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(void);
@@ -73,5 +68,6 @@ private:
     std::mutex cvWaitingForResponseMutex;
     bool mWaitingForResponse{ false };
     uint16_t mClusterId;
+    uint8_t mCommandId;
     uint8_t mEndPointId;
 };
