@@ -63,7 +63,7 @@ if __name__ == '__main__':
         fp, fname = tempfile.mkstemp()
         run_res = subprocess.run(["python3", args.test_script],
                                  stdout=fp, stderr=fp, env=test_environ)
-        if True:
+        if run_res.returncode != 0:
             with open(fname, 'rb') as test_output:
                 os.write(sys.stderr.fileno(), test_output.read())
         exit(run_res.returncode)
