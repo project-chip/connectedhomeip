@@ -14,14 +14,16 @@
 
 import("efr32_board.gni")
 
-arm_arch = "armv7e-m"
-arm_abi = "aapcs"
-arm_cpu = "cortex-m4"
-
 if (efr32_family == "efr32mg12") {
+  arm_arch = "armv7e-m"
+  arm_abi = "aapcs"
+  arm_cpu = "cortex-m4"
   arm_float_abi = "softfp"
   arm_fpu = "fpv4-sp-d16"
 } else if (efr32_family == "efr32mg21") {
+  arm_arch = "armv8-m.main+dsp"
+  arm_abi = "aapcs"
+  arm_cpu = "cortex-m33"
   arm_float_abi = "hard"
   arm_fpu = "fpv5-sp-d16"
 }

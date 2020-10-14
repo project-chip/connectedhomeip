@@ -35,16 +35,12 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-using namespace chip::TLV;
-using namespace chip::DeviceLayer;
-
 #include <platform/CHIPDeviceLayer.h>
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/EFR32/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#define JOINER_START_TRIGGER_TIMEOUT 1500
 #endif
 
 #define FACTORY_RESET_TRIGGER_TIMEOUT 3000
@@ -68,6 +64,7 @@ static bool sIsPairedToAccount       = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
 
+using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -358,17 +355,8 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
     // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartThread)
     {
-#if CHIP_ENABLE_OPENTHREAD
-        EFR32_LOG("Release button now to Start Thread Joiner");
-        EFR32_LOG("Hold to trigger Factory Reset");
-        sAppTask.mFunction = kFunction_Joiner;
-        sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-    }
-    else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Joiner)
-    {
-#endif
         EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
         // Start timer for FACTORY_RESET_CANCEL_WINDOW_TIMEOUT to allow user to
@@ -411,37 +399,31 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
     {
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
-#if CHIP_ENABLE_OPENTHREAD
-            sAppTask.StartTimer(JOINER_START_TRIGGER_TIMEOUT);
-#else
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-#endif
-
-            sAppTask.mFunction = kFunction_SoftwareUpdate;
+            sAppTask.mFunction = kFunction_StartThread;
         }
     }
     else
     {
-        // If the button was released before factory reset got initiated, trigger a
-        // software update.
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+        // If the button was released before factory reset got initiated, start Thread Network
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartThread)
         {
             sAppTask.CancelTimer();
-
             sAppTask.mFunction = kFunction_NoneSelected;
-
-            EFR32_LOG("Software Update currently not supported.");
-        }
 #if CHIP_ENABLE_OPENTHREAD
-        else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_Joiner)
-        {
-            sAppTask.CancelTimer();
-            sAppTask.mFunction = kFunction_NoneSelected;
-
-            CHIP_ERROR error = ThreadStackMgr().JoinerStart();
-            EFR32_LOG("Thread joiner triggered: %s", chip::ErrorStr(error));
-        }
+            if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+            {
+                StartDefaultThreadNetwork();
+                EFR32_LOG("Device is not commissioned to a Thread network. Starting with the default configuration.");
+            }
+            else
+            {
+                EFR32_LOG("Device is commissioned to a Thread network.");
+            }
+#elif
+            EFR32_LOG("Thread is not defined.");
 #endif
+        }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {
             // Set lock status LED back to show state of lock.

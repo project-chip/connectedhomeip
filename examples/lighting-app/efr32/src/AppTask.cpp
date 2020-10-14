@@ -35,9 +35,6 @@
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 
-using namespace chip::TLV;
-using namespace chip::DeviceLayer;
-
 #include <platform/CHIPDeviceLayer.h>
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/EFR32/ThreadStackManagerImpl.h>
@@ -67,6 +64,7 @@ static bool sIsThreadAttached        = false;
 static bool sHaveBLEConnections      = false;
 static bool sHaveServiceConnectivity = false;
 
+using namespace chip::TLV;
 using namespace ::chip::DeviceLayer;
 
 AppTask AppTask::sAppTask;
@@ -355,7 +353,7 @@ void AppTask::FunctionTimerEventHandler(AppEvent * aEvent)
 
     // If we reached here, the button was held past FACTORY_RESET_TRIGGER_TIMEOUT,
     // initiate factory reset
-    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+    if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartThread)
     {
         EFR32_LOG("Factory Reset Triggered. Release button within %ums to cancel.", FACTORY_RESET_CANCEL_WINDOW_TIMEOUT);
 
@@ -400,20 +398,29 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
         if (!sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_NoneSelected)
         {
             sAppTask.StartTimer(FACTORY_RESET_TRIGGER_TIMEOUT);
-            sAppTask.mFunction = kFunction_SoftwareUpdate;
+            sAppTask.mFunction = kFunction_StartThread;
         }
     }
     else
     {
-        // If the button was released before factory reset got initiated, trigger a
-        // software update.
-        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_SoftwareUpdate)
+        // If the button was released before factory reset got initiated, start Thread Network
+        if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_StartThread)
         {
             sAppTask.CancelTimer();
-
             sAppTask.mFunction = kFunction_NoneSelected;
-
-            EFR32_LOG("Software Update currently not supported.");
+#if CHIP_ENABLE_OPENTHREAD
+            if (!chip::DeviceLayer::ConnectivityMgr().IsThreadProvisioned())
+            {
+                StartDefaultThreadNetwork();
+                EFR32_LOG("Device is not commissioned to a Thread network. Starting with the default configuration.");
+            }
+            else
+            {
+                EFR32_LOG("Device is commissioned to a Thread network.");
+            }
+#elif
+            EFR32_LOG("Thread is not defined.");
+#endif
         }
         else if (sAppTask.mFunctionTimerActive && sAppTask.mFunction == kFunction_FactoryReset)
         {

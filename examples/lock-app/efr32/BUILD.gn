@@ -23,6 +23,11 @@ assert(current_os == "freertos")
 efr32_project_dir = "${chip_root}/examples/lock-app/efr32"
 examples_plat_dir = "${chip_root}/examples/platform/efr32"
 
+declare_args() {
+  # Dump memory usage at link time.
+  chip_print_memory_usage = false
+}
+
 show_qr_code = true
 
 # BRD4166A --> ThunderBoard Sense 2 (No LCD)
@@ -124,6 +129,13 @@ efr32_executable("lock_app") {
   }
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+
+  if (chip_print_memory_usage) {
+    ldflags += [
+      "-Wl,--print-memory-usage",
+      "-fstack-usage",
+    ]
+  }
 }
 
 group("efr32") {

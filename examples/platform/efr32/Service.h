@@ -19,3 +19,4 @@
 
 void SetDeviceName(const char * newDeviceName);
 void PublishService();
+void StartDefaultThreadNetwork(void);
