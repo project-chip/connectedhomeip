@@ -27,7 +27,7 @@
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.tempsensorvc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
-    
+
     [self.chipController sendReadTemperatureMeasurementCommand];
 }
 
@@ -39,7 +39,7 @@
 
     // Title
     UILabel * titleLabel = [CHIPUIViewUtils addTitle:@"Temperature Sensor" toView:self.view];
-    
+
     // stack view
     UIStackView * stackView = [UIStackView new];
     stackView.axis = UILayoutConstraintAxisVertical;
@@ -52,7 +52,7 @@
     [stackView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:40].active = YES;
     [stackView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    
+
     // Temperature label
     UILabel *temperatureLabel = [UILabel new];
     temperatureLabel.text = @"40°C";
@@ -62,7 +62,7 @@
     [stackView addArrangedSubview:temperatureLabel];
     temperatureLabel.translatesAutoresizingMaskIntoConstraints = false;
     [temperatureLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
-    
+
     // Refresh button
     UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
                                                                             target:self
