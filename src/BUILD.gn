@@ -56,9 +56,7 @@ if (chip_build_tests) {
     }
 
     if (chip_config_network_layer_ble && chip_device_platform != "esp32") {
-      deps += [
-        "${chip_root}/src/ble/tests",
-      ]
+      deps += [ "${chip_root}/src/ble/tests" ]
     }
 
     if (chip_with_lwip && chip_device_platform != "esp32") {
