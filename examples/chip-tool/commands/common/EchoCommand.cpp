@@ -71,7 +71,7 @@ void EchoCommand::ReceiveEcho(PacketBuffer * buffer) const
     }
     else
     {
-        ChipLogProgress(chipTool, "Echo: (%s): Error \nSend: %s \nRecv: %s", GetNetworkName(), PAYLOAD, msg_buffer);
+        ChipLogError(chipTool, "Echo: (%s): Error \nSend: %s \nRecv: %s", GetNetworkName(), PAYLOAD, msg_buffer);
     }
 }
 

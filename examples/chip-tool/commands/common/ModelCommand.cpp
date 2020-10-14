@@ -103,7 +103,7 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
     }
 
     buffer->SetDataLength(dataLength);
-    ChipLogProgress(chipTool, "Encoded data of length %d", dataLength);
+    ChipLogDetail(chipTool, "Encoded data of length %d", dataLength);
 
 #ifdef DEBUG
     PrintBuffer(buffer);
@@ -129,7 +129,7 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
         PacketBuffer::Free(buffer);
         ExitNow();
     }
-    ChipLogProgress(chipTool, "APS frame processing success!");
+    ChipLogDetail(chipTool, "APS frame processing success!");
 
     messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
     CHECK_MESSAGE_LENGTH(messageLen >= 3);
@@ -264,7 +264,7 @@ void ModelCommand::ParseSpecificClusterResponseCommand(uint8_t commandId, uint8_
     ChipLogProgress(chipTool, "Parsing cluster id '0x%04x' response command '0x%02x'", mClusterId, commandId);
     if (!HandleClusterResponse(message, messageLen))
     {
-        ChipLogProgress(chipTool, "Not handling command '0x%02x'", commandId);
+        ChipLogError(chipTool, "Not handling command '0x%02x'", commandId);
     }
 }
 
