@@ -23,15 +23,8 @@
 #include <sstream>
 #include <string>
 
-#include <support/SafeInt.h>
-
 using namespace ::chip;
 using namespace ::chip::DeviceController;
-
-namespace {
-constexpr uint8_t kDefaultResponseCommandId        = 0x0b;
-constexpr uint8_t kReadAttributesResponseCommandId = 0x01;
-} // namespace
 
 namespace {
 constexpr uint8_t kZCLGlobalCmdFrameControlHeader  = 8;
@@ -94,6 +87,9 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
         return false;
     }
 
+    ChipLogProgress(chipTool, "Endpoint id: '0x%02x', Cluster id: '0x%04x', Command id: '0x%02x'", mEndPointId, mClusterId,
+                    mCommandId);
+
     uint16_t dataLength = EncodeCommand(buffer, bufferSize, mEndPointId);
     if (dataLength == 0)
     {
@@ -141,131 +137,15 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
 
     VerifyOrExit(isValidFrame(frameControl), ChipLogError(chipTool, "Unexpected frame control byte: 0x%02x", frameControl));
     VerifyOrExit(sequenceNumber == 1, ChipLogError(chipTool, "Unexpected sequence number: %d", sequenceNumber));
-    VerifyOrExit(
-        mEndPointId == frame.sourceEndpoint,
-        ChipLogError(chipTool, "Invalid endpoint '0x%02x'. Expected endpoint '0x%02x'", frame.sourceEndpoint, mEndPointId));
-    VerifyOrExit(mClusterId == frame.clusterId,
-                 ChipLogError(chipTool, "Invalid cluster '0x%04x'. Expected cluster '0x%04x'", frame.clusterId, mClusterId));
+    VerifyOrExit(mEndPointId == frame.sourceEndpoint,
+                 ChipLogError(chipTool, "Unexpected endpoint id '0x%02x'", frame.sourceEndpoint));
+    VerifyOrExit(mClusterId == frame.clusterId, ChipLogError(chipTool, "Unexpected cluster id '0x%04x'", frame.clusterId));
 
     isGlobalCommand = (frameControl == kZCLGlobalCmdFrameControlHeader);
-    isGlobalCommand ? ParseGlobalResponseCommand(commandId, message, messageLen)
-                    : ParseSpecificClusterResponseCommand(commandId, message, messageLen);
+    isGlobalCommand ? HandleGlobalResponse(commandId, message, messageLen) : HandleSpecificResponse(commandId, message, messageLen);
 
 exit:
     return;
-}
-
-void ModelCommand::ParseGlobalResponseCommand(uint8_t commandId, uint8_t * message, uint16_t messageLen) const
-{
-    switch (commandId)
-    {
-    case kDefaultResponseCommandId:
-        ParseDefaultResponseCommand(message, messageLen);
-        break;
-    case kReadAttributesResponseCommandId:
-        ParseReadAttributeResponseCommand(message, messageLen);
-        break;
-    default:
-        ChipLogError(chipTool, "Unexpected command '0x%02x'", commandId);
-        break;
-    }
-}
-
-void ModelCommand::ParseDefaultResponseCommand(uint8_t * message, uint16_t messageLen) const
-{
-    uint8_t commandId;
-    uint8_t status;
-
-    CHECK_MESSAGE_LENGTH(messageLen == 2);
-
-    commandId = chip::Encoding::Read8(message);
-    status    = chip::Encoding::Read8(message);
-
-    ChipLogProgress(chipTool, "Got default response to command '0x%02x' for cluster '0x%04x'.  Status is '0x%02x'", commandId,
-                    mClusterId, status);
-
-exit:
-    return;
-}
-
-void ModelCommand::ParseReadAttributeResponseCommand(uint8_t * message, uint16_t messageLen) const
-{
-    uint16_t attrId;
-    uint8_t status;
-
-    // Remaining bytes are a list of (attr id, 0, attr type, attr value) or (attr id, failure status)
-    // tuples.
-    //
-    // But for now we only support one attribute value, and that value is a boolean.
-    CHECK_MESSAGE_LENGTH(messageLen >= 3);
-
-    attrId     = chip::Encoding::LittleEndian::Read16(message);
-    status     = chip::Encoding::Read8(message);
-    messageLen = static_cast<uint16_t>(messageLen - 3);
-
-    if (status == 0)
-    {
-        ParseReadAttributeResponseCommandSuccess(attrId, message, messageLen);
-    }
-    else
-    {
-        ParseReadAttributeResponseCommandFailure(attrId, status, messageLen);
-    }
-
-exit:
-    return;
-}
-
-void ModelCommand::ParseReadAttributeResponseCommandSuccess(uint16_t attrId, uint8_t * message, uint16_t messageLen) const
-{
-    uint8_t type = chip::Encoding::Read8(message);
-    messageLen--;
-
-    VerifyOrExit(type == 0x10 || type == 0x29, ChipLogError(chipTool, "Unexpected attribute type: '0x%02x'", type));
-
-    ChipLogProgress(chipTool, "Read attribute '0x%04x' for cluster '0x%04x'.  Type is '0x%02x'", attrId, mClusterId, type);
-
-    // FIXME: Should we have a mapping of type ids to types, based on
-    // table 2.6.2.2 in Rev 8 of the ZCL spec?
-    switch (type)
-    {
-    case 0x10: { // "Boolean"
-        uint8_t value;
-        CHECK_MESSAGE_LENGTH(messageLen == 1);
-        value = chip::Encoding::Read8(message);
-        ChipLogProgress(chipTool, "Attribute value: '0x%02x'", value);
-        break;
-    }
-    case 0x29: { // "Int16"
-        int16_t value;
-        CHECK_MESSAGE_LENGTH(messageLen == 2);
-        value = CastToSigned(chip::Encoding::LittleEndian::Read16(message));
-        ChipLogProgress(chipTool, "Attribute value: '0x%d'", value);
-        break;
-    }
-    }
-
-exit:
-    return;
-}
-
-void ModelCommand::ParseReadAttributeResponseCommandFailure(uint16_t attrId, uint8_t status, uint16_t messageLen) const
-{
-    CHECK_MESSAGE_LENGTH(messageLen == 0);
-    ChipLogProgress(chipTool, "Reading attribute '0x%04x' for cluster '0x%04x' failed with status '0x%02x'", attrId, mClusterId,
-                    status);
-
-exit:
-    return;
-}
-
-void ModelCommand::ParseSpecificClusterResponseCommand(uint8_t commandId, uint8_t * message, uint16_t messageLen) const
-{
-    ChipLogProgress(chipTool, "Parsing cluster id '0x%04x' response command '0x%02x'", mClusterId, commandId);
-    if (!HandleClusterResponse(message, messageLen))
-    {
-        ChipLogError(chipTool, "Not handling command '0x%02x'", commandId);
-    }
 }
 
 void ModelCommand::UpdateWaitForResponse(bool value)
