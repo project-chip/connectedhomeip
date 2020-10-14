@@ -65,7 +65,7 @@
 
 #include <string.h>
 
-// SOCK_CLOEXEC not defined on all platforms, e.g. iOS/MacOS:
+// SOCK_CLOEXEC not defined on all platforms, e.g. iOS/macOS:
 #ifdef SOCK_CLOEXEC
 #define SOCK_FLAGS SOCK_CLOEXEC
 #else

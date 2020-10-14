@@ -9,7 +9,7 @@ workflow [here](https://code.visualstudio.com/docs/remote/containers).
 
 Tested on:
 
--   MacOS 10.5
+-   macOS 10.5
 -   Windows 10 Pro + WSL + Ubuntu 18 LTS
 
 ## Setup Steps

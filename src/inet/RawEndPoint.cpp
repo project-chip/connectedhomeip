@@ -61,7 +61,7 @@
 #endif // HAVE_NETINET_ICMP6_H
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
-// SOCK_CLOEXEC not defined on all platforms, e.g. iOS/MacOS:
+// SOCK_CLOEXEC not defined on all platforms, e.g. iOS/macOS:
 #ifdef SOCK_CLOEXEC
 #define SOCK_FLAGS SOCK_CLOEXEC
 #else

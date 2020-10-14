@@ -63,7 +63,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// SOCK_CLOEXEC not defined on all platforms, e.g. iOS/MacOS:
+// SOCK_CLOEXEC not defined on all platforms, e.g. iOS/macOS:
 #ifdef SOCK_CLOEXEC
 #define SOCK_FLAGS SOCK_CLOEXEC
 #else
@@ -74,7 +74,7 @@
 // socket option level for Linux and BSD systems.
 #define TCP_SOCKOPT_LEVEL SOL_TCP
 #else
-// socket option level for MacOS & iOS systems.
+// socket option level for macOS & iOS systems.
 #define TCP_SOCKOPT_LEVEL IPPROTO_TCP
 #endif
 
@@ -82,7 +82,7 @@
 // socket option for Linux and BSD systems.
 #define TCP_IDLE_INTERVAL_OPT_NAME TCP_KEEPIDLE
 #else
-// socket option for MacOS & iOS systems.
+// socket option for macOS & iOS systems.
 #define TCP_IDLE_INTERVAL_OPT_NAME TCP_KEEPALIVE
 #endif
 
