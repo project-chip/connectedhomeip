@@ -17,7 +17,6 @@
 # This is a wrapper for running happy tests.
 
 import argparse
-import io
 import os
 import subprocess
 import sys
