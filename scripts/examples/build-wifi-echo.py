@@ -41,7 +41,7 @@ def GetEnvironment(script):
       logging.info(l)
 
   env['CHIP_ROOT'] = os.path.realpath(os.path.curdir)
-  env['PW_ROOT'] = os.path.join(env['CHIP_ROOT'], 'third_party', 'pigweed',
+  env['PW_CHECKOUT_ROOT'] = os.path.join(env['CHIP_ROOT'], 'third_party', 'pigweed',
                                 'repo')
   env['CHIP_BUILD_WITH_GN'] = 'y'
 

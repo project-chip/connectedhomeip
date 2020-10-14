@@ -158,7 +158,6 @@
             "type": "shell",
             "command": "scripts/examples/build-wifi-echo.py",
             "group": "build",
-            "dependsOn": "Clean Tree",
             "problemMatcher": ["$gcc"]
         }
     ]
