@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include "ChipShellCollection.h"
+
 #include <core/CHIPCore.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -27,8 +29,6 @@
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-
-#include <ChipShellCollection.h>
 
 using namespace chip;
 using namespace chip::Shell;

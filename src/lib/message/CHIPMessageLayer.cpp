@@ -54,7 +54,9 @@
 #include <support/crypto/HashAlgos.h>
 #include <support/logging/CHIPLogging.h>
 
+#if CONFIG_NETWORK_LAYER_BLE
 using namespace chip::Ble;
+#endif // CONFIG_NETWORK_LAYER_BLE
 using namespace chip::Crypto;
 using namespace chip::Encoding;
 using namespace chip::Inet;
