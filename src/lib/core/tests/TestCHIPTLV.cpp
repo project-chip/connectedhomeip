@@ -231,7 +231,7 @@ void TestDupString(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, cons
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
     chip::Platform::ScopedMemoryBuffer<char> valBuffer;
-    char * val = static_cast<char *>(valBuffer.Alloc(expectedLen + 1).Get());
+    char * val = valBuffer.Alloc(expectedLen + 1).Get();
 
     CHIP_ERROR err = reader.DupString(val);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -247,7 +247,7 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const
     NL_TEST_ASSERT(inSuite, reader.GetLength() == expectedLen);
 
     chip::Platform::ScopedMemoryBuffer<uint8_t> valBuffer;
-    uint8_t * val  = static_cast<uint8_t *>(valBuffer.Alloc(expectedLen).Get());
+    uint8_t * val  = valBuffer.Alloc(expectedLen).Get();
     CHIP_ERROR err = reader.DupBytes(val, expectedLen);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 

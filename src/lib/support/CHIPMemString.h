@@ -51,7 +51,7 @@ inline char * CopyString(char * dest, const char * source, size_t length)
 {
     if (dest)
     {
-        memcpy(dest, source, length);
+        strncpy(dest, source, length);
         dest[length] = 0;
     }
     return dest;
