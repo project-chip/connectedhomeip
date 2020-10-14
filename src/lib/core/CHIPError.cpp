@@ -591,6 +591,9 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION:
         desc = "Unsupported wireless operating location";
         break;
+    case CHIP_ERROR_MDNS_COLLISSION:
+        desc = "mDNS collission";
+        break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
 

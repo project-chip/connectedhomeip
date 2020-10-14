@@ -30,6 +30,7 @@
 
 // Include the non-inline definitions for the GenericPlatformManagerImpl<> template,
 // from which the GenericPlatformManagerImpl_POSIX<> template inherits.
+#include <platform/Linux/MdnsImpl.h>
 #include <platform/internal/GenericPlatformManagerImpl.cpp>
 
 #include <system/SystemLayer.h>
@@ -138,6 +139,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysUpdate()
         InetLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
     }
 #endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
+    UpdateMdnsDataset(mReadSet, mWriteSet, mErrorSet, mMaxFd, mNextTimeout);
 }
 
 template <class ImplClass>
@@ -173,6 +175,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
 #endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
     ProcessDeviceEvents();
+    ProcessMdns(mReadSet, mWriteSet, mErrorSet);
 }
 
 template <class ImplClass>

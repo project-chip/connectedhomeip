@@ -1691,6 +1691,15 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_UNSUPPORTED_WIRELESS_OPERATING_LOCATION     _CHIP_ERROR(179)
 
 /**
+ *  @def CHIP_ERROR_MDNS_COLLISSION
+ *
+ *  @brief
+ *    The registered service name has collision on the LAN.
+ *
+ */
+#define CHIP_ERROR_MDNS_COLLISSION _CHIP_ERROR(180)
+
+/**
  *  @}
  */
 
