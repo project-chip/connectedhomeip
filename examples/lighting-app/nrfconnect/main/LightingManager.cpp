@@ -34,7 +34,7 @@ int LightingManager::Init(const char * gpioDeviceName, gpio_pin_t gpioPin)
 
     mState      = kState_On;
     mGPIOPin    = gpioPin;
-    mGPIODevice = const_cast<device*>(device_get_binding(gpioDeviceName));
+    mGPIODevice = const_cast<device *>(device_get_binding(gpioDeviceName));
 
     if (!mGPIODevice)
     {
