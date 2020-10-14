@@ -72,15 +72,6 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
     virtual void OnResponseTimeout(ExchangeContext * ec) = 0;
-
-    /**
-     * @brief
-     *   This function is the protocol callback to invoke when the timeout for the retransmission
-     *   of a previously sent message has expired.
-     *
-     *  @param[in]    ec            A pointer to the ExchangeContext object.
-     */
-    virtual void OnRetransmissionTimeout(ExchangeContext * ec) = 0;
 };
 
 /**
@@ -96,7 +87,6 @@ public:
     {
         kSendFlag_ExpectResponse = 0x0001, /**< Used to indicate that a response is expected within a specified timeout. */
         kSendFlag_RetainBuffer   = 0x0002, /**< Used to indicate that the message buffer should not be freed after sending. */
-        kSendFlag_FromInitiator  = 0x0004, /**< Used to indicate that the current message is the initiator of the exchange. */
     };
 
     /**
@@ -152,7 +142,7 @@ public:
     /**
      *  Send a CHIP message on this exchange.
      *
-     *  @param[in]    protocolId     The protocol identifier of the CHIP message to be sent.
+     *  @param[in]    protocolId    The protocol identifier of the CHIP message to be sent.
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.
      *
@@ -174,7 +164,7 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(uint32_t protocolId, uint8_t msgType, System::PacketBuffer * msgPayload, uint16_t sendFlags = 0,
+    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBuffer * msgPayload, uint16_t sendFlags = 0,
                            void * msgCtxt = nullptr);
 
     /**
@@ -223,24 +213,6 @@ public:
      *  @retval  false                                      If a match is not found.
      */
     bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
-
-    /**
-     *  Start the Trickle rebroadcast algorithm's periodic retransmission timer mechanism.
-     *
-     *  @return  #CHIP_NO_ERROR if successful, else an INET_ERROR mapped into a CHIP_ERROR.
-     */
-    CHIP_ERROR StartTimerT();
-
-    /**
-     *  Tear down the Trickle retransmission mechanism by canceling the periodic timers
-     *  within Trickle and freeing the message buffer holding the CHIP message.
-     */
-    void TeardownTrickleRetransmit();
-
-    /**
-     *  Cancel the Trickle retransmission mechanism.
-     */
-    void CancelRetrans();
 
     /**
      *  Set delegate of the current ExchangeContext instance.
@@ -317,10 +289,7 @@ private:
     enum class ExFlagValues : uint16_t
     {
         kFlagInitiator        = 0x0001, /// This context is the initiator of the exchange.
-        kFlagConnectionClosed = 0x0002, /// This context was associated with a Connection.
-        kFlagResponseExpected = 0x0004, /// If a response is expected for a message that is being sent.
-        kFlagMsgRcvdFromPeer =
-            0x0008, /// When set, signifies that at least one message has been received from peer on this exchange context.
+        kFlagResponseExpected = 0x0002, /// If a response is expected for a message that is being sent.
     };
 
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
@@ -331,23 +300,14 @@ private:
     ExchangeManager * mExchangeMgr;
     void * mAppState; // Pointer to application-specific state object.
 
-    uint64_t mPeerNodeId;      // Node ID of peer node.
-    uint32_t mRetransInterval; // Time between retransmissions (in milliseconds); 0 disables retransmissions.
-    uint16_t mExchangeId;      // Assigned exchange ID.
-    bool mAllowDuplicateMsgs;  // Boolean indicator of whether duplicate messages are allowed for a given exchange.
+    uint64_t mPeerNodeId;     // Node ID of peer node.
+    uint16_t mExchangeId;     // Assigned exchange ID.
+    uint8_t mRefCount;        // Reference counter of the current instance
+    bool mAllowDuplicateMsgs; // Boolean indicator of whether duplicate messages are allowed for a given exchange.
 
-    // Trickle-controlled retransmissions:
-    uint32_t mBackoff;                       // mBackoff for sampling the numner of messages
-    uint8_t mRefCount;                       // Reference counter of the current instance
-    uint8_t mMsgsReceived;                   // number of messages heard during the mBackoff period
-    uint8_t mRebroadcastThreshold;           // re-broadcast threshold
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
     CHIP_ERROR ResendMessage();
-    static void CancelRetransmissionTimer(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
-    static void TimerTau(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
-    static void TimerT(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
-
     CHIP_ERROR StartResponseTimer();
     void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
