@@ -28,17 +28,11 @@
 #include <support/DLLUtil.h>
 #include <transport/SecureSessionMgr.h>
 
-#define EXCHANGE_CONTEXT_ID(x) ((x) + 1)
-
-using namespace chip::Transport;
-
 namespace chip {
-
-using System::PacketBuffer;
 
 class ExchangeContext;
 
-static constexpr int16_t ANY_MESSAGE_TYPE = -1;
+static constexpr int16_t kAnyMessageType = -1;
 
 /**
  *  @brief
@@ -207,19 +201,13 @@ public:
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType);
 
     /**
-     *  Return the pointer of the current associated SecureSessionMgr instance.
-     */
-    SecureSessionMgrBase * GetSessionMgr() { return mSessionMgr; }
-
-    /**
-     *  Return the number of current context in use.
-     */
-    size_t GetContextsInUse() { return mContextsInUse; }
-
-    /**
      *  Decrement current context in use by 1.
      */
     void DecrementContextsInUse();
+
+    SecureSessionMgrBase * GetSessionMgr() const { return mSessionMgr; }
+
+    size_t GetContextsInUse() const { return mContextsInUse; }
 
 private:
     enum class State

@@ -28,13 +28,7 @@
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
-#define EXCHANGE_CONTEXT_ID(x) ((x) + 1)
-
-using namespace chip::Transport;
-
 namespace chip {
-
-using System::PacketBuffer;
 
 class ExchangeManager;
 class ExchangeContext;
@@ -85,8 +79,8 @@ class DLL_EXPORT ExchangeContext
 public:
     enum
     {
-        kSendFlag_ExpectResponse = 0x0001, /**< Used to indicate that a response is expected within a specified timeout. */
-        kSendFlag_RetainBuffer   = 0x0002, /**< Used to indicate that the message buffer should not be freed after sending. */
+        kSendFlag_ExpectResponse = 0x0001, // Used to indicate that a response is expected within a specified timeout.
+        kSendFlag_RetainBuffer   = 0x0002, // Used to indicate that the message buffer should not be freed after sending.
     };
 
     /**
@@ -214,64 +208,28 @@ public:
      */
     bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
-    /**
-     *  Set delegate of the current ExchangeContext instance.
-     */
     void SetDelegate(ExchangeContextDelegate * delegate) { mDelegate = delegate; }
 
-    /**
-     *  Return the delegate pointer of the current ExchangeContext instance.
-     */
-    ExchangeContextDelegate * GetDelegate() { return mDelegate; }
+    ExchangeContextDelegate * GetDelegate() const { return mDelegate; }
 
-    /**
-     *  Set the current ExchangeManager instance.
-     */
     void SetExchangeMgr(ExchangeManager * exMgr) { mExchangeMgr = exMgr; }
 
-    /**
-     *  Return the pointer of the current associated ExchangeManager instance.
-     */
-    ExchangeManager * GetExchangeMgr() { return mExchangeMgr; }
+    ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    /**
-     *  Set the Node ID of peer node.
-     */
     void SetPeerNodeId(uint64_t nodeId) { mPeerNodeId = nodeId; }
 
-    /**
-     *  Return the Node ID of peer node.
-     */
-    uint64_t GetPeerNodeId() { return mPeerNodeId; }
+    uint64_t GetPeerNodeId() const { return mPeerNodeId; }
 
-    /**
-     *  Set exchange ID.
-     */
     void SetExchangeId(uint16_t exId) { mExchangeId = exId; }
 
-    /**
-     *  Return assigned exchange ID.
-     */
-    uint16_t GetExchangeId() { return mExchangeId; }
+    uint16_t GetExchangeId() const { return mExchangeId; }
 
-    /**
-     *  Set application-specific state object.
-     */
     void SetAppState(void * state) { mAppState = state; }
 
-    /**
-     *  Return application-specific state object.
-     */
-    void * GetAppState() { return mAppState; }
+    void * GetAppState() const { return mAppState; }
 
-    /**
-     *  Set application-specific state object.
-     */
     void SetAllowDuplicateMsgs(bool value) { mAllowDuplicateMsgs = value; }
 
-    /**
-     *  Return application-specific state object.
-     */
     bool isDuplicateMsgsAllowed() { return mAllowDuplicateMsgs; }
 
     /*
@@ -288,8 +246,8 @@ public:
 private:
     enum class ExFlagValues : uint16_t
     {
-        kFlagInitiator        = 0x0001, /// This context is the initiator of the exchange.
-        kFlagResponseExpected = 0x0002, /// If a response is expected for a message that is being sent.
+        kFlagInitiator        = 0x0001, // This context is the initiator of the exchange.
+        kFlagResponseExpected = 0x0002, // If a response is expected for a message that is being sent.
     };
 
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
