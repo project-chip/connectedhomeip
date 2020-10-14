@@ -40,6 +40,7 @@ const int kCustomFlowRequiredFieldLengthInBits       = 1;
 const int kRendezvousInfoFieldLengthInBits           = 8;
 const int kPayloadDiscriminatorFieldLengthInBits     = 12;
 const int kManualSetupDiscriminatorFieldLengthInBits = 4;
+const int kManualSetupDiscriminatorFieldBitMask      = (1 << kManualSetupDiscriminatorFieldLengthInBits) - 1;
 const int kSetupPINCodeFieldLengthInBits             = 27;
 const int kPaddingFieldLengthInBits                  = 5;
 
