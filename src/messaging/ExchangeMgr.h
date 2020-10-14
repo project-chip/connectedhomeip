@@ -108,10 +108,10 @@ public:
     ExchangeContext * FindContext(uint64_t peerNodeId, void * appState, bool isInitiator);
 
     /**
-     *  Register an unsolicited message handler for a given profile identifier. This handler would be
-     *  invoked for all messages of the given profile.
+     *  Register an unsolicited message handler for a given protocol identifier. This handler would be
+     *  invoked for all messages of the given protocol.
      *
-     *  @param[in]    protocolId     The profile identifier of the received message.
+     *  @param[in]    protocolId     The protocol identifier of the received message.
      *
      *  @param[in]    handler       The unsolicited message handler.
      *
@@ -125,14 +125,14 @@ public:
                                                  void * appState);
 
     /**
-     *  Register an unsolicited message handler for a given profile identifier. This handler would be invoked for all messages of
-     * the given profile.
+     *  Register an unsolicited message handler for a given protocol identifier. This handler would be invoked for all messages of
+     * the given protocol.
      *
-     *  @param[in]    protocolId     The profile identifier of the received message.
+     *  @param[in]    protocolId     The protocol identifier of the received message.
      *
      *  @param[in]    handler       The unsolicited message handler.
      *
-     *  @param[in]    allowDups     Boolean indicator of whether duplicate messages are allowed for a given profile.
+     *  @param[in]    allowDups     Boolean indicator of whether duplicate messages are allowed for a given protocol.
      *
      *  @param[in]    appState      A pointer to a higher layer object that holds context state.
      *
@@ -144,11 +144,11 @@ public:
                                                  void * appState);
 
     /**
-     *  Register an unsolicited message handler for a given profile identifier and message type.
+     *  Register an unsolicited message handler for a given protocol identifier and message type.
      *
-     *  @param[in]    protocolId     The profile identifier of the received message.
+     *  @param[in]    protocolId     The protocol identifier of the received message.
      *
-     *  @param[in]    msgType       The message type of the corresponding profile.
+     *  @param[in]    msgType       The message type of the corresponding protocol.
      *
      *  @param[in]    handler       The unsolicited message handler.
      *
@@ -162,16 +162,16 @@ public:
                                                  void * appState);
 
     /**
-     *  Register an unsolicited message handler for a given profile identifier and message type.
+     *  Register an unsolicited message handler for a given protocol identifier and message type.
      *
-     *  @param[in]    protocolId     The profile identifier of the received message.
+     *  @param[in]    protocolId     The protocol identifier of the received message.
      *
-     *  @param[in]    msgType       The message type of the corresponding profile.
+     *  @param[in]    msgType       The message type of the corresponding protocol.
      *
      *  @param[in]    handler       The unsolicited message handler.
      *
      *  @param[in]    allowDups     Boolean indicator of whether duplicate messages are allowed for a given
-     *                              profile identifier and message type.
+     *                              protocol identifier and message type.
      *
      *  @param[in]    appState      A pointer to a higher layer object that holds context state.
      *
@@ -183,9 +183,9 @@ public:
                                                  bool allowDups, void * appState);
 
     /**
-     *  Unregister an unsolicited message handler for a given profile identifier.
+     *  Unregister an unsolicited message handler for a given protocol identifier.
      *
-     *  @param[in]    protocolId     The profile identifier of the received message.
+     *  @param[in]    protocolId     The protocol identifier of the received message.
      *
      *  @retval #CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
      *                                                       is not found.
@@ -194,11 +194,11 @@ public:
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId);
 
     /**
-     *  Unregister an unsolicited message handler for a given profile identifier and message type.
+     *  Unregister an unsolicited message handler for a given protocol identifier and message type.
      *
-     *  @param[in]    protocolId     The profile identifier of the received message.
+     *  @param[in]    protocolId     The protocol identifier of the received message.
      *
-     *  @param[in]    msgType       The message type of the corresponding profile.
+     *  @param[in]    msgType       The message type of the corresponding protocol.
      *
      *  @retval #CHIP_ERROR_NO_UNSOLICITED_MESSAGE_HANDLER  If the matching unsolicited message handler
      *                                                       is not found.

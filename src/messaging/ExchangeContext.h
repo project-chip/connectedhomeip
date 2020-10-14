@@ -37,16 +37,6 @@ namespace chip {
 using System::PacketBuffer;
 
 class ExchangeManager;
-
-enum class ExFlagValues : uint16_t
-{
-    kFlagInitiator        = 0x0001, /// This context is the initiator of the exchange.
-    kFlagConnectionClosed = 0x0002, /// This context was associated with a Connection.
-    kFlagResponseExpected = 0x0004, /// If a response is expected for a message that is being sent.
-    kFlagMsgRcvdFromPeer =
-        0x0008, /// When set, signifies that at least one message has been received from peer on this exchange context.
-};
-
 class ExchangeContext;
 
 /**
@@ -68,7 +58,7 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      *  @param[in]    packetHeader  A reference to the PacketHeader object.
      *  @param[in]    protocolId    The protocol identifier of the received message.
-     *  @param[in]    msgType       The message type of the corresponding profile.
+     *  @param[in]    msgType       The message type of the corresponding protocol.
      *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
      */
     virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
@@ -102,6 +92,13 @@ public:
 class DLL_EXPORT ExchangeContext
 {
 public:
+    enum
+    {
+        kSendFlag_ExpectResponse = 0x0001, /**< Used to indicate that a response is expected within a specified timeout. */
+        kSendFlag_RetainBuffer   = 0x0002, /**< Used to indicate that the message buffer should not be freed after sending. */
+        kSendFlag_FromInitiator  = 0x0004, /**< Used to indicate that the current message is the initiator of the exchange. */
+    };
+
     /**
      * This function is the protocol callback of an unsolicited message handler.
      *
@@ -111,7 +108,7 @@ public:
      *
      *  @param[in]    protocolId    The protocol identifier of the received message.
      *
-     *  @param[in]    msgType       The message type of the corresponding profile.
+     *  @param[in]    msgType       The message type of the corresponding protocol.
      *
      *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
      */
@@ -155,9 +152,9 @@ public:
     /**
      *  Send a CHIP message on this exchange.
      *
-     *  @param[in]    protocolId     The profile identifier of the CHIP message to be sent.
+     *  @param[in]    protocolId     The protocol identifier of the CHIP message to be sent.
      *
-     *  @param[in]    msgType       The message type of the corresponding profile.
+     *  @param[in]    msgType       The message type of the corresponding protocol.
      *
      *  @param[in]    msgPayload    A pointer to the PacketBuffer object holding the CHIP message.
      *
@@ -236,8 +233,7 @@ public:
 
     /**
      *  Tear down the Trickle retransmission mechanism by canceling the periodic timers
-     *  within Trickle and freeing the message buffer holding the Weave
-     *  message.
+     *  within Trickle and freeing the message buffer holding the CHIP message.
      */
     void TeardownTrickleRetransmit();
 
@@ -269,12 +265,12 @@ public:
     /**
      *  Set the Node ID of peer node.
      */
-    void SetNodeId(uint64_t nodeId) { mNodeId = nodeId; }
+    void SetPeerNodeId(uint64_t nodeId) { mPeerNodeId = nodeId; }
 
     /**
      *  Return the Node ID of peer node.
      */
-    uint64_t GetNodeId() { return mNodeId; }
+    uint64_t GetPeerNodeId() { return mPeerNodeId; }
 
     /**
      *  Set exchange ID.
@@ -318,11 +314,13 @@ public:
     void SetRefCount(uint8_t value) { mRefCount = value; }
 
 private:
-    enum
+    enum class ExFlagValues : uint16_t
     {
-        kSendFlag_ExpectResponse = 0x0001, /**< Used to indicate that a response is expected within a specified timeout. */
-        kSendFlag_RetainBuffer   = 0x0002, /**< Used to indicate that the message buffer should not be freed after sending. */
-        kSendFlag_FromInitiator  = 0x0004, /**< Used to indicate that the current message is the initiator of the exchange. */
+        kFlagInitiator        = 0x0001, /// This context is the initiator of the exchange.
+        kFlagConnectionClosed = 0x0002, /// This context was associated with a Connection.
+        kFlagResponseExpected = 0x0004, /// If a response is expected for a message that is being sent.
+        kFlagMsgRcvdFromPeer =
+            0x0008, /// When set, signifies that at least one message has been received from peer on this exchange context.
     };
 
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
@@ -333,7 +331,7 @@ private:
     ExchangeManager * mExchangeMgr;
     void * mAppState; // Pointer to application-specific state object.
 
-    uint64_t mNodeId;          // Node ID of peer node.
+    uint64_t mPeerNodeId;      // Node ID of peer node.
     uint32_t mRetransInterval; // Time between retransmissions (in milliseconds); 0 disables retransmissions.
     uint16_t mExchangeId;      // Assigned exchange ID.
     bool mAllowDuplicateMsgs;  // Boolean indicator of whether duplicate messages are allowed for a given exchange.
