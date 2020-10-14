@@ -177,8 +177,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
                                                ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
-    CHIP_ERROR err                        = CHIP_NO_ERROR;
-    RendezvousSession * rendezvousSession = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
