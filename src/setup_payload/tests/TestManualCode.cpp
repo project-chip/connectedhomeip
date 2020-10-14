@@ -157,7 +157,7 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 {
     SetupPayload payload       = GetDefaultPayload();
     payload.requiresCustomFlow = false;
-    payload.discriminator      = 0xf11;
+    payload.discriminator      = 0xf1a;
 
     {
         // Test short 11 digit code
@@ -167,13 +167,13 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 
         SetupPayload outPayload;
         CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
-        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 1, payload.vendorID, payload.productID);
+        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 0xa, payload.vendorID, payload.productID);
     }
 
     payload.vendorID           = 1;
     payload.productID          = 1;
     payload.requiresCustomFlow = true;
-    payload.discriminator      = 0xf12;
+    payload.discriminator      = 0xf1b;
 
     {
         // Test long 21 digit code
@@ -183,7 +183,7 @@ void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * in
 
         SetupPayload outPayload;
         CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
-        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 2, payload.vendorID, payload.productID);
+        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 0xb, payload.vendorID, payload.productID);
     }
 }
 
