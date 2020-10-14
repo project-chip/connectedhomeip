@@ -54,7 +54,7 @@
     [stackView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
 
     // Temperature label
-    UILabel *temperatureLabel = [UILabel new];
+    UILabel * temperatureLabel = [UILabel new];
     temperatureLabel.text = @"40°C";
     temperatureLabel.textColor = UIColor.blackColor;
     temperatureLabel.textAlignment = NSTextAlignmentCenter;
@@ -64,9 +64,9 @@
     [temperatureLabel.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
 
     // Refresh button
-    UIBarButtonItem *button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
-                                                                            target:self
-                                                                            action:@selector(refreshTemperatureMeasurement:)];
+    UIBarButtonItem * button = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemRefresh
+                                                                             target:self
+                                                                             action:@selector(refreshTemperatureMeasurement:)];
     self.navigationItem.rightBarButtonItem = button;
 }
 
@@ -74,7 +74,6 @@
 {
     [self.chipController sendReadTemperatureMeasurementCommand];
 }
-
 
 // MARK: CHIPDeviceControllerDelegate
 - (void)deviceControllerOnConnected
@@ -96,10 +95,10 @@
         stringMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
     }
     NSLog(@"Status: Received a message %@", stringMessage);
-//    NSString * resultMessage = [@"Echo Response: " stringByAppendingFormat:@"%@", stringMessage];
-//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
-//        [self updateResult:resultMessage];
-//    });
+    //    NSString * resultMessage = [@"Echo Response: " stringByAppendingFormat:@"%@", stringMessage];
+    //    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 5.0), dispatch_get_main_queue(), ^{
+    //        [self updateResult:resultMessage];
+    //    });
 }
 
 @end
