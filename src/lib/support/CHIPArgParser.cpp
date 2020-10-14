@@ -43,6 +43,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
+#include <strings.h>
 
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
@@ -81,9 +82,14 @@ static bool HelpTextContainsLongOption(const char * optName, const char * helpTe
 static bool HelpTextContainsShortOption(char optChar, const char * helpText);
 #endif // CHIP_CONFIG_ENABLE_ARG_PARSER_SANTIY_CHECK
 
+static inline bool IsASCII(int ch)
+{
+    return (ch >= 0 && ch < 128) ? true : false;
+}
+
 static inline bool IsShortOptionChar(int ch)
 {
-    return isascii(ch) && isgraph(ch);
+    return IsASCII(ch) && isgraph(ch);
 }
 
 /**
