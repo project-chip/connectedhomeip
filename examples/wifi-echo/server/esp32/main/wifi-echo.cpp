@@ -45,6 +45,7 @@
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
+#include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -203,7 +204,7 @@ public:
     virtual void ItemAction(int i)
     {
         ESP_LOGI(TAG, "Opening attribute %d", i);
-        ScreenManager::PushScreen(new ListScreen(new EditAttributeListModel(d, e, c, i)));
+        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<EditAttributeListModel>(d, e, c, i)));
     }
 };
 
@@ -220,7 +221,7 @@ public:
     virtual void ItemAction(int i)
     {
         ESP_LOGI(TAG, "Opening cluster %d", i);
-        ScreenManager::PushScreen(new ListScreen(new AttributeListModel(d, e, i)));
+        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<AttributeListModel>(d, e, i)));
     }
 };
 
@@ -236,7 +237,7 @@ public:
     virtual void ItemAction(int i)
     {
         ESP_LOGI(TAG, "Opening endpoint %d", i);
-        ScreenManager::PushScreen(new ListScreen(new ClusterListModel(d, i)));
+        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<ClusterListModel>(d, i)));
     }
 };
 
@@ -249,7 +250,7 @@ public:
     virtual void ItemAction(int i)
     {
         ESP_LOGI(TAG, "Opening device %d", i);
-        ScreenManager::PushScreen(new ListScreen(new EndpointListModel(i)));
+        ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<EndpointListModel>(i)));
     }
 };
 
@@ -480,7 +481,7 @@ extern "C" void app_main()
 
     if (isRendezvousBLE())
     {
-        rendezvousDelegate = new RendezvousDeviceDelegate();
+        rendezvousDelegate = chip::Platform::New<RendezvousDeviceDelegate>();
     }
     else if (isRendezvousBypassed())
     {
@@ -513,33 +514,34 @@ extern "C" void app_main()
 
     // Initialize the screen manager and push a rudimentary user interface.
     ScreenManager::Init();
-    ScreenManager::PushScreen(new ListScreen((new SimpleListModel())
-                                                 ->Title("CHIP")
-                                                 ->Action([](int i) { ESP_LOGI(TAG, "action on item %d", i); })
-                                                 ->Item("Devices",
-                                                        []() {
-                                                            ESP_LOGI(TAG, "Opening device list");
-                                                            ScreenManager::PushScreen(new ListScreen(new DeviceListModel()));
-                                                        })
-                                                 ->Item("Custom",
-                                                        []() {
-                                                            ESP_LOGI(TAG, "Opening custom screen");
-                                                            ScreenManager::PushScreen(new CustomScreen());
-                                                        })
-                                                 ->Item("QR Code",
-                                                        [=]() {
-                                                            ESP_LOGI(TAG, "Opening QR code screen");
-                                                            ScreenManager::PushScreen(new QRCodeScreen(qrCodeText));
-                                                        })
-                                                 ->Item("Setup",
-                                                        [=]() {
-                                                            ESP_LOGI(TAG, "Opening Setup list");
-                                                            ScreenManager::PushScreen(new ListScreen(new SetupListModel()));
-                                                        })
-                                                 ->Item("More")
-                                                 ->Item("Items")
-                                                 ->Item("For")
-                                                 ->Item("Demo")));
+    ScreenManager::PushScreen(chip::Platform::New<ListScreen>(
+        (chip::Platform::New<SimpleListModel>())
+            ->Title("CHIP")
+            ->Action([](int i) { ESP_LOGI(TAG, "action on item %d", i); })
+            ->Item("Devices",
+                   []() {
+                       ESP_LOGI(TAG, "Opening device list");
+                       ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<DeviceListModel>()));
+                   })
+            ->Item("Custom",
+                   []() {
+                       ESP_LOGI(TAG, "Opening custom screen");
+                       ScreenManager::PushScreen(chip::Platform::New<CustomScreen>());
+                   })
+            ->Item("QR Code",
+                   [=]() {
+                       ESP_LOGI(TAG, "Opening QR code screen");
+                       ScreenManager::PushScreen(chip::Platform::New<QRCodeScreen>(qrCodeText));
+                   })
+            ->Item("Setup",
+                   [=]() {
+                       ESP_LOGI(TAG, "Opening Setup list");
+                       ScreenManager::PushScreen(chip::Platform::New<ListScreen>(chip::Platform::New<SetupListModel>()));
+                   })
+            ->Item("More")
+            ->Item("Items")
+            ->Item("For")
+            ->Item("Demo")));
 
     // Connect the status LED to VLEDs.
     {

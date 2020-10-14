@@ -30,6 +30,8 @@
 
 #if CONFIG_HAVE_DISPLAY
 
+#include <support/CHIPMem.h>
+
 #include <functional>
 #include <string>
 #include <tuple>
@@ -56,7 +58,7 @@ private:
 public:
     ListScreen(Model * model) : model(model) {}
 
-    virtual ~ListScreen() { delete model; }
+    virtual ~ListScreen() { chip::Platform::Delete(model); }
 
     virtual std::string GetTitle() { return model->GetTitle(); }
 

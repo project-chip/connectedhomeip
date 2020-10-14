@@ -36,6 +36,7 @@
 #include <protocols/CHIPProtocols.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <support/ScopedBuffer.h>
 
 using namespace chip;
 using namespace std;
@@ -83,14 +84,17 @@ exit:
 
 static CHIP_ERROR retrieveOptionalInfoString(TLVReader & reader, OptionalQRCodeInfo & info)
 {
+    CHIP_ERROR err;
     uint32_t valLength = reader.GetLength();
-    unique_ptr<char[]> value(new char[valLength + 1]);
+    chip::Platform::ScopedMemoryBuffer<char> value;
+    value.Alloc(valLength + 1);
+    VerifyOrExit(value, err = CHIP_ERROR_NO_MEMORY);
 
-    CHIP_ERROR err = reader.GetString(value.get(), valLength + 1);
+    err = reader.GetString(value.Get(), valLength + 1);
     SuccessOrExit(err);
 
     info.type = optionalQRCodeInfoTypeString;
-    info.data = string(value.get());
+    info.data = string(value.Get());
 
 exit:
     return err;
@@ -292,11 +296,12 @@ CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, cons
     CHIP_ERROR err        = CHIP_NO_ERROR;
     size_t bitsLeftToRead = (buf.size() * 8) - index;
     size_t tlvBytesLength = ceil(double(bitsLeftToRead) / 8);
-    unique_ptr<uint8_t[]> tlvArray;
+    chip::Platform::ScopedMemoryBuffer<uint8_t> tlvArray;
 
     SuccessOrExit(tlvBytesLength == 0);
+    tlvArray.Alloc(tlvBytesLength);
+    VerifyOrExit(tlvArray, err = CHIP_ERROR_NO_MEMORY);
 
-    tlvArray = unique_ptr<uint8_t[]>(new uint8_t[tlvBytesLength]);
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
         uint64_t dest;
@@ -304,7 +309,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, cons
         tlvArray[i] = static_cast<uint8_t>(dest);
     }
 
-    err = parseTLVFields(outPayload, tlvArray.get(), tlvBytesLength);
+    err = parseTLVFields(outPayload, tlvArray.Get(), tlvBytesLength);
     SuccessOrExit(err);
 
 exit:

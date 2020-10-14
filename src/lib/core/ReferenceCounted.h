@@ -26,6 +26,8 @@
 #include <limits>
 #include <stdlib.h>
 
+#include <support/CHIPMem.h>
+
 namespace chip {
 
 /**
@@ -62,7 +64,7 @@ public:
 
         if (--mRefCount == 0)
         {
-            delete this;
+            chip::Platform::Delete(this);
         }
     }
 

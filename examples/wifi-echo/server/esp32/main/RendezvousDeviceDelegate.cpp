@@ -21,6 +21,7 @@
 #include "RendezvousMessageHandler.h"
 #include "esp_log.h"
 #include <platform/ConfigurationManager.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
@@ -46,7 +47,7 @@ RendezvousDeviceDelegate::RendezvousDeviceDelegate()
 
     params.SetSetupPINCode(setupPINCode).SetLocalNodeId(kLocalNodeId).SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
 
-    mRendezvousSession = new RendezvousSession(this, &mDeviceNetworkProvisioningDelegate);
+    mRendezvousSession = chip::Platform::New<RendezvousSession>(this, &mDeviceNetworkProvisioningDelegate);
     err                = mRendezvousSession->Init(params);
 
 exit:

@@ -20,8 +20,6 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/BLEManager.h>
 
-#include <new>
-
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 

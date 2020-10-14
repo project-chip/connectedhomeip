@@ -23,7 +23,6 @@
  *   from the corresponding configuration on the tap interface.
  */
 
-#include <new>
 #include <vector>
 
 int CollectTapAddresses(std::vector<char *> & addresses, const char * ifName);

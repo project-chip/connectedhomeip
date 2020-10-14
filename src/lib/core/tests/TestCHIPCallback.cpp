@@ -25,6 +25,7 @@
 #include "TestCore.h"
 
 #include <core/CHIPCallback.h>
+#include <support/CHIPMem.h>
 #include <support/TestUtils.h>
 
 #include <nlunit-test.h>
@@ -136,7 +137,7 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     resumer.Dispatch();
     NL_TEST_ASSERT(inSuite, n == 3);
 
-    Callback<> * pcb = new Callback<>(reinterpret_cast<CallFn>(increment), &n);
+    Callback<> * pcb = chip::Platform::New<Callback<>>(reinterpret_cast<CallFn>(increment), &n);
 
     n = 1;
     // cancel on destruct
@@ -145,7 +146,7 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, n == 2);
 
     resumer.Resume(pcb);
-    delete pcb;
+    chip::Platform::Delete(pcb);
     resumer.Dispatch();
     NL_TEST_ASSERT(inSuite, n == 2);
 }
@@ -218,6 +219,26 @@ static void NotifierTest(nlTestSuite * inSuite, void * inContext)
 }
 
 /**
+ *  Set up the test suite.
+ */
+int TestCHIPCallback_Setup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int TestCHIPCallback_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
+/**
  *   Test Suite. It lists all the test functions.
  */
 
@@ -238,8 +259,8 @@ int TestCHIPCallback(void)
 	{
         "CHIPCallback",
         &sTests[0],
-        nullptr,
-        nullptr
+        TestCHIPCallback_Setup,
+        TestCHIPCallback_Teardown
     };
     // clang-format on
 
