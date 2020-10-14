@@ -16,6 +16,7 @@
 
 # This is a wrapper for running happy tests.
 
+import io
 import os
 import sys
 import argparse
@@ -33,6 +34,16 @@ parser.add_argument('--test-bin-dir', dest='bin_dir', type=str, nargs='?', defau
                     help='The path of test binaries')
 parser.add_argument('--ci', dest='ci', type=bool, nargs='?', default=False,
                     help='Set this if running script under venv but happy is installed globally')
+parser.add_argument('--redirect-stdout', dest='redirect_stdout', type=bool, nargs='?', default=False,
+                    help='Set this to redirect all output to stdout to stderr')
+
+
+def redirect_stdout():
+    stdout_fd = sys.stdout.fileno()
+    sys.stdout.close()
+    os.dup2(sys.stderr.fileno(), stdout_fd)
+    sys.stdout = io.TextIOWrapper(os.fdopen(stdout_fd, 'wb'))
+
 
 if __name__ == '__main__':
     if os.getuid() != 0:
@@ -54,4 +65,6 @@ if __name__ == '__main__':
     test_environ["TEST_BIN_DIR"] = args.bin_dir
     test_environ["HAPPY_MAIN_CONFIG_FILE"] = os.path.realpath(
         os.path.join(CHIP_PATH, "src/test_driver/happy/conf/main_conf.json"))
+    if args.redirect_stdout:
+        redirect_stdout()
     os.execvpe("python3", ["python3", args.test_script], test_environ)

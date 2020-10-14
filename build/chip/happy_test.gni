@@ -36,6 +36,7 @@ template("happy_test") {
         # GN will run python under virtual env, which will cause test failed to run
         args = [
           "--ci=True",
+          "--redirect-stdout=True",
           "--test-bin-dir",
           rebase_path("${_test_output_dir}"),
           rebase_path("${_test}.py"),
