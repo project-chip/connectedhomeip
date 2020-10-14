@@ -39,8 +39,8 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <support/Base64.h>
-#include <support/CodeUtils.h>
 #include <support/CHIPMem.h>
+#include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>

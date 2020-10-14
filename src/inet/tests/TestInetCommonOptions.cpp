@@ -259,7 +259,7 @@ bool FaultInjectionOptions::HandleOption(const char * progName, OptionSet * optS
     {
 #if CHIP_CONFIG_TEST || CHIP_SYSTEM_CONFIG_TEST || INET_CONFIG_TEST
     case kToolCommonOpt_FaultInjection: {
-        chip::Platform::ScopedMemoryString mutableArg(arg);
+        chip::Platform::ScopedMemoryString mutableArg(arg, strlen(arg));
         assert(mutableArg);
         bool parseRes = ParseFaultInjectionStr(mutableArg.Get(), faultMgrFnTable, faultMgrFnTableLen);
         if (!parseRes)

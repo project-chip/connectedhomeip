@@ -77,20 +77,6 @@ inline char * MemoryAllocString(const char * string, size_t length)
 }
 
 /**
- * This function copies a C-style string to memory newly allocated by Platform::MemoryAlloc().
- *
- * @param[in]  string           String to be copied.
- *
- * @retval  Pointer to a null-terminated string in case of success.
- * @retval  `nullptr` if memory allocation fails.
- *
- */
-inline char * MemoryAllocString(const char * string)
-{
-    return MemoryAllocString(string, strlen(string));
-}
-
-/**
  * Represents a C string in a ScopedMemoryBuffer.
  */
 
@@ -107,13 +93,6 @@ public:
      *                              `strndup()` but unlike `strncpy()`, the result is always null-terminated.
      */
     ScopedMemoryString(const char * string, size_t length) { CopyString(Alloc(length + 1).Get(), string, length); }
-
-    /**
-     * Create a ScopedMemoryString.
-     *
-     * @param[in]  string           String to be copied.
-     */
-    ScopedMemoryString(const char * string) : ScopedMemoryString(string, strlen(string)) {}
 };
 
 } // namespace Platform

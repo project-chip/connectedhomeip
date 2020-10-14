@@ -495,7 +495,7 @@ bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet *
     int argc;
     bool res;
 
-    chip::Platform::ScopedMemoryString argStrCopy(argStr);
+    chip::Platform::ScopedMemoryString argStrCopy(argStr, strlen(argStr));
     if (!argStrCopy)
     {
         PrintArgError("%s: Memory allocation failure\n", progName);
