@@ -16,10 +16,12 @@
 
 # This is a wrapper for running happy tests.
 
+import argparse
 import io
 import os
+import subprocess
 import sys
-import argparse
+import tempfile
 
 CHIP_PATH = os.path.realpath(os.path.join(
     os.path.dirname(__file__), "../.."))
@@ -34,16 +36,8 @@ parser.add_argument('--test-bin-dir', dest='bin_dir', type=str, nargs='?', defau
                     help='The path of test binaries')
 parser.add_argument('--ci', dest='ci', type=bool, nargs='?', default=False,
                     help='Set this if running script under venv but happy is installed globally')
-parser.add_argument('--redirect-stdout', dest='redirect_stdout', type=bool, nargs='?', default=False,
-                    help='Set this to redirect all output to stdout to stderr')
-
-
-def redirect_stdout():
-    stdout_fd = sys.stdout.fileno()
-    sys.stdout.close()
-    os.dup2(sys.stderr.fileno(), stdout_fd)
-    sys.stdout = io.TextIOWrapper(os.fdopen(stdout_fd, 'wb'))
-
+parser.add_argument('--silent', dest='silent', type=bool, nargs='?', default=False,
+                    help='Set this will mute output when the test finished successfully')
 
 if __name__ == '__main__':
     if os.getuid() != 0:
@@ -65,6 +59,13 @@ if __name__ == '__main__':
     test_environ["TEST_BIN_DIR"] = args.bin_dir
     test_environ["HAPPY_MAIN_CONFIG_FILE"] = os.path.realpath(
         os.path.join(CHIP_PATH, "src/test_driver/happy/conf/main_conf.json"))
-    if args.redirect_stdout:
-        redirect_stdout()
-    os.execvpe("python3", ["python3", args.test_script], test_environ)
+    if args.silent:
+        fp, fname = tempfile.mkstemp()
+        run_res = subprocess.run(["python3", args.test_script],
+                                 stdout=fp, stderr=fp, env=test_environ)
+        if True:
+            with open(fname, 'rb') as test_output:
+                os.write(sys.stderr.fileno(), test_output.read())
+        exit(run_res.returncode)
+    else:
+        os.execvpe("python3", ["python3", args.test_script], test_environ)
