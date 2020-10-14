@@ -35,9 +35,15 @@ parser.add_argument('--ci', dest='ci', type=bool, nargs='?', default=False,
                     help='Set this if running script under venv but happy is installed globally')
 
 if __name__ == '__main__':
+    if os.getuid() != 0:
+        os.execvpe("unshare", ["unshare", "--map-root-user",
+                               "-n", "-m", "python3"] + sys.argv, test_environ)
+        print("Failed to run script in new user namespace", file=sys.stderr)
+        exit(1)
+    if os.system("mount --make-private /") != 0 or os.system("mount -t tmpfs tmpfs /run") != 0:
+        print("Failed to setup private mount points", file=sys.stderr)
+        exit(1)
     args = parser.parse_args()
-    print(args, file=sys.stderr)
-    print(test_environ, file=sys.stderr)
     # GN will run Python in venv, which will break happy test
     if args.ci:
         if test_environ.get("VIRTUAL_ENV", None) != None:
