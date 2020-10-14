@@ -156,7 +156,7 @@
         {
             "label": "Build ESP32 Echo Example",
             "type": "shell",
-            "command": "scripts/examples/esp_echo_app.sh CHIP_BUILD_WITH_GN=y",
+            "command": "scripts/examples/build-wifi-echo.py",
             "group": "build",
             "dependsOn": "Clean Tree",
             "problemMatcher": ["$gcc"]
