@@ -76,6 +76,8 @@ public:
  */
 class DLL_EXPORT ExchangeContext
 {
+    friend class ExchangeManager;
+
 public:
     enum
     {
@@ -113,16 +115,6 @@ public:
      *  @return Returns 'true' if response expected, else 'false'.
      */
     bool IsResponseExpected() const;
-
-    /**
-     *  Set the kFlagInitiator flag bit. This flag is set by the node that
-     *  initiates an exchange.
-     *
-     *  @param[in]  inInitiator  A Boolean indicating whether (true) or not
-     *                           (false) the context is the initiator of
-     *                           the exchange.
-     */
-    void SetInitiator(bool inInitiator);
 
     /**
      *  Set whether a response is expected on this exchange.
@@ -216,21 +208,13 @@ public:
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    void SetPeerNodeId(uint64_t nodeId) { mPeerNodeId = nodeId; }
-
     uint64_t GetPeerNodeId() const { return mPeerNodeId; }
-
-    void SetExchangeId(uint16_t exId) { mExchangeId = exId; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
     void SetAppState(void * state) { mAppState = state; }
 
     void * GetAppState() const { return mAppState; }
-
-    void SetAllowDuplicateMsgs(bool value) { mAllowDuplicateMsgs = value; }
-
-    bool isDuplicateMsgsAllowed() { return mAllowDuplicateMsgs; }
 
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
@@ -258,12 +242,15 @@ private:
     ExchangeManager * mExchangeMgr;
     void * mAppState; // Pointer to application-specific state object.
 
-    uint64_t mPeerNodeId;     // Node ID of peer node.
-    uint16_t mExchangeId;     // Assigned exchange ID.
-    uint8_t mRefCount;        // Reference counter of the current instance
-    bool mAllowDuplicateMsgs; // Boolean indicator of whether duplicate messages are allowed for a given exchange.
+    uint64_t mPeerNodeId; // Node ID of peer node.
+    uint16_t mExchangeId; // Assigned exchange ID.
+    uint8_t mRefCount;    // Reference counter of the current instance
 
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
+
+    void SetInitiator(bool inInitiator);
+    void SetPeerNodeId(uint64_t nodeId) { mPeerNodeId = nodeId; }
+    void SetExchangeId(uint16_t exId) { mExchangeId = exId; }
 
     CHIP_ERROR ResendMessage();
     CHIP_ERROR StartResponseTimer();
