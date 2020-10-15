@@ -32,10 +32,7 @@ template <class T>
 class DeleteDeletor
 {
 public:
-    static void Release(T* obj)
-    {
-        delete obj;
-    }
+    static void Release(T * obj) { delete obj; }
 };
 
 /**
