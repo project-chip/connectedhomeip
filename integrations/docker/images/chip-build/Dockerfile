@@ -55,6 +55,9 @@ RUN set -x \
     udev \
     ninja-build \
     strace \
+    avahi-daemon \
+    libavahi-common-dev \
+    libavahi-client-dev \
     && rm -rf /var/lib/apt/lists/ \
     && : # last line
 
