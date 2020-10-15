@@ -17,6 +17,8 @@
 
 #include "RendezvousServer.h"
 
+#include "SessionManager.h"
+
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
@@ -31,8 +33,6 @@ using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
 
 namespace chip {
-
-extern SecureSessionMgrBase & SessionManager();
 
 RendezvousServer::RendezvousServer() : mRendezvousSession(this) {}
 
