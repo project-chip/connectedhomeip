@@ -15,9 +15,27 @@
  *    limitations under the License.
  */
 
+#include <condition_variable>
+#include <mutex>
+#include <thread>
+
 #include "TestMdns.h"
 
 int main()
 {
-    return (TestMdns());
+    std::mutex mtx;
+    std::unique_lock<std::mutex> lock(mtx);
+    std::condition_variable done;
+    int retVal = -1;
+
+    std::thread t([&done, &retVal]() {
+        retVal = TestMdns();
+        done.notify_all();
+    });
+
+    if (done.wait_for(lock, std::chrono::seconds(5)) == std::cv_status::timeout)
+    {
+        fprintf(stderr, "mDNS test timeout, is avahi daemon running?");
+    }
+    return retVal;
 }
