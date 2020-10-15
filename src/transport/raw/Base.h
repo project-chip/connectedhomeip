@@ -42,7 +42,7 @@ namespace Transport {
 class Base : public ReferenceCounted<Base>
 {
 public:
-    ~Base() override {}
+    virtual ~Base() {}
 
     /**
      * Sets the message receive handler and associated argument
