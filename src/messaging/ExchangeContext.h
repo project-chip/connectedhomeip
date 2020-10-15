@@ -188,31 +188,15 @@ public:
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf,
                              ExchangeContext::MessageReceiveFunct umhandler);
 
-    /**
-     *  Search for an existing exchange that the message applies to.
-     *
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
-     *
-     *  @param[in]    payloadHeader A reference to the PayloadHeader object.
-     *
-     *  @retval  true                                       If a match is found.
-     *  @retval  false                                      If a match is not found.
-     */
-    bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
-
     void SetDelegate(ExchangeContextDelegate * delegate) { mDelegate = delegate; }
 
     ExchangeContextDelegate * GetDelegate() const { return mDelegate; }
-
-    void SetExchangeMgr(ExchangeManager * exMgr) { mExchangeMgr = exMgr; }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
     uint64_t GetPeerNodeId() const { return mPeerNodeId; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
-
-    void SetAppState(void * state) { mAppState = state; }
 
     void * GetAppState() const { return mAppState; }
 
@@ -248,9 +232,23 @@ private:
 
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
+    /**
+     *  Search for an existing exchange that the message applies to.
+     *
+     *  @param[in]    packetHeader  A reference to the PacketHeader object.
+     *
+     *  @param[in]    payloadHeader A reference to the PayloadHeader object.
+     *
+     *  @retval  true                                       If a match is found.
+     *  @retval  false                                      If a match is not found.
+     */
+    bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+
     void SetInitiator(bool inInitiator);
     void SetPeerNodeId(uint64_t nodeId) { mPeerNodeId = nodeId; }
     void SetExchangeId(uint16_t exId) { mExchangeId = exId; }
+    void SetExchangeMgr(ExchangeManager * exMgr) { mExchangeMgr = exMgr; }
+    void SetAppState(void * state) { mAppState = state; }
 
     CHIP_ERROR ResendMessage();
     CHIP_ERROR StartResponseTimer();

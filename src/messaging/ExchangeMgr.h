@@ -67,7 +67,7 @@ public:
      *  of the object and releases all held resources.
      *
      *  @note
-     *     The application should only call this function after ensuring that
+     *     The protocol should only call this function after ensuring that
      *     there are no active ExchangeContext objects. Furthermore, it is the
      *     onus of the application to de-allocate the ExchangeManager
      *     object after calling ExchangeManager::Shutdown().
