@@ -25,8 +25,9 @@ public:
 
     bool HandleCommandResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen)
     {
-        VerifyOrExit(commandId == mCommandId,
-                     ChipLogError(chipTool, "Unexpected command response id: '0x%02x'. Expecting: '0x%02x'", commandId, mCommandId));
+        VerifyOrExit(
+            commandId == mCommandId,
+            ChipLogError(chipTool, "Unexpected command response id: '0x%02x'. Expecting: '0x%02x'", commandId, mCommandId));
         return HandleResponse(message, messageLen);
 
     exit:
