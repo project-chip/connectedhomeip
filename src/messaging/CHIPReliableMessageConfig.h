@@ -23,12 +23,10 @@
  *      for the CHIP Reliable Messaging Protocol.
  *
  */
-#ifndef CHIP_RMP_CONFIG_H_
-#define CHIP_RMP_CONFIG_H_
+#pragma once
 
 namespace chip {
-
-// clang-format off
+namespace messaging {
 
 /**
  *  @def CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD
@@ -120,6 +118,5 @@ const RMPConfig gDefaultRMPConfig = { CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TI
 
 // clang-format on
 
+} // namespace messaging
 } // namespace chip
-
-#endif // CHIP_RMP_CONFIG_H_

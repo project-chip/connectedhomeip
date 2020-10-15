@@ -21,12 +21,12 @@
  *      This file defines the classes for the CHIP Message Layer internal.
  */
 
-#ifndef CHIP_MESSAGE_LAYER_PRIVATE_H
-#define CHIP_MESSAGE_LAYER_PRIVATE_H
+#pragma once
 
 #include <stdint.h>
 
 namespace chip {
+namespace messaging {
 
 /**
  *  @brief
@@ -73,6 +73,5 @@ constexpr const uint16_t kSendFlag_RequestAck = 0x0400; /**< Used to send a RMP 
 constexpr const uint16_t kSendFlag_NoAutoRequestAck =
     0x0800; /**< Suppress the auto-request acknowledgment feature when sending a message. */
 
+} // namespace messaging
 } // namespace chip
-
-#endif // CHIP_MESSAGE_LAYER_PRIVATE_H

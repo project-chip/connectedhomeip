@@ -21,13 +21,13 @@
  *
  */
 
-#ifndef CHIP_MESSAGE_LAYER_UTILS_H
-#define CHIP_MESSAGE_LAYER_UTILS_H
+#pragma once
 
 #include <core/CHIPError.h>
 #include <support/DLLUtil.h>
 
 namespace chip {
+namespace messaging {
 
 class DLL_EXPORT ChipMessageLayerUtils
 {
@@ -37,6 +37,5 @@ public:
     static bool IsSendErrorNonCritical(CHIP_ERROR err);
 };
 
+} // namespace messaging
 } // namespace chip
-
-#endif // CHIP_MESSAGE_LAYER_UTILS_H

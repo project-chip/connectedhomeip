@@ -21,18 +21,19 @@
  *      protocol.
  */
 
-#ifndef CHIP_RELIABLE_MESSAGE_MANAGER_H
-#define CHIP_RELIABLE_MESSAGE_MANAGER_H
+#pragma once
 
 #include <stdint.h>
 
-#include <core/CHIPError.h>
 #include <messaging/CHIPReliableMessageConfig.h>
+
+#include <core/CHIPError.h>
 #include <system/SystemLayer.h>
 #include <system/SystemPacketBuffer.h>
 #include <system/SystemTimer.h>
 
 namespace chip {
+namespace messaging {
 
 class CHIPReliableMessageContext;
 
@@ -105,6 +106,5 @@ private:
     RetransTableEntry RetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
 };
 
+} // namespace messaging
 } // namespace chip
-
-#endif // CHIP_RELIABLE_MESSAGE_MANAGER_H

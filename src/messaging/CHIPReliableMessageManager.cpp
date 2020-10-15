@@ -23,16 +23,18 @@
 
 #include <inttypes.h>
 
+#include <messaging/CHIPReliableMessageManager.h>
+
 #include <messaging/CHIPMessageLayerPrivate.h>
 #include <messaging/CHIPMessageLayerUtils.h>
 #include <messaging/CHIPReliableMessageContext.h>
-#include <messaging/CHIPReliableMessageManager.h>
 #include <support/BitFlags.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CHIPLogging.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
+namespace message {
 
 CHIPReliableMessageManager::RetransTableEntry::RetransTableEntry() :
     rc(nullptr), msgBuf(nullptr), msgId(0), msgSendFlags(0), nextRetransTime(0), sendCount(0)
@@ -662,4 +664,5 @@ void CHIPReliableMessageManager::RMPStopTimer()
     mSystemLayer->CancelTimer(RMPTimeout, this);
 }
 
+} // namespace message
 } // namespace chip

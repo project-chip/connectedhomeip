@@ -23,10 +23,11 @@
 
 #include <inttypes.h>
 
+#include <messaging/CHIPReliableMessageContext.h>
+
 #include <core/CHIPEncoding.h>
 #include <messaging/CHIPMessageLayerPrivate.h>
 #include <messaging/CHIPMessageLayerUtils.h>
-#include <messaging/CHIPReliableMessageContext.h>
 #include <messaging/CHIPReliableMessageManager.h>
 #include <protocols/CHIPProtocols.h>
 #include <protocols/common/CommonProtocol.h>
@@ -34,6 +35,7 @@
 #include <support/CodeUtils.h>
 
 namespace chip {
+namespace message {
 
 CHIPReliableMessageContext::CHIPReliableMessageContext(CHIPReliableMessageDelegate & delegate) :
     mRMPConfig(gDefaultRMPConfig), mRMPNextAckTime(0), mRMPThrottleTimeout(0), mPendingPeerAckId(0), mDelegate(delegate)
@@ -451,4 +453,5 @@ exit:
     return err;
 }
 
+} // namespace message
 } // namespace chip

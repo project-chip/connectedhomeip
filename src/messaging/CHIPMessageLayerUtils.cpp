@@ -22,12 +22,14 @@
 
 #include <errno.h>
 
-#include <inet/InetError.h>
 #include <messaging/CHIPMessageLayerUtils.h>
+
+#include <inet/InetError.h>
 #include <system/SystemConfig.h>
 #include <system/SystemError.h>
 
 namespace chip {
+namespace messaging {
 
 bool ChipMessageLayerUtils::IsIgnoredMulticastSendError(CHIP_ERROR err)
 {
@@ -79,4 +81,5 @@ bool ChipMessageLayerUtils::IsSendErrorNonCritical(CHIP_ERROR err)
             err == INET_ERROR_MESSAGE_TOO_LONG || err == INET_ERROR_NO_MEMORY || CHIP_CONFIG_IsPlatformErrorNonCritical(err));
 }
 
+} // namespace messaging
 } // namespace chip

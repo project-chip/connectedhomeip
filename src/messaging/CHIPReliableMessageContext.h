@@ -21,20 +21,20 @@
  *      Layer. The context is one-on-one relationship with a chip session.
  */
 
-#ifndef CHIP_RELIABLE_MESSAGE_CONTEXT_H
-#define CHIP_RELIABLE_MESSAGE_CONTEXT_H
+#pragma once
 
 #include <stdint.h>
 #include <string.h>
 
-#include <core/CHIPError.h>
-#include <core/ReferenceCounted.h>
-#include <inet/InetLayer.h>
 #include <messaging/CHIPReliableMessageConfig.h>
+
+#include <core/CHIPError.h>
+#include <inet/InetLayer.h>
 #include <support/DLLUtil.h>
 #include <system/SystemLayer.h>
 
 namespace chip {
+namespace messaging {
 
 class ChipMessageInfo;
 class CHIPReliableMessageManager;
@@ -56,7 +56,7 @@ public:
     virtual CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, System::PacketBuffer * msgBuf, uint16_t sendFlags) = 0;
 };
 
-class CHIPReliableMessageContext : public ReferenceCounted<CHIPReliableMessageContext>
+class CHIPReliableMessageContext
 {
 public:
     CHIPReliableMessageContext(CHIPReliableMessageDelegate & delegate);
@@ -107,6 +107,5 @@ public:
     CHIPReliableMessageDelegate & mDelegate;
 };
 
-#endif // CHIP_RELIABLE_MESSAGE_CONTEXT_H
-
+} // namespace messaging
 } // namespace chip
