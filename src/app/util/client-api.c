@@ -274,15 +274,15 @@ uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameCo
     return returnValue;
 }
 
-// EmberStatus emberAfSendCommandUnicastToBindingsWithCallback(EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendUnicastToBindingsWithCallback(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-// }
+EmberStatus emberAfSendCommandUnicastToBindingsWithCallback(EmberAfMessageSentFunction callback)
+{
+    return emberAfSendUnicastToBindingsWithCallback(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
+}
 
-// EmberStatus emberAfSendCommandUnicastToBindings(void)
-// {
-//     return emberAfSendCommandUnicastToBindingsWithCallback(NULL);
-// }
+EmberStatus emberAfSendCommandUnicastToBindings(void)
+{
+    return emberAfSendCommandUnicastToBindingsWithCallback(NULL);
+}
 
 // EmberStatus emberAfSendCommandMulticastWithCallback(EmberMulticastId multicastId, EmberAfMessageSentFunction callback)
 // {
