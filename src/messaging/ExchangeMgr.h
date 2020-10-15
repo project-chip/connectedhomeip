@@ -37,7 +37,7 @@ static constexpr int16_t kAnyMessageType = -1;
 /**
  *  @brief
  *    This class is used to manage ExchangeContexts with other CHIP nodes.
- *    It works on behalf of higher layers, creating ExchangeContexts and
+ *    It works on be behalf of higher layers, creating ExchangeContexts and
  *    handling the registration/unregistration of unsolicited message handlers.
  */
 class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate
@@ -172,8 +172,8 @@ public:
 private:
     enum class State
     {
-        kState_NotInitialized = 0, /**< Used to indicate that the ExchangeManager is not initialized */
-        kState_Initialized    = 1  /**< Used to indicate that the ExchangeManager is initialized */
+        kState_NotInitialized = 0, // Used to indicate that the ExchangeManager is not initialized.
+        kState_Initialized    = 1  // Used to indicate that the ExchangeManager is initialized.
     };
 
     struct UnsolicitedMessageHandler
