@@ -61,4 +61,3 @@ constexpr const uint16_t kSendFlag_NoAutoRequestAck = 0x0800; /**< Suppress the 
 } // namespace chip
 
 #endif // CHIP_MESSAGE_LAYER_PRIVATE_H
-
