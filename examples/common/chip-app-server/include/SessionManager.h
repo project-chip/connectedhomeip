@@ -17,9 +17,8 @@
 
 #pragma once
 
+#include <transport/SecureSessionMgr.h>
+
 namespace chip {
-
-class SecureSessionMgrBase;
 SecureSessionMgrBase & SessionManager();
-
 } // namespace chip
