@@ -86,7 +86,7 @@ public:
      */
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
-    ~SecureSessionMgrDelegate() override {}
+    virtual ~SecureSessionMgrDelegate() {}
 };
 
 class DLL_EXPORT SecureSessionMgrBase : public ReferenceCounted<SecureSessionMgrBase>
@@ -103,7 +103,7 @@ public:
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
 
     SecureSessionMgrBase();
-    ~SecureSessionMgrBase() override;
+    virtual ~SecureSessionMgrBase();
 
     /**
      * @brief

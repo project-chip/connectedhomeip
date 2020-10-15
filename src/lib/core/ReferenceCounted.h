@@ -28,16 +28,21 @@
 
 namespace chip {
 
+template <class T>
+class DeleteDeletor
+{
+public:
+    static void Release(T * obj) { delete obj; }
+};
+
 /**
  * A reference counted object maintains a count of usages and when the usage
  * count drops to 0, it deletes itself.
  */
-template <class SUBCLASS>
+template <class SUBCLASS, class DELETOR = DeleteDeletor<SUBCLASS>>
 class ReferenceCounted
 {
 public:
-    virtual ~ReferenceCounted() {}
-
     typedef uint32_t count_type;
 
     /** Adds one to the usage count of this class */
@@ -49,7 +54,7 @@ public:
         }
         ++mRefCount;
 
-        return reinterpret_cast<SUBCLASS *>(this);
+        return static_cast<SUBCLASS *>(this);
     }
 
     /** Release usage of this class */
@@ -62,7 +67,7 @@ public:
 
         if (--mRefCount == 0)
         {
-            delete this;
+            DELETOR::Release(static_cast<SUBCLASS *>(this));
         }
     }
 
