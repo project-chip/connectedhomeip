@@ -15,9 +15,6 @@
  *    limitations under the License.
  */
 
-#ifndef TEST_MDNS_H_
-#define TEST_MDNS_H_
+#pragma once
 
 int TestMdns();
-
-#endif

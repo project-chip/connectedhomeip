@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_PLATFORM_MDNS_H_
-#define CHIP_PLATFORM_MDNS_H_
+#pragma once
 
 #include <stdint.h>
 
@@ -164,5 +163,3 @@ CHIP_ERROR ChipMdnsResolve(const char * name, const char * type, MdnsServiceProt
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_PLATFORM_MDNS_H_

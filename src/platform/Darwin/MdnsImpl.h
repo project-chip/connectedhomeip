@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_PLATFORM_DARWIN_MDNS_IMPL_H_
-#define CHIP_PLATFORM_DARWIN_MDNS_IMPL_H_
+#pragma once
 
 #include <sys/select.h>
 #include <unistd.h>
@@ -32,5 +31,3 @@ void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet);
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CHIP_PLATFORM_DARWIN_MDNS_IMPL_H_
