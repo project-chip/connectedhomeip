@@ -21,6 +21,10 @@ static void HandleResolve(void * context, MdnsResolveResult * result, CHIP_ERROR
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
     result->mAddress.ToString(addrBuf, sizeof(addrBuf));
     printf("Service at [%s]:%u\n", addrBuf, result->mService.mPort);
+    NL_TEST_ASSERT(suite, result->mService.mTextEntrySize == 1);
+    NL_TEST_ASSERT(suite, strcmp(result->mService.mTextEntryies[0].mKey, "key") == 0);
+    NL_TEST_ASSERT(suite, strcmp(reinterpret_cast<const char *>(result->mService.mTextEntryies[0].mData), "val") == 0);
+
     exit(0);
 }
 
@@ -42,7 +46,8 @@ static void InitCallback(void * context, CHIP_ERROR error)
 {
     MdnsService service;
     TextEntry entry;
-    char buf[]          = "key=val";
+    char key[]          = "key";
+    char val[]          = "val";
     nlTestSuite * suite = static_cast<nlTestSuite *>(context);
 
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
@@ -52,8 +57,9 @@ static void InitCallback(void * context, CHIP_ERROR error)
     strcpy(service.mName, "test");
     strcpy(service.mType, "_mock");
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
-    entry.mData            = reinterpret_cast<const uint8_t *>(buf);
-    entry.mSize            = strlen(reinterpret_cast<const char *>(entry.mData));
+    entry.mKey             = key;
+    entry.mData            = reinterpret_cast<const uint8_t *>(val);
+    entry.mDataSize        = strlen(reinterpret_cast<const char *>(entry.mData));
     service.mTextEntryies  = &entry;
     service.mTextEntrySize = 1;
 

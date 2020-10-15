@@ -351,7 +351,18 @@ static AvahiStringList * MakeAvahiStringListFromTextEntries(TextEntry * entries,
 
     for (size_t i = 0; i < size; i++)
     {
-        strList = avahi_string_list_add_arbitrary(strList, entries[i].mData, entries[i].mSize);
+        uint8_t buf[kMdnsTypeMaxSize];
+        size_t keySize   = strnlen(entries[i].mKey, kMdnsTypeMaxSize);
+        size_t valueSize = 0;
+
+        memcpy(buf, entries[i].mKey, keySize);
+        if (size < sizeof(buf))
+        {
+            valueSize    = std::min(entries[i].mDataSize, sizeof(buf) - keySize - 1);
+            buf[keySize] = static_cast<uint8_t>('=');
+            memcpy(&buf[keySize + 1], entries[i].mData, valueSize);
+        }
+        strList = avahi_string_list_add_arbitrary(strList, buf, keySize + valueSize + 1);
     }
 
     return strList;
@@ -575,7 +586,17 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         while (txt != nullptr)
         {
-            textEntries.push_back(TextEntry{ txt->text, txt->size });
+            TextEntry entry;
+
+            for (size_t i = 0; i < txt->size; i++)
+            {
+                if (txt->text[i] == '=')
+                {
+                    txt->text[i] = '\0';
+                    textEntries.push_back(TextEntry{ reinterpret_cast<char *>(txt->text), &txt->text[i + 1], txt->size - i - 1 });
+                    break;
+                }
+            }
             txt = txt->next;
         }
 

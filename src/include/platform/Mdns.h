@@ -39,8 +39,9 @@ enum class MdnsServiceProtocol : uint8_t
 
 struct TextEntry
 {
+    const char * mKey;
     const uint8_t * mData;
-    size_t mSize;
+    size_t mDataSize;
 };
 
 struct MdnsService
