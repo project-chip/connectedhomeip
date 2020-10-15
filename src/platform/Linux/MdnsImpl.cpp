@@ -243,7 +243,7 @@ void Poller::Process(const fd_set & readFdSet, const fd_set & writeFdSet, const 
     }
 }
 
-CHIP_ERROR MdnsAvahi::Init(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback)
+CHIP_ERROR MdnsAvahi::Init(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int avahiError   = 0;
@@ -251,9 +251,10 @@ CHIP_ERROR MdnsAvahi::Init(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturn
     VerifyOrExit(initCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(errorCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mClient == nullptr && mGroup == nullptr, error = CHIP_ERROR_INCORRECT_STATE);
-    mInitCallback  = initCallback;
-    mErrorCallback = errorCallback;
-    mClient        = avahi_client_new(mPoller.GetAvahiPoll(), AVAHI_CLIENT_NO_FAIL, HandleClientState, this, &avahiError);
+    mInitCallback       = initCallback;
+    mErrorCallback      = errorCallback;
+    mAsyncReturnContext = context;
+    mClient             = avahi_client_new(mPoller.GetAvahiPoll(), AVAHI_CLIENT_NO_FAIL, HandleClientState, this, &avahiError);
     VerifyOrExit(mClient != nullptr, error = CHIP_ERROR_OPEN_FAILED);
     VerifyOrExit(avahiError == 0, error = CHIP_ERROR_OPEN_FAILED);
 
@@ -277,21 +278,21 @@ void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state)
         if (mGroup == nullptr)
         {
             ChipLogError(DeviceLayer, "Failed to create avahi group: %s", avahi_strerror(avahi_client_errno(client)));
-            mInitCallback(CHIP_ERROR_OPEN_FAILED);
+            mInitCallback(mAsyncReturnContext, CHIP_ERROR_OPEN_FAILED);
         }
         else
         {
-            mInitCallback(CHIP_NO_ERROR);
+            mInitCallback(mAsyncReturnContext, CHIP_NO_ERROR);
         }
         break;
     case AVAHI_CLIENT_FAILURE:
         ChipLogError(DeviceLayer, "Avahi client failure");
-        mErrorCallback(CHIP_ERROR_INTERNAL);
+        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_INTERNAL);
         break;
     case AVAHI_CLIENT_S_COLLISION:
     case AVAHI_CLIENT_S_REGISTERING:
         ChipLogProgress(DeviceLayer, "Avahi re-register required");
-        mErrorCallback(CHIP_ERROR_MDNS_COLLISSION);
+        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_MDNS_COLLISSION);
         if (mGroup != nullptr)
         {
             avahi_entry_group_reset(mGroup);
@@ -317,12 +318,12 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
         break;
     case AVAHI_ENTRY_GROUP_COLLISION:
         ChipLogError(DeviceLayer, "Avahi group collission");
-        mErrorCallback(CHIP_ERROR_MDNS_COLLISSION);
+        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_MDNS_COLLISSION);
         break;
     case AVAHI_ENTRY_GROUP_FAILURE:
         ChipLogError(DeviceLayer, "Avahi group internal failure %s",
                      avahi_strerror(avahi_client_errno(avahi_entry_group_get_client(mGroup))));
-        mErrorCallback(CHIP_ERROR_INTERNAL);
+        mErrorCallback(mAsyncReturnContext, CHIP_ERROR_INTERNAL);
         break;
     case AVAHI_ENTRY_GROUP_UNCOMMITED:
     case AVAHI_ENTRY_GROUP_REGISTERING:
@@ -610,9 +611,9 @@ void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet)
     MdnsAvahi::GetInstance().GetPoller().Process(readFdSet, writeFdSet, errorFdSet);
 }
 
-CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback)
+CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context)
 {
-    return MdnsAvahi::GetInstance().Init(initCallback, errorCallback);
+    return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, context);
 }
 
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)

@@ -87,19 +87,20 @@ using MdnsResolveCallback = void (*)(void * context, MdnsResolveResult * result,
  */
 using MdnsBrowseCallback = void (*)(void * context, MdnsService * services, size_t servicesSize, CHIP_ERROR error);
 
-using MdnsAsnycReturnCallback = void (*)(CHIP_ERROR error);
+using MdnsAsnycReturnCallback = void (*)(void * context, CHIP_ERROR error);
 
 /**
  * This function intializes the mdns module
  *
- * @param[in] initCallback    The callback for notifying the initialization result
- * @param[in] errorCallback   The callback for notifying internal errors
+ * @param[in] initCallback    The callback for notifying the initialization result.
+ * @param[in] errorCallback   The callback for notifying internal errors.
+ * @param[in] context         The context passed to the callbacks.
  *
  * @retval CHIP_NO_ERROR  The initialization succeeds.
  * @retval Error code     The initialization fails
  *
  */
-CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback);
+CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context);
 
 /**
  * This function publishes an service via mDNS.

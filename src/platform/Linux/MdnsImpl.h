@@ -100,7 +100,7 @@ public:
     MdnsAvahi(const MdnsAvahi &) = delete;
     MdnsAvahi & operator=(const MdnsAvahi &) = delete;
 
-    CHIP_ERROR Init(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback);
+    CHIP_ERROR Init(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context);
     CHIP_ERROR PublishService(const MdnsService & service);
     CHIP_ERROR StopPublish();
     CHIP_ERROR Browse(const char * type, MdnsServiceProtocol protocol, chip::Inet::InterfaceId interface,
@@ -150,6 +150,7 @@ private:
 
     MdnsAsnycReturnCallback mInitCallback;
     MdnsAsnycReturnCallback mErrorCallback;
+    void * mAsyncReturnContext;
 
     std::set<std::string> mPublishedServices;
     std::map<BrowseContext *, std::shared_ptr<BrowseContext>> mBrowseContexts;
