@@ -64,7 +64,7 @@ public:
      */
     virtual void OnPairingComplete() {}
 
-    ~SecurePairingSessionDelegate() override {}
+    virtual ~SecurePairingSessionDelegate() {}
 };
 
 class DLL_EXPORT SecurePairingSession
