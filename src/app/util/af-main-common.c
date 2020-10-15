@@ -679,10 +679,21 @@ EmberStatus emAfSend(EmberOutgoingMessageType type, uint64_t indexOrDestination,
     EmberStatus status = EMBER_SUCCESS;
     switch (type)
     {
-    case EMBER_OUTGOING_VIA_BINDING:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
+    case EMBER_OUTGOING_VIA_BINDING: {
+        EmberBindingTableEntry binding;
+        status = emberGetBinding(indexOrDestination, &binding);
+        if (status != EMBER_SUCCESS)
+        {
+            break;
+        }
+        if (binding.type != EMBER_UNICAST_BINDING)
+        {
+            status = EMBER_INVALID_BINDING_INDEX;
+            break;
+        }
+        status = chipSendUnicast(binding.nodeId, apsFrame, messageLength, message);
         break;
+    }
     case EMBER_OUTGOING_VIA_ADDRESS_TABLE:
         // No implementation yet.
         status = EMBER_ERR_FATAL;
