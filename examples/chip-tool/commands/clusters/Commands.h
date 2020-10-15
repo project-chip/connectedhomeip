@@ -290,7 +290,10 @@ public:
         {
             ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
             ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                     // zclStatus
-            ReadAnyType(message);
+            if (!ReadAnyType(message))
+            {
+                return false;
+            }
         } while (message < messageEnd);
 
         return true;
@@ -336,7 +339,10 @@ public:
         do
         {
             ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
-            ReadAnyType(message);
+            if (!ReadAnyType(message))
+            {
+                return false;
+            }
         } while (message < messageEnd);
 
         return true;
