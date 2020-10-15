@@ -36,7 +36,7 @@ namespace messaging {
  *
  */
 #ifndef CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD
-#define CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD              200
+#define CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD 200
 #endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD
 
 /**
@@ -47,7 +47,7 @@ namespace messaging {
  *
  */
 #ifndef CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT
-#define CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT       (2000)
+#define CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT (2000)
 #endif // CHIP_CONFIG_WRMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT
 
 /**
@@ -59,7 +59,7 @@ namespace messaging {
  *
  */
 #ifndef CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT
-#define CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT      (2000)
+#define CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT (2000)
 #endif // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT
 
 /**
@@ -70,7 +70,7 @@ namespace messaging {
  *
  */
 #ifndef CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
-#define CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT               (CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD)
+#define CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT (CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD)
 #endif // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
 
 /**
@@ -82,9 +82,9 @@ namespace messaging {
  */
 #ifndef CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
 #ifdef PBUF_POOL_SIZE
-#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE                (PBUF_POOL_SIZE)
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE (PBUF_POOL_SIZE)
 #else
-#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE                (CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC)
+#define CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE (CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC)
 #endif // PBUF_POOL_SIZE
 #endif // CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE
 
@@ -96,7 +96,7 @@ namespace messaging {
  *
  */
 #ifndef CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
-#define CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS               (3)
+#define CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS (3)
 #endif // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
 
 /**
@@ -105,16 +105,15 @@ namespace messaging {
  */
 struct RMPConfig
 {
-    uint32_t mInitialRetransTimeout;            /**< Configurable timeout in msec for retransmission of the first sent message. */
-    uint32_t mActiveRetransTimeout;             /**< Configurable timeout in msec for retransmission of all subsequent messages. */
-    uint16_t mAckPiggybackTimeout;              /**< Configurable timeout in msec for transmission of a solitary Ack message. */
-    uint8_t  mMaxRetrans;                       /**< Configurable max value for retransmissions in the ExchangeContext. */
+    uint32_t mInitialRetransTimeout; /**< Configurable timeout in msec for retransmission of the first sent message. */
+    uint32_t mActiveRetransTimeout;  /**< Configurable timeout in msec for retransmission of all subsequent messages. */
+    uint16_t mAckPiggybackTimeout;   /**< Configurable timeout in msec for transmission of a solitary Ack message. */
+    uint8_t mMaxRetrans;             /**< Configurable max value for retransmissions in the ExchangeContext. */
 };
 
 const RMPConfig gDefaultRMPConfig = { CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT,
-                                        CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT,
-                                        CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT,
-                                        CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS };
+                                      CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT, CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT,
+                                      CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS };
 
 // clang-format on
 
