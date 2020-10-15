@@ -30,12 +30,14 @@
 #include <messaging/CHIPReliableMessageManager.h>
 #include <protocols/CHIPProtocols.h>
 #include <protocols/common/CommonProtocol.h>
-#include <support/CodeUtils.h>
 #include <support/BitFlags.h>
+#include <support/CodeUtils.h>
 
 namespace chip {
 
-CHIPReliableMessageContext::CHIPReliableMessageContext(CHIPReliableMessageDelegate& delegate) : mRMPConfig(gDefaultRMPConfig), mRMPNextAckTime(0), mRMPThrottleTimeout(0), mPendingPeerAckId(0), mDelegate(delegate) {}
+CHIPReliableMessageContext::CHIPReliableMessageContext(CHIPReliableMessageDelegate & delegate) :
+    mRMPConfig(gDefaultRMPConfig), mRMPNextAckTime(0), mRMPThrottleTimeout(0), mPendingPeerAckId(0), mDelegate(delegate)
+{}
 
 /**
  *  Determine whether there is already an acknowledgment pending to be sent
@@ -151,7 +153,8 @@ CHIP_ERROR CHIPReliableMessageContext::RMPFlushAcks()
         if (err == CHIP_NO_ERROR)
         {
 #if defined(DEBUG)
-            ChipLogProgress(ExchangeManager, "Flushed pending ack for MsgId:%08" PRIX32 " to Peer %016" PRIX64, mPendingPeerAckId, PeerNodeId);
+            ChipLogProgress(ExchangeManager, "Flushed pending ack for MsgId:%08" PRIX32 " to Peer %016" PRIX64, mPendingPeerAckId,
+                            PeerNodeId);
 #endif
         }
     }
@@ -196,10 +199,10 @@ uint32_t CHIPReliableMessageContext::GetCurrentRetransmitTimeout()
  */
 CHIP_ERROR CHIPReliableMessageContext::RMPSendThrottleFlow(uint32_t pauseTimeMillis)
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     System::PacketBuffer * msgBuf = nullptr;
-    uint8_t * p           = nullptr;
-    uint8_t msgLen        = sizeof(pauseTimeMillis);
+    uint8_t * p                   = nullptr;
+    uint8_t msgLen                = sizeof(pauseTimeMillis);
 
     msgBuf = System::PacketBuffer::NewWithAvailableSize(msgLen);
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -213,7 +216,8 @@ CHIP_ERROR CHIPReliableMessageContext::RMPSendThrottleFlow(uint32_t pauseTimeMil
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = mDelegate.SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow, msgBuf, kSendFlag_NoAutoRequestAck);
+    err = mDelegate.SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
+                                kSendFlag_NoAutoRequestAck);
 
 exit:
     msgBuf = nullptr;
@@ -251,10 +255,10 @@ exit:
  */
 CHIP_ERROR CHIPReliableMessageContext::RMPSendDelayedDelivery(uint32_t pauseTimeMillis, uint64_t delayedNodeId)
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     System::PacketBuffer * msgBuf = nullptr;
-    uint8_t * p           = nullptr;
-    uint8_t msgLen        = sizeof(pauseTimeMillis) + sizeof(delayedNodeId);
+    uint8_t * p                   = nullptr;
+    uint8_t msgLen                = sizeof(pauseTimeMillis) + sizeof(delayedNodeId);
 
     msgBuf = System::PacketBuffer::NewWithAvailableSize(msgLen);
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
@@ -270,7 +274,8 @@ CHIP_ERROR CHIPReliableMessageContext::RMPSendDelayedDelivery(uint32_t pauseTime
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = mDelegate.SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery, msgBuf, kSendFlag_NoAutoRequestAck);
+    err = mDelegate.SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
+                                kSendFlag_NoAutoRequestAck);
 
 exit:
     msgBuf = nullptr;
@@ -367,7 +372,8 @@ CHIP_ERROR CHIPReliableMessageContext::RMPHandleNeedsAck(uint32_t MessageId, uin
 
         // Replace the Pending ack id.
         mPendingPeerAckId = MessageId;
-        mRMPNextAckTime   = static_cast<uint16_t>(mDelegate.GetManager().GetTickCounterFromTimeDelta(mRMPConfig.mAckPiggybackTimeout + System::Timer::GetCurrentEpoch()));
+        mRMPNextAckTime   = static_cast<uint16_t>(
+            mDelegate.GetManager().GetTickCounterFromTimeDelta(mRMPConfig.mAckPiggybackTimeout + System::Timer::GetCurrentEpoch()));
         SetAckPending(true);
     }
 
@@ -387,7 +393,8 @@ CHIP_ERROR CHIPReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMill
 
     if (0 != PauseTimeMillis)
     {
-        mRMPThrottleTimeout = static_cast<uint16_t>(mDelegate.GetManager().GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch() + PauseTimeMillis));
+        mRMPThrottleTimeout = static_cast<uint16_t>(
+            mDelegate.GetManager().GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch() + PauseTimeMillis));
         mDelegate.GetManager().RMPPauseRetransTable(this, PauseTimeMillis);
     }
     else
@@ -418,7 +425,7 @@ CHIP_ERROR CHIPReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMill
  */
 CHIP_ERROR CHIPReliableMessageContext::SendCommonNullMessage()
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
+    CHIP_ERROR err                = CHIP_NO_ERROR;
     System::PacketBuffer * msgBuf = nullptr;
 
     // Allocate a buffer for the null message
@@ -426,7 +433,8 @@ CHIP_ERROR CHIPReliableMessageContext::SendCommonNullMessage()
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err    = mDelegate.SendMessage(chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf, kSendFlag_NoAutoRequestAck);
+    err    = mDelegate.SendMessage(chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf,
+                                kSendFlag_NoAutoRequestAck);
     msgBuf = nullptr;
 
 exit:

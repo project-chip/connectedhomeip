@@ -23,9 +23,9 @@
 #include <errno.h>
 
 #include <inet/InetError.h>
+#include <messaging/CHIPMessageLayerUtils.h>
 #include <system/SystemConfig.h>
 #include <system/SystemError.h>
-#include <messaging/CHIPMessageLayerUtils.h>
 
 namespace chip {
 

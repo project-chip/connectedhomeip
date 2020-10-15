@@ -43,23 +43,23 @@ class CHIPReliableMessageDelegate
 {
 public:
     /* Application callbacks */
-    virtual void OnThrottleRcvd(uint32_t pauseTime) = 0;          /**< Application callback for received Throttle message. */
-    virtual void OnDDRcvd(uint32_t pauseTime) = 0;                /**< Application callback for received Delayed Delivery message. */
-    virtual void OnSendError(CHIP_ERROR err) = 0; /**< Application callback for error while sending. */
-    virtual void OnAckRcvd()                   = 0; /**< Application callback for received acknowledgment. */
+    virtual void OnThrottleRcvd(uint32_t pauseTime) = 0; /**< Application callback for received Throttle message. */
+    virtual void OnDDRcvd(uint32_t pauseTime)       = 0; /**< Application callback for received Delayed Delivery message. */
+    virtual void OnSendError(CHIP_ERROR err)        = 0; /**< Application callback for error while sending. */
+    virtual void OnAckRcvd()                        = 0; /**< Application callback for received acknowledgment. */
 
     /* Transport delegates */
-    virtual CHIPReliableMessageManager& GetManager() = 0;
-    virtual bool IsNode(uint64_t id) = 0;
+    virtual CHIPReliableMessageManager & GetManager() = 0;
+    virtual bool IsNode(uint64_t id)                  = 0;
 
-    virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf, uint16_t sendFlags) = 0;
+    virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf, uint16_t sendFlags)                                      = 0;
     virtual CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, System::PacketBuffer * msgBuf, uint16_t sendFlags) = 0;
 };
 
 class CHIPReliableMessageContext : public ReferenceCounted<CHIPReliableMessageContext>
 {
 public:
-    CHIPReliableMessageContext(CHIPReliableMessageDelegate& delegate);
+    CHIPReliableMessageContext(CHIPReliableMessageDelegate & delegate);
 
     CHIP_ERROR RMPFlushAcks();
     uint32_t GetCurrentRetransmitTimeout();
@@ -78,28 +78,33 @@ public:
     void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
 
 private:
-    static constexpr const uint16_t kFlagAutoRequestAck   = 0x0004; /// When set, automatically request an acknowledgment whenever a message is sent via UDP.
-    static constexpr const uint16_t kFlagDropAck          = 0x0008; /// Internal and debug only: when set, the exchange layer does not send an acknowledgment.
+    static constexpr const uint16_t kFlagAutoRequestAck =
+        0x0004; /// When set, automatically request an acknowledgment whenever a message is sent via UDP.
+    static constexpr const uint16_t kFlagDropAck =
+        0x0008; /// Internal and debug only: when set, the exchange layer does not send an acknowledgment.
     static constexpr const uint16_t kFlagResponseExpected = 0x0010; /// If a response is expected for a message that is being sent.
-    static constexpr const uint16_t kFlagAckPending       = 0x0020; /// When set, signifies that there is an acknowledgment pending to be sent back.
-    static constexpr const uint16_t kFlagPeerRequestedAck = 0x0040; /// When set, signifies that at least one message received on this exchange requested an acknowledgment.
-                                                                    /// This flag is read by the application to decide if it needs to request an acknowledgment for the
-                                                                    /// response message it is about to send. This flag can also indicate whether peer is using RMP.
-    static constexpr const uint16_t kFlagMsgRcvdFromPeer  = 0x0080; /// When set, signifies that at least one message has been received from peer on this exchange context.
+    static constexpr const uint16_t kFlagAckPending =
+        0x0020; /// When set, signifies that there is an acknowledgment pending to be sent back.
+    static constexpr const uint16_t kFlagPeerRequestedAck =
+        0x0040; /// When set, signifies that at least one message received on this exchange requested an acknowledgment.
+                /// This flag is read by the application to decide if it needs to request an acknowledgment for the
+                /// response message it is about to send. This flag can also indicate whether peer is using RMP.
+    static constexpr const uint16_t kFlagMsgRcvdFromPeer =
+        0x0080; /// When set, signifies that at least one message has been received from peer on this exchange context.
 
-    uint16_t mFlags;              // Internal state flags
+    uint16_t mFlags; // Internal state flags
 
     CHIP_ERROR RMPHandleRcvdAck(uint32_t AckMsgId);
     CHIP_ERROR RMPHandleNeedsAck(uint32_t MessageId, uint32_t Flags);
     CHIP_ERROR HandleThrottleFlow(uint32_t PauseTimeMillis);
 
 public:
-    RMPConfig mRMPConfig;     /**< RMP configuration. */
+    RMPConfig mRMPConfig;         /**< RMP configuration. */
     uint16_t mRMPNextAckTime;     // Next time for triggering Solo Ack
     uint16_t mRMPThrottleTimeout; // Timeout until when Throttle is On when RMPThrottleEnabled is set
     uint32_t mPendingPeerAckId;
 
-    CHIPReliableMessageDelegate& mDelegate;
+    CHIPReliableMessageDelegate & mDelegate;
 };
 
 #endif // CHIP_RELIABLE_MESSAGE_CONTEXT_H

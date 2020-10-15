@@ -27,16 +27,21 @@
 #include <messaging/CHIPMessageLayerUtils.h>
 #include <messaging/CHIPReliableMessageContext.h>
 #include <messaging/CHIPReliableMessageManager.h>
+#include <support/BitFlags.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CHIPLogging.h>
 #include <support/CodeUtils.h>
-#include <support/BitFlags.h>
 
 namespace chip {
 
-CHIPReliableMessageManager::RetransTableEntry::RetransTableEntry() : rc(nullptr), msgBuf(nullptr), msgId(0), msgSendFlags(0), nextRetransTime(0), sendCount(0) {}
+CHIPReliableMessageManager::RetransTableEntry::RetransTableEntry() :
+    rc(nullptr), msgBuf(nullptr), msgId(0), msgSendFlags(0), nextRetransTime(0), sendCount(0)
+{}
 
-CHIPReliableMessageManager::CHIPReliableMessageManager() : mRMPConfig(gDefaultRMPConfig), mRMPTimeStampBase(System::Timer::GetCurrentEpoch()), mRMPCurrentTimerExpiry(0), mRMPTimerInterval(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD) {}
+CHIPReliableMessageManager::CHIPReliableMessageManager() :
+    mRMPConfig(gDefaultRMPConfig), mRMPTimeStampBase(System::Timer::GetCurrentEpoch()), mRMPCurrentTimerExpiry(0),
+    mRMPTimerInterval(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD)
+{}
 
 void CHIPReliableMessageManager::RMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId)
 {
@@ -53,7 +58,8 @@ void CHIPReliableMessageManager::RMPProcessDDMessage(uint32_t PauseTimeMillis, u
             if (RetransTable[i].rc->mDelegate.IsNode(DelayedNodeId))
             {
                 // Paustime is specified in milliseconds; Update retrans values
-                RetransTable[i].nextRetransTime = static_cast<uint16_t>(RetransTable[i].nextRetransTime + (PauseTimeMillis / mRMPTimerInterval));
+                RetransTable[i].nextRetransTime =
+                    static_cast<uint16_t>(RetransTable[i].nextRetransTime + (PauseTimeMillis / mRMPTimerInterval));
                 RetransTable[i].rc->mDelegate.OnDDRcvd(PauseTimeMillis);
             } // DelayedNodeId == PeerNodeId
         }     // exchContext
@@ -124,7 +130,7 @@ void CHIPReliableMessageManager::RMPExecuteActions()
     ChipLogProgress(ExchangeManager, "RMPExecuteActions");
 #endif
 
-    ExecuteForAllExchange([] (CHIPReliableMessageContext *rc) {
+    ExecuteForAllExchange([](CHIPReliableMessageContext * rc) {
         if (rc->IsAckPending())
         {
             if (0 == rc->mRMPNextAckTime)
@@ -145,7 +151,7 @@ void CHIPReliableMessageManager::RMPExecuteActions()
     // has expired
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        CHIPReliableMessageContext* rc = RetransTable[i].rc;
+        CHIPReliableMessageContext * rc = RetransTable[i].rc;
         if (rc)
         {
             CHIP_ERROR err = CHIP_NO_ERROR;
@@ -193,7 +199,7 @@ void CHIPReliableMessageManager::RMPExecuteActions()
     TicklessDebugDumpRetransTable("RMPExecuteActions Dumping RetransTable entries after processing");
 }
 
-static void TickProceed(uint16_t& time, uint16_t ticks)
+static void TickProceed(uint16_t & time, uint16_t ticks)
 {
     if (time >= ticks)
     {
@@ -233,7 +239,7 @@ void CHIPReliableMessageManager::RMPExpireTicks()
     ChipLogProgress(ExchangeManager, "RMPExpireTicks at %" PRIu64 ", %" PRIu64 ", %u", now, mRMPTimeStampBase, deltaTicks);
 #endif
 
-    ExecuteForAllExchange([deltaTicks] (CHIPReliableMessageContext *rc) {
+    ExecuteForAllExchange([deltaTicks](CHIPReliableMessageContext * rc) {
         if (rc->IsAckPending())
         {
             // Decrement counter of Ack timestamp by the elapsed timer ticks
@@ -248,7 +254,7 @@ void CHIPReliableMessageManager::RMPExpireTicks()
     // Check Throttle timeout stored in EC to set/unset Throttle flag
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        CHIPReliableMessageContext *rc = RetransTable[i].rc;
+        CHIPReliableMessageContext * rc = RetransTable[i].rc;
         if (rc)
         {
             // Process Retransmit Table
@@ -288,7 +294,7 @@ void CHIPReliableMessageManager::RMPExpireTicks()
  */
 void CHIPReliableMessageManager::RMPTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError)
 {
-    CHIPReliableMessageManager *manager = reinterpret_cast<CHIPReliableMessageManager*>(aAppState);
+    CHIPReliableMessageManager * manager = reinterpret_cast<CHIPReliableMessageManager *>(aAppState);
 
     VerifyOrDie((aSystemLayer != nullptr) && (manager != nullptr));
 
@@ -322,7 +328,8 @@ void CHIPReliableMessageManager::RMPTimeout(System::Layer * aSystemLayer, void *
  *  @retval  #CHIP_NO_ERROR On success.
  *
  */
-CHIP_ERROR CHIPReliableMessageManager::AddToRetransTable(CHIPReliableMessageContext* rc, System::PacketBuffer * msgBuf, uint32_t messageId, uint16_t msgSendFlags, RetransTableEntry ** rEntry)
+CHIP_ERROR CHIPReliableMessageManager::AddToRetransTable(CHIPReliableMessageContext * rc, System::PacketBuffer * msgBuf,
+                                                         uint32_t messageId, uint16_t msgSendFlags, RetransTableEntry ** rEntry)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -340,9 +347,10 @@ CHIP_ERROR CHIPReliableMessageManager::AddToRetransTable(CHIPReliableMessageCont
             RetransTable[i].msgBuf          = msgBuf;
             RetransTable[i].msgSendFlags    = msgSendFlags;
             RetransTable[i].sendCount       = 0;
-            RetransTable[i].nextRetransTime = static_cast<uint16_t>(GetTickCounterFromTimeDelta(rc->GetCurrentRetransmitTimeout() + System::Timer::GetCurrentEpoch()));
+            RetransTable[i].nextRetransTime = static_cast<uint16_t>(
+                GetTickCounterFromTimeDelta(rc->GetCurrentRetransmitTimeout() + System::Timer::GetCurrentEpoch()));
 
-            *rEntry                 = &RetransTable[i];
+            *rEntry = &RetransTable[i];
             // Increment the reference count
             rc->Retain();
             added = true;
@@ -362,19 +370,20 @@ CHIP_ERROR CHIPReliableMessageManager::AddToRetransTable(CHIPReliableMessageCont
     return err;
 }
 
-void CHIPReliableMessageManager::RMPPauseRetransTable(CHIPReliableMessageContext* rc, uint32_t PauseTimeMillis)
+void CHIPReliableMessageManager::RMPPauseRetransTable(CHIPReliableMessageContext * rc, uint32_t PauseTimeMillis)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         if (RetransTable[i].rc == rc)
         {
-            RetransTable[i].nextRetransTime = static_cast<uint16_t>(RetransTable[i].nextRetransTime + PauseTimeMillis / mRMPTimerInterval);
+            RetransTable[i].nextRetransTime =
+                static_cast<uint16_t>(RetransTable[i].nextRetransTime + PauseTimeMillis / mRMPTimerInterval);
             break;
         }
     }
 }
 
-void CHIPReliableMessageManager::RMPResumeRetransTable(CHIPReliableMessageContext* rc)
+void CHIPReliableMessageManager::RMPResumeRetransTable(CHIPReliableMessageContext * rc)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
@@ -386,7 +395,7 @@ void CHIPReliableMessageManager::RMPResumeRetransTable(CHIPReliableMessageContex
     }
 }
 
-bool CHIPReliableMessageManager::RMPCheckAndRemRetransTable(CHIPReliableMessageContext* rc, uint32_t ackMsgId)
+bool CHIPReliableMessageManager::RMPCheckAndRemRetransTable(CHIPReliableMessageContext * rc, uint32_t ackMsgId)
 {
     bool res = false;
 
@@ -420,19 +429,20 @@ bool CHIPReliableMessageManager::RMPCheckAndRemRetransTable(CHIPReliableMessageC
  */
 CHIP_ERROR CHIPReliableMessageManager::SendFromRetransTable(RetransTableEntry * entry)
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
-    CHIPReliableMessageContext* rc  = entry->rc;
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
+    CHIPReliableMessageContext * rc = entry->rc;
 
     // To trigger a call to OnSendError, set the number of transmissions so
     // that the next call to RMPExecuteActions will abort this entry,
     // restart the timer immediately, and ExitNow.
 
-    CHIP_FAULT_INJECT(FaultInjection::kFault_RMPSendError, entry->sendCount = static_cast<uint8_t>(rc->mRMPConfig.mMaxRetrans + 1); entry->nextRetransTime = 0; RMPStartTimer(); ExitNow());
+    CHIP_FAULT_INJECT(FaultInjection::kFault_RMPSendError, entry->sendCount = static_cast<uint8_t>(rc->mRMPConfig.mMaxRetrans + 1);
+                      entry->nextRetransTime = 0; RMPStartTimer(); ExitNow());
 
     if (rc)
     {
         // Locally store the start and length;
-        uint8_t *p   = entry->msgBuf->Start();
+        uint8_t * p  = entry->msgBuf->Start();
         uint32_t len = entry->msgBuf->DataLength();
 
         // Send the message through
@@ -482,7 +492,7 @@ exit:
  *  @param[in]    rc    A pointer to the ExchangeContext object.
  *
  */
-void CHIPReliableMessageManager::ClearRetransmitTable(CHIPReliableMessageContext* rc)
+void CHIPReliableMessageManager::ClearRetransmitTable(CHIPReliableMessageContext * rc)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
@@ -562,7 +572,7 @@ void CHIPReliableMessageManager::RMPStartTimer()
 
     // When do we need to next wake up to send an ACK?
 
-    ExecuteForAllExchange([&nextWakeTime, &foundWake] (CHIPReliableMessageContext *rc) {
+    ExecuteForAllExchange([&nextWakeTime, &foundWake](CHIPReliableMessageContext * rc) {
         if (rc->IsAckPending() && rc->mRMPNextAckTime < nextWakeTime)
         {
             nextWakeTime = rc->mRMPNextAckTime;
@@ -575,7 +585,7 @@ void CHIPReliableMessageManager::RMPStartTimer()
 
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        CHIPReliableMessageContext *rc = RetransTable[i].rc;
+        CHIPReliableMessageContext * rc = RetransTable[i].rc;
         if (rc)
         {
             // When do we need to next wake up for throttle retransmission?
@@ -603,8 +613,8 @@ void CHIPReliableMessageManager::RMPStartTimer()
     if (foundWake)
     {
         // Set timer for next tick boundary - subtract the elapsed time from the current tick
-        System::Timer::Epoch currentTime      = System::Timer::GetCurrentEpoch();
-        int32_t timerArmValue                 = static_cast<uint32_t>(nextWakeTime * mRMPTimerInterval - (currentTime - mRMPTimeStampBase));
+        System::Timer::Epoch currentTime = System::Timer::GetCurrentEpoch();
+        int32_t timerArmValue = static_cast<uint32_t>(nextWakeTime * mRMPTimerInterval - (currentTime - mRMPTimeStampBase));
         System::Timer::Epoch timerExpiryEpoch = currentTime + timerArmValue;
 
 #if defined(RMP_TICKLESS_DEBUG)

@@ -21,7 +21,6 @@
  *      protocol.
  */
 
-
 #ifndef CHIP_RELIABLE_MESSAGE_MANAGER_H
 #define CHIP_RELIABLE_MESSAGE_MANAGER_H
 
@@ -29,15 +28,16 @@
 
 #include <core/CHIPError.h>
 #include <messaging/CHIPReliableMessageConfig.h>
-#include <system/SystemPacketBuffer.h>
 #include <system/SystemLayer.h>
+#include <system/SystemPacketBuffer.h>
 #include <system/SystemTimer.h>
 
 namespace chip {
 
 class CHIPReliableMessageContext;
 
-class CHIPReliableMessageManager {
+class CHIPReliableMessageManager
+{
 private:
     /**
      *  @class RetransTableEntry
@@ -54,12 +54,12 @@ private:
     public:
         RetransTableEntry();
 
-        CHIPReliableMessageContext* rc; /**< The context for the stored CHIP message. */
-        System::PacketBuffer * msgBuf;  /**< A pointer to the PacketBuffer object holding the CHIP message. */
-        uint32_t msgId;                 /**< The message identifier of the CHIP message awaiting acknowledgment. */
+        CHIPReliableMessageContext * rc; /**< The context for the stored CHIP message. */
+        System::PacketBuffer * msgBuf;   /**< A pointer to the PacketBuffer object holding the CHIP message. */
+        uint32_t msgId;                  /**< The message identifier of the CHIP message awaiting acknowledgment. */
         uint16_t msgSendFlags;
-        uint16_t nextRetransTime;       /**< A counter representing the next retransmission time for the message. */
-        uint8_t sendCount;              /**< A counter representing the number of times the message has been sent. */
+        uint16_t nextRetransTime; /**< A counter representing the next retransmission time for the message. */
+        uint8_t sendCount;        /**< A counter representing the number of times the message has been sent. */
     };
 
 public:
@@ -72,20 +72,21 @@ public:
     void RMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
     static void RMPTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
-    CHIP_ERROR AddToRetransTable(CHIPReliableMessageContext* rc, System::PacketBuffer * msgBuf, uint32_t messageId, uint16_t msgSendFlags, RetransTableEntry ** rEntry);
-    void RMPPauseRetransTable(CHIPReliableMessageContext* rc, uint32_t PauseTimeMillis);
-    void RMPResumeRetransTable(CHIPReliableMessageContext* rc);
-    bool RMPCheckAndRemRetransTable(CHIPReliableMessageContext* rc, uint32_t msgId);
+    CHIP_ERROR AddToRetransTable(CHIPReliableMessageContext * rc, System::PacketBuffer * msgBuf, uint32_t messageId,
+                                 uint16_t msgSendFlags, RetransTableEntry ** rEntry);
+    void RMPPauseRetransTable(CHIPReliableMessageContext * rc, uint32_t PauseTimeMillis);
+    void RMPResumeRetransTable(CHIPReliableMessageContext * rc);
+    bool RMPCheckAndRemRetransTable(CHIPReliableMessageContext * rc, uint32_t msgId);
     CHIP_ERROR SendFromRetransTable(RetransTableEntry * entry);
-    void ClearRetransmitTable(CHIPReliableMessageContext* rc);
+    void ClearRetransmitTable(CHIPReliableMessageContext * rc);
     void ClearRetransmitTable(RetransTableEntry & rEntry);
-    void FailRetransmitTableEntries(CHIPReliableMessageContext* rc, CHIP_ERROR err);
+    void FailRetransmitTableEntries(CHIPReliableMessageContext * rc, CHIP_ERROR err);
 
     void RMPStartTimer();
     void RMPStopTimer();
     void RMPExpireTicks();
 
-    RMPConfig mRMPConfig;     /**< RMP configuration. */
+    RMPConfig mRMPConfig; /**< RMP configuration. */
 
 private:
     chip::System::Layer * mSystemLayer;
@@ -94,7 +95,9 @@ private:
     uint16_t mRMPTimerInterval;                  // RMP Timer tick period
 
     /* Placeholder function to run a function for all exchanges */
-    template<typename Function> void ExecuteForAllExchange(Function function) {}
+    template <typename Function>
+    void ExecuteForAllExchange(Function function)
+    {}
 
     void TicklessDebugDumpRetransTable(const char * log);
 
