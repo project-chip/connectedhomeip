@@ -83,7 +83,7 @@ static bool HelpTextContainsShortOption(char optChar, const char * helpText);
 
 static inline bool IsShortOptionChar(int ch)
 {
-    return isascii(ch) && isgraph(ch);
+    return isgraph(ch);
 }
 
 /**

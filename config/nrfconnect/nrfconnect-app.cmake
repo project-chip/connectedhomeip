@@ -53,6 +53,9 @@ endif()
 # ==================================================
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
+# This is temporary solution and should be removed after merging including fix in Zephyr
+zephyr_include_directories("${ZEPHYR_BASE}/../nrfxlib/crypto/nrf_cc310_platform/include")
+
 # ==================================================
 # General settings
 # ==================================================
