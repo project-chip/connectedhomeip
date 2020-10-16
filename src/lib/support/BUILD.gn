@@ -21,6 +21,19 @@ import("${chip_root}/build/chip/chip_version.gni")
 import("${chip_root}/build/chip/tests.gni")
 import("${chip_root}/src/lib/core/core.gni")
 
+action("gen_asn1oid") {
+  script = "gen_asn1oid.py"
+  asn1oid_file = "${root_gen_dir}/include/support/ASN1OID.h"
+  outputs = [ asn1oid_file ]
+  args = [ "--output_file=" + rebase_path(asn1oid_file, root_build_dir), ]
+}
+
+source_set("asn1oid_header") {
+  sources = get_target_outputs(":gen_asn1oid")
+
+  deps = [ ":gen_asn1oid" ]
+}
+
 action("gen_chip_version") {
   script = "${chip_root}/scripts/gen_chip_version.py"
 
@@ -42,6 +55,10 @@ source_set("chip_version_header") {
 }
 
 support_headers = [
+  "ASN1Config.h",
+  "ASN1Error.h",
+  "ASN1.h",
+  "ASN1Macros.h",
   "Base64.h",
   "BitFlags.h",
   "BufBound.h",
@@ -66,6 +83,10 @@ static_library("support") {
   output_name = "libSupportLayer"
 
   sources = [
+    "ASN1Error.cpp",
+    "ASN1OID.cpp",
+    "ASN1Reader.cpp",
+    "ASN1Writer.cpp",
     "Base64.cpp",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
@@ -88,10 +109,12 @@ static_library("support") {
   public = support_headers
 
   public_deps = [
+    ":asn1oid_header",
     ":chip_version_header",
     ":support_headers",
     "${chip_root}/src/lib/core:chip_config_header",
     "${nlassert_root}:nlassert",
+    "${nlio_root}:nlio",
   ]
 
   # These are needed because we include CHIPCore.h, which uses config

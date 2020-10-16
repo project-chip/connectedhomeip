@@ -17,28 +17,14 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP support library
- *      unit tests.
+ *      This file implements a standalone/native program executable
+ *      test driver for the support library ASN1 unit tests.
  *
  */
 
-#pragma once
+#include "TestSupport.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-int TestASN1(void);
-int TestCHIPArgParser(void);
-int TestErrorStr(void);
-int TestTimeUtils(void);
-int TestMemAlloc(void);
-int TestBufBound(void);
-int TestCHIPCounter(void);
-int TestPersistedCounter(int argc, char * argv[]);
-int TestScopedBuffer(void);
-int TestSafeInt();
-
-#ifdef __cplusplus
+int main(void)
+{
+    return (TestASN1());
 }
-#endif
