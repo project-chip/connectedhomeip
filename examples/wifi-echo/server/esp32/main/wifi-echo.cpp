@@ -421,7 +421,7 @@ std::string createSetupPayload()
 
         if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
         {
-            ESP_LOGI(TAG, "DECIMAL PAYLOAD: %s", outCode.c_str());
+            ESP_LOGI(TAG, "Manual(decimal) setup code: %s", outCode.c_str());
         }
         else
         {
