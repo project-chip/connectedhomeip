@@ -67,8 +67,8 @@ constexpr const char * kDeviceAddressKeyPrefix     = "DeviceAddress";
     do                                                                                                                             \
     {                                                                                                                              \
         const size_t len = strlen(keyPrefix);                                                                                      \
-        char key[len + sizeof(NodeId) + 1];                                                                                        \
-        snprintf(key, sizeof(key), "%s%llx", keyPrefix, node);                                                                     \
+        char key[len + 2 * sizeof(NodeId) + 1];                                                                                        \
+        snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                     \
         action;                                                                                                                    \
     } while (0)
 
