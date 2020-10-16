@@ -15,6 +15,7 @@
 import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tests.gni")
+import("${chip_root}/src/ble/ble.gni")
 import("${chip_root}/src/lwip/lwip.gni")
 import("${chip_root}/src/platform/device.gni")
 
@@ -27,8 +28,8 @@ config("includes") {
 
   defines = [ "CHIP_SEPARATE_CONFIG_H=1" ]
 
-  if (current_os == "linux") {
-    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
+  if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
+    defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
   }
 }
 
@@ -47,12 +48,15 @@ if (chip_build_tests) {
 
     if (chip_device_platform != "esp32") {
       deps += [
-        "${chip_root}/src/ble/tests",
         "${chip_root}/src/lib/core/tests",
         "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/platform/tests",
         "${chip_root}/src/setup_payload/tests",
       ]
+    }
+
+    if (chip_config_network_layer_ble && chip_device_platform != "esp32") {
+      deps += [ "${chip_root}/src/ble/tests" ]
     }
 
     if (chip_with_lwip && chip_device_platform != "esp32") {

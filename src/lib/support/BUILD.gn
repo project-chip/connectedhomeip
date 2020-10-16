@@ -69,7 +69,6 @@ static_library("support") {
     "Base64.cpp",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
-    "CHIPMemString.cpp",
     "CHIPPlatformMemory.cpp",
     "ErrorStr.cpp",
     "FibonacciUtils.cpp",

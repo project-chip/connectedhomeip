@@ -47,7 +47,7 @@ sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libg
 
 #### How to install prerequisites on macOS
 
-On MacOS, first install Xcode from the Mac App Store. The remaining dependencies
+On macOS, first install Xcode from the Mac App Store. The remaining dependencies
 can be installed and satisfied using [Brew](https://brew.sh/):
 
 ```

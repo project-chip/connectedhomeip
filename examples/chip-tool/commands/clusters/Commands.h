@@ -3082,7 +3082,6 @@ public:
         uint16_t transitionTime = chip::Encoding::LittleEndian::Read16(message);
         uint8_t msgLen          = chip::Encoding::Read8(message);
         // FIXME - SExtensionFieldSetList is not supported.
-        void * extensionFieldSets;
 
         ChipLogProgress(chipTool, "EnhancedViewSceneResponse:");
         ChipLogProgress(chipTool, "  status: 0x%02x", status);
@@ -3293,7 +3292,6 @@ public:
         uint16_t transitionTime = chip::Encoding::LittleEndian::Read16(message);
         uint8_t msgLen          = chip::Encoding::Read8(message);
         // FIXME - SExtensionFieldSetList is not supported.
-        void * extensionFieldSets;
 
         ChipLogProgress(chipTool, "ViewSceneResponse:");
         ChipLogProgress(chipTool, "  status: 0x%02x", status);

@@ -691,11 +691,11 @@ static bool HandleOption(const char * progName, OptionSet * optSet, int id, cons
 
     VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
     sCallbackRecords[sCallbackRecordCount].Type     = CallbackRecord::kHandleOption;
-    sCallbackRecords[sCallbackRecordCount].ProgName = chip::Platform::MemoryAllocString(progName);
+    sCallbackRecords[sCallbackRecordCount].ProgName = chip::Platform::MemoryAllocString(progName, strlen(progName));
     sCallbackRecords[sCallbackRecordCount].OptSet   = optSet;
     sCallbackRecords[sCallbackRecordCount].Id       = id;
-    sCallbackRecords[sCallbackRecordCount].Name     = chip::Platform::MemoryAllocString(name);
-    sCallbackRecords[sCallbackRecordCount].Arg      = (arg != nullptr) ? chip::Platform::MemoryAllocString(arg) : nullptr;
+    sCallbackRecords[sCallbackRecordCount].Name     = chip::Platform::MemoryAllocString(name, strlen(name));
+    sCallbackRecords[sCallbackRecordCount].Arg = (arg != nullptr) ? chip::Platform::MemoryAllocString(arg, strlen(arg)) : nullptr;
     sCallbackRecordCount++;
     return true;
 }
@@ -716,7 +716,7 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
 
     VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
     sCallbackRecords[sCallbackRecordCount].Type     = CallbackRecord::kHandleNonOptionArgs;
-    sCallbackRecords[sCallbackRecordCount].ProgName = chip::Platform::MemoryAllocString(progName);
+    sCallbackRecords[sCallbackRecordCount].ProgName = chip::Platform::MemoryAllocString(progName, strlen(progName));
     sCallbackRecords[sCallbackRecordCount].Argc     = argc;
     sCallbackRecordCount++;
 
@@ -724,7 +724,7 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
     {
         VerifyOrQuit(sCallbackRecordCount < kMaxCallbackRecords, "Out of callback records");
         sCallbackRecords[sCallbackRecordCount].Type = CallbackRecord::kNonOptionArg;
-        sCallbackRecords[sCallbackRecordCount].Arg  = chip::Platform::MemoryAllocString(argv[i]);
+        sCallbackRecords[sCallbackRecordCount].Arg  = chip::Platform::MemoryAllocString(argv[i], strlen(argv[i]));
         sCallbackRecordCount++;
     }
 

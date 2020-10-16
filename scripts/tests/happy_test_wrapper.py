@@ -16,9 +16,11 @@
 
 # This is a wrapper for running happy tests.
 
-import os
-import sys
 import argparse
+import os
+import subprocess
+import sys
+import tempfile
 
 CHIP_PATH = os.path.realpath(os.path.join(
     os.path.dirname(__file__), "../.."))
@@ -33,11 +35,19 @@ parser.add_argument('--test-bin-dir', dest='bin_dir', type=str, nargs='?', defau
                     help='The path of test binaries')
 parser.add_argument('--ci', dest='ci', type=bool, nargs='?', default=False,
                     help='Set this if running script under venv but happy is installed globally')
+parser.add_argument('--silent', dest='silent', type=bool, nargs='?', default=False,
+                    help='Set this will mute output when the test finished successfully')
 
 if __name__ == '__main__':
+    if os.getuid() != 0:
+        os.execvpe("unshare", ["unshare", "--map-root-user",
+                               "-n", "-m", "python3"] + sys.argv, test_environ)
+        print("Failed to run script in new user namespace", file=sys.stderr)
+        exit(1)
+    if os.system("mount --make-private /") != 0 or os.system("mount -t tmpfs tmpfs /run") != 0:
+        print("Failed to setup private mount points", file=sys.stderr)
+        exit(1)
     args = parser.parse_args()
-    print(args, file=sys.stderr)
-    print(test_environ, file=sys.stderr)
     # GN will run Python in venv, which will break happy test
     if args.ci:
         if test_environ.get("VIRTUAL_ENV", None) != None:
@@ -48,4 +58,13 @@ if __name__ == '__main__':
     test_environ["TEST_BIN_DIR"] = args.bin_dir
     test_environ["HAPPY_MAIN_CONFIG_FILE"] = os.path.realpath(
         os.path.join(CHIP_PATH, "src/test_driver/happy/conf/main_conf.json"))
-    os.execvpe("python3", ["python3", args.test_script], test_environ)
+    if args.silent:
+        fp, fname = tempfile.mkstemp()
+        run_res = subprocess.run(["python3", args.test_script],
+                                 stdout=fp, stderr=fp, env=test_environ)
+        if run_res.returncode != 0:
+            with open(fname, 'rb') as test_output:
+                os.write(sys.stderr.fileno(), test_output.read())
+        exit(run_res.returncode)
+    else:
+        os.execvpe("python3", ["python3", args.test_script], test_environ)

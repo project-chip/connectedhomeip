@@ -136,7 +136,7 @@ void TestDecimalRepresentation_AllZeros(nlTestSuite * inSuite, void * inContext)
 void TestDecimalRepresentation_InvalidPayload(nlTestSuite * inSuite, void * inContext)
 {
     SetupPayload payload  = GetDefaultPayload();
-    payload.discriminator = 16;
+    payload.discriminator = 0x1f00;
 
     ManualSetupPayloadGenerator generator(payload);
     string result;
@@ -151,6 +151,42 @@ void assertPayloadValues(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERR
     NL_TEST_ASSERT(inSuite, payload.discriminator == discriminator);
     NL_TEST_ASSERT(inSuite, payload.vendorID == vendorID);
     NL_TEST_ASSERT(inSuite, payload.productID == productID);
+}
+
+void TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator(nlTestSuite * inSuite, void * inContext)
+{
+    SetupPayload payload       = GetDefaultPayload();
+    payload.requiresCustomFlow = false;
+    payload.discriminator      = 0xf1a;
+
+    {
+        // Test short 11 digit code
+        ManualSetupPayloadGenerator generator(payload);
+        string result;
+        NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+
+        SetupPayload outPayload;
+        CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
+        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 0xa, payload.vendorID,
+                            payload.productID);
+    }
+
+    payload.vendorID           = 1;
+    payload.productID          = 1;
+    payload.requiresCustomFlow = true;
+    payload.discriminator      = 0xf1b;
+
+    {
+        // Test long 21 digit code
+        ManualSetupPayloadGenerator generator(payload);
+        string result;
+        NL_TEST_ASSERT(inSuite, generator.payloadDecimalStringRepresentation(result) == CHIP_NO_ERROR);
+
+        SetupPayload outPayload;
+        CHIP_ERROR err = ManualSetupPayloadParser(result).populatePayload(outPayload);
+        assertPayloadValues(inSuite, err, CHIP_NO_ERROR, outPayload, payload.setUpPINCode, 0xb, payload.vendorID,
+                            payload.productID);
+    }
 }
 
 void assertEmptyPayloadWithError(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERROR expectedError,
@@ -507,6 +543,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Decimal Representation from Full Payload without Zeros",               TestDecimalRepresentation_FullPayloadWithoutZeros_DoesNotRequireCustomFlow),
     NL_TEST_DEF("Decimal Representation from Full Payload without Zeros (Custom Flow)", TestDecimalRepresentation_FullPayloadWithoutZeros),
     NL_TEST_DEF("Test Decimal Representation - Invalid Payload",                        TestDecimalRepresentation_InvalidPayload),
+    NL_TEST_DEF("Test 12 bit discriminator for manual setup code",                      TestGenerateAndParser_ManualSetupCodeWithLongDiscriminator),
     NL_TEST_DEF("Test Decimal Representation - All Zeros",                              TestDecimalRepresentation_AllZeros),
     NL_TEST_DEF("Parse from Partial Payload",                                           TestPayloadParser_PartialPayload),
     NL_TEST_DEF("Parse from Full Payload",                                              TestPayloadParser_FullPayload),

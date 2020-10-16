@@ -44,7 +44,9 @@
 #include <inet/InetLayer.h>
 #include <system/SystemStats.h>
 
+#if CONFIG_NETWORK_LAYER_BLE
 using namespace chip::Ble;
+#endif // CONFIG_NETWORK_LAYER_BLE
 using namespace chip::Inet;
 using namespace chip::System;
 

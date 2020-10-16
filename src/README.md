@@ -10,7 +10,7 @@ The CHIP src directory is structured as follows:
 | ble           | BLE Layer -- Bluetooth Transport Protocol (BTP)    |
 | controller    | Controller API                                     |
 | crypto        | Cryptography libraries                             |
-| darwin        | Darwin Framework (iOS and MacOS)                   |
+| darwin        | Darwin Framework (iOS and macOS)                   |
 | include       | Public headers                                     |
 | inet          | Network Layer -- TCP and UDP endpoints             |
 | lib           | Core and Support libraries                         |

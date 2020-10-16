@@ -16,7 +16,7 @@
 #
 
 from generic_node_image
-
+RUN apt-get install -y libglib2.0
 COPY out/debug/chip-tool-server /usr/bin/
 COPY entrypoint.sh /
 

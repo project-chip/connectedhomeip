@@ -81,7 +81,8 @@ function(chip_configure TARGET_NAME)
     convert_list_of_flags_to_string_of_flags(CHIP_CFLAGS CHIP_CFLAGS)
 
     zephyr_get_compile_flags(CHIP_CXXFLAGS CXX)
-    list(FILTER CHIP_CXXFLAGS EXCLUDE REGEX -std.*) # CHIP adds gnu++11 anyway...
+    list(FILTER CHIP_CXXFLAGS EXCLUDE REGEX -std.*)
+    list(APPEND CHIP_CXXFLAGS "-std=gnu++11")
     convert_list_of_flags_to_string_of_flags(CHIP_CXXFLAGS CHIP_CXXFLAGS)
 
     set(GN_ARGS "")

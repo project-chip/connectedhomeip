@@ -39,6 +39,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <support/Base64.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/TimeUtils.h>
@@ -177,18 +178,17 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
                                                ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
-    CHIP_ERROR err                        = CHIP_NO_ERROR;
-    RendezvousSession * rendezvousSession = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
 
-#if CONFIG_DEVICE_LAYER
+#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
     if (!params.HasBleLayer())
     {
         params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
     }
-#endif // CONFIG_DEVICE_LAYER
+#endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
 
     mRendezvousSession = new RendezvousSession(this);
     err                = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
