@@ -36,21 +36,29 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
     ConfigureChipLogging();
 
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    ChipDeviceController dc;
+    CHIP_ERROR err = chip::Platform::MemoryInit();
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err));
+    }
+    else
+    {
 
-    err = dc.Init(localId);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure: %s", chip::ErrorStr(err)));
+        ChipDeviceController dc;
 
-    err = dc.ServiceEvents();
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Run Loop failure: %s", chip::ErrorStr(err)));
+        err = dc.Init(localId);
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure: %s", chip::ErrorStr(err)));
 
-    err = RunCommand(dc, remoteId, argc, argv);
-    SuccessOrExit(err);
+        err = dc.ServiceEvents();
+        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Run Loop failure: %s", chip::ErrorStr(err)));
 
-exit:
-    dc.ServiceEventSignal();
-    dc.Shutdown();
+        err = RunCommand(dc, remoteId, argc, argv);
+        SuccessOrExit(err);
+
+    exit:
+        dc.ServiceEventSignal();
+        dc.Shutdown();
+    }
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 

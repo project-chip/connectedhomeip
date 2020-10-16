@@ -280,8 +280,6 @@ struct TestContext
     nlTestSuite * mSuite;
 };
 
-} // namespace
-
 /**
  *  Set up the test suite.
  */
@@ -301,6 +299,8 @@ int TestQRCodeTLV_Teardown(void * inContext)
     chip::Platform::MemoryShutdown();
     return SUCCESS;
 }
+
+} // namespace
 
 /**
  *  Main
