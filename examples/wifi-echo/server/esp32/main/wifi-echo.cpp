@@ -44,6 +44,7 @@
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/ErrorStr.h>
 #include <transport/SecureSessionMgr.h>
@@ -412,6 +413,20 @@ std::string createSetupPayload()
     {
         QRCodeSetupPayloadGenerator generator(payload);
         err = generator.payloadBase41Representation(result);
+    }
+
+    {
+        ManualSetupPayloadGenerator generator(payload);
+        std::string outCode;
+
+        if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
+        {
+            ESP_LOGI(TAG, "DECIMAL PAYLOAD: %s", outCode.c_str());
+        }
+        else
+        {
+            ESP_LOGE(TAG, "Failed to get decimal QR code");
+        }
     }
 
     if (err != CHIP_NO_ERROR)
