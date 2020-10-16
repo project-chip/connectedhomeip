@@ -330,6 +330,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
     uint16_t len                   = 0;
     uint16_t decodedSize           = 0;
     uint16_t taglen                = 0;
+    uint16_t payloadlen            = 0;
     System::PacketBuffer * origMsg = nullptr;
 
     err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
@@ -351,8 +352,9 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 #endif
     plainText = msgBuf->Start();
 
-    // TODO: We need length checks here!  https://github.com/project-chip/connectedhomeip/issues/2928
-    err = mac.Decode(packetHeader, &data[packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
+    payloadlen = packetHeader.GetPayloadLength();
+    VerifyOrExit(payloadlen <= len, err = CHIP_ERROR_INCORRECT_STATE);
+    err = mac.Decode(packetHeader, &data[payloadlen], len - payloadlen, &taglen);
     SuccessOrExit(err);
 
     len = static_cast<uint16_t>(len - taglen);
@@ -361,7 +363,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
     err = mSecureSession.Decrypt(data, len, plainText, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
     SuccessOrExit(err);
 
-    err = payloadHeader.Decode(packetHeader.GetFlags(), plainText, headerSize, &decodedSize);
+    err = payloadHeader.Decode(packetHeader.GetFlags(), plainText, len, &decodedSize);
     SuccessOrExit(err);
     VerifyOrExit(headerSize == decodedSize, err = CHIP_ERROR_INCORRECT_STATE);
 
