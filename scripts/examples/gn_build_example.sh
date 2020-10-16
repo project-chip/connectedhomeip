@@ -20,9 +20,7 @@ set -e
 
 # Build script for GN examples GitHub workflow.
 
-CHIP_ROOT="$(dirname "$0")/../.."
-
-source "$CHIP_ROOT/scripts/activate.sh"
+source "$(dirname "$0")/../../scripts/activate.sh"
 
 GN_ARGS=()
 

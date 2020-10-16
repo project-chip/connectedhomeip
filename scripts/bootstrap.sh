@@ -32,5 +32,12 @@ fi
 
 git submodule update --init
 
+export PW_VIRTUALENV_SETUP_PY_ROOTS="$CHIP_ROOT/integrations/mobly"
+
 # shellcheck source=/dev/null
 source "$CHIP_ROOT/third_party/pigweed/repo/bootstrap.sh"
+
+#TODO - remove this once native python building is solved for
+#       psutil (one of mobly's dependencies which CHIP does
+#       not actually need, so --no-deps is OK)
+pip install --no-deps portpicker mobly

@@ -1,26 +1,30 @@
-#!/usr/bin/env bash
-
-#
 # Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-#     http://www.apache.org/licenses/LICENSE-2.0
+# http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
 
-set -e
+"""chip_mobly"""
 
-# Bootstrap script for GN build GitHub workflow.
+import setuptools
 
-# This is used to account bootstrap time in a dedicated workflow step; there's
-# no need to use this script locally.
-
-source "$(dirname "$0")/../../scripts/activate.sh"
+setuptools.setup(
+    name='chip_mobly',
+    version='0.0.1',
+    author='CHIP Authors',
+#    author_email='?',
+    description='Integration of Mobly with CHIP devices',
+    packages=setuptools.find_packages(),
+#TODO - uncomment this once native python building is solved for
+#       psutil (one of mobly's dependencies which CHIP does
+#       not actually need)
+#     install_requires=['mobly'],
+)

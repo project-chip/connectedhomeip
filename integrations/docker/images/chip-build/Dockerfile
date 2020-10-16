@@ -68,7 +68,8 @@ RUN set -x \
     && : # last line
 
 RUN set -x \
-    && pip3 install circleci attrs coloredlogs PyGithub pygit \
+    && pip3 install circleci attrs coloredlogs PyGithub pygit future \
+    portpicker mobly                                                 \
     && : # last line
 
 # build and install gn
