@@ -17,7 +17,9 @@
 
 #include "Server.h"
 
-#include <string.h>
+#include "DataModelHandler.h"
+#include "RendezvousServer.h"
+#include "SessionManager.h"
 
 #include <ble/BLEEndPoint.h>
 #include <inet/IPAddress.h>
@@ -32,9 +34,6 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
-#include "DataModelHandler.h"
-#include "RendezvousServer.h"
-
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -43,19 +42,6 @@ using namespace ::chip::DeviceLayer;
 #ifndef EXAMPLE_SERVER_NODEID
 #define EXAMPLE_SERVER_NODEID 12344321
 #endif // EXAMPLE_SERVER_NODEID
-
-// Transport Callbacks
-
-DemoSessionManager sessions;
-
-namespace chip {
-
-SecureSessionMgrBase & SessionManager()
-{
-    return sessions;
-}
-
-} // namespace chip
 
 namespace {
 
@@ -96,11 +82,17 @@ public:
     }
 };
 
+DemoSessionManager gSessions;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 RendezvousServer gRendezvousServer;
 
 } // namespace
+
+SecureSessionMgrBase & chip::SessionManager()
+{
+    return gSessions;
+}
 
 // The function will initialize datamodel handler and then start the server
 // The server assumes the platform's networking has been setup already
@@ -111,8 +103,8 @@ void InitServer()
 
     InitDataModelHandler();
 
-    err = sessions.Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
-                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    err = gSessions.Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
+                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
     // This flag is used to bypass BLE in the cirque test
@@ -130,10 +122,10 @@ void InitServer()
     }
 #endif
 
-    err = sessions.NewPairing(peer, &gTestPairing);
+    err = gSessions.NewPairing(peer, &gTestPairing);
     SuccessOrExit(err);
 
-    sessions.SetDelegate(&gCallbacks);
+    gSessions.SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)

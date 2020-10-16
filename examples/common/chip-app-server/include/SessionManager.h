@@ -18,14 +18,7 @@
 #pragma once
 
 #include <transport/SecureSessionMgr.h>
-#include <transport/raw/UDP.h>
 
-using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
-
-/**
- * Initialize DataModelHandler and start CHIP datamodel server, the server
- * assumes the platform's networking has been setup already.
- *
- * @param [in] sessions The demo's session manager.
- */
-void InitServer();
+namespace chip {
+SecureSessionMgrBase & SessionManager();
+} // namespace chip

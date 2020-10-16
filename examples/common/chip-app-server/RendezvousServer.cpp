@@ -16,6 +16,13 @@
  */
 
 #include "RendezvousServer.h"
+
+#include "SessionManager.h"
+
+#include <core/CHIPError.h>
+#include <support/CodeUtils.h>
+#include <transport/SecureSessionMgr.h>
+
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
@@ -113,6 +120,27 @@ void RendezvousServer::OnRendezvousMessageReceived(PacketBuffer * buffer)
 #endif
 exit:
     chip::System::PacketBuffer::Free(buffer);
+}
+
+void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
+{
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(AppServer, "OnRendezvousStatusUpdate: %s", chip::ErrorStr(err)));
+
+    switch (status)
+    {
+    case RendezvousSessionDelegate::SecurePairingSuccess:
+        ChipLogProgress(AppServer, "Device completed SPAKE2+ handshake");
+        SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, &mRendezvousSession.GetPairingSession());
+        break;
+    case RendezvousSessionDelegate::NetworkProvisioningSuccess:
+        ChipLogProgress(AppServer, "Device was assigned network credentials");
+        break;
+    default:
+        break;
+    };
+
+exit:
+    return;
 }
 
 } // namespace chip
