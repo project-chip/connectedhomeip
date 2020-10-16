@@ -31,5 +31,5 @@ set -x
 ninja -v -C "$CHIP_ROOT/out/$BUILD_TYPE" -k 0 check
 
 if [ "x$RUN_HAPPY_TESTS" == "x1" ]; then
-    unshare --map-root-user -n -m "$CHIP_ROOT/scripts/tests/happy_tests.sh" ninjarun
+    ninja -v -C "$CHIP_ROOT/out/$BUILD_TYPE" -k 0 happy_tests
 fi
