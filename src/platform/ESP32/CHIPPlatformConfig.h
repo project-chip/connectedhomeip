@@ -25,6 +25,14 @@
 
 #pragma once
 
+/* Force sdkconfig to be added as a dependecy. That file is also included as a sideffect of
+ * esp_err.h -> assert.h -> sdkconfig.h however since esp_err.h and above are -isystem includes,
+ * they are not added as dependencies by GN build systems.
+ *
+ * This triggers a rebuild of files including CHIPPlatformConfig if sdkconfig.h changes.
+ */
+#include <sdkconfig.h>
+
 #include "esp_err.h"
 
 // ==================== General Platform Adaptations ====================
