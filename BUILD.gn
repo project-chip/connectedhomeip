@@ -44,6 +44,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${chip_root}/src/crypto",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
+      "${chip_root}/src/lib/asn1",
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/shell",
       "${chip_root}/src/lib/support",
