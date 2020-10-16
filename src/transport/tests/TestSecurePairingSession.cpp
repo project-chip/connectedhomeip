@@ -27,6 +27,7 @@
 #include <nlunit-test.h>
 
 #include <core/CHIPCore.h>
+#include <core/CHIPSafeCasts.h>
 #include <transport/SecurePairingSession.h>
 
 #include <stdarg.h>
@@ -131,6 +132,59 @@ void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, deleageCommissioner.mNumPairingComplete == 1);
 }
 
+void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
+{
+    // Test all combinations of invalid parameters
+    TestSecurePairingDelegate delegateAccessory, deleageCommissioner;
+    SecurePairingSession pairingAccessory, pairingCommissioner;
+
+    deleageCommissioner.peer = &pairingAccessory;
+    delegateAccessory.peer   = &pairingCommissioner;
+
+    NL_TEST_ASSERT(inSuite,
+                   pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0,
+                                                   &delegateAccessory) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   pairingCommissioner.Pair(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(2), 0,
+                                            &deleageCommissioner) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 1);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
+
+    NL_TEST_ASSERT(inSuite, deleageCommissioner.mNumMessageSend == 2);
+    NL_TEST_ASSERT(inSuite, deleageCommissioner.mNumPairingComplete == 1);
+
+    SecurePairingSessionSerialized serialized;
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.Serialize(serialized) == CHIP_NO_ERROR);
+
+    SecurePairingSession deserialized;
+    NL_TEST_ASSERT(inSuite, deserialized.Deserialize(serialized) == CHIP_NO_ERROR);
+
+    // Serialize from the deserialized session, and check we get the same string back
+    SecurePairingSessionSerialized serialized2;
+    NL_TEST_ASSERT(inSuite, deserialized.Serialize(serialized2) == CHIP_NO_ERROR);
+
+    NL_TEST_ASSERT(inSuite, strncmp(Uint8::to_char(serialized.inner), Uint8::to_char(serialized2.inner), sizeof(serialized)) == 0);
+
+    // Let's try encrypting using original session, and decrypting using deserialized
+    SecureSession session1, session2;
+
+    NL_TEST_ASSERT(inSuite, pairingCommissioner.DeriveSecureSession(Uint8::from_const_char("abc"), 3, session1) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, deserialized.DeriveSecureSession(Uint8::from_const_char("abc"), 3, session2) == CHIP_NO_ERROR);
+
+    const uint8_t plain_text[] = { 0x86, 0x74, 0x64, 0xe5, 0x0b, 0xd4, 0x0d, 0x90, 0xe1, 0x17, 0xa3, 0x2d, 0x4b, 0xd4, 0xe1, 0xe6 };
+    uint8_t encrypted[128];
+    PacketHeader header;
+    MessageAuthenticationCode mac;
+
+    NL_TEST_ASSERT(inSuite,
+                   session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, Header::Flags(), mac) == CHIP_NO_ERROR);
+
+    uint8_t decrypted[128];
+    NL_TEST_ASSERT(inSuite,
+                   session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, Header::Flags(), mac) == CHIP_NO_ERROR);
+}
+
 // Test Suite
 
 /**
@@ -142,6 +196,7 @@ static const nlTest sTests[] =
     NL_TEST_DEF("WaitInit",    SecurePairingWaitTest),
     NL_TEST_DEF("Start",       SecurePairingStartTest),
     NL_TEST_DEF("Handshake",   SecurePairingHandshakeTest),
+    NL_TEST_DEF("Serialize",   SecurePairingSerializeTest),
 
     NL_TEST_SENTINEL()
 };

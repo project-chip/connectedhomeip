@@ -48,6 +48,38 @@ typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * app
                              const Inet::IPPacketInfo * pktInfo);
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
 
+class DLL_EXPORT PersistentStorageDelegate
+{
+public:
+    /**
+     * @brief
+     *   Lookup the key and return it's stringified value
+     *
+     * @param[in] key Key to lookup
+     * @return Value or nullptr if not found
+     */
+    virtual const char * GetKeyValue(const char * key) = 0;
+
+    /**
+     * @brief
+     *   Set the value for the key
+     *
+     * @param[in] key Key to be set
+     * @param[in] value Value to be set
+     * @return returns corresponding error if unsuccessful
+     */
+    virtual CHIP_ERROR SetKeyValue(const char * key, const char * value) = 0;
+
+    /**
+     * @brief
+     *   Deletes the value for the key
+     *
+     * @param[in] key Key to be deleted
+     * @return returns corresponding error if unsuccessful
+     */
+    virtual CHIP_ERROR DeleteKeyValue(const char * key) = 0;
+};
+
 class DLL_EXPORT DevicePairingDelegate
 {
 public:
@@ -114,7 +146,8 @@ public:
      * Init function to be used when already-initialized System::Layer and InetLayer are available.
      */
     CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, Inet::InetLayer * inetLayer);
-    CHIP_ERROR Init(NodeId localDeviceId, DevicePairingDelegate * pairingDelegate);
+    CHIP_ERROR Init(NodeId localDeviceId, DevicePairingDelegate * pairingDelegate,
+                    PersistentStorageDelegate * storageDelegate = nullptr);
     CHIP_ERROR Shutdown();
 
     // ----- Connection Management -----
@@ -257,7 +290,6 @@ private:
     uint16_t mDevicePort;
     Inet::InterfaceId mInterface;
     Optional<NodeId> mRemoteDeviceId;
-    uint32_t mMessageNumber = 0;
 
     SecurePairingSession mPairingSession;
     SecurePairingUsingTestSecret * mTestSecurePairingSecret = nullptr;
@@ -266,11 +298,13 @@ private:
 
     DevicePairingDelegate * mPairingDelegate;
 
+    PersistentStorageDelegate * mStorageDelegate;
+
     void ClearRequestState();
     void ClearOpState();
 
-    CHIP_ERROR EstablishSecureSession();
-    CHIP_ERROR ResumeSecureSession();
+    CHIP_ERROR EstablishSecureSession(const NodeId & peer);
+    CHIP_ERROR ResumeSecureSession(const NodeId & peer);
 };
 
 } // namespace DeviceController
