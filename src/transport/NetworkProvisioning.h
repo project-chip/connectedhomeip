@@ -48,7 +48,7 @@ public:
      */
     virtual void ProvisionNetwork(const char * ssid, const char * passwd) {}
 
-    ~DeviceNetworkProvisioningDelegate() override {}
+    virtual ~DeviceNetworkProvisioningDelegate() {}
 };
 
 class DLL_EXPORT NetworkProvisioningDelegate : public ReferenceCounted<NetworkProvisioningDelegate>
@@ -82,7 +82,7 @@ public:
      */
     virtual void OnNetworkProvisioningComplete() {}
 
-    ~NetworkProvisioningDelegate() override {}
+    virtual ~NetworkProvisioningDelegate() {}
 };
 
 class DLL_EXPORT NetworkProvisioning

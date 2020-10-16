@@ -36,14 +36,54 @@
 
 using namespace chip;
 
+class TestClass : public ReferenceCounted<TestClass>
+{
+};
+
 static void TestRetainRelease(nlTestSuite * inSuite, void * inContext)
 {
-    ReferenceCounted<int> testObj;
+    TestClass * testObj = chip::Platform::New<TestClass>();
+    NL_TEST_ASSERT(inSuite, testObj->GetReferenceCount() == 1);
+    testObj->Retain();
+    NL_TEST_ASSERT(inSuite, testObj->GetReferenceCount() == 2);
+    testObj->Release();
+    NL_TEST_ASSERT(inSuite, testObj->GetReferenceCount() == 1);
+    testObj->Release();
+}
+
+class TestClassNonHeap;
+class Deletor
+{
+public:
+    static void Release(TestClassNonHeap * obj);
+};
+
+class TestClassNonHeap : public ReferenceCounted<TestClassNonHeap, Deletor>
+{
+public:
+    bool deleted;
+};
+
+void Deletor::Release(TestClassNonHeap * obj)
+{
+    obj->deleted = true;
+}
+
+static void TestRetainReleaseNonHeap(nlTestSuite * inSuite, void * inContext)
+{
+    TestClassNonHeap testObj;
+    testObj.deleted = false;
     NL_TEST_ASSERT(inSuite, testObj.GetReferenceCount() == 1);
+    NL_TEST_ASSERT(inSuite, testObj.deleted == false);
     testObj.Retain();
     NL_TEST_ASSERT(inSuite, testObj.GetReferenceCount() == 2);
+    NL_TEST_ASSERT(inSuite, testObj.deleted == false);
     testObj.Release();
     NL_TEST_ASSERT(inSuite, testObj.GetReferenceCount() == 1);
+    NL_TEST_ASSERT(inSuite, testObj.deleted == false);
+    testObj.Release();
+    NL_TEST_ASSERT(inSuite, testObj.GetReferenceCount() == 0);
+    NL_TEST_ASSERT(inSuite, testObj.deleted == true);
 }
 
 /**
@@ -54,20 +94,35 @@ static void TestRetainRelease(nlTestSuite * inSuite, void * inContext)
 static const nlTest sTests[] =
 {
     NL_TEST_DEF("ReferenceCountedRetain", TestRetainRelease),
+    NL_TEST_DEF("ReferenceCountedRetainNonHeap", TestRetainReleaseNonHeap),
 
     NL_TEST_SENTINEL()
 };
 // clang-format on
 
+int TestReferenceCounted_Setup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+int TestReferenceCounted_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 int TestReferenceCounted(void)
 {
     // clang-format off
     nlTestSuite theSuite =
-	{
+    {
         "Reference-Counted",
         &sTests[0],
-        nullptr,
-        nullptr
+        TestReferenceCounted_Setup,
+        TestReferenceCounted_Teardown
     };
     // clang-format on
 
