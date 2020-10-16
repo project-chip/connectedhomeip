@@ -425,7 +425,7 @@ std::string createSetupPayload()
         }
         else
         {
-            ESP_LOGE(TAG, "Failed to get decimal QR code");
+            ESP_LOGE(TAG, "Failed to get decimal setup code");
         }
     }
 
