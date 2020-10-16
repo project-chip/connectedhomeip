@@ -33,6 +33,7 @@
 #include <system/SystemTimer.h>
 
 // Include additional CHIP headers
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
@@ -1097,15 +1098,15 @@ DLL_EXPORT Error PostEvent(Layer & aLayer, void * aContext, Object & aTarget, Ev
     VerifyOrExit(aContext != NULL, lReturn = CHIP_SYSTEM_ERROR_BAD_ARGS);
     lSysMbox = reinterpret_cast<sys_mbox_t>(aContext);
 
-    ev = new LwIPEvent;
-    VerifyOrExit(ev != NULL, lReturn = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    ev = chip::Platform::New<LwIPEvent>();
+    VerifyOrExit(ev != nullptr, lReturn = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     ev->Type     = aType;
     ev->Target   = &aTarget;
     ev->Argument = aArgument;
 
     lLwIPError = sys_mbox_trypost(&lSysMbox, ev);
-    VerifyOrExit(lLwIPError == ERR_OK, delete ev; lReturn = chip::System::MapErrorLwIP(lLwIPError));
+    VerifyOrExit(lLwIPError == ERR_OK, chip::Platform::Delete(ev); lReturn = chip::System::MapErrorLwIP(lLwIPError));
 
 exit:
     return lReturn;
@@ -1151,7 +1152,7 @@ DLL_EXPORT Error DispatchEvents(Layer & aLayer, void * aContext)
         VerifyOrExit(lEvent != NULL && lEvent->Target != NULL, lReturn = CHIP_SYSTEM_ERROR_UNEXPECTED_EVENT);
 
         lReturn = aLayer.HandleEvent(*lEvent->Target, lEvent->Type, lEvent->Argument);
-        delete lEvent;
+        chip::Platform::Delete(lEvent);
 
         SuccessOrExit(lReturn);
     }

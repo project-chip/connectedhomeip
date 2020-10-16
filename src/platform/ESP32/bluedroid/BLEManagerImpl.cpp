@@ -43,8 +43,6 @@
 #include "esp_gatts_api.h"
 #include "esp_log.h"
 
-#include <new>
-
 #define MAX_ADV_DATA_LEN 31
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
 #define CHIP_ADV_DATA_FLAGS 0x06

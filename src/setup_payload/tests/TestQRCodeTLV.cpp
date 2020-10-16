@@ -280,6 +280,26 @@ struct TestContext
     nlTestSuite * mSuite;
 };
 
+/**
+ *  Set up the test suite.
+ */
+int TestQRCodeTLV_Setup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int TestQRCodeTLV_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
+
 } // namespace
 
 /**
@@ -292,8 +312,8 @@ int TestQRCodeTLV()
     {
         "chip-qrcode-optional-info-tests",
         &sTests[0],
-        nullptr,
-        nullptr
+        TestQRCodeTLV_Setup,
+        TestQRCodeTLV_Teardown
     };
     // clang-format on
     TestContext context;

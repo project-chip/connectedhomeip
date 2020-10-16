@@ -18,6 +18,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
@@ -48,7 +49,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
 #if CONFIG_NETWORK_LAYER_BLE
     {
-        Transport::BLE * transport = new Transport::BLE();
+        Transport::BLE * transport = chip::Platform::New<Transport::BLE>();
         err                        = transport->Init(this, mParams);
         mTransport                 = transport;
         mTransport->Retain();

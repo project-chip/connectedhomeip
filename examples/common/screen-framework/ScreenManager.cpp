@@ -27,6 +27,8 @@
 
 #if CONFIG_HAVE_DISPLAY
 
+#include <support/CHIPMem.h>
+
 #include <cassert>
 #include <vector>
 
@@ -260,7 +262,7 @@ void ScreenManager::PopScreen()
     Screen * screen = screens.back();
     screens.pop_back(); // screen is popped immediately before last exit
     screen->Exit(true); // screen is not top when exit/popped
-    delete screen;
+    chip::Platform::Delete(screen);
 
     focusBack = false;
 

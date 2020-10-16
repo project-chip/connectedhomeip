@@ -80,7 +80,7 @@ ChipDeviceController::~ChipDeviceController()
 {
     if (mTestSecurePairingSecret != nullptr)
     {
-        delete mTestSecurePairingSecret;
+        chip::Platform::Delete(mTestSecurePairingSecret);
     }
 }
 
@@ -144,8 +144,8 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 #else
     mSystemLayer->Shutdown();
     mInetLayer->Shutdown();
-    delete mSystemLayer;
-    delete mInetLayer;
+    chip::Platform::Delete(mSystemLayer);
+    chip::Platform::Delete(mInetLayer);
 #endif // CONFIG_DEVICE_LAYER
 
     mSystemLayer = nullptr;
@@ -153,13 +153,13 @@ CHIP_ERROR ChipDeviceController::Shutdown()
 
     if (mSessionManager != nullptr)
     {
-        delete mSessionManager;
+        chip::Platform::Delete(mSessionManager);
         mSessionManager = nullptr;
     }
 
     if (mRendezvousSession != nullptr)
     {
-        delete mRendezvousSession;
+        chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
 
@@ -190,7 +190,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     }
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
 
-    mRendezvousSession = new RendezvousSession(this);
+    mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     err                = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
     SuccessOrExit(err);
 
@@ -209,7 +209,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
 exit:
     if (err != CHIP_NO_ERROR && mRendezvousSession != nullptr)
     {
-        delete mRendezvousSession;
+        chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
 
@@ -223,10 +223,11 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
 {
     if (mTestSecurePairingSecret != nullptr)
     {
-        delete mTestSecurePairingSecret;
+        chip::Platform::Delete(mTestSecurePairingSecret);
     }
 
-    mTestSecurePairingSecret = new SecurePairingUsingTestSecret(Optional<NodeId>::Value(remoteDeviceId), 0, 0);
+    mTestSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>(
+        Optional<NodeId>::Value(remoteDeviceId), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
 
     mSecurePairingSession = mTestSecurePairingSecret;
 
@@ -259,7 +260,7 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
         ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
 
-    mSessionManager = new SecureSessionMgr<Transport::UDP>();
+    mSessionManager = chip::Platform::New<SecureSessionMgr<Transport::UDP>>();
 
     err = mSessionManager->Init(mLocalDeviceId, mSystemLayer,
                                 Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
@@ -282,7 +283,7 @@ exit:
     {
         if (mSessionManager != nullptr)
         {
-            delete mSessionManager;
+            chip::Platform::Delete(mSessionManager);
             mSessionManager = nullptr;
         }
         mConState = kConnectionState_NotConnected;
@@ -299,7 +300,7 @@ CHIP_ERROR ChipDeviceController::ResumeSecureSession()
 
     if (mSessionManager != nullptr)
     {
-        delete mSessionManager;
+        chip::Platform::Delete(mSessionManager);
         mSessionManager = nullptr;
     }
 
@@ -341,13 +342,13 @@ CHIP_ERROR ChipDeviceController::DisconnectDevice()
 
     if (mSessionManager != nullptr)
     {
-        delete mSessionManager;
+        chip::Platform::Delete(mSessionManager);
         mSessionManager = nullptr;
     }
 
     if (mRendezvousSession != nullptr)
     {
-        delete mRendezvousSession;
+        chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
 
@@ -479,7 +480,7 @@ void ChipDeviceController::OnRendezvousComplete()
 {
     if (mRendezvousSession != nullptr)
     {
-        delete mRendezvousSession;
+        chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
 }
@@ -492,7 +493,7 @@ void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
     // to clean up the session
     if (mRendezvousSession != nullptr)
     {
-        delete mRendezvousSession;
+        chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
     }
 }

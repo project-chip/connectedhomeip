@@ -27,6 +27,9 @@
 #include <core/CHIPError.h>
 #include <stdlib.h>
 
+#include <new>
+#include <utility>
+
 namespace chip {
 namespace Platform {
 
@@ -143,6 +146,35 @@ extern void * MemoryRealloc(void * p, size_t size);
  *
  */
 extern void MemoryFree(void * p);
+
+/**
+ * This function wraps the operator `new` with placement-new using MemoryAlloc().
+ * Instead of
+ *    p = new T(arguments)
+ * use
+ *    p = New<T>(arguments)
+ * In a few cases it may be necessary to add explicit casts to arguments, notably
+ * when passing integer constants to smaller integer parameters.
+ */
+template <typename T, typename... Args>
+inline T * New(Args &&... args)
+{
+    return new (MemoryAlloc(sizeof(T))) T(std::forward<Args>(args)...);
+}
+
+/**
+ * This function wraps the operator `delete` with using MemoryFree().
+ * Instead of
+ *    delete p
+ * use
+ *    Delete(p)
+ */
+template <typename T>
+inline void Delete(T * p)
+{
+    p->~T();
+    MemoryFree(p);
+}
 
 } // namespace Platform
 } // namespace chip

@@ -36,7 +36,6 @@
 
 #include "TestInetCommon.h"
 
-#include <new>
 #include <vector>
 
 #include <inttypes.h>
