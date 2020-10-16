@@ -71,7 +71,9 @@ constexpr const char * kDeviceAddressKeyPrefix     = "DeviceAddress";
     do                                                                                                                             \
     {                                                                                                                              \
         const size_t len = strlen(keyPrefix);                                                                                      \
+        /* 2 * sizeof(NodeId) to accomodate 2 character for each byte in Node Id */                                                \
         char key[len + 2 * sizeof(NodeId) + 1];                                                                                    \
+        nlSTATIC_ASSERT_PRINT(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                          \
         snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                 \
         action;                                                                                                                    \
     } while (0)
@@ -303,6 +305,7 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession(const NodeId & peer)
         SecurePairingSessionSerialized serialized;
 
         VerifyOrExit(credentials != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
+        VerifyOrExit(strlen(credentials) <= sizeof(serialized.inner), err = CHIP_ERROR_INVALID_STRING_LENGTH);
         strncpy(Uint8::to_char(serialized.inner), credentials, sizeof(serialized.inner));
 
         err = pairing.Deserialize(serialized);
@@ -432,7 +435,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
         // Try sesion resumption if needed
         if (err != CHIP_NO_ERROR && trySessionResumption)
         {
-            // VerifyOrExit(mRemoteDeviceId.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+            VerifyOrExit(mRemoteDeviceId.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
             err = ResumeSecureSession(mRemoteDeviceId.Value());
             // If session resumption failed, let's free the extra reference to
             // the buffer. If not, SendMessage would free it.

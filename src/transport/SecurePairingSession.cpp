@@ -92,7 +92,7 @@ CHIP_ERROR SecurePairingSession::Serialize(SecurePairingSessionSerialized & outp
 
         VerifyOrExit(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-        serializedLen = chip::Base64Encode(Uint8::to_const_uchar((uint8_t *) &serializable),
+        serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
                                            static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
         VerifyOrExit(serializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrExit(serializedLen < sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -121,9 +121,7 @@ CHIP_ERROR SecurePairingSession::Deserialize(SecurePairingSessionSerialized & in
     VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     mPairingComplete = (serializable.mPairingComplete == 1);
-
-    VerifyOrExit(CanCastTo<uint16_t>(serializable.mKeLen), error = CHIP_ERROR_INTERNAL);
-    mKeLen = static_cast<size_t>(serializable.mKeLen);
+    mKeLen           = static_cast<size_t>(serializable.mKeLen);
 
     VerifyOrExit(mKeLen <= sizeof(mKe), error = CHIP_ERROR_INVALID_ARGUMENT);
     memset(mKe, 0, sizeof(mKe));

@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <controller/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
@@ -47,38 +48,6 @@ typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * 
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
                              const Inet::IPPacketInfo * pktInfo);
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
-
-class DLL_EXPORT PersistentStorageDelegate
-{
-public:
-    /**
-     * @brief
-     *   Lookup the key and return it's stringified value
-     *
-     * @param[in] key Key to lookup
-     * @return Value or nullptr if not found
-     */
-    virtual const char * GetKeyValue(const char * key) = 0;
-
-    /**
-     * @brief
-     *   Set the value for the key
-     *
-     * @param[in] key Key to be set
-     * @param[in] value Value to be set
-     * @return returns corresponding error if unsuccessful
-     */
-    virtual CHIP_ERROR SetKeyValue(const char * key, const char * value) = 0;
-
-    /**
-     * @brief
-     *   Deletes the value for the key
-     *
-     * @param[in] key Key to be deleted
-     * @return returns corresponding error if unsuccessful
-     */
-    virtual CHIP_ERROR DeleteKeyValue(const char * key) = 0;
-};
 
 class DLL_EXPORT DevicePairingDelegate
 {
