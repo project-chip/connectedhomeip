@@ -491,29 +491,26 @@ bool ParseArgs(const char * progName, int argc, char * argv[], OptionSet * optSe
 bool ParseArgsFromString(const char * progName, const char * argStr, OptionSet * optSets[],
                          NonOptionArgHandlerFunct nonOptArgHandler, bool ignoreUnknown)
 {
-    char * argStrCopy = nullptr;
-    char ** argv      = nullptr;
+    char ** argv = nullptr;
     int argc;
     bool res;
 
-    argStrCopy = chip::Platform::MemoryAllocString(argStr);
-    if (argStrCopy == nullptr)
+    chip::Platform::ScopedMemoryString argStrCopy(argStr, strlen(argStr));
+    if (!argStrCopy)
     {
         PrintArgError("%s: Memory allocation failure\n", progName);
         return false;
     }
 
-    argc = SplitArgs(argStrCopy, argv, const_cast<char *>(progName));
+    argc = SplitArgs(argStrCopy.Get(), argv, const_cast<char *>(progName));
     if (argc < 0)
     {
         PrintArgError("%s: Memory allocation failure\n", progName);
-        chip::Platform::MemoryFree(argStrCopy);
         return false;
     }
 
     res = ParseArgs(progName, argc, argv, optSets, nonOptArgHandler, ignoreUnknown);
 
-    chip::Platform::MemoryFree(argStrCopy);
     chip::Platform::MemoryFree(argv);
 
     return res;
