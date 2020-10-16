@@ -42,7 +42,7 @@ class TestClass : public ReferenceCounted<TestClass>
 
 static void TestRetainRelease(nlTestSuite * inSuite, void * inContext)
 {
-    TestClass* testObj = new TestClass;
+    TestClass * testObj = new TestClass;
     NL_TEST_ASSERT(inSuite, testObj->GetReferenceCount() == 1);
     testObj->Retain();
     NL_TEST_ASSERT(inSuite, testObj->GetReferenceCount() == 2);
@@ -55,7 +55,7 @@ class TestClassNonHeap;
 class Deletor
 {
 public:
-    static void Release(TestClassNonHeap* obj);
+    static void Release(TestClassNonHeap * obj);
 };
 
 class TestClassNonHeap : public ReferenceCounted<TestClass>
@@ -64,7 +64,7 @@ public:
     bool deleted;
 };
 
-void Deletor::Release(TestClassNonHeap* obj)
+void Deletor::Release(TestClassNonHeap * obj)
 {
     obj->deleted = true;
 }
