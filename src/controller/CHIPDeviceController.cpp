@@ -25,6 +25,10 @@
  *
  */
 
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
+
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
@@ -67,8 +71,8 @@ constexpr const char * kDeviceAddressKeyPrefix     = "DeviceAddress";
     do                                                                                                                             \
     {                                                                                                                              \
         const size_t len = strlen(keyPrefix);                                                                                      \
-        char key[len + 2 * sizeof(NodeId) + 1];                                                                                        \
-        snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                     \
+        char key[len + 2 * sizeof(NodeId) + 1];                                                                                    \
+        snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                 \
         action;                                                                                                                    \
     } while (0)
 
