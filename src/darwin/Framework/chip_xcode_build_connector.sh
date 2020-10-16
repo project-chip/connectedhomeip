@@ -102,12 +102,14 @@ fi
 
 (
     cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
-    git submodule update --init
-    set +ex
-    echo PW_ENVSETUP_QUIET=1 . scripts/activate.sh >&2
-    PW_ENVSETUP_QUIET=1 . scripts/activate.sh
-    (($? != 0)) && echo "Please source $CHIP_ROOT/scripts/bootstrap.sh before building" && exit 1
-    set -ex
+    [[ -n $CHIP_NO_SUBMODULES ]] || git submodule update --init
+    if [[ -z $CHIP_NO_ACTIVATE ]]; then
+        set +ex
+        echo PW_ENVSETUP_QUIET=1 . scripts/activate.sh >&2
+        PW_ENVSETUP_QUIET=1 . scripts/activate.sh
+        (($? != 0)) && echo "Please source $CHIP_ROOT/scripts/bootstrap.sh before building" && exit 1
+        set -ex
+    fi
 
     cd "$TEMP_DIR"
     # [[ -f out/build.ninja ]] ?
