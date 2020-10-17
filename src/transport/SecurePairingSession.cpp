@@ -91,7 +91,7 @@ CHIP_ERROR SecurePairingSession::Serialize(SecurePairingSessionSerialized & outp
         serializable.mLocalKeyId      = mLocalKeyId;
         serializable.mPeerKeyId       = mPeerKeyId;
 
-        memcpy(serializable.mKe, mKe, kMAX_Hash_Length);
+        memcpy(serializable.mKe, mKe, mKeLen);
 
         uint16_t serializedLen = 0;
 
