@@ -611,8 +611,9 @@ void ChipDeviceController::ClearRequestState()
 
 void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
-void ChipDeviceController::OnMessageReceived(const PacketHeader & header, Transport::PeerConnectionState * state,
-                                             System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
+void ChipDeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
+                                             Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                             SecureSessionMgrBase * mgr)
 {
     if (header.GetSourceNodeId().HasValue())
     {
