@@ -82,13 +82,18 @@ CHIP_ERROR SecurePairingSession::Serialize(SecurePairingSessionSerialized & outp
     VerifyOrExit(CanCastTo<uint16_t>(sizeof(SecurePairingSessionSerializable)), error = CHIP_ERROR_INTERNAL);
 
     {
-        uint8_t paired                                = (mPairingComplete) ? 1 : 0;
-        uint16_t keLen                                = static_cast<uint16_t>(mKeLen);
-        uint16_t serializedLen                        = 0;
-        SecurePairingSessionSerializable serializable = {
-            keLen, { 0 }, paired, localNodeId, peerNodeId, mLocalKeyId, mPeerKeyId, 0
-        };
+        SecurePairingSessionSerializable serializable;
+        memset(&serializable, 0, sizeof(serializable));
+        serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
+        serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
+        serializable.mLocalNodeId     = localNodeId;
+        serializable.mPeerNodeId      = peerNodeId;
+        serializable.mLocalKeyId      = mLocalKeyId;
+        serializable.mPeerKeyId       = mPeerKeyId;
+
         memcpy(serializable.mKe, mKe, kMAX_Hash_Length);
+
+        uint16_t serializedLen = 0;
 
         VerifyOrExit(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
 
