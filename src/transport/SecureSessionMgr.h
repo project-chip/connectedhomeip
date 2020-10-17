@@ -59,6 +59,7 @@ public:
      *   msgBuf after processing it.
      *
      * @param packetHeader  The message header
+     * @param payloadHeader The payload header
      * @param state         The connection state
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
