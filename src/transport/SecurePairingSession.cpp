@@ -58,18 +58,6 @@ SecurePairingSession::~SecurePairingSession()
     memset(&mKe[0], 0, sizeof(mKe));
 }
 
-typedef struct
-{
-    uint16_t mKeLen;
-    uint8_t mKe[kMAX_Hash_Length];
-    uint8_t mPairingComplete;
-    uint64_t mLocalNodeId;
-    uint64_t mPeerNodeId;
-    uint16_t mLocalKeyId;
-    uint16_t mPeerKeyId;
-    uint64_t padding;
-} SecurePairingSessionSerializable;
-
 CHIP_ERROR SecurePairingSession::Serialize(SecurePairingSessionSerialized & output)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
@@ -116,7 +104,7 @@ CHIP_ERROR SecurePairingSession::Deserialize(SecurePairingSessionSerialized & in
     size_t len               = strnlen(Uint8::to_char(input.inner), maxlen);
     uint16_t deserializedLen = 0;
 
-    VerifyOrExit(BASE64_MAX_DECODED_LEN(len) <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(len < sizeof(SecurePairingSessionSerialized), error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(CanCastTo<uint16_t>(len), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     memset(&serializable, 0, sizeof(serializable));

@@ -263,9 +263,21 @@ public:
     CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg) override { return CHIP_NO_ERROR; }
 };
 
+typedef struct SecurePairingSessionSerializable
+{
+    uint16_t mKeLen;
+    uint8_t mKe[kMAX_Hash_Length];
+    uint8_t mPairingComplete;
+    uint64_t mLocalNodeId;
+    uint64_t mPeerNodeId;
+    uint16_t mLocalKeyId;
+    uint16_t mPeerKeyId;
+} SecurePairingSessionSerializable;
+
 typedef struct SecurePairingSessionSerialized
 {
-    uint8_t inner[BASE64_ENCODED_LEN(sizeof(SecurePairingSession))];
+    // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
+    uint8_t inner[BASE64_ENCODED_LEN(sizeof(SecurePairingSessionSerializable) + sizeof(uint64_t))];
 } SecurePairingSessionSerialized;
 
 } // namespace chip
