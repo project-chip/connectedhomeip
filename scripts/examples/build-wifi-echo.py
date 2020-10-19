@@ -9,48 +9,24 @@ import coloredlogs
 _LOG = logging.getLogger(__name__)
 
 ROOT = 'examples/wifi-echo/server/esp32'
-IDF_PATH = os.getenv('IDF_PATH')
+
+class IDFExecutor:
+  """Runs specified commands via an executor that activates the CHIP build environment."""
 
 
-def GetEnvironment(script):
-  """Executes the given script and extracts the subprocess environment."""
+  def __init__(self):
+    script_path = os.path.dirname(os.path.realpath(__file__))
+    self.chip_root = os.path.realpath(os.path.join(script_path, '..', '..'))
 
-  prog = subprocess.Popen(
-      ['bash', '-c',
-       'source "%s" && echo ENV_FOLLOWS && set' % script],
-      stdout=subprocess.PIPE,
-      stderr=subprocess.PIPE)
+    logging.info("CHIP Root directory: %s" % self.chip_root)
 
-  out, err = prog.communicate()
+    self.run_cmd = os.path.join(self.chip_root, "scripts", "run_in_build_env.sh")
+    logging.info("Executing via: %s" % self.run_cmd)
 
-  for l in err.decode('utf8').split('\n'):
-    if l:
-      logging.error(l)
-
-  env = None
-  for l in out.decode('utf8').split('\n'):
-    if env is not None:
-      logging.debug('Environment: %r', l)
-      idx = l.find('=')
-      if idx >= 0:
-        key, value = l[:idx], l[idx + 1:]
-        env[key] = value
-    elif l == 'ENV_FOLLOWS':
-      env = {}  # starts an envorinment
-    else:
-      logging.info(l)
-
-  env['CHIP_ROOT'] = os.path.realpath(os.path.curdir)
-  env['CHIP_BUILD_WITH_GN'] = 'y'
-
-  # HACK for pigweed:
-  #   - attempting to set PW_CEHCKOUT_ROOT will reslt in a bootstrap
-  #   - we want activate.sh
-  env['BASH_SOURCE'] = os.path.join(
-      os.path.realpath(os.path.curdir), 'third_party', 'pigweed', 'repo',
-      'activate.sh')
-
-  return env
+  
+  def execute(self, command):
+    os.chdir(self.chip_root)
+    subprocess.call([self.run_cmd, 'source "%s/%s/idf.sh"; idf %s' % (self.chip_root, ROOT, command)])
 
 
 def main():
@@ -74,19 +50,21 @@ def main():
       format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
   coloredlogs.install()
 
-  build_env = GetEnvironment(os.path.join(IDF_PATH, 'export.sh'))
+  e = IDFExecutor()
 
   if args.clear_config:
     logging.info('Building a clear configuration')
-    build_env[
-        'SDK_CONFIG_DEFAULTS'] = 'sdkconfig_%s.defaults' % args.clear_config
+    sdk_config = 'sdkconfig_%s.defaults' % args.clear_config
+
     os.remove(os.path.join(ROOT, 'sdkconfig'))
-    subprocess.call(
-        ['make', '-j%d' % os.cpu_count(), '-C', ROOT, 'defconfig'],
-        env=build_env)
+
+    e.execute('SDKCONFIG_DEFAULTS="{sdkname}" make -j{cpus} -C {example_root} defconfig'.format(
+      sdkname=sdkconfig, cpus=os.cpu_count(), example_root = ROOT
+    ))
+
 
   logging.info('Compiling')
-  subprocess.call(['make', '-j%d' % os.cpu_count(), '-C', ROOT], env=build_env)
+  e.execute('make -j{cpus} -C {example_root}'.format(cpus=os.cpu_count(), example_root=ROOT))
 
 
 if __name__ == '__main__':
