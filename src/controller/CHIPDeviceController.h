@@ -272,8 +272,8 @@ private:
     void ClearRequestState();
     void ClearOpState();
 
-    CHIP_ERROR EstablishSecureSession(const NodeId & peer);
-    CHIP_ERROR ResumeSecureSession(const NodeId & peer);
+    CHIP_ERROR EstablishSecureSession(NodeId peer);
+    CHIP_ERROR ResumeSecureSession(NodeId peer);
 };
 
 } // namespace DeviceController

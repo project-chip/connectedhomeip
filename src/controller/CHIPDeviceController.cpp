@@ -66,7 +66,7 @@ using namespace chip::Encoding;
 constexpr const char * kDeviceCredentialsKeyPrefix = "DeviceCredentials";
 constexpr const char * kDeviceAddressKeyPrefix     = "DeviceAddress";
 
-// This macro generats a key using node ID an key prefix, and performs the given action
+// This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
 #define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
     do                                                                                                                             \
@@ -273,7 +273,7 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDeviceController::EstablishSecureSession(const NodeId & peer)
+CHIP_ERROR ChipDeviceController::EstablishSecureSession(NodeId peer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     SecurePairingSession pairing;
@@ -337,7 +337,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ResumeSecureSession(const NodeId & peer)
+CHIP_ERROR ChipDeviceController::ResumeSecureSession(NodeId peer)
 {
     if (mConState == kConnectionState_SecureConnected)
     {
