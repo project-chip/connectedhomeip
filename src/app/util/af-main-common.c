@@ -102,7 +102,7 @@
 #include "gen/callback.h"
 //#include "print.h"
 #include "binding-table.h"
-#include "chip-response.h"
+#include "chip-message-send.h"
 #include "util.h"
 
 // Querying the Ember Stack for what libraries are present.
@@ -688,7 +688,7 @@ EmberStatus emAfSend(EmberOutgoingMessageType type, uint64_t indexOrDestination,
         status = EMBER_ERR_FATAL;
         break;
     case EMBER_OUTGOING_DIRECT:
-        status = chipSendResponse(indexOrDestination, apsFrame, messageLength, message);
+        status = chipSendUnicast(indexOrDestination, apsFrame, messageLength, message);
         break;
     case EMBER_OUTGOING_MULTICAST:
         // No implementation yet.
