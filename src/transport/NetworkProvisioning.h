@@ -24,6 +24,7 @@
 #pragma once
 
 #include <core/CHIPCore.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 #include <protocols/CHIPProtocols.h>
 #include <support/BufBound.h>
 #include <system/SystemPacketBuffer.h>
@@ -45,7 +46,15 @@ public:
      * @param ssid WiFi SSID
      * @param passwd WiFi password
      */
-    virtual void ProvisionNetwork(const char * ssid, const char * passwd) {}
+    virtual void ProvisionWiFi(const char * ssid, const char * passwd) {}
+
+    /**
+     * @brief
+     *   Called to provision Thread credentials in a device
+     *
+     * @param threadData Thread settings and credentials
+     */
+    virtual void ProvisionThread(const DeviceLayer::Internal::DeviceNetworkInfo & threadData) {}
 
     virtual ~DeviceNetworkProvisioningDelegate() {}
 };
@@ -89,8 +98,9 @@ class DLL_EXPORT NetworkProvisioning
 public:
     enum MsgTypes : uint8_t
     {
-        kWiFiAssociationRequest = 0,
-        kIPAddressAssigned      = 1,
+        kWiFiAssociationRequest   = 0,
+        kIPAddressAssigned        = 1,
+        kThreadAssociationRequest = 2
     };
 
     void Init(NetworkProvisioningDelegate * delegate, DeviceNetworkProvisioningDelegate * deviceDelegate);
@@ -128,6 +138,8 @@ private:
 
     CHIP_ERROR EncodeString(const char * str, BufBound & bbuf);
     CHIP_ERROR DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed);
+
+    CHIP_ERROR DecodeThreadAssociationRequest(System::PacketBuffer * msgBuf);
 
 #if CONFIG_DEVICE_LAYER
     static void ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
