@@ -83,7 +83,6 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
 
     override fun onStop() {
         super.onStop()
-        gatt?.disconnect()
         gatt = null
         scope.cancel()
     }
