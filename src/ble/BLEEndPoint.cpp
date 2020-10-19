@@ -78,7 +78,7 @@
  *   connection and free itself if the transport connection has not been established.
  *
  */
-#define BLE_CONNECT_TIMEOUT_MS                                5000 // 5 seconds
+#define BLE_CONNECT_TIMEOUT_MS                                15000 // 15 seconds
 
 /**
  *  @def BLE_UNSUBSCRIBE_TIMEOUT_MS
