@@ -106,12 +106,17 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.Init(&conn);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ExchangeContext * ec = exchangeMgr.NewContext(kDestinationNodeId, (void *) 0x1234);
-    NL_TEST_ASSERT(inSuite, ec != nullptr);
-    NL_TEST_ASSERT(inSuite, ec->IsInitiator() == true);
-    NL_TEST_ASSERT(inSuite, ec->GetExchangeId() != 0);
-    NL_TEST_ASSERT(inSuite, ec->GetPeerNodeId() == kDestinationNodeId);
-    NL_TEST_ASSERT(inSuite, ec->GetAppState() == (void *) 0x1234);
+    ExchangeContext * ec1 = exchangeMgr.NewContext(kSourceNodeId, (void *) 0x1234);
+    NL_TEST_ASSERT(inSuite, ec1 != nullptr);
+    NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
+    NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
+    NL_TEST_ASSERT(inSuite, ec1->GetPeerNodeId() == kSourceNodeId);
+    NL_TEST_ASSERT(inSuite, ec1->GetAppState() == (void *) 0x1234);
+
+    ExchangeContext * ec2 = exchangeMgr.NewContext(kDestinationNodeId, (void *) 0x2345);
+    NL_TEST_ASSERT(inSuite, ec2 != nullptr);
+    NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
+    NL_TEST_ASSERT(inSuite, ec2->GetPeerNodeId() == kDestinationNodeId);
 }
 
 void CheckFindContextTest(nlTestSuite * inSuite, void * inContext)
