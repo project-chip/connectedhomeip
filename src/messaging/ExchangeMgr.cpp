@@ -36,15 +36,10 @@
 #include <core/CHIPEncoding.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
-#include <protocols/CHIPProtocols.h>
-#include <protocols/common/CommonProtocol.h>
-#include <protocols/security/CHIPSecurity.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/SystemStats.h>
-#include <system/SystemTimer.h>
 
 using namespace chip::Encoding;
 using namespace chip::Inet;
@@ -135,7 +130,7 @@ ExchangeContext * ExchangeManager::FindContext(uint64_t peerNodeId, void * appSt
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContext::MessageReceiveFunct handler,
                                                               void * appState)
 {
-    return RegisterUMH(protocolId, (int16_t) -1, handler, appState);
+    return RegisterUMH(protocolId, kAnyMessageType, handler, appState);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType,
@@ -146,7 +141,7 @@ CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolI
 
 CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protocolId)
 {
-    return UnregisterUMH(protocolId, static_cast<int16_t>(-1));
+    return UnregisterUMH(protocolId, kAnyMessageType);
 }
 
 CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType)

@@ -38,11 +38,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <protocols/CHIPProtocols.h>
 #include <protocols/common/CommonProtocol.h>
-#include <support/CHIPFaultInjection.h>
-#include <support/CodeUtils.h>
-#include <support/RandUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/SystemStats.h>
 #include <system/SystemTimer.h>
 
 using namespace chip::Encoding;
@@ -52,11 +48,8 @@ using namespace chip::System;
 namespace chip {
 
 // Special node id values.
-enum
-{
-    kNodeIdNotSpecified = 0ULL,
-    kAnyNodeId          = 0xFFFFFFFFFFFFFFFFULL
-};
+static constexpr NodeId kNodeIdNotSpecified = 0ULL;
+static constexpr NodeId kAnyNodeId          = 0xFFFFFFFFFFFFFFFFULL;
 
 static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
                                      PacketBuffer * payload)
