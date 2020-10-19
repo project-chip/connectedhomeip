@@ -79,7 +79,6 @@ pw_cleanup
 
 unset PW_ROOT
 unset PW_CIPD_INSTALL_DIR
-unset PW_PIGWEED_CIPD_INSTALL_DIR
 unset CIPD_CACHE_DIR
 unset _PW_BANNER_FUNC
 unset _PW_TEXT
