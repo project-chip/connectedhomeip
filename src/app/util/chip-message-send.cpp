@@ -17,10 +17,10 @@
 
 /**
  * @file
- *   This file provides an implementation of chipSendResponse.
+ *   This file provides an implementation of functions for sending messages.
  */
 
-#include "chip-response.h"
+#include "chip-message-send.h"
 
 #include <assert.h>
 #include <inet/InetLayer.h> // PacketBuffer and the like
@@ -40,7 +40,7 @@ extern SecureSessionMgrBase & SessionManager();
 
 extern "C" {
 
-EmberStatus chipSendResponse(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
+EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
     uint16_t frameSize  = encodeApsFrame(nullptr, 0, apsFrame);
     uint32_t dataLength = uint32_t(frameSize) + uint32_t(messageLength);
