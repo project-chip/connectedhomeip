@@ -275,7 +275,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
         payloadlen = packetHeader.GetPayloadLength();
         VerifyOrExit(
             payloadlen <= len,
-            (ChipLogError(Inet, "Secure transport can't find MAC Tag; buffer too short"), err = CHIP_ERROR_INCORRECT_STATE));
+            (ChipLogError(Inet, "Secure transport can't find MAC Tag; buffer too short"), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH));
         err = mac.Decode(packetHeader, &data[payloadlen], len - payloadlen, &taglen);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
         len = static_cast<uint16_t>(len - taglen);
