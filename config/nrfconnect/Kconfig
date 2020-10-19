@@ -44,3 +44,24 @@ config MULTIPROTOCOL
 	depends on BT && NET_L2_OPENTHREAD
 	help
 	  Enable multiprotocol in the nRF 802.15.4 radio driver
+
+config CHIP_DISABLE_CHIPOBLE_ADVERTISING_WHEN_PROVISIONED
+	bool "Disable CHIPoBLE advertising when device is fully provisioned"
+	default n
+	help
+	  Enables CHIPoBLE advertising disabling when the device achieves a fully provisioned state.
+
+config CHIP_DISABLE_ACCOUNT_PAIRING
+	bool "Disable Account Pairing"
+	default n
+	help
+	  Disables sending the PairDeviceToAccount request to the service during a RegisterServicePairAccount
+	  operation.  When this option is enabled, the device will perform all local operations associated
+	  with registering a service, but will not request the service to add the device to the user's account.
+
+config CHIP_DISABLE_FABRIC_MEMBER
+	bool "Disable Fabric Member device checks"
+	default n
+	help
+	  Disables checking if device is fabric member in order to allow testing some of communication
+	  functionalities on development kits and other non-production boards.

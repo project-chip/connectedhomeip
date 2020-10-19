@@ -856,7 +856,10 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
         (!UseManufacturerCredentialsAsOperational() && _OperationalDeviceCredentialsProvisioned()) &&
 #endif
-        Impl()->IsMemberOfFabric();
+#if !CHIP_DEVICE_CONFIG_DISABLE_FABRIC_MEMBER
+        Impl()->IsMemberOfFabric() &&
+#endif
+    true;
 }
 
 template <class ImplClass>

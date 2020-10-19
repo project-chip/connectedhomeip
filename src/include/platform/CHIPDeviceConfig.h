@@ -607,6 +607,18 @@
 #define CHIP_DEVICE_CONFIG_DISABLE_ACCOUNT_PAIRING 0
 #endif
 
+/**
+ * CHIP_DEVICE_CONFIG_DISABLE_FABRIC_MEMBER
+ *
+ * Disables checking if device is fabric member in order to allow testing some of communication
+ * functionalities on development kits and other non-production boards.
+ *
+ * This option is for testing only and should not be enabled in production releases.
+ */
+#ifndef CHIP_DEVICE_CONFIG_DISABLE_FABRIC_MEMBER
+#define CHIP_DEVICE_CONFIG_DISABLE_FABRIC_MEMBER 0
+#endif
+
 // -------------------- Network Telemetry Configuration --------------------
 
 /**
