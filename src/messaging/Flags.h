@@ -69,7 +69,8 @@ constexpr const uint16_t kSendFlag_DefaultMulticastSourceAddress =
     0x0100; /**< Used to indicate that default IPv6 source address selection should be used when sending IPv6 multicast messages. */
 constexpr const uint16_t kSendFlag_FromInitiator =
     0x0200; /**< Used to indicate that the current message is the initiator of the exchange. */
-constexpr const uint16_t kSendFlag_RequestAck = 0x0400; /**< Used to send a ReliableMessageProtocol message requesting an acknowledgment. */
+constexpr const uint16_t kSendFlag_RequestAck =
+    0x0400; /**< Used to send a ReliableMessageProtocol message requesting an acknowledgment. */
 constexpr const uint16_t kSendFlag_NoAutoRequestAck =
     0x0800; /**< Suppress the auto-request acknowledgment feature when sending a message. */
 

@@ -27,8 +27,8 @@
 
 #include <core/CHIPEncoding.h>
 #include <messaging/Flags.h>
-#include <messaging/Utils.h>
 #include <messaging/ReliableMessageManager.h>
+#include <messaging/Utils.h>
 #include <protocols/CHIPProtocols.h>
 #include <protocols/common/CommonProtocol.h>
 #include <support/BitFlags.h>
@@ -37,13 +37,14 @@
 namespace chip {
 namespace messaging {
 
-void ReliableMessageContextDeletor::Release(ReliableMessageContext* obj)
+void ReliableMessageContextDeletor::Release(ReliableMessageContext * obj)
 {
     obj->mDelegate.GetManager().FreeContext(obj);
 }
 
 ReliableMessageContext::ReliableMessageContext(ReliableMessageDelegate & delegate) :
-    mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0), mThrottleTimeoutTick(0), mPendingPeerAckId(0), mDelegate(delegate)
+    mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0), mThrottleTimeoutTick(0), mPendingPeerAckId(0),
+    mDelegate(delegate)
 {}
 
 /**
@@ -375,7 +376,8 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, uint32_t F
 
         // Replace the Pending ack id.
         mPendingPeerAckId = MessageId;
-        mNextAckTimeTick = mConfig.mAckPiggybackTimeoutTick + static_cast<uint16_t>(mDelegate.GetManager().GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
+        mNextAckTimeTick  = mConfig.mAckPiggybackTimeoutTick +
+            static_cast<uint16_t>(mDelegate.GetManager().GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
         SetAckPending(true);
     }
 
@@ -435,7 +437,7 @@ CHIP_ERROR ReliableMessageContext::SendCommonNullMessage()
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err    = mDelegate.SendMessage(chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf,
+    err = mDelegate.SendMessage(chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf,
                                 kSendFlag_NoAutoRequestAck);
 
 exit:

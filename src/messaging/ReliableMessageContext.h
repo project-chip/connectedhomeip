@@ -53,7 +53,7 @@ public:
 
     /* Transport delegates */
     virtual ReliableMessageManager & GetManager() = 0;
-    virtual bool IsNode(uint64_t id)                  = 0;
+    virtual bool IsNode(uint64_t id)              = 0;
 
     virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf, uint16_t sendFlags)                                      = 0;
     virtual CHIP_ERROR SendMessage(uint32_t profileId, uint8_t msgType, System::PacketBuffer * msgBuf, uint16_t sendFlags) = 0;
@@ -63,7 +63,7 @@ class ReliableMessageContext;
 class ReliableMessageContextDeletor
 {
 public:
-    static void Release(ReliableMessageContext* obj);
+    static void Release(ReliableMessageContext * obj);
 };
 
 class ReliableMessageContext : public ReferenceCounted<ReliableMessageContext, ReliableMessageContextDeletor>
@@ -111,9 +111,9 @@ private:
     CHIP_ERROR HandleThrottleFlow(uint32_t PauseTimeMillis);
 
 public:
-    ReliableMessageProtocolConfig mConfig;         /**< ReliableMessageProtocol configuration. */
-    uint16_t mNextAckTimeTick;     // Next time for triggering Solo Ack
-    uint16_t mThrottleTimeoutTick; // Timeout until when Throttle is On when ThrottleEnabled is set
+    ReliableMessageProtocolConfig mConfig; /**< ReliableMessageProtocol configuration. */
+    uint16_t mNextAckTimeTick;             // Next time for triggering Solo Ack
+    uint16_t mThrottleTimeoutTick;         // Timeout until when Throttle is On when ThrottleEnabled is set
     uint32_t mPendingPeerAckId;
 
     ReliableMessageDelegate & mDelegate;

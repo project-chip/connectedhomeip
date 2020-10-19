@@ -55,12 +55,12 @@ private:
     public:
         RetransTableEntry();
 
-        ReliableMessageContext * rc; /**< The context for the stored CHIP message. */
-        System::PacketBuffer * msgBuf;   /**< A pointer to the PacketBuffer object holding the CHIP message. */
-        uint32_t msgId;                  /**< The message identifier of the CHIP message awaiting acknowledgment. */
+        ReliableMessageContext * rc;   /**< The context for the stored CHIP message. */
+        System::PacketBuffer * msgBuf; /**< A pointer to the PacketBuffer object holding the CHIP message. */
+        uint32_t msgId;                /**< The message identifier of the CHIP message awaiting acknowledgment. */
         uint16_t msgSendFlags;
         uint16_t nextRetransTimeTick; /**< A counter representing the next retransmission time for the message. */
-        uint8_t sendCount;        /**< A counter representing the number of times the message has been sent. */
+        uint8_t sendCount;            /**< A counter representing the number of times the message has been sent. */
     };
 
 public:
