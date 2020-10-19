@@ -65,6 +65,5 @@ jobs:
               if: ${{ always() }}
               with:
                   name:
-                      cirque_log-${{
-                        steps.outsuffix.outputs.value }}
+                      cirque_log-${{steps.outsuffix.outputs.value}}-logs
                   path: /tmp/cirque_test_output/
