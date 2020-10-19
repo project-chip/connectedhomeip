@@ -44,3 +44,9 @@ config MULTIPROTOCOL
 	depends on BT && NET_L2_OPENTHREAD
 	help
 	  Enable multiprotocol in the nRF 802.15.4 radio driver
+
+config CHIP_DISABLE_CHIPOBLE_ADVERTISING_WHEN_PROVISIONED
+	bool "Disable CHIPoBLE advertising when device is fully provisioned"
+	default n
+	help
+	  Enables CHIPoBLE advertising disabling when the device achieves a fully provisioned state.

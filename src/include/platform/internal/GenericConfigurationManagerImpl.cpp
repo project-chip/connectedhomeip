@@ -850,13 +850,11 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
         ConnectivityMgr().IsThreadProvisioned() &&
 #endif
-#if !CHIP_DEVICE_CONFIG_DISABLE_ACCOUNT_PAIRING
-        Impl()->IsPairedToAccount() &&
-#endif
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
         (!UseManufacturerCredentialsAsOperational() && _OperationalDeviceCredentialsProvisioned()) &&
 #endif
-        Impl()->IsMemberOfFabric();
+    // TODO: Add checks regarding fabric membership and account pairing, when functionalities will be implemented.
+        true;
 }
 
 template <class ImplClass>
