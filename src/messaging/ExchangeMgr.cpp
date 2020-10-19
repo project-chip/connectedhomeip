@@ -87,6 +87,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
 {
     if (mSessionMgr != nullptr)
     {
+        mSessionMgr->SetDelegate(nullptr);
         mSessionMgr = nullptr;
     }
 
@@ -190,7 +191,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     CHIP_ERROR err                          = CHIP_NO_ERROR;
 
     // Search for an existing exchange that the message applies to. If a match is found...
-    ec = (ExchangeContext *) ContextPool;
+    ec = ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
         if (ec->GetExchangeMgr() != nullptr && ec->MatchExchange(packetHeader, payloadHeader))
@@ -267,8 +268,6 @@ exit:
     {
         PacketBuffer::Free(msgBuf);
     }
-
-    return;
 }
 
 CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContext::MessageReceiveFunct handler,

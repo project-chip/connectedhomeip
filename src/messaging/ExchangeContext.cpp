@@ -47,10 +47,6 @@ using namespace chip::System;
 
 namespace chip {
 
-// Special node id values.
-static constexpr NodeId kNodeIdNotSpecified = 0ULL;
-static constexpr NodeId kAnyNodeId          = 0xFFFFFFFFFFFFFFFFULL;
-
 static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
                                      PacketBuffer * payload)
 {
@@ -134,8 +130,6 @@ exit:
     if (msgBuf != nullptr && (sendFlags & kSendFlag_RetainBuffer) == 0)
     {
         PacketBuffer::Free(msgBuf);
-        if (mMsg == msgBuf)
-            mMsg = nullptr;
     }
 
     // Release the reference to the exchange context acquired above. Under normal circumstances
@@ -246,18 +240,6 @@ void ExchangeContext::Release()
                         mExchangeId, mRefCount);
 #endif
     }
-}
-
-CHIP_ERROR ExchangeContext::ResendMessage()
-{
-    PayloadHeader payloadHeader;
-
-    if (mMsg == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-
-    return mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, mMsg);
 }
 
 bool ExchangeContext::MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader)

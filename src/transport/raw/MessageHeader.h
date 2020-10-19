@@ -58,12 +58,6 @@ enum class ExFlagValues : uint16_t
 {
     /// Set when current message is sent by the initiator of an exchange.
     kExchangeFlag_Initiator = 0x0001,
-
-    /// Set when current message is an acknowledgment for a previously received message.
-    kExchangeFlag_AckId = 0x0002,
-
-    /// Set when current message is requesting an acknowledgment from the recipient.
-    kExchangeFlag_NeedsAck = 0x0004,
 };
 
 enum class FlagValues : uint16_t
