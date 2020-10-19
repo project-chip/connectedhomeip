@@ -783,7 +783,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetSlaacIPv6Add
         }
     }
 
-    return CHIP_ERROR_INCORRECT_STATE;
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
 }
 
 template <class ImplClass>

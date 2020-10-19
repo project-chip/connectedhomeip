@@ -33,7 +33,7 @@ using namespace ::chip::DeviceLayer;
 
 namespace chip {
 
-void AccesoryNetworkProvisioningDelegate::ProvisionThread(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+void AccessoryNetworkProvisioningDelegate::ProvisionThread(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
 #if CHIP_ENABLE_OPENTHREAD
     ThreadStackMgr().SetThreadEnabled(false);

@@ -22,7 +22,7 @@
 
 namespace chip {
 
-class AccesoryNetworkProvisioningDelegate : public DeviceNetworkProvisioningDelegate
+class AccessoryNetworkProvisioningDelegate : public DeviceNetworkProvisioningDelegate
 {
     void ProvisionThread(const DeviceLayer::Internal::DeviceNetworkInfo & threadData) override;
 };
@@ -41,7 +41,7 @@ public:
     void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) override;
 
 private:
-    AccesoryNetworkProvisioningDelegate mNetworkProvisioningDelegate;
+    AccessoryNetworkProvisioningDelegate mNetworkProvisioningDelegate;
     RendezvousSession mRendezvousSession;
 };
 
