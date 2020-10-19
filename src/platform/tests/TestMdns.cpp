@@ -7,23 +7,22 @@
 #include "platform/CHIPDeviceLayer.h"
 #include "platform/Mdns.h"
 
-using chip::DeviceLayer::MdnsResolveResult;
 using chip::DeviceLayer::MdnsService;
 using chip::DeviceLayer::MdnsServiceProtocol;
 using chip::DeviceLayer::TextEntry;
 
-static void HandleResolve(void * context, MdnsResolveResult * result, CHIP_ERROR error)
+static void HandleResolve(void * context, MdnsService * result, CHIP_ERROR error)
 {
     char addrBuf[100];
     nlTestSuite * suite = static_cast<nlTestSuite *>(context);
 
     NL_TEST_ASSERT(suite, result != nullptr);
     NL_TEST_ASSERT(suite, error == CHIP_NO_ERROR);
-    result->mAddress.ToString(addrBuf, sizeof(addrBuf));
-    printf("Service at [%s]:%u\n", addrBuf, result->mService.mPort);
-    NL_TEST_ASSERT(suite, result->mService.mTextEntrySize == 1);
-    NL_TEST_ASSERT(suite, strcmp(result->mService.mTextEntryies[0].mKey, "key") == 0);
-    NL_TEST_ASSERT(suite, strcmp(reinterpret_cast<const char *>(result->mService.mTextEntryies[0].mData), "val") == 0);
+    result->mAddress.Value().ToString(addrBuf, sizeof(addrBuf));
+    printf("Service at [%s]:%u\n", addrBuf, result->mPort);
+    NL_TEST_ASSERT(suite, result->mTextEntrySize == 1);
+    NL_TEST_ASSERT(suite, strcmp(result->mTextEntryies[0].mKey, "key") == 0);
+    NL_TEST_ASSERT(suite, strcmp(reinterpret_cast<const char *>(result->mTextEntryies[0].mData), "val") == 0);
 
     exit(0);
 }
@@ -38,7 +37,7 @@ static void HandleBrowse(void * context, MdnsService * services, size_t services
         printf("Mdns service size %zu\n", servicesSize);
         printf("Service name %s\n", services->mName);
         printf("Service type %s\n", services->mType);
-        ChipMdnsResolve(services->mName, services->mType, services->mProtocol, INET_NULL_INTERFACEID, HandleResolve, suite);
+        NL_TEST_ASSERT(suite, ChipMdnsResolve(services, INET_NULL_INTERFACEID, HandleResolve, suite) == CHIP_NO_ERROR);
     }
 }
 

@@ -555,15 +555,16 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         ChipLogError(DeviceLayer, "Avahi resolve failed");
         context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
     case AVAHI_RESOLVER_FOUND:
-        MdnsResolveResult result;
+        MdnsService result;
 
+        result.mAddress.SetValue(chip::Inet::IPAddress());
         ChipLogError(DeviceLayer, "Avahi resolve found");
-        strncpy(result.mService.mName, name, sizeof(result.mService.mName));
-        strncpy(result.mService.mType, type, sizeof(result.mService.mType));
-        result.mService.mName[kMdnsNameMaxSize] = 0;
-        result.mService.mType[kMdnsTypeMaxSize] = 0;
-        result.mService.mProtocol               = TruncateProtocolInType(result.mService.mType);
-        result.mService.mPort                   = port;
+        strncpy(result.mName, name, sizeof(result.mName));
+        strncpy(result.mType, type, sizeof(result.mType));
+        result.mName[kMdnsNameMaxSize] = 0;
+        result.mType[kMdnsTypeMaxSize] = 0;
+        result.mProtocol               = TruncateProtocolInType(result.mType);
+        result.mPort                   = port;
 
         if (address)
         {
@@ -573,12 +574,12 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
                 struct in_addr addr4;
 
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
-                result.mAddress = chip::Inet::IPAddress::FromIPv4(addr4);
+                result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv4(addr4));
             case AVAHI_PROTO_INET6:
                 struct in6_addr addr6;
 
                 memcpy(&addr6, &(address->data.ipv6), sizeof(addr6));
-                result.mAddress = chip::Inet::IPAddress::FromIPv6(addr6);
+                result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv6(addr6));
             default:
                 break;
             }
@@ -602,9 +603,9 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         if (!textEntries.empty())
         {
-            result.mService.mTextEntryies = textEntries.data();
+            result.mTextEntryies = textEntries.data();
         }
-        result.mService.mTextEntrySize = textEntries.size();
+        result.mTextEntrySize = textEntries.size();
 
         context->mCallback(context->mContext, &result, CHIP_NO_ERROR);
     }
@@ -655,10 +656,22 @@ CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip:
     return MdnsAvahi::GetInstance().Browse(type, protocol, interface, callback, context);
 }
 
-CHIP_ERROR ChipMdnsResolve(const char * name, const char * type, MdnsServiceProtocol protocol, chip::Inet::InterfaceId interface,
-                           MdnsResolveCallback callback, void * context)
+CHIP_ERROR ChipMdnsResolve(MdnsService * browseResult, chip::Inet::InterfaceId interface, MdnsResolveCallback callback,
+                           void * context)
+
 {
-    return MdnsAvahi::GetInstance().Resolve(name, type, protocol, interface, callback, context);
+    CHIP_ERROR error;
+
+    if (browseResult != nullptr)
+    {
+        error = MdnsAvahi::GetInstance().Resolve(browseResult->mName, browseResult->mType, browseResult->mProtocol, interface,
+                                                 callback, context);
+    }
+    else
+    {
+        error = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return error;
 }
 
 } // namespace DeviceLayer

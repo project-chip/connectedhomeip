@@ -22,6 +22,7 @@
 #include "core/CHIPError.h"
 #include "inet/IPAddress.h"
 #include "inet/InetInterface.h"
+#include "lib/core/Optional.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -53,12 +54,7 @@ struct MdnsService
     chip::Inet::InterfaceId interface;
     TextEntry * mTextEntryies;
     size_t mTextEntrySize;
-};
-
-struct MdnsResolveResult
-{
-    MdnsService mService;
-    chip::Inet::IPAddress mAddress;
+    Optional<chip::Inet::IPAddress> mAddress;
 };
 
 /**
@@ -72,7 +68,7 @@ struct MdnsResolveResult
  * @param[in] error       The error code.
  *
  */
-using MdnsResolveCallback = void (*)(void * context, MdnsResolveResult * result, CHIP_ERROR error);
+using MdnsResolveCallback = void (*)(void * context, MdnsService * result, CHIP_ERROR error);
 
 /**
  * The callback function for mDNS browse.
@@ -148,20 +144,17 @@ CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip:
 /**
  * This function resolves the services published by mdns
  *
- * @param[in] name       The service instance name.
- * @param[in] type       The service type.
- * @param[in] protocol   The service protocol.
- * @param[in] interface  The interface to send queries.
- * @param[in] callback   The callback for found services.
- * @param[in] context    The user context.
+ * @param[in] browseResult  The service entry returned by @ref ChipMdnsBrowse
+ * @param[in] callback      The callback for found services.
+ * @param[in] context       The user context.
  *
  * @retval CHIP_NO_ERROR                The resolve succeeds.
  * @retval CHIP_ERROR_INVALID_ARGUMENT  The name, type or callback is nullptr.
  * @retval Error code                   The resolve fails.
  *
  */
-CHIP_ERROR ChipMdnsResolve(const char * name, const char * type, MdnsServiceProtocol protocol, chip::Inet::InterfaceId interface,
-                           MdnsResolveCallback callback, void * context);
+CHIP_ERROR ChipMdnsResolve(MdnsService * browseResult, chip::Inet::InterfaceId interface, MdnsResolveCallback callback,
+                           void * context);
 
 } // namespace DeviceLayer
 } // namespace chip
