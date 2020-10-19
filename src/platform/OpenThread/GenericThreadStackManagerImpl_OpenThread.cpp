@@ -772,6 +772,21 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary80215
 };
 
 template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetSlaacIPv6Address(chip::Inet::IPAddress & addr)
+{
+    for (const otNetifAddress * otAddr = otIp6GetUnicastAddresses(mOTInst); otAddr != nullptr; otAddr = otAddr->mNext)
+    {
+        if (otAddr->mValid && otAddr->mAddressOrigin == OT_ADDRESS_ORIGIN_SLAAC)
+        {
+            addr = ToIPAddress(otAddr->mAddress);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_ERROR_INCORRECT_STATE;
+}
+
+template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
