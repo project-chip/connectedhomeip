@@ -38,7 +38,7 @@ _bootstrap_or_activate() {
 EOF
     )"
 
-    PW_ROOT="${_CHIP_ROOT}/third_party/pigweed/repo"
+    PW_ROOT="$_CHIP_ROOT/third_party/pigweed/repo"
     export PW_ROOT
 
     . "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh"
