@@ -53,5 +53,5 @@ function main() {
     python3 "$SOURCE_DIR/test-on-off-cluster.py"
 }
 
-source ${SOURCE_DIR}/shell-helpers.sh
+source "$SOURCE_DIR"/shell-helpers.sh
 main

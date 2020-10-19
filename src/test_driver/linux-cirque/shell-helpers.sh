@@ -7,5 +7,5 @@
 # unlikely to appear in compiler errors, then filtering it out.
 function run_ninja() {
     prefix="|ninja_filter_prefix|"
-    NINJA_STATUS="${prefix}[%f/%t] " ninja "$@" | grep -v "^${prefix}"
+    NINJA_STATUS="$prefix[%f/%t] " ninja "$@" | grep -v "^$prefix"
 }
