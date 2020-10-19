@@ -1,6 +1,5 @@
 /**
  *
- *    Copyright (c) 2020 Silicon Labs
  *    Copyright (c) 2020 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
