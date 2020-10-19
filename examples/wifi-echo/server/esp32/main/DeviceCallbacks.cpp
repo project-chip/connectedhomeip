@@ -24,10 +24,12 @@
  **/
 #include "DeviceCallbacks.h"
 
+#include "CHIPDeviceManager.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <lib/protocols/mdns/Publisher.h>
 #include <support/CodeUtils.h>
 
 extern "C" {
@@ -45,6 +47,8 @@ using namespace ::chip::DeviceLayer;
 extern LEDWidget statusLED1;
 extern LEDWidget statusLED2;
 extern WiFiWidget wifiLED;
+extern const chip::NodeId kLocalNodeId;
+extern chip::Protocols::Mdns::Publisher publisher;
 
 uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
@@ -96,6 +100,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
+        publisher.StartPublishDevice();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -105,6 +110,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
+        publisher.StartPublishDevice();
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

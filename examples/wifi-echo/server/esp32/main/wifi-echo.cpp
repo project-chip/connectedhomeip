@@ -44,6 +44,7 @@
 #include <vector>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/protocols/mdns/Publisher.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -87,6 +88,7 @@ LEDWidget statusLED1;
 LEDWidget statusLED2;
 BluetoothWidget bluetoothLED;
 WiFiWidget wifiLED;
+chip::Protocols::Mdns::Publisher publisher;
 
 extern void PairingComplete(SecurePairingSession * pairing);
 
@@ -523,6 +525,7 @@ extern "C" void app_main()
     }
 
     SetupPretendDevices();
+    publisher.Init();
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
     // Our second LED doesn't map to any physical LEDs so far, just to virtual
