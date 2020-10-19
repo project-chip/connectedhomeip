@@ -1,0 +1,116 @@
+[
+  {
+    "path": "gn/gn/${os}-${arch=amd64,arm64}",
+    "tags": [
+      "git_revision:132588e1f9c2bf07b0cc0516e190b445de1153a7"
+    ]
+  },
+  {
+    "path": "infra/ninja/${os}-${arch=amd64}",
+    "tags": [
+      "version:1.9.0"
+    ]
+  },
+  {
+    "path": "infra/cmake/${os}-${arch=amd64}",
+    "tags": [
+      "version:3.16.1"
+    ]
+  },
+  {
+    "_comment": "TODO(pwbug/93): Package Bazel for Windows.",
+    "path": "pigweed/third_party/bazel/${os=linux,mac}-${arch=amd64}",
+    "tags": [
+      "version:3.2.0"
+    ]
+  },
+  {
+    "path": "pigweed/third_party/bloaty-embedded/${os=linux,mac}-${arch=amd64}",
+    "tags": [
+      "git_revision:2d87d204057b419f5290f8d38b61b9c2c5b4fb52-2"
+    ]
+  },
+  {
+    "path": "pigweed/third_party/gcc-arm-none-eabi/${os}-${arch=amd64}",
+    "tags": [
+      "version:9-2020-q2-update"
+    ]
+  },
+  {
+    "path": "infra/tools/protoc/${os}-${arch=amd64}",
+    "tags": [
+      "protobuf_version:v3.8.0"
+    ]
+  },
+  {
+    "_comment": "TODO(pwbug/70) Put clang in cipd for Windows.",
+    "path": "fuchsia/third_party/clang/${os=linux,mac}-${arch}",
+    "tags": [
+      "git_revision:8af160b0b8ca8102b9490a287244af75727872f5"
+    ]
+  },
+  {
+    "path": "infra/go/${os}-${arch=amd64}",
+    "tags": [
+      "version:1.13.5"
+    ]
+  },
+  {
+    "path": "pigweed/third_party/protoc-gen-go/${os}-${arch=amd64}",
+    "tags": [
+      "version:1.3.2"
+    ]
+  },
+  {
+    "_comment": "TODO(pwbug/66) Put openocd in cipd for Windows.",
+    "path": "pigweed/third_party/openocd/${os=linux,mac}-${arch=amd64}",
+    "tags": [
+      "git_revision:e41c0f4906e46d1076ce62a0da5518aa1ca280b8"
+    ]
+  },
+  {
+    "_comment": "TODO(pwbug/69) Put rust in cipd for Windows.",
+    "path": "fuchsia/rust/${os=linux,mac}-${arch=amd64}",
+    "tags": [
+      "git_revision:027149919e36ce5645ca5d02d55b97ef52eb55ba"
+    ]
+  },
+  {
+    "path": "pigweed/third_party/mingw64-x86_64-win32-seh/${os=windows}-${arch=amd64}",
+    "tags": [
+      "version:8.1.0"
+    ]
+  },
+  {
+    "path": "pigweed/host_tools/${os}-${arch=amd64}",
+    "tags": [
+      "git_revision:918276537a01f4f470fa61511347d4dfe1c9f297"
+    ]
+  },
+  {
+    "path": "infra/goma/client/${os}-${arch=amd64}",
+    "tags": [
+      "git_revision:4e2693cc42d116902f0767b9b93643555f79e7c4"
+    ]
+  },
+  {
+    "path": "fuchsia/third_party/qemu/${os=linux,mac}-${arch}",
+    "tags": [
+      "git_revision:841f14e74f5af7886cf49cfcd4fed264911ae58e"
+    ]
+  },
+  {
+    "path": "fuchsia/third_party/kythe",
+    "subdir": "kythe",
+    "tags": [
+      "version:1.0.1"
+    ]
+  },
+  {
+    "path": "fuchsia/third_party/kythe-libs/${os=linux}-${arch=amd64}",
+    "subdir": "kythe",
+    "tags": [
+      "version:2020-08-05"
+    ]
+  }
+]
