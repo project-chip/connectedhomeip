@@ -165,6 +165,12 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(const Internal::DeviceNet
 {
     mNetworkInfo = netInfo;
 
+    // post an event alerting other subsystems about change in provisioning state
+    ChipDeviceEvent event;
+    event.Type                                           = DeviceEventType::kServiceProvisioningChange;
+    event.ServiceProvisioningChange.IsServiceProvisioned = true;
+    PlatformMgr().PostEvent(&event);
+
     return CHIP_NO_ERROR;
 }
 
