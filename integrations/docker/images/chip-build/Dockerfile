@@ -32,6 +32,7 @@ RUN set -x \
     openjdk-11-jdk \
     python3 \
     python3-pip \
+    python3-venv \
     libusb-1.0-0 \
     libncurses5-dev \
     libncursesw5-dev \
