@@ -100,8 +100,27 @@ fi
     )
 }
 
+updirs() {
+    declare lookinfer="${1}"
+    declare dir="${2:-$(pwd)}"
+
+    while [[ ! -e ${dir}/${lookinfer} && -n ${dir} ]]; do
+        dir=${dir%/*}
+    done
+
+    if [[ ! -e ${dir}/${lookinfer} ]]; then
+        printf 'error: updirs: %s not found\n' "$lookinfer" >&2
+        return 1
+    fi
+    printf '%s\n' "$dir/$lookinfer"
+}
+
 (
     cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
+
+    ENV=$(updirs chip_xcode_build_connector_env.sh)
+    [[ -n $ENV ]] && . "$ENV"
+
     [[ -n $CHIP_NO_SUBMODULES ]] || git submodule update --init
     if [[ -z $CHIP_NO_ACTIVATE ]]; then
         set +ex
