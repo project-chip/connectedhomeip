@@ -31,6 +31,8 @@ menu "WiFi Echo Demo"
 
         config DEVICE_TYPE_ESP32_DEVKITC
             bool "ESP32-DevKitC"
+        config DEVICE_TYPE_ESP32_WROVER_KIT
+            bool "ESP32-WROVER-KIT_V4.1"
         config DEVICE_TYPE_M5STACK
             bool "M5Stack"
     endchoice
@@ -66,8 +68,9 @@ menu "WiFi Echo Demo"
     config TFT_PREDEFINED_DISPLAY_TYPE
         int
         range 0 5
-        default 3 if DEVICE_TYPE_M5STACK
         default 0 if DEVICE_TYPE_ESP32_DEVKITC
+        default 3 if DEVICE_TYPE_M5STACK
+        default 4 if DEVICE_TYPE_ESP32_WROVER_KIT
 
     config RENDEZVOUS_MODE
        int

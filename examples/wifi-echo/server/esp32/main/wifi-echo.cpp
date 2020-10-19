@@ -63,11 +63,12 @@ extern void startServer();
 #define BUTTON_3_GPIO_NUM GPIO_NUM_37    // Right button on M5Stack
 #define STATUS_LED_GPIO_NUM GPIO_NUM_MAX // No status LED on M5Stack
 
+#elif CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT
+
+#define STATUS_LED_GPIO_NUM GPIO_NUM_26
+
 #elif CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
-#define BUTTON_1_GPIO_NUM GPIO_NUM_34  // Button 1 on DevKitC
-#define BUTTON_2_GPIO_NUM GPIO_NUM_35  // Button 2 on DevKitC
-#define BUTTON_3_GPIO_NUM GPIO_NUM_0   // Button 3 on DevKitC
 #define STATUS_LED_GPIO_NUM GPIO_NUM_2 // Use LED1 (blue LED) as status LED on DevKitC
 
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
@@ -78,15 +79,6 @@ extern void startServer();
 
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
-
-#if CONFIG_HAVE_DISPLAY
-
-// Where to draw the connection status message
-#define CONNECTION_MESSAGE 75
-// Where to draw the IPv6 information
-#define IPV6_INFO 85
-
-#endif // CONFIG_HAVE_DISPLAY
 
 LEDWidget statusLED1;
 LEDWidget statusLED2;
@@ -102,8 +94,12 @@ RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
 
 namespace {
 
+#if CONFIG_DEVICE_TYPE_M5STACK
+
 std::vector<Button> buttons          = { Button(), Button(), Button() };
 std::vector<gpio_num_t> button_gpios = { BUTTON_1_GPIO_NUM, BUTTON_2_GPIO_NUM, BUTTON_3_GPIO_NUM };
+
+#endif
 
 // Pretend these are devices with endpoints with clusters with attributes
 typedef std::tuple<std::string, std::string> Attribute;
@@ -140,7 +136,7 @@ void AddDevice(std::string name)
     devices.emplace_back(std::move(device));
 }
 
-#if CONFIG_HAVE_DISPLAY
+#if CONFIG_DEVICE_TYPE_M5STACK
 
 class EditAttributeListModel : public ListScreen::Model
 {
@@ -292,7 +288,7 @@ public:
     }
 };
 
-#endif // CONFIG_HAVE_DISPLAY
+#endif // CONFIG_DEVICE_TYPE_M5STACK
 
 void SetupPretendDevices()
 {
@@ -508,6 +504,18 @@ extern "C" void app_main()
     ESP_LOGI(TAG, "QR CODE: '%s'", qrCodeText.c_str());
 
 #if CONFIG_HAVE_DISPLAY
+    // Initialize the display device.
+    err = InitDisplay();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "InitDisplay() failed: %s", ErrorStr(err));
+        return;
+    }
+
+    // Initialize the screen manager
+    ScreenManager::Init();
+
+#if CONFIG_DEVICE_TYPE_M5STACK
     // Initialize the buttons.
     for (int i = 0; i < buttons.size(); ++i)
     {
@@ -519,16 +527,7 @@ extern "C" void app_main()
         }
     }
 
-    // Initialize the display device.
-    err = InitDisplay();
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "InitDisplay() failed: %s", ErrorStr(err));
-        return;
-    }
-
-    // Initialize the screen manager and push a rudimentary user interface.
-    ScreenManager::Init();
+    // Push a rudimentary user interface.
     ScreenManager::PushScreen(chip::Platform::New<ListScreen>(
         (chip::Platform::New<SimpleListModel>())
             ->Title("CHIP")
@@ -558,6 +557,14 @@ extern "C" void app_main()
             ->Item("For")
             ->Item("Demo")));
 
+#elif CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT
+
+    // Display the QR Code
+    QRCodeScreen qrCodeScreen(qrCodeText);
+    qrCodeScreen.Display();
+
+#endif
+
     // Connect the status LED to VLEDs.
     {
         int vled1 = ScreenManager::AddVLED(TFT_GREEN);
@@ -577,7 +584,7 @@ extern "C" void app_main()
     // Run the UI Loop
     while (true)
     {
-#if CONFIG_HAVE_DISPLAY
+#if CONFIG_DEVICE_TYPE_M5STACK
         // TODO consider refactoring this example to use FreeRTOS tasks
 
         bool woken = false;
@@ -602,7 +609,7 @@ extern "C" void app_main()
             }
         }
 
-#endif // CONFIG_HAVE_DISPLAY
+#endif // CONFIG_DEVICE_TYPE_M5STACK
 
         vTaskDelay(50 / portTICK_PERIOD_MS);
     }

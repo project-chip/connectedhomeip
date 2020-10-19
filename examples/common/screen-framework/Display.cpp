@@ -131,8 +131,7 @@ esp_err_t InitDisplay()
 
     ESP_LOGI(TAG, "Display initialized (height %u, width %u)", DisplayHeight, DisplayWidth);
 
-    // for some reason this is backwards (turns out this is because of a 2019 update to the m5stack hw)
-    TFT_invertDisplay(INVERT_ON);
+    TFT_invertDisplay(INVERT_DISPLAY);
 
     // prepare the display for brightness control
     SetupBrightnessControl();
