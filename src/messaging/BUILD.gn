@@ -21,11 +21,11 @@ static_library("messaging") {
     "ErrorCategory.cpp",
     "ErrorCategory.h",
     "Flags.h",
-    "ReliableMessageProtocolConfig.h",
     "ReliableMessageContext.cpp",
     "ReliableMessageContext.h",
     "ReliableMessageManager.cpp",
     "ReliableMessageManager.h",
+    "ReliableMessageProtocolConfig.h",
   ]
 
   public_deps = [
