@@ -301,7 +301,7 @@ exit:
 
 CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
-    LinkModeConfig linkMode{ true, true, true, true };
+    LinkModeConfig linkMode{ true, true, true };
     ClientError error = ClientError::ERROR_NONE;
 
     if (deviceType == ConnectivityManager::ThreadDeviceType::kThreadDeviceType_MinimalEndDevice)
