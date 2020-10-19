@@ -568,6 +568,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         if (address)
         {
+            printf("address proto %d\n", address->proto);
             switch (address->proto)
             {
             case AVAHI_PROTO_INET:
@@ -575,11 +576,13 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
                 memcpy(&addr4, &(address->data.ipv4), sizeof(addr4));
                 result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv4(addr4));
+                break;
             case AVAHI_PROTO_INET6:
                 struct in6_addr addr6;
 
                 memcpy(&addr6, &(address->data.ipv6), sizeof(addr6));
                 result.mAddress.SetValue(chip::Inet::IPAddress::FromIPv6(addr6));
+                break;
             default:
                 break;
             }
