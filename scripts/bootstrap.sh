@@ -24,7 +24,8 @@ _bootstrap_or_activate() {
     local _BOOTSTRAP_NAME="${_BOOTSTRAP_PATH##*/}"
     local _CHIP_ROOT="$(cd "${_BOOTSTRAP_PATH%/*}/.." && pwd)"
 
-    if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ]; then
+    if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
+        [ ! -f "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh" ]; then
         git submodule update --init
     fi
 
