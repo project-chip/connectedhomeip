@@ -14,28 +14,77 @@
 # limitations under the License.
 #
 
-if [[ -n ${BASH_SOURCE[0]} ]]; then
-    CHIP_ROOT=$(cd "${BASH_SOURCE[0]%/*}/.." && pwd)
-else
-    CHIP_ROOT=$(cd "${0%/*}/.." && pwd)
-fi
+_bootstrap_or_activate() {
+    if [ -n "$BASH" ]; then
+        local _BOOTSTRAP_PATH="${BASH_SOURCE[0]}"
+    else
+        local _BOOTSTRAP_PATH="$1"
+    fi
 
-export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"
-export PW_BRANDING_BANNER_COLOR="bold_white"
-export PW_VIRTUALENV_REQUIREMENTS="$CHIP_ROOT/scripts/requirements.txt"
+    local _BOOTSTRAP_NAME="${_BOOTSTRAP_PATH##*/}"
+    local _CHIP_ROOT="$(cd "${_BOOTSTRAP_PATH%/*}/.." && pwd)"
 
-if test -f "$CHIP_ROOT/scripts/helpers/rename_submodules.sh"; then
-    "$CHIP_ROOT/scripts/helpers/rename_submodules.sh"
-fi
+    if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ]; then
+        git submodule update --init
+    fi
 
-git submodule update --init
+    local _CHIP_BANNER="$(
+        cat <<EOF
+  ▄███▒  ░▓█  ░▓█ ░▓█▓ ▒█████▄
+ ██▒ ▀█▒  ▒█   ▒█  ░█▒  ▒█░  █░
+ █▓░      ▒██████  ░█▒  ▒█▄▄▄█░
+ ▓█   █▒  ▒█   ▒█  ░█░  ▒█▀
+ ░▓███▀  ░▓███░▓█▒ ░█░  ▒█
+EOF
+    )"
 
-export PW_VIRTUALENV_SETUP_PY_ROOTS="$CHIP_ROOT/integrations/mobly"
+    PW_ROOT="$_CHIP_ROOT/third_party/pigweed/repo"
+    export PW_ROOT
 
-# shellcheck source=/dev/null
-source "$CHIP_ROOT/third_party/pigweed/repo/bootstrap.sh"
+    . "$_CHIP_ROOT/third_party/pigweed/repo/pw_env_setup/util.sh"
 
-#TODO - remove this once native python building is solved for
-#       psutil (one of mobly's dependencies which CHIP does
-#       not actually need, so --no-deps is OK)
-pip install --no-deps portpicker mobly
+    _chip_bootstrap_banner() {
+        if [ -z "$PW_ENVSETUP_QUIET" ] && [ -z "$PW_ENVSETUP_NO_BANNER" ]; then
+            pw_bold_white "$_CHIP_BANNER\n"
+        fi
+    }
+
+    local _PW_BANNER_FUNC="_chip_bootstrap_banner"
+
+    local _PW_ACTUAL_ENVIRONMENT_ROOT="$(pw_get_env_root)"
+    local _SETUP_SH="$_PW_ACTUAL_ENVIRONMENT_ROOT/activate.sh"
+
+    export PW_DOCTOR_SKIP_CIPD_CHECKS=1
+
+    if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
+        [ ! -f "$_SETUP_SH" ] ||
+        [ ! -s "$_SETUP_SH" ]; then
+        pw_bootstrap --shell-file "$_SETUP_SH" \
+            --install-dir "$_PW_ACTUAL_ENVIRONMENT_ROOT" \
+            --virtualenv-requirements "$_CHIP_ROOT/scripts/requirements.txt" \
+            --cipd-package-file "$_CHIP_ROOT/scripts/pigweed.json" \
+            --virtualenv-setup-py-root "$_CHIP_ROOT/third_party/pigweed" \
+            --virtualenv-setup-py-root "$_CHIP_ROOT/integrations/mobly"
+        pw_finalize bootstrap "$_SETUP_SH"
+    else
+        pw_activate
+        pw_finalize activate "$_SETUP_SH"
+    fi
+}
+
+_bootstrap_or_activate "$0"
+unset -f _bootstrap_or_activate
+
+pw_cleanup
+
+unset PW_ROOT
+unset PW_CIPD_INSTALL_DIR
+unset PW_PIGWEED_CIPD_INSTALL_DIR
+unset CIPD_CACHE_DIR
+unset _PW_BANNER_FUNC
+unset _PW_TEXT
+unset PW_DOCTOR_SKIP_CIPD_CHECKS
+
+unset -f pw_cleanup
+unset -f _pw_hello
+unset -f _chip_bootstrap_banner
