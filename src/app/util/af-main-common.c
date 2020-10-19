@@ -102,6 +102,7 @@
 #include "gen/callback.h"
 //#include "print.h"
 #include "binding-table.h"
+#include "chip-response.h"
 #include "util.h"
 
 // Querying the Ember Stack for what libraries are present.
@@ -226,7 +227,7 @@ EmberAfCbkeKeyEstablishmentSuite emberAfIsFullSmartEnergySecurityPresent(void)
     return cbkeKeyEstablishmentSuite;
 }
 
-static EmberStatus send(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                         uint16_t messageLength, uint8_t * message, bool broadcast, EmberNodeId alias, uint8_t sequence,
                         EmberAfMessageSentFunction callback)
 {
@@ -470,7 +471,7 @@ EmberStatus emberAfSendBroadcast(EmberNodeId destination, EmberApsFrame * apsFra
     return emberAfSendBroadcastWithCallback(destination, apsFrame, messageLength, message, NULL);
 }
 
-EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                                            uint16_t messageLength, uint8_t * message, EmberAfMessageSentFunction callback)
 {
     // The source endpoint in the APS frame MAY NOT be valid at this point if the
@@ -496,7 +497,7 @@ EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint16
                 callback);
 }
 
-EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                                uint16_t messageLength, uint8_t * message)
 {
     return emberAfSendUnicastWithCallback(type, indexOrDestination, apsFrame, messageLength, message, NULL);
@@ -605,7 +606,7 @@ static void printMessage(EmberIncomingMessageType type, EmberApsFrame * apsFrame
     emberAfAppPrintln("");
 }
 
-void emAfMessageSentHandler(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+void emAfMessageSentHandler(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                             EmberStatus status, uint16_t messageLength, uint8_t * messageContents, uint8_t messageTag)
 {
     EmberAfMessageSentFunction callback;
@@ -645,7 +646,7 @@ void emAfMessageSentHandler(EmberOutgoingMessageType type, uint16_t indexOrDesti
 }
 
 #ifdef EMBER_AF_PLUGIN_FRAGMENTATION
-void emAfFragmentationMessageSentHandler(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+void emAfFragmentationMessageSentHandler(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                                          uint8_t * buffer, uint16_t bufLen, EmberStatus status, uint8_t messageTag)
 {
     // the fragmented message is no longer in process
@@ -658,9 +659,23 @@ void emAfFragmentationMessageSentHandler(EmberOutgoingMessageType type, uint16_t
 }
 #endif // EMBER_AF_PLUGIN_FRAGMENTATION
 
-EmberStatus emAfSend(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame, uint8_t messageLength,
+EmberStatus emAfSend(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint8_t messageLength,
                      uint8_t * message, uint8_t * messageTag, EmberNodeId alias, uint8_t sequence)
 {
+    // TODO: There's an impedance mismatch here in a few ways:
+    // 1) The caller expects to get a messageTag out that will identify this
+    // message somewhat uniquely.  Right now we just ignore that and claim an
+    // invalid tag, which means message-sent callbacks don't get called.
+    //
+    // 2) The caller expects us to call emAfMessageSentHandler when we get an
+    // ack or time out, and pass it the original contents of the message, so it
+    // can invoke message-sent callbacks as needed.  But we may not have the
+    // contents of the message if we've done in-place encryption since then.
+    // Need to figure out whether any of this matters.
+    //
+    // https://github.com/project-chip/connectedhomeip/issues/2435 sort of
+    // tracks this.
+    *messageTag        = INVALID_MESSAGE_TAG;
     EmberStatus status = EMBER_SUCCESS;
     switch (type)
     {
@@ -673,8 +688,7 @@ EmberStatus emAfSend(EmberOutgoingMessageType type, uint16_t indexOrDestination,
         status = EMBER_ERR_FATAL;
         break;
     case EMBER_OUTGOING_DIRECT:
-        // No implementation yet.
-        status = EMBER_ERR_FATAL;
+        status = chipSendResponse(indexOrDestination, apsFrame, messageLength, message);
         break;
     case EMBER_OUTGOING_MULTICAST:
         // No implementation yet.
