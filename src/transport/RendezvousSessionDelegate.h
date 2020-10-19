@@ -18,6 +18,7 @@
 #pragma once
 
 #include <core/CHIPCore.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 namespace chip {
 
@@ -46,8 +47,9 @@ public:
 class DLL_EXPORT RendezvousDeviceCredentialsDelegate
 {
 public:
-    virtual void SendNetworkCredentials(const char * ssid, const char * passwd) = 0;
-    virtual void SendOperationalCredentials()                                   = 0;
+    virtual void SendNetworkCredentials(const char * ssid, const char * passwd)          = 0;
+    virtual void SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo &) = 0;
+    virtual void SendOperationalCredentials()                                            = 0;
 };
 
 } // namespace chip

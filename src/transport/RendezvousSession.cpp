@@ -425,5 +425,10 @@ void RendezvousSession::SendNetworkCredentials(const char * ssid, const char * p
     mNetworkProvision.SendNetworkCredentials(ssid, passwd);
 }
 
+void RendezvousSession::SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+{
+    mNetworkProvision.SendThreadCredentials(threadData);
+}
+
 void RendezvousSession::SendOperationalCredentials() {}
 } // namespace chip

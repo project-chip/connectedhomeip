@@ -214,6 +214,44 @@ exit:
     return err;
 }
 
+CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+{
+    CHIP_ERROR err                = CHIP_NO_ERROR;
+    System::PacketBuffer * buffer = System::PacketBuffer::New();
+
+    ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
+    VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
+    {
+        BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
+        bbuf.Put(threadData.ThreadNetworkName, sizeof(threadData.ThreadNetworkName));
+        bbuf.Put(threadData.ThreadExtendedPANId, sizeof(threadData.ThreadExtendedPANId));
+        bbuf.Put(threadData.ThreadMeshPrefix, sizeof(threadData.ThreadMeshPrefix));
+        bbuf.Put(threadData.ThreadMasterKey, sizeof(threadData.ThreadMasterKey));
+        bbuf.Put(threadData.ThreadPSKc, sizeof(threadData.ThreadPSKc));
+        bbuf.PutLE16(threadData.ThreadPANId);
+        bbuf.Put(threadData.ThreadChannel);
+        bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadExtendedPANId));
+        bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadMeshPrefix));
+        bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadPSKc));
+
+        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
+
+        err = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
+                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer);
+    }
+
+exit:
+    if (CHIP_NO_ERROR != err)
+    {
+        ChipLogError(NetworkProvisioning, "Failed to send Thread Credentials: %s", ErrorStr(err));
+        System::PacketBuffer::Free(buffer);
+    }
+    return err;
+}
+
 #ifdef CHIP_ENABLE_OPENTHREAD
 CHIP_ERROR NetworkProvisioning::DecodeThreadAssociationRequest(System::PacketBuffer * msgBuf)
 {
