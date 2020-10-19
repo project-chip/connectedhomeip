@@ -21,6 +21,7 @@
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.h>
 #else
@@ -52,6 +53,7 @@ class GenericNetworkProvisioningServerImpl;
  */
 class ConnectivityManagerImpl final : public ConnectivityManager,
                                       public Internal::GenericConnectivityManagerImpl<ConnectivityManagerImpl>,
+                                      public Internal::GenericConnectivityManagerImpl_WiFi<ConnectivityManagerImpl>,
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
                                       public Internal::GenericConnectivityManagerImpl_BLE<ConnectivityManagerImpl>,
 #else
@@ -94,8 +96,6 @@ private:
     bool _CanStartWiFiScan();
     void _OnWiFiScanDone();
     void _OnWiFiStationProvisionChange();
-    static const char * _WiFiStationModeToStr(WiFiStationMode mode);
-    static const char * _WiFiAPModeToStr(WiFiAPMode mode);
 
     // ===== Members for internal use by the following friends.
 
@@ -105,31 +105,6 @@ private:
     static ConnectivityManagerImpl sInstance;
 
     // ===== Private members reserved for use by this class only.
-
-    enum WiFiStationState
-    {
-        kWiFiStationState_NotConnected,
-        kWiFiStationState_Connecting,
-        kWiFiStationState_Connecting_Succeeded,
-        kWiFiStationState_Connecting_Failed,
-        kWiFiStationState_Connected,
-        kWiFiStationState_Disconnecting,
-    };
-
-    enum WiFiAPState
-    {
-        kWiFiAPState_NotActive,
-        kWiFiAPState_Activating,
-        kWiFiAPState_Active,
-        kWiFiAPState_Deactivating,
-    };
-
-    enum Flags
-    {
-        kFlag_HaveIPv4InternetConnectivity = 0x0001,
-        kFlag_HaveIPv6InternetConnectivity = 0x0002,
-        kFlag_AwaitingConnectivity         = 0x0004,
-    };
 
     uint64_t mLastStationConnectFailTime;
     uint64_t mLastAPDemandTime;
@@ -157,8 +132,6 @@ private:
     void OnStationIPv4AddressLost(void);
     void OnIPv6AddressAvailable(const ip_event_got_ip6_t & got_ip);
 
-    static const char * WiFiStationStateToStr(WiFiStationState state);
-    static const char * WiFiAPStateToStr(WiFiAPState state);
     static void RefreshMessageLayer(void);
 };
 
