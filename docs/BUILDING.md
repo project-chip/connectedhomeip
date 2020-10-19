@@ -8,6 +8,7 @@ Tested on:
 
 -   macOS 10.15
 -   Debian 10
+-   Ubuntu 20.04 LTS
 
 Build system features:
 
@@ -42,7 +43,7 @@ On Debian-based Linux distributions such as Ubuntu, these dependencies can be
 satisfied with the following:
 
 ```
-sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev
+sudo apt-get install git gcc g++ python pkg-config libssl-dev libdbus-1-dev libglib2.0-dev ninja-build python3-venv python3-dev unzip
 ```
 
 #### How to install prerequisites on macOS
@@ -67,6 +68,14 @@ OpenSSL installed by Brew.
 
 Note: If using MacPorts, `port install openssl` is sufficient to satisfy this
 dependency.
+
+#### How to install prerequisites on Raspberry Pi 4
+
+Using `rpi-imager`, install the Ubuntu 20.04.1 LTS (Raspberry Pi 3/4) 64-bit
+server OS for arm64 architectures on a micro SD card.
+
+Boot the SD card, login with the default user account "ubuntu" and password
+"ubuntu", then proceed with "How to install prerequisites on Linux".
 
 ### Build Preparation
 
