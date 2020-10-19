@@ -260,6 +260,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
         const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
         uint16_t decodedSize      = 0;
         uint16_t taglen           = 0;
+        uint16_t payloadlen       = 0;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not
@@ -271,8 +272,11 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 #endif
         plainText = msg->Start();
 
-        // TODO: We need length checks here!  https://github.com/project-chip/connectedhomeip/issues/2928
-        err = mac.Decode(packetHeader, &data[packetHeader.GetPayloadLength()], kMaxTagLen, &taglen);
+        payloadlen = packetHeader.GetPayloadLength();
+        VerifyOrExit(
+            payloadlen <= len,
+            (ChipLogError(Inet, "Secure transport can't find MAC Tag; buffer too short"), err = CHIP_ERROR_INCORRECT_STATE));
+        err = mac.Decode(packetHeader, &data[payloadlen], len - payloadlen, &taglen);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
         len = static_cast<uint16_t>(len - taglen);
         msg->SetDataLength(len, nullptr);
@@ -280,7 +284,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
         err = state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decrypt msg: err %d", err));
 
-        err = payloadHeader.Decode(packetHeader.GetFlags(), plainText, headerSize, &decodedSize);
+        err = payloadHeader.Decode(packetHeader.GetFlags(), plainText, len, &decodedSize);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode encrypted header: err %d", err));
         VerifyOrExit(headerSize == decodedSize, ChipLogError(Inet, "Secure transport decode encrypted header length mismatched"));
 
