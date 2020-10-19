@@ -61,7 +61,8 @@ chip_test_suite("tests") {
     "TestInetEndPoint",
   ]
 
-  if (current_os != "mac" && chip_device_platform != "esp32") {
+  if (current_os != "mac" && chip_device_platform != "esp32" &&
+      current_cpu == "x64") {
     sources += [
       "TestInetLayerDNS.cpp",
       "TestLwIPDNS.cpp",
