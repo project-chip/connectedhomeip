@@ -96,10 +96,9 @@ static EmberAfStatus addEntryToGroupTable(uint8_t endpoint, uint16_t groupId, ui
         if (emberGetBinding(i, &binding) == EMBER_SUCCESS && binding.type == EMBER_UNUSED_BINDING)
         {
             EmberStatus status;
-            binding.type          = EMBER_MULTICAST_BINDING;
-            binding.identifier[0] = LOW_BYTE(groupId);
-            binding.identifier[1] = HIGH_BYTE(groupId);
-            binding.local         = endpoint;
+            binding.type    = EMBER_MULTICAST_BINDING;
+            binding.groupId = groupId;
+            binding.local   = endpoint;
 
             status = emberSetBinding(i, &binding);
             if (status == EMBER_SUCCESS)
@@ -220,8 +219,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
             status = emberGetBinding(i, &entry);
             if ((status == EMBER_SUCCESS) && (entry.type == EMBER_MULTICAST_BINDING) && (entry.local == emberAfCurrentEndpoint()))
             {
-                list[listLen]     = entry.identifier[0];
-                list[listLen + 1] = entry.identifier[1];
+                list[listLen]     = LOW_BYTE(entry.groupId);
+                list[listLen + 1] = HIGH_BYTE(entry.groupId);
                 listLen += 2;
                 count++;
             }
@@ -238,11 +237,10 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
                 status = emberGetBinding(j, &entry);
                 if ((status == EMBER_SUCCESS) && (entry.type == EMBER_MULTICAST_BINDING))
                 {
-                    if (entry.local == emberAfCurrentEndpoint() && entry.identifier[0] == LOW_BYTE(groupId) &&
-                        entry.identifier[1] == HIGH_BYTE(groupId))
+                    if (entry.local == emberAfCurrentEndpoint() && entry.groupId == groupId)
                     {
-                        list[listLen]     = entry.identifier[0];
-                        list[listLen + 1] = entry.identifier[1];
+                        list[listLen]     = LOW_BYTE(groupId);
+                        list[listLen + 1] = HIGH_BYTE(groupId);
                         listLen += 2;
                         count++;
                     }
@@ -329,7 +327,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
                 else
                 {
                     uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
-                    uint16_t groupId = HIGH_LOW_TO_INT(binding.identifier[1], binding.identifier[0]);
+                    uint16_t groupId                                              = binding.groupId;
                     emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
                     success = true && success;
 
@@ -423,8 +421,7 @@ static bool isGroupPresent(uint8_t endpoint, uint16_t groupId)
 
 static bool bindingGroupMatch(uint8_t endpoint, uint16_t groupId, EmberBindingTableEntry * entry)
 {
-    return (entry->type == EMBER_MULTICAST_BINDING && entry->identifier[0] == LOW_BYTE(groupId) &&
-            entry->identifier[1] == HIGH_BYTE(groupId) && entry->local == endpoint);
+    return (entry->type == EMBER_MULTICAST_BINDING && entry->groupId == groupId && entry->local == endpoint);
 }
 
 static uint8_t findGroupIndex(uint8_t endpoint, uint16_t groupId)
