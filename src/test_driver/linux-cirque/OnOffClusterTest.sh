@@ -31,7 +31,7 @@ function build_chip_tool() {
     set -x
     cd "$chip_tool_dir"
     gn gen out/debug >/dev/null
-    ninja -C out/debug >/dev/null
+    run_ninja -C out/debug
     docker build -t chip_tool -f Dockerfile . >/dev/null 2>&1
 }
 
@@ -40,7 +40,7 @@ function build_chip_lighting() {
     set -x
     cd "$chip_light_dir"
     gn gen out/debug --args='bypass_rendezvous=true' >/dev/null
-    ninja -C out/debug >/dev/null
+    run_ninja -C out/debug
     docker build -t chip_server -f Dockerfile . >/dev/null 2>&1
     set +x
 }
@@ -53,4 +53,5 @@ function main() {
     python3 "$SOURCE_DIR/test-on-off-cluster.py"
 }
 
+source ${SOURCE_DIR}/shell-helpers.sh
 main
