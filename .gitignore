@@ -35,9 +35,15 @@ TAGS
 # C-Lion / IDEA files
 .idea/**
 
-# Python bytecodes
-__pycache__
+# Python
 *.pyc
+*.egg/
+*.eggs/
+*.egg-info/
+.cache/
+.mypy_cache/
+__pycache__/
+dist/
 
 # Doxygen outputs
 docs/html
