@@ -31,6 +31,7 @@ RUN set -x \
     libmbedtls-dev \
     openjdk-11-jdk \
     python3 \
+    python3-dev \
     python3-pip \
     python3-venv \
     libusb-1.0-0 \
