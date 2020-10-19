@@ -1,3 +1,4 @@
+#!/usr/bin/bash
 #
 # Copyright (c) 2020 Project CHIP Authors
 #
@@ -14,22 +15,16 @@
 # limitations under the License.
 #
 
+# This script executes the command given as an argument within
+# CHIP_ROOT with a build environment activated.
+
 if [[ -n ${BASH_SOURCE[0]} ]]; then
-    CHIP_ROOT=$(cd "${BASH_SOURCE[0]%/*}/.." && pwd)
+    source "${BASH_SOURCE[0]%/*}/activate.sh"
 else
-    CHIP_ROOT=$(cd "${0%/*}/.." && pwd)
+    source "${0%/*}/activate.sh"
 fi
 
-export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"
-export PW_BRANDING_BANNER_COLOR="bold_white"
-export PW_VIRTUALENV_REQUIREMENTS="$CHIP_ROOT/scripts/requirements.txt"
+set -e
 
-export PW_VIRTUALENV_SETUP_PY_ROOTS="$CHIP_ROOT/integrations/mobly"
-
-# shellcheck source=/dev/null
-source "$CHIP_ROOT/third_party/pigweed/repo/activate.sh"
-
-#TODO - remove this once native python building is solved for
-#       psutil (one of mobly's dependencies which CHIP does
-#       not actually need, so --no-deps is OK)
-pip install --no-deps portpicker mobly
+echo "Executing in build environment: $@"
+bash -c -- "$@"

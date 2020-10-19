@@ -46,6 +46,20 @@
 
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
+/**
+ * Try to use our chip::NodeId definition if we are C++; otherwise define a
+ * ChipNodeId that's compatible.
+ */
+#ifdef __cplusplus
+#include <transport/raw/MessageHeader.h>
+static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
+// Make it easier to have unified function declarations across C and C++ source
+// files.
+typedef chip::NodeId ChipNodeId;
+#else
+typedef uint64_t ChipNodeId;
+#endif // __cplusplus
+
 #ifdef __cplusplus
 extern "C" {
 #endif // __cplusplus
@@ -603,11 +617,16 @@ typedef struct
     uint16_t clusterId;
     /** The endpoint on the remote node (specified by \c identifier). */
     uint8_t remote;
-    /** A 64-bit identifier.  This is either:
-     * - The destination EUI64, for unicasts.
+    /** A 64-bit destination identifier.  This is either:
+     * - The destination ChipNodeId, for unicasts.
      * - A 16-bit multicast group address, for multicasts.
+     * Which one is being used depends on the type of this binding.
      */
-    EmberEUI64 identifier;
+    union
+    {
+        ChipNodeId nodeId;
+        uint16_t groupId;
+    };
     /** The index of the network the binding belongs to. */
     uint8_t networkIndex;
 } EmberBindingTableEntry;
@@ -1947,19 +1966,7 @@ typedef struct
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
-/**
- * Try to use our chip::NodeId definition if we are C++; otherwise define a
- * ChipNodeId that's compatible.
- */
-#ifdef __cplusplus
-#include <transport/raw/MessageHeader.h>
-static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
-// Make it easier to have unified function declarations across C and C++ source
-// files.
-typedef chip::NodeId ChipNodeId;
-#else
-typedef uint64_t ChipNodeId;
-#endif // __cplusplus
+
 /**
  * @brief Macro that copies the token value from non-volatile storage into a RAM
  * location.  This macro can only be used with tokens that are defined using
