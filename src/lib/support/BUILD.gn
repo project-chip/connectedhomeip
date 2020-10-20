@@ -25,7 +25,7 @@ action("gen_asn1oid") {
   script = "gen_asn1oid.py"
   asn1oid_file = "${root_gen_dir}/include/support/ASN1OID.h"
   outputs = [ asn1oid_file ]
-  args = [ "--output_file=" + rebase_path(asn1oid_file, root_build_dir), ]
+  args = [ "--output_file=" + rebase_path(asn1oid_file, root_build_dir) ]
 }
 
 source_set("asn1oid_header") {
