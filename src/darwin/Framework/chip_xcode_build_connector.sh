@@ -100,14 +100,35 @@ fi
     )
 }
 
+find_in_ancestors() {
+    declare to_find="${1}"
+    declare dir="${2:-$(pwd)}"
+
+    while [[ ! -e ${dir}/${to_find} && -n ${dir} ]]; do
+        dir=${dir%/*}
+    done
+
+    if [[ ! -e ${dir}/${to_find} ]]; then
+        printf 'error: find_in_ancestors: %s not found\n' "$to_find" >&2
+        return 1
+    fi
+    printf '%s\n' "$dir/$to_find"
+}
+
 (
     cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
+
+    if ENV=$(find_in_ancestors chip_xcode_build_connector_env.sh 2>/dev/null); then
+        . "$ENV"
+    fi
+
     [[ -n $CHIP_NO_SUBMODULES ]] || git submodule update --init
     if [[ -z $CHIP_NO_ACTIVATE ]]; then
+        # first run bootstrap in an external env to build everything
+        env -i PW_ENVSETUP_NO_BANNER=1 PW_ENVSETUP_QUIET=1 bash -c '. scripts/activate.sh'
         set +ex
-        echo PW_ENVSETUP_QUIET=1 . scripts/activate.sh >&2
-        PW_ENVSETUP_QUIET=1 . scripts/activate.sh
-        (($? != 0)) && echo "Please source $CHIP_ROOT/scripts/bootstrap.sh before building" && exit 1
+        # now source activate for env vars
+        PW_ENVSETUP_NO_BANNER=1 PW_ENVSETUP_QUIET=1 . scripts/activate.sh
         set -ex
     fi
 

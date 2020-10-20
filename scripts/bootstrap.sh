@@ -56,6 +56,7 @@ EOF
     local _SETUP_SH="$_PW_ACTUAL_ENVIRONMENT_ROOT/activate.sh"
 
     export PW_DOCTOR_SKIP_CIPD_CHECKS=1
+    export PATH # https://bugs.chromium.org/p/pigweed/issues/detail?id=281
 
     if [ "$_BOOTSTRAP_NAME" = "bootstrap.sh" ] ||
         [ ! -f "$_SETUP_SH" ] ||
