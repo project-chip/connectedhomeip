@@ -28,7 +28,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.4.8
+            image: connectedhomeip/chip-build-esp32:0.4.11
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
