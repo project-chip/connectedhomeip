@@ -54,7 +54,7 @@ public:
      * @param[in] op Operation that was being performed on the key
      * @param[in] result CHIP_NO_ERROR or corresponding error code
      */
-    virtual void OnStatus(const char * key, Operation op, CHIP_ERROR err) = 0;
+    virtual void OnStatus(const char * key, Operation op, CHIP_ERROR result) = 0;
 };
 
 class DLL_EXPORT PersistentStorageDelegate
