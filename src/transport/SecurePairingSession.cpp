@@ -49,10 +49,6 @@ SecurePairingSession::SecurePairingSession() {}
 
 SecurePairingSession::~SecurePairingSession()
 {
-    if (mDelegate != nullptr)
-    {
-        mDelegate->Release();
-    }
     memset(&mPoint[0], 0, sizeof(mPoint));
     memset(&mWS[0][0], 0, sizeof(mWS));
     memset(&mKe[0], 0, sizeof(mKe));
@@ -146,11 +142,7 @@ CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCou
                         sizeof(mWS), &mWS[0][0]);
     SuccessOrExit(err);
 
-    if (mDelegate != nullptr)
-    {
-        mDelegate->Release();
-    }
-    mDelegate    = delegate->Retain();
+    mDelegate    = delegate;
     mLocalNodeId = myNodeId;
     mLocalKeyId  = myKeyId;
 

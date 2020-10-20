@@ -24,7 +24,6 @@
 #pragma once
 
 #include <core/CHIPCore.h>
-#include <core/ReferenceCounted.h>
 #include <protocols/CHIPProtocols.h>
 #include <support/BufBound.h>
 #include <system/SystemPacketBuffer.h>
@@ -36,7 +35,7 @@
 
 namespace chip {
 
-class DLL_EXPORT DeviceNetworkProvisioningDelegate : public ReferenceCounted<DeviceNetworkProvisioningDelegate>
+class DLL_EXPORT DeviceNetworkProvisioningDelegate
 {
 public:
     /**
@@ -51,7 +50,7 @@ public:
     virtual ~DeviceNetworkProvisioningDelegate() {}
 };
 
-class DLL_EXPORT NetworkProvisioningDelegate : public ReferenceCounted<NetworkProvisioningDelegate>
+class DLL_EXPORT NetworkProvisioningDelegate
 {
 public:
     /**

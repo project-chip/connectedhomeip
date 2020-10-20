@@ -51,33 +51,17 @@ SecureSessionMgrBase::SecureSessionMgrBase() : mState(State::kNotReady) {}
 SecureSessionMgrBase::~SecureSessionMgrBase()
 {
     CancelExpiryTimer();
-
-    if (mCB != nullptr)
-    {
-        mCB->Release();
-    }
-
-    if (mTransport)
-    {
-        mTransport->Release();
-    }
 }
 
 CHIP_ERROR SecureSessionMgrBase::InitInternal(NodeId localNodeId, System::Layer * systemLayer, Transport::Base * transport)
 {
-    if (mTransport)
-    {
-        mTransport->Release();
-        mTransport = nullptr;
-    }
-
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
 
     mState       = State::kInitialized;
     mLocalNodeId = localNodeId;
     mSystemLayer = systemLayer;
-    mTransport   = transport->Retain();
+    mTransport   = transport;
 
     mTransport->SetMessageReceiveHandler(HandleDataReceived, this);
     mPeerConnections.SetConnectionExpiredHandler(HandleConnectionExpired, this);
