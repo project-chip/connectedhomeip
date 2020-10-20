@@ -13,13 +13,13 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
 import("//${chip_root}/build/chip/tests.gni")
 
 assert(current_os == "zephyr")
 
 declare_args() {
   chip_build_libshell = false
+  chip_build_pw_rpc_lib = false
 }
 
 group("dummy") {
@@ -30,6 +30,12 @@ group("nrfconnect") {
 
   if (chip_build_libshell) {
     deps += [ "${chip_root}/src/lib/shell" ]
+  }
+
+  # Building PW_RPC lib with GN may go obsolete after getting full CMake
+  # support in Pigweed.
+  if (chip_build_pw_rpc_lib) {
+    deps += [ "${chip_root}/config/nrfconnect/lib/pw_rpc" ]
   }
 }
 

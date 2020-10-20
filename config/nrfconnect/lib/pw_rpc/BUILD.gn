@@ -13,19 +13,27 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//lib/pw_rpc/pw_rpc.gni")
+import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/target_types.gni")
 
-nrfconnect_target = get_label_info(":nrfconnect", "label_no_toolchain")
+static_library("pw_rpc") {
+  output_name = "libPwRpc"
 
-chip_device_platform = "nrfconnect"
-chip_logging_style = "external"
+  public_configs = [ "${dir_pigweed}/pw_hdlc_lite:default_config" ]
+  sources = [
+  "${dir_pigweed}/pw_hdlc_lite/rpc_example/hdlc_rpc_server.cc",
+  ]
+  deps = [
+    "$dir_pw_rpc:server",
+    "$dir_pw_rpc/nanopb:echo_service",
+    "${dir_pigweed}/pw_hdlc_lite:pw_rpc",
+    "${chip_root}/examples/platform/nrfconnect/pw_sys_io:pw_sys_io_nrfconnect",
+    dir_pw_hdlc_lite,
+    dir_pw_log,
+    dir_pw_assert,
+  ]
 
-chip_config_network_layer_ble = true
+  output_dir = "${root_out_dir}/lib"
 
-chip_build_tests = false
-
-chip_project_config_include = ""
-chip_system_project_config_include = ""
-
-custom_toolchain = "//toolchain:zephyr"
-mbedtls_target = "//:dummy"
+  complete_static_lib = true
+}

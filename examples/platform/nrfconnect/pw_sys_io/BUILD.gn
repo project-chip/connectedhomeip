@@ -12,20 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("//lib/pw_rpc/pw_rpc.gni")
+# gn-format disable
+import("//build_overrides/pigweed.gni")
 
-nrfconnect_target = get_label_info(":nrfconnect", "label_no_toolchain")
+import("$dir_pw_build/target_types.gni")
 
-chip_device_platform = "nrfconnect"
-chip_logging_style = "external"
+config("default_config") {
+  include_dirs = [ "include" ]
+}
 
-chip_config_network_layer_ble = true
-
-chip_build_tests = false
-
-chip_project_config_include = ""
-chip_system_project_config_include = ""
-
-custom_toolchain = "//toolchain:zephyr"
-mbedtls_target = "//:dummy"
+pw_source_set("pw_sys_io_nrfconnect") {
+  public_configs = [ ":default_config" ]
+  deps = [
+    "$dir_pw_sys_io:default_putget_bytes",
+    "$dir_pw_sys_io:facade",
+  ]
+  sources = [ "sys_io_nrfconnect.cc" ]
+}
