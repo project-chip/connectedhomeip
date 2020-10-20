@@ -859,7 +859,7 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 #if !CHIP_DEVICE_CONFIG_DISABLE_FABRIC_MEMBER
         Impl()->IsMemberOfFabric() &&
 #endif
-    true;
+        true;
 }
 
 template <class ImplClass>
