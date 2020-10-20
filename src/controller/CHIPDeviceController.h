@@ -28,6 +28,7 @@
 
 #pragma once
 
+#include <controller/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/DLLUtil.h>
@@ -114,7 +115,8 @@ public:
      * Init function to be used when already-initialized System::Layer and InetLayer are available.
      */
     CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, Inet::InetLayer * inetLayer);
-    CHIP_ERROR Init(NodeId localDeviceId, DevicePairingDelegate * pairingDelegate);
+    CHIP_ERROR Init(NodeId localDeviceId, DevicePairingDelegate * pairingDelegate,
+                    PersistentStorageDelegate * storageDelegate = nullptr);
     CHIP_ERROR Shutdown();
 
     // ----- Connection Management -----
@@ -257,7 +259,6 @@ private:
     uint16_t mDevicePort;
     Inet::InterfaceId mInterface;
     Optional<NodeId> mRemoteDeviceId;
-    uint32_t mMessageNumber = 0;
 
     SecurePairingSession mPairingSession;
     SecurePairingUsingTestSecret * mTestSecurePairingSecret = nullptr;
@@ -266,11 +267,13 @@ private:
 
     DevicePairingDelegate * mPairingDelegate;
 
+    PersistentStorageDelegate * mStorageDelegate;
+
     void ClearRequestState();
     void ClearOpState();
 
-    CHIP_ERROR EstablishSecureSession();
-    CHIP_ERROR ResumeSecureSession();
+    CHIP_ERROR EstablishSecureSession(NodeId peer);
+    CHIP_ERROR ResumeSecureSession(NodeId peer);
 };
 
 } // namespace DeviceController
