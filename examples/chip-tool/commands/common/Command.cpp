@@ -23,7 +23,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#include <support/CHIPLogging.h>
+#include <support/logging/CHIPLogging.h>
 
 bool Command::InitArguments(int argc, char ** argv)
 {

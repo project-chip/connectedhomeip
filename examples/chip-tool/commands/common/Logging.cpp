@@ -16,7 +16,7 @@
  *
  */
 
-#include <support/CHIPLogging.h>
+#include <support/logging/CHIPLogging.h>
 #include <support/CodeUtils.h>
 
 #include <stdlib.h>
