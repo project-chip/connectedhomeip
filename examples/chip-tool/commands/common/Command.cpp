@@ -167,6 +167,12 @@ size_t Command::AddArgument(const char * name, int64_t min, int64_t max, void * 
     return mArgs.size();
 }
 
+size_t Command::AddArgument(const char * name, Argument arg)
+{
+    mArgs.emplace(mArgs.begin(), arg);
+    return mArgs.size();
+}
+
 const char * Command::GetArgumentName(size_t index) const
 {
     if (index < mArgs.size())

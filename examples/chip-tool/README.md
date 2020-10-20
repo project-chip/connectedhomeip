@@ -91,3 +91,11 @@ To get the list of parameters for a specific command, run the built executable
 with the target cluster name and the target command name
 
     $ chip-tool onoff on
+
+### How to parse a setup code
+
+To parse a setup code, run the built executable with the `parse` cluster name
+and the target command name
+
+    $ chip-tool parse qr base41-representation
+    $ chip-tool parse manual decimal-representation
