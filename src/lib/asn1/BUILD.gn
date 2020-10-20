@@ -28,24 +28,19 @@ source_set("asn1oid_header") {
   deps = [ ":gen_asn1oid" ]
 }
 
-asn1_headers = [
-  "ASN1Config.h",
-  "ASN1Error.h",
-  "ASN1.h",
-  "ASN1Macros.h",
-]
-
 static_library("asn1") {
   output_name = "libASN1"
 
   sources = [
+    "ASN1.h",
+    "ASN1Config.h",
     "ASN1Error.cpp",
+    "ASN1Error.h",
+    "ASN1Macros.h",
     "ASN1OID.cpp",
     "ASN1Reader.cpp",
     "ASN1Writer.cpp",
   ]
-
-  public = asn1_headers
 
   public_deps = [
     ":asn1oid_header",
@@ -59,10 +54,4 @@ static_library("asn1") {
     "${chip_root}/src/lib:includes",
     "${chip_root}/src/system:system_config",
   ]
-}
-
-copy("asn1_headers") {
-  sources = asn1_headers
-
-  outputs = [ "${root_gen_dir}/include/asn1/{{source_file_part}}" ]
 }
