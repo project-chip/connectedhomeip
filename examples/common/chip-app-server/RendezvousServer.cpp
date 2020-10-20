@@ -33,16 +33,7 @@ using namespace ::chip::DeviceLayer;
 
 namespace chip {
 
-void AccessoryNetworkProvisioningDelegate::ProvisionThread(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
-{
-#if CHIP_ENABLE_OPENTHREAD
-    ThreadStackMgr().SetThreadEnabled(false);
-    ThreadStackMgr().SetThreadProvision(threadData);
-    ThreadStackMgr().SetThreadEnabled(true);
-#endif // CHIP_ENABLE_OPENTHREAD
-}
-
-RendezvousServer::RendezvousServer() : mRendezvousSession(this, &mNetworkProvisioningDelegate) {}
+RendezvousServer::RendezvousServer() : mRendezvousSession(this, this) {}
 
 CHIP_ERROR RendezvousServer::Init(const RendezvousParameters & params)
 {
@@ -88,6 +79,15 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
 
 exit:
     return;
+}
+
+void RendezvousServer::ProvisionThread(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+{
+#if CHIP_ENABLE_OPENTHREAD
+    ThreadStackMgr().SetThreadEnabled(false);
+    ThreadStackMgr().SetThreadProvision(threadData);
+    ThreadStackMgr().SetThreadEnabled(true);
+#endif // CHIP_ENABLE_OPENTHREAD
 }
 
 } // namespace chip
