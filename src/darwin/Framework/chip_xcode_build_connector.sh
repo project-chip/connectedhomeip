@@ -118,15 +118,18 @@ updirs() {
 (
     cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
 
-    ENV=$(updirs chip_xcode_build_connector_env.sh)
-    [[ -n $ENV ]] && . "$ENV"
+    if ENV=$(updirs chip_xcode_build_connector_env.sh 2>/dev/null);
+    then
+        . "$ENV"
+    fi
 
     [[ -n $CHIP_NO_SUBMODULES ]] || git submodule update --init
-    if [[ -z $CHIP_NO_ACTIVATE ]]; then
+    if [[ -z $CHIP_NO_BOOTSTRAP ]]; then
+        # first run bootstrap in an external env to build everything
+        env -i PW_ENVSETUP_NO_BANNER=1 PW_ENVSETUP_QUIET=1 bash -c '. scripts/activate.sh'
         set +ex
-        echo PW_ENVSETUP_QUIET=1 . scripts/activate.sh >&2
-        PW_ENVSETUP_QUIET=1 . scripts/activate.sh
-        (($? != 0)) && echo "Please source $CHIP_ROOT/scripts/bootstrap.sh before building" && exit 1
+        # now source activate for env vars
+        PW_ENVSETUP_NO_BANNER=1 PW_ENVSETUP_QUIET=1 . scripts/activate.sh
         set -ex
     fi
 

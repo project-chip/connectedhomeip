@@ -15,9 +15,17 @@
 #
 
 if [[ -n ${BASH_SOURCE[0]} ]]; then
-    CHIP_ROOT=$(cd "${BASH_SOURCE[0]%/*}/.." && pwd)
+    me=${BASH_SOURCE[0]##*/}
 else
-    CHIP_ROOT=$(cd "${0%/*}/.." && pwd)
+    me=${0##*/}
+fi
+
+if [[ ! -d ${CHIP_ROOT} ]]; then
+    if [[ -n ${BASH_SOURCE[0]} ]]; then
+        CHIP_ROOT=$(cd "${BASH_SOURCE[0]%/*}/.." && pwd)
+    else
+        CHIP_ROOT=$(cd "${0%/*}/.." && pwd)
+    fi
 fi
 
 export PW_BRANDING_BANNER="$CHIP_ROOT/.chip-banner.txt"
@@ -32,10 +40,12 @@ git submodule update --init
 
 export PW_VIRTUALENV_SETUP_PY_ROOTS="$CHIP_ROOT/integrations/mobly"
 
+export PATH # https://bugs.chromium.org/p/pigweed/issues/detail?id=281
+
 # shellcheck source=/dev/null
-source "$CHIP_ROOT/third_party/pigweed/repo/bootstrap.sh"
+source "$CHIP_ROOT/third_party/pigweed/repo/$me"
 
 #TODO - remove this once native python building is solved for
 #       psutil (one of mobly's dependencies which CHIP does
 #       not actually need, so --no-deps is OK)
-pip install --no-deps portpicker mobly
+pip install --quiet --upgrade --no-deps portpicker mobly
