@@ -12,23 +12,26 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Examples - GN
+name: Examples-nrf
 
 on:
     push:
     pull_request:
 
 jobs:
-    esp32:
-        name: ESP32
-
+    # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
+    nrf:
+        name: nRF
         env:
-            BUILD_TYPE: esp32
+            BUILD_TYPE: gn_nrf
+            BUILD_VERSION: 0.2.14
+            BUILD_IMAGE: chip-build-nrf-platform
+            BUILD_ORG: connectedhomeip
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.4.12
+            image: connectedhomeip/chip-build-nrf-platform:0.4.12
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -45,13 +48,16 @@ jobs:
               with:
                   languages: "cpp, python"
                   queries: +security-and-quality
-            - name: Build example Echo App
-              run: scripts/examples/esp_echo_app.sh
-            - name: Copy aside build products
-              run: |
-                  mkdir -p example_binaries/$BUILD_TYPE-build
-                  cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
-                     example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
+            - name: Bootstrap
+              run: scripts/build/gn_bootstrap.sh
+            - name: Build example nRF5 Lock App
+              run:
+                  scripts/examples/gn_nrf_example.sh examples/lock-app/nrf5
+                  out/lock_app_debug
+            - name: Build example nRF5 Lighting App
+              run:
+                  scripts/examples/gn_nrf_example.sh examples/lighting-app/nrf5
+                  out/lighting_app_debug
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -59,22 +65,26 @@ jobs:
                   cond: ${{ github.event.pull_request.number == '' }}
                   if_true: "${{ github.sha }}"
                   if_false: "pull-${{ github.event.pull_request.number }}"
-            - name: Copy aside bloat report & binaries
-              run: |
-                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
             - name: Uploading Binaries
-              uses: actions/upload-artifact@v1
+              uses: actions/upload-artifact@v2
               with:
                   name:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
-                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
+                  path: |
+                      out/lock_app_debug/chip-nrf52840-lock-example
+                      out/lighting_app_debug/chip-nrf52840-lighting-example
+            # TODO: NRF Connect https://github.com/project-chip/connectedhomeip/issues/2225
             - name: Show tree
               run: find .
-            # - name: Remove third_party binaries for CodeQL Analysis
-            #   run: find . -type d -name "third_party" -exec rm -rf {} +
-            # - name: Remove m5stack-tft binaries for CodeQL Analysis
-            #   run: find . -type d -name "m5stack-tft" -exec rm -rf {} +
+            - name: Remove third_party binaries for CodeQL Analysis
+              run: find out -type d -name "third_party" -exec rm -rf {} +
+            - name: Remove nrfxlib binaries for CodeQL Analysis
+              run: find out -type d -name "nrfxlib" -exec rm -rf {} +
+            - name: Remove NordicSemiconductor binaries for CodeQL Analysis
+              run:
+                  find out -type d -name "NordicSemiconductor" -exec rm -rf {} +
+
             - name: Perform CodeQL Analysis
               if: ${{ github.event_name == 'push' }}
               uses: github/codeql-action/analyze@v1
