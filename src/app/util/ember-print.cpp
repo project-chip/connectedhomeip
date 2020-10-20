@@ -20,7 +20,7 @@
 
 #include "gen/gen_config.h"
 
-#include <support/CHIPLogging.h>
+#include <support/logging/CHIPLogging.h>
 
 bool emberAfPrintReceivedMessages = true;
 
