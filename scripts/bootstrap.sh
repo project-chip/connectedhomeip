@@ -52,7 +52,7 @@ EOF
 
     local _PW_BANNER_FUNC="_chip_bootstrap_banner"
 
-    local _PW_ACTUAL_ENVIRONMENT_ROOT="$(pw_get_env_root)"
+    export _PW_ACTUAL_ENVIRONMENT_ROOT="$(pw_get_env_root)"
     local _SETUP_SH="$_PW_ACTUAL_ENVIRONMENT_ROOT/activate.sh"
 
     export PW_DOCTOR_SKIP_CIPD_CHECKS=1
