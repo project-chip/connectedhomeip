@@ -78,6 +78,9 @@ set(CHIP_LIBRARIES ${CHIP_OUTPUT_DIR}/lib/libCHIP.a)
 if (CONFIG_CHIP_LIB_SHELL)
     list(APPEND CHIP_LIBRARIES ${CHIP_OUTPUT_DIR}/obj/third_party/connectedhomeip/src/lib/shell/lib/libCHIPShell.a)
 endif()
+if (CONFIG_CHIP_PW_RPC)
+    list(APPEND CHIP_LIBRARIES ${CHIP_OUTPUT_DIR}/lib/libPwRpc.a)
+endif()
 
 find_file(CHIP_PROJECT_CONFIG 
     CHIPProjectConfig.h

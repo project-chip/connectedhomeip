@@ -38,6 +38,11 @@ config CHIP_LIB_SHELL
 	help
 	  Link the application with the library containing CHIP shell commands
 
+config CHIP_PW_RPC
+	bool "Enable Pigweed RPC library"
+	help
+	  Link the application with the library containing Pigweed RPC functionalities
+
 config MULTIPROTOCOL
 	bool "Enable multiprotocol support"
 	select NRF_802154_MULTIPROTOCOL_SUPPORT
