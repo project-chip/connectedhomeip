@@ -26,7 +26,7 @@ config("includes") {
     "${root_gen_dir}/include",
   ]
 
-  defines = [ "CHIP_SEPARATE_CONFIG_H=1" ]
+  defines = [ "CHIP_HAVE_CONFIG_H=1" ]
 
   if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]

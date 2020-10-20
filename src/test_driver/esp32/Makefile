@@ -16,7 +16,7 @@ EXTRA_COMPONENT_DIRS += $(PROJECT_PATH)/third_party/connectedhomeip/config/esp32
 CHIP_BUILD_WITH_GN ?= ""
 
 ifneq ($(CHIP_BUILD_WITH_GN),n)
-CPPFLAGS += -DCHIP_SEPARATE_CONFIG_H
+CPPFLAGS += -DCHIP_HAVE_CONFIG_H
 endif
 export CHIP_BUILD_WITH_GN
 
