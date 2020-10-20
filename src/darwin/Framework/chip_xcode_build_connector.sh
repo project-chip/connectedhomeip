@@ -118,8 +118,7 @@ updirs() {
 (
     cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
 
-    if ENV=$(updirs chip_xcode_build_connector_env.sh 2>/dev/null);
-    then
+    if ENV=$(updirs chip_xcode_build_connector_env.sh 2>/dev/null); then
         . "$ENV"
     fi
 
