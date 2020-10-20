@@ -24,11 +24,12 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/Mdns.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
 
 #include <thread>
+
+#include "MdnsImpl.h"
 
 namespace chip {
 namespace DeviceLayer {

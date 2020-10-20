@@ -25,22 +25,64 @@
 
 #include <netinet/in.h>
 
-#include "platform/Mdns.h"
+#include "support/CHIPMem.h"
 #include "support/CodeUtils.h"
 
+using chip::Protocols::Mdns::kMdnsTypeMaxSize;
+using chip::Protocols::Mdns::MdnsServiceProtocol;
+using chip::Protocols::Mdns::TextEntry;
 using std::chrono::duration_cast;
 using std::chrono::microseconds;
 using std::chrono::seconds;
 using std::chrono::steady_clock;
 
+namespace {
+
+CHIP_ERROR MakeAvahiStringListFromTextEntries(TextEntry * entries, size_t size, AvahiStringList ** strListOut)
+{
+    *strListOut = avahi_string_list_new(nullptr, nullptr);
+
+    for (size_t i = 0; i < size; i++)
+    {
+        uint8_t buf[kMdnsTypeMaxSize];
+        int offset = snprintf(reinterpret_cast<char *>(buf), sizeof(buf), "%s=", entries[i].mKey);
+
+        if (offset + entries[i].mDataSize > sizeof(buf))
+        {
+            avahi_string_list_free(*strListOut);
+            *strListOut = nullptr;
+            return CHIP_ERROR_INVALID_ARGUMENT;
+        }
+
+        memcpy(&buf[offset], entries[i].mData, entries[i].mDataSize);
+        *strListOut = avahi_string_list_add_arbitrary(*strListOut, buf, offset + entries[i].mDataSize);
+    }
+    return CHIP_NO_ERROR;
+}
+
+const char * GetProtocolString(MdnsServiceProtocol protocol)
+{
+    return protocol == MdnsServiceProtocol::kMdnsProtocolUdp ? "_udp" : "_tcp";
+}
+
+std::string GetFullType(const char * type, MdnsServiceProtocol protocol)
+{
+    std::ostringstream typeBuilder;
+    typeBuilder << type << "." << GetProtocolString(protocol);
+    return typeBuilder.str();
+}
+
+} // namespace
+
 namespace chip {
-namespace DeviceLayer {
+namespace Protocols {
+namespace Mdns {
 
 MdnsAvahi MdnsAvahi::sInstance;
 
 constexpr uint64_t kUsPerSec = 1000 * 1000;
 
-Poller::Poller(void)
+Poller::Poller()
 {
     mAvahiPoller.userdata         = this;
     mAvahiPoller.watch_new        = WatchNew;
@@ -333,41 +375,6 @@ void MdnsAvahi::HandleGroupState(AvahiEntryGroup * group, AvahiEntryGroupState s
     }
 }
 
-static const char * GetProtocolString(MdnsServiceProtocol protocol)
-{
-    return protocol == MdnsServiceProtocol::kMdnsProtocolUdp ? "_udp" : "_tcp";
-}
-
-static std::string GetFullType(const char * type, MdnsServiceProtocol protocol)
-{
-    std::ostringstream typeBuilder;
-    typeBuilder << type << "." << GetProtocolString(protocol);
-    return typeBuilder.str();
-}
-
-static AvahiStringList * MakeAvahiStringListFromTextEntries(TextEntry * entries, size_t size)
-{
-    AvahiStringList * strList = avahi_string_list_new(nullptr, nullptr);
-
-    for (size_t i = 0; i < size; i++)
-    {
-        uint8_t buf[kMdnsTypeMaxSize];
-        size_t keySize   = strnlen(entries[i].mKey, kMdnsTypeMaxSize);
-        size_t valueSize = 0;
-
-        memcpy(buf, entries[i].mKey, keySize);
-        if (size < sizeof(buf))
-        {
-            valueSize    = std::min(entries[i].mDataSize, sizeof(buf) - keySize - 1);
-            buf[keySize] = static_cast<uint8_t>('=');
-            memcpy(&buf[keySize + 1], entries[i].mData, valueSize);
-        }
-        strList = avahi_string_list_add_arbitrary(strList, buf, keySize + valueSize + 1);
-    }
-
-    return strList;
-}
-
 CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
 {
     std::ostringstream keyBuilder;
@@ -381,7 +388,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
     key = keyBuilder.str();
     if (mPublishedServices.find(key) == mPublishedServices.end())
     {
-        text = MakeAvahiStringListFromTextEntries(service.mTextEntryies, service.mTextEntrySize);
+        SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntryies, service.mTextEntrySize, &text));
 
         mPublishedServices.emplace(key);
         VerifyOrExit(avahi_entry_group_add_service_strlst(mGroup, interface, AVAHI_PROTO_UNSPEC, static_cast<AvahiPublishFlags>(0),
@@ -390,7 +397,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
     }
     else
     {
-        text = MakeAvahiStringListFromTextEntries(service.mTextEntryies, service.mTextEntrySize);
+        SuccessOrExit(error = MakeAvahiStringListFromTextEntries(service.mTextEntryies, service.mTextEntrySize, &text));
 
         VerifyOrExit(avahi_entry_group_update_service_txt_strlst(mGroup, interface, AVAHI_PROTO_UNSPEC,
                                                                  static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(),
@@ -426,7 +433,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
                              MdnsBrowseCallback callback, void * context)
 {
     AvahiServiceBrowser * browser;
-    std::shared_ptr<BrowseContext> browseContext = std::make_shared<BrowseContext>();
+    BrowseContext * browseContext = static_cast<BrowseContext *>(chip::Platform::MemoryAlloc(sizeof(BrowseContext)));
 
     browseContext->mInstance = this;
     browseContext->mContext  = context;
@@ -436,10 +443,11 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
         interface = AVAHI_IF_UNSPEC;
     }
     browser = avahi_service_browser_new(mClient, interface, AVAHI_PROTO_UNSPEC, GetFullType(type, protocol).c_str(), nullptr,
-                                        static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext.get());
-    if (browser != nullptr)
+                                        static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
+    // Otherwise the browser will be freed in the callback
+    if (browser == nullptr)
     {
-        mBrowseContexts[browseContext.get()] = browseContext;
+        chip::Platform::MemoryFree(browseContext);
     }
 
     return browser == nullptr ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
@@ -467,10 +475,9 @@ MdnsServiceProtocol TruncateProtocolInType(char * type)
 }
 
 void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
-                             const char * name, const char * type, const char * domain, AvahiLookupResultFlags flags,
+                             const char * name, const char * type, const char * domain, AvahiLookupResultFlags /*flags*/,
                              void * userdata)
 {
-    (void) flags;
     BrowseContext * context = static_cast<BrowseContext *>(userdata);
 
     switch (event)
@@ -478,7 +485,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     case AVAHI_BROWSER_FAILURE:
         context->mCallback(context->mContext, nullptr, 0, CHIP_ERROR_INTERNAL);
         avahi_service_browser_free(browser);
-        context->mInstance->mBrowseContexts.erase(context);
+        chip::Platform::MemoryFree(context);
         break;
     case AVAHI_BROWSER_NEW:
         ChipLogProgress(DeviceLayer, "Avahi browse: cache new");
@@ -498,14 +505,14 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
         context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), CHIP_NO_ERROR);
         avahi_service_browser_free(browser);
-        context->mInstance->mBrowseContexts.erase(context);
+        chip::Platform::MemoryFree(context);
         break;
     case AVAHI_BROWSER_REMOVE:
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)
         {
             std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const MdnsService service) {
-                return name == std::string(service.mName) && type == GetFullType(service.mType, service.mProtocol);
+                return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
             });
         }
         break;
@@ -519,8 +526,8 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
                               MdnsResolveCallback callback, void * context)
 {
     AvahiServiceResolver * resolver;
-    std::shared_ptr<ResolveContext> resolveContext = std::make_shared<ResolveContext>();
-    CHIP_ERROR error                               = CHIP_NO_ERROR;
+    ResolveContext * resolveContext = static_cast<ResolveContext *>(chip::Platform::MemoryAlloc(sizeof(ResolveContext)));
+    CHIP_ERROR error                = CHIP_NO_ERROR;
 
     resolveContext->mInstance = this;
     resolveContext->mCallback = callback;
@@ -531,21 +538,22 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
     }
     resolver =
         avahi_service_resolver_new(mClient, interface, AVAHI_PROTO_UNSPEC, name, GetFullType(type, protocol).c_str(), nullptr,
-                                   AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), HandleResolve, resolveContext.get());
-    VerifyOrExit(resolver != nullptr, error = CHIP_ERROR_INTERNAL);
-    mResolveContexts[resolveContext.get()] = resolveContext;
+                                   AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), HandleResolve, resolveContext);
+    // Otherwise the resolver will be freed in the callback
+    if (resolver == nullptr)
+    {
+        error = CHIP_ERROR_INTERNAL;
+        chip::Platform::MemoryFree(resolver);
+    }
 
-exit:
     return error;
 }
 
 void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex interface, AvahiProtocol protocol,
-                              AvahiResolverEvent event, const char * name, const char * type, const char * domain,
-                              const char * host_name, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
+                              AvahiResolverEvent event, const char * name, const char * type, const char * /*domain*/,
+                              const char * /*host_name*/, const AvahiAddress * address, uint16_t port, AvahiStringList * txt,
                               AvahiLookupResultFlags flags, void * userdata)
 {
-    (void) host_name;
-    (void) domain;
     ResolveContext * context = reinterpret_cast<ResolveContext *>(userdata);
     std::vector<TextEntry> textEntries;
 
@@ -568,7 +576,6 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         if (address)
         {
-            printf("address proto %d\n", address->proto);
             switch (address->proto)
             {
             case AVAHI_PROTO_INET:
@@ -590,8 +597,6 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
 
         while (txt != nullptr)
         {
-            TextEntry entry;
-
             for (size_t i = 0; i < txt->size; i++)
             {
                 if (txt->text[i] == '=')
@@ -614,6 +619,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     }
 
     avahi_service_resolver_free(resolver);
+    chip::Platform::MemoryFree(context);
 }
 
 MdnsAvahi::~MdnsAvahi()
@@ -677,5 +683,6 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * browseResult, chip::Inet::InterfaceId i
     return error;
 }
 
-} // namespace DeviceLayer
+} // namespace Mdns
+} // namespace Protocols
 } // namespace chip

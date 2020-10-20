@@ -4,12 +4,13 @@
 
 #include <nlunit-test.h>
 
+#include "lib/protocols/mdns/Mdns.h"
 #include "platform/CHIPDeviceLayer.h"
-#include "platform/Mdns.h"
+#include "support/CHIPMem.h"
 
-using chip::DeviceLayer::MdnsService;
-using chip::DeviceLayer::MdnsServiceProtocol;
-using chip::DeviceLayer::TextEntry;
+using chip::Protocols::Mdns::MdnsService;
+using chip::Protocols::Mdns::MdnsServiceProtocol;
+using chip::Protocols::Mdns::TextEntry;
 
 static void HandleResolve(void * context, MdnsService * result, CHIP_ERROR error)
 {
@@ -77,8 +78,9 @@ static void ErrorCallback(void * context, CHIP_ERROR error)
 
 void TestMdnsPubSub(nlTestSuite * inSuite, void * inContext)
 {
+    chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformMgr().InitChipStack();
-    NL_TEST_ASSERT(inSuite, chip::DeviceLayer::ChipMdnsInit(InitCallback, ErrorCallback, inSuite) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, chip::Protocols::Mdns::ChipMdnsInit(InitCallback, ErrorCallback, inSuite) == CHIP_NO_ERROR);
 
     ChipLogProgress(DeviceLayer, "Start EventLoop");
     chip::DeviceLayer::PlatformMgr().RunEventLoop();

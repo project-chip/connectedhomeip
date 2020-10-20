@@ -33,7 +33,7 @@
 #include <avahi-common/error.h>
 #include <avahi-common/watch.h>
 
-#include "platform/Mdns.h"
+#include "lib/protocols/mdns/Mdns.h"
 
 struct AvahiWatch
 {
@@ -55,7 +55,8 @@ struct AvahiTimeout
 };
 
 namespace chip {
-namespace DeviceLayer {
+namespace Protocols {
+namespace Mdns {
 
 class Poller
 {
@@ -111,7 +112,6 @@ public:
     Poller & GetPoller() { return mPoller; }
 
     static MdnsAvahi & GetInstance() { return sInstance; }
-    void RunTestLoop();
 
     ~MdnsAvahi();
 
@@ -153,9 +153,6 @@ private:
     void * mAsyncReturnContext;
 
     std::set<std::string> mPublishedServices;
-    std::map<BrowseContext *, std::shared_ptr<BrowseContext>> mBrowseContexts;
-    std::map<ResolveContext *, std::shared_ptr<ResolveContext>> mResolveContexts;
-    std::set<AvahiServiceResolver *> mResolvers;
     AvahiClient * mClient;
     AvahiEntryGroup * mGroup;
     Poller mPoller;
@@ -165,5 +162,6 @@ void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFd
 
 void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet);
 
-} // namespace DeviceLayer
+} // namespace Mdns
+} // namespace Protocols
 } // namespace chip

@@ -15,6 +15,14 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file defines the platform API to publish and subscribe mDNS
+ *      services.
+ *
+ *      You can find the implementation in src/platform/<PLATFORM>/MdnsImpl.cpp.
+ */
+
 #pragma once
 
 #include <stdint.h>
@@ -25,7 +33,8 @@
 #include "lib/core/Optional.h"
 
 namespace chip {
-namespace DeviceLayer {
+namespace Protocols {
+namespace Mdns {
 
 static constexpr uint8_t kMdnsNameMaxSize  = 32;
 static constexpr uint8_t kMdnsTypeMaxSize  = 32;
@@ -156,5 +165,6 @@ CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip:
 CHIP_ERROR ChipMdnsResolve(MdnsService * browseResult, chip::Inet::InterfaceId interface, MdnsResolveCallback callback,
                            void * context);
 
-} // namespace DeviceLayer
+} // namespace Mdns
+} // namespace Protocols
 } // namespace chip
