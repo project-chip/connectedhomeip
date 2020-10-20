@@ -61,7 +61,10 @@ chip_test_suite("tests") {
     "TestInetEndPoint",
   ]
 
-  if (current_os != "mac" && chip_device_platform != "esp32") {
+  # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
+  # x64.
+  if (current_os != "mac" && chip_device_platform != "esp32" &&
+      current_cpu == "x64") {
     sources += [
       "TestInetLayerDNS.cpp",
       "TestLwIPDNS.cpp",

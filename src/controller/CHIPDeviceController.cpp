@@ -28,6 +28,10 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
+#ifndef __STDC_FORMAT_MACROS
+#define __STDC_FORMAT_MACROS
+#endif
+
 // module header, comes first
 #include <controller/CHIPDeviceController.h>
 
@@ -46,6 +50,7 @@
 #include <support/logging/CHIPLogging.h>
 
 #include <errno.h>
+#include <inttypes.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <time.h>
@@ -58,6 +63,22 @@ namespace DeviceController {
 
 using namespace chip::Encoding;
 
+constexpr const char * kDeviceCredentialsKeyPrefix = "DeviceCredentials";
+constexpr const char * kDeviceAddressKeyPrefix     = "DeviceAddress";
+
+// This macro generates a key using node ID an key prefix, and performs the given action
+// on that key.
+#define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        const size_t len = strlen(keyPrefix);                                                                                      \
+        /* 2 * sizeof(NodeId) to accomodate 2 character for each byte in Node Id */                                                \
+        char key[len + 2 * sizeof(NodeId) + 1];                                                                                    \
+        nlSTATIC_ASSERT_PRINT(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                          \
+        snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                 \
+        action;                                                                                                                    \
+    } while (0)
+
 ChipDeviceController::ChipDeviceController()
 {
     mState             = kState_NotInitialized;
@@ -69,6 +90,7 @@ ChipDeviceController::ChipDeviceController()
     mOnError           = nullptr;
     mOnNewConnection   = nullptr;
     mPairingDelegate   = nullptr;
+    mStorageDelegate   = nullptr;
     mDeviceAddr        = IPAddress::Any;
     mDevicePort        = CHIP_PORT;
     mInterface         = INET_NULL_INTERFACEID;
@@ -117,12 +139,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, DevicePairingDelegate * pairingDelegate)
+CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, DevicePairingDelegate * pairingDelegate,
+                                      PersistentStorageDelegate * storage)
 {
     CHIP_ERROR err = Init(localNodeId);
     SuccessOrExit(err);
 
     mPairingDelegate = pairingDelegate;
+    mStorageDelegate = storage;
 
 exit:
     return err;
@@ -167,7 +191,6 @@ CHIP_ERROR ChipDeviceController::Shutdown()
     memset(&mOnComplete, 0, sizeof(mOnComplete));
     mOnError         = nullptr;
     mOnNewConnection = nullptr;
-    mMessageNumber   = 0;
     mRemoteDeviceId.ClearValue();
 
 exit:
@@ -251,11 +274,14 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDeviceController::EstablishSecureSession()
+CHIP_ERROR ChipDeviceController::EstablishSecureSession(NodeId peer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    SecurePairingSession pairing;
+    SecurePairingSession * pairingSession = mSecurePairingSession;
+    Inet::IPAddress peerAddr              = mDeviceAddr;
 
-    if (mState != kState_Initialized || mSessionManager != nullptr || mConState != kConnectionState_Connected)
+    if (mState != kState_Initialized || mSessionManager != nullptr || mConState == kConnectionState_SecureConnected)
     {
         ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
@@ -270,12 +296,33 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
 
     mConState = kConnectionState_SecureConnected;
 
-    err = mSessionManager->NewPairing(
-        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)),
-        mSecurePairingSession);
-    SuccessOrExit(err);
+    if (mStorageDelegate != nullptr)
+    {
+        const char * credentials;
+        const char * address;
 
-    mMessageNumber = 1;
+        PERSISTENT_KEY_OP(peer, kDeviceCredentialsKeyPrefix, key, credentials = mStorageDelegate->GetKeyValue(key));
+        PERSISTENT_KEY_OP(peer, kDeviceAddressKeyPrefix, key, address = mStorageDelegate->GetKeyValue(key));
+
+        SecurePairingSessionSerialized serialized;
+
+        VerifyOrExit(credentials != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
+        VerifyOrExit(strlen(credentials) <= sizeof(serialized.inner), err = CHIP_ERROR_INVALID_STRING_LENGTH);
+        strncpy(Uint8::to_char(serialized.inner), credentials, sizeof(serialized.inner));
+
+        err = pairing.Deserialize(serialized);
+        SuccessOrExit(err);
+
+        pairingSession = &pairing;
+
+        VerifyOrExit(address != nullptr, err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
+
+        VerifyOrExit(IPAddress::FromString(address, peerAddr), err = CHIP_ERROR_INVALID_ADDRESS);
+    }
+
+    err = mSessionManager->NewPairing(
+        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(peerAddr, mDevicePort, mInterface)), pairingSession);
+    SuccessOrExit(err);
 
 exit:
 
@@ -291,7 +338,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::ResumeSecureSession()
+CHIP_ERROR ChipDeviceController::ResumeSecureSession(NodeId peer)
 {
     if (mConState == kConnectionState_SecureConnected)
     {
@@ -304,12 +351,8 @@ CHIP_ERROR ChipDeviceController::ResumeSecureSession()
         mSessionManager = nullptr;
     }
 
-    uint32_t currentMessageNumber = mMessageNumber;
-
-    CHIP_ERROR err = EstablishSecureSession();
+    CHIP_ERROR err = EstablishSecureSession(peer);
     SuccessOrExit(err);
-
-    mMessageNumber = currentMessageNumber;
 
 exit:
 
@@ -377,8 +420,8 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
         if (!IsSecurelyConnected())
         {
             // For now, it's expected that the device is connected
-            VerifyOrExit(IsConnected(), err = CHIP_ERROR_INCORRECT_STATE);
-            err = EstablishSecureSession();
+            VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+            err = EstablishSecureSession(mRemoteDeviceId.Value());
             SuccessOrExit(err);
 
             trySessionResumption = false;
@@ -394,7 +437,8 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
         // Try sesion resumption if needed
         if (err != CHIP_NO_ERROR && trySessionResumption)
         {
-            err = ResumeSecureSession();
+            VerifyOrExit(mRemoteDeviceId.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+            err = ResumeSecureSession(mRemoteDeviceId.Value());
             // If session resumption failed, let's free the extra reference to
             // the buffer. If not, SendMessage would free it.
             VerifyOrExit(err == CHIP_NO_ERROR, PacketBuffer::Free(buffer));
@@ -521,12 +565,30 @@ void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::S
         {
             mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
         }
+
+        if (mStorageDelegate != nullptr)
+        {
+            SecurePairingSessionSerialized serialized;
+            CHIP_ERROR err = mSecurePairingSession->Serialize(serialized);
+            if (err == CHIP_NO_ERROR)
+            {
+                PERSISTENT_KEY_OP(mSecurePairingSession->GetPeerNodeId(), kDeviceCredentialsKeyPrefix, key,
+                                  mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+            }
+        }
         break;
 
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
 
         ChipLogDetail(Controller, "Remote device was assigned an ip address\n");
         mDeviceAddr = mRendezvousSession->GetIPAddress();
+        if (mStorageDelegate != nullptr)
+        {
+            char addrStr[INET6_ADDRSTRLEN];
+            mDeviceAddr.ToString(addrStr, INET6_ADDRSTRLEN);
+            PERSISTENT_KEY_OP(mRendezvousSession->GetPairingSession().GetPeerNodeId(), kDeviceAddressKeyPrefix, key,
+                              mStorageDelegate->SetKeyValue(key, addrStr));
+        }
         break;
 
     default:

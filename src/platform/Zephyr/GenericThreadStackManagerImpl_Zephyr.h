@@ -51,21 +51,21 @@ class GenericThreadStackManagerImpl_Zephyr : public GenericThreadStackManagerImp
 {
 public:
     // ===== Methods that implement the ThreadStackManager abstract interface.
-    CHIP_ERROR _InitThreadStack(void);
+    CHIP_ERROR _InitThreadStack();
 
 protected:
     // ===== Methods that implement the ThreadStackManager abstract interface.
 
-    CHIP_ERROR _StartThreadTask(void);
-    void _LockThreadStack(void);
-    bool _TryLockThreadStack(void);
-    void _UnlockThreadStack(void);
+    CHIP_ERROR _StartThreadTask();
+    void _LockThreadStack();
+    bool _TryLockThreadStack();
+    void _UnlockThreadStack();
 
     // ===== Methods that override the GenericThreadStackManagerImpl_OpenThread abstract interface.
 
-    void _ProcessThreadActivity(void);
-    void _OnCHIPoBLEAdvertisingStart(void);
-    void _OnCHIPoBLEAdvertisingStop(void);
+    void _ProcessThreadActivity();
+    void _OnCHIPoBLEAdvertisingStart();
+    void _OnCHIPoBLEAdvertisingStop();
 
 private:
     // ===== Private members for use by this class only.
@@ -77,64 +77,51 @@ private:
 extern template class GenericThreadStackManagerImpl_Zephyr<ThreadStackManagerImpl>;
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_Zephyr<ImplClass>::_InitThreadStack(void)
+CHIP_ERROR GenericThreadStackManagerImpl_Zephyr<ImplClass>::_InitThreadStack()
 {
     return GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(openthread_get_default_instance());
 }
 
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_Zephyr<ImplClass>::_StartThreadTask(void)
+CHIP_ERROR GenericThreadStackManagerImpl_Zephyr<ImplClass>::_StartThreadTask()
 {
     // Intentionally empty.
     return CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_LockThreadStack(void)
+void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_LockThreadStack()
 {
-    if (k_thread_priority_get(k_current_get()) >= 0 || CONFIG_MP_NUM_CPUS != 1)
-    {
-        ChipLogError(DeviceLayer, "No locking is available. All calls to ThreadStackManager must come from a cooperative task.");
-        ChipLogError(DeviceLayer, "Offending task: %s", k_thread_name_get(k_current_get()));
-    }
+    openthread_api_mutex_lock(openthread_get_default_context());
 }
 
 template <class ImplClass>
-bool GenericThreadStackManagerImpl_Zephyr<ImplClass>::_TryLockThreadStack(void)
+bool GenericThreadStackManagerImpl_Zephyr<ImplClass>::_TryLockThreadStack()
 {
-    if (k_thread_priority_get(k_current_get()) >= 0 || CONFIG_MP_NUM_CPUS != 1)
-    {
-        ChipLogError(DeviceLayer, "No locking is available. All calls to ThreadStackManager must come from a cooperative task.");
-        ChipLogError(DeviceLayer, "Offending task: %s", k_thread_name_get(k_current_get()));
-    }
-
-    return true;
+    // There's no openthread_api_mutex_try_lock() in Zephyr, so until it's contributed we must use the low-level API
+    return k_mutex_lock(&openthread_get_default_context()->api_lock, K_NO_WAIT) == 0;
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_UnlockThreadStack(void)
+void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_UnlockThreadStack()
 {
-    if (k_thread_priority_get(k_current_get()) >= 0 || CONFIG_MP_NUM_CPUS != 1)
-    {
-        ChipLogError(DeviceLayer, "No locking is available. All calls to ThreadStackManager must come from a cooperative task.");
-        ChipLogError(DeviceLayer, "Offending task: %s", k_thread_name_get(k_current_get()));
-    }
+    openthread_api_mutex_unlock(openthread_get_default_context());
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_ProcessThreadActivity(void)
+void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_ProcessThreadActivity()
 {
     // Intentionally empty.
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_OnCHIPoBLEAdvertisingStart(void)
+void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_OnCHIPoBLEAdvertisingStart()
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
 }
 
 template <class ImplClass>
-void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_OnCHIPoBLEAdvertisingStop(void)
+void GenericThreadStackManagerImpl_Zephyr<ImplClass>::_OnCHIPoBLEAdvertisingStop()
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
 }
