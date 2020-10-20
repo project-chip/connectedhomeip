@@ -204,11 +204,13 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, uint
 /*----------------------------------------------------------------------------*\
 | Cluster BarrierControl                                              | 0x0103 |
 |------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * GoToPercent                                                       |   0x00 |
+| Responses:                                                          |        |
 |                                                                     |        |
 |------------------------------------------------------------------------------|
-| Attributes::                                                        |        |
+| Commands:                                                           |        |
+| * GoToPercent                                                       |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
 | * MovingState                                                       | 0x0001 |
 | * SafetyStatus                                                      | 0x0002 |
 | * Capabilities                                                      | 0x0003 |
@@ -266,24 +268,15 @@ uint16_t encodeBarrierControlClusterReadBarrierPositionAttribute(uint8_t * buffe
 /*----------------------------------------------------------------------------*\
 | Cluster Basic                                                       | 0x0000 |
 |------------------------------------------------------------------------------|
-| Commands:                                                           |        |
-| * ResetToFactoryDefaults                                            |   0x00 |
+| Responses:                                                          |        |
 |                                                                     |        |
 |------------------------------------------------------------------------------|
-| Attributes::                                                        |        |
+| Commands:                                                           |        |
+| * ResetToFactoryDefaults                                            |   0x00 |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
 | * ZCLVersion                                                        | 0x0000 |
-| * ApplicationVersion                                                | 0x0001 |
-| * StackVersion                                                      | 0x0002 |
-| * HWVersion                                                         | 0x0003 |
-| * ManufacturerName                                                  | 0x0004 |
-| * ModelIdentifier                                                   | 0x0005 |
-| * DateCode                                                          | 0x0006 |
 | * PowerSource                                                       | 0x0007 |
-| * GenericDevice-Class                                               | 0x0008 |
-| * GenericDevice-Type                                                | 0x0009 |
-| * ProductCode                                                       | 0x000A |
-| * ProductURL                                                        | 0x000B |
-| * SWBuildID                                                         | 0x4000 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -305,60 +298,6 @@ uint16_t encodeBasicClusterReadZCLVersionAttribute(uint8_t * buffer, uint16_t bu
 }
 
 /*
- * Attribute ApplicationVersion
- */
-uint16_t encodeBasicClusterReadApplicationVersionAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x0001 };
-    READ_ATTRIBUTES("ReadBasicApplicationVersion", BASIC_CLUSTER_ID);
-}
-
-/*
- * Attribute StackVersion
- */
-uint16_t encodeBasicClusterReadStackVersionAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x0002 };
-    READ_ATTRIBUTES("ReadBasicStackVersion", BASIC_CLUSTER_ID);
-}
-
-/*
- * Attribute HWVersion
- */
-uint16_t encodeBasicClusterReadHWVersionAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x0003 };
-    READ_ATTRIBUTES("ReadBasicHWVersion", BASIC_CLUSTER_ID);
-}
-
-/*
- * Attribute ManufacturerName
- */
-uint16_t encodeBasicClusterReadManufacturerNameAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x0004 };
-    READ_ATTRIBUTES("ReadBasicManufacturerName", BASIC_CLUSTER_ID);
-}
-
-/*
- * Attribute ModelIdentifier
- */
-uint16_t encodeBasicClusterReadModelIdentifierAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x0005 };
-    READ_ATTRIBUTES("ReadBasicModelIdentifier", BASIC_CLUSTER_ID);
-}
-
-/*
- * Attribute DateCode
- */
-uint16_t encodeBasicClusterReadDateCodeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x0006 };
-    READ_ATTRIBUTES("ReadBasicDateCode", BASIC_CLUSTER_ID);
-}
-
-/*
  * Attribute PowerSource
  */
 uint16_t encodeBasicClusterReadPowerSourceAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
@@ -367,53 +306,11 @@ uint16_t encodeBasicClusterReadPowerSourceAttribute(uint8_t * buffer, uint16_t b
     READ_ATTRIBUTES("ReadBasicPowerSource", BASIC_CLUSTER_ID);
 }
 
-/*
- * Attribute GenericDeviceClass
- */
-uint16_t encodeBasicClusterReadGenericDeviceClassAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x0008 };
-    READ_ATTRIBUTES("ReadBasicGenericDeviceClass", BASIC_CLUSTER_ID);
-}
-
-/*
- * Attribute GenericDeviceType
- */
-uint16_t encodeBasicClusterReadGenericDeviceTypeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x0009 };
-    READ_ATTRIBUTES("ReadBasicGenericDeviceType", BASIC_CLUSTER_ID);
-}
-
-/*
- * Attribute ProductCode
- */
-uint16_t encodeBasicClusterReadProductCodeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x000A };
-    READ_ATTRIBUTES("ReadBasicProductCode", BASIC_CLUSTER_ID);
-}
-
-/*
- * Attribute ProductURL
- */
-uint16_t encodeBasicClusterReadProductURLAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x000B };
-    READ_ATTRIBUTES("ReadBasicProductURL", BASIC_CLUSTER_ID);
-}
-
-/*
- * Attribute SWBuildID
- */
-uint16_t encodeBasicClusterReadSWBuildIDAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x4000 };
-    READ_ATTRIBUTES("ReadBasicSWBuildID", BASIC_CLUSTER_ID);
-}
-
 /*----------------------------------------------------------------------------*\
 | Cluster ColorControl                                                | 0x0300 |
+|------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+|                                                                     |        |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * MoveColor                                                         |   0x08 |
@@ -430,11 +327,11 @@ uint16_t encodeBasicClusterReadSWBuildIDAttribute(uint8_t * buffer, uint16_t buf
 | * StepHue                                                           |   0x02 |
 | * StepSaturation                                                    |   0x05 |
 | * StopMoveStep                                                      |   0x47 |
-|                                                                     |        |
 |------------------------------------------------------------------------------|
-| Attributes::                                                        |        |
+| Attributes:                                                         |        |
 | * CurrentHue                                                        | 0x0000 |
 | * CurrentSaturation                                                 | 0x0001 |
+| * RemainingTime                                                     | 0x0002 |
 | * CurrentX                                                          | 0x0003 |
 | * CurrentY                                                          | 0x0004 |
 | * ColorTemperatureMireds                                            | 0x0007 |
@@ -710,6 +607,15 @@ uint16_t encodeColorControlClusterReadCurrentSaturationAttribute(uint8_t * buffe
 {
     uint16_t attr_ids[] = { 0x0001 };
     READ_ATTRIBUTES("ReadColorControlCurrentSaturation", COLOR_CONTROL_CLUSTER_ID);
+}
+
+/*
+ * Attribute RemainingTime
+ */
+uint16_t encodeColorControlClusterReadRemainingTimeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0002 };
+    READ_ATTRIBUTES("ReadColorControlRemainingTime", COLOR_CONTROL_CLUSTER_ID);
 }
 
 /*
@@ -1057,6 +963,32 @@ uint16_t encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(uin
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
 |------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+| * ClearAllPINCodesResponse                                          |   0x08 |
+| * ClearAllRFIDCodesResponse                                         |   0x19 |
+| * ClearHolidayScheduleResponse                                      |   0x13 |
+| * ClearPINCodeResponse                                              |   0x07 |
+| * ClearRFIDCodeResponse                                             |   0x18 |
+| * ClearWeekdayScheduleResponse                                      |   0x0D |
+| * ClearYearDayScheduleResponse                                      |   0x10 |
+| * GetHolidayScheduleResponse                                        |   0x12 |
+| * GetLogRecordResponse                                              |   0x04 |
+| * GetPINCodeResponse                                                |   0x06 |
+| * GetRFIDCodeResponse                                               |   0x17 |
+| * GetUserTypeResponse                                               |   0x15 |
+| * GetWeekdayScheduleResponse                                        |   0x0C |
+| * GetYearDayScheduleResponse                                        |   0x0F |
+| * LockDoorResponse                                                  |   0x00 |
+| * SetHolidayScheduleResponse                                        |   0x11 |
+| * SetPINCodeResponse                                                |   0x05 |
+| * SetRFIDCodeResponse                                               |   0x16 |
+| * SetUserTypeResponse                                               |   0x14 |
+| * SetWeekdayScheduleResponse                                        |   0x0B |
+| * SetYearDayScheduleResponse                                        |   0x0E |
+| * UnlockDoorResponse                                                |   0x01 |
+| * UnlockWithTimeoutResponse                                         |   0x03 |
+|                                                                     |        |
+|------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * ClearAllPINCodes                                                  |   0x08 |
 | * ClearAllRFIDCodes                                                 |   0x19 |
@@ -1081,9 +1013,8 @@ uint16_t encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(uin
 | * SetYearDaySchedule                                                |   0x0E |
 | * UnlockDoor                                                        |   0x01 |
 | * UnlockWithTimeout                                                 |   0x03 |
-|                                                                     |        |
 |------------------------------------------------------------------------------|
-| Attributes::                                                        |        |
+| Attributes:                                                         |        |
 | * LockState                                                         | 0x0000 |
 | * LockType                                                          | 0x0001 |
 | * ActuatorEnabled                                                   | 0x0002 |
@@ -1391,6 +1322,13 @@ uint16_t encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t * buffer, uin
 /*----------------------------------------------------------------------------*\
 | Cluster Groups                                                      | 0x0004 |
 |------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+| * AddGroupResponse                                                  |   0x00 |
+| * GetGroupMembershipResponse                                        |   0x02 |
+| * RemoveGroupResponse                                               |   0x03 |
+| * ViewGroupResponse                                                 |   0x01 |
+|                                                                     |        |
+|------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddGroup                                                          |   0x00 |
 | * AddGroupIfIdentifying                                             |   0x05 |
@@ -1398,9 +1336,8 @@ uint16_t encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t * buffer, uin
 | * RemoveAllGroups                                                   |   0x04 |
 | * RemoveGroup                                                       |   0x03 |
 | * ViewGroup                                                         |   0x01 |
-|                                                                     |        |
 |------------------------------------------------------------------------------|
-| Attributes::                                                        |        |
+| Attributes:                                                         |        |
 | * NameSupport                                                       | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
@@ -1481,12 +1418,15 @@ uint16_t encodeGroupsClusterReadNameSupportAttribute(uint8_t * buffer, uint16_t 
 /*----------------------------------------------------------------------------*\
 | Cluster Identify                                                    | 0x0003 |
 |------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+| * IdentifyQueryResponse                                             |   0x00 |
+|                                                                     |        |
+|------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Identify                                                          |   0x00 |
 | * IdentifyQuery                                                     |   0x01 |
-|                                                                     |        |
 |------------------------------------------------------------------------------|
-| Attributes::                                                        |        |
+| Attributes:                                                         |        |
 | * IdentifyTime                                                      | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
@@ -1522,6 +1462,9 @@ uint16_t encodeIdentifyClusterReadIdentifyTimeAttribute(uint8_t * buffer, uint16
 /*----------------------------------------------------------------------------*\
 | Cluster Level                                                       | 0x0008 |
 |------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+|                                                                     |        |
+|------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Move                                                              |   0x01 |
 | * MoveToLevel                                                       |   0x00 |
@@ -1531,12 +1474,9 @@ uint16_t encodeIdentifyClusterReadIdentifyTimeAttribute(uint8_t * buffer, uint16
 | * StepWithOnOff                                                     |   0x06 |
 | * Stop                                                              |   0x03 |
 | * StopWithOnOff                                                     |   0x07 |
-|                                                                     |        |
 |------------------------------------------------------------------------------|
-| Attributes::                                                        |        |
+| Attributes:                                                         |        |
 | * CurrentLevel                                                      | 0x0000 |
-| * RemainingTime                                                     | 0x0001 |
-| * Options                                                           | 0x000F |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -1660,34 +1600,18 @@ uint16_t encodeLevelClusterReadCurrentLevelAttribute(uint8_t * buffer, uint16_t 
     READ_ATTRIBUTES("ReadLevelCurrentLevel", LEVEL_CLUSTER_ID);
 }
 
-/*
- * Attribute RemainingTime
- */
-uint16_t encodeLevelClusterReadRemainingTimeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x0001 };
-    READ_ATTRIBUTES("ReadLevelRemainingTime", LEVEL_CLUSTER_ID);
-}
-
-/*
- * Attribute Options
- */
-uint16_t encodeLevelClusterReadOptionsAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
-{
-    uint16_t attr_ids[] = { 0x000F };
-    READ_ATTRIBUTES("ReadLevelOptions", LEVEL_CLUSTER_ID);
-}
-
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
+|------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+|                                                                     |        |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * Off                                                               |   0x00 |
 | * On                                                                |   0x01 |
 | * Toggle                                                            |   0x02 |
-|                                                                     |        |
 |------------------------------------------------------------------------------|
-| Attributes::                                                        |        |
+| Attributes:                                                         |        |
 | * OnOff                                                             | 0x0000 |
 \*----------------------------------------------------------------------------*/
 
@@ -1730,6 +1654,18 @@ uint16_t encodeOnOffClusterReadOnOffAttribute(uint8_t * buffer, uint16_t buf_len
 /*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |
 |------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+| * AddSceneResponse                                                  |   0x00 |
+| * CopySceneResponse                                                 |   0x42 |
+| * EnhancedAddSceneResponse                                          |   0x40 |
+| * EnhancedViewSceneResponse                                         |   0x41 |
+| * GetSceneMembershipResponse                                        |   0x06 |
+| * RemoveAllScenesResponse                                           |   0x03 |
+| * RemoveSceneResponse                                               |   0x02 |
+| * StoreSceneResponse                                                |   0x04 |
+| * ViewSceneResponse                                                 |   0x01 |
+|                                                                     |        |
+|------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddScene                                                          |   0x00 |
 | * CopyScene                                                         |   0x42 |
@@ -1741,9 +1677,8 @@ uint16_t encodeOnOffClusterReadOnOffAttribute(uint8_t * buffer, uint16_t buf_len
 | * RemoveScene                                                       |   0x02 |
 | * StoreScene                                                        |   0x04 |
 | * ViewScene                                                         |   0x01 |
-|                                                                     |        |
 |------------------------------------------------------------------------------|
-| Attributes::                                                        |        |
+| Attributes:                                                         |        |
 | * SceneCount                                                        | 0x0000 |
 | * CurrentScene                                                      | 0x0001 |
 | * CurrentGroup                                                      | 0x0002 |
@@ -1927,10 +1862,12 @@ uint16_t encodeScenesClusterReadNameSupportAttribute(uint8_t * buffer, uint16_t 
 /*----------------------------------------------------------------------------*\
 | Cluster TemperatureMeasurement                                      | 0x0402 |
 |------------------------------------------------------------------------------|
-| Commands:                                                           |        |
+| Responses:                                                          |        |
 |                                                                     |        |
 |------------------------------------------------------------------------------|
-| Attributes::                                                        |        |
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
 | * MeasuredValue                                                     | 0x0000 |
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
