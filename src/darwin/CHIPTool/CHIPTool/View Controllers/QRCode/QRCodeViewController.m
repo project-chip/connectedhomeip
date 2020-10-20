@@ -65,6 +65,7 @@
 @property (strong, nonatomic) UILabel * errorLabel;
 
 @property (readwrite) CHIPDeviceController * chipController;
+@property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
 @end
 
 @implementation QRCodeViewController {
@@ -254,10 +255,13 @@
     [super viewDidLoad];
     [self setupUI];
 
+    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
+
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.qrcodevc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
     [self.chipController setPairingDelegate:self queue:callbackQueue];
+    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
 
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
