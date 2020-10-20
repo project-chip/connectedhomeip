@@ -50,3 +50,13 @@ jobs:
             - name: Run Build
               run: |
                   scripts/build/gn_build.sh
+                  rsync -a out/lib/*.jar src/android/CHIPTool/app/libs
+                  rsync -a out/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
+                  git submodule update --init --recursive third_party/ot-commissioner/repo
+                  ABI=arm64-v8a API=21 ./third_party/ot-commissioner/build-android-libs.sh
+                # sdkmanager doesn't work with JDK 11.
+                  update-java-alternatives --set /usr/lib/jvm/java-1.8.0-openjdk-amd64
+                  yes | /opt/android/sdk/tools/bin/sdkmanager --licenses
+                  update-java-alternatives --set /usr/lib/jvm/java-1.11.0-openjdk-amd64
+                  cd src/android/CHIPTool
+                  ./gradlew build
