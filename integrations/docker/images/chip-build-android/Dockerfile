@@ -1,7 +1,9 @@
 ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION}
 
-# JDK 11 access
+# JDK 11 & 8 access
+# JDK 8 is required because Android `sdkmanager`
+# doesn't work with JDK 11.
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
@@ -24,7 +26,7 @@ RUN set -x \
     && test -d /opt/android/sdk/platforms/android-21 \
     && : # last line
 
-# Download and install android command line tool
+# Download and install android command line tool (for installing `sdkmanager`)
 RUN set -x \
     && wget -O /tmp/android-tools.zip https://dl.google.com/android/repository/sdk-tools-linux-3859397.zip \
     && cd /opt/android/sdk \
