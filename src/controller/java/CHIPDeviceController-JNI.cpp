@@ -531,6 +531,23 @@ JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong deviceContro
     return JNI_FALSE;
 }
 
+JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
+{
+    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+
+    chip::Inet::IPAddress addr;
+    char addrStr[50];
+
+    {
+        ScopedPthreadLock lock(&sStackLock);
+        if (!deviceController->GetIpAddress(addr))
+            return nullptr;
+    }
+
+    addr.ToString(addrStr, sizeof(addrStr));
+    return env->NewStringUTF(addrStr);
+}
+
 JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
 {
     ChipLogProgress(Controller, "disconnectDevice() called");

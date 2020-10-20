@@ -408,15 +408,22 @@ exit:
     return err;
 }
 
-bool ChipDeviceController::IsConnected()
+bool ChipDeviceController::IsConnected() const
 {
     return mState == kState_Initialized &&
         (mConState == kConnectionState_Connected || mConState == kConnectionState_SecureConnected);
 }
 
-bool ChipDeviceController::IsSecurelyConnected()
+bool ChipDeviceController::IsSecurelyConnected() const
 {
     return mState == kState_Initialized && mConState == kConnectionState_SecureConnected;
+}
+
+bool ChipDeviceController::GetIpAddress(Inet::IPAddress & addr) const
+{
+    if (IsConnected())
+        addr = mDeviceAddr;
+    return IsConnected();
 }
 
 CHIP_ERROR ChipDeviceController::DisconnectDevice()
