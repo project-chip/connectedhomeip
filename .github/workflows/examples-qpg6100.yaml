@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Examples-qpg6100
+name: Examples
 
 on:
     push:
