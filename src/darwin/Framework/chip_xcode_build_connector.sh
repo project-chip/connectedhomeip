@@ -25,18 +25,15 @@ die() {
     exit 1
 }
 
-set -e
+set -ex
 
 mkdir -p "$TEMP_DIR"
 export >"$TEMP_DIR/env.sh"
 
-set -x
-
 # these should be set by the Xcode project
-CHIP_ROOT=${CHIP_ROOT:-"$SRCROOT/../../.."}
-CHIP_ROOT=$(cd "$CHIP_ROOT" && pwd)
+CHIP_ROOT=$(cd "$here/../../.." && pwd)
 
-[[ -d ${CHIP_ROOT} ]] || die Please set CHIP_ROOT to the location of the CHIP directory
+[[ -d $CHIP_ROOT ]] || die Please set CHIP_ROOT to the location of the CHIP directory
 
 declare -a DEFINES=()
 # lots of environment variables passed by Xcode to this script
@@ -62,41 +59,55 @@ for define in "${DEFINES[@]}"; do
         CHIP_CRYPTO_*)
             continue
             ;;
+        CHIP_LOGGING_STYLE_*)
+            continue
+            ;;
     esac
     target_defines+=,\"${define//\"/\\\"}\"
 done
 target_defines=[${target_defines:1}]
 
+declare target_cflags='"-target","'"$PLATFORM_PREFERRED_ARCH"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'"'
+
+read -r -a archs <<<"$ARCHS"
+
+for arch in "${archs[@]}"; do
+    target_cflags+=',"-arch","'"$arch"'"'
+done
+
+[[ $ENABLE_BITCODE == YES ]] && {
+    target_cflags+=',"-flto"'
+}
+
 declare -a args=(
     'chip_crypto="mbedtls"'
+    'chip_logging_style="darwin"'
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_ble_project_config_include=""'
     'chip_device_project_config_include=""'
     'chip_inet_project_config_include=""'
     'chip_system_project_config_include=""'
-    'target_cpu="'"$ARCHS"'"'
+    'target_cpu="'"$PLATFORM_PREFERRED_ARCH"'"'
     'target_defines='"$target_defines"
     'default_configs_cosmetic=[]'
-    'target_cflags=["-target","'"$ARCHS"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'", "-DNDEBUG"]'
+    'target_cflags=['"$target_cflags"']'
 )
 
-if [[ ${CONFIGURATION} != Debug* ]]; then
-    args+='is_debug=true'
-fi
+[[ $CONFIGURATION != Debug* ]] && args+='is_debug=true'
 
-[[ ${PLATFORM_FAMILY_NAME} == iOS ]] && {
+[[ $PLATFORM_FAMILY_NAME == iOS ]] && {
     args+=(
         'target_os="ios"'
         'import("//config/ios/args.gni")'
     )
 }
 
-[[ ${PLATFORM_FAMILY_NAME} == macOS ]] && {
+[[ $PLATFORM_FAMILY_NAME == macOS ]] && {
     args+=(
         'target_os="mac"'
+        'import("//config/standalone/args.gni")'
         'chip_project_config_include_dirs=["'"$CHIP_ROOT"'/config/standalone"]'
-        'import("'"$CHIP_ROOT"'/config/standalone/args.gni")'
     )
 }
 
