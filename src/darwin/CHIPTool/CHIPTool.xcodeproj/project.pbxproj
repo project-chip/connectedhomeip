@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		0CA0E0CF248599BB009087B9 /* OnOffViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0CA0E0CE248599BB009087B9 /* OnOffViewController.m */; };
 		991DC091247747F500C13860 /* EchoViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 991DC090247747F500C13860 /* EchoViewController.m */; };
+		997A639C253F93F7005C64E6 /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 997A639B253F93F7005C64E6 /* CHIP.framework */; };
+		997A639D253F93F7005C64E6 /* CHIP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 997A639B253F93F7005C64E6 /* CHIP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		B204A621244E1D0600C7C0E1 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A620244E1D0600C7C0E1 /* AppDelegate.m */; };
 		B204A624244E1D0600C7C0E1 /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A623244E1D0600C7C0E1 /* SceneDelegate.m */; };
 		B204A627244E1D0600C7C0E1 /* QRCodeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B204A626244E1D0600C7C0E1 /* QRCodeViewController.m */; };
@@ -19,8 +21,6 @@
 		B2946A4224C99D53005C87D0 /* WifiViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A4124C99D53005C87D0 /* WifiViewController.m */; };
 		B2946A9B24C9A7BF005C87D0 /* DefaultsUtils.m in Sources */ = {isa = PBXBuildFile; fileRef = B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */; };
 		B2F53AEB245B0D140010745E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */; };
-		B2F53AEF245B0D910010745E /* CHIP.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2E0D7BE245B0C59003C5B48 /* CHIP.framework */; };
-		B2F53AF0245B0D910010745E /* CHIP.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B2E0D7BE245B0C59003C5B48 /* CHIP.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -34,13 +34,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		B20252E32459ED6900F97062 /* Embed Frameworks */ = {
+		997A639A253F93E5005C64E6 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B2F53AF0245B0D910010745E /* CHIP.framework in Embed Frameworks */,
+				997A639D253F93F7005C64E6 /* CHIP.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -52,6 +52,7 @@
 		0CA0E0CE248599BB009087B9 /* OnOffViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = OnOffViewController.m; sourceTree = "<group>"; };
 		991DC08F247747F500C13860 /* EchoViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EchoViewController.h; sourceTree = "<group>"; };
 		991DC090247747F500C13860 /* EchoViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = EchoViewController.m; sourceTree = "<group>"; };
+		997A639B253F93F7005C64E6 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61C244E1D0600C7C0E1 /* CHIPTool.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CHIPTool.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B204A61F244E1D0600C7C0E1 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B204A620244E1D0600C7C0E1 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -72,7 +73,6 @@
 		B2946A4124C99D53005C87D0 /* WifiViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WifiViewController.m; sourceTree = "<group>"; };
 		B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DefaultsUtils.h; sourceTree = "<group>"; };
 		B2946A9A24C9A7BF005C87D0 /* DefaultsUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DefaultsUtils.m; sourceTree = "<group>"; };
-		B2E0D7BE245B0C59003C5B48 /* CHIP.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CHIP.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B2F53AEA245B0D140010745E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = UI/Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -81,7 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B2F53AEF245B0D910010745E /* CHIP.framework in Frameworks */,
+				997A639C253F93F7005C64E6 /* CHIP.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -125,7 +125,7 @@
 		B20252DE2459EC7600F97062 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B2E0D7BE245B0C59003C5B48 /* CHIP.framework */,
+				997A639B253F93F7005C64E6 /* CHIP.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -225,7 +225,7 @@
 				B204A618244E1D0600C7C0E1 /* Sources */,
 				B204A619244E1D0600C7C0E1 /* Frameworks */,
 				B204A61A244E1D0600C7C0E1 /* Resources */,
-				B20252E32459ED6900F97062 /* Embed Frameworks */,
+				997A639A253F93E5005C64E6 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -260,7 +260,7 @@
 		B204A614244E1D0600C7C0E1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 1150;
+				LastUpgradeCheck = 1200;
 				ORGANIZATIONNAME = CHIP;
 				TargetAttributes = {
 					B204A61B244E1D0600C7C0E1 = {
@@ -357,7 +357,7 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		B204A649244E1D0700C7C0E1 /* Debug iOS */ = {
+		B204A649244E1D0700C7C0E1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -416,9 +416,9 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 			};
-			name = "Debug iOS";
+			name = Debug;
 		};
-		B204A64A244E1D0700C7C0E1 /* Release iOS */ = {
+		B204A64A244E1D0700C7C0E1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -471,9 +471,9 @@
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};
-			name = "Release iOS";
+			name = Release;
 		};
-		B204A64C244E1D0700C7C0E1 /* Debug iOS */ = {
+		B204A64C244E1D0700C7C0E1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -492,11 +492,10 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 armv4t armv5 armv6 armv6m armv7 armv7em armv7f armv7k armv7m armv7s xscale";
 			};
-			name = "Debug iOS";
+			name = Debug;
 		};
-		B204A64D244E1D0700C7C0E1 /* Release iOS */ = {
+		B204A64D244E1D0700C7C0E1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
@@ -515,11 +514,10 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				VALID_ARCHS = "arm64 armv4t armv5 armv6 armv6m armv7 armv7em armv7f armv7k armv7m armv7s xscale";
 			};
-			name = "Release iOS";
+			name = Release;
 		};
-		B204A64F244E1D0700C7C0E1 /* Debug iOS */ = {
+		B204A64F244E1D0700C7C0E1 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -536,9 +534,9 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CHIPTool.app/CHIPTool";
 			};
-			name = "Debug iOS";
+			name = Debug;
 		};
-		B204A650244E1D0700C7C0E1 /* Release iOS */ = {
+		B204A650244E1D0700C7C0E1 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -555,7 +553,7 @@
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/CHIPTool.app/CHIPTool";
 			};
-			name = "Release iOS";
+			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
@@ -563,29 +561,29 @@
 		B204A617244E1D0600C7C0E1 /* Build configuration list for PBXProject "CHIPTool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B204A649244E1D0700C7C0E1 /* Debug iOS */,
-				B204A64A244E1D0700C7C0E1 /* Release iOS */,
+				B204A649244E1D0700C7C0E1 /* Debug */,
+				B204A64A244E1D0700C7C0E1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release iOS";
+			defaultConfigurationName = Release;
 		};
 		B204A64B244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPTool" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B204A64C244E1D0700C7C0E1 /* Debug iOS */,
-				B204A64D244E1D0700C7C0E1 /* Release iOS */,
+				B204A64C244E1D0700C7C0E1 /* Debug */,
+				B204A64D244E1D0700C7C0E1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release iOS";
+			defaultConfigurationName = Release;
 		};
 		B204A64E244E1D0700C7C0E1 /* Build configuration list for PBXNativeTarget "CHIPToolTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				B204A64F244E1D0700C7C0E1 /* Debug iOS */,
-				B204A650244E1D0700C7C0E1 /* Release iOS */,
+				B204A64F244E1D0700C7C0E1 /* Debug */,
+				B204A650244E1D0700C7C0E1 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = "Release iOS";
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
