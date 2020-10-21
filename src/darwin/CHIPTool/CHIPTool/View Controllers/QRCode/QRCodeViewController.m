@@ -270,9 +270,6 @@
 - (void)deviceControllerOnConnected
 {
     NSLog(@"Status: Device connected");
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
-        [self retrieveAndSendWifiCredentials];
-    });
 }
 
 - (void)deviceControllerOnError:(nonnull NSError *)error
@@ -288,6 +285,9 @@
 - (void)onNetworkCredentialsRequested:(SendNetworkCredentials)handler
 {
     NSLog(@"Network credential requested for pairing");
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
+        [self retrieveAndSendWifiCredentialsUsing:handler];
+    });
 }
 
 // MARK: UI Helper methods
@@ -372,7 +372,7 @@
     [self handleRendezVous:payload];
 }
 
-- (void)retrieveAndSendWifiCredentials
+- (void)retrieveAndSendWifiCredentialsUsing:(SendNetworkCredentials)sendCredentials
 {
     UIAlertController * alertController =
         [UIAlertController alertControllerWithTitle:@"Wifi Configuration"
@@ -415,19 +415,9 @@
                                                  NSArray * textfields = alertController.textFields;
                                                  UITextField * networkSSID = textfields[0];
                                                  UITextField * networkPassword = textfields[1];
-                                                 if ([networkSSID.text length] > 0) {
-                                                     CHIPSetDomainValueForKey(
-                                                         kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
-                                                 }
-
-                                                 if ([networkPassword.text length] > 0) {
-                                                     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey,
-                                                         networkPassword.text);
-                                                 }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
-
-                                                 [strongSelf sendWifiCredentialsWithSSID:networkSSID.text
-                                                                                password:networkPassword.text];
+                                                 
+                                                 sendCredentials(networkSSID.text, networkPassword.text);
                                              }
                                          }]];
     [self presentViewController:alertController animated:YES completion:nil];
