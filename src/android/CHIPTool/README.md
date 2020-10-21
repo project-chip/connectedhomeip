@@ -58,9 +58,7 @@ rsync -a out/android_arm64/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
     ## JAR and .so libraries will be copy to target directories.
     ```
 
-6. 'Gradle sync' the Android project and run.
-
-7. You will also need the "libc++\_shared.so" file in the jniLibs folder. This
+6. You will also need the "libc++\_shared.so" file in the jniLibs folder. This
    file comes packaged with Android NDK and can be found under
    `$ANDROID_NDK_HOME/sources/cxx-stl/llvm-libc++/libs/$TARGET`, e.g.
 
@@ -69,3 +67,5 @@ rsync -a out/android_arm64/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
     (Eventually hoping to not have to include this .so, but that needs some more
     tweaking of the Android automake build rules. Include it in the interim to
     be able to build the Android app).
+
+7. 'Gradle sync' the Android project and run.
