@@ -35,7 +35,7 @@ ORG=${DOCKER_RUN_ORG:-connectedhomeip}
 IMAGE=${DOCKER_RUN_IMAGE:-$(basename "$here")}
 
 # version
-VERSION=${DOCKER_RUN_VERSION:-latest} ||
+VERSION=${DOCKER_RUN_VERSION:-0.4.11} ||
     die "please run me from an image directory or set environment variables:
           DOCKER_RUN_ORG
           DOCKER_RUN_IMAGE
