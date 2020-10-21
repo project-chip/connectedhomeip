@@ -491,16 +491,16 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t* pDmEvt)
                 ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_START_IND error: %d", (int) pDmEvt->advSetStart.hdr.status);
                 ExitNow();
             }
-            
+
             ClearFlag(sInstance.mFlags, kFlag_AdvertisingRefreshNeeded);
-            
+
             // Transition to the Advertising state...
             if (!GetFlag(sInstance.mFlags, kFlag_Advertising))
             {
                 ChipLogProgress(DeviceLayer, "CHIPoBLE advertising started");
-            
+
                 SetFlag(sInstance.mFlags, kFlag_Advertising, true);
-            
+
                 // Post a CHIPoBLEAdvertisingChange(Started) event.
                 {
                     ChipDeviceEvent advChange;
@@ -518,21 +518,21 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t* pDmEvt)
                 ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_STOP_IND error: %d", (int) pDmEvt->advSetStop.status);
                 ExitNow();
             }
-    
+
             ClearFlag(sInstance.mFlags, kFlag_AdvertisingRefreshNeeded);
-    
+
             // Transition to the not Advertising state...
             if (GetFlag(sInstance.mFlags, kFlag_Advertising))
             {
                 ClearFlag(sInstance.mFlags, kFlag_Advertising);
-    
+
                 ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
-    
+
                 // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
                 ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
-    
+
                 // Post a CHIPoBLEAdvertisingChange(Stopped) event.
                 {
                     ChipDeviceEvent advChange;
@@ -546,11 +546,11 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t* pDmEvt)
         case QVCHIP_DM_CONN_OPEN_IND:
         {
             ChipLogProgress(DeviceLayer, "BLE GATT connection established (con %u)", pDmEvt->connOpen.hdr.param);
-            
+
             // Allocate a connection state record for the new connection.
             //GetConnectionState(pDmEvt->mtu.conn_id, true);
             mNumGAPCons++;
-            
+
             // Receiving a connection stops the advertising processes.  So force a refresh of the advertising
             // state.
             SetFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
@@ -561,7 +561,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t* pDmEvt)
         {
             ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", pDmEvt->connClose.hdr.param,
                             pDmEvt->connClose.reason);
-            
+
             // If this was a CHIPoBLE connection, release the associated connection state record
             // and post an event to deliver a connection error to the CHIPoBLE layer.
             ChipDeviceEvent event;
@@ -580,7 +580,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t* pDmEvt)
                 break;
             }
             PlatformMgr().PostEvent(&event);
-        
+
             // Force a refresh of the advertising state.
             SetFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
             PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -595,7 +595,7 @@ void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t* pDmEvt)
             break;
         }
     }
-    
+
 exit:
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 }
