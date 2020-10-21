@@ -1,13 +1,12 @@
 ARG VERSION=latest
 FROM connectedhomeip/chip-build:${VERSION}
 
-# JDK 11 & 8 access
+# JDK 8 access
 # JDK 8 is required because Android `sdkmanager`
 # doesn't work with JDK 11.
 RUN set -x \
     && apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -fy \
-    openjdk-11-jdk \
     openjdk-8-jdk \
     rsync \
     swig \
