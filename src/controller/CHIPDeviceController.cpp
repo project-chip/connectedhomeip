@@ -96,8 +96,8 @@ ChipDeviceController::ChipDeviceController()
     mInterface         = INET_NULL_INTERFACEID;
     mLocalDeviceId     = 0;
     mNumCachedPackets  = 0;
-    memset(&mOnComplete, 0, sizeof(mOnComplete));
-    memset(&mCachedPackets, 0, sizeof(mCachedPackets));
+    CHIP_ZERO_AT(mOnComplete);
+    CHIP_ZERO_AT(mCachedPackets);
 }
 
 ChipDeviceController::~ChipDeviceController()
@@ -195,7 +195,7 @@ CHIP_ERROR ChipDeviceController::Shutdown()
     }
 
     mConState = kConnectionState_NotConnected;
-    memset(&mOnComplete, 0, sizeof(mOnComplete));
+    CHIP_ZERO_AT(mOnComplete);
     mOnError         = nullptr;
     mOnNewConnection = nullptr;
     mRemoteDeviceId.ClearValue();
@@ -330,10 +330,12 @@ void ChipDeviceController::OnValue(const char * key, const char * value)
     PERSISTENT_KEY_OP(
         peer, kDeviceCredentialsKeyPrefix, expectedKey, if (strcmp(key, expectedKey) == 0) {
             SecurePairingSessionSerialized serialized;
+            size_t length = 0;
 
             VerifyOrExit(value != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrExit(strlen(value) <= sizeof(serialized.inner), err = CHIP_ERROR_INVALID_ARGUMENT);
-            strncpy(Uint8::to_char(serialized.inner), value, sizeof(serialized.inner));
+            length = strlen(value) + 1; // account for the null termination
+            VerifyOrExit(length <= sizeof(serialized.inner), err = CHIP_ERROR_INVALID_ARGUMENT);
+            memmove(serialized.inner, value, length);
             SuccessOrExit(mPairingSession.Deserialize(serialized));
 
             mSecurePairingSession = &mPairingSession;
@@ -476,7 +478,7 @@ CHIP_ERROR ChipDeviceController::SendCachedPackets()
     }
 
     mNumCachedPackets = 0;
-    memset(&mCachedPackets, 0, sizeof(mCachedPackets));
+    CHIP_ZERO_AT(mCachedPackets);
 
 exit:
     return err;
@@ -490,7 +492,7 @@ void ChipDeviceController::DiscardCachedPackets()
     }
 
     mNumCachedPackets = 0;
-    memset(&mCachedPackets, 0, sizeof(mCachedPackets));
+    CHIP_ZERO_AT(mCachedPackets);
 }
 
 CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * buffer, NodeId peerDevice)

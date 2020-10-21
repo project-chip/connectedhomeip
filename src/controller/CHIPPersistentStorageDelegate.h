@@ -64,16 +64,16 @@ public:
 
     /**
      * @brief
-     *   Lookup the key and return it's stringified value
+     *   Set the callback object with methods that are called on completion
+     *   of the operation.
      *
-     * @param[in] key Key to lookup
-     * @param[in] delegate Callback handler using which the value wiil be returned.
+     * @param[in] delegate The callback object
      */
     virtual void SetDelegate(PersistentStorageResultDelegate * delegate) = 0;
 
     /**
      * @brief
-     *   Lookup the key and return it's stringified value
+     *   Lookup the key and call delegate object with it's stringified value
      *
      * @param[in] key Key to lookup
      */
