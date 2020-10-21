@@ -425,7 +425,7 @@
                                                          networkPassword.text);
                                                  }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
-                                                 
+
                                                  sendCredentials(networkSSID.text, networkPassword.text);
                                              }
                                          }]];
