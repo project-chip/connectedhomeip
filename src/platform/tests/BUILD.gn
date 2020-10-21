@@ -34,7 +34,7 @@ if (chip_device_platform != "none") {
 
     tests = [ "TestPlatformMgr" ]
 
-    if (chip_device_platform == "linux") {
+    if (chip_enable_happy_tests && chip_device_platform == "linux") {
       sources += [
         "TestMdns.cpp",
         "TestMdns.h",
