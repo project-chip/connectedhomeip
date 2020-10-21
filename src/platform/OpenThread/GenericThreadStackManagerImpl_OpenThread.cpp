@@ -222,7 +222,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
         memcpy(newDataset.mMeshLocalPrefix.m8, netInfo.ThreadMeshPrefix, sizeof(newDataset.mMeshLocalPrefix.m8));
         newDataset.mComponents.mIsMeshLocalPrefixPresent = true;
     }
-    memcpy(newDataset.mMasterKey.m8, netInfo.ThreadNetworkKey, sizeof(newDataset.mMasterKey.m8));
+    memcpy(newDataset.mMasterKey.m8, netInfo.ThreadMasterKey, sizeof(newDataset.mMasterKey.m8));
     newDataset.mComponents.mIsMasterKeyPresent = true;
     if (netInfo.FieldPresent.ThreadPSKc)
     {
