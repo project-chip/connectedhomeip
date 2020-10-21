@@ -415,6 +415,15 @@
                                                  NSArray * textfields = alertController.textFields;
                                                  UITextField * networkSSID = textfields[0];
                                                  UITextField * networkPassword = textfields[1];
+                                                 if ([networkSSID.text length] > 0) {
+                                                     CHIPSetDomainValueForKey(
+                                                         kCHIPToolDefaultsDomain, kNetworkSSIDDefaultsKey, networkSSID.text);
+                                                 }
+
+                                                 if ([networkPassword.text length] > 0) {
+                                                     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kNetworkPasswordDefaultsKey,
+                                                         networkPassword.text);
+                                                 }
                                                  NSLog(@"New SSID: %@ Password: %@", networkSSID.text, networkPassword.text);
                                                  
                                                  sendCredentials(networkSSID.text, networkPassword.text);
