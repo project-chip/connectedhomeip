@@ -103,6 +103,20 @@ declare -a args=(
     )
 }
 
+[[ $PLATFORM_FAMILY_NAME == watchOS ]] && {
+    args+=(
+        'target_os="ios"'
+        'import("//config/ios/args.gni")'
+    )
+}
+
+[[ $PLATFORM_FAMILY_NAME == tvOS ]] && {
+    args+=(
+        'target_os="ios"'
+        'import("//config/ios/args.gni")'
+    )
+}
+
 [[ $PLATFORM_FAMILY_NAME == macOS ]] && {
     args+=(
         'target_os="mac"'
