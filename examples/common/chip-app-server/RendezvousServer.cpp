@@ -82,8 +82,7 @@ void RendezvousServer::OnRendezvousMessageReceived(PacketBuffer * buffer)
     data += sizeof(networkInfo.ThreadMeshPrefix);
     bufferLen -= sizeof(networkInfo.ThreadMeshPrefix);
 
-    VerifyOrExit(bufferLen >= sizeof(networkInfo.ThreadMasterKey),
-                 ChipLogProgress(AppServer, "Invalid network provision message"));
+    VerifyOrExit(bufferLen >= sizeof(networkInfo.ThreadMasterKey), ChipLogProgress(AppServer, "Invalid network provision message"));
     memcpy(networkInfo.ThreadMasterKey, data, sizeof(networkInfo.ThreadMasterKey));
     data += sizeof(networkInfo.ThreadMasterKey);
     bufferLen -= sizeof(networkInfo.ThreadMasterKey);
