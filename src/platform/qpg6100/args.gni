@@ -20,8 +20,6 @@ arm_platform_config = "${qpg6100_sdk_build_root}/qpg6100_arm.gni"
 
 mbedtls_target = "${qpg6100_sdk_build_root}:qpg6100_sdk"
 
-openthread_external_mbedtls = mbedtls_target
-
 chip_device_platform = "qpg6100"
 
 lwip_platform = "qpg6100"
@@ -36,11 +34,3 @@ chip_build_tests = false
 
 # TODO - enable OpenThread build flow
 # https://github.com/project-chip/connectedhomeip/issues/2939
-
-# openthread_project_core_config_file = "openthread-core-qpg6100-config.h"
-# openthread_core_config_platform_check_file =
-#     "openthread-core-qpg6100-config-check.h"
-# openthread_core_config_deps = [ "${chip_root}/third_party/openthread/platforms/qpg6100:libopenthread-eqpg6100-config" ]
-
-# openthread_external_platform =
-#    "${chip_root}/third_party/openthread/platforms/qpg6100:libopenthread-qpg6100"
