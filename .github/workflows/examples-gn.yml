@@ -15,65 +15,66 @@
 name: Examples - GN
 
 on:
-  push:
-  pull_request:
+    push:
+    pull_request:
 
 jobs:
-  esp32:
-    name: ESP32
+    esp32:
+        name: ESP32
 
-    env:
-      BUILD_TYPE: esp32
+        env:
+            BUILD_TYPE: esp32
 
-    runs-on: ubuntu-latest
+        runs-on: ubuntu-latest
 
-    container:
-      image: connectedhomeip/chip-build-esp32:0.4.11
-      volumes:
-        - "/tmp/bloat_reports:/tmp/bloat_reports"
-        - "/tmp/output_binaries:/tmp/output_binaries"
+        container:
+            image: connectedhomeip/chip-build-esp32:0.4.11
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+                - "/tmp/output_binaries:/tmp/output_binaries"
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
-        # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
-        with:
-          fetch-depth: 0
-          submodules: true
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v1
-        with:
-          languages: "cpp, python"
-          queries: +security-and-quality
-      - name: Build example Echo App
-        run: scripts/examples/esp_echo_app.sh
-      - name: Copy aside build products
-        run: |
-          mkdir -p example_binaries/$BUILD_TYPE-build
-          cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
-             example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
-      - name: Binary artifact suffix
-        id: outsuffix
-        uses: haya14busa/action-cond@v1.0.0
-        with:
-          cond: ${{ github.event.pull_request.number == '' }}
-          if_true: "${{ github.sha }}"
-          if_false: "pull-${{ github.event.pull_request.number }}"
-      - name: Copy aside bloat report & binaries
-        run: |
-          cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
-      - name: Uploading Binaries
-        uses: actions/upload-artifact@v1
-        with:
-          name: ${{ env.BUILD_TYPE }}-example-build-${{
-            steps.outsuffix.outputs.value }}
-          path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-      - name: Show tree
-        run: find .
-      # - name: Remove third_party binaries for CodeQL Analysis
-      #   run: find . -type d -name "third_party" -exec rm -rf {} +
-      # - name: Remove m5stack-tft binaries for CodeQL Analysis
-      #   run: find . -type d -name "m5stack-tft" -exec rm -rf {} +
-      - name: Perform CodeQL Analysis
-        if: ${{ github.event_name == 'push' }}
-        uses: github/codeql-action/analyze@v1
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                  fetch-depth: 0
+                  submodules: true
+            - name: Initialize CodeQL
+              uses: github/codeql-action/init@v1
+              with:
+                  languages: "cpp, python"
+                  queries: +security-and-quality
+            - name: Build example Echo App
+              run: scripts/examples/esp_echo_app.sh
+            - name: Copy aside build products
+              run: |
+                  mkdir -p example_binaries/$BUILD_TYPE-build
+                  cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Copy aside bloat report & binaries
+              run: |
+                  cp -r example_binaries/$BUILD_TYPE-build /tmp/output_binaries/
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v1
+              with:
+                  name:
+                      ${{ env.BUILD_TYPE }}-example-build-${{
+                      steps.outsuffix.outputs.value }}
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
+            - name: Show tree
+              run: find .
+            # - name: Remove third_party binaries for CodeQL Analysis
+            #   run: find . -type d -name "third_party" -exec rm -rf {} +
+            # - name: Remove m5stack-tft binaries for CodeQL Analysis
+            #   run: find . -type d -name "m5stack-tft" -exec rm -rf {} +
+            - name: Perform CodeQL Analysis
+              if: ${{ github.event_name == 'push' }}
+              uses: github/codeql-action/analyze@v1
