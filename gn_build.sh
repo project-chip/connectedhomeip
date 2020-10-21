@@ -72,7 +72,7 @@ echo 'To build a custom build (for help run "gn args --list out/debug")'
 echo gn args "$CHIP_ROOT/out/custom"
 echo ninja -C "$CHIP_ROOT/out/custom"
 
-extra_args=""
+extra_args=" enable_qpg6100_builds=true"
 
 # Android SDK setup
 android_sdk_args=""
