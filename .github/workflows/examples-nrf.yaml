@@ -12,14 +12,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: Examples
+name: Examples nRF
 
 on:
     push:
     pull_request:
 
 jobs:
-    # TODO ESP32 https://github.com/project-chip/connectedhomeip/issues/1510
     nrf:
         name: nRF
         env:
