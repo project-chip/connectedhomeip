@@ -117,7 +117,7 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
     SecurePairingSession pairingAccessory;
 
     delegateCommissioner.peer = &pairingAccessory;
-    delegateAccessory.peer   = &pairingCommissioner;
+    delegateAccessory.peer    = &pairingCommissioner;
 
     NL_TEST_ASSERT(inSuite,
                    pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0,
