@@ -69,11 +69,6 @@ extern "C" {
 EmberEventControl emberAfPluginIasZoneClientStateMachineEventControl;
 void emberAfPluginIasZoneClientStateMachineEventHandler(void){};
 
-// Stubs for IAS Zone Server Cluster issue #2058
-EmberEventControl emberAfPluginIasZoneServerManageQueueEventControl;
-void emberAfPluginIasZoneServerManageQueueEventHandler(void){};
-void emberAfIasZoneClusterServerTickCallback(uint8_t endpoint){};
-
 EMBER_AF_GENERATED_EVENT_CODE
 }
 #endif // EMBER_AF_GENERATED_EVENT_CODE

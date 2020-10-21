@@ -56,18 +56,6 @@ bool emberAfIasZoneClusterZoneEnrollRequestCallback(uint16_t zoneType, uint16_t 
     return false;
 }
 
-/** @brief IAS Zone Cluster Zone Enroll Response
- *
- *
- *
- * @param enrollResponseCode   Ver.: always
- * @param zoneId   Ver.: always
- */
-bool emberAfIasZoneClusterZoneEnrollResponseCallback(uint8_t enrollResponseCode, uint8_t zoneId)
-{
-    return false;
-}
-
 /** @brief IAS Zone Cluster Zone Status Change Notification
  *
  *
@@ -86,18 +74,6 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStat
 // endpoint_config.h callbacks, grep'd from SDK, comment these out as clusters come in
 
 void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint) {}
-void emberAfIasZoneClusterServerInitCallback(uint8_t endpoint) {}
-void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
-                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                    EmberStatus status)
-{}
-
-EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
-                                                                     EmberAfAttributeType attributeType, uint8_t size,
-                                                                     uint8_t * value)
-{
-    return EMBER_ZCL_STATUS_SUCCESS;
-}
 
 void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
 void emberAfPollControlClusterServerInitCallback(uint8_t endpoint) {}

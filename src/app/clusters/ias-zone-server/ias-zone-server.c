@@ -51,12 +51,9 @@
 // *****************************************************************************
 
 #include "ias-zone-server.h"
-#include "app/framework/include/af.h"
-#include "hal/micro/token.h"
-
-#ifdef EMBER_SCRIPTED_TEST
-#include "app/framework/plugin/ias-zone-server/ias-zone-server-test.h"
-#endif
+#include <app/util/af-event.h>
+#include <app/util/af.h>
+#include <app/util/binding-table.h>
 
 #define UNDEFINED_ZONE_ID 0xFF
 #define DELAY_TIMER_MS (1 * MILLISECOND_TICKS_PER_SECOND)
@@ -74,6 +71,11 @@
 #endif
 
 #define DEFAULT_ENROLLMENT_METHOD EMBER_ZCL_IAS_ZONE_ENROLLMENT_MODE_REQUEST
+
+// TODO: Need to figure out what needs to happen wrt HAL tokens here, but for
+// now define ESZP_HOST to disable it.  See
+// https://github.com/project-chip/connectedhomeip/issues/3275
+#define EZSP_HOST
 
 typedef struct
 {
@@ -143,6 +145,13 @@ static int16_t copyToBuffer(IasZoneStatusQueue * ring, const IasZoneStatusQueueE
 static int16_t popFromBuffer(IasZoneStatusQueue * ring, IasZoneStatusQueueEntry * entry);
 #endif
 
+// TODO: https://github.com/project-chip/connectedhomeip/issues/3276 needs to be
+// fixed to implement this for real.
+EmberNetworkStatus emberAfNetworkState(void)
+{
+    return EMBER_JOINED_NETWORK;
+}
+
 //-----------------------------------------------------------------------------
 // Functions
 
@@ -196,7 +205,7 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
     bool zeroAddress;
     EmberBindingTableEntry bindingEntry;
     EmberBindingTableEntry currentBind;
-    EmberEUI64 destEUI;
+    ChipNodeId destNodeId;
     uint8_t ieeeAddress[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
     // If this is not a CIE Address write, the CIE address has already been
@@ -206,7 +215,7 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
-    MEMCOPY(destEUI, value, EUI64_SIZE);
+    memcpy(&destNodeId, value, sizeof(ChipNodeId));
 
     // Create the binding table entry
 
@@ -219,7 +228,7 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
     bindingEntry.local     = endpoint;
     bindingEntry.clusterId = ZCL_IAS_ZONE_CLUSTER_ID;
     bindingEntry.remote    = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
-    MEMCOPY(bindingEntry.identifier, destEUI, EUI64_SIZE);
+    bindingEntry.nodeId    = destNodeId;
 
     // Cycle through the binding table until we find a valid entry that is not
     // being used, then use the created entry to make the bind.
@@ -634,7 +643,7 @@ void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status)
         {
             endpoint     = emberAfEndpointFromIndex(i);
             networkIndex = emberAfNetworkIndexFromEndpointIndex(i);
-            if (networkIndex == emberGetCurrentNetwork() && emberAfContainsServer(endpoint, ZCL_IAS_ZONE_CLUSTER_ID))
+            if (networkIndex == 0 /* emberGetCurrentNetwork() */ && emberAfContainsServer(endpoint, ZCL_IAS_ZONE_CLUSTER_ID))
             {
                 unenrollSecurityDevice(endpoint);
             }
@@ -740,8 +749,9 @@ void emberAfPluginIasZoneServerPrintQueueConfig(void)
 // destination when the destination is the only router the node is joined to.
 // In that case, the command will never have been sent, as the device will have
 // had no router by which to send the command.
-void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, int16u indexOrDestination,
-                                                    EmberApsFrame * apsFrame, int16u msgLen, int8u * message, EmberStatus status)
+void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
+                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                                    EmberStatus status)
 {
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
     uint8_t frameControl;
