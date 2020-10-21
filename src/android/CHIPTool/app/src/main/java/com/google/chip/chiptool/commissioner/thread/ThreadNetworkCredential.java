@@ -31,6 +31,23 @@ public class ThreadNetworkCredential implements NetworkCredential, Parcelable {
     this.activeOperationalDataset = activeOperationalDataset;
   }
 
+  protected ThreadNetworkCredential(Parcel in) {
+    activeOperationalDataset = in.createByteArray();
+  }
+
+  public static final Creator<ThreadNetworkCredential> CREATOR =
+      new Creator<ThreadNetworkCredential>() {
+        @Override
+        public ThreadNetworkCredential createFromParcel(Parcel in) {
+          return new ThreadNetworkCredential(in);
+        }
+
+        @Override
+        public ThreadNetworkCredential[] newArray(int size) {
+          return new ThreadNetworkCredential[size];
+        }
+      };
+
   public byte[] getActiveOperationalDataset() {
     return activeOperationalDataset;
   }

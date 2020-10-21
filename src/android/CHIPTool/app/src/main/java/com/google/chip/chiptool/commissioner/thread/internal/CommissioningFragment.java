@@ -71,8 +71,6 @@ public class CommissioningFragment extends Fragment {
     errorImage = view.findViewById(R.id.error_image);
     statusText = view.findViewById(R.id.status_text);
     progressBar = view.findViewById(R.id.commissioning_progress);
-    progressBar.setMin(0);
-    progressBar.setMax(100);
 
     view.findViewById(R.id.cancel_button)
         .setOnClickListener(
