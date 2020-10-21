@@ -4,6 +4,24 @@ readonly CUR_DIR="$(dirname "$(realpath -s "$0")")"
 
 set -e
 
+case "$TARGET_CPU" in
+    arm)
+        ABI="armeabi-v7a"
+        ;;
+    arm64)
+        ABI="arm64-v8a"
+        ;;
+    x86)
+        ABI="x86"
+        ;;
+    x64)
+        ABI="x86-64"
+        ;;
+    *)
+        echo "invalid TARGET_CPU value: $TARGET_CPU"
+        exit 1
+esac
+
 cd "$CUR_DIR"
 
 ## Install dependencies.

@@ -64,6 +64,6 @@ rsync -a out/android_arm64/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
 
     ```shell
     git submodule update --init --recursive third_party/ot-commissioner/repo
-    ABI=arm64-v8a API=21 ./third_party/ot-commissioner/build-android-libs.sh
+    TARGET_CPU=arm64 API=21 ./third_party/ot-commissioner/build-android-libs.sh
     ## JAR and .so libraries will be copy to target directories.
     ```
