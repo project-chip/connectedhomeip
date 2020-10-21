@@ -40,7 +40,7 @@ namespace Internal {
 namespace {
 
 const uint16_t UUID16_CHIPoBLEService = 0xFEAF;
-//const ble_uuid_t UUID_CHIPoBLEService = { UUID16_CHIPoBLEService, BLE_UUID_TYPE_BLE };
+// const ble_uuid_t UUID_CHIPoBLEService = { UUID16_CHIPoBLEService, BLE_UUID_TYPE_BLE };
 
 const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x11 } };
@@ -56,9 +56,9 @@ CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
 
-    mServiceMode    = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
-    mFlags          = kFlag_AdvertisingEnabled;
-    mNumGAPCons     = 0;
+    mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
+    mFlags       = kFlag_AdvertisingEnabled;
+    mNumGAPCons  = 0;
     for (int i = 0; i < kMaxConnections; i++)
     {
         mSubscribedConIds[i] = BLE_CONNECTION_UNINITIALIZED;
@@ -68,10 +68,10 @@ CHIP_ERROR BLEManagerImpl::_Init()
     err = BleLayer::Init(this, this, &SystemLayer);
     SuccessOrExit(err);
 
-    appCbacks.stackCback = ExternalCbHandler;
-    appCbacks.chrReadCback = HandleTXCharRead;
+    appCbacks.stackCback    = ExternalCbHandler;
+    appCbacks.chrReadCback  = HandleTXCharRead;
     appCbacks.chrWriteCback = HandleRXCharWrite;
-    appCbacks.cccCback = HandleTXCharCCCDWrite;
+    appCbacks.cccCback      = HandleTXCharCCCDWrite;
     qvCHIP_BleInit(&appCbacks);
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
@@ -229,7 +229,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
                                     PacketBuffer * data)
 {
-    CHIP_ERROR err   = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     bool isRxHandle;
     uint16_t cId;
     uint16_t dataLen;
@@ -238,8 +238,8 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE TX characteristic (con %u, len %u)", conId, dataLen);
 
     isRxHandle = UUIDsMatch(&chipUUID_CHIPoBLEChar_RX, charId);
-    dataLen = data->DataLength();
-    cId = qvCHIP_BleGetHandle(isRxHandle);
+    dataLen    = data->DataLength();
+    cId        = qvCHIP_BleGetHandle(isRxHandle);
 
     qvCHIP_TxData(conId, cId, dataLen, data->Start());
 
@@ -389,8 +389,8 @@ void BLEManagerImpl::DriveBLEState(intptr_t arg)
     sInstance.DriveBLEState();
 }
 
-void BLEManagerImpl::HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t operation,
-                                   uint16_t offset, qvCHIP_Ble_Attr_t *pAttr)
+void BLEManagerImpl::HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t operation, uint16_t offset,
+                                      qvCHIP_Ble_Attr_t * pAttr)
 {
     uint8_t rsp = 0;
 
@@ -400,9 +400,8 @@ void BLEManagerImpl::HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t 
     qvCHIP_TxData(connId, handle, 0, &rsp);
 }
 
-void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t operation,
-                                    uint16_t offset, uint16_t len, uint8_t *pValue,
-                                    qvCHIP_Ble_Attr_t *pAttr)
+void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t operation, uint16_t offset, uint16_t len,
+                                       uint8_t * pValue, qvCHIP_Ble_Attr_t * pAttr)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     PacketBuffer * buf = NULL;
@@ -468,132 +467,123 @@ void BLEManagerImpl::HandleTXComplete(const ChipDeviceEvent * event)
 }
 
 /* Process DM Messages */
-void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t* pDmEvt)
+void BLEManagerImpl::HandleDmMsg(qvCHIP_Ble_DmEvt_t * pDmEvt)
 {
-    switch(pDmEvt->hdr.event)
+    switch (pDmEvt->hdr.event)
     {
-        case QVCHIP_DM_RESET_CMPL_IND:
+    case QVCHIP_DM_RESET_CMPL_IND: {
+        break;
+    }
+    case QVCHIP_DM_SCAN_START_IND: {
+        break;
+    }
+    case QVCHIP_DM_SCAN_STOP_IND: {
+        break;
+    }
+    case QVCHIP_DM_ADV_START_IND: {
+        if (pDmEvt->hdr.status != QVCHIP_HCI_SUCCESS)
         {
-            break;
+            ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_START_IND error: %d", (int) pDmEvt->advSetStart.hdr.status);
+            ExitNow();
         }
-        case QVCHIP_DM_SCAN_START_IND:
+
+        ClearFlag(sInstance.mFlags, kFlag_AdvertisingRefreshNeeded);
+
+        // Transition to the Advertising state...
+        if (!GetFlag(sInstance.mFlags, kFlag_Advertising))
         {
-            break;
-        }
-        case QVCHIP_DM_SCAN_STOP_IND:
-        {
-            break;
-        }
-        case QVCHIP_DM_ADV_START_IND:
-        {
-            if (pDmEvt->hdr.status != QVCHIP_HCI_SUCCESS)
+            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising started");
+
+            SetFlag(sInstance.mFlags, kFlag_Advertising, true);
+
+            // Post a CHIPoBLEAdvertisingChange(Started) event.
             {
-                ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_START_IND error: %d", (int) pDmEvt->advSetStart.hdr.status);
-                ExitNow();
+                ChipDeviceEvent advChange;
+                advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+                advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
+                PlatformMgr().PostEvent(&advChange);
             }
-
-            ClearFlag(sInstance.mFlags, kFlag_AdvertisingRefreshNeeded);
-
-            // Transition to the Advertising state...
-            if (!GetFlag(sInstance.mFlags, kFlag_Advertising))
-            {
-                ChipLogProgress(DeviceLayer, "CHIPoBLE advertising started");
-
-                SetFlag(sInstance.mFlags, kFlag_Advertising, true);
-
-                // Post a CHIPoBLEAdvertisingChange(Started) event.
-                {
-                    ChipDeviceEvent advChange;
-                    advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
-                    advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
-                    PlatformMgr().PostEvent(&advChange);
-                }
-            }
-            break;
         }
-        case QVCHIP_DM_ADV_STOP_IND:
+        break;
+    }
+    case QVCHIP_DM_ADV_STOP_IND: {
+        if (pDmEvt->advSetStop.status != QVCHIP_HCI_SUCCESS)
         {
-            if (pDmEvt->advSetStop.status != QVCHIP_HCI_SUCCESS)
-            {
-                ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_STOP_IND error: %d", (int) pDmEvt->advSetStop.status);
-                ExitNow();
-            }
+            ChipLogError(DeviceLayer, "QVCHIP_DM_ADV_STOP_IND error: %d", (int) pDmEvt->advSetStop.status);
+            ExitNow();
+        }
 
-            ClearFlag(sInstance.mFlags, kFlag_AdvertisingRefreshNeeded);
+        ClearFlag(sInstance.mFlags, kFlag_AdvertisingRefreshNeeded);
 
-            // Transition to the not Advertising state...
-            if (GetFlag(sInstance.mFlags, kFlag_Advertising))
-            {
-                ClearFlag(sInstance.mFlags, kFlag_Advertising);
+        // Transition to the not Advertising state...
+        if (GetFlag(sInstance.mFlags, kFlag_Advertising))
+        {
+            ClearFlag(sInstance.mFlags, kFlag_Advertising);
 
-                ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
+            ChipLogProgress(DeviceLayer, "CHIPoBLE advertising stopped");
 
-                // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
+            // Directly inform the ThreadStackManager that CHIPoBLE advertising has stopped.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-                ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
+            ThreadStackMgr().OnCHIPoBLEAdvertisingStop();
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
 
-                // Post a CHIPoBLEAdvertisingChange(Stopped) event.
-                {
-                    ChipDeviceEvent advChange;
-                    advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
-                    advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
-                    PlatformMgr().PostEvent(&advChange);
-                }
-            }
-            break;
-        }
-        case QVCHIP_DM_CONN_OPEN_IND:
-        {
-            ChipLogProgress(DeviceLayer, "BLE GATT connection established (con %u)", pDmEvt->connOpen.hdr.param);
-
-            // Allocate a connection state record for the new connection.
-            //GetConnectionState(pDmEvt->mtu.conn_id, true);
-            mNumGAPCons++;
-
-            // Receiving a connection stops the advertising processes.  So force a refresh of the advertising
-            // state.
-            SetFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
-            PlatformMgr().ScheduleWork(DriveBLEState, 0);
-            break;
-        }
-        case QVCHIP_DM_CONN_CLOSE_IND:
-        {
-            ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", pDmEvt->connClose.hdr.param,
-                            pDmEvt->connClose.reason);
-
-            // If this was a CHIPoBLE connection, release the associated connection state record
-            // and post an event to deliver a connection error to the CHIPoBLE layer.
-            ChipDeviceEvent event;
-            event.Type                          = DeviceEventType::kCHIPoBLEConnectionError;
-            event.CHIPoBLEConnectionError.ConId = pDmEvt->connClose.hdr.param;
-            switch (pDmEvt->connClose.reason)
+            // Post a CHIPoBLEAdvertisingChange(Stopped) event.
             {
-            case QVCHIP_HCI_ERR_REMOTE_TERMINATED:
-                event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
-                break;
-            case QVCHIP_HCI_ERR_LOCAL_TERMINATED:
-                event.CHIPoBLEConnectionError.Reason = BLE_ERROR_APP_CLOSED_CONNECTION;
-                break;
-            default:
-                event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
-                break;
+                ChipDeviceEvent advChange;
+                advChange.Type                             = DeviceEventType::kCHIPoBLEAdvertisingChange;
+                advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
+                PlatformMgr().PostEvent(&advChange);
             }
-            PlatformMgr().PostEvent(&event);
+        }
+        break;
+    }
+    case QVCHIP_DM_CONN_OPEN_IND: {
+        ChipLogProgress(DeviceLayer, "BLE GATT connection established (con %u)", pDmEvt->connOpen.hdr.param);
 
-            // Force a refresh of the advertising state.
-            SetFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
-            PlatformMgr().ScheduleWork(DriveBLEState, 0);
-            break;
-        }
-        case QVCHIP_DM_CONN_UPDATE_IND:
+        // Allocate a connection state record for the new connection.
+        // GetConnectionState(pDmEvt->mtu.conn_id, true);
+        mNumGAPCons++;
+
+        // Receiving a connection stops the advertising processes.  So force a refresh of the advertising
+        // state.
+        SetFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
+        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        break;
+    }
+    case QVCHIP_DM_CONN_CLOSE_IND: {
+        ChipLogProgress(DeviceLayer, "BLE GATT connection closed (con %u, reason %u)", pDmEvt->connClose.hdr.param,
+                        pDmEvt->connClose.reason);
+
+        // If this was a CHIPoBLE connection, release the associated connection state record
+        // and post an event to deliver a connection error to the CHIPoBLE layer.
+        ChipDeviceEvent event;
+        event.Type                          = DeviceEventType::kCHIPoBLEConnectionError;
+        event.CHIPoBLEConnectionError.ConId = pDmEvt->connClose.hdr.param;
+        switch (pDmEvt->connClose.reason)
         {
+        case QVCHIP_HCI_ERR_REMOTE_TERMINATED:
+            event.CHIPoBLEConnectionError.Reason = BLE_ERROR_REMOTE_DEVICE_DISCONNECTED;
             break;
-        }
+        case QVCHIP_HCI_ERR_LOCAL_TERMINATED:
+            event.CHIPoBLEConnectionError.Reason = BLE_ERROR_APP_CLOSED_CONNECTION;
+            break;
         default:
-        {
+            event.CHIPoBLEConnectionError.Reason = BLE_ERROR_CHIPOBLE_PROTOCOL_ABORT;
             break;
         }
+        PlatformMgr().PostEvent(&event);
+
+        // Force a refresh of the advertising state.
+        SetFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
+        PlatformMgr().ScheduleWork(DriveBLEState, 0);
+        break;
+    }
+    case QVCHIP_DM_CONN_UPDATE_IND: {
+        break;
+    }
+    default: {
+        break;
+    }
     }
 
 exit:
@@ -601,12 +591,11 @@ exit:
 }
 
 /* Process ATT Messages */
-void BLEManagerImpl::HandleAttMsg(qvCHIP_Ble_AttEvt_t* pAttEvt)
+void BLEManagerImpl::HandleAttMsg(qvCHIP_Ble_AttEvt_t * pAttEvt)
 {
-    switch(pAttEvt->hdr.event)
+    switch (pAttEvt->hdr.event)
     {
-        case QVCHIP_ATT_MTU_UPDATE_IND:
-        {
+    case QVCHIP_ATT_MTU_UPDATE_IND: {
         /*
             ChipLogProgress(DeviceLayer, "MTU for con %u: %u", param->mtu.conn_id, param->mtu.mtu);
             CHIPoBLEConState * conState = GetConnectionState(param->mtu.conn_id);
@@ -615,32 +604,31 @@ void BLEManagerImpl::HandleAttMsg(qvCHIP_Ble_AttEvt_t* pAttEvt)
                 conState->MTU = param->mtu.mtu;
             }
         */
-            break;
-        }
-        case QVCHIP_ATTC_FIND_BY_TYPE_VALUE_RSP:
-        case QVCHIP_ATTC_READ_BY_GROUP_TYPE_RSP:
-        case QVCHIP_ATTC_READ_BY_TYPE_RSP:
-        case QVCHIP_ATTC_FIND_INFO_RSP:
-            break;
-        case QVCHIP_ATTC_READ_RSP:
-            break;
-        case QVCHIP_ATTC_WRITE_RSP:
-        case QVCHIP_ATTC_WRITE_CMD_RSP:
-        case QVCHIP_ATTC_PREPARE_WRITE_RSP:
-            break;
-        case QVCHIP_ATTC_EXECUTE_WRITE_RSP:
-            break;
-        case QVCHIP_ATTC_HANDLE_VALUE_NTF:
-        case QVCHIP_ATTC_HANDLE_VALUE_IND:
-            break;
-        default:
-        {
-            break;
-        }
+        break;
+    }
+    case QVCHIP_ATTC_FIND_BY_TYPE_VALUE_RSP:
+    case QVCHIP_ATTC_READ_BY_GROUP_TYPE_RSP:
+    case QVCHIP_ATTC_READ_BY_TYPE_RSP:
+    case QVCHIP_ATTC_FIND_INFO_RSP:
+        break;
+    case QVCHIP_ATTC_READ_RSP:
+        break;
+    case QVCHIP_ATTC_WRITE_RSP:
+    case QVCHIP_ATTC_WRITE_CMD_RSP:
+    case QVCHIP_ATTC_PREPARE_WRITE_RSP:
+        break;
+    case QVCHIP_ATTC_EXECUTE_WRITE_RSP:
+        break;
+    case QVCHIP_ATTC_HANDLE_VALUE_NTF:
+    case QVCHIP_ATTC_HANDLE_VALUE_IND:
+        break;
+    default: {
+        break;
+    }
     }
 }
 
-void BLEManagerImpl::ExternalCbHandler(qvCHIP_Ble_MsgHdr_t *pMsg)
+void BLEManagerImpl::ExternalCbHandler(qvCHIP_Ble_MsgHdr_t * pMsg)
 {
     if (pMsg != NULL)
     {
@@ -649,14 +637,14 @@ void BLEManagerImpl::ExternalCbHandler(qvCHIP_Ble_MsgHdr_t *pMsg)
         /* Process advertising/scanning and connection-related messages */
         if (pMsg->event >= QVCHIP_DM_CBACK_START && pMsg->event <= QVCHIP_DM_CBACK_END)
         {
-            ChipLogProgress(DeviceLayer, "DM event %d: status %d",pMsg->event, pMsg->status);
-            sInstance.HandleDmMsg((qvCHIP_Ble_DmEvt_t *)pMsg);
+            ChipLogProgress(DeviceLayer, "DM event %d: status %d", pMsg->event, pMsg->status);
+            sInstance.HandleDmMsg((qvCHIP_Ble_DmEvt_t *) pMsg);
         }
         /* Process attribute-related messages */
         else if (pMsg->event >= QVCHIP_ATT_CBACK_START && pMsg->event <= QVCHIP_ATT_CBACK_END)
         {
-            ChipLogProgress(DeviceLayer, "ATT event %d: status %d",pMsg->event, pMsg->status);
-            sInstance.HandleAttMsg((qvCHIP_Ble_AttEvt_t *)pMsg);
+            ChipLogProgress(DeviceLayer, "ATT event %d: status %d", pMsg->event, pMsg->status);
+            sInstance.HandleAttMsg((qvCHIP_Ble_AttEvt_t *) pMsg);
         }
         else
         {
