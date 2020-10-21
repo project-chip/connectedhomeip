@@ -31,6 +31,5 @@ chip_inet_config_enable_ipv4 = false
 chip_inet_config_enable_dns_resolver = false
 
 chip_build_tests = false
-
 # TODO - enable OpenThread build flow
 # https://github.com/project-chip/connectedhomeip/issues/2939
