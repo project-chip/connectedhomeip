@@ -40,11 +40,11 @@ public:
         kState_Off,
     };
 
-    using LightingCallback_fn = void (*)(Action_t);
+    using LightingCallback_fn = void (*)(Action_t, int32_t);
 
     int Init(const char * gpioDeviceName, gpio_pin_t gpioPin);
     bool IsTurnedOn() const { return mState == kState_On; }
-    bool InitiateAction(Action_t aAction);
+    bool InitiateAction(Action_t aAction, int32_t aActor);
     void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
 
 private:

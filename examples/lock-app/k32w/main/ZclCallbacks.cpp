@@ -45,4 +45,17 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
 
     BoltLockMgr().InitiateAction(0, *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
 }
+
+/** @brief On/off Cluster Server Post Init
+ *
+ * Following resolution of the On/Off state at startup for this endpoint,
+ * perform any additional initialization needed; e.g., synchronize hardware
+ * state.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
+{
+    // TODO: implement any additional On/off Cluster Server post init actions
+}
 }

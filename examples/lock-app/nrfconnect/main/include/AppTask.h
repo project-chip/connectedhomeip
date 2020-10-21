@@ -31,6 +31,7 @@ public:
 
     void PostLockActionRequest(int32_t aActor, BoltLockManager::Action_t aAction);
     void PostEvent(AppEvent * event);
+    void UpdateClusterState();
 
 private:
     friend AppTask & GetAppTask(void);
@@ -38,7 +39,7 @@ private:
     int Init();
 
     static void ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor);
-    static void ActionCompleted(BoltLockManager::Action_t aAction);
+    static void ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor);
 
     void CancelTimer(void);
 
@@ -65,7 +66,6 @@ private:
 
     Function_t mFunction;
     bool mFunctionTimerActive;
-
     static AppTask sAppTask;
 };
 
