@@ -17,7 +17,6 @@
 
 #include "RendezvousDeviceDelegate.h"
 
-#include "RendezvousMessageHandler.h"
 #include "esp_log.h"
 #include <platform/ConfigurationManager.h>
 #include <support/CodeUtils.h>
@@ -76,17 +75,4 @@ void RendezvousDeviceDelegate::OnRendezvousStatusUpdate(RendezvousSessionDelegat
     default:
         break;
     };
-}
-
-void RendezvousDeviceDelegate::OnRendezvousMessageReceived(PacketBuffer * buffer)
-{
-    ESP_LOGI(TAG, "OnRendezvousMessageReceived");
-
-    // When paired, offer the RendezvousMessageHandler a chance to process the message.
-    CHIP_ERROR err = RendezvousMessageHandler::HandleMessageReceived(buffer);
-    if (err == CHIP_ERROR_INVALID_MESSAGE_TYPE)
-    {
-        // If the handler did not recognize the message, treat it as an echo request.
-        mRendezvousSession->SendMessage(buffer);
-    }
 }

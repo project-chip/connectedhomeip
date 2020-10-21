@@ -497,73 +497,65 @@ void ChipDeviceController::DiscardCachedPackets()
 
 CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * buffer, NodeId peerDevice)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    bool trySessionResumption = true;
+
+    VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     mAppReqState = appReqState;
 
-    VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    if (mRendezvousSession != nullptr)
+    if (peerDevice != kUndefinedNodeId)
     {
-        err = mRendezvousSession->SendMessage(buffer);
+        mRemoteDeviceId = Optional<NodeId>::Value(peerDevice);
+    }
+    VerifyOrExit(mRemoteDeviceId.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
+
+    // If there is no secure connection to the device, try establishing it
+    if (!IsSecurelyConnected())
+    {
+        err = TryEstablishingSecureSession(mRemoteDeviceId.Value());
+        SuccessOrExit(err);
+
+        trySessionResumption = false;
+
+        if (mConState == kConnectionState_SecureConnecting)
+        {
+            // Cache the packet while connection is being established
+            ExitNow(err = CachePacket(buffer));
+        }
+    }
+
+    // Hold on to the buffer, in case of session resumption and resend is needed
+    buffer->AddRef();
+
+    err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
+    ChipLogDetail(Controller, "SendMessage returned %d", err);
+
+    // The send could fail due to network timeouts (e.g. broken pipe)
+    // Try sesion resumption if needed
+    if (err != CHIP_NO_ERROR && trySessionResumption)
+    {
+        err = ResumeSecureSession(mRemoteDeviceId.Value());
+        // If session resumption failed, let's free the extra reference to
+        // the buffer. If not, SendMessage would free it.
+        VerifyOrExit(err == CHIP_NO_ERROR, PacketBuffer::Free(buffer));
+
+        if (mConState == kConnectionState_SecureConnecting)
+        {
+            // Cache the packet while connection is being established
+            ExitNow(err = CachePacket(buffer));
+        }
+
+        err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
+        SuccessOrExit(err);
     }
     else
     {
-        bool trySessionResumption = true;
-        if (peerDevice != kUndefinedNodeId)
-        {
-            mRemoteDeviceId = Optional<NodeId>::Value(peerDevice);
-        }
-        VerifyOrExit(mRemoteDeviceId.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
-
-        // If there is no secure connection to the device, try establishing it
-        if (!IsSecurelyConnected())
-        {
-            // For now, it's expected that the device is connected
-            VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-            err = TryEstablishingSecureSession(mRemoteDeviceId.Value());
-            SuccessOrExit(err);
-
-            trySessionResumption = false;
-
-            if (mConState == kConnectionState_SecureConnecting)
-            {
-                // Cache the packet while connection is being established
-                ExitNow(err = CachePacket(buffer));
-            }
-        }
-
-        // Hold on to the buffer, in case a session resumption and resend is needed
-        buffer->AddRef();
-
-        err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
-        ChipLogDetail(Controller, "SendMessage returned %d", err);
-
-        // The send could fail due to network timeouts (e.g. broken pipe)
-        // Try sesion resumption if needed
-        if (err != CHIP_NO_ERROR && trySessionResumption)
-        {
-            VerifyOrExit(mRemoteDeviceId.HasValue(), err = CHIP_ERROR_INCORRECT_STATE);
-            err = ResumeSecureSession(mRemoteDeviceId.Value());
-            // If session resumption failed, let's free the extra reference to
-            // the buffer. If not, SendMessage would free it.
-            VerifyOrExit(err == CHIP_NO_ERROR, PacketBuffer::Free(buffer));
-
-            if (mConState == kConnectionState_SecureConnecting)
-            {
-                // Cache the packet while connection is being established
-                ExitNow(err = CachePacket(buffer));
-            }
-
-            err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
-            SuccessOrExit(err);
-        }
-        else
-        {
-            // Free the extra reference to the buffer
-            PacketBuffer::Free(buffer);
-        }
+        // Free the extra reference to the buffer
+        PacketBuffer::Free(buffer);
     }
+
 exit:
 
     return err;
@@ -632,26 +624,23 @@ void ChipDeviceController::OnMessageReceived(const PacketHeader & header, Transp
     }
 }
 
-void ChipDeviceController::OnRendezvousComplete()
+void ChipDeviceController::OnRendezvousError(CHIP_ERROR err)
 {
     if (mRendezvousSession != nullptr)
     {
         chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
+    }
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnPairingComplete(err);
     }
 }
 
-void ChipDeviceController::OnRendezvousMessageReceived(PacketBuffer * buffer)
+void ChipDeviceController::OnRendezvousComplete()
 {
-    // TODO: this is a stop gap solution to clean up RendezvouSession.
-    // Once the Network provisioning code changes to using delegate calls, this
-    // function would be removed. At that time, OnRendezvousComplete() would be used
-    // to clean up the session
-    if (mRendezvousSession != nullptr)
-    {
-        chip::Platform::Delete(mRendezvousSession);
-        mRendezvousSession = nullptr;
-    }
+    OnRendezvousError(CHIP_NO_ERROR);
 }
 
 void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
@@ -706,6 +695,11 @@ void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::S
     default:
         break;
     };
+
+    if (mPairingDelegate != nullptr)
+    {
+        mPairingDelegate->OnStatusUpdate(status);
+    }
 }
 
 } // namespace DeviceController
