@@ -17,33 +17,38 @@
 #    limitations under the License.
 #
 
+# This script connects Xcode's "Run Script" build phase to a build of CHIP for Apple's environments.
+#
+# Conventions used in this script:
+#  * Variables in upper case supplied by Xcode (or other executor), are exported to subprocesses, or
+#      are upper-case elsewhere in CHIP scripts (e.g. CHIP_ROOT is only used locally,
+#      but is all uppper). Variables defined herein and used locally are lower-case
+#
+
 here=$(cd "${0%/*}" && pwd)
 me=${0##*/}
+
+CHIP_ROOT=$(cd "$here/../../.." && pwd)
 
 die() {
     echo "$me: *** ERROR: $*"
     exit 1
 }
 
-set -e
+# lotsa debug output :-)
+set -ex
 
+# helpful debugging, save off environment that Xcode gives us, can source it to
+#  retry/repro failures from a bash terminal
 mkdir -p "$TEMP_DIR"
 export >"$TEMP_DIR/env.sh"
 
-set -x
-
-# these should be set by the Xcode project
-CHIP_ROOT=${CHIP_ROOT:-"$SRCROOT/../../.."}
-CHIP_ROOT=$(cd "$CHIP_ROOT" && pwd)
-
-[[ -d ${CHIP_ROOT} ]] || die Please set CHIP_ROOT to the location of the CHIP directory
-
-declare -a DEFINES=()
+declare -a defines=()
 # lots of environment variables passed by Xcode to this script
-read -r -a DEFINES <<<"$GCC_PREPROCESSOR_DEFINITIONS"
+read -r -a defines <<<"$GCC_PREPROCESSOR_DEFINITIONS"
 
 declare target_defines=
-for define in "${DEFINES[@]}"; do
+for define in "${defines[@]}"; do
 
     # skip over those that GN does for us
     case "$define" in
@@ -62,44 +67,60 @@ for define in "${DEFINES[@]}"; do
         CHIP_CRYPTO_*)
             continue
             ;;
+        CHIP_LOGGING_STYLE_*)
+            continue
+            ;;
     esac
     target_defines+=,\"${define//\"/\\\"}\"
 done
 target_defines=[${target_defines:1}]
 
+declare target_cflags='"-target","'"$PLATFORM_PREFERRED_ARCH"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'"'
+
+read -r -a archs <<<"$ARCHS"
+
+for arch in "${archs[@]}"; do
+    target_cflags+=',"-arch","'"$arch"'"'
+done
+
+[[ $ENABLE_BITCODE == YES ]] && {
+    target_cflags+=',"-flto"'
+}
+
 declare -a args=(
+    'default_configs_cosmetic=[]' # suppress colorization
     'chip_crypto="mbedtls"'
+    'chip_logging_style="darwin"'
     'chip_build_tools=false'
     'chip_build_tests=false'
     'chip_ble_project_config_include=""'
     'chip_device_project_config_include=""'
     'chip_inet_project_config_include=""'
     'chip_system_project_config_include=""'
-    'target_cpu="'"$ARCHS"'"'
+    'target_cpu="'"$PLATFORM_PREFERRED_ARCH"'"'
     'target_defines='"$target_defines"
-    'default_configs_cosmetic=[]'
-    'target_cflags=["-target","'"$ARCHS"'-'"$LLVM_TARGET_TRIPLE_VENDOR"'-'"$LLVM_TARGET_TRIPLE_OS_VERSION"'", "-DNDEBUG"]'
+    'target_cflags=['"$target_cflags"']'
 )
 
-if [[ ${CONFIGURATION} != Debug* ]]; then
-    args+='is_debug=true'
-fi
+[[ $CONFIGURATION != Debug* ]] && args+='is_debug=true'
 
-[[ ${PLATFORM_FAMILY_NAME} == iOS ]] && {
+[[ $PLATFORM_FAMILY_NAME == iOS || $PLATFORM_FAMILY_NAME == watchOS || $PLATFORM_FAMILY_NAME == tvOS ]] && {
     args+=(
         'target_os="ios"'
         'import("//config/ios/args.gni")'
     )
 }
 
-[[ ${PLATFORM_FAMILY_NAME} == macOS ]] && {
+[[ $PLATFORM_FAMILY_NAME == macOS ]] && {
     args+=(
         'target_os="mac"'
+        'import("//config/standalone/args.gni")'
         'chip_project_config_include_dirs=["'"$CHIP_ROOT"'/config/standalone"]'
-        'import("'"$CHIP_ROOT"'/config/standalone/args.gni")'
     )
 }
 
+# search current (or $2) and its parent directories until
+#  a name match is found, which is output on stdout
 find_in_ancestors() {
     declare to_find="${1}"
     declare dir="${2:-$(pwd)}"
@@ -115,6 +136,7 @@ find_in_ancestors() {
     printf '%s\n' "$dir/$to_find"
 }
 
+# actual build stuff
 (
     cd "$CHIP_ROOT" # pushd and popd because we need the env vars from activate
 
@@ -122,9 +144,10 @@ find_in_ancestors() {
         . "$ENV"
     fi
 
+    # there are environments where these bits are unwanted, unnecessary, or impossible
     [[ -n $CHIP_NO_SUBMODULES ]] || git submodule update --init
     if [[ -z $CHIP_NO_ACTIVATE ]]; then
-        # first run bootstrap in an external env to build everything
+        # first run bootstrap/activate in an external env to build everything
         env -i PW_ENVSETUP_NO_BANNER=1 PW_ENVSETUP_QUIET=1 bash -c '. scripts/activate.sh'
         set +ex
         # now source activate for env vars
@@ -132,8 +155,10 @@ find_in_ancestors() {
         set -ex
     fi
 
+    # put build intermediates in TEMP_DIR
     cd "$TEMP_DIR"
-    # [[ -f out/build.ninja ]] ?
+
+    # gnerate and build
     gn --root="$CHIP_ROOT" gen --check out --args="${args[*]}"
     ninja -v -C out
 )
