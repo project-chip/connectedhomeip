@@ -17,7 +17,7 @@
 
 /**
  *    @file
- *      This file defines the utility class for the CHIP Message Layer.
+ *      This file defines Defines error filtering and selection methods.
  *
  */
 

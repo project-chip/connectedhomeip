@@ -18,7 +18,7 @@
 
 /**
  *    @file
- *      This file defines the classes for the CHIP Message Layer internal.
+ *      This file defines flags for messaging layer.
  */
 
 #pragma once
