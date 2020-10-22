@@ -589,6 +589,12 @@ exit:
     return err;
 }
 
+CHIP_ERROR ChipDeviceController::SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate)
+{
+    mPairingDelegate = pairingDelegate;
+    return CHIP_NO_ERROR;
+}
+
 void ChipDeviceController::ClearRequestState()
 {
     if (mCurReqMsg != nullptr)
@@ -651,12 +657,13 @@ void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::S
     switch (status)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
-        ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
+        ChipLogProgress(Controller, "Remote device completed SPAKE2+ handshake\n");
         mPairingSession       = mRendezvousSession->GetPairingSession();
         mSecurePairingSession = &mPairingSession;
 
         if (mOnNewConnection)
         {
+            ChipLogProgress(Controller, "Will Call on mOnNewConnection(%p)\n", mOnNewConnection);
             mOnNewConnection(this, nullptr, mAppReqState);
         }
 
@@ -698,6 +705,24 @@ void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::S
     {
         mPairingDelegate->OnStatusUpdate(status);
     }
+}
+
+void ScriptDevicePairingDelegate::SetWifiCredential(const char * ssid, const char * password)
+{
+    wifiSSID     = ssid;
+    wifiPassword = password;
+}
+
+void ScriptDevicePairingDelegate::OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback)
+{
+    callback->SendNetworkCredentials(wifiSSID.c_str(), wifiPassword.c_str());
+}
+
+void ScriptDevicePairingDelegate::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
+                                                                    RendezvousDeviceCredentialsDelegate * callback)
+{
+    // TODO: Implement this
+    ChipLogDetail(Controller, "ScriptDevicePairingDelegate::OnOperationalCredentialsRequested\n");
 }
 
 } // namespace DeviceController

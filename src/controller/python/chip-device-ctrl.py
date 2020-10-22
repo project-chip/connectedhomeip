@@ -36,6 +36,7 @@ import textwrap
 import string
 from cmd import Cmd
 from six.moves import range
+from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 
 # Extend sys.path with one or more directories, relative to the location of the
 # running script, in which the chip package might be found .  This makes it
@@ -128,6 +129,9 @@ class DeviceMgrCmd(Cmd):
         "ble-adapter-select",
         "ble-adapter-print",
         "ble-debug-log",
+
+        "connect",
+        "set-pairing-wifi-credential",
     ]
 
     def parseline(self, line):
@@ -358,6 +362,41 @@ class DeviceMgrCmd(Cmd):
             return
 
         print("BTP Connected")
+    
+    def do_connect(self, line):
+        """
+        connect (rendezvous)
+        """
+
+        try:
+            args = shlex.split(line)
+            if len(args) == 0:
+                print("Usage:")
+                self.do_help("connect SetupPinCode")
+                return
+            if len(args) > 1:
+                print("Unexpected argument: " + args[1])
+                return
+            self.devCtrl.Connect(FAKE_CONN_OBJ_VALUE, int(args[0]))
+        except ChipStack.ChipStackException as ex:
+            print(str(ex))
+            return
+        print("Connected")
+    
+    def do_setpairingwificredential(self, line):
+        """
+        set-pairing-wifi-credential
+
+        Set WiFi credential for pairing, will sent to device
+        """
+        try:
+            args = shlex.split(line)
+            self.devCtrl.SetWifiCredential(args[0], args[1])
+        except ChipStack.ChipStackException as ex:
+            print(str(ex))
+            return
+
+        print("WiFi credential set")
 
     def do_history(self, line):
         """

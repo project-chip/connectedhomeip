@@ -37,6 +37,8 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
+#include <string>
+
 namespace chip {
 namespace DeviceController {
 
@@ -96,6 +98,21 @@ public:
      * @param error Error cause, if any
      */
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
+};
+
+class DLL_EXPORT ScriptDevicePairingDelegate final : public DevicePairingDelegate
+{
+public:
+    ~ScriptDevicePairingDelegate() = default;
+    void SetWifiCredential(const char * ssid, const char * password);
+    void OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback) override;
+
+    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
+                                           RendezvousDeviceCredentialsDelegate * callback) override;
+
+private:
+    // WiFi Provisioning Data
+    std::string wifiSSID, wifiPassword;
 };
 
 class DLL_EXPORT ChipDeviceController : public SecureSessionMgrDelegate,
@@ -216,6 +233,14 @@ public:
      */
     CHIP_ERROR ServiceEvents();
 
+    // ----- Pairing -----
+    /**
+     * @brief
+     * Set device pairing delegate after init, pass nullptr remove device delegate.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate);
+
     /**
      * @brief
      *   Allow the CHIP Stack to process any pending events
@@ -283,7 +308,7 @@ private:
 
     SecurePairingSession * mSecurePairingSession = nullptr;
 
-    DevicePairingDelegate * mPairingDelegate;
+    DevicePairingDelegate * mPairingDelegate = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate;
 
