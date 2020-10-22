@@ -49,10 +49,10 @@ public:
     virtual ~ReliableMessageDelegate() {}
 
     /* Application callbacks */
-    virtual void OnThrottleRcvd(uint32_t pauseTime) = 0; /**< Application callback for received Throttle message. */
+    virtual void OnThrottleRcvd(uint32_t pauseTime)        = 0; /**< Application callback for received Throttle message. */
     virtual void OnDelayedDeliveryRcvd(uint32_t pauseTime) = 0; /**< Application callback for received Delayed Delivery message. */
-    virtual void OnSendError(CHIP_ERROR err)        = 0; /**< Application callback for error while sending. */
-    virtual void OnAckRcvd()                        = 0; /**< Application callback for received acknowledgment. */
+    virtual void OnSendError(CHIP_ERROR err)               = 0; /**< Application callback for error while sending. */
+    virtual void OnAckRcvd()                               = 0; /**< Application callback for received acknowledgment. */
 };
 
 class ReliableMessageContextDeletor
@@ -122,8 +122,8 @@ private:
     friend class ReliableMessageManager;
 
     ReliableMessageProtocolConfig mConfig;
-    uint16_t mNextAckTimeTick;             // Next time for triggering Solo Ack
-    uint16_t mThrottleTimeoutTick;         // Timeout until when Throttle is On when ThrottleEnabled is set
+    uint16_t mNextAckTimeTick;     // Next time for triggering Solo Ack
+    uint16_t mThrottleTimeoutTick; // Timeout until when Throttle is On when ThrottleEnabled is set
     uint32_t mPendingPeerAckId;
 
     ReliableMessageDelegate * mDelegate;
