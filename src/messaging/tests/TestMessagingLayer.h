@@ -25,4 +25,3 @@
 #pragma once
 
 int TestReliableMessageProtocol(void);
-
