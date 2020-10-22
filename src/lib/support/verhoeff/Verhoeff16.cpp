@@ -114,10 +114,10 @@ int Verhoeff16::CharToVal(char ch)
 char Verhoeff16::ValToChar(int val)
 {
     if (val >= 0 && val < 10)
-        return '0' + val;
+        return static_cast<char>('0' + val);
 
     if (val >= 10 && val < Base)
-        return 'A' + (val - 10);
+        return static_cast<char>('A' + (val - 10));
 
     return 0;
 }

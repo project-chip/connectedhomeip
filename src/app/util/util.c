@@ -42,7 +42,6 @@
 
 #include "af-main.h"
 #include "af.h"
-#include "chip-response.h"
 #include "common.h"
 //#include "../plugin/time-server/time-server.h"
 #include "af-event.h"
@@ -747,7 +746,8 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
     else if (!isBroadcastDestination(emberAfResponseDestination))
     {
         label  = 'U';
-        status = chipSendResponse(emberAfResponseDestination, &emberAfResponseApsFrame, appResponseLength, appResponseData);
+        status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_DIRECT, emberAfResponseDestination, &emberAfResponseApsFrame,
+                                                appResponseLength, appResponseData, callback);
     }
     else
     {
@@ -954,7 +954,7 @@ bool emberAfDetermineIfLinkSecurityIsRequired(uint8_t commandId, bool incoming, 
     return false;
 }
 
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame)
+uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame)
 {
     EmberNodeId destination = EMBER_UNKNOWN_NODE_ID;
     uint8_t max             = EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH;

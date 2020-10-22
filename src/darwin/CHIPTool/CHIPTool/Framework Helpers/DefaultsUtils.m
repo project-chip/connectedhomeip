@@ -41,3 +41,26 @@ void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
     CFPreferencesSetAppValue((CFStringRef) key, NULL, (CFStringRef) domain);
     CFPreferencesAppSynchronize((CFStringRef) domain);
 }
+
+@implementation CHIPToolPersistentStorageDelegate
+
+// MARK: CHIPPersistentStorageDelegate
+- (void)GetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler
+{
+    NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    completionHandler(key, value);
+}
+
+- (void)SetKeyValue:(NSString *)key value:(NSString *)value handler:(SendStatus)completionHandler
+{
+    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
+    completionHandler(key, kSet, [CHIPError errorForCHIPErrorCode:0]);
+}
+
+- (void)DeleteKeyValue:(NSString *)key handler:(SendStatus)completionHandler
+{
+    CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    completionHandler(key, kDelete, [CHIPError errorForCHIPErrorCode:0]);
+}
+
+@end

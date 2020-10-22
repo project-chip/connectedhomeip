@@ -42,7 +42,7 @@
             "cppStandard": "c++11",
             "intelliSenseMode": "gcc-x64",
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.android_x64.json",
-            "compilerPath": "/opt/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang",
+            "compilerPath": "/opt/android/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/x86_64-linux-android24-clang",
             "browse": {
                 "path": ["${workspaceFolder}/out/debug/"],
                 "limitSymbolsToIncludedHeaders": true
@@ -54,7 +54,7 @@
             "cppStandard": "c++11",
             "intelliSenseMode": "gcc-x64",
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.android_arm64.json",
-            "compilerPath": "/opt/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang",
+            "compilerPath": "/opt/android/android-ndk-r21b/toolchains/llvm/prebuilt/linux-x86_64/bin/aarch64-linux-android24-clang",
             "browse": {
                 "path": ["${workspaceFolder}/out/debug/"],
                 "limitSymbolsToIncludedHeaders": true

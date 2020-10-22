@@ -122,6 +122,7 @@ struct StackUnlockGuard
     StackUnlockGuard() { pthread_mutex_unlock(&sStackLock); }
     ~StackUnlockGuard() { pthread_mutex_lock(&sStackLock); }
 };
+
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -137,6 +138,8 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     int pthreadErr = 0;
 
     ChipLogProgress(Controller, "JNI_OnLoad() called");
+
+    chip::Platform::MemoryInit();
 
     // Save a reference to the JVM.  Will need this to call back into Java.
     sJVM = jvm;
@@ -220,6 +223,8 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
     sSystemLayer.Shutdown();
     sInetLayer.Shutdown();
     sJVM = NULL;
+
+    chip::Platform::MemoryShutdown();
 }
 
 JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
@@ -533,7 +538,10 @@ JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong deviceC
 
     {
         ScopedPthreadLock lock(&sStackLock);
-        err = deviceController->DisconnectDevice();
+        if (deviceController->IsConnected())
+        {
+            err = deviceController->DisconnectDevice();
+        }
     }
 
     if (err != CHIP_NO_ERROR)

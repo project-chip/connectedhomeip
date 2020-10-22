@@ -84,8 +84,8 @@ DLL_EXPORT void FuzzExchangeHeader(uint8_t * p, int32_t arg)
     size_t offsetIndex                                         = 0;
     size_t valueIndex                                          = 0;
     size_t numOffsets                                          = sizeof(offsets) / sizeof(offsets[0]);
-    offsetIndex                                                = arg % (numOffsets);
-    valueIndex                                                 = (arg / numOffsets) % CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES;
+    offsetIndex                                                = static_cast<uint32_t>(arg) % (numOffsets);
+    valueIndex = (static_cast<uint32_t>(arg) / numOffsets) % CHIP_FAULT_INJECTION_NUM_FUZZ_VALUES;
     p[offsetIndex] ^= values[valueIndex];
 }
 

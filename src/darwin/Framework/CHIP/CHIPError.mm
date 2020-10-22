@@ -51,11 +51,41 @@ NSString * const CHIPErrorDomain = @"CHIPErrorDomain";
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeIntegrityCheckFailed
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Integrity check failed.", nil) }];
+    case CHIP_NO_ERROR:
+        return [NSError errorWithDomain:CHIPErrorDomain
+                                   code:CHIPSuccess
+                               userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Success.", nil) }];
     default:
         return [NSError errorWithDomain:CHIPErrorDomain
                                    code:CHIPErrorCodeUndefinedError
                                userInfo:@{ NSLocalizedDescriptionKey : NSLocalizedString(@"Undefined error.", nil) }];
         ;
+    }
+}
+
++ (CHIP_ERROR)errorToCHIPErrorCode:(NSError *)error
+{
+    if (error.domain != CHIPErrorDomain) {
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    switch (error.code) {
+    case CHIPErrorCodeInvalidStringLength:
+        return CHIP_ERROR_INVALID_STRING_LENGTH;
+    case CHIPErrorCodeInvalidIntegerValue:
+        return CHIP_ERROR_INVALID_INTEGER_VALUE;
+    case CHIPErrorCodeInvalidArgument:
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    case CHIPErrorCodeInvalidMessageLength:
+        return CHIP_ERROR_INVALID_MESSAGE_LENGTH;
+    case CHIPErrorCodeInvalidState:
+        return CHIP_ERROR_INCORRECT_STATE;
+    case CHIPErrorCodeIntegrityCheckFailed:
+        return CHIP_ERROR_INTEGRITY_CHECK_FAILED;
+    case CHIPSuccess:
+        return CHIP_NO_ERROR;
+    default:
+        return CHIP_ERROR_INTERNAL;
     }
 }
 @end

@@ -36,6 +36,24 @@ class ThreadNetworkInfoHolder implements Parcelable {
     borderAgents.add(borderAgent);
   }
 
+  protected ThreadNetworkInfoHolder(Parcel in) {
+    networkInfo = in.readParcelable(ThreadNetworkInfo.class.getClassLoader());
+    borderAgents = in.createTypedArrayList(BorderAgentInfo.CREATOR);
+  }
+
+  public static final Creator<ThreadNetworkInfoHolder> CREATOR =
+      new Creator<ThreadNetworkInfoHolder>() {
+        @Override
+        public ThreadNetworkInfoHolder createFromParcel(Parcel in) {
+          return new ThreadNetworkInfoHolder(in);
+        }
+
+        @Override
+        public ThreadNetworkInfoHolder[] newArray(int size) {
+          return new ThreadNetworkInfoHolder[size];
+        }
+      };
+
   public ThreadNetworkInfo getNetworkInfo() {
     return networkInfo;
   }

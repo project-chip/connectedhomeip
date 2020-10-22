@@ -32,14 +32,15 @@ public:
 
     void PostLightingActionRequest(LightingManager::Action_t aAction);
     void PostEvent(AppEvent * event);
+    void UpdateClusterState();
 
 private:
     friend AppTask & GetAppTask(void);
 
     int Init();
 
-    static void ActionInitiated(LightingManager::Action_t aAction);
-    static void ActionCompleted(LightingManager::Action_t aAction);
+    static void ActionInitiated(LightingManager::Action_t aAction, int32_t aActor);
+    static void ActionCompleted(LightingManager::Action_t aAction, int32_t aActor);
 
     void CancelTimer(void);
 
@@ -66,7 +67,6 @@ private:
 
     Function_t mFunction;
     bool mFunctionTimerActive;
-
     static AppTask sAppTask;
 };
 

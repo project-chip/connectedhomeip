@@ -939,12 +939,12 @@ CHIP_ERROR GenericNetworkProvisioningServerImpl<ImplClass>::SetThreadProvisionDe
         netInfo.FieldPresent.ThreadMeshPrefix = true;
     }
 
-    // If network key was not specified, generate a random key.
-    if (!netInfo.FieldPresent.ThreadNetworkKey)
+    // If the master key was not specified, generate a random key.
+    if (!netInfo.FieldPresent.ThreadMasterKey)
     {
-        err = Platform::Security::GetSecureRandomData(netInfo.ThreadNetworkKey, NetworkInfo::kThreadNetworkKeyLength);
+        err = Platform::Security::GetSecureRandomData(netInfo.ThreadMasterKey, NetworkInfo::kThreadMasterKeyLength);
         SuccessOrExit(err);
-        netInfo.FieldPresent.ThreadNetworkKey = true;
+        netInfo.FieldPresent.ThreadMasterKey = true;
     }
 
     // If a PSKc was not specified, generate a random PSKc.

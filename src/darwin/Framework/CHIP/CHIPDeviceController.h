@@ -29,6 +29,7 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @protocol CHIPDeviceControllerDelegate;
 @protocol CHIPDevicePairingDelegate;
+@protocol CHIPPersistentStorageDelegate;
 
 @interface AddressInfo : NSObject
 
@@ -88,6 +89,15 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
  * @param[in] queue The queue on which the callbacks will be delivered
  */
 - (void)setPairingDelegate:(id<CHIPDevicePairingDelegate>)delegate queue:(dispatch_queue_t)queue;
+
+/**
+ * Set the Delegate for the persistent storage  as well as the Queue on which the Delegate callbacks will be triggered
+ *
+ * @param[in] delegate The delegate for persistent storage
+ *
+ * @param[in] queue The queue on which the callbacks will be delivered
+ */
+- (void)setPersistentStorageDelegate:(id<CHIPPersistentStorageDelegate>)delegate queue:(dispatch_queue_t)queue;
 
 @end
 

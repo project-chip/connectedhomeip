@@ -37,13 +37,13 @@ namespace chip {
 static char Base64ValToChar(uint8_t val)
 {
     if (val < 26)
-        return 'A' + val;
-    val -= 26;
+        return static_cast<char>('A' + val);
+    val = static_cast<uint8_t>(val - 26);
     if (val < 26)
-        return 'a' + val;
-    val -= 26;
+        return static_cast<char>('a' + val);
+    val = static_cast<uint8_t>(val - 26);
     if (val < 10)
-        return '0' + val;
+        return static_cast<char>('0' + val);
     if (val == 10)
         return '+';
     if (val == 11)
@@ -59,15 +59,17 @@ static uint8_t Base64CharToVal(uint8_t c)
     if (c == 47)
         return 63;
     // NOTE: c < 48 will fall through to return UINT8_MAX below.
-    c -= 48;
+    c = static_cast<uint8_t>(c - 48);
     if (c < 10)
-        return c + 52;
-    c -= 17;
+        return static_cast<uint8_t>(c + 52);
+    // NOTE: c < 17 here will fall through to return UINT8_MAX below.
+    c = static_cast<uint8_t>(c - 17);
     if (c < 26)
         return c;
-    c -= 32;
+    // NOTE: c < 32 here will fall through to return UINT8_MAX below.
+    c = static_cast<uint8_t>(c - 32);
     if (c < 26)
-        return c + 26;
+        return static_cast<uint8_t>(c + 26);
     return UINT8_MAX;
 }
 
@@ -76,13 +78,13 @@ static uint8_t Base64CharToVal(uint8_t c)
 static char Base64URLValToChar(uint8_t val)
 {
     if (val < 26)
-        return 'A' + val;
-    val -= 26;
+        return static_cast<char>('A' + val);
+    val = static_cast<uint8_t>(val - 26);
     if (val < 26)
-        return 'a' + val;
-    val -= 26;
+        return static_cast<char>('a' + val);
+    val = static_cast<uint8_t>(val - 26);
     if (val < 10)
-        return '0' + val;
+        return static_cast<char>('0' + val);
     if (val == 10)
         return '-';
     if (val == 11)
@@ -98,15 +100,17 @@ static uint8_t Base64URLCharToVal(uint8_t c)
     if (c == 95)
         return 63;
     // NOTE: c < 48 will fall through to return UINT8_MAX below.
-    c -= 48;
+    c = static_cast<uint8_t>(c - 48);
     if (c < 10)
-        return c + 52;
-    c -= 17;
+        return static_cast<uint8_t>(c + 52);
+    // NOTE: c < 17 here will fall through to return UINT8_MAX below.
+    c = static_cast<uint8_t>(c - 17);
     if (c < 26)
         return c;
-    c -= 32;
+    // NOTE: c < 32 here will fall through to return UINT8_MAX below.
+    c = static_cast<uint8_t>(c - 32);
     if (c < 26)
-        return c + 26;
+        return static_cast<uint8_t>(c + 26);
     return UINT8_MAX;
 }
 
@@ -118,19 +122,19 @@ uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, char * out, Base64ValT
     {
         uint8_t val1, val2, val3, val4;
 
-        val1 = *in >> 2;
+        val1 = static_cast<uint8_t>(*in >> 2);
         val2 = (*in << 4) & 0x3F;
         in++;
         inLen--;
         if (inLen > 0)
         {
-            val2 |= *in >> 4;
+            val2 = static_cast<uint8_t>(val2 | *in >> 4);
             val3 = (*in << 2) & 0x3F;
             in++;
             inLen--;
             if (inLen > 0)
             {
-                val3 |= *in >> 6;
+                val3 = static_cast<uint8_t>(val3 | *in >> 6);
                 val4 = *in & 0x3F;
                 in++;
                 inLen--;
@@ -147,7 +151,7 @@ uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, char * out, Base64ValT
         *out++ = valToCharFunct(val4);
     }
 
-    return out - outStart;
+    return static_cast<uint16_t>(out - outStart);
 }
 
 uint16_t Base64Encode(const uint8_t * in, uint16_t inLen, char * out)
@@ -206,39 +210,39 @@ uint16_t Base64Decode(const char * in, uint16_t inLen, uint8_t * out, Base64Char
         if (inLen == 1)
             goto fail;
 
-        uint8_t a = charToValFunct(*in++);
-        uint8_t b = charToValFunct(*in++);
-        inLen -= 2;
+        uint8_t a = charToValFunct(static_cast<uint8_t>(*in++));
+        uint8_t b = charToValFunct(static_cast<uint8_t>(*in++));
+        inLen     = static_cast<uint16_t>(inLen - 2);
 
         if (a == UINT8_MAX || b == UINT8_MAX)
             goto fail;
 
-        *out++ = (a << 2) | (b >> 4);
+        *out++ = static_cast<uint8_t>((a << 2) | (b >> 4));
 
         if (inLen == 0 || *in == '=')
             break;
 
-        uint8_t c = charToValFunct(*in++);
+        uint8_t c = charToValFunct(static_cast<uint8_t>(*in++));
         inLen--;
 
         if (c == UINT8_MAX)
             goto fail;
 
-        *out++ = (b << 4) | (c >> 2);
+        *out++ = static_cast<uint8_t>((b << 4) | (c >> 2));
 
         if (inLen == 0 || *in == '=')
             break;
 
-        uint8_t d = charToValFunct(*in++);
+        uint8_t d = charToValFunct(static_cast<uint8_t>(*in++));
         inLen--;
 
         if (d == UINT8_MAX)
             goto fail;
 
-        *out++ = (c << 6) | d;
+        *out++ = static_cast<uint8_t>((c << 6) | d);
     }
 
-    return out - outStart;
+    return static_cast<uint16_t>(out - outStart);
 
 fail:
     return UINT16_MAX;

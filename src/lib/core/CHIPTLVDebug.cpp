@@ -82,7 +82,7 @@ static void DumpHandler(DumpWriter aWriter, const char * aIndent, const TLVReade
     }
     else if (IsContextTag(tag))
     {
-        aWriter("tag[%s]: 0x%x, ", DecodeTagControl(tagControl), static_cast<uint32_t>(ContextTag(tag)));
+        aWriter("tag[%s]: 0x%x, ", DecodeTagControl(tagControl), TagNumFromTag(tag));
     }
     else if (IsSpecialTag(tag))
     {

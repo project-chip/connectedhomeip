@@ -568,6 +568,39 @@ exit:
     return error;
 }
 
+CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_length, P256ECDSASignature & out_signature)
+{
+    ERR_clear_error();
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    int nid          = NID_undef;
+    EC_KEY * ec_key  = nullptr;
+    uint out_length  = 0;
+
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(hash_length == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    nid = _nidForCurve(MapECName(mPublicKey.Type()));
+    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    ec_key = to_EC_KEY(&mKeypair);
+    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = ECDSA_sign(0, hash, static_cast<int>(hash_length), Uint8::to_uchar(out_signature), &out_length, ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+    // This should not happen due to the check above. But check this nonetheless
+    SuccessOrExit(out_signature.SetLength(out_length));
+
+exit:
+    if (error != CHIP_NO_ERROR)
+    {
+        _logSSLError();
+    }
+
+    return error;
+}
+
 CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
                                                        const P256ECDSASignature & signature) const
 {
@@ -654,6 +687,66 @@ exit:
     {
         EVP_PKEY_free(verification_key);
         verification_key = nullptr;
+    }
+    return error;
+}
+
+CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length,
+                                                        const P256ECDSASignature & signature) const
+{
+    ERR_clear_error();
+    CHIP_ERROR error     = CHIP_ERROR_INTERNAL;
+    int nid              = NID_undef;
+    EC_KEY * ec_key      = nullptr;
+    EC_POINT * key_point = nullptr;
+    EC_GROUP * ec_group  = nullptr;
+    int result           = 0;
+
+    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(hash_length == kSHA256_Hash_Length, error = CHIP_ERROR_INVALID_ARGUMENT);
+    nid = _nidForCurve(MapECName(Type()));
+    VerifyOrExit(nid != NID_undef, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    ec_group = EC_GROUP_new_by_curve_name(nid);
+    VerifyOrExit(ec_group != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    key_point = EC_POINT_new(ec_group);
+    VerifyOrExit(key_point != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_POINT_oct2point(ec_group, key_point, Uint8::to_const_uchar(*this), Length(), nullptr);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    ec_key = EC_KEY_new_by_curve_name(nid);
+    VerifyOrExit(ec_key != nullptr, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_set_public_key(ec_key, key_point);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    result = EC_KEY_check_key(ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INTERNAL);
+
+    // The cast for length arguments is safe because values are small enough to fit.
+    result = ECDSA_verify(0, hash, static_cast<int>(hash_length), Uint8::to_const_uchar(signature),
+                          static_cast<int>(signature.Length()), ec_key);
+    VerifyOrExit(result == 1, error = CHIP_ERROR_INVALID_SIGNATURE);
+    error = CHIP_NO_ERROR;
+
+exit:
+    _logSSLError();
+    if (ec_group != nullptr)
+    {
+        EC_GROUP_free(ec_group);
+        ec_group = nullptr;
+    }
+    if (key_point != nullptr)
+    {
+        EC_POINT_clear_free(key_point);
+        key_point = nullptr;
+    }
+    if (ec_key != nullptr)
+    {
+        EC_KEY_free(ec_key);
+        ec_key = nullptr;
     }
     return error;
 }

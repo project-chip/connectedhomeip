@@ -274,15 +274,15 @@ uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameCo
     return returnValue;
 }
 
-// EmberStatus emberAfSendCommandUnicastToBindingsWithCallback(EmberAfMessageSentFunction callback)
-// {
-//     return emberAfSendUnicastToBindingsWithCallback(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
-// }
+EmberStatus emberAfSendCommandUnicastToBindingsWithCallback(EmberAfMessageSentFunction callback)
+{
+    return emberAfSendUnicastToBindingsWithCallback(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
+}
 
-// EmberStatus emberAfSendCommandUnicastToBindings(void)
-// {
-//     return emberAfSendCommandUnicastToBindingsWithCallback(NULL);
-// }
+EmberStatus emberAfSendCommandUnicastToBindings(void)
+{
+    return emberAfSendCommandUnicastToBindingsWithCallback(NULL);
+}
 
 // EmberStatus emberAfSendCommandMulticastWithCallback(EmberMulticastId multicastId, EmberAfMessageSentFunction callback)
 // {
@@ -307,10 +307,10 @@ uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameCo
 //     return emberAfSendCommandMulticastWithAliasWithCallback(multicastId, alias, sequence, NULL);
 // }
 
-// EmberStatus emberAfSendCommandMulticastToBindings(void)
-// {
-//     return emberAfSendMulticastToBindings(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer);
-// }
+EmberStatus emberAfSendCommandMulticastToBindings(void)
+{
+    return emberAfSendMulticastToBindings(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer);
+}
 
 // EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
 //                                                   EmberAfMessageSentFunction callback)
