@@ -26,7 +26,6 @@
 
 #pragma once
 
-#include <core/ReferenceCounted.h>
 #include <crypto/CHIPCryptoPAL.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
@@ -39,7 +38,7 @@ extern const char * kSpake2pR2ISessionInfo;
 
 using namespace Crypto;
 
-class DLL_EXPORT SecurePairingSessionDelegate : public ReferenceCounted<SecurePairingSessionDelegate>
+class DLL_EXPORT SecurePairingSessionDelegate
 {
 public:
     /**
