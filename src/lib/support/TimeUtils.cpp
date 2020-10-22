@@ -26,9 +26,12 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
+#include <limits>
 #include <stdint.h>
+#include <type_traits>
 
 #include <core/CHIPCore.h>
+#include <support/SafeInt.h>
 
 #include "TimeUtils.h"
 
@@ -65,14 +68,16 @@ static inline uint8_t DaysToMarch1(uint16_t year)
  */
 static uint16_t MarchBasedMonthToDayOfYear(uint8_t month)
 {
-    return (153 * month + 2) / 5;
+    return static_cast<uint16_t>((153 * month + 2) / 5);
 }
 
 /* Converts a March-1st based day of year (0=March 1st, 1=March 2nd, etc.) to a March-based month number (0=March, 1=April, etc.).
  */
 static uint8_t MarchBasedDayOfYearToMonth(uint16_t dayOfYear)
 {
-    return (5 * dayOfYear + 2) / 153;
+    // This assumes dayOfYear is not using the full uint16_t range, so the cast
+    // to uint8_t doesn't overflow.
+    return static_cast<uint8_t>((5 * dayOfYear + 2) / 153);
 }
 
 /**
@@ -131,8 +136,9 @@ uint8_t DaysInMonth(uint16_t year, uint8_t month)
 uint8_t FirstWeekdayOfYear(uint16_t year)
 {
     // Compute the day of the week for the first day of the given year using Gauss' algorithm.
-    return (1 + 5 * ((year - 1) % kLeapYearInterval) + 4 * ((year - 1) % kYearsPerCentury) + 6 * ((year - 1) % kYearsPerCycle)) %
-        kDaysPerWeek;
+    return static_cast<uint8_t>(
+        (1 + 5 * ((year - 1) % kLeapYearInterval) + 4 * ((year - 1) % kYearsPerCentury) + 6 * ((year - 1) % kYearsPerCycle)) %
+        kDaysPerWeek);
 }
 
 /**
@@ -159,15 +165,15 @@ void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t & mont
     uint8_t daysToMarch1 = DaysToMarch1(year);
 
     // Make dayOfYear base 0.
-    dayOfYear -= 1;
+    dayOfYear = static_cast<uint16_t>(dayOfYear - 1);
 
     // Adjust dayOfYear to a March 1st base (i.e. 0 = March 1, 1 = March 2, etc.).  This numbers January
     // and February at the end of the range, with the benefit that day numbering is identical between
     // standard and leap years with the exception of the leap day itself.
     if (dayOfYear < daysToMarch1)
-        dayOfYear += kDaysFromMarch1ToDecember31;
+        dayOfYear = static_cast<uint16_t>(dayOfYear + kDaysFromMarch1ToDecember31);
     else
-        dayOfYear -= daysToMarch1;
+        dayOfYear = static_cast<uint16_t>(dayOfYear - daysToMarch1);
 
     // Compute a March-based month number (i.e. 0=March...11=February) from the day of year.  This is based
     // on the logic in http://howardhinnant.github.io/date_algorithms.html.
@@ -177,10 +183,10 @@ void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t & mont
     uint16_t daysFromMarch1ToStartOfMonth = MarchBasedMonthToDayOfYear(month);
 
     // Compute the day of month in standard form (1=1st, 2=2nd, etc.).
-    dayOfMonth = dayOfYear - daysFromMarch1ToStartOfMonth + 1;
+    dayOfMonth = static_cast<uint8_t>(dayOfYear - daysFromMarch1ToStartOfMonth + 1);
 
     // Convert the month number to standard form (1=January...12=December).
-    month = month + (month < 10 ? 3 : -9);
+    month = static_cast<uint8_t>(month + (month < 10 ? 3 : -9));
 }
 
 /**
@@ -205,19 +211,19 @@ void OrdinalDateToCalendarDate(uint16_t year, uint16_t dayOfYear, uint8_t & mont
 void CalendarDateToOrdinalDate(uint16_t year, uint8_t month, uint8_t dayOfMonth, uint16_t & dayOfYear)
 {
     // Convert month to a March-based month number (i.e. 0=March, 1=April, ...11=February).
-    month = month + (month > kFebruary ? -3 : 9);
+    month = static_cast<uint8_t>(month + (month > kFebruary ? -3 : 9));
 
     // Compute the days from March 1st to the start of the corresponding month.
     dayOfYear = MarchBasedMonthToDayOfYear(month);
 
     // Adjust dayOfYear to be January-based (0=January 1st, 1=January 2nd...).
     if (dayOfYear < kDaysFromMarch1ToDecember31)
-        dayOfYear += DaysToMarch1(year);
+        dayOfYear = static_cast<uint16_t>(dayOfYear + DaysToMarch1(year));
     else
-        dayOfYear -= kDaysFromMarch1ToDecember31;
+        dayOfYear = static_cast<uint16_t>(dayOfYear - kDaysFromMarch1ToDecember31);
 
     // Add in day of month, converting to base 1 in the process.
-    dayOfYear += dayOfMonth;
+    dayOfYear = static_cast<uint16_t>(dayOfYear + dayOfMonth);
 }
 
 /**
@@ -261,16 +267,16 @@ bool CalendarDateToDaysSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMon
     if (month <= kFebruary)
     {
         year--;
-        month += 9;
+        month = static_cast<uint8_t>(month + 9);
     }
     else
-        month -= 3;
+        month = static_cast<uint8_t>(month - 3);
 
     // Compute the days from March 1st to the start of the specified day.
-    uint16_t dayOfYear = MarchBasedMonthToDayOfYear(month) + (dayOfMonth - 1);
+    uint16_t dayOfYear = static_cast<uint16_t>(MarchBasedMonthToDayOfYear(month) + (dayOfMonth - 1));
 
     // Compute the 400-year Gregorian "cycle" within which the given year falls.
-    uint16_t cycle = year / kYearsPerCycle;
+    uint16_t cycle = static_cast<uint16_t>(year / kYearsPerCycle);
 
     // Compute the relative year within the cycle.
     uint32_t yearOfCycle = year - (cycle * kYearsPerCycle);
@@ -306,10 +312,18 @@ bool CalendarDateToDaysSinceEpoch(uint16_t year, uint8_t month, uint8_t dayOfMon
  *  @param dayOfMonth
  *    [OUTPUT] Day-of-month in standard form (1=1st, 2=2nd, etc.).
  *
+ *  @return
+ *     True if the conversion was successful.  False if the year would not fit
+ *     in uint16_t.
  */
-void DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
+bool DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)
 {
     // NOTE: This algorithm is based on the logic described in http://howardhinnant.github.io/date_algorithms.html.
+    if (daysSinceEpoch / kDaysPerStandardYear + 1 > std::numeric_limits<std::remove_reference<decltype(year)>::type>::max())
+    {
+        // Our year calculation will likely overflow.
+        return false;
+    }
 
     // Adjust days value to be relative to 0000-03-01.
     daysSinceEpoch += kEpochOffsetDays;
@@ -321,11 +335,12 @@ void DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint
     uint32_t dayOfCycle = daysSinceEpoch - (cycle * kDaysPerCycle);
 
     // Compute the relative year within the cycle, adjusting for leap-years.
-    uint16_t yearOfCycle = (dayOfCycle - dayOfCycle / 1460 + dayOfCycle / 36524 - dayOfCycle / 146096) / kDaysPerStandardYear;
+    uint16_t yearOfCycle =
+        static_cast<uint16_t>((dayOfCycle - dayOfCycle / 1460 + dayOfCycle / 36524 - dayOfCycle / 146096) / kDaysPerStandardYear);
 
     // Compute the relative day with the year.
-    uint16_t dayOfYear =
-        dayOfCycle - (yearOfCycle * kDaysPerStandardYear + yearOfCycle / kLeapYearInterval - yearOfCycle / kYearsPerCentury);
+    uint16_t dayOfYear = static_cast<uint16_t>(
+        dayOfCycle - (yearOfCycle * kDaysPerStandardYear + yearOfCycle / kLeapYearInterval - yearOfCycle / kYearsPerCentury));
 
     // Compute a March-based month number (i.e. 0=March...11=February) from the day of year.
     month = MarchBasedDayOfYearToMonth(dayOfYear);
@@ -334,15 +349,16 @@ void DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint
     uint16_t daysFromMarch1ToStartOfMonth = MarchBasedMonthToDayOfYear(month);
 
     // Compute the day of month in standard form (1=1st, 2=2nd, etc.).
-    dayOfMonth = dayOfYear - daysFromMarch1ToStartOfMonth + 1;
+    dayOfMonth = static_cast<uint8_t>(dayOfYear - daysFromMarch1ToStartOfMonth + 1);
 
     // Convert the month number to standard form (1=January...12=December).
-    month = month + (month < 10 ? 3 : -9);
+    month = static_cast<uint8_t>(month + (month < 10 ? 3 : -9));
 
     // Compute the year, adjusting for the standard start of year (January).
-    year = yearOfCycle + cycle * kYearsPerCycle;
+    year = static_cast<uint16_t>(yearOfCycle + cycle * kYearsPerCycle);
     if (month <= kFebruary)
         year++;
+    return true;
 }
 
 /**
@@ -363,16 +379,29 @@ void DaysSinceEpochToCalendarDate(uint32_t daysSinceEpoch, uint16_t & year, uint
  *  @param relativeDays
  *    Number of days to add/subtract from given calendar date.
  *
+ *  @return
+ *    True if the adjustment succeeded.  False if the adjustment would put us
+ *    outside the representable date range.
+ *
  *  @note
  *    Given date must be equal to or greater than 1970-01-01.
  */
-void AdjustCalendarDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, int32_t relativeDays)
+bool AdjustCalendarDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, int32_t relativeDays)
 {
     uint32_t daysSinceEpoch;
+    if (!CalendarDateToDaysSinceEpoch(year, month, dayOfMonth, daysSinceEpoch))
+    {
+        return false;
+    }
 
-    CalendarDateToDaysSinceEpoch(year, month, dayOfMonth, daysSinceEpoch);
-    daysSinceEpoch += relativeDays;
-    DaysSinceEpochToCalendarDate(daysSinceEpoch, year, month, dayOfMonth);
+    // Make sure we can do our additions without overflowing.
+    int64_t adjustedDays = static_cast<int64_t>(daysSinceEpoch) + relativeDays;
+    if (!CanCastTo<uint32_t>(adjustedDays))
+    {
+        return false;
+    }
+
+    return DaysSinceEpochToCalendarDate(static_cast<uint32_t>(adjustedDays), year, month, dayOfMonth);
 }
 
 /**
@@ -479,6 +508,11 @@ void SecondsSinceEpochToCalendarTime(uint32_t secondsSinceEpoch, uint16_t & year
     uint32_t daysSinceEpoch = secondsSinceEpoch / kSecondsPerDay;
     uint32_t timeOfDay      = secondsSinceEpoch - (daysSinceEpoch * kSecondsPerDay);
 
+    // Note: This call to DaysSinceEpochToCalendarDate can't fail, because we
+    // can't overflow a uint16_t year with a 32-bit number of seconds.
+    static_assert(std::numeric_limits<decltype(secondsSinceEpoch)>::max() / (kDaysPerStandardYear * kSecondsPerDay) + 1 <=
+                      std::numeric_limits<std::remove_reference<decltype(year)>::type>::max(),
+                  "What happened to our year or day lengths?");
     DaysSinceEpochToCalendarDate(daysSinceEpoch, year, month, dayOfMonth);
 
     hour = static_cast<uint8_t>(timeOfDay / kSecondsPerHour);

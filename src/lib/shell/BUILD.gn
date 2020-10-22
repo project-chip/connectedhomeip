@@ -36,6 +36,8 @@ static_library("shell") {
     sources += [ "streamer_zephyr.cpp" ]
   }
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",

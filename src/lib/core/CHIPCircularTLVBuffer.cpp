@@ -56,7 +56,7 @@ using namespace chip::Encoding;
  * @param[in] inHead         Initial point for the head.  The @a inHead pointer is must fall within the backing store for the
  * circular buffer, i.e. within @a inBuffer and &(@a inBuffer[@a inBufferLength])
  */
-CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBufferLength, uint8_t * inHead)
+CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength, uint8_t * inHead)
 {
     mQueue       = inBuffer;
     mQueueSize   = inBufferLength;
@@ -80,7 +80,7 @@ CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBuffer
  *
  * @param[in] inBufferLength Length, in bytes, of the backing store
  */
-CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBufferLength)
+CHIPCircularTLVBuffer::CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength)
 {
     mQueue       = inBuffer;
     mQueueSize   = inBufferLength;
@@ -118,7 +118,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::EvictHead()
 {
     CircularTLVReader reader;
     uint8_t * newHead;
-    size_t newLen;
+    uint32_t newLen;
     CHIP_ERROR err;
 
     // find the boundaries of an event to throw away
@@ -192,11 +192,11 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNewBuffer(TLVWriter & ioWriter, uint8_t *& 
 
     if (tail >= mQueueHead)
     {
-        outBufLen = mQueueSize - (tail - mQueue);
+        outBufLen = mQueueSize - static_cast<uint32_t>(tail - mQueue);
     }
     else
     {
-        outBufLen = mQueueHead - tail;
+        outBufLen = static_cast<uint32_t>(mQueueHead - tail);
     }
 
 exit:
@@ -228,11 +228,11 @@ CHIP_ERROR CHIPCircularTLVBuffer::FinalizeBuffer(TLVWriter & ioWriter, uint8_t *
     {
         if (tail <= mQueueHead)
         {
-            mQueueLength = mQueueSize + (tail - mQueueHead);
+            mQueueLength = mQueueSize - static_cast<uint32_t>(mQueueHead - tail);
         }
         else
         {
-            mQueueLength = tail - mQueueHead;
+            mQueueLength = static_cast<uint32_t>(tail - mQueueHead);
         }
     }
     return err;
@@ -291,7 +291,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader & ioReader, const uint
         // outBufStart until the end of the underlying storage buffer
         // (i.e. mQueue+mQueueSize).  This case tail == outBufStart
         // indicates that the buffer is completely full
-        outBufLen = (mQueue + mQueueSize) - outBufStart;
+        outBufLen = mQueueSize - static_cast<uint32_t>(outBufStart - mQueue);
         if ((tail == outBufStart) && (readerStart != nullptr))
             outBufLen = 0;
     }
@@ -299,7 +299,7 @@ CHIP_ERROR CHIPCircularTLVBuffer::GetNextBuffer(TLVReader & ioReader, const uint
     {
         // the buffer length is the distance between head and tail;
         // tail is either strictly larger or the buffer is empty
-        outBufLen = tail - outBufStart;
+        outBufLen = static_cast<uint32_t>(tail - outBufStart);
     }
     return err;
 }
