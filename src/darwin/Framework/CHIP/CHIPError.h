@@ -31,10 +31,12 @@ typedef NS_ERROR_ENUM(CHIPErrorDomain, CHIPErrorCode) {
     CHIPErrorCodeInvalidState = 5,
     CHIPErrorCodeWrongAddressType = 6,
     CHIPErrorCodeIntegrityCheckFailed = 7,
+    CHIPSuccess = 8,
 };
 
 @interface CHIPError : NSObject
 + (nullable NSError *)errorForCHIPErrorCode:(CHIP_ERROR)errorCode;
++ (CHIP_ERROR)errorToCHIPErrorCode:(NSError *)errorCode;
 @end
 
 NS_ASSUME_NONNULL_END

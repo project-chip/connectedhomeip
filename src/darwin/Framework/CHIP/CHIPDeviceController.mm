@@ -23,6 +23,7 @@
 #import "CHIPDevicePairingDelegateBridge.h"
 #import "CHIPError.h"
 #import "CHIPLogging.h"
+#import "CHIPPersistentStorageDelegateBridge.h"
 
 #include <controller/CHIPDeviceController.h>
 #include <inet/IPAddress.h>
@@ -65,6 +66,7 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
 @property (readonly, nonatomic) dispatch_queue_t delegateQueue;
 @property (readonly) chip::DeviceController::ChipDeviceController * cppController;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
+@property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
 
 @end
 
@@ -106,12 +108,24 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
             return nil;
         }
 
-        if (CHIP_NO_ERROR != _cppController->Init(kLocalDeviceId, _pairingDelegateBridge)) {
+        _persistentStorageDelegateBridge = new CHIPPersistentStorageDelegateBridge();
+        if (!_persistentStorageDelegateBridge) {
+            CHIP_LOG_ERROR("Error: couldn't create persistent storage delegate");
+            delete _cppController;
+            _cppController = NULL;
+            delete _pairingDelegateBridge;
+            _pairingDelegateBridge = NULL;
+            return nil;
+        }
+
+        if (CHIP_NO_ERROR != _cppController->Init(kLocalDeviceId, _pairingDelegateBridge, _persistentStorageDelegateBridge)) {
             CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
             delete _cppController;
             _cppController = NULL;
             delete _pairingDelegateBridge;
             _pairingDelegateBridge = NULL;
+            delete _persistentStorageDelegateBridge;
+            _persistentStorageDelegateBridge = NULL;
             return nil;
         }
     }
@@ -267,7 +281,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         buffer->SetDataLength(messageLen);
 
         memcpy(buffer->Start(), messageChars, messageLen);
-        err = self.cppController->SendMessage((__bridge void *) self, buffer);
+        err = self.cppController->SendMessage((__bridge void *) self, buffer, kRemoteDeviceId);
     }
     [self.lock unlock];
 
@@ -294,7 +308,7 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
         uint32_t dataLength = encodeCommandBlock(buffer, (uint16_t) bufferSize);
         buffer->SetDataLength(dataLength);
 
-        err = self.cppController->SendMessage((__bridge void *) self, buffer);
+        err = self.cppController->SendMessage((__bridge void *) self, buffer, kRemoteDeviceId);
     }
     [self.lock unlock];
     if (err != CHIP_NO_ERROR) {
@@ -455,6 +469,13 @@ static void onInternalError(chip::DeviceController::ChipDeviceController * devic
 {
     [self.lock lock];
     _pairingDelegateBridge->setDelegate(delegate, queue);
+    [self.lock unlock];
+}
+
+- (void)setPersistentStorageDelegate:(id<CHIPPersistentStorageDelegate>)delegate queue:(dispatch_queue_t)queue
+{
+    [self.lock lock];
+    _persistentStorageDelegateBridge->setFrameworkDelegate(delegate, queue);
     [self.lock unlock];
 }
 
