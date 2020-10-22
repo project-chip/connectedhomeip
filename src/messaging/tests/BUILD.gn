@@ -24,6 +24,8 @@ chip_test_suite("tests") {
   sources = [
     "TestExchangeMgr.cpp",
     "TestMessagingLayer.h",
+    "TestReliableMessageProtocol.cpp",
+    "TestReliableMessageProtocol.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -39,5 +41,8 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  tests = [ "TestExchangeMgr" ]
+  tests = [
+    "TestExchangeMgr",
+    "TestReliableMessageProtocol",
+  ]
 }
