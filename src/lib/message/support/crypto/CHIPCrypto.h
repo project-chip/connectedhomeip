@@ -26,7 +26,7 @@
 #ifndef CHIPCRYPTO_H_
 #define CHIPCRYPTO_H_
 
-#if CHIP_SEPARATE_CONFIG_H
+#if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
 #endif
 

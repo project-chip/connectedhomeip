@@ -106,4 +106,4 @@ chip_build(ChipLib ChipConfig
 # ==================================================
 
 target_link_libraries(app PUBLIC ChipLib)
-target_compile_definitions(app PRIVATE CHIP_SEPARATE_CONFIG_H)
+target_compile_definitions(app PRIVATE CHIP_HAVE_CONFIG_H)
