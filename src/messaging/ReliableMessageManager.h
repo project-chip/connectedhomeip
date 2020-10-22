@@ -42,7 +42,7 @@ class ReliableMessageContext;
 
 class ReliableMessageManager
 {
-private:
+public:
     /**
      *  @class RetransTableEntry
      *
@@ -53,9 +53,8 @@ private:
      *    specific timeout, the message would be retransmitted from this table.
      *
      */
-    class RetransTableEntry
+    struct RetransTableEntry
     {
-    public:
         RetransTableEntry();
 
         ReliableMessageContext * rc;   /**< The context for the stored CHIP message. */
@@ -70,13 +69,19 @@ public:
     ReliableMessageManager();
     ~ReliableMessageManager();
 
+    void Init(chip::System::Layer & system)
+    {
+        mSystemLayer = &system;
+    }
+    void Shutdown() {}
+
     void FreeContext(ReliableMessageContext * rc);
 
     uint64_t GetTickCounterFromTimePeriod(uint64_t period);
     uint64_t GetTickCounterFromTimeDelta(uint64_t newTime);
 
     void ExecuteActions();
-    void ProcessDDMessage(uint32_t PauseTimeMillis, NodeId DelayedNodeId);
+    void ProcessDelayedDeliveryMessage(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
     static void Timeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
     CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, System::PacketBuffer * msgBuf, uint32_t messageId,
@@ -93,6 +98,10 @@ public:
     void StopTimer();
     void ExpireTicks();
 
+    // Functions for testing
+    int TestGetCountRetransTable();
+    void TestSetIntervalShift(uint16_t value) { mTimerIntervalShift = value; }
+
 public:
     // public functions for ReliableMessageProtocol internal usage
     static ReliableMessageManager & GetManager();
@@ -101,8 +110,6 @@ public:
     CHIP_ERROR SendMessage(ReliableMessageContext *context, uint32_t profileId, uint8_t msgType, System::PacketBuffer * msgBuf, BitFlags<uint16_t, SendMessageFlags> sendFlags);
 
 private:
-    ReliableMessageProtocolConfig mConfig; /**< ReliableMessageProtocol configuration. */
-
     chip::System::Layer * mSystemLayer;
     uint64_t mTimeStampBase;                  // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
     System::Timer::Epoch mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
@@ -110,7 +117,7 @@ private:
 
     /* Placeholder function to run a function for all exchanges */
     template <typename Function>
-    void ExecuteForAllExchange(Function function)
+    void ExecuteForAllContext(Function function)
     {}
 
     void TicklessDebugDumpRetransTable(const char * log);
