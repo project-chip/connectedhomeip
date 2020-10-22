@@ -40,12 +40,12 @@ ReliableMessageManager::RetransTableEntry::RetransTableEntry() :
     rc(nullptr), msgBuf(nullptr), msgId(0), msgSendFlags(0), nextRetransTimeTick(0), sendCount(0)
 {}
 
-ReliableMessageManager::ReliableMessageManager() :
-    mConfig(gDefaultReliableMessageProtocolConfig), mTimeStampBase(System::Timer::GetCurrentEpoch()), mCurrentTimerExpiry(0),
-    mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
+ReliableMessageManager::ReliableMessageManager() : mTimeStampBase(System::Timer::GetCurrentEpoch()), mCurrentTimerExpiry(0), mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
 {}
 
-void ReliableMessageManager::ProcessDDMessage(uint32_t PauseTimeMillis, NodeId DelayedNodeId)
+ReliableMessageManager::~ReliableMessageManager() {}
+
+void ReliableMessageManager::ProcessDelayedDeliveryMessage(ReliableMessageContext * rc, uint32_t PauseTimeMillis)
 {
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
     ExpireTicks();
@@ -54,16 +54,10 @@ void ReliableMessageManager::ProcessDDMessage(uint32_t PauseTimeMillis, NodeId D
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         // Exchcontext is the sentinel object to ascertain validity of the element
-        if (RetransTable[i].rc)
+        if (RetransTable[i].rc && RetransTable[i].rc == rc)
         {
-            // Adjust the retrans timer value if Delayed Node identifier matches Peer in ExchangeContext
-            if (RetransTable[i].rc->IsNode(DelayedNodeId))
-            {
-                // Paustime is specified in milliseconds; Update retrans values
-                RetransTable[i].nextRetransTimeTick =
-                    static_cast<uint16_t>(RetransTable[i].nextRetransTimeTick + (PauseTimeMillis >> mTimerIntervalShift));
-                RetransTable[i].rc->mDelegate.OnDDRcvd(PauseTimeMillis);
-            } // DelayedNodeId == PeerNodeId
+            // Paustime is specified in milliseconds; Update retrans values
+            RetransTable[i].nextRetransTimeTick = static_cast<uint16_t>(RetransTable[i].nextRetransTimeTick + (PauseTimeMillis >> mTimerIntervalShift));
         }     // exchContext
     }         // for loop in table entry
 
@@ -127,7 +121,7 @@ void ReliableMessageManager::ExecuteActions()
     ChipLogProgress(ExchangeManager, "ReliableMessageManager::ExecuteActions");
 #endif
 
-    ExecuteForAllExchange([](ReliableMessageContext * rc) {
+    ExecuteForAllContext([](ReliableMessageContext * rc) {
         if (rc->IsAckPending())
         {
             if (0 == rc->mNextAckTimeTick)
@@ -157,7 +151,7 @@ void ReliableMessageManager::ExecuteActions()
             {
                 uint8_t sendCount = RetransTable[i].sendCount;
 
-                if (sendCount > rc->mConfig.mMaxRetrans)
+                if (sendCount == rc->mConfig.mMaxRetrans)
                 {
                     err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
@@ -187,7 +181,7 @@ void ReliableMessageManager::ExecuteActions()
 
                 if (err != CHIP_NO_ERROR)
                 {
-                    rc->mDelegate.OnSendError(err);
+                    rc->mDelegate->OnSendError(err);
                 }
             } // nextRetransTimeTick = 0
         }
@@ -232,7 +226,7 @@ void ReliableMessageManager::ExpireTicks()
                     deltaTicks);
 #endif
 
-    ExecuteForAllExchange([deltaTicks](ReliableMessageContext * rc) {
+    ExecuteForAllContext([deltaTicks](ReliableMessageContext * rc) {
         if (rc->IsAckPending())
         {
             // Decrement counter of Ack timestamp by the elapsed timer ticks
@@ -535,7 +529,7 @@ void ReliableMessageManager::FailRetransmitTableEntries(ReliableMessageContext *
             ClearRetransmitTable(RetransTable[i]);
 
             // Application callback OnSendError.
-            rc->mDelegate.OnSendError(err);
+            rc->mDelegate->OnSendError(err);
         }
     }
 }
@@ -554,7 +548,7 @@ void ReliableMessageManager::StartTimer()
 
     // When do we need to next wake up to send an ACK?
 
-    ExecuteForAllExchange([&nextWakeTimeTick, &foundWake](ReliableMessageContext * rc) {
+    ExecuteForAllContext([&nextWakeTimeTick, &foundWake](ReliableMessageContext * rc) {
         if (rc->IsAckPending() && rc->mNextAckTimeTick < nextWakeTimeTick)
         {
             nextWakeTimeTick = rc->mNextAckTimeTick;
@@ -595,27 +589,24 @@ void ReliableMessageManager::StartTimer()
     if (foundWake)
     {
         // Set timer for next tick boundary - subtract the elapsed time from the current tick
-        System::Timer::Epoch currentTime      = System::Timer::GetCurrentEpoch();
-        int64_t timerArmValue                 = (nextWakeTimeTick << mTimerIntervalShift) - (currentTime - mTimeStampBase);
-        System::Timer::Epoch timerExpiryEpoch = currentTime + timerArmValue;
+        System::Timer::Epoch timerExpiryEpoch = (nextWakeTimeTick << mTimerIntervalShift) + mTimeStampBase;
 
 #if defined(RMP_TICKLESS_DEBUG)
         ChipLogProgress(ExchangeManager,
-                        "ReliableMessageManager::StartTimer wake in %d ms (%" PRIu64 " %u %" PRIu64 " %" PRIu64 ")", timerArmValue,
-                        timerExpiryEpoch, nextWakeTimeTick, currentTime, mTimeStampBase);
+                        "ReliableMessageManager::StartTimer wake at %" PRIu64 " ms (%" PRIu64 " %" PRIu64 ")", timerExpiryEpoch, nextWakeTimeTick, mTimeStampBase);
 #endif
         if (timerExpiryEpoch != mCurrentTimerExpiry)
         {
             // If the tick boundary has expired in the past (delayed processing of event due to other system activity),
             // expire the timer immediately
+            int64_t timerArmValue = timerExpiryEpoch - System::Timer::GetCurrentEpoch();
             if (timerArmValue < 0)
             {
                 timerArmValue = 0;
             }
 
 #if defined(RMP_TICKLESS_DEBUG)
-            ChipLogProgress(ExchangeManager, "ReliableMessageManager::StartTimer set timer for %d %" PRIu64, timerArmValue,
-                            timerExpiryEpoch);
+            ChipLogProgress(ExchangeManager, "ReliableMessageManager::StartTimer set timer for %" PRIu64, timerArmValue);
 #endif
             StopTimer();
             res = mSystemLayer->StartTimer((uint32_t) timerArmValue, Timeout, this);
@@ -645,6 +636,17 @@ void ReliableMessageManager::StartTimer()
 void ReliableMessageManager::StopTimer()
 {
     mSystemLayer->CancelTimer(Timeout, this);
+}
+
+int ReliableMessageManager::TestGetCountRetransTable()
+{
+    int count = 0;
+    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
+    {
+        ReliableMessageContext * rc = RetransTable[i].rc;
+        if (rc) count++;
+    }
+    return count;
 }
 
 } // namespace messaging

@@ -41,9 +41,9 @@ void ReliableMessageContextDeletor::Release(ReliableMessageContext * obj)
     ReliableMessageManager::GetManager().FreeContext(obj);
 }
 
-ReliableMessageContext::ReliableMessageContext(ReliableMessageDelegate & delegate) :
+ReliableMessageContext::ReliableMessageContext() :
     mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0), mThrottleTimeoutTick(0), mPendingPeerAckId(0),
-    mDelegate(delegate)
+    mDelegate(nullptr)
 {}
 
 /**
@@ -303,6 +303,26 @@ exit:
  *  @retval  #CHIP_NO_ERROR                             if the context was removed.
  *
  */
+CHIP_ERROR ReliableMessageContext::HandleDelayedDeliveryMessage(uint32_t PauseTimeMillis)
+{
+    ReliableMessageManager::GetManager().ProcessDelayedDeliveryMessage(this, PauseTimeMillis);
+    mDelegate->OnDelayedDeliveryRcvd(PauseTimeMillis);
+    return CHIP_NO_ERROR;
+}
+
+/**
+ *  Process received Ack. Remove the corresponding message context from the RetransTable and execute the application
+ *  callback
+ *
+ *  @note
+ *    This message is part of the CHIP Reliable Messaging protocol.
+ *
+ *  @param[in]    exchHeader         CHIP exchange information for incoming Ack message.
+ *
+ *  @retval  #CHIP_ERROR_INVALID_ACK_ID                 if the msgId of received Ack is not in the RetransTable.
+ *  @retval  #CHIP_NO_ERROR                             if the context was removed.
+ *
+ */
 CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -318,7 +338,7 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     }
     else
     {
-        mDelegate.OnAckRcvd();
+        mDelegate->OnAckRcvd();
 #if defined(DEBUG)
         ChipLogProgress(ExchangeManager, "Removed CHIP MsgId:%08" PRIX32 " from RetransTable", AckMsgId);
 #endif
@@ -411,7 +431,7 @@ CHIP_ERROR ReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
     }
 
     // Call OnThrottleRcvd application callback
-    mDelegate.OnThrottleRcvd(PauseTimeMillis);
+    mDelegate->OnThrottleRcvd(PauseTimeMillis);
 
     // Schedule next physical wakeup
     ReliableMessageManager::GetManager().StartTimer();
