@@ -30,8 +30,8 @@
 #include <messaging/ReliableMessageContext.h>
 #include <support/BitFlags.h>
 #include <support/CHIPFaultInjection.h>
-#include <support/CHIPLogging.h>
 #include <support/CodeUtils.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace messaging {
@@ -175,7 +175,7 @@ void ReliableMessageManager::ExecuteActions()
                 if (err == CHIP_NO_ERROR)
                 {
                     // If the retransmission was successful, update the passive timer
-                    RetransTable[i].nextRetransTimeTick = rc->GetCurrentRetransmitTimeoutTick();
+                    RetransTable[i].nextRetransTimeTick = static_cast<uint16_t>(rc->GetCurrentRetransmitTimeoutTick());
 #if defined(DEBUG)
                     ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", RetransTable[i].msgId,
                                     RetransTable[i].sendCount);
@@ -602,11 +602,8 @@ void ReliableMessageManager::StartTimer()
         {
             // If the tick boundary has expired in the past (delayed processing of event due to other system activity),
             // expire the timer immediately
-            int64_t timerArmValue = timerExpiryEpoch - System::Timer::GetCurrentEpoch();
-            if (timerArmValue < 0)
-            {
-                timerArmValue = 0;
-            }
+            uint64_t now = System::Timer::GetCurrentEpoch();
+            uint64_t timerArmValue = (timerExpiryEpoch > now) ? timerExpiryEpoch - now : 0;
 
 #if defined(RMP_TICKLESS_DEBUG)
             ChipLogProgress(ExchangeManager, "ReliableMessageManager::StartTimer set timer for %" PRIu64, timerArmValue);

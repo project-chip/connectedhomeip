@@ -53,8 +53,8 @@ void test_os_sleep_ms(uint64_t millisecs)
     uint64_t s = millisecs / 1000;
 
     millisecs -= s * 1000;
-    sleep_time.tv_sec  = s;
-    sleep_time.tv_nsec = millisecs * 1000000;
+    sleep_time.tv_sec  = static_cast<time_t>(s);
+    sleep_time.tv_nsec = static_cast<long>(millisecs * 1000000);
 
     nanosleep(&sleep_time, nullptr);
 }
