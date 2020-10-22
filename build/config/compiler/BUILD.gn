@@ -96,9 +96,7 @@ config("abi_default") {
   ldflags = cflags
 
   if (current_os == "android") {
-    ldflags += [
-      "-static-libstdc++",
-    ]
+    ldflags += [ "-static-libstdc++" ]
   }
 }
 
