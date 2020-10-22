@@ -202,7 +202,6 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags
 
             // Generate a SHA hash of the encoded TBS certificate.
             chip::Crypto::Hash_SHA256(mDecodeBuf, writer.GetLengthWritten(), cert->TBSHash);
-
             cert->CertFlags |= kCertFlag_TBSHashPresent;
         }
 
