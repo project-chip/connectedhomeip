@@ -35,8 +35,9 @@ namespace chip {
 /// Convenience type to make it clear a number represents a node id.
 typedef uint64_t NodeId;
 
-constexpr NodeId kUndefinedNodeId = 0xFFFFFFFFFFFFFFFFll;
-constexpr size_t kMaxTagLen       = 16;
+static constexpr NodeId kUndefinedNodeId = 0ULL;
+static constexpr NodeId kAnyNodeId       = 0xFFFFFFFFFFFFFFFFULL;
+static constexpr size_t kMaxTagLen       = 16;
 
 typedef int PacketHeaderFlags;
 
