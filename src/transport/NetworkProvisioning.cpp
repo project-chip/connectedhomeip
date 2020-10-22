@@ -242,11 +242,11 @@ CHIP_ERROR NetworkProvisioning::DecodeThreadAssociationRequest(System::PacketBuf
     data += sizeof(networkInfo.ThreadMeshPrefix);
     dataLen -= sizeof(networkInfo.ThreadMeshPrefix);
 
-    VerifyOrExit(dataLen >= sizeof(networkInfo.ThreadNetworkKey),
+    VerifyOrExit(dataLen >= sizeof(networkInfo.ThreadMasterKey),
                  ChipLogProgress(NetworkProvisioning, "Invalid network provision message"));
-    memcpy(networkInfo.ThreadNetworkKey, data, sizeof(networkInfo.ThreadNetworkKey));
-    data += sizeof(networkInfo.ThreadNetworkKey);
-    dataLen -= sizeof(networkInfo.ThreadNetworkKey);
+    memcpy(networkInfo.ThreadMasterKey, data, sizeof(networkInfo.ThreadMasterKey));
+    data += sizeof(networkInfo.ThreadMasterKey);
+    dataLen -= sizeof(networkInfo.ThreadMasterKey);
 
     VerifyOrExit(dataLen >= sizeof(networkInfo.ThreadPSKc),
                  ChipLogProgress(NetworkProvisioning, "Invalid network provision message"));
