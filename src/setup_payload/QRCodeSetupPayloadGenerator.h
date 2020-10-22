@@ -80,11 +80,11 @@ public:
      *               that an error occurred preventing the function from
      *               producing the requested string.
      */
-    CHIP_ERROR payloadBase41Representation(std::string & base41Representation, uint8_t * tlvDataStart, size_t tlvDataStartSize);
+    CHIP_ERROR payloadBase41Representation(std::string & base41Representation, uint8_t * tlvDataStart, uint32_t tlvDataStartSize);
 
 private:
     CHIP_ERROR generateTLVFromOptionalData(SetupPayload & outPayload, uint8_t * tlvDataStart, uint32_t maxLen,
-                                           uint32_t & tlvDataLengthInBytes);
+                                           size_t & tlvDataLengthInBytes);
 };
 
 } // namespace chip
