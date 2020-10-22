@@ -24,8 +24,8 @@
 #include "TestMessagingLayer.h"
 
 #include <core/CHIPCore.h>
-#include <messaging/ReliableMessageManager.h>
 #include <messaging/ReliableMessageContext.h>
+#include <messaging/ReliableMessageManager.h>
 #include <protocols/CHIPProtocols.h>
 #include <support/CodeUtils.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -76,7 +76,7 @@ public:
 void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto& m = ReliableMessageManager::GetManager();
+    auto & m          = ReliableMessageManager::GetManager();
     m.Init(ctx.GetSystemLayer());
     ReliableMessageContext rc;
     ReliableMessageManager::RetransTableEntry * entry;
@@ -90,7 +90,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto& m = ReliableMessageManager::GetManager();
+    auto & m          = ReliableMessageManager::GetManager();
     m.Init(ctx.GetSystemLayer());
     ReliableMessageContext rc;
     ReliableMessageDelegateObject delegate;
@@ -109,7 +109,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 void CheckRetransExpire(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto& m = ReliableMessageManager::GetManager();
+    auto & m          = ReliableMessageManager::GetManager();
     m.TestSetIntervalShift(4); // 16ms per tick
     m.Init(ctx.GetSystemLayer());
     ReliableMessageContext rc;
@@ -149,7 +149,7 @@ void CheckRetransExpire(nlTestSuite * inSuite, void * inContext)
 void CheckDelayDelivery(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto& m = ReliableMessageManager::GetManager();
+    auto & m          = ReliableMessageManager::GetManager();
     m.TestSetIntervalShift(4); // 16ms per tick
     m.Init(ctx.GetSystemLayer());
     ReliableMessageContext rc;
@@ -241,13 +241,23 @@ namespace chip {
 namespace messaging {
 
 // Stub implementation
-ReliableMessageManager & ReliableMessageManager::GetManager() { return manager; }
-CHIP_ERROR ReliableMessageManager::SendMessage(ReliableMessageContext *context, System::PacketBuffer * msgBuf, uint16_t sendFlags) { return CHIP_NO_ERROR; }
-CHIP_ERROR ReliableMessageManager::SendMessage(ReliableMessageContext *context, uint32_t profileId, uint8_t msgType, System::PacketBuffer * msgBuf, BitFlags<uint16_t, SendMessageFlags> sendFlags) { return CHIP_NO_ERROR; }
-void ReliableMessageManager::FreeContext(ReliableMessageContext*) {}
+ReliableMessageManager & ReliableMessageManager::GetManager()
+{
+    return manager;
+}
+CHIP_ERROR ReliableMessageManager::SendMessage(ReliableMessageContext * context, System::PacketBuffer * msgBuf, uint16_t sendFlags)
+{
+    return CHIP_NO_ERROR;
+}
+CHIP_ERROR ReliableMessageManager::SendMessage(ReliableMessageContext * context, uint32_t profileId, uint8_t msgType,
+                                               System::PacketBuffer * msgBuf, BitFlags<uint16_t, SendMessageFlags> sendFlags)
+{
+    return CHIP_NO_ERROR;
+}
+void ReliableMessageManager::FreeContext(ReliableMessageContext *) {}
 
-}
-}
+} // namespace messaging
+} // namespace chip
 
 /**
  *  Main
