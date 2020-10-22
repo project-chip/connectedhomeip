@@ -36,6 +36,7 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
     ConfigureChipLogging();
 
+    CHIP_ERROR err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err));

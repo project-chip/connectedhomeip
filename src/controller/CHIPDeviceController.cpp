@@ -118,9 +118,6 @@ CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId)
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    err = Platform::MemoryInit();
-    SuccessOrExit(err);
-
     err = Init(localNodeId, &DeviceLayer::SystemLayer, &DeviceLayer::InetLayer);
 #endif // CONFIG_DEVICE_LAYER
 
