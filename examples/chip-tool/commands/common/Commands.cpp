@@ -24,8 +24,6 @@
 #include <algorithm>
 #include <string>
 
-#include <support/CHIPMem.h>
-
 void Commands::Register(const char * clusterName, commands_list commandsList)
 {
     for (auto & command : commandsList)

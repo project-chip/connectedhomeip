@@ -24,6 +24,7 @@
 #pragma once
 
 #include <core/CHIPError.h>
+#include <core/ReferenceCounted.h>
 #include <inet/IPAddress.h>
 #include <inet/UDPEndPoint.h>
 #include <system/SystemPacketBuffer.h>
@@ -38,7 +39,7 @@ namespace Transport {
  * packing by encoding and decoding headers) and generic message transport
  * methods.
  */
-class Base
+class Base : public ReferenceCounted<Base>
 {
 public:
     virtual ~Base() {}

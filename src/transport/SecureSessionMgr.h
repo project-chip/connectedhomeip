@@ -28,6 +28,7 @@
 #include <utility>
 
 #include <core/CHIPCore.h>
+#include <core/ReferenceCounted.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
 #include <support/CodeUtils.h>
@@ -49,7 +50,7 @@ class SecureSessionMgrBase;
  *   is interested in receiving these callbacks, they can specialize this class and handle
  *   each trigger in their implementation of this class.
  */
-class DLL_EXPORT SecureSessionMgrDelegate
+class DLL_EXPORT SecureSessionMgrDelegate : public ReferenceCounted<SecureSessionMgrDelegate>
 {
 public:
     /**
@@ -88,7 +89,7 @@ public:
     virtual ~SecureSessionMgrDelegate() {}
 };
 
-class DLL_EXPORT SecureSessionMgrBase
+class DLL_EXPORT SecureSessionMgrBase : public ReferenceCounted<SecureSessionMgrBase>
 {
 public:
     /**
@@ -111,7 +112,14 @@ public:
      * @details
      *   Release if there was an existing callback object
      */
-    void SetDelegate(SecureSessionMgrDelegate * cb) { mCB = cb; }
+    void SetDelegate(SecureSessionMgrDelegate * cb)
+    {
+        if (mCB != nullptr)
+        {
+            mCB->Release();
+        }
+        mCB = cb->Retain();
+    }
 
     /**
      * @brief

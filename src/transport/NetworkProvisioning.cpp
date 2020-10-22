@@ -32,9 +32,24 @@ namespace chip {
 
 void NetworkProvisioning::Init(NetworkProvisioningDelegate * delegate, DeviceNetworkProvisioningDelegate * deviceDelegate)
 {
+    if (mDelegate != nullptr)
+    {
+        mDelegate->Release();
+    }
+
+    if (delegate != nullptr)
+    {
+        mDelegate = delegate->Retain();
+    }
+
+    if (mDeviceDelegate != nullptr)
+    {
+        mDeviceDelegate->Release();
+    }
+
     if (deviceDelegate != nullptr)
     {
-        mDeviceDelegate = deviceDelegate;
+        mDeviceDelegate = deviceDelegate->Retain();
 #if CONFIG_DEVICE_LAYER
         DeviceLayer::PlatformMgr().AddEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
 #endif
@@ -45,9 +60,16 @@ NetworkProvisioning::~NetworkProvisioning()
 {
     if (mDeviceDelegate != nullptr)
     {
+        mDeviceDelegate->Release();
+
 #if CONFIG_DEVICE_LAYER
         DeviceLayer::PlatformMgr().RemoveEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
 #endif
+    }
+
+    if (mDelegate != nullptr)
+    {
+        mDelegate->Release();
     }
 }
 
