@@ -41,57 +41,51 @@ source_set("chip_version_header") {
   deps = [ ":gen_chip_version" ]
 }
 
-support_headers = [
-  "Base64.h",
-  "BitFlags.h",
-  "BufBound.h",
-  "CHIPCounter.h",
-  "CodeUtils.h",
-  "DLLUtil.h",
-  "ErrorStr.h",
-  "FibonacciUtils.h",
-  "PersistedCounter.h",
-  "RandUtils.h",
-  "SafeInt.h",
-  "TestUtils.h",
-  "TimeUtils.h",
-  "logging/CHIPLogging.h",
-  "verhoeff/Verhoeff.h",
-  "CHIPMem.h",
-  "CHIPMemString.h",
-  "CHIPPlatformMemory.h",
-]
-
 static_library("support") {
   output_name = "libSupportLayer"
 
   sources = [
     "Base64.cpp",
+    "Base64.h",
+    "BitFlags.h",
+    "BufBound.h",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
+    "CHIPCounter.h",
+    "CHIPMem.h",
+    "CHIPMemString.h",
     "CHIPPlatformMemory.cpp",
+    "CHIPPlatformMemory.h",
+    "CodeUtils.h",
+    "DLLUtil.h",
     "ErrorStr.cpp",
+    "ErrorStr.h",
     "FibonacciUtils.cpp",
+    "FibonacciUtils.h",
     "PersistedCounter.cpp",
+    "PersistedCounter.h",
     "RandUtils.cpp",
+    "RandUtils.h",
+    "SafeInt.h",
     "TestUtils.cpp",
+    "TestUtils.h",
     "TimeUtils.cpp",
+    "TimeUtils.h",
     "logging/CHIPLogging.cpp",
+    "logging/CHIPLogging.h",
     "logging/CHIPLoggingLogV.cpp",
     "verhoeff/Verhoeff.cpp",
+    "verhoeff/Verhoeff.h",
     "verhoeff/Verhoeff10.cpp",
     "verhoeff/Verhoeff16.cpp",
     "verhoeff/Verhoeff32.cpp",
     "verhoeff/Verhoeff36.cpp",
   ]
 
-  public = support_headers
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     ":chip_version_header",
-    ":support_headers",
     "${chip_root}/src/lib/core:chip_config_header",
     "${nlassert_root}:nlassert",
   ]
@@ -117,8 +111,10 @@ static_library("support") {
     sources += [ "CHIPMem-Malloc.cpp" ]
   }
   if (chip_with_nlfaultinjection) {
-    sources += [ "CHIPFaultInjection.cpp" ]
-    public += [ "CHIPFaultInjection.h" ]
+    sources += [
+      "CHIPFaultInjection.cpp",
+      "CHIPFaultInjection.h",
+    ]
     public_deps += [ "${nlfaultinjection_root}:nlfaultinjection" ]
   }
 
@@ -126,10 +122,4 @@ static_library("support") {
   if (chip_logging_style == "android") {
     libs += [ "log" ]
   }
-}
-
-copy("support_headers") {
-  sources = support_headers
-
-  outputs = [ "${root_gen_dir}/include/support/{{source_file_part}}" ]
 }
