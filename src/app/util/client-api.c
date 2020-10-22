@@ -307,10 +307,10 @@ EmberStatus emberAfSendCommandUnicastToBindings(void)
 //     return emberAfSendCommandMulticastWithAliasWithCallback(multicastId, alias, sequence, NULL);
 // }
 
-// EmberStatus emberAfSendCommandMulticastToBindings(void)
-// {
-//     return emberAfSendMulticastToBindings(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer);
-// }
+EmberStatus emberAfSendCommandMulticastToBindings(void)
+{
+    return emberAfSendMulticastToBindings(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer);
+}
 
 // EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
 //                                                   EmberAfMessageSentFunction callback)
