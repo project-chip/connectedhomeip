@@ -109,33 +109,35 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
                        CHIP_ERROR_BAD_REQUEST);
 }
 
-void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SecurePairingSession & pairingCommissioner)
+void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SecurePairingSession & pairingCommissioner,
+                                      TestSecurePairingDelegate & delegateCommissioner)
 {
     // Test all combinations of invalid parameters
-    TestSecurePairingDelegate delegateAccessory, deleageCommissioner;
+    TestSecurePairingDelegate delegateAccessory;
     SecurePairingSession pairingAccessory;
 
-    deleageCommissioner.peer = &pairingAccessory;
-    delegateAccessory.peer   = &pairingCommissioner;
+    delegateCommissioner.peer = &pairingAccessory;
+    delegateAccessory.peer    = &pairingCommissioner;
 
     NL_TEST_ASSERT(inSuite,
                    pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0,
                                                    &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
                    pairingCommissioner.Pair(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(2), 0,
-                                            &deleageCommissioner) == CHIP_NO_ERROR);
+                                            &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 1);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
 
-    NL_TEST_ASSERT(inSuite, deleageCommissioner.mNumMessageSend == 2);
-    NL_TEST_ASSERT(inSuite, deleageCommissioner.mNumPairingComplete == 1);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumMessageSend == 2);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 }
 
 void SecurePairingHandshakeTest(nlTestSuite * inSuite, void * inContext)
 {
+    TestSecurePairingDelegate delegateCommissioner;
     SecurePairingSession pairingCommissioner;
-    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner);
+    SecurePairingHandshakeTestCommon(inSuite, inContext, pairingCommissioner, delegateCommissioner);
 }
 
 void SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, SecurePairingSession & pairingCommissioner,
@@ -153,13 +155,16 @@ void SecurePairingDeserialize(nlTestSuite * inSuite, void * inContext, SecurePai
     NL_TEST_ASSERT(inSuite, strncmp(Uint8::to_char(serialized.inner), Uint8::to_char(serialized2.inner), sizeof(serialized)) == 0);
 }
 
-// Defining these globally to avoid stack overflow in some restricted test scenarios (e.g. QEMU)
-static SecurePairingSession gTestPairingSession1, gTestPairingSession2;
-
 void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
 {
-    SecurePairingHandshakeTestCommon(inSuite, inContext, gTestPairingSession1);
-    SecurePairingDeserialize(inSuite, inContext, gTestPairingSession1, gTestPairingSession2);
+    TestSecurePairingDelegate delegateCommissioner;
+
+    // Allocate on the heap to avoid stack overflow in some restricted test scenarios (e.g. QEMU)
+    auto * testPairingSession1 = chip::Platform::New<SecurePairingSession>();
+    auto * testPairingSession2 = chip::Platform::New<SecurePairingSession>();
+
+    SecurePairingHandshakeTestCommon(inSuite, inContext, *testPairingSession1, delegateCommissioner);
+    SecurePairingDeserialize(inSuite, inContext, *testPairingSession1, *testPairingSession2);
 
     const uint8_t plain_text[] = { 0x86, 0x74, 0x64, 0xe5, 0x0b, 0xd4, 0x0d, 0x90, 0xe1, 0x17, 0xa3, 0x2d, 0x4b, 0xd4, 0xe1, 0xe6 };
     uint8_t encrypted[64];
@@ -171,7 +176,7 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
         SecureSession session1;
 
         NL_TEST_ASSERT(inSuite,
-                       gTestPairingSession1.DeriveSecureSession(Uint8::from_const_char("abc"), 3, session1) == CHIP_NO_ERROR);
+                       testPairingSession1->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session1) == CHIP_NO_ERROR);
 
         NL_TEST_ASSERT(inSuite,
                        session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, Header::Flags(), mac) == CHIP_NO_ERROR);
@@ -180,13 +185,16 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
     {
         SecureSession session2;
         NL_TEST_ASSERT(inSuite,
-                       gTestPairingSession2.DeriveSecureSession(Uint8::from_const_char("abc"), 3, session2) == CHIP_NO_ERROR);
+                       testPairingSession2->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session2) == CHIP_NO_ERROR);
 
         uint8_t decrypted[64];
         NL_TEST_ASSERT(inSuite,
                        session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, Header::Flags(), mac) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, memcmp(plain_text, decrypted, sizeof(plain_text)) == 0);
     }
+
+    chip::Platform::Delete(testPairingSession1);
+    chip::Platform::Delete(testPairingSession2);
 }
 
 // Test Suite
@@ -205,14 +213,34 @@ static const nlTest sTests[] =
     NL_TEST_SENTINEL()
 };
 // clang-format on
+//
+/**
+ *  Set up the test suite.
+ */
+int TestSecurePairing_Setup(void * inContext)
+{
+    CHIP_ERROR error = chip::Platform::MemoryInit();
+    if (error != CHIP_NO_ERROR)
+        return FAILURE;
+    return SUCCESS;
+}
+
+/**
+ *  Tear down the test suite.
+ */
+int TestSecurePairing_Teardown(void * inContext)
+{
+    chip::Platform::MemoryShutdown();
+    return SUCCESS;
+}
 
 // clang-format off
 static nlTestSuite sSuite =
 {
     "Test-CHIP-SecurePairing",
     &sTests[0],
-    nullptr,
-    nullptr
+    TestSecurePairing_Setup,
+    TestSecurePairing_Teardown,
 };
 // clang-format on
 
