@@ -25,7 +25,7 @@ chip_test_suite("tests") {
     "TestExchangeMgr.cpp",
     "TestMessagingLayer.h",
     "TestReliableMessageProtocol.cpp",
-    "TestReliableMessageProtocol.h",
+    "TestReliableMessageProtocolDriver.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

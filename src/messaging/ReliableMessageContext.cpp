@@ -409,8 +409,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
 
         // Replace the Pending ack id.
         mPendingPeerAckId = MessageId;
-        mNextAckTimeTick  = mConfig.mAckPiggybackTimeoutTick +
-            static_cast<uint16_t>(
+        mNextAckTimeTick  = static_cast<uint16_t>(mConfig.mAckPiggybackTimeoutTick +
                                ReliableMessageManager::GetManager().GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
         SetAckPending(true);
     }
