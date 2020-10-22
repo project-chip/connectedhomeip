@@ -47,9 +47,7 @@ public:
     BitFlags(const BitFlags &) = default;
     BitFlags & operator=(const BitFlags &) = default;
 
-    explicit BitFlags(FlagsEnum v) {
-        Set(v);
-    }
+    explicit BitFlags(FlagsEnum v) { Set(v); }
 
     BitFlags & Set(FlagsEnum v)
     {

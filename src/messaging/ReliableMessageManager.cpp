@@ -40,7 +40,9 @@ ReliableMessageManager::RetransTableEntry::RetransTableEntry() :
     rc(nullptr), msgBuf(nullptr), msgId(0), msgSendFlags(0), nextRetransTimeTick(0), sendCount(0)
 {}
 
-ReliableMessageManager::ReliableMessageManager() : mTimeStampBase(System::Timer::GetCurrentEpoch()), mCurrentTimerExpiry(0), mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
+ReliableMessageManager::ReliableMessageManager() :
+    mTimeStampBase(System::Timer::GetCurrentEpoch()), mCurrentTimerExpiry(0),
+    mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
 {}
 
 ReliableMessageManager::~ReliableMessageManager() {}
@@ -57,9 +59,10 @@ void ReliableMessageManager::ProcessDelayedDeliveryMessage(ReliableMessageContex
         if (RetransTable[i].rc && RetransTable[i].rc == rc)
         {
             // Paustime is specified in milliseconds; Update retrans values
-            RetransTable[i].nextRetransTimeTick = static_cast<uint16_t>(RetransTable[i].nextRetransTimeTick + (PauseTimeMillis >> mTimerIntervalShift));
-        }     // exchContext
-    }         // for loop in table entry
+            RetransTable[i].nextRetransTimeTick =
+                static_cast<uint16_t>(RetransTable[i].nextRetransTimeTick + (PauseTimeMillis >> mTimerIntervalShift));
+        } // exchContext
+    }     // for loop in table entry
 
     // Schedule next physical wakeup
     StartTimer();
@@ -592,8 +595,8 @@ void ReliableMessageManager::StartTimer()
         System::Timer::Epoch timerExpiryEpoch = (nextWakeTimeTick << mTimerIntervalShift) + mTimeStampBase;
 
 #if defined(RMP_TICKLESS_DEBUG)
-        ChipLogProgress(ExchangeManager,
-                        "ReliableMessageManager::StartTimer wake at %" PRIu64 " ms (%" PRIu64 " %" PRIu64 ")", timerExpiryEpoch, nextWakeTimeTick, mTimeStampBase);
+        ChipLogProgress(ExchangeManager, "ReliableMessageManager::StartTimer wake at %" PRIu64 " ms (%" PRIu64 " %" PRIu64 ")",
+                        timerExpiryEpoch, nextWakeTimeTick, mTimeStampBase);
 #endif
         if (timerExpiryEpoch != mCurrentTimerExpiry)
         {
@@ -644,7 +647,8 @@ int ReliableMessageManager::TestGetCountRetransTable()
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         ReliableMessageContext * rc = RetransTable[i].rc;
-        if (rc) count++;
+        if (rc)
+            count++;
     }
     return count;
 }
