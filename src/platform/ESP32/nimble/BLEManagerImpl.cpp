@@ -404,10 +404,10 @@ void BLEManagerImpl::DriveBLEState(void)
         err = InitESPBleLayer();
         SuccessOrExit(err);
 
-    // Add delay of 500msec while NimBLE host task gets up and running
-    {
-        vTaskDelay(500 / portTICK_RATE_MS);
-    }
+        // Add delay of 500msec while NimBLE host task gets up and running
+        {
+            vTaskDelay(500 / portTICK_RATE_MS);
+        }
     }
 
     // If the application has enabled CHIPoBLE and BLE advertising...
