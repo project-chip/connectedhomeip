@@ -25,6 +25,8 @@
  */
 #pragma once
 
+#include <system/SystemConfig.h>
+
 namespace chip {
 namespace messaging {
 
@@ -41,7 +43,7 @@ namespace messaging {
 #endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
 
 /**
- *  @def CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT
+ *  @def CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT_TICK
  *
  *  @brief
  *    The default retransmission timeout in milliseconds.
@@ -52,7 +54,7 @@ namespace messaging {
 #endif // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT_TICK
 
 /**
- *  @def CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT
+ *  @def CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT_TICK
  *
  *  @brief
  *    The default long retransmission timeout in milliseconds
@@ -64,7 +66,7 @@ namespace messaging {
 #endif // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT_TICK
 
 /**
- *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT
+ *  @def CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
  *
  *  @brief
  *    The default acknowledgment timeout in milliseconds.
