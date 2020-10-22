@@ -28,11 +28,11 @@
 
 #include <core/CHIPCore.h>
 #include <core/CHIPSafeCasts.h>
-#include <transport/SecurePairingSession.h>
-
 #include <stdarg.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/TestUtils.h>
+#include <transport/SecurePairingSession.h>
 
 using namespace chip;
 
