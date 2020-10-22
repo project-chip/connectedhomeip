@@ -119,8 +119,9 @@ container:
 >     source directory in case you have it already installed.
 > -   Likewise, `~/connectedhomeip` can be replaced with an absolute path to
 >     CHIP source directory.
-> -   `-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule 'c 189:* rmw` parameters can be omitted if you're not planning to flash the
->     example onto hardware. The parameters give the container access to USB devices
+> -   `-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule 'c 189:* rmw`
+>     parameters can be omitted if you're not planning to flash the example onto
+>     hardware. The parameters give the container access to USB devices
 >     connected to your computer such as the nRF52840 DK.
 > -   `--rm` flag can be omitted if you don't want the container to be
 >     auto-removed when you exit the container shell session.
