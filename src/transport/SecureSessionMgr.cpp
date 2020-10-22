@@ -90,6 +90,13 @@ exit:
 
 CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf)
 {
+    PayloadHeader payloadHeader;
+
+    return SendMessage(payloadHeader, peerNodeId, msgBuf);
+}
+
+CHIP_ERROR SecureSessionMgrBase::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf)
+{
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = nullptr;
 
@@ -108,7 +115,6 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
     {
         uint8_t * data = nullptr;
         PacketHeader packetHeader;
-        PayloadHeader payloadHeader;
         MessageAuthenticationCode mac;
 
         const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
@@ -297,7 +303,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 
         if (connection->mCB != nullptr)
         {
-            connection->mCB->OnMessageReceived(packetHeader, state, msg, connection);
+            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg, connection);
             msg = nullptr;
         }
     }

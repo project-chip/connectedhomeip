@@ -220,8 +220,7 @@ private:
 
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
-    Timeout mResponseTimeout;    // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    System::PacketBuffer * mMsg; // If we are re-transmitting, then this is the pointer to the message being retransmitted
+    Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeContextDelegate * mDelegate = nullptr;
     ExchangeManager * mExchangeMgr;
     void * mAppState; // Pointer to application-specific state object.
@@ -250,7 +249,6 @@ private:
     void SetExchangeMgr(ExchangeManager * exMgr) { mExchangeMgr = exMgr; }
     void SetAppState(void * state) { mAppState = state; }
 
-    CHIP_ERROR ResendMessage();
     CHIP_ERROR StartResponseTimer();
     void CancelResponseTimer();
     static void HandleResponseTimeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
