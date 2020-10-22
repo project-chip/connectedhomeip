@@ -40,6 +40,8 @@
 namespace chip {
 namespace DeviceController {
 
+constexpr uint16_t kPacketCacheMaxSize = 16;
+
 class ChipDeviceController;
 
 typedef void (*NewConnectionHandler)(ChipDeviceController * deviceController, Transport::PeerConnectionState * state,
@@ -96,7 +98,9 @@ public:
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
 };
 
-class DLL_EXPORT ChipDeviceController : public SecureSessionMgrDelegate, public RendezvousSessionDelegate
+class DLL_EXPORT ChipDeviceController : public SecureSessionMgrDelegate,
+                                        public RendezvousSessionDelegate,
+                                        public PersistentStorageResultDelegate
 {
     friend class ChipDeviceControllerCallback;
 
@@ -190,10 +194,11 @@ public:
      *   Send a message to a connected CHIP device
      *
      * @param[in] appReqState   Application specific context to be passed back when a message is received or on error
-     * @param[in] buffer        The Data Buffer to trasmit to the deviec
+     * @param[in] buffer        The Data Buffer to trasmit to the device
+     * @param[in] peerDevice    Device ID of the peer device
      * @return CHIP_ERROR   The return status
      */
-    CHIP_ERROR SendMessage(void * appReqState, System::PacketBuffer * buffer);
+    CHIP_ERROR SendMessage(void * appReqState, System::PacketBuffer * buffer, NodeId peerDevice = kUndefinedNodeId);
 
     // ----- IO -----
     /**
@@ -221,6 +226,10 @@ public:
     void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
     void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
 
+    //////////// PersistentStorageResultDelegate Implementation ///////////////
+    void OnValue(const char * key, const char * value) override;
+    void OnStatus(const char * key, Operation op, CHIP_ERROR err) override;
+
 private:
     enum
     {
@@ -230,9 +239,10 @@ private:
 
     enum ConnectionState
     {
-        kConnectionState_NotConnected    = 0,
-        kConnectionState_Connected       = 1,
-        kConnectionState_SecureConnected = 2,
+        kConnectionState_NotConnected     = 0,
+        kConnectionState_Connected        = 1,
+        kConnectionState_SecureConnecting = 2,
+        kConnectionState_SecureConnected  = 3,
     };
 
     System::Layer * mSystemLayer;
@@ -269,11 +279,19 @@ private:
 
     PersistentStorageDelegate * mStorageDelegate;
 
+    System::PacketBuffer * mCachedPackets[kPacketCacheMaxSize];
+    uint16_t mNumCachedPackets;
+
     void ClearRequestState();
     void ClearOpState();
 
-    CHIP_ERROR EstablishSecureSession(NodeId peer);
+    CHIP_ERROR EstablishSecureSession();
+    CHIP_ERROR TryEstablishingSecureSession(NodeId peer);
     CHIP_ERROR ResumeSecureSession(NodeId peer);
+
+    CHIP_ERROR CachePacket(System::PacketBuffer * buffer);
+    CHIP_ERROR SendCachedPackets();
+    void DiscardCachedPackets();
 };
 
 } // namespace DeviceController

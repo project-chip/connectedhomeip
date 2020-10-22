@@ -43,11 +43,12 @@ target_sources(app PRIVATE
                ${CHIP_APP_SERVER}/QRCodeUtil.cpp
                ${CHIP_APP_SERVER}/RendezvousServer.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
+               ${CHIP_ROOT}/src/app/util/af-main-common.c
                ${CHIP_ROOT}/src/app/util/attribute-size.c
                ${CHIP_ROOT}/src/app/util/attribute-storage.c
                ${CHIP_ROOT}/src/app/util/attribute-table.c
                ${CHIP_ROOT}/src/app/util/binding-table.cpp
-               ${CHIP_ROOT}/src/app/util/chip-response.cpp
+               ${CHIP_ROOT}/src/app/util/chip-message-send.cpp
                ${CHIP_ROOT}/src/app/util/client-api.c
                ${CHIP_ROOT}/src/app/util/ember-print.cpp
                ${CHIP_ROOT}/src/app/util/message.c

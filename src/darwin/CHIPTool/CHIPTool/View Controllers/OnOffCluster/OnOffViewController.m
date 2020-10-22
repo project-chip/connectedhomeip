@@ -30,6 +30,8 @@
 
 @property (readwrite) CHIPDeviceController * chipController;
 
+@property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
+
 @end
 
 @implementation OnOffViewController
@@ -41,10 +43,13 @@
     [super viewDidLoad];
     [self setupUIElements];
 
+    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
+
     // initialize the device controller
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
+    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
     self.onOff = [[CHIPOnOff alloc] initWithDeviceController:self.chipController];
 }
 

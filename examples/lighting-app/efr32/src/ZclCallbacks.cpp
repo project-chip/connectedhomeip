@@ -56,3 +56,16 @@ extern "C" void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClus
         LightMgr().InitiateAction(AppEvent::kEventType_Light, LightingManager::OFF_ACTION);
     }
 }
+
+/** @brief On/off Cluster Server Post Init
+ *
+ * Following resolution of the On/Off state at startup for this endpoint,
+ * perform any additional initialization needed; e.g., synchronize hardware
+ * state.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+extern "C" void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
+{
+    // TODO: implement any additional On/off Cluster Server post init actions
+}

@@ -82,6 +82,8 @@ static_library("support") {
     "verhoeff/Verhoeff36.cpp",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     ":chip_version_header",
     "${chip_root}/src/lib/core:chip_config_header",

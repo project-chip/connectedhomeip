@@ -33,6 +33,8 @@ static_library("lib") {
     "${chip_root}/src/transport",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   output_name = "libCHIP"
 
   output_dir = "${root_out_dir}/lib"

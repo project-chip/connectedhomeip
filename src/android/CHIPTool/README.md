@@ -48,7 +48,15 @@ rsync -a out/android_arm64/lib/*.jar src/android/CHIPTool/app/libs
 rsync -a out/android_arm64/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
 ```
 
-5. 'Gradle sync' the Android project and run.
+5. Build OT Commissioner
+
+    ```shell
+    sudo apt-get install -y swig # "brew install swig" for macOS.
+
+    git submodule update --init --recursive third_party/ot-commissioner/repo
+    ABI=arm64-v8a API=21 ./third_party/ot-commissioner/build-android-libs.sh
+    ## JAR and .so libraries will be copy to target directories.
+    ```
 
 6. You will also need the "libc++\_shared.so" file in the jniLibs folder. This
    file comes packaged with Android NDK and can be found under
@@ -60,10 +68,4 @@ rsync -a out/android_arm64/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
     tweaking of the Android automake build rules. Include it in the interim to
     be able to build the Android app).
 
-7. Build OT Commissioner
-
-    ```shell
-    git submodule update --init --recursive third_party/ot-commissioner/repo
-    ABI=arm64-v8a API=21 ./third_party/ot-commissioner/build-android-libs.sh
-    ## JAR and .so libraries will be copy to target directories.
-    ```
+7. 'Gradle sync' the Android project and run.

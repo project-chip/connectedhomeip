@@ -48,13 +48,13 @@ int streamer_zephyr_init(streamer_t * streamer)
     return 0;
 }
 
-int streamer_zephyr_read(streamer_t * streamer, char * buffer, size_t length)
+ssize_t streamer_zephyr_read(streamer_t * streamer, char * buffer, size_t length)
 {
     ARG_UNUSED(streamer);
     return 0;
 }
 
-int streamer_zephyr_write(streamer_t * streamer, const char * buffer, size_t length)
+ssize_t streamer_zephyr_write(streamer_t * streamer, const char * buffer, size_t length)
 {
     ARG_UNUSED(streamer);
     for (size_t i = 0; i < length; ++i)
@@ -71,14 +71,14 @@ int streamer_zephyr_init(streamer_t * streamer)
     return console_init();
 }
 
-int streamer_zephyr_read(streamer_t * streamer, char * buffer, size_t length)
+ssize_t streamer_zephyr_read(streamer_t * streamer, char * buffer, size_t length)
 {
     ARG_UNUSED(streamer);
     const ssize_t rc = console_read(nullptr, buffer, length);
     return rc >= 0 ? rc : 0;
 }
 
-int streamer_zephyr_write(streamer_t * streamer, const char * buffer, size_t length)
+ssize_t streamer_zephyr_write(streamer_t * streamer, const char * buffer, size_t length)
 {
     ARG_UNUSED(streamer);
     size_t written = 0;
@@ -88,7 +88,7 @@ int streamer_zephyr_write(streamer_t * streamer, const char * buffer, size_t len
         const ssize_t rc = console_write(nullptr, buffer + written, length - written);
         if (rc <= 0) // error
             break;
-        written += rc;
+        written += static_cast<size_t>(rc);
     }
 
     return written;

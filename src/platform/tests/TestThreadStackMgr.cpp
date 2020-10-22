@@ -59,7 +59,7 @@ int TestThreadStackManager()
     info.FieldPresent.ThreadExtendedPANId = false;
     info.FieldPresent.ThreadMeshPrefix    = false;
     info.FieldPresent.ThreadPSKc          = false;
-    memcpy(&info.ThreadNetworkKey, &masterKey, sizeof(masterKey));
+    memcpy(&info.ThreadMasterKey, &masterKey, sizeof(masterKey));
 
     chip::DeviceLayer::PlatformMgrImpl().InitChipStack();
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);

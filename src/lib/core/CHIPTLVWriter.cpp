@@ -32,6 +32,7 @@
 
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <stdarg.h>
@@ -281,7 +282,7 @@ CHIP_ERROR TLVWriter::Finalize()
     if (IsContainerOpen())
         return CHIP_ERROR_TLV_CONTAINER_OPEN;
     if (FinalizeBuffer != nullptr)
-        err = FinalizeBuffer(*this, mBufHandle, mBufStart, mWritePoint - mBufStart);
+        err = FinalizeBuffer(*this, mBufHandle, mBufStart, static_cast<uint32_t>(mWritePoint - mBufStart));
     return err;
 }
 
@@ -511,7 +512,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, int8_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(TLVElementType::Int8, tag, v);
+        return WriteElementHead(TLVElementType::Int8, tag, static_cast<uint8_t>(v));
     return Put(tag, v);
 }
 
@@ -529,7 +530,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int16_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, int16_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(TLVElementType::Int16, tag, v);
+        return WriteElementHead(TLVElementType::Int16, tag, static_cast<uint16_t>(v));
     return Put(tag, v);
 }
 
@@ -547,7 +548,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int32_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, int32_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(TLVElementType::Int32, tag, v);
+        return WriteElementHead(TLVElementType::Int32, tag, static_cast<uint32_t>(v));
     return Put(tag, v);
 }
 
@@ -565,7 +566,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v)
         elemType = TLVElementType::Int32;
     else
         elemType = TLVElementType::Int64;
-    return WriteElementHead(elemType, tag, v);
+    return WriteElementHead(elemType, tag, static_cast<uint64_t>(v));
 }
 
 /**
@@ -574,7 +575,7 @@ CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v)
 CHIP_ERROR TLVWriter::Put(uint64_t tag, int64_t v, bool preserveSize)
 {
     if (preserveSize)
-        return WriteElementHead(TLVElementType::Int64, tag, v);
+        return WriteElementHead(TLVElementType::Int64, tag, static_cast<uint64_t>(v));
     return Put(tag, v);
 }
 
@@ -689,7 +690,12 @@ CHIP_ERROR TLVWriter::PutBytes(uint64_t tag, const uint8_t * buf, uint32_t len)
  */
 CHIP_ERROR TLVWriter::PutString(uint64_t tag, const char * buf)
 {
-    return PutString(tag, buf, strlen(buf));
+    size_t len = strlen(buf);
+    if (!CanCastTo<uint32_t>(len))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    return PutString(tag, buf, static_cast<uint32_t>(len));
 }
 
 /**
@@ -855,7 +861,11 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
 #endif
     va_copy(aq, ap);
 
-    dataLen = vsnprintf(nullptr, 0, fmt, aq);
+    dataLen = static_cast<size_t>(vsnprintf(nullptr, 0, fmt, aq));
+    if (!CanCastTo<uint32_t>(dataLen))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
 
     va_end(aq);
 
@@ -878,7 +888,8 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
 #endif
 
     // write length.
-    err = WriteElementHead(static_cast<TLVElementType>(kTLVType_UTF8String | lenFieldSize), tag, dataLen);
+    err = WriteElementHead(
+        static_cast<TLVElementType>(static_cast<uint8_t>(kTLVType_UTF8String) | static_cast<uint8_t>(lenFieldSize)), tag, dataLen);
     SuccessOrExit(err);
 
     VerifyOrExit((mLenWritten + dataLen) <= mMaxLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -938,7 +949,7 @@ CHIP_ERROR TLVWriter::VPutStringF(uint64_t tag, const char * fmt, va_list ap)
 
     va_end(aq);
 
-    err = WriteData(reinterpret_cast<uint8_t *>(tmpBuf), dataLen);
+    err = WriteData(reinterpret_cast<uint8_t *>(tmpBuf), static_cast<uint32_t>(dataLen));
     chip::Platform::MemoryFree(tmpBuf);
 
 #endif // CONFIG_HAVE_VSNPRINTF_EX
@@ -1554,7 +1565,8 @@ CHIP_ERROR TLVWriter::CopyContainer(uint64_t tag, TLVReader & container)
     if (err != CHIP_NO_ERROR)
         return err;
 
-    return PutPreEncodedContainer(tag, containerType, containerStart, container.GetReadPoint() - containerStart);
+    return PutPreEncodedContainer(tag, containerType, containerStart,
+                                  static_cast<uint32_t>(container.GetReadPoint() - containerStart));
 }
 
 /**
@@ -1741,17 +1753,23 @@ CHIP_ERROR TLVWriter::WriteElementHead(TLVElementType elemType, uint64_t tag, ui
 
     if ((mRemainingLen >= sizeof(stagingBuf)) && (mMaxLen >= sizeof(stagingBuf)))
     {
-        uint32_t len = p - mWritePoint;
+        uint32_t len = static_cast<uint32_t>(p - mWritePoint);
         mWritePoint  = p;
         mRemainingLen -= len;
         mLenWritten += len;
         return CHIP_NO_ERROR;
     }
-    return WriteData(stagingBuf, p - stagingBuf);
+    return WriteData(stagingBuf, static_cast<uint32_t>(p - stagingBuf));
 }
 
 CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uint8_t * data, uint32_t dataLen)
 {
+    if (static_cast<uint64_t>(type) & kTLVTypeSizeMask)
+    {
+        // We won't be able to recover this type properly!
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+
     TLVFieldSize lenFieldSize;
 
     if (dataLen <= UINT8_MAX)
@@ -1761,7 +1779,8 @@ CHIP_ERROR TLVWriter::WriteElementWithData(TLVType type, uint64_t tag, const uin
     else
         lenFieldSize = kTLVFieldSize_4Byte;
 
-    CHIP_ERROR err = WriteElementHead(static_cast<TLVElementType>(type | lenFieldSize), tag, dataLen);
+    CHIP_ERROR err = WriteElementHead(static_cast<TLVElementType>(static_cast<uint8_t>(type) | static_cast<uint8_t>(lenFieldSize)),
+                                      tag, dataLen);
     if (err != CHIP_NO_ERROR)
         return err;
 
@@ -1782,7 +1801,8 @@ CHIP_ERROR TLVWriter::WriteData(const uint8_t * p, uint32_t len)
 
             if (FinalizeBuffer != nullptr)
             {
-                err = FinalizeBuffer(*this, mBufHandle, mBufStart, mWritePoint - mBufStart);
+                VerifyOrExit(CanCastTo<uint32_t>(mWritePoint - mBufStart), err = CHIP_ERROR_INCORRECT_STATE);
+                err = FinalizeBuffer(*this, mBufHandle, mBufStart, static_cast<uint32_t>(mWritePoint - mBufStart));
                 SuccessOrExit(err);
             }
 
@@ -1866,7 +1886,12 @@ CHIP_ERROR TLVWriter::FinalizePacketBuffer(TLVWriter & writer, uintptr_t bufHand
     PacketBuffer * buf = reinterpret_cast<PacketBuffer *>(bufHandle);
     uint8_t * endPtr   = bufStart + dataLen;
 
-    buf->SetDataLength(endPtr - buf->Start());
+    intptr_t length = endPtr - buf->Start();
+    if (!CanCastTo<uint16_t>(length))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    buf->SetDataLength(static_cast<uint16_t>(length));
 
     return CHIP_NO_ERROR;
 }

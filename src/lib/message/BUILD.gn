@@ -45,6 +45,12 @@ static_library("message") {
     "ExchangeContext.cpp",
   ]
 
+  # Not including -Wconversion here for now, because it requires things like
+  # https://github.com/project-chip/connectedhomeip/issues/3115 and
+  # https://github.com/project-chip/connectedhomeip/issues/3117 to get sorted
+  # out first.
+  #cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/ble",
     "${chip_root}/src/ble:ble_config_header",

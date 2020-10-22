@@ -33,6 +33,12 @@
 namespace chip {
 namespace Platform {
 
+#define CHIP_ZERO_AT(value)                                                                                                        \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        memset(&value, 0, sizeof(value));                                                                                          \
+    } while (0)
+
 /**
  * This function is called by CHIP layer to initialize memory and resources
  * required for proper functionality of the CHIP memory allocator.

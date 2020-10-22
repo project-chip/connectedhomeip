@@ -24,6 +24,39 @@
 namespace chip {
 namespace DeviceController {
 
+class DLL_EXPORT PersistentStorageResultDelegate
+{
+public:
+    enum class Operation : uint8_t
+    {
+        kGET = 0,
+        kSET,
+        kDELETE,
+    };
+
+    virtual ~PersistentStorageResultDelegate() {}
+
+    /**
+     * @brief
+     *   Called when a value is returned from the storage.
+     *   This is useful for GetKeyValue() API call.
+     *
+     * @param[in] key Key for which the value is being returned
+     * @param[in] value Value or nullptr if not found.
+     */
+    virtual void OnValue(const char * key, const char * value) = 0;
+
+    /**
+     * @brief
+     *   Called on completion of an operation in PersistentStorageDelegate API
+     *
+     * @param[in] key Key for which the status is being returned
+     * @param[in] op Operation that was being performed on the key
+     * @param[in] result CHIP_NO_ERROR or corresponding error code
+     */
+    virtual void OnStatus(const char * key, Operation op, CHIP_ERROR result) = 0;
+};
+
 class DLL_EXPORT PersistentStorageDelegate
 {
 public:
@@ -31,14 +64,20 @@ public:
 
     /**
      * @brief
-     *   Lookup the key and return it's stringified value
+     *   Set the callback object with methods that are called on completion
+     *   of the operation.
+     *
+     * @param[in] delegate The callback object
+     */
+    virtual void SetDelegate(PersistentStorageResultDelegate * delegate) = 0;
+
+    /**
+     * @brief
+     *   Lookup the key and call delegate object with it's stringified value
      *
      * @param[in] key Key to lookup
-     * @return Value or nullptr if not found. Lifetime of the returned
-     *         buffer is tied to the delegate object. If the delegate is
-     *         freed, the returned value would be inaccessible.
      */
-    virtual const char * GetKeyValue(const char * key) = 0;
+    virtual void GetKeyValue(const char * key) = 0;
 
     /**
      * @brief
@@ -46,18 +85,16 @@ public:
      *
      * @param[in] key Key to be set
      * @param[in] value Value to be set
-     * @return returns corresponding error if unsuccessful
      */
-    virtual CHIP_ERROR SetKeyValue(const char * key, const char * value) = 0;
+    virtual void SetKeyValue(const char * key, const char * value) = 0;
 
     /**
      * @brief
      *   Deletes the value for the key
      *
      * @param[in] key Key to be deleted
-     * @return returns corresponding error if unsuccessful
      */
-    virtual CHIP_ERROR DeleteKeyValue(const char * key) = 0;
+    virtual void DeleteKeyValue(const char * key) = 0;
 };
 
 } // namespace DeviceController
