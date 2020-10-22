@@ -78,6 +78,8 @@ public:
     void _OnWiFiStationProvisionChange();
     static const char * _WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode);
     static const char * _WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode);
+    static const char * _WiFiStationStateToStr(ConnectivityManager::WiFiStationState state);
+    static const char * _WiFiAPStateToStr(ConnectivityManager::WiFiAPState state);
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
@@ -216,6 +218,19 @@ GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiStationModeToStr(Connecti
 
 template <class ImplClass>
 inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode)
+{
+    return NULL;
+}
+
+template <class ImplClass>
+inline const char *
+GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiStationStateToStr(ConnectivityManager::WiFiStationState state)
+{
+    return NULL;
+}
+
+template <class ImplClass>
+inline const char * GenericConnectivityManagerImpl_NoWiFi<ImplClass>::_WiFiAPStateToStr(ConnectivityManager::WiFiAPState state)
 {
     return NULL;
 }
