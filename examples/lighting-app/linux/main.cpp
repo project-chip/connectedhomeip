@@ -19,6 +19,8 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
+#include <platform/Linux/BLEManagerImpl.h>
+
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include "gen/znet-bookkeeping.h"
@@ -79,6 +81,13 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
 int main()
 {
     chip::DeviceLayer::PlatformMgr().InitChipStack();
+
+    chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName("CHIP0001");
+
+    chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(1, false);
+
+    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(
+        chip::DeviceLayer::ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
 
     LightingMgr().Init();
 
