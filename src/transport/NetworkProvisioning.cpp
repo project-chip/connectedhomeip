@@ -219,7 +219,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     err    = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
                                        NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer);
     buffer = nullptr;
-    SuccessOrExit(err); 
+    SuccessOrExit(err);
 
 exit:
     if (buffer)
