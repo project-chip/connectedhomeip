@@ -33,7 +33,7 @@ shared_library("jni") {
 android_library("java") {
   output_name = "SetupPayloadParser.jar"
 
-  data_deps = [ 
+  data_deps = [
     ":jni",
     "//build/chip/java:shared_cpplib",
   ]
