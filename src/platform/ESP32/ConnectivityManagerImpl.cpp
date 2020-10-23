@@ -19,10 +19,11 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <platform/ConnectivityManager.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <platform/internal/GenericConnectivityManagerImpl_BLE.cpp>
 #endif
-#include <platform/ConnectivityManager.h>
+#include <platform/internal/GenericConnectivityManagerImpl_WiFi.cpp>
 
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/internal/BLEManager.h>
@@ -1020,82 +1021,6 @@ void ConnectivityManagerImpl::OnIPv6AddressAvailable(const ip_event_got_ip6_t & 
     RefreshMessageLayer();
 
     UpdateInternetConnectivityState();
-}
-
-const char * ConnectivityManagerImpl::_WiFiStationModeToStr(WiFiStationMode mode)
-{
-    switch (mode)
-    {
-    case kWiFiStationMode_NotSupported:
-        return "NotSupported";
-    case kWiFiStationMode_ApplicationControlled:
-        return "AppControlled";
-    case kWiFiStationMode_Enabled:
-        return "Enabled";
-    case kWiFiStationMode_Disabled:
-        return "Disabled";
-    default:
-        return "(unknown)";
-    }
-}
-
-const char * ConnectivityManagerImpl::_WiFiAPModeToStr(WiFiAPMode mode)
-{
-    switch (mode)
-    {
-    case kWiFiAPMode_NotSupported:
-        return "NotSupported";
-    case kWiFiAPMode_ApplicationControlled:
-        return "AppControlled";
-    case kWiFiAPMode_Disabled:
-        return "Disabled";
-    case kWiFiAPMode_Enabled:
-        return "Enabled";
-    case kWiFiAPMode_OnDemand:
-        return "OnDemand";
-    case kWiFiAPMode_OnDemand_NoStationProvision:
-        return "OnDemand_NoStationProvision";
-    default:
-        return "(unknown)";
-    }
-}
-
-const char * ConnectivityManagerImpl::WiFiStationStateToStr(WiFiStationState state)
-{
-    switch (state)
-    {
-    case kWiFiStationState_NotConnected:
-        return "NotConnected";
-    case kWiFiStationState_Connecting:
-        return "Connecting";
-    case kWiFiStationState_Connecting_Succeeded:
-        return "Connecting_Succeeded";
-    case kWiFiStationState_Connecting_Failed:
-        return "Connecting_Failed";
-    case kWiFiStationState_Connected:
-        return "Connected";
-    case kWiFiStationState_Disconnecting:
-        return "Disconnecting";
-    default:
-        return "(unknown)";
-    }
-}
-
-const char * ConnectivityManagerImpl::WiFiAPStateToStr(WiFiAPState state)
-{
-    switch (state)
-    {
-    case kWiFiAPState_NotActive:
-        return "NotActive";
-    case kWiFiAPState_Activating:
-        return "Activating";
-    case kWiFiAPState_Active:
-        return "Active";
-    case kWiFiAPState_Deactivating:
-        return "Deactivating";
-    default:
-        return "(unknown)";
-    }
 }
 
 void ConnectivityManagerImpl::RefreshMessageLayer(void) {}

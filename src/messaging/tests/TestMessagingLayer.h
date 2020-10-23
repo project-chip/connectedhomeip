@@ -15,15 +15,21 @@
  *    limitations under the License.
  */
 
-#include <support/logging/CHIPLogging.h>
+/**
+ *    @file
+ *      This file declares test entry points for CHIP Messaging layer
+ *      layer library unit tests.
+ *
+ */
 
-#include "DeviceNetworkProvisioningDelegate.h"
-#include "ServiceProvisioning.h"
+#pragma once
 
-using namespace ::chip;
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-void ESP32NetworkProvisioningDelegate::ProvisionNetwork(const char * ssid, const char * key)
-{
-    ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
-    SetWiFiStationProvisioning(ssid, key);
+int TestExchangeMgr(void);
+
+#ifdef __cplusplus
 }
+#endif

@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import <CHIP/CHIP.h>
 #import <Foundation/Foundation.h>
 
 extern NSString * const kCHIPToolDefaultsDomain;
@@ -24,3 +25,7 @@ extern NSString * const kNetworkPasswordDefaultsKey;
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key);
 void CHIPSetDomainValueForKey(NSString * domain, NSString * key, id value);
 void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key);
+
+@interface CHIPToolPersistentStorageDelegate : NSObject <CHIPPersistentStorageDelegate>
+
+@end

@@ -59,12 +59,14 @@ public:
      *   msgBuf after processing it.
      *
      * @param packetHeader  The message header
+     * @param payloadHeader The payload header
      * @param state         The connection state
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
-    virtual void OnMessageReceived(const PacketHeader & packetHeader, Transport::PeerConnectionState * state,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
+    virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                   Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                   SecureSessionMgrBase * mgr)
     {}
 
     /**
@@ -101,7 +103,7 @@ public:
      *   behalf of the caller regardless of the return status.
      */
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
-
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf);
     SecureSessionMgrBase();
     virtual ~SecureSessionMgrBase();
 
@@ -131,6 +133,12 @@ public:
      *   peer node.
      */
     CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, SecurePairingSession * pairing);
+
+    /**
+     * @brief
+     *   Return the System Layer pointer used by current SecureSessionMgr.
+     */
+    System::Layer * SystemLayer() { return mSystemLayer; }
 
 protected:
     /**

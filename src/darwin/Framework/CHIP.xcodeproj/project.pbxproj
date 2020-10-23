@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C4DF09D248B2C60009307CB /* libmbedtls.a */; settings = {ATTRIBUTES = (Required, ); }; };
+		2C8C8FC0253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C8C8FBD253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h */; };
+		2C8C8FC1253E0C2100797F05 /* CHIPPersistentStorageDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C8C8FBE253E0C2100797F05 /* CHIPPersistentStorageDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2C8C8FC2253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C8C8FBF253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.mm */; };
 		2CB7163B252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CB71638252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h */; };
 		2CB7163C252E8A7C0026E2BB /* CHIPDevicePairingDelegateBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2CB71639252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.mm */; };
 		2CB7163F252F731E0026E2BB /* CHIPDevicePairingDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2CB7163E252F731E0026E2BB /* CHIPDevicePairingDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -42,6 +45,9 @@
 
 /* Begin PBXFileReference section */
 		2C4DF09D248B2C60009307CB /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = lib/libmbedtls.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		2C8C8FBD253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPPersistentStorageDelegateBridge.h; sourceTree = "<group>"; };
+		2C8C8FBE253E0C2100797F05 /* CHIPPersistentStorageDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPPersistentStorageDelegate.h; sourceTree = "<group>"; };
+		2C8C8FBF253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPPersistentStorageDelegateBridge.mm; sourceTree = "<group>"; };
 		2CB71638252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevicePairingDelegateBridge.h; sourceTree = "<group>"; };
 		2CB71639252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDevicePairingDelegateBridge.mm; sourceTree = "<group>"; };
 		2CB7163E252F731E0026E2BB /* CHIPDevicePairingDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevicePairingDelegate.h; sourceTree = "<group>"; };
@@ -112,6 +118,9 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				2C8C8FBE253E0C2100797F05 /* CHIPPersistentStorageDelegate.h */,
+				2C8C8FBD253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h */,
+				2C8C8FBF253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.mm */,
 				2CB7163E252F731E0026E2BB /* CHIPDevicePairingDelegate.h */,
 				2CB71638252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.h */,
 				2CB71639252E8A7B0026E2BB /* CHIPDevicePairingDelegateBridge.mm */,
@@ -165,7 +174,9 @@
 				B2E0D7B2245B0B5C003C5B48 /* CHIPManualSetupPayloadParser.h in Headers */,
 				B2E0D7B1245B0B5C003C5B48 /* CHIP.h in Headers */,
 				B2E0D7B8245B0B5C003C5B48 /* CHIPSetupPayload.h in Headers */,
+				2C8C8FC1253E0C2100797F05 /* CHIPPersistentStorageDelegate.h in Headers */,
 				B2E0D7B5245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h in Headers */,
+				2C8C8FC0253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h in Headers */,
 				515C401D2486BF43004C4DB3 /* CHIPOnOff.h in Headers */,
 				991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */,
 				B2E0D7B4245B0B5C003C5B48 /* CHIPError.h in Headers */,
@@ -292,6 +303,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2C8C8FC2253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.mm in Sources */,
 				2CB7163C252E8A7C0026E2BB /* CHIPDevicePairingDelegateBridge.mm in Sources */,
 				515C401C2486BF43004C4DB3 /* CHIPOnOff.mm in Sources */,
 				991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */,

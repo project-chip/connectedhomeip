@@ -37,10 +37,8 @@
 #pragma once
 
 /* Platform include headers */
-#if CHIP_SEPARATE_CONFIG_H
+#if CHIP_HAVE_CONFIG_H
 #include <system/SystemBuildConfig.h>
-#elif defined(HAVE_CONFIG_H)
-#include <BuildConfig.h>
 #endif
 
 /* Include a CHIP project-specific configuration file, if defined.

@@ -37,7 +37,7 @@
 #ifndef LWIP_HDR_ARCH_H
 #define LWIP_HDR_ARCH_H
 
-#if CHIP_SEPARATE_CONFIG_H
+#if CHIP_HAVE_CONFIG_H
 #include <lwip/lwip_buildconfig.h>
 #endif
 

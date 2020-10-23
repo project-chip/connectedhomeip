@@ -15,15 +15,21 @@
  *    limitations under the License.
  */
 
-#include <support/logging/CHIPLogging.h>
+/**
+ *    @file
+ *      This file implements a standalone/native program executable
+ *      test driver for the CHIP core library CHIP ExchangeManager tests.
+ *
+ */
 
-#include "DeviceNetworkProvisioningDelegate.h"
-#include "ServiceProvisioning.h"
+#include "TestMessagingLayer.h"
 
-using namespace ::chip;
+#include <nlunit-test.h>
 
-void ESP32NetworkProvisioningDelegate::ProvisionNetwork(const char * ssid, const char * key)
+int main()
 {
-    ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
-    SetWiFiStationProvisioning(ssid, key);
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return (TestExchangeMgr());
 }
