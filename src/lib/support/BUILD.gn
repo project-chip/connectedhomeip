@@ -52,6 +52,7 @@ static_library("support") {
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
     "CHIPCounter.h",
+    "CHIPMem.cpp",
     "CHIPMem.h",
     "CHIPMemString.h",
     "CHIPPlatformMemory.cpp",

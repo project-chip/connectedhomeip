@@ -59,7 +59,7 @@ static void VerifyInitialized(const char * func)
 
 #endif
 
-CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
+CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 {
 #ifndef NDEBUG
     if (memoryInitialized++ > 0)
@@ -71,7 +71,7 @@ CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-void MemoryShutdown()
+void MemoryAllocatorShutdown()
 {
 #ifndef NDEBUG
     if (--memoryInitialized < 0)
