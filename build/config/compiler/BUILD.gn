@@ -92,7 +92,6 @@ config("abi_default") {
       ]
     }
   }
-
   ldflags = cflags
 }
 
