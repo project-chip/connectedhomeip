@@ -69,7 +69,7 @@ const EmberAfClusterName zclClusterNames[] = {
     { ZCL_NULL_CLUSTER_ID, EMBER_AF_NULL_MANUFACTURER_CODE, NULL }, // terminator
 };
 
-static const EmberAfClusterCommand staticCmd;
+static const EmberAfClusterCommand staticCmd = {};
 EmberAfClusterCommand curCmd;
 // A pointer to the current command being processed
 // This struct is allocated on the stack inside
@@ -112,12 +112,14 @@ uint8_t emAfExtendedPanId[EXTENDED_PAN_ID_SIZE] = {
     0, 0, 0, 0, 0, 0, 0, 0,
 };
 
+extern "C" {
 #ifdef EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_DECLARATIONS
 #endif
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 #endif
+} // extern "C"
 
 //------------------------------------------------------------------------------
 

@@ -1963,10 +1963,6 @@ typedef struct
 #define emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint) (void) 0
 #define emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint) (void) 0
 
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
-
 /**
  * @brief Macro that copies the token value from non-volatile storage into a RAM
  * location.  This macro can only be used with tokens that are defined using
@@ -2001,5 +1997,9 @@ typedef struct
 #define halCommonSetIndexedToken(token, index, data)
 
 uint32_t halCommonGetInt32uMillisecondTick(void);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
 
 #endif // TYPES_STUB_H

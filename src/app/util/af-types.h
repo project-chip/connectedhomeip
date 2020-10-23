@@ -1500,7 +1500,7 @@ typedef struct
     EmberAfMessageSentFunction callback;
     EmberApsFrame * apsFrame;
     uint8_t * message;
-    uint16_t indexOrDestination;
+    uint64_t indexOrDestination;
     uint16_t messageLength;
     EmberOutgoingMessageType type;
     bool broadcast;
