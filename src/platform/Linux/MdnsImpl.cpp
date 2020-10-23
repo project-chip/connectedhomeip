@@ -45,7 +45,7 @@ CHIP_ERROR MakeAvahiStringListFromTextEntries(TextEntry * entries, size_t size, 
     for (size_t i = 0; i < size; i++)
     {
         uint8_t buf[kMdnsTypeMaxSize];
-        int offset = snprintf(reinterpret_cast<char *>(buf), sizeof(buf), "%s=", entries[i].mKey);
+        size_t offset = static_cast<size_t>(snprintf(reinterpret_cast<char *>(buf), sizeof(buf), "%s=", entries[i].mKey));
 
         if (offset + entries[i].mDataSize > sizeof(buf))
         {
@@ -238,8 +238,8 @@ void Poller::UpdateFdSet(fd_set & readFdSet, fd_set & writeFdSet, fd_set & error
         }
     }
 
-    timeout.tv_sec  = timeoutVal.count() / kUsPerSec;
-    timeout.tv_usec = timeoutVal.count() % kUsPerSec;
+    timeout.tv_sec  = static_cast<uint64_t>(timeoutVal.count()) / kUsPerSec;
+    timeout.tv_usec = static_cast<uint64_t>(timeoutVal.count()) % kUsPerSec;
 }
 
 void Poller::Process(const fd_set & readFdSet, const fd_set & writeFdSet, const fd_set & errorFdSet)
@@ -382,7 +382,8 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
     std::string type       = GetFullType(service.mType, service.mProtocol);
     CHIP_ERROR error       = CHIP_NO_ERROR;
     AvahiStringList * text = nullptr;
-    AvahiIfIndex interface = service.interface == INET_NULL_INTERFACEID ? AVAHI_IF_UNSPEC : service.interface;
+    AvahiIfIndex interface =
+        service.interface == INET_NULL_INTERFACEID ? AVAHI_IF_UNSPEC : static_cast<AvahiIfIndex>(service.interface);
 
     keyBuilder << service.mName << "." << type << service.mPort << "." << interface;
     key = keyBuilder.str();
@@ -434,15 +435,16 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
 {
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = static_cast<BrowseContext *>(chip::Platform::MemoryAlloc(sizeof(BrowseContext)));
+    AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface);
 
     browseContext->mInstance = this;
     browseContext->mContext  = context;
     browseContext->mCallback = callback;
     if (interface == INET_NULL_INTERFACEID)
     {
-        interface = AVAHI_IF_UNSPEC;
+        avahiInterface = AVAHI_IF_UNSPEC;
     }
-    browser = avahi_service_browser_new(mClient, interface, AVAHI_PROTO_UNSPEC, GetFullType(type, protocol).c_str(), nullptr,
+    browser = avahi_service_browser_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, GetFullType(type, protocol).c_str(), nullptr,
                                         static_cast<AvahiLookupFlags>(0), HandleBrowse, browseContext);
     // Otherwise the browser will be freed in the callback
     if (browser == nullptr)
@@ -499,8 +501,8 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             service.mType[kMdnsTypeMaxSize] = 0;
             service.mProtocol               = TruncateProtocolInType(service.mType);
             context->mServices.push_back(service);
-            break;
         }
+        break;
     case AVAHI_BROWSER_ALL_FOR_NOW:
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
         context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), CHIP_NO_ERROR);
@@ -526,6 +528,7 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
                               MdnsResolveCallback callback, void * context)
 {
     AvahiServiceResolver * resolver;
+    AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface);
     ResolveContext * resolveContext = static_cast<ResolveContext *>(chip::Platform::MemoryAlloc(sizeof(ResolveContext)));
     CHIP_ERROR error                = CHIP_NO_ERROR;
 
@@ -534,10 +537,10 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
     resolveContext->mContext  = context;
     if (interface == INET_NULL_INTERFACEID)
     {
-        interface = AVAHI_IF_UNSPEC;
+        avahiInterface = AVAHI_IF_UNSPEC;
     }
     resolver =
-        avahi_service_resolver_new(mClient, interface, AVAHI_PROTO_UNSPEC, name, GetFullType(type, protocol).c_str(), nullptr,
+        avahi_service_resolver_new(mClient, avahiInterface, AVAHI_PROTO_UNSPEC, name, GetFullType(type, protocol).c_str(), nullptr,
                                    AVAHI_PROTO_UNSPEC, static_cast<AvahiLookupFlags>(0), HandleResolve, resolveContext);
     // Otherwise the resolver will be freed in the callback
     if (resolver == nullptr)
@@ -562,6 +565,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     case AVAHI_RESOLVER_FAILURE:
         ChipLogError(DeviceLayer, "Avahi resolve failed");
         context->mCallback(context->mContext, nullptr, CHIP_ERROR_INTERNAL);
+        break;
     case AVAHI_RESOLVER_FOUND:
         MdnsService result;
 
@@ -616,6 +620,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         result.mTextEntrySize = textEntries.size();
 
         context->mCallback(context->mContext, &result, CHIP_NO_ERROR);
+        break;
     }
 
     avahi_service_resolver_free(resolver);

@@ -48,6 +48,7 @@ function happytest_install_packages() {
 function happytest_bootstrap() {
     echo "Bootstrapping Happy Test"
     set -e
+    service dbus start
     service avahi-daemon start
     # Bootstrap Happy
     cd "$REPO_DIR/third_party/happy/repo"
