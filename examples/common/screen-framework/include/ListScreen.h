@@ -60,17 +60,17 @@ public:
 
     virtual ~ListScreen() { chip::Platform::Delete(model); }
 
-    virtual std::string GetTitle() { return model->GetTitle(); }
+    std::string GetTitle() override { return model->GetTitle(); }
 
-    virtual std::string GetButtonText(int id);
+    std::string GetButtonText(int id) override;
 
-    virtual void Display();
+    void Display() override;
 
-    virtual bool IsFocusable() { return model->GetItemCount() > 0; }
+    bool IsFocusable() override { return model->GetItemCount() > 0; }
 
-    virtual void Focus(FocusType focus);
+    void Focus(FocusType focus) override;
 
-    virtual void Action() { model->ItemAction(focusIndex); }
+    void Action() override { model->ItemAction(focusIndex); }
 };
 
 class SimpleListModel : public ListScreen::Model
@@ -80,11 +80,11 @@ class SimpleListModel : public ListScreen::Model
     std::vector<std::tuple<std::string, std::function<void()>>> items;
 
 public:
-    virtual std::string GetTitle() { return title; }
-    virtual int GetItemCount() { return items.size(); }
-    virtual std::string GetItemText(int i) { return std::get<0>(items[i]); }
+    std::string GetTitle() override { return title; }
+    int GetItemCount() override { return items.size(); }
+    std::string GetItemText(int i) override { return std::get<0>(items[i]); }
 
-    virtual void ItemAction(int i)
+    void ItemAction(int i) override
     {
         auto & action = std::get<1>(items[i]);
         if (action)

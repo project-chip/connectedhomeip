@@ -39,26 +39,26 @@ extern color_t ScreenFocusColor;
 
 class Screen;
 
-class ScreenManager
-{
-public:
-    static void Init();
+namespace ScreenManager {
 
-    static void Display();
+void Init();
 
-    static void ButtonPressed(int id);
+void Display();
 
-    static void PushScreen(Screen * screen);
+void ButtonPressed(int id);
 
-    static void PopScreen();
+void PushScreen(Screen * screen);
 
-    static void FocusBack();
+void PopScreen();
 
-    static int AddVLED(color_t color);
+void FocusBack();
 
-    static void SetVLED(int id, bool on);
+int AddVLED(color_t color);
 
-    static void ToggleVLED(int id);
-};
+void SetVLED(int id, bool on);
+
+void ToggleVLED(int id);
+
+} // namespace ScreenManager
 
 #endif // CONFIG_HAVE_DISPLAY
