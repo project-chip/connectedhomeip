@@ -222,8 +222,8 @@ public:
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 
     //////////// RendezvousSessionDelegate Implementation ///////////////
+    void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousComplete() override;
-    void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
     void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
