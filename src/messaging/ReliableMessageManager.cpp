@@ -602,7 +602,7 @@ void ReliableMessageManager::StartTimer()
         {
             // If the tick boundary has expired in the past (delayed processing of event due to other system activity),
             // expire the timer immediately
-            uint64_t now = System::Timer::GetCurrentEpoch();
+            uint64_t now           = System::Timer::GetCurrentEpoch();
             uint64_t timerArmValue = (timerExpiryEpoch > now) ? timerExpiryEpoch - now : 0;
 
 #if defined(RMP_TICKLESS_DEBUG)
