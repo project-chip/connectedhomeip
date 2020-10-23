@@ -213,10 +213,13 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err = mDelegate->SendMessage(msgBuf);
+    err    = mDelegate->SendMessage(msgBuf);
+    msgBuf = nullptr;
     SuccessOrExit(err);
 
 exit:
+    if (msgBuf)
+        System::PacketBuffer::Free(msgBuf);
     return err;
 }
 
@@ -254,7 +257,8 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
     mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_pB_cB;
 
     // Call delegate to send the Compute_pA to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pA, resp);
+    err  = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pA, resp);
+    resp = nullptr;
     SuccessOrExit(err);
 
     return err;
@@ -338,7 +342,8 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, S
     mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_cA;
 
     // Call delegate to send the Compute_pB_cB to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pB_cB, resp);
+    err  = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pB_cB, resp);
+    resp = nullptr;
     SuccessOrExit(err);
 
     return err;
@@ -391,10 +396,9 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
     resp->SetDataLength(verifier_len);
 
     // Call delegate to send the Compute_cA to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_cA, resp);
-    SuccessOrExit(err);
-
+    err  = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_cA, resp);
     resp = nullptr;
+    SuccessOrExit(err);
 
     {
         const uint8_t * hash = &buf[kMAX_Point_Length];

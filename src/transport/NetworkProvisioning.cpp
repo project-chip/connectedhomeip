@@ -188,16 +188,16 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     VerifyOrExit(CanCastTo<uint16_t>(addrLen), err = CHIP_ERROR_INVALID_ARGUMENT);
     buffer->SetDataLength(static_cast<uint16_t>(addrLen));
 
-    err = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
+    err    = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
                                        NetworkProvisioning::MsgTypes::kIPAddressAssigned, buffer);
+    buffer = nullptr;
     SuccessOrExit(err);
 
 exit:
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(NetworkProvisioning, "Failed in sending IP address. error %s\n", ErrorStr(err));
+    if (buffer)
         System::PacketBuffer::Free(buffer);
-    }
+    if (CHIP_NO_ERROR != err)
+        ChipLogError(NetworkProvisioning, "Failed in sending IP address. error %s\n", ErrorStr(err));
     return err;
 }
 
@@ -216,16 +216,16 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     VerifyOrExit(CanCastTo<uint16_t>(bbuf.Written()), err = CHIP_ERROR_INVALID_ARGUMENT);
     buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
-    err = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
+    err    = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
                                        NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer);
-    SuccessOrExit(err);
+    buffer = nullptr;
+    SuccessOrExit(err); 
 
 exit:
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(NetworkProvisioning, "Failed in sending Network Creds. error %s\n", ErrorStr(err));
+    if (buffer)
         System::PacketBuffer::Free(buffer);
-    }
+    if (CHIP_NO_ERROR != err)
+        ChipLogError(NetworkProvisioning, "Failed in sending Network Creds. error %s\n", ErrorStr(err));
     return err;
 }
 
