@@ -58,6 +58,9 @@ enum class ExFlagValues : uint16_t
 {
     /// Set when current message is sent by the initiator of an exchange.
     kExchangeFlag_Initiator = 0x0001,
+
+    /// Header flag specifying that a source vendor id is included in the header.
+    kVendorIdPresent = 0x0002,
 };
 
 enum class FlagValues : uint16_t
@@ -68,12 +71,8 @@ enum class FlagValues : uint16_t
     /// Header flag specifying that a source node id is included in the header.
     kSourceNodeIdPresent = 0x0200,
 
-    /// Header flag specifying that a source vendor id is included in the header.
-    kVendorIdPresent = 0x0400,
-
     /// Header flag specifying that it is a control message for secure session.
-    kSecureSessionControlMessage = 0x0800,
-
+    kSecureSessionControlMessage = 0x0400,
 };
 
 using Flags = BitFlags<uint16_t, FlagValues>;
@@ -297,6 +296,7 @@ public:
     PayloadHeader & SetVendorId(uint16_t id)
     {
         mVendorId.SetValue(id);
+        mExchangeFlags.Set(Header::ExFlagValues::kVendorIdPresent);
 
         return *this;
     }
@@ -305,6 +305,7 @@ public:
     PayloadHeader & SetVendorId(Optional<uint16_t> id)
     {
         mVendorId = id;
+        mExchangeFlags.Set(Header::ExFlagValues::kVendorIdPresent, id.HasValue());
 
         return *this;
     }
@@ -313,9 +314,18 @@ public:
     PayloadHeader & ClearVendorId()
     {
         mVendorId.ClearValue();
+        mExchangeFlags.Set(Header::ExFlagValues::kVendorIdPresent, false);
 
         return *this;
     }
+
+    /**
+     *  Determine whether the source vendor id is included in the header.
+     *
+     *  @return Returns 'true' if it is included, else 'false'.
+     *
+     */
+    bool IsVendorIdPresent() const { return mExchangeFlags.Has(Header::ExFlagValues::kVendorIdPresent); }
 
     /** Set the secure message type for this header. */
     PayloadHeader & SetMessageType(uint8_t type)
