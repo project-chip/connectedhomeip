@@ -101,4 +101,6 @@ for arg in "$@"; do
     esac
 done
 
-docker run "${runargs[@]}" --rm --mount "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" -w "$RUN_DIR" -v "$RUN_DIR:$RUN_DIR" "$ORG/$IMAGE${VERSION:+:${VERSION}}" "$@"
+docker pull "$ORG/$IMAGE${VERSION:+:${VERSION}}" || docker build -t "$IMAGE" "$here"
+
+docker run "${runargs[@]}" --rm --mount "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" -w "$RUN_DIR" -v "$RUN_DIR:$RUN_DIR" "$IMAGE" "$@"
