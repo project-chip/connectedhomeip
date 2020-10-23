@@ -33,7 +33,7 @@ function happytest_install_packages() {
         echo "install_packages should be invoked under root"
         return 1
     fi
-    echo "Install packages: bridge-utils iproute2 net-tools python3-lockfile python3-pip python3-psutil python3-setuptools strace"
+    echo "Install packages: avahi-daemon bridge-utils iproute2 net-tools python3-lockfile python3-pip python3-psutil python3-setuptools strace"
     apt-get update && apt-get install -y avahi-daemon \
         bridge-utils \
         iproute2 \

@@ -42,6 +42,8 @@ declare_args() {
   # Enable ble support.
   chip_enable_ble =
       chip_device_platform == "linux" || chip_device_platform == "darwin"
+
+  chip_enable_mdns = chip_device_platform == "linux"
 }
 
 _chip_device_layer = "none"

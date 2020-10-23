@@ -139,7 +139,9 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysUpdate()
         InetLayer.PrepareSelect(mMaxFd, &mReadSet, &mWriteSet, &mErrorSet, mNextTimeout);
     }
 #endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
+#if CHIP_ENABLE_MDNS
     chip::Protocols::Mdns::UpdateMdnsDataset(mReadSet, mWriteSet, mErrorSet, mMaxFd, mNextTimeout);
+#endif
 }
 
 template <class ImplClass>
@@ -175,7 +177,9 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
 #endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
     ProcessDeviceEvents();
+#if CHIP_ENABLE_MDNS
     chip::Protocols::Mdns::ProcessMdns(mReadSet, mWriteSet, mErrorSet);
+#endif
 }
 
 template <class ImplClass>
