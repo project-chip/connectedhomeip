@@ -48,6 +48,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     CHIP_ERROR err;
 
+    err = chip::Platform::MemoryInit();
+    SuccessOrExit(err);
+
 #if CHIP_WITH_GIO
     GError * error = nullptr;
 

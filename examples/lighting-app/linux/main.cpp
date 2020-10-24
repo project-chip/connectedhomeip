@@ -156,8 +156,6 @@ int main()
 
     chip::DeviceLayer::PlatformMgr().InitChipStack();
 
-    chip::Platform::MemoryInit();
-
     err = PrintQRCodeContent();
     SuccessOrExit(err);
 
