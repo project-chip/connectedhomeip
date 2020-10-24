@@ -25,7 +25,7 @@ COMPONENT_SRCDIRS :=                                                            
   .                                                                               \
   gen                                                                             \
   ../third_party/connectedhomeip/src/app/util                                     \
- ../third_party/connectedhomeip/src/app/clusters/basic                            \
+  ../third_party/connectedhomeip/src/app/clusters/basic                           \
   ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server  \
 
 
