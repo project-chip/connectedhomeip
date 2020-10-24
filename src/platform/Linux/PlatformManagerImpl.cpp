@@ -58,9 +58,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     gdbusThread.detach();
 #endif
 
-    err = chip::Platform::MemoryInit();
-    SuccessOrExit(err);
-
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
     SuccessOrExit(err);

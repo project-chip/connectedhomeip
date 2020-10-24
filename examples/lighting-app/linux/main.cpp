@@ -154,7 +154,11 @@ int main()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    chip::DeviceLayer::PlatformMgr().InitChipStack();
+    err = chip::Platform::MemoryInit();
+    SuccessOrExit(err);
+
+    err = chip::DeviceLayer::PlatformMgr().InitChipStack();
+    SuccessOrExit(err);
 
     err = PrintQRCodeContent();
     SuccessOrExit(err);
