@@ -26,6 +26,7 @@
 
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_POSIX.cpp>
+#include <support/CHIPMem.h>
 
 #include <thread>
 
@@ -48,9 +49,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
 {
     CHIP_ERROR err;
 
-    err = chip::Platform::MemoryInit();
-    SuccessOrExit(err);
-
 #if CHIP_WITH_GIO
     GError * error = nullptr;
 
@@ -59,6 +57,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack()
     std::thread gdbusThread(GDBus_Thread);
     gdbusThread.detach();
 #endif
+
+    err = chip::Platform::MemoryInit();
+    SuccessOrExit(err);
 
     // Initialize the configuration system.
     err = Internal::PosixConfig::Init();
