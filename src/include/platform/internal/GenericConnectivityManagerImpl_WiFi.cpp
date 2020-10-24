@@ -54,6 +54,68 @@ const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiStationModeToS
 }
 
 template <class ImplClass>
+const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode)
+{
+    switch (mode)
+    {
+    case ConnectivityManager::kWiFiAPMode_NotSupported:
+        return "NotSupported";
+    case ConnectivityManager::kWiFiAPMode_ApplicationControlled:
+        return "AppControlled";
+    case ConnectivityManager::kWiFiAPMode_Disabled:
+        return "Disabled";
+    case ConnectivityManager::kWiFiAPMode_Enabled:
+        return "Enabled";
+    case ConnectivityManager::kWiFiAPMode_OnDemand:
+        return "OnDemand";
+    case ConnectivityManager::kWiFiAPMode_OnDemand_NoStationProvision:
+        return "OnDemand_NoStationProvision";
+    default:
+        return "(unknown)";
+    }
+}
+
+template <class ImplClass>
+const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiStationStateToStr(ConnectivityManager::WiFiStationState state)
+{
+    switch (state)
+    {
+    case ConnectivityManager::kWiFiStationState_NotConnected:
+        return "NotConnected";
+    case ConnectivityManager::kWiFiStationState_Connecting:
+        return "Connecting";
+    case ConnectivityManager::kWiFiStationState_Connecting_Succeeded:
+        return "Connecting_Succeeded";
+    case ConnectivityManager::kWiFiStationState_Connecting_Failed:
+        return "Connecting_Failed";
+    case ConnectivityManager::kWiFiStationState_Connected:
+        return "Connected";
+    case ConnectivityManager::kWiFiStationState_Disconnecting:
+        return "Disconnecting";
+    default:
+        return "(unknown)";
+    }
+}
+
+template <class ImplClass>
+const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiAPStateToStr(ConnectivityManager::WiFiAPState state)
+{
+    switch (state)
+    {
+    case ConnectivityManager::kWiFiAPState_NotActive:
+        return "NotActive";
+    case ConnectivityManager::kWiFiAPState_Activating:
+        return "Activating";
+    case ConnectivityManager::kWiFiAPState_Active:
+        return "Active";
+    case ConnectivityManager::kWiFiAPState_Deactivating:
+        return "Deactivating";
+    default:
+        return "(unknown)";
+    }
+}
+
+template <class ImplClass>
 bool GenericConnectivityManagerImpl_WiFi<ImplClass>::_IsWiFiStationEnabled()
 {
     return Impl()->GetWiFiStationMode() == ConnectivityManager::kWiFiStationMode_Enabled;

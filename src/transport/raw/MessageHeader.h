@@ -35,8 +35,9 @@ namespace chip {
 /// Convenience type to make it clear a number represents a node id.
 typedef uint64_t NodeId;
 
-constexpr NodeId kUndefinedNodeId = 0xFFFFFFFFFFFFFFFFll;
-constexpr size_t kMaxTagLen       = 16;
+static constexpr NodeId kUndefinedNodeId = 0ULL;
+static constexpr NodeId kAnyNodeId       = 0xFFFFFFFFFFFFFFFFULL;
+static constexpr size_t kMaxTagLen       = 16;
 
 typedef int PacketHeaderFlags;
 
@@ -47,6 +48,16 @@ enum class EncryptionType
     kAESCCMTagLen8  = 0,
     kAESCCMTagLen12 = 1,
     kAESCCMTagLen16 = 2,
+};
+
+/**
+ *  @brief
+ *    The CHIP Exchange header flag bits.
+ */
+enum class ExFlagValues : uint16_t
+{
+    /// Set when current message is sent by the initiator of an exchange.
+    kExchangeFlag_Initiator = 0x0001,
 };
 
 enum class FlagValues : uint16_t
@@ -327,6 +338,21 @@ public:
         return *this;
     }
 
+    /** Set the Initiator flag bit. */
+    PayloadHeader & SetInitiator(bool inInitiator)
+    {
+        mExchangeFlags.Set(Header::ExFlagValues::kExchangeFlag_Initiator, inInitiator);
+        return *this;
+    }
+
+    /**
+     *  Determine whether the initiator of the exchange.
+     *
+     *  @return Returns 'true' if it is the initiator, else 'false'.
+     *
+     */
+    bool IsInitiator() const { return mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_Initiator); }
+
     /**
      * A call to `Encode` will require at least this many bytes on the current
      * object to be successful.
@@ -385,6 +411,9 @@ private:
 
     /// Protocol identifier
     uint16_t mProtocolID = 0;
+
+    /// Bit flag indicators for CHIP Exchange header
+    BitFlags<uint16_t, Header::ExFlagValues> mExchangeFlags;
 };
 
 /** Handles encoding/decoding of CHIP message headers */

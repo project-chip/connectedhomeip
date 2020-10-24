@@ -183,7 +183,7 @@ uint32_t ChipKeyId::UpdateEpochKeyId(uint32_t keyId, uint32_t epochKeyId)
 bool ChipKeyId::IsValidKeyId(uint32_t keyId)
 {
     bool retval;
-    int usedBits = kMask_KeyType;
+    unsigned int usedBits = kMask_KeyType;
 
     switch (GetType(keyId))
     {
@@ -229,7 +229,7 @@ bool ChipKeyId::IsValidKeyId(uint32_t keyId)
 
     if (IncorporatesRootKey(keyId))
     {
-        int rootKeyId = GetRootKeyId(keyId);
+        uint32_t rootKeyId = GetRootKeyId(keyId);
         VerifyOrExit(rootKeyId == kFabricRootKey || rootKeyId == kClientRootKey || rootKeyId == kServiceRootKey, retval = false);
     }
 

@@ -42,9 +42,9 @@ namespace Shell {
 
 Shell Shell::theShellRoot;
 
-int shell_line_read(char * buffer, size_t max)
+intptr_t shell_line_read(char * buffer, size_t max)
 {
-    int read     = 0;
+    ssize_t read = 0;
     bool done    = false;
     char * inptr = buffer;
 
@@ -96,7 +96,7 @@ int shell_line_read(char * buffer, size_t max)
         }
     }
 
-    return (inptr - buffer);
+    return inptr - buffer;
 }
 
 void Shell::ForEachCommand(shell_command_iterator_t * on_command, void * arg)
@@ -164,9 +164,9 @@ static bool IsEscapable(char aChar)
 
 int Shell::TokenizeLine(char * buffer, char ** tokens, int max_tokens)
 {
-    int len    = strlen(buffer);
+    size_t len = strlen(buffer);
     int cursor = 0;
-    int i      = 0;
+    size_t i   = 0;
 
     // Strip leading spaces
     while (buffer[i] && buffer[i] == ' ')

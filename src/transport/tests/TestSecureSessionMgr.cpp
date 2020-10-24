@@ -66,8 +66,8 @@ public:
 class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, PeerConnectionState * state, System::PacketBuffer * msgBuf,
-                           SecureSessionMgrBase * mgr) override
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, PeerConnectionState * state,
+                           System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));

@@ -20,7 +20,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <inet/InetInterface.h>
-#include <support/CHIPLogging.h>
+#include <support/logging/CHIPLogging.h>
 
 #include <memory>
 #include <vector>

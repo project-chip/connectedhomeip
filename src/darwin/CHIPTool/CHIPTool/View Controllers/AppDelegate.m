@@ -18,8 +18,6 @@
 #import "AppDelegate.h"
 #import "RootViewController.h"
 
-static NSString * const ipKey = @"ipk";
-
 @interface AppDelegate ()
 
 @end

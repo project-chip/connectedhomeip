@@ -32,6 +32,8 @@
 
 @property (readwrite) CHIPDeviceController * chipController;
 
+@property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
+
 @end
 
 @implementation EchoViewController
@@ -43,6 +45,8 @@
     [super viewDidLoad];
     [self setupUIElements];
 
+    _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
+
     // listen for taps to dismiss the keyboard
     UITapGestureRecognizer * tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(dismissKeyboard)];
     [self.view addGestureRecognizer:tap];
@@ -51,6 +55,7 @@
     dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.echovc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
+    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
 }
 
 - (void)dismissKeyboard

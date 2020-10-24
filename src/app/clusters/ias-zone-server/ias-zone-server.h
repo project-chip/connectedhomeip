@@ -46,6 +46,8 @@
 #ifndef SILABS_IAS_ZONE_SERVER_H
 #define SILABS_IAS_ZONE_SERVER_H
 
+#include <app/util/af-types.h>
+
 #define EM_AF_UNKNOWN_ENDPOINT 0
 // Absolute max backoff time, at least one retry a day
 // (ie. 24 hours * 60 minutes * 60 seconds).

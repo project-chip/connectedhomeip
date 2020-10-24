@@ -74,6 +74,15 @@ echo ninja -C "$CHIP_ROOT/out/custom"
 
 extra_args=""
 
+for arg; do
+    case $arg in
+        enable_qpg6100_builds=true)
+            qpg6100_enabled=1
+            ;;
+    esac
+    extra_args+=" $arg"
+done
+
 # Android SDK setup
 android_sdk_args=""
 
@@ -130,6 +139,13 @@ else
     echo "(cd $CHIP_ROOT/examples/lock-app/k32w; gn gen out/debug --args='$k32w_sdk_args'; ninja -C out/debug)"
 fi
 echo
+
+if [[ -z "$qpg6100_enabled" ]]; then
+    echo "Hint: Pass enable_qpg6100_builds=true to this script to enable building for QPG6100"
+else
+    echo 'To build the QPG6100 lock sample as a standalone project:'
+    echo "(cd $CHIP_ROOT/examples/lock-app/qpg6100; gn gen out/debug; ninja -C out/debug)"
+fi
 
 echo
 

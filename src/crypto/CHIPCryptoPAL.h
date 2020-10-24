@@ -23,7 +23,7 @@
 #ifndef _CHIP_CRYPTO_PAL_H_
 #define _CHIP_CRYPTO_PAL_H_
 
-#if CHIP_SEPARATE_CONFIG_H
+#if CHIP_HAVE_CONFIG_H
 #include <crypto/CryptoBuildConfig.h>
 #endif
 
@@ -115,6 +115,10 @@ public:
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
+    virtual CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length, const Sig & signature) const
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 };
 
 template <size_t Cap>
@@ -166,6 +170,8 @@ public:
 
     CHIP_ERROR ECDSA_validate_msg_signature(const uint8_t * msg, size_t msg_length,
                                             const P256ECDSASignature & signature) const override;
+    CHIP_ERROR ECDSA_validate_hash_signature(const uint8_t * hash, size_t hash_length,
+                                             const P256ECDSASignature & signature) const override;
 
 private:
     uint8_t bytes[kP256_PublicKey_Length];
@@ -192,6 +198,16 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     virtual CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, Sig & out_signature) = 0;
+
+    /**
+     * @brief A function to sign a hash using ECDSA
+     * @param hash Hash that needs to be signed
+     * @param hash_length Length of hash
+     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
+     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    virtual CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, Sig & out_signature) = 0;
 
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is
@@ -250,6 +266,16 @@ public:
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR ECDSA_sign_msg(const uint8_t * msg, size_t msg_length, P256ECDSASignature & out_signature) override;
+
+    /**
+     * @brief A function to sign a hash using ECDSA
+     * @param hash Hash that needs to be signed
+     * @param hash_length Length of hash
+     * @param out_signature Buffer that will hold the output signature. The signature consists of: 2 EC elements (r and s),
+     *represented as ASN.1 DER integers, plus the ASN.1 sequence Header
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR ECDSA_sign_hash(const uint8_t * hash, size_t hash_length, P256ECDSASignature & out_signature) override;
 
     /** @brief A function to derive a shared secret using ECDH
      * @param remote_public_key Public key of remote peer with which we are trying to establish secure channel. remote_public_key is

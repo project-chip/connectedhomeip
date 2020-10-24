@@ -26,6 +26,7 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <sys/types.h>
 
 namespace chip {
 namespace Shell {
@@ -34,8 +35,8 @@ struct streamer;
 typedef const struct streamer streamer_t;
 
 typedef int streamer_init_fn(streamer_t * self);
-typedef int streamer_read_fn(streamer_t * self, char * buf, size_t len);
-typedef int streamer_write_fn(streamer_t * self, const char * buf, size_t len);
+typedef ssize_t streamer_read_fn(streamer_t * self, char * buf, size_t len);
+typedef ssize_t streamer_write_fn(streamer_t * self, const char * buf, size_t len);
 
 struct streamer
 {
@@ -45,10 +46,10 @@ struct streamer
 };
 
 int streamer_init(streamer_t * self);
-int streamer_read(streamer_t * self, char * buf, size_t len);
-int streamer_write(streamer_t * self, const char * buf, size_t len);
-int streamer_vprintf(streamer_t * self, const char * fmt, va_list ap);
-int streamer_printf(streamer_t * self, const char * fmt, ...);
+ssize_t streamer_read(streamer_t * self, char * buf, size_t len);
+ssize_t streamer_write(streamer_t * self, const char * buf, size_t len);
+ssize_t streamer_vprintf(streamer_t * self, const char * fmt, va_list ap);
+ssize_t streamer_printf(streamer_t * self, const char * fmt, ...);
 void streamer_print_hex(streamer_t * self, const uint8_t * data, int len);
 streamer_t * streamer_get();
 

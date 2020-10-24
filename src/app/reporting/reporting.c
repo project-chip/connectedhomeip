@@ -131,6 +131,9 @@ void emAfPluginReportingSetEntry(uint8_t index, EmberAfPluginReportingEntry * va
 #else
 void emAfPluginReportingGetEntry(uint8_t index, EmberAfPluginReportingEntry * result)
 {
+    // TODO: Once https://github.com/project-chip/connectedhomeip/issues/2470 is
+    // fixed this manual marking of the entry as unused can probably be removed.
+    result->endpoint = EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID;
     halCommonGetIndexedToken(result, TOKEN_REPORT_TABLE, index);
 }
 void emAfPluginReportingSetEntry(uint8_t index, EmberAfPluginReportingEntry * value)
@@ -158,11 +161,8 @@ void emberAfPluginReportingInitCallback(void)
     {
         EmberAfPluginReportingEntry entry;
         emAfPluginReportingGetEntry(i, &entry);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
         if (entry.endpoint != EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID &&
             entry.direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
-#pragma GCC diagnostic pop
         {
             emAfPluginReportVolatileData[i].reportableChange = true;
         }
@@ -186,9 +186,6 @@ void emberAfPluginReportingTickEventHandler(void)
 
     for (i = 0; i < REPORT_TABLE_SIZE; i++)
     {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wuninitialized"
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
         EmberAfPluginReportingEntry entry;
         // Not initializing entry.mask causes errors even if wrapped with GCC diagnostic ignored
         entry.mask = CLUSTER_MASK_SERVER;
@@ -210,7 +207,6 @@ void emberAfPluginReportingTickEventHandler(void)
 
         status = emAfReadAttribute(entry.endpoint, entry.clusterId, entry.attributeId, entry.mask, entry.manufacturerCode,
                                    (uint8_t *) &readData, READ_DATA_SIZE, &dataType);
-#pragma GCC diagnostic pop
         if (status != EMBER_ZCL_STATUS_SUCCESS)
         {
             emberAfReportingPrintln("ERR: reading cluster 0x%2x attribute 0x%2x: 0x%x", entry.clusterId, entry.attributeId, status);
@@ -229,9 +225,6 @@ void emberAfPluginReportingTickEventHandler(void)
         dataSize   = emberAfAttributeValueSize(dataType, readData);
         reportSize = sizeof(entry.attributeId) + sizeof(dataType) + dataSize;
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#pragma GCC diagnostic ignored "-Wuninitialized"
         // If we have already started a report for a different attribute or
         // destination, or if the current entry is too big for current report, send it and create a new one.
         if (apsFrame != NULL &&
@@ -239,7 +232,6 @@ void emberAfPluginReportingTickEventHandler(void)
                emberAfClusterIsClient(&entry) == clientToServer && entry.manufacturerCode == manufacturerCode) ||
              (appResponseLength + reportSize > smallestPayloadMaxLength)))
         {
-#pragma GCC diagnostic pop
             if (appResponseLength + reportSize > smallestPayloadMaxLength)
             {
                 emberAfReportingPrintln("Reporting Entry Full - creating new report");
@@ -251,10 +243,7 @@ void emberAfPluginReportingTickEventHandler(void)
         // If we haven't made the message header, make it.
         if (apsFrame == NULL)
         {
-            apsFrame = emberAfGetCommandApsFrame();
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#pragma GCC diagnostic ignored "-Wuninitialized"
+            apsFrame       = emberAfGetCommandApsFrame();
             clientToServer = emberAfClusterIsClient(&entry);
             // The manufacturer-specfic version of the fill API only creates a
             // manufacturer-specfic command if the manufacturer code is set.  For
@@ -279,7 +268,6 @@ void emberAfPluginReportingTickEventHandler(void)
                 status = (EmberAfStatus) emberGetBinding(index, &bindingEntry);
                 if (status == (EmberAfStatus) EMBER_SUCCESS && bindingEntry.local == entry.endpoint &&
                     bindingEntry.clusterId == entry.clusterId)
-#pragma GCC diagnostic pop
                 {
                     currentPayloadMaxLength =
                         emberAfMaximumApsPayloadLength(bindingEntry.type, bindingEntry.networkIndex, apsFrame);
@@ -594,11 +582,13 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
         // CCB 1854 removes the ambiguity and requires NOT_FOUND to be returned in
         // the status field and all fields except direction and attribute identifier
         // to be omitted if there is no report configuration found.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
         for (i = 0; i < REPORT_TABLE_SIZE; i++)
         {
             emAfPluginReportingGetEntry(i, &entry);
+            if (entry.endpoint == EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID)
+            {
+                continue;
+            }
             if (entry.direction == direction && entry.endpoint == cmd->apsFrame->destinationEndpoint &&
                 entry.clusterId == cmd->apsFrame->clusterId && entry.attributeId == attributeId && entry.mask == mask &&
                 entry.manufacturerCode == cmd->mfgCode &&
@@ -609,7 +599,6 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
                 break;
             }
         }
-#pragma GCC diagnostic pop
         // Attribute supported, reportable, no report configuration was found.
         if (found == false)
         {
@@ -627,8 +616,6 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
         case EMBER_ZCL_REPORTING_DIRECTION_REPORTED:
             if (metadata != NULL)
             {
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
                 emberAfPutInt8uInResp(metadata->attributeType);
                 emberAfPutInt16uInResp(entry.data.reported.minInterval);
                 emberAfPutInt16uInResp(entry.data.reported.maxInterval);
@@ -642,7 +629,6 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
             emberAfPutInt16uInResp(entry.data.received.timeout);
             break;
         }
-#pragma GCC diagnostic pop
     }
 
     sendStatus = emberAfSendResponse();
@@ -683,14 +669,14 @@ void emberAfReportingAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId 
     {
         EmberAfPluginReportingEntry entry;
         emAfPluginReportingGetEntry(i, &entry);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#pragma GCC diagnostic ignored "-Wuninitialized"
+        if (entry.endpoint == EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID)
+        {
+            continue;
+        }
         if (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED && entry.endpoint == endpoint &&
             entry.clusterId == clusterId && entry.attributeId == attributeId && entry.mask == mask &&
             entry.manufacturerCode == manufacturerCode)
         {
-#pragma GCC diagnostic pop
             // For CHAR and OCTET strings, the string value may be too long to fit into the
             // lastReportValue field (EmberAfDifferenceType), so instead we save the string's
             // hash, and detect changes in string value based on unequal hash.
@@ -708,15 +694,12 @@ void emberAfReportingAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId 
             // mark the entry as ready to report and reschedule the tick.  Whether
             // the tick will be scheduled for immediate or delayed execution depends
             // on the minimum reporting interval.  This is handled in the scheduler.
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
             EmberAfDifferenceType difference =
                 emberAfGetDifference(dataRef, emAfPluginReportVolatileData[i].lastReportValue, dataSize);
             uint8_t analogOrDiscrete = emberAfGetAttributeAnalogOrDiscreteType(type);
             if ((analogOrDiscrete == EMBER_AF_DATA_TYPE_DISCRETE && difference != 0) ||
                 (analogOrDiscrete == EMBER_AF_DATA_TYPE_ANALOG && entry.data.reported.reportableChange <= difference))
             {
-#pragma GCC diagnostic pop
                 emAfPluginReportVolatileData[i].reportableChange = true;
                 scheduleTick();
             }
@@ -767,15 +750,12 @@ uint8_t emAfPluginReportingAddEntry(EmberAfPluginReportingEntry * newEntry)
     for (i = 0; i < REPORT_TABLE_SIZE; i++)
     {
         emAfPluginReportingGetEntry(i, &oldEntry);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
         if (oldEntry.endpoint == EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID)
         {
             emAfPluginReportingSetEntry(i, newEntry);
             return i;
         }
     }
-#pragma GCC diagnostic pop
 
     // If no free spots were found, return the failure indicator
     return 0xFF;
@@ -790,15 +770,11 @@ static void scheduleTick(void)
         EmberAfPluginReportingEntry entry;
         emAfPluginReportingGetEntry(i, &entry);
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-#pragma GCC diagnostic ignored "-Wuninitialized"
         if (entry.endpoint != EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID &&
             entry.direction == EMBER_ZCL_REPORTING_DIRECTION_REPORTED)
         {
             uint32_t minIntervalMs = (entry.data.reported.minInterval * MILLISECOND_TICKS_PER_SECOND);
             uint32_t maxIntervalMs = (entry.data.reported.maxInterval * MILLISECOND_TICKS_PER_SECOND);
-#pragma GCC diagnostic pop
             uint32_t elapsedMs =
                 elapsedTimeInt32u(emAfPluginReportVolatileData[i].lastReportTimeMs, halCommonGetInt32uMillisecondTick());
             uint32_t remainingMs = MAX_INT32U_VALUE;
@@ -974,8 +950,10 @@ static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cm
     for (i = 0; i < REPORT_TABLE_SIZE; i++)
     {
         emAfPluginReportingGetEntry(i, &entry);
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+        if (entry.endpoint == EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID)
+        {
+            continue;
+        }
         if (entry.direction == EMBER_ZCL_REPORTING_DIRECTION_RECEIVED && entry.endpoint == cmd->apsFrame->destinationEndpoint &&
             entry.clusterId == cmd->apsFrame->clusterId && entry.attributeId == attributeId && entry.mask == mask &&
             entry.manufacturerCode == cmd->mfgCode && entry.data.received.source == cmd->source &&
@@ -989,7 +967,6 @@ static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cm
         {
             index = i;
         }
-#pragma GCC diagnostic pop
     }
 
     if (index == NULL_INDEX)
@@ -1046,8 +1023,6 @@ static void putReportableChangeInResp(const EmberAfPluginReportingEntry * entry,
     else
     { // reportable change value
         uint32_t value = entry->data.reported.reportableChange;
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
         for (; bytes > 0; bytes--)
         {
             uint8_t b = BYTE_0(value);
@@ -1055,7 +1030,6 @@ static void putReportableChangeInResp(const EmberAfPluginReportingEntry * entry,
             value >>= 8;
         }
     }
-#pragma GCC diagnostic pop
 }
 
 // Conditionally add reporting entry.

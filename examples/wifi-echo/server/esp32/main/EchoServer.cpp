@@ -123,8 +123,8 @@ static size_t odc(const uint8_t * bytes, size_t bytes_len, char * out, size_t ou
 class EchoServerCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
-                           SecureSessionMgrBase * mgr) override
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
+                           System::PacketBuffer * buffer, SecureSessionMgrBase * mgr) override
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();

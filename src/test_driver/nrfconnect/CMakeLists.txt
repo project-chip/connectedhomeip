@@ -99,6 +99,6 @@ chip_build(ChipLib ChipConfig
 target_sources(app PRIVATE main/runner.cpp)
 target_link_options(app PUBLIC -Wl,--whole-archive ${CHIP_TESTS} -Wl,--no-whole-archive)
 target_link_libraries(app PUBLIC ChipLib $<TARGET_FILE:kernel>)
-target_compile_definitions(app PUBLIC CHIP_SEPARATE_CONFIG_H)
+target_compile_definitions(app PUBLIC CHIP_HAVE_CONFIG_H)
 
 add_test(AllChipTests zephyr/zephyr.exe)

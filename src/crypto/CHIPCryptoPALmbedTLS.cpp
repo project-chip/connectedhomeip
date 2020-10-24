@@ -451,6 +451,36 @@ exit:
     return error;
 }
 
+CHIP_ERROR P256Keypair::ECDSA_sign_hash(const uint8_t * hash, const size_t hash_length, P256ECDSASignature & out_signature)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+    size_t siglen    = out_signature.Capacity();
+
+    const mbedtls_ecp_keypair * keypair = to_const_keypair(&mKeypair);
+
+    mbedtls_ecdsa_context ecdsa_ctxt;
+    mbedtls_ecdsa_init(&ecdsa_ctxt);
+
+    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(hash_length == NUM_BYTES_IN_SHA256_HASH, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, keypair);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_ecdsa_write_signature(&ecdsa_ctxt, MBEDTLS_MD_SHA256, hash, hash_length, Uint8::to_uchar(out_signature),
+                                           &siglen, CryptoRNG, nullptr);
+    SuccessOrExit(out_signature.SetLength(siglen));
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    keypair = nullptr;
+    mbedtls_ecdsa_free(&ecdsa_ctxt);
+    _log_mbedTLS_error(result);
+    return error;
+}
+
 CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, const size_t msg_length,
                                                        const P256ECDSASignature & signature) const
 {
@@ -480,6 +510,40 @@ CHIP_ERROR P256PublicKey::ECDSA_validate_msg_signature(const uint8_t * msg, cons
     VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
 
     result = mbedtls_ecdsa_read_signature(&ecdsa_ctxt, hash, sizeof(hash), Uint8::to_const_uchar(signature), signature.Length());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_SIGNATURE);
+
+exit:
+    mbedtls_ecp_keypair_free(&keypair);
+    mbedtls_ecdsa_free(&ecdsa_ctxt);
+    _log_mbedTLS_error(result);
+    return error;
+}
+
+CHIP_ERROR P256PublicKey::ECDSA_validate_hash_signature(const uint8_t * hash, const size_t hash_length,
+                                                        const P256ECDSASignature & signature) const
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    int result       = 0;
+
+    mbedtls_ecp_keypair keypair;
+    mbedtls_ecp_keypair_init(&keypair);
+
+    mbedtls_ecdsa_context ecdsa_ctxt;
+    mbedtls_ecdsa_init(&ecdsa_ctxt);
+
+    VerifyOrExit(hash != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(hash_length == NUM_BYTES_IN_SHA256_HASH, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecp_group_load(&keypair.grp, MapECPGroupId(Type()));
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecp_point_read_binary(&keypair.grp, &keypair.Q, Uint8::to_const_uchar(*this), Length());
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    result = mbedtls_ecdsa_from_keypair(&ecdsa_ctxt, &keypair);
+    VerifyOrExit(result == 0, error = CHIP_ERROR_INTERNAL);
+
+    result = mbedtls_ecdsa_read_signature(&ecdsa_ctxt, hash, hash_length, Uint8::to_const_uchar(signature), signature.Length());
     VerifyOrExit(result == 0, error = CHIP_ERROR_INVALID_SIGNATURE);
 
 exit:

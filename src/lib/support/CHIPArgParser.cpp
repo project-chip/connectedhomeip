@@ -43,6 +43,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
+#include <support/SafeInt.h>
 
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
@@ -712,9 +713,13 @@ bool ParseInt(const char * str, uint32_t & output, int base)
     char * parseEnd;
     unsigned long v;
 
-    errno  = 0;
-    v      = strtoul(str, &parseEnd, base);
-    output = v;
+    errno = 0;
+    v     = strtoul(str, &parseEnd, base);
+    if (!CanCastTo<uint32_t>(v))
+    {
+        return false;
+    }
+    output = static_cast<uint32_t>(v);
 
     return parseEnd > str && *parseEnd == 0 && (v != ULONG_MAX || errno == 0);
 }
@@ -740,9 +745,13 @@ bool ParseInt(const char * str, int32_t & output, int base)
     char * parseEnd;
     long v;
 
-    errno  = 0;
-    v      = strtol(str, &parseEnd, base);
-    output = v;
+    errno = 0;
+    v     = strtol(str, &parseEnd, base);
+    if (!CanCastTo<int32_t>(v))
+    {
+        return false;
+    }
+    output = static_cast<int32_t>(v);
 
     return parseEnd > str && *parseEnd == 0 && ((v != LONG_MIN && v != LONG_MAX) || errno == 0);
 }
@@ -849,7 +858,7 @@ bool ParseInt(const char * str, int16_t & output)
 
     if ((ParseInt(str, output32, base)) && (output32 <= SHRT_MAX))
     {
-        output = ((1 << 16) - 1) & output32;
+        output = static_cast<int16_t>(UINT16_MAX & output32);
         return true;
     }
 
@@ -1022,18 +1031,18 @@ bool ParseHexString(const char * hexStr, uint32_t strLen, uint8_t * outBuf, uint
         if (c == 0)
             break;
         if (c >= '0' && c <= '9')
-            nibbleVal = c - '0';
+            nibbleVal = static_cast<uint8_t>(c - '0');
         else if (c >= 'a' && c <= 'f')
-            nibbleVal = 10 + (c - 'a');
+            nibbleVal = static_cast<uint8_t>(10 + (c - 'a'));
         else if (c >= 'A' && c <= 'F')
-            nibbleVal = 10 + (c - 'A');
+            nibbleVal = static_cast<uint8_t>(10 + (c - 'A'));
         else if (isspace(c))
             continue;
         else if (isFirstNibble && (c == ':' || c == ';' || c == ',' || c == '.' || c == '-'))
             continue;
         else
         {
-            outDataLen = p - hexStr;
+            outDataLen = static_cast<decltype(strLen)>(p - hexStr);
             return false;
         }
 
@@ -1050,7 +1059,7 @@ bool ParseHexString(const char * hexStr, uint32_t strLen, uint8_t * outBuf, uint
                 return false;
             }
 
-            *outBuf = firstNibbleVal << 4 | nibbleVal;
+            *outBuf = static_cast<uint8_t>(firstNibbleVal << 4 | nibbleVal);
 
             outBuf++;
             outBufSize--;
@@ -1062,7 +1071,7 @@ bool ParseHexString(const char * hexStr, uint32_t strLen, uint8_t * outBuf, uint
 
     if (!isFirstNibble)
     {
-        outDataLen = p - hexStr;
+        outDataLen = static_cast<decltype(strLen)>(p - hexStr);
         return false;
     }
 
@@ -1246,8 +1255,8 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
     {
         InitialArgListSize = 10
     };
-    int32_t argListSize = 0;
-    int32_t argCount    = 0;
+    size_t argListSize = 0;
+    int32_t argCount   = 0;
 
     // Allocate an array to hold pointers to the arguments.
     argList = static_cast<char **>(chip::Platform::MemoryAlloc(sizeof(char *) * InitialArgListSize));
@@ -1273,7 +1282,7 @@ static int32_t SplitArgs(char * argStr, char **& argList, char * initialArg)
 
         // Grow the arg list array if needed. Note that we reserve one slot at the end of the array
         // for a NULL entry.
-        if (argListSize == argCount + 1)
+        if (argListSize == static_cast<size_t>(argCount + 1))
         {
             argListSize *= 2;
             argList = static_cast<char **>(chip::Platform::MemoryRealloc(argList, argListSize));
@@ -1488,7 +1497,8 @@ static bool SanityCheckOptions(OptionSet * optSets[])
                 res = false;
             }
 
-            if (IsShortOptionChar(optionDef->Id) && !HelpTextContainsShortOption(optionDef->Id, (*optSetP)->OptionHelp))
+            if (IsShortOptionChar(optionDef->Id) &&
+                !HelpTextContainsShortOption(static_cast<char>(optionDef->Id), (*optSetP)->OptionHelp))
             {
                 PrintArgError("INTERNAL ERROR: No help text defined for option: -%c\n", optionDef->Id);
                 res = false;

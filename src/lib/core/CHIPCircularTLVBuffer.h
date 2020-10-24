@@ -57,18 +57,18 @@ namespace TLV {
 class DLL_EXPORT CHIPCircularTLVBuffer
 {
 public:
-    CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBufferLength);
-    CHIPCircularTLVBuffer(uint8_t * inBuffer, size_t inBufferLength, uint8_t * inHead);
+    CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength);
+    CHIPCircularTLVBuffer(uint8_t * inBuffer, uint32_t inBufferLength, uint8_t * inHead);
 
     CHIP_ERROR GetNewBuffer(TLVWriter & ioWriter, uint8_t *& outBufStart, uint32_t & outBufLen);
     CHIP_ERROR FinalizeBuffer(TLVWriter & ioWriter, uint8_t * inBufStart, uint32_t inBufLen);
     CHIP_ERROR GetNextBuffer(TLVReader & ioReader, const uint8_t *& outBufStart, uint32_t & outBufLen);
 
     inline uint8_t * QueueHead() const { return mQueueHead; }
-    inline uint8_t * QueueTail() const { return mQueue + (((mQueueHead - mQueue) + mQueueLength) % mQueueSize); }
-    inline size_t DataLength() const { return mQueueLength; }
-    inline size_t AvailableDataLength() const { return mQueueSize - mQueueLength; }
-    inline size_t GetQueueSize() const { return mQueueSize; }
+    inline uint8_t * QueueTail() const { return mQueue + ((static_cast<size_t>(mQueueHead - mQueue) + mQueueLength) % mQueueSize); }
+    inline uint32_t DataLength() const { return mQueueLength; }
+    inline uint32_t AvailableDataLength() const { return mQueueSize - mQueueLength; }
+    inline uint32_t GetQueueSize() const { return mQueueSize; }
     inline uint8_t * GetQueue() const { return mQueue; }
 
     CHIP_ERROR EvictHead();
@@ -132,9 +132,9 @@ public:
 
 private:
     uint8_t * mQueue;
-    size_t mQueueSize;
+    uint32_t mQueueSize;
     uint8_t * mQueueHead;
-    size_t mQueueLength;
+    uint32_t mQueueLength;
 };
 
 class DLL_EXPORT CircularTLVReader : public TLVReader

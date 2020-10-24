@@ -90,6 +90,13 @@ exit:
 
 CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf)
 {
+    PayloadHeader payloadHeader;
+
+    return SendMessage(payloadHeader, peerNodeId, msgBuf);
+}
+
+CHIP_ERROR SecureSessionMgrBase::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf)
+{
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = nullptr;
 
@@ -108,7 +115,6 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
     {
         uint8_t * data = nullptr;
         PacketHeader packetHeader;
-        PayloadHeader payloadHeader;
         MessageAuthenticationCode mac;
 
         const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
@@ -275,7 +281,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
         payloadlen = packetHeader.GetPayloadLength();
         VerifyOrExit(
             payloadlen <= len,
-            (ChipLogError(Inet, "Secure transport can't find MAC Tag; buffer too short"), err = CHIP_ERROR_INCORRECT_STATE));
+            (ChipLogError(Inet, "Secure transport can't find MAC Tag; buffer too short"), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH));
         err = mac.Decode(packetHeader, &data[payloadlen], len - payloadlen, &taglen);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
         len = static_cast<uint16_t>(len - taglen);
@@ -297,7 +303,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 
         if (connection->mCB != nullptr)
         {
-            connection->mCB->OnMessageReceived(packetHeader, state, msg, connection);
+            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg, connection);
             msg = nullptr;
         }
     }

@@ -37,7 +37,7 @@ constexpr size_t kMaxWiFiKeyLength  = 64;
 constexpr size_t kMaxThreadNetworkNameLength = 16;
 constexpr size_t kThreadExtendedPANIdLength  = 8;
 constexpr size_t kThreadMeshPrefixLength     = 8;
-constexpr size_t kThreadNetworkKeyLength     = 16;
+constexpr size_t kThreadMasterKeyLength      = 16;
 constexpr size_t kThreadPSKcLength           = 16;
 constexpr size_t kThreadChannel_NotSpecified = UINT8_MAX;
 constexpr size_t kThreadPANId_NotSpecified   = UINT16_MAX;
@@ -90,8 +90,8 @@ public:
     /**< The Thread extended PAN ID. */
     uint8_t ThreadMeshPrefix[kThreadMeshPrefixLength];
     /**< The Thread mesh prefix. */
-    uint8_t ThreadNetworkKey[kThreadNetworkKeyLength];
-    /**< The Thread master network key (NOT NULL-terminated). */
+    uint8_t ThreadMasterKey[kThreadMasterKeyLength];
+    /**< The Thread master key (NOT NULL-terminated). */
     uint8_t ThreadPSKc[kThreadPSKcLength];
     /**< The Thread pre-shared commissioner key (NOT NULL-terminated). */
     uint16_t ThreadPANId;  /**< The 16-bit Thread PAN ID, or kThreadPANId_NotSpecified */

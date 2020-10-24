@@ -183,13 +183,14 @@ struct TestArgv
 
 // Duplicate arguments since tests use string constants and argv is not
 // defined const.
-TestArgv DupeArgs(const char * argv[], int argc)
+TestArgv DupeArgs(const char * argv[], int argc_as_int)
 {
+    size_t argc = static_cast<size_t>(argc_as_int);
     TestArgv ret;
     ret.argv.Alloc(argc + 1);
 
     size_t len = 0;
-    for (int i = 0; i < argc; ++i)
+    for (size_t i = 0; i < argc; ++i)
     {
         len += strlen(argv[i]) + 1;
     }
@@ -197,7 +198,7 @@ TestArgv DupeArgs(const char * argv[], int argc)
     ret.strings.Alloc(len);
 
     size_t offset = 0;
-    for (int i = 0; i < argc; ++i)
+    for (size_t i = 0; i < argc; ++i)
     {
         ret.argv[i] = &ret.strings[offset];
         memcpy(ret.argv[i], argv[i], strlen(argv[i]) + 1);
@@ -733,7 +734,7 @@ static bool HandleNonOptionArgs(const char * progName, int argc, char * argv[])
 
 static void HandleArgError(const char * msg, ...)
 {
-    int msgLen;
+    size_t msgLen;
     int status;
     va_list ap;
 
@@ -742,7 +743,7 @@ static void HandleArgError(const char * msg, ...)
     sCallbackRecords[sCallbackRecordCount].Type = CallbackRecord::kArgError;
 
     va_start(ap, msg);
-    msgLen = vsnprintf(nullptr, 0, msg, ap);
+    msgLen = static_cast<size_t>(vsnprintf(nullptr, 0, msg, ap));
     va_end(ap);
 
     va_start(ap, msg);

@@ -59,7 +59,7 @@ void LightingManager::SetCallbacks(LightingCallback_fn aActionInitiated_CB, Ligh
     mActionCompleted_CB = aActionCompleted_CB;
 }
 
-bool LightingManager::InitiateAction(Action_t aAction)
+bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor)
 {
     // TODO: this function is called InitiateAction because we want to implement some features such as ramping up here.
     bool action_initiated = false;
@@ -81,14 +81,14 @@ bool LightingManager::InitiateAction(Action_t aAction)
     {
         if (mActionInitiated_CB)
         {
-            mActionInitiated_CB(aAction);
+            mActionInitiated_CB(aAction, aActor);
         }
 
         Set(new_state == kState_On);
 
         if (mActionCompleted_CB)
         {
-            mActionCompleted_CB(aAction);
+            mActionCompleted_CB(aAction, aActor);
         }
     }
 

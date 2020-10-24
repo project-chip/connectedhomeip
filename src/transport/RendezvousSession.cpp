@@ -271,6 +271,11 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState)
     };
 
     mCurrentState = newState;
+
+    if (newState == State::kRendezvousComplete)
+    {
+        mDelegate->OnRendezvousComplete();
+    }
 }
 
 void RendezvousSession::OnRendezvousMessageReceived(PacketBuffer * msgBuf)
@@ -354,7 +359,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
     plainText = msgBuf->Start();
 
     payloadlen = packetHeader.GetPayloadLength();
-    VerifyOrExit(payloadlen <= len, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(payloadlen <= len, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     err = mac.Decode(packetHeader, &data[payloadlen], len - payloadlen, &taglen);
     SuccessOrExit(err);
 
@@ -375,12 +380,11 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
         err = mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf);
         SuccessOrExit(err);
     }
-    // else .. TODO once application dependency on this message has been removed, enable the else condition
+    else // This else condition should eventually be removed, once all messages are handled via delegate callbacks
     {
         mDelegate->OnRendezvousMessageReceived(msgBuf);
+        msgBuf = nullptr;
     }
-
-    msgBuf = nullptr;
 
 exit:
     if (origMsg != nullptr)

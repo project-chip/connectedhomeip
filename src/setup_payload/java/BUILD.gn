@@ -33,7 +33,10 @@ shared_library("jni") {
 android_library("java") {
   output_name = "SetupPayloadParser.jar"
 
-  data_deps = [ ":jni" ]
+  data_deps = [
+    ":jni",
+    "//build/chip/java:shared_cpplib",
+  ]
 
   sources = [
     "src/chip/setuppayload/OptionalQRCodeInfo.java",

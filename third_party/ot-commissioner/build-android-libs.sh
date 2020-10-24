@@ -6,9 +6,6 @@ set -e
 
 cd "$CUR_DIR"
 
-## Install dependencies.
-[ ! -d build/ ] && ./repo/script/bootstrap.sh
-
 mkdir -p build && cd build
 cmake -GNinja \
     -DCMAKE_TOOLCHAIN_FILE="$ANDROID_NDK_HOME"/build/cmake/android.toolchain.cmake \

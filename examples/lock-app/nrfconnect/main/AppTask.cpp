@@ -25,6 +25,9 @@
 #include "Service.h"
 #include "ThreadUtil.h"
 
+#include "attribute-storage.h"
+#include "gen/cluster-id.h"
+
 #include <platform/CHIPDeviceLayer.h>
 
 #include <dk_buttons_and_leds.h>
@@ -200,6 +203,7 @@ void AppTask::LockActionEventHandler(AppEvent * aEvent)
     else if (aEvent->Type == AppEvent::kEventType_Button)
     {
         action = BoltLockMgr().IsUnlocked() ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION;
+        actor  = AppEvent::kEventType_Button;
     }
 
     if (action != BoltLockManager::INVALID_ACTION && !BoltLockMgr().InitiateAction(actor, action))
@@ -370,7 +374,7 @@ void AppTask::ActionInitiated(BoltLockManager::Action_t aAction, int32_t aActor)
     sLockLED.Blink(50, 50);
 }
 
-void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
+void AppTask::ActionCompleted(BoltLockManager::Action_t aAction, int32_t aActor)
 {
     // if the action has been completed by the lock, update the bolt lock trait.
     // Turn on the lock LED if in a LOCKED state OR
@@ -384,6 +388,11 @@ void AppTask::ActionCompleted(BoltLockManager::Action_t aAction)
     {
         LOG_INF("Unlock Action has been completed");
         sLockLED.Set(false);
+    }
+
+    if (aActor == AppEvent::kEventType_Button)
+    {
+        sAppTask.UpdateClusterState();
     }
 }
 
@@ -414,5 +423,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         LOG_INF("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState()
+{
+    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
+                                                 ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        LOG_ERR("Updating on/off %x", status);
     }
 }
