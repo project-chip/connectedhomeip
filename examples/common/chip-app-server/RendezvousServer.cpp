@@ -115,7 +115,6 @@ void RendezvousServer::OnRendezvousMessageReceived(PacketBuffer * buffer)
     ThreadStackMgr().SetThreadEnabled(false);
     ThreadStackMgr().SetThreadProvision(networkInfo);
     ThreadStackMgr().SetThreadEnabled(true);
-
 #endif
 exit:
     chip::System::PacketBuffer::Free(buffer);
