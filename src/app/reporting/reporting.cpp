@@ -153,7 +153,7 @@ void emberAfPluginReportingStackStatusCallback(EmberStatus status)
     }
 }
 
-void emberAfPluginReportingInitCallback(void)
+extern "C" void emberAfPluginReportingInitCallback(void)
 {
     // On device initialization, any attributes that have been set up to report
     // should generate an attribute report.
@@ -171,7 +171,7 @@ void emberAfPluginReportingInitCallback(void)
     scheduleTick();
 }
 
-void emberAfPluginReportingTickEventHandler(void)
+extern "C" void emberAfPluginReportingTickEventHandler(void)
 {
     EmberApsFrame * apsFrame = NULL;
     EmberAfStatus status;
