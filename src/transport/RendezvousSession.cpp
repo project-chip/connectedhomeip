@@ -62,7 +62,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
         SuccessOrExit(err);
     }
 
-    mNetworkProvision.Init(this, mDeviceNetworkProvisionDelegate);
+    mNetworkProvision.Init(this);
 
 exit:
     return err;

@@ -18,9 +18,8 @@
 #ifndef __RENDEZVOUSDEVICEDELEGATE_H__
 #define __RENDEZVOUSDEVICEDELEGATE_H__
 
-#include "DeviceNetworkProvisioningDelegate.h"
-
 #include <platform/CHIPDeviceLayer.h>
+#include <platform/ESP32/DeviceNetworkProvisioningDelegateImpl.h>
 #include <transport/RendezvousSession.h>
 
 class RendezvousDeviceDelegate : public chip::RendezvousSessionDelegate
@@ -33,7 +32,7 @@ public:
 
 private:
     chip::RendezvousSession * mRendezvousSession;
-    ESP32NetworkProvisioningDelegate mDeviceNetworkProvisioningDelegate;
+    chip::DeviceLayer::DeviceNetworkProvisioningDelegateImpl mDeviceNetworkProvisioningDelegate;
 };
 
 #endif // __RENDEZVOUSDEVICEDELEGATE_H__
