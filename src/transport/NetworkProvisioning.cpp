@@ -26,24 +26,31 @@
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
+#if defined(CHIP_DEVICE_LAYER_TARGET)
+#define DEVICENETWORKPROVISIONING_HEADER <platform/CHIP_DEVICE_LAYER_TARGET/DeviceNetworkProvisioningDelegateImpl.h>
+#include DEVICENETWORKPROVISIONING_HEADER
+#endif
 #endif
 
 namespace chip {
 
-void NetworkProvisioning::Init(NetworkProvisioningDelegate * delegate, DeviceNetworkProvisioningDelegate * deviceDelegate)
+void NetworkProvisioning::Init(NetworkProvisioningDelegate * delegate)
 {
     mDelegate       = delegate;
-    mDeviceDelegate = deviceDelegate;
+#if CONFIG_DEVICE_LAYER
+#if defined(CHIP_DEVICE_LAYER_TARGET)
+    DeviceLayer::PlatformMgr().AddEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
+#endif
+#endif
 }
 
 NetworkProvisioning::~NetworkProvisioning()
 {
-    if (mDeviceDelegate != nullptr)
-    {
 #if CONFIG_DEVICE_LAYER
-        DeviceLayer::PlatformMgr().RemoveEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
+#if defined(CHIP_DEVICE_LAYER_TARGET)
+    DeviceLayer::PlatformMgr().RemoveEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
 #endif
-    }
+#endif
 }
 
 CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, System::PacketBuffer * msgBuf)
@@ -62,9 +69,7 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
         size_t len             = msgBuf->DataLength();
         size_t offset          = 0;
 
-        ChipLogProgress(NetworkProvisioning, "Received kWiFiAssociationRequest. DeviceDelegate %p", mDeviceDelegate);
-
-        VerifyOrExit(mDeviceDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+        ChipLogProgress(NetworkProvisioning, "Received kWiFiAssociationRequest.\n");
 
         err = DecodeString(&buffer[offset], len - offset, bbufSSID, offset);
         // TODO: Check for the error once network provisioning is moved to delegate calls
@@ -73,11 +78,11 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
         // TODO: Check for the error once network provisioning is moved to delegate calls
 
 #if CONFIG_DEVICE_LAYER
-        // Start listening for Internet connectivity changes to be able to respond with assigned IP Address
-        DeviceLayer::PlatformMgr().AddEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
+#if defined(CHIP_DEVICE_LAYER_TARGET)
+        DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
+        deviceDelegate.ProvisionWiFi(SSID, passwd);
 #endif
-
-        mDeviceDelegate->ProvisionWiFi(SSID, passwd);
+#endif
         err = CHIP_NO_ERROR;
     }
     break;
@@ -220,8 +225,6 @@ CHIP_ERROR NetworkProvisioning::DecodeThreadAssociationRequest(System::PacketBuf
     uint8_t * data                                       = msgBuf->Start();
     size_t dataLen                                       = msgBuf->DataLength();
 
-    VerifyOrExit(mDeviceDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
     VerifyOrExit(dataLen >= sizeof(networkInfo.ThreadNetworkName),
                  ChipLogProgress(NetworkProvisioning, "Invalid network provision message"));
     memcpy(networkInfo.ThreadNetworkName, data, sizeof(networkInfo.ThreadNetworkName));
@@ -277,9 +280,14 @@ CHIP_ERROR NetworkProvisioning::DecodeThreadAssociationRequest(System::PacketBuf
 #if CONFIG_DEVICE_LAYER
     // Start listening for OpenThread changes to be able to respond with SLAAC/On-Mesh IP Address
     DeviceLayer::PlatformMgr().AddEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
+#if defined(CHIP_DEVICE_LAYER_TARGET)
+    {
+        DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
+        deviceDelegate.ProvisionThread(networkInfo);
+    }
+#endif
 #endif
 
-    mDeviceDelegate->ProvisionThread(networkInfo);
 exit:
     return err;
 }

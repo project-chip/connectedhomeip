@@ -15,14 +15,22 @@
  *    limitations under the License.
  */
 
+/**
+ *    @file
+ *      This file defines the CHIP Device Network Provisioning object.
+ *
+ */
+
 #pragma once
 
-#include <core/CHIPError.h>
-#include <transport/NetworkProvisioning.h>
+#include <core/CHIPCore.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
-using namespace ::chip;
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
 
-class ESP32NetworkProvisioningDelegate : public DeviceNetworkProvisioningDelegate
+class DLL_EXPORT DeviceNetworkProvisioningDelegate
 {
 public:
     /**
@@ -32,5 +40,18 @@ public:
      * @param ssid WiFi SSID
      * @param passwd WiFi password
      */
-    void ProvisionWiFi(const char * ssid, const char * passwd) override;
+    virtual void ProvisionWiFi(const char * ssid, const char * passwd) {}
+
+    /**
+     * @brief
+     *   Called to provision Thread credentials in a device
+     *
+     */
+    virtual void ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData) {}
+
+    virtual ~DeviceNetworkProvisioningDelegate() {}
 };
+
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip
