@@ -151,7 +151,7 @@ void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     header.SetMessageType(112).SetExchangeID(2233);
     NL_TEST_ASSERT(inSuite, !header.GetVendorId().HasValue());
 
-    header.SetMessageType(112).SetExchangeID(2233).SetProtocolID(1221);
+    header.SetMessageType(112).SetExchangeID(2233).SetProtocolID(1221).SetInitiator(true);
     NL_TEST_ASSERT(inSuite, header.Encode(buffer, sizeof(buffer), &encodeLen) == CHIP_NO_ERROR);
 
     header.SetMessageType(221).SetExchangeID(3322).SetProtocolID(4567);
@@ -161,6 +161,7 @@ void TestPayloadHeaderEncodeDecode(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetExchangeID() == 2233);
     NL_TEST_ASSERT(inSuite, header.GetProtocolID() == 1221);
     NL_TEST_ASSERT(inSuite, !header.GetVendorId().HasValue());
+    NL_TEST_ASSERT(inSuite, header.IsInitiator());
 
     header.SetMessageType(112).SetExchangeID(2233).SetProtocolID(1221);
     header.SetVendorId(6789);
