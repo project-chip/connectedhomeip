@@ -45,7 +45,8 @@ inline void GenericDeviceNetworkProvisioningDelegateImpl<ImplClass>::ProvisionWi
 }
 
 template <class ImplClass>
-inline void GenericDeviceNetworkProvisioningDelegateImpl<ImplClass>::ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+inline void
+GenericDeviceNetworkProvisioningDelegateImpl<ImplClass>::ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
     Impl()->_ProvisionThreadNetwork(threadData);
 }
