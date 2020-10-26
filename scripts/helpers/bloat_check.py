@@ -328,7 +328,7 @@ def main():
       results = generateBloatReport(report_name, bOutput, aOutput)
 
       sendFileAsPrComment(prefix, report_name, args.github_api_token,
-                          args.github_repository,	pull_number, results, base_sha)
+                          args.github_repository, pull_number, results, base_sha)
 
       # If running over a top level directory, ensure git sees no output
       cleanDir(aOutput)
