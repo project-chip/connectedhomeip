@@ -102,10 +102,14 @@ public:
 
     virtual CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) = 0;
 
+    bool GetCommandExitStatus() const { return mCommandExitStatus; }
+    void SetCommandExitStatus(bool status) { mCommandExitStatus = status; }
+
 private:
     bool InitArgument(size_t argIndex, const char * argValue);
     size_t AddArgument(const char * name, int64_t min, int64_t max, void * out);
 
-    const char * mName = nullptr;
+    bool mCommandExitStatus = false;
+    const char * mName      = nullptr;
     std::vector<Argument> mArgs;
 };

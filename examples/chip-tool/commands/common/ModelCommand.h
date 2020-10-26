@@ -57,7 +57,7 @@ public:
 
 private:
     bool SendCommand(ChipDeviceController * dc);
-    void ReceiveCommandResponse(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) const;
+    bool ReceiveCommandResponse(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) const;
 
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(void);
