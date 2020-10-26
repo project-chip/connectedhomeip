@@ -707,23 +707,5 @@ void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::S
     }
 }
 
-void ScriptDevicePairingDelegate::SetWifiCredential(const char * ssid, const char * password)
-{
-    wifiSSID     = ssid;
-    wifiPassword = password;
-}
-
-void ScriptDevicePairingDelegate::OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback)
-{
-    callback->SendNetworkCredentials(wifiSSID.c_str(), wifiPassword.c_str());
-}
-
-void ScriptDevicePairingDelegate::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                                                    RendezvousDeviceCredentialsDelegate * callback)
-{
-    // TODO: Implement this
-    ChipLogDetail(Controller, "ScriptDevicePairingDelegate::OnOperationalCredentialsRequested\n");
-}
-
 } // namespace DeviceController
 } // namespace chip

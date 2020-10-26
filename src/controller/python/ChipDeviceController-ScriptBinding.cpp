@@ -43,6 +43,8 @@
 #include "ChipDeviceController-BlePlatformDelegate.h"
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
+#include "ChipDeviceController-ScriptDevicePairingDelegate.h"
+
 #include <controller/CHIPDeviceController.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
@@ -539,9 +541,9 @@ CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceCo
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::RendezvousParameters params =
         chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetConnectionObject(connObj).SetBleLayer(&sBle);
-    ;
     err = devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
     SuccessOrExit(err);
+
 exit:
     return err;
 }

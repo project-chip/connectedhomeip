@@ -100,21 +100,6 @@ public:
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
 };
 
-class DLL_EXPORT ScriptDevicePairingDelegate final : public DevicePairingDelegate
-{
-public:
-    ~ScriptDevicePairingDelegate() = default;
-    void SetWifiCredential(const char * ssid, const char * password);
-    void OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback) override;
-
-    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
-                                           RendezvousDeviceCredentialsDelegate * callback) override;
-
-private:
-    // WiFi Provisioning Data
-    std::string wifiSSID, wifiPassword;
-};
-
 class DLL_EXPORT ChipDeviceController : public SecureSessionMgrDelegate,
                                         public RendezvousSessionDelegate,
                                         public PersistentStorageResultDelegate

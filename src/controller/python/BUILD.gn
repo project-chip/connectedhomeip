@@ -37,6 +37,8 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-BlePlatformDelegate.cpp",
     "ChipDeviceController-BlePlatformDelegate.h",
     "ChipDeviceController-ScriptBinding.cpp",
+    "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
+    "ChipDeviceController-ScriptDevicePairingDelegate.h",
   ]
 
   public_deps = [
