@@ -141,7 +141,7 @@ def generateBloatReport(outputFileName,
 
 
 def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
-                        compare_results):
+                        compare_results, base_sha):
   """Generates a PR comment containing the specified file content."""
 
   logging.info('Uploading report to "%s", PR %d', gh_repo, gh_pr_number)
@@ -149,7 +149,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
   rawText = open(filename, 'rt').read()
 
   # a consistent title to help identify obsolete comments
-  titleHeading = 'Size increase report for "{jobName}"'.format(jobName=job_name)
+  titleHeading = 'Size increase report for "{jobName}" from {baseSha}'.format(jobName=job_name, baseSha=base_sha)
 
   api = github.Github(gh_token)
   repo = api.get_repo(gh_repo)
@@ -328,7 +328,7 @@ def main():
       results = generateBloatReport(report_name, bOutput, aOutput)
 
       sendFileAsPrComment(prefix, report_name, args.github_api_token,
-                          args.github_repository,	pull_number, results)
+                          args.github_repository,	pull_number, results, base_sha)
 
       # If running over a top level directory, ensure git sees no output
       cleanDir(aOutput)
