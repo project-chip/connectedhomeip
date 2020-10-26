@@ -15,29 +15,26 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include <support/logging/CHIPLogging.h>
 
-#include <platform/internal/GenericDeviceNetworkProvisioningDelegateImpl.h>
+#include "DeviceNetworkProvisioningDelegateImpl.h"
+#include "ServiceProvisioning.h"
+
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/ThreadStackManager.h>
+#endif
 
 namespace chip {
 namespace DeviceLayer {
 
-namespace Internal {
-
-template <class ImplClass>
-class GenericDeviceNetworkProvisioningDelegateImpl;
-
-} // namespace Internal
-
-class DeviceNetworkProvisioningDelegateImpl final
-    : public Internal::GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>
+void DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
-    friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
-
-private:
-    void _ProvisionWiFiNetwork(const char * ssid, const char * passwd) {}
-    void _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData);
-};
+#if CHIP_ENABLE_OPENTHREAD
+    ThreadStackMgr().SetThreadEnabled(false);
+    ThreadStackMgr().SetThreadProvision(threadData);
+    ThreadStackMgr().SetThreadEnabled(true);
+#endif // CHIP_ENABLE_OPENTHREAD
+}
 
 } // namespace DeviceLayer
 } // namespace chip
