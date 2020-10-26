@@ -853,7 +853,7 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 #if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
         (!UseManufacturerCredentialsAsOperational() && _OperationalDeviceCredentialsProvisioned()) &&
 #endif
-    // TODO: Add checks regarding fabric membership and account pairing, when functionalities will be implemented.
+        // TODO: Add checks regarding fabric membership and account pairing, when functionalities will be implemented.
         true;
 }
 
