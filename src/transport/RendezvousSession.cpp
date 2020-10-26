@@ -97,6 +97,7 @@ CHIP_ERROR RendezvousSession::SendMessage(System::PacketBuffer * msgBuf)
         break;
 
     default:
+        System::PacketBuffer::Free(msgBuf);
         err = CHIP_ERROR_INCORRECT_STATE;
         break;
     };
@@ -124,10 +125,13 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
     SuccessOrExit(err);
 
     msgBuf->ConsumeHead(headerSize);
-    err = mTransport->SendMessage(header, Header::Flags(), Transport::PeerAddress::BLE(), msgBuf);
+    err    = mTransport->SendMessage(header, Header::Flags(), Transport::PeerAddress::BLE(), msgBuf);
+    msgBuf = nullptr;
     SuccessOrExit(err);
 
 exit:
+    if (msgBuf)
+        System::PacketBuffer::Free(msgBuf);
     return err;
 }
 
@@ -174,13 +178,15 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    err = mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(), msgBuf);
+    err    = mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(), msgBuf);
+    msgBuf = nullptr;
     SuccessOrExit(err);
 
     mSecureMessageIndex++;
-    msgBuf = nullptr;
 
 exit:
+    if (msgBuf)
+        System::PacketBuffer::Free(msgBuf);
     return err;
 }
 
