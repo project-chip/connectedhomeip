@@ -24,9 +24,9 @@
 #
 
 from __future__ import absolute_import
+from __future__ import print_function
 from chip import ChipStack
 from chip import ChipDeviceCtrl
-from __future__ import print_function
 from builtins import range
 import sys
 import os
