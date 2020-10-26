@@ -34,6 +34,7 @@
 #include <support/RandUtils.h>
 
 #include "LightingManager.h"
+#include "Options.h"
 #include "Server.h"
 
 #include <cassert>
@@ -150,11 +151,14 @@ exit:
 }
 } // namespace
 
-int main()
+int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     err = chip::Platform::MemoryInit();
+    SuccessOrExit(err);
+
+    err = ParseArguments(argc, argv);
     SuccessOrExit(err);
 
     err = chip::DeviceLayer::PlatformMgr().InitChipStack();
@@ -167,7 +171,7 @@ int main()
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
 
-    chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(0, false);
+    chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(GetLinuxDeviceOptions().mBleDevice, false);
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(
         chip::DeviceLayer::ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
