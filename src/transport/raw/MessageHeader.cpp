@@ -210,15 +210,6 @@ CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data
 
     mExchangeFlags.SetRaw(header);
 
-    if (mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_Initiator))
-    {
-        SetInitiator(true);
-    }
-    else
-    {
-        SetInitiator(false);
-    }
-
     VerifyOrExit(size >= static_cast<size_t>(p - data) + sizeof(uint16_t), err = CHIP_ERROR_INVALID_ARGUMENT);
     mProtocolID = LittleEndian::Read16(p);
 
@@ -278,11 +269,9 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, size_t size, uint16_t * encode_
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t * p    = data;
-    uint8_t header = 0;
+    uint8_t header = mExchangeFlags.Raw();
 
     VerifyOrExit(size >= EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    header = header | mExchangeFlags.Raw();
 
     Write8(p, header);
     Write8(p, mMessageType);
