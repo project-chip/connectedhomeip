@@ -36,7 +36,7 @@ class DeviceNetworkProvisioningDelegateImpl final
 
 private:
     void _ProvisionWiFiNetwork(const char * ssid, const char * passwd) {}
-    void _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData) {}
+    void _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData);
 };
 
 } // namespace DeviceLayer

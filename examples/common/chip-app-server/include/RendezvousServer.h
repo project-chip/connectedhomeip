@@ -22,7 +22,7 @@
 
 namespace chip {
 
-class RendezvousServer : public RendezvousSessionDelegate, public DeviceNetworkProvisioningDelegate
+class RendezvousServer : public RendezvousSessionDelegate
 {
 public:
     RendezvousServer();
@@ -36,10 +36,6 @@ public:
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
     void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) override;
-
-    //////////// DeviceNetworkProvisioningDelegate Implementation ///////////////
-
-    void ProvisionThread(const DeviceLayer::Internal::DeviceNetworkInfo & threadData) override;
 
 private:
     RendezvousSession mRendezvousSession;
