@@ -60,6 +60,7 @@ extern "C" {
 } // extern "C"
 #endif // __cplusplus
 
+#include "basic-types.h"
 #include "types_stub.h" // For various types.
 
 #ifdef __cplusplus
@@ -69,21 +70,6 @@ extern "C" {
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"
 #endif
-
-/**
- * @brief Type for referring to zigbee application profile id
- */
-typedef uint16_t EmberAfProfileId;
-
-/**
- * @brief Type for referring to ZCL attribute id
- */
-typedef uint16_t EmberAfAttributeId;
-
-/**
- * @brief Type for referring to ZCL cluster id
- */
-typedef uint16_t EmberAfClusterId;
 
 /**
  * @brief Type for referring to ZCL attribute type
