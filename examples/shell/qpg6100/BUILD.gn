@@ -20,13 +20,14 @@ import("${qpg6100_sdk_build_root}/qpg6100_sdk.gni")
 
 assert(current_os == "freertos")
 
-qpg6100_project_dir = "${chip_root}/examples/lock-app/qpg6100"
 examples_plat_dir = "${chip_root}/examples/platform/qpg6100"
+project_dir = "${chip_root}/examples/shell"
 
 qpg6100_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/qpg6100",
     "${examples_plat_dir}/project_include",
+    "${chip_root}/src/app/util",
   ]
 
   sources = [ "${examples_plat_dir}/project_include/CHIPProjectConfig.h" ]
@@ -39,41 +40,44 @@ qpg6100_sdk("sdk") {
   }
 }
 
-qpg6100_executable("lock_app") {
+qpg6100_executable("shell_qpg6100") {
   include_dirs = []
   defines = []
-  output_name = "chip-qpg6100-lock-example.out"
+  output_name = "shell-qpg6100.out"
 
   public_deps = [
     ":sdk",
+    "${chip_root}/examples/shell/shell_common",
     "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
     "${chip_root}/src/setup_payload",
 
     #    OpenThread to be enabled
     #    https://github.com/project-chip/connectedhomeip/issues/293
-    #    "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
-    #    "${chip_root}/third_party/openthread/platforms:libopenthread-platform-utils",
-    #    "${chip_root}/third_party/openthread/repo:libopenthread-cli-ftd",
-    #    "${chip_root}/third_party/openthread/repo:libopenthread-ftd",
   ]
 
-  include_dirs += [
-    "${qpg6100_project_dir}/src/",
-    "${chip_root}/src/app/util",
-    "${examples_plat_dir}/",
-  ]
+  include_dirs += [ "${chip_root}/src/app/util" ]
 
-  sources = [ "src/main.cpp" ]
+  sources = [
+    "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
+    "${examples_plat_dir}/util/streamer/streamer_qpg6100.cpp",
+    "${project_dir}/test_identity.cpp",
+    "main.cpp",
+  ]
 
   output_dir = root_out_dir
 
   ldscript = "${qpg6100_sdk_root}/qpg6100/ldscripts/chip-qpg6100-example.ld"
 
   ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  defines = [
+    "QPG6100_SHELL_STREAMER",
+    "SHELL_STREAMER_APP_SPECIFIC",
+  ]
 }
 
 group("qpg6100") {
-  deps = [ ":lock_app" ]
+  deps = [ ":shell_qpg6100" ]
 }
 
 group("default") {
