@@ -49,6 +49,7 @@ static_library("support") {
     "Base64.h",
     "BitFlags.h",
     "BufBound.h",
+    "BufferReader.h",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
     "CHIPCounter.h",
