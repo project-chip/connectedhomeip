@@ -52,8 +52,6 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
         Transport::BLE * transport = chip::Platform::New<Transport::BLE>();
         err                        = transport->Init(this, mParams);
         mTransport                 = transport;
-        mTransport->Retain();
-        transport->Release();
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
     SuccessOrExit(err);
@@ -74,7 +72,7 @@ RendezvousSession::~RendezvousSession()
 {
     if (mTransport)
     {
-        mTransport->Release();
+        chip::Platform::Delete(mTransport);
         mTransport = nullptr;
     }
 

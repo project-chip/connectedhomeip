@@ -30,6 +30,7 @@
 #include <controller/CHIPDeviceController.h>
 #include <jni.h>
 #include <pthread.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
