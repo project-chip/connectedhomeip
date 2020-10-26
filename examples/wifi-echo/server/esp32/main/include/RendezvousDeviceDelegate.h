@@ -18,7 +18,6 @@
 #pragma once
 
 #include <platform/CHIPDeviceLayer.h>
-#include <platform/ESP32/DeviceNetworkProvisioningDelegateImpl.h>
 #include <transport/RendezvousSession.h>
 
 class RendezvousDeviceDelegate : public chip::RendezvousSessionDelegate
@@ -31,5 +30,4 @@ public:
 
 private:
     chip::RendezvousSession * mRendezvousSession;
-    chip::DeviceLayer::DeviceNetworkProvisioningDelegateImpl mDeviceNetworkProvisioningDelegate;
 };
