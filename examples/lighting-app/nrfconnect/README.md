@@ -106,7 +106,8 @@ container:
 
         $ mkdir ~/nrfconnect
         $ mkdir ~/connectedhomeip
-        $ docker run --rm -it --privileged -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip nordicsemi/nrfconnect-chip
+        $ docker pull nordicsemi/nrfconnect-chip
+        $ docker run --rm -it -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
 
 > **Note**:
 >
@@ -114,9 +115,10 @@ container:
 >     source directory in case you have it already installed.
 > -   Likewise, `~/connectedhomeip` can be replaced with an absolute path to
 >     CHIP source directory.
-> -   `--privileged` flag can be omitted if you're not planning to flash the
->     example onto hardware. The parameter gives the container access to devices
->     connected to your computer when the container is started.
+> -   `-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule 'c 189:* rmw`
+>     parameters can be omitted if you're not planning to flash the example onto
+>     hardware. The parameters give the container access to USB devices
+>     connected to your computer such as the nRF52840 DK.
 > -   `--rm` flag can be omitted if you don't want the container to be
 >     auto-removed when you exit the container shell session.
 
