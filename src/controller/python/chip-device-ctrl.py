@@ -24,6 +24,8 @@
 #
 
 from __future__ import absolute_import
+from chip import ChipStack
+from chip import ChipDeviceCtrl
 from __future__ import print_function
 from builtins import range
 import sys
@@ -59,22 +61,19 @@ for relInstallDir in relChipPackageInstallDirs:
     if os.path.isdir(os.path.join(absInstallDir, "chip")):
         sys.path.insert(0, absInstallDir)
 
-from chip import ChipDeviceCtrl
-from chip import ChipStack
 
 if platform.system() == 'Darwin':
     from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
 elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
 
-from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
-
 
 def DecodeBase64Option(option, opt, value):
     try:
         return base64.standard_b64decode(value)
     except TypeError:
-        raise OptionValueError("option %s: invalid base64 value: %r" % (opt, value))
+        raise OptionValueError(
+            "option %s: invalid base64 value: %r" % (opt, value))
 
 
 def DecodeHexIntOption(option, opt, value):
@@ -104,7 +103,8 @@ class DeviceMgrCmd(Cmd):
 
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController()
 
-        self.historyFileName = os.path.expanduser("~/.chip-device-ctrl-history")
+        self.historyFileName = os.path.expanduser(
+            "~/.chip-device-ctrl-history")
 
         try:
             import readline
@@ -362,10 +362,16 @@ class DeviceMgrCmd(Cmd):
             return
 
         print("BTP Connected")
-    
+
     def do_connect(self, line):
         """
-        connect (rendezvous)
+        connect (via BLE) <setup pin code>
+
+        connect command is used for establishing a rendezvous session to the device.
+        currently, only connect using setupPinCode is supported.
+
+        TODO: Add more methods to connect to device (like cert for auth, and IP
+              for connection)
         """
 
         try:
@@ -382,7 +388,7 @@ class DeviceMgrCmd(Cmd):
             print(str(ex))
             return
         print("Connected")
-    
+
     def do_setpairingwificredential(self, line):
         """
         set-pairing-wifi-credential
