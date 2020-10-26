@@ -22,7 +22,7 @@
 
 using namespace ::chip;
 
-void ESP32NetworkProvisioningDelegate::ProvisionNetwork(const char * ssid, const char * key)
+void ESP32NetworkProvisioningDelegate::ProvisionWiFi(const char * ssid, const char * key)
 {
     ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
     SetWiFiStationProvisioning(ssid, key);

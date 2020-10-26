@@ -76,6 +76,7 @@ public:
     CHIP_ERROR GetAndLogThreadTopologyMinimal();
     CHIP_ERROR GetAndLogThreadTopologyFull();
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
+    CHIP_ERROR GetSlaacIPv6Address(chip::Inet::IPAddress & addr);
 
     CHIP_ERROR JoinerStart();
     CHIP_ERROR SetThreadProvision(const Internal::DeviceNetworkInfo & netInfo);
@@ -303,6 +304,11 @@ inline CHIP_ERROR ThreadStackManager::GetAndLogThreadTopologyFull()
 inline CHIP_ERROR ThreadStackManager::GetPrimary802154MACAddress(uint8_t * buf)
 {
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
+}
+
+inline CHIP_ERROR ThreadStackManager::GetSlaacIPv6Address(chip::Inet::IPAddress & addr)
+{
+    return static_cast<ImplClass *>(this)->_GetSlaacIPv6Address(addr);
 }
 
 inline CHIP_ERROR ThreadStackManager::JoinerStart()
