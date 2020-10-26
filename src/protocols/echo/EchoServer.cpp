@@ -23,18 +23,18 @@
  *
  */
 
-#include "CHIPEcho.h"
+#include "Echo.h"
 
 namespace chip {
 namespace Protocols {
 
-ChipEchoServer::ChipEchoServer()
+EchoServer::EchoServer()
 {
     ExchangeMgr           = nullptr;
     OnEchoRequestReceived = nullptr;
 }
 
-CHIP_ERROR ChipEchoServer::Init(ExchangeManager * exchangeMgr)
+CHIP_ERROR EchoServer::Init(ExchangeManager * exchangeMgr)
 {
     // Error if already initialized.
     if (ExchangeMgr != nullptr)
@@ -49,7 +49,7 @@ CHIP_ERROR ChipEchoServer::Init(ExchangeManager * exchangeMgr)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipEchoServer::Shutdown()
+CHIP_ERROR EchoServer::Shutdown()
 {
     if (ExchangeMgr != nullptr)
     {
@@ -60,10 +60,10 @@ CHIP_ERROR ChipEchoServer::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-void ChipEchoServer::HandleEchoRequest(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                       uint8_t msgType, System::PacketBuffer * payload)
+void EchoServer::HandleEchoRequest(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+                                   System::PacketBuffer * payload)
 {
-    ChipEchoServer * echoApp = static_cast<ChipEchoServer *>(ec->GetAppState());
+    EchoServer * echoApp = static_cast<EchoServer *>(ec->GetAppState());
 
     // NOTE: we already know this is an Echo Request message because we explicitly registered with the
     // Exchange Manager for unsolicited Echo Requests.

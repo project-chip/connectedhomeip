@@ -23,19 +23,19 @@
  *
  */
 
-#include "CHIPEcho.h"
+#include "Echo.h"
 
 namespace chip {
 namespace Protocols {
 
-ChipEchoClient::ChipEchoClient()
+EchoClient::EchoClient()
 {
     ExchangeMgr            = nullptr;
     OnEchoResponseReceived = nullptr;
     ExchangeCtx            = nullptr;
 }
 
-CHIP_ERROR ChipEchoClient::Init(ExchangeManager * exchangeMgr)
+CHIP_ERROR EchoClient::Init(ExchangeManager * exchangeMgr)
 {
     // Error if already initialized.
     if (ExchangeMgr != nullptr)
@@ -48,7 +48,7 @@ CHIP_ERROR ChipEchoClient::Init(ExchangeManager * exchangeMgr)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipEchoClient::Shutdown()
+CHIP_ERROR EchoClient::Shutdown()
 {
     if (ExchangeCtx != nullptr)
     {
@@ -61,16 +61,7 @@ CHIP_ERROR ChipEchoClient::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-/**
- * Send an echo request to a CHIP node.
- *
- * @param nodeId        The destination's nodeId
- * @param payload       A System::PacketBuffer with the payload. This function takes ownership of the System::PacketBuffer
- *
- * @return CHIP_ERROR_NO_MEMORY if no ExchangeContext is available.
- *         Other CHIP_ERROR codes as returned by the lower layers.
- */
-CHIP_ERROR ChipEchoClient::SendEchoRequest(uint64_t nodeId, System::PacketBuffer * payload)
+CHIP_ERROR EchoClient::SendEchoRequest(uint64_t nodeId, System::PacketBuffer * payload)
 {
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.
@@ -91,7 +82,7 @@ CHIP_ERROR ChipEchoClient::SendEchoRequest(uint64_t nodeId, System::PacketBuffer
     return SendEchoRequest(payload);
 }
 
-CHIP_ERROR ChipEchoClient::SendEchoRequest(System::PacketBuffer * payload)
+CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBuffer * payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -108,10 +99,10 @@ CHIP_ERROR ChipEchoClient::SendEchoRequest(System::PacketBuffer * payload)
     return err;
 }
 
-void ChipEchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                       uint8_t msgType, System::PacketBuffer * payload)
+void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+                                   System::PacketBuffer * payload)
 {
-    ChipEchoClient * echoApp = static_cast<ChipEchoClient *>(ec->GetAppState());
+    EchoClient * echoApp = static_cast<EchoClient *>(ec->GetAppState());
 
     // Assert that the exchange context matches the client's current context.
     // This should never fail because even if SendEchoRequest is called

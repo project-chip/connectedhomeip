@@ -18,9 +18,9 @@ static_library("protocols") {
   output_name = "libChipProtocols"
 
   sources = [
-    "echo/CHIPEcho.h",
-    "echo/CHIPEchoClient.cpp",
-    "echo/CHIPEchoServer.cpp",
+    "echo/Echo.h",
+    "echo/EchoClient.cpp",
+    "echo/EchoServer.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
