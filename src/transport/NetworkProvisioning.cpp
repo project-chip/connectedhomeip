@@ -239,16 +239,16 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
         buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
-        err = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
+        err    = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
                                            NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer);
+        buffer = nullptr;
     }
 
 exit:
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogError(NetworkProvisioning, "Failed to send Thread Credentials: %s", ErrorStr(err));
+    if (buffer)
         System::PacketBuffer::Free(buffer);
-    }
+    if (CHIP_NO_ERROR != err)
+        ChipLogError(NetworkProvisioning, "Failed to send Thread Credentials: %s", ErrorStr(err));
     return err;
 }
 
