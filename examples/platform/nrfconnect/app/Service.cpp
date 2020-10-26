@@ -36,7 +36,7 @@
 #include <platform/nrfconnect/ThreadStackManagerImpl.h>
 #endif
 
-LOG_MODULE_DECLARE(serv);
+LOG_MODULE_DECLARE(app);
 
 // Transport Callbacks
 namespace {
