@@ -31,4 +31,10 @@
         </activity>
     </application>
 
+    <queries>
+        <intent>
+            <action android:name="chip.intent.action.ATTESTATION"/>
+        </intent>
+    </queries>
+
 </manifest>

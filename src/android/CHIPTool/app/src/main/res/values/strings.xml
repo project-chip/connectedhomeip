@@ -53,4 +53,8 @@
     <string name="commissioner_location_permission_missing_alert_title">Location permission missing</string>
     <string name="commissioner_location_permission_missing_alert_message">Location permission is required to scan BLE devices.</string>
     <string name="commissioner_location_permission_missing_alert_try_again">Try again</string>
+
+    <string name="attestation_test_btn_text">Attestation Test</string>
+    <string name="attestation_fetching_status">Fetching…</string>
+    <string name="attestation_app_not_found">No attestation app found</string>
 </resources>
