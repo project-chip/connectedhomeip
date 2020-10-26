@@ -19,6 +19,8 @@
 
 #include "LightingManager.h"
 
+#include <cstdio>
+
 LightingManager LightingManager::sLight;
 
 int LightingManager::Init()

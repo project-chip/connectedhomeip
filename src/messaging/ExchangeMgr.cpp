@@ -31,6 +31,7 @@
 
 #include <inttypes.h>
 #include <stddef.h>
+#include <cstring>
 
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
@@ -70,7 +71,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgrBase * sessionMgr)
 
     mNextExchangeId = GetRandU16();
 
-    memset(ContextPool, 0, sizeof(ContextPool));
+    memset((void*)ContextPool, 0, sizeof(ContextPool));
     mContextsInUse = 0;
 
     memset(UMHandlerPool, 0, sizeof(UMHandlerPool));
