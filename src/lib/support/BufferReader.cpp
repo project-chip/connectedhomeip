@@ -44,7 +44,7 @@ void ReadHelper(const uint8_t *& p, uint64_t * dest)
 } // anonymous namespace
 
 template <typename T>
-void Reader::Read(T * retval)
+void Reader::RawRead(T * retval)
 {
     static_assert(CHAR_BIT == 8, "Our various sizeof checks rely on bytes and octets being the same thing");
 
@@ -63,10 +63,10 @@ void Reader::Read(T * retval)
 }
 
 // Explicit Read instantiations for the data types we want to support.
-template void Reader::Read(uint8_t *);
-template void Reader::Read(uint16_t *);
-template void Reader::Read(uint32_t *);
-template void Reader::Read(uint64_t *);
+template void Reader::RawRead(uint8_t *);
+template void Reader::RawRead(uint16_t *);
+template void Reader::RawRead(uint32_t *);
+template void Reader::RawRead(uint64_t *);
 
 } // namespace LittleEndian
 } // namespace Encoding

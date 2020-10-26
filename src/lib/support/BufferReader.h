@@ -79,7 +79,7 @@ public:
     CHECK_RETURN_VALUE
     Reader & Read8(uint8_t * dest)
     {
-        Read(dest);
+        RawRead(dest);
         return *this;
     }
 
@@ -96,7 +96,7 @@ public:
     CHECK_RETURN_VALUE
     Reader & Read16(uint16_t * dest)
     {
-        Read(dest);
+        RawRead(dest);
         return *this;
     }
 
@@ -113,7 +113,7 @@ public:
     CHECK_RETURN_VALUE
     Reader & Read32(uint32_t * dest)
     {
-        Read(dest);
+        RawRead(dest);
         return *this;
     }
 
@@ -130,17 +130,19 @@ public:
     CHECK_RETURN_VALUE
     Reader & Read64(uint64_t * dest)
     {
-        Read(dest);
+        RawRead(dest);
         return *this;
     }
 
-protected:
     /**
      * Helper for our various APIs so we don't have to write out various logic
-     * multiple times.
+     * multiple times.  This is public so that consumers that want to read into
+     * whatever size a logical thing they are reading into has don't have to
+     * hardcode the right API.  This is meant for other reader classes that
+     * delegate to this one.
      */
     template <typename T>
-    void Read(T * retval);
+    void RawRead(T * retval);
 
 private:
     /**
