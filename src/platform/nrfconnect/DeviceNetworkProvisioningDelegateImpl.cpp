@@ -15,10 +15,7 @@
  *    limitations under the License.
  */
 
-#include <support/logging/CHIPLogging.h>
-
 #include "DeviceNetworkProvisioningDelegateImpl.h"
-#include "ServiceProvisioning.h"
 
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
