@@ -41,6 +41,9 @@ VERSION=${DOCKER_RUN_VERSION:-$(cat "$here/version")} ||
           DOCKER_RUN_IMAGE
           DOCKER_RUN_VERSION"
 
+# full image name
+FULL_IMAGE_NAME="$ORG/$IMAGE${VERSION:+:${VERSION}}"
+
 # where
 RUN_DIR=${DOCKER_RUN_DIR:-$(pwd)}
 
@@ -101,4 +104,6 @@ for arg in "$@"; do
     esac
 done
 
-docker run "${runargs[@]}" --rm --mount "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" -w "$RUN_DIR" -v "$RUN_DIR:$RUN_DIR" "$ORG/$IMAGE${VERSION:+:${VERSION}}" "$@"
+docker pull "$FULL_IMAGE_NAME" || "$here"/build.sh
+
+docker run "${runargs[@]}" --rm --mount "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" -w "$RUN_DIR" -v "$RUN_DIR:$RUN_DIR" "$FULL_IMAGE_NAME" "$@"
