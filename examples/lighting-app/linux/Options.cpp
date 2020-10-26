@@ -35,7 +35,7 @@ LinuxDeviceOptions::LinuxDeviceOptions()
 namespace {
 enum
 {
-    kDeviceOption_BleDevice = 0xF000,
+    kDeviceOption_BleDevice = 0x1000,
 };
 
 OptionDef sDeviceOptionDefs[] = { { "ble-device", kArgumentRequired, kDeviceOption_BleDevice }, {} };
