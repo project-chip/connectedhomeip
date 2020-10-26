@@ -32,7 +32,7 @@
  *      implementation should be reviewed and adjusted accordingly.
  *
  *      Where available, the library can also consume dedicated memory buffer during memory initialization
- *      with MemoryInit() function.
+ *      with MemoryAllocatorInit() function.
  *
  *      The Simple Allocator design is highly parametrized and the number of
  *      buffers, number and sizes of memory blocks can be changed according to new
@@ -260,7 +260,7 @@ static const BlockMark_t sBufferAllocationMask[kNumberOfNetworkBuffers] = {
 
 /**
  * A boolean indicating whether (true) or not (false) the network buffers are used by Simple Allocator.
- * When false - dedicated buffer provided with MemoryInit() function is used.
+ * When false - dedicated buffer provided with MemoryAllocatorInit() function is used.
  *
  */
 static bool sNetworkBuffersUsed = true;
@@ -331,7 +331,7 @@ static uint16_t GetBlockSize(void * p)
     return 0;
 }
 
-CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
+CHIP_ERROR MemoryAllocatorInit(void * buf, size_t bufSize)
 {
     if (buf != NULL)
     {
@@ -356,7 +356,7 @@ CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
     return CHIP_NO_ERROR;
 }
 
-void MemoryShutdown()
+void MemoryAllocatorShutdown()
 {
     if (sNetworkBuffersUsed)
     {
