@@ -392,6 +392,11 @@ exit:
         PacketBuffer::Free(origMsg);
     }
 
+    if (msgBuf != nullptr)
+    {
+        PacketBuffer::Free(msgBuf);
+    }
+
     return err;
 }
 
