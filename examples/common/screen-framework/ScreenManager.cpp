@@ -115,9 +115,11 @@ void DisplayVLED(int id)
                  vleds[id].on ? vleds[id].color : vleds[id].color_off);
 }
 
-}; // namespace
+} // namespace
 
-void ScreenManager::Init()
+namespace ScreenManager {
+
+void Init()
 {
     mutex = xSemaphoreCreateRecursiveMutex();
 
@@ -129,7 +131,7 @@ void ScreenManager::Init()
     ScreenTitleSafeTop = ScreenFontHeight * 5 / 2;
 }
 
-void ScreenManager::Display()
+void Display()
 {
     Lock lock;
 
@@ -184,7 +186,7 @@ void ScreenManager::Display()
     screens.back()->Display();
 }
 
-void ScreenManager::ButtonPressed(int id)
+void ButtonPressed(int id)
 {
     Lock lock;
     LazyDisplay lazy;
@@ -218,7 +220,7 @@ void ScreenManager::ButtonPressed(int id)
     }
 }
 
-void ScreenManager::PushScreen(Screen * screen)
+void PushScreen(Screen * screen)
 {
     Lock lock;
     LazyDisplay lazy;
@@ -249,7 +251,7 @@ void ScreenManager::PushScreen(Screen * screen)
     Display();
 }
 
-void ScreenManager::PopScreen()
+void PopScreen()
 {
     Lock lock;
     LazyDisplay lazy;
@@ -282,7 +284,7 @@ void ScreenManager::PopScreen()
     Display();
 }
 
-void ScreenManager::FocusBack()
+void FocusBack()
 {
     Lock lock;
     if (screens.size() > 1)
@@ -299,7 +301,7 @@ void ScreenManager::FocusBack()
     }
 }
 
-int ScreenManager::AddVLED(color_t color)
+int AddVLED(color_t color)
 {
     Lock lock;
     int id = vleds.size();
@@ -308,7 +310,7 @@ int ScreenManager::AddVLED(color_t color)
     return id;
 }
 
-void ScreenManager::SetVLED(int id, bool on)
+void SetVLED(int id, bool on)
 {
     Lock lock;
     if (vleds[id].on == on)
@@ -321,12 +323,14 @@ void ScreenManager::SetVLED(int id, bool on)
     WakeDisplay();
 }
 
-void ScreenManager::ToggleVLED(int id)
+void ToggleVLED(int id)
 {
     Lock lock;
     vleds[id].on = !vleds[id].on;
     DisplayVLED(id);
     WakeDisplay();
 }
+
+} // namespace ScreenManager
 
 #endif // CONFIG_HAVE_DISPLAY
