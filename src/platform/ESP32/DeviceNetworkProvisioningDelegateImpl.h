@@ -22,29 +22,22 @@
 namespace chip {
 namespace DeviceLayer {
 
+namespace Internal {
+
+template <class ImplClass>
+class GenericDeviceNetworkProvisioningDelegateImpl;
+
+} // namespace Internal
+
 class DeviceNetworkProvisioningDelegateImpl final
     : public Internal::GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>
 {
 private:
-    friend class Internal::GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
-    friend DeviceNetworkProvisioningDelegateImpl & GetDeviceNetworkProvisioningDelegateImpl(void);
+    friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
 
     void _ProvisionWiFiNetwork(const char * ssid, const char * passwd);
     void _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData) {}
-
-    static DeviceNetworkProvisioningDelegateImpl sInstance;
 };
-
-/**
- * Returns the platform-specific implementation of the DeviceNetworkProvisioningDelegateImpl singleton object.
- *
- * Internal components can use this to gain access to features of the DeviceNetworkProvisioningDelegateImpl
- * that are specific to the ESP32 platform.
- */
-inline DeviceNetworkProvisioningDelegateImpl & GetDeviceNetworkProvisioningDelegateImpl(void)
-{
-    return DeviceNetworkProvisioningDelegateImpl::sInstance;
-}
 
 } // namespace DeviceLayer
 } // namespace chip

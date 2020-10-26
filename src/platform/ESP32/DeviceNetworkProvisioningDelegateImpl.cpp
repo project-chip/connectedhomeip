@@ -23,8 +23,6 @@
 namespace chip {
 namespace DeviceLayer {
 
-DeviceNetworkProvisioningDelegateImpl DeviceNetworkProvisioningDelegateImpl::sInstance;
-
 void DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
     ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
