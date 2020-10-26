@@ -36,6 +36,7 @@ namespace chip {
 
 void NetworkProvisioning::Init(NetworkProvisioningDelegate * delegate)
 {
+    mDelegate = delegate;
 #if CONFIG_DEVICE_LAYER
 #if defined(CHIP_DEVICE_LAYER_TARGET)
     DeviceLayer::PlatformMgr().AddEventHandler(ConnectivityHandler, reinterpret_cast<intptr_t>(this));
