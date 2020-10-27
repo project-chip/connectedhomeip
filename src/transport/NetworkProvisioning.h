@@ -36,29 +36,6 @@
 
 namespace chip {
 
-class DLL_EXPORT DeviceNetworkProvisioningDelegate
-{
-public:
-    /**
-     * @brief
-     *   Called to provision WiFi credentials in a device
-     *
-     * @param ssid WiFi SSID
-     * @param passwd WiFi password
-     */
-    virtual void ProvisionWiFi(const char * ssid, const char * passwd) {}
-
-    /**
-     * @brief
-     *   Called to provision Thread credentials in a device
-     *
-     * @param threadData Thread settings and credentials
-     */
-    virtual void ProvisionThread(const DeviceLayer::Internal::DeviceNetworkInfo & threadData) {}
-
-    virtual ~DeviceNetworkProvisioningDelegate() {}
-};
-
 class DLL_EXPORT NetworkProvisioningDelegate
 {
 public:
@@ -103,7 +80,7 @@ public:
         kThreadAssociationRequest = 2
     };
 
-    void Init(NetworkProvisioningDelegate * delegate, DeviceNetworkProvisioningDelegate * deviceDelegate);
+    void Init(NetworkProvisioningDelegate * delegate);
 
     ~NetworkProvisioning();
 
@@ -121,8 +98,7 @@ public:
     const Inet::IPAddress & GetIPAddress() const { return mDeviceAddress; }
 
 private:
-    NetworkProvisioningDelegate * mDelegate             = nullptr;
-    DeviceNetworkProvisioningDelegate * mDeviceDelegate = nullptr;
+    NetworkProvisioningDelegate * mDelegate = nullptr;
 
     Inet::IPAddress mDeviceAddress = Inet::IPAddress::Any;
 

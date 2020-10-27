@@ -15,25 +15,23 @@
  *    limitations under the License.
  */
 
-#ifndef _DEVICE_NETWORK_PROVISIONING_DELEGATE_H_
-#define _DEVICE_NETWORK_PROVISIONING_DELEGATE_H_
+#include "DeviceNetworkProvisioningDelegateImpl.h"
 
-#include <core/CHIPError.h>
-#include <transport/NetworkProvisioning.h>
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/ThreadStackManager.h>
+#endif
 
-using namespace ::chip;
+namespace chip {
+namespace DeviceLayer {
 
-class ESP32NetworkProvisioningDelegate : public DeviceNetworkProvisioningDelegate
+void DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
-public:
-    /**
-     * @brief
-     *   Called to provision WiFi credentials in a device
-     *
-     * @param ssid WiFi SSID
-     * @param passwd WiFi password
-     */
-    void ProvisionNetwork(const char * ssid, const char * passwd) override;
-};
+#if CHIP_ENABLE_OPENTHREAD
+    ThreadStackMgr().SetThreadEnabled(false);
+    ThreadStackMgr().SetThreadProvision(threadData);
+    ThreadStackMgr().SetThreadEnabled(true);
+#endif // CHIP_ENABLE_OPENTHREAD
+}
 
-#endif // _DEVICE_NETWORK_PROVISIONING_DELEGATE_H_
+} // namespace DeviceLayer
+} // namespace chip

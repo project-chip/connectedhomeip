@@ -46,7 +46,7 @@ RendezvousDeviceDelegate::RendezvousDeviceDelegate()
 
     params.SetSetupPINCode(setupPINCode).SetLocalNodeId(kLocalNodeId).SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
 
-    mRendezvousSession = chip::Platform::New<RendezvousSession>(this, &mDeviceNetworkProvisioningDelegate);
+    mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     err                = mRendezvousSession->Init(params);
 
 exit:

@@ -15,12 +15,23 @@
  *    limitations under the License.
  */
 
-#include "DeviceNetworkProvisioningDelegate.h"
-#include <support/logging/CHIPLogging.h>
+#include "DeviceNetworkProvisioningDelegateImpl.h"
 
-using namespace ::chip;
+#if CHIP_ENABLE_OPENTHREAD
+#include <platform/ThreadStackManager.h>
+#endif
 
-void ESP32NetworkProvisioningDelegate::ProvisionNetwork(const char * ssid, const char * passwd)
+namespace chip {
+namespace DeviceLayer {
+
+void DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
-    ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: Received SSID and passwd\n");
+#if CHIP_ENABLE_OPENTHREAD
+    ThreadStackMgr().SetThreadEnabled(false);
+    ThreadStackMgr().SetThreadProvision(threadData);
+    ThreadStackMgr().SetThreadEnabled(true);
+#endif // CHIP_ENABLE_OPENTHREAD
 }
+
+} // namespace DeviceLayer
+} // namespace chip

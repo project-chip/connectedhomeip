@@ -43,7 +43,7 @@ RendezvousDeviceDelegate::RendezvousDeviceDelegate()
 
     params.SetSetupPINCode(setupPINCode).SetLocalNodeId(kLocalNodeId).SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
 
-    mRendezvousSession = new RendezvousSession(this, &mDeviceNetworkProvisioningDelegate);
+    mRendezvousSession = new RendezvousSession(this);
     err                = mRendezvousSession->Init(params);
 
 exit:

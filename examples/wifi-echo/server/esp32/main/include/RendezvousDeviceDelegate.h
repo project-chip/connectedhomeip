@@ -17,8 +17,6 @@
 
 #pragma once
 
-#include "DeviceNetworkProvisioningDelegate.h"
-
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/RendezvousSession.h>
 
@@ -32,5 +30,4 @@ public:
 
 private:
     chip::RendezvousSession * mRendezvousSession;
-    ESP32NetworkProvisioningDelegate mDeviceNetworkProvisioningDelegate;
 };
