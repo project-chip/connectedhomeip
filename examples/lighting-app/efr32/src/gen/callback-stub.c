@@ -831,4 +831,3 @@ bool __attribute__((weak))  emberAfZLLCommissioningClusterScanRequestCallback( u
 
     return false;
 }
-
