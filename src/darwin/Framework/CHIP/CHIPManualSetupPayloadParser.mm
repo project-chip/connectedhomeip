@@ -55,9 +55,9 @@
             *error = [CHIPError errorForCHIPErrorCode:chipError];
         }
     } else {
-        //Memory init has failed
+        // Memory init has failed
         if (error) {
-        *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
+            *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
         }
     }
 
