@@ -29,7 +29,6 @@ RUN set -x \
     wget \
     iproute2 \
     libmbedtls-dev \
-    openjdk-11-jdk \
     python3 \
     python3-dev \
     python3-pip \
