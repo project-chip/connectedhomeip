@@ -49,6 +49,7 @@ extern "C" {
 #endif // CHIP_ENABLE_OPENTHREAD
 #include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <support/CHIPMem.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace ::chip;
@@ -77,6 +78,13 @@ ret_code_t ChipInit()
     ret_code_t ret = CHIP_NO_ERROR;
 
     NRF_LOG_INFO("Init CHIP stack");
+    ret = chip::Platform::MemoryInit();
+    if (ret != CHIP_NO_ERROR)
+    {
+        NRF_LOG_INFO("PlatformMgr().InitChipStack() failed");
+        APP_ERROR_HANDLER(ret);
+    }
+
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
