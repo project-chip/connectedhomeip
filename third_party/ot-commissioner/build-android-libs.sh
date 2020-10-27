@@ -20,9 +20,10 @@ case "$TARGET_CPU" in
     *)
         echo "invalid TARGET_CPU value: $TARGET_CPU"
         exit 1
+        ;;
 esac
 
-readonly BUILD_DIR=".build_${TARGET_CPU}"
+readonly BUILD_DIR=".build_$TARGET_CPU"
 
 cd "$CUR_DIR"
 
