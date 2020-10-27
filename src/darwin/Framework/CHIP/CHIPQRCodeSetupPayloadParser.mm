@@ -31,12 +31,12 @@
 - (id)initWithBase41Representation:(NSString *)base41Representation
 {
     if (self = [super init]) {
-        _base41Representation = base41Representation;
-        _chipQRCodeSetupPayloadParser = new chip::QRCodeSetupPayloadParser(std::string([base41Representation UTF8String]));
         if (CHIP_NO_ERROR != chip::Platform::MemoryInit()) {
             CHIP_LOG_ERROR("Error: couldn't initialize platform memory");
-            delete _chipQRCodeSetupPayloadParser;
+            return self;
         }
+        _base41Representation = base41Representation;
+        _chipQRCodeSetupPayloadParser = new chip::QRCodeSetupPayloadParser(std::string([base41Representation UTF8String]));
     }
     return self;
 }
