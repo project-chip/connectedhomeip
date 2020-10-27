@@ -1057,7 +1057,8 @@ uint16_t encodeOnOffClusterReadOnOffAttribute(uint8_t * buffer, uint16_t buf_len
  *    Encode an add-scene command for Scenes server into buffer including the APS frame
  */
 uint16_t encodeScenesClusterAddSceneCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t groupID,
-                                            uint8_t sceneID, uint16_t transitionTime, char * sceneName, void * extensionFieldSets);
+                                            uint8_t sceneID, uint16_t transitionTime, char * sceneName, uint16_t clusterId,
+                                            char * extensionFieldSet);
 
 /**
  * @brief
@@ -1073,7 +1074,7 @@ uint16_t encodeScenesClusterCopySceneCommand(uint8_t * buffer, uint16_t buf_leng
  */
 uint16_t encodeScenesClusterEnhancedAddSceneCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
                                                     uint16_t groupID, uint8_t sceneID, uint16_t transitionTime, char * sceneName,
-                                                    void * extensionFieldSets);
+                                                    uint16_t clusterId, char * extensionFieldSet);
 
 /**
  * @brief

@@ -122,7 +122,6 @@ public:
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint32);
     }
-    size_t AddArgument(const char * name, const void * value) { return 0; };
 
     virtual CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) = 0;
 
