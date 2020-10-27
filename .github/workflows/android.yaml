@@ -28,11 +28,12 @@ jobs:
 
         env:
             BUILD_TYPE: android_${{ matrix.type }}
+            TARGET_CPU: ${{ matrix.type }}
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-android:0.4.8
+            image: connectedhomeip/chip-build-android:0.4.13
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -45,19 +46,4 @@ jobs:
               run: scripts/build/gn_bootstrap.sh
             - name: Setup Build
               run: |
-                  GN_ARGS="is_clang=true target_os=\"android\" target_cpu=\"${{ matrix.type }}\" android_ndk_root=\"/opt/android/android-ndk-r21b\" android_sdk_root=\"/opt/android/sdk\""
-                  scripts/build/gn_gen.sh --args="$GN_ARGS"
-            - name: Run Build CHIP libs
-              run: |
-                  scripts/build/gn_build.sh
-                  rsync -a out/lib/*.jar src/android/CHIPTool/app/libs
-                  rsync -a out/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs
-            - name: Run Build OT Commissioner libs
-              run: |
-                  git submodule update --init --recursive third_party/ot-commissioner/repo
-                  TARGET_CPU=${{ matrix.type }} API=21 ./third_party/ot-commissioner/build-android-libs.sh
-            - name: Run Build Android App
-              run: |
-                  yes | /opt/android/sdk/tools/bin/sdkmanager --licenses
-                  cd src/android/CHIPTool
-                  ./gradlew build
+                  ./scripts/examples/android_app.sh
