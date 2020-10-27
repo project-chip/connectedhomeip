@@ -197,13 +197,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       sources += [
         "Darwin/BLEManagerImpl.cpp",
         "Darwin/BLEManagerImpl.h",
-        "Darwin/BleApplicationDelegate.h",
-        "Darwin/BleApplicationDelegateImpl.mm",
-        "Darwin/BleConnectionDelegate.h",
-        "Darwin/BleConnectionDelegateImpl.mm",
         "Darwin/BlePlatformConfig.h",
-        "Darwin/BlePlatformDelegate.h",
-        "Darwin/BlePlatformDelegateImpl.mm",
         "Darwin/CHIPDevicePlatformConfig.h",
         "Darwin/CHIPDevicePlatformEvent.h",
         "Darwin/CHIPPlatformConfig.h",
@@ -218,6 +212,17 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Darwin/PosixConfig.h",
         "Darwin/SystemPlatformConfig.h",
       ]
+
+      if (chip_enable_ble) {
+        sources += [
+          "Darwin/BleApplicationDelegate.h",
+          "Darwin/BleApplicationDelegateImpl.mm",
+          "Darwin/BleConnectionDelegate.h",
+          "Darwin/BleConnectionDelegateImpl.mm",
+          "Darwin/BlePlatformDelegate.h",
+          "Darwin/BlePlatformDelegateImpl.mm",
+        ]
+      }
     } else if (chip_device_platform == "efr32") {
       sources += [
         "EFR32/BLEManagerImpl.cpp",
