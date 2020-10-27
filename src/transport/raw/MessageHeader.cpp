@@ -135,7 +135,7 @@ uint16_t MessageAuthenticationCode::TagLenForEncryptionType(Header::EncryptionTy
     }
 }
 
-CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, size_t size, uint16_t * decode_len)
+CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint16_t * decode_len)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     const uint8_t * p = data;
@@ -186,7 +186,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data, size_t size, uint16_t * decode_len)
+CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data, uint16_t size, uint16_t * decode_len)
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     const uint8_t * p = data;
@@ -218,7 +218,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PacketHeader::Encode(uint8_t * data, size_t size, uint16_t * encode_size, Header::Flags payloadFlags) const
+CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size, Header::Flags payloadFlags) const
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     uint8_t * p     = data;
@@ -262,7 +262,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PayloadHeader::Encode(uint8_t * data, size_t size, uint16_t * encode_size) const
+CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t * p    = data;
@@ -290,7 +290,7 @@ Header::Flags PayloadHeader::GetEncodePacketFlags() const
     return Header::Flags().Set(Header::FlagValues::kVendorIdPresent, mVendorId.HasValue());
 }
 
-CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, size_t size,
+CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, uint16_t size,
                                              uint16_t * decode_len)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
@@ -309,7 +309,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR MessageAuthenticationCode::Encode(const PacketHeader & packetHeader, uint8_t * data, size_t size,
+CHIP_ERROR MessageAuthenticationCode::Encode(const PacketHeader & packetHeader, uint8_t * data, uint16_t size,
                                              uint16_t * encode_size) const
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;

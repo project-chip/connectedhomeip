@@ -129,7 +129,7 @@ private:
     // The encryption operations includes AAD when message authentication tag is generated. This tag
     // is used at the time of decryption to integrity check the received data.
     static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, Header::Flags payloadEncodeFlags, uint8_t * aad,
-                                            size_t & len);
+                                            uint16_t & len);
 };
 
 } // namespace chip

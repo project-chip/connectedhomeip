@@ -122,7 +122,7 @@ exit:
 }
 
 CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, const Header::Flags payloadEncodeFlags, uint8_t * aad,
-                                                size_t & len)
+                                                uint16_t & len)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t actualEncodedHeaderSize;
@@ -147,7 +147,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     CHIP_ERROR error = CHIP_NO_ERROR;
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
-    size_t aadLen = sizeof(AAD);
+    uint16_t aadLen = sizeof(AAD);
 
     constexpr Header::EncryptionType encType = Header::EncryptionType::kAESCCMTagLen16;
 
@@ -182,7 +182,7 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
     const uint8_t * tag = mac.GetTag();
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
-    size_t aadLen = sizeof(AAD);
+    uint16_t aadLen = sizeof(AAD);
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);

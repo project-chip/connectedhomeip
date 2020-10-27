@@ -364,7 +364,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 
     payloadlen = packetHeader.GetPayloadLength();
     VerifyOrExit(payloadlen <= len, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    err = mac.Decode(packetHeader, &data[payloadlen], len - payloadlen, &taglen);
+    err = mac.Decode(packetHeader, &data[payloadlen], static_cast<uint16_t>(len - payloadlen), &taglen);
     SuccessOrExit(err);
 
     len = static_cast<uint16_t>(len - taglen);
