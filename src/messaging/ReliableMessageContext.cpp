@@ -38,7 +38,7 @@ namespace messaging {
 
 void ReliableMessageContextDeletor::Release(ReliableMessageContext * obj)
 {
-    ReliableMessageManager::GetManager().FreeContext(obj);
+    obj->mManager->FreeContext(obj);
 }
 
 ReliableMessageContext::ReliableMessageContext() :
@@ -89,10 +89,7 @@ bool ReliableMessageContext::HasRcvdMsgFromPeer() const
  */
 void ReliableMessageContext::SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer)
 {
-    if (inMsgRcvdFromPeer)
-        mFlags.Set(Flags::kFlagMsgRcvdFromPeer);
-    else
-        mFlags.Clear(Flags::kFlagMsgRcvdFromPeer);
+    mFlags.Set(Flags::kFlagMsgRcvdFromPeer, inMsgRcvdFromPeer);
 }
 
 /**
@@ -235,7 +232,7 @@ CHIP_ERROR ReliableMessageContext::SendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = ReliableMessageManager::GetManager().SendMessage(
+    err = mManager->SendMessage(
         this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
         BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
 
@@ -292,7 +289,7 @@ CHIP_ERROR ReliableMessageContext::SendDelayedDelivery(uint32_t pauseTimeMillis,
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = ReliableMessageManager::GetManager().SendMessage(
+    err = mManager->SendMessage(
         this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
         BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
@@ -315,7 +312,7 @@ exit:
  */
 CHIP_ERROR ReliableMessageContext::HandleDelayedDeliveryMessage(uint32_t PauseTimeMillis)
 {
-    ReliableMessageManager::GetManager().ProcessDelayedDeliveryMessage(this, PauseTimeMillis);
+    mManager->ProcessDelayedDeliveryMessage(this, PauseTimeMillis);
     mDelegate->OnDelayedDeliveryRcvd(PauseTimeMillis);
     return CHIP_NO_ERROR;
 }
@@ -338,7 +335,7 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Msg is an Ack; Check Retrans Table and remove message context
-    if (!ReliableMessageManager::GetManager().CheckAndRemRetransTable(this, AckMsgId))
+    if (!mManager->CheckAndRemRetransTable(this, AckMsgId))
     {
 #if defined(DEBUG)
         ChipLogError(ExchangeManager, "CHIP MsgId:%08" PRIX32 " not in RetransTable", AckMsgId);
@@ -363,7 +360,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-    ReliableMessageManager::GetManager().ExpireTicks();
+    mManager->ExpireTicks();
 
     // If the message IS a duplicate.
     if (Flags.Has(MessageFlagValues::kChipMessageFlag_DuplicateMessage))
@@ -411,20 +408,20 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
         mPendingPeerAckId = MessageId;
         mNextAckTimeTick  = static_cast<uint16_t>(
             mConfig.mAckPiggybackTimeoutTick +
-            ReliableMessageManager::GetManager().GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
+            mManager->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
         SetAckPending(true);
     }
 
 exit:
     // Schedule next physical wakeup
-    ReliableMessageManager::GetManager().StartTimer();
+    mManager->StartTimer();
     return err;
 }
 
 CHIP_ERROR ReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
 {
     // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-    ReliableMessageManager::GetManager().ExpireTicks();
+    mManager->ExpireTicks();
 
     // Flow Control Message Received; Adjust Throttle timeout accordingly.
     // A PauseTimeMillis of zero indicates that peer is unthrottling this Exchange.
@@ -432,20 +429,20 @@ CHIP_ERROR ReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
     if (0 != PauseTimeMillis)
     {
         mThrottleTimeoutTick = static_cast<uint16_t>(
-            ReliableMessageManager::GetManager().GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch() + PauseTimeMillis));
-        ReliableMessageManager::GetManager().PauseRetransTable(this, PauseTimeMillis);
+            mManager->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch() + PauseTimeMillis));
+        mManager->PauseRetransTable(this, PauseTimeMillis);
     }
     else
     {
         mThrottleTimeoutTick = 0;
-        ReliableMessageManager::GetManager().ResumeRetransTable(this);
+        mManager->ResumeRetransTable(this);
     }
 
     // Call OnThrottleRcvd application callback
     mDelegate->OnThrottleRcvd(PauseTimeMillis);
 
     // Schedule next physical wakeup
-    ReliableMessageManager::GetManager().StartTimer();
+    mManager->StartTimer();
     return CHIP_NO_ERROR;
 }
 
@@ -471,7 +468,7 @@ CHIP_ERROR ReliableMessageContext::SendCommonNullMessage()
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err = ReliableMessageManager::GetManager().SendMessage(
+    err = mManager->SendMessage(
         this, chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf,
         BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 

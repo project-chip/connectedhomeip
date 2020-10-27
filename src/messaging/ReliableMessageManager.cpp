@@ -146,48 +146,37 @@ void ReliableMessageManager::ExecuteActions()
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         ReliableMessageContext * rc = RetransTable[i].rc;
-        if (rc)
+        CHIP_ERROR err = CHIP_NO_ERROR;
+
+        if (!rc || RetransTable[i].nextRetransTimeTick != 0) continue;
+
+        uint8_t sendCount = RetransTable[i].sendCount;
+
+        if (sendCount == rc->mConfig.mMaxRetrans)
         {
-            CHIP_ERROR err = CHIP_NO_ERROR;
+            err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
-            if (0 == RetransTable[i].nextRetransTimeTick)
-            {
-                uint8_t sendCount = RetransTable[i].sendCount;
+            ChipLogError(ExchangeManager,
+                "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
+                RetransTable[i].msgId, sendCount, rc->mConfig.mMaxRetrans);
 
-                if (sendCount == rc->mConfig.mMaxRetrans)
-                {
-                    err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
-
-                    ChipLogError(ExchangeManager,
-                                 "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
-                                 RetransTable[i].msgId, sendCount, rc->mConfig.mMaxRetrans);
-
-                    // Remove from Table
-                    ClearRetransmitTable(RetransTable[i]);
-                }
-
-                if (err == CHIP_NO_ERROR)
-                {
-                    // Resend from Table (if the operation fails, the entry is cleared)
-                    err = SendFromRetransTable(&(RetransTable[i]));
-                }
-
-                if (err == CHIP_NO_ERROR)
-                {
-                    // If the retransmission was successful, update the passive timer
-                    RetransTable[i].nextRetransTimeTick = static_cast<uint16_t>(rc->GetCurrentRetransmitTimeoutTick());
-#if defined(DEBUG)
-                    ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", RetransTable[i].msgId,
-                                    RetransTable[i].sendCount);
-#endif
-                }
-
-                if (err != CHIP_NO_ERROR)
-                {
-                    rc->mDelegate->OnSendError(err);
-                }
-            } // nextRetransTimeTick = 0
+            // Remove from Table
+            ClearRetransmitTable(RetransTable[i]);
         }
+
+            // Resend from Table (if the operation fails, the entry is cleared)
+        if (err == CHIP_NO_ERROR) err = SendFromRetransTable(&(RetransTable[i]));
+
+        if (err == CHIP_NO_ERROR)
+        {
+            // If the retransmission was successful, update the passive timer
+            RetransTable[i].nextRetransTimeTick = static_cast<uint16_t>(rc->GetCurrentRetransmitTimeoutTick());
+#if defined(DEBUG)
+            ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", RetransTable[i].msgId, RetransTable[i].sendCount);
+#endif
+        }
+
+        if (err != CHIP_NO_ERROR) rc->mDelegate->OnSendError(err);
     }
 
     TicklessDebugDumpRetransTable("ReliableMessageManager::ExecuteActions Dumping RetransTable entries after processing");
@@ -428,7 +417,7 @@ CHIP_ERROR ReliableMessageManager::SendFromRetransTable(RetransTableEntry * entr
         // Send the message through
         uint16_t msgSendFlags = entry->msgSendFlags;
         SetFlag(msgSendFlags, MessageFlagValues::kChipMessageFlag_RetainBuffer);
-        err = ReliableMessageManager::GetManager().SendMessage(rc, entry->msgBuf, msgSendFlags);
+        err = SendMessage(rc, entry->msgBuf, msgSendFlags);
 
         // Reset the msgBuf start pointer and data length after sending
         entry->msgBuf->SetStart(p);

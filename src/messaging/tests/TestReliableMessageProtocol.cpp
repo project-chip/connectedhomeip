@@ -76,9 +76,10 @@ public:
 void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto & m          = ReliableMessageManager::GetManager();
+    auto & m          = manager;
     m.Init(ctx.GetSystemLayer());
     ReliableMessageContext rc;
+    rc.Init(&m);
     ReliableMessageManager::RetransTableEntry * entry;
     m.AddToRetransTable(&rc, nullptr, 1, 0, &entry);
     NL_TEST_ASSERT(inSuite, m.TestGetCountRetransTable() == 1);
@@ -90,9 +91,10 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto & m          = ReliableMessageManager::GetManager();
+    auto & m          = manager;
     m.Init(ctx.GetSystemLayer());
     ReliableMessageContext rc;
+    rc.Init(&m);
     ReliableMessageDelegateObject delegate;
     rc.SetDelegate(&delegate);
     ReliableMessageManager::RetransTableEntry * entry;
@@ -109,10 +111,11 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 void CheckRetransExpire(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto & m          = ReliableMessageManager::GetManager();
+    auto & m          = manager;
     m.TestSetIntervalShift(4); // 16ms per tick
     m.Init(ctx.GetSystemLayer());
     ReliableMessageContext rc;
+    rc.Init(&m);
     ReliableMessageDelegateObject delegate;
     rc.SetDelegate(&delegate);
     rc.SetConfig({
@@ -149,10 +152,11 @@ void CheckRetransExpire(nlTestSuite * inSuite, void * inContext)
 void CheckDelayDelivery(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    auto & m          = ReliableMessageManager::GetManager();
+    auto & m          = manager;
     m.TestSetIntervalShift(4); // 16ms per tick
     m.Init(ctx.GetSystemLayer());
     ReliableMessageContext rc;
+    rc.Init(&m);
     ReliableMessageDelegateObject delegate;
     rc.SetDelegate(&delegate);
     rc.SetConfig({
@@ -241,10 +245,6 @@ namespace chip {
 namespace messaging {
 
 // Stub implementation
-ReliableMessageManager & ReliableMessageManager::GetManager()
-{
-    return manager;
-}
 CHIP_ERROR ReliableMessageManager::SendMessage(ReliableMessageContext * context, System::PacketBuffer * msgBuf, uint16_t sendFlags)
 {
     return CHIP_NO_ERROR;

@@ -68,6 +68,7 @@ public:
 
     ReliableMessageContext();
 
+    void Init(ReliableMessageManager * manager) { mManager = manager; }
     void SetConfig(ReliableMessageProtocolConfig config) { mConfig = config; }
     void SetDelegate(ReliableMessageDelegate * delegate) { mDelegate = delegate; }
 
@@ -121,6 +122,7 @@ private:
 private:
     friend class ReliableMessageManager;
 
+    ReliableMessageManager * mManager;
     ReliableMessageProtocolConfig mConfig;
     uint16_t mNextAckTimeTick;     // Next time for triggering Solo Ack
     uint16_t mThrottleTimeoutTick; // Timeout until when Throttle is On when ThrottleEnabled is set
