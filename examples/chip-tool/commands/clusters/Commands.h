@@ -567,18 +567,7 @@ public:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * ZCLVersion                                                        | 0x0000 |
-| * ApplicationVersion                                                | 0x0001 |
-| * StackVersion                                                      | 0x0002 |
-| * HWVersion                                                         | 0x0003 |
-| * ManufacturerName                                                  | 0x0004 |
-| * ModelIdentifier                                                   | 0x0005 |
-| * DateCode                                                          | 0x0006 |
 | * PowerSource                                                       | 0x0007 |
-| * GenericDevice-Class                                               | 0x0008 |
-| * GenericDevice-Type                                                | 0x0009 |
-| * ProductCode                                                       | 0x000A |
-| * ProductURL                                                        | 0x000B |
-| * SWBuildID                                                         | 0x4000 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -624,132 +613,6 @@ public:
 };
 
 /*
- * Attribute ApplicationVersion
- */
-class ReadBasicApplicationVersion : public ModelCommand
-{
-public:
-    ReadBasicApplicationVersion() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "application-version"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadApplicationVersionAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute StackVersion
- */
-class ReadBasicStackVersion : public ModelCommand
-{
-public:
-    ReadBasicStackVersion() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "stack-version"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadStackVersionAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute HWVersion
- */
-class ReadBasicHWVersion : public ModelCommand
-{
-public:
-    ReadBasicHWVersion() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "hwversion"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadHWVersionAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute ManufacturerName
- */
-class ReadBasicManufacturerName : public ModelCommand
-{
-public:
-    ReadBasicManufacturerName() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "manufacturer-name"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadManufacturerNameAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute ModelIdentifier
- */
-class ReadBasicModelIdentifier : public ModelCommand
-{
-public:
-    ReadBasicModelIdentifier() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "model-identifier"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadModelIdentifierAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute DateCode
- */
-class ReadBasicDateCode : public ModelCommand
-{
-public:
-    ReadBasicDateCode() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "date-code"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadDateCodeAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
  * Attribute PowerSource
  */
 class ReadBasicPowerSource : public ModelCommand
@@ -760,114 +623,6 @@ public:
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBasicClusterReadPowerSourceAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute GenericDeviceClass
- */
-class ReadBasicGenericDeviceClass : public ModelCommand
-{
-public:
-    ReadBasicGenericDeviceClass() : ModelCommand("read", kBasicClusterId, 0x00)
-    {
-        AddArgument("attr-name", "generic-device-class");
-    }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadGenericDeviceClassAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute GenericDeviceType
- */
-class ReadBasicGenericDeviceType : public ModelCommand
-{
-public:
-    ReadBasicGenericDeviceType() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "generic-device-type"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadGenericDeviceTypeAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute ProductCode
- */
-class ReadBasicProductCode : public ModelCommand
-{
-public:
-    ReadBasicProductCode() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "product-code"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadProductCodeAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute ProductURL
- */
-class ReadBasicProductURL : public ModelCommand
-{
-public:
-    ReadBasicProductURL() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "product-url"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadProductURLAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute SWBuildID
- */
-class ReadBasicSWBuildID : public ModelCommand
-{
-public:
-    ReadBasicSWBuildID() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "swbuild-id"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeBasicClusterReadSWBuildIDAttribute(buffer->Start(), bufferSize, endPointId);
     }
 
     // Global Response: ReadAttributesResponse
@@ -903,6 +658,7 @@ public:
 | Attributes:                                                         |        |
 | * CurrentHue                                                        | 0x0000 |
 | * CurrentSaturation                                                 | 0x0001 |
+| * RemainingTime                                                     | 0x0002 |
 | * CurrentX                                                          | 0x0003 |
 | * CurrentY                                                          | 0x0004 |
 | * ColorTemperatureMireds                                            | 0x0007 |
@@ -1472,6 +1228,30 @@ public:
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadCurrentSaturationAttribute(buffer->Start(), bufferSize, endPointId);
+    }
+
+    // Global Response: ReadAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ReadAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+};
+
+/*
+ * Attribute RemainingTime
+ */
+class ReadColorControlRemainingTime : public ModelCommand
+{
+public:
+    ReadColorControlRemainingTime() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "remaining-time");
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeColorControlClusterReadRemainingTimeAttribute(buffer->Start(), bufferSize, endPointId);
     }
 
     // Global Response: ReadAttributesResponse
@@ -4084,8 +3864,6 @@ public:
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * CurrentLevel                                                      | 0x0000 |
-| * RemainingTime                                                     | 0x0001 |
-| * Options                                                           | 0x000F |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -4365,48 +4143,6 @@ public:
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterReadCurrentLevelAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute RemainingTime
- */
-class ReadLevelRemainingTime : public ModelCommand
-{
-public:
-    ReadLevelRemainingTime() : ModelCommand("read", kLevelClusterId, 0x00) { AddArgument("attr-name", "remaining-time"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeLevelClusterReadRemainingTimeAttribute(buffer->Start(), bufferSize, endPointId);
-    }
-
-    // Global Response: ReadAttributesResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        ReadAttributesResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-};
-
-/*
- * Attribute Options
- */
-class ReadLevelOptions : public ModelCommand
-{
-public:
-    ReadLevelOptions() : ModelCommand("read", kLevelClusterId, 0x00) { AddArgument("attr-name", "options"); }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeLevelClusterReadOptionsAttribute(buffer->Start(), bufferSize, endPointId);
     }
 
     // Global Response: ReadAttributesResponse
@@ -5333,13 +5069,9 @@ void registerClusterBasic(Commands & commands)
     const char * clusterName = "Basic";
 
     commands_list clusterCommands = {
-        make_unique<BasicResetToFactoryDefaults>(), make_unique<ReadBasicZCLVersion>(),
-        make_unique<ReadBasicApplicationVersion>(), make_unique<ReadBasicStackVersion>(),
-        make_unique<ReadBasicHWVersion>(),          make_unique<ReadBasicManufacturerName>(),
-        make_unique<ReadBasicModelIdentifier>(),    make_unique<ReadBasicDateCode>(),
-        make_unique<ReadBasicPowerSource>(),        make_unique<ReadBasicGenericDeviceClass>(),
-        make_unique<ReadBasicGenericDeviceType>(),  make_unique<ReadBasicProductCode>(),
-        make_unique<ReadBasicProductURL>(),         make_unique<ReadBasicSWBuildID>(),
+        make_unique<BasicResetToFactoryDefaults>(),
+        make_unique<ReadBasicZCLVersion>(),
+        make_unique<ReadBasicPowerSource>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -5366,6 +5098,7 @@ void registerClusterColorControl(Commands & commands)
         make_unique<ColorControlStopMoveStep>(),
         make_unique<ReadColorControlCurrentHue>(),
         make_unique<ReadColorControlCurrentSaturation>(),
+        make_unique<ReadColorControlRemainingTime>(),
         make_unique<ReadColorControlCurrentX>(),
         make_unique<ReadColorControlCurrentY>(),
         make_unique<ReadColorControlColorTemperatureMireds>(),
@@ -5474,17 +5207,9 @@ void registerClusterLevel(Commands & commands)
     const char * clusterName = "Level";
 
     commands_list clusterCommands = {
-        make_unique<LevelMove>(),
-        make_unique<LevelMoveToLevel>(),
-        make_unique<LevelMoveToLevelWithOnOff>(),
-        make_unique<LevelMoveWithOnOff>(),
-        make_unique<LevelStep>(),
-        make_unique<LevelStepWithOnOff>(),
-        make_unique<LevelStop>(),
-        make_unique<LevelStopWithOnOff>(),
-        make_unique<ReadLevelCurrentLevel>(),
-        make_unique<ReadLevelRemainingTime>(),
-        make_unique<ReadLevelOptions>(),
+        make_unique<LevelMove>(),          make_unique<LevelMoveToLevel>(),   make_unique<LevelMoveToLevelWithOnOff>(),
+        make_unique<LevelMoveWithOnOff>(), make_unique<LevelStep>(),          make_unique<LevelStepWithOnOff>(),
+        make_unique<LevelStop>(),          make_unique<LevelStopWithOnOff>(), make_unique<ReadLevelCurrentLevel>(),
     };
 
     commands.Register(clusterName, clusterCommands);

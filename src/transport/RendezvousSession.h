@@ -72,9 +72,7 @@ public:
         kRendezvousComplete,
     };
 
-    RendezvousSession(RendezvousSessionDelegate * delegate, DeviceNetworkProvisioningDelegate * networkDelegate = nullptr) :
-        mDelegate(delegate), mDeviceNetworkProvisionDelegate(networkDelegate)
-    {}
+    RendezvousSession(RendezvousSessionDelegate * delegate) : mDelegate(delegate) {}
     ~RendezvousSession() override;
 
     /**
@@ -135,7 +133,6 @@ private:
 
     SecurePairingSession mPairingSession;
     NetworkProvisioning mNetworkProvision;
-    DeviceNetworkProvisioningDelegate * mDeviceNetworkProvisionDelegate = nullptr;
     SecureSession mSecureSession;
     uint32_t mSecureMessageIndex = 0;
     uint16_t mNextKeyId          = 0;

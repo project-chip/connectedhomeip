@@ -40,7 +40,7 @@
 	branch = master
 [submodule "bluez"]
 	path = third_party/bluez/repo
-	url = git://git.kernel.org/pub/scm/bluetooth/bluez.git
+	url = https://kernel.googlesource.com/pub/scm/bluetooth/bluez.git
 	branch = master
 [submodule "ot-commissioner"]
 	path = third_party/ot-commissioner/repo

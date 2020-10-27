@@ -54,10 +54,10 @@ enum class EncryptionType
  *  @brief
  *    The CHIP Exchange header flag bits.
  */
-enum class ExFlagValues : uint16_t
+enum class ExFlagValues : uint8_t
 {
     /// Set when current message is sent by the initiator of an exchange.
-    kExchangeFlag_Initiator = 0x0001,
+    kExchangeFlag_Initiator = 0x01,
 };
 
 enum class FlagValues : uint16_t
@@ -76,7 +76,8 @@ enum class FlagValues : uint16_t
 
 };
 
-using Flags = BitFlags<uint16_t, FlagValues>;
+using Flags   = BitFlags<uint16_t, FlagValues>;
+using ExFlags = BitFlags<uint8_t, ExFlagValues>;
 
 // Header is a 16-bit value of the form
 //  |  4 bit  | 4 bit |  4 bit  |  4 bit   |
@@ -396,9 +397,6 @@ public:
     Header::Flags GetEncodePacketFlags() const;
 
 private:
-    /// Header structure for exchange information
-    uint8_t mExchangeHeader = 0;
-
     /// Packet type (application data, security control packets, e.g. pairing,
     /// configuration, rekey etc)
     uint8_t mMessageType = 0;
@@ -413,7 +411,7 @@ private:
     uint16_t mProtocolID = 0;
 
     /// Bit flag indicators for CHIP Exchange header
-    BitFlags<uint16_t, Header::ExFlagValues> mExchangeFlags;
+    Header::ExFlags mExchangeFlags;
 };
 
 /** Handles encoding/decoding of CHIP message headers */

@@ -190,12 +190,13 @@ CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data
 {
     CHIP_ERROR err    = CHIP_NO_ERROR;
     const uint8_t * p = data;
+    uint8_t header;
 
     VerifyOrExit(size >= kEncryptedHeaderSizeBytes, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    mExchangeHeader = Read8(p);
-    mMessageType    = Read8(p);
-    mExchangeID     = LittleEndian::Read16(p);
+    header       = Read8(p);
+    mMessageType = Read8(p);
+    mExchangeID  = LittleEndian::Read16(p);
 
     if (flags.Has(Header::FlagValues::kVendorIdPresent))
     {
@@ -206,6 +207,8 @@ CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data
     {
         mVendorId.ClearValue();
     }
+
+    mExchangeFlags.SetRaw(header);
 
     VerifyOrExit(size >= static_cast<size_t>(p - data) + sizeof(uint16_t), err = CHIP_ERROR_INVALID_ARGUMENT);
     mProtocolID = LittleEndian::Read16(p);
@@ -266,9 +269,11 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t * p    = data;
+    uint8_t header = mExchangeFlags.Raw();
+
     VerifyOrExit(size >= EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    Write8(p, mExchangeHeader);
+    Write8(p, header);
     Write8(p, mMessageType);
     LittleEndian::Write16(p, mExchangeID);
     if (mVendorId.HasValue())

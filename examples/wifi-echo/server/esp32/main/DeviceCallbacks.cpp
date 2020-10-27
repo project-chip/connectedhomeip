@@ -175,3 +175,10 @@ void DeviceCallbacks::PluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint
 exit:
     return;
 }
+
+bool DeviceCallbacks::PluginDoorLockActivateDoorLockCallback(bool activate)
+{
+    ESP_LOGI(TAG, "PluginDoorLockActivateDoorLockCallback: '0x%02x'", activate);
+    // Simulate that locking/unlocking the door is always succesful.
+    return true;
+}

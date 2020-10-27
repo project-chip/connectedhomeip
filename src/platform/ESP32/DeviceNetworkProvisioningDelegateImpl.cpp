@@ -17,13 +17,17 @@
 
 #include <support/logging/CHIPLogging.h>
 
-#include "DeviceNetworkProvisioningDelegate.h"
+#include "DeviceNetworkProvisioningDelegateImpl.h"
 #include "ServiceProvisioning.h"
 
-using namespace ::chip;
+namespace chip {
+namespace DeviceLayer {
 
-void ESP32NetworkProvisioningDelegate::ProvisionWiFi(const char * ssid, const char * key)
+void DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
     ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
     SetWiFiStationProvisioning(ssid, key);
 }
+
+} // namespace DeviceLayer
+} // namespace chip

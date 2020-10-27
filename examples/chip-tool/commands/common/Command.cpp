@@ -23,6 +23,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
 bool Command::InitArguments(int argc, char ** argv)
@@ -97,9 +98,59 @@ bool Command::InitArgument(size_t argIndex, const char * argValue)
         break;
     }
 
-    case ArgumentType::Number: {
-        uint32_t * value = reinterpret_cast<uint32_t *>(arg.value);
+    case ArgumentType::Number_uint8: {
+        uint8_t * value = reinterpret_cast<uint8_t *>(arg.value);
+
         // stringstream treats uint8_t as char, which is not what we want here.
+        uint16_t tmpValue;
+        std::stringstream ss(argValue);
+        ss >> tmpValue;
+        if (chip::CanCastTo<uint8_t>(tmpValue))
+        {
+            *value          = static_cast<uint8_t>(tmpValue);
+            isValidArgument = (!ss.fail() && ss.eof() && *value >= arg.min && *value <= arg.max);
+        }
+        else
+        {
+            isValidArgument = false;
+        }
+        break;
+    }
+
+    case ArgumentType::Number_uint16: {
+        uint16_t * value = reinterpret_cast<uint16_t *>(arg.value);
+        std::stringstream ss(argValue);
+        ss >> *value;
+        isValidArgument = (!ss.fail() && ss.eof() && *value >= arg.min && *value <= arg.max);
+        break;
+    }
+
+    case ArgumentType::Number_uint32: {
+        uint32_t * value = reinterpret_cast<uint32_t *>(arg.value);
+        std::stringstream ss(argValue);
+        ss >> *value;
+        isValidArgument = (!ss.fail() && ss.eof() && *value >= arg.min && *value <= arg.max);
+        break;
+    }
+
+    case ArgumentType::Number_int8: {
+        int8_t * value = reinterpret_cast<int8_t *>(arg.value);
+        std::stringstream ss(argValue);
+        ss >> *value;
+        isValidArgument = (!ss.fail() && ss.eof() && *value >= arg.min && *value <= arg.max);
+        break;
+    }
+
+    case ArgumentType::Number_int16: {
+        int16_t * value = reinterpret_cast<int16_t *>(arg.value);
+        std::stringstream ss(argValue);
+        ss >> *value;
+        isValidArgument = (!ss.fail() && ss.eof() && *value >= arg.min && *value <= arg.max);
+        break;
+    }
+
+    case ArgumentType::Number_int32: {
+        int32_t * value = reinterpret_cast<int32_t *>(arg.value);
         std::stringstream ss(argValue);
         ss >> *value;
         isValidArgument = (!ss.fail() && ss.eof() && *value >= arg.min && *value <= arg.max);
@@ -154,10 +205,23 @@ size_t Command::AddArgument(const char * name, AddressWithInterface * out)
     return mArgs.size();
 }
 
+size_t Command::AddArgument(const char * name, int64_t min, int64_t max, void * out, ArgumentType type)
+{
+    Argument arg;
+    arg.type  = type;
+    arg.name  = name;
+    arg.value = out;
+    arg.min   = min;
+    arg.max   = max;
+
+    mArgs.emplace(mArgs.begin(), arg);
+    return mArgs.size();
+}
+
 size_t Command::AddArgument(const char * name, int64_t min, int64_t max, void * out)
 {
     Argument arg;
-    arg.type  = ArgumentType::Number;
+    arg.type  = ArgumentType::Number_uint8;
     arg.name  = name;
     arg.value = out;
     arg.min   = min;

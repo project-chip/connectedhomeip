@@ -17,28 +17,27 @@
 
 #pragma once
 
-#include <platform/CHIPDeviceLayer.h>
-#include <transport/RendezvousSession.h>
+#include <platform/internal/GenericDeviceNetworkProvisioningDelegateImpl.h>
 
 namespace chip {
+namespace DeviceLayer {
 
-class RendezvousServer : public RendezvousSessionDelegate
+namespace Internal {
+
+template <class ImplClass>
+class GenericDeviceNetworkProvisioningDelegateImpl;
+
+} // namespace Internal
+
+class DeviceNetworkProvisioningDelegateImpl final
+    : public Internal::GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>
 {
-public:
-    RendezvousServer();
-
-    CHIP_ERROR Init(const RendezvousParameters & params);
-
-    //////////////// RendezvousSessionDelegate Implementation ///////////////////
-
-    void OnRendezvousConnectionOpened() override;
-    void OnRendezvousConnectionClosed() override;
-    void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
-    void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) override;
-
 private:
-    RendezvousSession mRendezvousSession;
+    friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
+
+    void _ProvisionWiFiNetwork(const char * ssid, const char * passwd);
+    void _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData) {}
 };
 
+} // namespace DeviceLayer
 } // namespace chip
