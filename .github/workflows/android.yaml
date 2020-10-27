@@ -44,6 +44,10 @@ jobs:
                   submodules: true
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
-            - name: Run Build
+            - name: Build libs
               run: |
                   ./scripts/examples/android_app.sh
+            - name: Build App
+              run: |
+                  cd src/android/CHIPTool
+                  ./gradlew build
