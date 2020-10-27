@@ -32,10 +32,8 @@ namespace chip {
 
 void NetworkProvisioning::Init(NetworkProvisioningDelegate * delegate, DeviceNetworkProvisioningDelegate * deviceDelegate)
 {
-    if (deviceDelegate != nullptr)
-    {
-        mDeviceDelegate = deviceDelegate;
-    }
+    mDelegate       = delegate;
+    mDeviceDelegate = deviceDelegate;
 }
 
 NetworkProvisioning::~NetworkProvisioning()
