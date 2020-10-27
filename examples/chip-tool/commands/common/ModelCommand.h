@@ -31,9 +31,6 @@
 #define CHIP_ZCL_ENDPOINT_MIN 0x01
 #define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
-#define CHECK_MESSAGE_LENGTH(rv)                                                                                                   \
-    VerifyOrExit(rv, ChipLogError(chipTool, "%s: Unexpected response length: %d", __FUNCTION__, messageLen));
-
 class ModelCommand : public NetworkCommand
 {
 public:

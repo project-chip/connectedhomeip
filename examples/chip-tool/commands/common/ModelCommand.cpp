@@ -133,7 +133,7 @@ bool ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     ChipLogDetail(chipTool, "APS frame processing success!");
 
     messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
-    CHECK_MESSAGE_LENGTH(messageLen >= 3);
+    VerifyOrExit(messageLen >= 3, ChipLogError(chipTool, "Unexpected response length: %d", messageLen));
 
     frameControl   = chip::Encoding::Read8(message);
     sequenceNumber = chip::Encoding::Read8(message);
