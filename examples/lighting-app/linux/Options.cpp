@@ -47,7 +47,7 @@ bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdentifier, 
     {
 
     case kDeviceOption_BleDevice:
-        if (!ParseInt(aValue, GetLinuxDeviceOptions().mBleDevice))
+        if (!ParseInt(aValue, LinuxDeviceOptions::GetInstance().mBleDevice))
         {
             PrintArgError("%s: invalid value specified for ble device number: %s\n", aProgram, aValue);
             retval = false;
@@ -77,7 +77,7 @@ CHIP_ERROR ParseArguments(int argc, char * argv[])
     return CHIP_NO_ERROR;
 }
 
-LinuxDeviceOptions & GetInstance()
+LinuxDeviceOptions & LinuxDeviceOptions::GetInstance()
 {
     return gDeviceOptions;
 }

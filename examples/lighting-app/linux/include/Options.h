@@ -33,7 +33,7 @@ struct LinuxDeviceOptions
     uint32_t mBleDevice = 0;
 
     LinuxDeviceOptions() {}
-    LinuxDeviceOptions & GetInstance();
+    static LinuxDeviceOptions & GetInstance();
 };
 
 CHIP_ERROR ParseArguments(int argc, char * argv[]);

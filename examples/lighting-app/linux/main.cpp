@@ -169,7 +169,7 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEDeviceName(nullptr); // Use default device name (CHIP-XXXX)
 
-    chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(GetLinuxDeviceOptions().mBleDevice, false);
+    chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
 
     chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(
         chip::DeviceLayer::ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
