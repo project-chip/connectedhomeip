@@ -1,0 +1,16 @@
+#ifndef __ZAP_EMBER_ENUMS__
+#define __ZAP_EMBER_ENUMS__
+
+// ZCL enums
+
+{{#zcl_enums}}
+
+// Enum for {{label}}
+typedef enum {
+{{#zcl_enum_items}}
+{{ident}}EMBER_ZCL_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} = {{value}},
+{{/zcl_enum_items}}
+} EmberAf{{asType label}};
+{{/zcl_enums}}
+
+#endif //__ZAP_EMBER_ENUMS__

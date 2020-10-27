@@ -1,0 +1,58 @@
+{{chip_header}}
+
+
+#ifndef ZCL_CALLBACK_HEADER
+#define ZCL_CALLBACK_HEADER
+
+#include "af-structs.h"
+#include "af-types.h"
+
+/** @brief Cluster Init
+ *
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
+ *
+ * @param endpoint   Ver.: always
+ * @param clusterId   Ver.: always
+ */
+void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId);
+
+// Cluster Init Functions
+{{#all_user_clusters}}
+{{#if (isEnable enabled)}}
+void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}InitCallback(uint8_t endpoint);
+{{/if}}
+{{/all_user_clusters}}
+
+
+// CLuster Commands Callback
+
+{{#all_user_clusters}}
+{{#if (isEnable enabled)}}
+{{#all_user_cluster_commands}}
+{{#if (isStrEqual clusterName parent.name)}}
+{{#if (isCommandAvailable parent.side incoming outcoming)}}
+/**
+* @brief {{parent.name}} Cluster {{name}} Command callback
+{{#if (zcl_command_arguments_count this.id)}}
+{{#zcl_command_arguments}}
+* @param {{asCamelCased label}}
+{{/zcl_command_arguments}}
+{{/if}}
+*/
+
+{{#if (zcl_command_arguments_count this.id)}}
+bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}} {{asUnderlyingType type}} {{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
+{{else}}
+bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(void);
+{{/if}}
+
+
+{{/if}}
+{{/if}}
+{{/all_user_cluster_commands}}
+{{/if}}
+{{/all_user_clusters}}
+
+#endif //ZCL_CALLBACK_HEADER

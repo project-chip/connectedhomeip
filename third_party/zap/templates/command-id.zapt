@@ -1,0 +1,21 @@
+{{zap_header}}
+
+#ifndef __ZAP_GEN_ID__
+#define __ZAP_GEN_ID__
+
+// Global, non-cluster-specific commands
+{{#zcl_global_commands}}
+#define ZCL_{{asDelimitedMacro label}}_COMMAND_ID ({{asHex code 2}})
+{{/zcl_global_commands}}
+
+{{#zcl_clusters}}
+
+{{#zcl_commands}}
+{{#first}}
+// Commands for cluster: {{parent.label}}
+{{/first}}
+#define ZCL_{{asDelimitedMacro label}}_COMMAND_ID ({{asHex code 2}})
+{{/zcl_commands}}
+{{/zcl_clusters}}
+
+#endif // __ZAP_GEN_ID__
