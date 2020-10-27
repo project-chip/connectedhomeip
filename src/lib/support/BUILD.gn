@@ -49,6 +49,7 @@ static_library("support") {
     "Base64.h",
     "BitFlags.h",
     "BufBound.h",
+    "BufferReader.cpp",
     "BufferReader.h",
     "CHIPArgParser.cpp",
     "CHIPCounter.cpp",
@@ -90,6 +91,7 @@ static_library("support") {
     ":chip_version_header",
     "${chip_root}/src/lib/core:chip_config_header",
     "${nlassert_root}:nlassert",
+    "${nlio_root}:nlio",
   ]
 
   # These are needed because we include CHIPCore.h, which uses config
