@@ -28,21 +28,12 @@
 
 #include <core/CHIPError.h>
 
-class LinuxDeviceOptions
+struct LinuxDeviceOptions
 {
-public:
-    uint32_t mBleDevice;
+    uint32_t mBleDevice = 0;
 
-    LinuxDeviceOptions();
-
-private:
-    friend LinuxDeviceOptions & GetLinuxDeviceOptions();
-    static LinuxDeviceOptions mLinuxDeviceOptions;
+    LinuxDeviceOptions() {}
+    LinuxDeviceOptions & GetInstance();
 };
-
-inline LinuxDeviceOptions & GetLinuxDeviceOptions()
-{
-    return LinuxDeviceOptions::mLinuxDeviceOptions;
-}
 
 CHIP_ERROR ParseArguments(int argc, char * argv[]);

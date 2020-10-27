@@ -24,15 +24,10 @@
 using namespace chip;
 using namespace chip::ArgParser;
 
-LinuxDeviceOptions LinuxDeviceOptions::mLinuxDeviceOptions;
-
-LinuxDeviceOptions::LinuxDeviceOptions()
-{
-    // Default values
-    mBleDevice = 0;
-}
-
 namespace {
+LinuxDeviceOptions gDeviceOptions;
+
+// Follow the code style of command line arguments in case we need to add more options in the future.
 enum
 {
     kDeviceOption_BleDevice = 0x1000,
@@ -80,4 +75,9 @@ CHIP_ERROR ParseArguments(int argc, char * argv[])
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
     return CHIP_NO_ERROR;
+}
+
+LinuxDeviceOptions & GetInstance()
+{
+    return gDeviceOptions;
 }

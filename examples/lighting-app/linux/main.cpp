@@ -95,7 +95,6 @@ void EventHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg
     if (event->Type == chip::DeviceLayer::DeviceEventType::kCHIPoBLEConnectionEstablished)
     {
         ChipLogProgress(DeviceLayer, "Receive kCHIPoBLEConnectionEstablished");
-        // exit(0);
     }
 }
 
@@ -145,7 +144,6 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         std::cerr << "Failed to generate QR Code: " << ErrorStr(err) << std::endl;
-        return 1;
     }
     return err;
 }
@@ -187,6 +185,7 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         std::cerr << "Failed to run Linux Lighting App: " << ErrorStr(err) << std::endl;
+        // End the program with non zero error code to indicate a error.
         return 1;
     }
     return 0;
