@@ -425,6 +425,7 @@ constexpr uint16_t kTempMeasurementClusterId = 0x0402;
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * GoToPercent                                                       |   0x00 |
+| * Stop                                                              |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MovingState                                                       | 0x0001 |
@@ -458,6 +459,27 @@ public:
 
 private:
     uint8_t mPercentOpen;
+};
+
+/*
+ * Command Stop
+ */
+class BarrierControlStop : public ModelCommand
+{
+public:
+    BarrierControlStop() : ModelCommand("stop", kBarrierControlClusterId, 0x01) {}
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeBarrierControlClusterStopCommand(buffer->Start(), bufferSize, endPointId);
+    }
+
+    // Global Response: DefaultResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        DefaultResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
 };
 
 /*
@@ -5062,9 +5084,9 @@ void registerClusterBarrierControl(Commands & commands)
     const char * clusterName = "BarrierControl";
 
     commands_list clusterCommands = {
-        make_unique<BarrierControlGoToPercent>(),         make_unique<ReadBarrierControlMovingState>(),
-        make_unique<ReadBarrierControlSafetyStatus>(),    make_unique<ReadBarrierControlCapabilities>(),
-        make_unique<ReadBarrierControlBarrierPosition>(),
+        make_unique<BarrierControlGoToPercent>(),      make_unique<BarrierControlStop>(),
+        make_unique<ReadBarrierControlMovingState>(),  make_unique<ReadBarrierControlSafetyStatus>(),
+        make_unique<ReadBarrierControlCapabilities>(), make_unique<ReadBarrierControlBarrierPosition>(),
     };
 
     commands.Register(clusterName, clusterCommands);

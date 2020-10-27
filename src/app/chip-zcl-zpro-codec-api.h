@@ -50,6 +50,7 @@ extern "C" {
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * GoToPercent                                                       |   0x00 |
+| * Stop                                                              |   0x01 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
 | * MovingState                                                       | 0x0001 |
@@ -64,6 +65,12 @@ extern "C" {
  */
 uint16_t encodeBarrierControlClusterGoToPercentCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
                                                        uint8_t percentOpen);
+
+/**
+ * @brief
+ *    Encode an stop command for BarrierControl server into buffer including the APS frame
+ */
+uint16_t encodeBarrierControlClusterStopCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /**
  * @brief
