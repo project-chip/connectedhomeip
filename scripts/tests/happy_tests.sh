@@ -33,8 +33,9 @@ function happytest_install_packages() {
         echo "install_packages should be invoked under root"
         return 1
     fi
-    echo "Install packages: bridge-utils iproute2 net-tools python3-lockfile python3-pip python3-psutil python3-setuptools strace"
-    apt-get update && apt-get install -y bridge-utils \
+    echo "Install packages: avahi-daemon bridge-utils iproute2 net-tools python3-lockfile python3-pip python3-psutil python3-setuptools strace"
+    apt-get update && apt-get install -y avahi-daemon \
+        bridge-utils \
         iproute2 \
         net-tools \
         python3-lockfile \
@@ -47,6 +48,8 @@ function happytest_install_packages() {
 function happytest_bootstrap() {
     echo "Bootstrapping Happy Test"
     set -e
+    service dbus start
+    service avahi-daemon start
     # Bootstrap Happy
     cd "$REPO_DIR/third_party/happy/repo"
 

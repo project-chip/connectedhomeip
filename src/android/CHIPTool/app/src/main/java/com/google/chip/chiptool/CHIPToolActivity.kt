@@ -21,6 +21,7 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.commissioner.CommissionerActivity
 import com.google.chip.chiptool.echoclient.EchoClientFragment
@@ -65,6 +66,10 @@ class CHIPToolActivity :
 
   override fun handleOnOffClicked() {
     showFragment(OnOffClientFragment.newInstance())
+  }
+
+  override fun handleAttestationTestClicked() {
+    showFragment(AttestationTestFragment.newInstance())
   }
 
   override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

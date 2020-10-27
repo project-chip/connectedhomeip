@@ -19,6 +19,7 @@
 #include "AppTask.h"
 
 #include <platform/CHIPDeviceLayer.h>
+#include <support/CHIPMem.h>
 
 #include <logging/log.h>
 
@@ -33,6 +34,13 @@ int main(void)
     int ret = 0;
 
     k_thread_priority_set(k_current_get(), K_PRIO_COOP(CONFIG_NUM_COOP_PRIORITIES - 1));
+
+    ret = chip::Platform::MemoryInit();
+    if (ret != CHIP_NO_ERROR)
+    {
+        LOG_ERR("Platform::MemoryInit() failed");
+        goto exit;
+    }
 
     LOG_INF("Init CHIP stack");
     ret = PlatformMgr().InitChipStack();

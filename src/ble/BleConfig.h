@@ -35,7 +35,7 @@
 
 #pragma once
 
-#if CHIP_SEPARATE_CONFIG_H
+#if CHIP_HAVE_CONFIG_H
 #include <ble/BleBuildConfig.h>
 #endif
 

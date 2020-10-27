@@ -28,7 +28,6 @@ public:
     RendezvousDeviceDelegate();
 
     //////////// RendezvousSession callback Implementation ///////////////
-    void OnRendezvousMessageReceived(chip::System::PacketBuffer * buffer) override;
     void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
 
 private:

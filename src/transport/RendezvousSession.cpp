@@ -52,8 +52,6 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
         Transport::BLE * transport = chip::Platform::New<Transport::BLE>();
         err                        = transport->Init(this, mParams);
         mTransport                 = transport;
-        mTransport->Retain();
-        transport->Release();
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
     SuccessOrExit(err);
@@ -74,7 +72,7 @@ RendezvousSession::~RendezvousSession()
 {
     if (mTransport)
     {
-        mTransport->Release();
+        chip::Platform::Delete(mTransport);
         mTransport = nullptr;
     }
 
@@ -97,6 +95,7 @@ CHIP_ERROR RendezvousSession::SendMessage(System::PacketBuffer * msgBuf)
         break;
 
     default:
+        System::PacketBuffer::Free(msgBuf);
         err = CHIP_ERROR_INCORRECT_STATE;
         break;
     };
@@ -124,10 +123,13 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
     SuccessOrExit(err);
 
     msgBuf->ConsumeHead(headerSize);
-    err = mTransport->SendMessage(header, Header::Flags(), Transport::PeerAddress::BLE(), msgBuf);
+    err    = mTransport->SendMessage(header, Header::Flags(), Transport::PeerAddress::BLE(), msgBuf);
+    msgBuf = nullptr;
     SuccessOrExit(err);
 
 exit:
+    if (msgBuf)
+        System::PacketBuffer::Free(msgBuf);
     return err;
 }
 
@@ -174,13 +176,15 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    err = mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(), msgBuf);
+    err    = mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(), msgBuf);
+    msgBuf = nullptr;
     SuccessOrExit(err);
 
     mSecureMessageIndex++;
-    msgBuf = nullptr;
 
 exit:
+    if (msgBuf)
+        System::PacketBuffer::Free(msgBuf);
     return err;
 }
 
@@ -271,6 +275,11 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState)
     };
 
     mCurrentState = newState;
+
+    if (newState == State::kRendezvousComplete)
+    {
+        mDelegate->OnRendezvousComplete();
+    }
 }
 
 void RendezvousSession::OnRendezvousMessageReceived(PacketBuffer * msgBuf)
@@ -354,7 +363,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
     plainText = msgBuf->Start();
 
     payloadlen = packetHeader.GetPayloadLength();
-    VerifyOrExit(payloadlen <= len, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(payloadlen <= len, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     err = mac.Decode(packetHeader, &data[payloadlen], len - payloadlen, &taglen);
     SuccessOrExit(err);
 
@@ -375,17 +384,21 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
         err = mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf);
         SuccessOrExit(err);
     }
-    // else .. TODO once application dependency on this message has been removed, enable the else condition
+    else // This else condition should eventually be removed, once all messages are handled via delegate callbacks
     {
         mDelegate->OnRendezvousMessageReceived(msgBuf);
+        msgBuf = nullptr;
     }
-
-    msgBuf = nullptr;
 
 exit:
     if (origMsg != nullptr)
     {
         PacketBuffer::Free(origMsg);
+    }
+
+    if (msgBuf != nullptr)
+    {
+        PacketBuffer::Free(msgBuf);
     }
 
     return err;

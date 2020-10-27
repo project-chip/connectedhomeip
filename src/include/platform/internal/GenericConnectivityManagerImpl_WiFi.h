@@ -78,6 +78,8 @@ public:
     void _OnWiFiStationProvisionChange();
     static const char * _WiFiStationModeToStr(ConnectivityManager::WiFiStationMode mode);
     static const char * _WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode);
+    static const char * _WiFiStationStateToStr(ConnectivityManager::WiFiStationState state);
+    static const char * _WiFiAPStateToStr(ConnectivityManager::WiFiAPState state);
 
 protected:
     enum Flags
@@ -178,12 +180,6 @@ inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiScanDone()
 template <class ImplClass>
 inline void GenericConnectivityManagerImpl_WiFi<ImplClass>::_OnWiFiStationProvisionChange()
 {}
-
-template <class ImplClass>
-inline const char * GenericConnectivityManagerImpl_WiFi<ImplClass>::_WiFiAPModeToStr(ConnectivityManager::WiFiAPMode mode)
-{
-    return nullptr;
-}
 
 } // namespace Internal
 } // namespace DeviceLayer

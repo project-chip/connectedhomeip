@@ -23,6 +23,7 @@
 #include "gen/znet-bookkeeping.h"
 #include <app/util/af-types.h>
 
+#include "AppTask.h"
 #include "LightingManager.h"
 
 extern "C" {
@@ -41,6 +42,19 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
         return;
     }
 
-    LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION);
+    LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, AppEvent::kEventType_Lighting);
+}
+
+/** @brief On/off Cluster Server Post Init
+ *
+ * Following resolution of the On/Off state at startup for this endpoint,
+ * perform any additional initialization needed; e.g., synchronize hardware
+ * state.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
+{
+    GetAppTask().UpdateClusterState();
 }
 }

@@ -39,11 +39,13 @@
 
 #include <cmath>
 #include <cstdio>
+#include <ctype.h>
 #include <string>
 #include <vector>
 
 #include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
@@ -55,6 +57,8 @@ using namespace ::chip::DeviceLayer;
 
 extern void startServer();
 
+#define QRCODE_BASE_URL "https://dhrishi.github.io/connectedhomeip/qrcode.html"
+
 #if CONFIG_DEVICE_TYPE_M5STACK
 
 #define BUTTON_1_GPIO_NUM GPIO_NUM_39    // Left button on M5Stack
@@ -62,11 +66,12 @@ extern void startServer();
 #define BUTTON_3_GPIO_NUM GPIO_NUM_37    // Right button on M5Stack
 #define STATUS_LED_GPIO_NUM GPIO_NUM_MAX // No status LED on M5Stack
 
+#elif CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT
+
+#define STATUS_LED_GPIO_NUM GPIO_NUM_26
+
 #elif CONFIG_DEVICE_TYPE_ESP32_DEVKITC
 
-#define BUTTON_1_GPIO_NUM GPIO_NUM_34  // Button 1 on DevKitC
-#define BUTTON_2_GPIO_NUM GPIO_NUM_35  // Button 2 on DevKitC
-#define BUTTON_3_GPIO_NUM GPIO_NUM_0   // Button 3 on DevKitC
 #define STATUS_LED_GPIO_NUM GPIO_NUM_2 // Use LED1 (blue LED) as status LED on DevKitC
 
 #else // !CONFIG_DEVICE_TYPE_ESP32_DEVKITC
@@ -77,15 +82,6 @@ extern void startServer();
 
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
-
-#if CONFIG_HAVE_DISPLAY
-
-// Where to draw the connection status message
-#define CONNECTION_MESSAGE 75
-// Where to draw the IPv6 information
-#define IPV6_INFO 85
-
-#endif // CONFIG_HAVE_DISPLAY
 
 LEDWidget statusLED1;
 LEDWidget statusLED2;
@@ -101,8 +97,12 @@ RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
 
 namespace {
 
+#if CONFIG_DEVICE_TYPE_M5STACK
+
 std::vector<Button> buttons          = { Button(), Button(), Button() };
 std::vector<gpio_num_t> button_gpios = { BUTTON_1_GPIO_NUM, BUTTON_2_GPIO_NUM, BUTTON_3_GPIO_NUM };
+
+#endif
 
 // Pretend these are devices with endpoints with clusters with attributes
 typedef std::tuple<std::string, std::string> Attribute;
@@ -139,7 +139,7 @@ void AddDevice(std::string name)
     devices.emplace_back(std::move(device));
 }
 
-#if CONFIG_HAVE_DISPLAY
+#if CONFIG_DEVICE_TYPE_M5STACK
 
 class EditAttributeListModel : public ListScreen::Model
 {
@@ -291,7 +291,7 @@ public:
     }
 };
 
-#endif // CONFIG_HAVE_DISPLAY
+#endif // CONFIG_DEVICE_TYPE_M5STACK
 
 void SetupPretendDevices()
 {
@@ -415,12 +415,68 @@ std::string createSetupPayload()
         err = generator.payloadBase41Representation(result);
     }
 
+    {
+        ManualSetupPayloadGenerator generator(payload);
+        std::string outCode;
+
+        if (generator.payloadDecimalStringRepresentation(outCode) == CHIP_NO_ERROR)
+        {
+            ESP_LOGI(TAG, "Manual(decimal) setup code: %s", outCode.c_str());
+        }
+        else
+        {
+            ESP_LOGE(TAG, "Failed to get decimal setup code");
+        }
+    }
+
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "Couldn't get payload string %d", err);
     }
     return result;
 };
+
+bool inRfc3986UnreservedChar(const char c)
+{
+    static const char unreserved[] = { '-', '.', '_', '~' };
+    return isalpha(c) || isdigit(c) || (strchr(unreserved, c) != NULL);
+}
+
+esp_err_t urlEncode(const char * src, size_t len, char * dest, size_t max_size)
+{
+    const char upper_xdigits[] = "0123456789ABCDEF";
+    size_t i = 0, j = 0;
+    for (i = 0; i < len; ++i)
+    {
+        unsigned char c = src[i];
+        if (inRfc3986UnreservedChar(c))
+        {
+            if ((j + 1) < max_size)
+            {
+                dest[j++] = c;
+            }
+            else
+            {
+                return ESP_FAIL;
+            }
+        }
+        else
+        {
+            if ((j + 3) < max_size)
+            {
+                dest[j++] = '%';
+                dest[j++] = upper_xdigits[c >> 4];
+                dest[j++] = upper_xdigits[(c & 0x0f)];
+            }
+            else
+            {
+                return ESP_FAIL;
+            }
+        }
+    }
+    dest[j] = '\0';
+    return ESP_OK;
+}
 
 static SecurePairingUsingTestSecret gTestPairing;
 
@@ -490,9 +546,31 @@ extern "C" void app_main()
     }
 
     std::string qrCodeText = createSetupPayload();
-    ESP_LOGI(TAG, "QR CODE: '%s'", qrCodeText.c_str());
+    ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
+
+    {
+        std::vector<char> qrCode(3 * qrCodeText.size() + 1);
+        err = urlEncode(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
+        if (err == ESP_OK)
+        {
+            ESP_LOGI(TAG, "Copy paste the below URL in a browser to see the QR CODE:\n\t%s?data=%s", QRCODE_BASE_URL,
+                     qrCode.data());
+        }
+    }
 
 #if CONFIG_HAVE_DISPLAY
+    // Initialize the display device.
+    err = InitDisplay();
+    if (err != ESP_OK)
+    {
+        ESP_LOGE(TAG, "InitDisplay() failed: %s", ErrorStr(err));
+        return;
+    }
+
+    // Initialize the screen manager
+    ScreenManager::Init();
+
+#if CONFIG_DEVICE_TYPE_M5STACK
     // Initialize the buttons.
     for (int i = 0; i < buttons.size(); ++i)
     {
@@ -504,16 +582,7 @@ extern "C" void app_main()
         }
     }
 
-    // Initialize the display device.
-    err = InitDisplay();
-    if (err != ESP_OK)
-    {
-        ESP_LOGE(TAG, "InitDisplay() failed: %s", ErrorStr(err));
-        return;
-    }
-
-    // Initialize the screen manager and push a rudimentary user interface.
-    ScreenManager::Init();
+    // Push a rudimentary user interface.
     ScreenManager::PushScreen(chip::Platform::New<ListScreen>(
         (chip::Platform::New<SimpleListModel>())
             ->Title("CHIP")
@@ -543,6 +612,14 @@ extern "C" void app_main()
             ->Item("For")
             ->Item("Demo")));
 
+#elif CONFIG_DEVICE_TYPE_ESP32_WROVER_KIT
+
+    // Display the QR Code
+    QRCodeScreen qrCodeScreen(qrCodeText);
+    qrCodeScreen.Display();
+
+#endif
+
     // Connect the status LED to VLEDs.
     {
         int vled1 = ScreenManager::AddVLED(TFT_GREEN);
@@ -562,7 +639,7 @@ extern "C" void app_main()
     // Run the UI Loop
     while (true)
     {
-#if CONFIG_HAVE_DISPLAY
+#if CONFIG_DEVICE_TYPE_M5STACK
         // TODO consider refactoring this example to use FreeRTOS tasks
 
         bool woken = false;
@@ -587,7 +664,7 @@ extern "C" void app_main()
             }
         }
 
-#endif // CONFIG_HAVE_DISPLAY
+#endif // CONFIG_DEVICE_TYPE_M5STACK
 
         vTaskDelay(50 / portTICK_PERIOD_MS);
     }

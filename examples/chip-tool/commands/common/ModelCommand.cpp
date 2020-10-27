@@ -26,18 +26,21 @@
 using namespace ::chip;
 using namespace ::chip::DeviceController;
 
-namespace {
-constexpr uint8_t kZCLGlobalCmdFrameControlHeader  = 8;
-constexpr uint8_t kZCLClusterCmdFrameControlHeader = 9;
-} // namespace
-
 constexpr std::chrono::seconds kWaitingForResponseTimeout(10);
 
 namespace {
+constexpr uint8_t kZCLGlobalCmdFrameControlHeader  = 8;
+constexpr uint8_t kZCLClusterCmdFrameControlHeader = 9;
+
 bool isValidFrame(uint8_t frameControl)
 {
     // Bit 3 of the frame control byte set means direction is server to client.
     return (frameControl == kZCLGlobalCmdFrameControlHeader || frameControl == kZCLClusterCmdFrameControlHeader);
+}
+
+bool isGlobalCommand(uint8_t frameControl)
+{
+    return (frameControl == kZCLGlobalCmdFrameControlHeader);
 }
 } // namespace
 
@@ -57,8 +60,8 @@ void ModelCommand::OnError(ChipDeviceController * dc, CHIP_ERROR err)
 
 void ModelCommand::OnMessage(ChipDeviceController * dc, PacketBuffer * buffer)
 {
+    SetCommandExitStatus(ReceiveCommandResponse(dc, buffer));
     UpdateWaitForResponse(false);
-    ReceiveCommandResponse(dc, buffer);
 }
 
 CHIP_ERROR ModelCommand::Run(ChipDeviceController * dc, NodeId remoteId)
@@ -70,6 +73,8 @@ CHIP_ERROR ModelCommand::Run(ChipDeviceController * dc, NodeId remoteId)
 
     err = dc->ServiceEventSignal();
     SuccessOrExit(err);
+
+    VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);
 
 exit:
     return err;
@@ -109,7 +114,7 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
     return true;
 }
 
-void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer) const
+bool ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer) const
 {
     EmberApsFrame frame;
     uint8_t * message;
@@ -117,7 +122,7 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     uint8_t frameControl;
     uint8_t sequenceNumber;
     uint8_t commandId;
-    bool isGlobalCommand = false;
+    bool success = false;
 
     if (extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) == 0)
     {
@@ -141,11 +146,11 @@ void ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
                  ChipLogError(chipTool, "Unexpected endpoint id '0x%02x'", frame.sourceEndpoint));
     VerifyOrExit(mClusterId == frame.clusterId, ChipLogError(chipTool, "Unexpected cluster id '0x%04x'", frame.clusterId));
 
-    isGlobalCommand = (frameControl == kZCLGlobalCmdFrameControlHeader);
-    isGlobalCommand ? HandleGlobalResponse(commandId, message, messageLen) : HandleSpecificResponse(commandId, message, messageLen);
+    success = isGlobalCommand(frameControl) ? HandleGlobalResponse(commandId, message, messageLen)
+                                            : HandleSpecificResponse(commandId, message, messageLen);
 
 exit:
-    return;
+    return success;
 }
 
 void ModelCommand::UpdateWaitForResponse(bool value)

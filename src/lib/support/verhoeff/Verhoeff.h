@@ -190,5 +190,5 @@ class Verhoeff
 public:
     static int DihedralMultiply(int x, int y, int n);
     static int DihedralInvert(int val, int n);
-    static int Permute(int val, uint8_t * permTable, int permTableLen, int iterCount);
+    static int Permute(int val, uint8_t * permTable, int permTableLen, uint64_t iterCount);
 };

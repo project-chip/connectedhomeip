@@ -26,8 +26,8 @@
 
 #pragma once
 
-#include <core/ReferenceCounted.h>
 #include <crypto/CHIPCryptoPAL.h>
+#include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSession.h>
 
@@ -38,7 +38,7 @@ extern const char * kSpake2pR2ISessionInfo;
 
 using namespace Crypto;
 
-class DLL_EXPORT SecurePairingSessionDelegate : public ReferenceCounted<SecurePairingSessionDelegate>
+class DLL_EXPORT SecurePairingSessionDelegate
 {
 public:
     /**
@@ -66,6 +66,8 @@ public:
 
     virtual ~SecurePairingSessionDelegate() {}
 };
+
+struct SecurePairingSessionSerialized;
 
 class DLL_EXPORT SecurePairingSession
 {
@@ -159,6 +161,18 @@ public:
      */
     uint16_t GetLocalKeyId() { return mLocalKeyId; }
 
+    /** @brief Serialize the Pairing Session to a string.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Serialize(SecurePairingSessionSerialized & output);
+
+    /** @brief Deserialize the Pairing Session from the string.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Deserialize(SecurePairingSessionSerialized & input);
+
 private:
     CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
                     uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
@@ -247,5 +261,22 @@ public:
 
     CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg) override { return CHIP_NO_ERROR; }
 };
+
+typedef struct SecurePairingSessionSerializable
+{
+    uint16_t mKeLen;
+    uint8_t mKe[kMAX_Hash_Length];
+    uint8_t mPairingComplete;
+    uint64_t mLocalNodeId;
+    uint64_t mPeerNodeId;
+    uint16_t mLocalKeyId;
+    uint16_t mPeerKeyId;
+} SecurePairingSessionSerializable;
+
+typedef struct SecurePairingSessionSerialized
+{
+    // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
+    uint8_t inner[BASE64_ENCODED_LEN(sizeof(SecurePairingSessionSerializable) + sizeof(uint64_t))];
+} SecurePairingSessionSerialized;
 
 } // namespace chip

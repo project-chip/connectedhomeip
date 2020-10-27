@@ -32,5 +32,5 @@ public:
      * @param ssid WiFi SSID
      * @param passwd WiFi password
      */
-    void ProvisionNetwork(const char * ssid, const char * passwd) override;
+    void ProvisionWiFi(const char * ssid, const char * passwd) override;
 };

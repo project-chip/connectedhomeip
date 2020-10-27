@@ -28,6 +28,8 @@ chip_test_suite("tests") {
     "TestReferenceCounted.cpp",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/lib/core",
     "${nlunit_test_root}:nlunit-test",

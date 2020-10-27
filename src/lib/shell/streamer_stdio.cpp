@@ -53,20 +53,20 @@ int streamer_stdio_init(streamer_t * streamer)
         atexit(&streamer_restore_termios);
 
         ret = tcgetattr(in_fd, &termios);
-        termios.c_lflag &= ~ECHO;   // Disable echo mode
-        termios.c_lflag &= ~ICANON; // Disable canonical line editing mode
+        termios.c_lflag &= ~static_cast<tcflag_t>(ECHO);   // Disable echo mode
+        termios.c_lflag &= ~static_cast<tcflag_t>(ICANON); // Disable canonical line editing mode
         ret = tcsetattr(in_fd, TCSANOW, &termios);
     }
 
     return ret;
 }
 
-int streamer_stdio_read(streamer_t * streamer, char * buf, size_t len)
+ssize_t streamer_stdio_read(streamer_t * streamer, char * buf, size_t len)
 {
     return read(STDIN_FILENO, buf, len);
 }
 
-int streamer_stdio_write(streamer_t * streamer, const char * buf, size_t len)
+ssize_t streamer_stdio_write(streamer_t * streamer, const char * buf, size_t len)
 {
     return write(STDOUT_FILENO, buf, len);
 }

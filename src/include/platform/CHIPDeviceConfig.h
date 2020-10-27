@@ -24,7 +24,7 @@
 
 #pragma once
 
-#if CHIP_SEPARATE_CONFIG_H
+#if CHIP_HAVE_CONFIG_H
 #include <platform/CHIPDeviceBuildConfig.h>
 #endif
 
@@ -594,17 +594,6 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 #define CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY 0
-#endif
-
-/**
- * CHIP_DEVICE_CONFIG_DISABLE_ACCOUNT_PAIRING
- *
- * Disables sending the PairDeviceToAccount request to the service during a RegisterServicePairAccount
- * operation.  When this option is enabled, the device will perform all local operations associated
- * with registering a service, but will not request the service to add the device to the user's account.
- */
-#ifndef CHIP_DEVICE_CONFIG_DISABLE_ACCOUNT_PAIRING
-#define CHIP_DEVICE_CONFIG_DISABLE_ACCOUNT_PAIRING 0
 #endif
 
 // -------------------- Network Telemetry Configuration --------------------

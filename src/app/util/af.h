@@ -1341,13 +1341,13 @@ EmberStatus emberAfSendBroadcastWithAliasWithCallback(EmberNodeId destination, E
 /**
  * @brief Sends unicast.
  */
-EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                                uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Sends unicast with attached message sent callback.
  */
-EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                                            uint16_t messageLength, uint8_t * message, EmberAfMessageSentFunction callback);
 
 /**
@@ -1439,7 +1439,7 @@ EmberStatus emberAfSendCommandUnicast(EmberOutgoingMessageType type, uint16_t in
 /**
  * @brief emberAfSendCommandUnicast with attached message sent callback.
  */
-EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
+EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
                                                   EmberAfMessageSentFunction callback);
 
 /**
@@ -1534,7 +1534,7 @@ EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status
  * @param apsFrame The APS frame for the message.
  * @return The maximum APS payload length for the given message.
  */
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame);
+uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame);
 
 /**
  * @brief Access to client API APS frame.

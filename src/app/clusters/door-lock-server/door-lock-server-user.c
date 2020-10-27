@@ -270,7 +270,7 @@ bool emberAfDoorLockClusterSetPinCallback(uint16_t userId, uint8_t userStatus, u
         emberAfFillCommandDoorLockClusterProgrammingEventNotification(
             EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF, EMBER_ZCL_DOOR_LOCK_PROGRAMMING_EVENT_CODE_PIN_ADDED, userId, pin, userType,
             userStatus, 0 /*emberAfGetCurrentTime() #2507*/, pin);
-        // SEND_COMMAND_UNICAST_TO_BINDINGS();
+        SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
 
     return true;
@@ -334,12 +334,12 @@ bool emberAfDoorLockClusterClearPinCallback(uint16_t userId)
     if ((rfProgrammingEventMask & BIT(2)) && !status)
     {
         emberAfFillCommandDoorLockClusterProgrammingEventNotification(0x01, 0x03, userId, &userPin, 0x00, 0x00, 0x00, &userPin);
-        // SEND_COMMAND_UNICAST_TO_BINDINGS();
+        SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
     else if ((rfProgrammingEventMask & BIT(0)) && status)
     {
         emberAfFillCommandDoorLockClusterProgrammingEventNotification(0x01, 0x00, userId, &userPin, 0x00, 0x00, 0x00, &userPin);
-        // SEND_COMMAND_UNICAST_TO_BINDINGS();
+        SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
 
     return true;
@@ -532,7 +532,7 @@ bool emberAfDoorLockClusterLockDoorCallback(uint8_t * PIN)
             emberAfFillCommandDoorLockClusterOperationEventNotification(0x01, 0x03, userId, PIN, 0x00, PIN);
         }
     }
-    // SEND_COMMAND_UNICAST_TO_BINDINGS();
+    SEND_COMMAND_UNICAST_TO_BINDINGS();
 
     return true;
 }
@@ -570,7 +570,7 @@ bool emberAfDoorLockClusterUnlockDoorCallback(uint8_t * pin)
         emberAfFillCommandDoorLockClusterOperationEventNotification(EMBER_ZCL_DOOR_LOCK_EVENT_SOURCE_RF,
                                                                     EMBER_ZCL_DOOR_LOCK_OPERATION_EVENT_CODE_UNLOCK, userId, pin,
                                                                     0 /*emberAfGetCurrentTime() #2507 */, pin);
-        // SEND_COMMAND_UNICAST_TO_BINDINGS();
+        SEND_COMMAND_UNICAST_TO_BINDINGS();
     }
 
     return true;

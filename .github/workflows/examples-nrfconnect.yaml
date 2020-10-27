@@ -1,0 +1,98 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: Build example - nRF Connect SDK
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    nrfconnect:
+        name: nRF Connect SDK
+        env:
+            BUILD_TYPE: nrfconnect
+
+        runs-on: ubuntu-latest
+
+        container:
+            image: connectedhomeip/chip-build-nrf-platform:0.4.12
+            volumes:
+                - "/tmp/bloat_reports:/tmp/bloat_reports"
+                - "/tmp/output_binaries:/tmp/output_binaries"
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              # Fetch depth 0 to get all history and be able to check mergepoint for bloat report
+              with:
+                  fetch-depth: 0
+                  submodules: true
+            # https://github.com/project-chip/connectedhomeip/issues/3100
+            # - name: Initialize CodeQL
+            #   uses: github/codeql-action/init@v1
+            #   with:
+            #       languages: "cpp, python"
+            #       queries: +security-and-quality
+            - name: Build example nRF Connect SDK Lock App
+              run: scripts/examples/nrfconnect_example.sh lock-app
+            - name: Build example nRF Connect SDK Lighting App
+              run: scripts/examples/nrfconnect_example.sh lighting-app
+            - name: Build example nRF Connect SDK Shell
+              run: scripts/examples/nrfconnect_example.sh shell
+            - name: Run unit tests for Zephyr native_posix_64 platform
+              run:
+                  scripts/tests/nrfconnect_native_posix_tests.sh native_posix_64
+            - name: Copy aside build products
+              run: |
+                  mkdir -p /tmp/output_binaries/$BUILD_TYPE-build
+                  cp examples/lock-app/nrfconnect/build/zephyr/zephyr.elf \
+                      /tmp/output_binaries/$BUILD_TYPE-build/chip-lock.elf
+                  cp examples/lighting-app/nrfconnect/build/zephyr/zephyr.elf \
+                      /tmp/output_binaries/$BUILD_TYPE-build/chip-lighting.elf
+                  cp examples/shell/nrfconnect/build/zephyr/zephyr.elf \
+                      /tmp/output_binaries/$BUILD_TYPE-build/chip-shell.elf
+            - name: Binary artifact suffix
+              id: outsuffix
+              uses: haya14busa/action-cond@v1.0.0
+              with:
+                  cond: ${{ github.event.pull_request.number == '' }}
+                  if_true: "${{ github.sha }}"
+                  if_false: "pull-${{ github.event.pull_request.number }}"
+            - name: Uploading Binaries
+              uses: actions/upload-artifact@v1
+              with:
+                  name:
+                      ${{ env.BUILD_TYPE }}-example-build-${{
+                      steps.outsuffix.outputs.value }}
+                  path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
+            # https://github.com/project-chip/connectedhomeip/issues/3100
+            # - name: Show tree
+            #   run: find .
+            # - name: Remove third_party binaries for CodeQL Analysis
+            #   run: find examples -type d -name "third_party" -exec rm -rf {} +
+            # - name: Remove nrfxlib binaries for CodeQL Analysis
+            #   run: find examples -type d -name "nrfxlib" -exec rm -rf {} +
+            # - name: Remove zephyr binaries for CodeQL Analysis
+            #   run: find examples -type d -name "zephyr" -exec rm -rf {} +
+            # - name: Remove nrf binaries for CodeQL Analysis
+            #   run: find examples -type d -name "nrf" -exec rm -rf {} +
+            # - name: Remove modules binaries for CodeQL Analysis
+            #   run: find examples -type d -name "modules" -exec rm -rf {} +
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ github.event_name == 'push' }}
+            #   uses: github/codeql-action/analyze@v1
+            # - name: Perform CodeQL Analysis
+            #   if: ${{ github.event_name == 'push' }}
+            #   uses: github/codeql-action/analyze@v1

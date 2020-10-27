@@ -103,6 +103,6 @@ int Verhoeff10::CharToVal(char ch)
 char Verhoeff10::ValToChar(int val)
 {
     if (val >= 0 && val <= Base)
-        return '0' + val;
+        return static_cast<char>('0' + val);
     return 0;
 }

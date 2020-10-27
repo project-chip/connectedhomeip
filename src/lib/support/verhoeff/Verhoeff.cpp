@@ -52,10 +52,10 @@ int Verhoeff::DihedralInvert(int val, int n)
     return val;
 }
 
-int Verhoeff::Permute(int val, uint8_t * permTable, int permTableLen, int iterCount)
+int Verhoeff::Permute(int val, uint8_t * permTable, int permTableLen, uint64_t iterCount)
 {
     val = val % permTableLen;
-    if (iterCount <= 0)
+    if (iterCount == 0)
         return val;
     return Permute(permTable[val], permTable, permTableLen, iterCount - 1);
 }

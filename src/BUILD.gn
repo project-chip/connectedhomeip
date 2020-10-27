@@ -26,7 +26,7 @@ config("includes") {
     "${root_gen_dir}/include",
   ]
 
-  defines = [ "CHIP_SEPARATE_CONFIG_H=1" ]
+  defines = [ "CHIP_HAVE_CONFIG_H=1" ]
 
   if (chip_device_platform == "linux" || chip_device_platform == "darwin") {
     defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=${chip_enable_ble}" ]
@@ -40,6 +40,7 @@ if (chip_build_tests) {
     deps = [
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
+      "${chip_root}/src/messaging/tests",
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/raw/tests",
       "${chip_root}/src/transport/retransmit/tests",
@@ -48,6 +49,7 @@ if (chip_build_tests) {
 
     if (chip_device_platform != "esp32") {
       deps += [
+        "${chip_root}/src/lib/asn1/tests",
         "${chip_root}/src/lib/core/tests",
         "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/platform/tests",

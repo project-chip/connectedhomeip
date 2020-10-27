@@ -222,7 +222,7 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
         memcpy(newDataset.mMeshLocalPrefix.m8, netInfo.ThreadMeshPrefix, sizeof(newDataset.mMeshLocalPrefix.m8));
         newDataset.mComponents.mIsMeshLocalPrefixPresent = true;
     }
-    memcpy(newDataset.mMasterKey.m8, netInfo.ThreadNetworkKey, sizeof(newDataset.mMasterKey.m8));
+    memcpy(newDataset.mMasterKey.m8, netInfo.ThreadMasterKey, sizeof(newDataset.mMasterKey.m8));
     newDataset.mComponents.mIsMasterKeyPresent = true;
     if (netInfo.FieldPresent.ThreadPSKc)
     {
@@ -244,6 +244,12 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
     Impl()->LockThreadStack();
     otErr = otDatasetSetActive(mOTInst, &newDataset);
     Impl()->UnlockThreadStack();
+
+    // post an event alerting other subsystems about change in provisioning state
+    ChipDeviceEvent event;
+    event.Type                                           = DeviceEventType::kServiceProvisioningChange;
+    event.ServiceProvisioningChange.IsServiceProvisioned = true;
+    PlatformMgr().PostEvent(&event);
 
     return MapOpenThreadError(otErr);
 }
@@ -764,6 +770,21 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary80215
     memcpy(buf, extendedAddr, sizeof(otExtAddress));
     return CHIP_NO_ERROR;
 };
+
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetSlaacIPv6Address(chip::Inet::IPAddress & addr)
+{
+    for (const otNetifAddress * otAddr = otIp6GetUnicastAddresses(mOTInst); otAddr != nullptr; otAddr = otAddr->mNext)
+    {
+        if (otAddr->mValid && otAddr->mAddressOrigin == OT_ADDRESS_ORIGIN_SLAAC)
+        {
+            addr = ToIPAddress(otAddr->mAddress);
+            return CHIP_NO_ERROR;
+        }
+    }
+
+    return CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND;
+}
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::DoInit(otInstance * otInst)

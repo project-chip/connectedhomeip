@@ -23,6 +23,7 @@
 
 #include "streamer.h"
 
+#include <limits.h>
 #include <stdio.h>
 
 #ifndef CONSOLE_DEFAULT_MAX_LINE
@@ -37,22 +38,25 @@ int streamer_init(streamer_t * self)
     return self->init_cb(self);
 }
 
-int streamer_read(streamer_t * self, char * buf, size_t len)
+ssize_t streamer_read(streamer_t * self, char * buf, size_t len)
 {
     return self->read_cb(self, buf, len);
 }
 
-int streamer_write(streamer_t * self, const char * buf, size_t len)
+ssize_t streamer_write(streamer_t * self, const char * buf, size_t len)
 {
     return self->write_cb(self, buf, len);
 }
 
-int streamer_vprintf(streamer_t * self, const char * fmt, va_list ap)
+ssize_t streamer_vprintf(streamer_t * self, const char * fmt, va_list ap)
 {
     char buf[CONSOLE_DEFAULT_MAX_LINE];
     unsigned len;
 
-    len = vsnprintf(buf, sizeof(buf), fmt, ap);
+    // vsnprintf doesn't return negative numbers as long as the length it's
+    // passed fits in INT_MAX.
+    static_assert(sizeof(buf) <= INT_MAX, "Return value cast not valid");
+    len = static_cast<unsigned int>(vsnprintf(buf, sizeof(buf), fmt, ap));
     if (len >= sizeof(buf))
     {
         len = sizeof(buf) - 1;
@@ -60,10 +64,10 @@ int streamer_vprintf(streamer_t * self, const char * fmt, va_list ap)
     return streamer_write(self, buf, len);
 }
 
-int streamer_printf(streamer_t * self, const char * fmt, ...)
+ssize_t streamer_printf(streamer_t * self, const char * fmt, ...)
 {
     va_list ap;
-    int rc;
+    ssize_t rc;
 
     va_start(ap, fmt);
     rc = streamer_vprintf(self, fmt, ap);

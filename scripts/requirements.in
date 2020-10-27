@@ -14,3 +14,7 @@ requests>=2.24.0
 
 # device controller wheel package
 wheel>=0.34.2
+
+# mobly tests
+portpicker
+mobly

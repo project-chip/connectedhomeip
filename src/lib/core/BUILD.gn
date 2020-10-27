@@ -113,6 +113,8 @@ static_library("core") {
     "CHIPTLVWriter.cpp",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     ":chip_config_header",
     "${chip_root}/src/app",

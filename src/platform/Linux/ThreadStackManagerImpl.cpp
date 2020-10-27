@@ -165,6 +165,12 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadProvision(const Internal::DeviceNet
 {
     mNetworkInfo = netInfo;
 
+    // post an event alerting other subsystems about change in provisioning state
+    ChipDeviceEvent event;
+    event.Type                                           = DeviceEventType::kServiceProvisioningChange;
+    event.ServiceProvisioningChange.IsServiceProvisioned = true;
+    PlatformMgr().PostEvent(&event);
+
     return CHIP_NO_ERROR;
 }
 
@@ -174,7 +180,7 @@ CHIP_ERROR ThreadStackManagerImpl::_GetThreadProvision(Internal::DeviceNetworkIn
 
     if (!includeCredentials)
     {
-        memset(&netInfo.ThreadNetworkKey, 0, sizeof(netInfo.ThreadNetworkKey));
+        memset(&netInfo.ThreadMasterKey, 0, sizeof(netInfo.ThreadMasterKey));
         memset(&netInfo.ThreadPSKc, 0, sizeof(netInfo.ThreadPSKc));
         netInfo.FieldPresent.ThreadPSKc = false;
     }
@@ -216,7 +222,7 @@ CHIP_ERROR ThreadStackManagerImpl::_SetThreadEnabled(bool val)
 
     if (val)
     {
-        std::vector<uint8_t> masterkey(std::begin(mNetworkInfo.ThreadNetworkKey), std::end(mNetworkInfo.ThreadNetworkKey));
+        std::vector<uint8_t> masterkey(std::begin(mNetworkInfo.ThreadMasterKey), std::end(mNetworkInfo.ThreadMasterKey));
         std::vector<uint8_t> pskc;
         uint64_t extPanId    = UINT64_MAX;
         uint32_t channelMask = UINT32_MAX;
@@ -301,7 +307,7 @@ exit:
 
 CHIP_ERROR ThreadStackManagerImpl::_SetThreadDeviceType(ConnectivityManager::ThreadDeviceType deviceType)
 {
-    LinkModeConfig linkMode{ true, true, true, true };
+    LinkModeConfig linkMode{ true, true, true };
     ClientError error = ClientError::ERROR_NONE;
 
     if (deviceType == ConnectivityManager::ThreadDeviceType::kThreadDeviceType_MinimalEndDevice)
@@ -409,6 +415,11 @@ CHIP_ERROR ThreadStackManagerImpl::_GetPrimary802154MACAddress(uint8_t * buf)
 exit:
     LogClientError(error);
     return OTBR_TO_CHIP_ERROR(error);
+}
+
+CHIP_ERROR ThreadStackManagerImpl::_GetSlaacIPv6Address(chip::Inet::IPAddress & addr)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 CHIP_ERROR ThreadStackManagerImpl::_JoinerStart()

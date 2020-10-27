@@ -28,6 +28,8 @@
  *
  */
 
+#include <inttypes.h>
+
 #include <core/CHIPSafeCasts.h>
 #include <protocols/CHIPProtocols.h>
 #include <support/BufBound.h>
@@ -47,13 +49,81 @@ SecurePairingSession::SecurePairingSession() {}
 
 SecurePairingSession::~SecurePairingSession()
 {
-    if (mDelegate != nullptr)
-    {
-        mDelegate->Release();
-    }
     memset(&mPoint[0], 0, sizeof(mPoint));
     memset(&mWS[0][0], 0, sizeof(mWS));
     memset(&mKe[0], 0, sizeof(mKe));
+}
+
+CHIP_ERROR SecurePairingSession::Serialize(SecurePairingSessionSerialized & output)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    const NodeId localNodeId = (mLocalNodeId.HasValue()) ? mLocalNodeId.Value() : kUndefinedNodeId;
+    const NodeId peerNodeId  = (mPeerNodeId.HasValue()) ? mPeerNodeId.Value() : kUndefinedNodeId;
+    VerifyOrExit(CanCastTo<uint16_t>(mKeLen), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<uint64_t>(localNodeId), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<uint64_t>(peerNodeId), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<uint16_t>(sizeof(SecurePairingSessionSerializable)), error = CHIP_ERROR_INTERNAL);
+
+    {
+        SecurePairingSessionSerializable serializable;
+        memset(&serializable, 0, sizeof(serializable));
+        serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
+        serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
+        serializable.mLocalNodeId     = localNodeId;
+        serializable.mPeerNodeId      = peerNodeId;
+        serializable.mLocalKeyId      = mLocalKeyId;
+        serializable.mPeerKeyId       = mPeerKeyId;
+
+        memcpy(serializable.mKe, mKe, mKeLen);
+
+        uint16_t serializedLen = 0;
+
+        VerifyOrExit(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+        serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
+                                           static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
+        VerifyOrExit(serializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(serializedLen < sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
+        output.inner[serializedLen] = '\0';
+    }
+
+exit:
+    return error;
+}
+
+CHIP_ERROR SecurePairingSession::Deserialize(SecurePairingSessionSerialized & input)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+    SecurePairingSessionSerializable serializable;
+    size_t maxlen            = BASE64_ENCODED_LEN(sizeof(serializable));
+    size_t len               = strnlen(Uint8::to_char(input.inner), maxlen);
+    uint16_t deserializedLen = 0;
+
+    VerifyOrExit(len < sizeof(SecurePairingSessionSerialized), error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(CanCastTo<uint16_t>(len), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    memset(&serializable, 0, sizeof(serializable));
+    deserializedLen =
+        Base64Decode(Uint8::to_const_char(input.inner), static_cast<uint16_t>(len), Uint8::to_uchar((uint8_t *) &serializable));
+    VerifyOrExit(deserializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    mPairingComplete = (serializable.mPairingComplete == 1);
+    mKeLen           = static_cast<size_t>(serializable.mKeLen);
+
+    VerifyOrExit(mKeLen <= sizeof(mKe), error = CHIP_ERROR_INVALID_ARGUMENT);
+    memset(mKe, 0, sizeof(mKe));
+    memcpy(mKe, serializable.mKe, mKeLen);
+
+    mLocalNodeId = Optional<NodeId>::Value(serializable.mLocalNodeId);
+    mPeerNodeId  = Optional<NodeId>::Value(serializable.mPeerNodeId);
+
+    mLocalKeyId = serializable.mLocalKeyId;
+    mPeerKeyId  = serializable.mPeerKeyId;
+
+exit:
+    return error;
 }
 
 CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
@@ -72,11 +142,7 @@ CHIP_ERROR SecurePairingSession::Init(uint32_t setupCode, uint32_t pbkdf2IterCou
                         sizeof(mWS), &mWS[0][0]);
     SuccessOrExit(err);
 
-    if (mDelegate != nullptr)
-    {
-        mDelegate->Release();
-    }
-    mDelegate    = delegate->Retain();
+    mDelegate    = delegate;
     mLocalNodeId = myNodeId;
     mLocalKeyId  = myKeyId;
 
@@ -139,10 +205,13 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err = mDelegate->SendMessage(msgBuf);
+    err    = mDelegate->SendMessage(msgBuf);
+    msgBuf = nullptr;
     SuccessOrExit(err);
 
 exit:
+    if (msgBuf)
+        System::PacketBuffer::Free(msgBuf);
     return err;
 }
 
@@ -180,7 +249,8 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
     mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_pB_cB;
 
     // Call delegate to send the Compute_pA to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pA, resp);
+    err  = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pA, resp);
+    resp = nullptr;
     SuccessOrExit(err);
 
     return err;
@@ -264,7 +334,8 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, S
     mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_cA;
 
     // Call delegate to send the Compute_pB_cB to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pB_cB, resp);
+    err  = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pB_cB, resp);
+    resp = nullptr;
     SuccessOrExit(err);
 
     return err;
@@ -317,10 +388,9 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
     resp->SetDataLength(verifier_len);
 
     // Call delegate to send the Compute_cA to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_cA, resp);
-    SuccessOrExit(err);
-
+    err  = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_cA, resp);
     resp = nullptr;
+    SuccessOrExit(err);
 
     {
         const uint8_t * hash = &buf[kMAX_Point_Length];

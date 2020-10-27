@@ -29,6 +29,7 @@
 #include <mbedtls/threading.h>
 
 #include <platform/CHIPDeviceLayer.h>
+#include <support/CHIPMem.h>
 #include <support/CHIPPlatformMemory.h>
 
 #include <AppTask.h>
@@ -117,6 +118,10 @@ int main(void)
     EFR32_LOG("==================================================");
 
     EFR32_LOG("Init CHIP Stack");
+
+    // Init Chip memory management before the stack
+    chip::Platform::MemoryInit();
+
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
@@ -171,6 +176,8 @@ int main(void)
 
     EFR32_LOG("Starting FreeRTOS scheduler");
     vTaskStartScheduler();
+
+    chip::Platform::MemoryShutdown();
 
     // Should never get here.
     EFR32_LOG("vTaskStartScheduler() failed");

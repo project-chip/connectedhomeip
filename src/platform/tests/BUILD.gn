@@ -32,14 +32,24 @@ if (chip_device_platform != "none") {
       "TestPlatformTime.h",
     ]
 
+    tests = [ "TestPlatformMgr" ]
+
+    if (chip_enable_mdns && chip_enable_happy_tests &&
+        chip_device_platform == "linux") {
+      sources += [
+        "TestMdns.cpp",
+        "TestMdns.h",
+      ]
+
+      tests += [ "TestMdns" ]
+    }
+
     public_deps = [
       "${chip_root}/src/lib/support",
       "${chip_root}/src/platform",
       "${chip_root}/src/system",
       "${nlunit_test_root}:nlunit-test",
     ]
-
-    tests = [ "TestPlatformMgr" ]
 
     # These tests appear to be broken on Mac.
     if (current_os != "mac") {

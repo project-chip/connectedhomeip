@@ -25,14 +25,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".OnOffActivity"
-            android:exported="false"
-            android:screenOrientation="portrait"/>
-
-        <activity
             android:name="com.google.chip.chiptool.commissioner.CommissionerActivity"
-            android:label="@string/commissioner_name">
+            android:label="@string/commissioner_name"
+            android:exported="false">
         </activity>
     </application>
+
+    <queries>
+        <intent>
+            <action android:name="chip.intent.action.ATTESTATION"/>
+        </intent>
+    </queries>
 
 </manifest>

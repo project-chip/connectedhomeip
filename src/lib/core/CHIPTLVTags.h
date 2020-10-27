@@ -69,7 +69,7 @@ enum class TLVTagControl : uint8_t
 template <typename T>
 inline uint8_t operator>>(TLVTagControl lhs, const T & rhs)
 {
-    return static_cast<uint8_t>(lhs) >> rhs;
+    return static_cast<uint8_t>(static_cast<uint8_t>(lhs) >> rhs);
 }
 
 // TODO: Move to private namespace

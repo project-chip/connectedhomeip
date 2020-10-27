@@ -23,13 +23,14 @@ ABIs and corresponding values for `TARGET_CPU`
 | armeabi-v7a | arm        |
 | arm64-v8a   | arm64      |
 | x86         | x86        |
-| x86-64      | x64        |
+| x86_64      | x64        |
 
 1. Checkout the CHIP repo
 
 2. In commandline / Terminal, 'cd' into the top CHIP directory and run
 
     ```shell
+    sudo apt-get install -y swig # "brew install swig" for macOS.
     TARGET_CPU=arm64 ./scripts/examples/android_app.sh
     ```
 

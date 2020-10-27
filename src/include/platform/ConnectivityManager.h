@@ -84,6 +84,24 @@ public:
         kThreadMode_Enabled               = 3,
     };
 
+    enum WiFiStationState
+    {
+        kWiFiStationState_NotConnected,
+        kWiFiStationState_Connecting,
+        kWiFiStationState_Connecting_Succeeded,
+        kWiFiStationState_Connecting_Failed,
+        kWiFiStationState_Connected,
+        kWiFiStationState_Disconnecting,
+    };
+
+    enum WiFiAPState
+    {
+        kWiFiAPState_NotActive,
+        kWiFiAPState_Activating,
+        kWiFiAPState_Active,
+        kWiFiAPState_Deactivating,
+    };
+
     enum CHIPoBLEServiceMode
     {
         kCHIPoBLEServiceMode_NotSupported = 0,
@@ -171,6 +189,8 @@ public:
     // Support methods
     static const char * WiFiStationModeToStr(WiFiStationMode mode);
     static const char * WiFiAPModeToStr(WiFiAPMode mode);
+    static const char * WiFiStationStateToStr(WiFiStationState state);
+    static const char * WiFiAPStateToStr(WiFiAPState state);
     static const char * CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode);
 
 private:
@@ -515,6 +535,16 @@ inline const char * ConnectivityManager::WiFiStationModeToStr(WiFiStationMode mo
 inline const char * ConnectivityManager::WiFiAPModeToStr(WiFiAPMode mode)
 {
     return ImplClass::_WiFiAPModeToStr(mode);
+}
+
+inline const char * ConnectivityManager::WiFiStationStateToStr(WiFiStationState state)
+{
+    return ImplClass::_WiFiStationStateToStr(state);
+}
+
+inline const char * ConnectivityManager::WiFiAPStateToStr(WiFiAPState state)
+{
+    return ImplClass::_WiFiAPStateToStr(state);
 }
 
 inline const char * ConnectivityManager::CHIPoBLEServiceModeToStr(CHIPoBLEServiceMode mode)
