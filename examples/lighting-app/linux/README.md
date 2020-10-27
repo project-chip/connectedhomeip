@@ -1,6 +1,9 @@
 # CHIP Linux Lighting Example
 
-An example showing the use of CHIP on the Linux. The document will describe how to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested on **Ubuntu for Respberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for Respberry Pi Desktop 20.10 (aarch64)**
+An example showing the use of CHIP on the Linux. The document will describe how
+to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
+on **Ubuntu for Respberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
+Respberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
@@ -40,44 +43,50 @@ An example showing the use of CHIP on the Linux. The document will describe how 
 >     gn gen out/debug --args='bypass_rendezvous=true'
 >     ninja -C out/debug
 >
-> Note that GN will set bypass_rendezvous for future builds, to enable rendezvous, re-generate using
+> Note that GN will set bypass_rendezvous for future builds, to enable
+> rendezvous, re-generate using
 >
 >     gn gen out/debug --args='bypass_rendezvous=false'
 
-- Prerequisites
+-   Prerequisites
 
-  1. A Raspberry Pi 4 board
-  2. A USB Bluetooth Dongle, Ubuntu desktop will send Bluetooth advertisement, which will block CHIP from connecting via BLE. On Ubuntu server, you need to install `pi-bluetooth` via APT.
-  3. Ubuntu 20.04 or newer image for ARM64 platform.
+    1. A Raspberry Pi 4 board
+    2. A USB Bluetooth Dongle, Ubuntu desktop will send Bluetooth advertisement,
+       which will block CHIP from connecting via BLE. On Ubuntu server, you need
+       to install `pi-bluetooth` via APT.
+    3. Ubuntu 20.04 or newer image for ARM64 platform.
 
-- Building
+-   Building
 
-  Follow [Building](#building) section of this document.
+    Follow [Building](#building) section of this document.
 
-- Running
+-   Running
 
-  - [Optiuonal] Plug USB Bluetooth dongle
+    -   [Optiuonal] Plug USB Bluetooth dongle
 
-    - Plug USB Bluetooth dongle and find its bluetooth device number. The number after `hci` is the bluetooth device number, `1` in this example.
+        -   Plug USB Bluetooth dongle and find its bluetooth device number. The
+            number after `hci` is the bluetooth device number, `1` in this
+            example.
 
-            $ hciconfig
-            hci1:	Type: Primary  Bus: USB
-                BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
-                UP RUNNING PSCAN ISCAN 
-                RX bytes:20942 acl:1023 sco:0 events:1140 errors:0
-                TX bytes:16559 acl:1011 sco:0 commands:121 errors:0
+                  $ hciconfig
+                  hci1:	Type: Primary  Bus: USB
+                      BD Address: 00:1A:7D:AA:BB:CC  ACL MTU: 310:10  SCO MTU: 64:8
+                      UP RUNNING PSCAN ISCAN
+                      RX bytes:20942 acl:1023 sco:0 events:1140 errors:0
+                      TX bytes:16559 acl:1011 sco:0 commands:121 errors:0
 
-            hci0:	Type: Primary  Bus: UART
-                BD Address: B8:27:EB:AA:BB:CC  ACL MTU: 1021:8  SCO MTU: 64:1
-                UP RUNNING PSCAN ISCAN 
-                RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
-                TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
+                  hci0:	Type: Primary  Bus: UART
+                      BD Address: B8:27:EB:AA:BB:CC  ACL MTU: 1021:8  SCO MTU: 64:1
+                      UP RUNNING PSCAN ISCAN
+                      RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
+                      TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
 
-    - Run Linux Lighting Example App
+        -   Run Linux Lighting Example App
 
-            $ cd ~/connectedhomeip/examples/lighting-app/linux
-            $ sudo out/debug/chip-tool-server --ble-device [bluetooth device number]
-            # In this example, the device we want to use is hci1
-            $ sudo out/debug/chip-tool-server --ble-device 1
+                  $ cd ~/connectedhomeip/examples/lighting-app/linux
+                  $ sudo out/debug/chip-tool-server --ble-device [bluetooth device number]
+                  # In this example, the device we want to use is hci1
+                  $ sudo out/debug/chip-tool-server --ble-device 1
 
-    - Test the device using ChipDeviceController on your laptop / workstation etc.
+        -   Test the device using ChipDeviceController on your laptop /
+            workstation etc.
