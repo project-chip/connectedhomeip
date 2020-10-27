@@ -84,7 +84,7 @@ void TestSparseArraySerialize(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, array.Serialize(buf1, size) == buf1);
     NL_TEST_ASSERT(inSuite, size != 0);
 
-    uint16_t size2 = 2 * size;
+    uint16_t size2 = static_cast<uint16_t>(2 * size);
     char buf2[size2];
     NL_TEST_ASSERT(inSuite, array.Serialize(buf2, size2) == buf2);
     NL_TEST_ASSERT(inSuite, size2 == size);

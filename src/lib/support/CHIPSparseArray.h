@@ -24,6 +24,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPError.h>
 #include <support/Base64.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -34,6 +35,7 @@ class SparseU64Array
 {
 
 public:
+    SparseU64Array() { CHIP_ZERO_AT(mArray); }
     /**
      * @brief
      *   Serialize the sparse array into a base 64 encoded string.
@@ -86,13 +88,13 @@ public:
      * @brief
      *   Get the length of string if the array is serialized.
      */
-    uint16_t SerializedSize() { return BASE64_ENCODED_LEN(sizeof(uint64_t) * mNextAvailable); }
+    uint16_t SerializedSize() { return static_cast<uint16_t>(BASE64_ENCODED_LEN(sizeof(uint64_t) * mNextAvailable)); }
 
     /**
      * @brief
      *   Get the maximum length of string if the array was full and serialized.
      */
-    uint16_t MaxSerializedSize() { return BASE64_ENCODED_LEN(sizeof(uint64_t) * Capacity); }
+    uint16_t MaxSerializedSize() { return static_cast<uint16_t>(BASE64_ENCODED_LEN(sizeof(uint64_t) * Capacity)); }
 
     /**
      * @brief
@@ -131,7 +133,7 @@ public:
             mArray[index] = ToLE64(value);
             if (index == mNextAvailable)
             {
-                mNextAvailable = index + 1;
+                mNextAvailable = static_cast<uint16_t>(index + 1);
             }
             err = CHIP_NO_ERROR;
         }
