@@ -49,5 +49,6 @@ jobs:
                   ./scripts/examples/android_app.sh
             - name: Build App
               run: |
+                  yes | "$ANDROID_HOME"/tools/bin/sdkmanager --licenses
                   cd src/android/CHIPTool
                   ./gradlew build
