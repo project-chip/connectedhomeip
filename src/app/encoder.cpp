@@ -1228,6 +1228,8 @@ uint16_t encodeDoorLockClusterSetHolidayScheduleCommand(uint8_t * buffer, uint16
     const char * kName = "DoorLockSetHolidaySchedule";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x11);
     buf.Put(holidayScheduleID);
+    buf.PutLE32(localStartTime);
+    buf.PutLE32(localEndTime);
     buf.Put(operatingModeDuringHoliday);
     COMMAND_FOOTER(kName);
 }
@@ -1305,6 +1307,8 @@ uint16_t encodeDoorLockClusterSetYearDayScheduleCommand(uint8_t * buffer, uint16
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x0E);
     buf.Put(scheduleID);
     buf.PutLE16(userID);
+    buf.PutLE32(localStartTime);
+    buf.PutLE32(localEndTime);
     COMMAND_FOOTER(kName);
 }
 
