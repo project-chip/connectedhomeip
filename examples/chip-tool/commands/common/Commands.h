@@ -37,11 +37,11 @@ private:
     CHIP_ERROR RunCommand(ChipDeviceController & dc, NodeId remoteId, int argc, char ** argv);
     std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
-    Command * GetReadCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
+    Command * GetReadWriteCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
 
     void ShowClusters(std::string executable);
     void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands);
-    void ShowClusterAttributes(std::string executable, std::string clusterName, CommandsVector & commands);
+    void ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName, CommandsVector & commands);
     void ShowCommand(std::string executable, std::string clusterName, Command * command);
 
     std::map<std::string, CommandsVector> mClusters;

@@ -92,7 +92,7 @@ CHIP_ERROR Commands::RunCommand(ChipDeviceController & dc, NodeId remoteId, int 
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    if (strcmp(argv[2], "read") != 0)
+    if (strcmp(argv[2], "read") != 0 && strcmp(argv[2], "write") != 0)
     {
         command = GetCommand(cluster->second, argv[2]);
         if (command == nullptr)
@@ -107,15 +107,15 @@ CHIP_ERROR Commands::RunCommand(ChipDeviceController & dc, NodeId remoteId, int 
         if (argc <= 3)
         {
             ChipLogError(chipTool, "Missing attribute name");
-            ShowClusterAttributes(argv[0], argv[1], cluster->second);
+            ShowClusterAttributes(argv[0], argv[1], argv[2], cluster->second);
             ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        command = GetReadCommand(cluster->second, argv[2], argv[3]);
+        command = GetReadWriteCommand(cluster->second, argv[2], argv[3]);
         if (command == nullptr)
         {
             ChipLogError(chipTool, "Unknown attribute: %s", argv[3]);
-            ShowClusterAttributes(argv[0], argv[1], cluster->second);
+            ShowClusterAttributes(argv[0], argv[1], argv[2], cluster->second);
             ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
         }
     }
@@ -165,7 +165,7 @@ Command * Commands::GetCommand(CommandsVector & commands, std::string commandNam
     return nullptr;
 }
 
-Command * Commands::GetReadCommand(CommandsVector & commands, std::string commandName, std::string attributeName)
+Command * Commands::GetReadWriteCommand(CommandsVector & commands, std::string commandName, std::string attributeName)
 {
     for (auto & command : commands)
     {
@@ -201,7 +201,8 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Commands:                                                                           |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    bool readCommand = false;
+    bool readCommand  = false;
+    bool writeCommand = false;
     for (auto & command : commands)
     {
         if (strcmp(command->GetName(), "read") == 0)
@@ -212,6 +213,14 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
                 readCommand = true;
             }
         }
+        else if (strcmp(command->GetName(), "write") == 0)
+        {
+            if (writeCommand == false)
+            {
+                fprintf(stderr, "  | * %-82s|\n", command->GetName());
+                writeCommand = true;
+            }
+        }
         else
         {
             fprintf(stderr, "  | * %-82s|\n", command->GetName());
@@ -220,17 +229,19 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
 }
 
-void Commands::ShowClusterAttributes(std::string executable, std::string clusterName, CommandsVector & commands)
+void Commands::ShowClusterAttributes(std::string executable, std::string clusterName, std::string commandName,
+                                     CommandsVector & commands)
 {
     fprintf(stderr, "Usage:\n");
-    fprintf(stderr, "  %s %s read attribute-name [param1 param2 ...]\n", executable.c_str(), clusterName.c_str());
+    fprintf(stderr, "  %s %s %s attribute-name [param1 param2 ...]\n", executable.c_str(), clusterName.c_str(),
+            commandName.c_str());
     fprintf(stderr, "\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Attributes:                                                                         |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     for (auto & command : commands)
     {
-        if (strcmp(command->GetName(), "read") == 0)
+        if (commandName.compare(command->GetName()) == 0)
         {
             fprintf(stderr, "  | * %-82s|\n", command->GetAttribute());
         }
