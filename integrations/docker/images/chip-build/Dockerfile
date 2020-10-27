@@ -98,3 +98,17 @@ RUN set -x \
     && cd ../.. \
     && rm -rf bloaty \
     && : # last line
+
+# NodeJS: install a newer version than what apt-get would read
+# This installs the latest LTS version of nodejs
+RUN set -x \
+    && mkdir node_js \
+    && cd node_js \
+    && wget https://nodejs.org/dist/v12.19.0/node-v12.19.0-linux-x64.tar.xz \
+    && tar xfvJ node-v12.19.0-linux-x64.tar.xz \
+    && mv node-v12.19.0-linux-x64 /opt/ \
+    && ln -s /opt/node-v12.19.0-linux-x64 /opt/node \
+    && ln -s /opt/node/bin/* /usr/bin \
+    && cd .. \
+    && rm -rf node_js \
+    && : # last line
