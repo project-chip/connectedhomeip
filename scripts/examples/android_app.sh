@@ -19,11 +19,6 @@
 set -x
 env
 
-if [ -z "$JAVA_HOME" ]; then
-    echo "JAVA_HOME not set!"
-    exit 1
-fi
-
 if [ -z "$ANDROID_HOME" ]; then
     echo "ANDROID_HOME not set!"
     exit 1
