@@ -17,9 +17,11 @@
 #import "CHIPManualSetupPayloadParser.h"
 
 #import "CHIPError.h"
+#import "CHIPLogging.h"
 
 #import <setup_payload/ManualSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
+#import <support/CHIPMem.h>
 
 @implementation CHIPManualSetupPayloadParser {
     NSString * _decimalStringRepresentation;
@@ -31,6 +33,10 @@
     if (self = [super init]) {
         _decimalStringRepresentation = decimalStringRepresentation;
         _chipManualSetupPayloadParser = new chip::ManualSetupPayloadParser(std::string([decimalStringRepresentation UTF8String]));
+        if (CHIP_NO_ERROR != chip::Platform::MemoryInit()) {
+               CHIP_LOG_ERROR("Error: couldn't initialize platform memory");
+               delete _chipManualSetupPayloadParser;
+        }
     }
     return self;
 }
@@ -48,6 +54,11 @@
     }
 
     return payload;
+}
+
+-(void)dealloc {
+    delete _chipManualSetupPayloadParser;
+    chip::Platform::MemoryShutdown();
 }
 
 @end
