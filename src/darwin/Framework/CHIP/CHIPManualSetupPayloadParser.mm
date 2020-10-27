@@ -17,9 +17,11 @@
 #import "CHIPManualSetupPayloadParser.h"
 
 #import "CHIPError.h"
+#import "CHIPLogging.h"
 
 #import <setup_payload/ManualSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
+#import <support/CHIPMem.h>
 
 @implementation CHIPManualSetupPayloadParser {
     NSString * _decimalStringRepresentation;
@@ -29,6 +31,10 @@
 - (id)initWithDecimalStringRepresentation:(NSString *)decimalStringRepresentation
 {
     if (self = [super init]) {
+        if (CHIP_NO_ERROR != chip::Platform::MemoryInit()) {
+            CHIP_LOG_ERROR("Error: couldn't initialize platform memory");
+            return self;
+        }
         _decimalStringRepresentation = decimalStringRepresentation;
         _chipManualSetupPayloadParser = new chip::ManualSetupPayloadParser(std::string([decimalStringRepresentation UTF8String]));
     }
@@ -38,16 +44,31 @@
 - (CHIPSetupPayload *)populatePayload:(NSError * __autoreleasing *)error
 {
     chip::SetupPayload cPlusPluspayload;
-    CHIP_ERROR chipError = _chipManualSetupPayloadParser->populatePayload(cPlusPluspayload);
-
     CHIPSetupPayload * payload;
-    if (chipError == 0) {
-        payload = [[CHIPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
-    } else if (error) {
-        *error = [CHIPError errorForCHIPErrorCode:chipError];
+
+    if (_chipManualSetupPayloadParser) {
+        CHIP_ERROR chipError = _chipManualSetupPayloadParser->populatePayload(cPlusPluspayload);
+
+        if (chipError == 0) {
+            payload = [[CHIPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
+        } else if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:chipError];
+        }
+    } else {
+        // Memory init has failed
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
+        }
     }
 
     return payload;
+}
+
+- (void)dealloc
+{
+    delete _chipManualSetupPayloadParser;
+    _chipManualSetupPayloadParser = nullptr;
+    chip::Platform::MemoryShutdown();
 }
 
 @end

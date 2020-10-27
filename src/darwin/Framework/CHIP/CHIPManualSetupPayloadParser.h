@@ -22,8 +22,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPManualSetupPayloadParser : NSObject
-- (id)initWithDecimalStringRepresentation:(NSString *)decimalStringRepresentation;
-- (CHIPSetupPayload *)populatePayload:(NSError * __autoreleasing *)error;
+- (instancetype)initWithDecimalStringRepresentation:(NSString *)decimalStringRepresentation;
+- (CHIPSetupPayload * __nullable)populatePayload:(NSError * __autoreleasing *)error;
 @end
 
 NS_ASSUME_NONNULL_END

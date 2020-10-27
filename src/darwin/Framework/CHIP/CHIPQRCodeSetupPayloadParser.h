@@ -23,8 +23,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPQRCodeSetupPayloadParser : NSObject
-- (id)initWithBase41Representation:(NSString *)base41Representation;
-- (CHIPSetupPayload *)populatePayload:(NSError * __autoreleasing *)error;
+- (instancetype)initWithBase41Representation:(NSString *)base41Representation;
+- (CHIPSetupPayload * __nullable)populatePayload:(NSError * __autoreleasing *)error;
 @end
-;
+
 NS_ASSUME_NONNULL_END

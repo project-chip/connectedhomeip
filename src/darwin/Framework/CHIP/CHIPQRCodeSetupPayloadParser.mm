@@ -17,9 +17,11 @@
 
 #import "CHIPQRCodeSetupPayloadParser.h"
 #import "CHIPError.h"
+#import "CHIPLogging.h"
 
 #import <setup_payload/QRCodeSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>
+#import <support/CHIPMem.h>
 
 @implementation CHIPQRCodeSetupPayloadParser {
     NSString * _base41Representation;
@@ -29,6 +31,10 @@
 - (id)initWithBase41Representation:(NSString *)base41Representation
 {
     if (self = [super init]) {
+        if (CHIP_NO_ERROR != chip::Platform::MemoryInit()) {
+            CHIP_LOG_ERROR("Error: couldn't initialize platform memory");
+            return self;
+        }
         _base41Representation = base41Representation;
         _chipQRCodeSetupPayloadParser = new chip::QRCodeSetupPayloadParser(std::string([base41Representation UTF8String]));
     }
@@ -38,14 +44,31 @@
 - (CHIPSetupPayload *)populatePayload:(NSError * __autoreleasing *)error
 {
     chip::SetupPayload cPlusPluspayload;
-    CHIP_ERROR chipError = _chipQRCodeSetupPayloadParser->populatePayload(cPlusPluspayload);
-
     CHIPSetupPayload * payload;
-    if (chipError == 0) {
-        payload = [[CHIPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
-    } else if (error) {
-        *error = [CHIPError errorForCHIPErrorCode:chipError];
+
+    if (_chipQRCodeSetupPayloadParser) {
+        CHIP_ERROR chipError = _chipQRCodeSetupPayloadParser->populatePayload(cPlusPluspayload);
+
+        if (chipError == 0) {
+            payload = [[CHIPSetupPayload alloc] initWithSetupPayload:cPlusPluspayload];
+        } else if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:chipError];
+        }
+    } else {
+        // Memory init has failed
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:CHIP_ERROR_NO_MEMORY];
+        }
     }
+
     return payload;
 }
+
+- (void)dealloc
+{
+    delete _chipQRCodeSetupPayloadParser;
+    _chipQRCodeSetupPayloadParser = nullptr;
+    chip::Platform::MemoryShutdown();
+}
+
 @end
