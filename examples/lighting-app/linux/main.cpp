@@ -31,6 +31,7 @@
 #include <core/CHIPError.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
+#include <support/CHIPMem.h>
 #include <support/RandUtils.h>
 
 #include "LightingManager.h"
