@@ -232,9 +232,8 @@ CHIP_ERROR ReliableMessageContext::SendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = mManager->SendMessage(
-        this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
-        BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
+    err = mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
+                                BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
 
 exit:
     return err;
@@ -289,9 +288,8 @@ CHIP_ERROR ReliableMessageContext::SendDelayedDelivery(uint32_t pauseTimeMillis,
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = mManager->SendMessage(
-        this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
-        BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
+    err = mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
+                                BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
 exit:
     return err;
@@ -406,9 +404,8 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
 
         // Replace the Pending ack id.
         mPendingPeerAckId = MessageId;
-        mNextAckTimeTick  = static_cast<uint16_t>(
-            mConfig.mAckPiggybackTimeoutTick +
-            mManager->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
+        mNextAckTimeTick  = static_cast<uint16_t>(mConfig.mAckPiggybackTimeoutTick +
+                                                 mManager->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
         SetAckPending(true);
     }
 
@@ -428,8 +425,8 @@ CHIP_ERROR ReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
 
     if (0 != PauseTimeMillis)
     {
-        mThrottleTimeoutTick = static_cast<uint16_t>(
-            mManager->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch() + PauseTimeMillis));
+        mThrottleTimeoutTick =
+            static_cast<uint16_t>(mManager->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch() + PauseTimeMillis));
         mManager->PauseRetransTable(this, PauseTimeMillis);
     }
     else
@@ -468,9 +465,8 @@ CHIP_ERROR ReliableMessageContext::SendCommonNullMessage()
     VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err = mManager->SendMessage(
-        this, chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf,
-        BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
+    err = mManager->SendMessage(this, chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf,
+                                BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
 exit:
     if (IsSendErrorNonCritical(err))
