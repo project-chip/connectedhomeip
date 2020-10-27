@@ -44,6 +44,6 @@ jobs:
                   submodules: true
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
-            - name: Setup Build
+            - name: Run Build
               run: |
                   ./scripts/examples/android_app.sh
