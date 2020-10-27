@@ -64,3 +64,11 @@
 	path = third_party/qpg_sdk/repo
 	url = https://github.com/Qorvo/qpg-connectedhomeip
 	branch = master
+[submodule "zap"]
+	path = third_party/zap/repo
+	url = https://github.com/project-chip/zap.git
+	branch = master
+
+[submodule "third_party/zap/repo"]
+	path = third_party/zap/repo
+	url = https://github.com/project-chip/zap.git
