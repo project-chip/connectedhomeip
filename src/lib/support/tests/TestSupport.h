@@ -37,7 +37,7 @@ int TestCHIPCounter(void);
 int TestPersistedCounter(int argc, char * argv[]);
 int TestScopedBuffer(void);
 int TestSafeInt();
-int TestSparseArray(void);
+int TestSerializableIntegerSet(void);
 
 #ifdef __cplusplus
 }

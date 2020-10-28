@@ -18,15 +18,14 @@
 
 /**
  *    @file
- *      Defines a data structure that can store an array of uint64_t values
- *      in not contiguous indexes. The array is initialized with a constant
+ *      Defines a data structure that can store a set of uint64_t values
+ *      in not contiguous indexes. The set is initialized with a constant
  *      capacity. The data structure supports serialize/deserialize operations,
- *      where, serialize converts the array to a base64 string, and deserializing
- *      the base64 string reconstructs the original array.
+ *      where, serialize converts the set to a base64 string, and deserializing
+ *      the base64 string reconstructs the original set.
  *
- *      The data is stored in LittleEndian byte order in the array, so that
- *      serialized data can be deserialized correctly on different machine
- *      architectures.
+ *      The data is stored such that serialized data can be deserialized correctly
+ *      on different machine architectures.
  *
  */
 
@@ -38,11 +37,11 @@
 
 namespace chip {
 
-class SparseU64ArrayBase
+class SerializableU64SetBase
 {
 
 public:
-    SparseU64ArrayBase(uint64_t * data, uint16_t capacity) : mData(data), mCapacity(capacity), mNextAvailable(0) {}
+    SerializableU64SetBase(uint64_t * data, uint16_t capacity) : mData(data), mCapacity(capacity), mNextAvailable(0) {}
 
     /**
      * @brief
@@ -77,18 +76,18 @@ public:
 
     /**
      * @brief
-     *   Get the maximum length of string if the array was full and serialized.
+     *   Get the maximum length of string if the array were full and serialized.
      */
     uint16_t MaxSerializedSize() { return static_cast<uint16_t>(BASE64_ENCODED_LEN(sizeof(uint64_t) * mCapacity)); }
 
     /**
      * @brief
-     *   Find a value in the array.
+     *   Check if the value is in the array.
      *
      * @param[in] value Value to find
-     * @return index of the value if found, or max length (mCapacity) of the array
+     * @return True, if it's prsent in the array.
      */
-    uint16_t Find(uint64_t value);
+    bool Contains(uint64_t value) { return Find(value) != mCapacity; }
 
     /**
      * @brief
@@ -106,23 +105,32 @@ public:
     void Remove(uint64_t value);
 
 private:
-    uint64_t * mData;
+    uint64_t * const mData;
     const uint16_t mCapacity;
     uint16_t mNextAvailable;
 
     uint16_t FirstAvailableForUniqueId(uint64_t value);
 
+    /**
+     * @brief
+     *   Find a value in the array.
+     *
+     * @param[in] value Value to find
+     * @return index of the value if found, or max length (mCapacity) of the array
+     */
+    uint16_t Find(uint64_t value);
+
     uint64_t ToLE64(uint64_t value) { return Encoding::LittleEndian::Get64(reinterpret_cast<const uint8_t *>(&value)); }
 };
 
 template <uint16_t kCapacity>
-class SparseU64Array : public SparseU64ArrayBase
+class SerializableU64Set : public SerializableU64SetBase
 {
 public:
-    SparseU64Array() : SparseU64ArrayBase(mBuffer, kCapacity)
+    SerializableU64Set() : SerializableU64SetBase(mBuffer, kCapacity)
     {
         nlSTATIC_ASSERT_PRINT(kCapacity < UINT16_MAX / sizeof(uint64_t),
-                              "Sparse array capacity cannot be more than UINT16_MAX / sizeof(uint64_t)");
+                              "Serializable u64 set capacity cannot be more than UINT16_MAX / sizeof(uint64_t)");
         CHIP_ZERO_AT(mBuffer);
     }
 

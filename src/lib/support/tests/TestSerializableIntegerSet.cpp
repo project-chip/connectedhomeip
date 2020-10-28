@@ -19,84 +19,84 @@
 #include "TestSupport.h"
 
 #include <support/CHIPMem.h>
-#include <support/SparseArray.h>
+#include <support/SerializableIntegerSet.h>
 #include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
 namespace {
 
-void TestSparseArray(nlTestSuite * inSuite, void * inContext)
+void TestSerializableIntegerSet(nlTestSuite * inSuite, void * inContext)
 {
-    chip::SparseU64Array<8> array;
-    NL_TEST_ASSERT(inSuite, array.Find(123) == 8);
+    chip::SerializableU64Set<8> set;
+    NL_TEST_ASSERT(inSuite, !set.Contains(123));
 
-    NL_TEST_ASSERT(inSuite, array.Insert(123) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, array.Find(123) == 0);
+    NL_TEST_ASSERT(inSuite, set.Insert(123) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, set.Contains(123));
 
-    NL_TEST_ASSERT(inSuite, array.Insert(123) == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, array.Find(123) == 0);
+    NL_TEST_ASSERT(inSuite, set.Insert(123) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, set.Contains(123));
 
-    array.Remove(123);
-    NL_TEST_ASSERT(inSuite, array.Find(123) == 8);
-
-    for (uint64_t i = 1; i <= 8; i++)
-    {
-        NL_TEST_ASSERT(inSuite, array.Insert(i) == CHIP_NO_ERROR);
-    }
-
-    NL_TEST_ASSERT(inSuite, array.Insert(9) != CHIP_NO_ERROR);
+    set.Remove(123);
+    NL_TEST_ASSERT(inSuite, !set.Contains(123));
 
     for (uint64_t i = 1; i <= 8; i++)
     {
-        NL_TEST_ASSERT(inSuite, array.Find(i) != 8);
+        NL_TEST_ASSERT(inSuite, set.Insert(i) == CHIP_NO_ERROR);
     }
 
-    size_t size = array.SerializedSize();
-    NL_TEST_ASSERT(inSuite, array.MaxSerializedSize() == size);
+    NL_TEST_ASSERT(inSuite, set.Insert(9) != CHIP_NO_ERROR);
+
+    for (uint64_t i = 1; i <= 8; i++)
+    {
+        NL_TEST_ASSERT(inSuite, set.Contains(i));
+    }
+
+    size_t size = set.SerializedSize();
+    NL_TEST_ASSERT(inSuite, set.MaxSerializedSize() == size);
 
     for (uint64_t i = 1; i <= 7; i++)
     {
-        array.Remove(i);
-        NL_TEST_ASSERT(inSuite, array.SerializedSize() == size);
+        set.Remove(i);
+        NL_TEST_ASSERT(inSuite, set.SerializedSize() == size);
     }
 
-    array.Remove(8);
-    NL_TEST_ASSERT(inSuite, array.SerializedSize() == 0);
+    set.Remove(8);
+    NL_TEST_ASSERT(inSuite, set.SerializedSize() == 0);
 }
 
-void TestSparseArraySerialize(nlTestSuite * inSuite, void * inContext)
+void TestSerializableIntegerSetSerialize(nlTestSuite * inSuite, void * inContext)
 {
-    chip::SparseU64Array<8> array;
+    chip::SerializableU64Set<8> set;
 
     for (uint64_t i = 1; i <= 6; i++)
     {
-        NL_TEST_ASSERT(inSuite, array.Insert(i) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, set.Insert(i) == CHIP_NO_ERROR);
     }
 
     char * buf    = nullptr;
     uint16_t size = 0;
 
-    NL_TEST_ASSERT(inSuite, array.SerializeBase64(buf, size) == nullptr);
+    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf, size) == nullptr);
     NL_TEST_ASSERT(inSuite, size != 0);
 
     char buf1[size];
-    NL_TEST_ASSERT(inSuite, array.SerializeBase64(buf1, size) == buf1);
+    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf1, size) == buf1);
     NL_TEST_ASSERT(inSuite, size != 0);
 
     uint16_t size2 = static_cast<uint16_t>(2 * size);
     char buf2[size2];
-    NL_TEST_ASSERT(inSuite, array.SerializeBase64(buf2, size2) == buf2);
+    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf2, size2) == buf2);
     NL_TEST_ASSERT(inSuite, size2 == size);
 
-    chip::SparseU64Array<8> array2;
-    NL_TEST_ASSERT(inSuite, array2.DeserializeBase64(buf2, size2) == CHIP_NO_ERROR);
+    chip::SerializableU64Set<8> set2;
+    NL_TEST_ASSERT(inSuite, set2.DeserializeBase64(buf2, size2) == CHIP_NO_ERROR);
 
     for (uint64_t i = 1; i <= 6; i++)
     {
-        NL_TEST_ASSERT(inSuite, array2.Find(i) != 8);
+        NL_TEST_ASSERT(inSuite, set.Contains(i));
     }
-    NL_TEST_ASSERT(inSuite, array2.Find(7) == 8);
+    NL_TEST_ASSERT(inSuite, !set.Contains(7));
 }
 
 int Setup(void * inContext)
@@ -120,14 +120,14 @@ int Teardown(void * inContext)
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = {
-    NL_TEST_DEF_FN(TestSparseArray),          //
-    NL_TEST_DEF_FN(TestSparseArraySerialize), //
-    NL_TEST_SENTINEL()                        //
+    NL_TEST_DEF_FN(TestSerializableIntegerSet),          //
+    NL_TEST_DEF_FN(TestSerializableIntegerSetSerialize), //
+    NL_TEST_SENTINEL()                                   //
 };
 
-int TestSparseArray(void)
+int TestSerializableIntegerSet(void)
 {
-    nlTestSuite theSuite = { "CHIP Sparse Array tests", &sTests[0], Setup, Teardown };
+    nlTestSuite theSuite = { "CHIP SerializableIntegerSet tests", &sTests[0], Setup, Teardown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);

@@ -31,7 +31,7 @@ chip_test_suite("tests") {
     "TestPersistedStorageImplementation.h",
     "TestSafeInt.cpp",
     "TestScopedBuffer.cpp",
-    "TestSparseArray.cpp",
+    "TestSerializableIntegerSet.cpp",
     "TestSupport.h",
     "TestTimeUtils.cpp",
   ]
@@ -54,6 +54,6 @@ chip_test_suite("tests") {
     "TestPersistedCounter",
     "TestSafeInt",
     "TestScopedBuffer",
-    "TestSparseArray",
+    "TestSerializableIntegerSet",
   ]
 }

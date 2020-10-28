@@ -16,11 +16,11 @@
  *    limitations under the License.
  */
 
-#include "SparseArray.h"
+#include "SerializableIntegerSet.h"
 
 namespace chip {
 
-const char * SparseU64ArrayBase::SerializeBase64(char * buf, uint16_t & buflen)
+const char * SerializableU64SetBase::SerializeBase64(char * buf, uint16_t & buflen)
 {
     char * out = nullptr;
     size_t len = sizeof(uint64_t) * mNextAvailable;
@@ -34,7 +34,7 @@ exit:
     return out;
 }
 
-CHIP_ERROR SparseU64ArrayBase::DeserializeBase64(const char * serialized, uint16_t buflen)
+CHIP_ERROR SerializableU64SetBase::DeserializeBase64(const char * serialized, uint16_t buflen)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
     uint16_t decodelen = 0;
@@ -49,8 +49,13 @@ exit:
     return err;
 }
 
-uint16_t SparseU64ArrayBase::Find(uint64_t value)
+uint16_t SerializableU64SetBase::Find(uint64_t value)
 {
+    /**
+     *  The data is stored in LittleEndian byte order in the set. This will enable
+     *  different machine architectures to interpret a given set in a consistent manner,
+     *  for serialize and deserialize operations.
+     */
     uint64_t valueLE = ToLE64(value);
     for (uint16_t i = 0; i < mNextAvailable; i++)
     {
@@ -63,12 +68,17 @@ uint16_t SparseU64ArrayBase::Find(uint64_t value)
     return mCapacity;
 }
 
-CHIP_ERROR SparseU64ArrayBase::Insert(uint64_t value)
+CHIP_ERROR SerializableU64SetBase::Insert(uint64_t value)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
     uint16_t index = FirstAvailableForUniqueId(value);
     if (index < mCapacity)
     {
+        /**
+         *  The data is stored in LittleEndian byte order in the set. This will enable
+         *  different machine architectures to interpret a given set in a consistent manner,
+         *  for serialize and deserialize operations.
+         */
         mData[index] = ToLE64(value);
         if (index == mNextAvailable)
         {
@@ -79,7 +89,7 @@ CHIP_ERROR SparseU64ArrayBase::Insert(uint64_t value)
     return err;
 }
 
-void SparseU64ArrayBase::Remove(uint64_t value)
+void SerializableU64SetBase::Remove(uint64_t value)
 {
     uint16_t index = Find(value);
     if (index < mCapacity)
@@ -94,8 +104,13 @@ void SparseU64ArrayBase::Remove(uint64_t value)
     }
 }
 
-uint16_t SparseU64ArrayBase::FirstAvailableForUniqueId(uint64_t value)
+uint16_t SerializableU64SetBase::FirstAvailableForUniqueId(uint64_t value)
 {
+    /**
+     *  The data is stored in LittleEndian byte order in the set. This will enable
+     *  different machine architectures to interpret a given set in a consistent manner,
+     *  for serialize and deserialize operations.
+     */
     uint64_t valueLE   = ToLE64(value);
     uint16_t available = mNextAvailable;
     for (uint16_t i = 0; i < mNextAvailable; i++)

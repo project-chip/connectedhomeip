@@ -18,5 +18,5 @@
 
 int main()
 {
-    return (TestSparseArray());
+    return (TestSerializableIntegerSet());
 }
