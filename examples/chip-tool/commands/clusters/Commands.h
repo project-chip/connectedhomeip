@@ -3632,6 +3632,8 @@ public:
         ChipLogProgress(chipTool, "GetGroupMembershipResponse (0x02):");
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "groupCount", chip::Encoding::Read8(message)); // uint8
         // uint16_t uint16[]
         while (messageLen)
         {
@@ -3766,6 +3768,7 @@ class GroupsGetGroupMembership : public ModelCommand
 public:
     GroupsGetGroupMembership() : ModelCommand("get-group-membership", kGroupsClusterId, 0x02)
     {
+        AddArgument("groupCount", 0, UINT8_MAX, &mGroupCount);
         // groupList is an array, but since chip-tool does not support variable
         // number of arguments, only a single instance is supported.
         AddArgument("groupList", 0, UINT16_MAX, &mGroupList);
@@ -3773,7 +3776,7 @@ public:
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
-        return encodeGroupsClusterGetGroupMembershipCommand(buffer->Start(), bufferSize, endPointId, mGroupList);
+        return encodeGroupsClusterGetGroupMembershipCommand(buffer->Start(), bufferSize, endPointId, mGroupCount, mGroupList);
     }
 
     // Global Response: DefaultResponse
@@ -3791,6 +3794,7 @@ public:
     }
 
 private:
+    uint8_t mGroupCount;
     uint16_t mGroupList;
 };
 

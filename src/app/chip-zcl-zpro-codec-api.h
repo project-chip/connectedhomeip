@@ -840,7 +840,7 @@ uint16_t encodeGroupsClusterAddGroupIfIdentifyingCommand(uint8_t * buffer, uint1
  *    Encode an get-group-membership command for Groups server into buffer including the APS frame
  */
 uint16_t encodeGroupsClusterGetGroupMembershipCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                                      uint16_t groupList);
+                                                      uint8_t groupCount, uint16_t groupList);
 
 /**
  * @brief

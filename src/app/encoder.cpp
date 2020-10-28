@@ -1427,10 +1427,11 @@ uint16_t encodeGroupsClusterAddGroupIfIdentifyingCommand(uint8_t * buffer, uint1
  * Command GetGroupMembership
  */
 uint16_t encodeGroupsClusterGetGroupMembershipCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                                      uint16_t groupList)
+                                                      uint8_t groupCount, uint16_t groupList)
 {
     const char * kName = "GroupsGetGroupMembership";
     COMMAND_HEADER(kName, GROUPS_CLUSTER_ID, 0x02);
+    buf.Put(groupCount);
     buf.PutLE16(groupList);
     COMMAND_FOOTER(kName);
 }
