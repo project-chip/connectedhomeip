@@ -28,10 +28,10 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
-    "decoder.cpp",
-    "encoder.cpp",
     "MessageDef.cpp",
     "MessageDef.h",
+    "decoder.cpp",
+    "encoder.cpp",
   ]
 
   public_deps = [
