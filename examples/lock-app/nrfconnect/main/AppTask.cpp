@@ -370,7 +370,6 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     }
 }
 
-
 void AppTask::CancelTimer()
 {
     k_timer_stop(&sFunctionTimer);

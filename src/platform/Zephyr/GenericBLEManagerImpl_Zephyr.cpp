@@ -502,7 +502,8 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXComplete(const ChipD
 }
 
 template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, System::Error error)
+void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param,
+                                                                            System::Error error)
 {
     BLEMgr().SetAdvertisingEnabled(false);
     ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because of timeout expired");
