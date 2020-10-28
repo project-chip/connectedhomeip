@@ -138,26 +138,27 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
     if (deviceName != nullptr && deviceName[0] != 0)
     {
-        if (strlen(deviceName) >= kMaxDeviceNameLength)
-        {
-            return CHIP_ERROR_INVALID_ARGUMENT;
-        }
+        VerifyOrExit(strlen(deviceName) < kMaxDeviceNameLength, err = CHIP_ERROR_INVALID_ARGUMENT);
         strcpy(mDeviceName, deviceName);
         SetFlag(mFlags, kFlag_UseCustomDeviceName);
     }
     else
     {
-        mDeviceName[0] = 0;
+        uint16_t discriminator;
+        SuccessOrExit(err = ConfigurationMgr().GetSetupDiscriminator(discriminator));
+        snprintf(mDeviceName, sizeof(mDeviceName), "%s%04u", CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX, discriminator);
+        mDeviceName[kMaxDeviceNameLength] = 0;
         ClearFlag(mFlags, kFlag_UseCustomDeviceName);
     }
 
-    return CHIP_NO_ERROR;
+exit:
+    return err;
 }
 
 uint16_t BLEManagerImpl::_NumConnections()

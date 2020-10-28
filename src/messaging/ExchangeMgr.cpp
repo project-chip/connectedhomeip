@@ -29,6 +29,7 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
+#include <cstring>
 #include <inttypes.h>
 #include <stddef.h>
 
@@ -70,7 +71,7 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgrBase * sessionMgr)
 
     mNextExchangeId = GetRandU16();
 
-    memset(ContextPool, 0, sizeof(ContextPool));
+    memset((void *) ContextPool, 0, sizeof(ContextPool));
     mContextsInUse = 0;
 
     memset(UMHandlerPool, 0, sizeof(UMHandlerPool));
