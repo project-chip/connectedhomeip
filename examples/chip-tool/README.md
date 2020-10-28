@@ -56,7 +56,8 @@ Stop the Client at any time with `Ctrl + C`.
 ## Using the Client to Send CHIP Commands
 
 To use the Client to send a CHIP commands, run the built executable and pass it
-the target cluster name, the target command name, the ip address and port of the server to talk to as well as an endpoint id. The endpoint id must be between 1
+the target cluster name, the target command name, the ip address and port of the
+server to talk to as well as an endpoint id. The endpoint id must be between 1
 and 240.
 
     $ chip-tool onoff on 192.168.0.30 11095 1
