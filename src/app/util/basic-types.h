@@ -32,7 +32,10 @@ typedef uint8_t CHIPEndpointId;
 typedef uint16_t CHIPClusterId;
 typedef uint16_t CHIPAttributeId;
 typedef uint16_t CHIPGroupId;
-
+typedef uint16_t CHIPEventId;
+typedef uint16_t CHIPCommandId;
+typedef uint64_t CHIPNodeId;
+typedef uint64_t CHIPDataVersion;
 /**
  * Types for use by generated Silicon Labs code until we convert the generator
  * to using CHIP types.
