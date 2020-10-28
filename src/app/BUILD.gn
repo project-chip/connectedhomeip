@@ -30,6 +30,8 @@ static_library("app") {
   sources = [
     "decoder.cpp",
     "encoder.cpp",
+    "MessageDef.cpp",
+    "MessageDef.h",
   ]
 
   public_deps = [
