@@ -36,14 +36,14 @@ pass it the discriminator and pairing code of the remote device. The command
 below uses the default values hard-coded into the debug versions of the ESP32
 wifi-echo app:
 
-    $ chip-tool echo ble 3840 12345678
+    $ chip-tool echo ble 12345678 3840
 
 ### Ping a device over IP
 
 To start the Client in echo mode, run the built executable and pass it the IP
 address and port of the server to talk to, as well as the command "echo".
 
-    $ chip-tool echo ip 192.168.0.30 8000
+    $ chip-tool echo ip 192.168.0.30 11095
 
 If valid values are supplied, it will begin to periodically send messages to the
 server address provided.
@@ -56,11 +56,10 @@ Stop the Client at any time with `Ctrl + C`.
 ## Using the Client to Send CHIP Commands
 
 To use the Client to send a CHIP commands, run the built executable and pass it
-the target cluster name, the target command name, an endpoint id as well as the
-IP address and port of the server to talk to. The endpoint id must be between 1
+the target cluster name, the target command name, the ip address and port of the server to talk to as well as an endpoint id. The endpoint id must be between 1
 and 240.
 
-    $ chip-tool onoff on 1 192.168.0.30 11095
+    $ chip-tool onoff on 192.168.0.30 11095 1
 
 The client will send a single command packet and then exit.
 

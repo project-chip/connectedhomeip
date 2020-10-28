@@ -179,7 +179,7 @@ size_t Command::AddArgument(const char * name, const char * value)
     arg.name  = name;
     arg.value = const_cast<void *>(reinterpret_cast<const void *>(value));
 
-    mArgs.emplace(mArgs.begin(), arg);
+    mArgs.emplace_back(arg);
     return mArgs.size();
 }
 
@@ -190,7 +190,7 @@ size_t Command::AddArgument(const char * name, char ** value)
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(value);
 
-    mArgs.emplace(mArgs.begin(), arg);
+    mArgs.emplace_back(arg);
     return mArgs.size();
 }
 
@@ -201,7 +201,7 @@ size_t Command::AddArgument(const char * name, AddressWithInterface * out)
     arg.name  = name;
     arg.value = reinterpret_cast<void *>(out);
 
-    mArgs.emplace(mArgs.begin(), arg);
+    mArgs.emplace_back(arg);
     return mArgs.size();
 }
 
@@ -214,7 +214,7 @@ size_t Command::AddArgument(const char * name, int64_t min, int64_t max, void * 
     arg.min   = min;
     arg.max   = max;
 
-    mArgs.emplace(mArgs.begin(), arg);
+    mArgs.emplace_back(arg);
     return mArgs.size();
 }
 
@@ -227,7 +227,7 @@ size_t Command::AddArgument(const char * name, int64_t min, int64_t max, void * 
     arg.min   = min;
     arg.max   = max;
 
-    mArgs.emplace(mArgs.begin(), arg);
+    mArgs.emplace_back(arg);
     return mArgs.size();
 }
 
