@@ -23,13 +23,13 @@
 class Echo : public EchoCommand
 {
 public:
-    Echo() : EchoCommand("ip", NetworkType::UDP) {}
+    Echo() : EchoCommand("ip", NetworkType::UDP) { NetworkCommand::AddArguments(); }
 };
 
 class EchoBle : public EchoCommand
 {
 public:
-    EchoBle() : EchoCommand("ble", NetworkType::BLE) {}
+    EchoBle() : EchoCommand("ble", NetworkType::BLE) { NetworkCommand::AddArguments(); }
 };
 
 void registerCommandsEcho(Commands & commands)

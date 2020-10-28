@@ -79,7 +79,7 @@ class TestOnOffCluster(CHIPVirtualHome):
 
         for ip in server_ip_address:
             output = self.execute_device_cmd(
-                tool_device_id, "chip-tool onoff on 1 {} {}".format(ip, CHIP_PORT))
+                tool_device_id, "chip-tool onoff on {} {} 1".format(ip, CHIP_PORT))
             self.logger.info(
                 'checking output does not contain "No response from device"')
             self.assertFalse(self.sequenceMatch(
@@ -87,7 +87,7 @@ class TestOnOffCluster(CHIPVirtualHome):
         time.sleep(1)
         for ip in server_ip_address:
             output = self.execute_device_cmd(
-                tool_device_id, "chip-tool onoff off 1 {} {}".format(ip, CHIP_PORT))
+                tool_device_id, "chip-tool onoff off {} {} 1".format(ip, CHIP_PORT))
             self.logger.info(
                 'checking output does not contain "No response from device"')
             self.assertFalse(self.sequenceMatch(
