@@ -40,6 +40,181 @@
                                                                                                                                    \
     messageLen = static_cast<uint16_t>(messageLen - static_cast<uint16_t>(value));
 
+typedef enum
+{
+    EMBER_ZCL_STATUS_SUCCESS                      = 0x00,
+    EMBER_ZCL_STATUS_FAILURE                      = 0x01,
+    EMBER_ZCL_STATUS_REQUEST_DENIED               = 0x70,
+    EMBER_ZCL_STATUS_MULTIPLE_REQUEST_NOT_ALLOWED = 0x71,
+    EMBER_ZCL_STATUS_INDICATION_REDIRECTION_TO_AP = 0x72,
+    EMBER_ZCL_STATUS_PREFERENCE_DENIED            = 0x73,
+    EMBER_ZCL_STATUS_PREFERENCE_IGNORED           = 0x74,
+    EMBER_ZCL_STATUS_NOT_AUTHORIZED               = 0x7E,
+    EMBER_ZCL_STATUS_RESERVED_FIELD_NOT_ZERO      = 0x7F,
+    EMBER_ZCL_STATUS_MALFORMED_COMMAND            = 0x80,
+    EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND        = 0x81,
+    EMBER_ZCL_STATUS_UNSUP_GENERAL_COMMAND        = 0x82,
+    EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND  = 0x83,
+    EMBER_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND  = 0x84,
+    EMBER_ZCL_STATUS_INVALID_FIELD                = 0x85,
+    EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE        = 0x86,
+    EMBER_ZCL_STATUS_INVALID_VALUE                = 0x87,
+    EMBER_ZCL_STATUS_READ_ONLY                    = 0x88,
+    EMBER_ZCL_STATUS_INSUFFICIENT_SPACE           = 0x89,
+    EMBER_ZCL_STATUS_DUPLICATE_EXISTS             = 0x8A,
+    EMBER_ZCL_STATUS_NOT_FOUND                    = 0x8B,
+    EMBER_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE       = 0x8C,
+    EMBER_ZCL_STATUS_INVALID_DATA_TYPE            = 0x8D,
+    EMBER_ZCL_STATUS_INVALID_SELECTOR             = 0x8E,
+    EMBER_ZCL_STATUS_WRITE_ONLY                   = 0x8F,
+    EMBER_ZCL_STATUS_INCONSISTENT_STARTUP_STATE   = 0x90,
+    EMBER_ZCL_STATUS_DEFINED_OUT_OF_BAND          = 0x91,
+    EMBER_ZCL_STATUS_INCONSISTENT                 = 0x92,
+    EMBER_ZCL_STATUS_ACTION_DENIED                = 0x93,
+    EMBER_ZCL_STATUS_TIMEOUT                      = 0x94,
+    EMBER_ZCL_STATUS_ABORT                        = 0x95,
+    EMBER_ZCL_STATUS_INVALID_IMAGE                = 0x96,
+    EMBER_ZCL_STATUS_WAIT_FOR_DATA                = 0x97,
+    EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE           = 0x98,
+    EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE           = 0x99,
+    EMBER_ZCL_STATUS_HARDWARE_FAILURE             = 0xC0,
+    EMBER_ZCL_STATUS_SOFTWARE_FAILURE             = 0xC1,
+    EMBER_ZCL_STATUS_CALIBRATION_ERROR            = 0xC2,
+    EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER          = 0xC3,
+} EmberAfStatus;
+
+bool CheckStatus(uint8_t status)
+{
+    bool success = false;
+
+    switch (status)
+    {
+    case EMBER_ZCL_STATUS_SUCCESS:
+        success = true;
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_SUCCESS (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_FAILURE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_FAILURE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_REQUEST_DENIED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_REQUEST_DENIED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_MULTIPLE_REQUEST_NOT_ALLOWED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_REQUEST_NOT_ALLOWED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INDICATION_REDIRECTION_TO_AP:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INDICATION_REDIRECTION_TO_AP (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_PREFERENCE_DENIED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_PREFERENCE_DENIED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_PREFERENCE_IGNORED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_PREFERENCE_IGNORED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_NOT_AUTHORIZED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_NOT_AUTHORIZED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_RESERVED_FIELD_NOT_ZERO:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_RESERVED_FIELD_NOT_ZERO (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_MALFORMED_COMMAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_MALFORMED_COMMAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUP_GENERAL_COMMAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUP_GENERAL_COMMAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INVALID_FIELD:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INVALID_FIELD (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INVALID_VALUE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INVALID_VALUE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_READ_ONLY:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_READ_ONLY (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INSUFFICIENT_SPACE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INSUFFICIENT_SPACE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_DUPLICATE_EXISTS:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_DUPLICATE_EXISTS (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_NOT_FOUND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_NOT_FOUND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INVALID_DATA_TYPE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INVALID_DATA_TYPE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INVALID_SELECTOR:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INVALID_SELECTOR (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_WRITE_ONLY:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_WRITE_ONLY (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INCONSISTENT_STARTUP_STATE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INCONSISTENT_STARTUP_STATE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_DEFINED_OUT_OF_BAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_DEFINED_OUT_Of_BAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INCONSISTENT:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INCONSISTENT (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_ACTION_DENIED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_ACTION_DENIED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_TIMEOUT:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_TIMEOUT (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_ABORT:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_ABORT (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INVALID_IMAGE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INVALID_IMAGE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_WAIT_FOR_DATA:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_WAIT_FOR_DATA (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_HARDWARE_FAILURE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_HARDWARE_FAILURE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_SOFTWARE_FAILURE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_SOFTWARE_FAILURE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_CALIBRATION_ERROR:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_CALIBRATION_ERROR (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER (0x%02x)", status);
+        break;
+    default:
+        ChipLogError(chipTool, "Unknow status: 0x%02x", status);
+        break;
+    }
+
+    return success;
+}
+
 bool ReadAttributeValue(uint8_t *& message, uint16_t & messageLen)
 {
     CHECK_MESSAGE_LENGTH(1);
@@ -330,7 +505,10 @@ public:
             CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+            if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+            {
+                return false;
+            }
             if (!ReadAttributeValue(message, messageLen))
             {
                 return false;
@@ -356,7 +534,10 @@ public:
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+            if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+            {
+                return false;
+            }
             CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
         }
@@ -405,7 +586,10 @@ public:
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "commandId", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "statusCode", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
 
         return true;
     }
@@ -2466,7 +2650,10 @@ public:
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "holidayScheduleId", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(4);
         ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
         CHECK_MESSAGE_LENGTH(4);
@@ -2615,7 +2802,10 @@ public:
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "daysMask", chip::Encoding::Read8(message)); // DrlkDaysMask
         CHECK_MESSAGE_LENGTH(1);
@@ -2647,7 +2837,10 @@ public:
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(4);
         ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
         CHECK_MESSAGE_LENGTH(4);
@@ -2669,7 +2862,10 @@ public:
     {
         ChipLogProgress(chipTool, "LockDoorResponse (0x00):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
 
         return true;
     }
@@ -2795,7 +2991,10 @@ public:
     {
         ChipLogProgress(chipTool, "UnlockDoorResponse (0x01):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
 
         return true;
     }
@@ -2813,7 +3012,10 @@ public:
     {
         ChipLogProgress(chipTool, "UnlockWithTimeoutResponse (0x03):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
 
         return true;
     }
@@ -4662,7 +4864,10 @@ public:
     {
         ChipLogProgress(chipTool, "AddSceneResponse (0x00):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
@@ -4684,7 +4889,10 @@ public:
     {
         ChipLogProgress(chipTool, "CopySceneResponse (0x42):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupIdFrom", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
@@ -4706,7 +4914,10 @@ public:
     {
         ChipLogProgress(chipTool, "EnhancedAddSceneResponse (0x40):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
@@ -4728,7 +4939,10 @@ public:
     {
         ChipLogProgress(chipTool, "EnhancedViewSceneResponse (0x41):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
@@ -4777,7 +4991,10 @@ public:
     {
         ChipLogProgress(chipTool, "GetSceneMembershipResponse (0x06):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(2);
@@ -4805,7 +5022,10 @@ public:
     {
         ChipLogProgress(chipTool, "RemoveAllScenesResponse (0x03):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
 
@@ -4825,7 +5045,10 @@ public:
     {
         ChipLogProgress(chipTool, "RemoveSceneResponse (0x02):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
@@ -4847,7 +5070,10 @@ public:
     {
         ChipLogProgress(chipTool, "StoreSceneResponse (0x04):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
@@ -4869,7 +5095,10 @@ public:
     {
         ChipLogProgress(chipTool, "ViewSceneResponse (0x01):");
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        {
+            return false;
+        }
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
