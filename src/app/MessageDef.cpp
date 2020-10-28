@@ -577,7 +577,7 @@ AttributePath::Builder & AttributePath::Builder::FieldTag(const uint8_t aFieldTa
 
     mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_FieldTag), aFieldTag);
     ChipLogFunctError(mError);
-    
+
 exit:
     return *this;
 }
@@ -1518,7 +1518,7 @@ EventDataElement::Builder EventDataElement::Builder::DeltaSystemTime(const uint6
 
     mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_DeltaSystemTime), aDeltaSystemTime);
     ChipLogFunctError(mError);
-    
+
 exit:
     return *this;
 }
@@ -1536,18 +1536,18 @@ CHIP_ERROR EventList::Parser::CheckSchemaValidity(void) const
     CHIP_ERROR err       = CHIP_NO_ERROR;
     size_t NumDataElement = 0;
     chip::TLV::TLVReader reader;
-    
+
     PRETTY_PRINT("EventList =");
     PRETTY_PRINT("[");
-    
+
     // make a copy of the EventList reader
     reader.Init(mReader);
-    
+
     while (CHIP_NO_ERROR == (err = reader.Next()))
     {
         VerifyOrExit(chip::TLV::AnonymousTag == reader.GetTag(), err = CHIP_ERROR_INVALID_TLV_TAG);
         VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-    
+
         {
             EventDataElement::Parser event;
             err = event.Init(reader);
@@ -1555,12 +1555,12 @@ CHIP_ERROR EventList::Parser::CheckSchemaValidity(void) const
             err = event.CheckSchemaValidity();
             SuccessOrExit(err);
         }
-        
+
         ++NumDataElement;
     }
-    
+
     PRETTY_PRINT("],");
-    
+
     // if we have exhausted this container
     if (CHIP_END_OF_TLV == err)
     {
@@ -1576,10 +1576,10 @@ CHIP_ERROR EventList::Parser::CheckSchemaValidity(void) const
             err = CHIP_NO_ERROR;
         }
     }
-    
+
 exit:
     ChipLogFunctError(err);
-    
+
     return err;
 }
 #endif // CHIP_CONFIG_DATA_MANAGEMENT_ENABLE_SCHEMA_CHECK
@@ -1622,7 +1622,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR StatusCode::Parser::GetProtocolId(uint32_t * apProtocolId) const 
+CHIP_ERROR StatusCode::Parser::GetProtocolId(uint32_t * apProtocolId) const
 {
     return GetUnsignedInteger(kCsTag_ProtocolId, apProtocolId);
 }
@@ -1829,7 +1829,7 @@ exit:
     return mAttributePathBuilder;
 }
 
-StatusCode::Builder & AttributeStatusElement::Builder::CreateStatusCodeBuilder(void) 
+StatusCode::Builder & AttributeStatusElement::Builder::CreateStatusCodeBuilder(void)
 {
     // skip if error has already been set
     VerifyOrExit(CHIP_NO_ERROR == mError, mStatusCodeBuilder.ResetError(mError));
@@ -1847,7 +1847,7 @@ AttributeStatusElement::Builder & AttributeStatusElement::Builder::EndOfAttribut
     return *this;
 }
 
-CHIP_ERROR AttributeStatusElement::Parser::Init(const chip::TLV::TLVReader & aReader) 
+CHIP_ERROR AttributeStatusElement::Parser::Init(const chip::TLV::TLVReader & aReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -1865,7 +1865,7 @@ exit:
 }
 
 #if CHIP_CONFIG_INTERACTION_MODEL_ENABLE_SCHEMA_CHECK
-CHIP_ERROR AttributeStatusElement::Parser::CheckSchemaValidity(void) const 
+CHIP_ERROR AttributeStatusElement::Parser::CheckSchemaValidity(void) const
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
@@ -1887,7 +1887,7 @@ CHIP_ERROR AttributeStatusElement::Parser::CheckSchemaValidity(void) const
             TagPresenceMask |= (1 << kCsTag_AttributePath);
 
             VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-    
+
             {
                 AttributePath::Parser path;
                 err = path.Init(reader);
@@ -1942,7 +1942,7 @@ exit:
 }
 #endif // CHIP_CONFIG_INTERACTION_MODEL_ENABLE_SCHEMA_CHECK
 
-CHIP_ERROR AttributeStatusElement::Parser::GetAttributePath(AttributePath::Parser * const apAttributePath) const 
+CHIP_ERROR AttributeStatusElement::Parser::GetAttributePath(AttributePath::Parser * const apAttributePath) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -1962,7 +1962,7 @@ exit:
 }
 
 
-CHIP_ERROR AttributeStatusElement::Parser::GetStatusCode(StatusCode::Parser * const apStatusCode) const 
+CHIP_ERROR AttributeStatusElement::Parser::GetStatusCode(StatusCode::Parser * const apStatusCode) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;

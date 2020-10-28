@@ -594,7 +594,7 @@ public:
     StatusCode::Builder & CreateStatusCodeBuilder(void);
 
     AttributeStatusElement::Builder & EndOfAttributeStatusElement(void);
-    
+
 private:
     AttributePath::Builder mAttributePathBuilder;
     StatusCode::Builder mStatusCodeBuilder;
@@ -643,7 +643,7 @@ public:
      */
     AttributeStatusElement::Builder & CreateAttributeStatusBuilder(void);
     AttributeStatusList::Builder & EndOfStatusList(void);
-    
+
 private:
     AttributeStatusElement::Builder mAttributeStatusBuilder;
 };
@@ -801,7 +801,7 @@ public:
 
     // Get a TLVReader for the AttributesDataList. Next() must be called before accessing them.
     CHIP_ERROR GetAttributeDataList(AttributeDataList::Parser * const apAttributeDataList) const;
-    
+
     // Get a TLVReader for the events. Next() must be called before accessing them.
     CHIP_ERROR GetEventDataList(EventList::Parser * const apEventDataList) const;
 
