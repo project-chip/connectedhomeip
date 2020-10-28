@@ -28,11 +28,12 @@ jobs:
 
         env:
             BUILD_TYPE: android_${{ matrix.type }}
+            TARGET_CPU: ${{ matrix.type }}
 
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-android:0.4.12
+            image: connectedhomeip/chip-build-android:0.4.13
             volumes:
                 - "/tmp/log_output:/tmp/test_logs"
 
@@ -43,10 +44,11 @@ jobs:
                   submodules: true
             - name: Bootstrap
               run: scripts/build/gn_bootstrap.sh
-            - name: Setup Build
+            - name: Build libs
               run: |
-                  GN_ARGS="is_clang=true target_os=\"android\" target_cpu=\"${{ matrix.type }}\" android_ndk_root=\"/opt/android/android-ndk-r21b\" android_sdk_root=\"/opt/android/sdk\""
-                  scripts/build/gn_gen.sh --args="$GN_ARGS"
-            - name: Run Build
+                  ./scripts/examples/android_app.sh
+            - name: Build App
               run: |
-                  scripts/build/gn_build.sh
+                  yes | "$ANDROID_HOME"/tools/bin/sdkmanager --licenses
+                  cd src/android/CHIPTool
+                  ./gradlew build
