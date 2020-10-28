@@ -1573,5 +1573,31 @@ CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHan
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR TLVReader::LookForElementWithTag(const uint64_t aTagInApiForm, chip::TLV::TLVReader * apDstReader) const
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // make a copy of the Path reader
+    chip::TLV::TLVReader reader;
+    reader.Init(*this);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        // Documentation says the result of GetType must be verified before calling GetTag
+        VerifyOrExit(chip::TLV::kTLVType_NotSpecified != reader.GetType(), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
+
+        if (aTagInApiForm == reader.GetTag())
+        {
+            apDstReader->Init(reader);
+            break;
+        }
+    }
+
+exit:
+    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
+
+    return err;
+}
+
 } // namespace TLV
 } // namespace chip
