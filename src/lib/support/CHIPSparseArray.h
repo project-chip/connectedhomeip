@@ -26,6 +26,7 @@
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/SafeInt.h>
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
@@ -49,14 +50,17 @@ public:
      */
     const char * Serialize(char * buf, uint16_t & buflen)
     {
-        if (buflen < SerializedSize() || buf == nullptr)
-        {
-            buflen = SerializedSize();
-            return nullptr;
-        }
+        char * out = nullptr;
+        size_t len = sizeof(uint64_t) * mNextAvailable;
+        VerifyOrExit(buflen >= SerializedSize(), buflen = SerializedSize());
+        VerifyOrExit(buf != nullptr, buflen = SerializedSize());
+        VerifyOrExit(CanCastTo<uint16_t>(len), buflen = SerializedSize());
 
-        buflen = Base64Encode(reinterpret_cast<const uint8_t *>(mArray), sizeof(uint64_t) * mNextAvailable, buf);
-        return buf;
+        buflen = Base64Encode(reinterpret_cast<const uint8_t *>(mArray), static_cast<uint16_t>(len), buf);
+        out    = buf;
+
+    exit:
+        return out;
     }
 
     /**
