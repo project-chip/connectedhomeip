@@ -31,7 +31,6 @@
 
 #pragma once
 
-#include <core/CHIPEncoding.h>
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
 
@@ -41,7 +40,14 @@ class SerializableU64SetBase
 {
 
 public:
-    SerializableU64SetBase(uint64_t * data, uint16_t capacity) : mData(data), mCapacity(capacity), mNextAvailable(0) {}
+    SerializableU64SetBase(uint64_t * data, uint16_t capacity, uint64_t emptyValue) :
+        mData(data), mCapacity(capacity), mEmptyValue(emptyValue), mNextAvailable(0)
+    {
+        for (uint16_t i = 0; i < capacity; i++)
+        {
+            data[i] = emptyValue;
+        }
+    }
 
     /**
      * @brief
@@ -107,6 +113,7 @@ public:
 private:
     uint64_t * const mData;
     const uint16_t mCapacity;
+    const uint64_t mEmptyValue;
     uint16_t mNextAvailable;
 
     uint16_t FirstAvailableForUniqueId(uint64_t value);
@@ -119,19 +126,21 @@ private:
      * @return index of the value if found, or max length (mCapacity) of the array
      */
     uint16_t Find(uint64_t value);
-
-    uint64_t ToLE64(uint64_t value) { return Encoding::LittleEndian::Get64(reinterpret_cast<const uint8_t *>(&value)); }
 };
 
-template <uint16_t kCapacity>
+template <uint16_t kCapacity, uint64_t kEmptyValue = 0>
 class SerializableU64Set : public SerializableU64SetBase
 {
 public:
-    SerializableU64Set() : SerializableU64SetBase(mBuffer, kCapacity)
+    SerializableU64Set() : SerializableU64SetBase(mBuffer, kCapacity, kEmptyValue)
     {
+        /**
+         * Check that requested capacity (kCapacity) will not exceed maximum number of uint64_t
+         * values that can fit in a meory of size UINT16_MAX. This is required, since APIs in
+         * this class are using uint16_t type for buffer sizes.
+         */
         nlSTATIC_ASSERT_PRINT(kCapacity < UINT16_MAX / sizeof(uint64_t),
                               "Serializable u64 set capacity cannot be more than UINT16_MAX / sizeof(uint64_t)");
-        CHIP_ZERO_AT(mBuffer);
     }
 
 private:

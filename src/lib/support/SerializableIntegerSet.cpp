@@ -18,6 +18,8 @@
 
 #include "SerializableIntegerSet.h"
 
+#include <core/CHIPEncoding.h>
+
 namespace chip {
 
 const char * SerializableU64SetBase::SerializeBase64(char * buf, uint16_t & buflen)
@@ -26,6 +28,16 @@ const char * SerializableU64SetBase::SerializeBase64(char * buf, uint16_t & bufl
     size_t len = sizeof(uint64_t) * mNextAvailable;
     VerifyOrExit(buflen >= SerializedSize(), buflen = SerializedSize());
     VerifyOrExit(buf != nullptr, buflen = SerializedSize());
+
+    /**
+     *  The data is serialized in LittleEndian byte order in the set. This will enable
+     *  different machine architectures to interpret a given set in a consistent manner,
+     *  for serialize and deserialize operations.
+     */
+    for (uint16_t i = 0; i < mNextAvailable; i++)
+    {
+        Encoding::LittleEndian::Put64(reinterpret_cast<uint8_t *>(&mData[i]), mData[i]);
+    }
 
     buflen = Base64Encode(reinterpret_cast<const uint8_t *>(mData), static_cast<uint16_t>(len), buf);
     out    = buf;
@@ -45,21 +57,26 @@ CHIP_ERROR SerializableU64SetBase::DeserializeBase64(const char * serialized, ui
     VerifyOrExit(decodelen % sizeof(uint64_t) == 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     mNextAvailable = decodelen / static_cast<uint16_t>(sizeof(uint64_t));
+
+    /**
+     *  The data is serialized in LittleEndian byte order in the set. This will enable
+     *  different machine architectures to interpret a given set in a consistent manner,
+     *  for serialize and deserialize operations.
+     */
+    for (uint16_t i = 0; i < mNextAvailable; i++)
+    {
+        mData[i] = Encoding::LittleEndian::HostSwap64(mData[i]);
+    }
+
 exit:
     return err;
 }
 
 uint16_t SerializableU64SetBase::Find(uint64_t value)
 {
-    /**
-     *  The data is stored in LittleEndian byte order in the set. This will enable
-     *  different machine architectures to interpret a given set in a consistent manner,
-     *  for serialize and deserialize operations.
-     */
-    uint64_t valueLE = ToLE64(value);
     for (uint16_t i = 0; i < mNextAvailable; i++)
     {
-        if (mData[i] == valueLE)
+        if (mData[i] == value)
         {
             return i;
         }
@@ -71,57 +88,56 @@ uint16_t SerializableU64SetBase::Find(uint64_t value)
 CHIP_ERROR SerializableU64SetBase::Insert(uint64_t value)
 {
     CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
-    uint16_t index = FirstAvailableForUniqueId(value);
+    uint16_t index = 0;
+    VerifyOrExit(value != mEmptyValue, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    index = FirstAvailableForUniqueId(value);
     if (index < mCapacity)
     {
-        /**
-         *  The data is stored in LittleEndian byte order in the set. This will enable
-         *  different machine architectures to interpret a given set in a consistent manner,
-         *  for serialize and deserialize operations.
-         */
-        mData[index] = ToLE64(value);
+        mData[index] = value;
         if (index == mNextAvailable)
         {
             mNextAvailable = static_cast<uint16_t>(index + 1);
         }
         err = CHIP_NO_ERROR;
     }
+
+exit:
     return err;
 }
 
 void SerializableU64SetBase::Remove(uint64_t value)
 {
-    uint16_t index = Find(value);
-    if (index < mCapacity)
+    if (value != mEmptyValue)
     {
-        mData[index] = 0;
-        if ((index + 1) == mNextAvailable)
+        uint16_t index = Find(value);
+        if (index < mCapacity)
         {
-            mNextAvailable = index;
-            while (mNextAvailable > 0 && mData[mNextAvailable - 1] == 0)
-                mNextAvailable--;
+            mData[index] = mEmptyValue;
+            if ((index + 1) == mNextAvailable)
+            {
+                mNextAvailable = index;
+                while (mNextAvailable > 0 && mData[mNextAvailable - 1] == mEmptyValue)
+                    mNextAvailable--;
+            }
         }
     }
 }
 
 uint16_t SerializableU64SetBase::FirstAvailableForUniqueId(uint64_t value)
 {
-    /**
-     *  The data is stored in LittleEndian byte order in the set. This will enable
-     *  different machine architectures to interpret a given set in a consistent manner,
-     *  for serialize and deserialize operations.
-     */
-    uint64_t valueLE   = ToLE64(value);
     uint16_t available = mNextAvailable;
     for (uint16_t i = 0; i < mNextAvailable; i++)
     {
-        if (mData[i] == valueLE)
+        if (mData[i] == value)
         {
             return i;
         }
 
-        if (mData[i] == 0 && i < available)
+        if (mData[i] == mEmptyValue && i < available)
         {
+            // Don't return here, as we want to make sure there are no duplicate
+            // entries in the set.
             available = i;
         }
     }
