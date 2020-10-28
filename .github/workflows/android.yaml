@@ -29,6 +29,7 @@ jobs:
         env:
             BUILD_TYPE: android_${{ matrix.type }}
             TARGET_CPU: ${{ matrix.type }}
+            JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64/
 
         runs-on: ubuntu-latest
 
