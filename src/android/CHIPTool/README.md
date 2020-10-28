@@ -14,8 +14,6 @@ Pre-conditions: Have Android SDK & NDK downloaded to your machine. Set the
 \$ANDROID_NDK_HOME environment variable to point to the NDK package is
 downloaded.
 
-Make sure that JAVA_HOME is set to the correct path.
-
 ABIs and corresponding values for `TARGET_CPU`
 
 | ABI         | TARGET_CPU |
