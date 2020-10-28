@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef CHIP_ECHO_CURRENT_H_
-#define CHIP_ECHO_CURRENT_H_
+#pragma once
 
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
@@ -42,11 +41,11 @@ enum
     kEchoMessageType_EchoResponse = 2
 };
 
+typedef void (*EchoFunct)(NodeId nodeId, System::PacketBuffer * payload);
+
 class DLL_EXPORT EchoClient : public ExchangeContextDelegate
 {
 public:
-    EchoClient(void);
-
     /**
      *  Initialize the EchoClient object. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -58,6 +57,7 @@ public:
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
+     *
      */
     CHIP_ERROR Init(ExchangeManager * exchangeMgr);
 
@@ -65,9 +65,16 @@ public:
      *  Shutdown the EchoClient. This terminates this instance
      *  of the object and releases all held resources.
      *
-     *  @return #CHIP_NO_ERROR unconditionally.
      */
-    CHIP_ERROR Shutdown(void);
+    void Shutdown();
+
+    /**
+     * Set the application callback to be invoked when an echo response is received.
+     *
+     *  @param[in]    callback    The callback function to receive echo response message.
+     *
+     */
+    void SetEchoResponseReceived(EchoFunct callback) { OnEchoResponseReceived = callback; }
 
     /**
      * Send an echo request to a CHIP node.
@@ -77,15 +84,14 @@ public:
      *
      * @return CHIP_ERROR_NO_MEMORY if no ExchangeContext is available.
      *         Other CHIP_ERROR codes as returned by the lower layers.
+     *
      */
-    CHIP_ERROR SendEchoRequest(uint64_t nodeId, System::PacketBuffer * payload);
-
-    typedef void (*EchoFunct)(uint64_t nodeId, System::PacketBuffer * payload);
-    EchoFunct OnEchoResponseReceived;
+    CHIP_ERROR SendEchoRequest(NodeId nodeId, System::PacketBuffer * payload);
 
 private:
-    ExchangeManager * ExchangeMgr = nullptr;
-    ExchangeContext * ExchangeCtx = nullptr;
+    ExchangeManager * ExchangeMgr    = nullptr;
+    ExchangeContext * ExchangeCtx    = nullptr;
+    EchoFunct OnEchoResponseReceived = nullptr;
 
     CHIP_ERROR SendEchoRequest(System::PacketBuffer * payload);
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
@@ -95,8 +101,6 @@ private:
 class DLL_EXPORT EchoServer
 {
 public:
-    EchoServer(void);
-
     /**
      *  Initialize the EchoServer object. Within the lifetime
      *  of this instance, this method is invoked once after object
@@ -116,15 +120,20 @@ public:
      *  Shutdown the EchoServer. This terminates this instance
      *  of the object and releases all held resources.
      *
-     *  @return #CHIP_NO_ERROR unconditionally.
      */
-    CHIP_ERROR Shutdown(void);
+    void Shutdown();
 
-    typedef void (*EchoFunct)(uint64_t nodeId, System::PacketBuffer * payload);
-    EchoFunct OnEchoRequestReceived;
+    /**
+     * Set the application callback to be invoked when an echo request is received.
+     *
+     *  @param[in]    callback    The callback function to receive echo request message.
+     *
+     */
+    void SetEchoRequestReceived(EchoFunct callback) { OnEchoRequestReceived = callback; }
 
 private:
-    ExchangeManager * ExchangeMgr = nullptr;
+    ExchangeManager * ExchangeMgr   = nullptr;
+    EchoFunct OnEchoRequestReceived = nullptr;
 
     static void HandleEchoRequest(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
                                   System::PacketBuffer * payload);
@@ -132,5 +141,3 @@ private:
 
 } // namespace Protocols
 } // namespace chip
-
-#endif // CHIP_ECHO_CURRENT_H_

@@ -28,12 +28,6 @@
 namespace chip {
 namespace Protocols {
 
-EchoServer::EchoServer()
-{
-    ExchangeMgr           = nullptr;
-    OnEchoRequestReceived = nullptr;
-}
-
 CHIP_ERROR EchoServer::Init(ExchangeManager * exchangeMgr)
 {
     // Error if already initialized.
@@ -49,15 +43,13 @@ CHIP_ERROR EchoServer::Init(ExchangeManager * exchangeMgr)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EchoServer::Shutdown()
+void EchoServer::Shutdown()
 {
     if (ExchangeMgr != nullptr)
     {
         ExchangeMgr->UnregisterUnsolicitedMessageHandler(kChipProtocol_Echo, kEchoMessageType_EchoRequest);
         ExchangeMgr = nullptr;
     }
-
-    return CHIP_NO_ERROR;
 }
 
 void EchoServer::HandleEchoRequest(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,

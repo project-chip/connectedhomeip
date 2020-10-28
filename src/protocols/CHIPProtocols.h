@@ -22,8 +22,7 @@
  *
  */
 
-#ifndef CHIP_PROTOCOLS_H_
-#define CHIP_PROTOCOLS_H_
+#pragma once
 
 #include <core/CHIPVendorIdentifiers.hpp>
 
@@ -47,8 +46,7 @@ enum CHIPProtocolId
     //
     // NOTE: Do not attempt to allocate these values yourself.
 
-    kChipProtocol_SecurityChannel     = (kChipVendor_Common << 16) | 0x0000, // Security Channel Protocol
-    kChipProtocol_Common              = (kChipVendor_Common << 16) | 0x0001, // Common Protocol
+    kChipProtocol_SecurityChannel     = (kChipVendor_Common << 16) | 0x0001, // Security Channel Protocol
     kChipProtocol_Echo                = (kChipVendor_Common << 16) | 0x0002, // Echo Protocol
     kChipProtocol_BDX                 = (kChipVendor_Common << 16) | 0x0003, // Bulk Data Exchange Protocol
     kChipProtocol_NetworkProvisioning = (kChipVendor_Common << 16) | 0x0004, // Network Provisioning Protocol
@@ -62,5 +60,3 @@ enum CHIPProtocolId
 
 } // namespace Protocols
 } // namespace chip
-
-#endif /* CHIP_PROTOCOLS_H_ */

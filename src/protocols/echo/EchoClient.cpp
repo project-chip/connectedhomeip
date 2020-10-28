@@ -28,13 +28,6 @@
 namespace chip {
 namespace Protocols {
 
-EchoClient::EchoClient()
-{
-    ExchangeMgr            = nullptr;
-    OnEchoResponseReceived = nullptr;
-    ExchangeCtx            = nullptr;
-}
-
 CHIP_ERROR EchoClient::Init(ExchangeManager * exchangeMgr)
 {
     // Error if already initialized.
@@ -48,20 +41,16 @@ CHIP_ERROR EchoClient::Init(ExchangeManager * exchangeMgr)
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EchoClient::Shutdown()
+void EchoClient::Shutdown()
 {
     if (ExchangeCtx != nullptr)
     {
         ExchangeCtx->Abort();
         ExchangeCtx = nullptr;
     }
-
-    ExchangeMgr = nullptr;
-
-    return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(uint64_t nodeId, System::PacketBuffer * payload)
+CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * payload)
 {
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.
@@ -89,7 +78,6 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBuffer * payload)
     // Send an Echo Request message.  Discard the exchange context if the send fails.
     err = ExchangeCtx->SendMessage(kChipProtocol_Echo, kEchoMessageType_EchoRequest, payload);
 
-    payload = nullptr;
     if (err != CHIP_NO_ERROR)
     {
         ExchangeCtx->Abort();
