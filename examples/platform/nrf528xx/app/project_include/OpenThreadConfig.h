@@ -49,7 +49,9 @@
 #define OPENTHREAD_CONFIG_NCP_UART_ENABLE 1
 #define OPENTHREAD_CONFIG_IP6_SLAAC_ENABLE 1
 
-#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 32 // Default is 160, set to 32
+// overly large numbers consume too many memory, especially when the device are
+// not intended to process large traffic
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 44
 
 // Use the Nordic-supplied default platform configuration for remainder
 // of OpenThread config options.
