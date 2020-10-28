@@ -46,8 +46,8 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <support/CodeUtils.h>
-#include <support/logging/CHIPLogging.h>
 #include <support/DLLUtil.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace app {
@@ -60,21 +60,21 @@ namespace app {
  */
 enum
 {
-    kMsgType_SubscribeRequest                   = 0x01,
-    kMsgType_ReadRequest                        = 0x02,
-    kMsgType_ReportData                         = 0x03,
-    kMsgType_WriteRequest                       = 0x04,
-    kMsgType_WriteResponse                      = 0x05,
-    kMsgType_InvokeCommandRequest               = 0x06,
-    kMsgType_InvokeCommandResponse              = 0x07,
+    kMsgType_SubscribeRequest      = 0x01,
+    kMsgType_ReadRequest           = 0x02,
+    kMsgType_ReportData            = 0x03,
+    kMsgType_WriteRequest          = 0x04,
+    kMsgType_WriteResponse         = 0x05,
+    kMsgType_InvokeCommandRequest  = 0x06,
+    kMsgType_InvokeCommandResponse = 0x07,
 };
 
-static inline bool IsVersionNewer(const uint64_t &aVersion, const uint64_t &aReference)
+static inline bool IsVersionNewer(const uint64_t & aVersion, const uint64_t & aReference)
 {
     return (aVersion != aReference);
 }
 
-static inline bool IsVersionNewerOrEqual(const uint64_t &aVersion, const uint64_t &aReference)
+static inline bool IsVersionNewerOrEqual(const uint64_t & aVersion, const uint64_t & aReference)
 {
     return true;
 }
@@ -175,29 +175,29 @@ public:
 };
 
 /**
-*  @brief
-*    CHIP interaction model Event Path definition
-*
-*/
+ *  @brief
+ *    CHIP interaction model Event Path definition
+ *
+ */
 namespace AttributePath {
-    enum
-    {
-        kCsTag_EndpointId      = 0,
-        kCsTag_ClusterId       = 1,
-        kCsTag_FieldTag        = 2,
-        kCsTag_ListIndex       = 3,
-    };
+enum
+{
+    kCsTag_EndpointId = 0,
+    kCsTag_ClusterId  = 1,
+    kCsTag_FieldTag   = 2,
+    kCsTag_ListIndex  = 3,
+};
 
-    class Parser;
-    class Builder;
+class Parser;
+class Builder;
 }; // namespace AttributePath
 
 /**
-*  @class Parser
-*
-*  @brief
-*    Parses a Attribute Path container
-*/
+ *  @class Parser
+ *
+ *  @brief
+ *    Parses a Attribute Path container
+ */
 
 class AttributePath::Parser : public ParserBase
 {
@@ -251,13 +251,13 @@ private:
 };
 
 /**
-*  @brief
-*    Chip Event Path List definition
-*/
+ *  @brief
+ *    Chip Event Path List definition
+ */
 namespace AttributePathList {
-    class Parser;
-    class Builder;
-}; // namespace PathList
+class Parser;
+class Builder;
+}; // namespace AttributePathList
 
 class AttributePathList::Parser : public ListParserBase
 {
@@ -288,15 +288,15 @@ private:
  *
  */
 namespace EventPath {
-    enum
-    {
-        kCsTag_EndpointId      = 0,
-        kCsTag_ClusterId       = 1,
-        kCsTag_EventId         = 2,
-    };
+enum
+{
+    kCsTag_EndpointId = 0,
+    kCsTag_ClusterId  = 1,
+    kCsTag_EventId    = 2,
+};
 
-    class Parser;
-    class Builder;
+class Parser;
+class Builder;
 }; // namespace EventPath
 
 /**
@@ -355,7 +355,7 @@ private:
 namespace EventPathList {
 class Parser;
 class Builder;
-}; // namespace PathList
+}; // namespace EventPathList
 
 class EventPathList::Parser : public ListParserBase
 {
@@ -383,14 +383,14 @@ private:
 namespace EventDataElement {
 enum
 {
-    kCsTag_EventPath        = 0,
-    kCsTag_ImportanceLevel  = 1,
-    kCsTag_Number           = 2,
-    kCsTag_UTCTimestamp     = 3,
-    kCsTag_SystemTimestamp  = 4,
-    kCsTag_DeltaUTCTime     = 5,
-    kCsTag_DeltaSystemTime  = 6,
-    kCsTag_Data             = 7,
+    kCsTag_EventPath       = 0,
+    kCsTag_ImportanceLevel = 1,
+    kCsTag_Number          = 2,
+    kCsTag_UTCTimestamp    = 3,
+    kCsTag_SystemTimestamp = 4,
+    kCsTag_DeltaUTCTime    = 5,
+    kCsTag_DeltaSystemTime = 6,
+    kCsTag_Data            = 7,
 };
 
 class Parser;
@@ -430,6 +430,7 @@ public:
 
     // Mark the end of this array and recover the type for outer container
     EventDataElement::Builder & EndOfEventDataElement(void);
+
 private:
     EventPath::Builder mEventPathBuilder;
 };
@@ -468,22 +469,22 @@ private:
  *
  */
 namespace StatusCode {
-    enum
-    {
-        kCsTag_ProtocolId         = 0,
-        kCsTag_ClusterId          = 1,
-        kCsTag_DetailedCode       = 2,
-        kCsTag_GeneralCode        = 3,
-    };
+enum
+{
+    kCsTag_ProtocolId   = 0,
+    kCsTag_ClusterId    = 1,
+    kCsTag_DetailedCode = 2,
+    kCsTag_GeneralCode  = 3,
+};
 
-    class Parser;
-    class Builder;
+class Parser;
+class Builder;
 }; // namespace StatusCode
 
 /**
-*  @brief
-*    Chip Attribute Status Element parser definition
-*/
+ *  @brief
+ *    Chip Attribute Status Element parser definition
+ */
 class StatusCode::Parser : public ParserBase
 {
 public:
@@ -543,9 +544,9 @@ public:
 };
 
 /**
-*  @brief
-*    CHIP StatusCode encoder definition
-*/
+ *  @brief
+ *    CHIP StatusCode encoder definition
+ */
 class StatusCode::Builder : public BuilderBase
 {
 public:
@@ -560,25 +561,25 @@ public:
 };
 
 /**
-*  @brief
-*    Chip Attribute Status Element definition
-*
-*/
+ *  @brief
+ *    Chip Attribute Status Element definition
+ *
+ */
 namespace AttributeStatusElement {
-    enum
-    {
-        kCsTag_AttributePath         = 9,
-        kCsTag_StatusCode            = 1,
-    };
+enum
+{
+    kCsTag_AttributePath = 9,
+    kCsTag_StatusCode    = 1,
+};
 
-    class Parser;
-    class Builder;
+class Parser;
+class Builder;
 }; // namespace AttributeStatusElement
 
 /**
-*  @brief
-*    Chip Attribute Status Element builder definition
-*/
+ *  @brief
+ *    Chip Attribute Status Element builder definition
+ */
 class AttributeStatusElement::Builder : public BuilderBase
 {
 public:
@@ -601,9 +602,9 @@ private:
 };
 
 /**
-*  @brief
-*    Chip Attribute Status Element parser definition
-*/
+ *  @brief
+ *    Chip Attribute Status Element parser definition
+ */
 class AttributeStatusElement::Parser : public ParserBase
 {
 public:
@@ -625,14 +626,14 @@ public:
 };
 
 namespace AttributeStatusList {
-    class Parser;
-    class Builder;
+class Parser;
+class Builder;
 }; // namespace AttributeStatusList
 
 /**
-* StatusList builder.
-* Supports both the current and the deprecated StatusList format.
-*/
+ * StatusList builder.
+ * Supports both the current and the deprecated StatusList format.
+ */
 class AttributeStatusList::Builder : public ListBuilderBase
 {
 public:
@@ -654,24 +655,23 @@ public:
     CHIP_ERROR CheckSchemaValidity(void) const;
 };
 
-
 /**
  *  @brief
  *    CHIP Attribute Data Element definition
  *
  */
 namespace AttributeDataElement {
-    enum
-    {
-        kCsTag_AttributePath       = 0,
-        kCsTag_DataVersion         = 1,
-        kCsTag_Data                = 2,
-        kCsTag_MoreToComeFlag      = 3,
-    };
+enum
+{
+    kCsTag_AttributePath  = 0,
+    kCsTag_DataVersion    = 1,
+    kCsTag_Data           = 2,
+    kCsTag_MoreToComeFlag = 3,
+};
 
-    class Parser;
-    class Builder;
-}; // namespace DataElement
+class Parser;
+class Builder;
+}; // namespace AttributeDataElement
 
 /**
  *  @brief
@@ -735,8 +735,8 @@ private:
 };
 
 namespace AttributeDataList {
-    class Parser;
-    class Builder;
+class Parser;
+class Builder;
 }; // namespace AttributeDataList
 
 class AttributeDataList::Parser : public ListParserBase
@@ -765,12 +765,12 @@ private:
 namespace ReportDataRequest {
 enum
 {
-    kCsTag_RequestResponse          = 0,
-    kCsTag_SubscriptionId           = 1,
-    kCsTag_AttributeStatusList      = 2,
-    kCsTag_AttributeDataList        = 3,
-    kCsTag_EventDataList            = 4,
-    kCsTag_IsLastReport             = 5,
+    kCsTag_RequestResponse     = 0,
+    kCsTag_SubscriptionId      = 1,
+    kCsTag_AttributeStatusList = 2,
+    kCsTag_AttributeDataList   = 3,
+    kCsTag_EventDataList       = 4,
+    kCsTag_IsLastReport        = 5,
 };
 
 class Parser;
@@ -810,7 +810,7 @@ public:
     CHIP_ERROR GetIsLastReport(bool * const apIsLastReport) const;
 };
 
-}; // app
+}; // namespace app
 }; // namespace chip
 
 #endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_H

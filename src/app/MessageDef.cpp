@@ -56,10 +56,10 @@
 #define __STDC_CONSTANT_MACROS
 #endif // __STDC_CONSTANT_MACROS
 
-#include <inttypes.h>
-#include <stdio.h>
-#include <stdarg.h>
 #include "MessageDef.h"
+#include <inttypes.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 using namespace chip;
 using namespace chip::TLV;
@@ -84,28 +84,23 @@ static size_t gCurLineBufferSize = 0;
 class PrettyPrintCheckpoint
 {
 public:
-    PrettyPrintCheckpoint()
-    {
-        mLevel = gPrettyPrintingDepthLevel;
-    }
-    ~PrettyPrintCheckpoint()
-    {
-        gPrettyPrintingDepthLevel = mLevel;
-    }
+    PrettyPrintCheckpoint() { mLevel = gPrettyPrintingDepthLevel; }
+    ~PrettyPrintCheckpoint() { gPrettyPrintingDepthLevel = mLevel; }
+
 private:
     uint32_t mLevel;
 };
-#define PRETTY_PRINT_CHECKPOINT()  PrettyPrintCheckpoint lPrettyPrintCheckpoint;
+#define PRETTY_PRINT_CHECKPOINT() PrettyPrintCheckpoint lPrettyPrintCheckpoint;
 
 #define PRETTY_PRINT(fmt, ...)                                                                                                     \
     do                                                                                                                             \
     {                                                                                                                              \
-        PrettyPrintDM(true, fmt, ##__VA_ARGS__);                                                                                  \
+        PrettyPrintDM(true, fmt, ##__VA_ARGS__);                                                                                   \
     } while (0)
 #define PRETTY_PRINT_SAMELINE(fmt, ...)                                                                                            \
     do                                                                                                                             \
     {                                                                                                                              \
-        PrettyPrintDM(false, fmt, ##__VA_ARGS__);                                                                                 \
+        PrettyPrintDM(false, fmt, ##__VA_ARGS__);                                                                                  \
     } while (0)
 #define PRETTY_PRINT_INCDEPTH()                                                                                                    \
     do                                                                                                                             \
@@ -171,7 +166,7 @@ static void PrettyPrintDM(bool aIsNewLine, const char * aFmt, ...)
 #endif // CHIP_DETAIL_LOGGING
 
 CHIP_ERROR LookForElementWithTag(const chip::TLV::TLVReader & aSrcReader, const uint64_t aTagInApiForm,
-                                  chip::TLV::TLVReader * apDstReader)
+                                 chip::TLV::TLVReader * apDstReader)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -197,7 +192,7 @@ exit:
     return err;
 }
 
-ParserBase::ParserBase() { }
+ParserBase::ParserBase() {}
 
 CHIP_ERROR ParserBase::GetReaderOnTag(const uint64_t aTagToFind, chip::TLV::TLVReader * const apReader) const
 {
@@ -232,7 +227,7 @@ exit:
     return err;
 }
 
-ListParserBase::ListParserBase() { }
+ListParserBase::ListParserBase() {}
 
 CHIP_ERROR ListParserBase::Init(const chip::TLV::TLVReader & aReader)
 {
@@ -286,7 +281,7 @@ void ListParserBase::GetReader(chip::TLV::TLVReader * const apReader)
 
 BuilderBase::BuilderBase() :
     mError(CHIP_ERROR_INCORRECT_STATE), mpWriter(NULL), mOuterContainerType(chip::TLV::kTLVType_NotSpecified)
-{ }
+{}
 
 void BuilderBase::ResetError()
 {
@@ -318,20 +313,19 @@ CHIP_ERROR BuilderBase::InitAnonymousStructure(chip::TLV::TLVWriter * const apWr
 {
     mpWriter            = apWriter;
     mOuterContainerType = chip::TLV::kTLVType_NotSpecified;
-    mError = mpWriter->StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, mOuterContainerType);
+    mError              = mpWriter->StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Structure, mOuterContainerType);
     ChipLogFunctError(mError);
 
     return mError;
 }
 
-ListBuilderBase::ListBuilderBase(void) { }
+ListBuilderBase::ListBuilderBase(void) {}
 
 CHIP_ERROR ListBuilderBase::Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
 {
     mpWriter            = apWriter;
     mOuterContainerType = chip::TLV::kTLVType_NotSpecified;
-    mError =
-        mpWriter->StartContainer(chip::TLV::ContextTag(aContextTagToUse), chip::TLV::kTLVType_Array, mOuterContainerType);
+    mError = mpWriter->StartContainer(chip::TLV::ContextTag(aContextTagToUse), chip::TLV::kTLVType_Array, mOuterContainerType);
     ChipLogFunctError(mError);
 
     return mError;
@@ -350,8 +344,7 @@ CHIP_ERROR ListBuilderBase::Init(chip::TLV::TLVWriter * const apWriter)
 {
     mpWriter            = apWriter;
     mOuterContainerType = chip::TLV::kTLVType_NotSpecified;
-    mError =
-        mpWriter->StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Array, mOuterContainerType);
+    mError              = mpWriter->StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Array, mOuterContainerType);
     ChipLogFunctError(mError);
 
     return mError;
@@ -386,7 +379,7 @@ exit:
 // 4) any tag can only appear once
 CHIP_ERROR AttributePath::Parser::CheckSchemaValidity(void) const
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
 
@@ -601,7 +594,7 @@ AttributePath::Builder & AttributePath::Builder::EndOfAttributePath(void)
 }
 
 #if CHIP_CONFIG_DATA_MANAGEMENT_ENABLE_SCHEMA_CHECK
-        // Roughly verify the schema is right, including
+// Roughly verify the schema is right, including
 // 1) at least one element is there
 //    (not checked since we want to subscribe/read to events only some times)
 // 2) all elements are anonymous and of Path type
@@ -609,7 +602,7 @@ AttributePath::Builder & AttributePath::Builder::EndOfAttributePath(void)
 CHIP_ERROR AttributePathList::Parser::CheckSchemaValidity(void) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    size_t NumPath  = 0;
+    size_t NumPath = 0;
     chip::TLV::TLVReader reader;
 
     PRETTY_PRINT("AttributePathList =");
@@ -689,7 +682,7 @@ CHIP_ERROR EventPath::Parser::Init(const chip::TLV::TLVReader & aReader)
     err = mReader.EnterContainer(dummyContainerType);
     SuccessOrExit(err);
 
-    exit:
+exit:
     ChipLogFunctError(err);
 
     return err;
@@ -703,7 +696,7 @@ CHIP_ERROR EventPath::Parser::Init(const chip::TLV::TLVReader & aReader)
 // 4) any tag can only appear once
 CHIP_ERROR EventPath::Parser::CheckSchemaValidity(void) const
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
 
@@ -798,7 +791,7 @@ CHIP_ERROR EventPath::Parser::CheckSchemaValidity(void) const
 exit:
     ChipLogFunctError(err);
 
-return err;
+    return err;
 }
 #endif // CHIP_CONFIG_INTERACTION_MODEL_ENABLE_SCHEMA_CHECK
 
@@ -824,7 +817,7 @@ CHIP_ERROR EventPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, cons
     mError              = mpWriter->StartContainer(aTagInApiForm, chip::TLV::kTLVType_Path, mOuterContainerType);
     SuccessOrExit(mError);
 
-    exit:
+exit:
     ChipLogFunctError(mError);
     return mError;
 }
@@ -847,7 +840,7 @@ EventPath::Builder & EventPath::Builder::EndpointId(const uint32_t aEndpointId)
     mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EndpointId), aEndpointId);
     ChipLogFunctError(mError);
 
-    exit:
+exit:
 
     return *this;
 }
@@ -860,7 +853,7 @@ EventPath::Builder & EventPath::Builder::ClusterId(const uint32_t aClusterId)
     mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_ClusterId), aClusterId);
     ChipLogFunctError(mError);
 
-    exit:
+exit:
     return *this;
 }
 
@@ -872,7 +865,7 @@ EventPath::Builder & EventPath::Builder::EventId(const uint16_t aEventId)
     mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_EventId), aEventId);
     ChipLogFunctError(mError);
 
-    exit:
+exit:
     return *this;
 }
 
@@ -891,7 +884,7 @@ EventPath::Builder & EventPath::Builder::EndOfEventPath(void)
 CHIP_ERROR EventPathList::Parser::CheckSchemaValidity(void) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    size_t NumPath  = 0;
+    size_t NumPath = 0;
     chip::TLV::TLVReader reader;
 
     PRETTY_PRINT("EventPathList =");
@@ -976,7 +969,7 @@ exit:
 }
 
 #if CHIP_CONFIG_DATA_MANAGEMENT_ENABLE_SCHEMA_CHECK
-        // Roughly verify the schema is right
+// Roughly verify the schema is right
 CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity(void) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1157,7 +1150,9 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity(void) const
             VerifyOrExit(tagPresence.ResourceId == false, err = CHIP_ERROR_INVALID_TLV_TAG);
             tagPresence.ResourceId = true;
 
-            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType() || chip::TLV::kTLVType_ByteString == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType() ||
+                             chip::TLV::kTLVType_ByteString == reader.GetType(),
+                         err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
             {
@@ -1179,8 +1174,7 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity(void) const
 
             break;
 
-        case kCsTag_TraitProfileId:
-        {
+        case kCsTag_TraitProfileId: {
             SchemaVersionRange requestedVersion;
             uint32_t ProfileID;
 
@@ -1533,7 +1527,7 @@ EventDataElement::Builder & EventDataElement::Builder::EndOfEventDataElement(voi
 #if CHIP_CONFIG_DATA_MANAGEMENT_ENABLE_SCHEMA_CHECK
 CHIP_ERROR EventList::Parser::CheckSchemaValidity(void) const
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     size_t NumDataElement = 0;
     chip::TLV::TLVReader reader;
 
@@ -1652,7 +1646,7 @@ CHIP_ERROR StatusCode::Parser::GetGeneralCode(uint16_t * apGeneralCode) const
  */
 CHIP_ERROR StatusCode::Parser::CheckSchemaValidity(void) const
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
 
@@ -1867,7 +1861,7 @@ exit:
 #if CHIP_CONFIG_INTERACTION_MODEL_ENABLE_SCHEMA_CHECK
 CHIP_ERROR AttributeStatusElement::Parser::CheckSchemaValidity(void) const
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
 
@@ -1961,7 +1955,6 @@ exit:
     return err;
 }
 
-
 CHIP_ERROR AttributeStatusElement::Parser::GetStatusCode(StatusCode::Parser * const apStatusCode) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -2002,7 +1995,7 @@ AttributeStatusList::Builder & AttributeStatusList::Builder::EndOfStatusList(voi
 
 CHIP_ERROR AttributeStatusList::Parser::CheckSchemaValidity(void) const
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err                  = CHIP_NO_ERROR;
     size_t NumAttributeStateElement = 0;
     chip::TLV::TLVReader reader;
 
@@ -2038,7 +2031,7 @@ CHIP_ERROR AttributeStatusList::Parser::CheckSchemaValidity(void) const
         {
             err = CHIP_NO_ERROR;
         }
-            // NOTE: temporarily disable this check, to allow test to continue
+        // NOTE: temporarily disable this check, to allow test to continue
         else
         {
             ChipLogError(DataManagement, "PROTOCOL ERROR: Empty attribute status list");
@@ -2108,8 +2101,7 @@ AttributeDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDep
         PRETTY_PRINT("\t\t\t");
         break;
 
-    case chip::TLV::kTLVType_SignedInteger:
-    {
+    case chip::TLV::kTLVType_SignedInteger: {
         int64_t value_s64;
 
         err = aReader.Get(value_s64);
@@ -2119,8 +2111,7 @@ AttributeDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDep
         break;
     }
 
-    case chip::TLV::kTLVType_UnsignedInteger:
-    {
+    case chip::TLV::kTLVType_UnsignedInteger: {
         uint64_t value_u64;
 
         err = aReader.Get(value_u64);
@@ -2130,8 +2121,7 @@ AttributeDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDep
         break;
     }
 
-    case chip::TLV::kTLVType_Boolean:
-    {
+    case chip::TLV::kTLVType_Boolean: {
         bool value_b;
 
         err = aReader.Get(value_b);
@@ -2141,8 +2131,7 @@ AttributeDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDep
         break;
     }
 
-    case chip::TLV::kTLVType_UTF8String:
-    {
+    case chip::TLV::kTLVType_UTF8String: {
         char value_s[256];
 
         err = aReader.GetString(value_s, sizeof(value_s));
@@ -2160,8 +2149,7 @@ AttributeDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDep
         break;
     }
 
-    case chip::TLV::kTLVType_ByteString:
-    {
+    case chip::TLV::kTLVType_ByteString: {
         uint8_t value_b[256];
         uint32_t len, readerLen;
 
@@ -2247,7 +2235,7 @@ exit:
 // At the top level of the structure, unknown tags are ignored for foward compatibility
 CHIP_ERROR AttributeDataElement::Parser::CheckSchemaValidity(void) const
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
     uint32_t tagNum = 0;
@@ -2470,7 +2458,7 @@ AttributeDataElement::Builder & AttributeDataElement::Builder::EndOfAttributeDat
 // 3) every Data Element is also valid in schemasd
 CHIP_ERROR AttributeDataList::Parser::CheckSchemaValidity(void) const
 {
-    CHIP_ERROR err       = CHIP_NO_ERROR;
+    CHIP_ERROR err        = CHIP_NO_ERROR;
     size_t NumDataElement = 0;
     chip::TLV::TLVReader reader;
 
@@ -2546,7 +2534,7 @@ AttributeDataList::Builder & AttributeDataList::Builder::EndOfAttributeDataList(
 // At the top level of the message, unknown tags are ignored for foward compatibility
 CHIP_ERROR ReportDataRequest::Parser::CheckSchemaValidity(void) const
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
+    CHIP_ERROR err           = CHIP_NO_ERROR;
     uint16_t TagPresenceMask = 0;
     chip::TLV::TLVReader reader;
     AttributeStatusList::Parser attributeStatusList;
@@ -2555,12 +2543,12 @@ CHIP_ERROR ReportDataRequest::Parser::CheckSchemaValidity(void) const
 
     enum
     {
-        kBit_RequestResponse       = 0,
-        kBit_SubscriptionId         = 1,
-        kBit_AttributeStatusList            = 2,
-        kBit_AttributeDataList = 3,
-        kBit_EventDataList        = 4,
-        kBit_IsLastReport     = 5,
+        kBit_RequestResponse     = 0,
+        kBit_SubscriptionId      = 1,
+        kBit_AttributeStatusList = 2,
+        kBit_AttributeDataList   = 3,
+        kBit_EventDataList       = 4,
+        kBit_IsLastReport        = 5,
     };
 
     PRETTY_PRINT("{");
@@ -2666,7 +2654,6 @@ CHIP_ERROR ReportDataRequest::Parser::CheckSchemaValidity(void) const
         {
             PRETTY_PRINT("\tUnknown tag 0x%" PRIx64, tag);
         }
-
     }
 
     PRETTY_PRINT("}");
@@ -2676,8 +2663,7 @@ CHIP_ERROR ReportDataRequest::Parser::CheckSchemaValidity(void) const
     if (CHIP_END_OF_TLV == err)
     {
         // if we have at least the DataList or EventList field
-        if ((TagPresenceMask & (1 << kBit_RequestResponse)) ||
-            (TagPresenceMask & (1 << kBit_IsLastReport)))
+        if ((TagPresenceMask & (1 << kBit_RequestResponse)) || (TagPresenceMask & (1 << kBit_IsLastReport)))
         {
             err = CHIP_NO_ERROR;
         }
