@@ -122,6 +122,7 @@ private:
     static void HandleTXIndicated(bt_conn * conn, const bt_gatt_attr * attr, uint8_t err);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
+    static void HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, System::Error error);
 
 public:
     // Below callbacks are public in order to be visible from the global scope.

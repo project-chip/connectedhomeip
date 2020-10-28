@@ -65,7 +65,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     // TODO: for chip-tool set mIsCentral   = true;
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
-    mFlags       = !mIsCentral ? kFlag_AdvertisingEnabled : 0;
+    mFlags       = (CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral) ? kFlag_AdvertisingEnabled : 0;
     mAppState    = nullptr;
 
     memset(mDeviceName, 0, sizeof(mDeviceName));

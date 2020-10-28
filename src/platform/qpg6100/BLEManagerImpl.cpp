@@ -56,7 +56,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     CHIP_ERROR err;
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
-    mFlags       = kFlag_AdvertisingEnabled;
+    mFlags       = CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0;
     mNumGAPCons  = 0;
     for (int i = 0; i < kMaxConnections; i++)
     {
