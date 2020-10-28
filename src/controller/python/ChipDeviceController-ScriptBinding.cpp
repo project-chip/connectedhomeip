@@ -46,6 +46,7 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 
 #include <controller/CHIPDeviceController.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
