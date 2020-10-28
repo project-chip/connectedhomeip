@@ -12,12 +12,33 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# The location of the build configuration file.
-buildconfig = "//build/config/BUILDCONFIG.gn"
+import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
 
-# CHIP uses angle bracket includes.
-check_system_includes = true
+import("${chip_root}/build/chip/tools.gni")
 
-default_args = {
-  chip_build_tests = false
+assert(chip_build_tools)
+
+project_dir = "./.."
+
+executable("chip-shell") {
+  sources = [ "main.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/platform",
+    "${project_dir}/shell_common:shell_common",
+  ]
+
+  if (is_debug) {
+    defines = [ "BUILD_RELEASE=0" ]
+  } else {
+    defines = [ "BUILD_RELEASE=1" ]
+  }
+
+  output_dir = root_out_dir
+}
+
+group("shell") {
+  deps = [ ":chip-shell" ]
 }

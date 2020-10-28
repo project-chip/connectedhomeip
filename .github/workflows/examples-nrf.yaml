@@ -57,6 +57,10 @@ jobs:
               run:
                   scripts/examples/gn_nrf_example.sh examples/lighting-app/nrf5
                   out/lighting_app_debug
+            - name: Build example nRF5 Shell App
+              run:
+                  scripts/examples/gn_nrf_example.sh examples/shell/nrf52
+                  out/shell_app_debug
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
@@ -73,6 +77,7 @@ jobs:
                   path: |
                       out/lock_app_debug/chip-nrf52840-lock-example
                       out/lighting_app_debug/chip-nrf52840-lighting-example
+                      out/shell_app_debug/shell-nrf52840
             # TODO: NRF Connect https://github.com/project-chip/connectedhomeip/issues/2225
             - name: Show tree
               run: find .
