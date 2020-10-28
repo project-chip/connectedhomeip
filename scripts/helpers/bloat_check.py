@@ -149,7 +149,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
   rawText = open(filename, 'rt').read()
 
   # a consistent title to help identify obsolete comments
-  titleHeading = 'Size increase report for "{jobName}" from {baseSha}'.format(jobName=job_name, baseSha=base_sha)
+  titleHeading = 'Size increase report for "{jobName}"'.format(jobName=job_name)
 
   api = github.Github(gh_token)
   repo = api.get_repo(gh_repo)
@@ -175,7 +175,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
                                                        change.vmChange)
 
   # NOTE: PRs are issues with attached patches, hence the API naming
-  pull.create_issue_comment("""{title}
+  pull.create_issue_comment("""{title} from {baseSha}
 
   {table}
 
@@ -187,7 +187,7 @@ def sendFileAsPrComment(job_name, filename, gh_token, gh_repo, gh_pr_number,
 ```
 
 </details>
-""".format(title=titleHeading, table=compareTable, rawReportText=rawText))
+""".format(title=titleHeading, baseSha=base_sha, table=compareTable, rawReportText=rawText))
 
 
 def getPullRequestBaseSha(githubToken,  githubRepo, pullRequestNumber):
