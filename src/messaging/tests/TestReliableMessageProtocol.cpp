@@ -18,7 +18,8 @@
 
 /**
  *    @file
- *      This file implements unit tests for the ExchangeManager implementation.
+ *      This file implements unit tests for the ReliableMessageProtocol
+ *      implementation.
  */
 
 #include "TestMessagingLayer.h"

@@ -102,10 +102,7 @@ void ReliableMessageContext::SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer)
  */
 void ReliableMessageContext::SetAckPending(bool inAckPending)
 {
-    if (inAckPending)
-        mFlags.Set(Flags::kFlagAckPending);
-    else
-        mFlags.Clear(Flags::kFlagAckPending);
+    mFlags.Set(Flags::kFlagAckPending, inAckPending);
 }
 
 /**
@@ -119,10 +116,7 @@ void ReliableMessageContext::SetAckPending(bool inAckPending)
  */
 void ReliableMessageContext::SetPeerRequestedAck(bool inPeerRequestedAck)
 {
-    if (inPeerRequestedAck)
-        mFlags.Set(Flags::kFlagPeerRequestedAck);
-    else
-        mFlags.Clear(Flags::kFlagPeerRequestedAck);
+    mFlags.Set(Flags::kFlagPeerRequestedAck, inPeerRequestedAck);
 }
 
 /**
@@ -138,10 +132,7 @@ void ReliableMessageContext::SetPeerRequestedAck(bool inPeerRequestedAck)
  */
 void ReliableMessageContext::SetDropAckDebug(bool inDropAckDebug)
 {
-    if (inDropAckDebug)
-        mFlags.Set(Flags::kFlagDropAckDebug);
-    else
-        mFlags.Clear(Flags::kFlagDropAckDebug);
+    mFlags.Set(Flags::kFlagDropAckDebug, inDropAckDebug);
 }
 
 /**

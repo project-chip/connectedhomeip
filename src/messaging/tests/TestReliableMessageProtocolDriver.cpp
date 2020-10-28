@@ -17,8 +17,8 @@
 
 /**
  *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP core library CHIP ExchangeManager tests.
+ *      This file implements a standalone/native program executable test driver
+ *      for the CHIP core library CHIP ReliableMessageProtocol tests.
  *
  */
 
