@@ -25,8 +25,24 @@
 
 #include <support/SafeInt.h>
 
-bool ReadAnyType(uint8_t *& message)
+#define CHECK_MESSAGE_LENGTH(value)                                                                                                \
+    if (!chip::CanCastTo<uint16_t>(value))                                                                                         \
+    {                                                                                                                              \
+        ChipLogError(chipTool, "CHECK_MESSAGE_LENGTH expects a uint16_t value, got: %d", value);                                   \
+        return false;                                                                                                              \
+    }                                                                                                                              \
+                                                                                                                                   \
+    if (messageLen < value)                                                                                                        \
+    {                                                                                                                              \
+        ChipLogError(chipTool, "Unexpected response length: %d", messageLen);                                                      \
+        return false;                                                                                                              \
+    }                                                                                                                              \
+                                                                                                                                   \
+    messageLen = static_cast<uint16_t>(messageLen - static_cast<uint16_t>(value));
+
+bool ReadAttributeValue(uint8_t *& message, uint16_t & messageLen)
 {
+    CHECK_MESSAGE_LENGTH(1);
     uint8_t type = chip::Encoding::Read8(message);
     ChipLogProgress(chipTool, "  type: 0x%02x", type);
 
@@ -39,10 +55,12 @@ bool ReadAnyType(uint8_t *& message)
         message += 0;
         break;
     case 0x08: // data8 / 8-bit data
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  value: 0x%02x", chip::Encoding::Read8(message));
         return true;
         break;
     case 0x09: // data16 / 16-bit data
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  value: 0x%04x", chip::Encoding::LittleEndian::Read16(message));
         return true;
         break;
@@ -51,6 +69,7 @@ bool ReadAnyType(uint8_t *& message)
         message += 3;
         break;
     case 0x0B: // data32 / 32-bit data
+        CHECK_MESSAGE_LENGTH(4);
         ChipLogProgress(chipTool, "  value: 0x%08x", chip::Encoding::LittleEndian::Read32(message));
         return true;
         break;
@@ -67,18 +86,22 @@ bool ReadAnyType(uint8_t *& message)
         message += 7;
         break;
     case 0x0F: // data64 / 64-bit data
+        CHECK_MESSAGE_LENGTH(8);
         ChipLogProgress(chipTool, "  value: 0x%16x", chip::Encoding::LittleEndian::Read64(message));
         return true;
         break;
     case 0x10: // bool / Boolean
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  value: 0x%02x", chip::Encoding::Read8(message));
         return true;
         break;
     case 0x18: // map8 / 8-bit bitmap
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  value: 0x%02x", chip::Encoding::Read8(message));
         return true;
         break;
     case 0x19: // map16 / 16-bit bitmap
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  value: 0x%04x", chip::Encoding::LittleEndian::Read16(message));
         return true;
         break;
@@ -87,6 +110,7 @@ bool ReadAnyType(uint8_t *& message)
         message += 3;
         break;
     case 0x1B: // map32 / 32-bit bitmap
+        CHECK_MESSAGE_LENGTH(4);
         ChipLogProgress(chipTool, "  value: 0x%08x", chip::Encoding::LittleEndian::Read32(message));
         return true;
         break;
@@ -103,14 +127,17 @@ bool ReadAnyType(uint8_t *& message)
         message += 7;
         break;
     case 0x1F: // map64 / 64-bit bitmap
+        CHECK_MESSAGE_LENGTH(8);
         ChipLogProgress(chipTool, "  value: 0x%16x", chip::Encoding::LittleEndian::Read64(message));
         return true;
         break;
     case 0x20: // uint8 / Unsigned  8-bit integer
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  value: 0x%02x", chip::Encoding::Read8(message));
         return true;
         break;
     case 0x21: // uint16 / Unsigned 16-bit integer
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  value: 0x%04x", chip::Encoding::LittleEndian::Read16(message));
         return true;
         break;
@@ -119,6 +146,7 @@ bool ReadAnyType(uint8_t *& message)
         message += 3;
         break;
     case 0x23: // uint32 / Unsigned 32-bit integer
+        CHECK_MESSAGE_LENGTH(4);
         ChipLogProgress(chipTool, "  value: 0x%08x", chip::Encoding::LittleEndian::Read32(message));
         return true;
         break;
@@ -135,14 +163,17 @@ bool ReadAnyType(uint8_t *& message)
         message += 7;
         break;
     case 0x27: // uint64 / Unsigned 64-bit integer
+        CHECK_MESSAGE_LENGTH(8);
         ChipLogProgress(chipTool, "  value: 0x%16x", chip::Encoding::LittleEndian::Read64(message));
         return true;
         break;
     case 0x28: // int8 / Signed 8-bit integer
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  value: %d", chip::CastToSigned(chip::Encoding::Read8(message)));
         return true;
         break;
     case 0x29: // int16 / Signed 16-bit integer
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  value: %d", chip::CastToSigned(chip::Encoding::LittleEndian::Read16(message)));
         return true;
         break;
@@ -151,6 +182,7 @@ bool ReadAnyType(uint8_t *& message)
         message += 3;
         break;
     case 0x2B: // int32 / Signed 32-bit integer
+        CHECK_MESSAGE_LENGTH(4);
         ChipLogProgress(chipTool, "  value: %d", chip::CastToSigned(chip::Encoding::LittleEndian::Read32(message)));
         return true;
         break;
@@ -167,14 +199,17 @@ bool ReadAnyType(uint8_t *& message)
         message += 7;
         break;
     case 0x2F: // int64 / Signed 64-bit integer
+        CHECK_MESSAGE_LENGTH(8);
         ChipLogProgress(chipTool, "  value: %d", chip::CastToSigned(chip::Encoding::LittleEndian::Read64(message)));
         return true;
         break;
     case 0x30: // enum8 / 8-bit enumeration
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  value: 0x%02x", chip::Encoding::Read8(message));
         return true;
         break;
     case 0x31: // enum16 / 16-bit enumeration
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  value: 0x%04x", chip::Encoding::LittleEndian::Read16(message));
         return true;
         break;
@@ -227,18 +262,22 @@ bool ReadAnyType(uint8_t *& message)
         message += 0;
         break;
     case 0xE1: // date / Date
+        CHECK_MESSAGE_LENGTH(4);
         ChipLogProgress(chipTool, "  value: 0x%08x", chip::Encoding::LittleEndian::Read32(message));
         return true;
         break;
     case 0xE2: // UTC / UTCTime
+        CHECK_MESSAGE_LENGTH(4);
         ChipLogProgress(chipTool, "  value: 0x%08x", chip::Encoding::LittleEndian::Read32(message));
         return true;
         break;
     case 0xE8: // clusterId / Cluster ID
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  value: 0x%04x", chip::Encoding::LittleEndian::Read16(message));
         return true;
         break;
     case 0xE9: // attribId / Attribute ID
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  value: 0x%04x", chip::Encoding::LittleEndian::Read16(message));
         return true;
         break;
@@ -247,6 +286,7 @@ bool ReadAnyType(uint8_t *& message)
         message += 0;
         break;
     case 0xF0: // EUI64 / IEEE address
+        CHECK_MESSAGE_LENGTH(8);
         ChipLogProgress(chipTool, "  value: 0x%16x", chip::Encoding::LittleEndian::Read64(message));
         return true;
         break;
@@ -285,16 +325,17 @@ public:
     {
         ChipLogProgress(chipTool, "ReadAttributesResponse (0x01):");
         // struct readAttributeResponseRecord[]
-        uint8_t * messageEnd = message + messageLen;
-        do
+        while (messageLen)
         {
+            CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                     // zclStatus
-            if (!ReadAnyType(message))
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+            if (!ReadAttributeValue(message, messageLen))
             {
                 return false;
             }
-        } while (message < messageEnd);
+        }
 
         return true;
     }
@@ -312,12 +353,13 @@ public:
     {
         ChipLogProgress(chipTool, "WriteAttributesResponse (0x04):");
         // struct writeAttributeResponseRecord[]
-        uint8_t * messageEnd = message + messageLen;
-        do
+        while (messageLen)
         {
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                     // zclStatus
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+            CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
-        } while (message < messageEnd);
+        }
 
         return true;
     }
@@ -335,15 +377,15 @@ public:
     {
         ChipLogProgress(chipTool, "WriteAttributesNoResponse (0x05):");
         // struct writeAttributeRecord[]
-        uint8_t * messageEnd = message + messageLen;
-        do
+        while (messageLen)
         {
+            CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
-            if (!ReadAnyType(message))
+            if (!ReadAttributeValue(message, messageLen))
             {
                 return false;
             }
-        } while (message < messageEnd);
+        }
 
         return true;
     }
@@ -360,7 +402,9 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "DefaultResponse (0x0B):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "commandId", chip::Encoding::Read8(message));  // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "commandId", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "statusCode", chip::Encoding::Read8(message)); // zclStatus
 
         return true;
@@ -378,14 +422,16 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "DiscoverAttributesResponse (0x0D):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "discoveryComplete", chip::Encoding::Read8(message)); // bool
         // struct discoverAttributesResponseRecord[]
-        uint8_t * messageEnd = message + messageLen;
-        do
+        while (messageLen)
         {
+            CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "attributeType", chip::Encoding::Read8(message));              // zclType
-        } while (message < messageEnd);
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "attributeType", chip::Encoding::Read8(message)); // zclType
+        }
 
         return true;
     }
@@ -2171,6 +2217,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "ClearAllPINCodesResponse (0x08):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2188,6 +2235,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "ClearAllRFIDCodesResponse (0x19):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2205,6 +2253,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "ClearHolidayScheduleResponse (0x13):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2222,6 +2271,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "ClearPINCodeResponse (0x07):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2239,6 +2289,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "ClearRFIDCodeResponse (0x18):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2256,6 +2307,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "ClearWeekdayScheduleResponse (0x0D):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2273,6 +2325,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "ClearYearDayScheduleResponse (0x10):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2290,11 +2343,16 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "GetHolidayScheduleResponse (0x12):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "holidayScheduleId", chip::Encoding::Read8(message));             // uint8
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                        // zclStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "holidayScheduleId", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(4);
         ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message));   // uint32
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "operatingModeDuringHoliday", chip::Encoding::Read8(message));    // DrlkOperMode
+        CHECK_MESSAGE_LENGTH(4);
+        ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "operatingModeDuringHoliday", chip::Encoding::Read8(message)); // DrlkOperMode
 
         return true;
     }
@@ -2311,13 +2369,27 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "GetLogRecordResponse (0x04):");
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "logEntryId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "timestamp", chip::Encoding::LittleEndian::Read32(message));  // uint32
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "eventType", chip::Encoding::Read8(message));                 // enum8
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sourceOperationEvent", chip::Encoding::Read8(message));  // DrlkOperEventSource
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "eventIdOrAlarmCode", chip::Encoding::Read8(message));    // uint8
+        CHECK_MESSAGE_LENGTH(4);
+        ChipLogProgress(chipTool, "  %s: 0x%08x", "timestamp", chip::Encoding::LittleEndian::Read32(message)); // uint32
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "eventType", chip::Encoding::Read8(message)); // enum8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sourceOperationEvent", chip::Encoding::Read8(message)); // DrlkOperEventSource
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "eventIdOrAlarmCode", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "pIN", chip::Encoding::Read8(message));                   // octstr
+        CHECK_MESSAGE_LENGTH(1);
+        {
+            uint8_t pINLen = chip::Encoding::Read8(message);             // octstr
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "pINLen", pINLen); // octstr
+
+            // FIXME Strings are not supported yet. For the moment the code just checks that
+            // there is enough bytes in the buffer
+            CHECK_MESSAGE_LENGTH(pINLen);
+        }
 
         return true;
     }
@@ -2334,10 +2406,22 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "GetPINCodeResponse (0x06):");
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "userStatus", chip::Encoding::Read8(message));            // DrlkUserStatus
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message));              // DrlkUserType
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "code", chip::Encoding::Read8(message));                  // octstr
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "userStatus", chip::Encoding::Read8(message)); // DrlkUserStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message)); // DrlkUserType
+        CHECK_MESSAGE_LENGTH(1);
+        {
+            uint8_t codeLen = chip::Encoding::Read8(message);              // octstr
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "codeLen", codeLen); // octstr
+
+            // FIXME Strings are not supported yet. For the moment the code just checks that
+            // there is enough bytes in the buffer
+            CHECK_MESSAGE_LENGTH(codeLen);
+            message += codeLen;
+        }
 
         return true;
     }
@@ -2354,10 +2438,22 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "GetRFIDCodeResponse (0x17):");
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "userStatus", chip::Encoding::Read8(message));            // DrlkUserStatus
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message));              // DrlkUserType
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "rFIdCode", chip::Encoding::Read8(message));              // octstr
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "userStatus", chip::Encoding::Read8(message)); // DrlkUserStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message)); // DrlkUserType
+        CHECK_MESSAGE_LENGTH(1);
+        {
+            uint8_t rFIdCodeLen = chip::Encoding::Read8(message);                  // octstr
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "rFIdCodeLen", rFIdCodeLen); // octstr
+
+            // FIXME Strings are not supported yet. For the moment the code just checks that
+            // there is enough bytes in the buffer
+            CHECK_MESSAGE_LENGTH(rFIdCodeLen);
+            message += rFIdCodeLen;
+        }
 
         return true;
     }
@@ -2374,8 +2470,10 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "GetUserTypeResponse (0x15):");
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message));              // DrlkUserType
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message)); // DrlkUserType
 
         return true;
     }
@@ -2392,14 +2490,22 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "GetWeekdayScheduleResponse (0x0C):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", chip::Encoding::Read8(message));            // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                // zclStatus
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "daysMask", chip::Encoding::Read8(message));              // DrlkDaysMask
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "startHour", chip::Encoding::Read8(message));             // uint8
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "startMinute", chip::Encoding::Read8(message));           // uint8
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "endHour", chip::Encoding::Read8(message));               // uint8
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "endMinute", chip::Encoding::Read8(message));             // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "daysMask", chip::Encoding::Read8(message)); // DrlkDaysMask
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "startHour", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "startMinute", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "endHour", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "endMinute", chip::Encoding::Read8(message)); // uint8
 
         return true;
     }
@@ -2416,11 +2522,16 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "GetYearDayScheduleResponse (0x0F):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", chip::Encoding::Read8(message));                    // uint8
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message));         // uint16
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                        // zclStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(2);
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(4);
         ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message));   // uint32
+        CHECK_MESSAGE_LENGTH(4);
+        ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
 
         return true;
     }
@@ -2437,6 +2548,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "LockDoorResponse (0x00):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
 
         return true;
@@ -2454,6 +2566,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "SetHolidayScheduleResponse (0x11):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2471,6 +2584,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "SetPINCodeResponse (0x05):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkSetCodeStatus
 
         return true;
@@ -2488,6 +2602,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "SetRFIDCodeResponse (0x16):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkSetCodeStatus
 
         return true;
@@ -2505,6 +2620,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "SetUserTypeResponse (0x14):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2522,6 +2638,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "SetWeekdayScheduleResponse (0x0B):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2539,6 +2656,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "SetYearDayScheduleResponse (0x0E):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
         return true;
@@ -2556,6 +2674,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "UnlockDoorResponse (0x01):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
 
         return true;
@@ -2573,6 +2692,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "UnlockWithTimeoutResponse (0x03):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
 
         return true;
@@ -3490,7 +3610,9 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "AddGroupResponse (0x00):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                 // enum8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // uint16
 
         return true;
@@ -3508,13 +3630,14 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "GetGroupMembershipResponse (0x02):");
+        CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message)); // uint8
         // uint16_t uint16[]
-        uint8_t * messageEnd = message + messageLen;
-        do
+        while (messageLen)
         {
+            CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "groupList", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        } while (message < messageEnd);
+        }
 
         return true;
     }
@@ -3531,7 +3654,9 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "RemoveGroupResponse (0x03):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                 // enum8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // uint16
 
         return true;
@@ -3549,9 +3674,20 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "ViewGroupResponse (0x01):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                 // enum8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "groupName", chip::Encoding::Read8(message));              // string
+        CHECK_MESSAGE_LENGTH(1);
+        {
+            uint8_t groupNameLen = chip::Encoding::Read8(message);                   // string
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "groupNameLen", groupNameLen); // string
+
+            // FIXME Strings are not supported yet. For the moment the code just checks that
+            // there is enough bytes in the buffer
+            CHECK_MESSAGE_LENGTH(groupNameLen);
+            message += groupNameLen;
+        }
 
         return true;
     }
@@ -3788,6 +3924,7 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "IdentifyQueryResponse (0x00):");
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "timeout", chip::Encoding::LittleEndian::Read16(message)); // uint16
 
         return true;
@@ -4322,9 +4459,12 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "AddSceneResponse (0x00):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                 // zclStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message));                // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
 
         return true;
     }
@@ -4341,9 +4481,12 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "CopySceneResponse (0x42):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                     // zclStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupIdFrom", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneIdFrom", chip::Encoding::Read8(message));                // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneIdFrom", chip::Encoding::Read8(message)); // uint8
 
         return true;
     }
@@ -4360,9 +4503,12 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "EnhancedAddSceneResponse (0x40):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                 // zclStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message));                // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
 
         return true;
     }
@@ -4379,18 +4525,39 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "EnhancedViewSceneResponse (0x41):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                        // zclStatus
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message));        // SGroupId
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message));                       // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(2);
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "transitionTime", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneName", chip::Encoding::Read8(message));                     // SSceneName
+        CHECK_MESSAGE_LENGTH(1);
+        {
+            uint8_t sceneNameLen = chip::Encoding::Read8(message);                   // SSceneName
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneNameLen", sceneNameLen); // SSceneName
+
+            // FIXME Strings are not supported yet. For the moment the code just checks that
+            // there is enough bytes in the buffer
+            CHECK_MESSAGE_LENGTH(sceneNameLen);
+        }
         // struct SExtensionFieldSetList[]
         uint8_t * messageEnd = message + messageLen;
-        do
+        while (message < messageEnd)
         {
+            CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "clusterId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "extensionFieldSet", chip::Encoding::Read8(message));        // octstr
-        } while (message < messageEnd);
+            CHECK_MESSAGE_LENGTH(1);
+            {
+                uint8_t extensionFieldSetLen = chip::Encoding::Read8(message);                           // octstr
+                ChipLogProgress(chipTool, "  %s: 0x%02x", "extensionFieldSetLen", extensionFieldSetLen); // octstr
+
+                // FIXME Strings are not supported yet. For the moment the code just checks that
+                // there is enough bytes in the buffer
+                CHECK_MESSAGE_LENGTH(extensionFieldSetLen);
+            }
+        }
 
         return true;
     }
@@ -4407,15 +4574,18 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "GetSceneMembershipResponse (0x06):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                 // zclStatus
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message));               // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         // uint8_t uint8[]
-        uint8_t * messageEnd = message + messageLen;
-        do
+        while (messageLen)
         {
+            CHECK_MESSAGE_LENGTH(1);
             ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneList", chip::Encoding::Read8(message)); // uint8
-        } while (message < messageEnd);
+        }
 
         return true;
     }
@@ -4432,7 +4602,9 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "RemoveAllScenesResponse (0x03):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                 // zclStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
 
         return true;
@@ -4450,9 +4622,12 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "RemoveSceneResponse (0x02):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                 // zclStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message));                // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
 
         return true;
     }
@@ -4469,9 +4644,12 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "StoreSceneResponse (0x04):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                 // zclStatus
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message));                // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
 
         return true;
     }
@@ -4488,18 +4666,40 @@ public:
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
         ChipLogProgress(chipTool, "ViewSceneResponse (0x01):");
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message));                        // zclStatus
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message));        // SGroupId
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message));                       // uint8
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        CHECK_MESSAGE_LENGTH(2);
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
+        CHECK_MESSAGE_LENGTH(1);
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
+        CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "transitionTime", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneName", chip::Encoding::Read8(message));                     // SSceneName
-        // struct SExtensionFieldSetList[]
-        uint8_t * messageEnd = message + messageLen;
-        do
+        CHECK_MESSAGE_LENGTH(1);
         {
+            uint8_t sceneNameLen = chip::Encoding::Read8(message);                   // SSceneName
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneNameLen", sceneNameLen); // SSceneName
+
+            // FIXME Strings are not supported yet. For the moment the code just checks that
+            // there is enough bytes in the buffer
+            CHECK_MESSAGE_LENGTH(sceneNameLen);
+            message += sceneNameLen;
+        }
+        // struct SExtensionFieldSetList[]
+        while (messageLen)
+        {
+            CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "clusterId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "extensionFieldSet", chip::Encoding::Read8(message));        // octstr
-        } while (message < messageEnd);
+            CHECK_MESSAGE_LENGTH(1);
+            {
+                uint8_t extensionFieldSetLen = chip::Encoding::Read8(message);                           // octstr
+                ChipLogProgress(chipTool, "  %s: 0x%02x", "extensionFieldSetLen", extensionFieldSetLen); // octstr
+
+                // FIXME Strings are not supported yet. For the moment the code just checks that
+                // there is enough bytes in the buffer
+                CHECK_MESSAGE_LENGTH(extensionFieldSetLen);
+                message += extensionFieldSetLen;
+            }
+        }
 
         return true;
     }
