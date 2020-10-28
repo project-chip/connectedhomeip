@@ -43,7 +43,7 @@ CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCal
     CHIP_ERROR error = CHIP_NO_ERROR;
     esp_err_t espError;
     uint16_t discriminator;
-    char hostname[11]; // Hostname willbe "CHIP-XXXX"
+    char hostname[11]; // Hostname will be "CHIP-XXXX"
 
     espError = mdns_init();
     VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
@@ -89,7 +89,7 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
     espError = mdns_service_add(service->mName, service->mType, GetProtocolString(service->mProtocol), service->mPort, items,
                                 service->mTextEntrySize);
     // The mdns_service_add will return error if we try to add an existing service
-    if (espError != ESP_OK)
+    if (espError != ESP_OK && espError != ESP_ERR_NO_MEM)
     {
         espError = mdns_service_txt_set(service->mType, GetProtocolString(service->mProtocol), items,
                                         static_cast<uint8_t>(service->mTextEntrySize));
@@ -121,9 +121,7 @@ CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip:
     TextEntry * textEntries;
     size_t serviceSize = 0;
 
-    ChipLogProgress(DeviceLayer, "call mdns_query_ptr, type=%s protocol=%s", type, GetProtocolString(protocol));
     espError = mdns_query_ptr(type, GetProtocolString(protocol), kTimeoutMilli, kMaxResults, &results);
-    ChipLogProgress(DeviceLayer, "call mdns_query_ptr error=%s result=%p", esp_err_to_name(espError), results);
     VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
     if (results == nullptr)
     {

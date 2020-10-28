@@ -21,6 +21,7 @@
 #include "DataModelHandler.h"
 #include "DeviceCallbacks.h"
 #include "Display.h"
+#include "Globals.h"
 #include "LEDWidget.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
@@ -84,18 +85,20 @@ extern void startServer();
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-LEDWidget statusLED1;
-LEDWidget statusLED2;
-BluetoothWidget bluetoothLED;
-WiFiWidget wifiLED;
-chip::Protocols::Mdns::Publisher publisher;
-
 extern void PairingComplete(SecurePairingSession * pairing);
 
 const char * TAG = "wifi-echo-demo";
 
 static DeviceCallbacks EchoCallbacks;
 RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
+
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
+const uint64_t TestDeviceId = kLocalNodeId; // For chip::DeviceLayer::GetDeviceId
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip
 
 namespace {
 

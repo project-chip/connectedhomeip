@@ -25,6 +25,7 @@
 #include "DeviceCallbacks.h"
 
 #include "CHIPDeviceManager.h"
+#include "Globals.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
@@ -42,13 +43,6 @@ static const char * TAG = "echo-devicecallbacks";
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
-
-// In wifi-echo.cpp
-extern LEDWidget statusLED1;
-extern LEDWidget statusLED2;
-extern WiFiWidget wifiLED;
-extern const chip::NodeId kLocalNodeId;
-extern chip::Protocols::Mdns::Publisher publisher;
 
 uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 250;

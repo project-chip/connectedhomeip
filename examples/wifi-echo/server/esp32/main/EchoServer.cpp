@@ -46,6 +46,7 @@
 #include <transport/raw/UDP.h>
 
 #include "DataModelHandler.h"
+#include "Globals.h"
 #include "LEDWidget.h"
 
 static const char * TAG = "echo_server";
@@ -53,16 +54,6 @@ static const char * TAG = "echo_server";
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
-
-extern const NodeId kLocalNodeId = 12344321;
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
-extern const uint64_t TestDeviceId = kLocalNodeId; // For chip::DeviceLayer::GetDeviceId
-}
-} // namespace DeviceLayer
-} // namespace chip
-extern LEDWidget statusLED1; // In wifi-echo.cpp
 
 namespace {
 

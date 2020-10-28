@@ -32,9 +32,6 @@ public:
     /**
      * This method initializes the publisher.
      *
-     * @retval CHIP_NO_ERROR                The initialization succeeds.
-     * @retval Error code                   The initialization fails.
-     *
      */
     CHIP_ERROR Init();
 
@@ -47,23 +44,14 @@ public:
      *
      * @param[in] interface   The interface to send mDNS multicast.
      *
-     * @retval CHIP_NO_ERROR                The publish succeeds.
-     * @retval CHIP_NO_ERROR                The publish succeeds.
-     * @retval Error code                   The publish fails.
-     *
      */
     CHIP_ERROR StartPublishDevice(chip::Inet::InterfaceId interface = INET_NULL_INTERFACEID);
 
     /**
      * This function stops publishing the device on mDNS.
      *
-     * @retval CHIP_NO_ERROR                The publish stops successfully.
-     * @retval Error code                   Stopping the publish fails.
-     *
      */
     CHIP_ERROR StopPublishDevice();
-
-    ~Publisher() = default;
 
 private:
     Publisher(const Publisher &) = delete;

@@ -51,7 +51,6 @@ void Publisher::HandleMdnsInit(void * context, CHIP_ERROR initError)
 
 void Publisher::HandleMdnsError(void * context, CHIP_ERROR initError)
 {
-
     ChipLogError(Discovery, "mDNS error: %s", chip::ErrorStr(initError));
 }
 
