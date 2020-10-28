@@ -94,7 +94,7 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::_Init()
     CHIP_ERROR err;
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
-    mFlags       = kFlag_AdvertisingEnabled;
+    mFlags       = CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0;
     mGAPConns    = 0;
 
     memset(mSubscribedConns, 0, sizeof(mSubscribedConns));
@@ -244,6 +244,9 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::StartAdvertising(void)
             advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Started;
             PlatformMgr().PostEvent(&advChange);
         }
+
+        // Start timer to disable CHIPoBLE advertisement after timeout expiration
+        SystemLayer.StartTimer(CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT, HandleBLEAdvertisementTimeout, this);
     }
 
 exit:
@@ -277,6 +280,9 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::StopAdvertising(void)
             advChange.CHIPoBLEAdvertisingChange.Result = kActivity_Stopped;
             PlatformMgr().PostEvent(&advChange);
         }
+
+        // Cancel timer event disabling CHIPoBLE advertisement after timeout expiration
+        SystemLayer.CancelTimer(HandleBLEAdvertisementTimeout, this);
     }
 
 exit:
@@ -493,6 +499,13 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXComplete(const ChipD
     bt_conn_unref(c2IndDoneEvent->BtConn);
 
     return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, System::Error error)
+{
+    BLEMgr().SetAdvertisingEnabled(false);
+    ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because of timeout expired");
 }
 
 template <class ImplClass>

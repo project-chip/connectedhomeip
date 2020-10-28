@@ -50,3 +50,9 @@ config CHIP_DISABLE_CHIPOBLE_ADVERTISING_WHEN_PROVISIONED
 	default y
 	help
 	  Enables CHIPoBLE advertising disabling when the device achieves a fully provisioned state.
+
+config CHIP_ENABLE_CHIPOBLE_ADVERTISING_AUTOSTART
+	bool "Enable CHIPoBLE advertising autostart"
+	default n
+	help
+	  Enables starting CHIPoBLE advertising automatically after application boot.

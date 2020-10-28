@@ -142,7 +142,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     mRXCharAttrHandle     = 0;
     mTXCharAttrHandle     = 0;
     mTXCharCCCDAttrHandle = 0;
-    mFlags                = kFlag_AdvertisingEnabled;
+    mFlags                = CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0;
     memset(mDeviceName, 0, sizeof(mDeviceName));
 
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
