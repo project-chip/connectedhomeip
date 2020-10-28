@@ -376,7 +376,7 @@ class DeviceMgrCmd(Cmd):
 
         try:
             args = shlex.split(line)
-            if len(args) == 0:
+            if not args:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
