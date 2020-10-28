@@ -42,6 +42,11 @@ const char * SerializableU64SetBase::SerializeBase64(char * buf, uint16_t & bufl
     buflen = Base64Encode(reinterpret_cast<const uint8_t *>(mData), static_cast<uint16_t>(len), buf);
     out    = buf;
 
+    for (uint16_t i = 0; i < mNextAvailable; i++)
+    {
+        mData[i] = Encoding::LittleEndian::HostSwap64(mData[i]);
+    }
+
 exit:
     return out;
 }
