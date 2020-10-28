@@ -19,7 +19,7 @@
 #include "TestSupport.h"
 
 #include <support/CHIPMem.h>
-#include <support/CHIPSparseArray.h>
+#include <support/SparseArray.h>
 #include <support/TestUtils.h>
 
 #include <nlunit-test.h>
@@ -40,14 +40,14 @@ void TestSparseArray(nlTestSuite * inSuite, void * inContext)
     array.Remove(123);
     NL_TEST_ASSERT(inSuite, array.Find(123) == 8);
 
-    for (chip::NodeId i = 1; i <= 8; i++)
+    for (uint64_t i = 1; i <= 8; i++)
     {
         NL_TEST_ASSERT(inSuite, array.Insert(i) == CHIP_NO_ERROR);
     }
 
     NL_TEST_ASSERT(inSuite, array.Insert(9) != CHIP_NO_ERROR);
 
-    for (chip::NodeId i = 1; i <= 8; i++)
+    for (uint64_t i = 1; i <= 8; i++)
     {
         NL_TEST_ASSERT(inSuite, array.Find(i) != 8);
     }
@@ -55,7 +55,7 @@ void TestSparseArray(nlTestSuite * inSuite, void * inContext)
     size_t size = array.SerializedSize();
     NL_TEST_ASSERT(inSuite, array.MaxSerializedSize() == size);
 
-    for (chip::NodeId i = 1; i <= 7; i++)
+    for (uint64_t i = 1; i <= 7; i++)
     {
         array.Remove(i);
         NL_TEST_ASSERT(inSuite, array.SerializedSize() == size);
@@ -69,7 +69,7 @@ void TestSparseArraySerialize(nlTestSuite * inSuite, void * inContext)
 {
     chip::SparseU64Array<8> array;
 
-    for (chip::NodeId i = 1; i <= 6; i++)
+    for (uint64_t i = 1; i <= 6; i++)
     {
         NL_TEST_ASSERT(inSuite, array.Insert(i) == CHIP_NO_ERROR);
     }
@@ -77,22 +77,22 @@ void TestSparseArraySerialize(nlTestSuite * inSuite, void * inContext)
     char * buf    = nullptr;
     uint16_t size = 0;
 
-    NL_TEST_ASSERT(inSuite, array.Serialize(buf, size) == nullptr);
+    NL_TEST_ASSERT(inSuite, array.SerializeBase64(buf, size) == nullptr);
     NL_TEST_ASSERT(inSuite, size != 0);
 
     char buf1[size];
-    NL_TEST_ASSERT(inSuite, array.Serialize(buf1, size) == buf1);
+    NL_TEST_ASSERT(inSuite, array.SerializeBase64(buf1, size) == buf1);
     NL_TEST_ASSERT(inSuite, size != 0);
 
     uint16_t size2 = static_cast<uint16_t>(2 * size);
     char buf2[size2];
-    NL_TEST_ASSERT(inSuite, array.Serialize(buf2, size2) == buf2);
+    NL_TEST_ASSERT(inSuite, array.SerializeBase64(buf2, size2) == buf2);
     NL_TEST_ASSERT(inSuite, size2 == size);
 
     chip::SparseU64Array<8> array2;
-    NL_TEST_ASSERT(inSuite, array2.Deserialize(buf2, size2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, array2.DeserializeBase64(buf2, size2) == CHIP_NO_ERROR);
 
-    for (chip::NodeId i = 1; i <= 6; i++)
+    for (uint64_t i = 1; i <= 6; i++)
     {
         NL_TEST_ASSERT(inSuite, array2.Find(i) != 8);
     }
