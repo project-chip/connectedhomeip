@@ -351,6 +351,22 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART
+ *
+ * Enable CHIPoBLE advertising start automatically after device power-up.
+ *
+ * CHIP's device may start advertising automatically only if its all primary device
+ * functions are within a CHIP network. Device providing unrelated to CHIP functionalities
+ * should not start advertising automatically after power-up.
+ *
+ * TODO: Default value should be changed to 0, after all platforms will implement enabling
+ *       advertisement in their own way.
+ */
+#ifndef CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART
+#define CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART 1
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_BLE_DEVICE_NAME_PREFIX
  *
  * A prefix string used in forming the BLE device name.  The remainder of the name
@@ -386,6 +402,18 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL
 #define CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL 3200
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
+ *
+ * The amount of time in miliseconds after which BLE advertisement should be disabled, counting
+ * from the moment of advertisement commencement.
+ *
+ * Defaults to 9000000 (15 minutes).
+ */
+#ifndef CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT
+#define CHIP_DEVICE_CONFIG_BLE_ADVERTISING_TIMEOUT (15 * 60 * 1000)
 #endif
 
 // -------------------- Time Sync Configuration --------------------

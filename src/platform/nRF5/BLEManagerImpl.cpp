@@ -134,7 +134,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
     ble_add_char_params_t addCharParams;
 
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
-    mFlags       = kFlag_AdvertisingEnabled;
+    mFlags       = CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0;
     mAdvHandle   = BLE_GAP_ADV_SET_HANDLE_NOT_SET;
     mNumGAPCons  = 0;
     for (int i = 0; i < kMaxConnections; i++)

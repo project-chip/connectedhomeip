@@ -49,6 +49,7 @@ private:
     static void FunctionHandler(AppEvent * aEvent);
     static void StartThreadHandler(AppEvent * aEvent);
     static void LockActionEventHandler(AppEvent * aEvent);
+    static void StartBLEAdvertisementHandler(AppEvent * aEvent);
 
     static void ButtonEventHandler(uint32_t buttons_state, uint32_t has_changed);
     static void TimerEventHandler(k_timer * timer);

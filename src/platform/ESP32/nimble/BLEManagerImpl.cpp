@@ -131,7 +131,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
 
     mRXCharAttrHandle     = 0;
     mTXCharCCCDAttrHandle = 0;
-    mFlags                = kFlag_AdvertisingEnabled;
+    mFlags                = CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0;
     mNumGAPCons           = 0;
     memset(mCons, 0, sizeof(mCons));
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;

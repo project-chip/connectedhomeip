@@ -88,6 +88,8 @@ toggle, swapping the state every time it is pressed.
 which was selected to match OpenThread Border Router default settings and
 network credentials.
 
+**Button #4** can be used to start BLE advertisement, which is disabled by default.
+
 The remaining two LEDs (#3 and #4) and button #4 are unused.
 
 <a name="building"></a>
