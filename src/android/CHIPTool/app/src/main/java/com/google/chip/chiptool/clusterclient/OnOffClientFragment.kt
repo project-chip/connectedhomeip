@@ -33,6 +33,11 @@ class OnOffClientFragment : Fragment(), ChipDeviceController.CompletionListener 
     }
   }
 
+  override fun onStart() {
+    super.onStart()
+    ipAddressEd.setText(deviceController.ipAddress ?: requireContext().getString(R.string.enter_ip_address_hint_text))
+  }
+
   override fun onConnectDeviceComplete() {
     sendCommand()
   }

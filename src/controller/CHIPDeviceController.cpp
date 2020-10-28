@@ -108,7 +108,8 @@ ChipDeviceController::~ChipDeviceController()
     }
 }
 
-CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId)
+CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, DevicePairingDelegate * pairingDelegate,
+                                      PersistentStorageDelegate * storageDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -118,37 +119,26 @@ CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId)
     err = DeviceLayer::PlatformMgr().InitChipStack();
     SuccessOrExit(err);
 
-    err = Init(localNodeId, &DeviceLayer::SystemLayer, &DeviceLayer::InetLayer);
+    err = Init(localNodeId, &DeviceLayer::SystemLayer, &DeviceLayer::InetLayer, pairingDelegate, storageDelegate);
 #endif // CONFIG_DEVICE_LAYER
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * systemLayer, InetLayer * inetLayer)
+CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * systemLayer, InetLayer * inetLayer,
+                                      DevicePairingDelegate * pairingDelegate, PersistentStorageDelegate * storageDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mSystemLayer = systemLayer;
-    mInetLayer   = inetLayer;
-
-    mState         = kState_Initialized;
-    mLocalDeviceId = localNodeId;
-
-exit:
-    return err;
-}
-
-CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, DevicePairingDelegate * pairingDelegate,
-                                      PersistentStorageDelegate * storage)
-{
-    CHIP_ERROR err = Init(localNodeId);
-    SuccessOrExit(err);
-
+    mState           = kState_Initialized;
+    mLocalDeviceId   = localNodeId;
+    mSystemLayer     = systemLayer;
+    mInetLayer       = inetLayer;
     mPairingDelegate = pairingDelegate;
-    mStorageDelegate = storage;
+    mStorageDelegate = storageDelegate;
 
     if (mStorageDelegate != nullptr)
     {
@@ -418,15 +408,22 @@ exit:
     return err;
 }
 
-bool ChipDeviceController::IsConnected()
+bool ChipDeviceController::IsConnected() const
 {
     return mState == kState_Initialized &&
         (mConState == kConnectionState_Connected || mConState == kConnectionState_SecureConnected);
 }
 
-bool ChipDeviceController::IsSecurelyConnected()
+bool ChipDeviceController::IsSecurelyConnected() const
 {
     return mState == kState_Initialized && mConState == kConnectionState_SecureConnected;
+}
+
+bool ChipDeviceController::GetIpAddress(Inet::IPAddress & addr) const
+{
+    if (IsConnected())
+        addr = mDeviceAddr;
+    return IsConnected();
 }
 
 CHIP_ERROR ChipDeviceController::DisconnectDevice()

@@ -114,13 +114,13 @@ public:
      * Init function to be used when there exists a device layer that takes care of initializing
      * System::Layer and InetLayer.
      */
-    CHIP_ERROR Init(NodeId localDeviceId);
+    CHIP_ERROR Init(NodeId localDeviceId, DevicePairingDelegate * pairingDelegate = nullptr,
+                    PersistentStorageDelegate * storageDelegate = nullptr);
     /**
      * Init function to be used when already-initialized System::Layer and InetLayer are available.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, Inet::InetLayer * inetLayer);
-    CHIP_ERROR Init(NodeId localDeviceId, DevicePairingDelegate * pairingDelegate,
-                    PersistentStorageDelegate * storageDelegate = nullptr);
+    CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, Inet::InetLayer * inetLayer,
+                    DevicePairingDelegate * pairingDelegate = nullptr, PersistentStorageDelegate * storageDelegate = nullptr);
     CHIP_ERROR Shutdown();
 
     // ----- Connection Management -----
@@ -178,7 +178,7 @@ public:
      *
      * @return bool   If there is an active connection
      */
-    bool IsConnected();
+    bool IsConnected() const;
 
     /**
      * @brief
@@ -186,7 +186,15 @@ public:
      *
      * @return bool   If the connection is active and security context is established
      */
-    bool IsSecurelyConnected();
+    bool IsSecurelyConnected() const;
+
+    /**
+     * @brief
+     *   Get IP Address of the peer if the connection is active
+     *
+     * @return bool   If IP Address was returned
+     */
+    bool GetIpAddress(Inet::IPAddress & addr) const;
 
     // ----- Messaging -----
     /**

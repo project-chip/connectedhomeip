@@ -25,6 +25,7 @@
 #include "AndroidBleApplicationDelegate.h"
 #include "AndroidBleConnectionDelegate.h"
 #include "AndroidBlePlatformDelegate.h"
+#include "AndroidDevicePairingDelegate.h"
 
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
@@ -89,6 +90,7 @@ namespace {
 JavaVM * sJVM;
 System::Layer sSystemLayer;
 Inet::InetLayer sInetLayer;
+AndroidDevicePairingDelegate sDevicePairingDelegate;
 
 #if CONFIG_NETWORK_LAYER_BLE
 Ble::BleLayer sBleLayer;
@@ -239,7 +241,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     deviceController = new ChipDeviceController();
     VerifyOrExit(deviceController != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-    err = deviceController->Init(kLocalDeviceId, &sSystemLayer, &sInetLayer);
+    err = deviceController->Init(kLocalDeviceId, &sSystemLayer, &sInetLayer, &sDevicePairingDelegate);
     SuccessOrExit(err);
 
     deviceController->AppState = (void *) env->NewGlobalRef(self);
@@ -527,6 +529,23 @@ JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong deviceContro
         return JNI_TRUE;
     }
     return JNI_FALSE;
+}
+
+JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
+{
+    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+
+    chip::Inet::IPAddress addr;
+    char addrStr[50];
+
+    {
+        ScopedPthreadLock lock(&sStackLock);
+        if (!deviceController->GetIpAddress(addr))
+            return nullptr;
+    }
+
+    addr.ToString(addrStr, sizeof(addrStr));
+    return env->NewStringUTF(addrStr);
 }
 
 JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr)

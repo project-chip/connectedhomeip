@@ -33,6 +33,12 @@
     <string name="rendezvous_over_ble_btn_text">Rendezvous over BLE</string>
     <string name="rendezvous_over_soft_ap_btn_text">Rendezvous over Soft AP</string>
 
+    <string name="rendezvous_over_ble_scanning_text">Scanning for BLE device</string>
+    <string name="rendezvous_over_ble_scanning_failed_text">Device not found</string>
+    <string name="rendezvous_over_ble_connecting_text">Connecting to</string>
+    <string name="rendezvous_over_ble_pairing_text">Pairing</string>
+    <string name="rendezvous_over_ble_success_text">Secure channel established. Provisioning</string>
+
     <string name="commissioner_commissioning">Commissioning</string>
     <string name="commissioner_name">Commissioner</string>
     <string name="commissioner_scan_device">Scan Device</string>

@@ -68,6 +68,10 @@ public class ChipDeviceController {
     return isConnected(deviceControllerPtr);
   }
 
+  public String getIpAddress() {
+    return getIpAddress(deviceControllerPtr);
+  }
+
   public void beginSendMessage(String message) {
     beginSendMessage(deviceControllerPtr, message);
   }
@@ -147,6 +151,8 @@ public class ChipDeviceController {
   private native void beginConnectDeviceIp(long deviceControllerPtr, String ipAddress);
 
   private native boolean isConnected(long deviceControllerPtr);
+
+  private native String getIpAddress(long deviceControllerPtr);
 
   private native void beginSendMessage(long deviceControllerPtr, String message);
 
