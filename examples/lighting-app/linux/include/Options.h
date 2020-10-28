@@ -32,7 +32,6 @@ struct LinuxDeviceOptions
 {
     uint32_t mBleDevice = 0;
 
-    LinuxDeviceOptions() {}
     static LinuxDeviceOptions & GetInstance();
 };
 
