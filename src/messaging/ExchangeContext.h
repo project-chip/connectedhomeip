@@ -244,7 +244,7 @@ private:
     bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     void SetInitiator(bool inInitiator);
-    void SetPeerNodeId(uint64_t nodeId) { mPeerNodeId = nodeId; }
+    void SetPeerNodeId(NodeId nodeId) { mPeerNodeId = nodeId; }
     void SetExchangeId(uint16_t exId) { mExchangeId = exId; }
     void SetExchangeMgr(ExchangeManager * exMgr) { mExchangeMgr = exMgr; }
     void SetAppState(void * state) { mAppState = state; }
