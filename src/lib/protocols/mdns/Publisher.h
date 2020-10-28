@@ -38,7 +38,7 @@ public:
     /**
      * This method publishes the device on mDNS.
      *
-     * This fucntion will fetch device name and other information and publish them
+     * This function will fetch device name and other information and publish them
      * via mDNS. If device meta data has changed, you can call this function again
      * to update the information.
      *
@@ -57,10 +57,16 @@ private:
     Publisher(const Publisher &) = delete;
     Publisher & operator=(const Publisher &) = delete;
 
+    CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::InterfaceId interface);
+    CHIP_ERROR PublishProvisionedDevice(chip::Inet::InterfaceId interface);
+    CHIP_ERROR SetupHostname();
+
     static void HandleMdnsInit(void * context, CHIP_ERROR initError);
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
 
-    bool mInitialized = false;
+    uint64_t mUnprovisionedInstanceName;
+    bool mInitialized                   = false;
+    bool mIsPublishingProvisionedDevice = false;
 };
 
 } // namespace Mdns

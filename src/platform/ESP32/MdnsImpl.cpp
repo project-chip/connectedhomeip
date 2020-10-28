@@ -42,14 +42,8 @@ CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCal
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     esp_err_t espError;
-    uint16_t discriminator;
-    char hostname[11]; // Hostname will be "CHIP-XXXX"
 
     espError = mdns_init();
-    VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
-    SuccessOrExit(error = DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
-    snprintf(hostname, sizeof(hostname), "CHIP-%04d", discriminator);
-    espError = mdns_hostname_set(hostname);
     VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
 
 exit:
@@ -67,6 +61,11 @@ static const char * GetProtocolString(MdnsServiceProtocol protocol)
     return protocol == MdnsServiceProtocol::kMdnsProtocolTcp ? "_tcp" : "_udp";
 }
 
+CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
+{
+    return mdns_hostname_set(hostname) == ESP_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
+}
+
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
 {
     CHIP_ERROR error        = CHIP_NO_ERROR;
@@ -81,7 +80,7 @@ CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)
         for (size_t i = 0; i < service->mTextEntrySize; i++)
         {
             items[i].key = service->mTextEntryies[i].mKey;
-            // Unfortunately ESP mdns stack dosen't support arbitrary binary data
+            // Unfortunately ESP mdns stack doesn't support arbitrary binary data
             items[i].value = reinterpret_cast<const char *>(service->mTextEntryies[i].mData);
         }
     }
@@ -110,128 +109,16 @@ CHIP_ERROR ChipMdnsStopPublish()
     return mdns_service_remove_all() == ESP_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
-CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip::Inet::InterfaceId interface,
-                          MdnsBrowseCallback callback, void * context)
+CHIP_ERROR ChipMdnsBrowse(const char * /*type*/, MdnsServiceProtocol /*protocol*/, chip::Inet::InterfaceId /*interface*/,
+                          MdnsBrowseCallback /*callback*/, void * /*context*/)
 {
-    mdns_result_t * results = nullptr;
-    mdns_result_t * current;
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    esp_err_t espError;
-    MdnsService * services = nullptr;
-    TextEntry * textEntries;
-    size_t serviceSize = 0;
-
-    espError = mdns_query_ptr(type, GetProtocolString(protocol), kTimeoutMilli, kMaxResults, &results);
-    VerifyOrExit(espError == ESP_OK, error = CHIP_ERROR_INTERNAL);
-    if (results == nullptr)
-    {
-        ChipLogProgress(DeviceLayer, "ChipMdnsBrowse: No result");
-        callback(context, nullptr, 0, CHIP_NO_ERROR);
-    }
-    else
-    {
-        current = results;
-        while (current != nullptr)
-        {
-            serviceSize++;
-            current = current->next;
-        }
-        ChipLogProgress(DeviceLayer, "Service size=%zu", serviceSize);
-        services = static_cast<MdnsService *>(chip::Platform::MemoryCalloc(serviceSize, sizeof(MdnsService)));
-        VerifyOrExit(services != nullptr, error = CHIP_ERROR_NO_MEMORY);
-        current = results;
-
-        for (size_t i = 0; i < serviceSize; i++, current = current->next)
-        {
-            mdns_ip_addr_t * addr          = current->addr;
-            mdns_ip_addr_t * preferredAddr = addr;
-
-            while (addr != nullptr)
-            {
-                if (addr->addr.type == ESP_IPADDR_TYPE_V6)
-                {
-                    preferredAddr = addr;
-
-                    break;
-                }
-                addr = addr->next;
-            }
-            if (preferredAddr && preferredAddr->addr.type == ESP_IPADDR_TYPE_V6)
-            {
-                ip6_addr_t addrBinary;
-
-                memcpy(&addrBinary, &preferredAddr->addr.u_addr.ip6, sizeof(addrBinary));
-                services[i].mAddress.SetValue(chip::Inet::IPAddress::FromIPv6(addrBinary));
-            }
-            else if (preferredAddr && preferredAddr->addr.type == ESP_IPADDR_TYPE_V4)
-            {
-                ip4_addr_t addrBinary;
-
-                memcpy(&addrBinary, &preferredAddr->addr.u_addr.ip4, sizeof(addrBinary));
-                services[i].mAddress.SetValue(chip::Inet::IPAddress::FromIPv4(addrBinary));
-            }
-            if (current->instance_name)
-            {
-                strncpy(services[i].mName, current->instance_name, sizeof(services[i].mName));
-            }
-            services[i].mPort     = current->port;
-            services[i].mProtocol = protocol;
-            strncpy(services[i].mType, type, sizeof(services[i].mType));
-        }
-        ChipLogProgress(DeviceLayer, "Call callback");
-        callback(context, services, serviceSize, CHIP_NO_ERROR);
-    }
-
-exit:
-    if (services != nullptr)
-    {
-        chip::Platform::MemoryFree(services);
-    }
-    if (results != nullptr)
-    {
-        mdns_query_results_free(results);
-    }
-
-    return error;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
-CHIP_ERROR ChipMdnsResolve(MdnsService * service, chip::Inet::InterfaceId interface, MdnsResolveCallback callback, void * context)
+CHIP_ERROR ChipMdnsResolve(MdnsService * /*service*/, chip::Inet::InterfaceId /*interface*/, MdnsResolveCallback /*callback*/,
+                           void * /*context*/)
 {
-    CHIP_ERROR error           = CHIP_NO_ERROR;
-    mdns_result_t * textResult = nullptr;
-    TextEntry * textEntries;
-    esp_err_t espError;
-
-    VerifyOrExit(service != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    espError = mdns_query_txt(service->mName, service->mType, GetProtocolString(service->mProtocol), kTimeoutMilli, &textResult);
-    VerifyOrExit(espError == ESP_OK && textResult != nullptr, error = CHIP_ERROR_INTERNAL);
-
-    if (textResult->txt_count > 0)
-    {
-        textEntries = static_cast<TextEntry *>(chip::Platform::MemoryCalloc(textResult->txt_count, sizeof(TextEntry)));
-        for (size_t i = 0; i < textResult->txt_count; i++)
-        {
-            textEntries[i].mKey      = textResult->txt[i].key;
-            textEntries[i].mData     = reinterpret_cast<const uint8_t *>(textResult->txt[i].value);
-            textEntries[i].mDataSize = strlen(textResult->txt[i].value);
-        }
-        service->mTextEntryies = textEntries;
-    }
-    service->mTextEntrySize = textResult->txt_count;
-
-    callback(context, service, error);
-
-exit:
-    if (textEntries != nullptr)
-    {
-        chip::Platform::MemoryFree(textEntries);
-    }
-    if (textResult != nullptr)
-    {
-        mdns_query_results_free(textResult);
-    }
-
-    return error;
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 }
 
 } // namespace Mdns

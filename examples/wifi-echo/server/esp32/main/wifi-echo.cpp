@@ -529,6 +529,7 @@ extern "C" void app_main()
 
     SetupPretendDevices();
     publisher.Init();
+    publisher.StopPublishDevice();
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
     // Our second LED doesn't map to any physical LEDs so far, just to virtual

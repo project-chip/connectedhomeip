@@ -29,5 +29,3 @@ extern BluetoothWidget bluetoothLED;
 extern WiFiWidget wifiLED;
 extern chip::Protocols::Mdns::Publisher publisher;
 extern const chip::NodeId kLocalNodeId;
-
-
