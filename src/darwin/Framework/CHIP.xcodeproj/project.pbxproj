@@ -399,7 +399,7 @@
 		BA09EB742474881D00605257 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CHIP_ROOT = "$(SRCROOT)/../../..";
+				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
@@ -525,7 +525,7 @@
 		BA09EB782474882200605257 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				CHIP_ROOT = "$(SRCROOT)/../../..";
+				CHIP_ROOT = "$(PROJECT_DIR)/../../..";
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
 				DEVELOPMENT_TEAM = "";
