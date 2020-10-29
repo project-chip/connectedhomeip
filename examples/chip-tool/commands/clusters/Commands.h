@@ -489,6 +489,7 @@ public:
     BarrierControlGoToPercent() : ModelCommand("go-to-percent", kBarrierControlClusterId, 0x00)
     {
         AddArgument("percentOpen", 0, UINT8_MAX, &mPercentOpen);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -513,7 +514,7 @@ private:
 class BarrierControlStop : public ModelCommand
 {
 public:
-    BarrierControlStop() : ModelCommand("stop", kBarrierControlClusterId, 0x01) {}
+    BarrierControlStop() : ModelCommand("stop", kBarrierControlClusterId, 0x01) { ModelCommand::AddArguments(); }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -537,6 +538,7 @@ public:
     ReadBarrierControlMovingState() : ModelCommand("read", kBarrierControlClusterId, 0x00)
     {
         AddArgument("attr-name", "moving-state");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -561,6 +563,7 @@ public:
     ReadBarrierControlSafetyStatus() : ModelCommand("read", kBarrierControlClusterId, 0x00)
     {
         AddArgument("attr-name", "safety-status");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -585,6 +588,7 @@ public:
     ReadBarrierControlCapabilities() : ModelCommand("read", kBarrierControlClusterId, 0x00)
     {
         AddArgument("attr-name", "capabilities");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -609,6 +613,7 @@ public:
     ReadBarrierControlBarrierPosition() : ModelCommand("read", kBarrierControlClusterId, 0x00)
     {
         AddArgument("attr-name", "barrier-position");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -644,7 +649,10 @@ public:
 class BasicResetToFactoryDefaults : public ModelCommand
 {
 public:
-    BasicResetToFactoryDefaults() : ModelCommand("reset-to-factory-defaults", kBasicClusterId, 0x00) {}
+    BasicResetToFactoryDefaults() : ModelCommand("reset-to-factory-defaults", kBasicClusterId, 0x00)
+    {
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -665,7 +673,11 @@ public:
 class ReadBasicZCLVersion : public ModelCommand
 {
 public:
-    ReadBasicZCLVersion() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "zclversion"); }
+    ReadBasicZCLVersion() : ModelCommand("read", kBasicClusterId, 0x00)
+    {
+        AddArgument("attr-name", "zclversion");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -686,7 +698,11 @@ public:
 class ReadBasicPowerSource : public ModelCommand
 {
 public:
-    ReadBasicPowerSource() : ModelCommand("read", kBasicClusterId, 0x00) { AddArgument("attr-name", "power-source"); }
+    ReadBasicPowerSource() : ModelCommand("read", kBasicClusterId, 0x00)
+    {
+        AddArgument("attr-name", "power-source");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -777,6 +793,7 @@ public:
         AddArgument("rateY", INT16_MIN, INT16_MAX, &mRateY);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -813,6 +830,7 @@ public:
         AddArgument("colorTemperatureMaximumMireds", 0, UINT16_MAX, &mColorTemperatureMaximumMireds);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -850,6 +868,7 @@ public:
         AddArgument("rate", 0, UINT8_MAX, &mRate);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -884,6 +903,7 @@ public:
         AddArgument("rate", 0, UINT8_MAX, &mRate);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -919,6 +939,7 @@ public:
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -954,6 +975,7 @@ public:
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -989,6 +1011,7 @@ public:
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1025,6 +1048,7 @@ public:
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1060,6 +1084,7 @@ public:
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1095,6 +1120,7 @@ public:
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1133,6 +1159,7 @@ public:
         AddArgument("colorTemperatureMaximumMireds", 0, UINT16_MAX, &mColorTemperatureMaximumMireds);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1172,6 +1199,7 @@ public:
         AddArgument("transitionTime", 0, UINT8_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1208,6 +1236,7 @@ public:
         AddArgument("transitionTime", 0, UINT8_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1241,6 +1270,7 @@ public:
     {
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1267,7 +1297,11 @@ private:
 class ReadColorControlCurrentHue : public ModelCommand
 {
 public:
-    ReadColorControlCurrentHue() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "current-hue"); }
+    ReadColorControlCurrentHue() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "current-hue");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1291,6 +1325,7 @@ public:
     ReadColorControlCurrentSaturation() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "current-saturation");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1315,6 +1350,7 @@ public:
     ReadColorControlRemainingTime() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "remaining-time");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1336,7 +1372,11 @@ public:
 class ReadColorControlCurrentX : public ModelCommand
 {
 public:
-    ReadColorControlCurrentX() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "current-x"); }
+    ReadColorControlCurrentX() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "current-x");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1357,7 +1397,11 @@ public:
 class ReadColorControlCurrentY : public ModelCommand
 {
 public:
-    ReadColorControlCurrentY() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "current-y"); }
+    ReadColorControlCurrentY() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "current-y");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1381,6 +1425,7 @@ public:
     ReadColorControlColorTemperatureMireds() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "color-temperature-mireds");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1402,7 +1447,11 @@ public:
 class ReadColorControlColorMode : public ModelCommand
 {
 public:
-    ReadColorControlColorMode() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "color-mode"); }
+    ReadColorControlColorMode() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "color-mode");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1423,7 +1472,11 @@ public:
 class ReadColorControlOptions : public ModelCommand
 {
 public:
-    ReadColorControlOptions() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "options"); }
+    ReadColorControlOptions() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "options");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1447,6 +1500,7 @@ public:
     ReadColorControlNumberOfPrimaries() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "number-of-primaries");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1468,7 +1522,11 @@ public:
 class ReadColorControlPrimary1X : public ModelCommand
 {
 public:
-    ReadColorControlPrimary1X() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary1-x"); }
+    ReadColorControlPrimary1X() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary1-x");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1489,7 +1547,11 @@ public:
 class ReadColorControlPrimary1Y : public ModelCommand
 {
 public:
-    ReadColorControlPrimary1Y() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary1-y"); }
+    ReadColorControlPrimary1Y() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary1-y");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1513,6 +1575,7 @@ public:
     ReadColorControlPrimary1Intensity() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "primary1-intensity");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1534,7 +1597,11 @@ public:
 class ReadColorControlPrimary2X : public ModelCommand
 {
 public:
-    ReadColorControlPrimary2X() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary2-x"); }
+    ReadColorControlPrimary2X() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary2-x");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1555,7 +1622,11 @@ public:
 class ReadColorControlPrimary2Y : public ModelCommand
 {
 public:
-    ReadColorControlPrimary2Y() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary2-y"); }
+    ReadColorControlPrimary2Y() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary2-y");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1579,6 +1650,7 @@ public:
     ReadColorControlPrimary2Intensity() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "primary2-intensity");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1600,7 +1672,11 @@ public:
 class ReadColorControlPrimary3X : public ModelCommand
 {
 public:
-    ReadColorControlPrimary3X() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary3-x"); }
+    ReadColorControlPrimary3X() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary3-x");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1621,7 +1697,11 @@ public:
 class ReadColorControlPrimary3Y : public ModelCommand
 {
 public:
-    ReadColorControlPrimary3Y() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary3-y"); }
+    ReadColorControlPrimary3Y() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary3-y");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1645,6 +1725,7 @@ public:
     ReadColorControlPrimary3Intensity() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "primary3-intensity");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1666,7 +1747,11 @@ public:
 class ReadColorControlPrimary4X : public ModelCommand
 {
 public:
-    ReadColorControlPrimary4X() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary4-x"); }
+    ReadColorControlPrimary4X() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary4-x");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1687,7 +1772,11 @@ public:
 class ReadColorControlPrimary4Y : public ModelCommand
 {
 public:
-    ReadColorControlPrimary4Y() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary4-y"); }
+    ReadColorControlPrimary4Y() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary4-y");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1711,6 +1800,7 @@ public:
     ReadColorControlPrimary4Intensity() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "primary4-intensity");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1732,7 +1822,11 @@ public:
 class ReadColorControlPrimary5X : public ModelCommand
 {
 public:
-    ReadColorControlPrimary5X() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary5-x"); }
+    ReadColorControlPrimary5X() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary5-x");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1753,7 +1847,11 @@ public:
 class ReadColorControlPrimary5Y : public ModelCommand
 {
 public:
-    ReadColorControlPrimary5Y() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary5-y"); }
+    ReadColorControlPrimary5Y() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary5-y");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1777,6 +1875,7 @@ public:
     ReadColorControlPrimary5Intensity() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "primary5-intensity");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1798,7 +1897,11 @@ public:
 class ReadColorControlPrimary6X : public ModelCommand
 {
 public:
-    ReadColorControlPrimary6X() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary6-x"); }
+    ReadColorControlPrimary6X() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary6-x");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1819,7 +1922,11 @@ public:
 class ReadColorControlPrimary6Y : public ModelCommand
 {
 public:
-    ReadColorControlPrimary6Y() : ModelCommand("read", kColorControlClusterId, 0x00) { AddArgument("attr-name", "primary6-y"); }
+    ReadColorControlPrimary6Y() : ModelCommand("read", kColorControlClusterId, 0x00)
+    {
+        AddArgument("attr-name", "primary6-y");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -1843,6 +1950,7 @@ public:
     ReadColorControlPrimary6Intensity() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "primary6-intensity");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1867,6 +1975,7 @@ public:
     ReadColorControlEnhancedCurrentHue() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "enhanced-current-hue");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1891,6 +2000,7 @@ public:
     ReadColorControlEnhancedColorMode() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "enhanced-color-mode");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1915,6 +2025,7 @@ public:
     ReadColorControlColorLoopActive() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "color-loop-active");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1939,6 +2050,7 @@ public:
     ReadColorControlColorLoopDirection() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "color-loop-direction");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1963,6 +2075,7 @@ public:
     ReadColorControlColorLoopTime() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "color-loop-time");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -1987,6 +2100,7 @@ public:
     ReadColorControlColorLoopStartEnhancedHue() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "color-loop-start-enhanced-hue");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2011,6 +2125,7 @@ public:
     ReadColorControlColorLoopStoredEnhancedHue() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "color-loop-stored-enhanced-hue");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2035,6 +2150,7 @@ public:
     ReadColorControlColorCapabilities() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "color-capabilities");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2059,6 +2175,7 @@ public:
     ReadColorControlColorTempPhysicalMinMireds() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "color-temp-physical-min-mireds");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2083,6 +2200,7 @@ public:
     ReadColorControlColorTempPhysicalMaxMireds() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "color-temp-physical-max-mireds");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2107,6 +2225,7 @@ public:
     ReadColorControlCoupleColorTempToLevelMinMireds() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "couple-color-temp-to-level-min-mireds");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2131,6 +2250,7 @@ public:
     ReadColorControlStartUpColorTemperatureMireds() : ModelCommand("read", kColorControlClusterId, 0x00)
     {
         AddArgument("attr-name", "start-up-color-temperature-mireds");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2705,7 +2825,7 @@ public:
 class DoorLockClearAllPINCodes : public ModelCommand
 {
 public:
-    DoorLockClearAllPINCodes() : ModelCommand("clear-all-pincodes", kDoorLockClusterId, 0x08) {}
+    DoorLockClearAllPINCodes() : ModelCommand("clear-all-pincodes", kDoorLockClusterId, 0x08) { ModelCommand::AddArguments(); }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -2733,7 +2853,7 @@ public:
 class DoorLockClearAllRFIDCodes : public ModelCommand
 {
 public:
-    DoorLockClearAllRFIDCodes() : ModelCommand("clear-all-rfidcodes", kDoorLockClusterId, 0x19) {}
+    DoorLockClearAllRFIDCodes() : ModelCommand("clear-all-rfidcodes", kDoorLockClusterId, 0x19) { ModelCommand::AddArguments(); }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -2764,6 +2884,7 @@ public:
     DoorLockClearHolidaySchedule() : ModelCommand("clear-holiday-schedule", kDoorLockClusterId, 0x13)
     {
         AddArgument("holidayScheduleID", 0, UINT8_MAX, &mHolidayScheduleID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2798,6 +2919,7 @@ public:
     DoorLockClearPINCode() : ModelCommand("clear-pincode", kDoorLockClusterId, 0x07)
     {
         AddArgument("userID", 0, UINT16_MAX, &mUserID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2832,6 +2954,7 @@ public:
     DoorLockClearRFIDCode() : ModelCommand("clear-rfidcode", kDoorLockClusterId, 0x18)
     {
         AddArgument("userID", 0, UINT16_MAX, &mUserID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2867,6 +2990,7 @@ public:
     {
         AddArgument("scheduleID", 0, UINT8_MAX, &mScheduleID);
         AddArgument("userID", 0, UINT16_MAX, &mUserID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2903,6 +3027,7 @@ public:
     {
         AddArgument("scheduleID", 0, UINT8_MAX, &mScheduleID);
         AddArgument("userID", 0, UINT16_MAX, &mUserID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2938,6 +3063,7 @@ public:
     DoorLockGetHolidaySchedule() : ModelCommand("get-holiday-schedule", kDoorLockClusterId, 0x12)
     {
         AddArgument("holidayScheduleID", 0, UINT8_MAX, &mHolidayScheduleID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -2972,6 +3098,7 @@ public:
     DoorLockGetLogRecord() : ModelCommand("get-log-record", kDoorLockClusterId, 0x04)
     {
         AddArgument("logIndex", 0, UINT16_MAX, &mLogIndex);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3003,7 +3130,11 @@ private:
 class DoorLockGetPINCode : public ModelCommand
 {
 public:
-    DoorLockGetPINCode() : ModelCommand("get-pincode", kDoorLockClusterId, 0x06) { AddArgument("userID", 0, UINT16_MAX, &mUserID); }
+    DoorLockGetPINCode() : ModelCommand("get-pincode", kDoorLockClusterId, 0x06)
+    {
+        AddArgument("userID", 0, UINT16_MAX, &mUserID);
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3037,6 +3168,7 @@ public:
     DoorLockGetRFIDCode() : ModelCommand("get-rfidcode", kDoorLockClusterId, 0x17)
     {
         AddArgument("userID", 0, UINT16_MAX, &mUserID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3071,6 +3203,7 @@ public:
     DoorLockGetUserType() : ModelCommand("get-user-type", kDoorLockClusterId, 0x15)
     {
         AddArgument("userID", 0, UINT16_MAX, &mUserID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3106,6 +3239,7 @@ public:
     {
         AddArgument("scheduleID", 0, UINT8_MAX, &mScheduleID);
         AddArgument("userID", 0, UINT16_MAX, &mUserID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3142,6 +3276,7 @@ public:
     {
         AddArgument("scheduleID", 0, UINT8_MAX, &mScheduleID);
         AddArgument("userID", 0, UINT16_MAX, &mUserID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3174,7 +3309,11 @@ private:
 class DoorLockLockDoor : public ModelCommand
 {
 public:
-    DoorLockLockDoor() : ModelCommand("lock-door", kDoorLockClusterId, 0x00) { AddArgument("pINOrRFIDCode", &mPINOrRFIDCode); }
+    DoorLockLockDoor() : ModelCommand("lock-door", kDoorLockClusterId, 0x00)
+    {
+        AddArgument("pINOrRFIDCode", &mPINOrRFIDCode);
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3211,6 +3350,7 @@ public:
         AddArgument("localStartTime", 0, UINT32_MAX, &mLocalStartTime);
         AddArgument("localEndTime", 0, UINT32_MAX, &mLocalEndTime);
         AddArgument("operatingModeDuringHoliday", 0, UINT8_MAX, &mOperatingModeDuringHoliday);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3252,6 +3392,7 @@ public:
         AddArgument("userStatus", 0, UINT8_MAX, &mUserStatus);
         AddArgument("userType", 0, UINT8_MAX, &mUserType);
         AddArgument("pIN", &mPIN);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3293,6 +3434,7 @@ public:
         AddArgument("userStatus", 0, UINT8_MAX, &mUserStatus);
         AddArgument("userType", 0, UINT8_MAX, &mUserType);
         AddArgument("rFIDCode", &mRFIDCode);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3332,6 +3474,7 @@ public:
     {
         AddArgument("userID", 0, UINT16_MAX, &mUserID);
         AddArgument("userType", 0, UINT8_MAX, &mUserType);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3373,6 +3516,7 @@ public:
         AddArgument("startMinute", 0, UINT8_MAX, &mStartMinute);
         AddArgument("endHour", 0, UINT8_MAX, &mEndHour);
         AddArgument("endMinute", 0, UINT8_MAX, &mEndMinute);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3417,6 +3561,7 @@ public:
         AddArgument("userID", 0, UINT16_MAX, &mUserID);
         AddArgument("localStartTime", 0, UINT32_MAX, &mLocalStartTime);
         AddArgument("localEndTime", 0, UINT32_MAX, &mLocalEndTime);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3452,7 +3597,11 @@ private:
 class DoorLockUnlockDoor : public ModelCommand
 {
 public:
-    DoorLockUnlockDoor() : ModelCommand("unlock-door", kDoorLockClusterId, 0x01) { AddArgument("pINOrRFIDCode", &mPINOrRFIDCode); }
+    DoorLockUnlockDoor() : ModelCommand("unlock-door", kDoorLockClusterId, 0x01)
+    {
+        AddArgument("pINOrRFIDCode", &mPINOrRFIDCode);
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3487,6 +3636,7 @@ public:
     {
         AddArgument("timeoutInSeconds", 0, UINT16_MAX, &mTimeoutInSeconds);
         AddArgument("pINOrRFIDCode", &mPINOrRFIDCode);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3520,7 +3670,11 @@ private:
 class ReadDoorLockLockState : public ModelCommand
 {
 public:
-    ReadDoorLockLockState() : ModelCommand("read", kDoorLockClusterId, 0x00) { AddArgument("attr-name", "lock-state"); }
+    ReadDoorLockLockState() : ModelCommand("read", kDoorLockClusterId, 0x00)
+    {
+        AddArgument("attr-name", "lock-state");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3541,7 +3695,11 @@ public:
 class ReadDoorLockLockType : public ModelCommand
 {
 public:
-    ReadDoorLockLockType() : ModelCommand("read", kDoorLockClusterId, 0x00) { AddArgument("attr-name", "lock-type"); }
+    ReadDoorLockLockType() : ModelCommand("read", kDoorLockClusterId, 0x00)
+    {
+        AddArgument("attr-name", "lock-type");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3562,7 +3720,11 @@ public:
 class ReadDoorLockActuatorEnabled : public ModelCommand
 {
 public:
-    ReadDoorLockActuatorEnabled() : ModelCommand("read", kDoorLockClusterId, 0x00) { AddArgument("attr-name", "actuator-enabled"); }
+    ReadDoorLockActuatorEnabled() : ModelCommand("read", kDoorLockClusterId, 0x00)
+    {
+        AddArgument("attr-name", "actuator-enabled");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3705,6 +3867,7 @@ public:
     {
         AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
         AddArgument("groupName", &mGroupName);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3741,6 +3904,7 @@ public:
     {
         AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
         AddArgument("groupName", &mGroupName);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3772,6 +3936,7 @@ public:
         // groupList is an array, but since chip-tool does not support variable
         // number of arguments, only a single instance is supported.
         AddArgument("groupList", 0, UINT16_MAX, &mGroupList);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3804,7 +3969,7 @@ private:
 class GroupsRemoveAllGroups : public ModelCommand
 {
 public:
-    GroupsRemoveAllGroups() : ModelCommand("remove-all-groups", kGroupsClusterId, 0x04) {}
+    GroupsRemoveAllGroups() : ModelCommand("remove-all-groups", kGroupsClusterId, 0x04) { ModelCommand::AddArguments(); }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3825,7 +3990,11 @@ public:
 class GroupsRemoveGroup : public ModelCommand
 {
 public:
-    GroupsRemoveGroup() : ModelCommand("remove-group", kGroupsClusterId, 0x03) { AddArgument("groupId", 0, UINT16_MAX, &mGroupId); }
+    GroupsRemoveGroup() : ModelCommand("remove-group", kGroupsClusterId, 0x03)
+    {
+        AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3856,7 +4025,11 @@ private:
 class GroupsViewGroup : public ModelCommand
 {
 public:
-    GroupsViewGroup() : ModelCommand("view-group", kGroupsClusterId, 0x01) { AddArgument("groupId", 0, UINT16_MAX, &mGroupId); }
+    GroupsViewGroup() : ModelCommand("view-group", kGroupsClusterId, 0x01)
+    {
+        AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3887,7 +4060,11 @@ private:
 class ReadGroupsNameSupport : public ModelCommand
 {
 public:
-    ReadGroupsNameSupport() : ModelCommand("read", kGroupsClusterId, 0x00) { AddArgument("attr-name", "name-support"); }
+    ReadGroupsNameSupport() : ModelCommand("read", kGroupsClusterId, 0x00)
+    {
+        AddArgument("attr-name", "name-support");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3944,6 +4121,7 @@ public:
     IdentifyIdentify() : ModelCommand("identify", kIdentifyClusterId, 0x00)
     {
         AddArgument("identifyTime", 0, UINT16_MAX, &mIdentifyTime);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -3968,7 +4146,7 @@ private:
 class IdentifyIdentifyQuery : public ModelCommand
 {
 public:
-    IdentifyIdentifyQuery() : ModelCommand("identify-query", kIdentifyClusterId, 0x01) {}
+    IdentifyIdentifyQuery() : ModelCommand("identify-query", kIdentifyClusterId, 0x01) { ModelCommand::AddArguments(); }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -3996,7 +4174,11 @@ public:
 class ReadIdentifyIdentifyTime : public ModelCommand
 {
 public:
-    ReadIdentifyIdentifyTime() : ModelCommand("read", kIdentifyClusterId, 0x00) { AddArgument("attr-name", "identify-time"); }
+    ReadIdentifyIdentifyTime() : ModelCommand("read", kIdentifyClusterId, 0x00)
+    {
+        AddArgument("attr-name", "identify-time");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -4043,6 +4225,7 @@ public:
         AddArgument("rate", 0, UINT8_MAX, &mRate);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4077,6 +4260,7 @@ public:
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4111,6 +4295,7 @@ public:
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4145,6 +4330,7 @@ public:
         AddArgument("rate", 0, UINT8_MAX, &mRate);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4180,6 +4366,7 @@ public:
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4216,6 +4403,7 @@ public:
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4249,6 +4437,7 @@ public:
     {
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4278,6 +4467,7 @@ public:
     {
         AddArgument("optionsMask", 0, UINT8_MAX, &mOptionsMask);
         AddArgument("optionsOverride", 0, UINT8_MAX, &mOptionsOverride);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4303,7 +4493,11 @@ private:
 class ReadLevelCurrentLevel : public ModelCommand
 {
 public:
-    ReadLevelCurrentLevel() : ModelCommand("read", kLevelClusterId, 0x00) { AddArgument("attr-name", "current-level"); }
+    ReadLevelCurrentLevel() : ModelCommand("read", kLevelClusterId, 0x00)
+    {
+        AddArgument("attr-name", "current-level");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -4339,7 +4533,7 @@ public:
 class OnOffOff : public ModelCommand
 {
 public:
-    OnOffOff() : ModelCommand("off", kOnOffClusterId, 0x00) {}
+    OnOffOff() : ModelCommand("off", kOnOffClusterId, 0x00) { ModelCommand::AddArguments(); }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -4360,7 +4554,7 @@ public:
 class OnOffOn : public ModelCommand
 {
 public:
-    OnOffOn() : ModelCommand("on", kOnOffClusterId, 0x01) {}
+    OnOffOn() : ModelCommand("on", kOnOffClusterId, 0x01) { ModelCommand::AddArguments(); }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -4381,7 +4575,7 @@ public:
 class OnOffToggle : public ModelCommand
 {
 public:
-    OnOffToggle() : ModelCommand("toggle", kOnOffClusterId, 0x02) {}
+    OnOffToggle() : ModelCommand("toggle", kOnOffClusterId, 0x02) { ModelCommand::AddArguments(); }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -4402,7 +4596,11 @@ public:
 class ReadOnOffOnOff : public ModelCommand
 {
 public:
-    ReadOnOffOnOff() : ModelCommand("read", kOnOffClusterId, 0x00) { AddArgument("attr-name", "on-off"); }
+    ReadOnOffOnOff() : ModelCommand("read", kOnOffClusterId, 0x00)
+    {
+        AddArgument("attr-name", "on-off");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -4725,6 +4923,7 @@ public:
         // number of arguments, only a single instance is supported.
         AddArgument("clusterId", 0, UINT16_MAX, &mClusterId);
         AddArgument("extensionFieldSet", &mExtensionFieldSet);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4769,6 +4968,7 @@ public:
         AddArgument("sceneIdentifierFrom", 0, UINT8_MAX, &mSceneIdentifierFrom);
         AddArgument("groupIdentifierTo", 0, UINT16_MAX, &mGroupIdentifierTo);
         AddArgument("sceneIdentifierTo", 0, UINT8_MAX, &mSceneIdentifierTo);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4815,6 +5015,7 @@ public:
         // number of arguments, only a single instance is supported.
         AddArgument("clusterId", 0, UINT16_MAX, &mClusterId);
         AddArgument("extensionFieldSet", &mExtensionFieldSet);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4856,6 +5057,7 @@ public:
     {
         AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4891,6 +5093,7 @@ public:
     ScenesGetSceneMembership() : ModelCommand("get-scene-membership", kScenesClusterId, 0x06)
     {
         AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4927,6 +5130,7 @@ public:
         AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4956,6 +5160,7 @@ public:
     ScenesRemoveAllScenes() : ModelCommand("remove-all-scenes", kScenesClusterId, 0x03)
     {
         AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -4991,6 +5196,7 @@ public:
     {
         AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -5027,6 +5233,7 @@ public:
     {
         AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -5063,6 +5270,7 @@ public:
     {
         AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -5095,7 +5303,11 @@ private:
 class ReadScenesSceneCount : public ModelCommand
 {
 public:
-    ReadScenesSceneCount() : ModelCommand("read", kScenesClusterId, 0x00) { AddArgument("attr-name", "scene-count"); }
+    ReadScenesSceneCount() : ModelCommand("read", kScenesClusterId, 0x00)
+    {
+        AddArgument("attr-name", "scene-count");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -5116,7 +5328,11 @@ public:
 class ReadScenesCurrentScene : public ModelCommand
 {
 public:
-    ReadScenesCurrentScene() : ModelCommand("read", kScenesClusterId, 0x00) { AddArgument("attr-name", "current-scene"); }
+    ReadScenesCurrentScene() : ModelCommand("read", kScenesClusterId, 0x00)
+    {
+        AddArgument("attr-name", "current-scene");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -5137,7 +5353,11 @@ public:
 class ReadScenesCurrentGroup : public ModelCommand
 {
 public:
-    ReadScenesCurrentGroup() : ModelCommand("read", kScenesClusterId, 0x00) { AddArgument("attr-name", "current-group"); }
+    ReadScenesCurrentGroup() : ModelCommand("read", kScenesClusterId, 0x00)
+    {
+        AddArgument("attr-name", "current-group");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -5158,7 +5378,11 @@ public:
 class ReadScenesSceneValid : public ModelCommand
 {
 public:
-    ReadScenesSceneValid() : ModelCommand("read", kScenesClusterId, 0x00) { AddArgument("attr-name", "scene-valid"); }
+    ReadScenesSceneValid() : ModelCommand("read", kScenesClusterId, 0x00)
+    {
+        AddArgument("attr-name", "scene-valid");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -5179,7 +5403,11 @@ public:
 class ReadScenesNameSupport : public ModelCommand
 {
 public:
-    ReadScenesNameSupport() : ModelCommand("read", kScenesClusterId, 0x00) { AddArgument("attr-name", "name-support"); }
+    ReadScenesNameSupport() : ModelCommand("read", kScenesClusterId, 0x00)
+    {
+        AddArgument("attr-name", "name-support");
+        ModelCommand::AddArguments();
+    }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
@@ -5217,6 +5445,7 @@ public:
     ReadTemperatureMeasurementMeasuredValue() : ModelCommand("read", kTempMeasurementClusterId, 0x00)
     {
         AddArgument("attr-name", "measured-value");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -5241,6 +5470,7 @@ public:
     ReadTemperatureMeasurementMinMeasuredValue() : ModelCommand("read", kTempMeasurementClusterId, 0x00)
     {
         AddArgument("attr-name", "min-measured-value");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
@@ -5265,6 +5495,7 @@ public:
     ReadTemperatureMeasurementMaxMeasuredValue() : ModelCommand("read", kTempMeasurementClusterId, 0x00)
     {
         AddArgument("attr-name", "max-measured-value");
+        ModelCommand::AddArguments();
     }
 
     uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
