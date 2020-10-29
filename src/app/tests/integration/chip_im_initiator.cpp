@@ -31,6 +31,7 @@
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceLayer.h>
 
+#include <protocols/mcsp/MessageCounterManager.h>
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PASESession.h>
@@ -53,8 +54,8 @@ constexpr chip::Transport::AdminId gAdminId = 0;
 chip::app::CommandSender * gpCommandSender = nullptr;
 
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-
 chip::SecureSessionMgr gSessionManager;
+chip::mcsp::MessageCounterManager gMessageCounterManager;
 
 chip::Inet::IPAddress gDestAddr;
 
@@ -217,10 +218,13 @@ int main(int argc, char * argv[])
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
+    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins, &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(chip::kTestControllerNodeId, &gTransportManager, &gSessionManager);
+    SuccessOrExit(err);
+
+    err = gMessageCounterManager.Init(&gExchangeManager);
     SuccessOrExit(err);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);

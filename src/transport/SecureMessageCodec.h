@@ -50,7 +50,7 @@ namespace SecureMessageCodec {
  * @ return CHIP_ERROR  The result of the encode operation
  */
 CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, PayloadHeader & payloadHeader,
-                  PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf);
+                  PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf, MessageCounter & counter);
 
 /**
  * @brief

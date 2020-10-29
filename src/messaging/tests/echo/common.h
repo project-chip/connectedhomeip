@@ -25,12 +25,14 @@
 #pragma once
 
 #include <messaging/ExchangeMgr.h>
+#include <transport/DummyMessageCounterManager.h>
 
 constexpr size_t kMaxTcpActiveConnectionCount = 4;
 constexpr size_t kMaxTcpPendingPackets        = 4;
 constexpr size_t kNetworkSleepTimeMsecs       = (100 * 1000);
 
 extern chip::Messaging::ExchangeManager gExchangeManager;
+extern chip::Transport::DummyMessageCounterManager gMessageCounterManager;
 
 void InitializeChip(void);
 void ShutdownChip(void);

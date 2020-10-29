@@ -73,12 +73,6 @@ enum class ExFlagValues : uint8_t
     kExchangeFlag_VendorIdPresent = 0x10,
 };
 
-enum class InternalFlagValues : uint8_t
-{
-    // Header flag indicates that the peer's group key message counter is not synchronized.
-    kPeerGroupMsgIdNotSynchronized = 0x01,
-};
-
 enum class FlagValues : uint16_t
 {
     /// Header flag specifying that a destination node id is included in the header.
@@ -97,7 +91,6 @@ enum class FlagValues : uint16_t
 
 using Flags         = BitFlags<FlagValues>;
 using ExFlags       = BitFlags<ExFlagValues>;
-using InternalFlags = BitFlags<InternalFlagValues>;
 
 // Header is a 16-bit value of the form
 //  |  4 bit  | 4 bit |8 bit Security Flags|
@@ -149,23 +142,11 @@ public:
     /** Check if it's a secure session control message. */
     bool IsSecureSessionControlMsg() const { return mFlags.Has(Header::FlagValues::kSecureSessionControlMessage); }
 
-    /** Check if the peer's group key message counter is not synchronized. */
-    bool IsPeerGroupMsgIdNotSynchronized() const
-    {
-        return mInternalFlags.Has(Header::InternalFlagValues::kPeerGroupMsgIdNotSynchronized);
-    }
-
     Header::EncryptionType GetEncryptionType() const { return mEncryptionType; }
 
     PacketHeader & SetSecureSessionControlMsg(bool value)
     {
         mFlags.Set(Header::FlagValues::kSecureSessionControlMessage, value);
-        return *this;
-    }
-
-    PacketHeader & SetPeerGroupMsgIdNotSynchronized(bool value)
-    {
-        mInternalFlags.Set(Header::InternalFlagValues::kPeerGroupMsgIdNotSynchronized, value);
         return *this;
     }
 
@@ -327,9 +308,6 @@ private:
 
     /// Message flags read from the message.
     Header::Flags mFlags;
-
-    /// Message flags not encoded into the packet sent over wire.
-    Header::InternalFlags mInternalFlags;
 
     /// Represents encryption type used for encrypting current packet
     Header::EncryptionType mEncryptionType = Header::EncryptionType::kAESCCMTagLen16;

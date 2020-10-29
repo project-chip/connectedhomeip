@@ -45,13 +45,13 @@ using System::PacketBufferHandle;
 namespace SecureMessageCodec {
 
 CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, PayloadHeader & payloadHeader,
-                  PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf)
+                  PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf, MessageCounter & counter)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(!msgBuf->HasChainedBuffer(), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(msgBuf->TotalLength() < kMax_SecureSDU_Length, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    uint32_t msgId = state->GetSendMessageIndex();
+    uint32_t msgId = counter.Value();
 
     static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                   "Addition to generate payloadLength might overflow");
@@ -84,7 +84,7 @@ CHIP_ERROR Encode(NodeId localNodeId, Transport::PeerConnectionState * state, Pa
 
     ChipLogDetail(Inet, "Secure message was encrypted: Msg ID %u", msgId);
 
-    state->IncrementSendMessageIndex();
+    counter.Advance();
     return CHIP_NO_ERROR;
 }
 

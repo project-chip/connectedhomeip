@@ -1293,6 +1293,17 @@
 #endif // CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS
 
 /**
+ *  @def CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE
+ *
+ *  @brief
+ *    Max number of messages behind message window can be accepted.
+ *
+ */
+#ifndef CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE
+#define CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE            32
+#endif // CHIP_CONFIG_MESSAGE_COUNTER_WINDOW_SIZE
+
+/**
  *  @def CHIP_CONFIG_CONNECT_IP_ADDRS
  *
  *  @brief

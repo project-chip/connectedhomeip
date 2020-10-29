@@ -18,7 +18,9 @@
 
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <protocols/mcsp/MessageCounterManager.h>
 #include <transport/AdminPairingTable.h>
+#include <transport/DummyMessageCounterManager.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -39,7 +41,7 @@ public:
     {}
 
     /// Initialize the underlying layers and test suite pointer
-    CHIP_ERROR Init(nlTestSuite * suite, TransportMgrBase * transport);
+    CHIP_ERROR Init(nlTestSuite * suite, TransportMgrBase * transport, bool useDummyMessageCounter = false);
 
     // Shutdown all layers, finalize operations
     CHIP_ERROR Shutdown();
@@ -59,6 +61,10 @@ public:
 
     SecureSessionMgr & GetSecureSessionManager() { return mSecureSessionMgr; }
     Messaging::ExchangeManager & GetExchangeManager() { return mExchangeManager; }
+    mcsp::MessageCounterManager & GetMessageCounterManager() { return mMessageCounterManager; }
+
+    SecureSessionHandle GetSessionToLocal();
+    SecureSessionHandle GetSessionToPeer();
 
     Messaging::ExchangeContext * NewExchangeToPeer(Messaging::ExchangeDelegate * delegate);
     Messaging::ExchangeContext * NewExchangeToLocal(Messaging::ExchangeDelegate * delegate);
@@ -66,6 +72,8 @@ public:
 private:
     SecureSessionMgr mSecureSessionMgr;
     Messaging::ExchangeManager mExchangeManager;
+    mcsp::MessageCounterManager mMessageCounterManager;
+    Transport::DummyMessageCounterManager mDummyMessageCounterManager;
 
     Optional<Transport::PeerAddress> mPeer;
     SecurePairingUsingTestSecret mPairingPeerToLocal;
