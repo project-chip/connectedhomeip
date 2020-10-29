@@ -25,6 +25,8 @@
 
 from __future__ import absolute_import
 from __future__ import print_function
+from chip import ChipStack
+from chip import ChipDeviceCtrl
 from builtins import range
 import sys
 import os
@@ -36,6 +38,7 @@ import textwrap
 import string
 from cmd import Cmd
 from six.moves import range
+from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
 
 # Extend sys.path with one or more directories, relative to the location of the
 # running script, in which the chip package might be found .  This makes it
@@ -58,22 +61,19 @@ for relInstallDir in relChipPackageInstallDirs:
     if os.path.isdir(os.path.join(absInstallDir, "chip")):
         sys.path.insert(0, absInstallDir)
 
-from chip import ChipDeviceCtrl
-from chip import ChipStack
 
 if platform.system() == 'Darwin':
     from chip.ChipCoreBluetoothMgr import CoreBluetoothManager as BleManager
 elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
 
-from chip.ChipBleUtility import FAKE_CONN_OBJ_VALUE
-
 
 def DecodeBase64Option(option, opt, value):
     try:
         return base64.standard_b64decode(value)
     except TypeError:
-        raise OptionValueError("option %s: invalid base64 value: %r" % (opt, value))
+        raise OptionValueError(
+            "option %s: invalid base64 value: %r" % (opt, value))
 
 
 def DecodeHexIntOption(option, opt, value):
@@ -103,7 +103,8 @@ class DeviceMgrCmd(Cmd):
 
         self.devCtrl = ChipDeviceCtrl.ChipDeviceController()
 
-        self.historyFileName = os.path.expanduser("~/.chip-device-ctrl-history")
+        self.historyFileName = os.path.expanduser(
+            "~/.chip-device-ctrl-history")
 
         try:
             import readline
@@ -128,6 +129,9 @@ class DeviceMgrCmd(Cmd):
         "ble-adapter-select",
         "ble-adapter-print",
         "ble-debug-log",
+
+        "connect",
+        "set-pairing-wifi-credential",
     ]
 
     def parseline(self, line):
@@ -358,6 +362,47 @@ class DeviceMgrCmd(Cmd):
             return
 
         print("BTP Connected")
+
+    def do_connect(self, line):
+        """
+        connect (via BLE) <setup pin code>
+
+        connect command is used for establishing a rendezvous session to the device.
+        currently, only connect using setupPinCode is supported.
+
+        TODO: Add more methods to connect to device (like cert for auth, and IP
+              for connection)
+        """
+
+        try:
+            args = shlex.split(line)
+            if not args:
+                print("Usage:")
+                self.do_help("connect SetupPinCode")
+                return
+            if len(args) > 1:
+                print("Unexpected argument: " + args[1])
+                return
+            self.devCtrl.Connect(FAKE_CONN_OBJ_VALUE, int(args[0]))
+        except ChipStack.ChipStackException as ex:
+            print(str(ex))
+            return
+        print("Connected")
+
+    def do_setpairingwificredential(self, line):
+        """
+        set-pairing-wifi-credential
+
+        Set WiFi credential for pairing, will sent to device
+        """
+        try:
+            args = shlex.split(line)
+            self.devCtrl.SetWifiCredential(args[0], args[1])
+        except ChipStack.ChipStackException as ex:
+            print(str(ex))
+            return
+
+        print("WiFi credential set")
 
     def do_history(self, line):
         """

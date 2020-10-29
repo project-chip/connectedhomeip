@@ -216,6 +216,14 @@ public:
      */
     CHIP_ERROR ServiceEvents();
 
+    // ----- Pairing -----
+    /**
+     * @brief
+     * Set device pairing delegate after init, pass nullptr remove device delegate.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate);
+
     /**
      * @brief
      *   Allow the CHIP Stack to process any pending events
@@ -283,7 +291,7 @@ private:
 
     SecurePairingSession * mSecurePairingSession = nullptr;
 
-    DevicePairingDelegate * mPairingDelegate;
+    DevicePairingDelegate * mPairingDelegate = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate;
 

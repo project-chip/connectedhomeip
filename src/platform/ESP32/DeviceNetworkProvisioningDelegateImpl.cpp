@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 
 #include "DeviceNetworkProvisioningDelegateImpl.h"
@@ -25,8 +26,13 @@ namespace DeviceLayer {
 
 void DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
-    SetWiFiStationProvisioning(ssid, key);
+    err = SetWiFiStationProvisioning(ssid, key);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %s", chip::ErrorStr(err));
+    }
 }
 
 } // namespace DeviceLayer

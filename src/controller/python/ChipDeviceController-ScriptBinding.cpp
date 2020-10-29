@@ -43,7 +43,10 @@
 #include "ChipDeviceController-BlePlatformDelegate.h"
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
+#include "ChipDeviceController-ScriptDevicePairingDelegate.h"
+
 #include <controller/CHIPDeviceController.h>
+#include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
@@ -55,6 +58,13 @@ extern "C" {
 typedef void * (*GetBleEventCBFunct)(void);
 typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataLen);
 typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
+
+typedef void (*OnConnectFunct)(chip::DeviceController::ChipDeviceController * dc, chip::Transport::PeerConnectionState * state,
+                               void * appReqState);
+typedef void (*OnErrorFunct)(chip::DeviceController::ChipDeviceController * dc, void * appReqState, CHIP_ERROR err,
+                             const chip::Inet::IPPacketInfo * pi);
+typedef void (*OnMessageFunct)(chip::DeviceController::ChipDeviceController * dc, void * appReqState,
+                               chip::System::PacketBuffer * buffer);
 }
 
 enum BleEventType
@@ -155,6 +165,20 @@ CHIP_ERROR nl_Chip_DeviceController_SetBleClose(CloseBleCBFunct closeBleCB);
 
 CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl);
 CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController * devCtrl);
+
+// Rendezvous
+CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceController * devCtrl, BLE_CONNECTION_OBJECT connObj,
+                                            uint32_t setupPinCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                            OnErrorFunct onError);
+
+// Network Provisioning
+CHIP_ERROR
+nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate(chip::DeviceController::ScriptDevicePairingDelegate ** pairingDelegate);
+CHIP_ERROR
+nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
+                                                      const char * ssid, const char * password);
+CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
+                                                             chip::DeviceController::DevicePairingDelegate * pairingDelegate);
 
 #if CONFIG_NETWORK_LAYER_BLE
 CHIP_ERROR nl_Chip_DeviceController_ValidateBTP(chip::DeviceController::ChipDeviceController * devCtrl,
@@ -511,9 +535,73 @@ void nl_Chip_DeviceController_SetLogFilter(uint8_t category)
 #endif
 }
 
+CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceController * devCtrl, BLE_CONNECTION_OBJECT connObj,
+                                            uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                            OnErrorFunct onError)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::RendezvousParameters params =
+        chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetConnectionObject(connObj).SetBleLayer(&sBle);
+    err = devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR
+nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate(chip::DeviceController::ScriptDevicePairingDelegate ** pairingDelegate)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(pairingDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    *pairingDelegate = new chip::DeviceController::ScriptDevicePairingDelegate();
+
+exit:
+    if (err != CHIP_NO_ERROR && pairingDelegate != nullptr && *pairingDelegate != nullptr)
+    {
+        delete *pairingDelegate;
+        *pairingDelegate = nullptr;
+    }
+    return err;
+}
+
+CHIP_ERROR
+nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
+                                                      const char * ssid, const char * password)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(pairingDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(ssid != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(password != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    pairingDelegate->SetWifiCredential(ssid, password);
+
+exit:
+    return err;
+}
+CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
+                                                             chip::DeviceController::DevicePairingDelegate * pairingDelegate)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(devCtrl != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(pairingDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    devCtrl->SetDevicePairingDelegate(pairingDelegate);
+
+exit:
+    return err;
+}
+
 CHIP_ERROR nl_Chip_Stack_Init()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = chip::Platform::MemoryInit();
+    SuccessOrExit(err);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS && CONFIG_NETWORK_LAYER_BLE
     int flags;
@@ -540,7 +628,7 @@ CHIP_ERROR nl_Chip_Stack_Init()
 
 #if CONFIG_NETWORK_LAYER_BLE
     // Initialize the BleLayer object. For now, assume Device Controller is always a central.
-    err = sBle.Init(&sBlePlatformDelegate, &sBleApplicationDelegate, &sSystemLayer);
+    err = sBle.Init(&sBlePlatformDelegate, nullptr, &sBleApplicationDelegate, &sSystemLayer);
     SuccessOrExit(err);
 
     // Create BLE wake pipe and make it non-blocking.
