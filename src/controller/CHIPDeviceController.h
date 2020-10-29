@@ -37,8 +37,6 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
-#include <string>
-
 namespace chip {
 namespace DeviceController {
 
