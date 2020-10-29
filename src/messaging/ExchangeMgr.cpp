@@ -101,18 +101,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(const NodeId & peerNodeId, void * appState)
 {
-    ExchangeContext * ec = AllocContext();
-
-    if (ec != nullptr)
-    {
-        ec->SetExchangeId(mNextExchangeId++);
-        ec->SetPeerNodeId(peerNodeId);
-        ec->SetAppState(appState);
-        ec->SetInitiator(true);
-        ChipLogProgress(ExchangeManager, "ec id: %d, AppState: 0x%x", (ec - ContextPool + 1), ec->GetAppState());
-    }
-
-    return ec;
+    return AllocContext(mNextExchangeId++, peerNodeId, true, appState);
 }
 
 ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, void * appState, bool isInitiator)
@@ -121,7 +110,7 @@ ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, void * appStat
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
-        if (ec->GetExchangeMgr() != nullptr && ec->GetPeerNodeId() == peerNodeId && ec->GetAppState() == appState &&
+        if (ec->GetReferenceCount() > 0 && ec->GetPeerNodeId() == peerNodeId && ec->GetAppState() == appState &&
             ec->IsInitiator() == isInitiator)
             return ec;
     }
@@ -156,7 +145,7 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
 }
 
-ExchangeContext * ExchangeManager::AllocContext()
+ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState)
 {
     ExchangeContext * ec = ContextPool;
 
@@ -164,18 +153,9 @@ ExchangeContext * ExchangeManager::AllocContext()
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
-        if (ec->GetExchangeMgr() == nullptr)
+        if (ec->GetReferenceCount() == 0)
         {
-            *ec = ExchangeContext();
-            ec->SetExchangeMgr(this);
-            ec->SetRefCount(1);
-            mContextsInUse++;
-
-#if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-            ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (ec - ContextPool + 1), mContextsInUse, ec);
-#endif
-            SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
-
+            ec->Alloc(this, ExchangeId, PeerNodeId, Initiator, AppState);
             return ec;
         }
     }
@@ -195,7 +175,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     ec = ContextPool;
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
-        if (ec->GetExchangeMgr() != nullptr && ec->MatchExchange(packetHeader, payloadHeader))
+        if (ec->GetReferenceCount() > 0 && ec->MatchExchange(packetHeader, payloadHeader))
         {
             // Matched ExchangeContext; send to message handler.
             ec->HandleMessage(packetHeader, payloadHeader, msgBuf);
@@ -243,13 +223,8 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     {
         ExchangeContext::MessageReceiveFunct umhandler = nullptr;
 
-        ec = AllocContext();
+        ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false, matchingUMH->AppState);
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-        ec->SetExchangeId(payloadHeader.GetExchangeID());
-        ec->SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
-        ec->SetInitiator(false);
-        ec->SetAppState(matchingUMH->AppState);
 
         umhandler = matchingUMH->Handler;
 
@@ -327,6 +302,11 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
                                         SecureSessionMgrBase * msgLayer)
 {
     DispatchMessage(packetHeader, payloadHeader, msgBuf);
+}
+
+void ExchangeManager::IncrementContextsInUse()
+{
+    mContextsInUse++;
 }
 
 void ExchangeManager::DecrementContextsInUse()

@@ -82,12 +82,12 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     PayloadHeader payloadHeader;
 
     // Don't let method get called on a freed object.
-    VerifyOrDie(mExchangeMgr != nullptr && mRefCount != 0);
+    VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
     // we hold the exchange context here in case the entity that
     // originally generated it tries to close it as a result of
     // an error arising below. at the end, we have to close it.
-    AddRef();
+    Retain();
 
     // Set the exchange ID for this header.
     payloadHeader.SetExchangeID(mExchangeId);
@@ -141,19 +141,6 @@ exit:
     return err;
 }
 
-/**
- *  Increment the reference counter for the exchange context by one.
- *
- */
-void ExchangeContext::AddRef()
-{
-    mRefCount++;
-#if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], refCount++: %d", (this - mExchangeMgr->ContextPool + 1),
-                    mExchangeId, mRefCount);
-#endif
-}
-
 void ExchangeContext::DoClose(bool clearRetransTable)
 {
     // Clear protocol callbacks
@@ -171,7 +158,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
  */
 void ExchangeContext::Close()
 {
-    VerifyOrDie(mExchangeMgr != nullptr && mRefCount != 0);
+    VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->ContextPool + 1), mExchangeId,
@@ -188,7 +175,7 @@ void ExchangeContext::Close()
  */
 void ExchangeContext::Abort()
 {
-    VerifyOrDie(mExchangeMgr != nullptr && mRefCount != 0);
+    VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() > 0);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], %s", (this - mExchangeMgr->ContextPool + 1), mExchangeId,
@@ -199,46 +186,49 @@ void ExchangeContext::Abort()
     Release();
 }
 
-/**
- *  Release reference to this exchange context. If count is down
- *  to one then close the context, reset all protocol callbacks,
- *  and stop all timers.
- *
- */
-void ExchangeContext::Release()
+void ExchangeContext::Reset()
 {
-    VerifyOrDie(mExchangeMgr != nullptr && mRefCount != 0);
+    *this = ExchangeContext();
+}
 
-    if (mRefCount == 1)
-    {
-        // Ideally, in this scenario, the retransmit table should
-        // be clear of any outstanding messages for this context and
-        // the boolean parameter passed to DoClose() should not matter.
-        ExchangeManager * em = mExchangeMgr;
-#if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-        uint16_t tmpid = mExchangeId;
-#endif
+void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState)
+{
+    VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
-        DoClose(false);
-        mRefCount    = 0;
-        mExchangeMgr = nullptr;
-
-        em->DecrementContextsInUse();
+    Reset();
+    Retain();
+    mExchangeMgr = em;
+    em->IncrementContextsInUse();
+    mExchangeId = ExchangeId;
+    mPeerNodeId = PeerNodeId;
+    mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
+    mAppState = AppState;
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-        ChipLogProgress(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), tmpid,
-                        em->GetContextsInUse(), this);
+    ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), em->GetContextsInUse(), this);
 #endif
-        SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
-    }
-    else
-    {
-        mRefCount--;
+    SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
+
+}
+
+void ExchangeContext::Free()
+{
+    VerifyOrDie(mExchangeMgr != nullptr && GetReferenceCount() == 0);
+
+    // Ideally, in this scenario, the retransmit table should
+    // be clear of any outstanding messages for this context and
+    // the boolean parameter passed to DoClose() should not matter.
+    ExchangeManager * em = mExchangeMgr;
+
+    DoClose(false);
+    mExchangeMgr = nullptr;
+
+    em->DecrementContextsInUse();
+
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-        ChipLogProgress(ExchangeManager, "ec id: %d [%04" PRIX16 "], refCount--: %d", (this - mExchangeMgr->ContextPool + 1),
-                        mExchangeId, mRefCount);
+    ChipLogProgress(ExchangeManager, "ec-- id: %d [%04" PRIX16 "], inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), mExchangeId, em->GetContextsInUse(), this);
 #endif
-    }
+    SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
 
 bool ExchangeContext::MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader)
@@ -317,7 +307,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // guard against Close() calls(decrementing the reference
     // count) by the protocol before the CHIP Exchange
     // layer has completed its work on the ExchangeContext.
-    AddRef();
+    Retain();
 
     protocolId  = payloadHeader.GetProtocolID();
     messageType = payloadHeader.GetMessageType();
