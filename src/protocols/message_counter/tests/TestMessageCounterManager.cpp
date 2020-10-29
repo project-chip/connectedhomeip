@@ -18,17 +18,20 @@
 
 /**
  *    @file
- *      This file implements unit tests for the MessageCounterSyncMgr implementation.
+ *      This file implements unit tests for the MessageCounterManager implementation.
  */
 
-#include "TestMessagingLayer.h"
-
 #include <core/CHIPCore.h>
-#include <messaging/ReliableMessageContext.h>
-#include <messaging/ReliableMessageMgr.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
+#include <messaging/Flags.h>
+#include <messaging/tests/MessagingContext.h>
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
+#include <protocols/message_counter/MessageCounterManager.h>
 #include <support/CodeUtils.h>
+#include <support/UnitTestRegistration.h>
+#include <support/logging/CHIPLogging.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 
@@ -36,12 +39,6 @@
 #include <nlunit-test.h>
 
 #include <errno.h>
-
-#include <messaging/ExchangeContext.h>
-#include <messaging/ExchangeMgr.h>
-#include <messaging/Flags.h>
-#include <messaging/tests/MessagingContext.h>
-#include <support/logging/CHIPLogging.h>
 
 namespace {
 
@@ -54,6 +51,7 @@ using namespace chip::Protocols;
 using TestContext = chip::Test::MessagingContext;
 
 TestContext sContext;
+message_counter::MessageCounterManager gMessageCounterManager;
 
 constexpr NodeId kSourceNodeId        = 123654;
 constexpr NodeId kDestinationNodeId   = 111222333;
@@ -86,7 +84,7 @@ public:
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
-        NL_TEST_ASSERT(mSuite, msgBuf->DataLength() == kMsgCounterChallengeSize);
+        NL_TEST_ASSERT(mSuite, msgBuf->DataLength() == message_counter::MessageCounterManager::kChallengeSize);
 
         ReceiveHandlerCallCount++;
     }
@@ -110,7 +108,7 @@ public:
         NL_TEST_ASSERT(mSuite, payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq));
         NL_TEST_ASSERT(mSuite, packetHeader.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, packetHeader.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
-        NL_TEST_ASSERT(mSuite, msgBuf->DataLength() == kMsgCounterChallengeSize);
+        NL_TEST_ASSERT(mSuite, msgBuf->DataLength() == message_counter::MessageCounterManager::kChallengeSize);
 
         ec->Close();
     }
@@ -138,9 +136,6 @@ void CheckSendMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     testExchangeMgr.mSuite = inSuite;
     ctx.GetSecureSessionManager().SetDelegate(&testExchangeMgr);
 
-    MessageCounterSyncMgr * sm = ctx.GetExchangeManager().GetMessageCounterSyncMgr();
-    NL_TEST_ASSERT(inSuite, sm != nullptr);
-
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
     SecurePairingUsingTestSecret pairingLocalToPeer(kTestPeerGroupKeyId, kTestLocalGroupKeyId);
@@ -160,7 +155,7 @@ void CheckSendMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     // Should be able to send a message to itself by just calling send.
     testExchangeMgr.ReceiveHandlerCallCount = 0;
 
-    err = sm->SendMsgCounterSyncReq(session);
+    err = gMessageCounterManager.SendMsgCounterSyncReq(session, ctx.GetSecureSessionManager().GetPeerConnectionState(session));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, testExchangeMgr.ReceiveHandlerCallCount == 1);
 }
@@ -178,9 +173,6 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
     MockAppDelegate mockAppDelegate;
 
     mockAppDelegate.mSuite = inSuite;
-
-    MessageCounterSyncMgr * sm = ctx.GetExchangeManager().GetMessageCounterSyncMgr();
-    NL_TEST_ASSERT(inSuite, sm != nullptr);
 
     // Register to receive unsolicited Secure Channel Request messages from the exchange manager.
     err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandlerForProtocol(Protocols::SecureChannel::Id, &mockAppDelegate);
@@ -202,7 +194,7 @@ void CheckReceiveMsgCounterSyncReq(nlTestSuite * inSuite, void * inContext)
 
     SecureSessionHandle session(kDestinationNodeId, 0x4000, 0);
 
-    err = sm->SendMsgCounterSyncReq(session);
+    err = gMessageCounterManager.SendMsgCounterSyncReq(session, ctx.GetSecureSessionManager().GetPeerConnectionState(session));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, mockAppDelegate.IsOnMessageReceivedCalled == true);
 }
@@ -213,19 +205,12 @@ void CheckAddRetransTable(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    MockAppDelegate mockAppDelegate;
-    ExchangeContext * exchange = ctx.NewExchangeToPeer(&mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, exchange != nullptr);
-
-    MessageCounterSyncMgr * sm = ctx.GetExchangeManager().GetMessageCounterSyncMgr();
-    NL_TEST_ASSERT(inSuite, sm != nullptr);
-
+    PayloadHeader payloadHeader;
     System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    CHIP_ERROR err =
-        sm->AddToRetransmissionTable(Protocols::Echo::Id, static_cast<uint8_t>(Protocols::Echo::MsgType::EchoRequest),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone), std::move(buffer), exchange);
+    CHIP_ERROR err = gMessageCounterManager.AddToRetransmissionTable(ctx.GetSessionToPeer(), ctx.GetDestinationNodeId(),
+                                                                     payloadHeader, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -235,13 +220,14 @@ void CheckAddToReceiveTable(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    MessageCounterSyncMgr * sm = ctx.GetExchangeManager().GetMessageCounterSyncMgr();
-    NL_TEST_ASSERT(inSuite, sm != nullptr);
-
     System::PacketBufferHandle buffer = MessagePacketBuffer::NewWithData(PAYLOAD, sizeof(PAYLOAD));
     NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-    CHIP_ERROR err = sm->AddToReceiveTable(std::move(buffer));
+    PacketHeader packetHeader;
+
+    CHIP_ERROR err = gMessageCounterManager.AddToReceiveTable(
+        ctx.GetDestinationNodeId(), packetHeader, Transport::PeerAddress::UDP(ctx.GetAddress(), CHIP_PORT, INET_NULL_INTERFACEID),
+        std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -253,10 +239,10 @@ void CheckAddToReceiveTable(nlTestSuite * inSuite, void * inContext)
 // clang-format off
 const nlTest sTests[] =
 {
-    NL_TEST_DEF("Test MessageCounterSyncMgr::ReceiveMsgCounterSyncReq", CheckReceiveMsgCounterSyncReq),
-    NL_TEST_DEF("Test MessageCounterSyncMgr::SendMsgCounterSyncReq", CheckSendMsgCounterSyncReq),
-    NL_TEST_DEF("Test MessageCounterSyncMgr::AddToRetransTable", CheckAddRetransTable),
-    NL_TEST_DEF("Test MessageCounterSyncMgr::AddToReceiveTable", CheckAddToReceiveTable),
+    NL_TEST_DEF("Test MessageCounterManager::ReceiveMsgCounterSyncReq", CheckReceiveMsgCounterSyncReq),
+    NL_TEST_DEF("Test MessageCounterManager::SendMsgCounterSyncReq", CheckSendMsgCounterSyncReq),
+    NL_TEST_DEF("Test MessageCounterManager::AddToRetransTable", CheckAddRetransTable),
+    NL_TEST_DEF("Test MessageCounterManager::AddToReceiveTable", CheckAddToReceiveTable),
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -267,7 +253,7 @@ int Finalize(void * aContext);
 // clang-format off
 nlTestSuite sSuite =
 {
-    "Test-MessageCounterSyncMgr",
+    "Test-MessageCounterManager",
     &sTests[0],
     Initialize,
     Finalize
@@ -282,13 +268,21 @@ int Initialize(void * aContext)
     CHIP_ERROR err = chip::Platform::MemoryInit();
     if (err != CHIP_NO_ERROR)
         return FAILURE;
+    auto * ctx = reinterpret_cast<TestContext *>(aContext);
 
     err = gTransportMgr.Init("LOOPBACK");
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 
-    err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite, &gTransportMgr);
-    return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
+    err = ctx->Init(&sSuite, &gTransportMgr, &gMessageCounterManager);
+    if (err != CHIP_NO_ERROR)
+        return FAILURE;
+
+    err = gMessageCounterManager.Init(&ctx->GetExchangeManager());
+    if (err != CHIP_NO_ERROR)
+        return FAILURE;
+
+    return SUCCESS;
 }
 
 /**
@@ -305,10 +299,12 @@ int Finalize(void * aContext)
 /**
  *  Main
  */
-int TestMessageCounterSyncMgr()
+int TestMessageCounterManager()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, &sContext);
 
     return (nlTestRunnerStats(&sSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestMessageCounterManager);

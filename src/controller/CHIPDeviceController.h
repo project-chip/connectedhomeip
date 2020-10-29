@@ -210,6 +210,7 @@ protected:
     DeviceTransportMgr * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     Messaging::ExchangeManager * mExchangeMgr;
+    Transport::MessageCounterManagerInterface * mMessageCounterManager;
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
     System::Layer * mSystemLayer;

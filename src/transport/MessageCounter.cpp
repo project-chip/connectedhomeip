@@ -1,6 +1,6 @@
 /*
- *
- *    Copyright (c) 2021 Project CHIP Authors
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,19 +17,22 @@
 
 /**
  *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the SecureChannelMgr tests.
+ *      This file defines the CHIP message counters.
  *
  */
 
-#include "TestMessagingLayer.h"
+#include <transport/MessageCounter.h>
 
-#include <nlunit-test.h>
+#include <platform/CHIPDeviceLayer.h>
+#include <support/RandUtils.h>
 
-int main()
+namespace chip {
+
+GlobalUnencryptedMessageCounter::GlobalUnencryptedMessageCounter() : value(GetRandU32()) {}
+
+CHIP_ERROR GlobalEncryptedMessageCounter::Init()
 {
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestMessageCounterSyncMgr());
+    return persisted.Init(CHIP_CONFIG_PERSISTED_STORAGE_KEY_GLOBAL_MESSAGE_COUNTER, 1000);
 }
+
+} // namespace chip

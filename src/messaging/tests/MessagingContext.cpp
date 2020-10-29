@@ -23,7 +23,8 @@
 namespace chip {
 namespace Test {
 
-CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport)
+CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transport,
+                                  Transport::MessageCounterManagerInterface * messageCounterManagerInterface)
 {
     ReturnErrorOnFailure(IOContext::Init(suite));
 
@@ -35,7 +36,8 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     chip::Transport::AdminPairingInfo * destNodeAdmin = mAdmins.AssignAdminId(mDestAdminId, GetDestinationNodeId());
     VerifyOrReturnError(destNodeAdmin != nullptr, CHIP_ERROR_NO_MEMORY);
 
-    ReturnErrorOnFailure(mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins));
+    ReturnErrorOnFailure(
+        mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport, &mAdmins, messageCounterManagerInterface));
 
     ReturnErrorOnFailure(mExchangeManager.Init(&mSecureSessionMgr));
 
@@ -53,16 +55,26 @@ CHIP_ERROR MessagingContext::Shutdown()
     return IOContext::Shutdown();
 }
 
+SecureSessionHandle MessagingContext::GetSessionToLocal()
+{
+    return { GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() };
+}
+
+SecureSessionHandle MessagingContext::GetSessionToPeer()
+{
+    return { GetSourceNodeId(), GetLocalKeyId(), GetAdminId() };
+}
+
 Messaging::ExchangeContext * MessagingContext::NewExchangeToPeer(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext({ GetDestinationNodeId(), GetPeerKeyId(), GetAdminId() }, delegate);
+    return mExchangeManager.NewContext(GetSessionToLocal(), delegate);
 }
 
 Messaging::ExchangeContext * MessagingContext::NewExchangeToLocal(Messaging::ExchangeDelegate * delegate)
 {
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    return mExchangeManager.NewContext({ GetSourceNodeId(), GetLocalKeyId(), GetAdminId() }, delegate);
+    return mExchangeManager.NewContext(GetSessionToPeer(), delegate);
 }
 
 } // namespace Test

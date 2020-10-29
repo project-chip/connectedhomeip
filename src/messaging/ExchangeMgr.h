@@ -30,7 +30,6 @@
 #include <messaging/ChannelContext.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgrDelegate.h>
-#include <messaging/MessageCounterSync.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <support/DLLUtil.h>
@@ -204,7 +203,6 @@ public:
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
-    MessageCounterSyncMgr * GetMessageCounterSyncMgr() { return &mMessageCounterSyncMgr; };
     Transport::AdminId GetAdminId() { return mAdminId; }
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
@@ -245,7 +243,6 @@ private:
     ExchangeMgrDelegate * mDelegate;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
-    MessageCounterSyncMgr mMessageCounterSyncMgr;
 
     Transport::AdminId mAdminId = 0;
 
@@ -272,8 +269,6 @@ private:
     // TransportMgrDelegate interface for rendezvous sessions
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
                            System::PacketBufferHandle msgBuf) override;
-
-    CHIP_ERROR QueueReceivedMessageAndSync(Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf) override;
 };
 
 } // namespace Messaging
