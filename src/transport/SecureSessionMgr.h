@@ -128,6 +128,17 @@ public:
 
     /**
      * @brief
+     *   Record a new unsecure session with a peer node
+     *
+     * @details
+     *   This method sets up a new session with the peer node without
+     *   encryption.
+     */
+    CHIP_ERROR NewUnsecureSession(const Transport::PeerAddress & peerAddr, const Optional<NodeId> & nodeId,
+                                  PeerConnectionState ** state);
+
+    /**
+     * @brief
      *   Return the System Layer pointer used by current SecureSessionMgr.
      */
     System::Layer * SystemLayer() { return mSystemLayer; }

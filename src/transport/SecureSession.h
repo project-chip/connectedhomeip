@@ -41,6 +41,11 @@ public:
     SecureSession & operator=(SecureSession &&) = default;
 
     /**
+     *
+     */
+    CHIP_ERROR InitUnsecure();
+
+    /**
      * @brief
      *   Derive a shared key. The derived key will be used for encryting/decrypting
      *   data exchanged on the secure channel.
@@ -112,6 +117,8 @@ public:
      */
     size_t EncryptionOverhead();
 
+    bool IsEncrypted() { return mEncrypted; }
+
     /**
      * Clears the internal state of secure session back to the state of a new object.
      */
@@ -121,6 +128,7 @@ private:
     static constexpr size_t kAES_CCM128_Key_Length = 16;
 
     bool mKeyAvailable;
+    bool mEncrypted;
     uint8_t mKey[kAES_CCM128_Key_Length];
 
     static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);

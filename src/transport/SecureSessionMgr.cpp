@@ -102,6 +102,7 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(PayloadHeader & payloadHeader, Node
         MessageAuthenticationCode mac;
 
         const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
+        const bool encrypted      = state->GetSecureSession().IsEncrypted();
         uint16_t actualEncodedHeaderSize;
         uint16_t totalLen = 0;
         uint16_t taglen   = 0;
@@ -119,6 +120,15 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(PayloadHeader & payloadHeader, Node
             .SetEncryptionKeyID(state->GetLocalKeyID()) //
             .SetPayloadLength(static_cast<uint16_t>(payloadLength));
 
+        if (encrypted)
+        {
+            packetHeader.GetFlags().Set(Header::FlagValues::kEncrypted);
+        }
+        else
+        {
+            packetHeader.GetFlags().Clear(Header::FlagValues::kEncrypted);
+        }
+
         VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
         msgBuf->SetStart(msgBuf->Start() - headerSize);
@@ -128,11 +138,16 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(PayloadHeader & payloadHeader, Node
         err = payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
         SuccessOrExit(err);
 
+        // Encrypt will do simple copy for unsecure session.
         err = state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
         SuccessOrExit(err);
 
-        err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
-        SuccessOrExit(err);
+        if (encrypted)
+        {
+            // Only encrypted packet have mac.
+            err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
+            SuccessOrExit(err);
+        }
 
         VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INTERNAL);
         msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen), nullptr);
@@ -199,6 +214,32 @@ exit:
     return err;
 }
 
+CHIP_ERROR SecureSessionMgrBase::NewUnsecureSession(const Transport::PeerAddress & peerAddr, const Optional<NodeId> & nodeId,
+                                                    PeerConnectionState ** state)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    *state = nullptr;
+
+    // Find any existing connection with the same node and key ID
+    if (mPeerConnections.FindPeerConnectionState(peerAddr, &state))
+    {
+        mPeerConnections.MarkConnectionExpired(state);
+    }
+
+    ChipLogDetail(Inet, "New unsecure session for address!!");
+    err = mPeerConnections.CreateNewPeerConnectionState(peerAddr, state);
+    SuccessOrExit(err);
+
+    if (nodeId.HasValue())
+    {
+        (*state)->SetPeerNodeId(nodeId.Value());
+    }
+
+exit:
+    return err;
+}
+
 void SecureSessionMgrBase::ScheduleExpiryTimer()
 {
     CHIP_ERROR err =
@@ -222,14 +263,29 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     System::PacketBuffer * origMsg = nullptr;
     PeerConnectionState * state    = nullptr;
+    const bool encrypted           = packetHeader.GetFlags().Get(Header::FlagValues::kEncrypted);
 
     VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
-    if (!connection->mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(), packetHeader.GetEncryptionKeyID(),
-                                                              &state))
+    if (encrypted)
     {
-        ChipLogError(Inet, "Data received on an unknown connection (%d). Dropping it!!", packetHeader.GetEncryptionKeyID());
-        ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
+        if (!connection->mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(), packetHeader.GetEncryptionKeyID(),
+                                                                  &state))
+        {
+            ChipLogError(Inet, "Data received on an unknown connection (%d). Dropping it!!", packetHeader.GetEncryptionKeyID());
+            ExitNow(err = CHIP_ERROR_KEY_NOT_FOUND_FROM_PEER);
+        }
+    }
+    else
+    {
+        // TODO: Check if such protocol is allowed to be unsecure.
+        // Unsecure connections are identified by address instead of NodeId.
+        if (!connection->mPeerConnections.FindPeerConnectionState(peerAddress, &state))
+        {
+            // We did not have connections with this peer before, create a new state
+            err = NewUnsecureSession(peerAddress, packetHeader.GetSourceNodeId(), &state);
+            SuccessOrExit(err);
+        }
     }
 
     if (!state->GetPeerAddress().IsInitialized())
@@ -266,9 +322,13 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
         VerifyOrExit(
             payloadlen <= len,
             (ChipLogError(Inet, "Secure transport can't find MAC Tag; buffer too short"), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH));
-        err = mac.Decode(packetHeader, &data[payloadlen], static_cast<uint16_t>(len - payloadlen), &taglen);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
-        len = static_cast<uint16_t>(len - taglen);
+
+        if (encrypted)
+        {
+            err = mac.Decode(packetHeader, &data[payloadlen], static_cast<uint16_t>(len - payloadlen), &taglen);
+            VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
+            len = static_cast<uint16_t>(len - taglen);
+        }
         msg->SetDataLength(len, nullptr);
 
         err = state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);

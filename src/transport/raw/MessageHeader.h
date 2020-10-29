@@ -74,6 +74,9 @@ enum class FlagValues : uint16_t
     /// Header flag specifying that it is a control message for secure session.
     kSecureSessionControlMessage = 0x0800,
 
+    // A single bit field identifying that the message is encrypted and authenticated.
+    kEncrypted = 0x0001,
+
 };
 
 using Flags   = BitFlags<uint16_t, FlagValues>;

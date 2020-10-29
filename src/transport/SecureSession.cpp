@@ -41,7 +41,7 @@ constexpr size_t kMaxAADLen   = 128;
 
 using namespace Crypto;
 
-SecureSession::SecureSession() : mKeyAvailable(false) {}
+SecureSession::SecureSession() : mKeyAvailable(false), mEncrypted(false) {}
 
 CHIP_ERROR SecureSession::InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
                                          const size_t salt_length, const uint8_t * info, const size_t info_length)
@@ -64,6 +64,7 @@ CHIP_ERROR SecureSession::InitFromSecret(const uint8_t * secret, const size_t se
     SuccessOrExit(error);
 
     mKeyAvailable = true;
+    mEncrypted    = true;
 
 exit:
     return error;
@@ -93,9 +94,16 @@ exit:
     return error;
 }
 
+CHIP_ERROR InitUnsecure()
+{
+    mEncrypted = false;
+    return CHIP_NO_ERROR;
+}
+
 void SecureSession::Reset()
 {
     mKeyAvailable = false;
+    mEncrypted    = false;
     memset(mKey, 0, sizeof(mKey));
 }
 
@@ -154,21 +162,29 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(encType);
     uint8_t tag[taglen];
 
-    VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = GetIV(header, IV, sizeof(IV));
-    SuccessOrExit(error);
+    if (mEncrypted)
+    {
+        VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
-    error = GetAdditionalAuthData(header, payloadFlags, AAD, aadLen);
-    SuccessOrExit(error);
+        error = GetIV(header, IV, sizeof(IV));
+        SuccessOrExit(error);
 
-    error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output, tag, taglen);
-    SuccessOrExit(error);
+        error = GetAdditionalAuthData(header, payloadFlags, AAD, aadLen);
+        SuccessOrExit(error);
 
-    mac.SetTag(&header, encType, tag, taglen);
+        error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output, tag, taglen);
+        SuccessOrExit(error);
+
+        mac.SetTag(&header, encType, tag, taglen);
+    }
+    else
+    {
+        memcpy(output, input, input_length);
+    }
 
 exit:
     return error;
@@ -183,19 +199,26 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
     uint16_t aadLen = sizeof(AAD);
-
-    VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = GetIV(header, IV, sizeof(IV));
-    SuccessOrExit(error);
+    if (mEncrypted)
+    {
+        VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
-    error = GetAdditionalAuthData(header, payloadFlags, AAD, aadLen);
-    SuccessOrExit(error);
+        error = GetIV(header, IV, sizeof(IV));
+        SuccessOrExit(error);
 
-    error = AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey), IV, sizeof(IV), output);
+        error = GetAdditionalAuthData(header, payloadFlags, AAD, aadLen);
+        SuccessOrExit(error);
+
+        error = AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey), IV, sizeof(IV), output);
+    }
+    else
+    {
+        memcpy(output, input, input_length);
+    }
 exit:
     return error;
 }
