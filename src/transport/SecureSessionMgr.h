@@ -33,53 +33,17 @@
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <transport/AdminPairingTable.h>
+#include <transport/MessageCounterManagerInterface.h>
 #include <transport/PASESession.h>
 #include <transport/PeerConnections.h>
 #include <transport/SecureSession.h>
+#include <transport/SecureSessionHandle.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
 
 namespace chip {
-
-class SecureSessionMgr;
-
-class SecureSessionHandle
-{
-public:
-    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0), mAdmin(Transport::kUndefinedAdminId) {}
-    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId, Transport::AdminId admin) :
-        mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId), mAdmin(admin)
-    {}
-
-    bool HasAdminId() const { return (mAdmin != Transport::kUndefinedAdminId); }
-    Transport::AdminId GetAdminId() const { return mAdmin; }
-    void SetAdminId(Transport::AdminId adminId) { mAdmin = adminId; }
-
-    bool IsPeerGroupMsgIdNotSynchronized() const { return mPeerGroupMsgIdNotSynchronized; }
-    void SetPeerGroupMsgIdNotSynchronized(bool value) { mPeerGroupMsgIdNotSynchronized = value; }
-
-    bool operator==(const SecureSessionHandle & that) const
-    {
-        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId && mAdmin == that.mAdmin;
-    }
-
-    NodeId GetPeerNodeId() const { return mPeerNodeId; }
-    uint16_t GetPeerKeyId() const { return mPeerKeyId; }
-
-private:
-    friend class SecureSessionMgr;
-    NodeId mPeerNodeId;
-    uint16_t mPeerKeyId;
-    // TODO: Re-evaluate the storing of Admin ID in SecureSessionHandle
-    //       The Admin ID will not be available for PASE and group sessions. So need
-    //       to identify an approach that'll allow looking up the corresponding information for
-    //       such sessions.
-    Transport::AdminId mAdmin;
-
-    bool mPeerGroupMsgIdNotSynchronized = false;
-};
 
 /**
  * @brief
@@ -267,13 +231,14 @@ public:
      * @brief
      *   Initialize a Secure Session Manager
      *
-     * @param localNodeId    Node id for the current node
-     * @param systemLayer    System, layer to use
-     * @param transportMgr   Transport to use
-     * @param admins         A table of device administrators
+     * @param localNodeId           Node id for the current node
+     * @param systemLayer           System, layer to use
+     * @param transportMgr          Transport to use
+     * @param admins                A table of device administrators
+     * @param messageCounterManager The message counter manager
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr,
-                    Transport::AdminPairingTable * admins);
+                    Transport::AdminPairingTable * admins, Transport::MessageCounterManagerInterface * messageCounterManager);
 
     /**
      * @brief
@@ -298,7 +263,6 @@ public:
      */
     Transport::Type GetTransportType(NodeId peerNodeId);
 
-protected:
     /**
      * @brief
      *   Handle received secure message. Implements TransportMgrDelegate
@@ -331,9 +295,10 @@ private:
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 
-    SecureSessionMgrDelegate * mCB         = nullptr;
-    TransportMgrBase * mTransportMgr       = nullptr;
-    Transport::AdminPairingTable * mAdmins = nullptr;
+    SecureSessionMgrDelegate * mCB                                     = nullptr;
+    TransportMgrBase * mTransportMgr                                   = nullptr;
+    Transport::AdminPairingTable * mAdmins                             = nullptr;
+    Transport::MessageCounterManagerInterface * mMessageCounterManager = nullptr;
 
     CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                            System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
@@ -354,6 +319,12 @@ private:
      * Callback for timer expiry check
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
+
+    static bool IsControlMessage(PayloadHeader & payloadHeader)
+    {
+        return payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncReq) ||
+            payloadHeader.HasMessageType(Protocols::SecureChannel::MsgType::MsgCounterSyncRsp);
+    }
 };
 
 namespace MessagePacketBuffer {

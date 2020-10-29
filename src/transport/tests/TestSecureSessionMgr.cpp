@@ -30,6 +30,7 @@
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <support/UnitTestRegistration.h>
+#include <transport/DummyMessageCounterManager.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -132,6 +133,8 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
+    Transport::DummyMessageCounterManager gMessageCounterManager;
+
     CHIP_ERROR err;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
@@ -140,7 +143,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -161,12 +164,13 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
+    Transport::DummyMessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -219,12 +223,13 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<OutgoingTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
+    Transport::DummyMessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
@@ -293,12 +298,13 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     TransportMgr<OutgoingTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
+    Transport::DummyMessageCounterManager gMessageCounterManager;
 
     err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     Transport::AdminPairingTable admins;
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr, &admins, &gMessageCounterManager);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;

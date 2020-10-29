@@ -277,7 +277,7 @@ int Initialize(void * aContext)
     if (err != CHIP_NO_ERROR)
         return FAILURE;
 
-    err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite, &gTransportMgr);
+    err = reinterpret_cast<TestContext *>(aContext)->Init(&sSuite, &gTransportMgr, true);
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 

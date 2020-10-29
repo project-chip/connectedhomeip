@@ -21,6 +21,8 @@ static_library("protocols") {
     "echo/Echo.h",
     "echo/EchoClient.cpp",
     "echo/EchoServer.cpp",
+    "mcsp/MessageCounterManager.cpp",
+    "mcsp/MessageCounterManager.h",
   ]
 
   cflags = [ "-Wconversion" ]

@@ -42,6 +42,12 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/StorablePeerConnection.h>
 
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+#include <protocols/mcsp/MessageCounterManager.h>
+#else
+#include <transport/DummyMessageCounterManager.h>
+#endif
+
 #include "Mdns.h"
 
 using namespace ::chip;
@@ -409,6 +415,9 @@ private:
 
 #if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
 Messaging::ExchangeManager gExchangeMgr;
+mcsp::MessageCounterManager gMessageCounterManager;
+#else
+Transport::DummyMessageCounterManager gMessageCounterManager;
 #endif
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
@@ -480,11 +489,16 @@ void InitServer(AppDelegate * delegate)
 #endif
     SuccessOrExit(err);
 
-    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings);
+    err =
+        gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports, &gAdminPairings, &gMessageCounterManager);
     SuccessOrExit(err);
 
 #if defined(CHIP_APP_USE_INTERACTION_MODEL) || defined(CHIP_APP_USE_ECHO)
     err = gExchangeMgr.Init(&gSessions);
+    SuccessOrExit(err);
+    err = gMessageCounterManager.Init(&gExchange);
+    SuccessOrExit(err);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
     SuccessOrExit(err);
 #else
     gSessions.SetDelegate(&gCallbacks);

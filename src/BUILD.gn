@@ -48,6 +48,7 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/support/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
+      "${chip_root}/src/protocols/mcsp/tests",
       "${chip_root}/src/setup_payload/tests",
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/raw/tests",
