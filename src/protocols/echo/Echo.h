@@ -28,9 +28,10 @@
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
-#include <protocols/CHIPProtocols.h>
+#include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <support/logging/CHIPLogging.h>
 
 namespace chip {
 namespace Protocols {
@@ -89,13 +90,14 @@ public:
     CHIP_ERROR SendEchoRequest(NodeId nodeId, System::PacketBuffer * payload);
 
 private:
-    ExchangeManager * ExchangeMgr    = nullptr;
-    ExchangeContext * ExchangeCtx    = nullptr;
+    ExchangeManager * mExchangeMgr   = nullptr;
+    ExchangeContext * mExchangeCtx   = nullptr;
     EchoFunct OnEchoResponseReceived = nullptr;
 
     CHIP_ERROR SendEchoRequest(System::PacketBuffer * payload);
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                           System::PacketBuffer * payload);
+                           System::PacketBuffer * payload) override;
+    void OnResponseTimeout(ExchangeContext * ec) override;
 };
 
 class DLL_EXPORT EchoServer
@@ -132,7 +134,7 @@ public:
     void SetEchoRequestReceived(EchoFunct callback) { OnEchoRequestReceived = callback; }
 
 private:
-    ExchangeManager * ExchangeMgr   = nullptr;
+    ExchangeManager * mExchangeMgr  = nullptr;
     EchoFunct OnEchoRequestReceived = nullptr;
 
     static void HandleEchoRequest(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,

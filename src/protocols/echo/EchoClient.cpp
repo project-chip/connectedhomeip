@@ -31,22 +31,22 @@ namespace Protocols {
 CHIP_ERROR EchoClient::Init(ExchangeManager * exchangeMgr)
 {
     // Error if already initialized.
-    if (ExchangeMgr != nullptr)
+    if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    ExchangeMgr            = exchangeMgr;
+    mExchangeMgr           = exchangeMgr;
     OnEchoResponseReceived = nullptr;
-    ExchangeCtx            = nullptr;
+    mExchangeCtx           = nullptr;
 
     return CHIP_NO_ERROR;
 }
 
 void EchoClient::Shutdown()
 {
-    if (ExchangeCtx != nullptr)
+    if (mExchangeCtx != nullptr)
     {
-        ExchangeCtx->Abort();
-        ExchangeCtx = nullptr;
+        mExchangeCtx->Abort();
+        mExchangeCtx = nullptr;
     }
 }
 
@@ -54,15 +54,15 @@ CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * pay
 {
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.
-    if (ExchangeCtx != nullptr)
+    if (mExchangeCtx != nullptr)
     {
-        ExchangeCtx->Abort();
-        ExchangeCtx = nullptr;
+        mExchangeCtx->Abort();
+        mExchangeCtx = nullptr;
     }
 
     // Create a new exchange context.
-    ExchangeCtx = ExchangeMgr->NewContext(nodeId, this);
-    if (ExchangeCtx == nullptr)
+    mExchangeCtx = mExchangeMgr->NewContext(nodeId, this);
+    if (mExchangeCtx == nullptr)
     {
         System::PacketBuffer::Free(payload);
         return CHIP_ERROR_NO_MEMORY;
@@ -76,12 +76,12 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBuffer * payload)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Send an Echo Request message.  Discard the exchange context if the send fails.
-    err = ExchangeCtx->SendMessage(kChipProtocol_Echo, kEchoMessageType_EchoRequest, payload);
+    err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, payload);
 
     if (err != CHIP_NO_ERROR)
     {
-        ExchangeCtx->Abort();
-        ExchangeCtx = nullptr;
+        mExchangeCtx->Abort();
+        mExchangeCtx = nullptr;
     }
 
     return err;
@@ -96,14 +96,14 @@ void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     // This should never fail because even if SendEchoRequest is called
     // back-to-back, the second call will call Close() on the first exchange,
     // which clears the OnMessageReceived callback.
-    VerifyOrDie(echoApp && ec == echoApp->ExchangeCtx);
+    VerifyOrDie(echoApp && ec == echoApp->mExchangeCtx);
 
     // Verify that the message is an Echo Response.
     // If not, close the exchange and free the payload.
-    if (protocolId != kChipProtocol_Echo || msgType != kEchoMessageType_EchoResponse)
+    if (protocolId != kProtocol_Echo || msgType != kEchoMessageType_EchoResponse)
     {
         ec->Close();
-        echoApp->ExchangeCtx = nullptr;
+        echoApp->mExchangeCtx = nullptr;
         ExitNow();
     }
 
@@ -111,8 +111,8 @@ void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     // SendEchoRequest and install a new one. We abort rather than close
     // because we no longer care whether the echo request message has been
     // acknowledged at the transport layer.
-    echoApp->ExchangeCtx->Abort();
-    echoApp->ExchangeCtx = nullptr;
+    echoApp->mExchangeCtx->Abort();
+    echoApp->mExchangeCtx = nullptr;
 
     // Call the registered OnEchoResponseReceived handler, if any.
     if (echoApp->OnEchoResponseReceived != nullptr)
@@ -124,6 +124,11 @@ void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
 exit:
     // Free the payload buffer.
     System::PacketBuffer::Free(payload);
+}
+
+void EchoClient::OnResponseTimeout(ExchangeContext * ec)
+{
+    ChipLogProgress(Echo, "Time out! failed to receive echo response from Node: %llu", ec->GetPeerNodeId());
 }
 
 } // namespace Protocols

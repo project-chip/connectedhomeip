@@ -31,24 +31,24 @@ namespace Protocols {
 CHIP_ERROR EchoServer::Init(ExchangeManager * exchangeMgr)
 {
     // Error if already initialized.
-    if (ExchangeMgr != nullptr)
+    if (mExchangeMgr != nullptr)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    ExchangeMgr           = exchangeMgr;
+    mExchangeMgr          = exchangeMgr;
     OnEchoRequestReceived = nullptr;
 
     // Register to receive unsolicited Echo Request messages from the exchange manager.
-    ExchangeMgr->RegisterUnsolicitedMessageHandler(kChipProtocol_Echo, kEchoMessageType_EchoRequest, HandleEchoRequest, this);
+    mExchangeMgr->RegisterUnsolicitedMessageHandler(kProtocol_Echo, kEchoMessageType_EchoRequest, HandleEchoRequest, this);
 
     return CHIP_NO_ERROR;
 }
 
 void EchoServer::Shutdown()
 {
-    if (ExchangeMgr != nullptr)
+    if (mExchangeMgr != nullptr)
     {
-        ExchangeMgr->UnregisterUnsolicitedMessageHandler(kChipProtocol_Echo, kEchoMessageType_EchoRequest);
-        ExchangeMgr = nullptr;
+        mExchangeMgr->UnregisterUnsolicitedMessageHandler(kProtocol_Echo, kEchoMessageType_EchoRequest);
+        mExchangeMgr = nullptr;
     }
 }
 
@@ -71,7 +71,7 @@ void EchoServer::HandleEchoRequest(ExchangeContext * ec, const PacketHeader & pa
     payload->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 
     // Send an Echo Response back to the sender.
-    ec->SendMessage(kChipProtocol_Echo, kEchoMessageType_EchoResponse, payload);
+    ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, payload);
 
     // Discard the exchange context.
     ec->Close();
