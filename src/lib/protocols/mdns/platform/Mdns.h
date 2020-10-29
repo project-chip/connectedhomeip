@@ -36,7 +36,7 @@ namespace chip {
 namespace Protocols {
 namespace Mdns {
 
-static constexpr uint8_t kMdnsNameMaxSize  = 32;
+static constexpr uint8_t kMdnsNameMaxSize  = 33;
 static constexpr uint8_t kMdnsTypeMaxSize  = 32;
 static constexpr uint16_t kMdnsTextMaxSize = 64;
 
@@ -69,8 +69,8 @@ struct MdnsService
 /**
  * The callback function for mDNS resolve.
  *
- * The callback function SHALL NOT take the ownership of the result->mService.mTextEntries
- * memory.
+ * The callback function SHALL NOT take the ownership of the service pointer or
+ * any pointer inside this structure.
  *
  * @param[in] context     The context passed to ChipMdnsBrowse or ChipMdnsResolve.
  * @param[in] result      The mdns resolve result, can be nullptr if error happens.
@@ -82,8 +82,8 @@ using MdnsResolveCallback = void (*)(void * context, MdnsService * result, CHIP_
 /**
  * The callback function for mDNS browse.
  *
- * The callback function SHALL NOT take the ownership of the service->mTextEntries
- * memory.
+ * The callback function SHALL NOT take the ownership of the service pointer or
+ * any pointer inside this structure.
  *
  * @param[in] context       The context passed to ChipMdnsBrowse or ChipMdnsResolve.
  * @param[in] services      The service list, can be nullptr.
@@ -107,6 +107,14 @@ using MdnsAsnycReturnCallback = void (*)(void * context, CHIP_ERROR error);
  *
  */
 CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context);
+
+/**
+ * This function sets the host name for services.
+ *
+ * @param[in] hostname   The hostname.
+ *
+ */
+CHIP_ERROR ChipMdnsSetHostname(const char * hostname);
 
 /**
  * This function publishes an service via mDNS.

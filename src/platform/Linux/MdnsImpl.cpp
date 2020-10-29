@@ -306,6 +306,17 @@ exit:
     return error;
 }
 
+CHIP_ERROR MdnsAvahi::SetHostname(const char * hostname)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(mClient != nullptr, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(avahi_client_set_host_name(mClient, hostname) == 0, error = CHIP_ERROR_INTERNAL);
+
+exit:
+    return error;
+}
+
 void MdnsAvahi::HandleClientState(AvahiClient * client, AvahiClientState state, void * context)
 {
     static_cast<MdnsAvahi *>(context)->HandleClientState(client, state);
@@ -652,6 +663,11 @@ void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet)
 CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context)
 {
     return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, context);
+}
+
+CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
+{
+    return MdnsAvahi::GetInstance().SetHostname(hostname);
 }
 
 CHIP_ERROR ChipMdnsPublishService(const MdnsService * service)

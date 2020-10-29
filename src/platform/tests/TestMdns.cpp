@@ -4,7 +4,7 @@
 
 #include <nlunit-test.h>
 
-#include "lib/protocols/mdns/Mdns.h"
+#include "lib/protocols/mdns/platform/Mdns.h"
 #include "platform/CHIPDeviceLayer.h"
 #include "support/CHIPMem.h"
 
