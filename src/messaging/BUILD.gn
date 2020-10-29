@@ -18,10 +18,18 @@ static_library("messaging") {
   output_name = "libMessagingLayer"
 
   sources = [
+    "ErrorCategory.cpp",
+    "ErrorCategory.h",
     "ExchangeContext.cpp",
     "ExchangeContext.h",
     "ExchangeMgr.cpp",
     "ExchangeMgr.h",
+    "Flags.h",
+    "ReliableMessageContext.cpp",
+    "ReliableMessageContext.h",
+    "ReliableMessageManager.cpp",
+    "ReliableMessageManager.h",
+    "ReliableMessageProtocolConfig.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -31,6 +39,7 @@ static_library("messaging") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/platform",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw",
   ]

@@ -1,6 +1,6 @@
 /*
- *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,20 +17,21 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP Messaging layer
- *      layer library unit tests.
+ *      This file defines Defines error filtering and selection methods.
  *
  */
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <core/CHIPError.h>
+#include <support/DLLUtil.h>
 
-int TestExchangeMgr(void);
-int TestReliableMessageProtocol(void);
+namespace chip {
+namespace messaging {
 
-#ifdef __cplusplus
-}
-#endif
+CHIP_ERROR FilterUDPSendError(CHIP_ERROR err, bool isMulticast);
+bool IsIgnoredMulticastSendError(CHIP_ERROR err);
+bool IsSendErrorNonCritical(CHIP_ERROR err);
+
+} // namespace messaging
+} // namespace chip
