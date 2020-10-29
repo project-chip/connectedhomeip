@@ -26,6 +26,7 @@
 #include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
+#include <protocols/mcsp/MessageCounterManager.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
@@ -136,6 +137,7 @@ TransportMgr<Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>
 
 Messaging::ExchangeManager gExchangeManager;
 SecureSessionMgr gSessionManager;
+chip::mcsp::MessageCounterManager gMessageCounterManager;
 Inet::IPAddress gDestAddr;
 
 bool EchoIntervalExpired(void)
@@ -274,7 +276,8 @@ void StartPinging(streamer_t * stream, char * destination)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     if (gPingArguments.IsUsingTCP())
     {
-        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins);
+        err =
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTCPManager, &admins, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(kTestControllerNodeId, &gTCPManager, &gSessionManager);
@@ -283,12 +286,16 @@ void StartPinging(streamer_t * stream, char * destination)
     else
 #endif
     {
-        err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins);
+        err =
+            gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gUDPManager, &admins, &gMessageCounterManager);
         SuccessOrExit(err);
 
         err = gExchangeManager.Init(kTestControllerNodeId, &gUDPManager, &gSessionManager);
         SuccessOrExit(err);
     }
+
+    err = gMessageCounterManager.Init(&gExchangeManager);
+    SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP echo responder.
     err = EstablishSecureSession(stream);

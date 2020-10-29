@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,21 +17,19 @@
 
 /**
  *    @file
- *      This file declares test entry points for CHIP Messaging layer
- *      layer library unit tests.
+ *      This file implements a standalone/native program executable
+ *      test driver for the SecureChannelMgr tests.
  *
  */
 
-#pragma once
+#include "TestMessagingLayer.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <nlunit-test.h>
 
-int TestChannel();
-int TestExchangeMgr(void);
-int TestReliableMessageProtocol(void);
+int main()
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
 
-#ifdef __cplusplus
+    return (TestMessageCounterManager());
 }
-#endif
