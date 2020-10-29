@@ -37,7 +37,6 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/CHIPProtocols.h>
-#include <protocols/common/CommonProtocol.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemTimer.h>
 
@@ -323,38 +322,28 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     protocolId  = payloadHeader.GetProtocolID();
     messageType = payloadHeader.GetMessageType();
 
-    // Return and not pass this to protocol if Common::Null Msg Type
-    if ((protocolId == chip::Protocols::kChipProtocol_Common) && (messageType == chip::Protocols::Common::kMsgType_Null))
+    // Since we got the response, cancel the response timer.
+    CancelResponseTimer();
+
+    // If the context was expecting a response to a previously sent message, this message
+    // is implicitly that response.
+    SetResponseExpected(false);
+
+    // Deliver the message to the app via its callback.
+    if (umhandler)
     {
-        ExitNow(err = CHIP_NO_ERROR);
+        umhandler(this, packetHeader, protocolId, messageType, msgBuf);
+        msgBuf = nullptr;
+    }
+    else if (mDelegate != nullptr)
+    {
+        mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, msgBuf);
+        msgBuf = nullptr;
     }
     else
     {
-        // Since we got the response, cancel the response timer.
-        CancelResponseTimer();
-
-        // If the context was expecting a response to a previously sent message, this message
-        // is implicitly that response.
-        SetResponseExpected(false);
-
-        // Deliver the message to the app via its callback.
-        if (umhandler)
-        {
-            umhandler(this, packetHeader, protocolId, messageType, msgBuf);
-            msgBuf = nullptr;
-        }
-        else if (mDelegate != nullptr)
-        {
-            mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, msgBuf);
-            msgBuf = nullptr;
-        }
-        else
-        {
-            DefaultOnMessageReceived(this, packetHeader, protocolId, messageType, msgBuf);
-        }
+        DefaultOnMessageReceived(this, packetHeader, protocolId, messageType, msgBuf);
     }
-
-exit:
 
     // Release the reference to the ExchangeContext that was held at the beginning of this function.
     // This call should also do the needful of closing the ExchangeContext if the protocol has

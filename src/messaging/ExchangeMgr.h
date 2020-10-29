@@ -86,7 +86,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(const uint64_t & peerNodeId, void * appState = nullptr);
+    ExchangeContext * NewContext(const NodeId & peerNodeId, void * appState = nullptr);
 
     /**
      *  Find the ExchangeContext from a pool matching a given set of parameters.
@@ -99,7 +99,7 @@ public:
      *
      *  @return   A pointer to the ExchangeContext object matching the provided parameters On success, NULL on no match.
      */
-    ExchangeContext * FindContext(uint64_t peerNodeId, void * appState, bool isInitiator);
+    ExchangeContext * FindContext(NodeId peerNodeId, void * appState, bool isInitiator);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier. This handler would be
