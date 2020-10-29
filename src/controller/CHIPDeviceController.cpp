@@ -52,6 +52,7 @@
 #include <support/SafeInt.h>
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <transport/DummyMessageCounterManager.h>
 
 #include <errno.h>
 #include <inttypes.h>
@@ -143,7 +144,11 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     mSessionManager = chip::Platform::New<SecureSessionMgr>();
 
 #if CHIP_ENABLE_INTERACTION_MODEL
-    mExchangeManager = chip::Platform::New<Messaging::ExchangeManager>();
+    mExchangeManager                                     = chip::Platform::New<Messaging::ExchangeManager>();
+    mcsp::MessageCounterManager * gMessageCounterManager = chip::Platform::New<mcsp::MessageCounterManager>();
+    mMessageCounterManager                               = gMessageCounterManager;
+#else
+    mMessageCounterManager = chip::Platform::New<Transport::DummyMessageCounterManager>();
 #endif
 
     err = mTransportMgr->Init(
@@ -158,11 +163,13 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, ControllerInitParams par
     admin = mAdmins.AssignAdminId(mAdminId, localDeviceId);
     VerifyOrExit(admin != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins);
+    err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr, &mAdmins, mMessageCounterManager);
     SuccessOrExit(err);
 
 #if CHIP_ENABLE_INTERACTION_MODEL
     err = mExchangeManager->Init(mSessionManager);
+    SuccessOrExit(err);
+    err = gMessageCounterManager->Init(mSessionManager);
     SuccessOrExit(err);
     err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager, nullptr);
     SuccessOrExit(err);
