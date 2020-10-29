@@ -33,6 +33,7 @@
 
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
+#include <transport/DummyMessageCounterManager.h>
 #include <transport/PASESession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
@@ -56,8 +57,8 @@ chip::app::CommandSender * gpCommandSender = nullptr;
 chip::app::ReadClient * gpReadClient = nullptr;
 
 chip::TransportMgr<chip::Transport::UDP> gTransportManager;
-
 chip::SecureSessionMgr gSessionManager;
+chip::Transport::DummyMessageCounterManager gMessageCounterManager;
 
 chip::Inet::IPAddress gDestAddr;
 
@@ -287,7 +288,8 @@ int main(int argc, char * argv[])
                                      .SetListenPort(IM_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins);
+    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager, &admins,
+                               &gMessageCounterManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);

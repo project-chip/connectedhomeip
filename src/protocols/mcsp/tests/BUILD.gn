@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,51 +19,23 @@ import("//build_overrides/nlunit_test.gni")
 
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
-static_library("helpers") {
-  output_name = "libMessagingHelpers"
-  output_dir = "${root_out_dir}/lib"
+chip_test_suite("tests") {
+  output_name = "libMessageCounterManagerTests"
 
-  sources = [
-    "MessagingContext.cpp",
-    "MessagingContext.h",
-  ]
+  test_sources = [ "TestMessageCounterManager.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/inet/tests:helpers",
-    "${chip_root}/src/messaging",
-    "${chip_root}/src/protocols",
-    "${chip_root}/src/transport/raw/tests:helpers",
-  ]
-}
-
-chip_test_suite("tests") {
-  output_name = "libMessagingLayerTests"
-
-  sources = [
-    "TestChannel.cpp",
-    "TestExchangeMgr.cpp",
-    "TestMessagingLayer.h",
-    "TestReliableMessageProtocol.cpp",
-  ]
-
-  cflags = [ "-Wconversion" ]
-
-  public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/messaging/tests:helpers",
     "${chip_root}/src/protocols",
     "${chip_root}/src/transport",
+    "${chip_root}/src/transport/raw/tests:helpers",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestChannel",
-    "TestExchangeMgr",
-    "TestReliableMessageProtocol",
   ]
 }
