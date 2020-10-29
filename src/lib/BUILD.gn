@@ -36,7 +36,7 @@ static_library("lib") {
   ]
 
   if (chip_enable_mdns) {
-    public_deps += [ "${chip_root}/src/lib/protocols/mdns" ]
+    public_deps += [ "${chip_root}/src/lib/mdns" ]
   }
 
   cflags = [ "-Wconversion" ]

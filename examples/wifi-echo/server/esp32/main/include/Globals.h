@@ -20,7 +20,7 @@
 #include "BluetoothWidget.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"
-#include "lib/protocols/mdns/Publisher.h"
+#include "lib/mdns/Publisher.h"
 #include "transport/raw/MessageHeader.h"
 
 extern LEDWidget statusLED1;

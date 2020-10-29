@@ -45,7 +45,7 @@
 #include <vector>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/protocols/mdns/Publisher.h>
+#include <lib/mdns/Publisher.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
