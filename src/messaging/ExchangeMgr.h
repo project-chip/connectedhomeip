@@ -29,7 +29,6 @@
 #include <messaging/Channel.h>
 #include <messaging/ChannelContext.h>
 #include <messaging/ExchangeContext.h>
-#include <messaging/MessageCounterSync.h>
 #include <messaging/ReliableMessageMgr.h>
 #include <protocols/Protocols.h>
 #include <support/DLLUtil.h>
@@ -176,19 +175,6 @@ public:
                                                           static_cast<uint8_t>(msgType));
     }
 
-    /**
-     * @brief
-     *   Called when a cached group message that was waiting for message counter
-     *   sync shold be reprocessed.
-     *
-     * @param packetHeader  The message header
-     * @param payloadHeader The payload header
-     * @param session       The handle to the secure session
-     * @param msgBuf        The received message
-     */
-    void HandleGroupMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                    const SecureSessionHandle & session, System::PacketBufferHandle msgBuf);
-
     // Channel public APIs
     ChannelHandle EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate);
 
@@ -214,7 +200,6 @@ public:
 
     ReliableMessageMgr * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
-    MessageCounterSyncMgr * GetMessageCounterSyncMgr() { return &mMessageCounterSyncMgr; };
     Transport::AdminId GetAdminId() { return mAdminId; }
 
     uint16_t GetNextKeyId() { return ++mNextKeyId; }
@@ -253,7 +238,6 @@ private:
     State mState;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageMgr mReliableMessageMgr;
-    MessageCounterSyncMgr mMessageCounterSyncMgr;
 
     Transport::AdminId mAdminId = 0;
 

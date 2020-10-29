@@ -31,6 +31,7 @@
 
 // The ExchangeManager global object.
 chip::Messaging::ExchangeManager gExchangeManager;
+chip::Transport::DummyMessageCounterManager gMessageCounterManager;
 
 void InitializeChip(void)
 {
