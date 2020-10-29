@@ -384,11 +384,6 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
         err = mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf);
         SuccessOrExit(err);
     }
-    else // This else condition should eventually be removed, once all messages are handled via delegate callbacks
-    {
-        mDelegate->OnRendezvousMessageReceived(msgBuf);
-        msgBuf = nullptr;
-    }
 
 exit:
     if (origMsg != nullptr)
