@@ -59,11 +59,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${nlunit_test_root}:nlunit-test",
     ]
 
-    # Temporary until RNG issue sorted out
-    if (current_os != "android") {
-      deps += [ "${chip_root}/src/lib/message" ]
-    }
-
     if (chip_build_tests) {
       deps += [ "//src:tests" ]
     }
