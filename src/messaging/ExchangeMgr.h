@@ -160,9 +160,7 @@ public:
      */
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType);
 
-    /**
-     *  Decrement current context in use by 1.
-     */
+    void IncrementContextsInUse();
     void DecrementContextsInUse();
 
     SecureSessionMgrBase * GetSessionMgr() const { return mSessionMgr; }
@@ -194,7 +192,7 @@ private:
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
     void (*OnExchangeContextChanged)(size_t numContextsInUse);
 
-    ExchangeContext * AllocContext();
+    ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState);
 
     void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 

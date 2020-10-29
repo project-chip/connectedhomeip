@@ -41,7 +41,7 @@ public:
  * A reference counted object maintains a count of usages and when the usage
  * count drops to 0, it deletes itself.
  */
-template <class SUBCLASS, class DELETOR = DeleteDeletor<SUBCLASS>>
+template <class SUBCLASS, class DELETOR = DeleteDeletor<SUBCLASS>, int INITIAL = 1>
 class ReferenceCounted
 {
 public:
@@ -77,7 +77,7 @@ public:
     count_type GetReferenceCount() const { return mRefCount; }
 
 private:
-    count_type mRefCount = 1;
+    count_type mRefCount = INITIAL;
 };
 
 } // namespace chip

@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <lib/core/ReferenceCounted.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
@@ -68,15 +69,22 @@ public:
     virtual void OnResponseTimeout(ExchangeContext * ec) = 0;
 };
 
+class ExchangeContextDeletor
+{
+public:
+    static void Release(ExchangeContext * obj);
+};
+
 /**
  *  @brief
  *    This class represents an ongoing conversation (ExchangeContext) between two or more nodes.
  *    It defines methods for encoding and communicating CHIP messages within an ExchangeContext
  *    over various transport mechanisms, for example, TCP, UDP, or CHIP Reliable Messaging.
  */
-class DLL_EXPORT ExchangeContext
+class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, ExchangeContextDeletor, 0>
 {
     friend class ExchangeManager;
+    friend class ExchangeContextDeletor;
 
 public:
     enum
@@ -205,11 +213,12 @@ public:
      * can hold onto it while it's out of their direct control to make sure it isn't closed before everyone's ready.
      * A customized version of reference counting is used since there are some extra stuff to do within Release.
      */
-    void AddRef();
     void Close();
     void Abort();
-    void Release();
-    void SetRefCount(uint8_t value) { mRefCount = value; }
+
+    void Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState);
+    void Free();
+    void Reset();
 
 private:
     enum class ExFlagValues : uint16_t
@@ -227,7 +236,6 @@ private:
 
     uint64_t mPeerNodeId; // Node ID of peer node.
     uint16_t mExchangeId; // Assigned exchange ID.
-    uint8_t mRefCount;    // Reference counter of the current instance
 
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
@@ -255,5 +263,10 @@ private:
 
     void DoClose(bool clearRetransTable);
 };
+
+inline void ExchangeContextDeletor::Release(ExchangeContext * obj)
+{
+    obj->Free();
+}
 
 } // namespace chip
