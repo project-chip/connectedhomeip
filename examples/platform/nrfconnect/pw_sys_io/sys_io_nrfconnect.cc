@@ -17,9 +17,9 @@
 
 #include <cinttypes>
 
+#include "console/console.h"
 #include "pw_sys_io/sys_io.h"
 #include <zephyr.h>
-#include "console/console.h"
 
 extern "C" void pw_sys_io_Init()
 {
@@ -34,7 +34,7 @@ Status ReadByte(std::byte * dest)
         return Status::INVALID_ARGUMENT;
 
     const int c = console_getchar();
-    *dest = static_cast<std::byte>(c);
+    *dest       = static_cast<std::byte>(c);
     return c < 0 ? Status::FAILED_PRECONDITION : Status::OK;
 }
 
