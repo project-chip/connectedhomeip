@@ -15,6 +15,8 @@
  *    limitations under the License.
  */
 
+#include <platform/CHIPDeviceConfig.h>
+
 #include <lib/shell/shell.h>
 
 #include <lib/core/CHIPCore.h>
@@ -26,7 +28,6 @@
 
 #include <ChipShellCollection.h>
 
-#if CHIP_DEVICE_LAYER_TARGET_NRF5
 #ifdef SOFTDEVICE_PRESENT
 #include "nrf_sdh.h"
 #include "nrf_sdh_ble.h"
@@ -38,12 +39,10 @@ extern "C" {
 #include <openthread/platform/platform-softdevice.h>
 }
 #endif // CHIP_ENABLE_OPENTHREAD
-#endif
 
 using namespace chip;
 using namespace chip::Shell;
 
-#if defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
 // TODO: Move softdevice initialization behind platform interface.
 static void OnSoCEvent(uint32_t sys_evt, void * p_context)
 {
@@ -83,13 +82,10 @@ CHIP_ERROR soft_device_init()
 exit:
     return err;
 }
-#endif // defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
 
 int main()
 {
-#if defined(CHIP_DEVICE_LAYER_TARGET_NRF5)
     soft_device_init();
-#endif
 
     // Initialize the default streamer that was linked.
     const int rc = streamer_init(streamer_get());
