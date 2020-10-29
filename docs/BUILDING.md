@@ -77,6 +77,12 @@ server OS for arm64 architectures on a micro SD card.
 Boot the SD card, login with the default user account "ubuntu" and password
 "ubuntu", then proceed with "How to install prerequisites on Linux".
 
+Finally, install some Raspberry Pi specific dependencies:
+
+```
+sudo apt-get install pi-bluetooth
+```
+
 ### Build Preparation
 
 Before running any other build command, the `scripts/activate.sh` environment
