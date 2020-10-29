@@ -1,4 +1,4 @@
-{{zap_header}}
+{{chip_header}}
 
 #ifndef __ZAP_GEN_ID__
 #define __ZAP_GEN_ID__

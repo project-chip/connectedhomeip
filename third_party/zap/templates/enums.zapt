@@ -1,3 +1,5 @@
+{{chip_header}}
+
 #ifndef __ZAP_EMBER_ENUMS__
 #define __ZAP_EMBER_ENUMS__
 

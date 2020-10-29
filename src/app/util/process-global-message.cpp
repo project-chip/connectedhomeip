@@ -541,6 +541,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         emberAfPluginSimpleMeteringClusterReadAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex);
 #endif
         // TODO Commented out since not implemented and was defaulted to 0 A.K.A always true in this context
+        // Issue #3522
         // if (!emberAfReadAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex))
         // {
         emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
@@ -601,7 +602,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
         emberAfClusterDefaultResponseWithMfgCodeCallback(cmd->apsFrame->destinationEndpoint, clusterId, commandId, status,
                                                          clientServerMask, cmd->mfgCode);
-        // TODO
+        // TODO Implement this function : issue emberAfDefaultResponseCallback
         // emberAfDefaultResponseCallback(clusterId, commandId, status);
         return true;
     }

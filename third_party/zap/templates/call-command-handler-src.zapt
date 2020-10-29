@@ -1,6 +1,5 @@
 {{chip_header}}
 
-
 #include <stdint.h>
 
 #include "af-structs.h"
