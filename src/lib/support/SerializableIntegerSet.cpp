@@ -29,23 +29,14 @@ const char * SerializableU64SetBase::SerializeBase64(char * buf, uint16_t & bufl
     VerifyOrExit(buflen >= SerializedSize(), buflen = SerializedSize());
     VerifyOrExit(buf != nullptr, buflen = SerializedSize());
 
-    /**
-     *  The data is serialized in LittleEndian byte order in the set. This will enable
-     *  different machine architectures to interpret a given set in a consistent manner,
-     *  for serialize and deserialize operations.
-     */
-    for (uint16_t i = 0; i < mNextAvailable; i++)
-    {
-        Encoding::LittleEndian::Put64(reinterpret_cast<uint8_t *>(&mData[i]), mData[i]);
-    }
+    // Swap to little endian order if needed.
+    SwapByteOrderIfNeeded();
 
     buflen = Base64Encode(reinterpret_cast<const uint8_t *>(mData), static_cast<uint16_t>(len), buf);
     out    = buf;
 
-    for (uint16_t i = 0; i < mNextAvailable; i++)
-    {
-        mData[i] = Encoding::LittleEndian::HostSwap64(mData[i]);
-    }
+    // Swap back to the original order
+    SwapByteOrderIfNeeded();
 
 exit:
     return out;
@@ -63,21 +54,30 @@ CHIP_ERROR SerializableU64SetBase::DeserializeBase64(const char * serialized, ui
 
     mNextAvailable = decodelen / static_cast<uint16_t>(sizeof(uint64_t));
 
-    /**
-     *  The data is serialized in LittleEndian byte order in the set. This will enable
-     *  different machine architectures to interpret a given set in a consistent manner,
-     *  for serialize and deserialize operations.
-     */
-    for (uint16_t i = 0; i < mNextAvailable; i++)
-    {
-        mData[i] = Encoding::LittleEndian::HostSwap64(mData[i]);
-    }
+    // Swap from little endian if needed
+    SwapByteOrderIfNeeded();
 
 exit:
     return err;
 }
 
-uint16_t SerializableU64SetBase::Find(uint64_t value)
+void SerializableU64SetBase::SwapByteOrderIfNeeded()
+{
+    /**
+     *  The data is serialized in LittleEndian byte order in the set. This will enable
+     *  different machine architectures to interpret a given set in a consistent manner,
+     *  for serialize and deserialize operations.
+     */
+    if (nl::ByteOrder::GetCurrent() != nl::ByteOrder::LittleEndian)
+    {
+        for (uint16_t i = 0; i < mNextAvailable; i++)
+        {
+            mData[i] = Encoding::LittleEndian::HostSwap64(mData[i]);
+        }
+    }
+}
+
+uint16_t SerializableU64SetBase::FindIndex(uint64_t value)
 {
     for (uint16_t i = 0; i < mNextAvailable; i++)
     {
@@ -115,7 +115,7 @@ void SerializableU64SetBase::Remove(uint64_t value)
 {
     if (value != mEmptyValue)
     {
-        uint16_t index = Find(value);
+        uint16_t index = FindIndex(value);
         if (index < mCapacity)
         {
             mData[index] = mEmptyValue;

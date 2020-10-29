@@ -93,7 +93,7 @@ public:
      * @param[in] value Value to find
      * @return True, if it's prsent in the array.
      */
-    bool Contains(uint64_t value) { return Find(value) != mCapacity; }
+    bool Contains(uint64_t value) { return FindIndex(value) != mCapacity; }
 
     /**
      * @brief
@@ -120,12 +120,14 @@ private:
 
     /**
      * @brief
-     *   Find a value in the array.
+     *   Find index of the value in the array.
      *
      * @param[in] value Value to find
      * @return index of the value if found, or max length (mCapacity) of the array
      */
-    uint16_t Find(uint64_t value);
+    uint16_t FindIndex(uint64_t value);
+
+    void SwapByteOrderIfNeeded();
 };
 
 template <uint16_t kCapacity, uint64_t kEmptyValue = 0>
