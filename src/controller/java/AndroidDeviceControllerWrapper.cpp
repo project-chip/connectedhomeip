@@ -30,7 +30,25 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::allocateNew(chi
                                                                              chip::Inet::InetLayer * inetLayer,
                                                                              CHIP_ERROR * errInfoOnFailure)
 {
-    errInfoOnFailure = CHIP_NO_ERROR;
+    if (errInfoOnFailure == nullptr)
+    {
+        ChipLogProgress(Controller, "Missing error info");
+        return nullptr;
+    }
+    if (systemLayer == nullptr)
+    {
+        ChipLogProgress(Controller, "Missing system layer");
+        *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+        return nullptr;
+    }
+    if (inetLayer == nullptr)
+    {
+        ChipLogProgress(Controller, "Missing inet layer");
+        *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
+        return nullptr;
+    }
+
+    *errInfoOnFailure = CHIP_NO_ERROR;
 
     std::unique_ptr<ChipDeviceController> controller(new ChipDeviceController());
     std::unique_ptr<AndroidDevicePairingDelegate> delegate(new AndroidDevicePairingDelegate());

@@ -53,7 +53,7 @@ private:
     ChipDeviceControllerPtr mController;
     AndroidDevicePairingDelegatePtr mDelegate;
 
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr && controller, AndroidDevicePairingDelegatePtr && delegate) :
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidDevicePairingDelegatePtr delegate) :
         mController(std::move(controller)), mDelegate(std::move(delegate))
     {}
 };
