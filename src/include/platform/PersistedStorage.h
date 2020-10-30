@@ -34,7 +34,7 @@ namespace Platform {
 namespace PersistedStorage {
 
 // Persistent storage key type is const char * in core config, however
-// it is uint8_t/uint16_t on other platofmrs (EFR32 and nRF5 respectively)
+// it is uint8_t/uint16_t on other platforms (EFR32 and nRF5 respectively)
 typedef CHIP_CONFIG_PERSISTED_STORAGE_KEY_TYPE Key;
 
 namespace internal {
