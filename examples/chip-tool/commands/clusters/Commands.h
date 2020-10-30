@@ -2462,7 +2462,6 @@ public:
 | * ClearWeekdayScheduleResponse                                      |   0x0D |
 | * ClearYearDayScheduleResponse                                      |   0x10 |
 | * GetHolidayScheduleResponse                                        |   0x12 |
-| * GetLogRecordResponse                                              |   0x04 |
 | * GetPINCodeResponse                                                |   0x06 |
 | * GetRFIDCodeResponse                                               |   0x17 |
 | * GetUserTypeResponse                                               |   0x15 |
@@ -2488,7 +2487,6 @@ public:
 | * ClearWeekdaySchedule                                              |   0x0D |
 | * ClearYearDaySchedule                                              |   0x10 |
 | * GetHolidaySchedule                                                |   0x12 |
-| * GetLogRecord                                                      |   0x04 |
 | * GetPINCode                                                        |   0x06 |
 | * GetRFIDCode                                                       |   0x17 |
 | * GetUserType                                                       |   0x15 |
@@ -2660,43 +2658,6 @@ public:
         ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "operatingModeDuringHoliday", chip::Encoding::Read8(message)); // DrlkOperMode
-
-        return true;
-    }
-};
-
-/*
- * Command Response GetLogRecordResponse
- */
-class GetLogRecordResponse : public ModelCommandResponse
-{
-public:
-    GetLogRecordResponse() : ModelCommandResponse(0x04) {}
-
-    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
-    {
-        ChipLogProgress(chipTool, "GetLogRecordResponse (0x04):");
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "logEntryId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        CHECK_MESSAGE_LENGTH(4);
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "timestamp", chip::Encoding::LittleEndian::Read32(message)); // uint32
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "eventType", chip::Encoding::Read8(message)); // enum8
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sourceOperationEvent", chip::Encoding::Read8(message)); // DrlkOperEventSource
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "eventIdOrAlarmCode", chip::Encoding::Read8(message)); // uint8
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        CHECK_MESSAGE_LENGTH(1);
-        {
-            uint8_t pINLen = chip::Encoding::Read8(message);             // octstr
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "pINLen", pINLen); // octstr
-
-            // FIXME Strings are not supported yet. For the moment the code just checks that
-            // there is enough bytes in the buffer
-            CHECK_MESSAGE_LENGTH(pINLen);
-        }
 
         return true;
     }
@@ -3289,41 +3250,6 @@ public:
 
 private:
     uint8_t mHolidayScheduleID;
-};
-
-/*
- * Command GetLogRecord
- */
-class DoorLockGetLogRecord : public ModelCommand
-{
-public:
-    DoorLockGetLogRecord() : ModelCommand("get-log-record", kDoorLockClusterId, 0x04)
-    {
-        AddArgument("logIndex", 0, UINT16_MAX, &mLogIndex);
-        ModelCommand::AddArguments();
-    }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeDoorLockClusterGetLogRecordCommand(buffer->Start(), bufferSize, endPointId, mLogIndex);
-    }
-
-    // Global Response: DefaultResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        DefaultResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-    // Specific Response: GetLogRecordResponse
-    bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        GetLogRecordResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-private:
-    uint16_t mLogIndex;
 };
 
 /*
@@ -4822,9 +4748,6 @@ public:
 |------------------------------------------------------------------------------|
 | Responses:                                                          |        |
 | * AddSceneResponse                                                  |   0x00 |
-| * CopySceneResponse                                                 |   0x42 |
-| * EnhancedAddSceneResponse                                          |   0x40 |
-| * EnhancedViewSceneResponse                                         |   0x41 |
 | * GetSceneMembershipResponse                                        |   0x06 |
 | * RemoveAllScenesResponse                                           |   0x03 |
 | * RemoveSceneResponse                                               |   0x02 |
@@ -4834,9 +4757,6 @@ public:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddScene                                                          |   0x00 |
-| * CopyScene                                                         |   0x42 |
-| * EnhancedAddScene                                                  |   0x40 |
-| * EnhancedViewScene                                                 |   0x41 |
 | * GetSceneMembership                                                |   0x06 |
 | * RecallScene                                                       |   0x05 |
 | * RemoveAllScenes                                                   |   0x03 |
@@ -4872,108 +4792,6 @@ public:
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
-
-        return true;
-    }
-};
-
-/*
- * Command Response CopySceneResponse
- */
-class CopySceneResponse : public ModelCommandResponse
-{
-public:
-    CopySceneResponse() : ModelCommandResponse(0x42) {}
-
-    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
-    {
-        ChipLogProgress(chipTool, "CopySceneResponse (0x42):");
-        CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupIdFrom", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneIdFrom", chip::Encoding::Read8(message)); // uint8
-
-        return true;
-    }
-};
-
-/*
- * Command Response EnhancedAddSceneResponse
- */
-class EnhancedAddSceneResponse : public ModelCommandResponse
-{
-public:
-    EnhancedAddSceneResponse() : ModelCommandResponse(0x40) {}
-
-    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
-    {
-        ChipLogProgress(chipTool, "EnhancedAddSceneResponse (0x40):");
-        CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
-
-        return true;
-    }
-};
-
-/*
- * Command Response EnhancedViewSceneResponse
- */
-class EnhancedViewSceneResponse : public ModelCommandResponse
-{
-public:
-    EnhancedViewSceneResponse() : ModelCommandResponse(0x41) {}
-
-    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
-    {
-        ChipLogProgress(chipTool, "EnhancedViewSceneResponse (0x41):");
-        CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "transitionTime", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        CHECK_MESSAGE_LENGTH(1);
-        {
-            uint8_t sceneNameLen = chip::Encoding::Read8(message);                   // SSceneName
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneNameLen", sceneNameLen); // SSceneName
-
-            // FIXME Strings are not supported yet. For the moment the code just checks that
-            // there is enough bytes in the buffer
-            CHECK_MESSAGE_LENGTH(sceneNameLen);
-        }
-        // struct SExtensionFieldSetList[]
-        uint8_t * messageEnd = message + messageLen;
-        while (message < messageEnd)
-        {
-            CHECK_MESSAGE_LENGTH(2);
-            ChipLogProgress(chipTool, "  %s: 0x%04x", "clusterId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-            CHECK_MESSAGE_LENGTH(1);
-            {
-                uint8_t extensionFieldSetLen = chip::Encoding::Read8(message);                           // octstr
-                ChipLogProgress(chipTool, "  %s: 0x%02x", "extensionFieldSetLen", extensionFieldSetLen); // octstr
-
-                // FIXME Strings are not supported yet. For the moment the code just checks that
-                // there is enough bytes in the buffer
-                CHECK_MESSAGE_LENGTH(extensionFieldSetLen);
-            }
-        }
 
         return true;
     }
@@ -5182,135 +5000,6 @@ private:
     char * mSceneName;
     uint16_t mClusterId;
     char * mExtensionFieldSet;
-};
-
-/*
- * Command CopyScene
- */
-class ScenesCopyScene : public ModelCommand
-{
-public:
-    ScenesCopyScene() : ModelCommand("copy-scene", kScenesClusterId, 0x42)
-    {
-        AddArgument("mode", 0, UINT8_MAX, &mMode);
-        AddArgument("groupIdentifierFrom", 0, UINT16_MAX, &mGroupIdentifierFrom);
-        AddArgument("sceneIdentifierFrom", 0, UINT8_MAX, &mSceneIdentifierFrom);
-        AddArgument("groupIdentifierTo", 0, UINT16_MAX, &mGroupIdentifierTo);
-        AddArgument("sceneIdentifierTo", 0, UINT8_MAX, &mSceneIdentifierTo);
-        ModelCommand::AddArguments();
-    }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeScenesClusterCopySceneCommand(buffer->Start(), bufferSize, endPointId, mMode, mGroupIdentifierFrom,
-                                                   mSceneIdentifierFrom, mGroupIdentifierTo, mSceneIdentifierTo);
-    }
-
-    // Global Response: DefaultResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        DefaultResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-    // Specific Response: CopySceneResponse
-    bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        CopySceneResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-private:
-    uint8_t mMode;
-    uint16_t mGroupIdentifierFrom;
-    uint8_t mSceneIdentifierFrom;
-    uint16_t mGroupIdentifierTo;
-    uint8_t mSceneIdentifierTo;
-};
-
-/*
- * Command EnhancedAddScene
- */
-class ScenesEnhancedAddScene : public ModelCommand
-{
-public:
-    ScenesEnhancedAddScene() : ModelCommand("enhanced-add-scene", kScenesClusterId, 0x40)
-    {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
-        AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
-        AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
-        AddArgument("sceneName", &mSceneName);
-        // extensionFieldSets is an array, but since chip-tool does not support variable
-        // number of arguments, only a single instance is supported.
-        AddArgument("clusterId", 0, UINT16_MAX, &mClusterId);
-        AddArgument("extensionFieldSet", &mExtensionFieldSet);
-        ModelCommand::AddArguments();
-    }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeScenesClusterEnhancedAddSceneCommand(buffer->Start(), bufferSize, endPointId, mGroupID, mSceneID,
-                                                          mTransitionTime, mSceneName, mClusterId, mExtensionFieldSet);
-    }
-
-    // Global Response: DefaultResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        DefaultResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-    // Specific Response: EnhancedAddSceneResponse
-    bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        EnhancedAddSceneResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-private:
-    uint16_t mGroupID;
-    uint8_t mSceneID;
-    uint16_t mTransitionTime;
-    char * mSceneName;
-    uint16_t mClusterId;
-    char * mExtensionFieldSet;
-};
-
-/*
- * Command EnhancedViewScene
- */
-class ScenesEnhancedViewScene : public ModelCommand
-{
-public:
-    ScenesEnhancedViewScene() : ModelCommand("enhanced-view-scene", kScenesClusterId, 0x41)
-    {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
-        AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
-        ModelCommand::AddArguments();
-    }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeScenesClusterEnhancedViewSceneCommand(buffer->Start(), bufferSize, endPointId, mGroupID, mSceneID);
-    }
-
-    // Global Response: DefaultResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        DefaultResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-    // Specific Response: EnhancedViewSceneResponse
-    bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        EnhancedViewSceneResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-private:
-    uint16_t mGroupID;
-    uint8_t mSceneID;
 };
 
 /*
@@ -5837,31 +5526,18 @@ void registerClusterDoorLock(Commands & commands)
     const char * clusterName = "DoorLock";
 
     commands_list clusterCommands = {
-        make_unique<DoorLockClearAllPINCodes>(),
-        make_unique<DoorLockClearAllRFIDCodes>(),
-        make_unique<DoorLockClearHolidaySchedule>(),
-        make_unique<DoorLockClearPINCode>(),
-        make_unique<DoorLockClearRFIDCode>(),
-        make_unique<DoorLockClearWeekdaySchedule>(),
-        make_unique<DoorLockClearYearDaySchedule>(),
-        make_unique<DoorLockGetHolidaySchedule>(),
-        make_unique<DoorLockGetLogRecord>(),
-        make_unique<DoorLockGetPINCode>(),
-        make_unique<DoorLockGetRFIDCode>(),
-        make_unique<DoorLockGetUserType>(),
-        make_unique<DoorLockGetWeekdaySchedule>(),
-        make_unique<DoorLockGetYearDaySchedule>(),
-        make_unique<DoorLockLockDoor>(),
-        make_unique<DoorLockSetHolidaySchedule>(),
-        make_unique<DoorLockSetPINCode>(),
-        make_unique<DoorLockSetRFIDCode>(),
-        make_unique<DoorLockSetUserType>(),
-        make_unique<DoorLockSetWeekdaySchedule>(),
-        make_unique<DoorLockSetYearDaySchedule>(),
-        make_unique<DoorLockUnlockDoor>(),
-        make_unique<DoorLockUnlockWithTimeout>(),
-        make_unique<ReadDoorLockLockState>(),
-        make_unique<ReadDoorLockLockType>(),
+        make_unique<DoorLockClearAllPINCodes>(),     make_unique<DoorLockClearAllRFIDCodes>(),
+        make_unique<DoorLockClearHolidaySchedule>(), make_unique<DoorLockClearPINCode>(),
+        make_unique<DoorLockClearRFIDCode>(),        make_unique<DoorLockClearWeekdaySchedule>(),
+        make_unique<DoorLockClearYearDaySchedule>(), make_unique<DoorLockGetHolidaySchedule>(),
+        make_unique<DoorLockGetPINCode>(),           make_unique<DoorLockGetRFIDCode>(),
+        make_unique<DoorLockGetUserType>(),          make_unique<DoorLockGetWeekdaySchedule>(),
+        make_unique<DoorLockGetYearDaySchedule>(),   make_unique<DoorLockLockDoor>(),
+        make_unique<DoorLockSetHolidaySchedule>(),   make_unique<DoorLockSetPINCode>(),
+        make_unique<DoorLockSetRFIDCode>(),          make_unique<DoorLockSetUserType>(),
+        make_unique<DoorLockSetWeekdaySchedule>(),   make_unique<DoorLockSetYearDaySchedule>(),
+        make_unique<DoorLockUnlockDoor>(),           make_unique<DoorLockUnlockWithTimeout>(),
+        make_unique<ReadDoorLockLockState>(),        make_unique<ReadDoorLockLockType>(),
         make_unique<ReadDoorLockActuatorEnabled>(),
     };
 
@@ -5926,11 +5602,10 @@ void registerClusterScenes(Commands & commands)
     const char * clusterName = "Scenes";
 
     commands_list clusterCommands = {
-        make_unique<ScenesAddScene>(),          make_unique<ScenesCopyScene>(),          make_unique<ScenesEnhancedAddScene>(),
-        make_unique<ScenesEnhancedViewScene>(), make_unique<ScenesGetSceneMembership>(), make_unique<ScenesRecallScene>(),
-        make_unique<ScenesRemoveAllScenes>(),   make_unique<ScenesRemoveScene>(),        make_unique<ScenesStoreScene>(),
-        make_unique<ScenesViewScene>(),         make_unique<ReadScenesSceneCount>(),     make_unique<ReadScenesCurrentScene>(),
-        make_unique<ReadScenesCurrentGroup>(),  make_unique<ReadScenesSceneValid>(),     make_unique<ReadScenesNameSupport>(),
+        make_unique<ScenesAddScene>(),         make_unique<ScenesGetSceneMembership>(), make_unique<ScenesRecallScene>(),
+        make_unique<ScenesRemoveAllScenes>(),  make_unique<ScenesRemoveScene>(),        make_unique<ScenesStoreScene>(),
+        make_unique<ScenesViewScene>(),        make_unique<ReadScenesSceneCount>(),     make_unique<ReadScenesCurrentScene>(),
+        make_unique<ReadScenesCurrentGroup>(), make_unique<ReadScenesSceneValid>(),     make_unique<ReadScenesNameSupport>(),
     };
 
     commands.Register(clusterName, clusterCommands);
