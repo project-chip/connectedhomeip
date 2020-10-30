@@ -92,7 +92,7 @@ CHIP_ERROR Commands::RunCommand(ChipDeviceController & dc, NodeId remoteId, int 
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    if (strcmp(argv[2], "read") != 0 && strcmp(argv[2], "write") != 0)
+    if (!IsGlobalCommand(argv[2]))
     {
         command = GetCommand(cluster->second, argv[2]);
         if (command == nullptr)
@@ -111,7 +111,7 @@ CHIP_ERROR Commands::RunCommand(ChipDeviceController & dc, NodeId remoteId, int 
             ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
         }
 
-        command = GetReadWriteCommand(cluster->second, argv[2], argv[3]);
+        command = GetGlobalCommand(cluster->second, argv[2], argv[3]);
         if (command == nullptr)
         {
             ChipLogError(chipTool, "Unknown attribute: %s", argv[3]);
@@ -165,7 +165,7 @@ Command * Commands::GetCommand(CommandsVector & commands, std::string commandNam
     return nullptr;
 }
 
-Command * Commands::GetReadWriteCommand(CommandsVector & commands, std::string commandName, std::string attributeName)
+Command * Commands::GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName)
 {
     for (auto & command : commands)
     {
@@ -176,6 +176,11 @@ Command * Commands::GetReadWriteCommand(CommandsVector & commands, std::string c
     }
 
     return nullptr;
+}
+
+bool Commands::IsGlobalCommand(std::string commandName) const
+{
+    return commandName.compare("read") == 0 || commandName.compare("write") == 0 || commandName.compare("report") == 0;
 }
 
 void Commands::ShowClusters(std::string executable)
@@ -204,27 +209,34 @@ void Commands::ShowCluster(std::string executable, std::string clusterName, Comm
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     fprintf(stderr, "  | Commands:                                                                           |\n");
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
-    bool readCommand  = false;
-    bool writeCommand = false;
+    bool readCommand   = false;
+    bool writeCommand  = false;
+    bool reportCommand = false;
     for (auto & command : commands)
     {
-        if (strcmp(command->GetName(), "read") == 0)
+        bool shouldPrint = true;
+
+        if (IsGlobalCommand(command->GetName()))
         {
-            if (readCommand == false)
+            if (strcmp(command->GetName(), "read") == 0 && readCommand == false)
             {
-                fprintf(stderr, "  | * %-82s|\n", command->GetName());
                 readCommand = true;
             }
-        }
-        else if (strcmp(command->GetName(), "write") == 0)
-        {
-            if (writeCommand == false)
+            else if (strcmp(command->GetName(), "write") == 0 && writeCommand == false)
             {
-                fprintf(stderr, "  | * %-82s|\n", command->GetName());
                 writeCommand = true;
             }
+            else if (strcmp(command->GetName(), "report") == 0 && reportCommand == false)
+            {
+                reportCommand = true;
+            }
+            else
+            {
+                shouldPrint = false;
+            }
         }
-        else
+
+        if (shouldPrint)
         {
             fprintf(stderr, "  | * %-82s|\n", command->GetName());
         }
