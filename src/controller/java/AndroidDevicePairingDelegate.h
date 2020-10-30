@@ -20,7 +20,7 @@
 
 #include <controller/CHIPDeviceController.h>
 
-class AndroidDevicePairingDelegate : public chip::DeviceController::DevicePairingDelegate
+class AndroidDevicePairingDelegate : chip::DeviceController::DevicePairingDelegate
 {
 public:
     void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
@@ -32,4 +32,9 @@ public:
     void OnPairingDeleted(CHIP_ERROR error) override;
 
     void * AppState = nullptr;
+
+    chip::RendezvousDeviceCredentialsDelegate * GetCredentialDelegate() { return mCredentialsDelegate; }
+
+private:
+    chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
 };

@@ -103,7 +103,6 @@ pthread_t sIOThread        = PTHREAD_NULL;
 bool sShutdown             = false;
 
 jclass sAndroidChipStackCls              = NULL;
-jclass sChipDeviceControllerCls          = NULL;
 jclass sChipDeviceControllerExceptionCls = NULL;
 
 /** A scoped lock/unlock around a mutex. */
@@ -152,8 +151,6 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(Controller, "Loading Java class references.");
 
     // Get various class references need by the API.
-    err = GetClassRef(env, "chip/devicecontroller/ChipDeviceController", sChipDeviceControllerCls);
-    SuccessOrExit(err);
     err = GetClassRef(env, "chip/devicecontroller/AndroidChipStack", sAndroidChipStackCls);
     SuccessOrExit(err);
     err = GetClassRef(env, "chip/devicecontroller/ChipDeviceControllerException", sChipDeviceControllerExceptionCls);
@@ -719,8 +716,6 @@ bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svc
     intptr_t tmpConnObj;
     bool rc = false;
 
-    ChipLogProgress(Controller, "Received SendCharacteristic");
-
     sJVM->GetEnv((void **) &env, JNI_VERSION_1_6);
 
     err = N2J_ByteArray(env, svcId, 16, svcIdObj);
@@ -734,8 +729,6 @@ bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svc
 
     method = env->GetStaticMethodID(sAndroidChipStackCls, "onSendCharacteristic", "(I[B[B[B)Z");
     VerifyOrExit(method != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
-
-    ChipLogProgress(Controller, "Calling Java SendCharacteristic");
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(connObj);
@@ -777,8 +770,6 @@ bool HandleSubscribeCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t 
 
     method = env->GetStaticMethodID(sAndroidChipStackCls, "onSubscribeCharacteristic", "(I[B[B)Z");
     VerifyOrExit(method != NULL, err = CDC_JNI_ERROR_METHOD_NOT_FOUND);
-
-    ChipLogProgress(Controller, "Calling Java SubscribeCharacteristic");
 
     env->ExceptionClear();
     tmpConnObj = reinterpret_cast<intptr_t>(connObj);

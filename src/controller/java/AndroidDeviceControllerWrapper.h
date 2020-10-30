@@ -31,7 +31,7 @@
  *
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
-class AndroidDeviceControllerWrapper
+class AndroidDeviceControllerWrapper : chip::DeviceController::DevicePairingDelegate
 {
 public:
     ~AndroidDeviceControllerWrapper();
@@ -39,6 +39,14 @@ public:
     chip::DeviceController::ChipDeviceController * Controller() { return mController.get(); }
 
     void SetJavaObjectRef(JNIEnv * env, jobject obj);
+
+    // DevicePairingDelegate implementation
+    void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
+    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
+                                           chip::RendezvousDeviceCredentialsDelegate * callback) override;
+    void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
+    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingDeleted(CHIP_ERROR error) override;
 
     jlong ToJNIHandle()
     {
@@ -62,19 +70,16 @@ public:
                                                         chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
 
 private:
-    using ChipDeviceControllerPtr         = std::unique_ptr<chip::DeviceController::ChipDeviceController>;
-    using AndroidDevicePairingDelegatePtr = std::unique_ptr<AndroidDevicePairingDelegate>;
+    using ChipDeviceControllerPtr = std::unique_ptr<chip::DeviceController::ChipDeviceController>;
 
     ChipDeviceControllerPtr mController;
-    AndroidDevicePairingDelegatePtr mDelegate;
+    chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
 
     JNIEnv * mJavaEnv      = nullptr;
     jobject mJavaObjectRef = nullptr;
 
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidDevicePairingDelegatePtr delegate) :
-        mController(std::move(controller)), mDelegate(std::move(delegate))
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller))
     {
         mController->AppState = reinterpret_cast<void *>(this);
-        mDelegate->AppState   = reinterpret_cast<void *>(this);
     }
 };

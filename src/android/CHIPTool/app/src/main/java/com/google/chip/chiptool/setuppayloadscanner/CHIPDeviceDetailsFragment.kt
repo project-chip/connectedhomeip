@@ -39,7 +39,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 /** Show the [CHIPDeviceInfo]. */
-class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionListener {
+class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionListener, ChipDeviceController.PairingListener {
 
     private lateinit var deviceInfo: CHIPDeviceInfo
     private var gatt: BluetoothGatt? = null
@@ -103,6 +103,7 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
                 gatt = bluetoothManager.connect(requireContext(), device)
 
                 showMessage(requireContext().getString(R.string.rendezvous_over_ble_pairing_text))
+                deviceController.setPairingListener(this@CHIPDeviceDetailsFragment)
                 deviceController.setCompletionListener(this@CHIPDeviceDetailsFragment)
                 deviceController.beginConnectDeviceBle(gatt, deviceInfo.setupPinCode);
             }
@@ -148,5 +149,25 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
                 arguments = Bundle(1).apply { putParcelable(ARG_DEVICE_INFO, deviceInfo) }
             }
         }
+    }
+
+    override fun onNetworkCredentialsRequested() {
+        Log.e(TAG, "onNetworkCredentialsRequested is not yet implemented");
+    }
+
+    override fun onOperationalCredentialsRequested(csr: String?) {
+        Log.e(TAG, "onOperationalCredentialsRequested is not yet implemented");
+    }
+
+    override fun onStatusUpdate(status: Int) {
+        Log.i(TAG, "Pairing status update: $status");
+    }
+
+    override fun onPairingComplete(code: Int) {
+        Log.i(TAG, "Pairing complete: $code");
+    }
+
+    override fun onPairingDeleted(code: Int) {
+        Log.i(TAG, "Pairing deleted: $code");
     }
 }

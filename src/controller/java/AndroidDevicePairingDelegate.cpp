@@ -23,6 +23,7 @@
 void AndroidDevicePairingDelegate::OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback)
 {
     using namespace chip::DeviceLayer::Internal;
+    ChipLogProgress(Controller, "Executing: %s", __PRETTY_FUNCTION__);
 
     // This is a dummy implementation of Thread provisioning which allows to test Rendezvous over BLE with
     // Thread-enabled devices by sending OpenThread Border Router default credentials.

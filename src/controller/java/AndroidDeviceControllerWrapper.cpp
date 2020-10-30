@@ -21,6 +21,48 @@
 
 using chip::DeviceController::ChipDeviceController;
 
+namespace {
+
+bool FindMethod(JNIEnv * env, jobject object, const char * methodName, const char * methodSignature, jmethodID * methodId)
+{
+    if ((env == nullptr) || (object == nullptr))
+    {
+        ChipLogError(Controller, "Missing java object for %s", methodName);
+        return false;
+    }
+
+    jclass javaClass = env->GetObjectClass(object);
+    if (javaClass == NULL)
+    {
+        ChipLogError(Controller, "Failed to get class for %s", methodName);
+        return false;
+    }
+
+    *methodId = env->GetMethodID(javaClass, methodName, methodSignature);
+    if (*methodId == NULL)
+    {
+        ChipLogError(Controller, "Failed to find method %s", methodName);
+        return false;
+    }
+
+    return true;
+}
+
+void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint argument)
+{
+    jmethodID method;
+
+    if (!FindMethod(env, object, methodName, "(I)V", &method))
+    {
+        return;
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(object, method, argument);
+}
+
+} // namespace
+
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
     if ((mJavaEnv != nullptr) && (mJavaObjectRef != nullptr))
@@ -62,19 +104,56 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(chi
     *errInfoOnFailure = CHIP_NO_ERROR;
 
     std::unique_ptr<ChipDeviceController> controller(new ChipDeviceController());
-    std::unique_ptr<AndroidDevicePairingDelegate> delegate(new AndroidDevicePairingDelegate());
 
-    if (!controller || !delegate)
+    if (!controller)
     {
         *errInfoOnFailure = CHIP_ERROR_NO_MEMORY;
         return nullptr;
     }
+    std::unique_ptr<AndroidDeviceControllerWrapper> wrapper(new AndroidDeviceControllerWrapper(std::move(controller)));
 
-    *errInfoOnFailure = controller->Init(nodeId, systemLayer, inetLayer, delegate.get());
+    *errInfoOnFailure = wrapper->Controller()->Init(nodeId, systemLayer, inetLayer, wrapper.get());
     if (*errInfoOnFailure != CHIP_NO_ERROR)
     {
         return nullptr;
     }
 
-    return new AndroidDeviceControllerWrapper(std::move(controller), std::move(delegate));
+    return wrapper.release();
+}
+
+void AndroidDeviceControllerWrapper::OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback)
+{
+    mCredentialsDelegate = callback;
+
+    jmethodID method;
+    if (!FindMethod(mJavaEnv, mJavaObjectRef, "onNetworkCredentialsRequested", "()V", &method))
+    {
+        return;
+    }
+
+    mJavaEnv->ExceptionClear();
+    mJavaEnv->CallVoidMethod(mJavaObjectRef, method);
+}
+
+void AndroidDeviceControllerWrapper::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
+                                                                       chip::RendezvousDeviceCredentialsDelegate * callback)
+{
+    mCredentialsDelegate = callback;
+
+    ChipLogProgress(Controller, "NOT YET IMPLEMENTED: %s", __PRETTY_FUNCTION__);
+}
+
+void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::RendezvousSessionDelegate::Status status)
+{
+    CallVoidInt(mJavaEnv, mJavaObjectRef, "onStatusUpdate", static_cast<jint>(status));
+}
+
+void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
+{
+    CallVoidInt(mJavaEnv, mJavaObjectRef, "onPairingComplete", static_cast<jint>(error));
+}
+
+void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
+{
+    CallVoidInt(mJavaEnv, mJavaObjectRef, "onPairingDeleted", static_cast<jint>(error));
 }

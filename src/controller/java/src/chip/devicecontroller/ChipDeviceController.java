@@ -28,9 +28,14 @@ public class ChipDeviceController {
   private int connectionId;
   private BluetoothGatt bleGatt;
   private CompletionListener completionListener;
+  private PairingListener pairingListener;
 
   public ChipDeviceController() {
     deviceControllerPtr = newDeviceController();
+  }
+
+  public void setPairingListener(PairingListener listener) {
+    pairingListener = listener;
   }
 
   public void setCompletionListener(CompletionListener listener) {
@@ -193,5 +198,42 @@ public class ChipDeviceController {
 
     /** Notifies the listener of the error. */
     void onError(Throwable error);
+  }
+
+  public interface PairingListener {
+    void onNetworkCredentialsRequested();
+    void onOperationalCredentialsRequested(String csr);
+    void onStatusUpdate(int status);
+    void onPairingComplete(int errorCode);
+    void onPairingDeleted(int errorCode);
+  }
+
+  public void onNetworkCredentialsRequested() {
+    if (pairingListener != null) {
+      pairingListener.onNetworkCredentialsRequested();
+    }
+  }
+  public void onOperationalCredentialsRequested(String csr) {
+    if (pairingListener != null) {
+      pairingListener.onOperationalCredentialsRequested(csr);
+    }
+  }
+
+  public void onStatusUpdate(int status){
+    if (pairingListener != null) {
+      pairingListener.onStatusUpdate(status);
+    }
+  }
+
+  public void onPairingComplete(int errorCode) {
+    if (pairingListener != null) {
+      pairingListener.onPairingComplete(errorCode);
+    }
+  }
+
+  public void onPairingDeleted(int errorCode) {
+    if (pairingListener != null) {
+      pairingListener.onPairingDeleted(errorCode);
+    }
   }
 }
