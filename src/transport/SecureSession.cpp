@@ -199,7 +199,7 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
     VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mState != State::kInitializedSecure, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+    VerifyOrExit(mState != State::kNotInitialized, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
     if (mState == State::kInitializedSecure)
     {
