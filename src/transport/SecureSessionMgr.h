@@ -135,7 +135,7 @@ public:
      *   encryption.
      */
     CHIP_ERROR NewUnsecureSession(const Transport::PeerAddress & peerAddr, const Optional<NodeId> & nodeId,
-                                  PeerConnectionState ** state);
+                                  Transport::PeerConnectionState ** state);
 
     /**
      * @brief
