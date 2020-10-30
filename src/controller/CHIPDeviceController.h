@@ -204,7 +204,6 @@ public:
      * @param[in] appReqState   Application specific context to be passed back when a message is received or on error
      * @param[in] buffer        The Data Buffer to trasmit to the device
      * @param[in] peerDevice    Device ID of the peer device
-     * @param[in] secure        Should the message be secure
      * @return CHIP_ERROR   The return status
      */
     CHIP_ERROR SendMessage(void * appReqState, System::PacketBuffer * buffer, NodeId peerDevice = kUndefinedNodeId);
