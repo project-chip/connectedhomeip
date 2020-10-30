@@ -23,7 +23,18 @@ using chip::DeviceController::ChipDeviceController;
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
+    if ((mJavaEnv != nullptr) && (mJavaObjectRef != nullptr))
+    {
+        mJavaEnv->DeleteGlobalRef(mJavaObjectRef);
+        mController->AppState = nullptr;
+    }
     mController->Shutdown();
+}
+
+void AndroidDeviceControllerWrapper::SetJavaObjectRef(JNIEnv * env, jobject obj)
+{
+    mJavaEnv       = env;
+    mJavaObjectRef = env->NewGlobalRef(obj);
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,

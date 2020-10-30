@@ -50,4 +50,21 @@ void AndroidDevicePairingDelegate::OnNetworkCredentialsRequested(chip::Rendezvou
 
 void AndroidDevicePairingDelegate::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
                                                                      chip::RendezvousDeviceCredentialsDelegate * callback)
-{}
+{
+    ChipLogProgress(Controller, "%s not yet implemented", __PRETTY_FUNCTION__);
+}
+
+void AndroidDevicePairingDelegate::OnStatusUpdate(chip::RendezvousSessionDelegate::Status status)
+{
+    ChipLogProgress(Controller, "%s not yet implemented", __PRETTY_FUNCTION__);
+}
+
+void AndroidDevicePairingDelegate::OnPairingComplete(CHIP_ERROR error)
+{
+    ChipLogProgress(Controller, "%s not yet implemented", __PRETTY_FUNCTION__);
+}
+
+void AndroidDevicePairingDelegate::OnPairingDeleted(CHIP_ERROR error)
+{
+    ChipLogProgress(Controller, "%s not yet implemented", __PRETTY_FUNCTION__);
+}

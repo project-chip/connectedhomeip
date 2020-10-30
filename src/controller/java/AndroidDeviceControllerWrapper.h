@@ -38,15 +38,24 @@ public:
 
     chip::DeviceController::ChipDeviceController * Controller() { return mController.get(); }
 
+    void SetJavaObjectRef(JNIEnv * env, jobject obj);
+
     jlong ToJNIHandle()
     {
         static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
         return reinterpret_cast<jlong>(this);
     }
 
+    jobject JavaObjectRef() { return mJavaObjectRef; }
+
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
+    }
+
+    static AndroidDeviceControllerWrapper * FromController(chip::DeviceController::ChipDeviceController * controller)
+    {
+        return reinterpret_cast<AndroidDeviceControllerWrapper *>(controller->AppState);
     }
 
     static AndroidDeviceControllerWrapper * AllocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
@@ -59,7 +68,13 @@ private:
     ChipDeviceControllerPtr mController;
     AndroidDevicePairingDelegatePtr mDelegate;
 
+    JNIEnv * mJavaEnv      = nullptr;
+    jobject mJavaObjectRef = nullptr;
+
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidDevicePairingDelegatePtr delegate) :
         mController(std::move(controller)), mDelegate(std::move(delegate))
-    {}
+    {
+        mController->AppState = reinterpret_cast<void *>(this);
+        mDelegate->AppState   = reinterpret_cast<void *>(this);
+    }
 };

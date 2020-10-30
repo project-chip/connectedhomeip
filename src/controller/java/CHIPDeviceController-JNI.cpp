@@ -240,8 +240,8 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     wrapper = AndroidDeviceControllerWrapper::AllocateNew(kLocalDeviceId, &sSystemLayer, &sInetLayer, &err);
     SuccessOrExit(err);
 
-    wrapper->Controller()->AppState = (void *) env->NewGlobalRef(self);
-    result                          = wrapper->ToJNIHandle();
+    wrapper->SetJavaObjectRef(env, self);
+    result = wrapper->ToJNIHandle();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -249,10 +249,6 @@ exit:
         result = 0;
         if (wrapper != NULL)
         {
-            if (wrapper->Controller()->AppState != NULL)
-            {
-                env->DeleteGlobalRef((jobject) wrapper->Controller()->AppState);
-            }
             delete wrapper;
         }
 
@@ -573,10 +569,6 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handl
 
     if (wrapper != NULL)
     {
-        if (wrapper->Controller()->AppState != NULL)
-        {
-            env->DeleteGlobalRef((jobject) wrapper->Controller()->AppState);
-        }
         delete wrapper;
     }
 }
@@ -588,7 +580,7 @@ void HandleSimpleOperationComplete(ChipDeviceController * deviceController, cons
     jclass deviceControllerCls;
     jmethodID methodID;
     char methodName[128];
-    jobject self   = (jobject) deviceController->AppState;
+    jobject self   = AndroidDeviceControllerWrapper::FromController(DeviceController)->JavaObjectRef();
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received response to %s request", operation);
@@ -654,7 +646,7 @@ void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqSt
     JNIEnv * env;
     jclass deviceControllerCls;
     jmethodID methodID;
-    jobject self      = (jobject) deviceController->AppState;
+    jobject self      = AndroidDeviceControllerWrapper::FromController(DeviceController)->JavaObjectRef();
     jstring msgString = NULL;
     CHIP_ERROR err    = CHIP_NO_ERROR;
 
@@ -920,7 +912,8 @@ void HandleNewConnection(void * appState, const uint16_t discriminator)
     JNIEnv * env;
     jmethodID method;
     jclass deviceControllerCls;
-    jobject self = (jobject) appState;
+    AndroidDeviceControllerWrapper * wrapper = reinterpret_cast<AndroidDeviceControllerWrapper *>(appState);
+    jobject self                             = wrapper->JavaObjectRef();
 
     ChipLogProgress(Controller, "Received New Connection");
 
@@ -953,7 +946,7 @@ void HandleError(ChipDeviceController * deviceController, void * appReqState, CH
     jclass cls;
     jmethodID method;
     jthrowable ex;
-    jobject self = (jobject) deviceController->AppState;
+    jobject self = AndroidDeviceControllerWrapper::FromController(DeviceController)->JavaObjectRef();
 
     ChipLogError(Controller, "HandleError");
 
