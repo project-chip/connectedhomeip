@@ -25,7 +25,6 @@
 #include "AndroidBleApplicationDelegate.h"
 #include "AndroidBleConnectionDelegate.h"
 #include "AndroidBlePlatformDelegate.h"
-#include "AndroidDevicePairingDelegate.h"
 
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
@@ -90,7 +89,6 @@ namespace {
 JavaVM * sJVM;
 System::Layer sSystemLayer;
 Inet::InetLayer sInetLayer;
-AndroidDevicePairingDelegate sDevicePairingDelegate;
 
 #if CONFIG_NETWORK_LAYER_BLE
 Ble::BleLayer sBleLayer;
