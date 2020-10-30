@@ -51,6 +51,9 @@ using namespace chip::DeviceController;
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipDeviceController_##METHOD_NAME
 
+#define JNI_ANDROID_CHIP_STACK_METHOD(RETURN, METHOD_NAME)                                                                                            \
+    extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_AndroidChipStack_##METHOD_NAME
+
 #define CDC_JNI_ERROR_MIN 10000
 #define CDC_JNI_ERROR_MAX 10999
 
@@ -181,7 +184,7 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     sBlePlatformDelegate.SetUnsubscribeCharacteristicCallback(HandleUnsubscribeCharacteristic);
     sBlePlatformDelegate.SetCloseConnectionCallback(HandleCloseConnection);
     sBlePlatformDelegate.SetGetMTUCallback(HandleGetMTU);
-
+    // Initialize the BleConnectionDelegate
     sBleConnectionDelegate.SetNewConnectionCallback(HandleNewConnection);
 
     ChipLogProgress(Controller, "Asking for BLE Layer initialization.");
@@ -273,19 +276,18 @@ exit:
 JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jint connObj, jlong pinCode)
 {
     CHIP_ERROR err                          = CHIP_NO_ERROR;
-    void * appReqState                      = (void *) self;
     ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
 
     ChipLogProgress(Controller, "beginConnectDevice() called with connection object and pincode");
 
     {
         ScopedPthreadLock lock(&sStackLock);
-        sBleLayer.mAppState         = appReqState;
+        sBleLayer.mAppState         = (void *) self;
         RendezvousParameters params = RendezvousParameters()
                                           .SetSetupPINCode(pinCode)
                                           .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
                                           .SetBleLayer(&sBleLayer);
-        err = deviceController->ConnectDevice(kRemoteDeviceId, params, appReqState, HandleKeyExchange, HandleEchoResponse,
+        err = deviceController->ConnectDevice(kRemoteDeviceId, params, (void *) "ConnectDevice", HandleKeyExchange, HandleEchoResponse,
                                               HandleError);
     }
 
@@ -428,7 +430,7 @@ exit:
     return result;
 }
 
-JNI_METHOD(void, handleIndicationReceived)
+JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
 (JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId, jbyteArray value)
 {
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
@@ -457,7 +459,7 @@ exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
 }
 
-JNI_METHOD(void, handleWriteConfirmation)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
+JNI_ANDROID_CHIP_STACK_METHOD(void, handleWriteConfirmation)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -475,7 +477,7 @@ exit:
     return;
 }
 
-JNI_METHOD(void, handleSubscribeComplete)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
+JNI_ANDROID_CHIP_STACK_METHOD(void, handleSubscribeComplete)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -493,7 +495,7 @@ exit:
     return;
 }
 
-JNI_METHOD(void, handleUnsubscribeComplete)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
+JNI_ANDROID_CHIP_STACK_METHOD(void, handleUnsubscribeComplete)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -511,7 +513,7 @@ exit:
     return;
 }
 
-JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
+JNI_ANDROID_CHIP_STACK_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
 {
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -654,7 +656,7 @@ exit:
 
 void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState)
 {
-    HandleSimpleOperationComplete(deviceController, "ConnectDevice");
+    HandleSimpleOperationComplete(deviceController, (const char *) appReqState);
 }
 
 void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
