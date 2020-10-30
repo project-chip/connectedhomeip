@@ -580,7 +580,7 @@ void HandleSimpleOperationComplete(ChipDeviceController * deviceController, cons
     jclass deviceControllerCls;
     jmethodID methodID;
     char methodName[128];
-    jobject self   = AndroidDeviceControllerWrapper::FromController(DeviceController)->JavaObjectRef();
+    jobject self   = AndroidDeviceControllerWrapper::FromController(deviceController)->JavaObjectRef();
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received response to %s request", operation);
@@ -646,7 +646,7 @@ void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqSt
     JNIEnv * env;
     jclass deviceControllerCls;
     jmethodID methodID;
-    jobject self      = AndroidDeviceControllerWrapper::FromController(DeviceController)->JavaObjectRef();
+    jobject self      = AndroidDeviceControllerWrapper::FromController(deviceController)->JavaObjectRef();
     jstring msgString = NULL;
     CHIP_ERROR err    = CHIP_NO_ERROR;
 
@@ -946,7 +946,7 @@ void HandleError(ChipDeviceController * deviceController, void * appReqState, CH
     jclass cls;
     jmethodID method;
     jthrowable ex;
-    jobject self = AndroidDeviceControllerWrapper::FromController(DeviceController)->JavaObjectRef();
+    jobject self = AndroidDeviceControllerWrapper::FromController(deviceController)->JavaObjectRef();
 
     ChipLogError(Controller, "HandleError");
 
