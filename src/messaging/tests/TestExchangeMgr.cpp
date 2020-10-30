@@ -26,7 +26,7 @@
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
-#include <protocols/CHIPProtocols.h>
+#include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
