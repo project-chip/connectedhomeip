@@ -188,7 +188,10 @@ void Commands::ShowClusters(std::string executable)
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
     for (auto & cluster : mClusters)
     {
-        fprintf(stderr, "  | * %-82s|\n", cluster.first.c_str());
+        std::string clusterName(cluster.first);
+        std::transform(clusterName.begin(), clusterName.end(), clusterName.begin(),
+                       [](unsigned char c) { return std::tolower(c); });
+        fprintf(stderr, "  | * %-82s|\n", clusterName.c_str());
     }
     fprintf(stderr, "  +-------------------------------------------------------------------------------------+\n");
 }
