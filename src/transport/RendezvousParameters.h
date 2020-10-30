@@ -42,8 +42,8 @@ public:
         return *this;
     }
 
-    bool HasDiscriminator() const { return mDiscriminator != 0; }
-    uint16_t GetDiscriminator() const { return mDiscriminator; }
+    bool HasDiscriminator() const { return mDiscriminator != -1; }
+    uint16_t GetDiscriminator() const { return (uint16_t) mDiscriminator; }
     RendezvousParameters & SetDiscriminator(uint16_t discriminator)
     {
         mDiscriminator = discriminator;
@@ -80,8 +80,8 @@ public:
 
 private:
     Optional<NodeId> mLocalNodeId; ///< the local node id
-    uint32_t mSetupPINCode  = 0;   ///< the target peripheral setup PIN Code
-    uint16_t mDiscriminator = 0;   ///< the target peripheral discriminator
+    uint32_t mSetupPINCode = 0;    ///< the target peripheral setup PIN Code
+    int32_t mDiscriminator = -1;   ///< the target peripheral discriminator
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer               = nullptr;
