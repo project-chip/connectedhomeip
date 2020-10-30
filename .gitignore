@@ -44,3 +44,6 @@ docs/html
 
 # VSCode java extensions
 .project
+
+# Android build outputs
+src/android/CHIPTool/app/src/main/jniLibs/*
