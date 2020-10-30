@@ -93,7 +93,7 @@ public class ChipDeviceController {
     sendNetworkCredentials(deviceControllerPtr, ssid, password);
   }
 
-  // Sends hardcoded thread network credentials. 
+  // Sends hardcoded thread network credentials.
   // method chain to be removed and replaced once full thread support is available
   public void deprecatedHardcodeThreadCredentials() {
     deprecatedHardcodeThreadCredentials(deviceControllerPtr);
