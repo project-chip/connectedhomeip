@@ -25,6 +25,12 @@
 
 #include "AndroidDevicePairingDelegate.h"
 
+/**
+ * This class contains all relevant information for the JNI view of CHIPDeviceController
+ * to handle all controller-related processing.
+ *
+ * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
+ */
 class AndroidDeviceControllerWrapper
 {
 public:
