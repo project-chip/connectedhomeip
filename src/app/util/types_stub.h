@@ -1996,8 +1996,6 @@ typedef struct
  */
 #define halCommonSetIndexedToken(token, index, data)
 
-uint32_t halCommonGetInt32uMillisecondTick(void);
-
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus

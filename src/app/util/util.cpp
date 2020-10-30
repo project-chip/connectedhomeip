@@ -1353,8 +1353,3 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
         return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_0;
     }
 }
-
-uint32_t halCommonGetInt32uMillisecondTick(void)
-{
-    return 0; // Stub for now. Implement stubs in zcl reporting cluster #2470
-}
