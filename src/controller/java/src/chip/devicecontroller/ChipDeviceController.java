@@ -171,7 +171,8 @@ public class ChipDeviceController {
 
   private native void deleteDeviceController(long deviceControllerPtr);
 
-  private native void sendNetworkCredentials(long deviceControllerPtr, String ssid, String password);
+  private native void sendNetworkCredentials(
+      long deviceControllerPtr, String ssid, String password);
 
   static {
     System.loadLibrary("CHIPController");
@@ -208,9 +209,13 @@ public class ChipDeviceController {
 
   public interface PairingListener {
     void onNetworkCredentialsRequested();
+
     void onOperationalCredentialsRequested(byte[] csr);
+
     void onStatusUpdate(int status);
+
     void onPairingComplete(int errorCode);
+
     void onPairingDeleted(int errorCode);
   }
 
@@ -219,13 +224,14 @@ public class ChipDeviceController {
       pairingListener.onNetworkCredentialsRequested();
     }
   }
+
   public void onOperationalCredentialsRequested(byte[] csr) {
     if (pairingListener != null) {
       pairingListener.onOperationalCredentialsRequested(csr);
     }
   }
 
-  public void onStatusUpdate(int status){
+  public void onStatusUpdate(int status) {
     if (pairingListener != null) {
       pairingListener.onStatusUpdate(status);
     }
