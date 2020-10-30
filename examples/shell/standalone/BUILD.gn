@@ -39,6 +39,6 @@ executable("chip-shell") {
   output_dir = root_out_dir
 }
 
-group("shell") {
+group("standalone") {
   deps = [ ":chip-shell" ]
 }
