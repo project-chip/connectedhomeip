@@ -303,10 +303,8 @@ JNI_METHOD(void, sendNetworkCredentials)(JNIEnv * env, jobject self, jlong handl
     JniUtfString ssidStr(env, ssid);
     JniUtfString passwordStr(env, password);
 
-    {
-        ScopedPthreadLock lock(&sStackLock);
-        AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
-    }
+    ChipLogProgress(Controller, "Native send network credentials for: %s", ssidStr.c_str());
+    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
 }
 
 JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)

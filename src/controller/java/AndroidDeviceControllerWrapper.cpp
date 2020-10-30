@@ -155,6 +155,7 @@ void AndroidDeviceControllerWrapper::SendNetworkCredentials(const char * ssid, c
         return;
     }
 
+    ChipLogProgress(Controller, "Sending network credentials for %s...", ssid);
     mCredentialsDelegate->SendNetworkCredentials(ssid, password);
 }
 

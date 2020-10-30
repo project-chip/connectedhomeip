@@ -155,8 +155,8 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
         Log.e(TAG, "onNetworkCredentialsRequested is not yet implemented");
     }
 
-    override fun onOperationalCredentialsRequested(csr: String?) {
-        Log.e(TAG, "onOperationalCredentialsRequested is not yet implemented");
+    override fun onOperationalCredentialsRequested(p0: ByteArray?) {
+        Log.e(TAG, "Operational credentials request not yet implemented");
     }
 
     override fun onStatusUpdate(status: Int) {
@@ -170,4 +170,7 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
     override fun onPairingDeleted(code: Int) {
         Log.i(TAG, "Pairing deleted: $code");
     }
+
+
+
 }
