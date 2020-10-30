@@ -237,7 +237,7 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     wrapper = AndroidDeviceControllerWrapper::AllocateNew(kLocalDeviceId, &sSystemLayer, &sInetLayer, &err);
     SuccessOrExit(err);
 
-    wrapper->SetJavaObjectRef(env, self);
+    wrapper->SetJavaObjectRef(sJVM, self);
     result = wrapper->ToJNIHandle();
 
 exit:

@@ -65,18 +65,31 @@ void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint arg
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
-    if ((mJavaEnv != nullptr) && (mJavaObjectRef != nullptr))
+    if ((mJavaVM != nullptr) && (mJavaObjectRef != nullptr))
     {
-        mJavaEnv->DeleteGlobalRef(mJavaObjectRef);
+        GetJavaEnv()->DeleteGlobalRef(mJavaObjectRef);
         mController->AppState = nullptr;
     }
     mController->Shutdown();
 }
 
-void AndroidDeviceControllerWrapper::SetJavaObjectRef(JNIEnv * env, jobject obj)
+void AndroidDeviceControllerWrapper::SetJavaObjectRef(JavaVM * vm, jobject obj)
 {
-    mJavaEnv       = env;
-    mJavaObjectRef = env->NewGlobalRef(obj);
+    mJavaVM        = vm;
+    mJavaObjectRef = GetJavaEnv()->NewGlobalRef(obj);
+}
+
+JNIEnv * AndroidDeviceControllerWrapper::GetJavaEnv()
+{
+    if (mJavaVM == nullptr)
+    {
+        return nullptr;
+    }
+
+    JNIEnv * env = nullptr;
+    mJavaVM->GetEnv((void **) &env, JNI_VERSION_1_6);
+
+    return env;
 }
 
 AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
@@ -125,14 +138,16 @@ void AndroidDeviceControllerWrapper::OnNetworkCredentialsRequested(chip::Rendezv
 {
     mCredentialsDelegate = callback;
 
+    JNIEnv * env = GetJavaEnv();
+
     jmethodID method;
-    if (!FindMethod(mJavaEnv, mJavaObjectRef, "onNetworkCredentialsRequested", "()V", &method))
+    if (!FindMethod(env, mJavaObjectRef, "onNetworkCredentialsRequested", "()V", &method))
     {
         return;
     }
 
-    mJavaEnv->ExceptionClear();
-    mJavaEnv->CallVoidMethod(mJavaObjectRef, method);
+    env->ExceptionClear();
+    env->CallVoidMethod(mJavaObjectRef, method);
 }
 
 void AndroidDeviceControllerWrapper::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
@@ -145,15 +160,15 @@ void AndroidDeviceControllerWrapper::OnOperationalCredentialsRequested(const cha
 
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::RendezvousSessionDelegate::Status status)
 {
-    CallVoidInt(mJavaEnv, mJavaObjectRef, "onStatusUpdate", static_cast<jint>(status));
+    CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onStatusUpdate", static_cast<jint>(status));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 {
-    CallVoidInt(mJavaEnv, mJavaObjectRef, "onPairingComplete", static_cast<jint>(error));
+    CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onPairingComplete", static_cast<jint>(error));
 }
 
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
-    CallVoidInt(mJavaEnv, mJavaObjectRef, "onPairingDeleted", static_cast<jint>(error));
+    CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onPairingDeleted", static_cast<jint>(error));
 }

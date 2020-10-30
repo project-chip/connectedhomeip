@@ -37,8 +37,7 @@ public:
     ~AndroidDeviceControllerWrapper();
 
     chip::DeviceController::ChipDeviceController * Controller() { return mController.get(); }
-
-    void SetJavaObjectRef(JNIEnv * env, jobject obj);
+    void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     // DevicePairingDelegate implementation
     void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
@@ -75,8 +74,10 @@ private:
     ChipDeviceControllerPtr mController;
     chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
 
-    JNIEnv * mJavaEnv      = nullptr;
+    JavaVM * mJavaVM       = nullptr;
     jobject mJavaObjectRef = nullptr;
+
+    JNIEnv * GetJavaEnv();
 
     AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller))
     {
