@@ -1081,7 +1081,7 @@ EmberStatus emberAfDeactivateServerTick(uint8_t endpoint, EmberAfClusterId clust
            event and return ::EMBER_SUCCESS.  Otherwise it will return
            ::EMBER_BAD_ARGUMENT.
  */
-EmberStatus emberAfEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs);
+EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs);
 
 /**
  * @brief Sets the ::EmberEventControl to run "delayQs" quarter seconds in the
@@ -1134,14 +1134,14 @@ void emberAfNetworkEventControlSetActive(EmberEventControl * controls);
 /**
  * @brief Sets the ::EmberEventControl for the current network, and only the
  * current network, to run "delayMs" milliseconds in the future.  See
- * ::emberAfEventControlSetDelayMS.
+ * ::emberEventControlSetDelayMS.
  */
 EmberStatus emberAfNetworkEventControlSetDelayMS(EmberEventControl * controls, uint32_t delayMs);
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /**
  * @brief Sets the ::EmberEventControl for the current network, and only the
  * current network, to run "delayMs" milliseconds in the future.  See
- * ::emberAfEventControlSetDelayMS.
+ * ::emberEventControlSetDelayMS.
  */
 EmberStatus emberAfNetworkEventControlSetDelay(EmberEventControl * controls, uint32_t delayMs);
 #else
@@ -1177,13 +1177,13 @@ bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, uint8_t 
 EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, uint8_t endpoint);
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run
- * "delayMs" milliseconds in the future.  See ::emberAfEventControlSetDelayMS.
+ * "delayMs" milliseconds in the future.  See ::emberEventControlSetDelayMS.
  */
 EmberStatus emberAfEndpointEventControlSetDelayMS(EmberEventControl * controls, uint8_t endpoint, uint32_t delayMs);
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run
- * "delayMs" milliseconds in the future.  See ::emberAfEventControlSetDelayMS.
+ * "delayMs" milliseconds in the future.  See ::emberEventControlSetDelayMS.
  */
 EmberStatus emberAfEndpointEventControlSetDelay(EmberEventControl * controls, uint8_t endpoint, uint32_t delayMs);
 #else

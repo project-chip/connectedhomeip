@@ -381,7 +381,7 @@ bool emberAfColorControlClusterMoveToHueAndSaturationCallback(uint8_t hue, uint8
     writeRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -440,7 +440,7 @@ bool emberAfColorControlClusterMoveHueCallback(uint8_t moveMode, uint8_t rate, u
     colorSaturationTransitionState.stepsRemaining = 0;
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -497,7 +497,7 @@ bool emberAfColorControlClusterMoveSaturationCallback(uint8_t moveMode, uint8_t 
     writeRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -590,7 +590,7 @@ bool emberAfColorControlClusterMoveToHueCallback(uint8_t hue, uint8_t hueMoveMod
     writeRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -643,7 +643,7 @@ bool emberAfColorControlClusterMoveToSaturationCallback(uint8_t saturation, uint
     writeRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -705,7 +705,7 @@ bool emberAfColorControlClusterStepHueCallback(uint8_t stepMode, uint8_t stepSiz
     writeRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -766,7 +766,7 @@ bool emberAfColorControlClusterStepSaturationCallback(uint8_t stepMode, uint8_t 
     writeRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -881,7 +881,7 @@ bool emberAfColorControlClusterMoveToColorCallback(uint16_t colorX, uint16_t col
     writeRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_XY_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -961,7 +961,7 @@ bool emberAfColorControlClusterMoveColorCallback(int16_t rateX, int16_t rateY, u
     }
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_XY_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -1014,7 +1014,7 @@ bool emberAfColorControlClusterStepColorCallback(int16_t stepX, int16_t stepY, u
     writeRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_XY_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -1106,7 +1106,7 @@ static void moveToColorTemp(uint8_t endpoint, uint16_t colorTemperature, uint16_
     colorTempTransitionState.highLimit      = temperatureMax;
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
 }
 
 bool emberAfColorControlClusterMoveToColorTemperatureCallback(uint16_t colorTemperature, uint16_t transitionTime,
@@ -1204,7 +1204,7 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(uint8_t moveMode, ui
     writeRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -1271,7 +1271,7 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(uint8_t stepMode, ui
     writeRemainingTime(endpoint, transitionTime);
 
     // kick off the state machine:
-    emberEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+    emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
 
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
@@ -1544,7 +1544,7 @@ void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
     }
     else
     {
-        emberEventControlSetDelayMS(COLOR_HSV_CONTROL, UPDATE_TIME_MS);
+        emberEventControlSetDelayMS(&COLOR_HSV_CONTROL, UPDATE_TIME_MS);
     }
 
     writeHue(colorHueTransitionState.endpoint, colorHueTransitionState.currentHue);
@@ -1648,7 +1648,7 @@ void emberAfPluginColorControlServerXyTransitionEventHandler(void)
     }
     else
     {
-        emberEventControlSetDelayMS(COLOR_XY_CONTROL, UPDATE_TIME_MS);
+        emberEventControlSetDelayMS(&COLOR_XY_CONTROL, UPDATE_TIME_MS);
     }
 
     // update the attributes
@@ -1674,7 +1674,7 @@ void emberAfPluginColorControlServerTempTransitionEventHandler(void)
     }
     else
     {
-        emberEventControlSetDelayMS(COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
+        emberEventControlSetDelayMS(&COLOR_TEMP_CONTROL, UPDATE_TIME_MS);
     }
 
     writeColorTemperature(colorTempTransitionState.endpoint, colorTempTransitionState.currentValue);

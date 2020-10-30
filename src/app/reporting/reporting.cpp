@@ -795,7 +795,7 @@ static void scheduleTick(void)
     if (delayMs != MAX_INT32U_VALUE)
     {
         emberAfDebugPrintln("sched report event for: 0x%4x", delayMs);
-        emberAfEventControlSetDelayMS(&emberAfPluginReportingTickEventControl, delayMs);
+        emberEventControlSetDelayMS(&emberAfPluginReportingTickEventControl, delayMs);
     }
     else
     {
