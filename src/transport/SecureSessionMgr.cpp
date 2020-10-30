@@ -283,7 +283,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
         if (!connection->mPeerConnections.FindPeerConnectionState(peerAddress, &state))
         {
             // We did not have connections with this peer before, create a new state
-            err = NewUnsecureSession(peerAddress, packetHeader.GetSourceNodeId(), &state);
+            err = connection->NewUnsecureSession(peerAddress, packetHeader.GetSourceNodeId(), &state);
             SuccessOrExit(err);
         }
     }
