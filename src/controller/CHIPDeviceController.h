@@ -54,6 +54,8 @@ typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, v
 class DLL_EXPORT DevicePairingDelegate
 {
 public:
+    virtual ~DevicePairingDelegate() {}
+
     /**
      * @brief
      *   Called when the pairing reaches a certain stage.

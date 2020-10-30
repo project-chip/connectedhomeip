@@ -25,6 +25,7 @@
 #include "AndroidBleApplicationDelegate.h"
 #include "AndroidBleConnectionDelegate.h"
 #include "AndroidBlePlatformDelegate.h"
+#include "AndroidDeviceControllerWrapper.h"
 
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
@@ -236,11 +237,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
-    wrapper = AndroidDeviceControllerWrapper::allocateNew(&sSystemLayer, &sInetLayer, &err);
+    wrapper = AndroidDeviceControllerWrapper::allocateNew(kLocalDeviceId, &sSystemLayer, &sInetLayer, &err);
     SuccessOrExit(err);
 
-    wraper->Controller()->AppState = (void *) env->NewGlobalRef(self);
-    result                         = wrapper->toJNIHandle();
+    wrapper->Controller()->AppState = (void *) env->NewGlobalRef(self);
+    result                          = wrapper->toJNIHandle();
 
 exit:
     if (err != CHIP_NO_ERROR)

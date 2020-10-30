@@ -21,8 +21,9 @@
 
 #include <jni.h>
 
-#include <AndroidDevicePairingDelegate.h>
 #include <controller/CHIPDeviceController.h>
+
+#include "AndroidDevicePairingDelegate.h"
 
 class AndroidDeviceControllerWrapper
 {
@@ -33,26 +34,26 @@ public:
 
     jlong toJNIHandle()
     {
-        static_assert(sizeog(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
-        return static_cast<jlong>(this);
+        static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
+        return reinterpret_cast<jlong>(this);
     }
 
     static AndroidDeviceControllerWrapper * fromJNIHandle(jlong handle)
     {
-        return static_cast<AndroidDeviceControllerWrapper *>(handle);
+        return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
     }
 
     static AndroidDeviceControllerWrapper * allocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
                                                         chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
 
 private:
-    using ChipDeviceControllerPtr          = std::unique_ptr<chip::DeviceController::ChipDeviceController>;
-    using AndroidBleApplicationDelegatePtr = std::unique_ptr<AndroidBleApplicationDelegate>;
+    using ChipDeviceControllerPtr         = std::unique_ptr<chip::DeviceController::ChipDeviceController>;
+    using AndroidDevicePairingDelegatePtr = std::unique_ptr<AndroidDevicePairingDelegate>;
 
     ChipDeviceControllerPtr mController;
-    AndroidBleApplicationDelegatePtr mDelegate;
+    AndroidDevicePairingDelegatePtr mDelegate;
 
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr && controller, AndroidBleApplicationDelegatePtr && delegate) :
-        mController(controller), mDelegate(delegate)
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr && controller, AndroidDevicePairingDelegatePtr && delegate) :
+        mController(std::move(controller)), mDelegate(std::move(delegate))
     {}
 };

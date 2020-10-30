@@ -15,7 +15,7 @@
  *   limitations under the License.
  *
  */
-#include <AndroidDeviceControllerWrapper.h>
+#include "AndroidDeviceControllerWrapper.h"
 
 #include <memory>
 
@@ -24,18 +24,16 @@ using chip::DeviceController::ChipDeviceController;
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
 {
     mController->Shutdown();
-
-    delete mController;
-    delete mDelegate;
 }
 
-static AndroidDeviceControllerWrapper * allocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
-                                                    chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure)
+AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::allocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
+                                                                             chip::Inet::InetLayer * inetLayer,
+                                                                             CHIP_ERROR * errInfoOnFailure)
 {
     errInfoOnFailure = CHIP_NO_ERROR;
 
-    std::unique_ptr<ChipDeviceController> controller       = std::make_uniqe<ChipDeviceController>();
-    std::unique_ptr<AndroidDevicePairingDelegate> delegate = std::make_uniqe<AndroidDevicePairingDelegate>();
+    std::unique_ptr<ChipDeviceController> controller(new ChipDeviceController());
+    std::unique_ptr<AndroidDevicePairingDelegate> delegate(new AndroidDevicePairingDelegate());
 
     if (!controller || !delegate)
     {
@@ -49,5 +47,5 @@ static AndroidDeviceControllerWrapper * allocateNew(chip::NodeId nodeId, chip::S
         return nullptr;
     }
 
-    return new AndroidDeviceControllerWrapper(controller, delegate);
+    return new AndroidDeviceControllerWrapper(std::move(controller), std::move(delegate));
 }
