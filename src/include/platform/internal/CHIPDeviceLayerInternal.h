@@ -29,6 +29,7 @@ extern const char * const TAG;
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 extern const uint64_t TestDeviceId;
+extern const uint64_t TestFabricId;
 extern const uint8_t TestDeviceCert[];
 extern const uint8_t TestDeviceIntermediateCACert[];
 extern const uint8_t TestDevicePrivateKey[];

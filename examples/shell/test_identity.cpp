@@ -25,6 +25,7 @@ namespace Internal {
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
 const uint64_t TestDeviceId                       = 0x1235;
+const uint64_t TestFabricId                       = 0;
 const uint8_t TestDeviceCert[]                    = { 0 };
 const uint8_t TestDeviceIntermediateCACert[]      = { 0 };
 const uint8_t TestDevicePrivateKey[]              = { 0 };

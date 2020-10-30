@@ -607,7 +607,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreSetupDiscriminator(
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFabricId(uint64_t & fabricId)
 {
-    return Impl()->ReadConfigValue(ImplClass::kConfigKey_FabricId, fabricId);
+    CHIP_ERROR err = Impl()->ReadConfigValue(ImplClass::kConfigKey_FabricId, fabricId);
+
+#if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    {
+        fabricId = TestFabricId;
+        err      = CHIP_NO_ERROR;
+    }
+#endif // CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
+    return err;
 }
 
 template <class ImplClass>
