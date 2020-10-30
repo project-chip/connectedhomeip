@@ -117,20 +117,13 @@ class BarcodeFragment : Fragment(), CHIPBarcodeProcessor.BarcodeDetectionListene
             stopCamera()
 
             val payload = SetupPayloadParser().parseQrCode(barcode.displayValue)
-
-            val optionalQrCodeInfo = payload.optionalQRCodeInfo
-            val qrCodeInfoMap = HashMap<Int, QrCodeInfo>()
-            optionalQrCodeInfo.forEach { (i, info) ->
-                qrCodeInfoMap[i] = QrCodeInfo(info.tag, info.type, info.data, info.int32)
-            }
-
             val deviceInfo = CHIPDeviceInfo(
                 payload.version,
                 payload.vendorId,
                 payload.productId,
                 payload.discriminator,
                 payload.setupPinCode,
-                qrCodeInfoMap
+                payload.optionalQRCodeInfo.mapValues { (_, info) ->  QrCodeInfo(info.tag, info.type, info.data, info.int32) }
             )
             FragmentUtil.getHost(this, Callback::class.java)?.onCHIPDeviceInfoReceived(deviceInfo)
         }
