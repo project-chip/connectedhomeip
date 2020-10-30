@@ -218,6 +218,8 @@ protected:
     uint16_t mLocalKeyId;
 
     uint16_t mPeerKeyId;
+
+    bool mIsSecure;
 };
 
 /*

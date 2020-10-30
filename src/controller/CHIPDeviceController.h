@@ -204,6 +204,7 @@ public:
      * @param[in] appReqState   Application specific context to be passed back when a message is received or on error
      * @param[in] buffer        The Data Buffer to trasmit to the device
      * @param[in] peerDevice    Device ID of the peer device
+     * @param[in] secure        Should the message be secure
      * @return CHIP_ERROR   The return status
      */
     CHIP_ERROR SendMessage(void * appReqState, System::PacketBuffer * buffer, NodeId peerDevice = kUndefinedNodeId);
@@ -289,6 +290,8 @@ private:
     SecurePairingSession mPairingSession;
     SecurePairingUsingTestSecret * mTestSecurePairingSecret = nullptr;
 
+    bool mIsSecure = true;
+
     SecurePairingSession * mSecurePairingSession = nullptr;
 
     DevicePairingDelegate * mPairingDelegate = nullptr;
@@ -301,7 +304,7 @@ private:
     void ClearRequestState();
     void ClearOpState();
 
-    CHIP_ERROR EstablishSecureSession();
+    CHIP_ERROR EstablishSecureSession(NodeId peer);
     CHIP_ERROR TryEstablishingSecureSession(NodeId peer);
     CHIP_ERROR ResumeSecureSession(NodeId peer);
 

@@ -241,16 +241,7 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
                                                                    MessageReceiveHandler onMessageReceived, ErrorHandler onError,
                                                                    uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
-    if (mTestSecurePairingSecret != nullptr)
-    {
-        chip::Platform::Delete(mTestSecurePairingSecret);
-    }
-
-    mTestSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>(
-        Optional<NodeId>::Value(remoteDeviceId), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
-
-    mSecurePairingSession = mTestSecurePairingSecret;
-
+    mIsSecure        = false;
     mDeviceAddr      = deviceAddr;
     mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
     mDevicePort      = devicePort;
@@ -271,11 +262,11 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDeviceController::EstablishSecureSession()
+CHIP_ERROR ChipDeviceController::EstablishSecureSession(NodeId peer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mSecurePairingSession != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(!mIsSecure || mSecurePairingSession != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceAddr != IPAddress::Any, err = CHIP_ERROR_INCORRECT_STATE);
 
     mSessionManager = chip::Platform::New<SecureSessionMgr<Transport::UDP>>();
@@ -285,11 +276,20 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
     SuccessOrExit(err);
 
     mSessionManager->SetDelegate(this);
-
-    err = mSessionManager->NewPairing(
-        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)),
-        mSecurePairingSession);
-    SuccessOrExit(err);
+    if (mIsSecure)
+    {
+        err = mSessionManager->NewPairing(
+            Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)),
+            mSecurePairingSession);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        Transport::PeerConnectionState * state;
+        err = mSessionManager->NewUnsecureSession(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface),
+                                                  Optional<NodeId>(peer), &state);
+        SuccessOrExit(err);
+    }
 
     mConState = kConnectionState_SecureConnected;
 
@@ -339,7 +339,7 @@ void ChipDeviceController::OnValue(const char * key, const char * value)
 
     if (mSecurePairingSession != nullptr && mDeviceAddr != IPAddress::Any)
     {
-        SuccessOrExit(EstablishSecureSession());
+        SuccessOrExit(EstablishSecureSession(peer));
     }
 
 exit:
@@ -371,7 +371,7 @@ CHIP_ERROR ChipDeviceController::TryEstablishingSecureSession(NodeId peer)
     }
     else
     {
-        ExitNow(err = EstablishSecureSession());
+        ExitNow(err = EstablishSecureSession(peer));
     }
 
 exit:
@@ -527,7 +527,6 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     buffer->AddRef();
 
     err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
-    ChipLogDetail(Controller, "SendMessage returned %d", err);
 
     // The send could fail due to network timeouts (e.g. broken pipe)
     // Try sesion resumption if needed
