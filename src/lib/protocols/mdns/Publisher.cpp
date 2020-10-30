@@ -64,9 +64,11 @@ void Publisher::HandleMdnsError(void * context, CHIP_ERROR initError)
 CHIP_ERROR Publisher::StartPublishDevice(chip::Inet::InterfaceId interface)
 {
     CHIP_ERROR error;
+    bool shouldPublishFullyProvisioned =
+        chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned() && chip::DeviceLayer::ConfigurationMgr().IsMemberOfFabric();
 
     // TODO: after multi-admin is decided we may need to publish both _chipc._udp and _chip._tcp service
-    if (chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned() != mIsPublishingProvisionedDevice)
+    if (shouldPublishFullyProvisioned != mIsPublishingProvisionedDevice)
     {
         SuccessOrExit(error = StopPublishDevice());
         // Set hostname again in case the mac address changes when shifting from soft-AP to station
