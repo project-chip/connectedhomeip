@@ -61,6 +61,19 @@ void CallVoidInt(JNIEnv * env, jobject object, const char * methodName, jint arg
     env->CallVoidMethod(object, method, argument);
 }
 
+bool N2J_ByteArray(JNIEnv * env, const uint8_t * inArray, uint32_t inArrayLen, jbyteArray & outArray)
+{
+    outArray = env->NewByteArray((int) inArrayLen);
+    if (outArray == nullptr)
+    {
+        return false;
+    }
+
+    env->ExceptionClear();
+    env->SetByteArrayRegion(outArray, 0, inArrayLen, (jbyte *) inArray);
+    return !env->ExceptionCheck();
+}
+
 } // namespace
 
 AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
@@ -134,6 +147,17 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(chi
     return wrapper.release();
 }
 
+void AndroidDeviceControllerWrapper::SendNetworkCredentials(const char * ssid, const char * password)
+{
+    if (mCredentialsDelegate == nullptr)
+    {
+        ChipLogError(Controller, "No credential callback available to send credentials.");
+        return;
+    }
+
+    mCredentialsDelegate->SendNetworkCredentials(ssid, password);
+}
+
 void AndroidDeviceControllerWrapper::OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback)
 {
     mCredentialsDelegate = callback;
@@ -155,7 +179,23 @@ void AndroidDeviceControllerWrapper::OnOperationalCredentialsRequested(const cha
 {
     mCredentialsDelegate = callback;
 
-    ChipLogProgress(Controller, "NOT YET IMPLEMENTED: %s", __PRETTY_FUNCTION__);
+    JNIEnv * env = GetJavaEnv();
+
+    jbyteArray jCsr;
+    if (!N2J_ByteArray(env, reinterpret_cast<const uint8_t *>(csr), csr_length, jCsr))
+    {
+        ChipLogError(Controller, "Failed to build byte array for operational credential request");
+        return;
+    }
+
+    jmethodID method;
+    if (!FindMethod(env, mJavaObjectRef, "onNetworkCredentialsRequested", "([B)V", &method))
+    {
+        return;
+    }
+
+    env->ExceptionClear();
+    env->CallVoidMethod(mJavaObjectRef, method, jCsr);
 }
 
 void AndroidDeviceControllerWrapper::OnStatusUpdate(chip::RendezvousSessionDelegate::Status status)

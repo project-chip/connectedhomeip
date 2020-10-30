@@ -39,6 +39,8 @@ public:
     chip::DeviceController::ChipDeviceController * Controller() { return mController.get(); }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
+    void SendNetworkCredentials(const char * ssid, const char * password);
+
     // DevicePairingDelegate implementation
     void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
     void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,

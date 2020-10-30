@@ -124,6 +124,20 @@ struct StackUnlockGuard
     ~StackUnlockGuard() { pthread_mutex_lock(&sStackLock); }
 };
 
+class JniUtfString
+{
+public:
+    JniUtfString(JNIEnv * env, jstring string) : mEnv(env), mString(string) { mChars = env->GetStringUTFChars(string, 0); }
+    ~JniUtfString() { mEnv->ReleaseStringUTFChars(mString, mChars); }
+
+    const char * c_str() const { return mChars; }
+
+private:
+    JNIEnv * mEnv;
+    jstring mString;
+    const char * mChars;
+};
+
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
@@ -281,6 +295,17 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong handle, j
     {
         ChipLogError(Controller, "Failed to connect to device.");
         ThrowError(env, err);
+    }
+}
+
+JNI_METHOD(void, sendNetworkCredentials)(JNIEnv * env, jobject self, jlong handle, jstring ssid, jstring password)
+{
+    JniUtfString ssidStr(env, ssid);
+    JniUtfString passwordStr(env, password);
+
+    {
+        ScopedPthreadLock lock(&sStackLock);
+        AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
     }
 }
 
