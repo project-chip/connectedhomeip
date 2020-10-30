@@ -38,18 +38,18 @@ public:
 
     chip::DeviceController::ChipDeviceController * Controller() { return mController.get(); }
 
-    jlong toJNIHandle()
+    jlong ToJNIHandle()
     {
         static_assert(sizeof(jlong) >= sizeof(void *), "Need to store a pointer in a java handle");
         return reinterpret_cast<jlong>(this);
     }
 
-    static AndroidDeviceControllerWrapper * fromJNIHandle(jlong handle)
+    static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
     }
 
-    static AndroidDeviceControllerWrapper * allocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
+    static AndroidDeviceControllerWrapper * AllocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
                                                         chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
 
 private:

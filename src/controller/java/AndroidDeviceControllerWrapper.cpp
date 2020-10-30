@@ -26,7 +26,7 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
     mController->Shutdown();
 }
 
-AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::allocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
+AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
                                                                              chip::Inet::InetLayer * inetLayer,
                                                                              CHIP_ERROR * errInfoOnFailure)
 {

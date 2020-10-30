@@ -237,11 +237,11 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
-    wrapper = AndroidDeviceControllerWrapper::allocateNew(kLocalDeviceId, &sSystemLayer, &sInetLayer, &err);
+    wrapper = AndroidDeviceControllerWrapper::AllocateNew(kLocalDeviceId, &sSystemLayer, &sInetLayer, &err);
     SuccessOrExit(err);
 
     wrapper->Controller()->AppState = (void *) env->NewGlobalRef(self);
-    result                          = wrapper->toJNIHandle();
+    result                          = wrapper->ToJNIHandle();
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -269,7 +269,7 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong handle, j
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     void * appReqState                       = (void *) self;
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::fromJNIHandle(handle);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "beginConnectDevice() called with connection object and pincode");
 
@@ -294,7 +294,7 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong handle, j
 JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::fromJNIHandle(handle);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     chip::Inet::IPAddress deviceIPAddr;
 
     ChipLogProgress(Controller, "beginConnectDevice() called with IP Address");
@@ -319,7 +319,7 @@ JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong handle,
 JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jstring messageObj)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::fromJNIHandle(handle);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "beginSendMessage() called");
 
@@ -354,7 +354,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
 JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, jobject commandObj)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::fromJNIHandle(handle);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "beginSendCommand() called");
 
@@ -518,14 +518,14 @@ JNI_METHOD(void, handleConnectionError)(JNIEnv * env, jobject self, jint conn)
 JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong handle)
 {
     ChipLogProgress(Controller, "isConnected() called");
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::fromJNIHandle(handle);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     return wrapper->Controller()->IsConnected() ? JNI_TRUE : JNI_FALSE;
 }
 
 JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle)
 {
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::fromJNIHandle(handle);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     chip::Inet::IPAddress addr;
     char addrStr[50];
@@ -546,7 +546,7 @@ JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong handle)
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::fromJNIHandle(handle);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     {
         ScopedPthreadLock lock(&sStackLock);
@@ -567,7 +567,7 @@ JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong handle)
 
 JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handle)
 {
-    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::fromJNIHandle(handle);
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "deleteDeviceController() called");
 
