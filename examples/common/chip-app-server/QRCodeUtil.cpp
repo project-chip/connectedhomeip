@@ -26,48 +26,51 @@
 
 void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags)
 {
+    uint32_t setupPinCode;
+    std::string QRCode;
+
+    if (GetQRCode(setupPinCode, QRCode, rendezvousFlags) == CHIP_NO_ERROR)
+    {
+        ChipLogProgress(AppServer, "SetupPINCode: [%" PRIu32 "]", setupPinCode);
+        ChipLogProgress(AppServer, "SetupQRCode:  [%s]", QRCode.c_str());
+    } else {
+        ChipLogError(AppServer, "Getting QR code failed!");
+    }
+}
+
+CHIP_ERROR GetQRCode(uint32_t& setupPinCode, std::string& QRCode, chip::RendezvousInformationFlags rendezvousFlags)
+{
     using namespace ::chip::DeviceLayer;
 
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     chip::SetupPayload payload;
+
     payload.version               = 1;
     payload.rendezvousInformation = rendezvousFlags;
 
     err = ConfigurationMgr().GetSetupPinCode(payload.setUpPINCode);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
-    }
-
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err)));
+    setupPinCode = payload.setUpPINCode;
+    
     err = ConfigurationMgr().GetSetupDiscriminator(payload.discriminator);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
-    }
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err)));
 
     err = ConfigurationMgr().GetVendorId(payload.vendorID);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err));
-    }
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogProgress(AppServer, "ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err)));
 
     err = ConfigurationMgr().GetProductId(payload.productID);
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogProgress(AppServer, "ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err));
-    }
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogProgress(AppServer, "ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err)));
 
     // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
     // generating payload
-    std::string result;
-    err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase41Representation(result);
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(AppServer, "Failed to generate QR Code"));
-
-    ChipLogProgress(AppServer, "SetupPINCode: [%" PRIu32 "]", payload.setUpPINCode);
-    // There might be whitespace in setup QRCode, add brackets to make it clearer.
-    ChipLogProgress(AppServer, "SetupQRCode:  [%s]", result.c_str());
+    err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase41Representation(QRCode);
+    VerifyOrExit(err == CHIP_NO_ERROR,
+                 ChipLogProgress(AppServer, "Generating QR Code failed: %s", chip::ErrorStr(err)));
 
 exit:
-    return;
+    return err;
 }

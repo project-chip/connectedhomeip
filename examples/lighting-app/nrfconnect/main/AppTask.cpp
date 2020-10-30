@@ -27,6 +27,10 @@
 #include "Service.h"
 #include "ThreadUtil.h"
 
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+#include "NFCWidget.h"
+#endif
+
 #include "attribute-storage.h"
 #include "gen/cluster-id.h"
 
@@ -59,6 +63,10 @@ k_timer sFunctionTimer;
 LEDWidget sStatusLED;
 LEDWidget sUnusedLED;
 LEDWidget sUnusedLED_1;
+
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+NFCWidget sNFC;
+#endif
 
 bool sIsThreadProvisioned     = false;
 bool sIsThreadEnabled         = false;
@@ -103,6 +111,24 @@ int AppTask::Init()
     // Init ZCL Data Model and start server
     InitServer();
     PrintQRCode(chip::RendezvousInformationFlags::kBLE);
+
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+    ret = sNFC.Init(ConnectivityMgr());
+    if (ret)
+    {
+        LOG_ERR("NFC initialization failed");
+        return ret;
+    }
+
+    PlatformMgr().AddEventHandler(AppTask::ThreadProvisioningHandler, 0);
+
+    ret = StartNFCTag();
+    if (ret)
+    {
+        LOG_ERR("Starting NFC Tag failed");
+        return ret;
+    }
+#endif
 
     return 0;
 }
@@ -368,6 +394,21 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     }
 }
 
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+void AppTask::ThreadProvisioningHandler(const ChipDeviceEvent * event, intptr_t arg)
+{
+    ARG_UNUSED(arg);
+    if ((event->Type == DeviceEventType::kServiceProvisioningChange) && ConnectivityMgr().IsThreadProvisioned())
+    {
+        const int result = sNFC.StopTagEmulation();
+        if (result)
+        {
+            LOG_ERR("Stopping NFC Tag emulation failed");
+        }
+    }
+}
+#endif
+
 void AppTask::CancelTimer()
 {
     k_timer_stop(&sFunctionTimer);
@@ -379,6 +420,24 @@ void AppTask::StartTimer(uint32_t aTimeoutInMs)
     k_timer_start(&sFunctionTimer, K_MSEC(aTimeoutInMs), K_NO_WAIT);
     mFunctionTimerActive = true;
 }
+
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+int AppTask::StartNFCTag()
+{
+    // Get QR Code and emulate its content using NFC tag
+    uint32_t setupPinCode;
+    std::string QRCode;
+
+    int result = GetQRCode(setupPinCode, QRCode, chip::RendezvousInformationFlags::kBLE);
+    VerifyOrExit(!result, LOG_ERR("Getting QR code payload failed"));
+
+    result = sNFC.StartTagEmulation(QRCode.c_str(), QRCode.size());
+    VerifyOrExit(!result, LOG_ERR("Starting NFC Tag emulation failed"));
+
+exit:
+    return result;
+}
+#endif
 
 void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
 {

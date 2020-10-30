@@ -87,7 +87,14 @@ network credentials.
 **Button #4** can be used to start BLE advertisement, which is disabled by
 default.
 
-The remaining two LEDs (#3 and #4) and button #4 are unused.
+The remaining two LEDs (#3 and #4) are unused.
+
+**NFC** can be used to scan shared tag and get information about device necessary
+to perform rendezvous and network provisioning operation.
+
+Tag can be read by bringing NFC poller e.g. smartphone supporting NFC close to the nRF52840's NFC antenna.
+Moreover in the reaction on sensing field from the smartphone CHIP device will start BLE
+advertisement, what is an alternative way to trigger this from manually pressing Button 4.
 
 <a name="building"></a>
 
