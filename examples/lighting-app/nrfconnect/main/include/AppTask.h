@@ -21,6 +21,8 @@
 #include "AppEvent.h"
 #include "LightingManager.h"
 
+#include <platform/CHIPDeviceLayer.h>
+
 #include <cstdint>
 
 struct k_timer;
@@ -52,10 +54,16 @@ private:
     static void LightingActionEventHandler(AppEvent * aEvent);
     static void StartBLEAdvertisementHandler(AppEvent * aEvent);
 
+    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
     static void ButtonEventHandler(uint32_t button_state, uint32_t has_changed);
     static void TimerEventHandler(k_timer * timer);
 
     void StartTimer(uint32_t aTimeoutInMs);
+
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+    int StartNFCTag();
+#endif
 
     enum Function_t
     {

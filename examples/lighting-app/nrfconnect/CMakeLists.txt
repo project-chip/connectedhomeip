@@ -36,6 +36,7 @@ target_sources(app PRIVATE
                ${LIGHTING_COMMON}/gen/callback-stub.c
                ${LIGHTING_COMMON}/gen/znet-bookkeeping.c
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
+               ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${NRFCONNECT_COMMON}/app/Service.cpp
                ${CHIP_APP_SERVER}/DataModelHandler.cpp
