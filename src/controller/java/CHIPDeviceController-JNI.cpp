@@ -307,6 +307,11 @@ JNI_METHOD(void, sendNetworkCredentials)(JNIEnv * env, jobject self, jlong handl
     AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
 }
 
+JNI_METHOD(void, deprecatedHardcodeThreadCredentials)(JNIEnv * env, jobject self, jlong handle)
+{
+    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->DeprecatedHardcodeThreadCredentials();
+}
+
 JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;

@@ -93,6 +93,12 @@ public class ChipDeviceController {
     sendNetworkCredentials(deviceControllerPtr, ssid, password);
   }
 
+  // Sends hardcoded thread network credentials. 
+  // method chain to be removed and replaced once full thread support is available
+  public void deprecatedHardcodeThreadCredentials() {
+    deprecatedHardcodeThreadCredentials(deviceControllerPtr);
+  }
+
   public void onConnectDeviceComplete() {
     completionListener.onConnectDeviceComplete();
   }
@@ -173,6 +179,8 @@ public class ChipDeviceController {
 
   private native void sendNetworkCredentials(
       long deviceControllerPtr, String ssid, String password);
+
+  private native void deprecatedHardcodeThreadCredentials(long deviceControllerPtr);
 
   static {
     System.loadLibrary("CHIPController");

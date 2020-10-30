@@ -23,8 +23,6 @@
 
 #include <controller/CHIPDeviceController.h>
 
-#include "AndroidDevicePairingDelegate.h"
-
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
  * to handle all controller-related processing.
@@ -40,6 +38,8 @@ public:
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     void SendNetworkCredentials(const char * ssid, const char * password);
+
+    void DeprecatedHardcodeThreadCredentials();
 
     // DevicePairingDelegate implementation
     void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
