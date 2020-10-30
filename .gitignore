@@ -47,3 +47,4 @@ docs/html
 
 # Android build outputs
 src/android/CHIPTool/app/src/main/jniLibs/*
+third_party/ot-commissioner/.build_arm64
