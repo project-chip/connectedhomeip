@@ -222,9 +222,9 @@ CHIP_ERROR SecureSessionMgrBase::NewUnsecureSession(const Transport::PeerAddress
     *state = nullptr;
 
     // Find any existing connection with the same node and key ID
-    if (mPeerConnections.FindPeerConnectionState(peerAddr, &state))
+    if (mPeerConnections.FindPeerConnectionState(peerAddr, state))
     {
-        mPeerConnections.MarkConnectionExpired(state);
+        mPeerConnections.MarkConnectionExpired(*state);
     }
 
     ChipLogDetail(Inet, "New unsecure session for address!!");
@@ -263,7 +263,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     System::PacketBuffer * origMsg = nullptr;
     PeerConnectionState * state    = nullptr;
-    const bool encrypted           = packetHeader.GetFlags().Get(Header::FlagValues::kEncrypted);
+    const bool encrypted           = packetHeader.GetFlags().Has(Header::FlagValues::kEncrypted);
 
     VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 

@@ -94,7 +94,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR InitUnsecure()
+CHIP_ERROR SecureSession::InitUnsecure()
 {
     mEncrypted = false;
     return CHIP_NO_ERROR;
