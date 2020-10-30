@@ -23,6 +23,7 @@
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 
+#include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -42,8 +43,8 @@ public:
         return *this;
     }
 
-    bool HasDiscriminator() const { return mDiscriminator != -1; }
-    uint16_t GetDiscriminator() const { return (uint16_t) mDiscriminator; }
+    bool HasDiscriminator() const { return mDiscriminator != -1 && CanCastTo<uint16_t>(mDiscriminator); }
+    uint16_t GetDiscriminator() const { return static_cast<uint16_t>(mDiscriminator); }
     RendezvousParameters & SetDiscriminator(uint16_t discriminator)
     {
         mDiscriminator = discriminator;
