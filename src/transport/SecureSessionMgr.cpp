@@ -231,6 +231,8 @@ CHIP_ERROR SecureSessionMgrBase::NewUnsecureSession(const Transport::PeerAddress
     err = mPeerConnections.CreateNewPeerConnectionState(peerAddr, state);
     SuccessOrExit(err);
 
+    (*state)->GetSecureSession().InitUnsecure();
+
     if (nodeId.HasValue())
     {
         (*state)->SetPeerNodeId(nodeId.Value());
