@@ -159,7 +159,7 @@
             "command": "scripts/examples/build-wifi-echo.py",
             "group": "build",
             "problemMatcher": ["$gcc"]
-        }
+        },
         {
             "label": "Build Android App",
             "type": "shell",
