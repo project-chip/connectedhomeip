@@ -33,7 +33,7 @@
 #include <avahi-common/error.h>
 #include <avahi-common/watch.h>
 
-#include "lib/protocols/mdns/platform/Mdns.h"
+#include "lib/mdns/platform/Mdns.h"
 
 struct AvahiWatch
 {

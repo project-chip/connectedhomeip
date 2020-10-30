@@ -19,7 +19,7 @@
 
 #include <inttypes.h>
 
-#include "lib/protocols/mdns/platform/Mdns.h"
+#include "lib/mdns/platform/Mdns.h"
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceBuildConfig.h"
 #include "platform/CHIPDeviceLayer.h"

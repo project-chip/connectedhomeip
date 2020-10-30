@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "lib/protocols/mdns/platform/Mdns.h"
+#include "lib/mdns/platform/Mdns.h"
 
 #include <esp_err.h>
 #include <lwip/ip4_addr.h>
