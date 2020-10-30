@@ -41,14 +41,14 @@ constexpr size_t kMaxAADLen   = 128;
 
 using namespace Crypto;
 
-SecureSession::SecureSession() : mKeyAvailable(false), mEncrypted(false) {}
+SecureSession::SecureSession() : mState(State::kNotInitialized) {}
 
 CHIP_ERROR SecureSession::InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
                                          const size_t salt_length, const uint8_t * info, const size_t info_length)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrExit(mKeyAvailable == false, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::kNotInitialized, error = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(secret != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -63,8 +63,7 @@ CHIP_ERROR SecureSession::InitFromSecret(const uint8_t * secret, const size_t se
     error = HKDF_SHA256(secret, secret_length, salt, salt_length, info, info_length, mKey, sizeof(mKey));
     SuccessOrExit(error);
 
-    mKeyAvailable = true;
-    mEncrypted    = true;
+    mState = State::kInitializedSecure;
 
 exit:
     return error;
@@ -76,7 +75,7 @@ CHIP_ERROR SecureSession::Init(const Crypto::P256Keypair & local_keypair, const 
     CHIP_ERROR error = CHIP_NO_ERROR;
     P256ECDHDerivedSecret secret;
 
-    VerifyOrExit(mKeyAvailable == false, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::kNotInitialized, error = CHIP_ERROR_INCORRECT_STATE);
     if (salt_length > 0)
     {
         VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
@@ -96,14 +95,13 @@ exit:
 
 CHIP_ERROR SecureSession::InitUnsecure()
 {
-    mEncrypted = false;
+    mState = State::kInitializedUnsecure;
     return CHIP_NO_ERROR;
 }
 
 void SecureSession::Reset()
 {
-    mKeyAvailable = false;
-    mEncrypted    = false;
+    mState = State::kNotInitialized;
     memset(mKey, 0, sizeof(mKey));
 }
 
@@ -165,11 +163,10 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mState != State::kNotInitialized, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
-    if (mEncrypted)
+    if (mState == State::kInitializedSecure)
     {
-        VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
-
         error = GetIV(header, IV, sizeof(IV));
         SuccessOrExit(error);
 
@@ -202,11 +199,10 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
     VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mState != State::kInitializedSecure, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
 
-    if (mEncrypted)
+    if (mState == State::kInitializedSecure)
     {
-        VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
-
         error = GetIV(header, IV, sizeof(IV));
         SuccessOrExit(error);
 

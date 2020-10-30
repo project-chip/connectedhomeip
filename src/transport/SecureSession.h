@@ -79,7 +79,8 @@ public:
 
     /**
      * @brief
-     *   Encrypt the input data using keys established in the secure channel
+     *   Encrypt the input data using keys established in the secure channel. If Session is not secure,
+     * just copy input data to output data.
      *
      * @param input Unencrypted input data
      * @param input_length Length of the input data
@@ -95,7 +96,8 @@ public:
 
     /**
      * @brief
-     *   Decrypt the input data using keys established in the secure channel
+     *   Decrypt the input data using keys established in the secure channel. If Session is not secure,
+     * just copy input data to output data.
      *
      * @param input Encrypted input data
      * @param input_length Length of the input data
@@ -117,7 +119,7 @@ public:
      */
     size_t EncryptionOverhead();
 
-    bool IsEncrypted() { return mEncrypted; }
+    bool IsEncrypted() { return mState == State::kInitializedSecure; }
 
     /**
      * Clears the internal state of secure session back to the state of a new object.
@@ -125,10 +127,15 @@ public:
     void Reset();
 
 private:
+    enum class State : uint8_t
+    {
+        kNotInitialized = 0,
+        kInitializedSecure,
+        kInitializedUnsecure,
+    };
     static constexpr size_t kAES_CCM128_Key_Length = 16;
 
-    bool mKeyAvailable;
-    bool mEncrypted;
+    State mState;
     uint8_t mKey[kAES_CCM128_Key_Length];
 
     static CHIP_ERROR GetIV(const PacketHeader & header, uint8_t * iv, size_t len);
