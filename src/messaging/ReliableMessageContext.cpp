@@ -160,8 +160,7 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
         if (err == CHIP_NO_ERROR)
         {
 #if defined(DEBUG)
-            ChipLogProgress(ExchangeManager, "Flushed pending ack for MsgId:%08" PRIX32 " to Peer %016" PRIX64, mPendingPeerAckId,
-                            PeerNodeId);
+            ChipLogProgress(ExchangeManager, "Flushed pending ack for MsgId:%08" PRIX32, mPendingPeerAckId);
 #endif
         }
     }
