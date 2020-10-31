@@ -47,14 +47,16 @@
 
 #include <app/util/af.h>
 
-bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t groupId)
+using namespace chip;
+
+bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, GroupId groupId)
 {
     emberAfGroupsClusterPrintln("RX: AddGroupResponse 0x%x, 0x%2x", status, groupId);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
 }
 
-bool emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, uint16_t groupId, uint8_t * groupName)
+bool emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, GroupId groupId, uint8_t * groupName)
 {
     emberAfGroupsClusterPrint("RX: ViewGroupResponse 0x%x, 0x%2x, \"", status, groupId);
     emberAfGroupsClusterPrintString(groupName);
@@ -76,7 +78,7 @@ bool emberAfGroupsClusterGetGroupMembershipResponseCallback(uint8_t capacity, ui
     return true;
 }
 
-bool emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, uint16_t groupId)
+bool emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, GroupId groupId)
 {
     emberAfGroupsClusterPrintln("RX: RemoveGroupResponse 0x%x, 0x%2x", status, groupId);
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

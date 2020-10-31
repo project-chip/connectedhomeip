@@ -905,8 +905,8 @@ typedef void (*EmberAfEndpointEventHandler)(uint8_t endpoint);
  */
 typedef struct
 {
-    uint8_t endpoint; // 0x00 when not in use
-    uint16_t groupId;
+    CHIPEndpointId endpoint; // 0x00 when not in use
+    CHIPGroupId groupId;
     uint8_t bindingIndex;
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER_NAME_SUPPORT
     uint8_t name[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1];
@@ -942,8 +942,8 @@ typedef struct
  */
 typedef struct
 {
-    uint8_t endpoint; // 0x00 when this record is not in use
-    uint16_t groupId; // 0x0000 if not associated with a group
+    CHIPEndpointId endpoint; // 0x00 when this record is not in use
+    CHIPGroupId groupId;     // 0x0000 if not associated with a group
     uint8_t sceneId;
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
     uint8_t name[ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH + 1];

@@ -48,11 +48,13 @@
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 
-static bool isGroupPresent(uint8_t endpoint, uint16_t groupId);
+using namespace chip;
 
-static bool bindingGroupMatch(uint8_t endpoint, uint16_t groupId, EmberBindingTableEntry * entry);
+static bool isGroupPresent(uint8_t endpoint, GroupId groupId);
 
-static uint8_t findGroupIndex(uint8_t endpoint, uint16_t groupId);
+static bool bindingGroupMatch(uint8_t endpoint, GroupId groupId, EmberBindingTableEntry * entry);
+
+static uint8_t findGroupIndex(uint8_t endpoint, GroupId groupId);
 
 void emberAfGroupsClusterServerInitCallback(uint8_t endpoint)
 {
@@ -76,7 +78,7 @@ void emberAfGroupsClusterServerInitCallback(uint8_t endpoint)
 // The first two bytes of the identifier is set to the groupId
 // The local endpoint is set to the endpoint that is mapped to this group
 // --------------------------
-static EmberAfStatus addEntryToGroupTable(uint8_t endpoint, uint16_t groupId, uint8_t * groupName)
+static EmberAfStatus addEntryToGroupTable(EndpointId endpoint, GroupId groupId, uint8_t * groupName)
 {
     uint8_t i;
 
@@ -117,7 +119,7 @@ static EmberAfStatus addEntryToGroupTable(uint8_t endpoint, uint16_t groupId, ui
     return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
 }
 
-static EmberAfStatus removeEntryFromGroupTable(uint8_t endpoint, uint16_t groupId)
+static EmberAfStatus removeEntryFromGroupTable(EndpointId endpoint, GroupId groupId)
 {
     if (isGroupPresent(endpoint, groupId))
     {
@@ -138,7 +140,7 @@ static EmberAfStatus removeEntryFromGroupTable(uint8_t endpoint, uint16_t groupI
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-bool emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName)
+bool emberAfGroupsClusterAddGroupCallback(GroupId groupId, uint8_t * groupName)
 {
     EmberAfStatus status;
 
@@ -159,7 +161,7 @@ bool emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName)
     return true;
 }
 
-bool emberAfGroupsClusterViewGroupCallback(uint16_t groupId)
+bool emberAfGroupsClusterViewGroupCallback(GroupId groupId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     EmberStatus sendStatus;
@@ -230,7 +232,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
     {
         for (i = 0; i < groupCount; i++)
         {
-            uint16_t groupId = emberAfGetInt16u(groupList + (i << 1), 0, 2);
+            GroupId groupId = emberAfGetInt16u(groupList + (i << 1), 0, 2);
             for (j = 0; j < EMBER_BINDING_TABLE_SIZE; j++)
             {
                 EmberBindingTableEntry entry;
@@ -273,7 +275,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
     return true;
 }
 
-bool emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId)
+bool emberAfGroupsClusterRemoveGroupCallback(GroupId groupId)
 {
     EmberAfStatus status;
     EmberStatus sendStatus;
@@ -327,7 +329,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
                 else
                 {
                     uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
-                    uint16_t groupId                                              = binding.groupId;
+                    GroupId groupId                                               = binding.groupId;
                     emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
                     success = true && success;
 
@@ -350,7 +352,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
     return true;
 }
 
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t * groupName)
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(GroupId groupId, uint8_t * groupName)
 {
     EmberAfStatus status;
     EmberStatus sendStatus;
@@ -377,7 +379,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t
     return true;
 }
 
-bool emberAfGroupsClusterEndpointInGroupCallback(uint8_t endpoint, uint16_t groupId)
+bool emberAfGroupsClusterEndpointInGroupCallback(EndpointId endpoint, GroupId groupId)
 {
     return isGroupPresent(endpoint, groupId);
 }
@@ -400,7 +402,7 @@ void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint)
     }
 }
 
-static bool isGroupPresent(uint8_t endpoint, uint16_t groupId)
+static bool isGroupPresent(EndpointId endpoint, GroupId groupId)
 {
     uint8_t i;
 
@@ -419,12 +421,12 @@ static bool isGroupPresent(uint8_t endpoint, uint16_t groupId)
     return false;
 }
 
-static bool bindingGroupMatch(uint8_t endpoint, uint16_t groupId, EmberBindingTableEntry * entry)
+static bool bindingGroupMatch(EndpointId endpoint, GroupId groupId, EmberBindingTableEntry * entry)
 {
     return (entry->type == EMBER_MULTICAST_BINDING && entry->groupId == groupId && entry->local == endpoint);
 }
 
-static uint8_t findGroupIndex(uint8_t endpoint, uint16_t groupId)
+static uint8_t findGroupIndex(EndpointId endpoint, GroupId groupId)
 {
     EmberStatus status;
     uint8_t i;

@@ -23,6 +23,9 @@
 #include "../common/ModelCommand.h"
 #include "../common/ModelCommandResponse.h"
 
+#include <limits>
+
+#include <app/util/basic-types.h>
 #include <support/SafeInt.h>
 
 #define CHECK_MESSAGE_LENGTH(value)                                                                                                \
@@ -4073,7 +4076,7 @@ class GroupsAddGroup : public ModelCommand
 public:
     GroupsAddGroup() : ModelCommand("add-group", kGroupsClusterId, 0x00)
     {
-        AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("groupId", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupId);
         AddArgument("groupName", &mGroupName);
         ModelCommand::AddArguments();
     }
@@ -4098,7 +4101,7 @@ public:
     }
 
 private:
-    uint16_t mGroupId;
+    chip::GroupId mGroupId;
     char * mGroupName;
 };
 
@@ -4110,7 +4113,7 @@ class GroupsAddGroupIfIdentifying : public ModelCommand
 public:
     GroupsAddGroupIfIdentifying() : ModelCommand("add-group-if-identifying", kGroupsClusterId, 0x05)
     {
-        AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("groupId", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupId);
         AddArgument("groupName", &mGroupName);
         ModelCommand::AddArguments();
     }
@@ -4128,7 +4131,7 @@ public:
     }
 
 private:
-    uint16_t mGroupId;
+    chip::GroupId mGroupId;
     char * mGroupName;
 };
 
@@ -4200,7 +4203,7 @@ class GroupsRemoveGroup : public ModelCommand
 public:
     GroupsRemoveGroup() : ModelCommand("remove-group", kGroupsClusterId, 0x03)
     {
-        AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("groupId", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupId);
         ModelCommand::AddArguments();
     }
 
@@ -4224,7 +4227,7 @@ public:
     }
 
 private:
-    uint16_t mGroupId;
+    chip::GroupId mGroupId;
 };
 
 /*
@@ -4235,7 +4238,7 @@ class GroupsViewGroup : public ModelCommand
 public:
     GroupsViewGroup() : ModelCommand("view-group", kGroupsClusterId, 0x01)
     {
-        AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("groupId", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupId);
         ModelCommand::AddArguments();
     }
 
@@ -4259,7 +4262,7 @@ public:
     }
 
 private:
-    uint16_t mGroupId;
+    chip::GroupId mGroupId;
 };
 
 /*
@@ -5044,7 +5047,7 @@ class ScenesAddScene : public ModelCommand
 public:
     ScenesAddScene() : ModelCommand("add-scene", kScenesClusterId, 0x00)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("sceneName", &mSceneName);
@@ -5076,7 +5079,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
     uint8_t mSceneID;
     uint16_t mTransitionTime;
     char * mSceneName;
@@ -5092,7 +5095,7 @@ class ScenesGetSceneMembership : public ModelCommand
 public:
     ScenesGetSceneMembership() : ModelCommand("get-scene-membership", kScenesClusterId, 0x06)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         ModelCommand::AddArguments();
     }
 
@@ -5116,7 +5119,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
 };
 
 /*
@@ -5127,7 +5130,7 @@ class ScenesRecallScene : public ModelCommand
 public:
     ScenesRecallScene() : ModelCommand("recall-scene", kScenesClusterId, 0x05)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         ModelCommand::AddArguments();
@@ -5146,7 +5149,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
     uint8_t mSceneID;
     uint16_t mTransitionTime;
 };
@@ -5159,7 +5162,7 @@ class ScenesRemoveAllScenes : public ModelCommand
 public:
     ScenesRemoveAllScenes() : ModelCommand("remove-all-scenes", kScenesClusterId, 0x03)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         ModelCommand::AddArguments();
     }
 
@@ -5183,7 +5186,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
 };
 
 /*
@@ -5194,7 +5197,7 @@ class ScenesRemoveScene : public ModelCommand
 public:
     ScenesRemoveScene() : ModelCommand("remove-scene", kScenesClusterId, 0x02)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         ModelCommand::AddArguments();
     }
@@ -5219,7 +5222,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
     uint8_t mSceneID;
 };
 
@@ -5231,7 +5234,7 @@ class ScenesStoreScene : public ModelCommand
 public:
     ScenesStoreScene() : ModelCommand("store-scene", kScenesClusterId, 0x04)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         ModelCommand::AddArguments();
     }
@@ -5256,7 +5259,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
     uint8_t mSceneID;
 };
 
@@ -5268,7 +5271,7 @@ class ScenesViewScene : public ModelCommand
 public:
     ScenesViewScene() : ModelCommand("view-scene", kScenesClusterId, 0x01)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         ModelCommand::AddArguments();
     }
@@ -5293,7 +5296,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
     uint8_t mSceneID;
 };
 
