@@ -1001,7 +1001,6 @@ uint16_t encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(uin
 | * ClearWeekdayScheduleResponse                                      |   0x0D |
 | * ClearYearDayScheduleResponse                                      |   0x10 |
 | * GetHolidayScheduleResponse                                        |   0x12 |
-| * GetLogRecordResponse                                              |   0x04 |
 | * GetPINCodeResponse                                                |   0x06 |
 | * GetRFIDCodeResponse                                               |   0x17 |
 | * GetUserTypeResponse                                               |   0x15 |
@@ -1027,7 +1026,6 @@ uint16_t encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(uin
 | * ClearWeekdaySchedule                                              |   0x0D |
 | * ClearYearDaySchedule                                              |   0x10 |
 | * GetHolidaySchedule                                                |   0x12 |
-| * GetLogRecord                                                      |   0x04 |
 | * GetPINCode                                                        |   0x06 |
 | * GetRFIDCode                                                       |   0x17 |
 | * GetUserType                                                       |   0x15 |
@@ -1140,18 +1138,6 @@ uint16_t encodeDoorLockClusterGetHolidayScheduleCommand(uint8_t * buffer, uint16
     const char * kName = "DoorLockGetHolidaySchedule";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x12);
     buf.Put(holidayScheduleID);
-    COMMAND_FOOTER(kName);
-}
-
-/*
- * Command GetLogRecord
- */
-uint16_t encodeDoorLockClusterGetLogRecordCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                                  uint16_t logIndex)
-{
-    const char * kName = "DoorLockGetLogRecord";
-    COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x04);
-    buf.PutLE16(logIndex);
     COMMAND_FOOTER(kName);
 }
 
@@ -1732,9 +1718,6 @@ uint16_t encodeOnOffClusterReadOnOffAttribute(uint8_t * buffer, uint16_t buf_len
 |------------------------------------------------------------------------------|
 | Responses:                                                          |        |
 | * AddSceneResponse                                                  |   0x00 |
-| * CopySceneResponse                                                 |   0x42 |
-| * EnhancedAddSceneResponse                                          |   0x40 |
-| * EnhancedViewSceneResponse                                         |   0x41 |
 | * GetSceneMembershipResponse                                        |   0x06 |
 | * RemoveAllScenesResponse                                           |   0x03 |
 | * RemoveSceneResponse                                               |   0x02 |
@@ -1744,9 +1727,6 @@ uint16_t encodeOnOffClusterReadOnOffAttribute(uint8_t * buffer, uint16_t buf_len
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddScene                                                          |   0x00 |
-| * CopyScene                                                         |   0x42 |
-| * EnhancedAddScene                                                  |   0x40 |
-| * EnhancedViewScene                                                 |   0x41 |
 | * GetSceneMembership                                                |   0x06 |
 | * RecallScene                                                       |   0x05 |
 | * RemoveAllScenes                                                   |   0x03 |
@@ -1777,54 +1757,6 @@ uint16_t encodeScenesClusterAddSceneCommand(uint8_t * buffer, uint16_t buf_lengt
     COMMAND_INSERT_STRING(kName, sceneName);
     buf.PutLE16(clusterId);
     COMMAND_INSERT_STRING(kName, extensionFieldSet);
-    COMMAND_FOOTER(kName);
-}
-
-/*
- * Command CopyScene
- */
-uint16_t encodeScenesClusterCopySceneCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint8_t mode,
-                                             uint16_t groupIdentifierFrom, uint8_t sceneIdentifierFrom, uint16_t groupIdentifierTo,
-                                             uint8_t sceneIdentifierTo)
-{
-    const char * kName = "ScenesCopyScene";
-    COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x42);
-    buf.Put(mode);
-    buf.PutLE16(groupIdentifierFrom);
-    buf.Put(sceneIdentifierFrom);
-    buf.PutLE16(groupIdentifierTo);
-    buf.Put(sceneIdentifierTo);
-    COMMAND_FOOTER(kName);
-}
-
-/*
- * Command EnhancedAddScene
- */
-uint16_t encodeScenesClusterEnhancedAddSceneCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                                    uint16_t groupID, uint8_t sceneID, uint16_t transitionTime, char * sceneName,
-                                                    uint16_t clusterId, char * extensionFieldSet)
-{
-    const char * kName = "ScenesEnhancedAddScene";
-    COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x40);
-    buf.PutLE16(groupID);
-    buf.Put(sceneID);
-    buf.PutLE16(transitionTime);
-    COMMAND_INSERT_STRING(kName, sceneName);
-    buf.PutLE16(clusterId);
-    COMMAND_INSERT_STRING(kName, extensionFieldSet);
-    COMMAND_FOOTER(kName);
-}
-
-/*
- * Command EnhancedViewScene
- */
-uint16_t encodeScenesClusterEnhancedViewSceneCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                                     uint16_t groupID, uint8_t sceneID)
-{
-    const char * kName = "ScenesEnhancedViewScene";
-    COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x41);
-    buf.PutLE16(groupID);
-    buf.Put(sceneID);
     COMMAND_FOOTER(kName);
 }
 
