@@ -54,6 +54,7 @@
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
+#include <system/SystemLayer.h>
 
 #define UNDEFINED_ZONE_ID 0xFF
 #define DELAY_TIMER_MS (1 * MILLISECOND_TICKS_PER_SECOND)
@@ -318,7 +319,7 @@ static bool isValidEnrollmentMode(EmberAfIasZoneEnrollmentMode method)
 
 bool emberAfIasZoneClusterAmIEnrolled(uint8_t endpoint)
 {
-    EmberAfIasZoneState zoneState = 0; // Clear this out completely.
+    EmberAfIasZoneState zoneState = EMBER_ZCL_IAS_ZONE_STATE_NOT_ENROLLED; // Clear this out completely.
     EmberAfStatus status;
     status =
         emberAfReadServerAttribute(endpoint, ZCL_IAS_ZONE_CLUSTER_ID, ZCL_ZONE_STATE_ATTRIBUTE_ID, (unsigned char *) &zoneState,
@@ -395,7 +396,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(uint8_t endpoint, uint16_
     IasZoneStatusQueueEntry newBufferEntry;
     newBufferEntry.endpoint    = endpoint;
     newBufferEntry.status      = newStatus;
-    newBufferEntry.eventTimeMs = halCommonGetInt32uMillisecondTick();
+    newBufferEntry.eventTimeMs = chip::System::Layer::GetClock_MonotonicMS();
 #endif
     EmberStatus sendStatus;
 
@@ -472,7 +473,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(uint8_t endpoint, uint16_
     return sendStatus;
 }
 
-void emberAfPluginIasZoneServerManageQueueEventHandler(void)
+extern "C" void emberAfPluginIasZoneServerManageQueueEventHandler(void)
 {
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
     IasZoneStatusQueueEntry * bufferStart;
@@ -894,7 +895,7 @@ static int16_t popFromBuffer(IasZoneStatusQueue * ring, IasZoneStatusQueueEntry 
 
 uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
 {
-    uint32_t currentTimeMs = halCommonGetInt32uMillisecondTick();
+    uint32_t currentTimeMs = chip::System::Layer::GetClock_MonotonicMS();
     int64_t deltaTimeMs    = currentTimeMs - entry->eventTimeMs;
 
     if (deltaTimeMs < 0)
