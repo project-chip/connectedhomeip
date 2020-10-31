@@ -59,15 +59,25 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
           $ source idf.sh
 
--   Next, if you want to use the M5Stack with its display and show a QRCode run
-    `menuconfig`.
+-   Configuration Options
+
+        To choose from the different configuration options, run menuconfig
 
           $ idf make menuconfig
 
-    While in the configurator, navigate to `WiFi Echo Demo`->`Device Type` and
-    select `M5Stack`.
+        Select ESP32 based `Device Type` through `WiFi Echo Demo`->`Device Type`.
+        The device types that are currently supported include `ESP32-DevKitC` (default),
+        `ESP32-WROVER-KIT_V4.1` and `M5Stack`
 
-    Otherwise, run the default config.
+        If you are using `standalone chip-tool` to communicate with the ESP32, bypass the
+        Rendezvous mode so that the device can communicate over an insecure channel.
+        This can be done through `WiFi Echo Demo`->`Rendezvous Mode`->`Bypass`
+
+        To connect the ESP32 to your network, configure the Wi-Fi SSID and Passphrase through
+        `Component config`->`CHIP Device Layer`->`WiFi Station Options`->`Default WiFi SSID` and
+        `Default WiFi Password` respectively.
+
+        To use the default configuration options, run the default config
 
           $ idf make defconfig
 
@@ -105,30 +115,24 @@ There are two ways to use the Echo Server running on the device.
 
 ### Connect the ESP32 to a 2.4GHz Network of your choice
 
-1.  To connect the device to your network, give it the network details via the
-    `menuconfig` target.
+1.  If the `WiFi Station Options` mentioned above are populated through
+    menuconfig, then ESP32 connects to the AP with those credentials (STA mode).
 
-                $ idf make menuconfig
-
-2.  While in the configurator, navigate to
-    `Component Config`->`CHIP Device Layer`->`WiFi Station Options` and fill out
-    the WiFi SSID and Password.
-
-3.  Now flash the device with the same command as before. (Use the right `/dev`
+2.  Now flash the device with the same command as before. (Use the right `/dev`
     device)
 
-                $ idf make flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
+          $ idf make flash monitor ESPPORT=/dev/tty.SLAB_USBtoUART
 
-4.  The device should boot up and connect to your network. When that happens you
+3.  The device should boot up and connect to your network. When that happens you
     will see a log like this in the monitor.
 
-                I (5524) chip[DL]: SYSTEM_EVENT_STA_GOT_IP
-                I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
+          I (5524) chip[DL]: SYSTEM_EVENT_STA_GOT_IP
+          I (5524) chip[DL]: IPv4 address changed on WiFi station interface: <IP_ADDRESS>...
 
     Note: If you are using the M5Stack, the screen will display the server's IP
-    Address if it successfully conencts to the configured 2.4GHz Network.
+    Address if it successfully connects to the configured 2.4GHz Network.
 
-5.  Use
+4.  Use
     [standalone chip-tool](https://github.com/project-chip/connectedhomeip/tree/master/examples/chip-tool)
     or
     [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin)
@@ -137,7 +141,7 @@ There are two ways to use the Echo Server running on the device.
 Note: The ESP32 does not support 5GHz networks. Also, the Device will persist
 your network configuration. To erase it, simply run.
 
-                $ idf make erase_flash ESPPORT=/dev/tty.SLAB_USBtoUART
+          $ idf make erase_flash ESPPORT=/dev/tty.SLAB_USBtoUART
 
 ### Use the ESP32's Network
 
@@ -155,3 +159,14 @@ Alternatively, you can connect to the ESP32's Soft-AP directly.
     or
     [iOS chip-tool app](https://github.com/project-chip/connectedhomeip/tree/master/src/darwin)
     to communicate with the device.
+
+In addition to the echo server, this demo also supports controlling OnOff
+cluster (Server) attributes of an endpoint. For `ESP32-DevKitC` and
+`ESP32-WROVER-KIT_V4.1`, a GPIO (configurable through `STATUS_LED_GPIO_NUM` in
+`main/wifi-echo.cpp`) is updated through the on/off/toggle commands from the
+`chip-tool`. For `M5Stack`, a virtual Green LED on the display is used for the
+same.
+
+Note: If you wish to see the actual effect of the commands on `ESP32-DevKitC`
+and `ESP32-WROVER-KIT_V4.1`, you will have to connect an external LED to GPIO
+`STATUS_LED_GPIO_NUM`.
