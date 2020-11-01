@@ -75,9 +75,71 @@ Using `rpi-imager`, install the Ubuntu 20.04.1 LTS (Raspberry Pi 3/4) 64-bit
 server OS for arm64 architectures on a micro SD card.
 
 Boot the SD card, login with the default user account "ubuntu" and password
-"ubuntu", then proceed with "How to install prerequisites on Linux".
+"ubuntu", then we can configure the wireless network to connect your Raspberry
+Pi 3/4 to the internet and using it remotely.
 
-Finally, install some Raspberry Pi specific dependencies:
+Getting setup with Wi-Fi:
+
+Please DON'T configure your wireless network using initial configuration files
+that will be loaded during the first boot.
+
+1. Create a WiFi configuration file wpa_supplicant.conf under directory
+   /etc/wpa_supplicant:
+
+```
+Open the wpa-supplicant configuration file in vim:
+
+sudo vim /etc/wpa_supplicant/wpa_supplicant.conf
+
+Add the following network configuration:
+
+    ctrl_interface=/run/wpa_supplicant
+
+    network={
+      ssid="wifi network name"
+      key_mgmt=WPA-PSK
+      psk="wifi password"
+    }
+
+Now save the file by pressing Ctrl+X, then Y, then finally press Enter.
+```
+
+2. Edit file /lib/systemd/system/wpa_supplicant.service to start wpa_supplicant
+   with DBus control interface enabled.
+
+```
+sudo vim /lib/systemd/system/wpa_supplicant.service
+
+Replace "/sbin/wpa_supplicant -u -s -O /run/wpa_supplicant" with
+"/sbin/wpa_supplicant -u -s -c /etc/wpa_supplicant/wpa_supplicant.conf -iwlan0"
+
+sudo reboot
+```
+
+3. Confirm your wpa_supplicant service is stated correctly with command:
+
+```
+systemctl status
+
+For example:
+├─wpa_supplicant.service │ └─1661 /sbin/wpa_supplicant -u -s -c
+/etc/wpa_supplicant/wpa_supplicant.conf -iwlan0
+```
+
+4. Get the IP address with dhclient:
+
+```
+sudo dhclient wlan0
+```
+
+5. Update system to the latest state (optional):
+
+```
+sudo apt update sudo apt upgrade sudo reboot
+```
+
+Then proceed with "How to install prerequisites on Linux". Finally, install some
+Raspberry Pi specific dependencies:
 
 ```
 sudo apt-get install pi-bluetooth
