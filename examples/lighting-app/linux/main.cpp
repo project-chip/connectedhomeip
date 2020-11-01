@@ -47,7 +47,6 @@ using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 
 constexpr uint32_t kDefaultSetupPinCode = 12345678; // TODO: Should be a macro in CHIPProjectConfig.h like other example apps.
-constexpr int kExampleVenderID          = 0xabcd;
 
 extern "C" {
 void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
@@ -106,6 +105,8 @@ CHIP_ERROR PrintQRCodeContent()
     chip::SetupPayload payload;
     uint32_t setUpPINCode;
     uint16_t setUpDiscriminator;
+    uint16_t vendorId;
+    uint16_t productId;
     std::string result;
 
     err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
@@ -124,9 +125,15 @@ CHIP_ERROR PrintQRCodeContent()
     }
     SuccessOrExit(err);
 
+    err = ConfigurationMgr().GetVendorId(vendorId);
+    SuccessOrExit(err);
+
+    err = ConfigurationMgr().GetProductId(productId);
+    SuccessOrExit(err);
+
     payload.version       = 1;
-    payload.vendorID      = kExampleVenderID;
-    payload.productID     = 1;
+    payload.vendorID      = vendorId;
+    payload.productID     = productId;
     payload.setUpPINCode  = setUpPINCode;
     payload.discriminator = setUpDiscriminator;
 
