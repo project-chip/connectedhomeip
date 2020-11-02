@@ -31,6 +31,7 @@
 namespace chip {
 
 class ExchangeContext;
+class ExchangeContextDelegate;
 
 static constexpr int16_t kAnyMessageType = -1;
 
@@ -81,25 +82,25 @@ public:
      *
      *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext is being set up.
      *
-     *  @param[in]    appState      A pointer to a higher layer object that holds context state.
+     *  @param[in]    app           A pointer to ExchangeContextDelegate.
      *
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(const NodeId & peerNodeId, void * appState = nullptr);
+    ExchangeContext * NewContext(const NodeId & peerNodeId, ExchangeContextDelegate * delegate);
 
     /**
      *  Find the ExchangeContext from a pool matching a given set of parameters.
      *
      *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext has been set up.
      *
-     *  @param[in]    appState      A pointer to a higher layer object that holds context state.
+     *  @param[in]    app           A pointer to ExchangeContextDelegate.
      *
      *  @param[in]    isInitiator   Boolean indicator of whether the local node is the initiator of the exchange.
      *
      *  @return   A pointer to the ExchangeContext object matching the provided parameters On success, NULL on no match.
      */
-    ExchangeContext * FindContext(NodeId peerNodeId, void * appState, bool isInitiator);
+    ExchangeContext * FindContext(NodeId peerNodeId, ExchangeContextDelegate * delegate, bool isInitiator);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier. This handler would be
@@ -109,14 +110,13 @@ public:
      *
      *  @param[in]    handler       The unsolicited message handler.
      *
-     *  @param[in]    appState      A pointer to a higher layer object that holds context state.
+     *  @param[in]    app           A pointer to ExchangeContextDelegate.
      *
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContext::MessageReceiveFunct handler,
-                                                 void * appState);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContextDelegate * app);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier and message type.
@@ -125,16 +125,13 @@ public:
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.
      *
-     *  @param[in]    handler       The unsolicited message handler.
-     *
-     *  @param[in]    appState      A pointer to a higher layer object that holds context state.
+     *  @param[in]    app           A pointer to ExchangeContextDelegate.
      *
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContext::MessageReceiveFunct handler,
-                                                 void * appState);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContextDelegate * app);
 
     /**
      *  Unregister an unsolicited message handler for a given protocol identifier.
@@ -176,8 +173,7 @@ private:
 
     struct UnsolicitedMessageHandler
     {
-        ExchangeContext::MessageReceiveFunct Handler;
-        void * AppState;
+        ExchangeContextDelegate * App;
         uint32_t ProtocolId;
         int16_t MessageType;
     };
@@ -192,11 +188,11 @@ private:
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
     void (*OnExchangeContextChanged)(size_t numContextsInUse);
 
-    ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState);
+    ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeContextDelegate * delegate);
 
     void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
-    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContext::MessageReceiveFunct handler, void * appState);
+    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContextDelegate * app);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer) override;

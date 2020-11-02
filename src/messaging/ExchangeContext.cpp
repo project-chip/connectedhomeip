@@ -191,7 +191,7 @@ void ExchangeContext::Reset()
     *this = ExchangeContext();
 }
 
-void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState)
+void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeContextDelegate * delegate)
 {
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
@@ -202,7 +202,7 @@ void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t 
     mExchangeId = ExchangeId;
     mPeerNodeId = PeerNodeId;
     mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
-    mAppState = AppState;
+    mDelegate = delegate;
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), em->GetContextsInUse(),
@@ -291,14 +291,7 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
         delegate->OnResponseTimeout(ec);
 }
 
-CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                          PacketBuffer * msgBuf)
-{
-    return HandleMessage(packetHeader, payloadHeader, msgBuf, nullptr);
-}
-
-CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                          PacketBuffer * msgBuf, ExchangeContext::MessageReceiveFunct umhandler)
+CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, PacketBuffer * msgBuf)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t protocolId = 0;
@@ -320,13 +313,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // is implicitly that response.
     SetResponseExpected(false);
 
-    // Deliver the message to the app via its callback.
-    if (umhandler)
-    {
-        umhandler(this, packetHeader, protocolId, messageType, msgBuf);
-        msgBuf = nullptr;
-    }
-    else if (mDelegate != nullptr)
+    if (mDelegate != nullptr)
     {
         mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, msgBuf);
         msgBuf = nullptr;
