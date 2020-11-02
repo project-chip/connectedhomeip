@@ -80,10 +80,9 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
 #if CONFIG_DEVICE_LAYER
 #if defined(CHIP_DEVICE_LAYER_TARGET)
         DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-        deviceDelegate.ProvisionWiFi(SSID, passwd);
+        err = deviceDelegate.ProvisionWiFi(SSID, passwd);
 #endif
 #endif
-        err = CHIP_NO_ERROR;
     }
     break;
 
@@ -321,7 +320,7 @@ CHIP_ERROR NetworkProvisioning::DecodeThreadAssociationRequest(System::PacketBuf
 #if defined(CHIP_DEVICE_LAYER_TARGET)
     {
         DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-        deviceDelegate.ProvisionThread(networkInfo);
+        err = deviceDelegate.ProvisionThread(networkInfo);
     }
 #endif
 #endif
