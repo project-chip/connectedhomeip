@@ -65,13 +65,14 @@ public:
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
 };
 
-static void HanldeAllUnsolicitedMessage(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                        uint8_t msgType, System::PacketBuffer * payload)
-{}
-
-static void HanldeOneUnsolicitedMessage(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                        uint8_t msgType, System::PacketBuffer * payload)
-{}
+class MockAppDelegate : public ExchangeContextDelegate
+{
+public:
+    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+                           System::PacketBuffer * buffer) override
+    {}
+    void OnResponseTimeout(ExchangeContext * ec) override {}
+} gMockAppDelegate;
 
 void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
@@ -106,14 +107,14 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.Init(&conn);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ExchangeContext * ec1 = exchangeMgr.NewContext(kSourceNodeId, (void *) 0x1234);
+    ExchangeContext * ec1 = exchangeMgr.NewContext(kSourceNodeId, (ExchangeContextDelegate *) 0x1234);
     NL_TEST_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
     NL_TEST_ASSERT(inSuite, ec1->GetPeerNodeId() == kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, ec1->GetAppState() == (void *) 0x1234);
+    NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == (void *) 0x1234);
 
-    ExchangeContext * ec2 = exchangeMgr.NewContext(kDestinationNodeId, (void *) 0x2345);
+    ExchangeContext * ec2 = exchangeMgr.NewContext(kDestinationNodeId, (ExchangeContextDelegate *) 0x2345);
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
     NL_TEST_ASSERT(inSuite, ec2->GetPeerNodeId() == kDestinationNodeId);
@@ -161,10 +162,10 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.Init(&conn);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, HanldeAllUnsolicitedMessage, nullptr);
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, &gMockAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0002, 0x0001, HanldeOneUnsolicitedMessage, nullptr);
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0002, 0x0001, &gMockAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = exchangeMgr.UnregisterUnsolicitedMessageHandler(0x0001);
