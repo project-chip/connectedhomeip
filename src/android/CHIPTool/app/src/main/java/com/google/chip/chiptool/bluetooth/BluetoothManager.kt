@@ -29,11 +29,6 @@ import kotlinx.coroutines.withTimeoutOrNull
 class BluetoothManager {
     private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
-    /** Converts an integer to a ByteArray with the first [size] bytes of the [Int]. */
-    private fun Int.toByteArray(size: Int): ByteArray {
-        return ByteArray(size) { i -> (this shr (8 * i)).toByte() }
-    }
-
     suspend fun getBluetoothDevice(discriminator: Int): BluetoothDevice? {
         val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
             Log.e(TAG, "No bluetooth scanner found")
@@ -58,7 +53,7 @@ class BluetoothManager {
                 val scanFilter = ScanFilter.Builder()
                     .setServiceData(
                       ParcelUuid(UUID.fromString(CHIP_UUID)),
-                      discriminator.toByteArray(3)
+                      byteArrayOf(0, discriminator.toByte(), (discriminator shr 8).toByte())
                     )
                     .build()
                 val scanSettings = ScanSettings.Builder()
