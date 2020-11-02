@@ -46,7 +46,7 @@ DEVICE_CONFIG = {
     }
 }
 
-CHIP_PORT = 11095
+CHIP_PORT = 11097
 
 CIRQUE_URL = "http://localhost:5000"
 
