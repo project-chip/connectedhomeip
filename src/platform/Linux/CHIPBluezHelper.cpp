@@ -921,8 +921,8 @@ static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aMa
                             conn->mpEndpoint    = endpoint;
                             BluezConnectionInit(conn);
                             endpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(aInterface));
-                            ChipLogError(DeviceLayer, "coonnected, insert, conn:%p, c1:%p, c2:%p and %s", conn, conn->mpC1,
-                                         conn->mpC2, endpoint->mpPeerDevicePath);
+                            ChipLogDetail(DeviceLayer, "Device %s (Path: %s) Connected", conn->mpPeerAddress,
+                                          endpoint->mpPeerDevicePath);
                             g_hash_table_insert(endpoint->mpConnMap, endpoint->mpPeerDevicePath, conn);
                         }
                         // for central, we do not call BluezConnectionInit until the services have been resolved
@@ -983,8 +983,12 @@ static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoi
     }
     else
     {
+        // We need to handle device connection both this function and BluezSignalInterfacePropertiesChanged
+        // When a device is connected for first time, this function will be triggerred.
+        // The future connections for the same device will trigger ``Connect'' property change.
+        // TODO: Factor common code in the two function.
         BluezConnection * conn;
-        SuccessOrExit(bluez_device1_get_connected(device));
+        VerifyOrExit(bluez_device1_get_connected(device), ChipLogError(DeviceLayer, "FAIL: device is not connected"));
 
         conn = static_cast<BluezConnection *>(
             g_hash_table_lookup(apEndpoint->mpConnMap, g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))));
@@ -997,7 +1001,8 @@ static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoi
         conn->mpDevice      = static_cast<BluezDevice1 *>(g_object_ref(device));
         conn->mpEndpoint    = apEndpoint;
         BluezConnectionInit(conn);
-
+        apEndpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
+        ChipLogDetail(DeviceLayer, "Device %s (Path: %s) Connected", conn->mpPeerAddress, apEndpoint->mpPeerDevicePath);
         g_hash_table_insert(apEndpoint->mpConnMap, g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))), conn);
     }
 
