@@ -71,6 +71,23 @@ using namespace chip;
     }                                                                                                                              \
     return result;
 
+#define DISCOVER_ATTRIBUTES(name, cluster_id)                                                                                      \
+    BufBound buf = BufBound(buffer, buf_length);                                                                                   \
+    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x0c))                                                         \
+    {                                                                                                                              \
+        /* Discover all attributes */                                                                                              \
+        buf.PutLE16(0x0000);                                                                                                       \
+        buf.Put(0xFF);                                                                                                             \
+    }                                                                                                                              \
+                                                                                                                                   \
+    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;                  \
+    if (result == 0)                                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
+        return 0;                                                                                                                  \
+    }                                                                                                                              \
+    return result;
+
 #define COMMAND_HEADER(name, cluster_id, command_id)                                                                               \
     BufBound buf    = BufBound(buffer, buf_length);                                                                                \
     uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, cluster_id, command_id);                            \
@@ -272,6 +289,11 @@ uint16_t encodeBarrierControlClusterStopCommand(uint8_t * buffer, uint16_t buf_l
     COMMAND_FOOTER(kName);
 }
 
+uint16_t encodeBarrierControlClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverBarrierControlAttributes", BARRIER_CONTROL_CLUSTER_ID);
+}
+
 /*
  * Attribute MovingState
  */
@@ -331,6 +353,11 @@ uint16_t encodeBasicClusterResetToFactoryDefaultsCommand(uint8_t * buffer, uint1
     const char * kName = "BasicResetToFactoryDefaults";
     COMMAND_HEADER(kName, BASIC_CLUSTER_ID, 0x00);
     COMMAND_FOOTER(kName);
+}
+
+uint16_t encodeBasicClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverBasicAttributes", BASIC_CLUSTER_ID);
 }
 
 /*
@@ -647,6 +674,11 @@ uint16_t encodeColorControlClusterStopMoveStepCommand(uint8_t * buffer, uint16_t
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
+}
+
+uint16_t encodeColorControlClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverColorControlAttributes", COLOR_CONTROL_CLUSTER_ID);
 }
 
 /*
@@ -1381,6 +1413,11 @@ uint16_t encodeDoorLockClusterUnlockWithTimeoutCommand(uint8_t * buffer, uint16_
     COMMAND_FOOTER(kName);
 }
 
+uint16_t encodeDoorLockClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverDoorLockAttributes", DOOR_LOCK_CLUSTER_ID);
+}
+
 /*
  * Attribute LockState
  */
@@ -1503,6 +1540,11 @@ uint16_t encodeGroupsClusterViewGroupCommand(uint8_t * buffer, uint16_t buf_leng
     COMMAND_FOOTER(kName);
 }
 
+uint16_t encodeGroupsClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverGroupsAttributes", GROUPS_CLUSTER_ID);
+}
+
 /*
  * Attribute NameSupport
  */
@@ -1547,6 +1589,11 @@ uint16_t encodeIdentifyClusterIdentifyQueryCommand(uint8_t * buffer, uint16_t bu
     const char * kName = "IdentifyIdentifyQuery";
     COMMAND_HEADER(kName, IDENTIFY_CLUSTER_ID, 0x01);
     COMMAND_FOOTER(kName);
+}
+
+uint16_t encodeIdentifyClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverIdentifyAttributes", IDENTIFY_CLUSTER_ID);
 }
 
 /*
@@ -1706,6 +1753,11 @@ uint16_t encodeLevelClusterStopWithOnOffCommand(uint8_t * buffer, uint16_t buf_l
     COMMAND_FOOTER(kName);
 }
 
+uint16_t encodeLevelClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverLevelAttributes", LEVEL_CLUSTER_ID);
+}
+
 /*
  * Attribute CurrentLevel
  */
@@ -1758,6 +1810,11 @@ uint16_t encodeOnOffClusterToggleCommand(uint8_t * buffer, uint16_t buf_length, 
     const char * kName = "OnOffToggle";
     COMMAND_HEADER(kName, ON_OFF_CLUSTER_ID, 0x02);
     COMMAND_FOOTER(kName);
+}
+
+uint16_t encodeOnOffClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverOnOffAttributes", ON_OFF_CLUSTER_ID);
 }
 
 /*
@@ -1893,6 +1950,11 @@ uint16_t encodeScenesClusterViewSceneCommand(uint8_t * buffer, uint16_t buf_leng
     COMMAND_FOOTER(kName);
 }
 
+uint16_t encodeScenesClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverScenesAttributes", SCENES_CLUSTER_ID);
+}
+
 /*
  * Attribute SceneCount
  */
@@ -1951,6 +2013,11 @@ uint16_t encodeScenesClusterReadNameSupportAttribute(uint8_t * buffer, uint16_t 
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 \*----------------------------------------------------------------------------*/
+
+uint16_t encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverTemperatureMeasurementAttributes", TEMPERATURE_MEASUREMENT_CLUSTER_ID);
+}
 
 /*
  * Attribute MeasuredValue
