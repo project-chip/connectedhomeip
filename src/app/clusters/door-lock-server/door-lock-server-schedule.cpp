@@ -292,11 +292,13 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(uint8_t holidayScheduleId,
     }
     else
     {
-        holidayScheduleTable[holidayScheduleId].localStartTime             = localStartTime;
-        holidayScheduleTable[holidayScheduleId].localEndTime               = localEndTime;
-        holidayScheduleTable[holidayScheduleId].operatingModeDuringHoliday = operatingModeDuringHoliday;
-        holidayScheduleTable[holidayScheduleId].inUse                      = true;
-        status                                                             = 0x00; // success (per 7.3.2.17.18)
+        holidayScheduleTable[holidayScheduleId].localStartTime = localStartTime;
+        holidayScheduleTable[holidayScheduleId].localEndTime   = localEndTime;
+        // TODO: This cast may not be safe.  https://github.com/project-chip/connectedhomeip/issues/3578
+        holidayScheduleTable[holidayScheduleId].operatingModeDuringHoliday =
+            static_cast<EmberAfDoorLockOperatingMode>(operatingModeDuringHoliday);
+        holidayScheduleTable[holidayScheduleId].inUse = true;
+        status                                        = 0x00; // success (per 7.3.2.17.18)
     }
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
                               ZCL_SET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID, "u", status);

@@ -90,15 +90,16 @@ extern "C" {
 
 #include "af-types.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 //#include "app/framework/util/print.h"
 //#include "app/framework/util/time-util.h"
 #include "client-api.h"
 #include "debug-printing.h"
 #include "ember-print.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
+
 #include "gen/af-structs.h"
 #include "gen/att-storage.h"
 #include "gen/attribute-id.h"
@@ -1891,6 +1892,12 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  */
 // Note:  This is a #define for now but could be a real function call in the future.
 #define emberAfMaxPowerLevel() (3)
+
+/**
+ * @brief API for parsing a cluster-specific message.  Implemented by
+ * generated code.
+ */
+EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
 
 #ifdef __cplusplus
 } // extern "C"

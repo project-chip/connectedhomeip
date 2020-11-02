@@ -168,8 +168,10 @@ static uint8_t setUser(uint16_t userId, uint8_t userStatus, uint8_t userType, ui
     if (validCodeLength && userId < userTableSize)
     {
         EmberAfPluginDoorLockServerUser * user = &userTable[userId];
-        user->status                           = userStatus;
-        user->type                             = userType;
+        // TODO: Need to check validity.  https://github.com/project-chip/connectedhomeip/issues/3579
+        user->status = static_cast<EmberAfDoorLockUserStatus>(userStatus);
+        // TODO: Need to check validity.  https://github.com/project-chip/connectedhomeip/issues/3580
+        user->type = static_cast<EmberAfDoorLockUserType>(userType);
         memmove(user->code.rfid, code,
                 emberAfStringLength(code) + 1); // + 1 for Zigbee string length byte
 
@@ -227,7 +229,8 @@ bool emberAfDoorLockClusterGetUserTypeCallback(uint16_t userId)
 
 bool emberAfDoorLockClusterSetUserTypeCallback(uint16_t userId, uint8_t userType)
 {
-    uint8_t status = (emAfPluginDoorLockServerSetPinUserType(userId, userType) ? 0x00   // success (per 7.3.2.17.21)
+    // TODO: Need to validate userType.  https://github.com/project-chip/connectedhomeip/issues/3580
+    uint8_t status = (emAfPluginDoorLockServerSetPinUserType(userId, static_cast<EmberAfDoorLockUserType>(userType)) ? 0x00   // success (per 7.3.2.17.21)
                                                                                : 0x01); // failure (per 7.3.2.17.21)
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
                               ZCL_SET_USER_TYPE_RESPONSE_COMMAND_ID, "u", status);
@@ -660,7 +663,7 @@ static EmberAfStatus applyCode(uint8_t * code, uint8_t codeLength, EmberAfPlugin
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-void emberAfPluginDoorLockServerLockoutEventHandler(void)
+extern "C" void emberAfPluginDoorLockServerLockoutEventHandler(void)
 {
     emberEventControlSetInactive(&emberAfPluginDoorLockServerLockoutEventControl);
 
@@ -708,7 +711,7 @@ static void scheduleAutoRelock(uint32_t autoRelockTimeS)
     }
 }
 
-void emberAfPluginDoorLockServerRelockEventHandler(void)
+extern "C" void emberAfPluginDoorLockServerRelockEventHandler(void)
 {
     emberEventControlSetInactive(&emberAfPluginDoorLockServerRelockEventControl);
 

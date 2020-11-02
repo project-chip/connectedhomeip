@@ -49,8 +49,7 @@ static const uint8_t attributeSizes[] = {
 
 uint8_t emberAfGetDataSize(uint8_t dataType)
 {
-    uint8_t i;
-    for (i = 0; (i + 1) < sizeof(attributeSizes); i += 2)
+    for (unsigned i = 0; (i + 1) < sizeof(attributeSizes); i += 2)
     {
         if (attributeSizes[i] == dataType)
         {
