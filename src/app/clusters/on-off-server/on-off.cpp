@@ -57,11 +57,13 @@
 #include "../zll-level-control-server/zll-level-control-server.h"
 #endif
 
+using namespace chip;
+
 #ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
-static bool areStartUpOnOffServerAttributesTokenized(uint8_t endpoint);
+static bool areStartUpOnOffServerAttributesTokenized(EndpointId endpoint);
 #endif
 
-EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t command, bool initiatedByLevelChange)
+EmberAfStatus emberAfOnOffClusterSetValueCallback(EndpointId endpoint, uint8_t command, bool initiatedByLevelChange)
 {
     EmberAfStatus status;
     bool currentValue, newValue;
@@ -197,7 +199,7 @@ bool emberAfOnOffClusterToggleCallback(void)
     return true;
 }
 
-void emberAfOnOffClusterServerInitCallback(uint8_t endpoint)
+void emberAfOnOffClusterServerInitCallback(EndpointId endpoint)
 {
 #ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
     // StartUp behavior relies on OnOff and StartUpOnOff attributes being tokenized.
@@ -260,7 +262,7 @@ void emberAfOnOffClusterServerInitCallback(uint8_t endpoint)
 }
 
 #ifdef ZCL_USING_ON_OFF_CLUSTER_START_UP_ON_OFF_ATTRIBUTE
-static bool areStartUpOnOffServerAttributesTokenized(uint8_t endpoint)
+static bool areStartUpOnOffServerAttributesTokenized(EndpointId endpoint)
 {
     EmberAfAttributeMetadata * metadata;
 

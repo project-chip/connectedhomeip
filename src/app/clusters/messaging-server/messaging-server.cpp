@@ -42,6 +42,8 @@
 #include "messaging-server.h"
 #include "../../include/af.h"
 
+using namespace chip;
+
 // The internal message is stored in the same structure type that is defined
 // publicly.  The internal state of the message is stored in the
 // messageStatusControl field
@@ -57,7 +59,7 @@ static EmberAfPluginMessagingServerMessage msgTable[EMBER_AF_MESSAGING_CLUSTER_S
 #define messageIsActive(ep) (msgTable[ep].messageStatusControl & ACTIVE)
 #define messageIsNow(ep) (msgTable[ep].messageStatusControl & NOW)
 #define messageIsForever(ep) (msgTable[ep].durationInMinutes == ZCL_MESSAGING_CLUSTER_DURATION_UNTIL_CHANGED)
-static bool messageIsCurrentOrScheduled(uint8_t endpoint)
+static bool messageIsCurrentOrScheduled(EndpointId endpoint)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
 
@@ -71,7 +73,7 @@ static bool messageIsCurrentOrScheduled(uint8_t endpoint)
              (emberAfGetCurrentTime() < msgTable[ep].startTime + (uint32_t) msgTable[ep].durationInMinutes * 60)));
 }
 
-void emberAfMessagingClusterServerInitCallback(uint8_t endpoint)
+void emberAfMessagingClusterServerInitCallback(EndpointId endpoint)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
 
@@ -85,7 +87,7 @@ void emberAfMessagingClusterServerInitCallback(uint8_t endpoint)
 
 bool emberAfMessagingClusterGetLastMessageCallback(void)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
     EmberAfPluginMessagingServerMessage message;
     emberAfMessagingClusterPrintln("RX: GetLastMessage");
     if (emberAfPluginMessagingServerGetMessage(endpoint, &message))
@@ -117,7 +119,7 @@ bool emberAfMessagingClusterMessageConfirmationCallback(uint32_t messageId, uint
     return true;
 }
 
-bool emberAfPluginMessagingServerGetMessage(uint8_t endpoint, EmberAfPluginMessagingServerMessage * message)
+bool emberAfPluginMessagingServerGetMessage(EndpointId endpoint, EmberAfPluginMessagingServerMessage * message)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
 
@@ -147,7 +149,7 @@ bool emberAfPluginMessagingServerGetMessage(uint8_t endpoint, EmberAfPluginMessa
     return messageIsCurrentOrScheduled(endpoint);
 }
 
-void emberAfPluginMessagingServerSetMessage(uint8_t endpoint, const EmberAfPluginMessagingServerMessage * message)
+void emberAfPluginMessagingServerSetMessage(EndpointId endpoint, const EmberAfPluginMessagingServerMessage * message)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
 
@@ -179,7 +181,7 @@ void emberAfPluginMessagingServerSetMessage(uint8_t endpoint, const EmberAfPlugi
     msgTable[ep].messageStatusControl |= (VALID | ACTIVE);
 }
 
-void emAfPluginMessagingServerPrintInfo(uint8_t endpoint)
+void emAfPluginMessagingServerPrintInfo(EndpointId endpoint)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
 
