@@ -985,7 +985,7 @@ static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoi
     {
         // We need to handle device connection both this function and BluezSignalInterfacePropertiesChanged
         // When a device is connected for first time, this function will be triggerred.
-        // The future connections for the same device will trigger ``Connect'' properties change.
+        // The future connections for the same device will trigger ``Connect'' property change.
         // TODO: Factor common code in the two function.
         BluezConnection * conn;
         VerifyOrExit(bluez_device1_get_connected(device), ChipLogError(DeviceLayer, "FAIL: device is not connected"));
