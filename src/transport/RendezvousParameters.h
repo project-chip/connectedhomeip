@@ -17,13 +17,13 @@
 
 #pragma once
 
+#include <setup_payload/SetupPayload.h>
 #include <transport/raw/Base.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
 
-#include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
@@ -43,8 +43,8 @@ public:
         return *this;
     }
 
-    bool HasDiscriminator() const { return mDiscriminator != -1 && CanCastTo<uint16_t>(mDiscriminator); }
-    uint16_t GetDiscriminator() const { return static_cast<uint16_t>(mDiscriminator); }
+    bool HasDiscriminator() const { return mDiscriminator <= kMaxDiscriminatorValue; }
+    uint16_t GetDiscriminator() const { return mDiscriminator; }
     RendezvousParameters & SetDiscriminator(uint16_t discriminator)
     {
         mDiscriminator = discriminator;
@@ -80,9 +80,9 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
-    Optional<NodeId> mLocalNodeId; ///< the local node id
-    uint32_t mSetupPINCode = 0;    ///< the target peripheral setup PIN Code
-    int32_t mDiscriminator = -1;   ///< the target peripheral discriminator
+    Optional<NodeId> mLocalNodeId;        ///< the local node id
+    uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
+    uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer               = nullptr;
