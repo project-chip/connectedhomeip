@@ -921,8 +921,8 @@ static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aMa
                             conn->mpEndpoint    = endpoint;
                             BluezConnectionInit(conn);
                             endpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(aInterface));
-                            ChipLogDetail(DeviceLayer, "coonnected, insert, conn:%p, c1:%p, c2:%p and %s", conn, conn->mpC1,
-                                          conn->mpC2, endpoint->mpPeerDevicePath);
+                            ChipLogDetail(DeviceLayer, "Device %s (Path: %s) Connected", conn->mpPeerAddress,
+                                          apEndpoint->mpPeerDevicePath);
                             g_hash_table_insert(endpoint->mpConnMap, endpoint->mpPeerDevicePath, conn);
                         }
                         // for central, we do not call BluezConnectionInit until the services have been resolved
@@ -1002,8 +1002,7 @@ static void BluezHandleNewDevice(BluezDevice1 * device, BluezEndpoint * apEndpoi
         conn->mpEndpoint    = apEndpoint;
         BluezConnectionInit(conn);
         apEndpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device)));
-        ChipLogDetail(DeviceLayer, "coonnected, insert, conn:%p, c1:%p, c2:%p and %s", conn, conn->mpC1, conn->mpC2,
-                      apEndpoint->mpPeerDevicePath);
+        ChipLogDetail(DeviceLayer, "Device %s (Path: %s) Connected", conn->mpPeerAddress, apEndpoint->mpPeerDevicePath);
         g_hash_table_insert(apEndpoint->mpConnMap, g_strdup(g_dbus_proxy_get_object_path(G_DBUS_PROXY(device))), conn);
     }
 
