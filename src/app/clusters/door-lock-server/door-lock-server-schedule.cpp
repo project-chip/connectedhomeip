@@ -108,7 +108,7 @@ void emAfPluginDoorLockServerInitSchedule(void)
         { ZCL_NUM_HOLIDAY_SCHEDULES_SUPPORTED_PER_USER_ATTRIBUTE_ID, EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_HOLIDAY_SCHEDULE_TABLE_SIZE },
 #endif
     };
-    emAfPluginDoorLockServerWriteAttributes(data, COUNTOF(data), "schedule table");
+    emAfPluginDoorLockServerWriteAttributes(data, ArraySize(data), "schedule table");
 #endif
 }
 
@@ -292,11 +292,12 @@ bool emberAfDoorLockClusterSetHolidayScheduleCallback(uint8_t holidayScheduleId,
     }
     else
     {
-        holidayScheduleTable[holidayScheduleId].localStartTime             = localStartTime;
-        holidayScheduleTable[holidayScheduleId].localEndTime               = localEndTime;
-        holidayScheduleTable[holidayScheduleId].operatingModeDuringHoliday = operatingModeDuringHoliday;
-        holidayScheduleTable[holidayScheduleId].inUse                      = true;
-        status                                                             = 0x00; // success (per 7.3.2.17.18)
+        holidayScheduleTable[holidayScheduleId].localStartTime = localStartTime;
+        holidayScheduleTable[holidayScheduleId].localEndTime   = localEndTime;
+        holidayScheduleTable[holidayScheduleId].operatingModeDuringHoliday =
+            static_cast<EmberAfDoorLockOperatingMode>(operatingModeDuringHoliday);
+        holidayScheduleTable[holidayScheduleId].inUse = true;
+        status                                        = 0x00; // success (per 7.3.2.17.18)
     }
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
                               ZCL_SET_HOLIDAY_SCHEDULE_RESPONSE_COMMAND_ID, "u", status);
