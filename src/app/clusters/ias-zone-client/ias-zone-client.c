@@ -270,7 +270,7 @@ static uint8_t findIasZoneServerByIeee(uint8_t * ieeeAddress)
     uint8_t i;
     for (i = 0; i < EMBER_AF_PLUGIN_IAS_ZONE_CLIENT_MAX_DEVICES; i++)
     {
-        if (0 == MEMCOMPARE(ieeeAddress, emberAfIasZoneClientKnownServers[i].ieeeAddress, EUI64_SIZE))
+        if (0 == memcmp(ieeeAddress, emberAfIasZoneClientKnownServers[i].ieeeAddress, EUI64_SIZE))
         {
             return i;
         }
@@ -365,7 +365,7 @@ static uint8_t addServer(EmberNodeId nodeId, uint8_t * ieeeAddress)
     for (i = 0; i < EMBER_AF_PLUGIN_IAS_ZONE_CLIENT_MAX_DEVICES; i++)
     {
         const uint8_t unsetEui64[] = { 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
-        if (0 == MEMCOMPARE(emberAfIasZoneClientKnownServers[i].ieeeAddress, unsetEui64, EUI64_SIZE))
+        if (0 == memcmp(emberAfIasZoneClientKnownServers[i].ieeeAddress, unsetEui64, EUI64_SIZE))
         {
             setServerIeee(i, ieeeAddress);
             setServerNodeId(i, nodeId);
@@ -584,7 +584,7 @@ void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId c
                     {
                         // Too short, dump the message
                     }
-                    else if (0 != MEMCOMPARE(&(buffer[i]), myIeee, EUI64_SIZE))
+                    else if (0 != memcmp(&(buffer[i]), myIeee, EUI64_SIZE))
                     {
                         emberAfIasZoneClusterPrintln("CIE Address not set to mine, removing IAS zone server.");
                         removeServer(&(buffer[i]));
