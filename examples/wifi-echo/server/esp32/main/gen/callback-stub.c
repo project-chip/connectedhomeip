@@ -2367,3 +2367,30 @@ bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
     emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Stop identify callback on endpoint %d", endpoint);
     return false;
 }
+
+/** @brief Compute Pwm from HSV
+ *
+ * This function is called from the color server when it is time for the PWMs to
+ * be driven with a new value from the HSV values.
+ *
+ * @param endpoint The identifying endpoint Ver.: always
+ */
+void emberAfPluginColorControlServerComputePwmFromHsvCallback(uint8_t endpoint) {}
+
+/** @brief Compute Pwm from HSV
+ *
+ * This function is called from the color server when it is time for the PWMs to
+ * be driven with a new value from the color temperature.
+ *
+ * @param endpoint The identifying endpoint Ver.: always
+ */
+void emberAfPluginColorControlServerComputePwmFromTempCallback(uint8_t endpoint) {}
+
+/** @brief Compute Pwm from HSV
+ *
+ * This function is called from the color server when it is time for the PWMs to
+ * be driven with a new value from the color X and color Y values.
+ *
+ * @param endpoint The identifying endpoint Ver.: always
+ */
+void emberAfPluginColorControlServerComputePwmFromXyCallback(uint8_t endpoint) {}

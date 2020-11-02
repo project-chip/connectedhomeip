@@ -1957,10 +1957,6 @@ typedef struct
 #define MILLISECOND_TICKS_PER_SECOND 1000
 #define MILLISECOND_TICKS_PER_DECISECOND (MILLISECOND_TICKS_PER_SECOND / 10)
 
-#define emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint) (void) 0
-#define emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint) (void) 0
-#define emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint) (void) 0
-
 /**
  * @brief Macro that copies the token value from non-volatile storage into a RAM
  * location.  This macro can only be used with tokens that are defined using
