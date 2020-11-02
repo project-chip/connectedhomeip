@@ -47,8 +47,6 @@
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
 #define CHIP_ADV_DATA_FLAGS 0x06
 #define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
-#define CHIP_BLE_OPCODE 0x00
-#define CHIP_ADV_VERSION 0x00
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -627,8 +625,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
     CHIP_ERROR err;
     uint8_t advData[MAX_ADV_DATA_LEN];
-    uint16_t advDataVersionDiscriminator = 0;
-    uint8_t index                        = 0;
+    uint8_t index = 0;
 
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
     // discriminator value
@@ -648,8 +645,6 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ChipLogError(DeviceLayer, "esp_ble_gap_set_device_name() failed: %s", ErrorStr(err));
         ExitNow();
     }
-
-    advDataVersionDiscriminator = (discriminator | (CHIP_ADV_VERSION << 12));
 
     memset(advData, 0, sizeof(advData));
     advData[index++] = 0x02;                            // length
