@@ -32,18 +32,18 @@ AndroidDeviceControllerWrapper * AndroidDeviceControllerWrapper::AllocateNew(chi
 {
     if (errInfoOnFailure == nullptr)
     {
-        ChipLogProgress(Controller, "Missing error info");
+        ChipLogError(Controller, "Missing error info");
         return nullptr;
     }
     if (systemLayer == nullptr)
     {
-        ChipLogProgress(Controller, "Missing system layer");
+        ChipLogError(Controller, "Missing system layer");
         *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
         return nullptr;
     }
     if (inetLayer == nullptr)
     {
-        ChipLogProgress(Controller, "Missing inet layer");
+        ChipLogError(Controller, "Missing inet layer");
         *errInfoOnFailure = CHIP_ERROR_INVALID_ARGUMENT;
         return nullptr;
     }
