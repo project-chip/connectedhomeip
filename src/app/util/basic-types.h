@@ -49,6 +49,9 @@ typedef CHIPGroupId EmberMulticastId;
 typedef uint16_t EmberAfProfileId;
 
 #ifdef __cplusplus
+// Pull in NodeId
+#include <transport/raw/MessageHeader.h>
+
 namespace chip {
 typedef CHIPEndpointId EndpointId;
 typedef CHIPClusterId ClusterId;
