@@ -684,10 +684,10 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
     EmberAfSceneTableEntry entry;
     EmberAfStatus status;
     EmberStatus sendStatus;
-    bool enhanced                    = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
-    uint16_t extensionFieldSetsLen   = (cmd->bufLen -
-                                      (cmd->payloadStartIndex + sizeof(groupId) + sizeof(sceneId) + sizeof(transitionTime) +
-                                       emberAfStringLength(sceneName) + 1));
+    bool enhanced                  = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
+    uint16_t extensionFieldSetsLen = static_cast<uint16_t>(
+        cmd->bufLen -
+        (cmd->payloadStartIndex + sizeof(groupId) + sizeof(sceneId) + sizeof(transitionTime) + emberAfStringLength(sceneName) + 1));
     uint16_t extensionFieldSetsIndex = 0;
     uint8_t endpoint                 = cmd->apsFrame->destinationEndpoint;
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
@@ -793,9 +793,9 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
             goto kickout;
         }
 
-        clusterId = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-        extensionFieldSetsIndex += 2;
-        length = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+        clusterId               = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+        extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+        length                  = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
         extensionFieldSetsIndex++;
 
         // If the length is off, the command is also malformed.
@@ -866,10 +866,10 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
             {
                 break;
             }
-            entry.hasCurrentXValue = true;
-            entry.currentXValue    = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-            extensionFieldSetsIndex += 2;
-            length -= 2;
+            entry.hasCurrentXValue  = true;
+            entry.currentXValue     = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+            length                  = static_cast<uint8_t>(length - 2);
             if (length < 2)
             {
                 break;
@@ -878,8 +878,9 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
             entry.currentYValue    = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
             if (enhanced)
             {
-                extensionFieldSetsIndex += 2;
-                length -= 2;
+                extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+                length                  = static_cast<uint8_t>(length - 2);
+                ;
                 if (length < 2)
                 {
                     break;
@@ -887,8 +888,8 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
                 entry.hasEnhancedCurrentHueValue = true;
                 entry.enhancedCurrentHueValue =
                     emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-                extensionFieldSetsIndex += 2;
-                length -= 2;
+                extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+                length                  = static_cast<uint8_t>(length - 2);
                 if (length < 1)
                 {
                     break;
@@ -919,8 +920,8 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
                 }
                 entry.hasColorLoopTimeValue = true;
                 entry.colorLoopTimeValue    = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-                extensionFieldSetsIndex += 2;
-                length -= 2;
+                extensionFieldSetsIndex     = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+                length                      = static_cast<uint8_t>(length - 2);
                 if (length < 2)
                 {
                     break;
@@ -967,7 +968,7 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
             break;
         }
 
-        extensionFieldSetsIndex += length;
+        extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + length);
     }
 
     // If we got this far, we either added a new entry or updated an existing one.
@@ -1042,7 +1043,8 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
     {
         // The transition time is returned in seconds in the regular version of the
         // command and tenths of a second in the enhanced version.
-        emberAfPutInt16uInResp(enhanced ? entry.transitionTime * 10 + entry.transitionTime100ms : entry.transitionTime);
+        emberAfPutInt16uInResp(
+            static_cast<uint16_t>(enhanced ? entry.transitionTime * 10 + entry.transitionTime100ms : entry.transitionTime));
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
         emberAfPutStringInResp(entry.name);
 #else
@@ -1093,17 +1095,17 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
             length = &appResponseData[appResponseLength];
             emberAfPutInt8uInResp(0); // temporary length
             emberAfPutInt16uInResp(entry.currentXValue);
-            *length += 2;
+            *length = static_cast<uint8_t>(*length + 2);
             if (entry.hasCurrentYValue)
             {
                 emberAfPutInt16uInResp(entry.currentYValue);
-                *length += 2;
+                *length = static_cast<uint8_t>(*length + 2);
                 if (enhanced)
                 {
                     if (entry.hasEnhancedCurrentHueValue)
                     {
                         emberAfPutInt16uInResp(entry.enhancedCurrentHueValue);
-                        *length += 2;
+                        *length = static_cast<uint8_t>(*length + 2);
                         if (entry.hasCurrentSaturationValue)
                         {
                             emberAfPutInt8uInResp(entry.currentSaturationValue);
@@ -1119,11 +1121,11 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
                                     if (entry.hasColorLoopTimeValue)
                                     {
                                         emberAfPutInt16uInResp(entry.colorLoopTimeValue);
-                                        *length += 2;
+                                        *length = static_cast<uint8_t>(*length + 2);
                                         if (entry.hasColorTemperatureMiredsValue)
                                         {
                                             emberAfPutInt16uInResp(entry.colorTemperatureMiredsValue);
-                                            *length += 2;
+                                            *length = static_cast<uint8_t>(*length + 2);
                                         }
                                     }
                                 }

@@ -260,7 +260,7 @@ extern "C" void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
     }
     else
     {
-        writeRemainingTime(endpoint, state->transitionTimeMs - state->elapsedTimeMs);
+        writeRemainingTime(endpoint, static_cast<uint16_t>(state->transitionTimeMs - state->elapsedTimeMs));
         schedule(endpoint, state->eventDurationMs);
     }
 }
@@ -514,12 +514,12 @@ static void moveToLevelHandler(uint8_t commandId, uint8_t level, uint16_t transi
             goto send_default_response;
         }
         state->increasing = true;
-        actualStepSize    = state->moveToLevel - currentLevel;
+        actualStepSize    = static_cast<uint8_t>(state->moveToLevel - currentLevel);
     }
     else
     {
         state->increasing = false;
-        actualStepSize    = currentLevel - state->moveToLevel;
+        actualStepSize    = static_cast<uint8_t>(currentLevel - state->moveToLevel);
     }
 
     // If the Transition time field takes the value 0xFFFF, then the time taken
@@ -623,7 +623,7 @@ static void moveHandler(uint8_t commandId, uint8_t moveMode, uint8_t rate, uint8
     case EMBER_ZCL_MOVE_MODE_UP:
         state->increasing  = true;
         state->moveToLevel = MAX_LEVEL;
-        difference         = MAX_LEVEL - currentLevel;
+        difference         = static_cast<uint8_t>(MAX_LEVEL - currentLevel);
         break;
     case EMBER_ZCL_MOVE_MODE_DOWN:
         state->increasing  = false;
@@ -737,11 +737,11 @@ static void stepHandler(uint8_t commandId, uint8_t stepMode, uint8_t stepSize, u
         if (MAX_LEVEL - currentLevel < stepSize)
         {
             state->moveToLevel = MAX_LEVEL;
-            actualStepSize     = (MAX_LEVEL - currentLevel);
+            actualStepSize     = static_cast<uint8_t>(MAX_LEVEL - currentLevel);
         }
         else
         {
-            state->moveToLevel = currentLevel + stepSize;
+            state->moveToLevel = static_cast<uint8_t>(currentLevel + stepSize);
         }
         break;
     case EMBER_ZCL_STEP_MODE_DOWN:
@@ -753,7 +753,7 @@ static void stepHandler(uint8_t commandId, uint8_t stepMode, uint8_t stepSize, u
         }
         else
         {
-            state->moveToLevel = currentLevel - stepSize;
+            state->moveToLevel = static_cast<uint8_t>(currentLevel - stepSize);
         }
         break;
     default:

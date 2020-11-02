@@ -143,7 +143,7 @@ uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length)
     if ((appResponseLength + length) < EMBER_AF_RESPONSE_BUFFER_LEN)
     {
         memmove(appResponseData + appResponseLength, data, length);
-        appResponseLength += length;
+        appResponseLength = static_cast<uint16_t>(appResponseLength + length);
         return &appResponseData[appResponseLength - length];
     }
     else
@@ -155,7 +155,7 @@ uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length)
 uint8_t * emberAfPutStringInResp(const uint8_t * buffer)
 {
     uint8_t length = emberAfStringLength(buffer);
-    return emberAfPutBlockInResp(buffer, length + 1);
+    return emberAfPutBlockInResp(buffer, static_cast<uint16_t>(length + 1));
 }
 
 uint8_t * emberAfPutDateInResp(EmberAfDate * value)

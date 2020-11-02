@@ -136,19 +136,19 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
             }
             else if (cmd == 'l')
             {
-                dataLen = emberAfLongStringLength(data) + 2;
+                dataLen = static_cast<uint16_t>(emberAfLongStringLength(data) + 2);
             }
             else if (cmd == 's')
             {
-                dataLen = emberAfStringLength(data) + 1;
+                dataLen = static_cast<uint16_t>(emberAfStringLength(data) + 1);
             }
             else if ('0' <= cmd && cmd <= '9')
             {
-                dataLen = cmd - '0';
+                dataLen = static_cast<uint16_t>(cmd - '0');
             }
             else if ('A' <= cmd && cmd <= 'G')
             {
-                dataLen = cmd - 'A' + 10;
+                dataLen = static_cast<uint16_t>(cmd - 'A' + 10);
             }
             else
             {
@@ -217,7 +217,7 @@ static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameC
                 return 0;
             }
             memcpy(buffer + bytes, data, dataLen);
-            bytes += dataLen;
+            bytes = static_cast<uint16_t>(bytes + dataLen);
         }
     }
 

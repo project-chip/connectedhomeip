@@ -235,7 +235,7 @@ static void prepareForResponse(const EmberAfClusterCommand * cmd)
     if (cmd->interPanHeader == NULL)
     {
         emberAfResponseDestination = cmd->source;
-        emberAfResponseType &= ~ZCL_UTIL_RESP_INTERPAN;
+        emberAfResponseType        = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_INTERPAN);
     }
     else
     {
@@ -402,9 +402,9 @@ static void printIncomingZclMessage(const EmberAfClusterCommand * cmd)
                         cmd->buffer[0], // frame control
                         cmd->seqNum, cmd->commandId);
         emberAfAppFlush();
-        emberAfAppPrintBuffer(cmd->buffer + cmd->payloadStartIndex, // message
-                              cmd->bufLen - cmd->payloadStartIndex, // length
-                              true);                                // spaces?
+        emberAfAppPrintBuffer(cmd->buffer + cmd->payloadStartIndex,                        // message
+                              static_cast<uint16_t>(cmd->bufLen - cmd->payloadStartIndex), // length
+                              true);                                                       // spaces?
         emberAfAppFlush();
         emberAfAppPrintln("]");
     }
@@ -480,8 +480,8 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
     returnCmd->payloadStartIndex = 1;
     if (returnCmd->mfgSpecific)
     {
-        returnCmd->mfgCode = emberAfGetInt16u(message, returnCmd->payloadStartIndex, messageLength);
-        returnCmd->payloadStartIndex += 2;
+        returnCmd->mfgCode           = emberAfGetInt16u(message, returnCmd->payloadStartIndex, messageLength);
+        returnCmd->payloadStartIndex = static_cast<uint8_t>(returnCmd->payloadStartIndex + 2);
     }
     else
     {
@@ -629,7 +629,7 @@ void emberAfSetNoReplyForNextMessage(bool set)
     }
     else
     {
-        emberAfResponseType &= ~ZCL_UTIL_RESP_NONE;
+        emberAfResponseType = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_NONE);
     }
 }
 
@@ -655,7 +655,7 @@ void emAfApplyRetryOverride(EmberApsOption * options)
     }
     else if (emberAfApsRetryOverride == EMBER_AF_RETRY_OVERRIDE_UNSET)
     {
-        *options &= ~EMBER_APS_OPTION_RETRY;
+        *options = static_cast<EmberApsOption>(*options & ~EMBER_APS_OPTION_RETRY);
     }
     else
     {
@@ -747,9 +747,9 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
     // the destination of the message.
     if ((emberAfResponseType & ZCL_UTIL_RESP_INTERPAN) != 0U)
     {
-        label  = 'I';
-        status = emberAfInterpanSendMessageCallback(&interpanResponseHeader, appResponseLength, appResponseData);
-        emberAfResponseType &= ~ZCL_UTIL_RESP_INTERPAN;
+        label               = 'I';
+        status              = emberAfInterpanSendMessageCallback(&interpanResponseHeader, appResponseLength, appResponseData);
+        emberAfResponseType = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_INTERPAN);
     }
     else if (!isBroadcastDestination(emberAfResponseDestination))
     {
@@ -830,9 +830,9 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
     }
 
     appResponseLength = 0;
-    frameControl      = (ZCL_GLOBAL_COMMAND |
-                    (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER ? ZCL_FRAME_CONTROL_SERVER_TO_CLIENT
-                                                                      : ZCL_FRAME_CONTROL_CLIENT_TO_SERVER));
+    frameControl      = static_cast<uint8_t>(ZCL_GLOBAL_COMMAND |
+                                        (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER ? ZCL_FRAME_CONTROL_SERVER_TO_CLIENT
+                                                                                          : ZCL_FRAME_CONTROL_CLIENT_TO_SERVER));
 
     if (!cmd->mfgSpecific)
     {
@@ -964,24 +964,24 @@ bool emberAfDetermineIfLinkSecurityIsRequired(uint8_t commandId, bool incoming, 
 
 uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame)
 {
-    EmberNodeId destination = EMBER_UNKNOWN_NODE_ID;
-    uint8_t max             = EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH;
+    ChipNodeId destination = EMBER_UNKNOWN_NODE_ID;
+    uint8_t max            = EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH;
 
     if ((apsFrame->options & EMBER_APS_OPTION_ENCRYPTION) != 0U)
     {
-        max -= EMBER_AF_APS_ENCRYPTION_OVERHEAD;
+        max = static_cast<uint8_t>(max - EMBER_AF_APS_ENCRYPTION_OVERHEAD);
     }
     if ((apsFrame->options & EMBER_APS_OPTION_SOURCE_EUI64) != 0U)
     {
-        max -= EUI64_SIZE;
+        max = static_cast<uint8_t>(max - EUI64_SIZE);
     }
     if ((apsFrame->options & EMBER_APS_OPTION_DESTINATION_EUI64) != 0U)
     {
-        max -= EUI64_SIZE;
+        max = static_cast<uint8_t>(max - EUI64_SIZE);
     }
     if ((apsFrame->options & EMBER_APS_OPTION_FRAGMENT) != 0U)
     {
-        max -= EMBER_AF_APS_FRAGMENTATION_OVERHEAD;
+        max = static_cast<uint8_t>(max - EMBER_AF_APS_FRAGMENTATION_OVERHEAD);
     }
 
     switch (type)
@@ -1007,7 +1007,7 @@ uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t i
         break;
     }
 
-    max -= emberAfGetSourceRouteOverheadCallback(destination);
+    max = static_cast<uint8_t>(max - emberAfGetSourceRouteOverheadCallback(destination));
 
     return max;
 }
@@ -1178,7 +1178,7 @@ int8_t emberAfCompareDates(EmberAfDate* date1, EmberAfDate* date2)
 // 2.15 from the ZCL spec 075123r02
 uint8_t emberAfGetAttributeAnalogOrDiscreteType(uint8_t dataType)
 {
-    uint8_t index = 0;
+    unsigned index = 0;
 
     while (emberAfAnalogDiscreteThresholds[index] < dataType)
     {
@@ -1240,12 +1240,13 @@ uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, co
         return 0;
     }
 
-    freeChars    = zclStringMaxLen - curLen;
+    freeChars    = static_cast<uint8_t>(zclStringMaxLen - curLen);
     charsToWrite = (freeChars > appendingCharsLen) ? appendingCharsLen : freeChars;
 
     memcpy(&zclString[1 + curLen], // 1 is to account for zcl's length byte
            appendingChars, charsToWrite);
-    zclString[0] = curLen + charsToWrite;
+    // Cast is safe, because the sum can't be bigger than zclStringMaxLen.
+    zclString[0] = static_cast<uint8_t>(curLen + charsToWrite);
     return charsToWrite;
 }
 

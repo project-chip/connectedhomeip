@@ -101,7 +101,7 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
 
     if (!ENTRY_ID_IS_VALID(*entryId))
     {
-        *entryId = MOST_RECENT_ENTRY_ID();
+        *entryId = static_cast<uint16_t>(MOST_RECENT_ENTRY_ID());
     }
     assert(ENTRY_ID_IS_VALID(*entryId));
 

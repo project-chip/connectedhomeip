@@ -225,7 +225,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
             {
                 list[listLen]     = LOW_BYTE(entry.groupId);
                 list[listLen + 1] = HIGH_BYTE(entry.groupId);
-                listLen += 2;
+                listLen           = static_cast<uint8_t>(listLen + 2);
                 count++;
             }
         }
@@ -245,7 +245,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
                     {
                         list[listLen]     = LOW_BYTE(groupId);
                         list[listLen + 1] = HIGH_BYTE(groupId);
-                        listLen += 2;
+                        listLen           = static_cast<uint8_t>(listLen + 2);
                         count++;
                     }
                 }

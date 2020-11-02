@@ -55,7 +55,7 @@ static EmberAfPluginDoorLockServerUser rfidUserTable[EMBER_AF_PLUGIN_DOOR_LOCK_S
 // This is the current number of invalid PIN/RFID's in a row.
 static uint8_t wrongCodeEntryCount = 0;
 
-bool emAfPluginDoorLockServerCheckForSufficientSpace(uint8_t spaceReq, uint8_t spaceAvail)
+bool emAfPluginDoorLockServerCheckForSufficientSpace(uint16_t spaceReq, uint8_t spaceAvail)
 {
     if (spaceReq > spaceAvail)
     {
