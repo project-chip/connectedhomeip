@@ -177,25 +177,6 @@ public:
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
-    /**
-     *  Handle a received CHIP message on this exchange.
-     *
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
-     *
-     *  @param[in]    payloadHeader A reference to the PayloadHeader object.
-     *
-     *  @param[in]    msgBuf        A pointer to the PacketBuffer object holding the CHIP message.
-     *
-     *  @param[in]    umhandler     A unsolicited message callback handler.
-     *
-     *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
-     *  @retval  #CHIP_ERROR_INCORRECT_STATE                if the state of the exchange context is incorrect.
-     *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
-     *                                                       protocol layer.
-     */
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf,
-                             ExchangeContext::MessageReceiveFunct umhandler);
-
     void SetDelegate(ExchangeContextDelegate * delegate) { mDelegate = delegate; }
 
     ExchangeContextDelegate * GetDelegate() const { return mDelegate; }
@@ -206,8 +187,6 @@ public:
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
-    void * GetAppState() const { return mAppState; }
-
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange
      * can hold onto it while it's out of their direct control to make sure it isn't closed before everyone's ready.
@@ -216,7 +195,7 @@ public:
     void Close();
     void Abort();
 
-    void Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState);
+    void Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeContextDelegate * delegate);
     void Free();
     void Reset();
 
@@ -232,7 +211,6 @@ private:
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeContextDelegate * mDelegate = nullptr;
     ExchangeManager * mExchangeMgr;
-    void * mAppState; // Pointer to application-specific state object.
 
     uint64_t mPeerNodeId; // Node ID of peer node.
     uint16_t mExchangeId; // Assigned exchange ID.
@@ -255,7 +233,6 @@ private:
     void SetPeerNodeId(NodeId nodeId) { mPeerNodeId = nodeId; }
     void SetExchangeId(uint16_t exId) { mExchangeId = exId; }
     void SetExchangeMgr(ExchangeManager * exMgr) { mExchangeMgr = exMgr; }
-    void SetAppState(void * state) { mAppState = state; }
 
     CHIP_ERROR StartResponseTimer();
     void CancelResponseTimer();

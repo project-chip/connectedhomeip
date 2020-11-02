@@ -99,18 +99,18 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(const NodeId & peerNodeId, void * appState)
+ExchangeContext * ExchangeManager::NewContext(const NodeId & peerNodeId, ExchangeContextDelegate * delegate)
 {
-    return AllocContext(mNextExchangeId++, peerNodeId, true, appState);
+    return AllocContext(mNextExchangeId++, peerNodeId, true, delegate);
 }
 
-ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, void * appState, bool isInitiator)
+ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, ExchangeContextDelegate * delegate, bool isInitiator)
 {
     ExchangeContext * ec = ContextPool;
 
     for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
     {
-        if (ec->GetReferenceCount() > 0 && ec->GetPeerNodeId() == peerNodeId && ec->GetAppState() == appState &&
+        if (ec->GetReferenceCount() > 0 && ec->GetPeerNodeId() == peerNodeId && ec->GetDelegate() == delegate &&
             ec->IsInitiator() == isInitiator)
             return ec;
     }
@@ -118,16 +118,14 @@ ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, void * appStat
     return nullptr;
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContext::MessageReceiveFunct handler,
-                                                              void * appState)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContextDelegate * app)
 {
-    return RegisterUMH(protocolId, kAnyMessageType, handler, appState);
+    return RegisterUMH(protocolId, kAnyMessageType, app);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType,
-                                                              ExchangeContext::MessageReceiveFunct handler, void * appState)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContextDelegate * app)
 {
-    return RegisterUMH(protocolId, static_cast<int16_t>(msgType), handler, appState);
+    return RegisterUMH(protocolId, static_cast<int16_t>(msgType), app);
 }
 
 CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protocolId)
@@ -145,7 +143,8 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
 }
 
-ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState)
+ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
+                                                ExchangeContextDelegate * delegate)
 {
     ExchangeContext * ec = ContextPool;
 
@@ -155,7 +154,7 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t Pe
     {
         if (ec->GetReferenceCount() == 0)
         {
-            ec->Alloc(this, ExchangeId, PeerNodeId, Initiator, AppState);
+            ec->Alloc(this, ExchangeId, PeerNodeId, Initiator, delegate);
             return ec;
         }
     }
@@ -199,7 +198,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
 
         for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
         {
-            if (umh->Handler != nullptr && umh->ProtocolId == payloadHeader.GetProtocolID())
+            if (umh->App != nullptr && umh->ProtocolId == payloadHeader.GetProtocolID())
             {
                 if (umh->MessageType == payloadHeader.GetMessageType())
                 {
@@ -221,16 +220,13 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     // If we found a handler or we need to create a new exchange context (EC).
     if (matchingUMH != nullptr)
     {
-        ExchangeContext::MessageReceiveFunct umhandler = nullptr;
-
-        ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false, matchingUMH->AppState);
+        ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false, matchingUMH->App);
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-        umhandler = matchingUMH->Handler;
+        ChipLogProgress(ExchangeManager, "ec id: %d, Delegate: 0x%x", (ec - ContextPool + 1), ec->GetDelegate());
 
-        ChipLogProgress(ExchangeManager, "ec id: %d, AppState: 0x%x", (ec - ContextPool + 1), ec->GetAppState());
-
-        ec->HandleMessage(packetHeader, payloadHeader, msgBuf, umhandler);
+        ec->SetDelegate(matchingUMH->App);
+        ec->HandleMessage(packetHeader, payloadHeader, msgBuf);
         msgBuf = nullptr;
     }
 
@@ -246,23 +242,21 @@ exit:
     }
 }
 
-CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContext::MessageReceiveFunct handler,
-                                        void * appState)
+CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContextDelegate * app)
 {
     UnsolicitedMessageHandler * umh      = UMHandlerPool;
     UnsolicitedMessageHandler * selected = nullptr;
 
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
-        if (umh->Handler == nullptr)
+        if (umh->App == nullptr)
         {
             if (selected == nullptr)
                 selected = umh;
         }
         else if (umh->ProtocolId == protocolId && umh->MessageType == msgType)
         {
-            umh->Handler  = handler;
-            umh->AppState = appState;
+            umh->App = app;
             return CHIP_NO_ERROR;
         }
     }
@@ -270,8 +264,7 @@ CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, Ex
     if (selected == nullptr)
         return CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS;
 
-    selected->Handler     = handler;
-    selected->AppState    = appState;
+    selected->App         = app;
     selected->ProtocolId  = protocolId;
     selected->MessageType = msgType;
 
@@ -286,9 +279,9 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
 
     for (int i = 0; i < CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS; i++, umh++)
     {
-        if (umh->Handler != nullptr && umh->ProtocolId == protocolId && umh->MessageType == msgType)
+        if (umh->App != nullptr && umh->ProtocolId == protocolId && umh->MessageType == msgType)
         {
-            umh->Handler = nullptr;
+            umh->App = nullptr;
             SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
             return CHIP_NO_ERROR;
         }
