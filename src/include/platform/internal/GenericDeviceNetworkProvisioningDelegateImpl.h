@@ -31,24 +31,24 @@ template <class ImplClass>
 class GenericDeviceNetworkProvisioningDelegateImpl : public DeviceNetworkProvisioningDelegate
 {
 public:
-    void ProvisionWiFi(const char * ssid, const char * passwd) override;
-    void ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData) override;
+    CHIP_ERROR ProvisionWiFi(const char * ssid, const char * passwd) override;
+    CHIP_ERROR ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData) override;
 
 private:
     ImplClass * Impl() { return static_cast<ImplClass *>(this); }
 };
 
 template <class ImplClass>
-inline void GenericDeviceNetworkProvisioningDelegateImpl<ImplClass>::ProvisionWiFi(const char * ssid, const char * passwd)
+inline CHIP_ERROR GenericDeviceNetworkProvisioningDelegateImpl<ImplClass>::ProvisionWiFi(const char * ssid, const char * passwd)
 {
-    Impl()->_ProvisionWiFiNetwork(ssid, passwd);
+    return Impl()->_ProvisionWiFiNetwork(ssid, passwd);
 }
 
 template <class ImplClass>
-inline void
+inline CHIP_ERROR
 GenericDeviceNetworkProvisioningDelegateImpl<ImplClass>::ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
-    Impl()->_ProvisionThreadNetwork(threadData);
+    return Impl()->_ProvisionThreadNetwork(threadData);
 }
 
 } // namespace Internal
