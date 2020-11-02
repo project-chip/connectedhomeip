@@ -31,6 +31,7 @@
 typedef uint8_t CHIPEndpointId;
 typedef uint16_t CHIPClusterId;
 typedef uint16_t CHIPAttributeId;
+typedef uint16_t CHIPGroupId;
 
 /**
  * Types for use by generated Silicon Labs code until we convert the generator
@@ -38,6 +39,8 @@ typedef uint16_t CHIPAttributeId;
  */
 typedef CHIPClusterId EmberAfClusterId;
 typedef CHIPAttributeId EmberAfAttributeId;
+typedef CHIPGroupId EmberMulticastId;
+
 /**
  * @brief Type for referring to zigbee application profile id
  *        TODO: This is probably not needed for CHIP and should be removed.
@@ -50,5 +53,6 @@ namespace chip {
 typedef CHIPEndpointId EndpointId;
 typedef CHIPClusterId ClusterId;
 typedef CHIPAttributeId AttributeId;
+typedef CHIPGroupId GroupId;
 } // namespace chip
 #endif // __cplusplus

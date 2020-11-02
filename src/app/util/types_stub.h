@@ -46,6 +46,8 @@
 
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
+#include "basic-types.h"
+
 /**
  * Try to use our chip::NodeId definition if we are C++; otherwise define a
  * ChipNodeId that's compatible.
@@ -289,9 +291,6 @@ typedef uint16_t EmberNodeId;
  * @brief 802.15.4 PAN ID.
  */
 typedef uint16_t EmberPanId;
-
-/** @brief 16-bit ZigBee multicast group identifier. */
-typedef uint16_t EmberMulticastId;
 
 /** @brief This enumeration determines whether or not a Trust Center
  *  answers trust center link key requests.
@@ -619,13 +618,13 @@ typedef struct
     uint8_t remote;
     /** A 64-bit destination identifier.  This is either:
      * - The destination ChipNodeId, for unicasts.
-     * - A 16-bit multicast group address, for multicasts.
+     * - A multicast ChipGroupId, for multicasts.
      * Which one is being used depends on the type of this binding.
      */
     union
     {
         ChipNodeId nodeId;
-        uint16_t groupId;
+        CHIPGroupId groupId;
     };
     /** The index of the network the binding belongs to. */
     uint8_t networkIndex;

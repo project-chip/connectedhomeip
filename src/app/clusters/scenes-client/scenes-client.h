@@ -45,10 +45,10 @@
 
 #include "af-types.h"
 
-bool emberAfPluginScenesClientParseAddSceneResponse(const EmberAfClusterCommand * cmd, uint8_t status, uint16_t groupId,
+bool emberAfPluginScenesClientParseAddSceneResponse(const EmberAfClusterCommand * cmd, uint8_t status, CHIPGroupId groupId,
                                                     uint8_t sceneId);
 
-bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand * cmd, uint8_t status, uint16_t groupId,
+bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand * cmd, uint8_t status, CHIPGroupId groupId,
                                                      uint8_t sceneId, uint16_t transitionTime, const uint8_t * sceneName,
                                                      const uint8_t * extensionFieldSets);
 

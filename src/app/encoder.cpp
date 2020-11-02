@@ -24,6 +24,8 @@
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
+using namespace chip;
+
 #define CHECK_FRAME_LENGTH(value, name)                                                                                            \
     if (value == 0)                                                                                                                \
     {                                                                                                                              \
@@ -105,7 +107,7 @@ extern "C" {
 #define TEMPERATURE_MEASUREMENT_CLUSTER_ID 0x0402
 
 static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t clusterId, uint8_t sourceEndpoint,
-                                 uint8_t destinationEndpoint, EmberApsOption options, uint16_t groupId, uint8_t sequence,
+                                 uint8_t destinationEndpoint, EmberApsOption options, GroupId groupId, uint8_t sequence,
                                  uint8_t radius, bool isMeasuring)
 {
 
@@ -1386,7 +1388,7 @@ uint16_t encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t * buffer, uin
 /*
  * Command AddGroup
  */
-uint16_t encodeGroupsClusterAddGroupCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t groupId,
+uint16_t encodeGroupsClusterAddGroupCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint, GroupId groupId,
                                             char * groupName)
 {
     const char * kName = "GroupsAddGroup";
@@ -1399,8 +1401,8 @@ uint16_t encodeGroupsClusterAddGroupCommand(uint8_t * buffer, uint16_t buf_lengt
 /*
  * Command AddGroupIfIdentifying
  */
-uint16_t encodeGroupsClusterAddGroupIfIdentifyingCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                                         uint16_t groupId, char * groupName)
+uint16_t encodeGroupsClusterAddGroupIfIdentifyingCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint,
+                                                         GroupId groupId, char * groupName)
 {
     const char * kName = "GroupsAddGroupIfIdentifying";
     COMMAND_HEADER(kName, GROUPS_CLUSTER_ID, 0x05);
@@ -1435,8 +1437,8 @@ uint16_t encodeGroupsClusterRemoveAllGroupsCommand(uint8_t * buffer, uint16_t bu
 /*
  * Command RemoveGroup
  */
-uint16_t encodeGroupsClusterRemoveGroupCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                               uint16_t groupId)
+uint16_t encodeGroupsClusterRemoveGroupCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint,
+                                               GroupId groupId)
 {
     const char * kName = "GroupsRemoveGroup";
     COMMAND_HEADER(kName, GROUPS_CLUSTER_ID, 0x03);
@@ -1447,7 +1449,8 @@ uint16_t encodeGroupsClusterRemoveGroupCommand(uint8_t * buffer, uint16_t buf_le
 /*
  * Command ViewGroup
  */
-uint16_t encodeGroupsClusterViewGroupCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t groupId)
+uint16_t encodeGroupsClusterViewGroupCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint,
+                                             GroupId groupId)
 {
     const char * kName = "GroupsViewGroup";
     COMMAND_HEADER(kName, GROUPS_CLUSTER_ID, 0x01);
@@ -1745,7 +1748,7 @@ uint16_t encodeOnOffClusterReadOnOffAttribute(uint8_t * buffer, uint16_t buf_len
 /*
  * Command AddScene
  */
-uint16_t encodeScenesClusterAddSceneCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t groupID,
+uint16_t encodeScenesClusterAddSceneCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint, GroupId groupID,
                                             uint8_t sceneID, uint16_t transitionTime, char * sceneName, uint16_t clusterId,
                                             char * extensionFieldSet)
 {
@@ -1763,8 +1766,8 @@ uint16_t encodeScenesClusterAddSceneCommand(uint8_t * buffer, uint16_t buf_lengt
 /*
  * Command GetSceneMembership
  */
-uint16_t encodeScenesClusterGetSceneMembershipCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                                      uint16_t groupID)
+uint16_t encodeScenesClusterGetSceneMembershipCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint,
+                                                      GroupId groupID)
 {
     const char * kName = "ScenesGetSceneMembership";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x06);
@@ -1775,8 +1778,8 @@ uint16_t encodeScenesClusterGetSceneMembershipCommand(uint8_t * buffer, uint16_t
 /*
  * Command RecallScene
  */
-uint16_t encodeScenesClusterRecallSceneCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                               uint16_t groupID, uint8_t sceneID, uint16_t transitionTime)
+uint16_t encodeScenesClusterRecallSceneCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint,
+                                               GroupId groupID, uint8_t sceneID, uint16_t transitionTime)
 {
     const char * kName = "ScenesRecallScene";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x05);
@@ -1789,8 +1792,8 @@ uint16_t encodeScenesClusterRecallSceneCommand(uint8_t * buffer, uint16_t buf_le
 /*
  * Command RemoveAllScenes
  */
-uint16_t encodeScenesClusterRemoveAllScenesCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                                   uint16_t groupID)
+uint16_t encodeScenesClusterRemoveAllScenesCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint,
+                                                   GroupId groupID)
 {
     const char * kName = "ScenesRemoveAllScenes";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x03);
@@ -1801,8 +1804,8 @@ uint16_t encodeScenesClusterRemoveAllScenesCommand(uint8_t * buffer, uint16_t bu
 /*
  * Command RemoveScene
  */
-uint16_t encodeScenesClusterRemoveSceneCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
-                                               uint16_t groupID, uint8_t sceneID)
+uint16_t encodeScenesClusterRemoveSceneCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint,
+                                               GroupId groupID, uint8_t sceneID)
 {
     const char * kName = "ScenesRemoveScene";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x02);
@@ -1814,8 +1817,8 @@ uint16_t encodeScenesClusterRemoveSceneCommand(uint8_t * buffer, uint16_t buf_le
 /*
  * Command StoreScene
  */
-uint16_t encodeScenesClusterStoreSceneCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t groupID,
-                                              uint8_t sceneID)
+uint16_t encodeScenesClusterStoreSceneCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint,
+                                              GroupId groupID, uint8_t sceneID)
 {
     const char * kName = "ScenesStoreScene";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x04);
@@ -1827,8 +1830,8 @@ uint16_t encodeScenesClusterStoreSceneCommand(uint8_t * buffer, uint16_t buf_len
 /*
  * Command ViewScene
  */
-uint16_t encodeScenesClusterViewSceneCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint, uint16_t groupID,
-                                             uint8_t sceneID)
+uint16_t encodeScenesClusterViewSceneCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint,
+                                             GroupId groupID, uint8_t sceneID)
 {
     const char * kName = "ScenesViewScene";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x01);
