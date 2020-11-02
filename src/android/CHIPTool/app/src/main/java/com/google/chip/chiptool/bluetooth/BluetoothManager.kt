@@ -34,22 +34,18 @@ class BluetoothManager {
         return ByteArray(size) { i -> (this shr (8 * i)).toByte() }
     }
 
-    private fun getServiceData(discriminator: Int, vendorId: Int, productId: Int): ByteArray {
+    private fun getServiceData(discriminator: Int): ByteArray {
       var opcode = 0
       var version = 0
       var versionDiscriminator = ((version and 0xf) shl 12) or (discriminator and 0xfff)
       return intArrayOf(
          opcode,
          versionDiscriminator,
-         versionDiscriminator shr 8,
-         vendorId,
-         vendorId shr 8,
-         productId,
-         productId shr 8
+         versionDiscriminator shr 8
       ).map { it.toByte() }.toByteArray()
     }
 
-    suspend fun getBluetoothDevice(discriminator: Int, vendorId: Int, productId: Int): BluetoothDevice? {
+    suspend fun getBluetoothDevice(discriminator: Int): BluetoothDevice? {
         val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
             Log.e(TAG, "No bluetooth scanner found")
             return null
@@ -70,9 +66,8 @@ class BluetoothManager {
                     }
                 }
 
-
                 var serviceDataList = listOf(
-                   getServiceData(discriminator, vendorId, productId),
+                   getServiceData(discriminator),
 
                    // TODO - Remove this incorrect format.
                    discriminator.toByteArray(3)

@@ -94,7 +94,7 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
                 val bluetoothManager = BluetoothManager()
 
                 showMessage(requireContext().getString(R.string.rendezvous_over_ble_scanning_text) + " " + deviceInfo.discriminator.toString())
-                val device = bluetoothManager.getBluetoothDevice(deviceInfo.discriminator, deviceInfo.vendorId, deviceInfo.productId) ?: run {
+                val device = bluetoothManager.getBluetoothDevice(deviceInfo.discriminator) ?: run {
                     showMessage(requireContext().getString(R.string.rendezvous_over_ble_scanning_failed_text))
                     return@launch
                 }
