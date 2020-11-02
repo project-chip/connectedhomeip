@@ -126,22 +126,6 @@ extern "C" void efr32Log(const char * aFormat, ...)
     va_end(v);
 }
 
-namespace {
-
-void GetModuleName(char * buf, uint8_t module)
-{
-    if (module == ::chip::Logging::kLogModule_DeviceLayer)
-    {
-        memcpy(buf, "DL", 3);
-    }
-    else
-    {
-        ::chip::Logging::GetModuleName(buf, module);
-    }
-}
-
-} // unnamed namespace
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -192,7 +176,7 @@ void LogV(uint8_t module, uint8_t category, const char * aFormat, va_list v)
 
         // Form the log prefix, e.g. "[DL] "
         formattedMsg[formattedMsgLen++] = '[';
-        ::GetModuleName(formattedMsg + formattedMsgLen, module);
+        GetModuleName(formattedMsg + formattedMsgLen, module);
         formattedMsgLen                 = strlen(formattedMsg);
         formattedMsg[formattedMsgLen++] = ']';
         formattedMsg[formattedMsgLen++] = ' ';
