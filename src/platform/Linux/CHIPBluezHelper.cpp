@@ -922,7 +922,7 @@ static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aMa
                             BluezConnectionInit(conn);
                             endpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(aInterface));
                             ChipLogDetail(DeviceLayer, "Device %s (Path: %s) Connected", conn->mpPeerAddress,
-                                          apEndpoint->mpPeerDevicePath);
+                                          endpoint->mpPeerDevicePath);
                             g_hash_table_insert(endpoint->mpConnMap, endpoint->mpPeerDevicePath, conn);
                         }
                         // for central, we do not call BluezConnectionInit until the services have been resolved
