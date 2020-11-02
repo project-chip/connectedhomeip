@@ -121,7 +121,7 @@ CHIP_ERROR Publisher::PublishUnprovisionedDevice(chip::Inet::InterfaceId interfa
     VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
     ChipLogProgress(Discovery, "setup mdns service");
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
-    snprintf(service.mName, sizeof(service.mName), "%016" PRIx64, mUnprovisionedInstanceName);
+    snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mUnprovisionedInstanceName);
     strncpy(service.mType, "_chipc", sizeof(service.mType));
     service.mProtocol = MdnsServiceProtocol::kMdnsProtocolUdp;
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetVendorId(vendorID));
