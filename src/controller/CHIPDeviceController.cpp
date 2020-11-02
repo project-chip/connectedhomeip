@@ -274,7 +274,8 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
 
 CHIP_ERROR ChipDeviceController::SetUdpListenPort(uint16_t listenPort)
 {
-    if (mState != kState_Initialized || mConState != kConnectionState_NotConnected) return CHIP_ERROR_INCORRECT_STATE;
+    if (mState != kState_Initialized || mConState != kConnectionState_NotConnected)
+        return CHIP_ERROR_INCORRECT_STATE;
     mListenPort = listenPort;
     return CHIP_NO_ERROR;
 }
@@ -288,8 +289,9 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
 
     mSessionManager = chip::Platform::New<SecureSessionMgr<Transport::UDP>>();
 
-    err = mSessionManager->Init(mLocalDeviceId, mSystemLayer,
-                                Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()).SetListenPort(mListenPort));
+    err = mSessionManager->Init(
+        mLocalDeviceId, mSystemLayer,
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()).SetListenPort(mListenPort));
     SuccessOrExit(err);
 
     mSessionManager->SetDelegate(this);
