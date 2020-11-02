@@ -1688,6 +1688,31 @@ public:
     }
 };
 
+class WriteColorControlOptions : public ModelCommand
+{
+public:
+    WriteColorControlOptions() : ModelCommand("write", kColorControlClusterId, 0x01)
+    {
+        AddArgument("attr-name", "options");
+        AddArgument("attr-value", 0, UINT8_MAX, &mOptions);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeColorControlClusterWriteOptionsAttribute(buffer->Start(), bufferSize, endPointId, mOptions);
+    }
+
+    // Global Response: WriteAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        WriteAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint8_t mOptions;
+};
 /*
  * Attribute NumberOfPrimaries
  */
@@ -2461,6 +2486,33 @@ public:
         ReadAttributesResponse response;
         return response.HandleCommandResponse(commandId, message, messageLen);
     }
+};
+
+class WriteColorControlStartUpColorTemperatureMireds : public ModelCommand
+{
+public:
+    WriteColorControlStartUpColorTemperatureMireds() : ModelCommand("write", kColorControlClusterId, 0x01)
+    {
+        AddArgument("attr-name", "start-up-color-temperature-mireds");
+        AddArgument("attr-value", 0, UINT16_MAX, &mStartUpColorTemperatureMireds);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(buffer->Start(), bufferSize, endPointId,
+                                                                                    mStartUpColorTemperatureMireds);
+    }
+
+    // Global Response: WriteAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        WriteAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mStartUpColorTemperatureMireds;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -4406,6 +4458,32 @@ public:
     }
 };
 
+class WriteIdentifyIdentifyTime : public ModelCommand
+{
+public:
+    WriteIdentifyIdentifyTime() : ModelCommand("write", kIdentifyClusterId, 0x01)
+    {
+        AddArgument("attr-name", "identify-time");
+        AddArgument("attr-value", 0, UINT16_MAX, &mIdentifyTime);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeIdentifyClusterWriteIdentifyTimeAttribute(buffer->Start(), bufferSize, endPointId, mIdentifyTime);
+    }
+
+    // Global Response: WriteAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        WriteAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mIdentifyTime;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster Level                                                       | 0x0008 |
 |------------------------------------------------------------------------------|
@@ -5570,6 +5648,7 @@ void registerClusterColorControl(Commands & commands)
         make_unique<ReadColorControlColorTemperatureMireds>(),
         make_unique<ReadColorControlColorMode>(),
         make_unique<ReadColorControlOptions>(),
+        make_unique<WriteColorControlOptions>(),
         make_unique<ReadColorControlNumberOfPrimaries>(),
         make_unique<ReadColorControlPrimary1X>(),
         make_unique<ReadColorControlPrimary1Y>(),
@@ -5601,6 +5680,7 @@ void registerClusterColorControl(Commands & commands)
         make_unique<ReadColorControlColorTempPhysicalMaxMireds>(),
         make_unique<ReadColorControlCoupleColorTempToLevelMinMireds>(),
         make_unique<ReadColorControlStartUpColorTemperatureMireds>(),
+        make_unique<WriteColorControlStartUpColorTemperatureMireds>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -5650,6 +5730,7 @@ void registerClusterIdentify(Commands & commands)
         make_unique<IdentifyIdentify>(),
         make_unique<IdentifyIdentifyQuery>(),
         make_unique<ReadIdentifyIdentifyTime>(),
+        make_unique<WriteIdentifyIdentifyTime>(),
     };
 
     commands.Register(clusterName, clusterCommands);

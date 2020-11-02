@@ -359,6 +359,13 @@ uint16_t encodeColorControlClusterReadOptionsAttribute(uint8_t * buffer, uint16_
 
 /**
  * @brief
+ *    Encode a write command for the options attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeColorControlClusterWriteOptionsAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                        uint8_t options);
+
+/**
+ * @brief
  *    Encode a read command for the number-of-primaries attribute for  server into buffer including the APS frame
  */
 uint16_t encodeColorControlClusterReadNumberOfPrimariesAttribute(uint8_t * buffer, uint16_t buf_length,
@@ -559,6 +566,14 @@ uint16_t encodeColorControlClusterReadCoupleColorTempToLevelMinMiredsAttribute(u
  */
 uint16_t encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(uint8_t * buffer, uint16_t buf_length,
                                                                              uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a write command for the start-up-color-temperature-mireds attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(uint8_t * buffer, uint16_t buf_length,
+                                                                              uint8_t destination_endpoint,
+                                                                              uint16_t startUpColorTemperatureMireds);
 
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
@@ -893,6 +908,13 @@ uint16_t encodeIdentifyClusterIdentifyQueryCommand(uint8_t * buffer, uint16_t bu
  *    Encode a read command for the identify-time attribute for  server into buffer including the APS frame
  */
 uint16_t encodeIdentifyClusterReadIdentifyTimeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a write command for the identify-time attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeIdentifyClusterWriteIdentifyTimeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                         uint16_t identifyTime);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Level                                                       | 0x0008 |

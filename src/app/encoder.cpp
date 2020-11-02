@@ -43,6 +43,34 @@ using namespace chip;
     }                                                                                                                              \
     return result;
 
+#define WRITE_ATTRIBUTE(name, cluster_id, value)                                                                                   \
+    BufBound buf = BufBound(buffer, buf_length);                                                                                   \
+    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x02))                                                         \
+    {                                                                                                                              \
+        buf.PutLE16(attr_id);                                                                                                      \
+        buf.Put(attr_type);                                                                                                        \
+        switch (attr_type)                                                                                                         \
+        {                                                                                                                          \
+        case 0x18:                                                                                                                 \
+            buf.Put(static_cast<uint8_t>(value));                                                                                  \
+            break;                                                                                                                 \
+        case 0x21:                                                                                                                 \
+            buf.PutLE16(static_cast<uint16_t>(value));                                                                             \
+            break;                                                                                                                 \
+        default:                                                                                                                   \
+            ChipLogError(Zcl, "Error encoding %s command", name);                                                                  \
+            return 0;                                                                                                              \
+        }                                                                                                                          \
+    }                                                                                                                              \
+                                                                                                                                   \
+    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;                  \
+    if (result == 0)                                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
+        return 0;                                                                                                                  \
+    }                                                                                                                              \
+    return result;
+
 #define COMMAND_HEADER(name, cluster_id, command_id)                                                                               \
     BufBound buf    = BufBound(buffer, buf_length);                                                                                \
     uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, cluster_id, command_id);                            \
@@ -695,6 +723,14 @@ uint16_t encodeColorControlClusterReadOptionsAttribute(uint8_t * buffer, uint16_
     READ_ATTRIBUTES("ReadColorControlOptions", COLOR_CONTROL_CLUSTER_ID);
 }
 
+uint16_t encodeColorControlClusterWriteOptionsAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                        uint8_t options)
+{
+    uint16_t attr_id  = 0x000F;
+    uint8_t attr_type = { 0x18 };
+    WRITE_ATTRIBUTE("WriteColorControlOptions", COLOR_CONTROL_CLUSTER_ID, options);
+}
+
 /*
  * Attribute NumberOfPrimaries
  */
@@ -989,6 +1025,15 @@ uint16_t encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(uin
 {
     uint16_t attr_ids[] = { 0x4010 };
     READ_ATTRIBUTES("ReadColorControlStartUpColorTemperatureMireds", COLOR_CONTROL_CLUSTER_ID);
+}
+
+uint16_t encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(uint8_t * buffer, uint16_t buf_length,
+                                                                              uint8_t destination_endpoint,
+                                                                              uint16_t startUpColorTemperatureMireds)
+{
+    uint16_t attr_id  = 0x4010;
+    uint8_t attr_type = { 0x21 };
+    WRITE_ATTRIBUTE("WriteColorControlStartUpColorTemperatureMireds", COLOR_CONTROL_CLUSTER_ID, startUpColorTemperatureMireds);
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1511,6 +1556,14 @@ uint16_t encodeIdentifyClusterReadIdentifyTimeAttribute(uint8_t * buffer, uint16
 {
     uint16_t attr_ids[] = { 0x0000 };
     READ_ATTRIBUTES("ReadIdentifyIdentifyTime", IDENTIFY_CLUSTER_ID);
+}
+
+uint16_t encodeIdentifyClusterWriteIdentifyTimeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                         uint16_t identifyTime)
+{
+    uint16_t attr_id  = 0x0000;
+    uint8_t attr_type = { 0x21 };
+    WRITE_ATTRIBUTE("WriteIdentifyIdentifyTime", IDENTIFY_CLUSTER_ID, identifyTime);
 }
 
 /*----------------------------------------------------------------------------*\
