@@ -822,6 +822,10 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
     deviceIdInfo.PairingStatus = ThreadStackMgr().IsThreadAttached()
         ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
         : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
+#elif CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
+    deviceIdInfo.PairingStatus = ConnectivityMgr().IsWiFiStationConnected()
+        ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
+        : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
 #else
     deviceIdInfo.PairingStatus = Impl()->_IsPairedToAccount() ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
                                                               : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;

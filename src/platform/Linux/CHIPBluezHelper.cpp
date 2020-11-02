@@ -114,9 +114,9 @@ static BluezLEAdvertisement1 * BluezAdvertisingCreate(BluezEndpoint * apEndpoint
     g_variant_builder_init(&serviceDataBuilder, G_VARIANT_TYPE("a{sv}"));
     g_variant_builder_init(&serviceUUIDsBuilder, G_VARIANT_TYPE("as"));
 
-    g_variant_builder_add(
-        &serviceDataBuilder, "{sv}", apEndpoint->mpAdvertisingUUID,
-        g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, apEndpoint->mpChipServiceData, sizeof(CHIPServiceData), sizeof(uint8_t)));
+    g_variant_builder_add(&serviceDataBuilder, "{sv}", apEndpoint->mpAdvertisingUUID,
+                          g_variant_new_fixed_array(G_VARIANT_TYPE_BYTE, &apEndpoint->mDeviceIdInfo,
+                                                    sizeof(apEndpoint->mDeviceIdInfo), sizeof(uint8_t)));
     g_variant_builder_add(&serviceUUIDsBuilder, "s", apEndpoint->mpAdvertisingUUID);
 
     if (apEndpoint->mpAdapterName != nullptr)
@@ -1235,11 +1235,6 @@ void EndpointCleanup(BluezEndpoint * apEndpoint)
             g_free(apEndpoint->mpAdvertisingUUID);
             apEndpoint->mpAdvertisingUUID = nullptr;
         }
-        if (apEndpoint->mpChipServiceData != nullptr)
-        {
-            g_free(apEndpoint->mpChipServiceData);
-            apEndpoint->mpChipServiceData = nullptr;
-        }
         if (apEndpoint->mpPeerDevicePath != nullptr)
         {
             g_free(apEndpoint->mpPeerDevicePath);
@@ -1560,32 +1555,21 @@ CHIP_ERROR ConfigureBluezAdv(BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEnd
     VerifyOrExit(aBleAdvConfig.mpBleName != nullptr, msg = "FAIL: BLE name is NULL");
     VerifyOrExit(aBleAdvConfig.mpAdvertisingUUID != nullptr, msg = "FAIL: BLE mpAdvertisingUUID is NULL in %s");
 
-    apEndpoint->mpAdapterName                             = g_strdup(aBleAdvConfig.mpBleName);
-    apEndpoint->mpAdvertisingUUID                         = g_strdup(aBleAdvConfig.mpAdvertisingUUID);
-    apEndpoint->mNodeId                                   = aBleAdvConfig.mNodeId;
-    apEndpoint->mType                                     = aBleAdvConfig.mType;
-    apEndpoint->mDuration                                 = aBleAdvConfig.mDuration;
-    apEndpoint->mpChipServiceData                         = static_cast<CHIPServiceData *>(g_malloc(sizeof(CHIPServiceData) + 1));
-    apEndpoint->mpChipServiceData->mDataBlock0Len         = sizeof(CHIPIdInfo) + 1;
-    apEndpoint->mpChipServiceData->mDataBlock0Type        = 1;
-    apEndpoint->mpChipServiceData->mIdInfo.mMajor         = aBleAdvConfig.mMajor;
-    apEndpoint->mpChipServiceData->mIdInfo.mMinor         = aBleAdvConfig.mMinor;
-    apEndpoint->mpChipServiceData->mIdInfo.mVendorId      = aBleAdvConfig.mVendorId;
-    apEndpoint->mpChipServiceData->mIdInfo.mProductId     = aBleAdvConfig.mProductId;
-    apEndpoint->mpChipServiceData->mIdInfo.mDeviceId      = aBleAdvConfig.mDeviceId;
-    apEndpoint->mpChipServiceData->mIdInfo.mPairingStatus = aBleAdvConfig.mPairingStatus;
-    apEndpoint->mDuration                                 = aBleAdvConfig.mDuration;
+    apEndpoint->mpAdapterName     = g_strdup(aBleAdvConfig.mpBleName);
+    apEndpoint->mpAdvertisingUUID = g_strdup(aBleAdvConfig.mpAdvertisingUUID);
+    apEndpoint->mNodeId           = aBleAdvConfig.mNodeId;
+    apEndpoint->mType             = aBleAdvConfig.mType;
+    apEndpoint->mDuration         = aBleAdvConfig.mDuration;
+    apEndpoint->mDuration         = aBleAdvConfig.mDuration;
+
+    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(apEndpoint->mDeviceIdInfo);
+    SuccessOrExit(err);
 
 exit:
     if (nullptr != msg)
     {
         ChipLogDetail(DeviceLayer, "%s in %s", msg, __func__);
         err = CHIP_ERROR_INCORRECT_STATE;
-        if (apEndpoint->mpChipServiceData != nullptr)
-        {
-            g_free(apEndpoint->mpChipServiceData);
-            apEndpoint->mpChipServiceData = nullptr;
-        }
     }
     return err;
 }

@@ -47,8 +47,6 @@
 #define CHIP_ADV_DATA_TYPE_FLAGS 0x01
 #define CHIP_ADV_DATA_FLAGS 0x06
 #define CHIP_ADV_DATA_TYPE_SERVICE_DATA 0x16
-#define CHIP_BLE_OPCODE 0x00
-#define CHIP_ADV_VERSION 0x00
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -266,7 +264,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
     case DeviceEventType::kFabricMembershipChange:
     case DeviceEventType::kServiceProvisioningChange:
     case DeviceEventType::kAccountPairingChange:
-
+    case DeviceEventType::kWiFiConnectivityChange:
         // If CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED is enabled, and there is a change to the
         // device's provisioning state, then automatically disable CHIPoBLE advertising if the device
         // is now fully provisioned.
@@ -279,7 +277,9 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 #endif // CHIP_DEVICE_CONFIG_CHIPOBLE_DISABLE_ADVERTISING_WHEN_PROVISIONED
 
         // Force the advertising configuration to be refreshed to reflect new provisioning state.
+        ChipLogProgress(DeviceLayer, "Updating advertising data");
         ClearFlag(mFlags, kFlag_AdvertisingConfigured);
+        SetFlag(mFlags, kFlag_AdvertisingRefreshNeeded);
 
         DriveBLEState();
 
@@ -627,8 +627,7 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
 {
     CHIP_ERROR err;
     uint8_t advData[MAX_ADV_DATA_LEN];
-    uint16_t advDataVersionDiscriminator = 0;
-    uint8_t index                        = 0;
+    uint8_t index = 0;
 
     // If a custom device name has not been specified, generate a CHIP-standard name based on the
     // discriminator value
@@ -649,19 +648,26 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
         ExitNow();
     }
 
-    advDataVersionDiscriminator = (discriminator | (CHIP_ADV_VERSION << 12));
-
     memset(advData, 0, sizeof(advData));
     advData[index++] = 0x02;                            // length
     advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;        // AD type : flags
     advData[index++] = CHIP_ADV_DATA_FLAGS;             // AD value
-    advData[index++] = 0x06;                            // length
+    advData[index++] = 0x0A;                            // length
     advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA; // AD type: (Service Data - 16-bit UUID)
     advData[index++] = ShortUUID_CHIPoBLEService[0];    // AD value
     advData[index++] = ShortUUID_CHIPoBLEService[1];    // AD value
-    advData[index++] = CHIP_BLE_OPCODE;                 // Used to differentiate from operational CHIP Ble adv
-    advData[index++] = static_cast<uint8_t>(advDataVersionDiscriminator >> 8); // Bits[15:12] == version - Bits[11:0] Discriminator
-    advData[index++] = static_cast<uint8_t>(advDataVersionDiscriminator & 0x00FF);
+
+    chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
+    err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "GetBLEDeviceIdentificationInfo(): ", ErrorStr(err));
+        ExitNow();
+    }
+
+    VerifyOrExit(index + sizeof(deviceIdInfo) <= sizeof(advData), err = BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG);
+    memcpy(&advData[index], &deviceIdInfo, sizeof(deviceIdInfo));
+    index = static_cast<uint8_t>(index + sizeof(deviceIdInfo));
 
     // Construct the Chip BLE Service Data to be sent in the scan response packet.
     err = esp_ble_gap_config_adv_data_raw(advData, sizeof(advData));

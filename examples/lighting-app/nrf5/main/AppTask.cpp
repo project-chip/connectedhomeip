@@ -57,7 +57,6 @@ constexpr int kFactoryResetCancelWindowTimeout = 3000;
 constexpr size_t kAppTaskStackSize             = 4096;
 constexpr int kAppTaskPriority                 = 2;
 constexpr int kAppEventQueueSize               = 10;
-constexpr int kExampleVenderID                 = 0xabcd;
 
 SemaphoreHandle_t sCHIPEventLock;
 
@@ -175,6 +174,8 @@ int AppTask::Init()
         chip::SetupPayload payload;
         uint32_t setUpPINCode       = 0;
         uint16_t setUpDiscriminator = 0;
+        uint16_t vendorId           = 0;
+        uint16_t productId          = 0;
 
         err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
         if (err != CHIP_NO_ERROR)
@@ -188,9 +189,21 @@ int AppTask::Init()
             NRF_LOG_INFO("ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
         }
 
+        err = ConfigurationMgr().GetVendorId(vendorId);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_INFO("ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err));
+        }
+
+        err = ConfigurationMgr().GetVendorId(productId);
+        if (err != CHIP_NO_ERROR)
+        {
+            NRF_LOG_INFO("ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err));
+        }
+
         payload.version       = 1;
-        payload.vendorID      = kExampleVenderID;
-        payload.productID     = 1;
+        payload.vendorID      = vendorId;
+        payload.productID     = productId;
         payload.setUpPINCode  = setUpPINCode;
         payload.discriminator = setUpDiscriminator;
         chip::QRCodeSetupPayloadGenerator generator(payload);

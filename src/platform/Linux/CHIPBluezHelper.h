@@ -55,6 +55,7 @@
 #include <stdint.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "ble/CHIPBleServiceData.h"
 #include "platform/Linux/dbus/bluez/DbusBluez.h"
 
 namespace chip {
@@ -167,7 +168,7 @@ struct BluezEndpoint
     bool mIsNotify;
     bool mIsCentral;
     char * mpAdvertisingUUID;
-    CHIPServiceData * mpChipServiceData;
+    chip::Ble::ChipBLEDeviceIdentificationInfo mDeviceIdInfo;
     ChipAdvType mType;  ///< Advertisement type.
     uint16_t mDuration; ///< Advertisement interval (in ms).
     bool mIsAdvertising;
