@@ -1530,7 +1530,7 @@ static bool computeNewHueValue(ColorHueTransitionState * p)
     return false;
 }
 
-void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
+extern "C" void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
 {
     uint8_t endpoint = colorHueTransitionState.endpoint;
     bool limitReached1, limitReached2;
@@ -1632,7 +1632,7 @@ static uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * 
     return (uint16_t) transitionTime;
 }
 
-void emberAfPluginColorControlServerXyTransitionEventHandler(void)
+extern "C" void emberAfPluginColorControlServerXyTransitionEventHandler(void)
 {
     uint8_t endpoint = colorXTransitionState.endpoint;
     bool limitReachedX, limitReachedY;
@@ -1661,7 +1661,7 @@ void emberAfPluginColorControlServerXyTransitionEventHandler(void)
     emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint);
 }
 
-void emberAfPluginColorControlServerTempTransitionEventHandler(void)
+extern "C" void emberAfPluginColorControlServerTempTransitionEventHandler(void)
 {
     uint8_t endpoint = colorTempTransitionState.endpoint;
     bool limitReached;

@@ -51,11 +51,6 @@
 #endif
 
 //------------------------------------------------------------------------------
-// Forward Declarations
-
-EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
-
-//------------------------------------------------------------------------------
 
 bool emAfProcessClusterSpecificCommand(EmberAfClusterCommand * cmd)
 {

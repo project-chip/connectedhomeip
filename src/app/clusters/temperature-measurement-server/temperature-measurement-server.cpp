@@ -33,20 +33,39 @@
  */
 /****************************************************************************
  * @file
- * @brief Implementation for the Basic Server Cluster
+ * @brief Routines for the Temperature Measurement Server
  *plugin.
  *******************************************************************************
  ******************************************************************************/
 
-#include "af.h"
+#include <app/util/af.h>
 
-void emberAfResetAttributes(uint8_t endpoint);
+#include <app/util/af-event.h>
+#include <app/util/attribute-storage.h>
 
-bool emberAfBasicClusterResetToFactoryDefaultsCallback(void)
+EmberEventControl emberAfPluginTemperatureMeasurementServerReadEventControl;
+
+// TODO: There's no header that declares this event handler, and it's not 100%
+// clear where best to declare it.
+// https://github.com/project-chip/connectedhomeip/issues/3619
+extern "C" void emberAfPluginTemperatureMeasurementServerReadEventHandler() {}
+
+// -------------------------------------------------------------------------
+// ****** callback section *******
+
+extern "C" void emberAfPluginTemperatureMeasurementServerInitCallback(void)
 {
-    emberAfBasicClusterPrintln("RX: ResetToFactoryDefaultsCallback");
-    emberAfResetAttributes(emberAfCurrentEndpoint());
-    emberAfPluginBasicResetToFactoryDefaultsCallback(emberAfCurrentEndpoint());
-    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
-    return true;
+    EmberAfStatus status;
+    // FIXME Use real values for the temperature sensor polling the sensor using the
+    //       EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S macro
+    uint16_t endpointId = 1; // Hardcoded to 1 for now
+    int16_t newValue    = 0x1234;
+
+    status = emberAfWriteAttribute(endpointId, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_CURRENT_TEMPERATURE_ATTRIBUTE_ID,
+                                   CLUSTER_MASK_SERVER, (uint8_t *) &newValue, ZCL_INT16S_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        emberAfTempMeasurementClusterPrint("Err: writing temperature: %x", status);
+        return;
+    }
 }

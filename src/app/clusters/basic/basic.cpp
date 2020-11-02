@@ -33,36 +33,20 @@
  */
 /****************************************************************************
  * @file
- * @brief Routines for the Temperature Measurement Server
+ * @brief Implementation for the Basic Server Cluster
  *plugin.
  *******************************************************************************
  ******************************************************************************/
 
-#include <app/util/af.h>
+#include "af.h"
 
-#include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
-EmberEventControl emberAfPluginTemperatureMeasurementServerReadEventControl;
-
-void emberAfPluginTemperatureMeasurementServerReadEventHandler() {}
-
-// -------------------------------------------------------------------------
-// ****** callback section *******
-
-void emberAfPluginTemperatureMeasurementServerInitCallback(void)
+bool emberAfBasicClusterResetToFactoryDefaultsCallback(void)
 {
-    EmberAfStatus status;
-    // FIXME Use real values for the temperature sensor polling the sensor using the
-    //       EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S macro
-    uint16_t endpointId = 1; // Hardcoded to 1 for now
-    int16_t newValue    = 0x1234;
-
-    status = emberAfWriteAttribute(endpointId, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_CURRENT_TEMPERATURE_ATTRIBUTE_ID,
-                                   CLUSTER_MASK_SERVER, (uint8_t *) &newValue, ZCL_INT16S_ATTRIBUTE_TYPE);
-    if (status != EMBER_ZCL_STATUS_SUCCESS)
-    {
-        emberAfTempMeasurementClusterPrint("Err: writing temperature: %x", status);
-        return;
-    }
+    emberAfBasicClusterPrintln("RX: ResetToFactoryDefaultsCallback");
+    emberAfResetAttributes(emberAfCurrentEndpoint());
+    emberAfPluginBasicResetToFactoryDefaultsCallback(emberAfCurrentEndpoint());
+    emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }
