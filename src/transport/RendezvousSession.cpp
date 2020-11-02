@@ -90,8 +90,8 @@ CHIP_ERROR RendezvousSession::SendMessage(System::PacketBuffer * msgBuf)
         break;
 
     case State::kNetworkProvisioning:
-        err = SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
-                                NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, msgBuf);
+        err = SendSecureMessage(Protocols::kProtocol_NetworkProvisioning, NetworkProvisioning::MsgTypes::kWiFiAssociationRequest,
+                                msgBuf);
         break;
 
     default:
@@ -379,7 +379,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
 
     msgBuf->ConsumeHead(headerSize);
 
-    if (payloadHeader.GetProtocolID() == Protocols::kChipProtocol_NetworkProvisioning)
+    if (payloadHeader.GetProtocolID() == Protocols::kProtocol_NetworkProvisioning)
     {
         err = mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf);
         SuccessOrExit(err);

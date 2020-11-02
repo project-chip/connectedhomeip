@@ -36,7 +36,7 @@
 #include <core/CHIPEncoding.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
-#include <protocols/CHIPProtocols.h>
+#include <protocols/Protocols.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemTimer.h>
 

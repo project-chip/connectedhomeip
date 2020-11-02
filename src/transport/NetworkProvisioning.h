@@ -25,7 +25,7 @@
 
 #include <core/CHIPCore.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <protocols/CHIPProtocols.h>
+#include <protocols/Protocols.h>
 #include <support/BufBound.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/RendezvousSessionDelegate.h>
