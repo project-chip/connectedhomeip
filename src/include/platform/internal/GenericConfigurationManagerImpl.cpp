@@ -823,7 +823,7 @@ GenericConfigurationManagerImpl<ImplClass>::_GetBLEDeviceIdentificationInfo(Ble:
         ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
         : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
 #elif CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-    deviceIdInfo.PairingStatus = ConnectivityMgr().IsWiFiStationProvisioned()
+    deviceIdInfo.PairingStatus = ConnectivityMgr().IsWiFiStationConnected()
         ? Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Paired
         : Ble::ChipBLEDeviceIdentificationInfo::kPairingStatus_Unpaired;
 #else
