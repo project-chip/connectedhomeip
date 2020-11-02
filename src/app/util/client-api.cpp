@@ -43,6 +43,8 @@
 #include "util.h"
 #include <stdarg.h>
 
+using namespace chip;
+
 uint8_t * emAfZclBuffer   = NULL;
 uint16_t emAfZclBufferLen = 0;
 
@@ -360,7 +362,7 @@ EmberApsFrame * emberAfGetCommandApsFrame(void)
     return emAfCommandApsFrame;
 }
 
-void emberAfSetCommandEndpoints(uint8_t sourceEndpoint, uint8_t destinationEndpoint)
+void emberAfSetCommandEndpoints(EndpointId sourceEndpoint, EndpointId destinationEndpoint)
 {
     emAfCommandApsFrame->sourceEndpoint      = sourceEndpoint;
     emAfCommandApsFrame->destinationEndpoint = destinationEndpoint;

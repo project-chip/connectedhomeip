@@ -51,6 +51,8 @@
 
 #include "gen/enums.h"
 
+using namespace chip;
+
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -62,7 +64,7 @@
 //------------------------------------------------------------------------------
 // Globals
 
-EmberAfStatus emberAfWriteAttributeExternal(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfWriteAttributeExternal(EndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
                                             uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr,
                                             EmberAfAttributeType dataType)
 {
@@ -82,7 +84,7 @@ EmberAfStatus emberAfWriteAttributeExternal(uint8_t endpoint, EmberAfClusterId c
 }
 
 //@deprecated use emberAfWriteServerAttribute or emberAfWriteClientAttribute
-EmberAfStatus emberAfWriteAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+EmberAfStatus emberAfWriteAttribute(EndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType)
 {
     return emAfWriteAttribute(endpoint, cluster, attributeID, mask, EMBER_AF_NULL_MANUFACTURER_CODE, dataPtr, dataType,
@@ -90,7 +92,7 @@ EmberAfStatus emberAfWriteAttribute(uint8_t endpoint, EmberAfClusterId cluster, 
                               false); // just test?
 }
 
-EmberAfStatus emberAfWriteClientAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfWriteClientAttribute(EndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
                                           uint8_t * dataPtr, EmberAfAttributeType dataType)
 {
     return emAfWriteAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, EMBER_AF_NULL_MANUFACTURER_CODE, dataPtr,
@@ -99,7 +101,7 @@ EmberAfStatus emberAfWriteClientAttribute(uint8_t endpoint, EmberAfClusterId clu
                               false); // just test?
 }
 
-EmberAfStatus emberAfWriteServerAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfWriteServerAttribute(EndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
                                           uint8_t * dataPtr, EmberAfAttributeType dataType)
 {
     return emAfWriteAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_SERVER, EMBER_AF_NULL_MANUFACTURER_CODE, dataPtr,
@@ -108,7 +110,7 @@ EmberAfStatus emberAfWriteServerAttribute(uint8_t endpoint, EmberAfClusterId clu
                               false); // just test?
 }
 
-EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(uint8_t endpoint, EmberAfClusterId cluster,
+EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(EndpointId endpoint, EmberAfClusterId cluster,
                                                               EmberAfAttributeId attributeID, uint16_t manufacturerCode,
                                                               uint8_t * dataPtr, EmberAfAttributeType dataType)
 {
@@ -117,7 +119,7 @@ EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(uint8_t endpoint, 
                               false); // just test?
 }
 
-EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(uint8_t endpoint, EmberAfClusterId cluster,
+EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(EndpointId endpoint, EmberAfClusterId cluster,
                                                               EmberAfAttributeId attributeID, uint16_t manufacturerCode,
                                                               uint8_t * dataPtr, EmberAfAttributeType dataType)
 {
@@ -126,51 +128,51 @@ EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(uint8_t endpoint, 
                               false); // just test?
 }
 
-EmberAfStatus emberAfVerifyAttributeWrite(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
-                                          uint16_t manufacturerCode, uint8_t * dataPtr, EmberAfAttributeType dataType)
+EmberAfStatus emberAfVerifyAttributeWrite(EndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+                                          uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr, EmberAfAttributeType dataType)
 {
     return emAfWriteAttribute(endpoint, cluster, attributeID, mask, manufacturerCode, dataPtr, dataType,
                               false, // override read-only?
                               true); // just test?
 }
 
-EmberAfStatus emberAfReadAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+EmberAfStatus emberAfReadAttribute(EndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
                                    uint8_t * dataPtr, uint8_t readLength, EmberAfAttributeType * dataType)
 {
     return emAfReadAttribute(endpoint, cluster, attributeID, mask, EMBER_AF_NULL_MANUFACTURER_CODE, dataPtr, readLength, dataType);
 }
 
-EmberAfStatus emberAfReadServerAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfReadServerAttribute(EndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
                                          uint8_t * dataPtr, uint8_t readLength)
 {
     return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_SERVER, EMBER_AF_NULL_MANUFACTURER_CODE, dataPtr,
                              readLength, NULL);
 }
 
-EmberAfStatus emberAfReadClientAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfReadClientAttribute(EndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
                                          uint8_t * dataPtr, uint8_t readLength)
 {
     return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, EMBER_AF_NULL_MANUFACTURER_CODE, dataPtr,
                              readLength, NULL);
 }
 
-EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(uint8_t endpoint, EmberAfClusterId cluster,
+EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(EndpointId endpoint, EmberAfClusterId cluster,
                                                              EmberAfAttributeId attributeID, uint16_t manufacturerCode,
                                                              uint8_t * dataPtr, uint8_t readLength)
 {
     return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_SERVER, manufacturerCode, dataPtr, readLength, NULL);
 }
 
-EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(uint8_t endpoint, EmberAfClusterId cluster,
+EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(EndpointId endpoint, EmberAfClusterId cluster,
                                                              EmberAfAttributeId attributeID, uint16_t manufacturerCode,
                                                              uint8_t * dataPtr, uint8_t readLength)
 {
     return emAfReadAttribute(endpoint, cluster, attributeID, CLUSTER_MASK_CLIENT, manufacturerCode, dataPtr, readLength, NULL);
 }
 
-bool emberAfReadSequentialAttributesAddToResponse(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId startAttributeId,
-                                                  uint8_t mask, uint16_t manufacturerCode, uint8_t maxAttributeIds,
-                                                  bool includeAccessControl)
+bool emberAfReadSequentialAttributesAddToResponse(EndpointId endpoint, EmberAfClusterId clusterId,
+                                                  EmberAfAttributeId startAttributeId, uint8_t mask, uint16_t manufacturerCode,
+                                                  uint8_t maxAttributeIds, bool includeAccessControl)
 {
     uint16_t i;
     uint16_t discovered = 0;
@@ -257,7 +259,8 @@ static void emberAfAttributeDecodeAndPrintCluster(EmberAfClusterId cluster, uint
 void emberAfPrintAttributeTable(void)
 {
     uint8_t data[ATTRIBUTE_LARGEST];
-    uint8_t endpointIndex, clusterIndex;
+    decltype(emberAfEndpointCount()) endpointIndex;
+    decltype(EmberAfEndpointType::clusterCount) clusterIndex;
     uint16_t attributeIndex;
     EmberAfStatus status;
     uint16_t mfgCode;
@@ -335,8 +338,8 @@ void emberAfPrintAttributeTable(void)
 // 1) unsupported: [attrId:2] [status:1]
 // 2) supported:   [attrId:2] [status:1] [type:1] [data:n]
 //
-void emberAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId, uint8_t mask,
-                                              uint16_t manufacturerCode, uint16_t readLength)
+void emberAfRetrieveAttributeAndCraftResponse(EndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId,
+                                              uint8_t mask, uint16_t manufacturerCode, uint16_t readLength)
 {
     EmberAfStatus status;
     uint8_t data[ATTRIBUTE_LARGEST];
@@ -412,7 +415,7 @@ void emberAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId
 // insufficient space in the buffer or an error occurs, buffer and bufIndex will
 // remain unchanged.  Otherwise, bufIndex will be incremented appropriately and
 // the fields will be written to the buffer.
-EmberAfStatus emberAfAppendAttributeReportFields(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfAppendAttributeReportFields(EndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
                                                  uint8_t mask, uint8_t * buffer, uint8_t bufLen, uint8_t * bufIndex)
 {
     EmberAfStatus status;
@@ -482,7 +485,7 @@ kickout:
 // the table or the data is too large, returns true and writes to dataPtr
 // if the attribute is supported and the readLength specified is less than
 // the length of the data.
-EmberAfStatus emAfWriteAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+EmberAfStatus emAfWriteAttribute(EndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
                                  uint16_t manufacturerCode, uint8_t * data, EmberAfAttributeType dataType,
                                  bool overrideReadOnlyAndDataType, bool justTest)
 {
@@ -625,7 +628,7 @@ EmberAfStatus emAfWriteAttribute(uint8_t endpoint, EmberAfClusterId cluster, Emb
 // If dataPtr is NULL, no data is copied to the caller.
 // readLength should be 0 in that case.
 
-EmberAfStatus emAfReadAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+EmberAfStatus emAfReadAttribute(EndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
                                 uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType)
 {
     EmberAfAttributeMetadata * metadata = NULL;

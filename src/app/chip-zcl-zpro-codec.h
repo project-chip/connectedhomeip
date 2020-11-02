@@ -19,6 +19,7 @@
 #define CHIP_ZCL_ZPRO_CODEC_H
 
 #include "chip-zcl-zpro-codec-api.h"
+#include <app/util/basic-types.h>
 
 typedef uint16_t EmberApsOption;
 
@@ -30,11 +31,11 @@ typedef struct
     /** The application profile ID that describes the format of the message. */
     uint16_t profileId;
     /** The cluster ID for this message. */
-    uint16_t clusterId;
+    CHIPClusterId clusterId;
     /** The source endpoint. */
-    uint8_t sourceEndpoint;
+    CHIPEndpointId sourceEndpoint;
     /** The destination endpoint. */
-    uint8_t destinationEndpoint;
+    CHIPEndpointId destinationEndpoint;
     /** A bitmask of options from the enumeration above. */
     EmberApsOption options;
     /** The group ID for this message, if it is multicast mode. */

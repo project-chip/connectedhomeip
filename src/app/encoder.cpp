@@ -24,6 +24,8 @@
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
+#include <app/util/basic-types.h>
+
 using namespace chip;
 
 #define CHECK_FRAME_LENGTH(value, name)                                                                                            \
@@ -156,8 +158,8 @@ extern "C" {
 #define SCENES_CLUSTER_ID 0x0005
 #define TEMPERATURE_MEASUREMENT_CLUSTER_ID 0x0402
 
-static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t clusterId, uint8_t sourceEndpoint,
-                                 uint8_t destinationEndpoint, EmberApsOption options, GroupId groupId, uint8_t sequence,
+static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, ClusterId clusterId, EndpointId sourceEndpoint,
+                                 EndpointId destinationEndpoint, EmberApsOption options, GroupId groupId, uint8_t sequence,
                                  uint8_t radius, bool isMeasuring)
 {
 
@@ -200,7 +202,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
                             apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
 
-uint16_t _encodeCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command, uint8_t frame_control)
+uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint8_t command,
+                        uint8_t frame_control)
 {
     CHECK_FRAME_LENGTH(buf.Size(), "Buffer is empty");
 
@@ -219,7 +222,7 @@ uint16_t _encodeCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t c
     return buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
 }
 
-uint16_t _encodeClusterSpecificCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
+uint16_t _encodeClusterSpecificCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint8_t command)
 {
     // This is a cluster-specific command so low two bits are 0b01.  The command
     // is standard, so does not need a manufacturer code, and we're sending
@@ -229,7 +232,7 @@ uint16_t _encodeClusterSpecificCommand(BufBound & buf, uint8_t destination_endpo
     return _encodeCommand(buf, destination_endpoint, cluster_id, command, frame_control);
 }
 
-uint16_t _encodeGlobalCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
+uint16_t _encodeGlobalCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint8_t command)
 {
     // This is a global command, so the low bits are 0b00.  The command is
     // standard, so does not need a manufacturer code, and we're sending client

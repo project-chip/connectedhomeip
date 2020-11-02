@@ -47,6 +47,8 @@
 #include <app/util/common.h>
 #include <system/SystemLayer.h>
 
+using namespace chip;
+
 #ifdef ATTRIBUTE_LARGEST
 #define READ_DATA_SIZE ATTRIBUTE_LARGEST
 #else
@@ -55,7 +57,7 @@
 
 #define NULL_INDEX 0xFF
 
-static void conditionallySendReport(uint8_t endpoint, EmberAfClusterId clusterId);
+static void conditionallySendReport(EndpointId endpoint, EmberAfClusterId clusterId);
 static void scheduleTick(void);
 static void removeConfiguration(uint8_t index);
 static void removeConfigurationAndScheduleTick(uint8_t index);
@@ -342,7 +344,7 @@ extern "C" void emberAfPluginReportingTickEventHandler(void)
     scheduleTick();
 }
 
-static void conditionallySendReport(uint8_t endpoint, EmberAfClusterId clusterId)
+static void conditionallySendReport(EndpointId endpoint, EmberAfClusterId clusterId)
 {
     EmberStatus status;
     if (emberAfIsDeviceEnabled(endpoint) || clusterId == ZCL_IDENTIFY_CLUSTER_ID)
@@ -667,9 +669,8 @@ EmberStatus emAfPluginReportingRemoveEntry(uint8_t index)
     return status;
 }
 
-extern "C" void emberAfReportingAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId,
-                                                        EmberAfAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode,
-                                                        EmberAfAttributeType type, uint8_t * data)
+extern "C" void emberAfReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                             uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
 {
     uint8_t i;
     for (i = 0; i < REPORT_TABLE_SIZE; i++)

@@ -44,6 +44,8 @@
 
 #include <support/CodeUtils.h>
 
+using namespace chip;
+
 static EmberAfPluginDoorLockServerLogEntry entries[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_LOG_ENTRIES];
 static uint8_t nextEntryId = 1;
 
@@ -55,7 +57,7 @@ static uint8_t nextEntryId = 1;
 static bool loggingIsEnabled(void)
 {
     // This is hardcoded to endpoint 1 because...we need to add endpoint support...
-    uint8_t endpoint     = 1;
+    EndpointId endpoint  = 1;
     bool logging         = false;
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_ENABLE_LOGGING_ATTRIBUTE_ID,
                                                       (uint8_t *) &logging, sizeof(logging));
