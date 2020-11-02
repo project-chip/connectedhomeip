@@ -169,6 +169,11 @@ void emberEventControlSetInactive(EmberEventControl * control)
     }
 }
 
+bool emberEventControlGetActive(EmberEventControl * control)
+{
+    return control->status != EMBER_EVENT_INACTIVE;
+}
+
 void emberEventControlSetActive(EmberEventControl * control)
 {
     control->status = EMBER_EVENT_ZERO_DELAY;

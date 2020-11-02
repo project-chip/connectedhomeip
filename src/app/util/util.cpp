@@ -1206,7 +1206,7 @@ EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls,
 bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, uint8_t endpoint)
 {
     uint8_t index = emberAfIndexFromEndpoint(endpoint);
-    return (index != 0xFF && false /*emberEventControlGetActive(controls[index])*/);
+    return (index != 0xFF && emberEventControlGetActive(&controls[index]));
 }
 
 EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, uint8_t endpoint)
