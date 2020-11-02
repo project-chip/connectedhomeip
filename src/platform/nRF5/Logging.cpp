@@ -43,22 +43,6 @@ using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 
-namespace {
-
-void GetModuleName(char * buf, uint8_t module)
-{
-    if (module == ::chip::Logging::kLogModule_DeviceLayer)
-    {
-        memcpy(buf, "DL", 3);
-    }
-    else
-    {
-        ::chip::Logging::GetModuleName(buf, module);
-    }
-}
-
-} // unnamed namespace
-
 namespace chip {
 namespace DeviceLayer {
 
@@ -100,7 +84,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 
             // Form the log prefix, e.g. "[DL] "
             formattedMsg[0] = '[';
-            ::GetModuleName(formattedMsg + 1, module);
+            GetModuleName(formattedMsg + 1, module);
             prefixLen                 = strlen(formattedMsg);
             formattedMsg[prefixLen++] = ']';
             formattedMsg[prefixLen++] = ' ';
