@@ -498,24 +498,27 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ReadAttributesResponse (0x01):");
+
         // struct readAttributeResponseRecord[]
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
             CHECK_MESSAGE_LENGTH(1);
-            if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+            uint8_t status = chip::Encoding::Read8(message); // zclStatus
+            success        = CheckStatus(status);
+            if (status == 0)
             {
-                return false;
-            }
-            if (!ReadAttributeValue(message, messageLen))
-            {
-                return false;
+                if (!ReadAttributeValue(message, messageLen))
+                {
+                    return false;
+                }
             }
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -529,20 +532,23 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "WriteAttributesResponse (0x04):");
+
         // struct writeAttributeResponseRecord[]
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(1);
-            if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+            uint8_t status = chip::Encoding::Read8(message); // zclStatus
+            success        = CheckStatus(status);
+            if (status != 0)
             {
-                return false;
+                CHECK_MESSAGE_LENGTH(2);
+                ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
             }
-            CHECK_MESSAGE_LENGTH(2);
-            ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -556,7 +562,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "WriteAttributesNoResponse (0x05):");
+
         // struct writeAttributeRecord[]
         while (messageLen)
         {
@@ -568,7 +576,7 @@ public:
             }
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -582,16 +590,16 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "DefaultResponse (0x0B):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "commandId", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
 
-        return true;
+        return success;
     }
 };
 
@@ -605,7 +613,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "DiscoverAttributesResponse (0x0D):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "discoveryComplete", chip::Encoding::Read8(message)); // bool
         // struct discoverAttributesResponseRecord[]
@@ -617,7 +627,7 @@ public:
             ChipLogProgress(chipTool, "  %s: 0x%02x", "attributeType", chip::Encoding::Read8(message)); // zclType
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -2518,11 +2528,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearAllPINCodesResponse (0x08):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2536,11 +2548,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearAllRFIDCodesResponse (0x19):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2554,11 +2568,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearHolidayScheduleResponse (0x13):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2572,11 +2588,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearPINCodeResponse (0x07):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2590,11 +2608,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearRFIDCodeResponse (0x18):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2608,11 +2628,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearWeekdayScheduleResponse (0x0D):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2626,11 +2648,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearYearDayScheduleResponse (0x10):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2644,22 +2668,31 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetHolidayScheduleResponse (0x12):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "holidayScheduleId", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+        if (status == 0)
         {
-            return false;
+            CHECK_MESSAGE_LENGTH(4);
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
         }
-        CHECK_MESSAGE_LENGTH(4);
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
-        CHECK_MESSAGE_LENGTH(4);
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "operatingModeDuringHoliday", chip::Encoding::Read8(message)); // DrlkOperMode
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(4);
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "operatingModeDuringHoliday", chip::Encoding::Read8(message)); // DrlkOperMode
+        }
 
-        return true;
+        return success;
     }
 };
 
@@ -2673,7 +2706,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetPINCodeResponse (0x06):");
+
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
@@ -2691,7 +2726,7 @@ public:
             message += codeLen;
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -2705,7 +2740,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetRFIDCodeResponse (0x17):");
+
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
@@ -2723,7 +2760,7 @@ public:
             message += rFIdCodeLen;
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -2737,13 +2774,15 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetUserTypeResponse (0x15):");
+
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message)); // DrlkUserType
 
-        return true;
+        return success;
     }
 };
 
@@ -2757,28 +2796,43 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetWeekdayScheduleResponse (0x0C):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+        if (status == 0)
         {
-            return false;
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "daysMask", chip::Encoding::Read8(message)); // DrlkDaysMask
         }
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "daysMask", chip::Encoding::Read8(message)); // DrlkDaysMask
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "startHour", chip::Encoding::Read8(message)); // uint8
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "startMinute", chip::Encoding::Read8(message)); // uint8
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "endHour", chip::Encoding::Read8(message)); // uint8
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "endMinute", chip::Encoding::Read8(message)); // uint8
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "startHour", chip::Encoding::Read8(message)); // uint8
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "startMinute", chip::Encoding::Read8(message)); // uint8
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "endHour", chip::Encoding::Read8(message)); // uint8
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "endMinute", chip::Encoding::Read8(message)); // uint8
+        }
 
-        return true;
+        return success;
     }
 };
 
@@ -2792,22 +2846,28 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetYearDayScheduleResponse (0x0F):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+        if (status == 0)
         {
-            return false;
+            CHECK_MESSAGE_LENGTH(4);
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
         }
-        CHECK_MESSAGE_LENGTH(4);
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
-        CHECK_MESSAGE_LENGTH(4);
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(4);
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+        }
 
-        return true;
+        return success;
     }
 };
 
@@ -2821,14 +2881,14 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "LockDoorResponse (0x00):");
-        CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
 
-        return true;
+        CHECK_MESSAGE_LENGTH(1);
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+
+        return success;
     }
 };
 
@@ -2842,11 +2902,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetHolidayScheduleResponse (0x11):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2860,11 +2922,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetPINCodeResponse (0x05):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkSetCodeStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2878,11 +2942,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetRFIDCodeResponse (0x16):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkSetCodeStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2896,11 +2962,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetUserTypeResponse (0x14):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2914,11 +2982,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetWeekdayScheduleResponse (0x0B):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2932,11 +3002,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetYearDayScheduleResponse (0x0E):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2950,14 +3022,14 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "UnlockDoorResponse (0x01):");
-        CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
 
-        return true;
+        CHECK_MESSAGE_LENGTH(1);
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+
+        return success;
     }
 };
 
@@ -2971,14 +3043,14 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "UnlockWithTimeoutResponse (0x03):");
-        CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
 
-        return true;
+        CHECK_MESSAGE_LENGTH(1);
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+
+        return success;
     }
 };
 
@@ -3899,13 +3971,15 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "AddGroupResponse (0x00):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // uint16
 
-        return true;
+        return success;
     }
 };
 
@@ -3919,7 +3993,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetGroupMembershipResponse (0x02):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(1);
@@ -3931,7 +4007,7 @@ public:
             ChipLogProgress(chipTool, "  %s: 0x%04x", "groupList", chip::Encoding::LittleEndian::Read16(message)); // uint16
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -3945,13 +4021,15 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "RemoveGroupResponse (0x03):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // uint16
 
-        return true;
+        return success;
     }
 };
 
@@ -3965,7 +4043,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ViewGroupResponse (0x01):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
         CHECK_MESSAGE_LENGTH(2);
@@ -3981,7 +4061,7 @@ public:
             message += groupNameLen;
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -4232,11 +4312,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "IdentifyQueryResponse (0x00):");
+
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "timeout", chip::Encoding::LittleEndian::Read16(message)); // uint16
 
-        return true;
+        return success;
     }
 };
 
@@ -4782,18 +4864,18 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "AddSceneResponse (0x00):");
+
         CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
 
-        return true;
+        return success;
     }
 };
 
@@ -4807,12 +4889,12 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetSceneMembershipResponse (0x06):");
+
         CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(2);
@@ -4824,7 +4906,7 @@ public:
             ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneList", chip::Encoding::Read8(message)); // uint8
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -4838,16 +4920,16 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "RemoveAllScenesResponse (0x03):");
+
         CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
 
-        return true;
+        return success;
     }
 };
 
@@ -4861,18 +4943,18 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "RemoveSceneResponse (0x02):");
+
         CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
 
-        return true;
+        return success;
     }
 };
 
@@ -4886,18 +4968,18 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "StoreSceneResponse (0x04):");
+
         CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
 
-        return true;
+        return success;
     }
 };
 
@@ -4911,12 +4993,12 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ViewSceneResponse (0x01):");
+
         CHECK_MESSAGE_LENGTH(1);
-        if (!CheckStatus(chip::Encoding::Read8(message))) // zclStatus
-        {
-            return false;
-        }
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
@@ -4950,7 +5032,7 @@ public:
             }
         }
 
-        return true;
+        return success;
     }
 };
 
