@@ -40,7 +40,7 @@
 
 #include "af.h"
 
-void emberAfResetAttributes(uint8_t endpoint);
+#include <app/util/attribute-storage.h>
 
 bool emberAfBasicClusterResetToFactoryDefaultsCallback(void)
 {

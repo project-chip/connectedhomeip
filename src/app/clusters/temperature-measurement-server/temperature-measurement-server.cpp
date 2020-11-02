@@ -45,12 +45,12 @@
 
 EmberEventControl emberAfPluginTemperatureMeasurementServerReadEventControl;
 
-void emberAfPluginTemperatureMeasurementServerReadEventHandler() {}
+extern "C" void emberAfPluginTemperatureMeasurementServerReadEventHandler() {}
 
 // -------------------------------------------------------------------------
 // ****** callback section *******
 
-void emberAfPluginTemperatureMeasurementServerInitCallback(void)
+extern "C" void emberAfPluginTemperatureMeasurementServerInitCallback(void)
 {
     EmberAfStatus status;
     // FIXME Use real values for the temperature sensor polling the sensor using the

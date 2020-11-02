@@ -67,7 +67,7 @@ static State state;
 // -----------------------------------------------------------------------------
 // Framework initialization
 
-void emberAfPluginBarrierControlServerInitCallback(void) {}
+extern "C" void emberAfPluginBarrierControlServerInitCallback(void) {}
 
 // -----------------------------------------------------------------------------
 // Accessing attributes

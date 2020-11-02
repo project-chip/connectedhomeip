@@ -53,7 +53,9 @@
 //------------------------------------------------------------------------------
 // Forward Declarations
 
-EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
+extern "C" {
+    EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
+} // extern "C"
 
 //------------------------------------------------------------------------------
 
