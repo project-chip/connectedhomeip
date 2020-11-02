@@ -41,6 +41,8 @@
 #ifndef __TIME_UTIL_H__
 #define __TIME_UTIL_H__
 
+#include "af.h"
+
 #define SECONDS_IN_MINUTE 60
 #define SECONDS_IN_HOUR 3600
 #define SECONDS_IN_DAY (SECONDS_IN_MINUTE * 60 * 24)

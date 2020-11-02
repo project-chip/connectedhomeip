@@ -19,11 +19,9 @@
 void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId);
 
 // Cluster Init Functions
-{{#all_user_clusters}}
-{{#if (isEnable enabled)}}
-void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}InitCallback(uint8_t endpoint);
-{{/if}}
-{{/all_user_clusters}}
+{{#all_user_clusters_names}}
+void emberAf{{asCamelCased name false}}ClusterInitCallback(uint8_t endpoint);
+{{/all_user_clusters_names}}
 
 
 // CLuster Commands Callback
@@ -32,7 +30,7 @@ void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}InitCal
 {{#if (isEnable enabled)}}
 {{#all_user_cluster_commands}}
 {{#if (isStrEqual clusterName parent.name)}}
-{{#if (isCommandAvailable parent.side incoming outcoming)}}
+{{#if (isCommandAvailable parent.side incoming outgoing commandSource)}}
 /**
 * @brief {{parent.name}} Cluster {{name}} Command callback
 {{#if (zcl_command_arguments_count this.id)}}

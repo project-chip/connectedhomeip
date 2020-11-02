@@ -63,6 +63,16 @@ void emAfPluginDoorLockServerWriteAttributes(const EmAfPluginDoorLockServerAttri
 // This function should be called when the door state has changed. A status
 // describing the success or failure of the update will be returned.
 EmberAfStatus emAfPluginDoorLockServerNoteDoorStateChanged(EmberAfDoorState state);
+
+/** @brief Activate Door Lock Callback
+ * This function is provided by the door lock server plugin.
+ *
+ * @param activate True if the lock should move to the locked position,
+ *  false if it should move to the unlocked position Ver.: always
+ *
+ * @returns true if the callback was able to activate/deactivate the Lock.
+ */
+bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate);
 #endif
 
 // At boot, the NumberOfPINUsersSupported attribute will be written to this

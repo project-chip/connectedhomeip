@@ -42,6 +42,7 @@
 #include "level-control.h"
 
 #include <app/clusters/on-off-server/on-off.h>
+#include <app/clusters/scenes/scenes.h>
 
 // this file contains all the common includes for clusters in the util
 #include <app/util/af.h>
@@ -408,21 +409,22 @@ extern "C" bool emberAfLevelControlClusterMoveToLevelWithOnOffCallback(uint8_t l
     return true;
 }
 
-extern "C" bool emberAfLevelControlClusterMoveCallback(uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
+extern "C" bool emberAfLevelControlClusterMoveCallback(EmberAfMoveMode moveMode, uint8_t rate, uint8_t optionMask,
+                                                       uint8_t optionOverride)
 {
     emberAfLevelControlClusterPrintln("%pMOVE %x %x", "RX level-control:", moveMode, rate);
     moveHandler(ZCL_MOVE_COMMAND_ID, moveMode, rate, optionMask, optionOverride);
     return true;
 }
 
-extern "C" bool emberAfLevelControlClusterMoveWithOnOffCallback(uint8_t moveMode, uint8_t rate)
+extern "C" bool emberAfLevelControlClusterMoveWithOnOffCallback(EmberAfMoveMode moveMode, uint8_t rate)
 {
     emberAfLevelControlClusterPrintln("%pMOVE_WITH_ON_OFF %x %x", "RX level-control:", moveMode, rate);
     moveHandler(ZCL_MOVE_WITH_ON_OFF_COMMAND_ID, moveMode, rate, 0xFF, 0xFF);
     return true;
 }
 
-extern "C" bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime,
+extern "C" bool emberAfLevelControlClusterStepCallback(EmberAfStepMode stepMode, uint8_t stepSize, uint16_t transitionTime,
                                                        uint8_t optionMask, uint8_t optionOverride)
 {
     emberAfLevelControlClusterPrintln("%pSTEP %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
@@ -430,7 +432,7 @@ extern "C" bool emberAfLevelControlClusterStepCallback(uint8_t stepMode, uint8_t
     return true;
 }
 
-extern "C" bool emberAfLevelControlClusterStepWithOnOffCallback(uint8_t stepMode, uint8_t stepSize, uint16_t transitionTime)
+extern "C" bool emberAfLevelControlClusterStepWithOnOffCallback(EmberAfStepMode stepMode, uint8_t stepSize, uint16_t transitionTime)
 {
     emberAfLevelControlClusterPrintln("%pSTEP_WITH_ON_OFF %x %x %2x", "RX level-control:", stepMode, stepSize, transitionTime);
     stepHandler(ZCL_STEP_WITH_ON_OFF_COMMAND_ID, stepMode, stepSize, transitionTime, 0xFF, 0xFF);

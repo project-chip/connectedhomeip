@@ -72,10 +72,6 @@ uint8_t emberEndpointCount = 0;
 const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
 #endif // GENERATED_DEFAULTS
 
-#ifdef GENERATED_FUNCTION_ARRAYS
-GENERATED_FUNCTION_ARRAYS
-#endif // GENERATED_FUNCTION_ARRAYS
-
 #ifdef GENERATED_MIN_MAX_DEFAULTS
 const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
 #endif // GENERATED_MIN_MAX_DEFAULTS

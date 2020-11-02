@@ -66,8 +66,12 @@ function isEnable(enable) {
     return 1 == enable;
 }
 
-function isCommandAvailable(clusterSide, incoming, outcoming) {
-    if (isClient(clusterSide) && outcoming) {
+function isCommandAvailable(clusterSide, incoming, outgoing, source, name) {
+    if (0 == clusterSide.localeCompare(source)) {
+        return false;
+    }
+
+    if (isClient(clusterSide) && outgoing) {
         return true;
     } else if (isServer(clusterSide) && incoming) {
         return true;

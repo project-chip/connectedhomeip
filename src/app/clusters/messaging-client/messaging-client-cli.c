@@ -37,7 +37,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#include "app/framework/include/af.h"
+#include "#include <app/util/af.h>"
 #include "app/framework/plugin/messaging-client/messaging-client.h"
 #include "app/util/serial/command-interpreter2.h"
 

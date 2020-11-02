@@ -210,32 +210,6 @@
             { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 90 / IAS Zone / cluster revision*/        \
     }
 
-// Cluster function static arrays
-#define GENERATED_FUNCTION_ARRAYS                                                                                                  \
-    const EmberAfGenericClusterFunction emberAfFuncArrayIdentifyClusterServer[] = {                                                \
-        (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerInitCallback,                                                  \
-        (EmberAfGenericClusterFunction) emberAfIdentifyClusterServerAttributeChangedCallback                                       \
-    };                                                                                                                             \
-    const EmberAfGenericClusterFunction emberAfFuncArrayGroupsClusterServer[]       = { (                                          \
-        EmberAfGenericClusterFunction) emberAfGroupsClusterServerInitCallback };                                             \
-    const EmberAfGenericClusterFunction emberAfFuncArrayScenesClusterServer[]       = { (                                          \
-        EmberAfGenericClusterFunction) emberAfScenesClusterServerInitCallback };                                             \
-    const EmberAfGenericClusterFunction emberAfFuncArrayOnOffClusterServer[]        = { (                                          \
-        EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback };                                             \
-    const EmberAfGenericClusterFunction emberAfFuncArrayLevelControlClusterServer[] = { (                                          \
-        EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback };                                             \
-    const EmberAfGenericClusterFunction emberAfFuncArrayDoorLockClusterServer[]     = { (                                          \
-        EmberAfGenericClusterFunction) emberAfDoorLockClusterServerAttributeChangedCallback };                                 \
-    const EmberAfGenericClusterFunction emberAfFuncArrayColorControlClusterServer[] = { (                                          \
-        EmberAfGenericClusterFunction) emberAfColorControlClusterServerInitCallback };                                             \
-    const EmberAfGenericClusterFunction emberAfFuncArrayIasZoneClusterClient[]      = { (                                          \
-        EmberAfGenericClusterFunction) emberAfIasZoneClusterClientInitCallback };                                             \
-    const EmberAfGenericClusterFunction emberAfFuncArrayIasZoneClusterServer[]      = {                                            \
-        (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerInitCallback,                                              \
-        (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerMessageSentCallback,                                       \
-        (EmberAfGenericClusterFunction) emberAfIasZoneClusterServerPreAttributeChangedCallback                                \
-    };
-
 // Clusters definitions
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
@@ -254,28 +228,28 @@
                 2,                                                                                                                 \
                 4,                                                                                                                 \
                 (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION),                      \
-                emberAfFuncArrayIdentifyClusterServer,                                                                             \
+                NULL,                                                                                                              \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0004, (EmberAfAttributeMetadata *) &(generatedAttributes[7]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                 \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0004, (EmberAfAttributeMetadata *) &(generatedAttributes[8]), 2,                                                 \
-                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),     emberAfFuncArrayGroupsClusterServer,               \
+                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),     NULL,                                              \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0005, (EmberAfAttributeMetadata *) &(generatedAttributes[10]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0005, (EmberAfAttributeMetadata *) &(generatedAttributes[11]), 6,                                                \
-                8,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayScenesClusterServer,              \
+                8,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[17]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[18]), 2,                                                \
-                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayOnOffClusterServer,               \
+                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0007, (EmberAfAttributeMetadata *) &(generatedAttributes[20]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
@@ -288,14 +262,14 @@
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0008, (EmberAfAttributeMetadata *) &(generatedAttributes[25]), 2,                                                \
-                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayLevelControlClusterServer,        \
+                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0101, (EmberAfAttributeMetadata *) &(generatedAttributes[27]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0101, (EmberAfAttributeMetadata *) &(generatedAttributes[28]),         4,                                        \
-                5,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION), emberAfFuncArrayDoorLockClusterServer,    \
+                5,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_ATTRIBUTE_CHANGED_FUNCTION), NULL,                                     \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0103, (EmberAfAttributeMetadata *) &(generatedAttributes[32]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
@@ -308,7 +282,7 @@
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0300, (EmberAfAttributeMetadata *) &(generatedAttributes[39]), 40,                                               \
-                66,     (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayColorControlClusterServer,        \
+                66,     (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0402, (EmberAfAttributeMetadata *) &(generatedAttributes[79]), 1, 2, (CLUSTER_MASK_CLIENT), NULL,                \
@@ -318,7 +292,7 @@
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0500, (EmberAfAttributeMetadata *) &(generatedAttributes[84]), 1,                                                \
-                2,      (CLUSTER_MASK_CLIENT | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayIasZoneClusterClient,             \
+                2,      (CLUSTER_MASK_CLIENT | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0500,                                                                                                            \
@@ -327,11 +301,11 @@
                 16,                                                                                                                \
                 (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION | CLUSTER_MASK_MESSAGE_SENT_FUNCTION |                           \
                  CLUSTER_MASK_PRE_ATTRIBUTE_CHANGED_FUNCTION),                                                                     \
-                emberAfFuncArrayIasZoneClusterServer,                                                                              \
+                NULL,                                                                                                              \
             },                                                                                                                     \
             {                                                                                                                      \
                 0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[18]), 2,                                                \
-                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayOnOffClusterServer,               \
+                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      NULL,                                             \
             },                                                                                                                     \
     }
 

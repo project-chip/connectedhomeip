@@ -15,4 +15,11 @@ typedef enum {
 } EmberAf{{asType label}};
 {{/zcl_enums}}
 
+{{#zcl_bitmaps}}
+{{#zcl_bitmap_items}}
+#define EMBER_AF_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}} ({{mask}})
+#define EMBER_AF_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}_OFFSET ({{asOffset mask}})
+{{/zcl_bitmap_items}}
+{{/zcl_bitmaps}}
+
 #endif //__ZAP_EMBER_ENUMS__

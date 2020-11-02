@@ -8,9 +8,7 @@
       "code3": "label3",
       "code4": "label4",
       "code5": "label5"
-    },
-    "externalOption": "externalOptions.json",
-    "cli": "cli.json"
+    }
   },
   "helpers": ["helper-chip.js"],
   "templates": [
@@ -63,11 +61,6 @@
       "path": "command-id.zapt",
       "name": "ZCL command-id header",
       "output": "command-id.h"
-    },
-    {
-      "path": "endpoint_config.zapt",
-      "name": "ZCL endpoint_config header",
-      "output": "endpoint_config.h"
     },
     {
       "path": "enums.zapt",

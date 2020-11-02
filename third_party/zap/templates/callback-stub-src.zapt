@@ -9,13 +9,11 @@ void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId)
 {
     switch (clusterId)
     {
-    {{#all_user_clusters}}
-    {{#if (isEnable enabled)}}
-    case ZCL_{{asDelimitedMacro define}}_ID :
-        emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}InitCallback(endpoint);
+    {{#all_user_clusters_names}}
+     case ZCL_{{asDelimitedMacro define}}_ID :
+        emberAf{{asCamelCased name false}}ClusterInitCallback(endpoint);
         break;
-    {{/if}}
-    {{/all_user_clusters}}
+    {{/all_user_clusters_names}}
 
     default:
         // Unrecognized cluster ID
@@ -23,15 +21,13 @@ void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId)
     }
 }
 
-{{#all_user_clusters}}
-{{#if (isEnable enabled)}}
-void __attribute__((weak)) emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}InitCallback(uint8_t endpoint)
+{{#all_user_clusters_names}}
+void __attribute__((weak)) emberAf{{asCamelCased name false}}ClusterInitCallback(uint8_t endpoint)
 {
     // To prevent warning
     (void) endpoint;
 }
-{{/if}}
-{{/all_user_clusters}}
+{{/all_user_clusters_names}}
 
 // Cluster Command callback
 
@@ -39,7 +35,7 @@ void __attribute__((weak)) emberAf{{asCamelCased name false}}Cluster{{asCamelCas
 {{#if (isEnable enabled)}}
 {{#all_user_cluster_commands}}
 {{#if (isStrEqual clusterName parent.name)}}
-{{#if (isCommandAvailable parent.side incoming outcoming)}}
+{{#if (isCommandAvailable parent.side incoming outgoing commandSource)}}
 /**
 * @brief {{parent.name}} Cluster {{name}} Command callback
 {{#if (zcl_command_arguments_count this.id)}}

@@ -45,6 +45,7 @@
 #include "af.h"
 #include "common.h"
 #include "ember-print.h"
+#include <app/clusters/groups-server/groups-server.h>
 #include <app/reporting/reporting.h>
 #include <gen/callback.h>
 

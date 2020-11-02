@@ -46,6 +46,41 @@
 EmberAfStatus emberAfScenesSetSceneCountAttribute(uint8_t endpoint, uint8_t newCount);
 EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, uint16_t groupId);
 EmberAfStatus emberAfScenesClusterMakeInvalidCallback(uint8_t endpoint);
+void emberAfScenesClusterRemoveScenesInGroupCallback(uint8_t endpoint, uint16_t groupId);
+
+/** @brief Scenes Cluster ClearSceneTable
+ *
+ * This function is called by the framework when the application should clear
+ * the scene table.
+ *
+ * @param endpoint The endpoint.  Ver.: always
+ */
+void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint);
+
+/** @brief Scenes Cluster Store Current Scene
+ *
+ * This function is called by the framework when the application should store
+ * the current scene.  If an entry already exists in the scene table with the
+ * same scene and group ids, the application should update the entry with the
+ * current scene.  Otherwise, a new entry should be adde to the scene table, if
+ * possible.
+ *
+ * @param endpoint The endpoint.  Ver.: always
+ * @param groupId The group identifier.  Ver.: always
+ * @param sceneId The scene identifier.  Ver.: always
+ */
+EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId);
+
+/** @brief Scenes Cluster Recall Saved Scene
+ *
+ * This function is called by the framework when the application should recall a
+ * saved scene.
+ *
+ * @param endpoint The endpoint.  Ver.: always
+ * @param groupId The group identifier.  Ver.: always
+ * @param sceneId The scene identifier.  Ver.: always
+ */
+EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId);
 
 // DEPRECATED.
 #define emberAfScenesMakeInvalid emberAfScenesClusterMakeInvalidCallback

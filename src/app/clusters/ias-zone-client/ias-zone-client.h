@@ -38,6 +38,9 @@
  *******************************************************************************
  ******************************************************************************/
 
+#ifndef __IAS_ZONE_CLIENT_H__
+#define __IAS_ZONE_CLIENT_H__
+
 typedef struct
 {
     EmberEUI64 ieeeAddress;
@@ -71,3 +74,5 @@ void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId c
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
+
+#endif // __IAS_ZONE_CLIENT_H__

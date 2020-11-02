@@ -97,7 +97,7 @@ EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false
 
         {{#all_user_cluster_commands}}
         {{#if (isStrEqual clusterName parent.name)}}
-        {{#if (isCommandAvailable parent.side incoming outcoming)}}
+        {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
         case ZCL_{{asDelimitedMacro name}}_COMMAND_ID: {
             {{#if (zcl_command_arguments_count this.id)}}
             uint32_t argOffset = 0;

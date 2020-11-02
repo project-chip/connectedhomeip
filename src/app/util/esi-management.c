@@ -266,7 +266,7 @@ uint8_t emberAfPluginEsiManagementUpdateEsiAndGetIndex(const EmberAfClusterComma
         }
         else
         {
-            emberAfPrint("No free entry available");
+            emberAfDebugPrintln("No free entry available");
         }
     }
     else
@@ -275,7 +275,7 @@ uint8_t emberAfPluginEsiManagementUpdateEsiAndGetIndex(const EmberAfClusterComma
         // If not, update it.
         if (esiEntry->nodeId != cmd->source)
         {
-            emberAfPrint("ESI short ID changed, updating it");
+            emberAfDebugPrintln("ESI short ID changed, updating it");
             esiEntry->nodeId = cmd->source;
         }
     }

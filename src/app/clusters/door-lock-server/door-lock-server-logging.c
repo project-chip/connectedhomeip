@@ -40,6 +40,7 @@
 
 #include "af.h"
 #include "door-lock-server.h"
+#include "time-util.h"
 #include <assert.h>
 
 static EmberAfPluginDoorLockServerLogEntry entries[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_LOG_ENTRIES];
@@ -75,7 +76,7 @@ bool emberAfPluginDoorLockServerAddLogEntry(EmberAfDoorLockEventType eventType, 
 
     EmberAfPluginDoorLockServerLogEntry * nextEntry = &entries[ENTRY_ID_TO_INDEX(nextEntryId)];
     nextEntry->logEntryId                           = nextEntryId;
-    nextEntry->timestamp                            = emberAfGetCurrentTimeCallback();
+    nextEntry->timestamp                            = emberAfGetCurrentTime();
     nextEntry->eventType                            = eventType;
     nextEntry->source                               = source;
     nextEntry->eventId                              = eventId;

@@ -104,10 +104,12 @@ extern "C" {
 #include "gen/attribute-type.h"
 #include "gen/call-command-handler.h"
 #include "gen/callback.h"
+#include "gen/client-command-macro.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 #include "gen/enums.h"
 #include "gen/print-cluster.h"
+#include "plugin-config.h"
 //#include "app/util/serial/command-interpreter2.h"
 //#include "app/framework/cli/zcl-cli.h"
 

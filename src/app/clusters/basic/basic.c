@@ -39,6 +39,7 @@
  ******************************************************************************/
 
 #include "af.h"
+#include "basic.h"
 
 void emberAfResetAttributes(uint8_t endpoint);
 
