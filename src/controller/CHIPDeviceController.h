@@ -123,6 +123,8 @@ public:
                     DevicePairingDelegate * pairingDelegate = nullptr, PersistentStorageDelegate * storageDelegate = nullptr);
     CHIP_ERROR Shutdown();
 
+    CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
+
     // ----- Connection Management -----
     /**
      * @brief
@@ -281,6 +283,7 @@ private:
     System::PacketBuffer * mCurReqMsg;
 
     NodeId mLocalDeviceId;
+    uint16_t mListenPort;
     Inet::IPAddress mDeviceAddr;
     uint16_t mDevicePort;
     Inet::InterfaceId mInterface;
