@@ -51,7 +51,7 @@ using namespace chip::DeviceController;
 #define JNI_METHOD(RETURN, METHOD_NAME)                                                                                            \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_ChipDeviceController_##METHOD_NAME
 
-#define JNI_ANDROID_CHIP_STACK_METHOD(RETURN, METHOD_NAME)                                                                                            \
+#define JNI_ANDROID_CHIP_STACK_METHOD(RETURN, METHOD_NAME)                                                                         \
     extern "C" JNIEXPORT RETURN JNICALL Java_chip_devicecontroller_AndroidChipStack_##METHOD_NAME
 
 #define CDC_JNI_ERROR_MIN 10000
@@ -281,8 +281,8 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong handle, j
                                           .SetSetupPINCode(pinCode)
                                           .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
                                           .SetBleLayer(&sBleLayer);
-        err = wrapper->Controller()->ConnectDevice(kRemoteDeviceId, params, (void *) "ConnectDevice", HandleKeyExchange, HandleEchoResponse,
-                                                   HandleError);
+        err = wrapper->Controller()->ConnectDevice(kRemoteDeviceId, params, (void *) "ConnectDevice", HandleKeyExchange,
+                                                   HandleEchoResponse, HandleError);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -453,7 +453,8 @@ exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
 }
 
-JNI_ANDROID_CHIP_STACK_METHOD(void, handleWriteConfirmation)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
+JNI_ANDROID_CHIP_STACK_METHOD(void, handleWriteConfirmation)
+(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -471,7 +472,8 @@ exit:
     return;
 }
 
-JNI_ANDROID_CHIP_STACK_METHOD(void, handleSubscribeComplete)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
+JNI_ANDROID_CHIP_STACK_METHOD(void, handleSubscribeComplete)
+(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
@@ -489,7 +491,8 @@ exit:
     return;
 }
 
-JNI_ANDROID_CHIP_STACK_METHOD(void, handleUnsubscribeComplete)(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
+JNI_ANDROID_CHIP_STACK_METHOD(void, handleUnsubscribeComplete)
+(JNIEnv * env, jobject self, jint conn, jbyteArray svcId, jbyteArray charId)
 {
     BLE_CONNECTION_OBJECT const connObj = reinterpret_cast<BLE_CONNECTION_OBJECT>(conn);
 
