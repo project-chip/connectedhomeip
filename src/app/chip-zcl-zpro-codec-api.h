@@ -36,6 +36,7 @@ extern "C" {
 | ColorControl                                                        | 0x0300 |
 | DoorLock                                                            | 0x0101 |
 | Groups                                                              | 0x0004 |
+| IASZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | Level                                                               | 0x0008 |
 | OnOff                                                               | 0x0006 |
@@ -904,6 +905,72 @@ uint16_t encodeGroupsClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_le
  *    Encode a read command for the name-support attribute for  server into buffer including the APS frame
  */
 uint16_t encodeGroupsClusterReadNameSupportAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/*----------------------------------------------------------------------------*\
+| Cluster IASZone                                                     | 0x0500 |
+|------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+|                                                                     |        |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ZoneState                                                         | 0x0000 |
+| * ZoneType                                                          | 0x0001 |
+| * ZoneStatus                                                        | 0x0002 |
+| * IASCIEAddress                                                     | 0x0010 |
+| * ZoneID                                                            | 0x0011 |
+\*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an zone-enroll-response command for IASZone server into buffer including the APS frame
+ */
+uint16_t encodeIASZoneClusterZoneEnrollResponseCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                       uint8_t enrollResponseCode, uint8_t zoneID);
+
+/**
+ * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeIASZoneClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a read command for the zone-state attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeIASZoneClusterReadZoneStateAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a read command for the zone-type attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeIASZoneClusterReadZoneTypeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a read command for the zone-status attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeIASZoneClusterReadZoneStatusAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a read command for the iascieaddress attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeIASZoneClusterReadIASCIEAddressAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a write command for the iascieaddress attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeIASZoneClusterWriteIASCIEAddressAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                         uint64_t iASCIEAddress);
+
+/**
+ * @brief
+ *    Encode a read command for the zone-id attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeIASZoneClusterReadZoneIDAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Identify                                                    | 0x0003 |

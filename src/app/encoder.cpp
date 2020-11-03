@@ -57,6 +57,9 @@ using namespace chip;
         case 0x21:                                                                                                                 \
             buf.PutLE16(static_cast<uint16_t>(value));                                                                             \
             break;                                                                                                                 \
+        case 0xF0:                                                                                                                 \
+            buf.PutLE64(static_cast<uint64_t>(value));                                                                             \
+            break;                                                                                                                 \
         default:                                                                                                                   \
             ChipLogError(Zcl, "Error encoding %s command", name);                                                                  \
             return 0;                                                                                                              \
@@ -133,6 +136,7 @@ extern "C" {
 | ColorControl                                                        | 0x0300 |
 | DoorLock                                                            | 0x0101 |
 | Groups                                                              | 0x0004 |
+| IASZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | Level                                                               | 0x0008 |
 | OnOff                                                               | 0x0006 |
@@ -145,6 +149,7 @@ extern "C" {
 #define COLOR_CONTROL_CLUSTER_ID 0x0300
 #define DOOR_LOCK_CLUSTER_ID 0x0101
 #define GROUPS_CLUSTER_ID 0x0004
+#define IAS_ZONE_CLUSTER_ID 0x0500
 #define IDENTIFY_CLUSTER_ID 0x0003
 #define LEVEL_CLUSTER_ID 0x0008
 #define ON_OFF_CLUSTER_ID 0x0006
@@ -1552,6 +1557,93 @@ uint16_t encodeGroupsClusterReadNameSupportAttribute(uint8_t * buffer, uint16_t 
 {
     uint16_t attr_ids[] = { 0x0000 };
     READ_ATTRIBUTES("ReadGroupsNameSupport", GROUPS_CLUSTER_ID);
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster IASZone                                                     | 0x0500 |
+|------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+|                                                                     |        |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ZoneState                                                         | 0x0000 |
+| * ZoneType                                                          | 0x0001 |
+| * ZoneStatus                                                        | 0x0002 |
+| * IASCIEAddress                                                     | 0x0010 |
+| * ZoneID                                                            | 0x0011 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ZoneEnrollResponse
+ */
+uint16_t encodeIASZoneClusterZoneEnrollResponseCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                       uint8_t enrollResponseCode, uint8_t zoneID)
+{
+    const char * kName = "IASZoneZoneEnrollResponse";
+    COMMAND_HEADER(kName, IAS_ZONE_CLUSTER_ID, 0x00);
+    buf.Put(enrollResponseCode);
+    buf.Put(zoneID);
+    COMMAND_FOOTER(kName);
+}
+
+uint16_t encodeIASZoneClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverIASZoneAttributes", IAS_ZONE_CLUSTER_ID);
+}
+
+/*
+ * Attribute ZoneState
+ */
+uint16_t encodeIASZoneClusterReadZoneStateAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0000 };
+    READ_ATTRIBUTES("ReadIASZoneZoneState", IAS_ZONE_CLUSTER_ID);
+}
+
+/*
+ * Attribute ZoneType
+ */
+uint16_t encodeIASZoneClusterReadZoneTypeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0001 };
+    READ_ATTRIBUTES("ReadIASZoneZoneType", IAS_ZONE_CLUSTER_ID);
+}
+
+/*
+ * Attribute ZoneStatus
+ */
+uint16_t encodeIASZoneClusterReadZoneStatusAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0002 };
+    READ_ATTRIBUTES("ReadIASZoneZoneStatus", IAS_ZONE_CLUSTER_ID);
+}
+
+/*
+ * Attribute IASCIEAddress
+ */
+uint16_t encodeIASZoneClusterReadIASCIEAddressAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0010 };
+    READ_ATTRIBUTES("ReadIASZoneIASCIEAddress", IAS_ZONE_CLUSTER_ID);
+}
+
+uint16_t encodeIASZoneClusterWriteIASCIEAddressAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                         uint64_t iASCIEAddress)
+{
+    uint16_t attr_id  = 0x0010;
+    uint8_t attr_type = { 0xF0 };
+    WRITE_ATTRIBUTE("WriteIASZoneIASCIEAddress", IAS_ZONE_CLUSTER_ID, iASCIEAddress);
+}
+
+/*
+ * Attribute ZoneID
+ */
+uint16_t encodeIASZoneClusterReadZoneIDAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0011 };
+    READ_ATTRIBUTES("ReadIASZoneZoneID", IAS_ZONE_CLUSTER_ID);
 }
 
 /*----------------------------------------------------------------------------*\
