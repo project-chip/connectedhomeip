@@ -364,5 +364,74 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
+CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, const char * key)
+{
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    CHIP_ERROR ret  = CHIP_NO_ERROR;
+    GError * err    = nullptr;
+    GVariant * args = nullptr;
+    GVariantBuilder builder;
+
+    // Clean up current network if exists
+    if (mWpaSupplicant.networkPath)
+    {
+        g_object_unref(mWpaSupplicant.networkPath);
+        mWpaSupplicant.networkPath = nullptr;
+    }
+
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssid));
+    g_variant_builder_add(&builder, "{sv}", "psk", g_variant_new_string(key));
+    g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("WPA-PSK"));
+    args = g_variant_builder_end(&builder);
+
+    gboolean result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args,
+                                                                                &mWpaSupplicant.networkPath, nullptr, &err);
+
+    if (result)
+    {
+        GError * error = nullptr;
+
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: added network: SSID: %s: %s", ssid, mWpaSupplicant.networkPath);
+
+        result = wpa_fi_w1_wpa_supplicant1_interface_call_select_network_sync(mWpaSupplicant.iface, mWpaSupplicant.networkPath,
+                                                                              nullptr, &error);
+        if (result)
+        {
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to network: SSID: %s", ssid);
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to connect to network: SSID: %s: %s", ssid,
+                            error ? error->message : "unknown error");
+        }
+
+        if (error != nullptr)
+            g_error_free(error);
+
+        ret = CHIP_NO_ERROR;
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to add network: %s: %s", ssid, err ? err->message : "unknown error");
+
+        if (mWpaSupplicant.networkPath)
+        {
+            g_object_unref(mWpaSupplicant.networkPath);
+            mWpaSupplicant.networkPath = nullptr;
+        }
+
+        ret = CHIP_ERROR_INTERNAL;
+    }
+
+    if (err != nullptr)
+        g_error_free(err);
+
+    return ret;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
+}
+
 } // namespace DeviceLayer
 } // namespace chip
