@@ -229,7 +229,8 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             char buffer[max_size];
             uint16_t size = max_size;
 
-            PERSISTENT_KEY_OP(0ull, kPairedDeviceListKeyPrefix, key, err = mStorageDelegate->GetKeyValue(key, buffer, size));
+            PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
+                              err = mStorageDelegate->GetKeyValue(key, buffer, size));
             SuccessOrExit(err);
             VerifyOrExit(size <= max_size, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
@@ -673,7 +674,7 @@ void DeviceCommissioner::PersistDeviceList()
         const char * value    = mPairedDevices.SerializeBase64(serialized, requiredSize);
         if (value != nullptr && requiredSize <= size)
         {
-            PERSISTENT_KEY_OP(0ull, kPairedDeviceListKeyPrefix, key, mStorageDelegate->SetKeyValue(key, value));
+            PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key, mStorageDelegate->SetKeyValue(key, value));
             mPairedDevicesUpdated = false;
         }
     }
