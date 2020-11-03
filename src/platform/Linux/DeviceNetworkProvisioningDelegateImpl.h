@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include <platform/Linux/ConnectivityManagerImpl.h>
 #include <platform/internal/GenericDeviceNetworkProvisioningDelegateImpl.h>
 
 namespace chip {
@@ -35,7 +36,10 @@ class DeviceNetworkProvisioningDelegateImpl final
     friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
 
 private:
-    CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd)
+    {
+        return ConnectivityMgrImpl().SetWiFiNetworkProvisioning(ssid, passwd);
+    }
     CHIP_ERROR _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 

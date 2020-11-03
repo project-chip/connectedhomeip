@@ -147,6 +147,37 @@ CHIP_ERROR ConnectivityManagerImpl::_SetWiFiStationReconnectIntervalMS(uint32_t 
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ConnectivityManagerImpl::SetWiFiNetworkProvisioning(const char * ssid, const char * psk)
+{
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    GVariantDict * wifiConfig = g_variant_dict_new(nullptr);
+    GError * dbusErr          = nullptr;
+
+    _ClearWiFiStationProvision();
+
+    g_variant_dict_insert_value(wifiConfig, "ssid", g_variant_new_string(ssid));
+    g_variant_dict_insert_value(wifiConfig, "scan_ssid", g_variant_new_int32(1));
+    g_variant_dict_insert_value(wifiConfig, "key_mgmt", g_variant_new_string("WPA-PSK WPA-PSK-SHA256 FT-PSK"));
+    g_variant_dict_insert_value(wifiConfig, "psk", g_variant_new_string(psk));
+
+    wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, g_variant_dict_end(wifiConfig),
+                                                              &mWpaSupplicant.networkPath, nullptr, &dbusErr);
+
+    VerifyOrExit(dbusErr == nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    ChipLogDetail(DeviceLayer, "Added WiFi Network: %s (Object Path: %s)", ssid, mWpaSupplicant.networkPath);
+
+    wpa_fi_w1_wpa_supplicant1_interface_call_select_network_sync(mWpaSupplicant.iface, mWpaSupplicant.networkPath, nullptr,
+                                                                 &dbusErr);
+
+    VerifyOrExit(dbusErr == nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    ChipLogDetail(DeviceLayer, "Enabled WiFi Network: %s (Object Path: %s)", ssid, mWpaSupplicant.networkPath);
+
+exit:
+    if (dbusErr != nullptr)
+        g_error_free(dbusErr);
+    return err;
+}
+
 bool ConnectivityManagerImpl::_IsWiFiStationEnabled()
 {
     return GetWiFiStationMode() == kWiFiStationMode_Enabled;
