@@ -114,9 +114,6 @@
 //#include "app/framework/plugin/ota-storage-common/ota-storage.h"
 //#include "app/framework/plugin/partner-link-key-exchange/partner-link-key-exchange.h"
 
-// Bookkeeping header
-#include "gen/znet-bookkeeping.h"
-
 //------------------------------------------------------------------------------
 
 #define INVALID_MESSAGE_TAG 0xFF
