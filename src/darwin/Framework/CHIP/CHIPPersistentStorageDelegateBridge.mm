@@ -22,6 +22,8 @@
 CHIPPersistentStorageDelegateBridge::CHIPPersistentStorageDelegateBridge(void)
     : mDelegate(nil)
 {
+    mDefaultPersistentStorage = [[NSUserDefaults alloc] init];
+    mDefaultCallbackQueue = dispatch_queue_create("com.zigbee.chip.framework.callback", DISPATCH_QUEUE_SERIAL);
 }
 
 CHIPPersistentStorageDelegateBridge::~CHIPPersistentStorageDelegateBridge(void) {}
@@ -79,6 +81,11 @@ void CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key)
         dispatch_async(mQueue, ^{
             [strongDelegate GetKeyValue:keyString handler:mCompletionHandler];
         });
+    } else {
+        dispatch_async(mDefaultCallbackQueue, ^{
+            NSString * value = [mDefaultPersistentStorage objectForKey:keyString];
+            mCompletionHandler(keyString, value);
+        });
     }
 }
 
@@ -93,6 +100,11 @@ void CHIPPersistentStorageDelegateBridge::SetKeyValue(const char * key, const ch
         dispatch_async(mQueue, ^{
             [strongDelegate SetKeyValue:keyString value:valueString handler:mStatusHandler];
         });
+    } else {
+        dispatch_async(mDefaultCallbackQueue, ^{
+            [mDefaultPersistentStorage setObject:valueString forKey:keyString];
+            mStatusHandler(keyString, kSet, [CHIPError errorForCHIPErrorCode:0]);
+        });
     }
 }
 
@@ -105,6 +117,11 @@ void CHIPPersistentStorageDelegateBridge::DeleteKeyValue(const char * key)
     if (strongDelegate && mQueue) {
         dispatch_async(mQueue, ^{
             [strongDelegate DeleteKeyValue:keyString handler:mStatusHandler];
+        });
+    } else {
+        dispatch_async(mDefaultCallbackQueue, ^{
+            [mDefaultPersistentStorage removeObjectForKey:keyString];
+            mStatusHandler(keyString, kDelete, [CHIPError errorForCHIPErrorCode:0]);
         });
     }
 }

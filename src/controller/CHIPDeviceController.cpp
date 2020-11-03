@@ -91,6 +91,7 @@ ChipDeviceController::ChipDeviceController()
     mOnNewConnection   = nullptr;
     mPairingDelegate   = nullptr;
     mStorageDelegate   = nullptr;
+    mListenPort        = CHIP_PORT;
     mDeviceAddr        = IPAddress::Any;
     mDevicePort        = CHIP_PORT;
     mInterface         = INET_NULL_INTERFACEID;
@@ -271,6 +272,14 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR ChipDeviceController::SetUdpListenPort(uint16_t listenPort)
+{
+    if (mState != kState_Initialized || mConState != kConnectionState_NotConnected)
+        return CHIP_ERROR_INCORRECT_STATE;
+    mListenPort = listenPort;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR ChipDeviceController::EstablishSecureSession()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -280,8 +289,9 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
 
     mSessionManager = chip::Platform::New<SecureSessionMgr<Transport::UDP>>();
 
-    err = mSessionManager->Init(mLocalDeviceId, mSystemLayer,
-                                Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
+    err = mSessionManager->Init(
+        mLocalDeviceId, mSystemLayer,
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()).SetListenPort(mListenPort));
     SuccessOrExit(err);
 
     mSessionManager->SetDelegate(this);
@@ -589,6 +599,12 @@ exit:
     return err;
 }
 
+CHIP_ERROR ChipDeviceController::SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate)
+{
+    mPairingDelegate = pairingDelegate;
+    return CHIP_NO_ERROR;
+}
+
 void ChipDeviceController::ClearRequestState()
 {
     if (mCurReqMsg != nullptr)
@@ -651,12 +667,13 @@ void ChipDeviceController::OnRendezvousStatusUpdate(RendezvousSessionDelegate::S
     switch (status)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
-        ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
+        ChipLogProgress(Controller, "Remote device completed SPAKE2+ handshake\n");
         mPairingSession       = mRendezvousSession->GetPairingSession();
         mSecurePairingSession = &mPairingSession;
 
         if (mOnNewConnection)
         {
+            ChipLogProgress(Controller, "Will Call on mOnNewConnection(%p)\n", mOnNewConnection);
             mOnNewConnection(this, nullptr, mAppReqState);
         }
 

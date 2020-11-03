@@ -21,6 +21,7 @@
 #include "DataModelHandler.h"
 #include "DeviceCallbacks.h"
 #include "Display.h"
+#include "Globals.h"
 #include "LEDWidget.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
@@ -44,6 +45,7 @@
 #include <vector>
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <lib/mdns/Publisher.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -83,17 +85,21 @@ extern void startServer();
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-LEDWidget statusLED1;
-LEDWidget statusLED2;
-BluetoothWidget bluetoothLED;
-WiFiWidget wifiLED;
-
 extern void PairingComplete(SecurePairingSession * pairing);
 
 const char * TAG = "wifi-echo-demo";
 
 static DeviceCallbacks EchoCallbacks;
 RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
+
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
+const uint64_t TestDeviceId = kLocalNodeId; // For chip::DeviceLayer::GetDeviceId
+const uint64_t TestFabricId = 0;            // For chip::DeviceLayer::GetFabricId
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip
 
 namespace {
 
@@ -523,6 +529,8 @@ extern "C" void app_main()
     }
 
     SetupPretendDevices();
+    publisher.Init();
+    publisher.StopPublishDevice();
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
     // Our second LED doesn't map to any physical LEDs so far, just to virtual

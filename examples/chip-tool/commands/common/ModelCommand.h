@@ -36,7 +36,11 @@ class ModelCommand : public NetworkCommand
 public:
     ModelCommand(const char * commandName, uint16_t clusterId, uint8_t commandId) :
         NetworkCommand(commandName, NetworkType::UDP), mClusterId(clusterId), mCommandId(commandId)
+    {}
+
+    void AddArguments()
     {
+        NetworkCommand::AddArguments();
         AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
     }
 

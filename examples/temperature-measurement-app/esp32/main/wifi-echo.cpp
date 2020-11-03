@@ -55,6 +55,14 @@ const char * TAG = "wifi-echo-demo";
 
 static DeviceCallbacks EchoCallbacks;
 RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
+namespace chip {
+namespace DeviceLayer {
+namespace Internal {
+const uint64_t TestDeviceId = kLocalNodeId; // For chip::DeviceLayer::GetDeviceId
+const uint64_t TestFabricId = 0;            // For chip::DeviceLayer::GetFabricId
+} // namespace Internal
+} // namespace DeviceLayer
+} // namespace chip
 
 namespace {
 

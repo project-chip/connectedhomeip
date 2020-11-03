@@ -276,6 +276,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "ESP32/ESP32Utils.h",
         "ESP32/Logging.cpp",
         "ESP32/LwIPCoreLock.cpp",
+        "ESP32/MdnsImpl.cpp",
         "ESP32/NetworkProvisioningServerImpl.h",
         "ESP32/PlatformManagerImpl.cpp",
         "ESP32/PlatformManagerImpl.h",
@@ -351,6 +352,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "Linux/MdnsImpl.cpp",
           "Linux/MdnsImpl.h",
         ]
+
+        public_deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
 
         public_configs += [ ":avahi_client_config" ]
       }

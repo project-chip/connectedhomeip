@@ -245,6 +245,14 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
         button_event.Handler            = StartThreadHandler;
         sAppTask.PostEvent(&button_event);
     }
+
+    if (BLE_ADVERTISEMENT_START_BUTTON_MASK & button_state & has_changed)
+    {
+        button_event.ButtonEvent.PinNo  = BLE_ADVERTISEMENT_START_BUTTON;
+        button_event.ButtonEvent.Action = kButtonPushEvent;
+        button_event.Handler            = StartBLEAdvertisementHandler;
+        sAppTask.PostEvent(&button_event);
+    }
 }
 
 void AppTask::TimerEventHandler(k_timer * timer)
@@ -342,6 +350,22 @@ void AppTask::StartThreadHandler(AppEvent * aEvent)
         LOG_INF("Device is commissioned to a Thread network.");
     }
 #endif
+}
+
+void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
+{
+    if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
+        return;
+
+    if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
+    {
+        ConnectivityMgr().SetBLEAdvertisingEnabled(ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
+        LOG_INF("Enabled BLE Advertisement");
+    }
+    else
+    {
+        LOG_INF("BLE Advertisement is already enabled");
+    }
 }
 
 void AppTask::CancelTimer()

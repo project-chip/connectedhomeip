@@ -110,6 +110,7 @@ enum LogModule
     kLogModule_DeviceLayer,
     kLogModule_SetupPayload,
     kLogModule_AppServer,
+    kLogModule_Discovery,
 
     kLogModule_Max
 };

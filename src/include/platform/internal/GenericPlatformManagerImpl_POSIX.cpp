@@ -153,7 +153,6 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
     int64_t nextTimeoutMs;
 
     nextTimeoutMs = mNextTimeout.tv_sec * 1000 + mNextTimeout.tv_usec / 1000;
-    ChipLogDetail(DeviceLayer, "Timer: " PRId64, nextTimeoutMs);
     _StartChipTimer(nextTimeoutMs);
 
     Impl()->UnlockChipStack();

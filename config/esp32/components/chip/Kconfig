@@ -67,13 +67,14 @@ menu "CHIP Core"
                 message handlers with the CHIP message layer to direct incoming messages to
                 their code.
 
-        config WRMP_TIMER_DEFAULT_PERIOD
-            int "Default WRMP Timer Tick Interval (ms)"
-            range 0 65535
-            default 50
+        config RMP_TIMER_DEFAULT_PERIOD_SHIFT
+            int "Default WRMP Timer Tick Interval Shift (ms)"
+            range 0 16
+            default 6
             help
-                The default interval, in milliseconds, at which items in the WRMP pending
-                message list are processed for the purpose of retransmission or timeout.
+                The default interval shift, in milliseconds (e.g. 6 bits shift
+                = 64ms), at which items in the WRMP pending message list are
+                processed for the purpose of retransmission or timeout.
 
                 This value can be overridden by the application at runtime.
 
@@ -683,7 +684,7 @@ menu "CHIP Device Layer"
             help
                 The IP address and port of the server to which the device should establish a service tunnel.
                 The supplied address must be a dot-notation IP address--not a host name.  The port number is
-                optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:11095).
+                optional; if present it should be separated from the IP address with a colon (e.g. 192.168.1.100:11097).
 
         config LOG_PROVISIONING_HASH
             bool "Enable Provisioning Hash Logging"

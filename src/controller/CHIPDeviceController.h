@@ -54,6 +54,8 @@ typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, v
 class DLL_EXPORT DevicePairingDelegate
 {
 public:
+    virtual ~DevicePairingDelegate() {}
+
     /**
      * @brief
      *   Called when the pairing reaches a certain stage.
@@ -122,6 +124,8 @@ public:
     CHIP_ERROR Init(NodeId localDeviceId, System::Layer * systemLayer, Inet::InetLayer * inetLayer,
                     DevicePairingDelegate * pairingDelegate = nullptr, PersistentStorageDelegate * storageDelegate = nullptr);
     CHIP_ERROR Shutdown();
+
+    CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
     // ----- Connection Management -----
     /**
@@ -216,6 +220,14 @@ public:
      */
     CHIP_ERROR ServiceEvents();
 
+    // ----- Pairing -----
+    /**
+     * @brief
+     * Set device pairing delegate after init, pass nullptr remove device delegate.
+     * @return CHIP_ERROR   The return status
+     */
+    CHIP_ERROR SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate);
+
     /**
      * @brief
      *   Allow the CHIP Stack to process any pending events
@@ -273,6 +285,7 @@ private:
     System::PacketBuffer * mCurReqMsg;
 
     NodeId mLocalDeviceId;
+    uint16_t mListenPort;
     Inet::IPAddress mDeviceAddr;
     uint16_t mDevicePort;
     Inet::InterfaceId mInterface;
@@ -283,7 +296,7 @@ private:
 
     SecurePairingSession * mSecurePairingSession = nullptr;
 
-    DevicePairingDelegate * mPairingDelegate;
+    DevicePairingDelegate * mPairingDelegate = nullptr;
 
     PersistentStorageDelegate * mStorageDelegate;
 

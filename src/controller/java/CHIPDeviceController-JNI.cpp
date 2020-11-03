@@ -25,7 +25,7 @@
 #include "AndroidBleApplicationDelegate.h"
 #include "AndroidBleConnectionDelegate.h"
 #include "AndroidBlePlatformDelegate.h"
-#include "AndroidDevicePairingDelegate.h"
+#include "AndroidDeviceControllerWrapper.h"
 
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController.h>
@@ -93,7 +93,6 @@ namespace {
 JavaVM * sJVM;
 System::Layer sSystemLayer;
 Inet::InetLayer sInetLayer;
-AndroidDevicePairingDelegate sDevicePairingDelegate;
 
 #if CONFIG_NETWORK_LAYER_BLE
 Ble::BleLayer sBleLayer;
@@ -235,33 +234,28 @@ void JNI_OnUnload(JavaVM * jvm, void * reserved)
 
 JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    ChipDeviceController * deviceController = NULL;
-    long result                             = 0;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = NULL;
+    long result                              = 0;
 
     ChipLogProgress(Controller, "newDeviceController() called");
 
-    deviceController = new ChipDeviceController();
-    VerifyOrExit(deviceController != NULL, err = CHIP_ERROR_NO_MEMORY);
-
-    err = deviceController->Init(kLocalDeviceId, &sSystemLayer, &sInetLayer, &sDevicePairingDelegate);
+    wrapper = AndroidDeviceControllerWrapper::AllocateNew(kLocalDeviceId, &sSystemLayer, &sInetLayer, &err);
     SuccessOrExit(err);
 
-    deviceController->AppState = (void *) env->NewGlobalRef(self);
-
-    result = (long) deviceController;
+    wrapper->Controller()->AppState = (void *) env->NewGlobalRef(self);
+    result                          = wrapper->ToJNIHandle();
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (deviceController != NULL)
+        if (wrapper != NULL)
         {
-            if (deviceController->AppState != NULL)
+            if (wrapper->Controller()->AppState != NULL)
             {
-                env->DeleteGlobalRef((jobject) deviceController->AppState);
+                env->DeleteGlobalRef((jobject) wrapper->Controller()->AppState);
             }
-            deviceController->Shutdown();
-            delete deviceController;
+            delete wrapper;
         }
 
         if (err != CDC_JNI_ERROR_EXCEPTION_THROWN)
@@ -273,10 +267,10 @@ exit:
     return result;
 }
 
-JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jint connObj, jlong pinCode)
+JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong handle, jint connObj, jlong pinCode)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "beginConnectDevice() called with connection object and pincode");
 
@@ -287,8 +281,8 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceCon
                                           .SetSetupPINCode(pinCode)
                                           .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
                                           .SetBleLayer(&sBleLayer);
-        err = deviceController->ConnectDevice(kRemoteDeviceId, params, (void *) "ConnectDevice", HandleKeyExchange, HandleEchoResponse,
-                                              HandleError);
+        err = wrapper->Controller()->ConnectDevice(kRemoteDeviceId, params, (void *) "ConnectDevice", HandleKeyExchange, HandleEchoResponse,
+                                                   HandleError);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -298,10 +292,10 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong deviceCon
     }
 }
 
-JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jstring deviceAddr)
+JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
     chip::Inet::IPAddress deviceIPAddr;
 
     ChipLogProgress(Controller, "beginConnectDevice() called with IP Address");
@@ -312,8 +306,8 @@ JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong deviceC
 
     {
         ScopedPthreadLock lock(&sStackLock);
-        err = deviceController->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, nullptr, HandleKeyExchange,
-                                                                  HandleEchoResponse, HandleError, CHIP_PORT);
+        err = wrapper->Controller()->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, nullptr, HandleKeyExchange,
+                                                                       HandleEchoResponse, HandleError, CHIP_PORT);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -323,10 +317,10 @@ JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong deviceC
     }
 }
 
-JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jstring messageObj)
+JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jstring messageObj)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "beginSendMessage() called");
 
@@ -345,7 +339,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong deviceContr
         {
             memcpy(buffer->Start(), messageStr, messageLen);
             buffer->SetDataLength(messageLen);
-            err = deviceController->SendMessage((void *) "SendMessage", buffer);
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer);
         }
     }
 
@@ -358,10 +352,10 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong deviceContr
     }
 }
 
-JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceControllerPtr, jobject commandObj)
+JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, jobject commandObj)
 {
-    CHIP_ERROR err                          = CHIP_NO_ERROR;
-    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+    CHIP_ERROR err                           = CHIP_NO_ERROR;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "beginSendCommand() called");
 
@@ -405,7 +399,7 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong deviceContr
             buffer->SetDataLength(dataLength);
 
             // Hardcode endpoint to 1 for now
-            err = deviceController->SendMessage((void *) "SendMessage", buffer);
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer);
         }
     }
 
@@ -522,27 +516,24 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleConnectionError)(JNIEnv * env, jobject
     pthread_mutex_unlock(&sStackLock);
 }
 
-JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
+JNI_METHOD(jboolean, isConnected)(JNIEnv * env, jobject self, jlong handle)
 {
     ChipLogProgress(Controller, "isConnected() called");
-    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
-    if (deviceController->IsConnected())
-    {
-        return JNI_TRUE;
-    }
-    return JNI_FALSE;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
+
+    return wrapper->Controller()->IsConnected() ? JNI_TRUE : JNI_FALSE;
 }
 
-JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
+JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong handle)
 {
-    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     chip::Inet::IPAddress addr;
     char addrStr[50];
 
     {
         ScopedPthreadLock lock(&sStackLock);
-        if (!deviceController->GetIpAddress(addr))
+        if (!wrapper->Controller()->GetIpAddress(addr))
             return nullptr;
     }
 
@@ -550,19 +541,19 @@ JNI_METHOD(jstring, getIpAddress)(JNIEnv * env, jobject self, jlong deviceContro
     return env->NewStringUTF(addrStr);
 }
 
-JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
+JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong handle)
 {
     ChipLogProgress(Controller, "disconnectDevice() called");
 
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     {
         ScopedPthreadLock lock(&sStackLock);
-        if (deviceController->IsConnected())
+        if (wrapper->Controller()->IsConnected())
         {
-            err = deviceController->DisconnectDevice();
+            err = wrapper->Controller()->DisconnectDevice();
         }
     }
 
@@ -575,20 +566,19 @@ JNI_METHOD(jboolean, disconnectDevice)(JNIEnv * env, jobject self, jlong deviceC
     return JNI_TRUE;
 }
 
-JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong deviceControllerPtr)
+JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handle)
 {
-    ChipDeviceController * deviceController = (ChipDeviceController *) deviceControllerPtr;
+    AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
 
     ChipLogProgress(Controller, "deleteDeviceController() called");
 
-    if (deviceController != NULL)
+    if (wrapper != NULL)
     {
-        if (deviceController->AppState != NULL)
+        if (wrapper->Controller()->AppState != NULL)
         {
-            env->DeleteGlobalRef((jobject) deviceController->AppState);
+            env->DeleteGlobalRef((jobject) wrapper->Controller()->AppState);
         }
-        deviceController->Shutdown();
-        delete deviceController;
+        delete wrapper;
     }
 }
 

@@ -46,6 +46,8 @@
 
 #include <app/chip-zcl-zpro-codec.h> // For EmberApsFrame
 
+#include "basic-types.h"
+
 /**
  * Try to use our chip::NodeId definition if we are C++; otherwise define a
  * ChipNodeId that's compatible.
@@ -289,9 +291,6 @@ typedef uint16_t EmberNodeId;
  * @brief 802.15.4 PAN ID.
  */
 typedef uint16_t EmberPanId;
-
-/** @brief 16-bit ZigBee multicast group identifier. */
-typedef uint16_t EmberMulticastId;
 
 /** @brief This enumeration determines whether or not a Trust Center
  *  answers trust center link key requests.
@@ -619,13 +618,13 @@ typedef struct
     uint8_t remote;
     /** A 64-bit destination identifier.  This is either:
      * - The destination ChipNodeId, for unicasts.
-     * - A 16-bit multicast group address, for multicasts.
+     * - A multicast ChipGroupId, for multicasts.
      * Which one is being used depends on the type of this binding.
      */
     union
     {
         ChipNodeId nodeId;
-        uint16_t groupId;
+        CHIPGroupId groupId;
     };
     /** The index of the network the binding belongs to. */
     uint8_t networkIndex;
@@ -1957,8 +1956,6 @@ typedef struct
 #define MILLISECOND_TICKS_PER_SECOND 1000
 #define MILLISECOND_TICKS_PER_DECISECOND (MILLISECOND_TICKS_PER_SECOND / 10)
 
-#define emberEventControlSetDelayMS(control, delay) (void) 0
-
 #define emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint) (void) 0
 #define emberAfPluginColorControlServerComputePwmFromHsvCallback(endpoint) (void) 0
 #define emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint) (void) 0
@@ -1995,8 +1992,6 @@ typedef struct
  * @param data   A pointer to where the token data should be placed.
  */
 #define halCommonSetIndexedToken(token, index, data)
-
-uint32_t halCommonGetInt32uMillisecondTick(void);
 
 #ifdef __cplusplus
 } // extern "C"

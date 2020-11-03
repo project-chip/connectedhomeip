@@ -18,6 +18,7 @@
 #include "RendezvousDeviceDelegate.h"
 
 #include "BluetoothWidget.h"
+#include "Globals.h"
 #include "esp_log.h"
 #include <platform/ConfigurationManager.h>
 #include <support/CHIPMem.h>
@@ -29,8 +30,6 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 
-extern BluetoothWidget bluetoothLED;
-extern NodeId kLocalNodeId;
 extern void PairingComplete(SecurePairingSession * pairing);
 
 static const char * TAG = "rendezvous-devicedelegate";

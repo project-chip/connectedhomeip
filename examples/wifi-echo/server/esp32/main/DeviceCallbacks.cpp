@@ -24,10 +24,13 @@
  **/
 #include "DeviceCallbacks.h"
 
+#include "CHIPDeviceManager.h"
+#include "Globals.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include <lib/mdns/Publisher.h>
 #include <support/CodeUtils.h>
 
 extern "C" {
@@ -40,11 +43,6 @@ static const char * TAG = "echo-devicecallbacks";
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
-
-// In wifi-echo.cpp
-extern LEDWidget statusLED1;
-extern LEDWidget statusLED2;
-extern WiFiWidget wifiLED;
 
 uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
@@ -96,6 +94,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
+        publisher.StartPublishDevice();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -105,6 +104,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
+        publisher.StartPublishDevice();
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

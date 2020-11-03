@@ -99,7 +99,7 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(const uint64_t & peerNodeId, void * appState)
+ExchangeContext * ExchangeManager::NewContext(const NodeId & peerNodeId, void * appState)
 {
     ExchangeContext * ec = AllocContext();
 
@@ -115,7 +115,7 @@ ExchangeContext * ExchangeManager::NewContext(const uint64_t & peerNodeId, void 
     return ec;
 }
 
-ExchangeContext * ExchangeManager::FindContext(uint64_t peerNodeId, void * appState, bool isInitiator)
+ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, void * appState, bool isInitiator)
 {
     ExchangeContext * ec = ContextPool;
 

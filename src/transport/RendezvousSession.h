@@ -23,7 +23,7 @@
 #pragma once
 
 #include <core/CHIPCore.h>
-#include <protocols/CHIPProtocols.h>
+#include <protocols/Protocols.h>
 #include <support/BufBound.h>
 #include <transport/NetworkProvisioning.h>
 #include <transport/RendezvousParameters.h>

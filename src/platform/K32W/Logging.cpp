@@ -36,24 +36,9 @@
 
 extern "C" void K32WWriteBlocking(const uint8_t * aBuf, uint32_t len);
 
-using namespace ::chip;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::DeviceLayer::Internal;
 using namespace ::chip::Logging;
-
-namespace {
-
-void GetModuleName(char * buf, uint8_t module)
-{
-    if (module == ::chip::Logging::kLogModule_DeviceLayer)
-    {
-        memcpy(buf, "DL", 3);
-    }
-    else
-    {
-        ::chip::Logging::GetModuleName(buf, module);
-    }
-}
 
 void GetMessageString(char * buf, uint8_t chipCategory, uint8_t otLogLevel)
 {

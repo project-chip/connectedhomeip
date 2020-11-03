@@ -159,6 +159,13 @@
             "command": "scripts/examples/build-wifi-echo.py",
             "group": "build",
             "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build Android App",
+            "type": "shell",
+            "command": "TARGET_CPU=arm64 scripts/examples/android_app.sh",
+            "group": "build",
+            "problemMatcher": ["$gcc"]
         }
     ]
 }

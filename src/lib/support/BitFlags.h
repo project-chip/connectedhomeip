@@ -47,6 +47,8 @@ public:
     BitFlags(const BitFlags &) = default;
     BitFlags & operator=(const BitFlags &) = default;
 
+    explicit BitFlags(FlagsEnum v) { Set(v); }
+
     BitFlags & Set(FlagsEnum v)
     {
         mValue = static_cast<StorageType>(mValue | static_cast<StorageType>(v));

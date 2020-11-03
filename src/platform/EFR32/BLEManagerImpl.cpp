@@ -158,7 +158,7 @@ CHIP_ERROR BLEManagerImpl::_Init()
                 CHIP_DEVICE_CONFIG_BLE_APP_TASK_PRIORITY,                         /* Priority at which the task is created. */
                 NULL);                                                            /* Variable to hold the task's data structure. */
 
-    mFlags = kFlag_AdvertisingEnabled;
+    mFlags = CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART ? kFlag_AdvertisingEnabled : 0;
     PlatformMgr().ScheduleWork(DriveBLEState, 0);
 
 exit:

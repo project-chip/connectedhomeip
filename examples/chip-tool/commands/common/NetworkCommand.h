@@ -30,15 +30,17 @@ enum NetworkType
 class NetworkCommand : public Command
 {
 public:
-    NetworkCommand(const char * commandName, NetworkType type) : Command(commandName), mNetworkType(type)
+    NetworkCommand(const char * commandName, NetworkType type) : Command(commandName), mNetworkType(type) {}
+
+    void AddArguments()
     {
-        if (type == NetworkType::UDP || type == NetworkType::ALL)
+        if (mNetworkType == NetworkType::UDP || mNetworkType == NetworkType::ALL)
         {
-            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             AddArgument("device-remote-ip", &mRemoteAddr);
+            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
         }
 
-        if (type == NetworkType::BLE || type == NetworkType::ALL)
+        if (mNetworkType == NetworkType::BLE || mNetworkType == NetworkType::ALL)
         {
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);

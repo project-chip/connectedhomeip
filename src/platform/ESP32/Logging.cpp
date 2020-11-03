@@ -32,22 +32,6 @@
 using namespace ::chip;
 using namespace ::chip::DeviceLayer::Internal;
 
-namespace {
-
-void GetModuleName(char * buf, uint8_t module)
-{
-    if (module == ::chip::Logging::kLogModule_DeviceLayer)
-    {
-        memcpy(buf, "DL", 3);
-    }
-    else
-    {
-        ::chip::Logging::GetModuleName(buf, module);
-    }
-}
-
-} // unnamed namespace
-
 namespace chip {
 namespace Logging {
 
@@ -65,7 +49,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
 
         strcpy(tag, "chip[");
         tagLen = strlen(tag);
-        ::GetModuleName(tag + tagLen, module);
+        GetModuleName(tag + tagLen, module);
         tagLen        = strlen(tag);
         tag[tagLen++] = ']';
         tag[tagLen]   = 0;

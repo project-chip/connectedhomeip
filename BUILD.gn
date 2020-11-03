@@ -59,18 +59,13 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${nlunit_test_root}:nlunit-test",
     ]
 
-    # Temporary until RNG issue sorted out
-    if (current_os != "android") {
-      deps += [ "${chip_root}/src/lib/message" ]
-    }
-
     if (chip_build_tests) {
       deps += [ "//src:tests" ]
     }
 
     if (chip_build_tools) {
       deps += [
-        "${chip_root}/examples/shell",
+        "${chip_root}/examples/shell/standalone:chip-shell",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
       ]
@@ -140,6 +135,10 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Build the shell example.
     enable_standalone_shell_build = enable_default_builds
 
+    # Build the Linux lighting app example.
+    enable_linux_lighting_app_build =
+        enable_default_builds && host_os == "linux"
+
     # Build the nRF5 lock app example.
     enable_nrf5_lock_app_build = enable_nrf5_builds
 
@@ -162,16 +161,22 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     enable_k32w_lock_app_build = enable_k32w_builds
   }
 
-  chip_build("host_clang") {
-    toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_clang"
+  if (enable_host_clang_build) {
+    chip_build("host_clang") {
+      toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_clang"
+    }
   }
 
-  chip_build("host_gcc") {
-    toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_gcc"
+  if (enable_host_gcc_build) {
+    chip_build("host_gcc") {
+      toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_gcc"
+    }
   }
 
-  chip_build("host_gcc_mbedtls") {
-    toolchain = "${chip_root}/config/mbedtls/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
+  if (enable_host_gcc_mbedtls_build) {
+    chip_build("host_gcc_mbedtls") {
+      toolchain = "${chip_root}/config/mbedtls/toolchain:${host_os}_${host_cpu}_gcc_mbedtls"
+    }
   }
 
   if (enable_android_builds) {
@@ -194,12 +199,25 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
   standalone_toolchain = "${chip_root}/config/standalone/toolchain:standalone"
 
-  group("standalone_chip_tool") {
-    deps = [ "${chip_root}/examples/chip-tool(${standalone_toolchain})" ]
+  if (enable_standalone_chip_tool_build) {
+    group("standalone_chip_tool") {
+      deps = [ "${chip_root}/examples/chip-tool(${standalone_toolchain})" ]
+    }
   }
 
-  group("standalone_shell") {
-    deps = [ "${chip_root}/examples/shell(${standalone_toolchain})" ]
+  if (enable_standalone_shell_build) {
+    group("standalone_shell") {
+      deps =
+          [ "${chip_root}/examples/shell/standalone(${standalone_toolchain})" ]
+    }
+  }
+
+  if (enable_linux_lighting_app_build) {
+    group("linux_lighting_app") {
+      deps = [
+        "${chip_root}/examples/lighting-app/linux(${standalone_toolchain})",
+      ]
+    }
   }
 
   if (enable_nrf5_lock_app_build) {
@@ -268,6 +286,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_standalone_shell_build) {
       deps += [ ":standalone_shell" ]
+    }
+    if (enable_linux_lighting_app_build) {
+      deps += [ ":linux_lighting_app" ]
     }
     if (enable_nrf5_lock_app_build) {
       deps += [ ":nrf5_lock_app" ]
