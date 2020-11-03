@@ -33,8 +33,8 @@ if (chip_device_platform == "auto") {
 declare_args() {
   # Enable openthread support.
   chip_enable_openthread =
-      chip_device_platform == "linux" || 
-      chip_device_platform == "efr32" || chip_device_platform == "k32w"
+      chip_device_platform == "linux" || chip_device_platform == "efr32" ||
+      chip_device_platform == "k32w"
 
   # Enable wifi support.
   chip_enable_wifi = chip_device_platform == "linux"
@@ -97,7 +97,7 @@ assert(
     (current_os != "freertos" && chip_device_platform == "none") ||
         chip_device_platform == "darwin" || chip_device_platform == "efr32" ||
         chip_device_platform == "esp32" || chip_device_platform == "external" ||
-        chip_device_platform == "linux" || 
+        chip_device_platform == "linux" ||
         chip_device_platform == "nrfconnect" ||
         chip_device_platform == "k32w" || chip_device_platform == "qpg6100",
     "Please select a valid value for chip_device_platform")
