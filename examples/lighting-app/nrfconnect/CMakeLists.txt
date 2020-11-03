@@ -41,6 +41,8 @@ target_sources(app PRIVATE
                ${CHIP_APP_SERVER}/Server.cpp
                ${CHIP_APP_SERVER}/QRCodeUtil.cpp
                ${CHIP_APP_SERVER}/RendezvousServer.cpp
+               ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
+               ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/af-main-common.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size.cpp
