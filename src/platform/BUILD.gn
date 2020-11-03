@@ -327,6 +327,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "Linux/ConfigurationManagerImpl.h",
         "Linux/ConnectivityManagerImpl.cpp",
         "Linux/ConnectivityManagerImpl.h",
+        "Linux/DeviceNetworkProvisioningDelegateImpl.cpp",
         "Linux/DeviceNetworkProvisioningDelegateImpl.h",
         "Linux/InetPlatformConfig.h",
         "Linux/Logging.cpp",
