@@ -75,6 +75,12 @@ uint16_t encodeBarrierControlClusterStopCommand(uint8_t * buffer, uint16_t buf_l
 
 /**
  * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeBarrierControlClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
  *    Encode a read command for the moving-state attribute for  server into buffer including the APS frame
  */
 uint16_t encodeBarrierControlClusterReadMovingStateAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
@@ -117,6 +123,12 @@ uint16_t encodeBarrierControlClusterReadBarrierPositionAttribute(uint8_t * buffe
  *    Encode an reset-to-factory-defaults command for Basic server into buffer including the APS frame
  */
 uint16_t encodeBasicClusterResetToFactoryDefaultsCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeBasicClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /**
  * @brief
@@ -306,6 +318,12 @@ uint16_t encodeColorControlClusterStepSaturationCommand(uint8_t * buffer, uint16
  */
 uint16_t encodeColorControlClusterStopMoveStepCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
                                                       uint8_t optionsMask, uint8_t optionsOverride);
+
+/**
+ * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeColorControlClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /**
  * @brief
@@ -790,6 +808,12 @@ uint16_t encodeDoorLockClusterUnlockWithTimeoutCommand(uint8_t * buffer, uint16_
 
 /**
  * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeDoorLockClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
  *    Encode a read command for the lock-state attribute for  server into buffer including the APS frame
  */
 uint16_t encodeDoorLockClusterReadLockStateAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
@@ -871,6 +895,12 @@ uint16_t encodeGroupsClusterViewGroupCommand(uint8_t * buffer, uint16_t buf_leng
 
 /**
  * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeGroupsClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
  *    Encode a read command for the name-support attribute for  server into buffer including the APS frame
  */
 uint16_t encodeGroupsClusterReadNameSupportAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
@@ -902,6 +932,12 @@ uint16_t encodeIdentifyClusterIdentifyCommand(uint8_t * buffer, uint16_t buf_len
  *    Encode an identify-query command for Identify server into buffer including the APS frame
  */
 uint16_t encodeIdentifyClusterIdentifyQueryCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeIdentifyClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /**
  * @brief
@@ -996,6 +1032,12 @@ uint16_t encodeLevelClusterStopWithOnOffCommand(uint8_t * buffer, uint16_t buf_l
 
 /**
  * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeLevelClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
  *    Encode a read command for the current-level attribute for  server into buffer including the APS frame
  */
 uint16_t encodeLevelClusterReadCurrentLevelAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
@@ -1032,6 +1074,12 @@ uint16_t encodeOnOffClusterOnCommand(uint8_t * buffer, uint16_t buf_length, uint
  *    Encode an toggle command for OnOff server into buffer including the APS frame
  */
 uint16_t encodeOnOffClusterToggleCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeOnOffClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /**
  * @brief
@@ -1120,6 +1168,12 @@ uint16_t encodeScenesClusterViewSceneCommand(uint8_t * buffer, uint16_t buf_leng
 
 /**
  * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeScenesClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
  *    Encode a read command for the scene-count attribute for  server into buffer including the APS frame
  */
 uint16_t encodeScenesClusterReadSceneCountAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
@@ -1161,6 +1215,12 @@ uint16_t encodeScenesClusterReadNameSupportAttribute(uint8_t * buffer, uint16_t 
 | * MinMeasuredValue                                                  | 0x0001 |
 | * MaxMeasuredValue                                                  | 0x0002 |
 \*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode a discover command for  server into buffer including the APS frame
+ */
+uint16_t encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
 /**
  * @brief
