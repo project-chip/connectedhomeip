@@ -23,9 +23,9 @@ An example application showing the use
 
 ![nrf52840 DK](../../platform/nrf528xx/doc/images/nrf52840-dk.jpg)
 
-The nRF52840 Pigweed example app exercises functionalities in third_party/pigweed, to see what
-is needed for integrating Pigweed to CHIP, as well as a precursor to CHIP functionalities like 
-on-device testing.
+The nRF52840 Pigweed example app exercises functionalities in
+third_party/pigweed, to see what is needed for integrating Pigweed to CHIP, as
+well as a precursor to CHIP functionalities like on-device testing.
 
 The example makes use of the CMake build system to generate the ninja build
 script. The build system takes care of invoking the CHIP library build with all
