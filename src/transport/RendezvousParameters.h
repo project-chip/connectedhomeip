@@ -17,7 +17,6 @@
 
 #pragma once
 
-#include <setup_payload/SetupPayload.h>
 #include <transport/raw/Base.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
@@ -27,6 +26,9 @@
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
+
+// The largest supported value for Rendezvous discriminators
+const uint16_t kMaxRendezvousDiscriminatorValue = 0xFFF;
 
 class RendezvousParameters
 {
@@ -43,7 +45,7 @@ public:
         return *this;
     }
 
-    bool HasDiscriminator() const { return mDiscriminator <= kMaxDiscriminatorValue; }
+    bool HasDiscriminator() const { return mDiscriminator <= kMaxRendezvousDiscriminatorValue; }
     uint16_t GetDiscriminator() const { return mDiscriminator; }
     RendezvousParameters & SetDiscriminator(uint16_t discriminator)
     {
