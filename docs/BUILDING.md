@@ -236,12 +236,12 @@ gn desc out/unified '//src/controller(//build/toolchain/host:linux_x64_clang)'
 ```
 
 Note: Some builds are disabled by default as they need extra SDKs. For example,
-to add the nRF5 examples to the unified build, download the
-[Nordic nRF5 SDK for Thread and Zigbee](https://www.nordicsemi.com/Software-and-Tools/Software/nRF5-SDK-for-Thread-and-Zigbee)
-and add the following build arguments:
+to add the EFR32 examples to the unified build, download the
+[SDK](https://github.com/SiliconLabs/sdk_support) and add the following
+build arguments:
 
 ```
-gn gen out/unified --args='target_os="all" enable_nrf5_builds=true nrf5_sdk_root="/path/to/sdk"'
+gn gen out/unified --args='target_os="all" enable_efr32_builds=true efr32_sdk_root="/path/to/sdk" efr32_board="BRD4161A"'
 ```
 
 ### Getting Help
