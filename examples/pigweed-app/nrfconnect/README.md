@@ -143,7 +143,8 @@ Docker image in case of doubt.
 
 Please refer to
 [this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories)
-in the user guide to learn how to update nRF Connect SDK repository. For example to checkout given `83764f` revision the following commands should be called:
+in the user guide to learn how to update nRF Connect SDK repository. For example
+to checkout given `83764f` revision the following commands should be called:
 
         # Phrase <nrfconnect-dir> should be replaced with an absolute path to nRF Connect SDK source directory.
         $ cd <nrfconnect-dir>/nrf
@@ -154,7 +155,6 @@ in the user guide to learn how to update nRF Connect SDK repository. For example
         $ git checkout 83764f
 
         $ west update
-
 
 <a name="configuring"></a>
 
