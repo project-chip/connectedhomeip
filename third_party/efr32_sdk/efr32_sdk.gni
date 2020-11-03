@@ -125,6 +125,8 @@ template("efr32_sdk") {
       "${efr32_board}=1",
     ]
 
+    defines += specific_brd_defines
+
     if (efr32_family == "efr32mg12") {
       _include_dirs += [
         "${efr32_sdk_root}/hardware/kit/EFR32MG12_${efr32_board}/config",
@@ -221,7 +223,6 @@ template("efr32_sdk") {
       "${efr32_sdk_root}/platform/service/mpu/src/sl_mpu.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer.c",
       "${efr32_sdk_root}/platform/service/sleeptimer/src/sl_sleeptimer_hal_rtcc.c",
-      "${efr32_sdk_root}/util/plugin/plugin-common/fem-control/fem-control.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/croutine.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/event_groups.c",
       "${efr32_sdk_root}/util/third_party/freertos/Source/include/FreeRTOS.h",
@@ -305,6 +306,12 @@ template("efr32_sdk") {
       "${mbedtls_root}/repo/library/hkdf.c",
       "${mbedtls_root}/repo/library/platform_util.c",
     ]
+
+    if (defined(enable_fem)){
+      sources += [ 
+        "${efr32_sdk_root}/util/plugin/plugin-common/fem-control/fem-control.c"
+      ]
+    }
 
     if (defined(invoker.show_qr_code)) {
       if (invoker.show_qr_code) {
