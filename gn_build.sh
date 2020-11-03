@@ -94,21 +94,6 @@ else
     echo "Hint: Set \$ANDROID_HOME and \$ANDROID_NDK_HOME to enable building for Android"
 fi
 
-# nRF5 SDK setup
-nrf5_sdk_args=""
-
-if [[ -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
-    nrf5_sdk_args+="nrf5_sdk_root=\"$NRF5_SDK_ROOT\""
-    extra_args+=" $nrf5_sdk_args enable_nrf5_builds=true"
-fi
-
-echo
-if [[ ! -d "$NRF5_SDK_ROOT/components/libraries" ]]; then
-    echo "Hint: Set \$NRF5_SDK_ROOT to enable building for nRF5"
-else
-    echo 'To build the nRF5 lock sample as a standalone project':
-    echo "(cd $CHIP_ROOT/examples/lock-app/nrf5; gn gen out/debug --args='$nrf5_sdk_args'; ninja -C out/debug)"
-fi
 echo
 
 # EFR32 SDK setup

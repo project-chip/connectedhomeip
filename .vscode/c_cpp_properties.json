@@ -61,18 +61,6 @@
             }
         },
         {
-            "name": "nRF5 examples debug (GN)",
-            "cStandard": "c11",
-            "cppStandard": "c++11",
-            "intelliSenseMode": "gcc-x64",
-            "compileCommands": "${workspaceFolder}/out/debug/compile_commands.nrf5.json",
-            "compilerPath": "/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc",
-            "browse": {
-                "path": ["${workspaceFolder}/out/debug/"],
-                "limitSymbolsToIncludedHeaders": true
-            }
-        },
-        {
             "name": "EFR32 examples debug (GN)",
             "cStandard": "c11",
             "cppStandard": "c++11",

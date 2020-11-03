@@ -70,7 +70,7 @@ same base configuration and build.
 -   Main Build - Build the default configuration (i.e., Linux OpenSSL)
 -   Run Unit and Functional Tests - Test the default configuration
 -   Build & Test (all) - Build & Test various configurations (Linux variants,
-    Android, nRF5, EFR32)
+    Android, EFR32)
 -   Update compilation database - Update the database used by IntelliSense
     (needed for cross references, completion)
 -   Bootstrap - On a clean tree, pull in the third party dependencies required
