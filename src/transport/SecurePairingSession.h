@@ -74,6 +74,17 @@ public:
 
 struct SecurePairingSessionSerialized;
 
+typedef struct SecurePairingSessionSerializable
+{
+    uint16_t mKeLen;
+    uint8_t mKe[kMAX_Hash_Length];
+    uint8_t mPairingComplete;
+    uint64_t mLocalNodeId;
+    uint64_t mPeerNodeId;
+    uint16_t mLocalKeyId;
+    uint16_t mPeerKeyId;
+} SecurePairingSessionSerializable;
+
 class DLL_EXPORT SecurePairingSession
 {
 public:
@@ -178,6 +189,18 @@ public:
      **/
     CHIP_ERROR Deserialize(SecurePairingSessionSerialized & input);
 
+    /** @brief Return the serializable data structure for secure pairing.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR Serializable(SecurePairingSessionSerializable & output);
+
+    /** @brief Reconstruct secure pairing class from the serializable data structure.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR FromSerializable(const SecurePairingSessionSerializable & output);
+
 private:
     CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
                     uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
@@ -266,17 +289,6 @@ public:
 
     CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg) override { return CHIP_NO_ERROR; }
 };
-
-typedef struct SecurePairingSessionSerializable
-{
-    uint16_t mKeLen;
-    uint8_t mKe[kMAX_Hash_Length];
-    uint8_t mPairingComplete;
-    uint64_t mLocalNodeId;
-    uint64_t mPeerNodeId;
-    uint16_t mLocalKeyId;
-    uint16_t mPeerKeyId;
-} SecurePairingSessionSerializable;
 
 typedef struct SecurePairingSessionSerialized
 {

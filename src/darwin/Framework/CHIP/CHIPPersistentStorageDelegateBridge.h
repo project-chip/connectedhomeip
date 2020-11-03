@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-class CHIPPersistentStorageDelegateBridge : public chip::DeviceController::PersistentStorageDelegate
+class CHIPPersistentStorageDelegateBridge : public chip::Controller::PersistentStorageDelegate
 {
 public:
     CHIPPersistentStorageDelegateBridge();
@@ -30,9 +30,11 @@ public:
 
     void setFrameworkDelegate(id<CHIPPersistentStorageDelegate> delegate, dispatch_queue_t queue);
 
-    void SetDelegate(chip::DeviceController::PersistentStorageResultDelegate * delegate);
+    void SetDelegate(chip::Controller::PersistentStorageResultDelegate * delegate);
 
     void GetKeyValue(const char * key) override;
+
+    CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) override;
 
     void SetKeyValue(const char * key, const char * value) override;
 
@@ -42,7 +44,7 @@ private:
     id<CHIPPersistentStorageDelegate> mDelegate;
     dispatch_queue_t mQueue;
 
-    chip::DeviceController::PersistentStorageResultDelegate * mCallback;
+    chip::Controller::PersistentStorageResultDelegate * mCallback;
     SendKeyValue mCompletionHandler;
     SendStatus mStatusHandler;
     NSUserDefaults * mDefaultPersistentStorage;

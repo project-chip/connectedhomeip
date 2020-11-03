@@ -25,7 +25,7 @@
 #import "CHIPLogging.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 #include <inet/IPAddress.h>
 #include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>

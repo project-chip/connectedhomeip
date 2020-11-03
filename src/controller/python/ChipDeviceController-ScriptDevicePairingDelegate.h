@@ -25,7 +25,7 @@
 
 #pragma once
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <transport/RendezvousSessionDelegate.h>
@@ -33,7 +33,7 @@
 namespace chip {
 namespace DeviceController {
 
-class ScriptDevicePairingDelegate final : public DevicePairingDelegate
+class ScriptDevicePairingDelegate final : public Controller::DevicePairingDelegate
 {
 public:
     ~ScriptDevicePairingDelegate() = default;
