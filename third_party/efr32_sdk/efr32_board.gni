@@ -38,7 +38,7 @@ if (efr32_board == "BRD4304A") {
   efr32_family = "efr32mg12"
   efr32_mcu = "EFR32MG12P432F1024GM48"
   enable_fem = true
-  specific_brd_defines += ["PAL_RTCC_CLOCK_LFRCO"]
+  specific_brd_defines += [ "PAL_RTCC_CLOCK_LFRCO" ]
 } else if (efr32_board == "BRD4161A") {
   efr32_family = "efr32mg12"
   efr32_mcu = "EFR32MG12P432F1024GL125"

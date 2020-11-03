@@ -307,9 +307,9 @@ template("efr32_sdk") {
       "${mbedtls_root}/repo/library/platform_util.c",
     ]
 
-    if (defined(enable_fem)){
-      sources += [ 
-        "${efr32_sdk_root}/util/plugin/plugin-common/fem-control/fem-control.c"
+    if (defined(enable_fem)) {
+      sources += [
+        "${efr32_sdk_root}/util/plugin/plugin-common/fem-control/fem-control.c",
       ]
     }
 
