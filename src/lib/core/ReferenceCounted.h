@@ -41,14 +41,14 @@ public:
  * A reference counted object maintains a count of usages and when the usage
  * count drops to 0, it deletes itself.
  */
-template <class SUBCLASS, class DELETOR = DeleteDeletor<SUBCLASS>>
+template <class Subclass, class Deletor = DeleteDeletor<Subclass>, int kInitRefCount = 1>
 class ReferenceCounted
 {
 public:
     typedef uint32_t count_type;
 
     /** Adds one to the usage count of this class */
-    SUBCLASS * Retain()
+    Subclass * Retain()
     {
         if (mRefCount == std::numeric_limits<count_type>::max())
         {
@@ -56,7 +56,7 @@ public:
         }
         ++mRefCount;
 
-        return static_cast<SUBCLASS *>(this);
+        return static_cast<Subclass *>(this);
     }
 
     /** Release usage of this class */
@@ -69,7 +69,7 @@ public:
 
         if (--mRefCount == 0)
         {
-            DELETOR::Release(static_cast<SUBCLASS *>(this));
+            Deletor::Release(static_cast<Subclass *>(this));
         }
     }
 
@@ -77,7 +77,7 @@ public:
     count_type GetReferenceCount() const { return mRefCount; }
 
 private:
-    count_type mRefCount = 1;
+    count_type mRefCount = kInitRefCount;
 };
 
 } // namespace chip
