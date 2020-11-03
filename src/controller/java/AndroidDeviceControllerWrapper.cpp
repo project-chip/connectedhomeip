@@ -81,8 +81,8 @@ AndroidDeviceControllerWrapper::~AndroidDeviceControllerWrapper()
     if ((mJavaVM != nullptr) && (mJavaObjectRef != nullptr))
     {
         GetJavaEnv()->DeleteGlobalRef(mJavaObjectRef);
-        mController->AppState = nullptr;
     }
+    mController->AppState = nullptr;
     mController->Shutdown();
 }
 
