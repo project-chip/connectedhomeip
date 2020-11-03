@@ -19,8 +19,8 @@
 
 #include "console/console.h"
 #include "pw_sys_io/sys_io.h"
-#include <zephyr.h>
 #include <cassert>
+#include <zephyr.h>
 
 extern "C" void pw_sys_io_Init()
 {
