@@ -35,14 +35,12 @@ class BluetoothManager {
   }
 
   private fun getServiceData(discriminator: Int): ByteArray {
-    var opcode = 0
-    var version = 0
-    var versionDiscriminator = ((version and 0xf) shl 12) or (discriminator and 0xfff)
-    return intArrayOf(
-        opcode,
-        versionDiscriminator,
-        versionDiscriminator shr 8
-    ).map { it.toByte() }.toByteArray()
+    val opcode = 0
+    val version = 0
+    val versionDiscriminator = ((version and 0xf) shl 12) or (discriminator and 0xfff)
+    return intArrayOf(opcode, versionDiscriminator, versionDiscriminator shr 8)
+        .map { it.toByte() }
+        .toByteArray()
   }
 
   suspend fun getBluetoothDevice(discriminator: Int): BluetoothDevice? {
@@ -66,21 +64,15 @@ class BluetoothManager {
           }
         }
 
-        var serviceDataList = listOf(getServiceData(discriminator),
+        val chipByte = CHIP_UUID.substring(4, 8)
+        val chipParcelUUID = ParcelUuid(UUID.fromString(CHIP_UUID))
 
-                   // TODO - Remove this incorrect format.
-                   discriminator.toByteArray(3)
-                )
-
-        serviceDataList.forEach {
-          Log.v(TAG, "Matching service " + CHIP_UUID.substring(4, 8) + " " + it.map { String.format("%02x", it) } )
-        }
-
-        val scanFilters = serviceDataList.map {
-          ScanFilter.Builder()
-              .setServiceData(ParcelUuid(UUID.fromString(CHIP_UUID)), it)
-              .build()
-        }
+        val serviceDataList = listOf(getServiceData(discriminator), discriminator.toByteArray(3))
+        val scanFilters =
+            serviceDataList.map {
+              Log.v(TAG, "Matching service $chipByte ${String.format("%02x", it)}}")
+              ScanFilter.Builder().setServiceData(chipParcelUUID, it).build()
+            }
 
         val scanSettings = ScanSettings.Builder()
             .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
