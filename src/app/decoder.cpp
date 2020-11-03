@@ -23,27 +23,12 @@
 //                            InterPanHeader *interPanHeader)
 
 #include <app/chip-zcl-zpro-codec.h>
-#include <core/CHIPEncoding.h>
+#include <app/message-reader.h>
+#include <lib/core/CHIPError.h>
+#include <lib/support/CodeUtils.h>
 #include <stdio.h>
 #include <string.h>
 #include <support/logging/CHIPLogging.h>
-
-template <int N>
-struct Reader
-{
-};
-
-template <>
-struct Reader<1>
-{
-    static uint8_t read(const uint8_t *& p) { return chip::Encoding::Read8(p); }
-};
-
-template <>
-struct Reader<2>
-{
-    static uint16_t read(const uint8_t *& p) { return chip::Encoding::LittleEndian::Read16(p); }
-};
 
 extern "C" {
 
@@ -55,39 +40,26 @@ uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * 
         return 0;
     }
 
-    const uint8_t * read_ptr = buffer;
+    chip::DataModelReader reader(buffer, buf_length);
+
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Skip first byte, because that's the always-0 frame control.
-    ++read_ptr;
-    --buf_length;
+    uint8_t ignored;
+    err = reader.ReadOctet(&ignored)
+              .Read16(&outApsFrame->profileId)
+              .ReadClusterId(&outApsFrame->clusterId)
+              .ReadEndpointId(&outApsFrame->sourceEndpoint)
+              .ReadEndpointId(&outApsFrame->destinationEndpoint)
+              .Read16(&outApsFrame->options)
+              .ReadGroupId(&outApsFrame->groupId)
+              .ReadOctet(&outApsFrame->sequence)
+              .ReadOctet(&outApsFrame->radius)
+              .StatusCode();
+    SuccessOrExit(err);
 
-#define TRY_READ(fieldName, fieldSize)                                                                                             \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        static_assert(sizeof(outApsFrame->fieldName) == fieldSize, "incorrect size for " #fieldName);                              \
-        if (buf_length < fieldSize)                                                                                                \
-        {                                                                                                                          \
-            ChipLogError(Zcl, "Missing " #fieldName " when extracting APS frame");                                                 \
-            return 0;                                                                                                              \
-        }                                                                                                                          \
-        outApsFrame->fieldName = Reader<fieldSize>::read(read_ptr);                                                                \
-        buf_length             = static_cast<uint16_t>(buf_length - fieldSize);                                                    \
-    } while (0)
-
-    TRY_READ(profileId, 2);
-    TRY_READ(clusterId, 2);
-    TRY_READ(sourceEndpoint, 1);
-    TRY_READ(destinationEndpoint, 1);
-    TRY_READ(options, 2);
-    TRY_READ(groupId, 2);
-    TRY_READ(sequence, 1);
-    TRY_READ(radius, 1);
-
-#undef TRY_READ
-
-    // Cast is safe because buf_length is uint16_t, so we can't have moved too
-    // far along.
-    return static_cast<uint16_t>(read_ptr - buffer);
+exit:
+    return err == CHIP_NO_ERROR ? reader.OctetsRead() : 0;
 }
 
 void printApsFrame(EmberApsFrame * frame)
