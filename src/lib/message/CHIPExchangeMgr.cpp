@@ -1288,7 +1288,7 @@ void ChipExchangeManager::RMPExecuteActions()
                 {
                     // If the retransmission was successful, update the passive timer
                     RetransTable[i].nextRetransTime = ec->GetCurrentRetransmitTimeout() / mRMPTimerInterval;
-#if defined(DEBUG)
+#if !defined(NDEBUG)
                     ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", RetransTable[i].msgId,
                                     RetransTable[i].sendCount);
 #endif

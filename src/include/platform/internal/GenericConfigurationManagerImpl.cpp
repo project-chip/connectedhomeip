@@ -1009,7 +1009,7 @@ exit:
     return err;
 }
 
-#if defined(DEBUG)
+#if !defined(NDEBUG)
 template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_RunUnitTests()
 {

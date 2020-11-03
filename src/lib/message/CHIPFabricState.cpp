@@ -263,7 +263,7 @@ CHIP_ERROR ChipFabricState::Init(GroupKeyStoreBase * groupKeyStore)
     ListenIPv4Addr = IPAddress::Any;
     ListenIPv6Addr = IPAddress::Any;
 
-#if defined(DEBUG) && !CHIP_SYSTEM_CONFIG_USE_LWIP
+#if !defined(NDEBUG) && !CHIP_SYSTEM_CONFIG_USE_LWIP
     {
         const char * envVal = getenv("CHIP_IPV6_LISTEN_ADDR");
         if (envVal != NULL)
