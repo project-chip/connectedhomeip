@@ -103,6 +103,7 @@ class ConnectivityManagerImpl final : public ConnectivityManager,
     // the implementation methods provided by this class.
     friend class ConnectivityManager;
 
+public:
     // TODO: This should be replaced by a more general function.
     CHIP_ERROR SetWiFiNetworkProvisioning(const char * ssid, const char * psk);
 
