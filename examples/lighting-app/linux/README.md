@@ -81,12 +81,21 @@ Raspberry Pi Desktop 20.10 (aarch64)**
                       RX bytes:8609495 acl:14 sco:0 events:217484 errors:0
                       TX bytes:92185 acl:20 sco:0 commands:5259 errors:0
 
-        -   Run Linux Lighting Example App
+    -   Run Linux Lighting Example App
 
-                  $ cd ~/connectedhomeip/examples/lighting-app/linux
-                  $ sudo out/debug/chip-tool-server --ble-device [bluetooth device number]
-                  # In this example, the device we want to use is hci1
-                  $ sudo out/debug/chip-tool-server --ble-device 1
+              $ cd ~/connectedhomeip/examples/lighting-app/linux
+              $ sudo out/debug/chip-tool-server --ble-device [bluetooth device number]
+              # In this example, the device we want to use is hci1
+              $ sudo out/debug/chip-tool-server --ble-device 1
 
-        -   Test the device using ChipDeviceController on your laptop /
-            workstation etc.
+    -   Run dhcpcd on `wlan0`
+
+        WiFi on Linux platforms are controlled by direct calling `wpa_supplicant`
+        dbus API. Which will not run `dhclient` on wlan0 interface, so you should
+        manaully run this to get an IP address. You can also add it to service and
+        run it on boot.
+
+              $ sudo dhclient wlan0
+
+    -   Test the device using ChipDeviceController on your laptop /
+        workstation etc.
