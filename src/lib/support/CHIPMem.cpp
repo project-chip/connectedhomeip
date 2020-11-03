@@ -30,6 +30,15 @@
 #include <atomic>
 #include <stdlib.h>
 
+// Decide whether MemoryInit and MemoryShutdown should configure mbedtls.
+#ifdef MBEDTLS_CONFIG_FILE
+#include MBEDTLS_CONFIG_FILE
+#if defined(MBEDTLS_PLATFORM_MEMORY) && !defined(MBEDTLS_PLATFORM_STD_CALLOC)
+#define USE_MBEDTLS_PLATFORM_SET_CALLOC_FREE 1
+#include <mbedtls/platform.h>
+#endif
+#endif
+
 namespace chip {
 namespace Platform {
 
@@ -50,7 +59,10 @@ CHIP_ERROR MemoryInit(void * buf, size_t bufSize)
     {
         return err;
     }
-    // Here we do things like mbedtls_platform_set_calloc_free(), depending on configuration.
+    // Initialization specific to platform configuration.
+#ifdef USE_MBEDTLS_PLATFORM_SET_CALLOC_FREE
+    mbedtls_platform_set_calloc_free(CHIPPlatformMemoryCalloc, CHIPPlatformMemoryFree);
+#endif
     return err;
 }
 
@@ -58,7 +70,10 @@ void MemoryShutdown()
 {
     if ((memoryInitializationCount > 0) && (--memoryInitializationCount == 0))
     {
-        // Here we undo things like mbedtls_platform_set_calloc_free()
+        // Finalization specific to platform configuration.
+#ifdef USE_MBEDTLS_PLATFORM_SET_CALLOC_FREE
+        mbedtls_platform_set_calloc_free(nullptr, nullptr);
+#endif
         MemoryAllocatorShutdown();
     }
 }
