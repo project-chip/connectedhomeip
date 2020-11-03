@@ -1,20 +1,19 @@
-# CHIP nRF52840 Lighting Example Application
+# CHIP nRF Connect nRF52840 Pigweed Example Application
 
 An example application showing the use
 [CHIP](https://github.com/project-chip/connectedhomeip) on the Nordic nRF52840.
 
 <hr>
 
--   [CHIP nRF52840 Lighting Example Application](#chip-nrf52840-lighting-example-application)
+-   [CHIP nRF52840 Pigweed Example Application](#chip-nrf52840-pigweed-example-application)
     -   [Introduction](#introduction)
-    -   [Device UI](#device-ui)
     -   [Building](#building)
         -   [Using Docker container](#using-docker-container)
         -   [Using Native shell](#using-native-shell)
         -   [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
     -   [Configuring the example](#configuring-the-example)
     -   [Flashing and debugging](#flashing-and-debugging)
-    -   [Accessing the command line](#accessing-the-command-line)
+    -   [Currently implemented features](#currently-implemented-features)
 
 <hr>
 
@@ -24,70 +23,13 @@ An example application showing the use
 
 ![nrf52840 DK](../../platform/nrf528xx/doc/images/nrf52840-dk.jpg)
 
-The nRF52840 lighting example application provides a working demonstration of a
-connected lighting device, built using CHIP, and the Nordic nRF Connect SDK. The
-example supports remote access and control of a lighting over a low-power,
-802.15.4 Thread network. It is capable of being paired into an existing CHIP
-network along with other CHIP-enabled devices. The example targets the
-[Nordic nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)
-development kit, but is readily adaptable to other nRF52840-based hardware.
-
-The lighting example is intended to serve both as a means to explore the
-workings of CHIP, as well as a template for creating real products based on the
-Nordic platform.
+The nRF52840 Pigweed example app exercises functionalities in
+third_party/pigweed, to see what is needed for integrating Pigweed to CHIP, as
+well as a precursor to CHIP functionalities like on-device testing.
 
 The example makes use of the CMake build system to generate the ninja build
 script. The build system takes care of invoking the CHIP library build with all
 necessary flags exported from the Zephyr environment.
-
-<a name="device-ui"></a>
-
-## Device UI
-
-The example application provides a simple UI that depicts the state of the
-device and offers basic user control. This UI is implemented via the
-general-purpose LEDs and buttons built in to the nRF52840 DK dev board.
-
-**LED #1** shows the overall state of the device and its connectivity. Four
-states are depicted:
-
--   _Short Flash On (50ms on/950ms off)_ &mdash; The device is in an
-    unprovisioned (unpaired) state and is waiting for a commissioning
-    application to connect.
-
-*   _Rapid Even Flashing (100ms on/100ms off)_ &mdash; The device is in an
-    unprovisioned state and a commissioning application is connected via BLE.
-
--   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full network (Thread) or service
-    connectivity.
-
-*   _Solid On_ &mdash; The device is fully provisioned and has full network and
-    service connectivity.
-
-**Button #1** can be used to initiate a OTA software update as well as to reset
-the device to a default state.
-
-Pressing and holding Button #1 for 6 seconds initiates a factory reset. After an
-initial period of 3 seconds, all four LED will flash in unison to signal the
-pending reset. Holding the button past 6 seconds will cause the device to reset
-its persistent configuration and initiate a reboot. The reset action can be
-cancelled by releasing the button at any point before the 6 second limit.
-
-**LED #2** shows the state of the lighting.
-
-**Button #2** can be used to change the state of the lighting. This can be used
-to mimick a user manually switching the lighting. The button behaves as a
-toggle, swapping the state every time it is pressed.
-
-**Button #3** can be used to start Thread networking using default configuration
-which was selected to match OpenThread Border Router default settings and
-network credentials.
-
-**Button #4** can be used to start BLE advertisement, which is disabled by
-default.
-
-The remaining two LEDs (#3 and #4) and button #4 are unused.
 
 <a name="building"></a>
 
@@ -110,7 +52,8 @@ container:
         $ mkdir ~/nrfconnect
         $ mkdir ~/connectedhomeip
         $ docker pull nordicsemi/nrfconnect-chip
-        $ docker run --rm -it -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
+        $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
+            -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
 
 > **Note**:
 >
@@ -124,6 +67,8 @@ container:
 >     connected to your computer such as the nRF52840 DK.
 > -   `--rm` flag can be omitted if you don't want the container to be
 >     auto-removed when you exit the container shell session.
+> -   `-e RUNAS=$(id -u)` is needed to start the container session as the
+>     current user instead of root.
 
 If you use the container for the first time and you don't have nRF Connect SDK
 and CHIP sources downloaded yet, run `setup` command in the container to pull
@@ -136,14 +81,19 @@ respectively:
         /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
         ...
 
+It is important to remember about running activate.sh script, as it is necessary
+to build Pigweed library and it can be done, by typing following command:
+
+        $ source scripts/activate.sh
+
 Now you may build the example by running the commands below in the Docker
 container:
 
-        $ cd /var/chip/examples/lighting-app/nrfconnect
+        $ cd /var/chip/examples/pigweed-app/nrfconnect
         $ west build -b nrf52840dk_nrf52840
 
 If the build succeeds, the binary will be available under
-`/var/chip/examples/lighting-app/nrfconnect/build/zephyr/zephyr.hex`. Note that
+`/var/chip/examples/pigweed-app/nrfconnect/build/zephyr/zephyr.hex`. Note that
 other operations described in this document like flashing or debugging can also
 be done in the container.
 
@@ -174,13 +124,18 @@ Make sure that you source the following file:
 > terminal before building. `$GNUARMEMB_TOOLCHAIN_PATH` and
 > `$ZEPHYR_TOOLCHAIN_VARIANT` must be set manually.
 
+Make sure that you run activate.sh script, as it is necessary to build Pigweed
+library and it can be done, by typing following command:
+
+        $ source scripts/activate.sh
+
 After your environment is set up, you are ready to build the example. The
 recommended tool for building and flashing the device is
 [west](https://docs.zephyrproject.org/latest/guides/west/).
 
-The following commands will build the `lighting-app` example:
+The following commands will build the `pigweed-app` example:
 
-        $ cd ~/connectedhomeip/examples/lighting-app/nrfconnect
+        $ cd ~/connectedhomeip/examples/pigweed-app/nrfconnect
 
         # If this is a first time build or if `build` directory was deleted
         $ west build -b nrf52840dk_nrf52840
@@ -260,17 +215,18 @@ To debug the application on target:
         $ cd <example-dir>
         $ west debug
 
-<a name="accessing-the-command-line"></a>
+<a name="currently-implemented-features"></a>
 
-## Accessing the command line
+## Currently implemented features
 
-The application includes a command line interface with support for logs and the
-OpenThread commands.
+### Echo RPC:
 
-To access it, use any serial terminal program you like, for example `minicom` or
-`GNU screen`.
+```
+python -m pw_hdlc_lite.rpc_console --device /dev/ttyACM0 -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
+```
 
-The UART interface is configured for `115200` baud rate.
+will start an interactive python shell where Echo RPC can be invoked as
 
-All OpenThread commands must be prefixed with `ot`, for example
-`ot thread start`.
+```
+rpcs.pw.rpc.EchoService.Echo(msg="hi")
+```
