@@ -159,7 +159,7 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
 
         if (err == CHIP_NO_ERROR)
         {
-#if defined(DEBUG)
+#if !defined(NDEBUG)
             ChipLogProgress(ExchangeManager, "Flushed pending ack for MsgId:%08" PRIX32, mPendingPeerAckId);
 #endif
         }
@@ -325,7 +325,7 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     // Msg is an Ack; Check Retrans Table and remove message context
     if (!mManager->CheckAndRemRetransTable(this, AckMsgId))
     {
-#if defined(DEBUG)
+#if !defined(NDEBUG)
         ChipLogError(ExchangeManager, "CHIP MsgId:%08" PRIX32 " not in RetransTable", AckMsgId);
 #endif
         err = CHIP_ERROR_INVALID_ACK_ID;
@@ -334,7 +334,7 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     else
     {
         mDelegate->OnAckRcvd();
-#if defined(DEBUG)
+#if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Removed CHIP MsgId:%08" PRIX32 " from RetransTable", AckMsgId);
 #endif
     }
@@ -353,7 +353,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
     // If the message IS a duplicate.
     if (Flags.Has(MessageFlagValues::kChipMessageFlag_DuplicateMessage))
     {
-#if defined(DEBUG)
+#if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Forcing tx of solitary ack for duplicate MsgId:%08" PRIX32, MessageId);
 #endif
         // Is there pending ack for a different message id.
@@ -383,7 +383,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
     {
         if (IsAckPending())
         {
-#if defined(DEBUG)
+#if !defined(NDEBUG)
             ChipLogProgress(ExchangeManager, "Pending ack queue full; forcing tx of solitary ack for MsgId:%08" PRIX32,
                             mPendingPeerAckId);
 #endif

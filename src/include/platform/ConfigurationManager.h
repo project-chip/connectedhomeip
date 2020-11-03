@@ -116,7 +116,7 @@ public:
 
     CHIP_ERROR GetBLEDeviceIdentificationInfo(Ble::ChipBLEDeviceIdentificationInfo & deviceIdInfo);
 
-#if defined(DEBUG)
+#if !defined(NDEBUG)
     CHIP_ERROR RunUnitTests();
 #endif
 
@@ -483,7 +483,7 @@ inline void ConfigurationManager::InitiateFactoryReset()
     static_cast<ImplClass *>(this)->_InitiateFactoryReset();
 }
 
-#if defined(DEBUG)
+#if !defined(NDEBUG)
 inline CHIP_ERROR ConfigurationManager::RunUnitTests()
 {
     return static_cast<ImplClass *>(this)->_RunUnitTests();

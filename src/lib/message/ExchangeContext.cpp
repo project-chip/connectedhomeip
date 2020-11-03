@@ -678,7 +678,7 @@ CHIP_ERROR ExchangeContext::EncodeExchHeader(ChipExchangeHeader * exchangeHeader
         // Schedule next physical wakeup
         ExchangeMgr->RMPStartTimer();
 
-#if defined(DEBUG)
+#if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg", mPendingPeerAckId);
 #endif
     }
@@ -1030,7 +1030,7 @@ bool ExchangeContext::RMPCheckAndRemRetransTable(uint32_t ackMsgId, void ** rCtx
             // Clear the entry from the retransmision table.
             ExchangeMgr->ClearRetransmitTable(ExchangeMgr->RetransTable[i]);
 
-#if defined(DEBUG)
+#if !defined(NDEBUG)
             ChipLogProgress(ExchangeManager, "Rxd Ack; Removing MsgId:%08" PRIX32 " from Retrans Table", ackMsgId);
 #endif
             res = true;
@@ -1053,7 +1053,7 @@ CHIP_ERROR ExchangeContext::RMPFlushAcks()
 
         if (err == CHIP_NO_ERROR)
         {
-#if defined(DEBUG)
+#if !defined(NDEBUG)
             ChipLogProgress(ExchangeManager, "Flushed pending ack for MsgId:%08" PRIX32 " to Peer %016" PRIX64, mPendingPeerAckId,
                             PeerNodeId);
 #endif
@@ -1207,7 +1207,7 @@ CHIP_ERROR ExchangeContext::RMPHandleRcvdAck(const ChipExchangeHeader * exchHead
     // Msg is an Ack; Check Retrans Table and remove message context
     if (!RMPCheckAndRemRetransTable(exchHeader->AckMsgId, &msgCtxt))
     {
-#if defined(DEBUG)
+#if !defined(NDEBUG)
         ChipLogError(ExchangeManager, "CHIP MsgId:%08" PRIX32 " not in RetransTable", exchHeader->AckMsgId);
 #endif
         err = CHIP_ERROR_INVALID_ACK_ID;
@@ -1224,7 +1224,7 @@ CHIP_ERROR ExchangeContext::RMPHandleRcvdAck(const ChipExchangeHeader * exchHead
         {
             ChipLogDetail(ExchangeManager, "No App Handler for Ack");
         }
-#if defined(DEBUG)
+#if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Removed CHIP MsgId:%08" PRIX32 " from RetransTable", exchHeader->AckMsgId);
 #endif
     }
@@ -1242,7 +1242,7 @@ CHIP_ERROR ExchangeContext::RMPHandleNeedsAck(const ChipMessageInfo * msgInfo)
     // If the message IS a duplicate.
     if (msgInfo->Flags & kChipMessageFlag_DuplicateMessage)
     {
-#if defined(DEBUG)
+#if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Forcing tx of solitary ack for duplicate MsgId:%08" PRIX32, msgInfo->MessageId);
 #endif
         // Is there pending ack for a different message id.
@@ -1272,7 +1272,7 @@ CHIP_ERROR ExchangeContext::RMPHandleNeedsAck(const ChipMessageInfo * msgInfo)
     {
         if (IsAckPending())
         {
-#if defined(DEBUG)
+#if !defined(NDEBUG)
             ChipLogProgress(ExchangeManager, "Pending ack queue full; forcing tx of solitary ack for MsgId:%08" PRIX32,
                             mPendingPeerAckId);
 #endif

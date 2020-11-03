@@ -53,7 +53,7 @@ static void TestPlatformMgr_Init(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
-#if defined(DEBUG)
+#if !defined(NDEBUG)
 static void TestPlatformMgr_RunUnitTest(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -403,7 +403,7 @@ static void TestConfigurationMgr_ServiceProvisioningData(nlTestSuite * inSuite, 
 static const nlTest sTests[] = {
 
     NL_TEST_DEF("Test PlatformMgr::Init", TestPlatformMgr_Init),
-#if defined(DEBUG)
+#if !defined(NDEBUG)
     NL_TEST_DEF("Test PlatformMgr::RunUnitTest", TestPlatformMgr_RunUnitTest),
 #endif
     NL_TEST_DEF("Test ConfigurationMgr::SerialNumber", TestConfigurationMgr_SerialNumber),
