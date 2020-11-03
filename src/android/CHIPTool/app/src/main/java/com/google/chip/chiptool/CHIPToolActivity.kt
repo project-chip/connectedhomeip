@@ -41,7 +41,7 @@ class CHIPToolActivity :
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.top_activity)
-    
+
     if (savedInstanceState == null) {
       val fragment = SelectActionFragment.newInstance()
       supportFragmentManager
@@ -99,14 +99,14 @@ class CHIPToolActivity :
   private fun onNfcIntent(intent: Intent?) {
     // Require 1 NDEF message containing 1 NDEF record
     val messages = intent?.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
-    if (messages?.size != 1) return;
+    if (messages?.size != 1) return
 
     val records = (messages[0] as NdefMessage).records
-    if (records.size != 1) return;
+    if (records.size != 1) return
 
     // Require NDEF URI record starting with "ch:"
     val uri = records[0].toUri()
-    if (!uri?.scheme.equals("ch", true)) return;
+    if (!uri?.scheme.equals("ch", true)) return
 
     val setupPayload = SetupPayloadParser().parseQrCode(uri.toString().toUpperCase())
     val deviceInfo = CHIPDeviceInfo(
