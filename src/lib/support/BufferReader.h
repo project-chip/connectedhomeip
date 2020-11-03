@@ -59,76 +59,90 @@ public:
     uint16_t OctetsRead() const { return static_cast<uint16_t>(mReadPtr - mBufStart); }
 
     /**
+     * The reader status.  Once the status becomes a failure status, all later
+     * read operations become no-ops and the status continues to be a failure
+     * status.
+     */
+    CHECK_RETURN_VALUE
+    CHIP_ERROR StatusCode() const { return mStatus; }
+
+    /**
      * Read a single 8-bit unsigned integer.
      *
      * @param [out] dest Where the 8-bit integer goes.
      *
-     * @return Whether the read succeeded.  The read can fail if there are not
-     *         enough octets available.
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Read8(uint8_t * dest) { return Read(dest); }
+    Reader & Read8(uint8_t * dest)
+    {
+        Read(dest);
+        return *this;
+    }
 
     /**
      * Read a single 16-bit unsigned integer.
      *
      * @param [out] dest Where the 16-bit integer goes.
      *
-     * @return Whether the read succeeded.  The read can fail if there are not
-     *         enough octets available.
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Read16(uint16_t * dest) { return Read(dest); }
+    Reader & Read16(uint16_t * dest)
+    {
+        Read(dest);
+        return *this;
+    }
 
     /**
      * Read a single 32-bit unsigned integer.
      *
      * @param [out] dest Where the 32-bit integer goes.
      *
-     * @return Whether the read succeeded.  The read can fail if there are not
-     *         enough octets available.
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Read32(uint32_t * dest) { return Read(dest); }
+    Reader & Read32(uint32_t * dest)
+    {
+        Read(dest);
+        return *this;
+    }
 
     /**
      * Read a single 64-bit unsigned integer.
      *
      * @param [out] dest Where the 64-bit integer goes.
      *
-     * @return Whether the read succeeded.  The read can fail if there are not
-     *         enough octets available.
+     * @note The read can put the reader in a failed-status state if there are
+     *       not enough octets available.  Callers must either continue to do
+     *       more reads on the return value or check its status to see whether
+     *       the sequence of reads that has been performed succeeded.
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Read64(uint64_t * dest) { return Read(dest); }
-
-protected:
-    template <typename T>
-    CHIP_ERROR Read(T * retval)
+    Reader & Read64(uint64_t * dest)
     {
-        static_assert(CHAR_BIT == 8, "Our various sizeof checks rely on bytes and octets being the same thing");
-
-        static constexpr size_t data_size = sizeof(T);
-
-        if (mAvailable < data_size)
-        {
-            return CHIP_ERROR_BUFFER_TOO_SMALL;
-        }
-
-        Read(mReadPtr, retval);
-        mAvailable = static_cast<uint16_t>(mAvailable - data_size);
-        return CHIP_NO_ERROR;
+        Read(dest);
+        return *this;
     }
 
-private:
-    // These helper methods return void and put the value being read into an
-    // outparam because that allows us to easily overload on the type of the
-    // thing being read.
-    void Read(const uint8_t *& p, uint8_t * dest) { *dest = Encoding::Read8(p); }
-    void Read(const uint8_t *& p, uint16_t * dest) { *dest = Encoding::LittleEndian::Read16(p); }
-    void Read(const uint8_t *& p, uint32_t * dest) { *dest = Encoding::LittleEndian::Read32(p); }
-    void Read(const uint8_t *& p, uint64_t * dest) { *dest = Encoding::LittleEndian::Read64(p); }
+protected:
+    /**
+     * Helper for our various APIs so we don't have to write out various logic
+     * multiple times.
+     */
+    template <typename T>
+    void Read(T * retval);
 
+private:
     /**
      * Our buffer start.
      */
@@ -143,6 +157,11 @@ private:
      * The number of octets we can still read starting at mReadPtr.
      */
     uint16_t mAvailable;
+
+    /**
+     * Our current status.
+     */
+    CHIP_ERROR mStatus = CHIP_NO_ERROR;
 };
 
 } // namespace LittleEndian

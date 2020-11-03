@@ -8,23 +8,31 @@ certifi==2020.6.20        # via requests
 cffi==1.14.3              # via cryptography
 chardet==3.0.4            # via requests
 click==7.1.2              # via -r requirements.in, pip-tools
-cryptography==3.2         # via -r requirements.in
+colorama==0.4.4           # via west
+configobj==5.0.6          # via west
+cryptography==3.2.1       # via -r requirements.in
+docopt==0.6.2             # via pykwalify
 future==0.18.2            # via -r requirements.in, mobly
 idna==2.10                # via requests
 mobly==1.10               # via -r requirements.in
+packaging==20.4           # via west
 pip-tools==5.3.1          # via -r requirements.in
 portpicker==1.3.1         # via -r requirements.in, mobly
 psutil==5.7.2             # via mobly
 pycparser==2.20           # via cffi
 pyelftools==0.26          # via -r requirements.in
-pyparsing==2.3.1          # via -r requirements.in
+pykwalify==1.7.0          # via west
+pyparsing==2.3.1          # via -r requirements.in, packaging
 pyserial==3.4             # via -r requirements.in, mobly
-pyyaml==5.3.1             # via mobly
+python-dateutil==2.8.1    # via pykwalify
+pyyaml==5.3.1             # via mobly, pykwalify, west
 requests==2.24.0          # via -r requirements.in
-six==1.15.0               # via cryptography, pip-tools
+six==1.15.0               # via configobj, cryptography, packaging, pip-tools, python-dateutil
 timeout-decorator==0.4.1  # via mobly
 urllib3==1.25.10          # via requests
+west==0.8.0               # via -r requirements.in
 wheel==0.34.2             # via -r requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip
+# setuptools

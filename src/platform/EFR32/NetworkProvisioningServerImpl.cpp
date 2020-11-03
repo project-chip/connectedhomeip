@@ -23,8 +23,7 @@
 #include <core/CHIPTLV.h>
 #include <platform/internal/DeviceNetworkInfo.h>
 #include <platform/internal/GenericNetworkProvisioningServerImpl.cpp>
-#include <protocols/CHIPProtocols.h>
-#include <protocols/common/CommonProtocol.h>
+#include <protocols/Protocols.h>
 
 namespace chip {
 namespace DeviceLayer {

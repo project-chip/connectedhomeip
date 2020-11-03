@@ -18,7 +18,7 @@
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <platform/internal/DeviceNetworkInfo.h>
-#include <protocols/CHIPProtocols.h>
+#include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
@@ -80,10 +80,9 @@ CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType
 #if CONFIG_DEVICE_LAYER
 #if defined(CHIP_DEVICE_LAYER_TARGET)
         DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-        deviceDelegate.ProvisionWiFi(SSID, passwd);
+        err = deviceDelegate.ProvisionWiFi(SSID, passwd);
 #endif
 #endif
-        err = CHIP_NO_ERROR;
     }
     break;
 
@@ -176,8 +175,8 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     VerifyOrExit(CanCastTo<uint16_t>(addrLen), err = CHIP_ERROR_INVALID_ARGUMENT);
     buffer->SetDataLength(static_cast<uint16_t>(addrLen));
 
-    err    = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
-                                       NetworkProvisioning::MsgTypes::kIPAddressAssigned, buffer);
+    err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning, NetworkProvisioning::MsgTypes::kIPAddressAssigned,
+                                       buffer);
     buffer = nullptr;
     SuccessOrExit(err);
 
@@ -204,7 +203,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     VerifyOrExit(CanCastTo<uint16_t>(bbuf.Written()), err = CHIP_ERROR_INVALID_ARGUMENT);
     buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
-    err    = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
+    err    = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
                                        NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer);
     buffer = nullptr;
     SuccessOrExit(err);
@@ -242,7 +241,7 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
         buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
-        err    = mDelegate->SendSecureMessage(Protocols::kChipProtocol_NetworkProvisioning,
+        err    = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
                                            NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer);
         buffer = nullptr;
     }
@@ -321,7 +320,7 @@ CHIP_ERROR NetworkProvisioning::DecodeThreadAssociationRequest(System::PacketBuf
 #if defined(CHIP_DEVICE_LAYER_TARGET)
     {
         DeviceLayer::DeviceNetworkProvisioningDelegateImpl deviceDelegate;
-        deviceDelegate.ProvisionThread(networkInfo);
+        err = deviceDelegate.ProvisionThread(networkInfo);
     }
 #endif
 #endif

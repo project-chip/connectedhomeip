@@ -27,7 +27,7 @@
 #include <core/CHIPCore.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageManager.h>
-#include <protocols/CHIPProtocols.h>
+#include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 

@@ -23,6 +23,9 @@
 #include "../common/ModelCommand.h"
 #include "../common/ModelCommandResponse.h"
 
+#include <limits>
+
+#include <app/util/basic-types.h>
 #include <support/SafeInt.h>
 
 #define CHECK_MESSAGE_LENGTH(value)                                                                                                \
@@ -39,6 +42,181 @@
     }                                                                                                                              \
                                                                                                                                    \
     messageLen = static_cast<uint16_t>(messageLen - static_cast<uint16_t>(value));
+
+typedef enum
+{
+    EMBER_ZCL_STATUS_SUCCESS                      = 0x00,
+    EMBER_ZCL_STATUS_FAILURE                      = 0x01,
+    EMBER_ZCL_STATUS_REQUEST_DENIED               = 0x70,
+    EMBER_ZCL_STATUS_MULTIPLE_REQUEST_NOT_ALLOWED = 0x71,
+    EMBER_ZCL_STATUS_INDICATION_REDIRECTION_TO_AP = 0x72,
+    EMBER_ZCL_STATUS_PREFERENCE_DENIED            = 0x73,
+    EMBER_ZCL_STATUS_PREFERENCE_IGNORED           = 0x74,
+    EMBER_ZCL_STATUS_NOT_AUTHORIZED               = 0x7E,
+    EMBER_ZCL_STATUS_RESERVED_FIELD_NOT_ZERO      = 0x7F,
+    EMBER_ZCL_STATUS_MALFORMED_COMMAND            = 0x80,
+    EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND        = 0x81,
+    EMBER_ZCL_STATUS_UNSUP_GENERAL_COMMAND        = 0x82,
+    EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND  = 0x83,
+    EMBER_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND  = 0x84,
+    EMBER_ZCL_STATUS_INVALID_FIELD                = 0x85,
+    EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE        = 0x86,
+    EMBER_ZCL_STATUS_INVALID_VALUE                = 0x87,
+    EMBER_ZCL_STATUS_READ_ONLY                    = 0x88,
+    EMBER_ZCL_STATUS_INSUFFICIENT_SPACE           = 0x89,
+    EMBER_ZCL_STATUS_DUPLICATE_EXISTS             = 0x8A,
+    EMBER_ZCL_STATUS_NOT_FOUND                    = 0x8B,
+    EMBER_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE       = 0x8C,
+    EMBER_ZCL_STATUS_INVALID_DATA_TYPE            = 0x8D,
+    EMBER_ZCL_STATUS_INVALID_SELECTOR             = 0x8E,
+    EMBER_ZCL_STATUS_WRITE_ONLY                   = 0x8F,
+    EMBER_ZCL_STATUS_INCONSISTENT_STARTUP_STATE   = 0x90,
+    EMBER_ZCL_STATUS_DEFINED_OUT_OF_BAND          = 0x91,
+    EMBER_ZCL_STATUS_INCONSISTENT                 = 0x92,
+    EMBER_ZCL_STATUS_ACTION_DENIED                = 0x93,
+    EMBER_ZCL_STATUS_TIMEOUT                      = 0x94,
+    EMBER_ZCL_STATUS_ABORT                        = 0x95,
+    EMBER_ZCL_STATUS_INVALID_IMAGE                = 0x96,
+    EMBER_ZCL_STATUS_WAIT_FOR_DATA                = 0x97,
+    EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE           = 0x98,
+    EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE           = 0x99,
+    EMBER_ZCL_STATUS_HARDWARE_FAILURE             = 0xC0,
+    EMBER_ZCL_STATUS_SOFTWARE_FAILURE             = 0xC1,
+    EMBER_ZCL_STATUS_CALIBRATION_ERROR            = 0xC2,
+    EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER          = 0xC3,
+} EmberAfStatus;
+
+bool CheckStatus(uint8_t status)
+{
+    bool success = false;
+
+    switch (status)
+    {
+    case EMBER_ZCL_STATUS_SUCCESS:
+        success = true;
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_SUCCESS (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_FAILURE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_FAILURE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_REQUEST_DENIED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_REQUEST_DENIED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_MULTIPLE_REQUEST_NOT_ALLOWED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_REQUEST_NOT_ALLOWED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INDICATION_REDIRECTION_TO_AP:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INDICATION_REDIRECTION_TO_AP (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_PREFERENCE_DENIED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_PREFERENCE_DENIED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_PREFERENCE_IGNORED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_PREFERENCE_IGNORED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_NOT_AUTHORIZED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_NOT_AUTHORIZED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_RESERVED_FIELD_NOT_ZERO:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_RESERVED_FIELD_NOT_ZERO (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_MALFORMED_COMMAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_MALFORMED_COMMAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUP_GENERAL_COMMAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUP_GENERAL_COMMAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUP_MANUF_GENERAL_COMMAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INVALID_FIELD:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INVALID_FIELD (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INVALID_VALUE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INVALID_VALUE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_READ_ONLY:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_READ_ONLY (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INSUFFICIENT_SPACE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INSUFFICIENT_SPACE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_DUPLICATE_EXISTS:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_DUPLICATE_EXISTS (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_NOT_FOUND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_NOT_FOUND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNREPORTABLE_ATTRIBUTE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INVALID_DATA_TYPE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INVALID_DATA_TYPE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INVALID_SELECTOR:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INVALID_SELECTOR (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_WRITE_ONLY:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_WRITE_ONLY (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INCONSISTENT_STARTUP_STATE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INCONSISTENT_STARTUP_STATE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_DEFINED_OUT_OF_BAND:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_DEFINED_OUT_Of_BAND (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INCONSISTENT:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INCONSISTENT (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_ACTION_DENIED:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_ACTION_DENIED (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_TIMEOUT:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_TIMEOUT (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_ABORT:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_ABORT (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_INVALID_IMAGE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_INVALID_IMAGE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_WAIT_FOR_DATA:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_WAIT_FOR_DATA (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_NO_IMAGE_AVAILABLE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_REQUIRE_MORE_IMAGE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_HARDWARE_FAILURE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_HARDWARE_FAILURE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_SOFTWARE_FAILURE:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_SOFTWARE_FAILURE (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_CALIBRATION_ERROR:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_CALIBRATION_ERROR (0x%02x)", status);
+        break;
+    case EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER:
+        ChipLogProgress(chipTool, "  status: EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER (0x%02x)", status);
+        break;
+    default:
+        ChipLogError(chipTool, "Unknow status: 0x%02x", status);
+        break;
+    }
+
+    return success;
+}
 
 bool ReadAttributeValue(uint8_t *& message, uint16_t & messageLen)
 {
@@ -323,21 +501,27 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ReadAttributesResponse (0x01):");
+
         // struct readAttributeResponseRecord[]
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(2);
             ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
-            if (!ReadAttributeValue(message, messageLen))
+            uint8_t status = chip::Encoding::Read8(message); // zclStatus
+            success        = CheckStatus(status);
+            if (status == 0)
             {
-                return false;
+                if (!ReadAttributeValue(message, messageLen))
+                {
+                    return false;
+                }
             }
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -351,17 +535,23 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "WriteAttributesResponse (0x04):");
+
         // struct writeAttributeResponseRecord[]
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
-            CHECK_MESSAGE_LENGTH(2);
-            ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
+            uint8_t status = chip::Encoding::Read8(message); // zclStatus
+            success        = CheckStatus(status);
+            if (status != 0)
+            {
+                CHECK_MESSAGE_LENGTH(2);
+                ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
+            }
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -375,7 +565,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "WriteAttributesNoResponse (0x05):");
+
         // struct writeAttributeRecord[]
         while (messageLen)
         {
@@ -387,7 +579,7 @@ public:
             }
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -401,13 +593,16 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "DefaultResponse (0x0B):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "commandId", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "statusCode", chip::Encoding::Read8(message)); // zclStatus
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
 
-        return true;
+        return success;
     }
 };
 
@@ -421,7 +616,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "DiscoverAttributesResponse (0x0D):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "discoveryComplete", chip::Encoding::Read8(message)); // bool
         // struct discoverAttributesResponseRecord[]
@@ -433,7 +630,7 @@ public:
             ChipLogProgress(chipTool, "  %s: 0x%02x", "attributeType", chip::Encoding::Read8(message)); // zclType
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -1491,6 +1688,31 @@ public:
     }
 };
 
+class WriteColorControlOptions : public ModelCommand
+{
+public:
+    WriteColorControlOptions() : ModelCommand("write", kColorControlClusterId, 0x01)
+    {
+        AddArgument("attr-name", "options");
+        AddArgument("attr-value", 0, UINT8_MAX, &mOptions);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeColorControlClusterWriteOptionsAttribute(buffer->Start(), bufferSize, endPointId, mOptions);
+    }
+
+    // Global Response: WriteAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        WriteAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint8_t mOptions;
+};
 /*
  * Attribute NumberOfPrimaries
  */
@@ -2266,6 +2488,33 @@ public:
     }
 };
 
+class WriteColorControlStartUpColorTemperatureMireds : public ModelCommand
+{
+public:
+    WriteColorControlStartUpColorTemperatureMireds() : ModelCommand("write", kColorControlClusterId, 0x01)
+    {
+        AddArgument("attr-name", "start-up-color-temperature-mireds");
+        AddArgument("attr-value", 0, UINT16_MAX, &mStartUpColorTemperatureMireds);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(buffer->Start(), bufferSize, endPointId,
+                                                                                    mStartUpColorTemperatureMireds);
+    }
+
+    // Global Response: WriteAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        WriteAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mStartUpColorTemperatureMireds;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster DoorLock                                                    | 0x0101 |
 |------------------------------------------------------------------------------|
@@ -2278,7 +2527,6 @@ public:
 | * ClearWeekdayScheduleResponse                                      |   0x0D |
 | * ClearYearDayScheduleResponse                                      |   0x10 |
 | * GetHolidayScheduleResponse                                        |   0x12 |
-| * GetLogRecordResponse                                              |   0x04 |
 | * GetPINCodeResponse                                                |   0x06 |
 | * GetRFIDCodeResponse                                               |   0x17 |
 | * GetUserTypeResponse                                               |   0x15 |
@@ -2304,7 +2552,6 @@ public:
 | * ClearWeekdaySchedule                                              |   0x0D |
 | * ClearYearDaySchedule                                              |   0x10 |
 | * GetHolidaySchedule                                                |   0x12 |
-| * GetLogRecord                                                      |   0x04 |
 | * GetPINCode                                                        |   0x06 |
 | * GetRFIDCode                                                       |   0x17 |
 | * GetUserType                                                       |   0x15 |
@@ -2336,11 +2583,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearAllPINCodesResponse (0x08):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2354,11 +2603,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearAllRFIDCodesResponse (0x19):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2372,11 +2623,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearHolidayScheduleResponse (0x13):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2390,11 +2643,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearPINCodeResponse (0x07):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2408,11 +2663,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearRFIDCodeResponse (0x18):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2426,11 +2683,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearWeekdayScheduleResponse (0x0D):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2444,11 +2703,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ClearYearDayScheduleResponse (0x10):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2462,56 +2723,31 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetHolidayScheduleResponse (0x12):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "holidayScheduleId", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
-        CHECK_MESSAGE_LENGTH(4);
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
-        CHECK_MESSAGE_LENGTH(4);
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "operatingModeDuringHoliday", chip::Encoding::Read8(message)); // DrlkOperMode
-
-        return true;
-    }
-};
-
-/*
- * Command Response GetLogRecordResponse
- */
-class GetLogRecordResponse : public ModelCommandResponse
-{
-public:
-    GetLogRecordResponse() : ModelCommandResponse(0x04) {}
-
-    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
-    {
-        ChipLogProgress(chipTool, "GetLogRecordResponse (0x04):");
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "logEntryId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        CHECK_MESSAGE_LENGTH(4);
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "timestamp", chip::Encoding::LittleEndian::Read32(message)); // uint32
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "eventType", chip::Encoding::Read8(message)); // enum8
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sourceOperationEvent", chip::Encoding::Read8(message)); // DrlkOperEventSource
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "eventIdOrAlarmCode", chip::Encoding::Read8(message)); // uint8
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        CHECK_MESSAGE_LENGTH(1);
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+        if (status == 0)
         {
-            uint8_t pINLen = chip::Encoding::Read8(message);             // octstr
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "pINLen", pINLen); // octstr
-
-            // FIXME Strings are not supported yet. For the moment the code just checks that
-            // there is enough bytes in the buffer
-            CHECK_MESSAGE_LENGTH(pINLen);
+            CHECK_MESSAGE_LENGTH(4);
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(4);
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "operatingModeDuringHoliday", chip::Encoding::Read8(message)); // DrlkOperMode
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -2525,7 +2761,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetPINCodeResponse (0x06):");
+
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
@@ -2543,7 +2781,7 @@ public:
             message += codeLen;
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -2557,7 +2795,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetRFIDCodeResponse (0x17):");
+
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
@@ -2575,7 +2815,7 @@ public:
             message += rFIdCodeLen;
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -2589,13 +2829,15 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetUserTypeResponse (0x15):");
+
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message)); // DrlkUserType
 
-        return true;
+        return success;
     }
 };
 
@@ -2609,25 +2851,43 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetWeekdayScheduleResponse (0x0C):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "daysMask", chip::Encoding::Read8(message)); // DrlkDaysMask
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "startHour", chip::Encoding::Read8(message)); // uint8
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "startMinute", chip::Encoding::Read8(message)); // uint8
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "endHour", chip::Encoding::Read8(message)); // uint8
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "endMinute", chip::Encoding::Read8(message)); // uint8
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "daysMask", chip::Encoding::Read8(message)); // DrlkDaysMask
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "startHour", chip::Encoding::Read8(message)); // uint8
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "startMinute", chip::Encoding::Read8(message)); // uint8
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "endHour", chip::Encoding::Read8(message)); // uint8
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "endMinute", chip::Encoding::Read8(message)); // uint8
+        }
 
-        return true;
+        return success;
     }
 };
 
@@ -2641,19 +2901,28 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetYearDayScheduleResponse (0x0F):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
-        CHECK_MESSAGE_LENGTH(4);
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
-        CHECK_MESSAGE_LENGTH(4);
-        ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(4);
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+        }
+        if (status == 0)
+        {
+            CHECK_MESSAGE_LENGTH(4);
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+        }
 
-        return true;
+        return success;
     }
 };
 
@@ -2667,11 +2936,14 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "LockDoorResponse (0x00):");
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
 
-        return true;
+        CHECK_MESSAGE_LENGTH(1);
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+
+        return success;
     }
 };
 
@@ -2685,11 +2957,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetHolidayScheduleResponse (0x11):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2703,11 +2977,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetPINCodeResponse (0x05):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkSetCodeStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2721,11 +2997,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetRFIDCodeResponse (0x16):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkSetCodeStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2739,11 +3017,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetUserTypeResponse (0x14):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2757,11 +3037,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetWeekdayScheduleResponse (0x0B):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2775,11 +3057,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "SetYearDayScheduleResponse (0x0E):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
 
-        return true;
+        return success;
     }
 };
 
@@ -2793,11 +3077,14 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "UnlockDoorResponse (0x01):");
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
 
-        return true;
+        CHECK_MESSAGE_LENGTH(1);
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+
+        return success;
     }
 };
 
@@ -2811,11 +3098,14 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "UnlockWithTimeoutResponse (0x03):");
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
 
-        return true;
+        CHECK_MESSAGE_LENGTH(1);
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
+
+        return success;
     }
 };
 
@@ -3087,41 +3377,6 @@ public:
 
 private:
     uint8_t mHolidayScheduleID;
-};
-
-/*
- * Command GetLogRecord
- */
-class DoorLockGetLogRecord : public ModelCommand
-{
-public:
-    DoorLockGetLogRecord() : ModelCommand("get-log-record", kDoorLockClusterId, 0x04)
-    {
-        AddArgument("logIndex", 0, UINT16_MAX, &mLogIndex);
-        ModelCommand::AddArguments();
-    }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeDoorLockClusterGetLogRecordCommand(buffer->Start(), bufferSize, endPointId, mLogIndex);
-    }
-
-    // Global Response: DefaultResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        DefaultResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-    // Specific Response: GetLogRecordResponse
-    bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        GetLogRecordResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-private:
-    uint16_t mLogIndex;
 };
 
 /*
@@ -3771,13 +4026,15 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "AddGroupResponse (0x00):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // uint16
 
-        return true;
+        return success;
     }
 };
 
@@ -3791,7 +4048,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetGroupMembershipResponse (0x02):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(1);
@@ -3803,7 +4062,7 @@ public:
             ChipLogProgress(chipTool, "  %s: 0x%04x", "groupList", chip::Encoding::LittleEndian::Read16(message)); // uint16
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -3817,13 +4076,15 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "RemoveGroupResponse (0x03):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // uint16
 
-        return true;
+        return success;
     }
 };
 
@@ -3837,7 +4098,9 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ViewGroupResponse (0x01):");
+
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
         CHECK_MESSAGE_LENGTH(2);
@@ -3853,7 +4116,7 @@ public:
             message += groupNameLen;
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -3865,7 +4128,7 @@ class GroupsAddGroup : public ModelCommand
 public:
     GroupsAddGroup() : ModelCommand("add-group", kGroupsClusterId, 0x00)
     {
-        AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("groupId", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupId);
         AddArgument("groupName", &mGroupName);
         ModelCommand::AddArguments();
     }
@@ -3890,7 +4153,7 @@ public:
     }
 
 private:
-    uint16_t mGroupId;
+    chip::GroupId mGroupId;
     char * mGroupName;
 };
 
@@ -3902,7 +4165,7 @@ class GroupsAddGroupIfIdentifying : public ModelCommand
 public:
     GroupsAddGroupIfIdentifying() : ModelCommand("add-group-if-identifying", kGroupsClusterId, 0x05)
     {
-        AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("groupId", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupId);
         AddArgument("groupName", &mGroupName);
         ModelCommand::AddArguments();
     }
@@ -3920,7 +4183,7 @@ public:
     }
 
 private:
-    uint16_t mGroupId;
+    chip::GroupId mGroupId;
     char * mGroupName;
 };
 
@@ -3992,7 +4255,7 @@ class GroupsRemoveGroup : public ModelCommand
 public:
     GroupsRemoveGroup() : ModelCommand("remove-group", kGroupsClusterId, 0x03)
     {
-        AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("groupId", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupId);
         ModelCommand::AddArguments();
     }
 
@@ -4016,7 +4279,7 @@ public:
     }
 
 private:
-    uint16_t mGroupId;
+    chip::GroupId mGroupId;
 };
 
 /*
@@ -4027,7 +4290,7 @@ class GroupsViewGroup : public ModelCommand
 public:
     GroupsViewGroup() : ModelCommand("view-group", kGroupsClusterId, 0x01)
     {
-        AddArgument("groupId", 0, UINT16_MAX, &mGroupId);
+        AddArgument("groupId", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupId);
         ModelCommand::AddArguments();
     }
 
@@ -4051,7 +4314,7 @@ public:
     }
 
 private:
-    uint16_t mGroupId;
+    chip::GroupId mGroupId;
 };
 
 /*
@@ -4104,11 +4367,13 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "IdentifyQueryResponse (0x00):");
+
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "timeout", chip::Encoding::LittleEndian::Read16(message)); // uint16
 
-        return true;
+        return success;
     }
 };
 
@@ -4191,6 +4456,32 @@ public:
         ReadAttributesResponse response;
         return response.HandleCommandResponse(commandId, message, messageLen);
     }
+};
+
+class WriteIdentifyIdentifyTime : public ModelCommand
+{
+public:
+    WriteIdentifyIdentifyTime() : ModelCommand("write", kIdentifyClusterId, 0x01)
+    {
+        AddArgument("attr-name", "identify-time");
+        AddArgument("attr-value", 0, UINT16_MAX, &mIdentifyTime);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeIdentifyClusterWriteIdentifyTimeAttribute(buffer->Start(), bufferSize, endPointId, mIdentifyTime);
+    }
+
+    // Global Response: WriteAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        WriteAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mIdentifyTime;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -4620,9 +4911,6 @@ public:
 |------------------------------------------------------------------------------|
 | Responses:                                                          |        |
 | * AddSceneResponse                                                  |   0x00 |
-| * CopySceneResponse                                                 |   0x42 |
-| * EnhancedAddSceneResponse                                          |   0x40 |
-| * EnhancedViewSceneResponse                                         |   0x41 |
 | * GetSceneMembershipResponse                                        |   0x06 |
 | * RemoveAllScenesResponse                                           |   0x03 |
 | * RemoveSceneResponse                                               |   0x02 |
@@ -4632,9 +4920,6 @@ public:
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
 | * AddScene                                                          |   0x00 |
-| * CopyScene                                                         |   0x42 |
-| * EnhancedAddScene                                                  |   0x40 |
-| * EnhancedViewScene                                                 |   0x41 |
 | * GetSceneMembership                                                |   0x06 |
 | * RecallScene                                                       |   0x05 |
 | * RemoveAllScenes                                                   |   0x03 |
@@ -4660,108 +4945,18 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "AddSceneResponse (0x00):");
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
 
-        return true;
-    }
-};
-
-/*
- * Command Response CopySceneResponse
- */
-class CopySceneResponse : public ModelCommandResponse
-{
-public:
-    CopySceneResponse() : ModelCommandResponse(0x42) {}
-
-    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
-    {
-        ChipLogProgress(chipTool, "CopySceneResponse (0x42):");
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupIdFrom", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneIdFrom", chip::Encoding::Read8(message)); // uint8
-
-        return true;
-    }
-};
-
-/*
- * Command Response EnhancedAddSceneResponse
- */
-class EnhancedAddSceneResponse : public ModelCommandResponse
-{
-public:
-    EnhancedAddSceneResponse() : ModelCommandResponse(0x40) {}
-
-    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
-    {
-        ChipLogProgress(chipTool, "EnhancedAddSceneResponse (0x40):");
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
-
-        return true;
-    }
-};
-
-/*
- * Command Response EnhancedViewSceneResponse
- */
-class EnhancedViewSceneResponse : public ModelCommandResponse
-{
-public:
-    EnhancedViewSceneResponse() : ModelCommandResponse(0x41) {}
-
-    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
-    {
-        ChipLogProgress(chipTool, "EnhancedViewSceneResponse (0x41):");
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
-        CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
-        CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "transitionTime", chip::Encoding::LittleEndian::Read16(message)); // uint16
-        CHECK_MESSAGE_LENGTH(1);
-        {
-            uint8_t sceneNameLen = chip::Encoding::Read8(message);                   // SSceneName
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneNameLen", sceneNameLen); // SSceneName
-
-            // FIXME Strings are not supported yet. For the moment the code just checks that
-            // there is enough bytes in the buffer
-            CHECK_MESSAGE_LENGTH(sceneNameLen);
-        }
-        // struct SExtensionFieldSetList[]
-        uint8_t * messageEnd = message + messageLen;
-        while (message < messageEnd)
-        {
-            CHECK_MESSAGE_LENGTH(2);
-            ChipLogProgress(chipTool, "  %s: 0x%04x", "clusterId", chip::Encoding::LittleEndian::Read16(message)); // uint16
-            CHECK_MESSAGE_LENGTH(1);
-            {
-                uint8_t extensionFieldSetLen = chip::Encoding::Read8(message);                           // octstr
-                ChipLogProgress(chipTool, "  %s: 0x%02x", "extensionFieldSetLen", extensionFieldSetLen); // octstr
-
-                // FIXME Strings are not supported yet. For the moment the code just checks that
-                // there is enough bytes in the buffer
-                CHECK_MESSAGE_LENGTH(extensionFieldSetLen);
-            }
-        }
-
-        return true;
+        return success;
     }
 };
 
@@ -4775,9 +4970,12 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "GetSceneMembershipResponse (0x06):");
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message)); // uint8
         CHECK_MESSAGE_LENGTH(2);
@@ -4789,7 +4987,7 @@ public:
             ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneList", chip::Encoding::Read8(message)); // uint8
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -4803,13 +5001,16 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "RemoveAllScenesResponse (0x03):");
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
 
-        return true;
+        return success;
     }
 };
 
@@ -4823,15 +5024,18 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "RemoveSceneResponse (0x02):");
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
 
-        return true;
+        return success;
     }
 };
 
@@ -4845,15 +5049,18 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "StoreSceneResponse (0x04):");
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
         ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
 
-        return true;
+        return success;
     }
 };
 
@@ -4867,9 +5074,12 @@ public:
 
     bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
     {
+        bool success = true;
         ChipLogProgress(chipTool, "ViewSceneResponse (0x01):");
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // zclStatus
+        uint8_t status = chip::Encoding::Read8(message); // zclStatus
+        success        = CheckStatus(status);
         CHECK_MESSAGE_LENGTH(2);
         ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
         CHECK_MESSAGE_LENGTH(1);
@@ -4903,7 +5113,7 @@ public:
             }
         }
 
-        return true;
+        return success;
     }
 };
 
@@ -4915,7 +5125,7 @@ class ScenesAddScene : public ModelCommand
 public:
     ScenesAddScene() : ModelCommand("add-scene", kScenesClusterId, 0x00)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         AddArgument("sceneName", &mSceneName);
@@ -4947,141 +5157,12 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
     uint8_t mSceneID;
     uint16_t mTransitionTime;
     char * mSceneName;
     uint16_t mClusterId;
     char * mExtensionFieldSet;
-};
-
-/*
- * Command CopyScene
- */
-class ScenesCopyScene : public ModelCommand
-{
-public:
-    ScenesCopyScene() : ModelCommand("copy-scene", kScenesClusterId, 0x42)
-    {
-        AddArgument("mode", 0, UINT8_MAX, &mMode);
-        AddArgument("groupIdentifierFrom", 0, UINT16_MAX, &mGroupIdentifierFrom);
-        AddArgument("sceneIdentifierFrom", 0, UINT8_MAX, &mSceneIdentifierFrom);
-        AddArgument("groupIdentifierTo", 0, UINT16_MAX, &mGroupIdentifierTo);
-        AddArgument("sceneIdentifierTo", 0, UINT8_MAX, &mSceneIdentifierTo);
-        ModelCommand::AddArguments();
-    }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeScenesClusterCopySceneCommand(buffer->Start(), bufferSize, endPointId, mMode, mGroupIdentifierFrom,
-                                                   mSceneIdentifierFrom, mGroupIdentifierTo, mSceneIdentifierTo);
-    }
-
-    // Global Response: DefaultResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        DefaultResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-    // Specific Response: CopySceneResponse
-    bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        CopySceneResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-private:
-    uint8_t mMode;
-    uint16_t mGroupIdentifierFrom;
-    uint8_t mSceneIdentifierFrom;
-    uint16_t mGroupIdentifierTo;
-    uint8_t mSceneIdentifierTo;
-};
-
-/*
- * Command EnhancedAddScene
- */
-class ScenesEnhancedAddScene : public ModelCommand
-{
-public:
-    ScenesEnhancedAddScene() : ModelCommand("enhanced-add-scene", kScenesClusterId, 0x40)
-    {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
-        AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
-        AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
-        AddArgument("sceneName", &mSceneName);
-        // extensionFieldSets is an array, but since chip-tool does not support variable
-        // number of arguments, only a single instance is supported.
-        AddArgument("clusterId", 0, UINT16_MAX, &mClusterId);
-        AddArgument("extensionFieldSet", &mExtensionFieldSet);
-        ModelCommand::AddArguments();
-    }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeScenesClusterEnhancedAddSceneCommand(buffer->Start(), bufferSize, endPointId, mGroupID, mSceneID,
-                                                          mTransitionTime, mSceneName, mClusterId, mExtensionFieldSet);
-    }
-
-    // Global Response: DefaultResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        DefaultResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-    // Specific Response: EnhancedAddSceneResponse
-    bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        EnhancedAddSceneResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-private:
-    uint16_t mGroupID;
-    uint8_t mSceneID;
-    uint16_t mTransitionTime;
-    char * mSceneName;
-    uint16_t mClusterId;
-    char * mExtensionFieldSet;
-};
-
-/*
- * Command EnhancedViewScene
- */
-class ScenesEnhancedViewScene : public ModelCommand
-{
-public:
-    ScenesEnhancedViewScene() : ModelCommand("enhanced-view-scene", kScenesClusterId, 0x41)
-    {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
-        AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
-        ModelCommand::AddArguments();
-    }
-
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
-    {
-        return encodeScenesClusterEnhancedViewSceneCommand(buffer->Start(), bufferSize, endPointId, mGroupID, mSceneID);
-    }
-
-    // Global Response: DefaultResponse
-    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        DefaultResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-    // Specific Response: EnhancedViewSceneResponse
-    bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
-    {
-        EnhancedViewSceneResponse response;
-        return response.HandleCommandResponse(commandId, message, messageLen);
-    }
-
-private:
-    uint16_t mGroupID;
-    uint8_t mSceneID;
 };
 
 /*
@@ -5092,7 +5173,7 @@ class ScenesGetSceneMembership : public ModelCommand
 public:
     ScenesGetSceneMembership() : ModelCommand("get-scene-membership", kScenesClusterId, 0x06)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         ModelCommand::AddArguments();
     }
 
@@ -5116,7 +5197,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
 };
 
 /*
@@ -5127,7 +5208,7 @@ class ScenesRecallScene : public ModelCommand
 public:
     ScenesRecallScene() : ModelCommand("recall-scene", kScenesClusterId, 0x05)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         AddArgument("transitionTime", 0, UINT16_MAX, &mTransitionTime);
         ModelCommand::AddArguments();
@@ -5146,7 +5227,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
     uint8_t mSceneID;
     uint16_t mTransitionTime;
 };
@@ -5159,7 +5240,7 @@ class ScenesRemoveAllScenes : public ModelCommand
 public:
     ScenesRemoveAllScenes() : ModelCommand("remove-all-scenes", kScenesClusterId, 0x03)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         ModelCommand::AddArguments();
     }
 
@@ -5183,7 +5264,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
 };
 
 /*
@@ -5194,7 +5275,7 @@ class ScenesRemoveScene : public ModelCommand
 public:
     ScenesRemoveScene() : ModelCommand("remove-scene", kScenesClusterId, 0x02)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         ModelCommand::AddArguments();
     }
@@ -5219,7 +5300,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
     uint8_t mSceneID;
 };
 
@@ -5231,7 +5312,7 @@ class ScenesStoreScene : public ModelCommand
 public:
     ScenesStoreScene() : ModelCommand("store-scene", kScenesClusterId, 0x04)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         ModelCommand::AddArguments();
     }
@@ -5256,7 +5337,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
     uint8_t mSceneID;
 };
 
@@ -5268,7 +5349,7 @@ class ScenesViewScene : public ModelCommand
 public:
     ScenesViewScene() : ModelCommand("view-scene", kScenesClusterId, 0x01)
     {
-        AddArgument("groupID", 0, UINT16_MAX, &mGroupID);
+        AddArgument("groupID", 0, std::numeric_limits<chip::GroupId>::max(), &mGroupID);
         AddArgument("sceneID", 0, UINT8_MAX, &mSceneID);
         ModelCommand::AddArguments();
     }
@@ -5293,7 +5374,7 @@ public:
     }
 
 private:
-    uint16_t mGroupID;
+    chip::GroupId mGroupID;
     uint8_t mSceneID;
 };
 
@@ -5567,6 +5648,7 @@ void registerClusterColorControl(Commands & commands)
         make_unique<ReadColorControlColorTemperatureMireds>(),
         make_unique<ReadColorControlColorMode>(),
         make_unique<ReadColorControlOptions>(),
+        make_unique<WriteColorControlOptions>(),
         make_unique<ReadColorControlNumberOfPrimaries>(),
         make_unique<ReadColorControlPrimary1X>(),
         make_unique<ReadColorControlPrimary1Y>(),
@@ -5598,6 +5680,7 @@ void registerClusterColorControl(Commands & commands)
         make_unique<ReadColorControlColorTempPhysicalMaxMireds>(),
         make_unique<ReadColorControlCoupleColorTempToLevelMinMireds>(),
         make_unique<ReadColorControlStartUpColorTemperatureMireds>(),
+        make_unique<WriteColorControlStartUpColorTemperatureMireds>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -5608,31 +5691,18 @@ void registerClusterDoorLock(Commands & commands)
     const char * clusterName = "DoorLock";
 
     commands_list clusterCommands = {
-        make_unique<DoorLockClearAllPINCodes>(),
-        make_unique<DoorLockClearAllRFIDCodes>(),
-        make_unique<DoorLockClearHolidaySchedule>(),
-        make_unique<DoorLockClearPINCode>(),
-        make_unique<DoorLockClearRFIDCode>(),
-        make_unique<DoorLockClearWeekdaySchedule>(),
-        make_unique<DoorLockClearYearDaySchedule>(),
-        make_unique<DoorLockGetHolidaySchedule>(),
-        make_unique<DoorLockGetLogRecord>(),
-        make_unique<DoorLockGetPINCode>(),
-        make_unique<DoorLockGetRFIDCode>(),
-        make_unique<DoorLockGetUserType>(),
-        make_unique<DoorLockGetWeekdaySchedule>(),
-        make_unique<DoorLockGetYearDaySchedule>(),
-        make_unique<DoorLockLockDoor>(),
-        make_unique<DoorLockSetHolidaySchedule>(),
-        make_unique<DoorLockSetPINCode>(),
-        make_unique<DoorLockSetRFIDCode>(),
-        make_unique<DoorLockSetUserType>(),
-        make_unique<DoorLockSetWeekdaySchedule>(),
-        make_unique<DoorLockSetYearDaySchedule>(),
-        make_unique<DoorLockUnlockDoor>(),
-        make_unique<DoorLockUnlockWithTimeout>(),
-        make_unique<ReadDoorLockLockState>(),
-        make_unique<ReadDoorLockLockType>(),
+        make_unique<DoorLockClearAllPINCodes>(),     make_unique<DoorLockClearAllRFIDCodes>(),
+        make_unique<DoorLockClearHolidaySchedule>(), make_unique<DoorLockClearPINCode>(),
+        make_unique<DoorLockClearRFIDCode>(),        make_unique<DoorLockClearWeekdaySchedule>(),
+        make_unique<DoorLockClearYearDaySchedule>(), make_unique<DoorLockGetHolidaySchedule>(),
+        make_unique<DoorLockGetPINCode>(),           make_unique<DoorLockGetRFIDCode>(),
+        make_unique<DoorLockGetUserType>(),          make_unique<DoorLockGetWeekdaySchedule>(),
+        make_unique<DoorLockGetYearDaySchedule>(),   make_unique<DoorLockLockDoor>(),
+        make_unique<DoorLockSetHolidaySchedule>(),   make_unique<DoorLockSetPINCode>(),
+        make_unique<DoorLockSetRFIDCode>(),          make_unique<DoorLockSetUserType>(),
+        make_unique<DoorLockSetWeekdaySchedule>(),   make_unique<DoorLockSetYearDaySchedule>(),
+        make_unique<DoorLockUnlockDoor>(),           make_unique<DoorLockUnlockWithTimeout>(),
+        make_unique<ReadDoorLockLockState>(),        make_unique<ReadDoorLockLockType>(),
         make_unique<ReadDoorLockActuatorEnabled>(),
     };
 
@@ -5660,6 +5730,7 @@ void registerClusterIdentify(Commands & commands)
         make_unique<IdentifyIdentify>(),
         make_unique<IdentifyIdentifyQuery>(),
         make_unique<ReadIdentifyIdentifyTime>(),
+        make_unique<WriteIdentifyIdentifyTime>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -5697,11 +5768,10 @@ void registerClusterScenes(Commands & commands)
     const char * clusterName = "Scenes";
 
     commands_list clusterCommands = {
-        make_unique<ScenesAddScene>(),          make_unique<ScenesCopyScene>(),          make_unique<ScenesEnhancedAddScene>(),
-        make_unique<ScenesEnhancedViewScene>(), make_unique<ScenesGetSceneMembership>(), make_unique<ScenesRecallScene>(),
-        make_unique<ScenesRemoveAllScenes>(),   make_unique<ScenesRemoveScene>(),        make_unique<ScenesStoreScene>(),
-        make_unique<ScenesViewScene>(),         make_unique<ReadScenesSceneCount>(),     make_unique<ReadScenesCurrentScene>(),
-        make_unique<ReadScenesCurrentGroup>(),  make_unique<ReadScenesSceneValid>(),     make_unique<ReadScenesNameSupport>(),
+        make_unique<ScenesAddScene>(),         make_unique<ScenesGetSceneMembership>(), make_unique<ScenesRecallScene>(),
+        make_unique<ScenesRemoveAllScenes>(),  make_unique<ScenesRemoveScene>(),        make_unique<ScenesStoreScene>(),
+        make_unique<ScenesViewScene>(),        make_unique<ReadScenesSceneCount>(),     make_unique<ReadScenesCurrentScene>(),
+        make_unique<ReadScenesCurrentGroup>(), make_unique<ReadScenesSceneValid>(),     make_unique<ReadScenesNameSupport>(),
     };
 
     commands.Register(clusterName, clusterCommands);

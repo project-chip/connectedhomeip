@@ -125,10 +125,18 @@ namespace DeviceLayer {
                 NSData * serviceData = [servicesData objectForKey:serviceUUID];
 
                 NSUInteger length = [serviceData length];
-                if (length == 3) {
+                if (length == 3 || length == 7) {
                     const uint8_t * bytes = (const uint8_t *) [serviceData bytes];
                     uint8_t opCode = bytes[0];
-                    uint16_t discriminator = static_cast<uint16_t>(((bytes[1] & 0x0F) << 8) | bytes[2]);
+                    uint16_t discriminator;
+                    if (length == 7) {
+                        discriminator = (bytes[1] | (bytes[2] << 8)) & 0xfff;
+                    } else {
+                        // TODO - Remove this incorrect format.
+                        ChipLogError(Ble, "Using deprecated BLE advertisement format");
+                        discriminator = static_cast<uint16_t>(((bytes[1] & 0x0F) << 8) | bytes[2]);
+                    }
+
                     if (opCode == 0 && discriminator == _deviceDiscriminator) {
                         ChipLogProgress(Ble, "Connecting to device: %@", peripheral);
                         [self connect:peripheral];

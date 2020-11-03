@@ -24,15 +24,18 @@
 namespace chip {
 namespace DeviceLayer {
 
-void DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const char * ssid, const char * key)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
     ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
     err = SetWiFiStationProvisioning(ssid, key);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(NetworkProvisioning, "Failed to connect to WiFi network: %s", chip::ErrorStr(err));
     }
+
+    return err;
 }
 
 } // namespace DeviceLayer

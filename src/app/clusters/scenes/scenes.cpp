@@ -46,6 +46,8 @@
 #include "../zll-scenes-server/zll-scenes-server.h"
 #endif
 
+using namespace chip;
+
 uint8_t emberAfPluginScenesServerEntriesInUse = 0;
 #if !defined(EMBER_AF_PLUGIN_SCENES_USE_TOKENS) || defined(EZSP_HOST)
 EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[EMBER_AF_PLUGIN_SCENES_TABLE_SIZE];
@@ -113,7 +115,7 @@ EmberAfStatus emberAfScenesSetSceneCountAttribute(uint8_t endpoint, uint8_t newC
                                 ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, uint16_t groupId)
+EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, GroupId groupId)
 {
     EmberAfStatus status;
     bool valid = true;
@@ -193,19 +195,19 @@ void emAfPluginScenesServerPrintInfo(void)
     }
 }
 
-bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+bool emberAfScenesClusterAddSceneCallback(GroupId groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                                           uint8_t * extensionFieldSets)
 {
     return emberAfPluginScenesServerParseAddScene(emberAfCurrentCommand(), groupId, sceneId, transitionTime, sceneName,
                                                   extensionFieldSets);
 }
 
-bool emberAfScenesClusterViewSceneCallback(uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterViewSceneCallback(GroupId groupId, uint8_t sceneId)
 {
     return emberAfPluginScenesServerParseViewScene(emberAfCurrentCommand(), groupId, sceneId);
 }
 
-bool emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterRemoveSceneCallback(GroupId groupId, uint8_t sceneId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     EmberStatus sendStatus;
@@ -251,7 +253,7 @@ bool emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneId)
     return true;
 }
 
-bool emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId)
+bool emberAfScenesClusterRemoveAllScenesCallback(GroupId groupId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_INVALID_FIELD;
     EmberStatus sendStatus;
@@ -291,7 +293,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId)
     return true;
 }
 
-bool emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId)
+bool emberAfScenesClusterStoreSceneCallback(GroupId groupId, uint8_t sceneId)
 {
     EmberAfStatus status;
     EmberStatus sendStatus;
@@ -312,7 +314,7 @@ bool emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId)
     return true;
 }
 
-bool emberAfScenesClusterRecallSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime)
+bool emberAfScenesClusterRecallSceneCallback(GroupId groupId, uint8_t sceneId, uint16_t transitionTime)
 {
     // NOTE: TransitionTime field in the RecallScene command is currently
     // ignored. Per Zigbee Alliance ZCL 7 (07-5123-07):
@@ -345,7 +347,7 @@ bool emberAfScenesClusterRecallSceneCallback(uint16_t groupId, uint8_t sceneId, 
     return true;
 }
 
-bool emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId)
+bool emberAfScenesClusterGetSceneMembershipCallback(GroupId groupId)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
     EmberStatus sendStatus;
@@ -400,7 +402,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId)
     return true;
 }
 
-EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId)
+EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(EndpointId endpoint, GroupId groupId, uint8_t sceneId)
 {
     EmberAfSceneTableEntry entry;
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
@@ -516,7 +518,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(uint8_t endpoint, ui
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId)
+EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, GroupId groupId, uint8_t sceneId)
 {
     if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID && !emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId))
     {
@@ -672,7 +674,7 @@ void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint)
     }
 }
 
-bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, uint16_t groupId, uint8_t sceneId,
+bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, GroupId groupId, uint8_t sceneId,
                                             uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
 {
     EmberAfSceneTableEntry entry;
@@ -996,7 +998,7 @@ kickout:
     return true;
 }
 
-bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, uint16_t groupId, uint8_t sceneId)
+bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, GroupId groupId, uint8_t sceneId)
 {
     EmberAfSceneTableEntry entry = {};
     EmberAfStatus status         = EMBER_ZCL_STATUS_NOT_FOUND;
@@ -1168,7 +1170,7 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
     return true;
 }
 
-void emberAfScenesClusterRemoveScenesInGroupCallback(uint8_t endpoint, uint16_t groupId)
+void emberAfScenesClusterRemoveScenesInGroupCallback(EndpointId endpoint, GroupId groupId)
 {
     uint8_t i;
     for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)

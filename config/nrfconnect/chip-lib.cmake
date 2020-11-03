@@ -65,6 +65,20 @@ function(zephyr_get_compile_flags VAR LANG)
     set(${VAR} ${INCLUDES} ${SYSTEM_INCLUDES} ${DEFINES} ${FLAGS} ${${VAR}} PARENT_SCOPE)
 endfunction()
 
+function(chip_select_cpp_standard VAR)
+    if (CONFIG_STD_CPP11)
+        set(${VAR} -std=gnu++11 PARENT_SCOPE)
+    elseif (CONFIG_STD_CPP14)
+        set(${VAR} -std=gnu++14 PARENT_SCOPE)
+    elseif (CONFIG_STD_CPP17)
+        set(${VAR} -std=gnu++17 PARENT_SCOPE)
+    elseif (CONFIG_STD_CPP2A)
+        set(${VAR} -std=gnu++20 PARENT_SCOPE)
+    else()
+        message(FATAL_ERROR "Building with unsupported C++ standard")
+    endif()
+endfunction()
+
 # ==================================================
 # Define chip configuration target
 # ==================================================
@@ -82,7 +96,8 @@ function(chip_configure TARGET_NAME)
 
     zephyr_get_compile_flags(CHIP_CXXFLAGS CXX)
     list(FILTER CHIP_CXXFLAGS EXCLUDE REGEX -std.*)
-    list(APPEND CHIP_CXXFLAGS "-std=gnu++11")
+    chip_select_cpp_standard(CHIP_CXX_STANDARD)
+    list(APPEND CHIP_CXXFLAGS ${CHIP_CXX_STANDARD})
     convert_list_of_flags_to_string_of_flags(CHIP_CXXFLAGS CHIP_CXXFLAGS)
 
     set(GN_ARGS "")
@@ -107,6 +122,7 @@ function(chip_configure TARGET_NAME)
     chip_gn_arg_bool_if(CONFIG_NET_IPV4          GN_ARGS "chip_inet_config_enable_ipv4")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_build_tests")
     chip_gn_arg_bool_if(CONFIG_CHIP_LIB_SHELL    GN_ARGS "chip_build_libshell")
+    chip_gn_arg_bool_if(CONFIG_CHIP_PW_RPC       GN_ARGS "chip_build_pw_rpc_lib")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_raw_endpoint")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_tcp_endpoint")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_dns_resolver")

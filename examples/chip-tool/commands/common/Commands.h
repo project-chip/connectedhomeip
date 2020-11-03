@@ -37,7 +37,8 @@ private:
     CHIP_ERROR RunCommand(ChipDeviceController & dc, NodeId remoteId, int argc, char ** argv);
     std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
-    Command * GetReadWriteCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
+    Command * GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName);
+    bool IsGlobalCommand(std::string commandName) const;
 
     void ShowClusters(std::string executable);
     void ShowCluster(std::string executable, std::string clusterName, CommandsVector & commands);

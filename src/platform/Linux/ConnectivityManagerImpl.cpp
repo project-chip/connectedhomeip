@@ -273,16 +273,47 @@ void ConnectivityManagerImpl::_OnWpaInterfaceReady(GObject * source_object, GAsy
     }
     else
     {
+        GError * error  = nullptr;
+        GVariant * args = nullptr;
+        GVariantBuilder builder;
+
         ChipLogProgress(DeviceLayer, "wpa_supplicant: can't find interface %s: %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME,
                         err ? err->message : "unknown error");
 
-        mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NO_INTERFACE_PATH;
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: try to create interface %s", CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME);
 
-        if (mWpaSupplicant.interfacePath)
+        g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+        g_variant_builder_add(&builder, "{sv}", "Ifname", g_variant_new_string(CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME));
+        args = g_variant_builder_end(&builder);
+
+        result = wpa_fi_w1_wpa_supplicant1_call_create_interface_sync(mWpaSupplicant.proxy, args, &mWpaSupplicant.interfacePath,
+                                                                      nullptr, &error);
+
+        if (result)
         {
-            g_free(mWpaSupplicant.interfacePath);
-            mWpaSupplicant.interfacePath = nullptr;
+            mWpaSupplicant.state = GDBusWpaSupplicant::WPA_GOT_INTERFACE_PATH;
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: WiFi interface: %s", mWpaSupplicant.interfacePath);
+
+            wpa_fi_w1_wpa_supplicant1_interface_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE,
+                                                                  kWpaSupplicantServiceName, mWpaSupplicant.interfacePath, nullptr,
+                                                                  _OnWpaInterfaceProxyReady, nullptr);
         }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to create interface %s: %s",
+                            CHIP_DEVICE_CONFIG_WIFI_STATION_IF_NAME, error ? error->message : "unknown error");
+
+            mWpaSupplicant.state = GDBusWpaSupplicant::WPA_NO_INTERFACE_PATH;
+
+            if (mWpaSupplicant.interfacePath)
+            {
+                g_free(mWpaSupplicant.interfacePath);
+                mWpaSupplicant.interfacePath = nullptr;
+            }
+        }
+
+        if (error != nullptr)
+            g_error_free(error);
     }
 
     if (err != nullptr)

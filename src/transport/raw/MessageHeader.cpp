@@ -143,7 +143,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     uint16_t octets_read;
 
     uint16_t header;
-    err = reader.Read16(&header);
+    err = reader.Read16(&header).StatusCode();
     SuccessOrExit(err);
     version = ((header & kVersionMask) >> kVersionShift);
     VerifyOrExit(version == kHeaderVersion, err = CHIP_ERROR_VERSION_MISMATCH);
@@ -151,13 +151,13 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     mEncryptionType = static_cast<Header::EncryptionType>((header & kEncryptionTypeMask) >> kEncryptionTypeShift);
     mFlags.SetRaw(header & Header::kFlagsMask);
 
-    err = reader.Read32(&mMessageId);
+    err = reader.Read32(&mMessageId).StatusCode();
     SuccessOrExit(err);
 
     if (mFlags.Has(Header::FlagValues::kSourceNodeIdPresent))
     {
         uint64_t sourceNodeId;
-        err = reader.Read64(&sourceNodeId);
+        err = reader.Read64(&sourceNodeId).StatusCode();
         SuccessOrExit(err);
         mSourceNodeId.SetValue(sourceNodeId);
     }
@@ -169,7 +169,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
     if (mFlags.Has(Header::FlagValues::kDestinationNodeIdPresent))
     {
         uint64_t destinationNodeId;
-        err = reader.Read64(&destinationNodeId);
+        err = reader.Read64(&destinationNodeId).StatusCode();
         SuccessOrExit(err);
         mDestinationNodeId.SetValue(destinationNodeId);
     }
@@ -178,10 +178,7 @@ CHIP_ERROR PacketHeader::Decode(const uint8_t * const data, uint16_t size, uint1
         mDestinationNodeId.ClearValue();
     }
 
-    err = reader.Read16(&mEncryptionKeyID);
-    SuccessOrExit(err);
-
-    err = reader.Read16(&mPayloadLength);
+    err = reader.Read16(&mEncryptionKeyID).Read16(&mPayloadLength).StatusCode();
     SuccessOrExit(err);
 
     octets_read = reader.OctetsRead();
@@ -200,19 +197,13 @@ CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data
     uint8_t header;
     uint16_t octets_read;
 
-    err = reader.Read8(&header);
-    SuccessOrExit(err);
-
-    err = reader.Read8(&mMessageType);
-    SuccessOrExit(err);
-
-    err = reader.Read16(&mExchangeID);
+    err = reader.Read8(&header).Read8(&mMessageType).Read16(&mExchangeID).StatusCode();
     SuccessOrExit(err);
 
     if (flags.Has(Header::FlagValues::kVendorIdPresent))
     {
         uint16_t vendor_id;
-        err = reader.Read16(&vendor_id);
+        err = reader.Read16(&vendor_id).StatusCode();
         SuccessOrExit(err);
         mVendorId.SetValue(vendor_id);
     }
@@ -223,7 +214,7 @@ CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data
 
     mExchangeFlags.SetRaw(header);
 
-    err = reader.Read16(&mProtocolID);
+    err = reader.Read16(&mProtocolID).StatusCode();
     SuccessOrExit(err);
 
     octets_read = reader.OctetsRead();

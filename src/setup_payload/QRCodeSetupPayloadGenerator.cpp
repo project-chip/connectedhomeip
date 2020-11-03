@@ -30,7 +30,7 @@
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
-#include <protocols/CHIPProtocols.h>
+#include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 
@@ -139,7 +139,7 @@ CHIP_ERROR QRCodeSetupPayloadGenerator::generateTLVFromOptionalData(SetupPayload
 
     TLVWriter rootWriter;
     rootWriter.Init(tlvDataStart, maxLen);
-    rootWriter.ImplicitProfileId = chip::Protocols::kChipProtocol_ServiceProvisioning;
+    rootWriter.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
 
     // The cost (in bytes) of the top-level container is amortized as soon as there is at least 4 optionals elements.
     if ((optionalData.size() + optionalExtensionData.size()) >= 4)

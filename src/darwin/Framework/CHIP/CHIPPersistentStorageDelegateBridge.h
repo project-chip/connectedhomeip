@@ -45,6 +45,8 @@ private:
     chip::DeviceController::PersistentStorageResultDelegate * mCallback;
     SendKeyValue mCompletionHandler;
     SendStatus mStatusHandler;
+    NSUserDefaults * mDefaultPersistentStorage;
+    dispatch_queue_t mDefaultCallbackQueue;
 };
 
 NS_ASSUME_NONNULL_END

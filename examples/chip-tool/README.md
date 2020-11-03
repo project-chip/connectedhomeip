@@ -43,7 +43,7 @@ wifi-echo app:
 To start the Client in echo mode, run the built executable and pass it the IP
 address and port of the server to talk to, as well as the command "echo".
 
-    $ chip-tool echo ip 192.168.0.30 11095
+    $ chip-tool echo ip 192.168.0.30 11097
 
 If valid values are supplied, it will begin to periodically send messages to the
 server address provided.
@@ -60,7 +60,7 @@ the target cluster name, the target command name, the ip address and port of the
 server to talk to as well as an endpoint id. The endpoint id must be between 1
 and 240.
 
-    $ chip-tool onoff on 192.168.0.30 11095 1
+    $ chip-tool onoff on 192.168.0.30 11097 1
 
 The client will send a single command packet and then exit.
 

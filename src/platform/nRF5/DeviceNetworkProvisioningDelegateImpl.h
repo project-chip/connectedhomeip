@@ -35,8 +35,8 @@ class DeviceNetworkProvisioningDelegateImpl final
     friend class GenericDeviceNetworkProvisioningDelegateImpl<DeviceNetworkProvisioningDelegateImpl>;
 
 private:
-    void _ProvisionWiFiNetwork(const char * ssid, const char * passwd) {}
-    void _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData);
+    CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData);
 };
 
 } // namespace DeviceLayer

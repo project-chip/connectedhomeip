@@ -2,8 +2,8 @@
 
 An example showing the use of CHIP on the Linux. The document will describe how
 to build and run CHIP Linux Lighting Example on Raspberry Pi. This doc is tested
-on **Ubuntu for Respberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
-Respberry Pi Desktop 20.10 (aarch64)**
+on **Ubuntu for Raspberry Pi Server 20.04 LTS (aarch64)** and **Ubuntu for
+Raspberry Pi Desktop 20.10 (aarch64)**
 
 <hr>
 
@@ -38,7 +38,7 @@ Respberry Pi Desktop 20.10 (aarch64)**
 
 ## Running the Complete Example on Raspberry Pi 4
 
-> If you want to test ZCL, please disable rendzevous
+> If you want to test ZCL, please disable Rendezvous
 >
 >     gn gen out/debug --args='bypass_rendezvous=true'
 >     ninja -C out/debug
@@ -62,7 +62,7 @@ Respberry Pi Desktop 20.10 (aarch64)**
 
 -   Running
 
-    -   [Optiuonal] Plug USB Bluetooth dongle
+    -   [Optional] Plug USB Bluetooth dongle
 
         -   Plug USB Bluetooth dongle and find its bluetooth device number. The
             number after `hci` is the bluetooth device number, `1` in this

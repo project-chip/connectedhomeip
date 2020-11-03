@@ -38,7 +38,7 @@ typedef struct
     /** A bitmask of options from the enumeration above. */
     EmberApsOption options;
     /** The group ID for this message, if it is multicast mode. */
-    uint16_t groupId;
+    CHIPGroupId groupId;
     /** The sequence number. */
     uint8_t sequence;
     uint8_t radius;

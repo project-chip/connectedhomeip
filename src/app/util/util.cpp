@@ -49,6 +49,11 @@
 #include "gen/znet-bookkeeping.h"
 //#include "hal/micro/crc.h"
 
+// TODO: Need to figure out what needs to happen wrt HAL tokens here, but for
+// now define ESZP_HOST to disable it.  See
+// https://github.com/project-chip/connectedhomeip/issues/3275
+#define EZSP_HOST
+
 //------------------------------------------------------------------------------
 // Forward Declarations
 
@@ -1201,7 +1206,7 @@ EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls,
 bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, uint8_t endpoint)
 {
     uint8_t index = emberAfIndexFromEndpoint(endpoint);
-    return (index != 0xFF && false /*emberEventControlGetActive(controls[index])*/);
+    return (index != 0xFF && emberEventControlGetActive(&controls[index]));
 }
 
 EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, uint8_t endpoint)
@@ -1352,9 +1357,4 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel)
         // as case 0 to make MISRA happy.
         return channel | ENCODED_8BIT_CHANPG_PAGE_MASK_PAGE_0;
     }
-}
-
-uint32_t halCommonGetInt32uMillisecondTick(void)
-{
-    return 0; // Stub for now. Implement stubs in zcl reporting cluster #2470
 }

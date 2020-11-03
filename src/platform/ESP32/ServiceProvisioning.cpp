@@ -19,6 +19,8 @@
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
+#include <algorithm>
+
 #include "esp_wifi.h"
 
 #include "ServiceProvisioning.h"
@@ -34,8 +36,8 @@ CHIP_ERROR SetWiFiStationProvisioning(const char * ssid, const char * key)
 
     // Set the wifi configuration
     memset(&wifiConfig, 0, sizeof(wifiConfig));
-    memcpy(wifiConfig.sta.ssid, ssid, strlen(ssid) + 1);
-    memcpy(wifiConfig.sta.password, key, strlen(key) + 1);
+    memcpy(wifiConfig.sta.ssid, ssid, std::min(strlen(ssid) + 1, sizeof(wifiConfig.sta.ssid)));
+    memcpy(wifiConfig.sta.password, key, std::min(strlen(key) + 1, sizeof(wifiConfig.sta.password)));
     wifiConfig.sta.scan_method = WIFI_ALL_CHANNEL_SCAN;
     wifiConfig.sta.sort_method = WIFI_CONNECT_AP_BY_SIGNAL;
 

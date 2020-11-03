@@ -74,6 +74,10 @@ void emAfInitEvents(void);
  */
 void emberEventControlSetInactive(EmberEventControl * control);
 
+/** @brief Returns true is ::EmberEventControl is active.
+ */
+bool emberEventControlGetActive(EmberEventControl * control);
+
 /** @brief Sets this ::EmberEventControl to run as soon as possible.
  */
 void emberEventControlSetActive(EmberEventControl * control);

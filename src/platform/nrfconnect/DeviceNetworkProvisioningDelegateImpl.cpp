@@ -24,12 +24,18 @@
 namespace chip {
 namespace DeviceLayer {
 
-void DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
 #if CHIP_ENABLE_OPENTHREAD
-    ThreadStackMgr().SetThreadEnabled(false);
-    ThreadStackMgr().SetThreadProvision(threadData);
-    ThreadStackMgr().SetThreadEnabled(true);
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    SuccessOrExit(error = ThreadStackMgr().SetThreadEnabled(false));
+    SuccessOrExit(error = ThreadStackMgr().SetThreadProvision(threadData));
+    SuccessOrExit(error = ThreadStackMgr().SetThreadEnabled(true));
+exit:
+    return error;
+#else
+    return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_ENABLE_OPENTHREAD
 }
 

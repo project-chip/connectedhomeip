@@ -40,14 +40,14 @@ public:
      * @param ssid WiFi SSID
      * @param passwd WiFi password
      */
-    virtual void ProvisionWiFi(const char * ssid, const char * passwd) {}
+    virtual CHIP_ERROR ProvisionWiFi(const char * ssid, const char * passwd) = 0;
 
     /**
      * @brief
      *   Called to provision Thread credentials in a device
      *
      */
-    virtual void ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData) {}
+    virtual CHIP_ERROR ProvisionThread(DeviceLayer::Internal::DeviceNetworkInfo & threadData) = 0;
 
     virtual ~DeviceNetworkProvisioningDelegate() {}
 };

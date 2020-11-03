@@ -142,7 +142,7 @@ static EmberAfEventContext * findEventContext(uint8_t endpoint, EmberAfClusterId
     return NULL;
 }
 
-EmberStatus emberAfEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs)
+EmberStatus emberEventControlSetDelayMS(EmberEventControl * control, uint32_t delayMs)
 {
     if (delayMs == 0)
     {
@@ -169,6 +169,11 @@ void emberEventControlSetInactive(EmberEventControl * control)
     }
 }
 
+bool emberEventControlGetActive(EmberEventControl * control)
+{
+    return control->status != EMBER_EVENT_INACTIVE;
+}
+
 void emberEventControlSetActive(EmberEventControl * control)
 {
     control->status = EMBER_EVENT_ZERO_DELAY;
@@ -179,7 +184,7 @@ EmberStatus emberAfEventControlSetDelayQS(EmberEventControl * control, uint32_t 
 {
     if (delayQs <= EMBER_MAX_EVENT_CONTROL_DELAY_QS)
     {
-        return emberAfEventControlSetDelayMS(control, delayQs << 8);
+        return emberEventControlSetDelayMS(control, delayQs << 8);
     }
     else
     {
@@ -191,7 +196,7 @@ EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint
 {
     if (delayM <= EMBER_MAX_EVENT_CONTROL_DELAY_MINUTES)
     {
-        return emberAfEventControlSetDelayMS(control, delayM << 16);
+        return emberEventControlSetDelayMS(control, delayM << 16);
     }
     else
     {
@@ -209,7 +214,7 @@ EmberStatus emberAfScheduleTickExtended(uint8_t endpoint, EmberAfClusterId clust
     EMBER_TEST_ASSERT(emberAfEndpointIsEnabled(endpoint));
 
     if (context != NULL && emberAfEndpointIsEnabled(endpoint) &&
-        (emberAfEventControlSetDelayMS(context->eventControl, delayMs) == EMBER_SUCCESS))
+        (emberEventControlSetDelayMS(context->eventControl, delayMs) == EMBER_SUCCESS))
     {
         context->pollControl  = pollControl;
         context->sleepControl = sleepControl;

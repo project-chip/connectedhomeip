@@ -44,7 +44,7 @@
 #include <stdint.h>
 
 EmberAfStatus emberAfScenesSetSceneCountAttribute(uint8_t endpoint, uint8_t newCount);
-EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, uint16_t groupId);
+EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, CHIPGroupId groupId);
 
 // DEPRECATED.
 #define emberAfScenesMakeInvalid emberAfScenesClusterMakeInvalidCallback
@@ -80,8 +80,8 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 #define emberAfPluginScenesServerDecrNumSceneEntriesInUse() (--emberAfPluginScenesServerEntriesInUse)
 #endif // Use tokens
 
-bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, uint16_t groupId, uint8_t sceneId,
+bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, CHIPGroupId groupId, uint8_t sceneId,
                                             uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets);
-bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, uint16_t groupId, uint8_t sceneId);
+bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, CHIPGroupId groupId, uint8_t sceneId);
 
 #endif // SILABS_SCENES_PLUGIN_H

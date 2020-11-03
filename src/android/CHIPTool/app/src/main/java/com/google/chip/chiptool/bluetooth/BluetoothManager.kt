@@ -29,6 +29,22 @@ import kotlinx.coroutines.withTimeoutOrNull
 class BluetoothManager {
     private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
+    /** Converts an integer to a ByteArray with the first [size] bytes of the [Int]. */
+    private fun Int.toByteArray(size: Int): ByteArray {
+        return ByteArray(size) { i -> (this shr (8 * i)).toByte() }
+    }
+
+    private fun getServiceData(discriminator: Int): ByteArray {
+      var opcode = 0
+      var version = 0
+      var versionDiscriminator = ((version and 0xf) shl 12) or (discriminator and 0xfff)
+      return intArrayOf(
+         opcode,
+         versionDiscriminator,
+         versionDiscriminator shr 8
+      ).map { it.toByte() }.toByteArray()
+    }
+
     suspend fun getBluetoothDevice(discriminator: Int): BluetoothDevice? {
         val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
             Log.e(TAG, "No bluetooth scanner found")
@@ -50,18 +66,31 @@ class BluetoothManager {
                     }
                 }
 
-                val scanFilter = ScanFilter.Builder()
+                var serviceDataList = listOf(
+                   getServiceData(discriminator),
+
+                   // TODO - Remove this incorrect format.
+                   discriminator.toByteArray(3)
+                )
+
+                serviceDataList.forEach {
+                  Log.v(TAG, "Matching service " + CHIP_UUID.substring(4, 8) + " " + it.map { String.format("%02x", it) } )
+                }
+
+                val scanFilters = serviceDataList.map { ScanFilter.Builder()
                     .setServiceData(
                       ParcelUuid(UUID.fromString(CHIP_UUID)),
-                      byteArrayOf(0, discriminator.toByte(), (discriminator shr 8).toByte())
+                      it
                     )
                     .build()
+                }
+
                 val scanSettings = ScanSettings.Builder()
                     .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
                     .build()
 
                 Log.i(TAG, "Starting Bluetooth scan")
-                scanner.startScan(listOf(scanFilter), scanSettings, scanCallback)
+                scanner.startScan(scanFilters, scanSettings, scanCallback)
                 awaitClose { scanner.stopScan(scanCallback) }
             }.first()
         }
