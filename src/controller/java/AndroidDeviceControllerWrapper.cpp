@@ -190,7 +190,7 @@ void AndroidDeviceControllerWrapper::OnOperationalCredentialsRequested(const cha
     }
 
     jmethodID method;
-    if (!FindMethod(env, mJavaObjectRef, "onNetworkCredentialsRequested", "([B)V", &method))
+    if (!FindMethod(env, mJavaObjectRef, "onOperationalCredentialsRequested", "([B)V", &method))
     {
         return;
     }
