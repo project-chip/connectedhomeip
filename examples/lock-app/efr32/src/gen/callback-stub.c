@@ -1765,21 +1765,6 @@ bool emberAfPluginNetworkSteeringGetDistributedKeyCallback(EmberKeyData * key)
     return false;
 }
 
-/** @brief Get Node Type
- *
- * This callback allows the application to set the node type that the network
- * steering process will use in joining a network.
- *
- * @param state The current ::EmberAfPluginNetworkSteeringJoiningState.
- *
- * @return An ::EmberNodeType value that the network steering process will
- * try to join a network as.
- */
-EmberNodeType emberAfPluginNetworkSteeringGetNodeTypeCallback(EmberAfPluginNetworkSteeringJoiningState state)
-{
-    return ((emAfCurrentZigbeeProNetwork->nodeType == EMBER_COORDINATOR) ? EMBER_ROUTER : emAfCurrentZigbeeProNetwork->nodeType);
-}
-
 /** @brief Get Power For Radio Channel
  *
  * This callback is fired when the Network Steering plugin needs to set the

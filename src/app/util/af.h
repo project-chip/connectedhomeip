@@ -452,15 +452,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
 #if !defined(DOXYGEN_SHOULD_SKIP_THIS)
 // master array of all defined endpoints
 extern EmberAfDefinedEndpoint emAfEndpoints[];
-
-// Master array of all zigbee PRO networks.
-extern const EmAfZigbeeProNetwork emAfZigbeeProNetworks[];
-
-// The current zigbee PRO network or NULL.
-extern const EmAfZigbeeProNetwork * emAfCurrentZigbeeProNetwork;
-
-// true if the current network is a zigbee PRO network.
-#define emAfProIsCurrentNetwork() (emAfCurrentZigbeeProNetwork != NULL)
 #endif
 
 /**
