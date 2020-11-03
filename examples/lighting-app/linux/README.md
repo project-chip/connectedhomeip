@@ -90,12 +90,12 @@ Raspberry Pi Desktop 20.10 (aarch64)**
 
     -   Run dhcpcd on `wlan0`
 
-        WiFi on Linux platforms are controlled by direct calling `wpa_supplicant`
-        dbus API. Which will not run `dhclient` on wlan0 interface, so you should
-        manaully run this to get an IP address. You can also add it to service and
-        run it on boot.
+        WiFi on Linux platforms are controlled by direct calling
+        `wpa_supplicant` dbus API. Which will not run `dhclient` on wlan0
+        interface, so you should manaully run this to get an IP address. You can
+        also add it to service and run it on boot.
 
               $ sudo dhclient wlan0
 
-    -   Test the device using ChipDeviceController on your laptop /
-        workstation etc.
+    -   Test the device using ChipDeviceController on your laptop / workstation
+        etc.
