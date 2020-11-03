@@ -106,21 +106,25 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t comm
             return status;
         }
 
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         // If initiatedByLevelChange is false, then we assume that the level change
         // ZCL stuff has not happened and we do it here
         if (!initiatedByLevelChange && emberAfContainsServer(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID))
         {
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
+#endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
     }
     else
     {
+#ifdef EMBER_AF_PLUGIN_LEVEL_CONTROL
         // If initiatedByLevelChange is false, then we assume that the level change
         // ZCL stuff has not happened and we do it here
         if (!initiatedByLevelChange && emberAfContainsServer(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID))
         {
             emberAfOnOffClusterLevelControlEffectCallback(endpoint, newValue);
         }
+#endif // EMBER_AF_PLUGIN_LEVEL_CONTROL
 
         // write the new on/off value
         status = emberAfWriteAttribute(endpoint, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
@@ -139,6 +143,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t comm
     }
 #endif
 
+#ifdef EMBER_AF_PLUGIN_SCENES
     // the scene has been changed (the value of on/off has changed) so
     // the current scene as descibed in the attribute table is invalid,
     // so mark it as invalid (just writes the valid/invalid attribute)
@@ -146,6 +151,7 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t comm
     {
         emberAfScenesClusterMakeInvalidCallback(endpoint);
     }
+#endif // EMBER_AF_PLUGIN_SCENES
 
     // The returned status is based solely on the On/Off cluster.  Errors in the
     // Level Control and/or Scenes cluster are ignored.

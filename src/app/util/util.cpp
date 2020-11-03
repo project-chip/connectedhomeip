@@ -439,6 +439,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
         emberAfDebugPrintln("0x%02x", cmd->apsFrame->profileId);
         return false;
     }
+#ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
     else if ((cmd->type == EMBER_INCOMING_MULTICAST || cmd->type == EMBER_INCOMING_MULTICAST_LOOPBACK) &&
              !emberAfGroupsClusterEndpointInGroupCallback(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
     {
@@ -447,6 +448,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
         emberAfDebugPrintln("0x%02x", cmd->apsFrame->groupId);
         return false;
     }
+#endif // EMBER_AF_PLUGIN_GROUPS_SERVER
     else
     {
         return (cmd->clusterSpecific ? emAfProcessClusterSpecificCommand(cmd) : emAfProcessGlobalCommand(cmd));
