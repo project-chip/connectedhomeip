@@ -114,7 +114,8 @@ container:
         $ mkdir ~/nrfconnect
         $ mkdir ~/connectedhomeip
         $ docker pull nordicsemi/nrfconnect-chip
-        $ docker run --rm -it -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
+        $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
+            -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
 
 > **Note**:
 >
@@ -128,6 +129,8 @@ container:
 >     connected to your computer such as the nRF52840 DK.
 > -   `--rm` flag can be omitted if you don't want the container to be
 >     auto-removed when you exit the container shell session.
+> -   `-e RUNAS=$(id -u)` is needed to start the container session as the
+>     current user instead of root.
 
 If you use the container for the first time and you don't have nRF Connect SDK
 and CHIP sources downloaded yet, run `setup` command in the container to pull
