@@ -338,7 +338,8 @@ bool emberAfIasZoneClusterZoneEnrollRequestCallback(uint16_t zoneType, uint16_t 
         zoneId       = serverIndex;
         setServerZoneId(serverIndex, zoneId);
     }
-    emberAfFillCommandIasZoneClusterZoneEnrollResponse(responseCode, zoneId);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+                              ZCL_ZONE_ENROLL_RESPONSE_COMMAND_ID, "uu", responseCode, zoneId);
     // Need to send this command with our source EUI because the server will
     // check our EUI64 against his CIE Address to see if we're his CIE.
     emberAfGetCommandApsFrame()->options |= EMBER_APS_OPTION_SOURCE_EUI64;
@@ -412,7 +413,8 @@ static void setCieAddress(EmberNodeId destAddress)
         0, // ieee (filled in later)
     };
     emberAfGetEui64(&writeAttributes[3]);
-    emberAfFillCommandGlobalClientToServerWriteAttributes(ZCL_IAS_ZONE_CLUSTER_ID, writeAttributes, sizeof(writeAttributes));
+    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+                              ZCL_WRITE_ATTRIBUTES_COMMAND_ID, "b", writeAttributes, sizeof(writeAttributes));
     emberAfIasZoneClusterPrintln("Writing CIE Address to IAS Zone Server");
     if (EMBER_SUCCESS == sendCommand(destAddress))
     {
@@ -491,7 +493,8 @@ void readIasZoneServerAttributes(EmberNodeId nodeId)
 
         LOW_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID), HIGH_BYTE(ZCL_ZONE_STATUS_ATTRIBUTE_ID),
     };
-    emberAfFillCommandGlobalClientToServerReadAttributes(ZCL_IAS_ZONE_CLUSTER_ID, iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
+    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+                              ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
     if (EMBER_SUCCESS == sendCommand(nodeId))
     {
         setIasZoneClientState(IAS_ZONE_CLIENT_STATE_READ_ATTRIBUTES);
@@ -504,7 +507,8 @@ void readIasZoneServerCieAddress(EmberNodeId nodeId)
         LOW_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
         HIGH_BYTE(ZCL_IAS_CIE_ADDRESS_ATTRIBUTE_ID),
     };
-    emberAfFillCommandGlobalClientToServerReadAttributes(ZCL_IAS_ZONE_CLUSTER_ID, iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
+    emberAfFillExternalBuffer((ZCL_GLOBAL_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_IAS_ZONE_CLUSTER_ID,
+                              ZCL_READ_ATTRIBUTES_COMMAND_ID, "b", iasZoneAttributeIds, sizeof(iasZoneAttributeIds));
     if (EMBER_SUCCESS == sendCommand(nodeId))
     {
         setIasZoneClientState(IAS_ZONE_CLIENT_STATE_READ_CIE_ADDRESS);

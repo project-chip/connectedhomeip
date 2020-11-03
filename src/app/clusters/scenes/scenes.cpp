@@ -243,7 +243,8 @@ bool emberAfScenesClusterRemoveSceneCallback(GroupId groupId, uint8_t sceneId)
     // single device.
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
-        emberAfFillCommandScenesClusterRemoveSceneResponse(status, groupId, sceneId);
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
+                                  ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID, "uvu", status, groupId, sceneId);
         sendStatus = emberAfSendResponse();
         if (EMBER_SUCCESS != sendStatus)
         {
@@ -283,7 +284,9 @@ bool emberAfScenesClusterRemoveAllScenesCallback(GroupId groupId)
     // to a single device.
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
-        emberAfFillCommandScenesClusterRemoveAllScenesResponse(status, groupId);
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
+                                  ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID, "uv", status, groupId);
+
         sendStatus = emberAfSendResponse();
         if (EMBER_SUCCESS != sendStatus)
         {
@@ -304,7 +307,8 @@ bool emberAfScenesClusterStoreSceneCallback(GroupId groupId, uint8_t sceneId)
     // single device.
     if (emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST || emberAfCurrentCommand()->type == EMBER_INCOMING_UNICAST_REPLY)
     {
-        emberAfFillCommandScenesClusterStoreSceneResponse(status, groupId, sceneId);
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_SCENES_CLUSTER_ID,
+                                  ZCL_STORE_SCENE_RESPONSE_COMMAND_ID, "uvu", status, groupId, sceneId);
         sendStatus = emberAfSendResponse();
         if (EMBER_SUCCESS != sendStatus)
         {

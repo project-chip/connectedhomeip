@@ -123,8 +123,10 @@ bool emberAfDoorLockClusterGetLogRecordCallback(uint16_t entryId)
     }
     else
     {
-        emberAfFillCommandDoorLockClusterGetLogRecordResponse(entry.logEntryId, entry.timestamp, entry.eventType, entry.source,
-                                                              entry.eventId, entry.userId, entry.pin);
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
+                                  ZCL_GET_LOG_RECORD_RESPONSE_COMMAND_ID, "vwuuuvs", entry.logEntryId, entry.timestamp,
+                                  entry.eventType, entry.source, entry.eventId, entry.userId, entry.pin);
+
         status = emberAfSendResponse();
         if (status != EMBER_SUCCESS)
         {

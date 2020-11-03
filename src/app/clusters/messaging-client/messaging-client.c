@@ -321,12 +321,9 @@ EmberAfStatus emberAfPluginMessagingClientConfirmMessage(uint8_t endpoint)
 
             nodeId = emberLookupNodeIdByEui64(esiEntry->eui64);
 
-#if defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_0) || defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_1) ||                                    \
-    defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_1A) || defined(EMBER_AF_HAS_SPEC_VERSIONS_SE_1_1B)
-            emberAfFillCommandMessagingClusterMessageConfirmation(messageTable[ep].messageId, emberAfGetCurrentTime());
-#else
-            emberAfFillCommandMessagingClusterMessageConfirmation(messageTable[ep].messageId, emberAfGetCurrentTime(), 0x00, "");
-#endif
+            emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_CLIENT_TO_SERVER), ZCL_MESSAGING_CLUSTER_ID,
+                                      ZCL_MESSAGE_CONFIRMATION_COMMAND_ID, "wwus", messageTable[ep].messageId,
+                                      emberAfGetCurrentTime(), 0x00, "");
             // The source and destination are reversed for the confirmation.
             emberAfSetCommandEndpoints(messageTable[ep].clientEndpoint, esiEntry->endpoint);
             status = ((emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, nodeId) == EMBER_SUCCESS) ? EMBER_ZCL_STATUS_SUCCESS

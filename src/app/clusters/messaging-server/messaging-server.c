@@ -90,9 +90,9 @@ bool emberAfMessagingClusterGetLastMessageCallback(void)
     emberAfMessagingClusterPrintln("RX: GetLastMessage");
     if (emberAfPluginMessagingServerGetMessage(endpoint, &message))
     {
-        emberAfFillCommandMessagingClusterDisplayMessage(message.messageId, message.messageControl, message.startTime,
-                                                         message.durationInMinutes, message.message,
-                                                         message.extendedMessageControl);
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_MESSAGING_CLUSTER_ID,
+                                  ZCL_DISPLAY_MESSAGE_COMMAND_ID, "wuwvsu", message.messageId, message.messageControl,
+                                  message.startTime, message.durationInMinutes, message.message, message.extendedMessageControl);
         emberAfGetCommandApsFrame()->options |= EMBER_APS_OPTION_SOURCE_EUI64;
         emberAfSendResponse();
     }
@@ -216,8 +216,9 @@ void emberAfPluginMessagingServerDisplayMessage(EmberNodeId nodeId, uint8_t srcE
         return;
     }
 
-    emberAfFillCommandMessagingClusterDisplayMessage(message.messageId, message.messageControl, message.startTime,
-                                                     message.durationInMinutes, message.message, message.extendedMessageControl);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_MESSAGING_CLUSTER_ID,
+                              ZCL_DISPLAY_MESSAGE_COMMAND_ID, "wuwvsu", message.messageId, message.messageControl,
+                              message.startTime, message.durationInMinutes, message.message, message.extendedMessageControl);
     emberAfSetCommandEndpoints(srcEndpoint, dstEndpoint);
     emberAfGetCommandApsFrame()->options |= EMBER_APS_OPTION_SOURCE_EUI64;
     status = emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, nodeId);
@@ -238,7 +239,8 @@ void emberAfPluginMessagingServerCancelMessage(EmberNodeId nodeId, uint8_t srcEn
     // Then send the response
     emberAfPluginMessagingServerGetMessage(srcEndpoint, &message);
 
-    emberAfFillCommandMessagingClusterCancelMessage(message.messageId, message.messageControl);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_MESSAGING_CLUSTER_ID,
+                              ZCL_CANCEL_MESSAGE_COMMAND_ID, "wu", message.messageId, message.messageControl);
     emberAfSetCommandEndpoints(srcEndpoint, dstEndpoint);
     emberAfGetCommandApsFrame()->options |= EMBER_APS_OPTION_SOURCE_EUI64;
     status = emberAfSendCommandUnicast(EMBER_OUTGOING_DIRECT, nodeId);
