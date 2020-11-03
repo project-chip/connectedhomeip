@@ -257,7 +257,6 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        result = 0;
         if (wrapper != NULL)
         {
             delete wrapper;
