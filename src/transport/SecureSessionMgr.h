@@ -211,6 +211,12 @@ public:
         return err;
     }
 
+    template <typename... Args>
+    CHIP_ERROR ResetTransport(Args &&... transportInitArgs)
+    {
+        return mTransport.Init(std::forward<Args>(transportInitArgs)...);
+    }
+
 private:
     Transport::Tuple<TransportTypes...> mTransport;
 };
