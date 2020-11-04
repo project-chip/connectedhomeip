@@ -1,0 +1,30 @@
+{{chip_header}}
+
+// Enclosing macro to prevent multiple inclusion
+#ifndef ZAP_EMBER_ATTRIBUTE_ID
+#define ZAP_EMBER_ATTRIBUTE_ID
+
+{{#zcl_clusters}}
+// Attribute id for cluster: {{label}}
+
+{{#zcl_attributes_client}}
+{{#first}}
+// Client attributes
+{{/first}}
+#define ZCL_{{asDelimitedMacro define}}_ATTRIBUTE_ID ({{asHex code 4}})
+{{#last}}
+
+{{/last}}
+{{/zcl_attributes_client}}
+{{#zcl_attributes_server}}
+{{#first}}
+// Server attributes
+{{/first}}
+#define ZCL_{{asDelimitedMacro define}}_ATTRIBUTE_ID ({{asHex code 4}})
+{{#last}}
+
+{{/last}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}
+
+#endif // ZAP_EMBER_ATTRIBUTE_ID
