@@ -230,8 +230,9 @@ bool emberAfDoorLockClusterGetUserTypeCallback(uint16_t userId)
 bool emberAfDoorLockClusterSetUserTypeCallback(uint16_t userId, uint8_t userType)
 {
     // TODO: Need to validate userType.  https://github.com/project-chip/connectedhomeip/issues/3580
-    uint8_t status = (emAfPluginDoorLockServerSetPinUserType(userId, static_cast<EmberAfDoorLockUserType>(userType)) ? 0x00   // success (per 7.3.2.17.21)
-                                                                               : 0x01); // failure (per 7.3.2.17.21)
+    uint8_t status = (emAfPluginDoorLockServerSetPinUserType(userId, static_cast<EmberAfDoorLockUserType>(userType))
+                          ? 0x00   // success (per 7.3.2.17.21)
+                          : 0x01); // failure (per 7.3.2.17.21)
     emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_DOOR_LOCK_CLUSTER_ID,
                               ZCL_SET_USER_TYPE_RESPONSE_COMMAND_ID, "u", status);
 
