@@ -47,9 +47,11 @@ enum ArgumentType
     Number_uint8,
     Number_uint16,
     Number_uint32,
+    Number_uint64,
     Number_int8,
     Number_int16,
     Number_int32,
+    Number_int64,
     String,
     Attribute,
     Address
@@ -60,7 +62,7 @@ struct Argument
     const char * name;
     ArgumentType type;
     int64_t min;
-    int64_t max;
+    uint64_t max;
     void * value;
 };
 
@@ -98,29 +100,37 @@ public:
      */
     size_t AddArgument(const char * name, char ** value);
     size_t AddArgument(const char * name, AddressWithInterface * out);
-    size_t AddArgument(const char * name, int64_t min, int64_t max, int8_t * out)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, int8_t * out)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int8);
     }
-    size_t AddArgument(const char * name, int64_t min, int64_t max, int16_t * out)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, int16_t * out)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int16);
     }
-    size_t AddArgument(const char * name, int64_t min, int64_t max, int32_t * out)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, int32_t * out)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int32);
     }
-    size_t AddArgument(const char * name, int64_t min, int64_t max, uint8_t * out)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, int64_t * out)
+    {
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_int64);
+    }
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint8_t * out)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint8);
     }
-    size_t AddArgument(const char * name, int64_t min, int64_t max, uint16_t * out)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint16_t * out)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint16);
     }
-    size_t AddArgument(const char * name, int64_t min, int64_t max, uint32_t * out)
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint32_t * out)
     {
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint32);
+    }
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, uint64_t * out)
+    {
+        return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64);
     }
 
     virtual CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) = 0;
@@ -130,8 +140,8 @@ public:
 
 private:
     bool InitArgument(size_t argIndex, const char * argValue);
-    size_t AddArgument(const char * name, int64_t min, int64_t max, void * out, ArgumentType type);
-    size_t AddArgument(const char * name, int64_t min, int64_t max, void * out);
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out, ArgumentType type);
+    size_t AddArgument(const char * name, int64_t min, uint64_t max, void * out);
 
     bool mCommandExitStatus = false;
     const char * mName      = nullptr;

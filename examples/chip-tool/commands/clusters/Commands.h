@@ -642,6 +642,7 @@ public:
 | ColorControl                                                        | 0x0300 |
 | DoorLock                                                            | 0x0101 |
 | Groups                                                              | 0x0004 |
+| IASZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | Level                                                               | 0x0008 |
 | OnOff                                                               | 0x0006 |
@@ -654,6 +655,7 @@ constexpr uint16_t kBasicClusterId           = 0x0000;
 constexpr uint16_t kColorControlClusterId    = 0x0300;
 constexpr uint16_t kDoorLockClusterId        = 0x0101;
 constexpr uint16_t kGroupsClusterId          = 0x0004;
+constexpr uint16_t kIASZoneClusterId         = 0x0500;
 constexpr uint16_t kIdentifyClusterId        = 0x0003;
 constexpr uint16_t kLevelClusterId           = 0x0008;
 constexpr uint16_t kOnOffClusterId           = 0x0006;
@@ -1776,6 +1778,7 @@ public:
 private:
     uint8_t mOptions;
 };
+
 /*
  * Attribute NumberOfPrimaries
  */
@@ -4448,6 +4451,194 @@ public:
 };
 
 /*----------------------------------------------------------------------------*\
+| Cluster IASZone                                                     | 0x0500 |
+|------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+|                                                                     |        |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ZoneState                                                         | 0x0000 |
+| * ZoneType                                                          | 0x0001 |
+| * ZoneStatus                                                        | 0x0002 |
+| * IASCIEAddress                                                     | 0x0010 |
+| * ZoneID                                                            | 0x0011 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Discover attributes
+ */
+class DiscoverIASZoneAttributes : public ModelCommand
+{
+public:
+    DiscoverIASZoneAttributes() : ModelCommand("discover", kIASZoneClusterId, 0x0c) { ModelCommand::AddArguments(); }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeIASZoneClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
+    }
+
+    // Global Response: DiscoverAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        DiscoverAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+};
+
+/*
+ * Attribute ZoneState
+ */
+class ReadIASZoneZoneState : public ModelCommand
+{
+public:
+    ReadIASZoneZoneState() : ModelCommand("read", kIASZoneClusterId, 0x00)
+    {
+        AddArgument("attr-name", "zone-state");
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeIASZoneClusterReadZoneStateAttribute(buffer->Start(), bufferSize, endPointId);
+    }
+
+    // Global Response: ReadAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ReadAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+};
+
+/*
+ * Attribute ZoneType
+ */
+class ReadIASZoneZoneType : public ModelCommand
+{
+public:
+    ReadIASZoneZoneType() : ModelCommand("read", kIASZoneClusterId, 0x00)
+    {
+        AddArgument("attr-name", "zone-type");
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeIASZoneClusterReadZoneTypeAttribute(buffer->Start(), bufferSize, endPointId);
+    }
+
+    // Global Response: ReadAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ReadAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+};
+
+/*
+ * Attribute ZoneStatus
+ */
+class ReadIASZoneZoneStatus : public ModelCommand
+{
+public:
+    ReadIASZoneZoneStatus() : ModelCommand("read", kIASZoneClusterId, 0x00)
+    {
+        AddArgument("attr-name", "zone-status");
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeIASZoneClusterReadZoneStatusAttribute(buffer->Start(), bufferSize, endPointId);
+    }
+
+    // Global Response: ReadAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ReadAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+};
+
+/*
+ * Attribute IASCIEAddress
+ */
+class ReadIASZoneIASCIEAddress : public ModelCommand
+{
+public:
+    ReadIASZoneIASCIEAddress() : ModelCommand("read", kIASZoneClusterId, 0x00)
+    {
+        AddArgument("attr-name", "iascieaddress");
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeIASZoneClusterReadIASCIEAddressAttribute(buffer->Start(), bufferSize, endPointId);
+    }
+
+    // Global Response: ReadAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ReadAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+};
+
+class WriteIASZoneIASCIEAddress : public ModelCommand
+{
+public:
+    WriteIASZoneIASCIEAddress() : ModelCommand("write", kIASZoneClusterId, 0x01)
+    {
+        AddArgument("attr-name", "iascieaddress");
+        AddArgument("attr-value", 0, UINT64_MAX, &mIASCIEAddress);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeIASZoneClusterWriteIASCIEAddressAttribute(buffer->Start(), bufferSize, endPointId, mIASCIEAddress);
+    }
+
+    // Global Response: WriteAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        WriteAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint64_t mIASCIEAddress;
+};
+
+/*
+ * Attribute ZoneID
+ */
+class ReadIASZoneZoneID : public ModelCommand
+{
+public:
+    ReadIASZoneZoneID() : ModelCommand("read", kIASZoneClusterId, 0x00)
+    {
+        AddArgument("attr-name", "zone-id");
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeIASZoneClusterReadZoneIDAttribute(buffer->Start(), bufferSize, endPointId);
+    }
+
+    // Global Response: ReadAttributesResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ReadAttributesResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+};
+
+/*----------------------------------------------------------------------------*\
 | Cluster Identify                                                    | 0x0003 |
 |------------------------------------------------------------------------------|
 | Responses:                                                          |        |
@@ -5939,6 +6130,19 @@ void registerClusterGroups(Commands & commands)
     commands.Register(clusterName, clusterCommands);
 }
 
+void registerClusterIASZone(Commands & commands)
+{
+    const char * clusterName = "IASZone";
+
+    commands_list clusterCommands = {
+        make_unique<DiscoverIASZoneAttributes>(), make_unique<ReadIASZoneZoneState>(),     make_unique<ReadIASZoneZoneType>(),
+        make_unique<ReadIASZoneZoneStatus>(),     make_unique<ReadIASZoneIASCIEAddress>(), make_unique<WriteIASZoneIASCIEAddress>(),
+        make_unique<ReadIASZoneZoneID>(),
+    };
+
+    commands.Register(clusterName, clusterCommands);
+}
+
 void registerClusterIdentify(Commands & commands)
 {
     const char * clusterName = "Identify";
@@ -6020,6 +6224,7 @@ void registerClusters(Commands & commands)
     registerClusterColorControl(commands);
     registerClusterDoorLock(commands);
     registerClusterGroups(commands);
+    registerClusterIASZone(commands);
     registerClusterIdentify(commands);
     registerClusterLevel(commands);
     registerClusterOnOff(commands);
