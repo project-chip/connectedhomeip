@@ -21,7 +21,7 @@
 
 #include <jni.h>
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
