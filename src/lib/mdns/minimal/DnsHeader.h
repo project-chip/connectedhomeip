@@ -134,8 +134,7 @@ private:
     inline uint16_t Get16At(size_t offset) const { return chip::Encoding::BigEndian::Get16(mBuffer + offset); }
     inline HeaderRef & Set16At(size_t offset, size_t value)
     {
-        uint8_t * p = mBuffer + offset;
-        chip::Encoding::BigEndian::Write16(p, value);
+        chip::Encoding::BigEndian::Put16(mBuffer + offset, value);
         return *this;
     }
 
