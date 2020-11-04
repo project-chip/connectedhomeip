@@ -95,6 +95,11 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
             return nil;
         }
 
+        if (CHIP_NO_ERROR != chip::Platform::MemoryInit()) {
+            CHIP_LOG_ERROR("Error: Failed in memory init");
+            return nil;
+        }
+
         _cppController = new chip::DeviceController::ChipDeviceController();
         if (!_cppController) {
             CHIP_LOG_ERROR("Error: couldn't create c++ controller");
@@ -120,17 +125,6 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
         }
 
         if (CHIP_NO_ERROR != _cppController->Init(kLocalDeviceId, _pairingDelegateBridge, _persistentStorageDelegateBridge)) {
-            CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
-            delete _cppController;
-            _cppController = NULL;
-            delete _pairingDelegateBridge;
-            _pairingDelegateBridge = NULL;
-            delete _persistentStorageDelegateBridge;
-            _persistentStorageDelegateBridge = NULL;
-            return nil;
-        }
-
-        if (CHIP_NO_ERROR != chip::Platform::MemoryInit()) {
             CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
             delete _cppController;
             _cppController = NULL;

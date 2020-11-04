@@ -86,9 +86,9 @@ public:
      *   buffer. This API should be used sparingly, since it may block for
      *   some duration.
      *
-     * @param[in]     key Key to lookup
-     * @param[out]    value Value for the key
-     * @param[in/out] size Input value buffer size, output length of value
+     * @param[in]      key Key to lookup
+     * @param[out]     value Value for the key
+     * @param[in, out] size Input value buffer size, output length of value
      */
     virtual CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 
