@@ -42,6 +42,8 @@
 #include "door-lock-server.h"
 #include <assert.h>
 
+#include <support/CodeUtils.h>
+
 static EmberAfPluginDoorLockServerLogEntry entries[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_LOG_ENTRIES];
 static uint8_t nextEntryId = 1;
 
@@ -67,8 +69,7 @@ static bool loggingIsEnabled(void)
 bool emberAfPluginDoorLockServerAddLogEntry(EmberAfDoorLockEventType eventType, EmberAfDoorLockEventSource source, uint8_t eventId,
                                             uint16_t userId, uint8_t pinLength, uint8_t * pin)
 {
-    if (!loggingIsEnabled() ||
-        ENTRY_ID_TO_INDEX(nextEntryId) >= (sizeof(entries) / sizeof((entries)[0]))) /* COUNTOF(entries) #2499 */
+    if (!loggingIsEnabled() || ENTRY_ID_TO_INDEX(nextEntryId) >= ArraySize(entries))
     {
         return false;
     }
