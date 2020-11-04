@@ -232,12 +232,6 @@ private:
     /* w0s and w1s */
     uint8_t mWS[2][kSpake2p_WS_Length];
 
-    uint8_t mKe[kMAX_Hash_Length];
-
-    size_t mKeLen = sizeof(mKe);
-
-    bool mPairingComplete = false;
-
 protected:
     Optional<NodeId> mLocalNodeId = Optional<NodeId>::Value(kUndefinedNodeId);
 
@@ -246,6 +240,12 @@ protected:
     uint16_t mLocalKeyId;
 
     uint16_t mPeerKeyId;
+
+    uint8_t mKe[kMAX_Hash_Length];
+
+    size_t mKeLen = sizeof(mKe);
+
+    bool mPairingComplete = false;
 };
 
 /*
@@ -257,12 +257,25 @@ protected:
 class SecurePairingUsingTestSecret : public SecurePairingSession
 {
 public:
-    SecurePairingUsingTestSecret() {}
+    SecurePairingUsingTestSecret()
+    {
+        const char * secret = "Test secret for key derivation";
+        size_t secretLen    = strlen(secret);
+        mKeLen = secretLen;
+        memmove(mKe, secret, mKeLen);
+        mPairingComplete = true;
+    }
+
     SecurePairingUsingTestSecret(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId)
     {
+        const char * secret = "Test secret for key derivation";
+        size_t secretLen    = strlen(secret);
         mPeerNodeId = peerNodeId;
         mPeerKeyId  = peerKeyId;
         mLocalKeyId = localKeyId;
+        mKeLen = secretLen;
+        memmove(mKe, secret, mKeLen);
+        mPairingComplete = true;
     }
 
     ~SecurePairingUsingTestSecret() override {}
@@ -277,14 +290,6 @@ public:
                     Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate)
     {
         return CHIP_NO_ERROR;
-    }
-
-    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override
-    {
-        const char * secret = "Test secret for key derivation";
-        size_t secretLen    = strlen(secret);
-        return session.InitFromSecret(reinterpret_cast<const uint8_t *>(secret), secretLen, reinterpret_cast<const uint8_t *>(""),
-                                      0, reinterpret_cast<const uint8_t *>(secret), secretLen);
     }
 
     CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg) override { return CHIP_NO_ERROR; }
