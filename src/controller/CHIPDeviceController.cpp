@@ -125,9 +125,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
 
     mSessionManager = chip::Platform::New<SecureSessionMgr<Transport::UDP>>();
 
-    // ToDo: Fix hardcoded IPv4 address requirement: issue# 2984
     err = mSessionManager->Init(localDeviceId, mSystemLayer,
-                                Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv4));
+                                Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6));
     SuccessOrExit(err);
 
     mSessionManager->SetDelegate(this);
