@@ -48,6 +48,7 @@
 #include <inet/InetFaultInjection.h>
 #include <support/CHIPFaultInjection.h>
 #include <support/CHIPMem.h>
+#include <support/ScopedBuffer.h>
 #include <system/SystemFaultInjection.h>
 #include <system/SystemTimer.h>
 
@@ -665,11 +666,17 @@ void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix)
 
     DumpMemory(mem, len, prefix, kRowWidth);
 }
+
 static void RebootCallbackFn()
 {
-    char * lArgv[sRestartCallbackCtx.mArgc + 2];
     int i;
     int j = 0;
+    chip::Platform::ScopedMemoryBuffer<char *> lArgv;
+    if (!lArgv.Alloc(sRestartCallbackCtx.mArgc + 2))
+    {
+        printf("** failed to allocate memory **\n");
+        ExitNow();
+    }
 
     if (gSigusr1Received)
     {
@@ -707,7 +714,7 @@ static void RebootCallbackFn()
 
     printf("********** Restarting *********\n");
     fflush(stdout);
-    execvp(lArgv[0], lArgv);
+    execvp(lArgv[0], lArgv.Get());
 
 exit:
     return;

@@ -40,7 +40,7 @@ static uint32_t shortPayloadRepresentation(const SetupPayload & payload)
     return result;
 }
 
-static std::string decimalStringWithPadding(uint32_t number, int minLength)
+static inline std::string decimalStringWithPadding(uint32_t number, int minLength)
 {
     char buf[minLength + 1];
     snprintf(buf, sizeof(buf), "%0*" PRIu32, minLength, number);
