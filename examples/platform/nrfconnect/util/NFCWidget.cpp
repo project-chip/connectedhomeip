@@ -15,24 +15,25 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
- #include "NFCWidget.h"
+#include "NFCWidget.h"
 
-#include <nfc_t2t_lib.h>
-#include <nfc/ndef/uri_rec.h>
 #include <nfc/ndef/uri_msg.h>
+#include <nfc/ndef/uri_rec.h>
+#include <nfc_t2t_lib.h>
 #include <zephyr.h>
 
-int NFCWidget::Init(chip::DeviceLayer::ConnectivityManager& mgr)
+int NFCWidget::Init(chip::DeviceLayer::ConnectivityManager & mgr)
 {
     return nfc_t2t_setup(FieldDetectionHandler, &mgr);
 }
 
-int NFCWidget::StartTagEmulation(const char* tagPayload, uint8_t tagPayloadLength)
+int NFCWidget::StartTagEmulation(const char * tagPayload, uint8_t tagPayloadLength)
 {
     uint32_t len = sizeof(mNdefBuffer);
     int result   = 0;
 
-    result = nfc_ndef_uri_msg_encode(NFC_URI_NONE, reinterpret_cast<const uint8_t*>(tagPayload), tagPayloadLength, mNdefBuffer, &len);
+    result =
+        nfc_ndef_uri_msg_encode(NFC_URI_NONE, reinterpret_cast<const uint8_t *>(tagPayload), tagPayloadLength, mNdefBuffer, &len);
     VerifyOrExit(result >= 0, ChipLogProgress(AppServer, "nfc_ndef_uri_msg_encode failed: %d", result));
 
     result = nfc_t2t_payload_set(mNdefBuffer, len);
@@ -54,21 +55,23 @@ int NFCWidget::StopTagEmulation()
     return result;
 }
 
-void NFCWidget::FieldDetectionHandler(void *context, enum nfc_t2t_event event, const uint8_t *data, size_t data_length)
+void NFCWidget::FieldDetectionHandler(void * context, enum nfc_t2t_event event, const uint8_t * data, size_t data_length)
 {
     ARG_UNUSED(data);
     ARG_UNUSED(data_length);
 
-    switch (event) {
+    switch (event)
+    {
     case NFC_T2T_EVENT_FIELD_ON: {
-        chip::DeviceLayer::ConnectivityManager* connectivityMgr = reinterpret_cast<chip::DeviceLayer::ConnectivityManager*>(context);
+        chip::DeviceLayer::ConnectivityManager * connectivityMgr =
+            reinterpret_cast<chip::DeviceLayer::ConnectivityManager *>(context);
         if (!connectivityMgr->IsBLEAdvertisingEnabled())
         {
             connectivityMgr->SetBLEAdvertisingEnabled(true);
         }
-        }
-    	break;
+    }
+    break;
     default:
-    	break;
+        break;
     }
 }

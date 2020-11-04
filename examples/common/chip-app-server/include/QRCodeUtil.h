@@ -20,4 +20,4 @@
 #include <setup_payload/SetupPayload.h>
 
 void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags);
-CHIP_ERROR GetQRCode(uint32_t& setupPinCode, std::string& QRCode, chip::RendezvousInformationFlags rendezvousFlags);
+CHIP_ERROR GetQRCode(uint32_t & setupPinCode, std::string & QRCode, chip::RendezvousInformationFlags rendezvousFlags);

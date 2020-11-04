@@ -33,12 +33,14 @@ void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags)
     {
         ChipLogProgress(AppServer, "SetupPINCode: [%" PRIu32 "]", setupPinCode);
         ChipLogProgress(AppServer, "SetupQRCode:  [%s]", QRCode.c_str());
-    } else {
+    }
+    else
+    {
         ChipLogError(AppServer, "Getting QR code failed!");
     }
 }
 
-CHIP_ERROR GetQRCode(uint32_t& setupPinCode, std::string& QRCode, chip::RendezvousInformationFlags rendezvousFlags)
+CHIP_ERROR GetQRCode(uint32_t & setupPinCode, std::string & QRCode, chip::RendezvousInformationFlags rendezvousFlags)
 {
     using namespace ::chip::DeviceLayer;
 
@@ -68,8 +70,7 @@ CHIP_ERROR GetQRCode(uint32_t& setupPinCode, std::string& QRCode, chip::Rendezvo
     // TODO: Usage of STL will significantly increase the image size, this should be changed to more efficient method for
     // generating payload
     err = chip::QRCodeSetupPayloadGenerator(payload).payloadBase41Representation(QRCode);
-    VerifyOrExit(err == CHIP_NO_ERROR,
-                 ChipLogProgress(AppServer, "Generating QR Code failed: %s", chip::ErrorStr(err)));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogProgress(AppServer, "Generating QR Code failed: %s", chip::ErrorStr(err)));
 
 exit:
     return err;
