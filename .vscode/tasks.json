@@ -128,9 +128,9 @@
             }
         },
         {
-            "label": "Build ESP32 Echo Example",
+            "label": "Build ESP32 all-clusters-app Example",
             "type": "shell",
-            "command": "scripts/examples/build-wifi-echo.py",
+            "command": "scripts/examples/build-all-clusters-app.py",
             "group": "build",
             "problemMatcher": ["$gcc"]
         },

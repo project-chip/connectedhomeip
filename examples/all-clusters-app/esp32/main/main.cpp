@@ -87,7 +87,7 @@ extern void startServer();
 
 extern void PairingComplete(SecurePairingSession * pairing);
 
-const char * TAG = "wifi-echo-demo";
+const char * TAG = "all-clusters-app";
 
 static DeviceCallbacks EchoCallbacks;
 RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
@@ -490,7 +490,7 @@ static SecurePairingUsingTestSecret gTestPairing;
 
 extern "C" void app_main()
 {
-    ESP_LOGI(TAG, "WiFi Echo Demo!");
+    ESP_LOGI(TAG, "All Clusters Demo!");
 
     /* Print chip information */
     esp_chip_info_t chip_info;

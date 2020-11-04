@@ -1,4 +1,4 @@
-# CHIP WiFi Echo Server Example
+# CHIP All Clusters Example
 
 A prototype appplication that uses CHIP to setup WiFi on the ESP32 and runs an
 Echo Server. This example will evolve as more complex messaging is supported in
@@ -6,7 +6,7 @@ CHIP.
 
 ---
 
--   [CHIP WiFi Echo Server Example](#chip-wifi-echo-server-example)
+-   [CHIP App Server Example](#chip-app-server-example)
     -   [Supported Devices](#supported-devices)
     -   [Building the Example Application](#building-the-example-application)
         -   [To build the application, follow these steps:](#to-build-the-application-follow-these-steps)
@@ -65,13 +65,13 @@ make sure the IDF_PATH has been exported(See the manual setup steps above).
 
           $ idf make menuconfig
 
-        Select ESP32 based `Device Type` through `WiFi Echo Demo`->`Device Type`.
+        Select ESP32 based `Device Type` through `Demo`->`Device Type`.
         The device types that are currently supported include `ESP32-DevKitC` (default),
         `ESP32-WROVER-KIT_V4.1` and `M5Stack`
 
         If you are using `standalone chip-tool` to communicate with the ESP32, bypass the
         Rendezvous mode so that the device can communicate over an insecure channel.
-        This can be done through `WiFi Echo Demo`->`Rendezvous Mode`->`Bypass`
+        This can be done through `Demo`->`Rendezvous Mode`->`Bypass`
 
         To connect the ESP32 to your network, configure the Wi-Fi SSID and Passphrase through
         `Component config`->`CHIP Device Layer`->`WiFi Station Options`->`Default WiFi SSID` and
@@ -163,7 +163,7 @@ Alternatively, you can connect to the ESP32's Soft-AP directly.
 In addition to the echo server, this demo also supports controlling OnOff
 cluster (Server) attributes of an endpoint. For `ESP32-DevKitC` and
 `ESP32-WROVER-KIT_V4.1`, a GPIO (configurable through `STATUS_LED_GPIO_NUM` in
-`main/wifi-echo.cpp`) is updated through the on/off/toggle commands from the
+`main/main.cpp`) is updated through the on/off/toggle commands from the
 `chip-tool`. For `M5Stack`, a virtual Green LED on the display is used for the
 same.
 

@@ -51,8 +51,8 @@ jobs:
             - name: Copy aside build products
               run: |
                   mkdir -p example_binaries/$BUILD_TYPE-build
-                  cp examples/wifi-echo/server/esp32/build/chip-wifi-echo.elf \
-                     example_binaries/$BUILD_TYPE-build/chip-wifi-echo.elf
+                  cp examples/all-clusters-app/esp32/build/chip-all-clusters-app.elf \
+                     example_binaries/$BUILD_TYPE-build/chip-all-clusters-app.elf
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0
