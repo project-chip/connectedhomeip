@@ -107,14 +107,14 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.Init(&conn);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ExchangeContext * ec1 = exchangeMgr.NewContext(kSourceNodeId, (ExchangeContextDelegate *) 0x1234);
+    ExchangeContext * ec1 = exchangeMgr.NewContext(kSourceNodeId, &gMockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
     NL_TEST_ASSERT(inSuite, ec1->GetPeerNodeId() == kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == (void *) 0x1234);
+    NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &gMockAppDelegate);
 
-    ExchangeContext * ec2 = exchangeMgr.NewContext(kDestinationNodeId, (ExchangeContextDelegate *) 0x2345);
+    ExchangeContext * ec2 = exchangeMgr.NewContext(kDestinationNodeId, &gMockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
     NL_TEST_ASSERT(inSuite, ec2->GetPeerNodeId() == kDestinationNodeId);
