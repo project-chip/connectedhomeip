@@ -91,7 +91,6 @@ const uint16_t commandManufacturerCodeCount                   = GENERATED_COMMAN
 const EmberAfAttributeMetadata generatedAttributes[]      = GENERATED_ATTRIBUTES;
 const EmberAfCluster generatedClusters[]                  = GENERATED_CLUSTERS;
 const EmberAfEndpointType generatedEmberAfEndpointTypes[] = GENERATED_ENDPOINT_TYPES;
-const EmAfZigbeeProNetwork emAfZigbeeProNetworks[]        = EM_AF_GENERATED_ZIGBEE_PRO_NETWORKS;
 
 const EmberAfManufacturerCodeEntry clusterManufacturerCodes[]   = GENERATED_CLUSTER_MANUFACTURER_CODES;
 const uint16_t clusterManufacturerCodeCount                     = GENERATED_CLUSTER_MANUFACTURER_CODE_COUNT;

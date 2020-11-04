@@ -528,15 +528,6 @@ typedef struct
     EmberKeyData preconfiguredKey;
 } EmberAfSecurityProfileData;
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-typedef struct
-{
-    EmberNodeType nodeType;
-    EmberAfSecurityProfile securityProfile;
-} EmAfZigbeeProNetwork;
-
-#endif
-
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 enum EmberAfEndpointBitmask;
 #else
