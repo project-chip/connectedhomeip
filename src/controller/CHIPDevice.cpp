@@ -176,6 +176,9 @@ CHIP_ERROR Device::EstablishSecureSession()
     err = pairingSession.FromSerializable(mPairing);
     SuccessOrExit(err);
 
+    err = mSessionManager->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
+    SuccessOrExit(err);
+
     err = mSessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)),
         &pairingSession);
@@ -202,8 +205,6 @@ CHIP_ERROR Device::ResumeSecureSession()
     }
 
     VerifyOrExit(mSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mSessionManager->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
-    SuccessOrExit(err);
 
     err = EstablishSecureSession();
     SuccessOrExit(err);
