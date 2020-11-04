@@ -261,7 +261,7 @@ public:
     {
         const char * secret = "Test secret for key derivation";
         size_t secretLen    = strlen(secret);
-        mKeLen = secretLen;
+        mKeLen              = secretLen;
         memmove(mKe, secret, mKeLen);
         mPairingComplete = true;
     }
@@ -270,10 +270,10 @@ public:
     {
         const char * secret = "Test secret for key derivation";
         size_t secretLen    = strlen(secret);
-        mPeerNodeId = peerNodeId;
-        mPeerKeyId  = peerKeyId;
-        mLocalKeyId = localKeyId;
-        mKeLen = secretLen;
+        mPeerNodeId         = peerNodeId;
+        mPeerKeyId          = peerKeyId;
+        mLocalKeyId         = localKeyId;
+        mKeLen              = secretLen;
         memmove(mKe, secret, mKeLen);
         mPairingComplete = true;
     }
