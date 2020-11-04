@@ -170,7 +170,7 @@ void DeviceCallbacks::PluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint
 
     VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
-    ConnectivityMgr().ClearWiFiStationProvision();
+    ConfigurationMgr().InitiateFactoryReset();
 
 exit:
     return;
