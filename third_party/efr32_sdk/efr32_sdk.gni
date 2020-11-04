@@ -125,7 +125,7 @@ template("efr32_sdk") {
       "${efr32_board}=1",
     ]
 
-    defines += specific_brd_defines
+    defines += board_defines
 
     if (efr32_family == "efr32mg12") {
       _include_dirs += [
