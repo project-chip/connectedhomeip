@@ -65,101 +65,6 @@ public final class AndroidChipStack {
     }
   }
 
-  public static class ChipGattCallback extends BluetoothGattCallback {
-    @Override
-    public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-      if (status != BluetoothGatt.GATT_SUCCESS || newState != BluetoothProfile.STATE_DISCONNECTED) {
-        return;
-      }
-
-      int connId = getInstance().getConnId(gatt);
-      ChipDeviceController controller = getInstance().getConnection(connId);
-
-      if (controller == null) {
-        Log.e(TAG, "onConnectionStateChange disconnected: no active connection");
-        return;
-      }
-
-      Log.d(TAG, "onConnectionStateChange Disconnected");
-      controller.handleConnectionError(connId);
-    }
-
-    @Override
-    public void onCharacteristicWrite(
-        BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
-      if (status != BluetoothGatt.GATT_SUCCESS) {
-        Log.e(
-            TAG,
-            "onCharacteristicWrite for "
-                + characteristic.getUuid().toString()
-                + " failed with status: "
-                + status);
-        return;
-      }
-
-      int connId = getInstance().getConnId(gatt);
-      ChipDeviceController controller = getInstance().getConnection(connId);
-
-      if (controller == null) {
-        Log.e(TAG, "onCharacteristicWrite no active connection");
-        return;
-      }
-
-      byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
-      byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
-      controller.handleWriteConfirmation(connId, svcIdBytes, charIdBytes);
-    }
-
-    @Override
-    public void onCharacteristicChanged(
-        BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
-      int connId = getInstance().getConnId(gatt);
-      ChipDeviceController controller = getInstance().getConnection(connId);
-
-      if (controller == null) {
-        Log.e(TAG, "onCharacteristicChanged no active connection");
-        return;
-      }
-
-      byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
-      byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
-      controller.handleIndicationReceived(
-          connId, svcIdBytes, charIdBytes, characteristic.getValue());
-    }
-
-    @Override
-    public void onDescriptorWrite(BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {
-      BluetoothGattCharacteristic characteristic = desc.getCharacteristic();
-      if (status != BluetoothGatt.GATT_SUCCESS) {
-        Log.e(
-            TAG,
-            "onDescriptorWrite for "
-                + desc.getUuid().toString()
-                + " failed with status: "
-                + status);
-      }
-
-      int connId = getInstance().getConnId(gatt);
-      ChipDeviceController controller = getInstance().getConnection(connId);
-
-      if (controller == null) {
-        Log.e(TAG, "onDescriptorWrite no active connection");
-        return;
-      }
-
-      byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
-      byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
-
-      if (desc.getValue() == BluetoothGattDescriptor.ENABLE_INDICATION_VALUE) {
-        controller.handleSubscribeComplete(connId, svcIdBytes, charIdBytes);
-      } else if (desc.getValue() == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
-        controller.handleUnsubscribeComplete(connId, svcIdBytes, charIdBytes);
-      } else {
-        Log.d(TAG, "Unexpected onDescriptorWrite().");
-      }
-    }
-  }
-
   /* Singleton instance of this class */
   private static final AndroidChipStack sInstance = new AndroidChipStack();
 
@@ -170,10 +75,116 @@ public final class AndroidChipStack {
 
   private AndroidChipStack() {
     mConnections = new ArrayList<ChipDeviceController>(INITIAL_CONNECTIONS);
+    mGattCallback =
+        new BluetoothGattCallback() {
+          @Override
+          public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
+            int connId = 0;
+
+            if (newState == BluetoothProfile.STATE_DISCONNECTED) {
+              connId = getConnId(gatt);
+              if (connId > 0) {
+                Log.d(TAG, "onConnectionStateChange Disconnected");
+                handleConnectionError(connId);
+              } else {
+                Log.e(TAG, "onConnectionStateChange disconnected: no active connection");
+              }
+            }
+          }
+
+          @Override
+          public void onServicesDiscovered(BluetoothGatt gatt, int status) {}
+
+          @Override
+          public void onCharacteristicRead(
+              BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {}
+
+          @Override
+          public void onCharacteristicWrite(
+              BluetoothGatt gatt, BluetoothGattCharacteristic characteristic, int status) {
+            byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
+            byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
+
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+              Log.e(
+                  TAG,
+                  "onCharacteristicWrite for "
+                      + characteristic.getUuid().toString()
+                      + " failed with status: "
+                      + status);
+              return;
+            }
+
+            int connId = getConnId(gatt);
+            if (connId > 0) {
+              handleWriteConfirmation(
+                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+            } else {
+              Log.e(TAG, "onCharacteristicWrite no active connection");
+              return;
+            }
+          }
+
+          @Override
+          public void onCharacteristicChanged(
+              BluetoothGatt gatt, BluetoothGattCharacteristic characteristic) {
+            byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
+            byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
+            int connId = getConnId(gatt);
+            if (connId > 0) {
+              handleIndicationReceived(connId, svcIdBytes, charIdBytes, characteristic.getValue());
+            } else {
+              Log.e(TAG, "onCharacteristicChanged no active connection");
+              return;
+            }
+          }
+
+          @Override
+          public void onDescriptorWrite(
+              BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {
+            BluetoothGattCharacteristic characteristic = desc.getCharacteristic();
+
+            byte[] svcIdBytes = convertUUIDToBytes(characteristic.getService().getUuid());
+            byte[] charIdBytes = convertUUIDToBytes(characteristic.getUuid());
+
+            if (status != BluetoothGatt.GATT_SUCCESS) {
+              Log.e(
+                  TAG,
+                  "onDescriptorWrite for "
+                      + desc.getUuid().toString()
+                      + " failed with status: "
+                      + status);
+            }
+
+            int connId = getConnId(gatt);
+            if (connId == 0) {
+              Log.e(TAG, "onDescriptorWrite no active connection");
+              return;
+            }
+
+            if (desc.getValue() == BluetoothGattDescriptor.ENABLE_INDICATION_VALUE) {
+              handleSubscribeComplete(
+                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+            } else if (desc.getValue() == BluetoothGattDescriptor.DISABLE_NOTIFICATION_VALUE) {
+              handleUnsubscribeComplete(
+                  connId, svcIdBytes, charIdBytes, status == BluetoothGatt.GATT_SUCCESS);
+            } else {
+              Log.d(TAG, "Unexpected onDescriptorWrite().");
+            }
+          }
+
+          @Override
+          public void onDescriptorRead(
+              BluetoothGatt gatt, BluetoothGattDescriptor desc, int status) {}
+        };
   }
 
   public static AndroidChipStack getInstance() {
     return sInstance;
+  }
+
+  public BluetoothGattCallback getCallback() {
+    return mGattCallback;
   }
 
   public synchronized ChipDeviceController getConnection(int connId) {
@@ -357,6 +368,24 @@ public final class AndroidChipStack {
   }
 
   // ----- Private Members -----
+
+  static {
+    System.loadLibrary("CHIPController");
+  }
+
+  private native void handleWriteConfirmation(
+      int connId, byte[] svcId, byte[] charId, boolean success);
+
+  private native void handleIndicationReceived(
+      int connId, byte[] svcId, byte[] charId, byte[] data);
+
+  private native void handleSubscribeComplete(
+      int connId, byte[] svcId, byte[] charId, boolean success);
+
+  private native void handleUnsubscribeComplete(
+      int connId, byte[] svcId, byte[] charId, boolean success);
+
+  private native void handleConnectionError(int connId);
 
   // CLIENT_CHARACTERISTIC_CONFIG is the well-known UUID of the client characteristic descriptor
   // that has the flags for enabling and disabling notifications and indications.
