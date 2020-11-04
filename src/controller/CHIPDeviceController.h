@@ -103,9 +103,8 @@ public:
      * Init function to be used when there exists a device layer that takes care of initializing
      * System::Layer and InetLayer.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, const char * pairedDeviceSerializedSet = nullptr,
-                    PersistentStorageDelegate * storageDelegate = nullptr, System::Layer * systemLayer = nullptr,
-                    Inet::InetLayer * inetLayer = nullptr);
+    CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
+                    System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
 
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
 
@@ -178,9 +177,9 @@ public:
      * Init function to be used when there exists a device layer that takes care of initializing
      * System::Layer and InetLayer.
      */
-    CHIP_ERROR Init(NodeId localDeviceId, const char * pairedDeviceSerializedSet = nullptr,
-                    PersistentStorageDelegate * storageDelegate = nullptr, DevicePairingDelegate * pairingDelegate = nullptr,
-                    System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
+    CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
+                    DevicePairingDelegate * pairingDelegate = nullptr, System::Layer * systemLayer = nullptr,
+                    Inet::InetLayer * inetLayer = nullptr);
 
     CHIP_ERROR SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate);
 

@@ -90,8 +90,7 @@ DeviceController::DeviceController()
     mPairedDevicesInitialized = false;
 }
 
-CHIP_ERROR DeviceController::Init(NodeId localDeviceId, const char * pairedDeviceSerializedSet,
-                                  PersistentStorageDelegate * storageDelegate, System::Layer * systemLayer,
+CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate, System::Layer * systemLayer,
                                   Inet::InetLayer * inetLayer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -106,9 +105,6 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, const char * pairedDevic
     else
     {
 #if CONFIG_DEVICE_LAYER
-        err = chip::Platform::MemoryInit();
-        SuccessOrExit(err);
-
         err = DeviceLayer::PlatformMgr().InitChipStack();
         SuccessOrExit(err);
 
@@ -120,12 +116,6 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, const char * pairedDevic
     VerifyOrExit(mSystemLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mInetLayer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (pairedDeviceSerializedSet != nullptr)
-    {
-        err = SetPairedDeviceList(pairedDeviceSerializedSet);
-        SuccessOrExit(err);
-    }
-
     mStorageDelegate = storageDelegate;
 
     if (mStorageDelegate != nullptr)
@@ -135,8 +125,9 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, const char * pairedDevic
 
     mSessionManager = chip::Platform::New<SecureSessionMgr<Transport::UDP>>();
 
+    // ToDo: Fix hardcoded IPv4 address requirement: issue# 2984
     err = mSessionManager->Init(localDeviceId, mSystemLayer,
-                                Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4));
+                                Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
     mSessionManager->SetDelegate(this);
@@ -400,11 +391,11 @@ DeviceCommissioner::~DeviceCommissioner()
     PersistDeviceList();
 }
 
-CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, const char * pairedDeviceSerializedSet,
-                                    PersistentStorageDelegate * storageDelegate, DevicePairingDelegate * pairingDelegate,
-                                    System::Layer * systemLayer, Inet::InetLayer * inetLayer)
+CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate,
+                                    DevicePairingDelegate * pairingDelegate, System::Layer * systemLayer,
+                                    Inet::InetLayer * inetLayer)
 {
-    CHIP_ERROR err = DeviceController::Init(localDeviceId, pairedDeviceSerializedSet, storageDelegate, systemLayer, inetLayer);
+    CHIP_ERROR err = DeviceController::Init(localDeviceId, storageDelegate, systemLayer, inetLayer);
     SuccessOrExit(err);
 
     mPairingDelegate = pairingDelegate;

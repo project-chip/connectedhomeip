@@ -84,13 +84,13 @@ ChipDeviceController::~ChipDeviceController() {}
 CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, DevicePairingDelegate * pairingDelegate,
                                       PersistentStorageDelegate * storageDelegate)
 {
-    return mCommissioner.Init(localNodeId, nullptr, storageDelegate, pairingDelegate);
+    return mCommissioner.Init(localNodeId, storageDelegate, pairingDelegate);
 }
 
 CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * systemLayer, InetLayer * inetLayer,
                                       DevicePairingDelegate * pairingDelegate, PersistentStorageDelegate * storageDelegate)
 {
-    return mCommissioner.Init(localNodeId, nullptr, storageDelegate, pairingDelegate, systemLayer, inetLayer);
+    return mCommissioner.Init(localNodeId, storageDelegate, pairingDelegate, systemLayer, inetLayer);
 }
 
 CHIP_ERROR ChipDeviceController::Shutdown()
