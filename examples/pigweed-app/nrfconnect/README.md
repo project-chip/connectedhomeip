@@ -81,8 +81,8 @@ respectively:
         /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
         ...
 
-It is important to remember about running activate.sh script, as it is necessary to build Pigweed library
-and it can be done, by typing following command:
+It is important to remember about running activate.sh script, as it is necessary
+to build Pigweed library and it can be done, by typing following command:
 
         $ source scripts/activate.sh
 
@@ -124,11 +124,10 @@ Make sure that you source the following file:
 > terminal before building. `$GNUARMEMB_TOOLCHAIN_PATH` and
 > `$ZEPHYR_TOOLCHAIN_VARIANT` must be set manually.
 
-Make sure that you run activate.sh script, as it is necessary to build Pigweed library and it can be done, by typing
-following command:
+Make sure that you run activate.sh script, as it is necessary to build Pigweed
+library and it can be done, by typing following command:
 
         $ source scripts/activate.sh
-
 
 After your environment is set up, you are ready to build the example. The
 recommended tool for building and flashing the device is
