@@ -68,8 +68,10 @@ public:
 class MockAppDelegate : public ExchangeContextDelegate
 {
 public:
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType, System::PacketBuffer * buffer) override { }
-    void OnResponseTimeout(ExchangeContext * ec) override { }
+    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+                           System::PacketBuffer * buffer) override
+    {}
+    void OnResponseTimeout(ExchangeContext * ec) override {}
 } gMockAppDelegate;
 
 void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)

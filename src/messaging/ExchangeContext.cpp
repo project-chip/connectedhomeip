@@ -191,7 +191,8 @@ void ExchangeContext::Reset()
     *this = ExchangeContext();
 }
 
-void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeContextDelegate * delegate)
+void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
+                            ExchangeContextDelegate * delegate)
 {
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
@@ -291,7 +292,8 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
         delegate->OnResponseTimeout(ec);
 }
 
-CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, PacketBuffer * msgBuf)
+CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                          PacketBuffer * msgBuf)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t protocolId = 0;

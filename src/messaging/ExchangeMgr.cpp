@@ -143,7 +143,8 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
 }
 
-ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeContextDelegate * delegate)
+ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
+                                                ExchangeContextDelegate * delegate)
 {
     ExchangeContext * ec = ContextPool;
 
