@@ -79,58 +79,16 @@ RendezvousSession::~RendezvousSession()
     mDelegate = nullptr;
 }
 
-CHIP_ERROR RendezvousSession::SendMessage(System::PacketBuffer * msgBuf)
+CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
+                                                 System::PacketBuffer * msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    switch (mCurrentState)
+    if (mCurrentState != State::kSecurePairing)
     {
-    case State::kSecurePairing:
-        err = SendPairingMessage(msgBuf);
-        break;
-
-    case State::kNetworkProvisioning:
-        err = SendSecureMessage(Protocols::kProtocol_NetworkProvisioning, NetworkProvisioning::MsgTypes::kWiFiAssociationRequest,
-                                msgBuf);
-        break;
-
-    default:
         System::PacketBuffer::Free(msgBuf);
-        err = CHIP_ERROR_INCORRECT_STATE;
-        break;
-    };
-
-    SuccessOrExit(err);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        OnRendezvousError(err);
+        return CHIP_ERROR_INCORRECT_STATE;
     }
-    return err;
-}
 
-CHIP_ERROR RendezvousSession::SendPairingMessage(System::PacketBuffer * msgBuf)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    PacketHeader header;
-    uint16_t headerSize = 0;
-
-    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-    err = header.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
-    SuccessOrExit(err);
-
-    msgBuf->ConsumeHead(headerSize);
-    err    = mTransport->SendMessage(header, Header::Flags(), Transport::PeerAddress::BLE(), msgBuf);
-    msgBuf = nullptr;
-    SuccessOrExit(err);
-
-exit:
-    if (msgBuf)
-        System::PacketBuffer::Free(msgBuf);
-    return err;
+    return mTransport->SendMessage(header, payloadFlags, Transport::PeerAddress::BLE(), msgBuf);
 }
 
 CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBuf)

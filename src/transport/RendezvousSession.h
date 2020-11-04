@@ -92,7 +92,7 @@ public:
     SecurePairingSession & GetPairingSession() { return mPairingSession; }
 
     //////////// SecurePairingSessionDelegate Implementation ///////////////
-    CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf) override;
+    CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags, System::PacketBuffer * msgBuf) override;
     void OnPairingError(CHIP_ERROR err) override;
     void OnPairingComplete() override;
 
@@ -122,7 +122,6 @@ public:
     const Inet::IPAddress & GetIPAddress() const { return mNetworkProvision.GetIPAddress(); }
 
 private:
-    CHIP_ERROR SendPairingMessage(System::PacketBuffer * msgBug);
     CHIP_ERROR HandlePairingMessage(System::PacketBuffer * msgBug);
     CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
