@@ -34,7 +34,6 @@ target_sources(app PRIVATE
                main/ZclCallbacks.cpp
                ${LIGHTING_COMMON}/gen/call-command-handler.c
                ${LIGHTING_COMMON}/gen/callback-stub.c
-               ${LIGHTING_COMMON}/gen/znet-bookkeeping.c
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${NRFCONNECT_COMMON}/app/Service.cpp

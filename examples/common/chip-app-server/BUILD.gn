@@ -29,7 +29,8 @@ declare_args() {
 static_library("chip-app-server") {
   output_name = "chip-app-server"
 
-  # DataModelHandler.cpp includes a generated header (gen/znet-bookkeeping.h),
+  # Issue #1630
+  # DataModelHandler.cpp includes files that relies on generated headers
   # so we can't compile it into this static library.  It needs to be compiled
   # directly by someone who knows where the generated files for the app we're
   # compiling live.

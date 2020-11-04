@@ -26,7 +26,6 @@
 
 #include "DataModelHandler.h"
 
-#include "gen/znet-bookkeeping.h"
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
@@ -80,6 +79,6 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * 
 void InitDataModelHandler()
 {
     emberAfEndpointConfigure();
-    emAfInit();
+    emberAfInit();
 }
 }

@@ -21,9 +21,9 @@
 #include "AppTask.h"
 #include "BoltLockManager.h"
 
+#include "af.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
-#include "gen/znet-bookkeeping.h"
 #include <app/util/af-types.h>
 
 using namespace ::chip;

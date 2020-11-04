@@ -46,7 +46,6 @@
 //#include "../plugin/time-server/time-server.h"
 #include "af-event.h"
 //#include "app/framework/util/time-util.h"
-#include "gen/znet-bookkeeping.h"
 //#include "hal/micro/crc.h"
 
 // TODO: Need to figure out what needs to happen wrt HAL tokens here, but for
@@ -522,7 +521,7 @@ bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType ty
     printIncomingZclMessage(&curCmd);
     prepareForResponse(&curCmd);
 
-    if (emAfPreCommandReceived(&curCmd))
+    if (emberAfPreCommandReceivedCallback(&curCmd))
     {
         msgHandled = true;
         goto kickout;

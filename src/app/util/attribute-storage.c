@@ -43,8 +43,6 @@
 #include "af.h"
 #include "common.h"
 
-#include "gen/znet-bookkeeping.h"
-
 //------------------------------------------------------------------------------
 // Globals
 // This is not declared CONST in order to handle dynamic endpoint information
@@ -1030,7 +1028,6 @@ void emberAfInitializeAttributes(uint8_t endpoint)
 void emberAfResetAttributes(uint8_t endpoint)
 {
     emAfLoadAttributeDefaults(endpoint, true);
-    emAfResetAttributes(endpoint);
 }
 
 void emAfLoadAttributeDefaults(uint8_t endpoint, bool writeTokens)
