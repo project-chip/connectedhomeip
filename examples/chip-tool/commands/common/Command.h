@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 #include <inet/InetInterface.h>
 #include <support/logging/CHIPLogging.h>
 

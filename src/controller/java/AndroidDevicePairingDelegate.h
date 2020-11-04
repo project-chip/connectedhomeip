@@ -20,7 +20,7 @@
 
 #include <controller/CHIPDeviceController.h>
 
-class AndroidDevicePairingDelegate : public chip::DeviceController::DevicePairingDelegate
+class AndroidDevicePairingDelegate : public chip::Controller::DevicePairingDelegate
 {
 public:
     void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
