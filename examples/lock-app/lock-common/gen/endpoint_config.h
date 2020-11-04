@@ -49,17 +49,12 @@
             { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 1 / On/off / cluster revision*/           \
     }
 
-// Cluster function static arrays
-#define GENERATED_FUNCTION_ARRAYS                                                                                                  \
-    const EmberAfGenericClusterFunction emberAfFuncArrayOnOffClusterServer[] = { (                                                 \
-        EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback };
-
 // Clusters definitions
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
             0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[0]), 2,                                                     \
-            3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),     emberAfFuncArrayOnOffClusterServer,                    \
+            3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),     NULL,                                                  \
         },                                                                                                                         \
     }
 

@@ -92,9 +92,9 @@ typedef struct
     uint32_t transitionTimeMs;
     uint32_t elapsedTimeMs;
 } EmberAfLevelControlState;
-
+#ifdef EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT
 static EmberAfLevelControlState stateTable[EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
-
+#endif // EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT
 static EmberAfLevelControlState * getState(uint8_t endpoint);
 
 static void moveToLevelHandler(uint8_t commandId, uint8_t level, uint16_t transitionTimeDs, uint8_t optionMask,
@@ -128,7 +128,11 @@ static void deactivate(uint8_t endpoint)
 static EmberAfLevelControlState * getState(uint8_t endpoint)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
+#ifdef EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT
     return (ep == 0xFF ? NULL : &stateTable[ep]);
+#else
+    return NULL;
+#endif // EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT
 }
 
 #if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)

@@ -57,9 +57,6 @@
             }, /* 8 / Temperature Measurement / cluster revision*/                                                                 \
     }
 
-// Cluster function static arrays
-#define GENERATED_FUNCTION_ARRAYS
-
 // Clusters definitions
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
