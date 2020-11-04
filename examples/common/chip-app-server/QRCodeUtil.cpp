@@ -52,7 +52,7 @@ CHIP_ERROR GetQRCode(uint32_t& setupPinCode, std::string& QRCode, chip::Rendezvo
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err)));
     setupPinCode = payload.setUpPINCode;
-    
+
     err = ConfigurationMgr().GetSetupDiscriminator(payload.discriminator);
     VerifyOrExit(err == CHIP_NO_ERROR,
                  ChipLogProgress(AppServer, "ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err)));
