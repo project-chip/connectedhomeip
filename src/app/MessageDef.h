@@ -393,13 +393,13 @@ private:
  *
  */
 namespace CommandPath {
-    enum
-    {
-        kCsTag_EndpointId = 0,
-        kCsTag_GroupId    = 1,
-        kCsTag_ClusterId  = 2,
-        kCsTag_CommandId  = 3,
-    };
+enum
+{
+    kCsTag_EndpointId = 0,
+    kCsTag_GroupId    = 1,
+    kCsTag_ClusterId  = 2,
+    kCsTag_CommandId  = 3,
+};
 
 /**
  *  @class Parser
@@ -829,12 +829,12 @@ private:
  *
  */
 namespace CommandDataElement {
-    enum
-    {
-        kCsTag_CommandPath  = 0,
-        kCsTag_Data         = 1,
-        kCsTag_StatusCode   = 2,
-    };
+enum
+{
+    kCsTag_CommandPath = 0,
+    kCsTag_Data        = 1,
+    kCsTag_StatusCode  = 2,
+};
 
 /**
  *  @brief
@@ -966,10 +966,10 @@ public:
 namespace InvokeCommandRequest {
 
 /// @brief Context-Specific tags used in this message
-    enum
-    {
-        kCsTag_CommandList            = 0,
-    };
+enum
+{
+    kCsTag_CommandList = 0,
+};
 
 /**
  *  @brief

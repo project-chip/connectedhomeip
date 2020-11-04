@@ -37,8 +37,8 @@
 #define __STDC_CONSTANT_MACROS
 #endif // __STDC_CONSTANT_MACROS
 
-#include <algorithm>
 #include "MessageDef.h"
+#include <algorithm>
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -55,7 +55,7 @@ namespace {
 uint32_t gPrettyPrintingDepthLevel = 0;
 char gLineBuffer[256];
 size_t gCurLineBufferSize = 0;
-}
+} // namespace
 
 /**
  * Simple object to checkpoint the pretty-print indentation level and make
@@ -119,7 +119,7 @@ static void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
                 ret      = (size_t)(snprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, "\t"));
                 if (ret > 0)
                 {
-                    gCurLineBufferSize +=  std::min(ret, sizeLeft);
+                    gCurLineBufferSize += std::min(ret, sizeLeft);
                 }
             }
         }
@@ -131,7 +131,7 @@ static void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
         ret      = (size_t)(vsnprintf(gLineBuffer + gCurLineBufferSize, sizeLeft, aFmt, args));
         if (ret > 0)
         {
-            gCurLineBufferSize +=  std::min(ret, sizeLeft);
+            gCurLineBufferSize += std::min(ret, sizeLeft);
         }
     }
 
@@ -964,7 +964,7 @@ exit:
 }
 
 #if CHIP_CONFIG_INTERACTION_MODEL_ENABLE_SCHEMA_CHECK
-        // Roughly verify the schema is right, including
+// Roughly verify the schema is right, including
 // 1) all mandatory tags are present
 // 2) no unknown tags
 // 3) all elements have expected data type
@@ -1244,7 +1244,7 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
             VerifyOrExit(tagPresence.Path == false, err = CHIP_ERROR_INVALID_TLV_TAG);
             tagPresence.Path = true;
 
-            VerifyOrExit(chip::TLV::kTLVType_Path== reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
             {
@@ -2625,108 +2625,108 @@ CommandDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth
 
     switch (aReader.GetType())
     {
-        case chip::TLV::kTLVType_Structure:
-            PRETTY_PRINT("\t\t{");
-            break;
+    case chip::TLV::kTLVType_Structure:
+        PRETTY_PRINT("\t\t{");
+        break;
 
-        case chip::TLV::kTLVType_Array:
-            PRETTY_PRINT_SAMELINE("[");
-            PRETTY_PRINT("\t\t\t");
-            break;
+    case chip::TLV::kTLVType_Array:
+        PRETTY_PRINT_SAMELINE("[");
+        PRETTY_PRINT("\t\t\t");
+        break;
 
-        case chip::TLV::kTLVType_SignedInteger: {
-            int64_t value_s64;
+    case chip::TLV::kTLVType_SignedInteger: {
+        int64_t value_s64;
 
-            err = aReader.Get(value_s64);
-            SuccessOrExit(err);
+        err = aReader.Get(value_s64);
+        SuccessOrExit(err);
 
-            PRETTY_PRINT_SAMELINE("%" PRId64 ", ", value_s64);
-            break;
-        }
+        PRETTY_PRINT_SAMELINE("%" PRId64 ", ", value_s64);
+        break;
+    }
 
-        case chip::TLV::kTLVType_UnsignedInteger: {
-            uint64_t value_u64;
+    case chip::TLV::kTLVType_UnsignedInteger: {
+        uint64_t value_u64;
 
-            err = aReader.Get(value_u64);
-            SuccessOrExit(err);
+        err = aReader.Get(value_u64);
+        SuccessOrExit(err);
 
-            PRETTY_PRINT_SAMELINE("%" PRIu64 ", ", value_u64);
-            break;
-        }
+        PRETTY_PRINT_SAMELINE("%" PRIu64 ", ", value_u64);
+        break;
+    }
 
-        case chip::TLV::kTLVType_Boolean: {
-            bool value_b;
+    case chip::TLV::kTLVType_Boolean: {
+        bool value_b;
 
-            err = aReader.Get(value_b);
-            SuccessOrExit(err);
+        err = aReader.Get(value_b);
+        SuccessOrExit(err);
 
-            PRETTY_PRINT_SAMELINE("%s, ", value_b ? "true" : "false");
-            break;
-        }
+        PRETTY_PRINT_SAMELINE("%s, ", value_b ? "true" : "false");
+        break;
+    }
 
-        case chip::TLV::kTLVType_UTF8String: {
-            char value_s[256];
+    case chip::TLV::kTLVType_UTF8String: {
+        char value_s[256];
 
-            err = aReader.GetString(value_s, sizeof(value_s));
-            VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, );
+        err = aReader.GetString(value_s, sizeof(value_s));
+        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, );
 
-            if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
-            {
-                PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
-                err = CHIP_NO_ERROR;
-            }
-            else
-            {
-                PRETTY_PRINT_SAMELINE("\"%s\", ", value_s);
-            }
-            break;
-        }
-
-        case chip::TLV::kTLVType_ByteString: {
-            uint8_t value_b[256];
-            uint32_t len, readerLen;
-
-            readerLen = aReader.GetLength();
-
-            err = aReader.GetBytes(value_b, sizeof(value_b));
-            VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, );
-
-            PRETTY_PRINT_SAMELINE("[");
-            PRETTY_PRINT("\t\t\t");
-
-            if (readerLen < sizeof(value_b))
-            {
-                len = readerLen;
-            }
-            else
-            {
-                len = sizeof(value_b);
-            }
-
-            if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
-            {
-                PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
-            }
-            else
-            {
-                for (size_t i = 0; i < len; i++)
-                {
-                    PRETTY_PRINT_SAMELINE("0x%" PRIx8 ", ", value_b[i]);
-                }
-            }
-
+        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
             err = CHIP_NO_ERROR;
-            PRETTY_PRINT("\t\t]");
-            break;
+        }
+        else
+        {
+            PRETTY_PRINT_SAMELINE("\"%s\", ", value_s);
+        }
+        break;
+    }
+
+    case chip::TLV::kTLVType_ByteString: {
+        uint8_t value_b[256];
+        uint32_t len, readerLen;
+
+        readerLen = aReader.GetLength();
+
+        err = aReader.GetBytes(value_b, sizeof(value_b));
+        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, );
+
+        PRETTY_PRINT_SAMELINE("[");
+        PRETTY_PRINT("\t\t\t");
+
+        if (readerLen < sizeof(value_b))
+        {
+            len = readerLen;
+        }
+        else
+        {
+            len = sizeof(value_b);
         }
 
-        case chip::TLV::kTLVType_Null:
-            PRETTY_PRINT_SAMELINE("NULL");
-            break;
+        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
+        }
+        else
+        {
+            for (size_t i = 0; i < len; i++)
+            {
+                PRETTY_PRINT_SAMELINE("0x%" PRIx8 ", ", value_b[i]);
+            }
+        }
 
-        default:
-            PRETTY_PRINT_SAMELINE("--");
-            break;
+        err = CHIP_NO_ERROR;
+        PRETTY_PRINT("\t\t]");
+        break;
+    }
+
+    case chip::TLV::kTLVType_Null:
+        PRETTY_PRINT_SAMELINE("NULL");
+        break;
+
+    default:
+        PRETTY_PRINT_SAMELINE("--");
+        break;
     }
 
     if (aReader.GetType() == chip::TLV::kTLVType_Structure || aReader.GetType() == chip::TLV::kTLVType_Array)
@@ -2842,7 +2842,7 @@ CHIP_ERROR AttributeDataElement::Parser::CheckSchemaValidity() const
         // check for required fields:
         const uint16_t RequiredFields = (1 << kCsTag_Path);
 
-    // Either the data or deleted keys should be present.
+        // Either the data or deleted keys should be present.
         const uint16_t DataElementTypeMask = (1 << kCsTag_AttributePath);
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {
@@ -2872,7 +2872,7 @@ CHIP_ERROR CommandDataElement::Parser::GetCommandPath(CommandPath::Parser * cons
     err = mReader.LookForElementWithTag(chip::TLV::ContextTag(kCsTag_CommandPath), &reader);
     SuccessOrExit(err);
 
-    VerifyOrExit(chip::TLV::kTLVType_Path== reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     err = apCommandPath->Init(reader);
     SuccessOrExit(err);
@@ -2906,7 +2906,7 @@ CHIP_ERROR CommandDataElement::Parser::GetStatusCode(StatusCode::Parser * const 
     err = mReader.LookForElementWithTag(chip::TLV::ContextTag(kCsTag_StatusCode), &reader);
     SuccessOrExit(err);
 
-    VerifyOrExit(chip::TLV::kTLVType_Structure== reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+    VerifyOrExit(chip::TLV::kTLVType_Structure == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
     err = apStatusCode->Init(reader);
     SuccessOrExit(err);
@@ -2916,7 +2916,6 @@ exit:
 
     return err;
 }
-
 
 // DataElement is only used in a Data List, which requires every path to be anonymous
 // Note that both mWriter and mPathBuilder only hold reference to the actual TLVWriter
@@ -2965,7 +2964,7 @@ CommandDataElement::Builder & CommandDataElement::Builder::EndOfCommandDataEleme
 // 3) every Data Element is also valid in schemasd
 CHIP_ERROR CommandList::Parser::CheckSchemaValidity() const
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
+    CHIP_ERROR err     = CHIP_NO_ERROR;
     size_t NumCommonds = 0;
     chip::TLV::TLVReader reader;
 
@@ -3213,7 +3212,7 @@ CHIP_ERROR ReportDataRequest::Parser::GetIsLastReport(bool * const apIsLastRepor
 }
 
 #if CHIP_CONFIG_INTERACTION_MODEL_ENABLE_SCHEMA_CHECK
-        // Roughly verify the schema is right, including
+// Roughly verify the schema is right, including
 // 1) all mandatory tags are present
 // 2) all elements have expected data type
 // 3) any tag can only appear once
@@ -3227,7 +3226,7 @@ CHIP_ERROR InvokeCommandRequest::Parser::CheckSchemaValidity() const
 
     enum
     {
-        kBit_CommandList     = 0,
+        kBit_CommandList = 0,
     };
 
     PRETTY_PRINT("{");
