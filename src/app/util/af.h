@@ -104,7 +104,6 @@ extern "C" {
 #include "gen/attribute-type.h"
 #include "gen/call-command-handler.h"
 #include "gen/callback.h"
-#include "gen/client-command-macro.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
 #include "gen/debug-printing.h"

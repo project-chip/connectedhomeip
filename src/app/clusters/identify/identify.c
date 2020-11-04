@@ -146,7 +146,8 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(void)
     }
 
     emberAfIdentifyClusterPrintln("Identifying for %d more seconds", identifyTime);
-    emberAfFillCommandIdentifyClusterIdentifyQueryResponse(identifyTime);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_IDENTIFY_CLUSTER_ID,
+                              ZCL_IDENTIFY_QUERY_RESPONSE_COMMAND_ID, "v", identifyTime);
     sendStatus = emberAfSendResponse();
     if (EMBER_SUCCESS != sendStatus)
     {
