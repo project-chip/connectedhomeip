@@ -1235,108 +1235,108 @@ EventDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth) 
 
     switch (aReader.GetType())
     {
-        case chip::TLV::kTLVType_Structure:
-            PRETTY_PRINT("\t\t{");
-            break;
+    case chip::TLV::kTLVType_Structure:
+        PRETTY_PRINT("\t\t{");
+        break;
 
-        case chip::TLV::kTLVType_Array:
-            PRETTY_PRINT_SAMELINE("[");
-            PRETTY_PRINT("\t\t\t");
-            break;
+    case chip::TLV::kTLVType_Array:
+        PRETTY_PRINT_SAMELINE("[");
+        PRETTY_PRINT("\t\t\t");
+        break;
 
-        case chip::TLV::kTLVType_SignedInteger: {
-            int64_t value_s64;
+    case chip::TLV::kTLVType_SignedInteger: {
+        int64_t value_s64;
 
-            err = aReader.Get(value_s64);
-            SuccessOrExit(err);
+        err = aReader.Get(value_s64);
+        SuccessOrExit(err);
 
-            PRETTY_PRINT_SAMELINE("%" PRId64 ", ", value_s64);
-            break;
-        }
+        PRETTY_PRINT_SAMELINE("%" PRId64 ", ", value_s64);
+        break;
+    }
 
-        case chip::TLV::kTLVType_UnsignedInteger: {
-            uint64_t value_u64;
+    case chip::TLV::kTLVType_UnsignedInteger: {
+        uint64_t value_u64;
 
-            err = aReader.Get(value_u64);
-            SuccessOrExit(err);
+        err = aReader.Get(value_u64);
+        SuccessOrExit(err);
 
-            PRETTY_PRINT_SAMELINE("%" PRIu64 ", ", value_u64);
-            break;
-        }
+        PRETTY_PRINT_SAMELINE("%" PRIu64 ", ", value_u64);
+        break;
+    }
 
-        case chip::TLV::kTLVType_Boolean: {
-            bool value_b;
+    case chip::TLV::kTLVType_Boolean: {
+        bool value_b;
 
-            err = aReader.Get(value_b);
-            SuccessOrExit(err);
+        err = aReader.Get(value_b);
+        SuccessOrExit(err);
 
-            PRETTY_PRINT_SAMELINE("%s, ", value_b ? "true" : "false");
-            break;
-        }
+        PRETTY_PRINT_SAMELINE("%s, ", value_b ? "true" : "false");
+        break;
+    }
 
-        case chip::TLV::kTLVType_UTF8String: {
-            char value_s[256];
+    case chip::TLV::kTLVType_UTF8String: {
+        char value_s[256];
 
-            err = aReader.GetString(value_s, sizeof(value_s));
-            VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, );
+        err = aReader.GetString(value_s, sizeof(value_s));
+        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, );
 
-            if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
-            {
-                PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
-                err = CHIP_NO_ERROR;
-            }
-            else
-            {
-                PRETTY_PRINT_SAMELINE("\"%s\", ", value_s);
-            }
-            break;
-        }
-
-        case chip::TLV::kTLVType_ByteString: {
-            uint8_t value_b[256];
-            uint32_t len, readerLen;
-
-            readerLen = aReader.GetLength();
-
-            err = aReader.GetBytes(value_b, sizeof(value_b));
-            VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, );
-
-            PRETTY_PRINT_SAMELINE("[");
-            PRETTY_PRINT("\t\t\t");
-
-            if (readerLen < sizeof(value_b))
-            {
-                len = readerLen;
-            }
-            else
-            {
-                len = sizeof(value_b);
-            }
-
-            if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
-            {
-                PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
-            }
-            else
-            {
-                for (size_t i = 0; i < len; i++)
-                {
-                    PRETTY_PRINT_SAMELINE("0x%" PRIx8 ", ", value_b[i]);
-                }
-            }
-
+        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
             err = CHIP_NO_ERROR;
-            PRETTY_PRINT("\t\t]");
-            break;
+        }
+        else
+        {
+            PRETTY_PRINT_SAMELINE("\"%s\", ", value_s);
+        }
+        break;
+    }
+
+    case chip::TLV::kTLVType_ByteString: {
+        uint8_t value_b[256];
+        uint32_t len, readerLen;
+
+        readerLen = aReader.GetLength();
+
+        err = aReader.GetBytes(value_b, sizeof(value_b));
+        VerifyOrExit(err == CHIP_NO_ERROR || err == CHIP_ERROR_BUFFER_TOO_SMALL, );
+
+        PRETTY_PRINT_SAMELINE("[");
+        PRETTY_PRINT("\t\t\t");
+
+        if (readerLen < sizeof(value_b))
+        {
+            len = readerLen;
+        }
+        else
+        {
+            len = sizeof(value_b);
         }
 
-        case chip::TLV::kTLVType_Null:
-            PRETTY_PRINT_SAMELINE("NULL");
-            break;
+        if (err == CHIP_ERROR_BUFFER_TOO_SMALL)
+        {
+            PRETTY_PRINT_SAMELINE("... (byte string too long) ...");
+        }
+        else
+        {
+            for (size_t i = 0; i < len; i++)
+            {
+                PRETTY_PRINT_SAMELINE("0x%" PRIx8 ", ", value_b[i]);
+            }
+        }
 
-        default:
-            PRETTY_PRINT_SAMELINE("--");
-            break;
+        err = CHIP_NO_ERROR;
+        PRETTY_PRINT("\t\t]");
+        break;
+    }
+
+    case chip::TLV::kTLVType_Null:
+        PRETTY_PRINT_SAMELINE("NULL");
+        break;
+
+    default:
+        PRETTY_PRINT_SAMELINE("--");
+        break;
     }
 
     if (aReader.GetType() == chip::TLV::kTLVType_Structure || aReader.GetType() == chip::TLV::kTLVType_Array)
