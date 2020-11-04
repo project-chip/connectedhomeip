@@ -27,7 +27,7 @@ void emberAf{{asCamelCased name false}}ClusterInitCallback(uint8_t endpoint);
 // CLuster Commands Callback
 
 {{#all_user_clusters}}
-{{#if (isEnable enabled)}}
+{{#if (isEnabled enabled)}}
 {{#all_user_cluster_commands}}
 {{#if (isStrEqual clusterName parent.name)}}
 {{#if (isCommandAvailable parent.side incoming outgoing commandSource)}}

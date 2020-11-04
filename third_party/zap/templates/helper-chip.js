@@ -62,7 +62,7 @@ function isLastElement(index, count) {
     return index == count - 1;
 }
 
-function isEnable(enable) {
+function isEnabled(enable) {
     return 1 == enable;
 }
 
@@ -89,5 +89,5 @@ exports.isClient = isClient;
 exports.isServer = isServer;
 exports.isStrEqual = isStrEqual;
 exports.isLastElement = isLastElement;
-exports.isEnable = isEnable;
+exports.isEnabled = isEnabled;
 exports.isCommandAvailable = isCommandAvailable;
