@@ -5,7 +5,7 @@
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.gcc.json",
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
-            "cppStandard": "c++14",
+            "cppStandard": "gnu++14",
             "intelliSenseMode": "gcc-x64",
             "browse": {
                 "path": ["${workspaceFolder}/out/debug/"],
@@ -17,7 +17,7 @@
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.clang.json",
             "compilerPath": "/usr/bin/clang",
             "cStandard": "c11",
-            "cppStandard": "c++14",
+            "cppStandard": "gnu++14",
             "intelliSenseMode": "clang-x64",
             "browse": {
                 "path": ["${workspaceFolder}/out/debug/"],
@@ -29,7 +29,7 @@
             "compileCommands": "${workspaceFolder}/out/debug/compile_commands.mbedtls.json",
             "compilerPath": "/usr/bin/gcc",
             "cStandard": "c11",
-            "cppStandard": "c++14",
+            "cppStandard": "gnu++14",
             "intelliSenseMode": "gcc-x64",
             "browse": {
                 "path": ["${workspaceFolder}/out/debug/"],
