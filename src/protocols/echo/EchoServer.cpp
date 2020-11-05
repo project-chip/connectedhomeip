@@ -38,7 +38,7 @@ CHIP_ERROR EchoServer::Init(ExchangeManager * exchangeMgr)
     OnEchoRequestReceived = nullptr;
 
     // Register to receive unsolicited Echo Request messages from the exchange manager.
-    mExchangeMgr->RegisterUnsolicitedMessageHandler(kProtocol_Echo, kEchoMessageType_EchoRequest, HandleEchoRequest, this);
+    mExchangeMgr->RegisterUnsolicitedMessageHandler(kProtocol_Echo, kEchoMessageType_EchoRequest, this);
 
     return CHIP_NO_ERROR;
 }
@@ -52,17 +52,13 @@ void EchoServer::Shutdown()
     }
 }
 
-void EchoServer::HandleEchoRequest(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                   System::PacketBuffer * payload)
+void EchoServer::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType, System::PacketBuffer * payload)
 {
-    EchoServer * echoApp = static_cast<EchoServer *>(ec->GetAppState());
-
     // NOTE: we already know this is an Echo Request message because we explicitly registered with the
     // Exchange Manager for unsolicited Echo Requests.
 
     // Call the registered OnEchoRequestReceived handler, if any.
-    if (echoApp->OnEchoRequestReceived != nullptr)
-        echoApp->OnEchoRequestReceived(ec->GetPeerNodeId(), payload);
+    if (OnEchoRequestReceived != nullptr) OnEchoRequestReceived(ec->GetPeerNodeId(), payload);
 
     // Since we are re-using the inbound EchoRequest buffer to send the EchoResponse, if necessary,
     // adjust the position of the payload within the buffer to ensure there is enough room for the
