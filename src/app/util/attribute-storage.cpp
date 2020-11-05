@@ -774,10 +774,10 @@ static uint8_t findClusterEndpointIndex(EndpointId endpoint, EmberAfClusterId cl
             break;
         }
         epi = static_cast<uint8_t>(epi +
-                                           (emberAfFindClusterIncludingDisabledEndpointsWithMfgCode(
-                                                emAfEndpoints[i].endpoint, clusterId, mask, manufacturerCode) != NULL)
-                                       ? 1
-                                       : 0);
+                                   ((emberAfFindClusterIncludingDisabledEndpointsWithMfgCode(emAfEndpoints[i].endpoint, clusterId,
+                                                                                             mask, manufacturerCode) != NULL)
+                                        ? 1
+                                        : 0));
     }
 
     return epi;

@@ -58,6 +58,10 @@ jobs:
               run:
                   scripts/examples/gn_build_example.sh examples/shell/standalone
                   out/shell_debug
+            - name: Build example Standalone All Clusters Server 
+              run:
+                  scripts/examples/gn_build_example.sh examples/all-clusters-app/linux
+                  out/all_clusters_debug bypass_rendezvous=true
             - name: Binary artifact suffix
               id: outsuffix
               uses: haya14busa/action-cond@v1.0.0

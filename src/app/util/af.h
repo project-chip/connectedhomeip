@@ -503,11 +503,6 @@ uint8_t emberAfFindClusterServerEndpointIndex(CHIPEndpointId endpoint, EmberAfCl
 #define emberAfNetworkIndexFromEndpointIndex(index) (emAfEndpoints[(index)].networkIndex)
 
 /**
- * @brief Returns the network index of a given endpoint.
- */
-uint8_t emberAfNetworkIndexFromEndpoint(CHIPEndpointId endpoint);
-
-/**
  * @brief Macro that returns primary profile ID.
  *
  * Primary profile is the profile of a primary endpoint as defined

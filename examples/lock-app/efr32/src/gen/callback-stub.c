@@ -137,15 +137,6 @@ bool emberAfAttributeWriteAccessCallback(uint8_t endpoint, EmberAfClusterId clus
  */
 void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint) {}
 
-/** @brief Scenes Cluster ClearSceneTable
- *
- * This function is called by the framework when the application should clear
- * the scene table.
- *
- * @param endpoint The endpoint.  Ver.: always
- */
-void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint) {}
-
 /** @brief Key Establishment Cluster Client Command Received
  *
  * This function is called by the application framework when a server-to-client
