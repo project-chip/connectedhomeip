@@ -186,7 +186,7 @@ class EchoClientProtocol:
     self.transport = transport
 
     query = DNSQuery.build({
-        "ID": 0,
+        "ID": 0x1234,
         "Questions": [
             {
                 "QNAME": "_googlecast._tcp.local",

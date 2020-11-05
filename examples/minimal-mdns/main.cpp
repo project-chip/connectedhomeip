@@ -21,6 +21,7 @@
 #include <mdns/minimal/DnsHeader.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
+#include <system/SystemPacketBuffer.h>
 #include <system/SystemTimer.h>
 
 using namespace chip;
@@ -28,8 +29,53 @@ using namespace chip;
 namespace {
 
 constexpr uint32_t kRunTimeMs = 3'000;
+constexpr uint16_t kMdnsPort  = 5353;
 
+constexpr uint32_t kTestMessageId = 0x1234;
+
+constexpr size_t kMdnsMaxPacketSize = 1'024;
+
+static uint8_t kHardcodedQuestion[] = { 0x0b, 0x5f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x63, 0x61, 0x73, 0x74, 0x04, 0x5f,
+                                        0x74, 0x63, 0x70, 0x05, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x00, 0x00, 0xff, 0x80, 0x01 };
+
+void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
+{
+    Inet::IPAddress destIpAddr;
+
+    if (!Inet::IPAddress::FromString(destIpString, destIpAddr))
+    {
+        printf("Cannot parse IP address: '%s'", destIpString);
+        return;
+    }
+
+    System::PacketBuffer * buffer = System::PacketBuffer::NewWithAvailableSize(kMdnsMaxPacketSize);
+    if (buffer == nullptr)
+    {
+        printf("Buffer allocation failure.");
+        return;
+    }
+
+    buffer->SetDataLength(mdns::Minimal::HeaderRef::kSizeBytes);
+
+    mdns::Minimal::HeaderRef hdr(buffer->Start());
+    hdr.Clear().SetFlags(hdr.GetFlags().SetQuery()).SetMessageId(kTestMessageId);
+
+    hdr.SetQuestionCount(static_cast<uint16_t>(hdr.GetQuestionCount() + 1));
+    buffer->SetDataLength(static_cast<uint16_t>(buffer->DataLength() + sizeof(kHardcodedQuestion)));
+    memcpy(buffer->Start() + mdns::Minimal::HeaderRef::kSizeBytes, kHardcodedQuestion, sizeof(kHardcodedQuestion));
+
+    // TODO: add questions please
+
+    // TODO: build the packet
+
+    if (udp->SendTo(destIpAddr, kMdnsPort, buffer) != CHIP_NO_ERROR)
+    {
+        printf("Error sending");
+        return;
+    }
 }
+
+} // namespace
 
 int main(int argc, char ** args)
 {
@@ -62,6 +108,13 @@ int main(int argc, char ** args)
         timer->Start(
             kRunTimeMs, [](System::Layer *, void *, System::Error err) { DeviceLayer::PlatformMgr().Shutdown(); }, nullptr);
     }
+    else
+    {
+        printf("Failed to create the shutdown timer. Kill with ^C.");
+    }
+
+    // IPV6: FF02::FB
+    SendPacket(udp, "224.0.0.251");
 
     // TODO:
     //   - MDNS:
