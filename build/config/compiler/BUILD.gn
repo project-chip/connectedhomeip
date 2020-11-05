@@ -192,15 +192,15 @@ config("symbols_default") {
   cflags = [ "-g${symbol_level}" ]
 }
 
-config("gnu11") {
+config("gnu14") {
   cflags_c = [ "-std=gnu11" ]
   cflags_objc = [ "-std=gnu11" ]
-  cflags_cc = [ "-std=gnu++11" ]
-  cflags_objcc = [ "-std=gnu++11" ]
+  cflags_cc = [ "-std=gnu++14" ]
+  cflags_objcc = [ "-std=gnu++14" ]
 }
 
 config("std_default") {
-  configs = [ ":gnu11" ]
+  configs = [ ":gnu14" ]
 }
 
 config("cosmetic_default") {
