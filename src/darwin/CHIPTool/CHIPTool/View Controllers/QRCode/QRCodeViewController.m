@@ -648,6 +648,9 @@
     // reset the view and remove any preferences that were stored from scanning the QRCode
     [self manualCodeInitialState];
     [self qrCodeInitialState];
+    NSError * error;
+    uint64_t deviceID = CHIPGetNextAvailableDeviceID() - 1;
+    [self.chipController unpairDevice:deviceID error:&error];
 }
 
 - (IBAction)enteredManualCode:(id)sender

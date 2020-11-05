@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
@@ -40,6 +41,19 @@ namespace Controller {
 class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
+
+class DeviceCallbackContextBase
+{
+    friend class Device;
+
+private:
+    uint16_t mClusterId;
+    uint8_t mEndpoint;
+};
+
+typedef void (*DeviceCallBackFn)(DeviceCallbackContextBase *);
+
+typedef Callback::Callback<DeviceCallBackFn> DeviceCallback;
 
 class DLL_EXPORT Device
 {
@@ -173,6 +187,9 @@ public:
 
     SecurePairingSessionSerializable & GetPairing() { return mPairing; }
 
+    void OnResponse(uint8_t endpoint, uint16_t cluster, DeviceCallback * onResponse);
+    void OnReport(uint8_t endpoint, uint16_t cluster, DeviceCallback * onReport);
+
 private:
     enum class ConnectionState
     {
@@ -203,6 +220,9 @@ private:
     DeviceStatusDelegate * mStatusDelegate;
 
     SecureSessionMgr<Transport::UDP> * mSessionManager;
+
+    Callback::CallbackDeque mResponses;
+    Callback::CallbackDeque mReports;
 
     /**
      * @brief

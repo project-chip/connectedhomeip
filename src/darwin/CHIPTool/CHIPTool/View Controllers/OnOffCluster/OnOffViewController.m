@@ -32,7 +32,7 @@
 @property (readwrite) CHIPDevice * chipDevice;
 
 @property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
-
+@property (readonly) dispatch_queue_t callbackQueue;
 @end
 
 @implementation OnOffViewController
@@ -47,10 +47,10 @@
     _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
     // initialize the device controller
-    dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
+    _callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
-    [self.chipController setDelegate:self queue:callbackQueue];
-    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
+    [self.chipController setDelegate:self queue:_callbackQueue];
+    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:_callbackQueue];
 
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
     if (deviceID > 1) {
@@ -141,17 +141,26 @@
 
 - (IBAction)onButtonTapped:(id)sender
 {
-    [self.onOff lightOn];
+    CHIPDeviceCallback completionHandler = ^(NSError * error) {
+        NSLog(@"Status: On command completed with error %@", [error description]);
+    };
+    [self.onOff lightOn:completionHandler queue:_callbackQueue];
 }
 
 - (IBAction)offButtonTapped:(id)sender
 {
-    [self.onOff lightOff];
+    CHIPDeviceCallback completionHandler = ^(NSError * error) {
+        NSLog(@"Status: Off command completed with error %@", [error description]);
+    };
+    [self.onOff lightOff:completionHandler queue:_callbackQueue];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
 {
-    [self.onOff toggleLight];
+    CHIPDeviceCallback completionHandler = ^(NSError * error) {
+        NSLog(@"Status: Toggle command completed with error %@", [error description]);
+    };
+    [self.onOff toggleLight:completionHandler queue:_callbackQueue];
 }
 
 // MARK: CHIPDeviceControllerDelegate

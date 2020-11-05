@@ -15,23 +15,26 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_INTERNAL_H
-#define CHIP_DEVICE_INTERNAL_H
-
-#import "CHIPDevice.h"
 #import <Foundation/Foundation.h>
+
+#import "CHIPDeviceCallback.h"
+#import "CHIPError.h"
 
 #include <controller/CHIPDevice.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPDevice ()
+class CHIPDeviceCallbackContext : public chip::Controller::DeviceCallbackContextBase
+{
+public:
+    CHIPDeviceCallbackContext(CHIPDeviceCallback handler, dispatch_queue_t queue);
+    ~CHIPDeviceCallbackContext();
 
-- (instancetype)initWithDevice:(chip::Controller::Device *)device;
-- (chip::Controller::Device *)internalDevice;
+    static void CallbackFn(CHIPDeviceCallbackContext * context);
 
-@end
+private:
+    CHIPDeviceCallback mHandler;
+    dispatch_queue_t mQueue;
+};
 
 NS_ASSUME_NONNULL_END
-
-#endif /* CHIP_DEVICE_INTERNAL_H */

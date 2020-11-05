@@ -17,11 +17,15 @@
 
 #import <Foundation/Foundation.h>
 
+#import "CHIPDeviceCallbackContext.h"
+#import "CHIPDevice_Internal.h"
 #import "CHIPOnOff.h"
+
+#include <controller/OnOffCluster.h>
 
 @interface CHIPOnOff ()
 
-@property (readonly) CHIPDevice * device;
+@property (readonly) chip::Controller::OnOffCluster cppCluster;
 
 @end
 
@@ -29,25 +33,74 @@
 
 - (instancetype)initWithDevice:(CHIPDevice *)device
 {
-    if (self = [super init]) {
-        _device = device;
+    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], 0);
+
+    if (err != CHIP_NO_ERROR) {
+        return nil;
     }
+
+    self = [super init];
     return self;
 }
 
-- (BOOL)lightOn
+- (BOOL)lightOn:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue
 {
-    return [self.device sendOnCommand];
+    CHIPDeviceCallbackContext * context = new CHIPDeviceCallbackContext(onCompletion, queue);
+    if (!context) {
+        return NO;
+    }
+
+    chip::Controller::DeviceCallback * callback = new chip::Controller::DeviceCallback(
+        reinterpret_cast<chip::Controller::DeviceCallBackFn>(CHIPDeviceCallbackContext::CallbackFn), context);
+
+    CHIP_ERROR err = self.cppCluster.On(callback);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        delete context;
+        return NO;
+    }
+    return YES;
 }
 
-- (BOOL)lightOff
+- (BOOL)lightOff:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue
 {
-    return [self.device sendOffCommand];
+    CHIPDeviceCallbackContext * context = new CHIPDeviceCallbackContext(onCompletion, queue);
+    if (!context) {
+        return NO;
+    }
+
+    chip::Controller::DeviceCallback * callback = new chip::Controller::DeviceCallback(
+        reinterpret_cast<chip::Controller::DeviceCallBackFn>(CHIPDeviceCallbackContext::CallbackFn), context);
+
+    CHIP_ERROR err = self.cppCluster.Off(callback);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        delete context;
+        return NO;
+    }
+    return YES;
 }
 
-- (BOOL)toggleLight
+- (BOOL)toggleLight:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue
 {
-    return [self.device sendToggleCommand];
+    CHIPDeviceCallbackContext * context = new CHIPDeviceCallbackContext(onCompletion, queue);
+    if (!context) {
+        return NO;
+    }
+
+    chip::Controller::DeviceCallback * callback = new chip::Controller::DeviceCallback(
+        reinterpret_cast<chip::Controller::DeviceCallBackFn>(CHIPDeviceCallbackContext::CallbackFn), context);
+
+    CHIP_ERROR err = self.cppCluster.Toggle(callback);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        delete context;
+        return NO;
+    }
+    return YES;
 }
 
 @end

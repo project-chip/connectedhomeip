@@ -15,23 +15,23 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_INTERNAL_H
-#define CHIP_DEVICE_INTERNAL_H
-
-#import "CHIPDevice.h"
+#import "CHIPDeviceCallbackContext.h"
+#import "CHIPError.h"
 #import <Foundation/Foundation.h>
 
-#include <controller/CHIPDevice.h>
+CHIPDeviceCallbackContext::CHIPDeviceCallbackContext(CHIPDeviceCallback handler, dispatch_queue_t queue)
+    : mHandler(handler)
+    , mQueue(queue)
+{
+}
 
-NS_ASSUME_NONNULL_BEGIN
+CHIPDeviceCallbackContext::~CHIPDeviceCallbackContext() {}
 
-@interface CHIPDevice ()
-
-- (instancetype)initWithDevice:(chip::Controller::Device *)device;
-- (chip::Controller::Device *)internalDevice;
-
-@end
-
-NS_ASSUME_NONNULL_END
-
-#endif /* CHIP_DEVICE_INTERNAL_H */
+void CHIPDeviceCallbackContext::CallbackFn(CHIPDeviceCallbackContext * context)
+{
+    if (context->mQueue) {
+        dispatch_async(context->mQueue, ^{
+            context->mHandler([CHIPError errorForCHIPErrorCode:CHIP_NO_ERROR]);
+        });
+    }
+}
