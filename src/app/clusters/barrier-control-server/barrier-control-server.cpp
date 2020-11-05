@@ -67,7 +67,10 @@ static State state;
 // -----------------------------------------------------------------------------
 // Framework initialization
 
-void emberAfPluginBarrierControlServerInitCallback(void) {}
+// TODO: There's no header that declares this callback, and it's not 100%
+// clear where best to declare it.
+// https://github.com/project-chip/connectedhomeip/issues/3619
+extern "C" void emberAfPluginBarrierControlServerInitCallback(void) {}
 
 // -----------------------------------------------------------------------------
 // Accessing attributes

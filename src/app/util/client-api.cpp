@@ -238,7 +238,7 @@ uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl, Emb
                                                        uint8_t commandId, const char * format, ...)
 {
     uint16_t returnValue;
-    va_list argPointer = { 0 };
+    va_list argPointer;
 
     va_start(argPointer, format);
     returnValue = vFillBuffer(emAfZclBuffer, emAfZclBufferLen, frameControl, manufacturerCode, commandId, format, argPointer);
@@ -252,7 +252,7 @@ uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl, Emb
 uint16_t emberAfFillExternalBuffer(uint8_t frameControl, EmberAfClusterId clusterId, uint8_t commandId, const char * format, ...)
 {
     uint16_t returnValue;
-    va_list argPointer = { 0 };
+    va_list argPointer;
 
     va_start(argPointer, format);
     returnValue =
@@ -267,7 +267,7 @@ uint16_t emberAfFillExternalBuffer(uint8_t frameControl, EmberAfClusterId cluste
 uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameControl, uint8_t commandId, const char * format, ...)
 {
     uint16_t returnValue;
-    va_list argPointer = { 0 };
+    va_list argPointer;
     va_start(argPointer, format);
     returnValue = vFillBuffer(buffer, bufferLen, frameControl, EMBER_AF_NULL_MANUFACTURER_CODE, commandId, format, argPointer);
     va_end(argPointer);
