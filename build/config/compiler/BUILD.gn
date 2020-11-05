@@ -199,8 +199,15 @@ config("gnu11") {
   cflags_objcc = [ "-std=gnu++11" ]
 }
 
+config("gnu14") {
+  cflags_c = [ "-std=gnu14" ]
+  cflags_objc = [ "-std=gnu14" ]
+  cflags_cc = [ "-std=gnu++14" ]
+  cflags_objcc = [ "-std=gnu++14" ]
+}
+
 config("std_default") {
-  configs = [ ":gnu11" ]
+  configs = [ ":gnu14" ]
 }
 
 config("cosmetic_default") {
