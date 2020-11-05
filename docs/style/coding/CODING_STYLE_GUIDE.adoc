@@ -155,7 +155,7 @@ CHIP strives to use the latest C++ functionality as long as existing compilers
 support such standards.
 
 C{plusplus}14 is considered pervasive enough to be used. As compilers start 
-supporting standards suche as C{plusplus}17, C{plusplus}20 and beyond,
+supporting standards such as C{plusplus}17, C{plusplus}20 and beyond,
 CHIP may follow suit.
 
 == Conventions and Best Practices
