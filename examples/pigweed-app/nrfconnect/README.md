@@ -75,8 +75,8 @@ and CHIP sources downloaded yet, run `setup` command in the container to pull
 the sources into directories mounted as `/var/ncs` and `/var/chip`,
 respectively:
 
-        $ setup --ncs 83764f
-        /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [83764f]? [Y/N] y
+        $ setup --ncs v1.4.0
+        /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [v1.4.0]? [Y/N] y
         ...
         /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
         ...
@@ -149,7 +149,7 @@ After a successful build, the binary will be available under
 ### Supported nRF Connect SDK versions
 
 It is recommended to use the nRF Connect version which is being verified as a
-part of CHIP Continuous Integration testing, which happens to be `83764f` at the
+part of CHIP Continuous Integration testing, which happens to be `v1.4.0` at the
 moment. You may verify that the revision is used in
 [chip-build-nrf-platform](https://github.com/project-chip/connectedhomeip/blob/master/integrations/docker/images/chip-build-nrf-platform/Dockerfile)
 Docker image in case of doubt.
@@ -157,17 +157,18 @@ Docker image in case of doubt.
 Please refer to
 [this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories)
 in the user guide to learn how to update nRF Connect SDK repository. For example
-to checkout given `83764f` revision the following commands should be called:
+to checkout given `v1.4.0` revision the following commands should be called:
 
         # Phrase <nrfconnect-dir> should be replaced with an absolute path to nRF Connect SDK source directory.
         $ cd <nrfconnect-dir>/nrf
 
         $ git fetch origin
-
-        # Number `83764f` can be replaced with the desired revision number.
-        $ git checkout 83764f
-
+        $ git checkout v1.4.0
         $ west update
+
+Alternatively, if you use the docker container, you may execute the following command instead:
+
+        $ setup --ncs v1.4.0
 
 <a name="configuring"></a>
 
