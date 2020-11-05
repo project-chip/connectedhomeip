@@ -34,11 +34,13 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #include <platform/ThreadStackManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#include <messaging/ExchangeMgr.h>
 
 namespace chip {
 namespace DeviceLayer {
 
 struct ChipDeviceEvent;
+extern chip::ExchangeManager ExchangeMgr;
 extern chip::System::Layer SystemLayer;
 extern Inet::InetLayer InetLayer;
 

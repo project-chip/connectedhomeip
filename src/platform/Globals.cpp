@@ -26,6 +26,7 @@ namespace DeviceLayer {
 
 chip::System::Layer SystemLayer;
 chip::Inet::InetLayer InetLayer;
+chip::ExchangeManager ExchangeMgr;
 
 namespace Internal {
 
