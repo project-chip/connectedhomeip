@@ -19,3 +19,5 @@
 #pragma once
 
 void ConfigureChipLogging();
+uint16_t GetRemotePort();
+uint16_t GetLocalPort();

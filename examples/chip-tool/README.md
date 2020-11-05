@@ -41,9 +41,9 @@ wifi-echo app:
 ### Ping a device over IP
 
 To start the Client in echo mode, run the built executable and pass it the IP
-address and port of the server to talk to, as well as the command "echo".
+address of the server to talk to, as well as the command "echo".
 
-    $ chip-tool echo ip 192.168.0.30 11097
+    $ chip-tool echo ip 192.168.0.30
 
 If valid values are supplied, it will begin to periodically send messages to the
 server address provided.
@@ -56,11 +56,10 @@ Stop the Client at any time with `Ctrl + C`.
 ## Using the Client to Send CHIP Commands
 
 To use the Client to send a CHIP commands, run the built executable and pass it
-the target cluster name, the target command name, the ip address and port of the
-server to talk to as well as an endpoint id. The endpoint id must be between 1
-and 240.
+the target cluster name, the target command name, the ip address of the server
+to talk to as well as an endpoint id. The endpoint id must be between 1 and 240.
 
-    $ chip-tool onoff on 192.168.0.30 11097 1
+    $ chip-tool onoff on 192.168.0.30 1
 
 The client will send a single command packet and then exit.
 
@@ -91,3 +90,10 @@ To get the list of parameters for a specific command, run the built executable
 with the target cluster name and the target command name
 
     $ chip-tool onoff on
+
+### How to configure the local and remote ports used by chip-tool
+
+By default chip-tool both send and listen messages on the port 11097.
+It can be changed by using environment variables.
+
+	$ CHIP_TOOL_LOCAL_PORT=11098 CHIP_TOOL_REMOTE_PORT=11099 chip-tool onoff on 192.168.0.30 1

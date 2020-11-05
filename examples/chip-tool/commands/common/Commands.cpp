@@ -19,7 +19,7 @@
 #include "Commands.h"
 
 #include "Command.h"
-#include "Logging.h"
+#include "Configuration.h"
 
 #include <algorithm>
 #include <string>
@@ -50,6 +50,9 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 
         err = dc.Init(localId);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure: %s", chip::ErrorStr(err)));
+
+        err = dc.SetUdpListenPort(GetLocalPort());
+        SuccessOrExit(err);
 
         err = dc.ServiceEvents();
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Run Loop failure: %s", chip::ErrorStr(err)));

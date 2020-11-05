@@ -18,6 +18,8 @@
 
 #include "NetworkCommand.h"
 
+#include "Configuration.h"
+
 using namespace ::chip;
 using namespace ::chip::DeviceController;
 using namespace ::chip::System;
@@ -88,6 +90,7 @@ CHIP_ERROR NetworkCommand::ConnectUDP(ChipDeviceController * dc, NodeId remoteId
 {
     char hostIpStr[40];
     mRemoteAddr.address.ToString(hostIpStr, sizeof(hostIpStr));
+    mRemotePort = GetRemotePort();
     snprintf(mName, sizeof(mName), "%s:%d", hostIpStr, mRemotePort);
 
     return dc->ConnectDeviceWithoutSecurePairing(remoteId, mRemoteAddr.address, nullptr, onConnect, onMessage, onError, mRemotePort,

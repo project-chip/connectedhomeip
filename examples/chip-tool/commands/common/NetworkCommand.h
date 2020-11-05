@@ -37,7 +37,6 @@ public:
         if (mNetworkType == NetworkType::UDP || mNetworkType == NetworkType::ALL)
         {
             AddArgument("device-remote-ip", &mRemoteAddr);
-            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
         }
 
         if (mNetworkType == NetworkType::BLE || mNetworkType == NetworkType::ALL)
