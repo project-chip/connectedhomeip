@@ -23,6 +23,7 @@
 
 #include "ManualSetupPayloadGenerator.h"
 
+#include <algorithm>
 #include <inttypes.h>
 
 #include <support/logging/CHIPLogging.h>
@@ -40,11 +41,9 @@ static uint32_t shortPayloadRepresentation(const SetupPayload & payload)
     return result;
 }
 
-static inline std::string decimalStringWithPadding(uint32_t number, int minLength)
+static inline int decimalStringWithPadding(char * buf, uint32_t number, int minLength)
 {
-    char buf[minLength + 1];
-    snprintf(buf, sizeof(buf), "%0*" PRIu32, minLength, number);
-    return std::string(buf);
+    return snprintf(buf, minLength + 1, "%0*" PRIu32, minLength, number);
 }
 
 CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::string & outDecimalString)
@@ -55,15 +54,21 @@ CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    uint32_t shortDecimal     = shortPayloadRepresentation(mSetupPayload);
-    std::string decimalString = decimalStringWithPadding(shortDecimal, kManualSetupShortCodeCharLength);
+    constexpr size_t decimalStringLength =
+        kManualSetupShortCodeCharLength + kManualSetupVendorIdCharLength + kManualSetupProductIdCharLength + 1;
+    char decimalString[decimalStringLength];
+    char * p = decimalString;
+
+    uint32_t shortDecimal = shortPayloadRepresentation(mSetupPayload);
+    p += decimalStringWithPadding(p, shortDecimal, kManualSetupShortCodeCharLength);
 
     if (mSetupPayload.requiresCustomFlow)
     {
-        decimalString += decimalStringWithPadding(mSetupPayload.vendorID, kManualSetupVendorIdCharLength);
-        decimalString += decimalStringWithPadding(mSetupPayload.productID, kManualSetupProductIdCharLength);
+        p += decimalStringWithPadding(p, mSetupPayload.vendorID, kManualSetupVendorIdCharLength);
+        p += decimalStringWithPadding(p, mSetupPayload.productID, kManualSetupProductIdCharLength);
     }
-    decimalString += Verhoeff10::ComputeCheckChar(decimalString.c_str());
+    *p++ = Verhoeff10::ComputeCheckChar(decimalString);
+    *p   = 0;
 
     outDecimalString = decimalString;
     return CHIP_NO_ERROR;
