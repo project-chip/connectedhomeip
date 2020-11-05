@@ -18,7 +18,7 @@
 #pragma once
 
 #include <transport/raw/Base.h>
-
+#include <transport/raw/PeerAddress.h>
 #if CONFIG_NETWORK_LAYER_BLE
 #include <ble/Ble.h>
 #endif // CONFIG_NETWORK_LAYER_BLE
@@ -42,6 +42,14 @@ public:
     RendezvousParameters & SetSetupPINCode(uint32_t setupPINCode)
     {
         mSetupPINCode = setupPINCode;
+        return *this;
+    }
+
+    bool HasPeerAddress() const { return mPeerAddress.IsInitialized(); }
+    Transport::PeerAddress GetPeerAddress() const { return mPeerAddress; }
+    RendezvousParameters & SetPeerAddress(const Transport::PeerAddress & peerAddress)
+    {
+        mPeerAddress = peerAddress;
         return *this;
     }
 
@@ -83,6 +91,7 @@ public:
 
 private:
     Optional<NodeId> mLocalNodeId;        ///< the local node id
+    Transport::PeerAddress mPeerAddress;  ///< the peer node address
     uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
     uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
 

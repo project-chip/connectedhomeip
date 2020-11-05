@@ -46,12 +46,16 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 
 #include <controller/CHIPDeviceController.h>
+#include <inet/IPAddress.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
+#include <transport/raw/PeerAddress.h>
 
+using namespace chip;
 using namespace chip::Ble;
+using namespace chip::Inet;
 using namespace chip::DeviceController;
 
 extern "C" {
@@ -170,6 +174,9 @@ CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceControlle
 CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceController * devCtrl, BLE_CONNECTION_OBJECT connObj,
                                             uint32_t setupPinCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
                                             OnErrorFunct onError);
+CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerIP,
+                                              uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                              OnErrorFunct onError);
 
 // Network Provisioning
 CHIP_ERROR
@@ -542,6 +549,26 @@ CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceCo
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::RendezvousParameters params =
         chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetConnectionObject(connObj).SetBleLayer(&sBle);
+    err = devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerIP,
+                                              uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                              OnErrorFunct onError)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    IPAddress addr;
+
+    chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
+
+    VerifyOrExit(IPAddress::FromString(peerIP, addr), err = CHIP_ERROR_INVALID_ADDRESS);
+
+    params.SetPeerAddress(Transport::PeerAddress(addr, Transport::Type::kUdp));
+
     err = devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
     SuccessOrExit(err);
 

@@ -34,8 +34,10 @@ public:
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                     System::PacketBuffer * buffer) override;
     void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) override;
+    RendezvousSession * GetRendezvousSession() { return &mRendezvousSession; };
 
 private:
     RendezvousSession mRendezvousSession;

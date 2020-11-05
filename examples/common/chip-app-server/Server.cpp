@@ -50,7 +50,7 @@ class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
-                           System::PacketBuffer * buffer, SecureSessionMgrBase * mgr) override
+                           System::PacketBuffer * buffer, SecureSessionMgr * mgr) override
     {
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
@@ -77,20 +77,21 @@ public:
         }
     }
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
+    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
     {
         ChipLogProgress(AppServer, "Received a new connection.");
     }
 };
 
-DemoSessionManager gSessions;
+DemoTransportMgr gTransports;
+SecureSessionMgr gSessions;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 RendezvousServer gRendezvousServer;
 
 } // namespace
 
-SecureSessionMgrBase & chip::SessionManager()
+SecureSessionMgr & chip::SessionManager()
 {
     return gSessions;
 }
@@ -104,8 +105,7 @@ void InitServer()
 
     InitDataModelHandler();
 
-    err = gSessions.Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
-                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    err = gSessions.Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer);
     SuccessOrExit(err);
 
     // This flag is used to bypass BLE in the cirque test
@@ -128,6 +128,9 @@ void InitServer()
 
     gSessions.SetDelegate(&gCallbacks);
     chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice(chip::Inet::kIPAddressType_IPv6);
+
+    gTransports.Init(&gSessions, gRendezvousServer.GetRendezvousSession(),
+                     UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
 
 exit:
     if (err != CHIP_NO_ERROR)

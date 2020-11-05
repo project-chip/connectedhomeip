@@ -29,6 +29,7 @@
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
@@ -77,12 +78,15 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    SecureSessionMgr<LoopbackTransport> conn;
+    TransportMgr<LoopbackTransport> tm;
+    SecureSessionMgr conn;
     CHIP_ERROR err;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    tm.Init(&conn, nullptr, "LOOPBACK");
+
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
@@ -94,12 +98,14 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    SecureSessionMgr<LoopbackTransport> conn;
+    TransportMgr<LoopbackTransport> tm;
+    SecureSessionMgr conn;
     CHIP_ERROR err;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    tm.Init(&conn, nullptr, "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
@@ -123,12 +129,15 @@ void CheckFindContextTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    SecureSessionMgr<LoopbackTransport> conn;
+    TransportMgr<LoopbackTransport> tm;
+    SecureSessionMgr conn;
     CHIP_ERROR err;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = tm.Init(&conn, nullptr, "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
@@ -149,12 +158,15 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    SecureSessionMgr<LoopbackTransport> conn;
+    TransportMgr<LoopbackTransport> tm;
+    SecureSessionMgr conn;
     CHIP_ERROR err;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = tm.Init(&conn, nullptr, "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;

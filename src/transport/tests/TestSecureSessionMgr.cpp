@@ -26,6 +26,7 @@
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
@@ -67,7 +68,7 @@ class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, PeerConnectionState * state,
-                           System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override
+                           System::PacketBuffer * msgBuf, SecureSessionMgr * mgr) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
@@ -81,7 +82,7 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(PeerConnectionState * state, SecureSessionMgrBase * mgr) override { NewConnectionHandlerCallCount++; }
+    void OnNewConnection(PeerConnectionState * state, SecureSessionMgr * mgr) override { NewConnectionHandlerCallCount++; }
 
     nlTestSuite * mSuite              = nullptr;
     int ReceiveHandlerCallCount       = 0;
@@ -94,12 +95,15 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    SecureSessionMgr<LoopbackTransport> conn;
+    TransportMgr<LoopbackTransport> tm;
+    SecureSessionMgr conn;
     CHIP_ERROR err;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = tm.Init(&conn, nullptr, "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -121,9 +125,12 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    SecureSessionMgr<LoopbackTransport> conn;
+    TransportMgr<LoopbackTransport> tm;
+    SecureSessionMgr conn;
 
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = tm.Init(&conn, nullptr, "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;

@@ -19,8 +19,11 @@
 
 #include <core/CHIPCore.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
+class TransportMgrBase;
 
 class RendezvousSessionDelegate
 {
@@ -39,7 +42,10 @@ public:
     virtual void OnRendezvousConnectionClosed() {}
     virtual void OnRendezvousError(CHIP_ERROR err) {}
     virtual void OnRendezvousComplete() {}
-    virtual void OnRendezvousMessageReceived(System::PacketBuffer * buffer){};
+    virtual void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                             System::PacketBuffer * buffer){};
+
+    virtual void SetTransportMgr(TransportMgrBase * transport) {}
 
     virtual void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) {}
 };

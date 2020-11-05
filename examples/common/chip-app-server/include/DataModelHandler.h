@@ -34,7 +34,6 @@ extern "C" {
  * @param [in] buffer The buffer holding the message.  This function guarantees
  *                    that it will free the buffer before returning.
  */
-void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::PacketBuffer * buffer,
-                            chip::SecureSessionMgrBase * mgr);
+void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::PacketBuffer * buffer, chip::SecureSessionMgr * mgr);
 void InitDataModelHandler();
 }

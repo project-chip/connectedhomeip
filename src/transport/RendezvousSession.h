@@ -29,12 +29,16 @@
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecurePairingSession.h>
-
+#include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 namespace chip {
 
 namespace DeviceLayer {
 class CHIPDeviceEvent;
 }
+
+class SecureSessionMgr;
+class TransportMgrBase;
 
 /**
  * RendezvousSession establishes and maintains the first connection between
@@ -92,7 +96,8 @@ public:
     SecurePairingSession & GetPairingSession() { return mPairingSession; }
 
     //////////// SecurePairingSessionDelegate Implementation ///////////////
-    CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags, System::PacketBuffer * msgBuf) override;
+    CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
+                                  const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf) override;
     void OnPairingError(CHIP_ERROR err) override;
     void OnPairingComplete() override;
 
@@ -100,7 +105,10 @@ public:
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(System::/*  */ PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                     System::/*  */ PacketBuffer * buffer) override;
+
+    void SetTransportMgr(TransportMgrBase * transport) override;
 
     //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
     void SendNetworkCredentials(const char * ssid, const char * passwd) override;
@@ -122,11 +130,13 @@ public:
     const Inet::IPAddress & GetIPAddress() const { return mNetworkProvision.GetIPAddress(); }
 
 private:
-    CHIP_ERROR HandlePairingMessage(System::PacketBuffer * msgBug);
+    CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                    System::PacketBuffer * msgBug);
     CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
 
-    CHIP_ERROR HandleSecureMessage(System::PacketBuffer * msgBuf);
+    CHIP_ERROR HandleSecureMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                   System::PacketBuffer * msgBuf);
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration
@@ -134,6 +144,7 @@ private:
     SecurePairingSession mPairingSession;
     NetworkProvisioning mNetworkProvision;
     SecureSession mSecureSession;
+    TransportMgrBase * mTransportMgr;
     uint32_t mSecureMessageIndex = 0;
     uint16_t mNextKeyId          = 0;
 

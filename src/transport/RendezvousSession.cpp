@@ -23,6 +23,9 @@
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
 #include <transport/RendezvousSession.h>
+#include <transport/SecureSessionMgr.h>
+#include <transport/TransportMgr.h>
+#include <transport/raw/PeerAddress.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <transport/BLE.h>
@@ -34,6 +37,7 @@ static const char * kSpake2pKeyExchangeSalt        = "SPAKE2P Key Exchange Salt"
 
 using namespace chip::Inet;
 using namespace chip::System;
+using namespace chip::Transport;
 
 namespace chip {
 
@@ -46,12 +50,17 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
     VerifyOrExit(mParams.HasLocalNodeId(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mParams.HasSetupPINCode(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    // TODO: BLE Should be a transport, in that case, RendezvousSession and BLE should decouple
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
 #if CONFIG_NETWORK_LAYER_BLE
     {
         Transport::BLE * transport = chip::Platform::New<Transport::BLE>();
         err                        = transport->Init(this, mParams);
         mTransport                 = transport;
+    }
+#else
+    {
+        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     }
 #endif // CONFIG_NETWORK_LAYER_BLE
     SuccessOrExit(err);
@@ -80,7 +89,7 @@ RendezvousSession::~RendezvousSession()
 }
 
 CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
-                                                 System::PacketBuffer * msgBuf)
+                                                 const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf)
 {
     if (mCurrentState != State::kSecurePairing)
     {
@@ -88,7 +97,7 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, He
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    return mTransport->SendMessage(header, payloadFlags, Transport::PeerAddress::BLE(), msgBuf);
+    return mTransport->SendMessage(header, payloadFlags, peerAddress, msgBuf);
 }
 
 CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBuf)
@@ -216,6 +225,11 @@ void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
     UpdateState(State::kInit);
 }
 
+void RendezvousSession::SetTransportMgr(TransportMgrBase * transport)
+{
+    mTransportMgr = transport;
+}
+
 void RendezvousSession::UpdateState(RendezvousSession::State newState)
 {
     switch (mCurrentState)
@@ -240,18 +254,20 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState)
     }
 }
 
-void RendezvousSession::OnRendezvousMessageReceived(PacketBuffer * msgBuf)
+void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
+                                                    PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    // TODO: RendezvousSession should handle SecurePairing messages only
 
     switch (mCurrentState)
     {
     case State::kSecurePairing:
-        err = HandlePairingMessage(msgBuf);
+        err = HandlePairingMessage(packetHeader, peerAddress, msgBuf);
         break;
 
     case State::kNetworkProvisioning:
-        err = HandleSecureMessage(msgBuf);
+        err = HandleSecureMessage(packetHeader, peerAddress, msgBuf);
         break;
 
     default:
@@ -268,28 +284,16 @@ exit:
     }
 }
 
-CHIP_ERROR RendezvousSession::HandlePairingMessage(PacketBuffer * msgBuf)
+CHIP_ERROR RendezvousSession::HandlePairingMessage(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
+                                                   PacketBuffer * msgBuf)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    PacketHeader packetHeader;
-    uint16_t headerSize = 0;
-
-    err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
-    SuccessOrExit(err);
-
-    msgBuf->ConsumeHead(headerSize);
-
-    err = mPairingSession.HandlePeerMessage(packetHeader, msgBuf);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return mPairingSession.HandlePeerMessage(packetHeader, peerAddress, msgBuf);
 }
 
-CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
+CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
+                                                  PacketBuffer * msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    PacketHeader packetHeader;
     PayloadHeader payloadHeader;
     MessageAuthenticationCode mac;
     uint16_t headerSize            = 0;
@@ -300,10 +304,6 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgBuf)
     uint16_t taglen                = 0;
     uint16_t payloadlen            = 0;
     System::PacketBuffer * origMsg = nullptr;
-
-    err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
-    SuccessOrExit(err);
-    msgBuf->ConsumeHead(headerSize);
 
     headerSize = payloadHeader.EncodeSizeBytes();
     data       = msgBuf->Start();
@@ -368,7 +368,7 @@ CHIP_ERROR RendezvousSession::WaitForPairing(Optional<NodeId> nodeId, uint32_t s
 CHIP_ERROR RendezvousSession::Pair(Optional<NodeId> nodeId, uint32_t setupPINCode)
 {
     UpdateState(State::kSecurePairing);
-    return mPairingSession.Pair(setupPINCode, kSpake2p_Iteration_Count,
+    return mPairingSession.Pair(mParams.GetPeerAddress(), setupPINCode, kSpake2p_Iteration_Count,
                                 reinterpret_cast<const unsigned char *>(kSpake2pKeyExchangeSalt), strlen(kSpake2pKeyExchangeSalt),
                                 nodeId, mNextKeyId++, this);
 }

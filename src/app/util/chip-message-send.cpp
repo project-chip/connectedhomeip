@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <inet/InetLayer.h> // PacketBuffer and the like
 #include <support/logging/CHIPLogging.h>
-#include <transport/SecureSessionMgr.h> // For SecureSessionMgrBase
+#include <transport/SecureSessionMgr.h> // For SecureSessionMgr
 
 using namespace chip;
 
@@ -35,7 +35,7 @@ using namespace chip;
 //
 // https://github.com/project-chip/connectedhomeip/issues/2566 tracks that API.
 namespace chip {
-extern SecureSessionMgrBase & SessionManager();
+extern SecureSessionMgr & SessionManager();
 }
 
 extern "C" {

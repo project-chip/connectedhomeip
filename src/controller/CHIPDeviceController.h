@@ -35,6 +35,7 @@
 #include <transport/RendezvousSession.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
 namespace chip {
@@ -50,6 +51,12 @@ typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * 
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
                              const Inet::IPPacketInfo * pktInfo);
 typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+
+#if INET_CONFIG_ENABLE_IPV4
+using TransportMgrType = TransportMgr<Transport::UDP /* IPv6 */, Transport::UDP /* IPv4 */>;
+#else
+using TransportMgrType = TransportMgr<Transport::UDP /* IPv6 */>;
+#endif
 
 class DLL_EXPORT DevicePairingDelegate
 {
@@ -237,9 +244,9 @@ public:
     CHIP_ERROR ServiceEventSignal();
 
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
-                           System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override;
+                           System::PacketBuffer * msgBuf, SecureSessionMgr * mgr) override;
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
+    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override;
 
     void OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgrBase * mgr) override;
 
@@ -270,7 +277,8 @@ private:
     System::Layer * mSystemLayer;
     Inet::InetLayer * mInetLayer;
 
-    SecureSessionMgr<Transport::UDP> * mSessionManager;
+    TransportMgrType * mTransportMgr;
+    SecureSessionMgr * mSessionManager;
     RendezvousSession * mRendezvousSession;
 
     ConnectionState mConState;

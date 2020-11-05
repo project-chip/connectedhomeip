@@ -17,10 +17,10 @@
 
 #pragma once
 
-#include <transport/SecureSessionMgr.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
-using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
+using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP>;
 
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server

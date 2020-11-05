@@ -142,6 +142,19 @@ CHIP_ERROR ChipDeviceController::Init(NodeId localNodeId, System::Layer * system
     mPairingDelegate = pairingDelegate;
     mStorageDelegate = storageDelegate;
 
+    mTransportMgr = chip::Platform::New<TransportMgrType>(); // Listen to both IPv4 and IPv6
+#if INET_CONFIG_ENABLE_IPV4
+    err = mTransportMgr->Init(
+        mSessionManager, mRendezvousSession,
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(mListenPort),
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(mListenPort));
+#else
+    err = mTransportMgr->Init(
+        mSessionManager, mRendezvousSession,
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(mListenPort));
+#endif
+    SuccessOrExit(err);
+
     if (mStorageDelegate != nullptr)
     {
         mStorageDelegate->SetDelegate(this);
@@ -206,14 +219,25 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     VerifyOrExit(mConState == kConnectionState_NotConnected, err = CHIP_ERROR_INCORRECT_STATE);
 
 #if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
-    if (!params.HasBleLayer())
+    // To support IP rendezvous, add BLE PeerAddress for default
+    if (!params.HasPeerAddress())
     {
-        params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+        params.SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle));
+        if (!params.HasBleLayer())
+        {
+            params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+        }
     }
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
 
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
-    err                = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
+    // For UDP, set the discriminator for Controller flag
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kUdp)
+    {
+        params.SetDiscriminator(0xfff);
+    }
+    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
+    mTransportMgr->SetRendezvousSession(mRendezvousSession);
     SuccessOrExit(err);
 
     mRemoteDeviceId  = Optional<NodeId>::Value(remoteDeviceId);
@@ -228,11 +252,18 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     mOnComplete.Response = onMessageReceived;
     mOnError             = onError;
 
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kUdp)
+    {
+        // Since we are using UDP, no need to wait for connecting
+        mRendezvousSession->OnRendezvousConnectionOpened();
+    }
+
 exit:
     if (err != CHIP_NO_ERROR && mRendezvousSession != nullptr)
     {
         chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
+        mTransportMgr->SetRendezvousSession(nullptr);
     }
 
     return err;
@@ -275,10 +306,27 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
 
 CHIP_ERROR ChipDeviceController::SetUdpListenPort(uint16_t listenPort)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
     if (mState != kState_Initialized || mConState != kConnectionState_NotConnected)
         return CHIP_ERROR_INCORRECT_STATE;
     mListenPort = listenPort;
-    return CHIP_NO_ERROR;
+
+    chip::Platform::Delete(mTransportMgr);
+    mTransportMgr = chip::Platform::New<TransportMgrType>();
+
+#if INET_CONFIG_ENABLE_IPV4
+    err = mTransportMgr->Init(
+        mSessionManager, mRendezvousSession,
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(mListenPort),
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(mListenPort));
+#else
+    err = mTransportMgr->Init(
+        mSessionManager, mRendezvousSession,
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(mListenPort));
+#endif
+
+    return err;
 }
 
 CHIP_ERROR ChipDeviceController::EstablishSecureSession()
@@ -287,12 +335,12 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
 
     VerifyOrExit(mSecurePairingSession != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    mSessionManager = chip::Platform::New<SecureSessionMgr<Transport::UDP>>();
+    mSessionManager = chip::Platform::New<SecureSessionMgr>();
 
-    err = mSessionManager->Init(
-        mLocalDeviceId, mSystemLayer,
-        Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()).SetListenPort(mListenPort));
+    err = mSessionManager->Init(mLocalDeviceId, mSystemLayer);
     SuccessOrExit(err);
+
+    mTransportMgr->SetSecureSessionMgr(mSessionManager);
 
     mSessionManager->SetDelegate(this);
 
@@ -460,6 +508,9 @@ CHIP_ERROR ChipDeviceController::DisconnectDevice()
         mRendezvousSession = nullptr;
     }
 
+    mTransportMgr->SetSecureSessionMgr(nullptr);
+    mTransportMgr->SetRendezvousSession(nullptr);
+
     mConState = kConnectionState_NotConnected;
     return err;
 }
@@ -617,7 +668,7 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
+void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
 
 void ChipDeviceController::OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgrBase * mgr)
 {
@@ -629,7 +680,7 @@ void ChipDeviceController::OnAddressResolved(CHIP_ERROR error, NodeId nodeId, Se
 
 void ChipDeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                                              Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
-                                             SecureSessionMgrBase * mgr)
+                                             SecureSessionMgr * mgr)
 {
     if (header.GetSourceNodeId().HasValue())
     {
@@ -655,6 +706,7 @@ void ChipDeviceController::OnRendezvousError(CHIP_ERROR err)
     {
         chip::Platform::Delete(mRendezvousSession);
         mRendezvousSession = nullptr;
+        mTransportMgr->SetRendezvousSession(nullptr);
     }
 
     if (mPairingDelegate != nullptr)
