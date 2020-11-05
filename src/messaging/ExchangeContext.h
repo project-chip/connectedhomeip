@@ -177,8 +177,6 @@ public:
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
-    void SetDelegate(ExchangeContextDelegate * delegate) { mDelegate = delegate; }
-
     ExchangeContextDelegate * GetDelegate() const { return mDelegate; }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
