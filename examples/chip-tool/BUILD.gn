@@ -20,9 +20,9 @@ assert(chip_build_tools)
 
 executable("chip-tool") {
   sources = [
-    "commands/common/Configuration.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
+    "commands/common/Configuration.cpp",
     "commands/common/EchoCommand.cpp",
     "commands/common/ModelCommand.cpp",
     "commands/common/NetworkCommand.cpp",
