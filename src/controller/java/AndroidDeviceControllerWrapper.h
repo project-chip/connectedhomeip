@@ -23,20 +23,31 @@
 
 #include <controller/CHIPDeviceController.h>
 
-#include "AndroidDevicePairingDelegate.h"
-
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
  * to handle all controller-related processing.
  *
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
-class AndroidDeviceControllerWrapper
+class AndroidDeviceControllerWrapper : chip::DeviceController::DevicePairingDelegate
 {
 public:
     ~AndroidDeviceControllerWrapper();
 
     chip::DeviceController::ChipDeviceController * Controller() { return mController.get(); }
+    void SetJavaObjectRef(JavaVM * vm, jobject obj);
+
+    void SendNetworkCredentials(const char * ssid, const char * password);
+
+    void DeprecatedHardcodeThreadCredentials();
+
+    // DevicePairingDelegate implementation
+    void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;
+    void OnOperationalCredentialsRequested(const char * csr, size_t csr_length,
+                                           chip::RendezvousDeviceCredentialsDelegate * callback) override;
+    void OnStatusUpdate(chip::RendezvousSessionDelegate::Status status) override;
+    void OnPairingComplete(CHIP_ERROR error) override;
+    void OnPairingDeleted(CHIP_ERROR error) override;
 
     jlong ToJNIHandle()
     {
@@ -44,22 +55,34 @@ public:
         return reinterpret_cast<jlong>(this);
     }
 
+    jobject JavaObjectRef() { return mJavaObjectRef; }
+
     static AndroidDeviceControllerWrapper * FromJNIHandle(jlong handle)
     {
         return reinterpret_cast<AndroidDeviceControllerWrapper *>(handle);
+    }
+
+    static AndroidDeviceControllerWrapper * FromController(chip::DeviceController::ChipDeviceController * controller)
+    {
+        return reinterpret_cast<AndroidDeviceControllerWrapper *>(controller->AppState);
     }
 
     static AndroidDeviceControllerWrapper * AllocateNew(chip::NodeId nodeId, chip::System::Layer * systemLayer,
                                                         chip::Inet::InetLayer * inetLayer, CHIP_ERROR * errInfoOnFailure);
 
 private:
-    using ChipDeviceControllerPtr         = std::unique_ptr<chip::DeviceController::ChipDeviceController>;
-    using AndroidDevicePairingDelegatePtr = std::unique_ptr<AndroidDevicePairingDelegate>;
+    using ChipDeviceControllerPtr = std::unique_ptr<chip::DeviceController::ChipDeviceController>;
 
     ChipDeviceControllerPtr mController;
-    AndroidDevicePairingDelegatePtr mDelegate;
+    chip::RendezvousDeviceCredentialsDelegate * mCredentialsDelegate = nullptr;
 
-    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller, AndroidDevicePairingDelegatePtr delegate) :
-        mController(std::move(controller)), mDelegate(std::move(delegate))
-    {}
+    JavaVM * mJavaVM       = nullptr;
+    jobject mJavaObjectRef = nullptr;
+
+    JNIEnv * GetJavaEnv();
+
+    AndroidDeviceControllerWrapper(ChipDeviceControllerPtr controller) : mController(std::move(controller))
+    {
+        mController->AppState = reinterpret_cast<void *>(this);
+    }
 };
