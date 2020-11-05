@@ -100,7 +100,7 @@ private:
     void OnResponseTimeout(ExchangeContext * ec) override;
 };
 
-class DLL_EXPORT EchoServer
+class DLL_EXPORT EchoServer : public ExchangeContextDelegate
 {
 public:
     /**
@@ -137,8 +137,9 @@ private:
     ExchangeManager * mExchangeMgr  = nullptr;
     EchoFunct OnEchoRequestReceived = nullptr;
 
-    static void HandleEchoRequest(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                  System::PacketBuffer * payload);
+    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+                           System::PacketBuffer * payload) override;
+    void OnResponseTimeout(ExchangeContext * ec) override;
 };
 
 } // namespace Protocols
