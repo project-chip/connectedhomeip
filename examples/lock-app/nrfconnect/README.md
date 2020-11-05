@@ -22,7 +22,7 @@ An example application showing the use
 
 ## Introduction
 
-![nrf52840 DK](../../platform/nrf528xx/doc/images/nrf52840-dk.jpg)
+![nrf52840 DK](../../platform/nrfconnect/doc/images/nrf52840-dk.jpg)
 
 The nRF52840 lock example application provides a working demonstration of a
 connected door lock device, built using CHIP, and the Nordic nRF Connect. The
