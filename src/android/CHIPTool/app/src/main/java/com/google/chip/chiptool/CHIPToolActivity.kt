@@ -28,6 +28,8 @@ import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.commissioner.CommissionerActivity
 import com.google.chip.chiptool.echoclient.EchoClientFragment
+import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
+import com.google.chip.chiptool.provisioning.EnterWifiNetworkFragment
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
@@ -36,7 +38,8 @@ import com.google.chip.chiptool.setuppayloadscanner.QrCodeInfo
 class CHIPToolActivity :
     AppCompatActivity(),
     BarcodeFragment.Callback,
-    SelectActionFragment.Callback {
+    SelectActionFragment.Callback,
+    CHIPDeviceDetailsFragment.Callback {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -52,6 +55,10 @@ class CHIPToolActivity :
 
     if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED)
       onNfcIntent(intent)
+  }
+
+  override fun onStartRendezvousOverBle(deviceInfo: CHIPDeviceInfo) {
+    showFragment(DeviceProvisioningFragment.newInstance(deviceInfo))
   }
 
   override fun onCHIPDeviceInfoReceived(deviceInfo: CHIPDeviceInfo) {
