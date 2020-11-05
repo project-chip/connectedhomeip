@@ -164,9 +164,12 @@ static uint8_t readColorMode(uint8_t endpoint)
 {
     uint8_t colorMode;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID,
-                                      (uint8_t *) &colorMode, sizeof(uint8_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID,
+                                   (uint8_t *) &colorMode, sizeof(uint8_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return colorMode;
 }
@@ -175,9 +178,12 @@ static uint16_t readColorTemperature(uint8_t endpoint)
 {
     uint16_t colorTemperature;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
-                                      (uint8_t *) &colorTemperature, sizeof(uint16_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
+                                   (uint8_t *) &colorTemperature, sizeof(uint16_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return colorTemperature;
 }
@@ -252,55 +258,79 @@ static uint8_t readLevelControlCurrentLevel(uint8_t endpoint)
 
 static void writeRemainingTime(uint8_t endpoint, uint16_t remainingTime)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_REMAINING_TIME_ATTRIBUTE_ID,
-                                       (uint8_t *) &remainingTime, ZCL_INT16U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_REMAINING_TIME_ATTRIBUTE_ID,
+                                    (uint8_t *) &remainingTime, ZCL_INT16U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
 static void writeColorMode(uint8_t endpoint, uint8_t colorMode)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID,
-                                       (uint8_t *) &colorMode, ZCL_INT8U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID,
+                                    (uint8_t *) &colorMode, ZCL_INT8U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID,
-                                       (uint8_t *) &colorMode, ZCL_INT8U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID,
+                                    (uint8_t *) &colorMode, ZCL_INT8U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
 static void writeHue(uint8_t endpoint, uint8_t hue)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
-                                       (uint8_t *) &hue, ZCL_INT8U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
+                                    (uint8_t *) &hue, ZCL_INT8U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
 static void writeSaturation(uint8_t endpoint, uint8_t saturation)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                       (uint8_t *) &saturation, ZCL_INT8U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                    (uint8_t *) &saturation, ZCL_INT8U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
 static void writeColorX(uint8_t endpoint, uint16_t colorX)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
-                                       (uint8_t *) &colorX, ZCL_INT16U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
+                                    (uint8_t *) &colorX, ZCL_INT16U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
 static void writeColorY(uint8_t endpoint, uint16_t colorY)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
-                                       (uint8_t *) &colorY, ZCL_INT16U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
+                                    (uint8_t *) &colorY, ZCL_INT16U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
 static void writeColorTemperature(uint8_t endpoint, uint16_t colorTemperature)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
-                                       (uint8_t *) &colorTemperature, ZCL_INT16U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
+                                    (uint8_t *) &colorTemperature, ZCL_INT16U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
 // -------------------------------------------------------------------------
@@ -815,9 +845,12 @@ static uint8_t readHue(uint8_t endpoint)
 {
     uint8_t hue;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
-                                      (uint8_t *) &hue, sizeof(uint8_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
+                                   (uint8_t *) &hue, sizeof(uint8_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return hue;
 }
@@ -826,9 +859,12 @@ static uint8_t readSaturation(uint8_t endpoint)
 {
     uint8_t saturation;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                      (uint8_t *) &saturation, sizeof(uint8_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                   (uint8_t *) &saturation, sizeof(uint8_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return saturation;
 }
@@ -1047,9 +1083,12 @@ static uint16_t readColorX(uint8_t endpoint)
 {
     uint16_t colorX;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
-                                      (uint8_t *) &colorX, sizeof(uint16_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
+                                   (uint8_t *) &colorX, sizeof(uint16_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return colorX;
 }
@@ -1058,9 +1097,12 @@ static uint16_t readColorY(uint8_t endpoint)
 {
     uint16_t colorY;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
-                                      (uint8_t *) &colorY, sizeof(uint16_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
+                                   (uint8_t *) &colorY, sizeof(uint16_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return colorY;
 }
