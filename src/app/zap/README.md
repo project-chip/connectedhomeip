@@ -12,14 +12,14 @@ Run ZAP with UI to configure endpoints and clusters
 
 ```
 cd ./third_party/zap/repo/
-node src-script/zap-start.js --logToStdout  --gen ../templates/chip-templates.json
+node src-script/zap-start.js --logToStdout  --gen ../../../src/app/zap/chip-templates.json
 ```
 
 Generate files in headless mode
 
 ```
 cd ./third_party/zap/repo/
-node src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ../templates/chip_templates.json -i <path to *.zap file> -o <Path to /gen/ folder>
+node src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ../../../src/app/zap/chip-templates.json -i <path to *.zap file> -o <Path to /gen/ folder>
 ```
 
 For more information please see the documentation under
