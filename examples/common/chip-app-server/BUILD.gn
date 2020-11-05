@@ -21,11 +21,6 @@ config("includes") {
   ]
 }
 
-declare_args() {
-  # By pass provision and secure session
-  bypass_rendezvous = false
-}
-
 static_library("chip-app-server") {
   output_name = "chip-app-server"
 
@@ -39,11 +34,10 @@ static_library("chip-app-server") {
     "Server.cpp",
   ]
 
-  if (bypass_rendezvous) {
-    defines = [ "BYPASS_RENDEZVOUS=1" ]
-  }
-
-  deps = [ "${chip_root}/src/lib" ]
+  deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/mdns",
+  ]
 
   public_configs = [ ":includes" ]
 

@@ -19,16 +19,21 @@
 
 #include "core/CHIPError.h"
 #include "inet/InetInterface.h"
+#include "lib/mdns/platform/Mdns.h"
 
 namespace chip {
-namespace Protocols {
 namespace Mdns {
 
-class Publisher
+class ResolveDelegate
 {
 public:
-    Publisher() = default;
+    virtual void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const MdnsService & address) = 0;
+    virtual ~ResolveDelegate() {}
+};
 
+class DiscoveryManager
+{
+public:
     /**
      * This method initializes the publisher.
      *
@@ -45,7 +50,8 @@ public:
      * @param[in] interface   The interface to send mDNS multicast.
      *
      */
-    CHIP_ERROR StartPublishDevice(chip::Inet::InterfaceId interface = INET_NULL_INTERFACEID);
+    CHIP_ERROR StartPublishDevice(chip::Inet::IPAddressType addressType = chip::Inet::kIPAddressType_Any,
+                                  chip::Inet::InterfaceId interface     = INET_NULL_INTERFACEID);
 
     /**
      * This function stops publishing the device on mDNS.
@@ -53,22 +59,42 @@ public:
      */
     CHIP_ERROR StopPublishDevice();
 
-private:
-    Publisher(const Publisher &) = delete;
-    Publisher & operator=(const Publisher &) = delete;
+    /**
+     * This function registers the delegate to handle node id resolve results.
+     *
+     */
+    CHIP_ERROR RegisterResovleDelegate(ResolveDelegate * delegate);
 
-    CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::InterfaceId interface);
-    CHIP_ERROR PublishProvisionedDevice(chip::Inet::InterfaceId interface);
+    /**
+     * This function resolves a node id to its address.
+     *
+     */
+    CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, chip::Inet::IPAddressType type = chip::Inet::kIPAddressType_Any);
+
+    static DiscoveryManager & GetInstance() { return sManager; }
+
+private:
+    DiscoveryManager() = default;
+
+    DiscoveryManager(const DiscoveryManager &) = delete;
+    DiscoveryManager & operator=(const DiscoveryManager &) = delete;
+
+    CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
+    CHIP_ERROR PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
     CHIP_ERROR SetupHostname();
 
+    static void HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error);
     static void HandleMdnsInit(void * context, CHIP_ERROR initError);
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
 
     uint64_t mUnprovisionedInstanceName;
     bool mInitialized                   = false;
     bool mIsPublishingProvisionedDevice = false;
+    bool mIsPublishing                  = false;
+    ResolveDelegate * mResolveDelegate  = nullptr;
+
+    static DiscoveryManager sManager;
 };
 
 } // namespace Mdns
-} // namespace Protocols
 } // namespace chip

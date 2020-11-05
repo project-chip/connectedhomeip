@@ -76,6 +76,7 @@ class TestOnOffCluster(CHIPVirtualHome):
 
         for device_id in server_ids:
             server_ip_address.add(self.get_device_thread_ip(device_id))
+        server_ip_address.add("::")
 
         for ip in server_ip_address:
             output = self.execute_device_cmd(

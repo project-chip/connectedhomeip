@@ -45,7 +45,6 @@
 #include <vector>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/mdns/Publisher.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -91,15 +90,6 @@ const char * TAG = "all-clusters-app";
 
 static DeviceCallbacks EchoCallbacks;
 RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
-
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
-const uint64_t TestDeviceId = kLocalNodeId; // For chip::DeviceLayer::GetDeviceId
-const uint64_t TestFabricId = 0;            // For chip::DeviceLayer::GetFabricId
-} // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip
 
 namespace {
 
@@ -529,8 +519,6 @@ extern "C" void app_main()
     }
 
     SetupPretendDevices();
-    publisher.Init();
-    publisher.StopPublishDevice();
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
     // Our second LED doesn't map to any physical LEDs so far, just to virtual

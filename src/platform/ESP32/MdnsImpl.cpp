@@ -35,7 +35,6 @@ static constexpr size_t kMaxResults     = 20;
 } // namespace
 
 namespace chip {
-namespace Protocols {
 namespace Mdns {
 
 CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context)
@@ -109,8 +108,8 @@ CHIP_ERROR ChipMdnsStopPublish()
     return mdns_service_remove_all() == ESP_OK ? CHIP_NO_ERROR : CHIP_ERROR_INTERNAL;
 }
 
-CHIP_ERROR ChipMdnsBrowse(const char * /*type*/, MdnsServiceProtocol /*protocol*/, chip::Inet::InterfaceId /*interface*/,
-                          MdnsBrowseCallback /*callback*/, void * /*context*/)
+CHIP_ERROR ChipMdnsBrowse(const char * /*type*/, MdnsServiceProtocol /*protocol*/, chip::Inet::IPAddressType addressType,
+                          chip::Inet::InterfaceId /*interface*/, MdnsBrowseCallback /*callback*/, void * /*context*/)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }
@@ -122,5 +121,4 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * /*service*/, chip::Inet::InterfaceId /*
 }
 
 } // namespace Mdns
-} // namespace Protocols
 } // namespace chip
