@@ -677,25 +677,6 @@ bool emberAfEndpointEnableDisable(CHIPEndpointId endpoint, bool enable);
 bool emberAfEndpointIndexIsEnabled(uint8_t index);
 
 /**
- * @brief This indicates a new image verification is taking place.
- */
-#define EMBER_AF_NEW_IMAGE_VERIFICATION true
-
-/**
- * @brief This indicates the continuation of an image verification already
- * in progress.
- */
-#define EMBER_AF_CONTINUE_IMAGE_VERIFY false
-
-/**
- * @brief This variable defines an invalid image id.  It is used
- *   to determine if a returned EmberAfOtaImageId is valid or not.
- *   This is done by passing the data to the function
- *   emberAfIsOtaImageIdValid().
- */
-extern const EmberAfOtaImageId emberAfInvalidImageId;
-
-/**
  * @brief Returns true if a given ZCL data type is a string type.
  *
  * You should use this function if you need to perform a different
