@@ -28,4 +28,4 @@ set -x
 
 env
 
-ninja -v -C "$CHIP_ROOT/out/$BUILD_TYPE"
+ninja -t compdb -v -C "$CHIP_ROOT/out/$BUILD_TYPE"

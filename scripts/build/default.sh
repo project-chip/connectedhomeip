@@ -28,4 +28,4 @@ env
 
 gn gen out/default
 
-ninja -C out/default
+ninja -t compdb -C out/default

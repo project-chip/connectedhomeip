@@ -13,3 +13,9 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+
+source_set("minimal") {
+    sources = [
+        "DnsHeader.h", 
+    ]
+}

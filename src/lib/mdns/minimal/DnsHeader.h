@@ -65,7 +65,7 @@ private:
 
     inline BitPackedFlags & ClearMask(uint16_t mask)
     {
-        mValue &= ~mask;
+        mValue &= static_cast<uint16_t>(~mask);
         return *this;
     }
 
@@ -132,7 +132,7 @@ private:
     uint8_t * mBuffer;
 
     inline uint16_t Get16At(size_t offset) const { return chip::Encoding::BigEndian::Get16(mBuffer + offset); }
-    inline HeaderRef & Set16At(size_t offset, size_t value)
+    inline HeaderRef & Set16At(size_t offset, uint16_t value)
     {
         chip::Encoding::BigEndian::Put16(mBuffer + offset, value);
         return *this;

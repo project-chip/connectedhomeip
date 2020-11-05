@@ -25,7 +25,10 @@ executable("minimal-mdns-test") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/lib" ]
+  public_deps = [ 
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/mdns/minimal",
+  ]
 
   output_dir = root_out_dir
 }

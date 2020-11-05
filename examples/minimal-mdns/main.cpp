@@ -1,6 +1,6 @@
 #include <cstdio>
 
-#include "DnsHeader.h"
+#include <lib/mdns/minimal/DnsHeader.h>
 
 int main(int argc, char ** args)
 {
