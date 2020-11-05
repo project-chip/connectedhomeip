@@ -8,7 +8,7 @@ import coloredlogs
 
 _LOG = logging.getLogger(__name__)
 
-ROOT = 'examples/wifi-echo/server/esp32'
+ROOT = 'examples/all-clusters-app/esp32'
 
 class IDFExecutor:
   """Runs specified commands via an executor that activates the CHIP build environment."""
@@ -31,7 +31,7 @@ class IDFExecutor:
 
 def main():
   """Main task if executed standalone."""
-  parser = argparse.ArgumentParser(description='Build wifi example app')
+  parser = argparse.ArgumentParser(description='Build all-clusters-app example')
   parser.add_argument(
       '--log-level',
       default=logging.INFO,

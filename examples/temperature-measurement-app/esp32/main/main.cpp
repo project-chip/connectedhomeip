@@ -51,7 +51,7 @@ extern void startServer();
 
 extern void PairingComplete(SecurePairingSession * pairing);
 
-const char * TAG = "wifi-echo-demo";
+const char * TAG = "temperature-measurement-app";
 
 static DeviceCallbacks EchoCallbacks;
 RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
