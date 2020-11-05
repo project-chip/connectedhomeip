@@ -63,15 +63,16 @@ namespace DeviceController {
 
 using namespace chip::Encoding;
 
-constexpr const char * kDeviceCredentialsKeyPrefix = "DeviceCredentials";
-constexpr const char * kDeviceAddressKeyPrefix     = "DeviceAddress";
+constexpr const char kDeviceCredentialsKeyPrefix[] = "DeviceCredentials";
+constexpr const char kDeviceAddressKeyPrefix[]     = "DeviceAddress";
 
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
 #define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
     do                                                                                                                             \
     {                                                                                                                              \
-        const size_t len = strlen(keyPrefix);                                                                                      \
+        constexpr size_t len = std::extent<decltype(keyPrefix)>::value;                                                            \
+        nlSTATIC_ASSERT_PRINT(len > 0, "keyPrefix length must be known at compile time");                                          \
         /* 2 * sizeof(NodeId) to accomodate 2 character for each byte in Node Id */                                                \
         char key[len + 2 * sizeof(NodeId) + 1];                                                                                    \
         nlSTATIC_ASSERT_PRINT(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                          \
