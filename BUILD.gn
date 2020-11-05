@@ -133,6 +133,10 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Build the shell example.
     enable_standalone_shell_build = enable_default_builds
 
+    # Build the Linux all clusters app example.
+    enable_linux_all_clusters_app_build =
+        enable_default_builds && host_os == "linux"
+
     # Build the Linux lighting app example.
     enable_linux_lighting_app_build =
         enable_default_builds && host_os == "linux"
@@ -201,6 +205,13 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  if (enable_linux_all_clusters_app_build) {
+    group("linux_all_clusters_app") {
+      deps =
+        [ "${chip_root}/examples/wifi-echo/linux(${standalone_toolchain})" ]
+    }
+  }
+
   if (enable_linux_lighting_app_build) {
     group("linux_lighting_app") {
       deps = [
@@ -257,6 +268,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
     if (enable_standalone_shell_build) {
       deps += [ ":standalone_shell" ]
+    }
+    if (enable_linux_all_clusters_app_build) {
+      deps += [ ":linux_all_clusters_app" ]
     }
     if (enable_linux_lighting_app_build) {
       deps += [ ":linux_lighting_app" ]

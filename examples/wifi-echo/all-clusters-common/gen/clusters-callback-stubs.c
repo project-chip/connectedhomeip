@@ -33,17 +33,6 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout)
     return false;
 }
 
-/** @brief Door Lock Cluster Get Log Record
- *
- *
- *
- * @param logIndex   Ver.: always
- */
-bool emberAfDoorLockClusterGetLogRecordCallback(uint16_t logIndex)
-{
-    return false;
-}
-
 /** @brief IAS Zone Cluster Zone Enroll Request
  *
  *
