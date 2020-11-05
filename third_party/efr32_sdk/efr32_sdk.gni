@@ -125,6 +125,8 @@ template("efr32_sdk") {
       "${efr32_board}=1",
     ]
 
+    defines += board_defines
+
     if (efr32_family == "efr32mg12") {
       _include_dirs += [
         "${efr32_sdk_root}/hardware/kit/EFR32MG12_${efr32_board}/config",
@@ -304,6 +306,12 @@ template("efr32_sdk") {
       "${mbedtls_root}/repo/library/hkdf.c",
       "${mbedtls_root}/repo/library/platform_util.c",
     ]
+
+    if (defined(enable_fem)) {
+      sources += [
+        "${efr32_sdk_root}/util/plugin/plugin-common/fem-control/fem-control.c",
+      ]
+    }
 
     if (defined(invoker.show_qr_code)) {
       if (invoker.show_qr_code) {

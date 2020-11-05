@@ -40,7 +40,6 @@ source_set("lighting-common") {
     "${chip_root}/src/app/util/util.cpp",
     "gen/call-command-handler.c",
     "gen/callback-stub.c",
-    "gen/znet-bookkeeping.c",
   ]
 
   deps = [

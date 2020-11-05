@@ -97,6 +97,7 @@ extern "C" {
 //#include "app/framework/util/print.h"
 //#include "app/framework/util/time-util.h"
 #include "client-api.h"
+#include "debug-printing.h"
 #include "ember-print.h"
 #include "gen/af-structs.h"
 #include "gen/att-storage.h"
@@ -104,10 +105,8 @@ extern "C" {
 #include "gen/attribute-type.h"
 #include "gen/call-command-handler.h"
 #include "gen/callback.h"
-#include "gen/client-command-macro.h"
 #include "gen/cluster-id.h"
 #include "gen/command-id.h"
-#include "gen/debug-printing.h"
 #include "gen/enums.h"
 #include "gen/print-cluster.h"
 //#include "app/util/serial/command-interpreter2.h"
@@ -452,15 +451,6 @@ uint8_t emberAfGetDataSize(uint8_t dataType);
 #if !defined(DOXYGEN_SHOULD_SKIP_THIS)
 // master array of all defined endpoints
 extern EmberAfDefinedEndpoint emAfEndpoints[];
-
-// Master array of all zigbee PRO networks.
-extern const EmAfZigbeeProNetwork emAfZigbeeProNetworks[];
-
-// The current zigbee PRO network or NULL.
-extern const EmAfZigbeeProNetwork * emAfCurrentZigbeeProNetwork;
-
-// true if the current network is a zigbee PRO network.
-#define emAfProIsCurrentNetwork() (emAfCurrentZigbeeProNetwork != NULL)
 #endif
 
 /**

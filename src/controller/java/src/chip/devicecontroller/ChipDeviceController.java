@@ -18,6 +18,7 @@
 package chip.devicecontroller;
 
 import android.bluetooth.BluetoothGatt;
+import android.bluetooth.BluetoothGattCallback;
 import android.util.Log;
 
 /** Controller to interact with the CHIP device. */
@@ -39,6 +40,10 @@ public class ChipDeviceController {
 
   public BluetoothGatt getBluetoothGatt() {
     return bleGatt;
+  }
+
+  public BluetoothGattCallback getCallback() {
+    return AndroidChipStack.getInstance().getCallback();
   }
 
   public void beginConnectDeviceBle(BluetoothGatt bleServer, long setupPincode) {
@@ -115,17 +120,9 @@ public class ChipDeviceController {
     completionListener.onError(error);
   }
 
-  /* BluetoothGattCallback handlers */
-
-  public native void handleWriteConfirmation(int connId, byte[] svcId, byte[] charId);
-
-  public native void handleIndicationReceived(int connId, byte[] svcId, byte[] charId, byte[] data);
-
-  public native void handleSubscribeComplete(int connId, byte[] svcId, byte[] charId);
-
-  public native void handleUnsubscribeComplete(int connId, byte[] svcId, byte[] charId);
-
-  public native void handleConnectionError(int connId);
+  public void close() {
+    releaseBluetoothGatt(connectionId);
+  }
 
   private boolean releaseBluetoothGatt(int connId) {
     if (connectionId == 0) {

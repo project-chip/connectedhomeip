@@ -186,7 +186,9 @@ static EmberStatus sendToClient(uint8_t endpoint)
 static void enrollWithClient(uint8_t endpoint)
 {
     EmberStatus status;
-    emberAfFillCommandIasZoneClusterZoneEnrollRequest(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE, EMBER_AF_MANUFACTURER_CODE);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_IAS_ZONE_CLUSTER_ID,
+                              ZCL_ZONE_ENROLL_REQUEST_COMMAND_ID, "vv", EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ZONE_TYPE,
+                              EMBER_AF_MANUFACTURER_CODE);
     status = sendToClient(endpoint);
     if (status == EMBER_SUCCESS)
     {
@@ -373,10 +375,10 @@ static EmberStatus sendZoneUpdate(uint16_t zoneStatus, uint16_t timeSinceStatusO
     {
         return EMBER_INVALID_CALL;
     }
-    emberAfFillCommandIasZoneClusterZoneStatusChangeNotification(zoneStatus,
-                                                                 0, // extended status, must be zero per spec
-                                                                 emberAfPluginIasZoneServerGetZoneId(endpoint),
-                                                                 timeSinceStatusOccurredQs); // called "delay" in the spec
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_IAS_ZONE_CLUSTER_ID,
+                              ZCL_ZONE_STATUS_CHANGE_NOTIFICATION_COMMAND_ID, "vuuv", zoneStatus,
+                              0 /*extended status, must be zero per spec*/, emberAfPluginIasZoneServerGetZoneId(endpoint),
+                              timeSinceStatusOccurredQs /* called "delay" in the spec */);
     status = sendToClient(endpoint);
 
     return status;

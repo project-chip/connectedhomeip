@@ -156,7 +156,8 @@ bool emberAfGroupsClusterAddGroupCallback(GroupId groupId, uint8_t * groupName)
     {
         return true;
     }
-    emberAfFillCommandGroupsClusterAddGroupResponse(status, groupId);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
+                              ZCL_ADD_GROUP_RESPONSE_COMMAND_ID, "uv", status, groupId);
     emberAfSendResponse();
     return true;
 }
@@ -184,7 +185,8 @@ bool emberAfGroupsClusterViewGroupCallback(GroupId groupId)
         status = EMBER_ZCL_STATUS_SUCCESS;
     }
 
-    emberAfFillCommandGroupsClusterViewGroupResponse(status, groupId, groupName);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
+                              ZCL_VIEW_GROUP_RESPONSE_COMMAND_ID, "uvs", status, groupId, groupName);
     sendStatus = emberAfSendResponse();
     if (EMBER_SUCCESS != sendStatus)
     {
@@ -259,8 +261,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
         // added.  Each group requires a binding and, because the binding table is
         // used for other purposes besides groups, we can't be sure what the
         // capacity will be in the future.
-        emberAfFillCommandGroupsClusterGetGroupMembershipResponse(0xFF, // capacity
-                                                                  count, list, listLen);
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
+                                  ZCL_GET_GROUP_MEMBERSHIP_RESPONSE_COMMAND_ID, "uub", 0xFF, count, list, listLen);
         status = emberAfSendResponse();
     }
     else
@@ -296,7 +298,8 @@ bool emberAfGroupsClusterRemoveGroupCallback(GroupId groupId)
     // removed the scenes associated with that group SHOULD be removed."
     emberAfScenesClusterRemoveScenesInGroupCallback(emberAfCurrentEndpoint(), groupId);
 
-    emberAfFillCommandGroupsClusterRemoveGroupResponse(status, groupId);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
+                              ZCL_REMOVE_GROUP_RESPONSE_COMMAND_ID, "uv", status, groupId);
     sendStatus = emberAfSendResponse();
     if (EMBER_SUCCESS != sendStatus)
     {

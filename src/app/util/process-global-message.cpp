@@ -52,7 +52,6 @@
 //  #include "../plugin/wwah-server-silabs/wwah-server-silabs.h"
 //#endif
 //#include "../plugin/simple-metering-server/simple-metering-server.h"
-#include "gen/znet-bookkeeping.h" // emAfRetrieveAttributeAndCraftResponse
 
 #ifdef EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_SUB_GHZ
 #include "app/framework/plugin/comms-hub-function-sub-ghz/comms-hub-function-sub-ghz.h"
@@ -219,13 +218,8 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
             // This function reads the attribute and creates the correct response
             // in the response buffer
-            if (!emAfRetrieveAttributeAndCraftResponse(cmd->apsFrame->destinationEndpoint, clusterId, attrId, clientServerMask,
-                                                       cmd->mfgCode, (EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength)))
-            {
-                emberAfRetrieveAttributeAndCraftResponse(cmd->apsFrame->destinationEndpoint, clusterId, attrId, clientServerMask,
-                                                         cmd->mfgCode, (EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength));
-            }
-
+            emberAfRetrieveAttributeAndCraftResponse(cmd->apsFrame->destinationEndpoint, clusterId, attrId, clientServerMask,
+                                                     cmd->mfgCode, (EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength));
             // Go to next attrID
             msgIndex += 2;
         }
@@ -549,7 +543,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         emberAfPluginSimpleMeteringClusterReadAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex);
 #endif
 
-        if (!emAfReadAttributesResponse(clusterId, message + msgIndex, msgLen - msgIndex))
+        if (!emberAfReadAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex))
         {
             emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
         }
@@ -592,7 +586,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
     // ([attribute id:2] [type:1] [data:V])+
     case ZCL_REPORT_ATTRIBUTES_COMMAND_ID:
-        if (!emAfReportAttributes(clusterId, message + msgIndex, msgLen - msgIndex))
+        if (!emberAfReportAttributesCallback(clusterId, message + msgIndex, msgLen - msgIndex))
         {
             emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
         }

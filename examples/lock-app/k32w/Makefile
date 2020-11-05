@@ -56,7 +56,6 @@ SRCS = \
     $(CHIP_ROOT)/examples/common/chip-app-server/Server.cpp                                               \
     $(CHIP_ROOT)/examples/lock-app/lock-common/gen/call-command-handler.c                                 \
     $(CHIP_ROOT)/examples/lock-app/lock-common/gen/callback-stub.c                                        \
-    $(CHIP_ROOT)/examples/lock-app/lock-common/gen/znet-bookkeeping.c                                     \
     $(K32W061_SDK_ROOT)/rtos/amazon-freertos/lib/FreeRTOS/tasks.c                                         \
     $(K32W061_SDK_ROOT)/rtos/amazon-freertos/lib/FreeRTOS/portable/MemMang/heap_3.c                       \
     $(K32W061_SDK_ROOT)/rtos/amazon-freertos/lib/FreeRTOS/list.c                                          \
