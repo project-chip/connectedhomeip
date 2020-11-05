@@ -49,6 +49,8 @@ constexpr uint16_t mNumMaxPairedDevices = 128;
 class DLL_EXPORT DevicePairingDelegate
 {
 public:
+    virtual ~DevicePairingDelegate() {}
+
     /**
      * @brief
      *   Called when the pairing reaches a certain stage.
