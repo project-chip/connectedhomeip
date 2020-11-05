@@ -669,8 +669,9 @@ EmberStatus emAfPluginReportingRemoveEntry(uint8_t index)
     return status;
 }
 
-extern "C" void emberAfReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
-                                             uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
+extern "C" void emberAfReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                                                        uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type,
+                                                        uint8_t * data)
 {
     uint8_t i;
     for (i = 0; i < REPORT_TABLE_SIZE; i++)
