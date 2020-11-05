@@ -61,3 +61,15 @@ config CHIP_ENABLE_CHIPOBLE_ADVERTISING_AUTOSTART
 	default n
 	help
 	  Enables starting CHIPoBLE advertising automatically after application boot.
+
+config CHIP_NFC_COMMISSIONING
+	bool "Enable NFC commissioning support"
+	default n
+	imply NFC_T2T_NRFXLIB
+	imply NFC_NDEF
+	imply NFC_NDEF_MSG
+	imply NFC_NDEF_RECORD
+	imply NFC_NDEF_URI_REC
+	imply NFC_NDEF_URI_MSG
+	help
+	  Enables NFC commissioning by sharing onboarding payload in NFC tag.

@@ -22,6 +22,8 @@
 #include "AppEvent.h"
 #include "BoltLockManager.h"
 
+#include <platform/CHIPDeviceLayer.h>
+
 struct k_timer;
 
 class AppTask
@@ -51,10 +53,16 @@ private:
     static void LockActionEventHandler(AppEvent * aEvent);
     static void StartBLEAdvertisementHandler(AppEvent * aEvent);
 
+    static void ThreadProvisioningHandler(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
+
     static void ButtonEventHandler(uint32_t buttons_state, uint32_t has_changed);
     static void TimerEventHandler(k_timer * timer);
 
     void StartTimer(uint32_t aTimeoutInMs);
+
+#ifdef CONFIG_CHIP_NFC_COMMISSIONING
+    int StartNFCTag();
+#endif
 
     enum Function_t
     {
