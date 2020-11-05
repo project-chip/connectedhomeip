@@ -153,5 +153,7 @@
         }
     ],
     "clang-format.fallbackStyle": "WebKit",
-    "files.trimFinalNewlines": true
+    "files.trimFinalNewlines": true,
+    "C_Cpp.default.cppStandard": "gnu++14",
+    "C_Cpp.default.cStandard": "gnu11"
 }
