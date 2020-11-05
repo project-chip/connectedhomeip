@@ -83,7 +83,7 @@ void emberAfIdentifyClusterServerTickCallback(uint8_t endpoint)
         // This tick writes the new attribute, which will trigger the Attribute
         // Changed callback below, which in turn will schedule or cancel the tick.
         // Because of this, the tick does not have to be scheduled here.
-        writeIdentifyTime(endpoint, (identifyTime == 0 ? 0 : identifyTime - 1));
+        writeIdentifyTime(endpoint, static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1));
     }
 }
 

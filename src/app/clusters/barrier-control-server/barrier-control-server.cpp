@@ -172,7 +172,7 @@ void emAfPluginBarrierControlServerIncrementEvents(uint8_t endpoint, bool open, 
     {
         if (READBIT(mask, bit))
         {
-            EmberAfAttributeId attributeId = baseEventAttributeId + bit;
+            EmberAfAttributeId attributeId = static_cast<EmberAfAttributeId>(baseEventAttributeId + bit);
             uint16_t events;
             EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID, attributeId,
                                                               (uint8_t *) &events, sizeof(events));
@@ -203,15 +203,15 @@ static uint8_t getCurrentPosition(uint8_t endpoint)
     // open so that we don't leave the barrier open when it should be closed.
     uint8_t currentPositionFromAttribute = emAfPluginBarrierControlServerGetBarrierPosition(endpoint);
     return ((currentPositionFromAttribute == EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_UNKNOWN)
-                ? EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN
+                ? static_cast<uint8_t>(EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN)
                 : currentPositionFromAttribute);
 }
 
 static uint32_t calculateDelayMs(uint8_t endpoint, uint8_t targetPosition, bool * opening)
 {
-    uint8_t currentPosition      = emAfPluginBarrierControlServerGetBarrierPosition(endpoint);
-    *opening                     = targetPosition > currentPosition;
-    uint8_t positionDelta        = (*opening ? targetPosition - currentPosition : currentPosition - targetPosition);
+    uint8_t currentPosition = emAfPluginBarrierControlServerGetBarrierPosition(endpoint);
+    *opening                = targetPosition > currentPosition;
+    uint8_t positionDelta   = static_cast<uint8_t>(*opening ? targetPosition - currentPosition : currentPosition - targetPosition);
     uint16_t openOrClosePeriodDs = getOpenOrClosePeriod(endpoint, *opening);
     uint32_t openOrClosePeriodMs = openOrClosePeriodDs * MILLISECOND_TICKS_PER_DECISECOND;
 
@@ -228,7 +228,7 @@ static uint32_t calculateDelayMs(uint8_t endpoint, uint8_t targetPosition, bool 
     }
 }
 
-void emberAfBarrierControlClusterServerTickCallback(uint8_t endpoint)
+void emberAfBarrierControlClusterServerTickCallback(CHIPEndpointId endpoint)
 {
     if (state.currentPosition == state.targetPosition)
     {
@@ -254,10 +254,11 @@ void emberAfBarrierControlClusterServerTickCallback(uint8_t endpoint)
                 emAfPluginBarrierControlServerIncrementEvents(endpoint, false, false);
             }
         }
-        emAfPluginBarrierControlServerSetBarrierPosition(endpoint,
-                                                         (emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint)
-                                                              ? state.currentPosition
-                                                              : EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_UNKNOWN));
+        emAfPluginBarrierControlServerSetBarrierPosition(
+            endpoint,
+            (emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint)
+                 ? state.currentPosition
+                 : static_cast<uint8_t>(EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_UNKNOWN)));
         setMovingState(
             endpoint,
             (state.increasing ? EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING : EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_CLOSING));

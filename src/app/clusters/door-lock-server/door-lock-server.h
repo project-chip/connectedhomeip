@@ -228,7 +228,7 @@ typedef struct
 // space available (spaceAvail) and if so it will send a DefaultResponse
 // command with the status of EMBER_ZCL_STATUS_INSUFFICIENT_SPACE and return
 // false. Otherwise, it will return true.
-bool emAfPluginDoorLockServerCheckForSufficientSpace(uint8_t spaceReq, uint8_t spaceAvail);
+bool emAfPluginDoorLockServerCheckForSufficientSpace(uint16_t spaceReq, uint8_t spaceAvail);
 #endif
 
 // Critical Message Queue

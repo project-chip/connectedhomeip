@@ -14601,7 +14601,7 @@ void emberAfIasZoneClusterServerManufacturerSpecificAttributeChangedCallback(uin
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
+void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                     EmberStatus status);
 /** @brief IAS Zone Cluster Server Pre Attribute Changed

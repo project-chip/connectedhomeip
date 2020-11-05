@@ -59,7 +59,7 @@
 typedef struct
 {
     EmberEUI64 eui64;
-    EmberNodeId nodeId;
+    ChipNodeId nodeId;
     uint8_t networkIndex;
     uint8_t endpoint;
     uint8_t age; // The number of discovery cycles the ESI has not been discovered.

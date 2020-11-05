@@ -58,6 +58,9 @@
 
 typedef struct
 {
+    // If the size of lastReportTimeMs changes (see
+    // https://github.com/project-chip/connectedhomeip/issues/3590) adjust the
+    // casts on assigning to it.
     uint32_t lastReportTimeMs;
     EmberAfDifferenceType lastReportValue;
     bool reportableChange;

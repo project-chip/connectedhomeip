@@ -43,6 +43,8 @@
 #include <app/util/af-event.h>
 #include <app/util/attribute-storage.h>
 
+using namespace chip;
+
 EmberEventControl emberAfPluginTemperatureMeasurementServerReadEventControl;
 
 // TODO: There's no header that declares this event handler, and it's not 100%
@@ -58,8 +60,8 @@ extern "C" void emberAfPluginTemperatureMeasurementServerInitCallback(void)
     EmberAfStatus status;
     // FIXME Use real values for the temperature sensor polling the sensor using the
     //       EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER_MAX_MEASUREMENT_FREQUENCY_S macro
-    uint16_t endpointId = 1; // Hardcoded to 1 for now
-    int16_t newValue    = 0x1234;
+    EndpointId endpointId = 1; // Hardcoded to 1 for now
+    int16_t newValue      = 0x1234;
 
     status = emberAfWriteAttribute(endpointId, ZCL_TEMP_MEASUREMENT_CLUSTER_ID, ZCL_CURRENT_TEMPERATURE_ATTRIBUTE_ID,
                                    CLUSTER_MASK_SERVER, (uint8_t *) &newValue, ZCL_INT16S_ATTRIBUTE_TYPE);

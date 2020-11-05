@@ -42,13 +42,14 @@ extern "C" {
 
 EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
-    uint16_t frameSize  = encodeApsFrame(nullptr, 0, apsFrame);
-    uint32_t dataLength = uint32_t(frameSize) + uint32_t(messageLength);
-    if (dataLength > UINT16_MAX)
+    uint16_t frameSize           = encodeApsFrame(nullptr, 0, apsFrame);
+    uint32_t dataLengthUnchecked = uint32_t(frameSize) + uint32_t(messageLength);
+    if (dataLengthUnchecked > UINT16_MAX)
     {
         // Definitely too long for a packet!
         return EMBER_MESSAGE_TOO_LONG;
     }
+    uint16_t dataLength = static_cast<uint16_t>(dataLengthUnchecked);
 
     if (frameSize == 0)
     {

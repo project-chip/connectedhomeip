@@ -309,11 +309,11 @@ void emberAfPrintAttributeTable(void)
                     uint16_t length;
                     if (emberAfIsStringAttributeType(metaData->attributeType))
                     {
-                        length = emberAfStringLength(data) + 1;
+                        length = static_cast<uint16_t>(emberAfStringLength(data) + 1);
                     }
                     else if (emberAfIsLongStringAttributeType(metaData->attributeType))
                     {
-                        length = emberAfLongStringLength(data) + 2;
+                        length = static_cast<uint16_t>(emberAfLongStringLength(data) + 2);
                     }
                     else
                     {
@@ -399,7 +399,8 @@ void emberAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId
 #else  //(BIGENDIAN_CPU)
         memmove(&(appResponseData[appResponseLength]), data, dataLen);
 #endif //(BIGENDIAN_CPU)
-        appResponseLength += dataLen;
+       // TODO: How do we know this does not overflow?
+        appResponseLength = static_cast<uint16_t>(appResponseLength + dataLen);
     }
 
     emberAfAttributesPrintln("READ: clus %2x, attr %2x, dataLen: %x, OK", clusterId, attrId, dataLen);
@@ -448,7 +449,7 @@ EmberAfStatus emberAfAppendAttributeReportFields(uint8_t endpoint, EmberAfCluste
 #else
     memmove(buffer + *bufIndex, data, size);
 #endif
-    *bufIndex += size;
+    *bufIndex = static_cast<uint8_t>(*bufIndex + size);
 
 kickout:
     emberAfAttributesPrintln("REPORT: clus 0x%2x, attr 0x%2x: 0x%x", clusterId, attributeId, status);

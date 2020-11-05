@@ -777,7 +777,7 @@ static uint8_t addSaturation(uint8_t saturation1, uint8_t saturation2)
     uint16_t saturation16;
 
     saturation16 = ((uint16_t) saturation1);
-    saturation16 += ((uint16_t) saturation2);
+    saturation16 = static_cast<uint16_t>(saturation16 + static_cast<uint16_t>(saturation2));
 
     if (saturation16 > MAX_SATURATION_VALUE)
     {
@@ -794,7 +794,7 @@ static uint8_t subtractSaturation(uint8_t saturation1, uint8_t saturation2)
         return 0;
     }
 
-    return saturation1 - saturation2;
+    return static_cast<uint8_t>(saturation1 - saturation2);
 }
 
 // any time we call a hue or saturation transition, we need to assume certain
@@ -1256,11 +1256,11 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(uint8_t stepMode, ui
     colorTempTransitionState.currentValue = readColorTemperature(endpoint);
     if (stepMode == MOVE_MODE_UP)
     {
-        colorTempTransitionState.finalValue = readColorTemperature(endpoint) + stepSize;
+        colorTempTransitionState.finalValue = static_cast<uint16_t>(readColorTemperature(endpoint) + stepSize);
     }
     else
     {
-        colorTempTransitionState.finalValue = readColorTemperature(endpoint) - stepSize;
+        colorTempTransitionState.finalValue = static_cast<uint16_t>(readColorTemperature(endpoint) - stepSize);
     }
     colorTempTransitionState.stepsRemaining = transitionTime;
     colorTempTransitionState.stepsTotal     = transitionTime;
@@ -1395,7 +1395,7 @@ static void handleModeSwitch(uint8_t endpoint, uint8_t newColorMode)
         writeColorMode(endpoint, newColorMode);
     }
 
-    colorModeTransition = (newColorMode << 4) + oldColorMode;
+    colorModeTransition = static_cast<uint8_t>((newColorMode << 4) + oldColorMode);
 
     // Note:  It may be OK to not do anything here.
     switch (colorModeTransition)
@@ -1433,11 +1433,11 @@ static uint8_t addHue(uint8_t hue1, uint8_t hue2)
     uint16_t hue16;
 
     hue16 = ((uint16_t) hue1);
-    hue16 += ((uint16_t) hue2);
+    hue16 = static_cast<uint16_t>(hue16 + static_cast<uint16_t>(hue2));
 
     if (hue16 > MAX_HUE_VALUE)
     {
-        hue16 -= MAX_HUE_VALUE;
+        hue16 = static_cast<uint16_t>(hue16 - MAX_HUE_VALUE);
     }
 
     return ((uint8_t) hue16);
@@ -1450,10 +1450,10 @@ static uint8_t subtractHue(uint8_t hue1, uint8_t hue2)
     hue16 = ((uint16_t) hue1);
     if (hue2 > hue1)
     {
-        hue16 += MAX_HUE_VALUE;
+        hue16 = static_cast<uint16_t>(hue16 + MAX_HUE_VALUE);
     }
 
-    hue16 -= ((uint16_t) hue2);
+    hue16 = static_cast<uint16_t>(hue16 - static_cast<uint16_t>(hue2));
 
     return ((uint8_t) hue16);
 }
@@ -1580,14 +1580,14 @@ static bool computeNewColor16uValue(Color16uTransitionState * p)
         newValue32u = ((uint32_t)(p->finalValue - p->initialValue));
         newValue32u *= ((uint32_t)(p->stepsRemaining));
         newValue32u /= ((uint32_t)(p->stepsTotal));
-        p->currentValue = p->finalValue - ((uint16_t)(newValue32u));
+        p->currentValue = static_cast<uint16_t>(p->finalValue - static_cast<uint16_t>(newValue32u));
     }
     else
     {
         newValue32u = ((uint32_t)(p->initialValue - p->finalValue));
         newValue32u *= ((uint32_t)(p->stepsRemaining));
         newValue32u /= ((uint32_t)(p->stepsTotal));
-        p->currentValue = p->finalValue + ((uint16_t)(newValue32u));
+        p->currentValue = static_cast<uint16_t>(p->finalValue + static_cast<uint16_t>(newValue32u));
     }
 
     if (p->stepsRemaining == 0)

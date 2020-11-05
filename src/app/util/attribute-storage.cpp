@@ -142,7 +142,7 @@ void emberAfEndpointConfigure(void)
 
 void emberAfSetEndpointCount(uint8_t dynamicEndpointCount)
 {
-    emberEndpointCount = FIXED_ENDPOINT_COUNT + dynamicEndpointCount;
+    emberEndpointCount = static_cast<uint8_t>(FIXED_ENDPOINT_COUNT + dynamicEndpointCount);
 }
 
 uint8_t emberAfFixedEndpointCount(void)
@@ -206,7 +206,7 @@ void emberAfClusterDefaultResponseCallback(uint8_t endpoint, EmberAfClusterId cl
 }
 
 // This function is used to call the per-cluster message sent callback
-void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
+void emberAfClusterMessageSentWithMfgCodeCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status,
                                                   uint16_t mfgCode)
 {
@@ -356,7 +356,7 @@ static uint8_t * singletonAttributeLocation(EmberAfAttributeMetadata * am)
     {
         if ((m->mask & ATTRIBUTE_MASK_SINGLETON) != 0U)
         {
-            index += m->size;
+            index = static_cast<uint16_t>(index + m->size);
         }
         m++;
     }
@@ -374,11 +374,11 @@ static EmberAfStatus typeSensitiveMemCopy(uint8_t * dest, uint8_t * src, EmberAf
 
     if (emberAfIsStringAttributeType(attributeType))
     {
-        emberAfCopyString(dest, src, size - 1);
+        emberAfCopyString(dest, src, static_cast<uint8_t>(size - 1));
     }
     else if (emberAfIsLongStringAttributeType(attributeType))
     {
-        emberAfCopyLongString(dest, src, size - 2);
+        emberAfCopyLongString(dest, src, static_cast<uint16_t>(size - 2));
     }
     else
     {
@@ -419,7 +419,7 @@ static uint16_t getManufacturerCode(EmberAfManufacturerCodeEntry * codes, uint16
 uint16_t emberAfGetMfgCode(EmberAfAttributeMetadata * metadata)
 {
     return getManufacturerCode((EmberAfManufacturerCodeEntry *) attributeManufacturerCodes, attributeManufacturerCodeCount,
-                               (metadata - generatedAttributes));
+                               static_cast<uint16_t>((metadata - generatedAttributes)));
 }
 
 uint16_t emAfGetManufacturerCodeForAttribute(EmberAfCluster * cluster, EmberAfAttributeMetadata * attMetaData)
@@ -431,7 +431,7 @@ uint16_t emAfGetManufacturerCodeForAttribute(EmberAfCluster * cluster, EmberAfAt
 uint16_t emAfGetManufacturerCodeForCluster(EmberAfCluster * cluster)
 {
     return getManufacturerCode((EmberAfManufacturerCodeEntry *) clusterManufacturerCodes, clusterManufacturerCodeCount,
-                               (cluster - generatedClusters));
+                               static_cast<uint16_t>(cluster - generatedClusters));
 }
 
 /**
@@ -569,20 +569,20 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                             // Increase the index if attribute is not externally stored
                             if (!(am->mask & ATTRIBUTE_MASK_EXTERNAL_STORAGE) && !(am->mask & ATTRIBUTE_MASK_SINGLETON))
                             {
-                                attributeOffsetIndex += emberAfAttributeSize(am);
+                                attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emberAfAttributeSize(am));
                             }
                         }
                     }
                 }
                 else
                 { // Not the cluster we are looking for
-                    attributeOffsetIndex += cluster->clusterSize;
+                    attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + cluster->clusterSize);
                 }
             }
         }
         else
         { // Not the endpoint we are looking for
-            attributeOffsetIndex += emAfEndpoints[i].endpointType->endpointSize;
+            attributeOffsetIndex = static_cast<uint16_t>(attributeOffsetIndex + emAfEndpoints[i].endpointType->endpointSize);
         }
     }
     return EMBER_ZCL_STATUS_UNSUPPORTED_ATTRIBUTE; // Sorry, attribute was not found.
@@ -768,10 +768,11 @@ static uint8_t findClusterEndpointIndex(uint8_t endpoint, EmberAfClusterId clust
         {
             break;
         }
-        epi += (emberAfFindClusterIncludingDisabledEndpointsWithMfgCode(emAfEndpoints[i].endpoint, clusterId, mask,
-                                                                        manufacturerCode) != NULL)
-            ? 1
-            : 0;
+        epi = static_cast<uint8_t>(epi +
+                                           (emberAfFindClusterIncludingDisabledEndpointsWithMfgCode(
+                                                emAfEndpoints[i].endpoint, clusterId, mask, manufacturerCode) != NULL)
+                                       ? 1
+                                       : 0);
     }
 
     return epi;
@@ -1182,7 +1183,7 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(EmberAfCluster * cluste
         {
             functionIndex++;
         }
-        mask <<= 1;
+        mask = static_cast<EmberAfClusterMask>(mask << 1);
     }
     return cluster->functions[functionIndex];
 }
@@ -1192,7 +1193,7 @@ EmberAfGenericClusterFunction emberAfFindClusterFunction(EmberAfCluster * cluste
 uint16_t emAfGetManufacturerCodeForCommand(EmberAfCommandMetadata * command)
 {
     return getManufacturerCode((EmberAfManufacturerCodeEntry *) commandManufacturerCodes, commandManufacturerCodeCount,
-                               (command - generatedCommands));
+                               static_cast<uint16_t>(command - generatedCommands));
 }
 
 /**

@@ -1106,7 +1106,7 @@ typedef struct
         struct
         {
             /** The node id of the source of the received reports. */
-            EmberNodeId source;
+            ChipNodeId source;
             /** The remote endpoint from which the attribute is reported. */
             uint8_t endpoint;
             /** The maximum expected time between reports, measured in seconds. */
@@ -1464,7 +1464,7 @@ typedef void (*EmberAfDefaultResponseFunction)(uint8_t endpoint, uint8_t command
  *
  * This function is called when a message is sent.
  */
-typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                                            uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /**
