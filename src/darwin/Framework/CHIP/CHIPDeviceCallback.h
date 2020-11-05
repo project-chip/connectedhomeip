@@ -15,23 +15,12 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_DEVICE_INTERNAL_H
-#define CHIP_DEVICE_INTERNAL_H
-
-#import "CHIPDevice.h"
 #import <Foundation/Foundation.h>
 
-#include <controller/CHIPDevice.h>
+#import "CHIPError.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPDevice ()
-
-- (instancetype)initWithDevice:(chip::Controller::Device *)device;
-- (chip::Controller::Device *)internalDevice;
-
-@end
+typedef void (^CHIPDeviceCallback)(NSError * error);
 
 NS_ASSUME_NONNULL_END
-
-#endif /* CHIP_DEVICE_INTERNAL_H */

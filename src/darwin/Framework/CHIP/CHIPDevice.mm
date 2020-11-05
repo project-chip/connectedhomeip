@@ -52,6 +52,11 @@
     return self;
 }
 
+- (chip::Controller::Device *)internalDevice
+{
+    return _cppDevice;
+}
+
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

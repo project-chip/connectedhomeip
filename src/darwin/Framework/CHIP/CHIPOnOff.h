@@ -19,6 +19,7 @@
 #define CHIP_ONOFF_H
 
 #import "CHIPDevice.h"
+#import "CHIPDeviceCallback.h"
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
@@ -26,9 +27,9 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPOnOff : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device;
-- (BOOL)lightOn;
-- (BOOL)lightOff;
-- (BOOL)toggleLight;
+- (BOOL)lightOn:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue;
+- (BOOL)lightOff:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue;
+- (BOOL)toggleLight:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
