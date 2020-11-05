@@ -27,8 +27,8 @@
 using namespace ::chip::Logging;
 
 constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Detail;
-constexpr uint16_t kDefaultRemotePort = CHIP_PORT;
-constexpr uint16_t kDefaultLocalPort = CHIP_PORT;
+constexpr uint16_t kDefaultRemotePort      = CHIP_PORT;
+constexpr uint16_t kDefaultLocalPort       = CHIP_PORT;
 
 void ConfigureChipLogging()
 {
@@ -65,7 +65,7 @@ exit:
 uint16_t GetPort(uint16_t defaultPortValue, const char * name)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t port = defaultPortValue;
+    uint16_t port  = defaultPortValue;
     std::stringstream ss;
 
     const char * portStr = getenv(name);
@@ -76,13 +76,13 @@ uint16_t GetPort(uint16_t defaultPortValue, const char * name)
     VerifyOrExit(ss.fail() || ss.eof(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
 exit:
-  if (err != CHIP_NO_ERROR)
-  {
-      ChipLogError(chipTool, "Invalid %s value: %s. Using: %" PRIu16, name, portStr, defaultPortValue);
-      port = defaultPortValue;
-  }
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(chipTool, "Invalid %s value: %s. Using: %" PRIu16, name, portStr, defaultPortValue);
+        port = defaultPortValue;
+    }
 
-  return port;
+    return port;
 }
 
 uint16_t GetRemotePort()
