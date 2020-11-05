@@ -218,5 +218,12 @@ exit:
     return err;
 }
 
+bool Device::GetIpAddress(Inet::IPAddress & addr) const
+{
+    if (mState == kConnectionState_SecureConnected)
+        addr = mDeviceAddr;
+    return mState == kConnectionState_SecureConnected;
+}
+
 } // namespace Controller
 } // namespace chip

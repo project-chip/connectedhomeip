@@ -136,6 +136,14 @@ public:
      */
     bool IsConnected() const;
 
+    /**
+     * @brief
+     *   Get IP Address of the peer if the connection is active
+     *
+     * @return bool   If IP Address was returned
+     */
+    bool GetIpAddress(Inet::IPAddress & addr) const;
+
     // ----- Messaging -----
     /**
      * @brief

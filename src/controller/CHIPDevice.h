@@ -76,6 +76,8 @@ public:
      */
     CHIP_ERROR SendMessage(System::PacketBuffer * buffer);
 
+    bool GetIpAddress(Inet::IPAddress & addr) const;
+
 private:
     enum ConnectionState
     {

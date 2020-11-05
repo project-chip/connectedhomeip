@@ -166,6 +166,14 @@ bool ChipDeviceController::IsConnected() const
     return mState == kState_Initialized;
 }
 
+bool ChipDeviceController::GetIpAddress(Inet::IPAddress & addr) const
+{
+    if (IsConnected() && mDevice != nullptr)
+        return mDevice->GetIpAddress(addr);
+
+    return false;
+}
+
 CHIP_ERROR ChipDeviceController::DisconnectDevice()
 {
     if (mDevice != nullptr)
