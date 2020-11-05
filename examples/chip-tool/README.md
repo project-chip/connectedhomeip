@@ -93,7 +93,7 @@ with the target cluster name and the target command name
 
 ### How to configure the local and remote ports used by chip-tool
 
-By default chip-tool both send and listen messages on the port 11097.
-It can be changed by using environment variables.
+By default chip-tool both send and listen messages on the port 11097. It can be
+changed by using environment variables.
 
-	$ CHIP_TOOL_LOCAL_PORT=11098 CHIP_TOOL_REMOTE_PORT=11099 chip-tool onoff on 192.168.0.30 1
+    $ CHIP_TOOL_LOCAL_PORT=11098 CHIP_TOOL_REMOTE_PORT=11099 chip-tool onoff on 192.168.0.30 1
