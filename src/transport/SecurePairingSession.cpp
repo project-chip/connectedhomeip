@@ -29,6 +29,7 @@
  */
 
 #include <inttypes.h>
+#include <string.h>
 
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
