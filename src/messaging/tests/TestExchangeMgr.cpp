@@ -65,7 +65,7 @@ public:
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
 };
 
-class MockAppDelegate : public ExchangeContextDelegate
+class MockAppDelegate : public SimpleExchangeContextDelegate
 {
 public:
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
@@ -136,10 +136,10 @@ void CheckFindContextTest(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.Init(&conn);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ExchangeContext * ec = exchangeMgr.NewContext(kDestinationNodeId, nullptr);
+    ExchangeContext * ec = exchangeMgr.NewContext(kDestinationNodeId, &gMockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec != nullptr);
 
-    bool result = exchangeMgr.FindContext(kDestinationNodeId, nullptr, true);
+    bool result = exchangeMgr.FindContext(kDestinationNodeId, &gMockAppDelegate, true);
     NL_TEST_ASSERT(inSuite, result == true);
 
     result = exchangeMgr.FindContext(kDestinationNodeId, nullptr, false);
