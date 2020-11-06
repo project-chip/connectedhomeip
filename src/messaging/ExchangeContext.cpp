@@ -191,7 +191,7 @@ void ExchangeContext::Reset()
     *this = ExchangeContext();
 }
 
-void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
+ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
                             ExchangeContextDelegateFactory * delegateFactory)
 {
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
@@ -211,6 +211,14 @@ void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t 
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 
     mDelegate = delegateFactory->CreateDelegate(this);
+    if (mDelegate == nullptr)
+    {
+        Release();
+        ChipLogError(ExchangeManager, "CreateDelegate failed.");
+        return nullptr;
+    }
+
+    return this;
 }
 
 void ExchangeContext::Free()

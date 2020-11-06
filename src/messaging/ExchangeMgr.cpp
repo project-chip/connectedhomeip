@@ -156,8 +156,7 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t Pe
     {
         if (ec->GetReferenceCount() == 0)
         {
-            ec->Alloc(this, ExchangeId, PeerNodeId, Initiator, delegateFactory);
-            return ec;
+            return ec->Alloc(this, ExchangeId, PeerNodeId, Initiator, delegateFactory);
         }
     }
 
