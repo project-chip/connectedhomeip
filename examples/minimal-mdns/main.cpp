@@ -122,13 +122,6 @@ int main(int argc, char ** args)
     // IPV6: FF02::FB
     SendPacket(udp, "224.0.0.251");
 
-    // TODO:
-    //   - MDNS:
-    //     - build a query (TODO header + query)
-    //     - Send it out (where? IPV4 works but what about V6?)
-    //     - Listen
-    //     - timeout
-
     DeviceLayer::PlatformMgr().RunEventLoop();
 
     udp->Free();
