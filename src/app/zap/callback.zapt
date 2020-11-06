@@ -1,8 +1,8 @@
 {{chip_header}}
 
-
-#ifndef ZCL_CALLBACK_HEADER
-#define ZCL_CALLBACK_HEADER
+// Enclosing macro to prevent multiple inclusion
+#ifndef __ZAP_CALLBACK__
+#define __ZAP_CALLBACK__
 
 #include "af-structs.h"
 #include "af-types.h"
@@ -24,7 +24,7 @@ void emberAf{{asCamelCased name false}}ClusterInitCallback(uint8_t endpoint);
 {{/all_user_clusters_names}}
 
 
-// CLuster Commands Callback
+// Cluster Commands Callback
 
 {{#all_user_clusters}}
 {{#if (isEnabled enabled)}}
@@ -53,4 +53,4 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
 {{/if}}
 {{/all_user_clusters}}
 
-#endif //ZCL_CALLBACK_HEADER
+#endif //__ZAP_CALLBACK__

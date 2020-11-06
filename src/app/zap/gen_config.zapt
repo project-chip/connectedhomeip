@@ -1,5 +1,6 @@
 {{chip_header}}
 
+// Enclosing macro to prevent multiple inclusion
 #ifndef __ZAP_GEN_CONFIG__
 #define __ZAP_GEN_CONFIG__
 

@@ -73,7 +73,6 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         {{/unless}}
         {{/if}}
         {{/all_user_clusters}}
-
         default:
             // Unrecognized cluster ID, error status will apply.
             break;
@@ -94,7 +93,6 @@ EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false
     {
         switch (cmd->commandId)
         {
-
         {{#all_user_cluster_commands}}
         {{#if (isStrEqual clusterName parent.name)}}
         {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}

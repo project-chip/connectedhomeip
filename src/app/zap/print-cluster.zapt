@@ -1,9 +1,8 @@
 {{chip_header}}
 
-
 // Enclosing macro to prevent multiple inclusion
-#ifndef SILABS_PRINT_CLUSTER
-#define SILABS_PRINT_CLUSTER
+#ifndef __ZAP_PRINT_CLUSTER__
+#define __ZAP_PRINT_CLUSTER__
 
 
 // This is the mapping of IDs to cluster names assuming a format according
@@ -27,4 +26,4 @@
 #define MAX_CLUSTER_NAME_LENGTH  {{zcl_cluster_largest_label_length}}
 
 // Enclosing macro to prevent multiple inclusion
-#endif // SILABS_PRINT_CLUSTER
+#endif // __ZAP_PRINT_CLUSTER__

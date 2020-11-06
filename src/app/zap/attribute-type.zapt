@@ -1,5 +1,6 @@
 {{chip_header}}
 
+// Enclosing macro to prevent multiple inclusion
 #ifndef __ZAP_ATTRIBUTE_TYPE__
 #define __ZAP_ATTRIBUTE_TYPE__
 

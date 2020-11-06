@@ -1,8 +1,8 @@
 {{chip_header}}
 
-
-#ifndef SILABS_EMBER_AF_STRUCTS
-#define SILABS_EMBER_AF_STRUCTS
+// Enclosing macro to prevent multiple inclusion
+#ifndef __ZAP_AF_STRUCTS__
+#define __ZAP_AF_STRUCTS__
 
 #include <stdint.h>
 #include "enums.h"
@@ -17,4 +17,4 @@ typedef struct _{{asType label}} {
 } {{asUnderlyingType label}};
 {{/zcl_structs}}
 
-#endif // SILABS_EMBER_AF_STRUCTS
+#endif // __ZAP_AF_STRUCTS__

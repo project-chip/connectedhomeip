@@ -1,6 +1,5 @@
 {{chip_header}}
 
-
 #include "callback.h"
 #include "cluster-id.h"
 
@@ -14,7 +13,6 @@ void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId)
         emberAf{{asCamelCased name false}}ClusterInitCallback(endpoint);
         break;
     {{/all_user_clusters_names}}
-
     default:
         // Unrecognized cluster ID
         break;

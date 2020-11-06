@@ -1,10 +1,11 @@
 {{chip_header}}
 
 // Enclosing macro to prevent multiple inclusion
-#ifndef SILABS_ATTRIBUTE_STORAGE_GEN
-#define SILABS_ATTRIBUTE_STORAGE_GEN
+#ifndef __ZAP_ATT_STORAGE__
+#define __ZAP_ATT_STORAGE__
 
 // Attribute masks modify how attributes are used by the framework
+//
 // Attribute that has this mask is NOT read-only
 #define ATTRIBUTE_MASK_WRITABLE (0x01)
 // Attribute that has this mask is saved to a token
@@ -21,6 +22,7 @@
 #define ATTRIBUTE_MASK_CLIENT (0x40)
 
 // Cluster masks modify how clusters are used by the framework
+//
 // Does this cluster have init function?
 #define CLUSTER_MASK_INIT_FUNCTION (0x01)
 // Does this cluster have attribute changed function?
@@ -39,6 +41,7 @@
 #define CLUSTER_MASK_CLIENT (0x80)
 
 // Command masks modify meanings of commands
+//
 // Is sending of this client command supported
 #define COMMAND_MASK_OUTGOING_CLIENT (0x01)
 // Is sending of this server command supported
@@ -49,4 +52,5 @@
 #define COMMAND_MASK_INCOMING_SERVER (0x08)
 // Is this command manufacturer specific?
 #define COMMAND_MASK_MANUFACTURER_SPECIFIC (0x10)
-#endif // SILABS_ATTRIBUTE_STORAGE_GEN
+
+#endif // __ZAP_ATT_STORAGE__

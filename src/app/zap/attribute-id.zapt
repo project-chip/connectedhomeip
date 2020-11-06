@@ -1,11 +1,11 @@
 {{chip_header}}
 
 // Enclosing macro to prevent multiple inclusion
-#ifndef ZAP_EMBER_ATTRIBUTE_ID
-#define ZAP_EMBER_ATTRIBUTE_ID
+#ifndef __ZAP_EMBER_ATTRIBUTE_ID__
+#define __ZAP_EMBER_ATTRIBUTE_ID__
 
 {{#zcl_clusters}}
-// Attribute id for cluster: {{label}}
+// Attribute ids for cluster: {{label}}
 
 {{#zcl_attributes_client}}
 {{#first}}
@@ -27,4 +27,4 @@
 {{/zcl_attributes_server}}
 {{/zcl_clusters}}
 
-#endif // ZAP_EMBER_ATTRIBUTE_ID
+#endif // __ZAP_EMBER_ATTRIBUTE_ID__
