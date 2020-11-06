@@ -36,6 +36,14 @@ namespace {
 
 using namespace chip;
 
+void TestFreeNull(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr const size_t size = 10;
+    BitMapObjectPool<uint32_t, size> pool;
+    pool.Delete(nullptr);
+    NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == 0);
+}
+
 void TestNewFree(nlTestSuite * inSuite, void * inContext)
 {
     constexpr const size_t size = 100;
@@ -115,7 +123,12 @@ int Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestNewFree), NL_TEST_DEF_FN(TestNewFreeStruct), NL_TEST_SENTINEL() };
+static const nlTest sTests[] = {
+    NL_TEST_DEF_FN(TestFreeNull),
+    NL_TEST_DEF_FN(TestNewFree),
+    NL_TEST_DEF_FN(TestNewFreeStruct),
+    NL_TEST_SENTINEL()
+};
 
 extern "C" int TestPool()
 {
