@@ -20,6 +20,7 @@
 #include <inet/UDPEndPoint.h>
 #include <mdns/minimal/DnsHeader.h>
 #include <mdns/minimal/QName.h>
+#include <mdns/minimal/QuestionBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
@@ -29,19 +30,15 @@ using namespace chip;
 
 namespace {
 
-constexpr uint32_t kRunTimeMs = 3'000;
-constexpr uint16_t kMdnsPort  = 5353;
+constexpr uint32_t kRunTimeMs    = 3'000;
+constexpr uint16_t kMdnsPort     = 5353;
+constexpr uint16_t kFakeMdnsPort = 53333;
 
 constexpr uint32_t kTestMessageId = 0x1234;
 
 constexpr size_t kMdnsMaxPacketSize = 1'024;
 
 const mdns::Minimal::QNamePart kCastQnames[] = { "_googlecast", "_tcp", "local" };
-
-const auto kQuestion = mdns::Minimal::Question(kCastQnames, ArraySize(kCastQnames))
-                           .SetClass(mdns::Minimal::Question::QClass::IN)
-                           .SetType(mdns::Minimal::Question::QType::ANY)
-                           .SetAnswerViaUnicast(true);
 
 void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
 {
@@ -60,16 +57,17 @@ void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
         return;
     }
 
-    buffer->SetDataLength(mdns::Minimal::HeaderRef::kSizeBytes);
+    mdns::Minimal::QuestionBuilder builder(buffer);
 
-    mdns::Minimal::HeaderRef hdr(buffer->Start());
-    hdr.Clear().SetFlags(hdr.GetFlags().SetQuery()).SetMessageId(kTestMessageId);
+    builder.Header().SetMessageId(kTestMessageId);
+    builder.AddQuestion(mdns::Minimal::Question(kCastQnames, ArraySize(kCastQnames))
+                            .SetClass(mdns::Minimal::Question::QClass::IN)
+                            .SetType(mdns::Minimal::Question::QType::ANY)
+                            .SetAnswerViaUnicast(true));
 
-    buffer->SetDataLength(static_cast<uint16_t>(buffer->DataLength() + kQuestion.WriteSizeBytes()));
-
-    if (kQuestion.Append(hdr, buffer->Start() + mdns::Minimal::HeaderRef::kSizeBytes, kQuestion.WriteSizeBytes()) == nullptr)
+    if (!builder.Ok())
     {
-        printf("Failed to encode buffer");
+        printf("Failed to build the question");
         System::PacketBuffer::Free(buffer);
         return;
     }
@@ -79,6 +77,15 @@ void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
         printf("Error sending");
         return;
     }
+}
+
+void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBuffer * buffer,
+                         const chip::Inet::IPPacketInfo * info)
+{
+    char addr[32];
+    info->SrcAddress.ToString(addr, sizeof(addr));
+
+    printf("Packet received from: %-15s on port %d\n", addr, info->SrcPort);
 }
 
 } // namespace
@@ -116,11 +123,22 @@ int main(int argc, char ** args)
     }
     else
     {
-        printf("Failed to create the shutdown timer. Kill with ^C.");
+        printf("Failed to create the shutdown timer. Kill with ^C.\n");
     }
 
-    // IPV6: FF02::FB
+    if (udp->Bind(chip::Inet::IPAddressType::kIPAddressType_IPv4, chip::Inet::IPAddress::Any, kFakeMdnsPort) != CHIP_NO_ERROR)
+    {
+        printf("Failed to bind\n");
+    }
+
+    udp->OnMessageReceived = OnUdpPacketReceived;
+    if (udp->Listen() != CHIP_NO_ERROR)
+    {
+        printf("Failed to listen\n");
+    }
+
     SendPacket(udp, "224.0.0.251");
+    // SendPacket(udp, "FF02::FB");
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 
