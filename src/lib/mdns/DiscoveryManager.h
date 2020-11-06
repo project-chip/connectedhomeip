@@ -20,6 +20,7 @@
 #include "core/CHIPError.h"
 #include "inet/InetInterface.h"
 #include "lib/mdns/platform/Mdns.h"
+#include "platform/CHIPDeviceConfig.h"
 
 namespace chip {
 namespace Mdns {
@@ -63,7 +64,7 @@ public:
      * This function registers the delegate to handle node id resolve results.
      *
      */
-    CHIP_ERROR RegisterResovleDelegate(ResolveDelegate * delegate);
+    CHIP_ERROR RegisterResolveDelegate(ResolveDelegate * delegate);
 
     /**
      * This function resolves a node id to its address.
@@ -87,11 +88,13 @@ private:
     static void HandleMdnsInit(void * context, CHIP_ERROR initError);
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
 
+#if CHIP_ENABLE_MDNS
     uint64_t mUnprovisionedInstanceName;
-    bool mInitialized                   = false;
+    bool mMdnsInitialized               = false;
     bool mIsPublishingProvisionedDevice = false;
     bool mIsPublishing                  = false;
-    ResolveDelegate * mResolveDelegate  = nullptr;
+#endif // CHIP_ENABLE_MDNS
+    ResolveDelegate * mResolveDelegate = nullptr;
 
     static DiscoveryManager sManager;
 };

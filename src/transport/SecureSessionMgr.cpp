@@ -69,7 +69,7 @@ CHIP_ERROR SecureSessionMgrBase::InitInternal(NodeId localNodeId, System::Layer 
     mPeerConnections.SetConnectionExpiredHandler(HandleConnectionExpired, this);
 
     Mdns::DiscoveryManager::GetInstance().Init();
-    Mdns::DiscoveryManager::GetInstance().RegisterResovleDelegate(this);
+    Mdns::DiscoveryManager::GetInstance().RegisterResolveDelegate(this);
 
     ScheduleExpiryTimer();
 
@@ -229,20 +229,20 @@ void SecureSessionMgrBase::HandleNodeIdResolve(CHIP_ERROR error, NodeId nodeId, 
     {
         PeerConnectionState * state = nullptr;
         PeerAddress addr;
-        bool hasAddressupdate = false;
+        bool hasAddressUpdate = false;
 
-        // Though the spec says the service name is _chip._tcp, we are now supporting tcp for now.
+        // Though the spec says the service name is _chip._tcp, we are not supporting tcp for now.
         addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(service.mAddress.Value()).SetPort(service.mPort);
 
         while ((state = mPeerConnections.FindPeerConnectionState(nodeId, state)) != nullptr)
         {
             if (state->GetPeerAddress().GetIPAddress() == Inet::IPAddress::Any)
             {
-                hasAddressupdate = true;
+                hasAddressUpdate = true;
                 state->SetPeerAddress(addr);
             }
         }
-        if (hasAddressupdate)
+        if (hasAddressUpdate)
         {
             mCB->OnAddressResolved(CHIP_NO_ERROR, nodeId, this);
         }

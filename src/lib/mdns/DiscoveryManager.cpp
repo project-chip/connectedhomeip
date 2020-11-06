@@ -80,7 +80,7 @@ void DiscoveryManager::HandleMdnsInit(void * context, CHIP_ERROR initError)
 
     if (initError == CHIP_NO_ERROR)
     {
-        publisher->mInitialized = true;
+        publisher->mMdnsInitialized = true;
     }
     else
     {
@@ -176,7 +176,7 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
         { "VP", nullptr, 0 },
     };
 
-    VerifyOrExit(mInitialized, error = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mMdnsInitialized, error = CHIP_ERROR_INCORRECT_STATE);
     ChipLogProgress(Discovery, "setup mdns service");
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
     snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mUnprovisionedInstanceName);
@@ -242,7 +242,7 @@ CHIP_ERROR DiscoveryManager::StopPublishDevice()
 #endif // CHIP_ENABLE_MDNS
 }
 
-CHIP_ERROR DiscoveryManager::RegisterResovleDelegate(ResolveDelegate * delegate)
+CHIP_ERROR DiscoveryManager::RegisterResolveDelegate(ResolveDelegate * delegate)
 {
     if (mResolveDelegate != nullptr)
     {
@@ -281,12 +281,12 @@ void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result,
     }
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Node ID resovled failed with %s", chip::ErrorStr(error));
+        ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
         mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, MdnsService{});
     }
     else if (result == nullptr)
     {
-        ChipLogError(Discovery, "Node ID resovle not found");
+        ChipLogError(Discovery, "Node ID resolve not found");
         mgr->mResolveDelegate->HandleNodeIdResolve(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, MdnsService{});
     }
     else

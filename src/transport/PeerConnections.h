@@ -139,18 +139,18 @@ public:
     PeerConnectionState * FindPeerConnectionState(const PeerAddress & address, PeerConnectionState * begin)
     {
         PeerConnectionState * state = nullptr;
-        PeerConnectionState * now   = &mStates[0];
+        PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= now && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
         {
-            now = begin + 1;
+            iter = begin + 1;
         }
 
-        for (; now <= &mStates[kMaxConnectionCount]; now++)
+        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
         {
-            if (now->GetPeerAddress() == address)
+            if (iter->GetPeerAddress() == address)
             {
-                state = now;
+                state = iter;
                 break;
             }
         }
@@ -170,22 +170,22 @@ public:
     PeerConnectionState * FindPeerConnectionState(NodeId nodeId, PeerConnectionState * begin)
     {
         PeerConnectionState * state = nullptr;
-        PeerConnectionState * now   = &mStates[0];
+        PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= now && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
         {
-            now = begin + 1;
+            iter = begin + 1;
         }
 
-        for (; now <= &mStates[kMaxConnectionCount]; now++)
+        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
         {
-            if (!now->IsInitialized())
+            if (!iter->IsInitialized())
             {
                 continue;
             }
-            if (now->GetPeerNodeId() == nodeId)
+            if (iter->GetPeerNodeId() == nodeId)
             {
-                state = now;
+                state = iter;
                 break;
             }
         }
@@ -206,24 +206,24 @@ public:
     PeerConnectionState * FindPeerConnectionState(Optional<NodeId> nodeId, uint16_t peerKeyId, PeerConnectionState * begin)
     {
         PeerConnectionState * state = nullptr;
-        PeerConnectionState * now   = &mStates[0];
+        PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= now && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
         {
-            now = begin + 1;
+            iter = begin + 1;
         }
 
-        for (; now <= &mStates[kMaxConnectionCount]; now++)
+        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
         {
-            if (!now->IsInitialized())
+            if (!iter->IsInitialized())
             {
                 continue;
             }
-            if (now->GetPeerKeyID() == peerKeyId)
+            if (iter->GetPeerKeyID() == peerKeyId)
             {
-                if (!nodeId.HasValue() || now->GetPeerNodeId() == kUndefinedNodeId || now->GetPeerNodeId() == nodeId.Value())
+                if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
                 {
-                    state = now;
+                    state = iter;
                     break;
                 }
             }
@@ -246,24 +246,24 @@ public:
                                                             PeerConnectionState * begin)
     {
         PeerConnectionState * state = nullptr;
-        PeerConnectionState * now   = &mStates[0];
+        PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= now && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
         {
-            now = begin + 1;
+            iter = begin + 1;
         }
 
-        for (; now <= &mStates[kMaxConnectionCount]; now++)
+        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
         {
-            if (!now->IsInitialized())
+            if (!iter->IsInitialized())
             {
                 continue;
             }
-            if (now->GetLocalKeyID() == localKeyId)
+            if (iter->GetLocalKeyID() == localKeyId)
             {
-                if (!nodeId.HasValue() || now->GetPeerNodeId() == kUndefinedNodeId || now->GetPeerNodeId() == nodeId.Value())
+                if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
                 {
-                    state = now;
+                    state = iter;
                     break;
                 }
             }
