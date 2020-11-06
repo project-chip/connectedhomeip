@@ -48,6 +48,7 @@ RUN set -x \
     make \
     net-tools \
     ninja-build \
+    openjdk-8-jdk \
     pkg-config \
     python3 \
     python3-dev \
