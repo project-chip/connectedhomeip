@@ -72,17 +72,18 @@ void TestNewFreeStruct(nlTestSuite * inSuite, void * inContext)
 {
     struct S;
 
-    std::set<S*> objs1;
+    std::set<S *> objs1;
 
-    struct S {
-        S(std::set<S*> & set) : set(set) { set.insert(this); }
+    struct S
+    {
+        S(std::set<S *> & set) : set(set) { set.insert(this); }
         ~S() { set.erase(this); }
-        std::set<S*> & set;
+        std::set<S *> & set;
     };
 
     constexpr const size_t size = 100;
     BitMapObjectPool<S, size> pool;
-    S* objs2[size];
+    S * objs2[size];
     for (size_t i = 0; i < pool.Size(); ++i)
     {
         objs2[i] = pool.New(objs1);
@@ -114,11 +115,7 @@ int Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = {
-    NL_TEST_DEF_FN(TestNewFree),
-    NL_TEST_DEF_FN(TestNewFreeStruct),
-    NL_TEST_SENTINEL()
-};
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestNewFree), NL_TEST_DEF_FN(TestNewFreeStruct), NL_TEST_SENTINEL() };
 
 extern "C" int TestPool()
 {
