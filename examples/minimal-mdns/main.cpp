@@ -19,6 +19,7 @@
 
 #include <inet/UDPEndPoint.h>
 #include <mdns/minimal/DnsHeader.h>
+#include <mdns/minimal/QName.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
@@ -35,8 +36,15 @@ constexpr uint32_t kTestMessageId = 0x1234;
 
 constexpr size_t kMdnsMaxPacketSize = 1'024;
 
-static uint8_t kHardcodedQuestion[] = { 0x0b, 0x5f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x63, 0x61, 0x73, 0x74, 0x04, 0x5f,
-                                        0x74, 0x63, 0x70, 0x05, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x00, 0x00, 0xff, 0x80, 0x01 };
+const mdns::Minimal::QNamePart kCastQnames[] = { "_googlecast", "_tcp", "local" };
+
+const auto kQuestion = mdns::Minimal::Question(kCastQnames, ArraySize(kCastQnames))
+                           .SetClass(mdns::Minimal::Question::QClass::IN)
+                           .SetType(mdns::Minimal::Question::QType::ANY)
+                           .SetAnswerViaUnicast(true);
+
+// static uint8_t kHardcodedQuestion[] = { 0x0b, 0x5f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x63, 0x61, 0x73, 0x74, 0x04, 0x5f,
+//                                        0x74, 0x63, 0x70, 0x05, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x00, 0x00, 0xff, 0x80, 0x01 };
 
 void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
 {
@@ -60,13 +68,14 @@ void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
     mdns::Minimal::HeaderRef hdr(buffer->Start());
     hdr.Clear().SetFlags(hdr.GetFlags().SetQuery()).SetMessageId(kTestMessageId);
 
-    hdr.SetQuestionCount(static_cast<uint16_t>(hdr.GetQuestionCount() + 1));
-    buffer->SetDataLength(static_cast<uint16_t>(buffer->DataLength() + sizeof(kHardcodedQuestion)));
-    memcpy(buffer->Start() + mdns::Minimal::HeaderRef::kSizeBytes, kHardcodedQuestion, sizeof(kHardcodedQuestion));
+    buffer->SetDataLength(static_cast<uint16_t>(buffer->DataLength() + kQuestion.WriteSizeBytes()));
 
-    // TODO: add questions please
-
-    // TODO: build the packet
+    if (kQuestion.Append(hdr, buffer->Start() + mdns::Minimal::HeaderRef::kSizeBytes, kQuestion.WriteSizeBytes()) == nullptr)
+    {
+        printf("Failed to encode buffer");
+        System::PacketBuffer::Free(buffer);
+        return;
+    }
 
     if (udp->SendTo(destIpAddr, kMdnsPort, buffer) != CHIP_NO_ERROR)
     {
