@@ -85,17 +85,17 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, System::PacketBufferHandle msgBuf)
 {
     PayloadHeader payloadHeader;
 
-    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf));
+    return SendMessage(session, payloadHeader, std::move(msgBuf));
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
+    PeerConnectionState * state = GetPeerConnectionState(session);
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -125,15 +125,14 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
         VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
 
-        packetHeader
-            .SetSourceNodeId(mLocalNodeId)              //
-            .SetDestinationNodeId(peerNodeId)           //
-            .SetMessageId(state->GetSendMessageIndex()) //
-            .SetEncryptionKeyID(state->GetLocalKeyID()) //
+        packetHeader.SetSourceNodeId(mLocalNodeId)
+            .SetDestinationNodeId(state->GetPeerNodeId())
+            .SetMessageId(state->GetSendMessageIndex())
+            .SetEncryptionKeyID(state->GetLocalKeyID())
             .SetPayloadLength(static_cast<uint16_t>(payloadLength));
         packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
 
-        ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, peerNodeId);
+        ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, state->GetPeerNodeId());
 
         VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
@@ -219,6 +218,10 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     {
         err = pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo),
                                            strlen(kSpake2pI2RSessionInfo), state->GetSecureSession());
+        if (mCB != nullptr)
+        {
+            mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID() }, this);
+        }
     }
 
 exit:
@@ -347,7 +350,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
 
         if (mCB != nullptr)
         {
-            mCB->OnMessageReceived(packetHeader, payloadHeader, state, std::move(msg), this);
+            mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID() }, std::move(msg), this);
         }
     }
 
@@ -367,7 +370,7 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
 
     if (mCB != nullptr)
     {
-        mCB->OnConnectionExpired(&state, this);
+        mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID() }, this);
     }
 
     mTransportMgr->Disconnect(state.GetPeerAddress());
@@ -384,6 +387,11 @@ void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, 
         [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
+}
+
+PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SecureSessionHandle session)
+{
+    return mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(session.mPeerNodeId), session.mPeerKeyId, nullptr);
 }
 
 } // namespace chip

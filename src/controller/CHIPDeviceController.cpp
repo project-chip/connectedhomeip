@@ -334,24 +334,58 @@ exit:
     return err;
 }
 
-void DeviceController::OnNewConnection(const Transport::PeerConnectionState * peerConnection, SecureSessionMgr * mgr) {}
+void DeviceController::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t index = 0;
+
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+
+    index = FindDeviceIndex(mgr->GetPeerConnectionState(session)->GetPeerNodeId());
+    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+
+    mActiveDevices[index].OnNewConnection(session, mgr);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to process received message: err %d", err);
+    }
+}
+
+void DeviceController::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t index = 0;
+
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+
+    index = FindDeviceIndex(session);
+    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+
+    mActiveDevices[index].OnConnectionExpired(session, mgr);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to process received message: err %d", err);
+    }
+}
 
 void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                                         const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
+                                         SecureSessionHandle session, System::PacketBufferHandle msgBuf,
                                          SecureSessionMgr * mgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t index = 0;
-    NodeId peer;
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(header.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    peer  = header.GetSourceNodeId().Value();
-    index = FindDeviceIndex(peer);
+    index = FindDeviceIndex(session);
     VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
-    mActiveDevices[index].OnMessageReceived(header, payloadHeader, state, std::move(msgBuf), mgr);
+    mActiveDevices[index].OnMessageReceived(header, payloadHeader, session, std::move(msgBuf), mgr);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -393,6 +427,20 @@ void DeviceController::ReleaseAllDevices()
     {
         ReleaseDevice(&mActiveDevices[i]);
     }
+}
+
+uint16_t DeviceController::FindDeviceIndex(SecureSessionHandle session)
+{
+    uint16_t i = 0;
+    while (i < kNumMaxActiveDevices)
+    {
+        if (mActiveDevices[i].IsActive() && mActiveDevices[i].IsSecureConnected() && mActiveDevices[i].MatchesSession(session))
+        {
+            return i;
+        }
+        i++;
+    }
+    return i;
 }
 
 uint16_t DeviceController::FindDeviceIndex(NodeId id)

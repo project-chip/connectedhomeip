@@ -101,7 +101,7 @@ CHIP_ERROR SendEchoRequest(void)
 
     printf("\nSend echo request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
-    err = gEchoClient.SendEchoRequest(chip::kTestDeviceNodeId, std::move(payloadBuf));
+    err = gEchoClient.SendEchoRequest(std::move(payloadBuf));
 
     if (err == CHIP_NO_ERROR)
     {
@@ -143,7 +143,7 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(chip::NodeId nodeId, chip::System::PacketBufferHandle payload)
+void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle payload)
 {
     uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastEchoTime;
@@ -151,10 +151,20 @@ void HandleEchoResponseReceived(chip::NodeId nodeId, chip::System::PacketBufferH
     gWaitingForEchoResp = false;
     gEchoRespCount++;
 
-    printf("Echo Response from node %" PRIu64 ": %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", nodeId, gEchoRespCount,
+    printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount,
            gEchoCount, static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(),
            static_cast<double>(transitTime) / 1000);
 }
+
+class TestSecureSessionMgrDelegate : public chip::SecureSessionMgrDelegate
+{
+public:
+    void OnNewConnection(chip::SecureSessionHandle session, chip::SecureSessionMgr * mgr) override {
+        mSecureSession = session;
+    }
+
+    chip::SecureSessionHandle mSecureSession;
+} gTestSecureSessionMgrDelegate;
 
 } // namespace
 
@@ -184,18 +194,20 @@ int main(int argc, char * argv[])
     err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
     SuccessOrExit(err);
 
+    gSessionManager.SetDelegate(&gTestSecureSessionMgrDelegate);
+
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
-
-    err = gEchoClient.Init(&gExchangeManager);
-    SuccessOrExit(err);
-
-    // Arrange to get a callback whenever an Echo Response is received.
-    gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
     // Start the CHIP connection to the CHIP echo responder.
     err = EstablishSecureSession();
     SuccessOrExit(err);
+
+    err = gEchoClient.Init(&gExchangeManager, gTestSecureSessionMgrDelegate.mSecureSession);
+    SuccessOrExit(err);
+
+    // Arrange to get a callback whenever an Echo Response is received.
+    gEchoClient.SetEchoResponseReceived(HandleEchoResponseReceived);
 
     // Connection has been established. Now send the EchoRequests.
     for (unsigned int i = 0; i < kMaxEchoCount; i++)

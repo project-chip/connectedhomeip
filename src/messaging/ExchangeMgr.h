@@ -90,7 +90,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(const NodeId & peerNodeId, ExchangeDelegate * delegate);
+    ExchangeContext * NewContext(SecureSessionHandle session, ExchangeDelegate * delegate);
 
     /**
      *  Find the ExchangeContext from a pool matching a given set of parameters.
@@ -191,9 +191,9 @@ private:
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
     void (*OnExchangeContextChanged)(size_t numContextsInUse);
 
-    ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeDelegate * delegate);
+    ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate);
 
-    void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
+    void DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
 
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
@@ -201,10 +201,10 @@ private:
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
+                           SecureSessionHandle session, System::PacketBufferHandle msgBuf,
                            SecureSessionMgr * msgLayer) override;
 
-    void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override;
+    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 };
 
 } // namespace Messaging

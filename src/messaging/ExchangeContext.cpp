@@ -110,7 +110,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
 
     payloadHeader.SetInitiator(IsInitiator());
 
-    err = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, std::move(msgBuf));
+    err = mExchangeMgr->GetSessionMgr()->SendMessage(mSecureSession, payloadHeader, std::move(msgBuf));
     SuccessOrExit(err);
 
 exit:
@@ -191,7 +191,7 @@ void ExchangeContext::Reset()
     *this = ExchangeContext();
 }
 
-ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
+ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
                                          ExchangeDelegate * delegate)
 {
     VerifyOrDie(delegate != nullptr);
@@ -201,8 +201,8 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     Retain();
     mExchangeMgr = em;
     em->IncrementContextsInUse();
-    mExchangeId = ExchangeId;
-    mPeerNodeId = PeerNodeId;
+    mExchangeId    = ExchangeId;
+    mSecureSession = session;
     mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
     mDelegate = delegate;
 
@@ -236,7 +236,8 @@ void ExchangeContext::Free()
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
 
-bool ExchangeContext::MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader)
+bool ExchangeContext::MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader,
+                                    const PayloadHeader & payloadHeader)
 {
     // A given message is part of a particular exchange if...
     return
@@ -244,8 +245,8 @@ bool ExchangeContext::MatchExchange(const PacketHeader & packetHeader, const Pay
         // The exchange identifier of the message matches the exchange identifier of the context.
         (mExchangeId == payloadHeader.GetExchangeID())
 
-        // AND The message was received from the peer node associated with the exchange, or the peer node identifier is 'any'.
-        && ((mPeerNodeId == kAnyNodeId) || (mPeerNodeId == packetHeader.GetSourceNodeId().Value()))
+        // AND The message was received from the peer node associated with the exchange
+        && (mSecureSession == session)
 
         // AND The message was sent by an initiator and the exchange context is a responder (IsInitiator==false)
         //    OR The message was sent by a responder and the exchange context is an initiator (IsInitiator==true) (for the broadcast

@@ -99,21 +99,9 @@ CHIP_ERROR ExchangeManager::Shutdown()
     return CHIP_NO_ERROR;
 }
 
-ExchangeContext * ExchangeManager::NewContext(const NodeId & peerNodeId, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::NewContext(SecureSessionHandle session, ExchangeDelegate * delegate)
 {
-    return AllocContext(mNextExchangeId++, peerNodeId, true, delegate);
-}
-
-ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, ExchangeDelegate * delegate, bool isInitiator)
-{
-    for (auto & ec : ContextPool)
-    {
-        if (ec.GetReferenceCount() > 0 && ec.GetPeerNodeId() == peerNodeId && ec.GetDelegate() == delegate &&
-            ec.IsInitiator() == isInitiator)
-            return &ec;
-    }
-
-    return nullptr;
+    return AllocContext(mNextExchangeId++, session, true, delegate);
 }
 
 CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeDelegate * delegate)
@@ -141,8 +129,7 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
 }
 
-ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                                                ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate)
 {
     CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return nullptr);
 
@@ -150,7 +137,7 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t Pe
     {
         if (ec.GetReferenceCount() == 0)
         {
-            return ec.Alloc(this, ExchangeId, PeerNodeId, Initiator, delegate);
+            return ec.Alloc(this, ExchangeId, session, Initiator, delegate);
         }
     }
 
@@ -158,7 +145,7 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t Pe
     return nullptr;
 }
 
-void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+void ExchangeManager::DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                       System::PacketBufferHandle msgBuf)
 {
     UnsolicitedMessageHandler * umh         = nullptr;
@@ -168,7 +155,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     // Search for an existing exchange that the message applies to. If a match is found...
     for (auto & ec : ContextPool)
     {
-        if (ec.GetReferenceCount() > 0 && ec.MatchExchange(packetHeader, payloadHeader))
+        if (ec.GetReferenceCount() > 0 && ec.MatchExchange(session, packetHeader, payloadHeader))
         {
             // Matched ExchangeContext; send to message handler.
             ec.HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
@@ -213,7 +200,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     if (matchingUMH != nullptr)
     {
         auto * ec =
-            AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false, matchingUMH->Delegate);
+            AllocContext(payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - ContextPool.begin(), ec->GetExchangeId(),
@@ -278,17 +265,17 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
+                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf,
                                         SecureSessionMgr * msgLayer)
 {
-    DispatchMessage(packetHeader, payloadHeader, std::move(msgBuf));
+    DispatchMessage(session, packetHeader, payloadHeader, std::move(msgBuf));
 }
 
-void ExchangeManager::OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
+void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
     for (auto & ec : ContextPool)
     {
-        if (ec.GetReferenceCount() > 0 && ec.mPeerNodeId == state->GetPeerNodeId())
+        if (ec.GetReferenceCount() > 0 && ec.mSecureSession == session)
         {
             ec.Close();
             // Continue iterate because there can be multiple contexts associated with the connection.

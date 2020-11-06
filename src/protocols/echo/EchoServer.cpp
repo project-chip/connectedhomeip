@@ -64,7 +64,7 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     if (OnEchoRequestReceived != nullptr)
     {
         response = payload.Retain();
-        OnEchoRequestReceived(ec->GetPeerNodeId(), std::move(payload));
+        OnEchoRequestReceived(ec, std::move(payload));
     }
     else
     {

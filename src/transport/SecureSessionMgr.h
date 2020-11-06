@@ -44,6 +44,23 @@ namespace chip {
 
 class SecureSessionMgr;
 
+
+class SecureSessionHandle
+{
+public:
+    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0) {}
+    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId) : mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId) {}
+
+    bool operator==(const SecureSessionHandle & that) const
+    {
+        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
+    }
+private:
+    friend class SecureSessionMgr;
+    NodeId mPeerNodeId;
+    uint16_t mPeerKeyId;
+};
+
 /**
  * @brief
  *   This class provides a skeleton for the callback functions. The functions will be
@@ -61,12 +78,12 @@ public:
      *
      * @param packetHeader  The message header
      * @param payloadHeader The payload header
-     * @param state         The connection state
+     * @param session       The handle to the secure session
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
+                                   SecureSessionHandle session, System::PacketBufferHandle msgBuf,
                                    SecureSessionMgr * mgr)
     {}
 
@@ -84,19 +101,19 @@ public:
      * @brief
      *   Called when a new pairing is being established
      *
-     * @param state   connection state
+     * @param session The handle to the secure session
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
+    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) {}
 
     /**
      * @brief
      *   Called when a new connection is closing
      *
-     * @param state   connection state
+     * @param session The handle to the secure session
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
+    virtual void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) {}
 
     /**
      * @brief
@@ -118,8 +135,9 @@ public:
      * @brief
      *   Send a message to a currently connected peer
      */
-    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
+    Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
     SecureSessionMgr();
     ~SecureSessionMgr() override;
 

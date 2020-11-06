@@ -62,9 +62,10 @@ class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBufferHandle buffer,
+                           SecureSessionHandle session, System::PacketBufferHandle buffer,
                            SecureSessionMgr * mgr) override
     {
+        auto state = mgr->GetPeerConnectionState(session);
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
 
@@ -92,7 +93,7 @@ public:
         }
     }
 
-    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
     {
         ChipLogProgress(AppServer, "Received a new connection.");
     }
@@ -181,10 +182,9 @@ void InitServer(AppDelegate * delegate)
     SuccessOrExit(err);
 #endif
 
+    gSessions.SetDelegate(&gCallbacks);
     err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
-
-    gSessions.SetDelegate(&gCallbacks);
 
 exit:
     if (err != CHIP_NO_ERROR)

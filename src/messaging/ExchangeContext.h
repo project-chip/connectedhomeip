@@ -129,7 +129,7 @@ public:
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    uint64_t GetPeerNodeId() const { return mPeerNodeId; }
+    SecureSessionHandle GetSecureSession() { return mSecureSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -141,7 +141,7 @@ public:
     void Close();
     void Abort();
 
-    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
+    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
                             ExchangeDelegate * delegate);
     void Free();
     void Reset();
@@ -159,13 +159,15 @@ private:
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
 
-    uint64_t mPeerNodeId; // Node ID of peer node.
-    uint16_t mExchangeId; // Assigned exchange ID.
+    SecureSessionHandle mSecureSession; // The connection state
+    uint16_t mExchangeId;               // Assigned exchange ID.
 
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
     /**
      *  Search for an existing exchange that the message applies to.
+     *
+     *  @param[in]    session       The secure session of the received message.
      *
      *  @param[in]    packetHeader  A reference to the PacketHeader object.
      *
@@ -174,7 +176,7 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     CHIP_ERROR StartResponseTimer();
     void CancelResponseTimer();

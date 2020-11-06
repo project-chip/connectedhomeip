@@ -67,12 +67,12 @@ public:
 class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const PeerConnectionState * state,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));
-        NL_TEST_ASSERT(mSuite, state->GetPeerNodeId() == kSourceNodeId);
+        NL_TEST_ASSERT(mSuite, session == mRemoteToLocalSession); // Packet received by remote peer
 
         size_t data_len = msgBuf->DataLength();
 
@@ -82,9 +82,19 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(const PeerConnectionState * state, SecureSessionMgr * mgr) override { NewConnectionHandlerCallCount++; }
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
+    {
+        if (NewConnectionHandlerCallCount == 0)
+            mRemoteToLocalSession = session;
+        if (NewConnectionHandlerCallCount == 1)
+            mLocalToRemoteSession = session;
+        NewConnectionHandlerCallCount++;
+    }
+    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override {}
 
-    nlTestSuite * mSuite              = nullptr;
+    nlTestSuite * mSuite = nullptr;
+    SecureSessionHandle mRemoteToLocalSession;
+    SecureSessionHandle mLocalToRemoteSession;
     int ReceiveHandlerCallCount       = 0;
     int NewConnectionHandlerCallCount = 0;
 };
@@ -137,20 +147,22 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     secureSessionMgr.SetDelegate(&callback);
 
-    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing1);
+    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
-    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing2);
+    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing2);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SecureSessionHandle localToRemoteSessoin = callback.mLocalToRemoteSession;
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
 
-    err = secureSessionMgr.SendMessage(kDestinationNodeId, std::move(buffer));
+    err = secureSessionMgr.SendMessage(localToRemoteSessoin, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
