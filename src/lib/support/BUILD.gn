@@ -67,6 +67,8 @@ static_library("support") {
     "FibonacciUtils.h",
     "PersistedCounter.cpp",
     "PersistedCounter.h",
+    "Pool.cpp",
+    "Pool.h",
     "RandUtils.cpp",
     "RandUtils.h",
     "ReturnMacros.h",
