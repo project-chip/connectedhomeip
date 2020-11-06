@@ -64,7 +64,6 @@ public:
     void SetDelegate(ReliableMessageDelegate * delegate) { mDelegate = delegate; }
 
     CHIP_ERROR FlushAcks();
-    uint64_t GetPeerNodeId();
     uint64_t GetCurrentRetransmitTimeoutTick();
 
     CHIP_ERROR SendStandaloneAckMessage();
