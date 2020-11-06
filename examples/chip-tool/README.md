@@ -102,13 +102,12 @@ To parse a setup code, run the built executable with the `payload` cluster name 
 
 #### QR Code
 
-    $ chip-tool payload parse "CH:J20800G008008000"
-
+    $ chip-tool payload parse "CH:#####"
 
 #### QR Code with optional Vendor Info
 
-    $ chip-tool chip-tool payload parse "CH:J20800G008008006DL200UOGMHARTHOMJ300IDL530.I7"
+    $ chip-tool chip-tool payload parse "CH:#####"
 
 #### Manual Setup Code
 
-    $ chip-tool payload parse "000003949145367145266"
+    $ chip-tool payload parse :#####"

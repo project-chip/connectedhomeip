@@ -34,9 +34,8 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
 int main(int argc, char * argv[])
 {
     Commands commands;
-
     registerCommandsEcho(commands);
-    registerPayloadCommands(commands);
+    registerCommandsPayload(commands);
 
     registerClusters(commands);
     

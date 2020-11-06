@@ -20,18 +20,11 @@
 
 #include "ParseCommand.h"
 
-class PayloadParse : public ParseCommand
-{
-public:
-    PayloadParse() : ParseCommand("parse") {}
-};
-
-void registerPayloadCommands(Commands & commands)
+void registerCommandsPayload(Commands & commands)
 {
     const char * clusterName = "Payload";
-
     commands_list clusterCommands = {
-        make_unique<PayloadParse>(),
+        make_unique<ParseCommand>(),
     };
 
     commands.Register(clusterName, clusterCommands);

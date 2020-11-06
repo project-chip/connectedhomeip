@@ -24,7 +24,7 @@
 class ParseCommand : public Command
 {
 public:
-    ParseCommand(const char * name) : Command(name)
+    ParseCommand() : Command("parse")
     {
         AddArgument("code", &mCode);
     }
@@ -34,6 +34,7 @@ public:
 private:
     char* mCode;
     CHIP_ERROR Parse(std::string codeString, chip::SetupPayload &payload);
-    void Print(chip::SetupPayload payload);
+    CHIP_ERROR Print(chip::SetupPayload payload);
     bool IsQRCode(std::string codeString);
+    const std::string QRCODE_PREFIX = "CH:";
 };
