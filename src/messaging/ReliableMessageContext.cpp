@@ -207,11 +207,6 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
     return err;
 }
 
-uint64_t ReliableMessageContext::GetPeerNodeId()
-{
-    return (mExchange ? mExchange->GetPeerNodeId() : kUndefinedNodeId);
-}
-
 /**
  *  Get the current retransmit timeout. It would be either the initial or
  *  the active retransmit timeout based on whether the ExchangeContext has

@@ -93,22 +93,21 @@ Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
     return Transport::Type::kUndefined;
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, System::PacketBufferHandle msgBuf)
 {
     PayloadHeader unusedPayloadHeader;
-    return SendMessage(unusedPayloadHeader, peerNodeId, std::move(msgBuf));
+    return SendMessage(session, unusedPayloadHeader, std::move(msgBuf));
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                                         EncryptedPacketBufferHandle * bufferRetainSlot)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                         System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     PacketHeader ununsedPacketHeader;
-    return SendMessage(payloadHeader, ununsedPacketHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot,
+    return SendMessage(session, payloadHeader, ununsedPacketHeader, std::move(msgBuf), bufferRetainSlot,
                        EncryptionState::kPayloadIsUnencrypted);
 }
 
-CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(EncryptedPacketBufferHandle msgBuf,
-                                                  EncryptedPacketBufferHandle * bufferRetainSlot)
+CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -116,19 +115,16 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(EncryptedPacketBufferHandle ms
     PacketHeader packetHeader;
     ReturnErrorOnFailure(packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize));
 
-    VerifyOrReturnError(packetHeader.GetDestinationNodeId().HasValue(), CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
-    NodeId peerNodeId = packetHeader.GetDestinationNodeId().Value();
-
     // Advancing the start to encrypted header, since the transport will attach the packet header on top of it
     msgBuf->SetStart(msgBuf->Start() + headerSize);
 
     PayloadHeader payloadHeader;
-    return SendMessage(payloadHeader, packetHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot,
+    return SendMessage(session, payloadHeader, packetHeader, std::move(msgBuf), bufferRetainSlot,
                        EncryptionState::kPayloadIsEncrypted);
 }
 
 CHIP_ERROR SecureSessionMgr::EncryptPayload(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader,
-                                            PacketHeader & packetHeader, NodeId peerNodeId, System::PacketBufferHandle & msgBuf)
+                                            PacketHeader & packetHeader, System::PacketBufferHandle & msgBuf)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     uint8_t * data         = nullptr;
@@ -149,7 +145,7 @@ CHIP_ERROR SecureSessionMgr::EncryptPayload(Transport::PeerConnectionState * sta
 
     packetHeader
         .SetSourceNodeId(mLocalNodeId)              //
-        .SetDestinationNodeId(peerNodeId)           //
+        .SetDestinationNodeId(state->GetPeerNodeId())           //
         .SetMessageId(msgId)                        //
         .SetEncryptionKeyID(state->GetLocalKeyID()) //
         .SetPayloadLength(static_cast<uint16_t>(payloadLength));
@@ -188,7 +184,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, PacketHeader & packetHeader, NodeId peerNodeId,
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
                                          System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
                                          EncryptionState encryptionState)
 {
@@ -210,15 +206,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, PacketHe
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Find an active connection to the specified peer node
-    state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
-    VerifyOrExit(state != nullptr, err = CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+    state = GetPeerConnectionState(session);
+    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
 
     // This marks any connection where we send data to as 'active'
     mPeerConnections.MarkConnectionActive(state);
 
     if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
-        err = EncryptPayload(state, payloadHeader, packetHeader, peerNodeId, msgBuf);
+        err = EncryptPayload(state, payloadHeader, packetHeader, msgBuf);
         SuccessOrExit(err);
     }
 
@@ -234,7 +230,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, PacketHe
     encryptedMsg        = msgBuf.Retain();
     encryptedMsg.mMsgId = packetHeader.GetMessageId();
 
-    ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, peerNodeId);
+    ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, state->GetPeerNodeId());
 
     err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
     SuccessOrExit(err);
@@ -298,6 +294,10 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     {
         err = pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo),
                                            strlen(kSpake2pI2RSessionInfo), state->GetSecureSession());
+        if (mCB != nullptr)
+        {
+            mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID() }, this);
+        }
     }
 
     return err;
@@ -391,7 +391,8 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
 
         if (mCB != nullptr)
         {
-            mCB->OnMessageReceived(packetHeader, payloadHeader, state, std::move(msg), this);
+            mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID() }, std::move(msg),
+                                   this);
         }
     }
 
@@ -411,7 +412,7 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
 
     if (mCB != nullptr)
     {
-        mCB->OnConnectionExpired(&state, this);
+        mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID() }, this);
     }
 
     mTransportMgr->Disconnect(state.GetPeerAddress());
@@ -428,6 +429,11 @@ void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, 
         [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
+}
+
+PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SecureSessionHandle session)
+{
+    return mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(session.mPeerNodeId), session.mPeerKeyId, nullptr);
 }
 
 } // namespace chip

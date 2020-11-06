@@ -190,7 +190,7 @@ void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apEc
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Node: %llu", ec->GetPeerNodeId());
+    ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
 InteractionModelEngine::HandlerKey::HandlerKey(chip::ClusterId aClusterId, chip::CommandId aCommandId,
