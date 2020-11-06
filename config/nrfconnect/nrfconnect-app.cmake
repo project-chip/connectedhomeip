@@ -53,9 +53,6 @@ endif()
 # ==================================================
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
-# This is temporary solution and should be removed after merging including fix in Zephyr
-zephyr_include_directories("${ZEPHYR_BASE}/../nrfxlib/crypto/nrf_cc310_platform/include")
-
 # ==================================================
 # General settings
 # ==================================================
@@ -87,6 +84,37 @@ find_file(CHIP_PROJECT_CONFIG
     PATHS ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/main/include
     NO_DEFAULT_PATH
 )
+
+# ==================================================
+# Configure Zephyr
+# ==================================================
+
+function(set_openthread_config OT_DIR CONFIG_FILE)
+    get_property(DEFINES DIRECTORY ${OT_DIR} PROPERTY COMPILE_DEFINITIONS)
+    get_property(SUBDIRS DIRECTORY ${OT_DIR} PROPERTY SUBDIRECTORIES)
+
+    list(TRANSFORM DEFINES REPLACE 
+         OPENTHREAD_PROJECT_CORE_CONFIG_FILE=.*
+         OPENTHREAD_PROJECT_CORE_CONFIG_FILE="${CONFIG_FILE}")
+
+    set_property(DIRECTORY ${OT_DIR} PROPERTY COMPILE_DEFINITIONS ${DEFINES})
+
+    foreach(SUBDIR ${SUBDIRS})
+        set_openthread_config(${SUBDIR} ${CONFIG_FILE})
+    endforeach()
+endfunction()
+
+# Add dependency on nRF crypto library.
+# This is temporary solution and should be removed after fixing it in nRF Connect SDK.
+zephyr_include_directories(${ZEPHYR_BASE}/../nrfxlib/crypto/nrf_cc310_platform/include)
+
+# Override Zephyr-supplied OpenThread configuration
+if (CHIP_OPENTHREAD_CONFIG)
+    get_filename_component(CONFIG_DIR ${CHIP_OPENTHREAD_CONFIG} DIRECTORY)
+    get_filename_component(CONFIG_FILE ${CHIP_OPENTHREAD_CONFIG} NAME)
+    target_include_directories(ot-config INTERFACE ${CONFIG_DIR})
+    set_openthread_config(${ZEPHYR_BASE}/../modules/lib/openthread ${CONFIG_FILE})
+endif()
 
 # ==================================================
 # Setup CHIP build
