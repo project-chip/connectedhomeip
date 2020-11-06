@@ -175,7 +175,7 @@
     [_resetButton.widthAnchor constraintEqualToConstant:60].active = YES;
     [_resetButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
     [_resetButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
-    
+
     // Redirect button
     _redirectCustomFlowButton = [UIButton new];
    [_redirectCustomFlowButton setTitle:@"Redirect" forState:UIControlStateNormal];
@@ -187,7 +187,7 @@
     _redirectCustomFlowButton.layer.cornerRadius = 5;
     _redirectCustomFlowButton.clipsToBounds = YES;
    [self.view addSubview:_redirectCustomFlowButton];
-    
+
     _redirectCustomFlowButton.translatesAutoresizingMaskIntoConstraints = false;
    [_redirectCustomFlowButton.widthAnchor constraintEqualToConstant:100].active = YES;
    [_redirectCustomFlowButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
@@ -497,7 +497,7 @@
     // TODO: Only display vid and pid if present
     _vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
     _productID.text = [NSString stringWithFormat:@"%@", payload.productID];
-    
+
     // customFlow
     _requiresCustomFlowLabel.text = payload.requiresCustomFlow ? @"Yes" : NOT_APPLICABLE_STRING;
     _redirectCustomFlowButton.hidden = !payload.requiresCustomFlow;
