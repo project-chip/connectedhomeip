@@ -24,6 +24,7 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
+#include <messaging/ExchangeContextDelegate.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
@@ -33,41 +34,6 @@ namespace chip {
 
 class ExchangeManager;
 class ExchangeContext;
-
-/**
- * @brief
- *   This class provides a skeleton for the callback functions. The functions will be
- *   called by ExchangeContext object on specific events. If the user of ExchangeContext
- *   is interested in receiving these callbacks, they can specialize this class and handle
- *   each trigger in their implementation of this class.
- */
-class DLL_EXPORT ExchangeContextDelegate
-{
-public:
-    virtual ~ExchangeContextDelegate() {}
-
-    /**
-     * @brief
-     *   This function is the protocol callback for handling a received CHIP message.
-     *
-     *  @param[in]    ec            A pointer to the ExchangeContext object.
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
-     *  @param[in]    protocolId    The protocol identifier of the received message.
-     *  @param[in]    msgType       The message type of the corresponding protocol.
-     *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
-     */
-    virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                   System::PacketBuffer * payload) = 0;
-
-    /**
-     * @brief
-     *   This function is the protocol callback to invoke when the timeout for the receipt
-     *   of a response message has expired.
-     *
-     *  @param[in]    ec            A pointer to the ExchangeContext object.
-     */
-    virtual void OnResponseTimeout(ExchangeContext * ec) = 0;
-};
 
 class ExchangeContextDeletor
 {
@@ -92,22 +58,6 @@ public:
         kSendFlag_ExpectResponse = 0x0001, // Used to indicate that a response is expected within a specified timeout.
         kSendFlag_RetainBuffer   = 0x0002, // Used to indicate that the message buffer should not be freed after sending.
     };
-
-    /**
-     * This function is the protocol callback of an unsolicited message handler.
-     *
-     *  @param[in]    ec            A pointer to the ExchangeContext object.
-     *
-     *  @param[in]    packetHeader  A reference to the PacketHeader object.
-     *
-     *  @param[in]    protocolId    The protocol identifier of the received message.
-     *
-     *  @param[in]    msgType       The message type of the corresponding protocol.
-     *
-     *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
-     */
-    typedef void (*MessageReceiveFunct)(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                        uint8_t msgType, System::PacketBuffer * payload);
 
     /**
      *  Determine whether the context is the initiator of the exchange.

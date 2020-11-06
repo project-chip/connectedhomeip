@@ -32,6 +32,7 @@ namespace chip {
 
 class ExchangeContext;
 class ExchangeContextDelegate;
+class ExchangeContextDelegateFactory;
 
 static constexpr int16_t kAnyMessageType = -1;
 
@@ -106,32 +107,32 @@ public:
      *  Register an unsolicited message handler for a given protocol identifier. This handler would be
      *  invoked for all messages of the given protocol.
      *
-     *  @param[in]    protocolId    The protocol identifier of the received message.
+     *  @param[in]    protocolId      The protocol identifier of the received message.
      *
-     *  @param[in]    handler       The unsolicited message handler.
+     *  @param[in]    handler         The unsolicited message handler.
      *
-     *  @param[in]    delegate      A pointer to ExchangeContextDelegate.
+     *  @param[in]    delegateFactory A pointer to ExchangeContextDelegateFactory.
      *
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContextDelegate * delegate);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContextDelegateFactory * delegateFactory);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier and message type.
      *
-     *  @param[in]    protocolId    The protocol identifier of the received message.
+     *  @param[in]    protocolId      The protocol identifier of the received message.
      *
-     *  @param[in]    msgType       The message type of the corresponding protocol.
+     *  @param[in]    msgType         The message type of the corresponding protocol.
      *
-     *  @param[in]    delegate      A pointer to ExchangeContextDelegate.
+     *  @param[in]    delegateFactory A pointer to ExchangeContextDelegateFactory.
      *
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContextDelegate * delegate);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContextDelegateFactory * delegateFactory);
 
     /**
      *  Unregister an unsolicited message handler for a given protocol identifier.
@@ -173,7 +174,7 @@ private:
 
     struct UnsolicitedMessageHandler
     {
-        ExchangeContextDelegate * Delegate;
+        ExchangeContextDelegateFactory * DelegateFactory;
         uint32_t ProtocolId;
         int16_t MessageType;
     };
@@ -192,7 +193,7 @@ private:
 
     void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
-    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContextDelegate * delegate);
+    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContextDelegateFactory * delegateFactory);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer) override;
