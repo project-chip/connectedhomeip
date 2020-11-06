@@ -132,7 +132,8 @@ public:
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeContextDelegateFactory * delegateFactory);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType,
+                                                 ExchangeContextDelegateFactory * delegateFactory);
 
     /**
      *  Unregister an unsolicited message handler for a given protocol identifier.
