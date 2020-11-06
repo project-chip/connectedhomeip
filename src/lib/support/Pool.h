@@ -73,7 +73,8 @@ public:
 
     void Delete(T * obj)
     {
-        if (obj == nullptr) return;
+        if (obj == nullptr)
+            return;
 
         size_t at     = static_cast<size_t>(obj - GetPoolHead());
         size_t word   = at / kAtomicSize;

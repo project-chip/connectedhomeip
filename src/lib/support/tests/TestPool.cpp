@@ -123,12 +123,8 @@ int Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = {
-    NL_TEST_DEF_FN(TestFreeNull),
-    NL_TEST_DEF_FN(TestNewFree),
-    NL_TEST_DEF_FN(TestNewFreeStruct),
-    NL_TEST_SENTINEL()
-};
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestFreeNull), NL_TEST_DEF_FN(TestNewFree), NL_TEST_DEF_FN(TestNewFreeStruct),
+                                 NL_TEST_SENTINEL() };
 
 extern "C" int TestPool()
 {
