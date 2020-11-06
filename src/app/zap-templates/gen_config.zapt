@@ -13,10 +13,6 @@
 
 #define EMBER_APS_UNICAST_MESSAGE_COUNT 10
 
-/**** CLI Section ****/
-#define EMBER_AF_GENERATE_CLI
-
-
 /**** Cluster endpoint counts ****/
 {{#all_user_clusters}}
 #define EMBER_AF_{{asDelimitedMacro define}}_{{asDelimitedMacro side}}_ENDPOINT_COUNT ({{user_endpoint_count_by_cluster id side}})
