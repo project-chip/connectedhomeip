@@ -20,7 +20,7 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "DnsHeader.h"
-#include "QName.h"
+#include "Question.h"
 
 namespace mdns {
 namespace Minimal {

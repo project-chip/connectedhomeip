@@ -18,5 +18,7 @@ source_set("minimal") {
     sources = [
         "DnsHeader.h", 
         "QName.h",
+        "QuestionBuilder.h",
+        "Question.h",
     ]
 }
