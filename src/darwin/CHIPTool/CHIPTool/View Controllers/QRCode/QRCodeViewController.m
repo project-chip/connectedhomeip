@@ -178,20 +178,21 @@
 
     // Redirect button
     _redirectCustomFlowButton = [UIButton new];
-   [_redirectCustomFlowButton setTitle:@"Redirect" forState:UIControlStateNormal];
+    [_redirectCustomFlowButton setTitle:@"Redirect" forState:UIControlStateNormal];
     // TODO: Replace resetView with actual redirect action
-   [_redirectCustomFlowButton addTarget:self action:@selector(resetView:) forControlEvents:UIControlEventTouchUpInside];
+    [_redirectCustomFlowButton addTarget:self action:@selector(resetView:) forControlEvents:UIControlEventTouchUpInside];
     _redirectCustomFlowButton.backgroundColor = UIColor.systemBlueColor;
     _redirectCustomFlowButton.titleLabel.font = [UIFont systemFontOfSize:17];
     _redirectCustomFlowButton.titleLabel.textColor = [UIColor whiteColor];
     _redirectCustomFlowButton.layer.cornerRadius = 5;
     _redirectCustomFlowButton.clipsToBounds = YES;
-   [self.view addSubview:_redirectCustomFlowButton];
+    [self.view addSubview:_redirectCustomFlowButton];
 
     _redirectCustomFlowButton.translatesAutoresizingMaskIntoConstraints = false;
-   [_redirectCustomFlowButton.widthAnchor constraintEqualToConstant:100].active = YES;
-   [_redirectCustomFlowButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
-   [_redirectCustomFlowButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-100].active = YES;
+    [_redirectCustomFlowButton.widthAnchor constraintEqualToConstant:100].active = YES;
+    [_redirectCustomFlowButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active
+        = YES;
+    [_redirectCustomFlowButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-100].active = YES;
 }
 
 - (void)addViewsToSetupPayloadView
@@ -235,8 +236,10 @@
 
 - (void)addResultsUIToStackView:(UIStackView *)stackView
 {
-    NSArray<NSString *> * resultLabelTexts =
-        @[ @"version", @"discriminator", @"setup pin code", @"rendez vous information", @"vendor ID", @"product ID", @"serial #", @"requiresCustomFlow" ];
+    NSArray<NSString *> * resultLabelTexts = @[
+        @"version", @"discriminator", @"setup pin code", @"rendez vous information", @"vendor ID", @"product ID", @"serial #",
+        @"requiresCustomFlow"
+    ];
     _versionLabel = [UILabel new];
     _discriminatorLabel = [UILabel new];
     _setupPinCodeLabel = [UILabel new];
@@ -244,9 +247,11 @@
     _vendorID = [UILabel new];
     _productID = [UILabel new];
     _serialNumber = [UILabel new];
-    _requiresCustomFlowLabel =  [UILabel new];
-    NSArray<UILabel *> * resultLabels =
-        @[ _versionLabel, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _vendorID, _productID, _serialNumber, _requiresCustomFlowLabel];
+    _requiresCustomFlowLabel = [UILabel new];
+    NSArray<UILabel *> * resultLabels = @[
+        _versionLabel, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _vendorID, _productID, _serialNumber,
+        _requiresCustomFlowLabel
+    ];
     for (int i = 0; i < resultLabels.count && i < resultLabels.count; i++) {
         UILabel * label = [UILabel new];
         label.text = [resultLabelTexts objectAtIndex:i];
