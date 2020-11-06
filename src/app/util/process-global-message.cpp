@@ -57,6 +57,8 @@
 #include "app/framework/plugin/comms-hub-function-sub-ghz/comms-hub-function-sub-ghz.h"
 #endif
 
+using namespace chip;
+
 // flag to keep track of the fact that we just sent a read attr for time and
 // we should set our time to the result of the read attr response.
 bool emAfSyncingTime = false;
@@ -82,7 +84,7 @@ bool emAfSyncingTime = false;
      % UINT8_MAX) /* make count fit in an 8 bit integer */
 
 #if defined(EMBER_AF_SUPPORT_COMMAND_DISCOVERY)
-static void printDiscoverCommandsResponse(bool generated, uint16_t clusterId, bool discoveryComplete, uint8_t * buffer,
+static void printDiscoverCommandsResponse(bool generated, ClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
                                           uint16_t length)
 {
     uint16_t i;
