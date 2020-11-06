@@ -65,7 +65,7 @@ int cmd_btp_adv(int argc, char ** argv)
     adv_enabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
     if (strcmp(argv[0], "start") == 0)
     {
-        if(adv_enabled)
+        if (adv_enabled)
         {
             streamer_printf(sout, "BLE advertising already enabled");
         }
@@ -77,7 +77,7 @@ int cmd_btp_adv(int argc, char ** argv)
     }
     else if (strcmp(argv[0], "stop") == 0)
     {
-        if(adv_enabled)
+        if (adv_enabled)
         {
             streamer_printf(sout, "Stopping BLE advertising");
             ConnectivityMgr().SetBLEAdvertisingEnabled(false);
@@ -110,7 +110,6 @@ int cmd_btp_scan(int argc, char ** argv)
     {
         streamer_printf(sout, "Starting scanning over BLE");
         // TODO: start scanning
-
     }
     else if (strcmp(argv[0], "stop") == 0)
     {
