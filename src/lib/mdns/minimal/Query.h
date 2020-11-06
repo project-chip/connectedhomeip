@@ -22,8 +22,8 @@
 namespace mdns {
 namespace Minimal {
 
-/// Represents a MDNS question: QName and flags
-class Question
+/// Represents a MDNS Query: QName and flags
+class Query
 {
 public:
     enum class QType : uint16_t
@@ -45,24 +45,24 @@ public:
         ANY = 255,
     };
 
-    Question(const QNamePart * names, uint16_t namesCount) : mQNameCount(namesCount), mQName(names) {}
+    Query(const QNamePart * names, uint16_t namesCount) : mQNameCount(namesCount), mQName(names) {}
 
     bool IsAnswerViaUnicast() const { return mAnswerViaUnicast; }
-    Question & SetAnswerViaUnicast(bool value)
+    Query & SetAnswerViaUnicast(bool value)
     {
         mAnswerViaUnicast = value;
         return *this;
     }
 
     QType GetType() const { return mType; }
-    Question & SetType(QType value)
+    Query & SetType(QType value)
     {
         mType = value;
         return *this;
     }
 
     QClass GetClass() const { return mClass; }
-    Question & SetClass(QClass value)
+    Query & SetClass(QClass value)
     {
         mClass = value;
         return *this;
@@ -79,8 +79,9 @@ public:
         return s;
     }
 
-    /// Append the question to the specified buffer
-    /// @param hdr will be updated with a question count
+    /// Append the query to the specified buffer
+    ///
+    /// @param hdr will be updated with a query count
     /// @return nullptr on failure, end of writing on success
     uint8_t * Append(HeaderRef & hdr, uint8_t * buffer, size_t max_size) const
     {
@@ -117,7 +118,7 @@ public:
         chip::Encoding::BigEndian::Write16(
             buffer, static_cast<uint16_t>(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kUnicastAnswerFlag : 0)));
 
-        hdr.SetQuestionCount(static_cast<uint16_t>(hdr.GetQuestionCount() + 1));
+        hdr.SetQueryCount(static_cast<uint16_t>(hdr.GetQueryCount() + 1));
 
         return buffer;
     }

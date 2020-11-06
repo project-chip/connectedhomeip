@@ -116,8 +116,8 @@ public:
     BitPackedFlags GetFlags() const { return BitPackedFlags(Get16At(kFlagsOffset)); }
     HeaderRef & SetFlags(BitPackedFlags flags) { return Set16At(kFlagsOffset, flags.RawValue()); }
 
-    uint16_t GetQuestionCount() const { return Get16At(kQuestionCountOffset); }
-    HeaderRef & SetQuestionCount(uint16_t value) { return Set16At(kQuestionCountOffset, value); }
+    uint16_t GetQueryCount() const { return Get16At(kQueryCountOffset); }
+    HeaderRef & SetQueryCount(uint16_t value) { return Set16At(kQueryCountOffset, value); }
 
     uint16_t GetAnswerCount() const { return Get16At(kAnswerCountOffset); }
     HeaderRef & SetAnswerCount(uint16_t value) { return Set16At(kAnswerCountOffset, value); }
@@ -143,7 +143,7 @@ private:
 
     static constexpr size_t kMessageIdOffset       = 0;
     static constexpr size_t kFlagsOffset           = 2;
-    static constexpr size_t kQuestionCountOffset   = 4;
+    static constexpr size_t kQueryCountOffset      = 4;
     static constexpr size_t kAnswerCountOffset     = 6;
     static constexpr size_t kAuthorityCountOffset  = 8;
     static constexpr size_t kAdditionalCountOffset = 10;

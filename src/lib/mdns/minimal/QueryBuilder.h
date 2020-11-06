@@ -20,15 +20,15 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "DnsHeader.h"
-#include "Question.h"
+#include "Query.h"
 
 namespace mdns {
 namespace Minimal {
 
-class QuestionBuilder
+class QueryBuilder
 {
 public:
-    QuestionBuilder(chip::System::PacketBuffer * packet) : mPacket(packet), mHeader(mPacket->Start())
+    QueryBuilder(chip::System::PacketBuffer * packet) : mPacket(packet), mHeader(mPacket->Start())
     {
 
         if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
@@ -38,7 +38,7 @@ public:
         }
         else
         {
-            mQuestionBuidOk = false;
+            mQueryBuidOk = false;
         }
 
         mHeader.SetFlags(mHeader.GetFlags().SetQuery());
@@ -46,22 +46,22 @@ public:
 
     HeaderRef & Header() { return mHeader; }
 
-    QuestionBuilder & AddQuestion(const Question & q)
+    QueryBuilder & AddQuery(const Query & q)
     {
-        if (!mQuestionBuidOk)
+        if (!mQueryBuidOk)
         {
             return *this;
         }
 
         if (mPacket->AvailableDataLength() < q.WriteSizeBytes())
         {
-            mQuestionBuidOk = false;
+            mQueryBuidOk = false;
             return *this;
         }
 
         if (q.Append(mHeader, mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength()) == nullptr)
         {
-            mQuestionBuidOk = false;
+            mQueryBuidOk = false;
             return *this;
         }
 
@@ -69,12 +69,12 @@ public:
         return *this;
     }
 
-    bool Ok() const { return mQuestionBuidOk; }
+    bool Ok() const { return mQueryBuidOk; }
 
 private:
     chip::System::PacketBuffer * mPacket;
     HeaderRef mHeader;
-    bool mQuestionBuidOk = true;
+    bool mQueryBuidOk = true;
 };
 
 } // namespace Minimal

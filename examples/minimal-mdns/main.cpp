@@ -20,7 +20,7 @@
 #include <inet/UDPEndPoint.h>
 #include <mdns/minimal/DnsHeader.h>
 #include <mdns/minimal/QName.h>
-#include <mdns/minimal/QuestionBuilder.h>
+#include <mdns/minimal/QueryBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
@@ -57,13 +57,13 @@ void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
         return;
     }
 
-    mdns::Minimal::QuestionBuilder builder(buffer);
+    mdns::Minimal::QueryBuilder builder(buffer);
 
     builder.Header().SetMessageId(kTestMessageId);
-    builder.AddQuestion(mdns::Minimal::Question(kCastQnames, ArraySize(kCastQnames))
-                            .SetClass(mdns::Minimal::Question::QClass::IN)
-                            .SetType(mdns::Minimal::Question::QType::ANY)
-                            .SetAnswerViaUnicast(true));
+    builder.AddQuery(mdns::Minimal::Query(kCastQnames, ArraySize(kCastQnames))
+                         .SetClass(mdns::Minimal::Query::QClass::IN)
+                         .SetType(mdns::Minimal::Query::QType::ANY)
+                         .SetAnswerViaUnicast(true));
 
     if (!builder.Ok())
     {
@@ -86,6 +86,13 @@ void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::P
     info->SrcAddress.ToString(addr, sizeof(addr));
 
     printf("Packet received from: %-15s on port %d\n", addr, info->SrcPort);
+
+    mdns::Minimal::HeaderRef hdr(buffer->Start());
+
+    printf("   Queries:     %d\n", hdr.GetQueryCount());
+    printf("   Answers:     %d\n", hdr.GetAnswerCount());
+    printf("   Authorities: %d\n", hdr.GetAuthorityCount());
+    printf("   Additionals: %d\n", hdr.GetAdditionalCount());
 }
 
 } // namespace
