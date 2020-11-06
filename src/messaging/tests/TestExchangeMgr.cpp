@@ -106,43 +106,17 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.Init(&conn);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ExchangeContext * ec1 = exchangeMgr.NewContext(kSourceNodeId, (void *) 0x1234);
+    ExchangeContext * ec1 = exchangeMgr.NewContext(nullptr, (void *) 0x1234);
     NL_TEST_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
-    NL_TEST_ASSERT(inSuite, ec1->GetPeerNodeId() == kSourceNodeId);
+    NL_TEST_ASSERT(inSuite, ec1->GetConnection()->GetPeerNodeId() == kSourceNodeId);
     NL_TEST_ASSERT(inSuite, ec1->GetAppState() == (void *) 0x1234);
 
-    ExchangeContext * ec2 = exchangeMgr.NewContext(kDestinationNodeId, (void *) 0x2345);
+    ExchangeContext * ec2 = exchangeMgr.NewContext(nullptr, (void *) 0x2345);
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
-    NL_TEST_ASSERT(inSuite, ec2->GetPeerNodeId() == kDestinationNodeId);
-}
-
-void CheckFindContextTest(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    SecureSessionMgr<LoopbackTransport> conn;
-    CHIP_ERROR err;
-
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
-
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&conn);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    ExchangeContext * ec = exchangeMgr.NewContext(kDestinationNodeId, nullptr);
-    NL_TEST_ASSERT(inSuite, ec != nullptr);
-
-    bool result = exchangeMgr.FindContext(kDestinationNodeId, nullptr, true);
-    NL_TEST_ASSERT(inSuite, result == true);
-
-    result = exchangeMgr.FindContext(kDestinationNodeId, nullptr, false);
-    NL_TEST_ASSERT(inSuite, result == false);
+    NL_TEST_ASSERT(inSuite, ec2->GetConnection()->GetPeerNodeId() == kDestinationNodeId);
 }
 
 void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
@@ -190,7 +164,6 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("Test ExchangeMgr::Init",                     CheckSimpleInitTest),
     NL_TEST_DEF("Test ExchangeMgr::NewContext",               CheckNewContextTest),
-    NL_TEST_DEF("Test ExchangeMgr::FindContext",              CheckFindContextTest),
     NL_TEST_DEF("Test ExchangeMgr::CheckUmhRegistrationTest", CheckUmhRegistrationTest),
 
     NL_TEST_SENTINEL()

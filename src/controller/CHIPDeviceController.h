@@ -240,6 +240,7 @@ public:
                            System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override;
 
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
+    void OnConnectionExpired(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 
     //////////// RendezvousSessionDelegate Implementation ///////////////
     void OnRendezvousError(CHIP_ERROR err) override;
@@ -290,6 +291,7 @@ private:
     uint16_t mDevicePort;
     Inet::InterfaceId mInterface;
     Optional<NodeId> mRemoteDeviceId;
+    Transport::PeerConnectionState * mConnectionState;
 
     SecurePairingSession mPairingSession;
     SecurePairingUsingTestSecret * mTestSecurePairingSecret = nullptr;

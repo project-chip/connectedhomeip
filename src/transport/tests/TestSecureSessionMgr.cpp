@@ -81,9 +81,14 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(PeerConnectionState * state, SecureSessionMgrBase * mgr) override { NewConnectionHandlerCallCount++; }
+    void OnNewConnection(PeerConnectionState * state, SecureSessionMgrBase * mgr) override {
+        mConnectionState = state;
+        NewConnectionHandlerCallCount++;
+    }
+    void OnConnectionExpired(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override {}
 
     nlTestSuite * mSuite              = nullptr;
+    PeerConnectionState * mConnectionState = nullptr;
     int ReceiveHandlerCallCount       = 0;
     int NewConnectionHandlerCallCount = 0;
 };
@@ -140,10 +145,12 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     err = conn.NewPairing(peer, &pairing2);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
+    PeerConnectionState * state = callback.mConnectionState;
+
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
 
-    err = conn.SendMessage(kDestinationNodeId, buffer);
+    err = conn.SendMessage(state, buffer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });

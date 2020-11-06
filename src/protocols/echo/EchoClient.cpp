@@ -50,7 +50,7 @@ void EchoClient::Shutdown()
     }
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * payload)
+CHIP_ERROR EchoClient::SendEchoRequest(Transport::PeerConnectionState * conn, System::PacketBuffer * payload)
 {
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.
@@ -61,7 +61,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * pay
     }
 
     // Create a new exchange context.
-    mExchangeCtx = mExchangeMgr->NewContext(nodeId, this);
+    mExchangeCtx = mExchangeMgr->NewContext(conn, this);
     if (mExchangeCtx == nullptr)
     {
         System::PacketBuffer::Free(payload);
@@ -128,7 +128,7 @@ exit:
 
 void EchoClient::OnResponseTimeout(ExchangeContext * ec)
 {
-    ChipLogProgress(Echo, "Time out! failed to receive echo response from Node: %llu", ec->GetPeerNodeId());
+    ChipLogProgress(Echo, "Time out! failed to receive echo response from Node: %llu", ec->GetConnection()->GetPeerNodeId());
 }
 
 } // namespace Protocols

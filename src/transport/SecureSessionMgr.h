@@ -87,6 +87,17 @@ public:
      */
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
+    /**
+     * @brief
+     *   Called when a connection is closing.
+     *
+     *   The receiver should release all resources associated with the connection.
+     *
+     * @param state   connection state
+     * @param mgr     A pointer to the SecureSessionMgr
+     */
+    virtual void OnConnectionExpired(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) = 0;
+
     virtual ~SecureSessionMgrDelegate() {}
 };
 
@@ -101,8 +112,9 @@ public:
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
      */
-    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+
     SecureSessionMgrBase();
     virtual ~SecureSessionMgrBase();
 
@@ -173,7 +185,7 @@ private:
     /**
      * Called when a specific connection expires.
      */
-    static void HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr);
+    static void HandleConnectionExpired(Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr);
 
     /**
      * Callback for timer expiry check

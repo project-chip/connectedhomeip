@@ -87,7 +87,7 @@ public:
      *         Other CHIP_ERROR codes as returned by the lower layers.
      *
      */
-    CHIP_ERROR SendEchoRequest(NodeId nodeId, System::PacketBuffer * payload);
+    CHIP_ERROR SendEchoRequest(Transport::PeerConnectionState * conn, System::PacketBuffer * payload);
 
 private:
     ExchangeManager * mExchangeMgr   = nullptr;

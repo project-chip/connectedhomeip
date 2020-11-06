@@ -86,20 +86,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(const NodeId & peerNodeId, void * appState = nullptr);
-
-    /**
-     *  Find the ExchangeContext from a pool matching a given set of parameters.
-     *
-     *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext has been set up.
-     *
-     *  @param[in]    appState      A pointer to a higher layer object that holds context state.
-     *
-     *  @param[in]    isInitiator   Boolean indicator of whether the local node is the initiator of the exchange.
-     *
-     *  @return   A pointer to the ExchangeContext object matching the provided parameters On success, NULL on no match.
-     */
-    ExchangeContext * FindContext(NodeId peerNodeId, void * appState, bool isInitiator);
+    ExchangeContext * NewContext(Transport::PeerConnectionState * conn, void * appState = nullptr);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier. This handler would be
@@ -192,9 +179,9 @@ private:
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
     void (*OnExchangeContextChanged)(size_t numContextsInUse);
 
-    ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState);
+    ExchangeContext * AllocContext(uint16_t ExchangeId, Transport::PeerConnectionState * conn, bool Initiator, void * AppState);
 
-    void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+    void DispatchMessage(Transport::PeerConnectionState * conn, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContext::MessageReceiveFunct handler, void * appState);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
@@ -204,6 +191,8 @@ private:
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
                            SecureSessionMgrBase * msgLayer) override;
+
+    void OnConnectionExpired(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 };
 
 } // namespace chip

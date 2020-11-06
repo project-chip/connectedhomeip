@@ -302,8 +302,6 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
         mSecurePairingSession);
     SuccessOrExit(err);
 
-    mConState = kConnectionState_SecureConnected;
-
     SendCachedPackets();
 
 exit:
@@ -481,7 +479,7 @@ CHIP_ERROR ChipDeviceController::SendCachedPackets()
 
     for (uint16_t i = 0; i < mNumCachedPackets; i++)
     {
-        err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), mCachedPackets[i]);
+        err = mSessionManager->SendMessage(mConnectionState, mCachedPackets[i]);
         ChipLogDetail(Controller, "SendMessage returned %d", err);
     }
 
@@ -537,7 +535,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     // Hold on to the buffer, in case of session resumption and resend is needed
     buffer->AddRef();
 
-    err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
+    err = mSessionManager->SendMessage(mConnectionState, buffer);
     ChipLogDetail(Controller, "SendMessage returned %d", err);
 
     // The send could fail due to network timeouts (e.g. broken pipe)
@@ -555,7 +553,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
             ExitNow(err = CachePacket(buffer));
         }
 
-        err = mSessionManager->SendMessage(mRemoteDeviceId.Value(), buffer);
+        err = mSessionManager->SendMessage(mConnectionState, buffer);
         SuccessOrExit(err);
     }
     else
@@ -615,7 +613,23 @@ void ChipDeviceController::ClearRequestState()
     }
 }
 
-void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
+void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
+{
+    if (mConState == kConnectionState_SecureConnecting)
+    {
+        mConState = kConnectionState_SecureConnected;
+        mConnectionState = state;
+    }
+}
+
+void ChipDeviceController::OnConnectionExpired(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
+{
+    if (mConState == kConnectionState_SecureConnected && mConnectionState == state)
+    {
+        mConState = kConnectionState_NotConnected;
+        mConnectionState = nullptr;
+    }
+}
 
 void ChipDeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                                              Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,

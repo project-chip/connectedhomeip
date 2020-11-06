@@ -67,6 +67,15 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
     virtual void OnResponseTimeout(ExchangeContext * ec) = 0;
+
+    /**
+     * @brief
+     *   This function is the protocol callback to invoke when the associated
+     *   exchange context is being closed
+     *
+     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     */
+    virtual void OnExchangeClosing(ExchangeContext * ec) {}
 };
 
 class ExchangeContextDeletor
@@ -202,7 +211,7 @@ public:
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    uint64_t GetPeerNodeId() const { return mPeerNodeId; }
+    Transport::PeerConnectionState * GetConnection() { return mConnectionState; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -216,7 +225,7 @@ public:
     void Close();
     void Abort();
 
-    void Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState);
+    void Alloc(ExchangeManager * em, uint16_t ExchangeId, Transport::PeerConnectionState * conn, bool Initiator, void * AppState);
     void Free();
     void Reset();
 
@@ -234,13 +243,15 @@ private:
     ExchangeManager * mExchangeMgr;
     void * mAppState; // Pointer to application-specific state object.
 
-    uint64_t mPeerNodeId; // Node ID of peer node.
+    Transport::PeerConnectionState * mConnectionState; // The connection state
     uint16_t mExchangeId; // Assigned exchange ID.
 
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
     /**
      *  Search for an existing exchange that the message applies to.
+     *
+     *  @param[in]    conn          The connection state of the received message.
      *
      *  @param[in]    packetHeader  A reference to the PacketHeader object.
      *
@@ -249,10 +260,9 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(Transport::PeerConnectionState * conn, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     void SetInitiator(bool inInitiator);
-    void SetPeerNodeId(NodeId nodeId) { mPeerNodeId = nodeId; }
     void SetExchangeId(uint16_t exId) { mExchangeId = exId; }
     void SetExchangeMgr(ExchangeManager * exMgr) { mExchangeMgr = exMgr; }
     void SetAppState(void * state) { mAppState = state; }

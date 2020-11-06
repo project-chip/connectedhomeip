@@ -299,7 +299,7 @@ public:
      *
      */
     template <class T>
-    void SetConnectionExpiredHandler(void (*handler)(const PeerConnectionState &, T *), T * param)
+    void SetConnectionExpiredHandler(void (*handler)(PeerConnectionState &, T *), T * param)
     {
         mConnectionExpiredArgument = param;
         OnConnectionExpired        = reinterpret_cast<ConnectionExpiredHandler>(handler);
