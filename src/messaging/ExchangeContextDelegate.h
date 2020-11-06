@@ -84,7 +84,7 @@ public:
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
-    virtual ExchangeContextDelegate * CreateDelegate() = 0;
+    virtual ExchangeContextDelegate * CreateDelegate(ExchangeContext * ec) = 0;
 };
 
 /**
@@ -99,7 +99,22 @@ class DLL_EXPORT SimpleExchangeContextDelegate : public ExchangeContextDelegateF
 {
 public:
     virtual ~SimpleExchangeContextDelegate() override {}
-    virtual ExchangeContextDelegate * CreateDelegate() override { return this; }
+    virtual ExchangeContextDelegate * CreateDelegate(ExchangeContext * ec) override { return this; }
+};
+
+/**
+ * @brief
+ *   A simple delegate factory returns given delegate
+ */
+class SimpleExchangeContextDelegateFactory : public ExchangeContextDelegateFactory
+{
+public:
+    SimpleExchangeContextDelegateFactory(ExchangeContextDelegate * delegate) : mDelegate(delegate) {}
+    virtual ~SimpleExchangeContextDelegateFactory() override {}
+    virtual ExchangeContextDelegate * CreateDelegate(ExchangeContext * ec) override { return mDelegate; }
+
+private:
+    ExchangeContextDelegate * mDelegate;
 };
 
 } // namespace chip

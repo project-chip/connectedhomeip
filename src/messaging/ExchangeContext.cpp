@@ -192,7 +192,7 @@ void ExchangeContext::Reset()
 }
 
 void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                            ExchangeContextDelegate * delegate)
+                            ExchangeContextDelegateFactory * delegateFactory)
 {
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
@@ -203,13 +203,14 @@ void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t 
     mExchangeId = ExchangeId;
     mPeerNodeId = PeerNodeId;
     mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
-    mDelegate = delegate;
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), em->GetContextsInUse(),
                     this);
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
+
+    mDelegate = delegateFactory->CreateDelegate(this);
 }
 
 void ExchangeContext::Free()
