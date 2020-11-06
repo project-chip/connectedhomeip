@@ -30,7 +30,7 @@ using namespace chip;
 
 namespace {
 
-constexpr uint32_t kRunTimeMs    = 3'000;
+constexpr uint32_t kRunTimeMs    = 500;
 constexpr uint16_t kMdnsPort     = 5353;
 constexpr uint16_t kFakeMdnsPort = 53333;
 
