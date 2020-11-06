@@ -91,3 +91,24 @@ To get the list of parameters for a specific command, run the built executable
 with the target cluster name and the target command name
 
     $ chip-tool onoff on
+
+## Using the Client for Setup Payload
+
+### How to parse a setup code
+
+To parse a setup code, run the built executable with the `payload` cluster name and the `parse` command
+
+    $ chip-tool payload parse code
+
+#### QR Code
+
+    $ chip-tool payload parse "CH:J20800G008008000"
+
+
+#### QR Code with optional Vendor Info
+
+    $ chip-tool chip-tool payload parse "CH:J20800G008008006DL200UOGMHARTHOMJ300IDL530.I7"
+
+#### Manual Setup Code
+
+    $ chip-tool payload parse "000003949145367145266"

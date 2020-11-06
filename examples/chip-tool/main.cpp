@@ -20,6 +20,7 @@
 
 #include "commands/clusters/Commands.h"
 #include "commands/echo/Commands.h"
+#include "commands/payload/Commands.h"
 
 // NOTE: Remote device ID is in sync with the echo server device id
 //       At some point, we may want to add an option to connect to a device without
@@ -35,7 +36,9 @@ int main(int argc, char * argv[])
     Commands commands;
 
     registerCommandsEcho(commands);
-    registerClusters(commands);
+    registerPayloadCommands(commands);
 
+    registerClusters(commands);
+    
     return commands.Run(kLocalDeviceId, kRemoteDeviceId, argc, argv);
 }

@@ -26,6 +26,7 @@ executable("chip-tool") {
     "commands/common/Logging.cpp",
     "commands/common/ModelCommand.cpp",
     "commands/common/NetworkCommand.cpp",
+    "commands/payload/ParseCommand.cpp",
     "main.cpp",
   ]
 
