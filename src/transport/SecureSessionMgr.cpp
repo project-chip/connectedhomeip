@@ -355,12 +355,17 @@ exit:
     }
 }
 
-void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr)
+void SecureSessionMgrBase::HandleConnectionExpired(Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr)
 {
     char addr[Transport::PeerAddress::kMaxToStringSize];
     state.GetPeerAddress().ToString(addr, sizeof(addr));
 
     ChipLogDetail(Inet, "Connection from '%s' expired", addr);
+
+    if (mgr->mCB != nullptr)
+    {
+        mgr->mCB->OnConnectionExpired(&state, mgr);
+    }
 
     mgr->mTransport->Disconnect(state.GetPeerAddress());
 }

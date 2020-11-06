@@ -295,6 +295,19 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     DispatchMessage(packetHeader, payloadHeader, msgBuf);
 }
 
+void ExchangeManager::OnConnectionExpired(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
+{
+    // Search for an existing exchange that the message applies to. If a match is found...
+    ExchangeContext * ec = ContextPool;
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    {
+        if (ec->GetReferenceCount() > 0 && ec->mPeerNodeId == state->GetPeerNodeId())
+        {
+            ec->Close();
+        }
+    }
+}
+
 void ExchangeManager::IncrementContextsInUse()
 {
     mContextsInUse++;
