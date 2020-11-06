@@ -646,38 +646,6 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-void emberAfScenesClusterClearSceneTableCallback(EndpointId endpoint)
-{
-    uint8_t i, networkIndex = 0 /* emberGetCurrentNetwork() */;
-    for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
-    {
-        EmberAfSceneTableEntry entry;
-        emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
-        if (entry.endpoint != EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID &&
-            (endpoint == entry.endpoint ||
-             (endpoint == EMBER_BROADCAST_ENDPOINT && (networkIndex == emberAfNetworkIndexFromEndpoint(entry.endpoint)))))
-        {
-            entry.endpoint = EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID;
-            emberAfPluginScenesServerSaveSceneEntry(entry, i);
-        }
-    }
-    emberAfPluginScenesServerSetNumSceneEntriesInUse(0);
-    if (endpoint == EMBER_BROADCAST_ENDPOINT)
-    {
-        for (i = 0; i < emberAfEndpointCount(); i++)
-        {
-            if (emberAfNetworkIndexFromEndpointIndex(i) == networkIndex)
-            {
-                emberAfScenesSetSceneCountAttribute(emberAfEndpointFromIndex(i), 0);
-            }
-        }
-    }
-    else
-    {
-        emberAfScenesSetSceneCountAttribute(endpoint, 0);
-    }
-}
-
 bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, GroupId groupId, uint8_t sceneId,
                                             uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
 {

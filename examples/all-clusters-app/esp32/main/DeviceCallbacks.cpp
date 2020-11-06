@@ -34,8 +34,8 @@
 #include <support/CodeUtils.h>
 
 extern "C" {
-#include "../gen/attribute-id.h"
-#include "../gen/cluster-id.h"
+#include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
 } // extern "C"
 
 static const char * TAG = "echo-devicecallbacks";
