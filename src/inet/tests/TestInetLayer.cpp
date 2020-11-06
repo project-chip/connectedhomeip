@@ -322,7 +322,7 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
     {
 
     case kToolOptInterval:
-        if (!ParseInt(aValue, gSendIntervalMs) || gSendIntervalMs > UINT32_MAX)
+        if (!ParseInt(aValue, gSendIntervalMs))
         {
             PrintArgError("%s: invalid value specified for send interval: %s\n", aProgram, aValue);
             retval = false;
