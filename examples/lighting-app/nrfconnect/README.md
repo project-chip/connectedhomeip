@@ -219,7 +219,8 @@ to checkout given `v1.4.0` revision the following commands should be called:
         $ git checkout v1.4.0
         $ west update
 
-Alternatively, if you use the docker container, you may execute the following command instead:
+Alternatively, if you use the docker container, you may execute the following
+command instead:
 
         $ setup --ncs v1.4.0
 
