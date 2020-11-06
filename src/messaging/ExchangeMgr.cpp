@@ -101,7 +101,8 @@ CHIP_ERROR ExchangeManager::Shutdown()
 
 ExchangeContext * ExchangeManager::NewContext(const NodeId & peerNodeId, ExchangeContextDelegate * delegate)
 {
-    return AllocContext(mNextExchangeId++, peerNodeId, true, delegate);
+    SimpleExchangeContextDelegateFactory factory(delegate);
+    return AllocContext(mNextExchangeId++, peerNodeId, true, &factory);
 }
 
 ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, ExchangeContextDelegate * delegate, bool isInitiator)
@@ -145,7 +146,7 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
 }
 
 ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                                                ExchangeContextDelegate * delegate)
+                                                ExchangeContextDelegateFactory * delegateFactory)
 {
     ExchangeContext * ec = ContextPool;
 
@@ -155,7 +156,7 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t Pe
     {
         if (ec->GetReferenceCount() == 0)
         {
-            ec->Alloc(this, ExchangeId, PeerNodeId, Initiator, delegate);
+            ec->Alloc(this, ExchangeId, PeerNodeId, Initiator, delegateFactory);
             return ec;
         }
     }
@@ -221,8 +222,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     // If we found a handler or we need to create a new exchange context (EC).
     if (matchingUMH != nullptr)
     {
-        ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false,
-                          matchingUMH->DelegateFactory->CreateDelegate());
+        ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false, matchingUMH->DelegateFactory);
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         ChipLogProgress(ExchangeManager, "ec id: %d, Delegate: 0x%x", (ec - ContextPool + 1), ec->GetDelegate());
