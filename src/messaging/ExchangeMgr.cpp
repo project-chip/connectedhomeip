@@ -222,7 +222,8 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     // If we found a handler or we need to create a new exchange context (EC).
     if (matchingUMH != nullptr)
     {
-        ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false, matchingUMH->DelegateFactory);
+        ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false,
+                          matchingUMH->DelegateFactory);
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         ChipLogProgress(ExchangeManager, "ec id: %d, Delegate: 0x%x", (ec - ContextPool + 1), ec->GetDelegate());

@@ -109,9 +109,10 @@ public:
 class SimpleExchangeContextDelegateFactory : public ExchangeContextDelegateFactory
 {
 public:
-    SimpleExchangeContextDelegateFactory(ExchangeContextDelegate * delegate) : mDelegate(delegate) { }
+    SimpleExchangeContextDelegateFactory(ExchangeContextDelegate * delegate) : mDelegate(delegate) {}
     virtual ~SimpleExchangeContextDelegateFactory() override {}
     virtual ExchangeContextDelegate * CreateDelegate(ExchangeContext * ec) override { return mDelegate; }
+
 private:
     ExchangeContextDelegate * mDelegate;
 };
