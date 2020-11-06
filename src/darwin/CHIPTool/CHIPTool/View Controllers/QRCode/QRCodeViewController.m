@@ -60,6 +60,8 @@
 @property (strong, nonatomic) UILabel * vendorID;
 @property (strong, nonatomic) UILabel * productID;
 @property (strong, nonatomic) UILabel * serialNumber;
+@property (strong, nonatomic) UILabel * requiresCustomFlowLabel;
+@property (strong, nonatomic) UIButton * redirectCustomFlowButton;
 
 @property (strong, nonatomic) UIActivityIndicatorView * activityIndicator;
 @property (strong, nonatomic) UILabel * errorLabel;
@@ -173,6 +175,23 @@
     [_resetButton.widthAnchor constraintEqualToConstant:60].active = YES;
     [_resetButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
     [_resetButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
+    
+    // Redirect button
+    _redirectCustomFlowButton = [UIButton new];
+   [_redirectCustomFlowButton setTitle:@"Redirect" forState:UIControlStateNormal];
+    // TODO: Replace resetView with actual redirect action
+   [_redirectCustomFlowButton addTarget:self action:@selector(resetView:) forControlEvents:UIControlEventTouchUpInside];
+    _redirectCustomFlowButton.backgroundColor = UIColor.systemBlueColor;
+    _redirectCustomFlowButton.titleLabel.font = [UIFont systemFontOfSize:17];
+    _redirectCustomFlowButton.titleLabel.textColor = [UIColor whiteColor];
+    _redirectCustomFlowButton.layer.cornerRadius = 5;
+    _redirectCustomFlowButton.clipsToBounds = YES;
+   [self.view addSubview:_redirectCustomFlowButton];
+    
+    _redirectCustomFlowButton.translatesAutoresizingMaskIntoConstraints = false;
+   [_redirectCustomFlowButton.widthAnchor constraintEqualToConstant:100].active = YES;
+   [_redirectCustomFlowButton.bottomAnchor constraintEqualToAnchor:self.view.safeAreaLayoutGuide.bottomAnchor constant:-30].active = YES;
+   [_redirectCustomFlowButton.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-100].active = YES;
 }
 
 - (void)addViewsToSetupPayloadView
@@ -217,7 +236,7 @@
 - (void)addResultsUIToStackView:(UIStackView *)stackView
 {
     NSArray<NSString *> * resultLabelTexts =
-        @[ @"version", @"discriminator", @"setup pin code", @"rendez vous information", @"vendor ID", @"product ID", @"serial #" ];
+        @[ @"version", @"discriminator", @"setup pin code", @"rendez vous information", @"vendor ID", @"product ID", @"serial #", @"requiresCustomFlow" ];
     _versionLabel = [UILabel new];
     _discriminatorLabel = [UILabel new];
     _setupPinCodeLabel = [UILabel new];
@@ -225,8 +244,9 @@
     _vendorID = [UILabel new];
     _productID = [UILabel new];
     _serialNumber = [UILabel new];
+    _requiresCustomFlowLabel =  [UILabel new];
     NSArray<UILabel *> * resultLabels =
-        @[ _versionLabel, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _vendorID, _productID, _serialNumber ];
+        @[ _versionLabel, _discriminatorLabel, _setupPinCodeLabel, _rendezVousInformation, _vendorID, _productID, _serialNumber, _requiresCustomFlowLabel];
     for (int i = 0; i < resultLabels.count && i < resultLabels.count; i++) {
         UILabel * label = [UILabel new];
         label.text = [resultLabelTexts objectAtIndex:i];
@@ -300,6 +320,7 @@
 {
     _setupPayloadView.hidden = YES;
     _resetButton.hidden = YES;
+    _redirectCustomFlowButton.hidden = YES;
     _activityIndicator.hidden = YES;
     _errorLabel.hidden = YES;
 }
@@ -313,6 +334,7 @@
         [_activityIndicator stopAnimating];
     }
     _resetButton.hidden = YES;
+    _redirectCustomFlowButton.hidden = YES;
     [self changeNavBarButtonToCamera];
     _activityIndicator.hidden = YES;
     _captureSession = nil;
@@ -324,6 +346,7 @@
     [self changeNavBarButtonToCancel];
     _setupPayloadView.hidden = YES;
     _resetButton.hidden = YES;
+    _redirectCustomFlowButton.hidden = YES;
     _errorLabel.hidden = YES;
 }
 
@@ -333,6 +356,7 @@
     [self->_activityIndicator startAnimating];
     _setupPayloadView.hidden = YES;
     _resetButton.hidden = YES;
+    _redirectCustomFlowButton.hidden = YES;
     _errorLabel.hidden = YES;
     _manualCodeTextField.text = @"";
 }
@@ -354,6 +378,7 @@
     self->_activityIndicator.hidden = YES;
     self->_manualCodeLabel.hidden = YES;
     _resetButton.hidden = YES;
+    _redirectCustomFlowButton.hidden = YES;
 
     self->_errorLabel.text = error.localizedDescription;
     self->_errorLabel.hidden = NO;
@@ -472,6 +497,10 @@
     // TODO: Only display vid and pid if present
     _vendorID.text = [NSString stringWithFormat:@"%@", payload.vendorID];
     _productID.text = [NSString stringWithFormat:@"%@", payload.productID];
+    
+    // customFlow
+    _requiresCustomFlowLabel.text = payload.requiresCustomFlow ? @"Yes" : NOT_APPLICABLE_STRING;
+    _redirectCustomFlowButton.hidden = !payload.requiresCustomFlow;
 }
 
 - (void)parseOptionalData:(CHIPSetupPayload *)payload
@@ -510,7 +539,6 @@
 - (void)handleRendezVous:(CHIPSetupPayload *)payload
 {
     switch (payload.rendezvousInformation) {
-    case kRendezvousInformationNone:
     case kRendezvousInformationThread:
     case kRendezvousInformationEthernet:
     case kRendezvousInformationAllMask:
@@ -520,6 +548,7 @@
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
         break;
+    case kRendezvousInformationNone:
     case kRendezvousInformationBLE:
         NSLog(@"Rendezvous BLE");
         [self handleRendezVousBLE:payload.discriminator.unsignedShortValue setupPINCode:payload.setUpPINCode.unsignedIntValue];
