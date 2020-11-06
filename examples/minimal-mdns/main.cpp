@@ -43,9 +43,6 @@ const auto kQuestion = mdns::Minimal::Question(kCastQnames, ArraySize(kCastQname
                            .SetType(mdns::Minimal::Question::QType::ANY)
                            .SetAnswerViaUnicast(true);
 
-// static uint8_t kHardcodedQuestion[] = { 0x0b, 0x5f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x63, 0x61, 0x73, 0x74, 0x04, 0x5f,
-//                                        0x74, 0x63, 0x70, 0x05, 0x6c, 0x6f, 0x63, 0x61, 0x6c, 0x00, 0x00, 0xff, 0x80, 0x01 };
-
 void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
 {
     Inet::IPAddress destIpAddr;
