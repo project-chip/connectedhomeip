@@ -145,6 +145,26 @@ public:
 
     /**
      * @brief
+     *   Called when a new pairing is being established
+     *
+     * @param state   connection state
+     * @param mgr     A pointer to the SecureSessionMgr
+     */
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgrBase * mgr);
+
+    /**
+     * @brief
+     *   Called when a connection is closing.
+     *
+     *   The receiver should release all resources associated with the connection.
+     *
+     * @param state   connection state
+     * @param mgr     A pointer to the SecureSessionMgr
+     */
+    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgrBase * mgr);
+
+    /**
+     * @brief
      *   This function is called when a message is received from the corresponding CHIP
      *   device. The message ownership is transferred to the function, and it is expected
      *   to release the message buffer before returning.
@@ -155,7 +175,7 @@ public:
      * @param[in] msgBuf        The message buffer
      * @param[in] mgr           Pointer to secure session manager which received the message
      */
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr);
 
     /**
@@ -167,7 +187,11 @@ public:
 
     void SetActive(bool active) { mActive = active; }
 
+    bool IsSecureConnected() const { return IsActive() && mState == ConnectionState::SecureConnected; }
+
     NodeId GetDeviceId() const { return mDeviceId; }
+
+    SecureSessionHandle GetSecureSession() const { return mSecureSession; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddr = deviceAddr; }
 
@@ -203,6 +227,9 @@ private:
     DeviceStatusDelegate * mStatusDelegate;
 
     SecureSessionMgr<Transport::UDP> * mSessionManager;
+
+    // mSecureSession will be set iff mState == SecureConnected
+    SecureSessionHandle mSecureSession;
 
     /**
      * @brief

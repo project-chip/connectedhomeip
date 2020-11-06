@@ -187,16 +187,19 @@ protected:
     Inet::InetLayer * mInetLayer;
 
     uint16_t GetInactiveDeviceIndex();
+    uint16_t FindDeviceIndex(SecureSessionHandle session);
+    [[deprecated("only peer node id is not sufficient to identify a device")]]
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
 
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override;
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgrBase * mgr) override;
+    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgrBase * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
     void OnValue(const char * key, const char * value) override;

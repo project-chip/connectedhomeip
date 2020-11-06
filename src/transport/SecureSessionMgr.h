@@ -41,6 +41,7 @@
 
 namespace chip {
 
+using SecureSessionHandle = std::tuple<NodeId, uint16_t>; // tuple<PeerNodeId, PeerKeyId>
 class SecureSessionMgrBase;
 
 /**
@@ -53,6 +54,7 @@ class SecureSessionMgrBase;
 class DLL_EXPORT SecureSessionMgrDelegate
 {
 public:
+
     /**
      * @brief
      *   Called when a new message is received. The function must internally release the
@@ -65,7 +67,7 @@ public:
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                   SecureSessionHandle session, System::PacketBuffer * msgBuf,
                                    SecureSessionMgrBase * mgr)
     {}
 
@@ -86,7 +88,18 @@ public:
      * @param state   connection state
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
+    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgrBase * mgr) {}
+
+    /**
+     * @brief
+     *   Called when a connection is closing.
+     *
+     *   The receiver should release all resources associated with the connection.
+     *
+     * @param state   connection state
+     * @param mgr     A pointer to the SecureSessionMgr
+     */
+    virtual void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgrBase * mgr) = 0;
 
     /**
      * @brief
@@ -112,8 +125,10 @@ public:
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
      */
-    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(SecureSessionHandle state, System::PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(SecureSessionHandle state, PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+    Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
+
     SecureSessionMgrBase();
     ~SecureSessionMgrBase() override;
 
@@ -184,7 +199,7 @@ private:
     /**
      * Called when a specific connection expires.
      */
-    static void HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr);
+    static void HandleConnectionExpired(Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr);
 
     /**
      * Callback for timer expiry check

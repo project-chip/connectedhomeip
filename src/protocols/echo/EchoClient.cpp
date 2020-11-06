@@ -50,7 +50,7 @@ void EchoClient::Shutdown()
     }
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * payload)
+CHIP_ERROR EchoClient::SendEchoRequest(SecureSessionHandle session, System::PacketBuffer * payload)
 {
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.
@@ -61,7 +61,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * pay
     }
 
     // Create a new exchange context.
-    mExchangeCtx = mExchangeMgr->NewContext(nodeId, this);
+    mExchangeCtx = mExchangeMgr->NewContext(session, this);
     if (mExchangeCtx == nullptr)
     {
         System::PacketBuffer::Free(payload);
@@ -117,8 +117,7 @@ void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     // Call the registered OnEchoResponseReceived handler, if any.
     if (echoApp->OnEchoResponseReceived != nullptr)
     {
-        echoApp->OnEchoResponseReceived(packetHeader.GetSourceNodeId().HasValue() ? packetHeader.GetSourceNodeId().Value() : 0,
-                                        payload);
+        echoApp->OnEchoResponseReceived(ec->GetSecureSession(), payload);
     }
 
 exit:
@@ -128,7 +127,7 @@ exit:
 
 void EchoClient::OnResponseTimeout(ExchangeContext * ec)
 {
-    ChipLogProgress(Echo, "Time out! failed to receive echo response from Node: %llu", ec->GetPeerNodeId());
+    ChipLogProgress(Echo, "Time out! failed to receive echo response from Exchange: %p", ec);
 }
 
 } // namespace Protocols

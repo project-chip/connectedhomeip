@@ -69,7 +69,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBuffer * buffer)
         resend = buffer;
     }
 
-    err    = mSessionManager->SendMessage(mDeviceId, buffer);
+    err    = mSessionManager->SendMessage(mSecureSession, buffer);
     buffer = nullptr;
     ChipLogDetail(Controller, "SendMessage returned %d", err);
 
@@ -82,7 +82,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBuffer * buffer)
         err = LoadSecureSessionParameters();
         SuccessOrExit(err);
 
-        err    = mSessionManager->SendMessage(mDeviceId, resend);
+        err    = mSessionManager->SendMessage(mSecureSession, resend);
         resend = nullptr;
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
         SuccessOrExit(err);
@@ -164,8 +164,19 @@ exit:
     return error;
 }
 
+void Device::OnNewConnection(SecureSessionHandle session, SecureSessionMgrBase * mgr)
+{
+    mState = ConnectionState::SecureConnected;
+    mSecureSession = session;
+}
+
+void Device::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgrBase * mgr)
+{
+    mState = ConnectionState::NotConnected;
+}
+
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                               Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
+                               SecureSessionHandle session, System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
 {
     if (mState == ConnectionState::SecureConnected && mStatusDelegate != nullptr)
     {

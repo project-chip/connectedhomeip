@@ -62,7 +62,7 @@ void EchoServer::HandleEchoRequest(ExchangeContext * ec, const PacketHeader & pa
 
     // Call the registered OnEchoRequestReceived handler, if any.
     if (echoApp->OnEchoRequestReceived != nullptr)
-        echoApp->OnEchoRequestReceived(ec->GetPeerNodeId(), payload);
+        echoApp->OnEchoRequestReceived(ec->GetSecureSession(), payload);
 
     // Since we are re-using the inbound EchoRequest buffer to send the EchoResponse, if necessary,
     // adjust the position of the payload within the buffer to ensure there is enough room for the

@@ -42,7 +42,7 @@ enum
     kEchoMessageType_EchoResponse = 2
 };
 
-typedef void (*EchoFunct)(NodeId nodeId, System::PacketBuffer * payload);
+typedef void (*EchoFunct)(SecureSessionHandle session, System::PacketBuffer * payload);
 
 class DLL_EXPORT EchoClient : public ExchangeContextDelegate
 {
@@ -87,7 +87,7 @@ public:
      *         Other CHIP_ERROR codes as returned by the lower layers.
      *
      */
-    CHIP_ERROR SendEchoRequest(NodeId nodeId, System::PacketBuffer * payload);
+    CHIP_ERROR SendEchoRequest(SecureSessionHandle session, System::PacketBuffer * payload);
 
 private:
     ExchangeManager * mExchangeMgr   = nullptr;
