@@ -65,14 +65,19 @@ public:
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
 };
 
-class MockAppDelegate : public SimpleExchangeContextDelegate
+class MockAppDelegate : public ExchangeContextDelegate
 {
 public:
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
                            System::PacketBuffer * buffer) override
-    {}
+    {
+        IsOnMessageReceivedCalled = true;
+    }
+
     void OnResponseTimeout(ExchangeContext * ec) override {}
-} gMockAppDelegate;
+
+    bool IsOnMessageReceivedCalled = false;
+};
 
 void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
@@ -107,14 +112,16 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.Init(&conn);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ExchangeContext * ec1 = exchangeMgr.NewContext(kSourceNodeId, &gMockAppDelegate);
+    MockAppDelegate mockAppDelegate;
+
+    ExchangeContext * ec1 = exchangeMgr.NewContext(kSourceNodeId, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
     NL_TEST_ASSERT(inSuite, ec1->GetPeerNodeId() == kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &gMockAppDelegate);
+    NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
 
-    ExchangeContext * ec2 = exchangeMgr.NewContext(kDestinationNodeId, &gMockAppDelegate);
+    ExchangeContext * ec2 = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
     NL_TEST_ASSERT(inSuite, ec2->GetPeerNodeId() == kDestinationNodeId);
@@ -136,10 +143,12 @@ void CheckFindContextTest(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.Init(&conn);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    ExchangeContext * ec = exchangeMgr.NewContext(kDestinationNodeId, &gMockAppDelegate);
+    MockAppDelegate mockAppDelegate;
+
+    ExchangeContext * ec = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec != nullptr);
 
-    bool result = exchangeMgr.FindContext(kDestinationNodeId, &gMockAppDelegate, true);
+    bool result = exchangeMgr.FindContext(kDestinationNodeId, &mockAppDelegate, true);
     NL_TEST_ASSERT(inSuite, result == true);
 
     result = exchangeMgr.FindContext(kDestinationNodeId, nullptr, false);
@@ -162,10 +171,13 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.Init(&conn);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, &gMockAppDelegate);
+    MockAppDelegate mockAppDelegate;
+    SimpleExchangeContextDelegateFactory mockAppDelegateFactory(&mockAppDelegate);
+
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, &mockAppDelegateFactory);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0002, 0x0001, &gMockAppDelegate);
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0002, 0x0001, &mockAppDelegateFactory);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = exchangeMgr.UnregisterUnsolicitedMessageHandler(0x0001);
@@ -181,6 +193,50 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 }
 
+void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    CHIP_ERROR err;
+
+    SecureSessionMgr<LoopbackTransport> conn;
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
+    Optional<Transport::PeerAddress> peer1(Transport::PeerAddress::UDP(addr, 1));
+    err = conn.NewPairing(peer1, &pairing1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
+    Optional<Transport::PeerAddress> peer2(Transport::PeerAddress::UDP(addr, 2));
+    err = conn.NewPairing(peer2, &pairing2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ExchangeManager exchangeMgr;
+    err = exchangeMgr.Init(&conn);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // create solicited exchange
+    MockAppDelegate mockSolicitedAppDelegate;
+    ExchangeContext * ec1 = exchangeMgr.NewContext(kDestinationNodeId, &mockSolicitedAppDelegate);
+
+    // create unsolicited exchange
+    MockAppDelegate mockUnsolicitedAppDelegate;
+    SimpleExchangeContextDelegateFactory mockUnsolicitedAppDelegateFactory(&mockUnsolicitedAppDelegate);
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegateFactory);
+
+    // send a malicious packet
+    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New());
+    NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+
+    // send a good packet
+    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New());
+    NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+}
+
 // Test Suite
 
 /**
@@ -193,6 +249,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ExchangeMgr::NewContext",               CheckNewContextTest),
     NL_TEST_DEF("Test ExchangeMgr::FindContext",              CheckFindContextTest),
     NL_TEST_DEF("Test ExchangeMgr::CheckUmhRegistrationTest", CheckUmhRegistrationTest),
+    NL_TEST_DEF("Test ExchangeMgr::CheckExchangeMessages",    CheckExchangeMessages),
 
     NL_TEST_SENTINEL()
 };
