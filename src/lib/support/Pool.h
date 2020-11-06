@@ -73,23 +73,21 @@ public:
 
     void Delete(T * obj)
     {
+        if (obj == nullptr)
+            return;
+
         size_t at     = static_cast<size_t>(obj - GetPoolHead());
         size_t word   = at / kAtomicSize;
         size_t offset = at - (word * kAtomicSize);
 
-#if !defined(NDEBUG)
         // ensure the obj is in the pool
         assert(at >= 0);
         assert(at < N);
-#endif
 
         obj->~T();
 
         uint32_t value = mUsage[word].fetch_and(~(1 << offset));
-
-#if !defined(NDEBUG)
         assert((value & (1 << offset)) != 0); // assert fail when free an unused slot
-#endif
     }
 
 #if !defined(NDEBUG)
