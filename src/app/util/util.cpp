@@ -48,6 +48,8 @@
 //#include "app/framework/util/time-util.h"
 //#include "hal/micro/crc.h"
 
+using namespace chip;
+
 // TODO: Need to figure out what needs to happen wrt HAL tokens here, but for
 // now define ESZP_HOST to disable it.  See
 // https://github.com/project-chip/connectedhomeip/issues/3275
@@ -128,7 +130,7 @@ EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 //------------------------------------------------------------------------------
 
 // Device enabled/disabled functions
-bool emberAfIsDeviceEnabled(uint8_t endpoint)
+bool emberAfIsDeviceEnabled(EndpointId endpoint)
 {
     uint8_t index;
 #ifdef ZCL_USING_BASIC_CLUSTER_DEVICE_ENABLED_ATTRIBUTE
@@ -147,7 +149,7 @@ bool emberAfIsDeviceEnabled(uint8_t endpoint)
     return false;
 }
 
-void emberAfSetDeviceEnabled(uint8_t endpoint, bool enabled)
+void emberAfSetDeviceEnabled(EndpointId endpoint, bool enabled)
 {
     uint8_t index = emberAfIndexFromEndpoint(endpoint);
     if (index != 0xFF && index < sizeof(afDeviceEnabled))
@@ -161,7 +163,7 @@ void emberAfSetDeviceEnabled(uint8_t endpoint, bool enabled)
 }
 
 // Is the device identifying?
-bool emberAfIsDeviceIdentifying(uint8_t endpoint)
+bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 {
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
     uint16_t identifyTime;
@@ -572,7 +574,7 @@ bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType ty
         uint8_t i;
         for (i = 0; i < emberAfEndpointCount(); i++)
         {
-            uint8_t endpoint = emberAfEndpointFromIndex(i);
+            EndpointId endpoint = emberAfEndpointFromIndex(i);
             if (!emberAfEndpointIndexIsEnabled(i) ||
                 !emberAfContainsClusterWithMfgCode(endpoint, curCmd.apsFrame->clusterId, curCmd.mfgCode))
             {
@@ -1193,7 +1195,7 @@ bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
     return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
-EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, uint8_t endpoint)
+EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, EndpointId endpoint)
 {
     uint8_t index = emberAfIndexFromEndpoint(endpoint);
     if (index == 0xFF)
@@ -1204,13 +1206,13 @@ EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls,
     return EMBER_SUCCESS;
 }
 
-bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, uint8_t endpoint)
+bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, EndpointId endpoint)
 {
     uint8_t index = emberAfIndexFromEndpoint(endpoint);
     return (index != 0xFF && emberEventControlGetActive(&controls[index]));
 }
 
-EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, uint8_t endpoint)
+EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, EndpointId endpoint)
 {
     uint8_t index = emberAfIndexFromEndpoint(endpoint);
     if (index == 0xFF)

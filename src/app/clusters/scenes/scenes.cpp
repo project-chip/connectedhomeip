@@ -53,7 +53,7 @@ uint8_t emberAfPluginScenesServerEntriesInUse = 0;
 EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[EMBER_AF_PLUGIN_SCENES_TABLE_SIZE];
 #endif
 
-static bool readServerAttribute(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, const char * name,
+static bool readServerAttribute(EndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, const char * name,
                                 uint8_t * data, uint8_t size)
 {
     bool success = false;
@@ -72,7 +72,7 @@ static bool readServerAttribute(uint8_t endpoint, EmberAfClusterId clusterId, Em
     return success;
 }
 
-static EmberAfStatus writeServerAttribute(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+static EmberAfStatus writeServerAttribute(EndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
                                           const char * name, uint8_t * data, EmberAfAttributeType type)
 {
     EmberAfStatus status = emberAfWriteServerAttribute(endpoint, clusterId, attributeId, data, type);
@@ -83,7 +83,7 @@ static EmberAfStatus writeServerAttribute(uint8_t endpoint, EmberAfClusterId clu
     return status;
 }
 
-void emberAfScenesClusterServerInitCallback(uint8_t endpoint)
+void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
 {
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
     {
@@ -109,13 +109,13 @@ void emberAfScenesClusterServerInitCallback(uint8_t endpoint)
     emberAfScenesSetSceneCountAttribute(endpoint, emberAfPluginScenesServerNumSceneEntriesInUse());
 }
 
-EmberAfStatus emberAfScenesSetSceneCountAttribute(uint8_t endpoint, uint8_t newCount)
+EmberAfStatus emberAfScenesSetSceneCountAttribute(EndpointId endpoint, uint8_t newCount)
 {
     return writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_SCENE_COUNT_ATTRIBUTE_ID, "scene count", (uint8_t *) &newCount,
                                 ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, GroupId groupId)
+EmberAfStatus emberAfScenesMakeValid(EndpointId endpoint, uint8_t sceneId, GroupId groupId)
 {
     EmberAfStatus status;
     bool valid = true;
@@ -141,7 +141,7 @@ EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, GroupId 
     return status;
 }
 
-EmberAfStatus emberAfScenesClusterMakeInvalidCallback(uint8_t endpoint)
+EmberAfStatus emberAfScenesClusterMakeInvalidCallback(EndpointId endpoint)
 {
     bool valid = false;
     return writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_SCENE_VALID_ATTRIBUTE_ID, "scene valid", (uint8_t *) &valid,
@@ -646,7 +646,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint)
+void emberAfScenesClusterClearSceneTableCallback(EndpointId endpoint)
 {
     uint8_t i, networkIndex = 0 /* emberGetCurrentNetwork() */;
     for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
@@ -689,7 +689,7 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
         cmd->bufLen -
         (cmd->payloadStartIndex + sizeof(groupId) + sizeof(sceneId) + sizeof(transitionTime) + emberAfStringLength(sceneName) + 1));
     uint16_t extensionFieldSetsIndex = 0;
-    uint8_t endpoint                 = cmd->apsFrame->destinationEndpoint;
+    EndpointId endpoint              = cmd->apsFrame->destinationEndpoint;
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
 
     emberAfScenesClusterPrint("RX: %pAddScene 0x%2x, 0x%x, 0x%2x, \"", (enhanced ? "Enhanced" : ""), groupId, sceneId,
@@ -1008,8 +1008,8 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
     EmberAfSceneTableEntry entry = {};
     EmberAfStatus status         = EMBER_ZCL_STATUS_NOT_FOUND;
     EmberStatus sendStatus;
-    bool enhanced    = (cmd->commandId == ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID);
-    uint8_t endpoint = cmd->apsFrame->destinationEndpoint;
+    bool enhanced       = (cmd->commandId == ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID);
+    EndpointId endpoint = cmd->apsFrame->destinationEndpoint;
 
     emberAfScenesClusterPrintln("RX: %pViewScene 0x%2x, 0x%x", (enhanced ? "Enhanced" : ""), groupId, sceneId);
 

@@ -54,8 +54,10 @@
 
 #include <assert.h>
 
+using namespace chip;
+
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
-static bool areStartUpLevelControlServerAttributesTokenized(uint8_t endpoint);
+static bool areStartUpLevelControlServerAttributesTokenized(EndpointId endpoint);
 #endif
 
 #if (EMBER_AF_PLUGIN_LEVEL_CONTROL_RATE == 0)
@@ -92,7 +94,7 @@ typedef struct
 
 static EmberAfLevelControlState stateTable[EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER_ENDPOINT_COUNT];
 
-static EmberAfLevelControlState * getState(uint8_t endpoint);
+static EmberAfLevelControlState * getState(EndpointId endpoint);
 
 static void moveToLevelHandler(uint8_t commandId, uint8_t level, uint16_t transitionTimeDs, uint8_t optionMask,
                                uint8_t optionOverride, uint16_t storedLevel);
@@ -101,35 +103,35 @@ static void stepHandler(uint8_t commandId, uint8_t stepMode, uint8_t stepSize, u
                         uint8_t optionOverride);
 static void stopHandler(uint8_t commandId, uint8_t optionMask, uint8_t optionOverride);
 
-static void setOnOffValue(uint8_t endpoint, bool onOff);
-static void writeRemainingTime(uint8_t endpoint, uint16_t remainingTimeMs);
-static bool shouldExecuteIfOff(uint8_t endpoint, uint8_t commandId, uint8_t optionMask, uint8_t optionOverride);
+static void setOnOffValue(EndpointId endpoint, bool onOff);
+static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs);
+static bool shouldExecuteIfOff(EndpointId endpoint, uint8_t commandId, uint8_t optionMask, uint8_t optionOverride);
 
 #if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
-static void reallyUpdateCoupledColorTemp(uint8_t endpoint);
+static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
 #define updateCoupledColorTemp(endpoint) reallyUpdateCoupledColorTemp(endpoint)
 #else
 #define updateCoupledColorTemp(endpoint)
 #endif // LEVEL...OPTIONS_ATTRIBUTE && COLOR...SERVER_TEMP
 
-static void schedule(uint8_t endpoint, uint32_t delayMs)
+static void schedule(EndpointId endpoint, uint32_t delayMs)
 {
     emberAfScheduleServerTickExtended(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID, delayMs, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP);
 }
 
-static void deactivate(uint8_t endpoint)
+static void deactivate(EndpointId endpoint)
 {
     emberAfDeactivateServerTick(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
 }
 
-static EmberAfLevelControlState * getState(uint8_t endpoint)
+static EmberAfLevelControlState * getState(EndpointId endpoint)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_LEVEL_CONTROL_CLUSTER_ID);
     return (ep == 0xFF ? NULL : &stateTable[ep]);
 }
 
 #if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
-static void reallyUpdateCoupledColorTemp(uint8_t endpoint)
+static void reallyUpdateCoupledColorTemp(EndpointId endpoint)
 {
     uint8_t options;
     EmberAfStatus status =
@@ -147,7 +149,7 @@ static void reallyUpdateCoupledColorTemp(uint8_t endpoint)
 }
 #endif // LEVEL...OPTIONS_ATTRIBUTE && COLOR...SERVER_TEMP
 
-extern "C" void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
+extern "C" void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 {
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
@@ -265,7 +267,7 @@ extern "C" void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint)
     }
 }
 
-static void writeRemainingTime(uint8_t endpoint, uint16_t remainingTimeMs)
+static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
 {
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_LEVEL_CONTROL_REMAINING_TIME_ATTRIBUTE
     // Convert milliseconds to tenths of a second, rounding any fractional value
@@ -294,7 +296,7 @@ static void writeRemainingTime(uint8_t endpoint, uint16_t remainingTimeMs)
 #endif
 }
 
-static void setOnOffValue(uint8_t endpoint, bool onOff)
+static void setOnOffValue(EndpointId endpoint, bool onOff)
 {
     if (emberAfContainsServer(endpoint, ZCL_ON_OFF_CLUSTER_ID))
     {
@@ -303,7 +305,7 @@ static void setOnOffValue(uint8_t endpoint, bool onOff)
     }
 }
 
-static bool shouldExecuteIfOff(uint8_t endpoint, uint8_t commandId, uint8_t optionMask, uint8_t optionOverride)
+static bool shouldExecuteIfOff(EndpointId endpoint, uint8_t commandId, uint8_t optionMask, uint8_t optionOverride)
 {
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE
     // From 3.10.2.2.8.1 of ZCL7 document 14-0127-20j-zcl-ch-3-general.docx:
@@ -452,7 +454,7 @@ extern "C" bool emberAfLevelControlClusterStopWithOnOffCallback(void)
 static void moveToLevelHandler(uint8_t commandId, uint8_t level, uint16_t transitionTimeDs, uint8_t optionMask,
                                uint8_t optionOverride, uint16_t storedLevel)
 {
-    uint8_t endpoint                 = emberAfCurrentEndpoint();
+    EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     uint8_t currentLevel;
@@ -585,7 +587,7 @@ send_default_response:
 
 static void moveHandler(uint8_t commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
 {
-    uint8_t endpoint                 = emberAfCurrentEndpoint();
+    EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     uint8_t currentLevel;
@@ -697,7 +699,7 @@ send_default_response:
 static void stepHandler(uint8_t commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs, uint8_t optionMask,
                         uint8_t optionOverride)
 {
-    uint8_t endpoint                 = emberAfCurrentEndpoint();
+    EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
     uint8_t currentLevel;
@@ -816,7 +818,7 @@ send_default_response:
 
 static void stopHandler(uint8_t commandId, uint8_t optionMask, uint8_t optionOverride)
 {
-    uint8_t endpoint                 = emberAfCurrentEndpoint();
+    EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
     EmberAfStatus status;
 
@@ -843,7 +845,7 @@ send_default_response:
 
 // Follows 07-5123-04 (ZigBee Cluster Library doc), section 3.10.2.1.1.
 // Quotes are from table 3.46.
-void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint, bool newValue)
+void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool newValue)
 {
     uint8_t temporaryCurrentLevelCache;
     uint16_t currentOnOffTransitionTime;
@@ -924,7 +926,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint, bool newVal
     }
 }
 
-extern "C" void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint)
+extern "C" void emberAfLevelControlClusterServerInitCallback(EndpointId endpoint)
 {
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
     // StartUp behavior relies StartUpCurrentLevel attributes being tokenized.
@@ -991,7 +993,7 @@ extern "C" void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint)
 }
 
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_START_UP_CURRENT_LEVEL_ATTRIBUTE
-static bool areStartUpLevelControlServerAttributesTokenized(uint8_t endpoint)
+static bool areStartUpLevelControlServerAttributesTokenized(EndpointId endpoint)
 {
     EmberAfAttributeMetadata * metadata;
 

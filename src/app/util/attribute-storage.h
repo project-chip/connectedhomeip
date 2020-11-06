@@ -119,35 +119,35 @@ EmberAfCluster * emberAfFindClusterInType(EmberAfEndpointType * endpointType, Em
 //    clusterIndex(Y,10,CLUSTER_MASK_SERVER) returns 0
 //    clusterIndex(Y,11,CLUSTER_MASK_SERVER) returns 0xFF
 //    clusterIndex(Y,12,CLUSTER_MASK_SERVER) returns 0xFF
-uint8_t emberAfClusterIndex(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfClusterMask mask);
+uint8_t emberAfClusterIndex(CHIPEndpointId endpoint, EmberAfClusterId clusterId, EmberAfClusterMask mask);
 
 // If server == true, returns the number of server clusters,
 // otherwise number of client clusters on this endpoint
-uint8_t emberAfClusterCount(uint8_t endpoint, bool server);
+uint8_t emberAfClusterCount(CHIPEndpointId endpoint, bool server);
 
 // Returns the clusterId of Nth server or client cluster,
 // depending on server toggle.
-EmberAfCluster * emberAfGetNthCluster(uint8_t endpoint, uint8_t n, bool server);
+EmberAfCluster * emberAfGetNthCluster(CHIPEndpointId endpoint, uint8_t n, bool server);
 
 // Returns number of clusters put into the passed cluster list
 // for the given endpoint and client/server polarity
-uint8_t emberAfGetClustersFromEndpoint(uint8_t endpoint, EmberAfClusterId * clusterList, uint8_t listLen, bool server);
+uint8_t emberAfGetClustersFromEndpoint(CHIPEndpointId endpoint, EmberAfClusterId * clusterList, uint8_t listLen, bool server);
 
 // Returns cluster within the endpoint, or NULL if it isn't there
-EmberAfCluster * emberAfFindClusterWithMfgCode(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfClusterMask mask,
+EmberAfCluster * emberAfFindClusterWithMfgCode(CHIPEndpointId endpoint, EmberAfClusterId clusterId, EmberAfClusterMask mask,
                                                uint16_t manufacturerCode);
 
 // Returns cluster within the endpoint, or NULL if it isn't there
 // This wraps emberAfFindClusterWithMfgCode with EMBER_AF_NULL_MANUFACTURER_CODE
-EmberAfCluster * emberAfFindCluster(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfClusterMask mask);
+EmberAfCluster * emberAfFindCluster(CHIPEndpointId endpoint, EmberAfClusterId clusterId, EmberAfClusterMask mask);
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints
-EmberAfCluster * emberAfFindClusterIncludingDisabledEndpointsWithMfgCode(uint8_t endpoint, EmberAfClusterId clusterId,
+EmberAfCluster * emberAfFindClusterIncludingDisabledEndpointsWithMfgCode(CHIPEndpointId endpoint, EmberAfClusterId clusterId,
                                                                          EmberAfClusterMask mask, uint16_t manufacturerCode);
 
 // Returns cluster within the endpoint; Does not ignore disabled endpoints
 // This wraps emberAfFindClusterIncludingDisabledEndpointsWithMfgCode with EMBER_AF_NULL_MANUFACTURER_CODE
-EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(uint8_t endpoint, EmberAfClusterId clusterId,
+EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(CHIPEndpointId endpoint, EmberAfClusterId clusterId,
                                                               EmberAfClusterMask mask);
 
 // Function mask must contain one of the CLUSTER_MASK function macros,
@@ -157,38 +157,40 @@ EmberAfCluster * emberAfFindClusterIncludingDisabledEndpoints(uint8_t endpoint, 
 EmberAfGenericClusterFunction emberAfFindClusterFunction(EmberAfCluster * cluster, EmberAfClusterMask functionMask);
 
 // Public APIs for loading attributes
-void emberAfInitializeAttributes(uint8_t endpoint);
-void emberAfResetAttributes(uint8_t endpoint);
+void emberAfInitializeAttributes(CHIPEndpointId endpoint);
+void emberAfResetAttributes(CHIPEndpointId endpoint);
 
 // Loads the attributes from built-in default and / or tokens
-void emAfLoadAttributeDefaults(uint8_t endpoint, bool writeTokens);
+void emAfLoadAttributeDefaults(CHIPEndpointId endpoint, bool writeTokens);
 
 // This function loads from tokens all the attributes that
 // are defined to be stored in tokens.
-void emAfLoadAttributesFromTokens(uint8_t endpoint);
+void emAfLoadAttributesFromTokens(CHIPEndpointId endpoint);
 
 // After the RAM value has changed, code should call this
 // function. If this attribute has been
 // tagged as stored-to-token, then code will store
 // the attribute to token.
-void emAfSaveAttributeToToken(uint8_t * data, uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeMetadata * metadata);
+void emAfSaveAttributeToToken(uint8_t * data, CHIPEndpointId endpoint, EmberAfClusterId clusterId,
+                              EmberAfAttributeMetadata * metadata);
 
 // Calls the attribute changed callback
-void emAfClusterAttributeChangedCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+void emAfClusterAttributeChangedCallback(CHIPEndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
                                          uint8_t clientServerMask, uint16_t manufacturerCode);
 
 // Calls the attribute changed callback for a specific cluster.
-EmberAfStatus emAfClusterPreAttributeChangedCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                                     uint8_t clientServerMask, uint16_t manufacturerCode,
-                                                     EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+EmberAfStatus emAfClusterPreAttributeChangedCallback(CHIPEndpointId endpoint, EmberAfClusterId clusterId,
+                                                     EmberAfAttributeId attributeId, uint8_t clientServerMask,
+                                                     uint16_t manufacturerCode, EmberAfAttributeType attributeType, uint8_t size,
+                                                     uint8_t * value);
 
 // Calls the default response callback for a specific cluster, and wraps emberAfClusterDefaultResponseWithMfgCodeCallback
 // with the EMBER_NULL_MANUFACTURER_CODE
-void emberAfClusterDefaultResponseCallback(uint8_t endpoint, EmberAfClusterId clusterId, uint8_t commandId, EmberAfStatus status,
-                                           uint8_t clientServerMask);
+void emberAfClusterDefaultResponseCallback(CHIPEndpointId endpoint, EmberAfClusterId clusterId, uint8_t commandId,
+                                           EmberAfStatus status, uint8_t clientServerMask);
 
 // Calls the default response callback for a specific cluster.
-void emberAfClusterDefaultResponseWithMfgCodeCallback(uint8_t endpoint, EmberAfClusterId clusterId, uint8_t commandId,
+void emberAfClusterDefaultResponseWithMfgCodeCallback(CHIPEndpointId endpoint, EmberAfClusterId clusterId, uint8_t commandId,
                                                       EmberAfStatus status, uint8_t clientServerMask, uint16_t manufacturerCode);
 
 // Calls the message sent callback for a specific cluster, and wraps emberAfClusterMessageSentWithMfgCodeCallback
@@ -208,7 +210,7 @@ uint16_t emAfGetManufacturerCodeForAttribute(EmberAfCluster * cluster, EmberAfAt
 // returns true if the mask matches a passed interval
 bool emberAfCheckTick(EmberAfClusterMask mask, uint8_t passedMask);
 
-bool emberAfEndpointIsEnabled(uint8_t endpoint);
+bool emberAfEndpointIsEnabled(CHIPEndpointId endpoint);
 
 // Note the difference in implementation from emberAfGetNthCluster().
 // emberAfGetClusterByIndex() retrieves the cluster by index regardless of server/client
@@ -219,11 +221,11 @@ bool emberAfEndpointIsEnabled(uint8_t endpoint);
 //  - Use emberAfGetClusterCountForEndpoint() with emberAfGetClusterByIndex()
 //
 // Don't mix them.
-uint8_t emberAfGetClusterCountForEndpoint(uint8_t endpoint);
-EmberAfCluster * emberAfGetClusterByIndex(uint8_t endpoint, uint8_t clusterIndex);
+uint8_t emberAfGetClusterCountForEndpoint(CHIPEndpointId endpoint);
+EmberAfCluster * emberAfGetClusterByIndex(CHIPEndpointId endpoint, uint8_t clusterIndex);
 
-EmberAfProfileId emberAfGetProfileIdForEndpoint(uint8_t endpoint);
-uint16_t emberAfGetDeviceIdForEndpoint(uint8_t endpoint);
+EmberAfProfileId emberAfGetProfileIdForEndpoint(CHIPEndpointId endpoint);
+uint16_t emberAfGetDeviceIdForEndpoint(CHIPEndpointId endpoint);
 
 #ifdef __cplusplus
 } // extern "C"

@@ -43,6 +43,8 @@
 #include "af.h"
 #include <assert.h>
 
+using namespace chip;
+
 static EmberAfPluginEsiManagementEsiEntry esiTable[EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE];
 static EmberAfEsiManagementDeletionCallback deletionCallbackTable[EMBER_AF_PLUGIN_ESI_MANAGEMENT_PLUGIN_CALLBACK_TABLE_SIZE];
 static uint8_t deletionCallbackTableSize = 0;
@@ -107,7 +109,7 @@ EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByShortI
     }
 }
 
-EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByLongIdAndEndpoint(EmberEUI64 longId, uint8_t endpoint)
+EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByLongIdAndEndpoint(EmberEUI64 longId, EndpointId endpoint)
 {
     uint8_t index = emberAfPluginEsiManagementIndexLookUpByLongIdAndEndpoint(longId, endpoint);
     if (index < EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE)
@@ -135,7 +137,7 @@ uint8_t emberAfPluginEsiManagementIndexLookUpByShortIdAndEndpoint(EmberNodeId sh
     return 0xFF;
 }
 
-uint8_t emberAfPluginEsiManagementIndexLookUpByLongIdAndEndpoint(EmberEUI64 longId, uint8_t endpoint)
+uint8_t emberAfPluginEsiManagementIndexLookUpByLongIdAndEndpoint(EmberEUI64 longId, EndpointId endpoint)
 {
     uint8_t i;
     for (i = 0; i < EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE; i++)

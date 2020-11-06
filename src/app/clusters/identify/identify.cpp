@@ -50,6 +50,8 @@
 
 #include "common.h"
 
+using namespace chip;
+
 typedef struct
 {
     bool identifying;
@@ -58,24 +60,24 @@ typedef struct
 
 static EmAfIdentifyState stateTable[EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT];
 
-static EmberAfStatus readIdentifyTime(uint8_t endpoint, uint16_t * identifyTime);
-static EmberAfStatus writeIdentifyTime(uint8_t endpoint, uint16_t identifyTime);
-static EmberStatus scheduleIdentifyTick(uint8_t endpoint);
+static EmberAfStatus readIdentifyTime(EndpointId endpoint, uint16_t * identifyTime);
+static EmberAfStatus writeIdentifyTime(EndpointId endpoint, uint16_t identifyTime);
+static EmberStatus scheduleIdentifyTick(EndpointId endpoint);
 
-static EmAfIdentifyState * getIdentifyState(uint8_t endpoint);
+static EmAfIdentifyState * getIdentifyState(EndpointId endpoint);
 
-static EmAfIdentifyState * getIdentifyState(uint8_t endpoint)
+static EmAfIdentifyState * getIdentifyState(EndpointId endpoint)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_IDENTIFY_CLUSTER_ID);
     return (ep == 0xFF ? NULL : &stateTable[ep]);
 }
 
-void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint)
+void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
 {
     scheduleIdentifyTick(endpoint);
 }
 
-void emberAfIdentifyClusterServerTickCallback(uint8_t endpoint)
+void emberAfIdentifyClusterServerTickCallback(EndpointId endpoint)
 {
     uint16_t identifyTime;
     if (readIdentifyTime(endpoint, &identifyTime) == EMBER_ZCL_STATUS_SUCCESS)
@@ -87,7 +89,7 @@ void emberAfIdentifyClusterServerTickCallback(uint8_t endpoint)
     }
 }
 
-void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId)
+void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, EmberAfAttributeId attributeId)
 {
     if (attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID)
     {
@@ -156,7 +158,7 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(void)
     return true;
 }
 
-EmberAfStatus readIdentifyTime(uint8_t endpoint, uint16_t * identifyTime)
+EmberAfStatus readIdentifyTime(EndpointId endpoint, uint16_t * identifyTime)
 {
     EmberAfStatus status = emberAfReadAttribute(endpoint, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
                                                 CLUSTER_MASK_SERVER, (uint8_t *) identifyTime, sizeof(*identifyTime),
@@ -170,7 +172,7 @@ EmberAfStatus readIdentifyTime(uint8_t endpoint, uint16_t * identifyTime)
     return status;
 }
 
-static EmberAfStatus writeIdentifyTime(uint8_t endpoint, uint16_t identifyTime)
+static EmberAfStatus writeIdentifyTime(EndpointId endpoint, uint16_t identifyTime)
 {
     EmberAfStatus status = emberAfWriteAttribute(endpoint, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
                                                  CLUSTER_MASK_SERVER, (uint8_t *) &identifyTime, ZCL_INT16U_ATTRIBUTE_TYPE);
@@ -183,7 +185,7 @@ static EmberAfStatus writeIdentifyTime(uint8_t endpoint, uint16_t identifyTime)
     return status;
 }
 
-static EmberStatus scheduleIdentifyTick(uint8_t endpoint)
+static EmberStatus scheduleIdentifyTick(EndpointId endpoint)
 {
     EmberAfStatus status;
     EmAfIdentifyState * state = getIdentifyState(endpoint);

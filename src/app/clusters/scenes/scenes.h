@@ -43,8 +43,8 @@
 #include <app/util/af-types.h>
 #include <stdint.h>
 
-EmberAfStatus emberAfScenesSetSceneCountAttribute(uint8_t endpoint, uint8_t newCount);
-EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, CHIPGroupId groupId);
+EmberAfStatus emberAfScenesSetSceneCountAttribute(CHIPEndpointId endpoint, uint8_t newCount);
+EmberAfStatus emberAfScenesMakeValid(CHIPEndpointId endpoint, uint8_t sceneId, CHIPGroupId groupId);
 
 // DEPRECATED.
 #define emberAfScenesMakeInvalid emberAfScenesClusterMakeInvalidCallback
