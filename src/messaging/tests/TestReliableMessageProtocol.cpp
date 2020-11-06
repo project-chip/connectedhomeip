@@ -148,7 +148,8 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockAppDelegate;
 
-    ExchangeContext * exchange = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
+    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    ExchangeContext * exchange = exchangeMgr.NewContext({kDestinationNodeId, kAnyKeyId}, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
@@ -185,7 +186,8 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockAppDelegate;
 
-    ExchangeContext * exchange = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
+    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    ExchangeContext * exchange = exchangeMgr.NewContext({kDestinationNodeId, kAnyKeyId}, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
@@ -246,7 +248,8 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockSender;
 
-    ExchangeContext * exchange = exchangeMgr.NewContext(kDestinationNodeId, &mockSender);
+    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    ExchangeContext * exchange = exchangeMgr.NewContext({kDestinationNodeId, kAnyKeyId}, &mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();

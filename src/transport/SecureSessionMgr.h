@@ -44,6 +44,23 @@ namespace chip {
 
 class SecureSessionMgr;
 
+class SecureSessionHandle
+{
+public:
+    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0) {}
+    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId) : mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId) {}
+
+    bool operator==(const SecureSessionHandle & that) const
+    {
+        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
+    }
+
+private:
+    friend class SecureSessionMgr;
+    NodeId mPeerNodeId;
+    uint16_t mPeerKeyId;
+};
+
 /**
  * @brief
  *  Tracks ownership of a encrypted PacketBuffer.
@@ -99,13 +116,12 @@ public:
      *
      * @param packetHeader  The message header
      * @param payloadHeader The payload header
-     * @param state         The connection state
+     * @param session       The handle to the secure session
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
-                                   SecureSessionMgr * mgr)
+                                   SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**
@@ -122,19 +138,19 @@ public:
      * @brief
      *   Called when a new pairing is being established
      *
-     * @param state   connection state
+     * @param session The handle to the secure session
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
+    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) {}
 
     /**
      * @brief
      *   Called when a new connection is closing
      *
-     * @param state   connection state
+     * @param session The handle to the secure session
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
+    virtual void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) {}
 
     virtual ~SecureSessionMgrDelegate() {}
 };
@@ -154,10 +170,11 @@ public:
      *   returns success, the encrypted data that was sent, as well as various other information needed
      *   to retransmit it, will be stored in *bufferRetainSlot.
      */
-    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
-    CHIP_ERROR SendMessage(EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot);
+
+    Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
 
     /**
      * @brief
@@ -225,8 +242,7 @@ private:
     SecureSessionMgrDelegate * mCB   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
 
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();

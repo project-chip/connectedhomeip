@@ -82,31 +82,29 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, System::PacketBufferHandle msgBuf)
 {
     PayloadHeader payloadHeader;
 
-    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf));
+    return SendMessage(session, payloadHeader, std::move(msgBuf));
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                                         EncryptedPacketBufferHandle * bufferRetainSlot)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
-    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, false);
+    return SendMessage(session, payloadHeader, std::move(msgBuf), bufferRetainSlot, false);
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     PayloadHeader payloadHeader;
 
-    return SendMessage(payloadHeader, 0, std::move(msgBuf), bufferRetainSlot, true);
+    return SendMessage(session, payloadHeader, std::move(msgBuf), bufferRetainSlot, true);
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                                         EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
-    PeerConnectionState * state = nullptr;
+    PeerConnectionState * state = GetPeerConnectionState(session);
     PacketHeader packetHeader;
     uint16_t headerSize = 0;
 
@@ -114,12 +112,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
     {
         err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
         SuccessOrExit(err);
-
-        VerifyOrExit(packetHeader.GetDestinationNodeId().HasValue(), err = CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
-        peerNodeId = packetHeader.GetDestinationNodeId().Value();
     }
 
-    state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -127,7 +121,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Find an active connection to the specified peer node
-    VerifyOrExit(state != nullptr, err = CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+    VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
 
     // This marks any connection where we send data to as 'active'
     mPeerConnections.MarkConnectionActive(state);
@@ -152,10 +146,10 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
             VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
 
             packetHeader
-                .SetSourceNodeId(mLocalNodeId)              //
-                .SetDestinationNodeId(peerNodeId)           //
-                .SetMessageId(msgId)                        //
-                .SetEncryptionKeyID(state->GetLocalKeyID()) //
+                .SetSourceNodeId(mLocalNodeId)
+                .SetDestinationNodeId(state->GetPeerNodeId())
+                .SetMessageId(msgId)
+                .SetEncryptionKeyID(state->GetLocalKeyID())
                 .SetPayloadLength(static_cast<uint16_t>(payloadLength));
             packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
         }
@@ -165,7 +159,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
             msgBuf->SetStart(msgBuf->Start() + headerSize);
         }
 
-        ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, peerNodeId);
+        ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, state->GetPeerNodeId());
 
         // Encrypt the packet if it's not already encrypted
         if (!isEncrypted)
@@ -277,6 +271,10 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
     {
         err = pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo),
                                            strlen(kSpake2pI2RSessionInfo), state->GetSecureSession());
+        if (mCB != nullptr)
+        {
+            mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID() }, this);
+        }
     }
 
 exit:
@@ -371,7 +369,8 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
 
         if (mCB != nullptr)
         {
-            mCB->OnMessageReceived(packetHeader, payloadHeader, state, std::move(msg), this);
+            mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID() }, std::move(msg),
+                                   this);
         }
     }
 
@@ -391,7 +390,7 @@ void SecureSessionMgr::HandleConnectionExpired(const Transport::PeerConnectionSt
 
     if (mCB != nullptr)
     {
-        mCB->OnConnectionExpired(&state, this);
+        mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID() }, this);
     }
 
     mTransportMgr->Disconnect(state.GetPeerAddress());
@@ -408,6 +407,11 @@ void SecureSessionMgr::ExpiryTimerCallback(System::Layer * layer, void * param, 
         [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
+}
+
+PeerConnectionState * SecureSessionMgr::GetPeerConnectionState(SecureSessionHandle session)
+{
+    return mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(session.mPeerNodeId), session.mPeerKeyId, nullptr);
 }
 
 } // namespace chip
