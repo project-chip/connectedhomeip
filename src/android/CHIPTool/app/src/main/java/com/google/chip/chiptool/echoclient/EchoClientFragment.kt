@@ -25,12 +25,13 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipDeviceController
 import com.google.chip.chiptool.ChipClient
+import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import kotlinx.android.synthetic.main.echo_client_fragment.*
 import kotlinx.android.synthetic.main.echo_client_fragment.view.*
 
 /** Sends echo messages to the CHIP device. */
-class EchoClientFragment : Fragment(), ChipDeviceController.CompletionListener {
+class EchoClientFragment : Fragment() {
 
   private val deviceController: ChipDeviceController
     get() = ChipClient.getDeviceController()
@@ -41,7 +42,7 @@ class EchoClientFragment : Fragment(), ChipDeviceController.CompletionListener {
       savedInstanceState: Bundle?
   ): View {
     return inflater.inflate(R.layout.echo_client_fragment, container, false).apply {
-      deviceController.setCompletionListener(this@EchoClientFragment)
+      deviceController.setCompletionListener(ChipControllerCallback())
 
       inputTextEd.hint = requireContext().getString(R.string.echo_input_hint_text)
 
@@ -49,24 +50,26 @@ class EchoClientFragment : Fragment(), ChipDeviceController.CompletionListener {
     }
   }
 
-  override fun onConnectDeviceComplete() {
-    sendEcho()
-  }
+  inner class ChipControllerCallback : GenericChipDeviceListener() {
+    override fun onConnectDeviceComplete() {
+      sendEcho()
+    }
 
-  override fun onSendMessageComplete(message: String?) {
-    commandStatusTv.text = requireContext().getString(R.string.echo_status_response, message)
-  }
+    override fun onSendMessageComplete(message: String?) {
+      commandStatusTv.text = requireContext().getString(R.string.echo_status_response, message)
+    }
 
-  override fun onNotifyChipConnectionClosed() {
-    Log.d(TAG, "onNotifyChipConnectionClosed")
-  }
+    override fun onNotifyChipConnectionClosed() {
+      Log.d(TAG, "onNotifyChipConnectionClosed")
+    }
 
-  override fun onCloseBleComplete() {
-    Log.d(TAG, "onCloseBleComplete")
-  }
+    override fun onCloseBleComplete() {
+      Log.d(TAG, "onCloseBleComplete")
+    }
 
-  override fun onError(error: Throwable) {
-    Log.d(TAG, "onError: $error")
+    override fun onError(error: Throwable?) {
+      Log.d(TAG, "onError: $error")
+    }
   }
 
   private fun onSendCommandClick() {
