@@ -93,7 +93,7 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     INET_ERROR err         = INET_NO_ERROR;
     IPAddress testDestAddr = IPAddress::Any;
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
-    char testHostName[20]  = "www.nest.com";
+    char testHostName[20] = "www.nest.com";
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
