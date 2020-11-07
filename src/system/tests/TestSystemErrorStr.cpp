@@ -63,8 +63,6 @@ static int32_t sContext[] =
 };
 // clang-format on
 
-static const size_t kTestElements = sizeof(sContext) / sizeof(sContext[0]);
-
 static void CheckSystemErrorStr(nlTestSuite * inSuite, void * inContext)
 {
     // Register the layer error formatter
