@@ -92,7 +92,9 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     INET_ERROR err         = INET_NO_ERROR;
     IPAddress testDestAddr = IPAddress::Any;
+#if INET_CONFIG_ENABLE_DNS_RESOLVER
     char testHostName[20]  = "www.nest.com";
+#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP);
