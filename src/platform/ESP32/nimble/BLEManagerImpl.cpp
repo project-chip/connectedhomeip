@@ -442,7 +442,7 @@ void BLEManagerImpl::DriveBLEState(void)
             err = StartAdvertising();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Configure Adv Data failed: %s", ErrorStr(err));
+                ChipLogError(DeviceLayer, "Start advertising failed: %s", ErrorStr(err));
                 ExitNow();
             }
 
@@ -931,8 +931,6 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
         break;
 
     case BLE_GAP_EVENT_ADV_COMPLETE:
-        err = sInstance.StartAdvertising();
-        SuccessOrExit(err);
         ESP_LOGD(TAG, "BLE_GAP_EVENT_ADV_COMPLETE event");
         break;
 
@@ -1057,6 +1055,24 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
 
 exit:
+    if (err == BLE_HS_EALREADY && connectable)
+    {
+        ChipLogProgress(DeviceLayer,
+                        "Connectable advertising failed because device was already advertising , stop active advertisement");
+        err = ble_gap_adv_stop();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
+        }
+        else
+        {
+            err = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Retried adv start; ble_gap_adv_start() failed: %s", ErrorStr(err));
+            }
+        }
+    }
     return err;
 }
 
