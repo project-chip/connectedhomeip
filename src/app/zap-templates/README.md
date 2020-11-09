@@ -22,5 +22,5 @@ cd ./third_party/zap/repo/
 node src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ../../../src/app/zap-templates/chip-templates.json -i <path to *.zap file> -o <Path to /gen/ folder>
 ```
 
-For more information please see the documentation under
-`docs/` in [ZAP](https://github.com/project-chip/zap)
+For more information please see the documentation under `docs/` in
+[ZAP](https://github.com/project-chip/zap)

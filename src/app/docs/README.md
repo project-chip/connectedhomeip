@@ -31,7 +31,8 @@ ZCL Application Framework.
 
 ### <code>/src/app/zap-templates</code>
 
-This directory contains all of the templates and helpers specific to CHIP for the ZAP tool.
+This directory contains all of the templates and helpers specific to CHIP for
+the ZAP tool.
 
 ## Public APIs
 
