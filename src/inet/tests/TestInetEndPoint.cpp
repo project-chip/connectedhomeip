@@ -91,8 +91,8 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
     TCPEndPoint * testTCPEP = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
     INET_ERROR err         = INET_NO_ERROR;
-    IPAddress testDestAddr = IPAddress::Any;
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
+    IPAddress testDestAddr = IPAddress::Any;
     char testHostName[20] = "www.nest.com";
 #endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
