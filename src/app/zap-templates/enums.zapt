@@ -1,8 +1,7 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_EMBER_ENUMS__
-#define __ZAP_EMBER_ENUMS__
+// Prevent multiple inclusion
+#pragma once
 
 // ZCL enums
 
@@ -22,5 +21,3 @@ typedef enum {
 #define EMBER_AF_{{asDelimitedMacro parent.label}}_{{asDelimitedMacro label}}_OFFSET ({{asOffset mask}})
 {{/zcl_bitmap_items}}
 {{/zcl_bitmaps}}
-
-#endif //__ZAP_EMBER_ENUMS__

@@ -1,8 +1,7 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_CLUSTER_ID__
-#define __ZAP_CLUSTER_ID__
+// Prevent multiple inclusion
+#pragma once
 
 {{#zcl_clusters}}
 
@@ -10,5 +9,3 @@
 #define ZCL_{{asDelimitedMacro define}}_ID ({{asHex code 4}})
 
 {{/zcl_clusters}}
-
-#endif // __ZAP_CLUSTER_ID__

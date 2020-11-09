@@ -1,8 +1,7 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_GEN_ID__
-#define __ZAP_GEN_ID__
+// Prevent multiple inclusion
+#pragma once
 
 // Global, non-cluster-specific commands
 {{#zcl_global_commands}}
@@ -18,5 +17,3 @@
 #define ZCL_{{asDelimitedMacro label}}_COMMAND_ID ({{asHex code 2}})
 {{/zcl_commands}}
 {{/zcl_clusters}}
-
-#endif // __ZAP_GEN_ID__

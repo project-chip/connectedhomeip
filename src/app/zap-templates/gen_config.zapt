@@ -1,8 +1,7 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_GEN_CONFIG__
-#define __ZAP_GEN_CONFIG__
+// Prevent multiple inclusion
+#pragma once
 
 // User options for plugin Binding Table Library
 #define EMBER_BINDING_TABLE_SIZE 10
@@ -17,5 +16,3 @@
 {{#all_user_clusters}}
 #define EMBER_AF_{{asDelimitedMacro define}}_{{asDelimitedMacro side}}_ENDPOINT_COUNT ({{user_endpoint_count_by_cluster id side}})
 {{/all_user_clusters}}
-
-#endif // __ZAP_GEN_CONFIG__

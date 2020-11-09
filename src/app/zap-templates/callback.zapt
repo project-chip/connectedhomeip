@@ -1,8 +1,7 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_CALLBACK__
-#define __ZAP_CALLBACK__
+// Prevent multiple inclusion
+#pragma once
 
 #include "af-structs.h"
 #include "af-types.h"
@@ -52,5 +51,3 @@ bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}
 {{/all_user_cluster_commands}}
 {{/if}}
 {{/all_user_clusters}}
-
-#endif //__ZAP_CALLBACK__

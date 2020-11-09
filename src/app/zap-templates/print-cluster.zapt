@@ -1,9 +1,7 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_PRINT_CLUSTER__
-#define __ZAP_PRINT_CLUSTER__
-
+// Prevent multiple inclusion
+#pragma once
 
 // This is the mapping of IDs to cluster names assuming a format according
 // to the "EmberAfClusterName" defined in the ZCL header.
@@ -24,6 +22,3 @@
 {{/zcl_clusters}}
 
 #define MAX_CLUSTER_NAME_LENGTH  {{zcl_cluster_largest_label_length}}
-
-// Enclosing macro to prevent multiple inclusion
-#endif // __ZAP_PRINT_CLUSTER__

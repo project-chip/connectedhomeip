@@ -1,9 +1,6 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_CALL_COMMAND_HANDLER__
-#define __ZAP_CALL_COMMAND_HANDLER__
+// Prevent multiple inclusion
+#pragma once
 
 #include "af-types.h"
-
-#endif //__ZAP_CALL_COMMAND_HANDLER__

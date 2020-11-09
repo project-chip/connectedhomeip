@@ -1,8 +1,7 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_EMBER_ATTRIBUTE_ID__
-#define __ZAP_EMBER_ATTRIBUTE_ID__
+// Prevent multiple inclusion
+#pragma once
 
 {{#zcl_clusters}}
 // Attribute ids for cluster: {{label}}
@@ -26,5 +25,3 @@
 {{/last}}
 {{/zcl_attributes_server}}
 {{/zcl_clusters}}
-
-#endif // __ZAP_EMBER_ATTRIBUTE_ID__

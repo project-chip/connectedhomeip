@@ -1,8 +1,7 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_ATT_STORAGE__
-#define __ZAP_ATT_STORAGE__
+// Prevent multiple inclusion
+#pragma once
 
 // Attribute masks modify how attributes are used by the framework
 //
@@ -52,5 +51,3 @@
 #define COMMAND_MASK_INCOMING_SERVER (0x08)
 // Is this command manufacturer specific?
 #define COMMAND_MASK_MANUFACTURER_SPECIFIC (0x10)
-
-#endif // __ZAP_ATT_STORAGE__

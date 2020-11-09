@@ -1,8 +1,7 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_ATTRIBUTE_TYPE__
-#define __ZAP_ATTRIBUTE_TYPE__
+// Prevent multiple inclusion
+#pragma once
 
 // ZCL attribute types
 enum {
@@ -19,5 +18,3 @@ enum {
 {{/if}}
 {{/zcl_atomics}}
 }
-
-#endif // __ZAP_ATTRIBUTE_TYPE__

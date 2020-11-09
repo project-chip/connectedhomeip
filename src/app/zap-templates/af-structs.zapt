@@ -1,8 +1,7 @@
 {{chip_header}}
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef __ZAP_AF_STRUCTS__
-#define __ZAP_AF_STRUCTS__
+// Prevent multiple inclusion
+#pragma once
 
 #include <stdint.h>
 #include "enums.h"
@@ -16,5 +15,3 @@ typedef struct _{{asType label}} {
 {{/zcl_struct_items}}
 } {{asUnderlyingType label}};
 {{/zcl_structs}}
-
-#endif // __ZAP_AF_STRUCTS__
