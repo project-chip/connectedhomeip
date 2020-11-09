@@ -27,18 +27,26 @@
 #include <array>
 #include <assert.h>
 #include <atomic>
+#include <limits>
 #include <new>
 #include <stddef.h>
 
 namespace chip {
 
+/**
+ *  @brief
+ *   A class template used for allocating Objects.
+ *
+ *  @tparam     T   a subclass of Object to be allocated.
+ *  @tparam     N   a positive integer max number of objects the pool provides.
+ */
 template <class T, size_t N>
 class BitMapObjectPool
 {
 public:
     BitMapObjectPool()
     {
-        for (size_t word = 0; word * kAtomicSize < N; ++word)
+        for (size_t word = 0; word * kBitChunkSize < N; ++word)
         {
             mUsage[word].store(0);
         }
@@ -49,17 +57,17 @@ public:
     template <typename... Args>
     T * New(Args &&... args)
     {
-        for (size_t word = 0; word * kAtomicSize < N; ++word)
+        for (size_t word = 0; word * kBitChunkSize < N; ++word)
         {
             auto & usage   = mUsage[word];
-            uint32_t value = usage.load();
-            for (size_t offset = 0; offset < kAtomicSize && offset + word * kAtomicSize < N; ++offset)
+            auto value = usage.load();
+            for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < N; ++offset)
             {
-                if ((value & (1 << offset)) == 0)
+                if ((value & (kBit1 << offset)) == 0)
                 {
-                    if (usage.compare_exchange_strong(value, value | (1 << offset)))
+                    if (usage.compare_exchange_strong(value, value | (kBit1 << offset)))
                     {
-                        return new (GetPoolHead() + (word * kAtomicSize + offset)) T(std::forward<Args>(args)...);
+                        return new (GetPoolHead() + (word * kBitChunkSize + offset)) T(std::forward<Args>(args)...);
                     }
                     else
                     {
@@ -77,8 +85,8 @@ public:
             return;
 
         size_t at     = static_cast<size_t>(obj - GetPoolHead());
-        size_t word   = at / kAtomicSize;
-        size_t offset = at - (word * kAtomicSize);
+        size_t word   = at / kBitChunkSize;
+        size_t offset = at - (word * kBitChunkSize);
 
         // ensure the obj is in the pool
         assert(at >= 0);
@@ -86,42 +94,45 @@ public:
 
         obj->~T();
 
-        uint32_t value = mUsage[word].fetch_and(~(1 << offset));
-        assert((value & (1 << offset)) != 0); // assert fail when free an unused slot
+        auto value = mUsage[word].fetch_and(~(kBit1 << offset));
+        assert((value & (kBit1 << offset)) != 0); // assert fail when free an unused slot
     }
 
 #if !defined(NDEBUG)
     template <typename F>
-    void ForEachActiveObject(F f)
+    void ForEachActiveObject(F f) const
     {
-        for (size_t word = 0; word * kAtomicSize < N; ++word)
+        for (size_t word = 0; word * kBitChunkSize < N; ++word)
         {
             auto & usage   = mUsage[word];
-            uint32_t value = usage.load();
-            for (size_t offset = 0; offset < kAtomicSize && offset + word * kAtomicSize < N; ++offset)
+            auto value = usage.load();
+            for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < N; ++offset)
             {
-                if ((value & (1 << offset)) != 0)
+                if ((value & (kBit1 << offset)) != 0)
                 {
-                    f(GetPoolHead() + (word * kAtomicSize + offset));
+                    f(GetPoolHead() + (word * kBitChunkSize + offset));
                 }
             }
         }
     }
 
-    size_t GetNumObjectsInUse()
+    size_t GetNumObjectsInUse() const
     {
         size_t count = 0;
-        ForEachActiveObject([&count](T *) { ++count; });
+        ForEachActiveObject([&count](const T *) { ++count; });
         return count;
     }
 #endif
 
 private:
     T * GetPoolHead() { return reinterpret_cast<T *>(mMemory); }
+    const T * GetPoolHead() const { return reinterpret_cast<const T *>(mMemory); }
 
-    static constexpr const size_t kAtomicSize = 32;
+    using tBitChunkType = uintmax_t;
+    static constexpr const tBitChunkType kBit1 = 1;
+    static constexpr const size_t kBitChunkSize = std::numeric_limits<tBitChunkType>::digits;
 
-    std::array<std::atomic_uint32_t, (N + kAtomicSize - 1) / kAtomicSize> mUsage;
+    std::array<std::atomic<tBitChunkType>, (N + kBitChunkSize - 1) / kBitChunkSize> mUsage;
     alignas(alignof(T)) uint8_t mMemory[N * sizeof(T)];
 };
 
