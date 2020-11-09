@@ -15,15 +15,13 @@
 import("//build_overrides/chip.gni")
 
 static_library("minimal") {
-    sources = [
-        "DnsHeader.h", 
-        "QName.h",
-        "QName.cpp",
-        "Query.h",
-        "QueryBuilder.h",
-    ]
-
-  public_deps = [
-    "${chip_root}/src/lib/core",
+  sources = [
+    "DnsHeader.h",
+    "QName.cpp",
+    "QName.h",
+    "Query.h",
+    "QueryBuilder.h",
   ]
+
+  public_deps = [ "${chip_root}/src/lib/core" ]
 }

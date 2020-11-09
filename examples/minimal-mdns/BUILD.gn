@@ -19,13 +19,11 @@ import("${chip_root}/build/chip/tools.gni")
 assert(chip_build_tools)
 
 executable("minimal-mdns-test") {
-  sources = [
-    "main.cpp",
-  ]
+  sources = [ "main.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ 
+  public_deps = [
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/mdns/minimal",
   ]
