@@ -26,6 +26,7 @@
 #include <ble/BleLayer.h>
 #include <ble/BleUUID.h>
 #include <platform/Darwin/BleConnectionDelegate.h>
+#include <setup_payload/SetupPayload.h>
 #include <support/logging/CHIPLogging.h>
 
 #import <CoreBluetooth/CoreBluetooth.h>
@@ -137,7 +138,7 @@ namespace DeviceLayer {
                         discriminator = static_cast<uint16_t>(((bytes[1] & 0x0F) << 8) | bytes[2]);
                     }
 
-                    if (opCode == 0 && discriminator == _deviceDiscriminator) {
+                    if (opCode == 0 && [self checkDiscriminator:discriminator]) {
                         ChipLogProgress(Ble, "Connecting to device: %@", peripheral);
                         [self connect:peripheral];
                         [self stopScanning];
@@ -147,6 +148,17 @@ namespace DeviceLayer {
                 break;
             }
         }
+    }
+}
+
+- (BOOL)checkDiscriminator:(uint16_t)discriminator
+{
+    // If the setup discriminator is only 4 bits, only match the lower 4 from the BLE advertisement
+    if (_deviceDiscriminator <= chip::kManualSetupDiscriminatorFieldBitMask) {
+        return _deviceDiscriminator == (discriminator & chip::kManualSetupDiscriminatorFieldBitMask);
+    } else {
+        // else compare the entire thing
+        return _deviceDiscriminator == discriminator;
     }
 }
 

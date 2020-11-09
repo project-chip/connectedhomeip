@@ -48,6 +48,8 @@
 //#include "app/framework/util/time-util.h"
 //#include "hal/micro/crc.h"
 
+using namespace chip;
+
 // TODO: Need to figure out what needs to happen wrt HAL tokens here, but for
 // now define ESZP_HOST to disable it.  See
 // https://github.com/project-chip/connectedhomeip/issues/3275
@@ -128,7 +130,7 @@ EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 //------------------------------------------------------------------------------
 
 // Device enabled/disabled functions
-bool emberAfIsDeviceEnabled(uint8_t endpoint)
+bool emberAfIsDeviceEnabled(EndpointId endpoint)
 {
     uint8_t index;
 #ifdef ZCL_USING_BASIC_CLUSTER_DEVICE_ENABLED_ATTRIBUTE
@@ -147,7 +149,7 @@ bool emberAfIsDeviceEnabled(uint8_t endpoint)
     return false;
 }
 
-void emberAfSetDeviceEnabled(uint8_t endpoint, bool enabled)
+void emberAfSetDeviceEnabled(EndpointId endpoint, bool enabled)
 {
     uint8_t index = emberAfIndexFromEndpoint(endpoint);
     if (index != 0xFF && index < sizeof(afDeviceEnabled))
@@ -161,7 +163,7 @@ void emberAfSetDeviceEnabled(uint8_t endpoint, bool enabled)
 }
 
 // Is the device identifying?
-bool emberAfIsDeviceIdentifying(uint8_t endpoint)
+bool emberAfIsDeviceIdentifying(EndpointId endpoint)
 {
 #ifdef ZCL_USING_IDENTIFY_CLUSTER_SERVER
     uint16_t identifyTime;
@@ -235,7 +237,7 @@ static void prepareForResponse(const EmberAfClusterCommand * cmd)
     if (cmd->interPanHeader == NULL)
     {
         emberAfResponseDestination = cmd->source;
-        emberAfResponseType &= ~ZCL_UTIL_RESP_INTERPAN;
+        emberAfResponseType        = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_INTERPAN);
     }
     else
     {
@@ -321,8 +323,9 @@ void emberAfStackDown(void)
 // Print out information about each cluster
 // ****************************************
 
-uint16_t emberAfFindClusterNameIndexWithMfgCode(uint16_t cluster, uint16_t mfgCode)
+uint16_t emberAfFindClusterNameIndexWithMfgCode(ClusterId cluster, uint16_t mfgCode)
 {
+    static_assert(sizeof(ClusterId) == 2, "May need to adjust our index type or somehow define it in terms of cluster id type");
     uint16_t index = 0;
     while (zclClusterNames[index].id != ZCL_NULL_CLUSTER_ID)
     {
@@ -342,18 +345,19 @@ uint16_t emberAfFindClusterNameIndexWithMfgCode(uint16_t cluster, uint16_t mfgCo
     return 0xFFFF;
 }
 
-uint16_t emberAfFindClusterNameIndex(uint16_t cluster)
+uint16_t emberAfFindClusterNameIndex(ClusterId cluster)
 {
     return emberAfFindClusterNameIndexWithMfgCode(cluster, EMBER_AF_NULL_MANUFACTURER_CODE);
 }
 
 // This function parses into the cluster name table, and tries to find
 // the index in the table that has the two keys: cluster + mfgcode.
-void emberAfDecodeAndPrintClusterWithMfgCode(uint16_t cluster, uint16_t mfgCode)
+void emberAfDecodeAndPrintClusterWithMfgCode(ClusterId cluster, uint16_t mfgCode)
 {
     uint16_t index = emberAfFindClusterNameIndexWithMfgCode(cluster, mfgCode);
     if (index == 0xFFFF)
     {
+        static_assert(sizeof(ClusterId) == 2, "Adjust the print formatting");
         emberAfPrint(emberAfPrintActiveArea, "(Unknown clus. [0x%2x])", cluster);
     }
     else
@@ -362,7 +366,7 @@ void emberAfDecodeAndPrintClusterWithMfgCode(uint16_t cluster, uint16_t mfgCode)
     }
 }
 
-void emberAfDecodeAndPrintCluster(uint16_t cluster)
+void emberAfDecodeAndPrintCluster(ClusterId cluster)
 {
     emberAfDecodeAndPrintClusterWithMfgCode(cluster, EMBER_AF_NULL_MANUFACTURER_CODE);
 }
@@ -402,9 +406,9 @@ static void printIncomingZclMessage(const EmberAfClusterCommand * cmd)
                         cmd->buffer[0], // frame control
                         cmd->seqNum, cmd->commandId);
         emberAfAppFlush();
-        emberAfAppPrintBuffer(cmd->buffer + cmd->payloadStartIndex, // message
-                              cmd->bufLen - cmd->payloadStartIndex, // length
-                              true);                                // spaces?
+        emberAfAppPrintBuffer(cmd->buffer + cmd->payloadStartIndex,                        // message
+                              static_cast<uint16_t>(cmd->bufLen - cmd->payloadStartIndex), // length
+                              true);                                                       // spaces?
         emberAfAppFlush();
         emberAfAppPrintln("]");
     }
@@ -480,8 +484,8 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
     returnCmd->payloadStartIndex = 1;
     if (returnCmd->mfgSpecific)
     {
-        returnCmd->mfgCode = emberAfGetInt16u(message, returnCmd->payloadStartIndex, messageLength);
-        returnCmd->payloadStartIndex += 2;
+        returnCmd->mfgCode           = emberAfGetInt16u(message, returnCmd->payloadStartIndex, messageLength);
+        returnCmd->payloadStartIndex = static_cast<uint8_t>(returnCmd->payloadStartIndex + 2);
     }
     else
     {
@@ -572,7 +576,7 @@ bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType ty
         uint8_t i;
         for (i = 0; i < emberAfEndpointCount(); i++)
         {
-            uint8_t endpoint = emberAfEndpointFromIndex(i);
+            EndpointId endpoint = emberAfEndpointFromIndex(i);
             if (!emberAfEndpointIndexIsEnabled(i) ||
                 !emberAfContainsClusterWithMfgCode(endpoint, curCmd.apsFrame->clusterId, curCmd.mfgCode))
             {
@@ -629,7 +633,7 @@ void emberAfSetNoReplyForNextMessage(bool set)
     }
     else
     {
-        emberAfResponseType &= ~ZCL_UTIL_RESP_NONE;
+        emberAfResponseType = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_NONE);
     }
 }
 
@@ -655,7 +659,7 @@ void emAfApplyRetryOverride(EmberApsOption * options)
     }
     else if (emberAfApsRetryOverride == EMBER_AF_RETRY_OVERRIDE_UNSET)
     {
-        *options &= ~EMBER_APS_OPTION_RETRY;
+        *options = static_cast<EmberApsOption>(*options & ~EMBER_APS_OPTION_RETRY);
     }
     else
     {
@@ -747,9 +751,9 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
     // the destination of the message.
     if ((emberAfResponseType & ZCL_UTIL_RESP_INTERPAN) != 0U)
     {
-        label  = 'I';
-        status = emberAfInterpanSendMessageCallback(&interpanResponseHeader, appResponseLength, appResponseData);
-        emberAfResponseType &= ~ZCL_UTIL_RESP_INTERPAN;
+        label               = 'I';
+        status              = emberAfInterpanSendMessageCallback(&interpanResponseHeader, appResponseLength, appResponseData);
+        emberAfResponseType = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_INTERPAN);
     }
     else if (!isBroadcastDestination(emberAfResponseDestination))
     {
@@ -830,9 +834,9 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
     }
 
     appResponseLength = 0;
-    frameControl      = (ZCL_GLOBAL_COMMAND |
-                    (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER ? ZCL_FRAME_CONTROL_SERVER_TO_CLIENT
-                                                                      : ZCL_FRAME_CONTROL_CLIENT_TO_SERVER));
+    frameControl      = static_cast<uint8_t>(ZCL_GLOBAL_COMMAND |
+                                        (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER ? ZCL_FRAME_CONTROL_SERVER_TO_CLIENT
+                                                                                          : ZCL_FRAME_CONTROL_CLIENT_TO_SERVER));
 
     if (!cmd->mfgSpecific)
     {
@@ -964,24 +968,24 @@ bool emberAfDetermineIfLinkSecurityIsRequired(uint8_t commandId, bool incoming, 
 
 uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame)
 {
-    EmberNodeId destination = EMBER_UNKNOWN_NODE_ID;
-    uint8_t max             = EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH;
+    ChipNodeId destination = EMBER_UNKNOWN_NODE_ID;
+    uint8_t max            = EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH;
 
     if ((apsFrame->options & EMBER_APS_OPTION_ENCRYPTION) != 0U)
     {
-        max -= EMBER_AF_APS_ENCRYPTION_OVERHEAD;
+        max = static_cast<uint8_t>(max - EMBER_AF_APS_ENCRYPTION_OVERHEAD);
     }
     if ((apsFrame->options & EMBER_APS_OPTION_SOURCE_EUI64) != 0U)
     {
-        max -= EUI64_SIZE;
+        max = static_cast<uint8_t>(max - EUI64_SIZE);
     }
     if ((apsFrame->options & EMBER_APS_OPTION_DESTINATION_EUI64) != 0U)
     {
-        max -= EUI64_SIZE;
+        max = static_cast<uint8_t>(max - EUI64_SIZE);
     }
     if ((apsFrame->options & EMBER_APS_OPTION_FRAGMENT) != 0U)
     {
-        max -= EMBER_AF_APS_FRAGMENTATION_OVERHEAD;
+        max = static_cast<uint8_t>(max - EMBER_AF_APS_FRAGMENTATION_OVERHEAD);
     }
 
     switch (type)
@@ -1007,7 +1011,7 @@ uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t i
         break;
     }
 
-    max -= emberAfGetSourceRouteOverheadCallback(destination);
+    max = static_cast<uint8_t>(max - emberAfGetSourceRouteOverheadCallback(destination));
 
     return max;
 }
@@ -1178,7 +1182,7 @@ int8_t emberAfCompareDates(EmberAfDate* date1, EmberAfDate* date2)
 // 2.15 from the ZCL spec 075123r02
 uint8_t emberAfGetAttributeAnalogOrDiscreteType(uint8_t dataType)
 {
-    uint8_t index = 0;
+    unsigned index = 0;
 
     while (emberAfAnalogDiscreteThresholds[index] < dataType)
     {
@@ -1193,7 +1197,7 @@ bool emberAfIsTypeSigned(EmberAfAttributeType dataType)
     return (dataType >= ZCL_INT8S_ATTRIBUTE_TYPE && dataType <= ZCL_INT64S_ATTRIBUTE_TYPE);
 }
 
-EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, uint8_t endpoint)
+EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, EndpointId endpoint)
 {
     uint8_t index = emberAfIndexFromEndpoint(endpoint);
     if (index == 0xFF)
@@ -1204,13 +1208,13 @@ EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls,
     return EMBER_SUCCESS;
 }
 
-bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, uint8_t endpoint)
+bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, EndpointId endpoint)
 {
     uint8_t index = emberAfIndexFromEndpoint(endpoint);
     return (index != 0xFF && emberEventControlGetActive(&controls[index]));
 }
 
-EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, uint8_t endpoint)
+EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, EndpointId endpoint)
 {
     uint8_t index = emberAfIndexFromEndpoint(endpoint);
     if (index == 0xFF)
@@ -1240,12 +1244,13 @@ uint8_t emberAfAppendCharacters(uint8_t * zclString, uint8_t zclStringMaxLen, co
         return 0;
     }
 
-    freeChars    = zclStringMaxLen - curLen;
+    freeChars    = static_cast<uint8_t>(zclStringMaxLen - curLen);
     charsToWrite = (freeChars > appendingCharsLen) ? appendingCharsLen : freeChars;
 
     memcpy(&zclString[1 + curLen], // 1 is to account for zcl's length byte
            appendingChars, charsToWrite);
-    zclString[0] = curLen + charsToWrite;
+    // Cast is safe, because the sum can't be bigger than zclStringMaxLen.
+    zclString[0] = static_cast<uint8_t>(curLen + charsToWrite);
     return charsToWrite;
 }
 

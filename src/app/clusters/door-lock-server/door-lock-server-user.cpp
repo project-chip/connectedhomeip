@@ -45,6 +45,8 @@
 
 #include <support/CodeUtils.h>
 
+using namespace chip;
+
 EmberEventControl emberAfPluginDoorLockServerLockoutEventControl;
 EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
 
@@ -55,7 +57,7 @@ static EmberAfPluginDoorLockServerUser rfidUserTable[EMBER_AF_PLUGIN_DOOR_LOCK_S
 // This is the current number of invalid PIN/RFID's in a row.
 static uint8_t wrongCodeEntryCount = 0;
 
-bool emAfPluginDoorLockServerCheckForSufficientSpace(uint8_t spaceReq, uint8_t spaceAvail)
+bool emAfPluginDoorLockServerCheckForSufficientSpace(uint16_t spaceReq, uint8_t spaceAvail)
 {
     if (spaceReq > spaceAvail)
     {
@@ -170,8 +172,10 @@ static uint8_t setUser(uint16_t userId, uint8_t userStatus, uint8_t userType, ui
     if (validCodeLength && userId < userTableSize)
     {
         EmberAfPluginDoorLockServerUser * user = &userTable[userId];
-        user->status                           = static_cast<EmberAfDoorLockUserStatus>(userStatus);
-        user->type                             = static_cast<EmberAfDoorLockUserType>(userType);
+        // TODO: Need to check validity.  https://github.com/project-chip/connectedhomeip/issues/3579
+        user->status = static_cast<EmberAfDoorLockUserStatus>(userStatus);
+        // TODO: Need to check validity.  https://github.com/project-chip/connectedhomeip/issues/3580
+        user->type = static_cast<EmberAfDoorLockUserType>(userType);
         memmove(user->code.rfid, code,
                 emberAfStringLength(code) + 1); // + 1 for Zigbee string length byte
 
@@ -229,6 +233,7 @@ bool emberAfDoorLockClusterGetUserTypeCallback(uint16_t userId)
 
 bool emberAfDoorLockClusterSetUserTypeCallback(uint16_t userId, uint8_t userType)
 {
+    // TODO: Need to validate userType.  https://github.com/project-chip/connectedhomeip/issues/3580
     uint8_t status = (emAfPluginDoorLockServerSetPinUserType(userId, static_cast<EmberAfDoorLockUserType>(userType))
                           ? 0x00   // success (per 7.3.2.17.21)
                           : 0x01); // failure (per 7.3.2.17.21)
@@ -719,7 +724,7 @@ extern "C" void emberAfPluginDoorLockServerRelockEventHandler(void)
     emberAfDoorLockClusterPrintln("Door automatically relocked: 0x%X", status);
 }
 
-void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId)
+void emberAfDoorLockClusterServerAttributeChangedCallback(EndpointId endpoint, EmberAfAttributeId attributeId)
 {
     if (endpoint == DOOR_LOCK_SERVER_ENDPOINT && attributeId == ZCL_LOCK_STATE_ATTRIBUTE_ID)
     {

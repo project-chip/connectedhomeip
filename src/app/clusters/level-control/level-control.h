@@ -48,6 +48,8 @@
 
 #include <stdint.h>
 
+#include <app/util/basic-types.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif // #ifdef __cplusplus
@@ -58,7 +60,7 @@ extern "C" {
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint);
+void emberAfPluginLevelControlClusterServerPostInitCallback(CHIPEndpointId endpoint);
 
 #ifdef __cplusplus
 }

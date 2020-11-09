@@ -186,6 +186,11 @@ config("warnings_default") {
   if (current_os != "mac" && current_os != "ios") {
     ldflags = [ "-Wl,--fatal-warnings" ]
   }
+
+  if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
+      current_os != "win") {
+    cflags = [ "-Wstack-usage=8192" ]
+  }
 }
 
 config("symbols_default") {

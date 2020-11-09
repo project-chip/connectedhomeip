@@ -77,25 +77,19 @@ class TestOnOffCluster(CHIPVirtualHome):
         for device_id in server_ids:
             server_ip_address.add(self.get_device_thread_ip(device_id))
 
+        command = "chip-tool onoff {} {} {} 1"
+
         for ip in server_ip_address:
-            output = self.execute_device_cmd(
-                tool_device_id, "chip-tool onoff on {} {} 1".format(ip, CHIP_PORT))
-            self.logger.info(
-                'checking output does not contain "No response from device"')
-            self.assertFalse(self.sequenceMatch(
-                output['output'], ["No response from device."]))
+            ret = self.execute_device_cmd(tool_device_id, command.format("on", ip, CHIP_PORT))
+            self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format("on", ret['output']))
+
+            ret = self.execute_device_cmd(tool_device_id, command.format("off", ip, CHIP_PORT))
+            self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format("off", ret['output']))
+
         time.sleep(1)
-        for ip in server_ip_address:
-            output = self.execute_device_cmd(
-                tool_device_id, "chip-tool onoff off {} {} 1".format(ip, CHIP_PORT))
-            self.logger.info(
-                'checking output does not contain "No response from device"')
-            self.assertFalse(self.sequenceMatch(
-                output['output'], ["No response from device."]))
 
         for device_id in server_ids:
-            self.logger.info("checking device log for {}".format(
-                self.get_device_pretty_id(device_id)))
+            self.logger.info("checking device log for {}".format(self.get_device_pretty_id(device_id)))
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)"]),
                             "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 

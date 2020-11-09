@@ -27,6 +27,9 @@
 
 namespace chip {
 
+// The largest supported value for Rendezvous discriminators
+const uint16_t kMaxRendezvousDiscriminatorValue = 0xFFF;
+
 class RendezvousParameters
 {
 public:
@@ -42,7 +45,7 @@ public:
         return *this;
     }
 
-    bool HasDiscriminator() const { return mDiscriminator != 0; }
+    bool HasDiscriminator() const { return mDiscriminator <= kMaxRendezvousDiscriminatorValue; }
     uint16_t GetDiscriminator() const { return mDiscriminator; }
     RendezvousParameters & SetDiscriminator(uint16_t discriminator)
     {
@@ -79,9 +82,9 @@ public:
 #endif // CONFIG_NETWORK_LAYER_BLE
 
 private:
-    Optional<NodeId> mLocalNodeId; ///< the local node id
-    uint32_t mSetupPINCode  = 0;   ///< the target peripheral setup PIN Code
-    uint16_t mDiscriminator = 0;   ///< the target peripheral discriminator
+    Optional<NodeId> mLocalNodeId;        ///< the local node id
+    uint32_t mSetupPINCode  = 0;          ///< the target peripheral setup PIN Code
+    uint16_t mDiscriminator = UINT16_MAX; ///< the target peripheral discriminator
 
 #if CONFIG_NETWORK_LAYER_BLE
     Ble::BleLayer * mBleLayer               = nullptr;

@@ -152,7 +152,8 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     constexpr Header::EncryptionType encType = Header::EncryptionType::kAESCCMTagLen16;
 
     const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(encType);
-    uint8_t tag[taglen];
+    assert(taglen <= kMaxTagLen);
+    uint8_t tag[kMaxTagLen];
 
     VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
     VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
