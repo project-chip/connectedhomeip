@@ -59,8 +59,8 @@ public:
     {
         for (size_t word = 0; word * kBitChunkSize < N; ++word)
         {
-            auto & usage   = mUsage[word];
-            auto value = usage.load();
+            auto & usage = mUsage[word];
+            auto value   = usage.load();
             for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < N; ++offset)
             {
                 if ((value & (kBit1 << offset)) == 0)
@@ -104,8 +104,8 @@ public:
     {
         for (size_t word = 0; word * kBitChunkSize < N; ++word)
         {
-            auto & usage   = mUsage[word];
-            auto value = usage.load();
+            auto & usage = mUsage[word];
+            auto value   = usage.load();
             for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < N; ++offset)
             {
                 if ((value & (kBit1 << offset)) != 0)
@@ -128,8 +128,8 @@ private:
     T * GetPoolHead() { return reinterpret_cast<T *>(mMemory); }
     const T * GetPoolHead() const { return reinterpret_cast<const T *>(mMemory); }
 
-    using tBitChunkType = uintmax_t;
-    static constexpr const tBitChunkType kBit1 = 1;
+    using tBitChunkType                         = uintmax_t;
+    static constexpr const tBitChunkType kBit1  = 1;
     static constexpr const size_t kBitChunkSize = std::numeric_limits<tBitChunkType>::digits;
 
     std::array<std::atomic<tBitChunkType>, (N + kBitChunkSize - 1) / kBitChunkSize> mUsage;
