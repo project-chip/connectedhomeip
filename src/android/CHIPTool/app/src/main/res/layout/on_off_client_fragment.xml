@@ -56,12 +56,22 @@
         android:text="@string/send_command_off_btn_text"
         android:textSize="16sp"/>
 
+    <SeekBar
+        android:id="@+id/levelBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/onBtn"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:max="254"
+        android:padding="16dp" />
+
     <TextView
         android:id="@+id/commandStatusTv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:layout_below="@id/onBtn"
+        android:layout_below="@id/levelBar"
         android:singleLine="false"
         android:minLines="4"
         android:textSize="20sp"/>

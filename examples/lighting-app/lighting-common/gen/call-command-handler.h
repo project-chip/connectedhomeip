@@ -47,4 +47,7 @@
 // Cluster: On/off, server
 EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
+// Cluster: Level Control, server
+EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
+
 #endif // SILABS_EMBER_AF_COMMAND_PARSE_HEADER
