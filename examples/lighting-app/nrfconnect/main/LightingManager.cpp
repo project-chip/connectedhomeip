@@ -59,7 +59,7 @@ void LightingManager::SetCallbacks(LightingCallback_fn aActionInitiated_CB, Ligh
     mActionCompleted_CB = aActionCompleted_CB;
 }
 
-bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor)
+bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint8_t size, uint8_t * value)
 {
     // TODO: this function is called InitiateAction because we want to implement some features such as ramping up here.
     bool action_initiated = false;
@@ -76,6 +76,15 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor)
         action_initiated = true;
         new_state        = kState_Off;
     }
+    else if (aAction == LEVEL_ACTION)
+    {
+        action_initiated = true;
+        if (*value == 0) {
+            new_state        = kState_Off;
+        } else {
+            new_state        = kState_On;
+        }
+    }
 
     if (action_initiated)
     {
@@ -84,7 +93,14 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor)
             mActionInitiated_CB(aAction, aActor);
         }
 
-        Set(new_state == kState_On);
+        if (aAction == ON_ACTION || aAction == OFF_ACTION)
+        {
+            Set(new_state == kState_On);
+        }
+        else if (aAction == LEVEL_ACTION)
+        {
+            SetLevel(*value);
+        }
 
         if (mActionCompleted_CB)
         {
@@ -93,6 +109,12 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor)
     }
 
     return action_initiated;
+}
+
+void LightingManager::SetLevel(uint8_t aLevel)
+{
+    LOG_INF("LEVEL %u", aLevel);
+    // TODO: use the level for PWM
 }
 
 void LightingManager::Set(bool aOn)
