@@ -30,6 +30,7 @@ public:
     {
         ON_ACTION = 0,
         OFF_ACTION,
+        LEVEL_ACTION,
 
         INVALID_ACTION
     };
@@ -44,7 +45,7 @@ public:
 
     int Init(const char * gpioDeviceName, gpio_pin_t gpioPin);
     bool IsTurnedOn() const { return mState == kState_On; }
-    bool InitiateAction(Action_t aAction, int32_t aActor);
+    bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t size, uint8_t * value);
     void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
 
 private:
@@ -57,6 +58,7 @@ private:
     LightingCallback_fn mActionCompleted_CB;
 
     void Set(bool aOn);
+    void Level(uint8_t aLevel);
 
     static LightingManager sLight;
 };

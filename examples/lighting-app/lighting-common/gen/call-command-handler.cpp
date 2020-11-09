@@ -102,6 +102,9 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_ON_OFF_CLUSTER_ID:
             result = emberAfOnOffClusterServerCommandParse(cmd);
             break;
+        case ZCL_LEVEL_CONTROL_CLUSTER_ID:
+            result = emberAfLevelControlClusterServerCommandParse(cmd);
+            break;
         default:
             // Unrecognized cluster ID, error status will apply.
             break;
@@ -141,3 +144,239 @@ EmberAfStatus emberAfOnOffClusterServerCommandParse(EmberAfClusterCommand * cmd)
     }
     return status(wasHandled, true, cmd->mfgSpecific);
 }
+
+// Cluster: Level Control, server
+EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        case ZCL_MOVE_TO_LEVEL_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t level;           // Ver.: always
+            uint16_t transitionTime; // Ver.: always
+            uint8_t optionMask;      // Ver.: since zcl6-errata-14-0129-15
+            uint8_t optionOverride;  // Ver.: since zcl6-errata-14-0129-15
+            // Command is not a fixed length
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            level = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1u;
+            if (cmd->bufLen < payloadOffset + 2u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 2u;
+            if ((cmd->bufLen < payloadOffset + 1u))
+            {
+                // Argument is not always present:
+                // - it is present only in versions higher than: zcl6-errata-14-0129-15
+                optionMask = 0xFF;
+            }
+            else
+            {
+                optionMask = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+                payloadOffset += 1u;
+            }
+            if ((cmd->bufLen < payloadOffset + 1u))
+            {
+                // Argument is not always present:
+                // - it is present only in versions higher than: zcl6-errata-14-0129-15
+                optionOverride = 0xFF;
+            }
+            else
+            {
+                optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            }
+            wasHandled = emberAfLevelControlClusterMoveToLevelCallback(level, transitionTime, optionMask, optionOverride);
+            break;
+        }
+        case ZCL_MOVE_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t moveMode;       // Ver.: always
+            uint8_t rate;           // Ver.: always
+            uint8_t optionMask;     // Ver.: since zcl6-errata-14-0129-15
+            uint8_t optionOverride; // Ver.: since zcl6-errata-14-0129-15
+            // Command is not a fixed length
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            moveMode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1u;
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            rate = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1u;
+            if ((cmd->bufLen < payloadOffset + 1u))
+            {
+                // Argument is not always present:
+                // - it is present only in versions higher than: zcl6-errata-14-0129-15
+                optionMask = 0xFF;
+            }
+            else
+            {
+                optionMask = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+                payloadOffset += 1u;
+            }
+            if ((cmd->bufLen < payloadOffset + 1u))
+            {
+                // Argument is not always present:
+                // - it is present only in versions higher than: zcl6-errata-14-0129-15
+                optionOverride = 0xFF;
+            }
+            else
+            {
+                optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            }
+            wasHandled = emberAfLevelControlClusterMoveCallback(moveMode, rate, optionMask, optionOverride);
+            break;
+        }
+        case ZCL_STEP_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t stepMode;        // Ver.: always
+            uint8_t stepSize;        // Ver.: always
+            uint16_t transitionTime; // Ver.: always
+            uint8_t optionMask;      // Ver.: since zcl6-errata-14-0129-15
+            uint8_t optionOverride;  // Ver.: since zcl6-errata-14-0129-15
+            // Command is not a fixed length
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepMode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1u;
+            if (cmd->bufLen < payloadOffset + 1u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepSize = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1u;
+            if (cmd->bufLen < payloadOffset + 2u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 2u;
+            if ((cmd->bufLen < payloadOffset + 1u))
+            {
+                // Argument is not always present:
+                // - it is present only in versions higher than: zcl6-errata-14-0129-15
+                optionMask = 0xFF;
+            }
+            else
+            {
+                optionMask = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+                payloadOffset += 1u;
+            }
+            if ((cmd->bufLen < payloadOffset + 1u))
+            {
+                // Argument is not always present:
+                // - it is present only in versions higher than: zcl6-errata-14-0129-15
+                optionOverride = 0xFF;
+            }
+            else
+            {
+                optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            }
+            wasHandled = emberAfLevelControlClusterStepCallback(stepMode, stepSize, transitionTime, optionMask, optionOverride);
+            break;
+        }
+        case ZCL_STOP_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t optionMask;     // Ver.: since zcl6-errata-14-0129-15
+            uint8_t optionOverride; // Ver.: since zcl6-errata-14-0129-15
+            // Command is not a fixed length
+            if ((cmd->bufLen < payloadOffset + 1u))
+            {
+                // Argument is not always present:
+                // - it is present only in versions higher than: zcl6-errata-14-0129-15
+                optionMask = 0xFF;
+            }
+            else
+            {
+                optionMask = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+                payloadOffset += 1u;
+            }
+            if ((cmd->bufLen < payloadOffset + 1u))
+            {
+                // Argument is not always present:
+                // - it is present only in versions higher than: zcl6-errata-14-0129-15
+                optionOverride = 0xFF;
+            }
+            else
+            {
+                optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            }
+            wasHandled = emberAfLevelControlClusterStopCallback(optionMask, optionOverride);
+            break;
+        }
+        case ZCL_MOVE_TO_LEVEL_WITH_ON_OFF_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t level;           // Ver.: always
+            uint16_t transitionTime; // Ver.: always
+            // Command is fixed length: 3
+            if (cmd->bufLen < payloadOffset + 3u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            level = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1u;
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            wasHandled     = emberAfLevelControlClusterMoveToLevelWithOnOffCallback(level, transitionTime);
+            break;
+        }
+        case ZCL_MOVE_WITH_ON_OFF_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t moveMode; // Ver.: always
+            uint8_t rate;     // Ver.: always
+            // Command is fixed length: 2
+            if (cmd->bufLen < payloadOffset + 2u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            moveMode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1u;
+            rate       = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            wasHandled = emberAfLevelControlClusterMoveWithOnOffCallback(moveMode, rate);
+            break;
+        }
+        case ZCL_STEP_WITH_ON_OFF_COMMAND_ID: {
+            uint16_t payloadOffset = cmd->payloadStartIndex;
+            uint8_t stepMode;        // Ver.: always
+            uint8_t stepSize;        // Ver.: always
+            uint16_t transitionTime; // Ver.: always
+            // Command is fixed length: 4
+            if (cmd->bufLen < payloadOffset + 4u)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepMode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1u;
+            stepSize = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1u;
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            wasHandled     = emberAfLevelControlClusterStepWithOnOffCallback(stepMode, stepSize, transitionTime);
+            break;
+        }
+        case ZCL_STOP_WITH_ON_OFF_COMMAND_ID: {
+            // Command is fixed length: 0
+            wasHandled = emberAfLevelControlClusterStopWithOnOffCallback();
+            break;
+        }
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+

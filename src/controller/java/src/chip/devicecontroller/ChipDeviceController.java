@@ -81,8 +81,8 @@ public class ChipDeviceController {
     beginSendMessage(deviceControllerPtr, message);
   }
 
-  public void beginSendCommand(ChipCommandType command) {
-    beginSendCommand(deviceControllerPtr, command);
+  public void beginSendCommand(ChipCommandType command, int value) {
+    beginSendCommand(deviceControllerPtr, command, value);
   }
 
   public void sendWiFiCredentials(String ssid, String password) {
@@ -187,7 +187,7 @@ public class ChipDeviceController {
 
   private native void beginSendMessage(long deviceControllerPtr, String message);
 
-  private native void beginSendCommand(long deviceControllerPtr, ChipCommandType command);
+  private native void beginSendCommand(long deviceControllerPtr, ChipCommandType command, int value);
 
   private native void sendWiFiCredentials(long deviceControllerPtr, String ssid, String password);
 

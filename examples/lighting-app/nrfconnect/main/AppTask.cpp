@@ -239,7 +239,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
         actor  = AppEvent::kEventType_Button;
     }
 
-    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor))
+    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor, 0, NULL))
         LOG_INF("Action is already in progress or active.");
 }
 
