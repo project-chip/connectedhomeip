@@ -43,8 +43,8 @@ namespace chip {
 
 namespace Controller {
 
-constexpr uint16_t mNumMaxActiveDevices = 64;
-constexpr uint16_t mNumMaxPairedDevices = 128;
+constexpr uint16_t kNumMaxActiveDevices = 64;
+constexpr uint16_t kNumMaxPairedDevices = 128;
 
 class DLL_EXPORT DevicePairingDelegate
 {
@@ -141,9 +141,9 @@ protected:
         kState_Initialized    = 1
     } mState;
 
-    Device mActiveDevices[mNumMaxActiveDevices];
+    Device mActiveDevices[kNumMaxActiveDevices];
 
-    SerializableU64Set<mNumMaxPairedDevices> mPairedDevices;
+    SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
     bool mPairedDevicesInitialized;
 
     NodeId mLocalDeviceId;
