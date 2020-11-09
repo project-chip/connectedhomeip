@@ -117,7 +117,7 @@ public:
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContextDelegateFactory * delegateFactory);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContextDelegate* delegate);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier and message type.
@@ -133,7 +133,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType,
-                                                 ExchangeContextDelegateFactory * delegateFactory);
+                                                 ExchangeContextDelegate* delegate);
 
     /**
      *  Unregister an unsolicited message handler for a given protocol identifier.
@@ -175,7 +175,7 @@ private:
 
     struct UnsolicitedMessageHandler
     {
-        ExchangeContextDelegateFactory * DelegateFactory;
+        ExchangeContextDelegate* Delegate;
         uint32_t ProtocolId;
         int16_t MessageType;
     };
@@ -191,11 +191,11 @@ private:
     void (*OnExchangeContextChanged)(size_t numContextsInUse);
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                                   ExchangeContextDelegateFactory * delegateFactory);
+                                   ExchangeContextDelegate * delegate);
 
     void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
-    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContextDelegateFactory * delegateFactory);
+    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContextDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer) override;

@@ -143,8 +143,7 @@ public:
     void Close();
     void Abort();
 
-    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                            ExchangeContextDelegateFactory * delegateFactory);
+    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeContextDelegate * delegate);
     void Free();
     void Reset();
 

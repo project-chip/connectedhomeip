@@ -100,7 +100,7 @@ private:
     void OnResponseTimeout(ExchangeContext * ec) override;
 };
 
-class DLL_EXPORT EchoServer : public SimpleExchangeContextDelegate
+class DLL_EXPORT EchoServer : public ExchangeContextDelegate
 {
 public:
     /**
