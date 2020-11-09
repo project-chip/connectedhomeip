@@ -659,7 +659,7 @@ void DeviceCommissioner::PersistDeviceList()
 {
     if (mStorageDelegate != nullptr && mPairedDevicesUpdated)
     {
-        uint16_t size = mPairedDevices.SerializedSize();
+        const uint16_t size = mPairedDevices.SerializedSize();
         char serialized[size];
         uint16_t requiredSize = size;
         const char * value    = mPairedDevices.SerializeBase64(serialized, requiredSize);
