@@ -28,7 +28,7 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/transport/bdx",
+    "${chip_root}/src/lib/protocols/bdx",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
   ]

@@ -21,7 +21,7 @@
  *      Implements utility methods for working with some complex BDX messages.
  */
 
-#include <transport/bdx/BDXMessageUtils.h>
+#include <protocols/bdx/BDXMessageUtils.h>
 
 #include <support/BufBound.h>
 #include <support/BufferReader.h>
