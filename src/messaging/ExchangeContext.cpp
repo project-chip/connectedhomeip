@@ -201,7 +201,7 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
         ChipLogError(ExchangeManager, "Invalid delegate");
         return nullptr;
     }
-    
+
     Reset();
     Retain();
     mExchangeMgr = em;
