@@ -18,7 +18,7 @@
 
 #include "TestMinimalMdns.h"
 
-#include "QName.h"
+#include <mdns/minimal/QName.h>
 #include <support/TestUtils.h>
 
 #include <nlunit-test.h>
@@ -61,4 +61,4 @@ int TestQName(void)
     return (nlTestRunnerStats(&theSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestCHIPCallback)
+CHIP_REGISTER_TEST_SUITE(TestQName)

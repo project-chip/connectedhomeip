@@ -44,8 +44,7 @@ class SerializedQNameIterator
 {
 public:
     SerializedQNameIterator(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t * position) :
-        mValidDataStart(dataStart), mValidDataEnd(dataEnd), mLookBehindMax(mCurrentPosition - mValidDataStart),
-        mCurrentPosition(position)
+        mValidDataStart(dataStart), mValidDataEnd(dataEnd), mLookBehindMax(position - dataStart), mCurrentPosition(position)
     {}
 
     // Advances to the next element in the sequence

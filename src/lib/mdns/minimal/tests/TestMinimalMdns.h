@@ -22,7 +22,7 @@
 extern "C" {
 #endif
 
-int TestQname();
+int TestQName();
 
 #ifdef __cplusplus
 }
