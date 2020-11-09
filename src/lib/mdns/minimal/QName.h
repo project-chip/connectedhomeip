@@ -33,6 +33,50 @@ namespace Minimal {
 /// A QName part is a null-terminated string
 using QNamePart = const char *;
 
+/// A serialized QNAME is comprised of
+///  - length-prefixed parts
+///  - Ends in a 0-length item
+///  - May contain pointers to previous data (for efficient transmission)
+///
+/// This class allows iterating over such parts while validating
+/// that the parts are within a valid range
+class SerializedQNameIterator
+{
+public:
+    SerializedQNameIterator(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t * position) :
+        mValidDataStart(dataStart), mValidDataEnd(dataEnd), mLookBehindMax(mCurrentPosition - mValidDataStart),
+        mCurrentPosition(position)
+    {}
+
+    // Advances to the next element in the sequence
+    // Returns true if new data was available
+    bool Next();
+
+    /// Valid IFF Next() returned true.
+    /// Next has to be called after construction
+    QNamePart Value() const { return mValue; }
+
+    // Get the end of the sequence *without* following any
+    // backwards pointers. Changes iterator state.
+    //
+    // returs nullptr on error (invalid data)
+    const uint8_t * FindDataEnd();
+
+private:
+    static constexpr size_t kMaxValueSize = 63;
+    static constexpr uint8_t kPtrMask     = 0xC0;
+
+    const uint8_t * const mValidDataStart; // valid data range start
+    const uint8_t * const mValidDataEnd;   // valid data range end
+    ptrdiff_t mLookBehindMax;              // avoid loops by limiting lookbehind
+    const uint8_t * mCurrentPosition;
+
+    char mValue[kMaxValueSize + 1] = { 0 };
+
+    // Advances to the next element in the sequence
+    bool Next(bool followIndirectPointers);
+};
+
 } // namespace Minimal
 
 } // namespace mdns

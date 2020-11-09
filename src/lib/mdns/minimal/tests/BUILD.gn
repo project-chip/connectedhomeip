@@ -1,3 +1,4 @@
+
 # Copyright (c) 2020 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,17 +14,26 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlunit_test.gni")
 
-static_library("minimal") {
-    sources = [
-        "DnsHeader.h", 
-        "QName.h",
-        "QName.cpp",
-        "Query.h",
-        "QueryBuilder.h",
-    ]
+import("${chip_root}/build/chip/chip_test_suite.gni")
+
+chip_test_suite("tests") {
+  output_name = "libMinimalMdnstests"
+
+  sources = [
+    "TestMinimalMdns.h"
+    "TestQName.cpp",
+  ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
+    "${nlunit_test_root}:nlunit-test",
+  ]
+
+  tests = [
+    "TestQName",
   ]
 }
