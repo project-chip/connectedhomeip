@@ -149,6 +149,7 @@ protected:
     NodeId mLocalDeviceId;
     SecureSessionMgr<Transport::UDP> * mSessionManager;
     PersistentStorageDelegate * mStorageDelegate;
+    Inet::InetLayer * mInetLayer;
 
     uint16_t GetAvailableDevice();
     uint16_t FindDevice(NodeId id);
@@ -166,7 +167,6 @@ private:
     void OnStatus(const char * key, Operation op, CHIP_ERROR err) override;
 
     System::Layer * mSystemLayer;
-    Inet::InetLayer * mInetLayer;
 };
 
 class DLL_EXPORT DeviceCommissioner : public DeviceController, public RendezvousSessionDelegate
@@ -196,19 +196,17 @@ public:
      *
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] params                The Rendezvous connection parameters
-     * @param[in] appReqState           Application specific context to be passed back when a message is received or on error
      * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
      * @param[in] interfaceId           [Optional] The interface indicator to use
      *
      * @return CHIP_ERROR               The connection status
      */
-    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params, void * appReqState, uint16_t devicePort = CHIP_PORT,
+    CHIP_ERROR PairDevice(NodeId remoteDeviceId, RendezvousParameters & params, uint16_t devicePort = CHIP_PORT,
                           Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     [[deprecated("Available until Rendezvous is implemented")]] CHIP_ERROR
     PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Inet::IPAddress & deviceAddr, SerializedDevice & serialized,
-                                  void * appReqState, uint16_t devicePort = CHIP_PORT,
-                                  Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
+                                  uint16_t devicePort = CHIP_PORT, Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
     CHIP_ERROR StopPairing(NodeId remoteDeviceId);
 
@@ -226,6 +224,8 @@ public:
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousComplete() override;
     void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
+
+    void RendezvousCleanup(CHIP_ERROR status);
 
     void ReleaseDevice(Device * device) override;
 

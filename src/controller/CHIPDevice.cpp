@@ -49,7 +49,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBuffer * buffer)
     // If there is no secure connection to the device, try establishing it
     if (mState != kConnectionState_SecureConnected)
     {
-        err = EstablishSecureSession();
+        err = LoadSecureSessionParameters();
         SuccessOrExit(err);
     }
     else
@@ -155,7 +155,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
     }
 }
 
-CHIP_ERROR Device::EstablishSecureSession()
+CHIP_ERROR Device::LoadSecureSessionParameters()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     SecurePairingSession pairingSession;
@@ -182,7 +182,7 @@ exit:
 
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(Controller, "EstablishSecureSession returning error %d\n", err);
+        ChipLogError(Controller, "LoadSecureSessionParameters returning error %d\n", err);
     }
     return err;
 }
@@ -191,14 +191,12 @@ CHIP_ERROR Device::ResumeSecureSession()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mState == kConnectionState_SecureConnected)
-    {
-        mState = kConnectionState_NotConnected;
-    }
-
+    VerifyOrExit(mState == kConnectionState_SecureConnected, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
-    err = EstablishSecureSession();
+    mState = kConnectionState_NotConnected;
+
+    err = LoadSecureSessionParameters();
     SuccessOrExit(err);
 
 exit:

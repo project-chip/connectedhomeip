@@ -102,7 +102,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
                                                NewConnectionHandler onConnected, MessageReceiveHandler onMessageReceived,
                                                ErrorHandler onError, uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
-    CHIP_ERROR err = mCommissioner.PairDevice(remoteDeviceId, params, nullptr, devicePort, interfaceId);
+    CHIP_ERROR err = mCommissioner.PairDevice(remoteDeviceId, params, devicePort, interfaceId);
     SuccessOrExit(err);
 
     mRemoteDeviceId  = remoteDeviceId;
@@ -121,8 +121,8 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
                                                                    MessageReceiveHandler onMessageReceived, ErrorHandler onError,
                                                                    uint16_t devicePort, Inet::InterfaceId interfaceId)
 {
-    CHIP_ERROR err = mCommissioner.PairTestDeviceWithoutSecurity(remoteDeviceId, deviceAddr, mSerializedTestDevice, nullptr,
-                                                                 devicePort, interfaceId);
+    CHIP_ERROR err =
+        mCommissioner.PairTestDeviceWithoutSecurity(remoteDeviceId, deviceAddr, mSerializedTestDevice, devicePort, interfaceId);
     SuccessOrExit(err);
 
     mPairingWithoutSecurity = true;
@@ -212,7 +212,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     }
 
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    mDevice->SetDelegate(this, mAppReqState);
+    mDevice->SetDelegate(this);
 
     err = mDevice->SendMessage(buffer);
 

@@ -192,8 +192,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
         err = device->Deserialize(deviceInfo);
         VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-        device->mSessionManager = mSessionManager;
-        device->mInetLayer      = mInetLayer;
+        device->Init(mSessionManager, mInetLayer);
     }
 
     (*out_device) = device;
@@ -247,8 +246,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             err = device->Deserialize(deviceInfo);
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-            device->mSessionManager = mSessionManager;
-            device->mInetLayer      = mInetLayer;
+            device->Init(mSessionManager, mInetLayer);
         }
     }
 
@@ -315,11 +313,11 @@ exit:
 uint16_t DeviceController::GetAvailableDevice()
 {
     uint16_t i = 0;
-    while (i < kNumMaxActiveDevices && mActiveDevices[i].mActive)
+    while (i < kNumMaxActiveDevices && mActiveDevices[i].IsActive())
         i++;
     if (i < kNumMaxActiveDevices)
     {
-        mActiveDevices[i].mActive = true;
+        mActiveDevices[i].SetActive(true);
     }
 
     return i;
@@ -327,7 +325,7 @@ uint16_t DeviceController::GetAvailableDevice()
 
 void DeviceController::ReleaseDevice(Device * device)
 {
-    device->mActive = false;
+    device->SetActive(false);
 }
 
 void DeviceController::ReleaseDevice(uint16_t index)
@@ -343,7 +341,7 @@ uint16_t DeviceController::FindDevice(NodeId id)
     uint16_t i = 0;
     while (i < kNumMaxActiveDevices)
     {
-        if (mActiveDevices[i].mActive && mActiveDevices[i].mDeviceId == id)
+        if (mActiveDevices[i].IsActive() && mActiveDevices[i].GetDeviceId() == id)
         {
             return i;
         }
@@ -431,8 +429,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params, void * appReqState,
-                                          uint16_t devicePort, Inet::InterfaceId interfaceId)
+CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params, uint16_t devicePort,
+                                          Inet::InterfaceId interfaceId)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
@@ -460,11 +458,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     err                = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
     SuccessOrExit(err);
 
-    device->mDeviceId       = remoteDeviceId;
-    device->mDevicePort     = devicePort;
-    device->mInterface      = interfaceId;
-    device->mState          = Device::kConnectionState_Connecting;
-    device->mSessionManager = mSessionManager;
+    device->Init(mSessionManager, mInetLayer, remoteDeviceId, devicePort, interfaceId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -486,7 +480,7 @@ exit:
 }
 
 CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Inet::IPAddress & deviceAddr,
-                                                             SerializedDevice & serialized, void * appReqState, uint16_t devicePort,
+                                                             SerializedDevice & serialized, uint16_t devicePort,
                                                              Inet::InterfaceId interfaceId)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -505,14 +499,11 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
-    testSecurePairingSecret->Serializable(device->mPairing);
+    testSecurePairingSecret->Serializable(device->GetPairing());
 
-    device->mDeviceId       = remoteDeviceId;
-    device->mDevicePort     = devicePort;
-    device->mInterface      = interfaceId;
-    device->mState          = Device::kConnectionState_Connecting;
-    device->mDeviceAddr     = deviceAddr;
-    device->mSessionManager = mSessionManager;
+    device->Init(mSessionManager, mInetLayer, remoteDeviceId, devicePort, interfaceId);
+
+    device->SetAddress(deviceAddr);
 
     device->Serialize(serialized);
 
@@ -544,7 +535,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
     device = &mActiveDevices[mDeviceBeingPaired];
-    VerifyOrExit(device->mDeviceId == remoteDeviceId, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+    VerifyOrExit(device->GetDeviceId() == remoteDeviceId, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
     if (mRendezvousSession != nullptr)
     {
@@ -573,7 +564,7 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
     return CHIP_NO_ERROR;
 }
 
-void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)
+void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 {
     if (mRendezvousSession != nullptr)
     {
@@ -583,7 +574,7 @@ void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)
 
     if (mPairingDelegate != nullptr)
     {
-        mPairingDelegate->OnPairingComplete(err);
+        mPairingDelegate->OnPairingComplete(status);
     }
 
     if (mDeviceBeingPaired != kNumMaxActiveDevices)
@@ -593,38 +584,53 @@ void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)
     }
 }
 
+void DeviceCommissioner::OnRendezvousError(CHIP_ERROR err)
+{
+    RendezvousCleanup(err);
+}
+
 void DeviceCommissioner::OnRendezvousComplete()
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
     device = &mActiveDevices[mDeviceBeingPaired];
-    mPairedDevices.Insert(device->mDeviceId);
+    mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
-    SuccessOrExit(err);
 
     if (mStorageDelegate != nullptr)
     {
         SerializedDevice serialized;
         device->Serialize(serialized);
-        PERSISTENT_KEY_OP(device->mDeviceId, kPairedDeviceKeyPrefix, key,
+        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
                           mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
     }
 
 exit:
-    OnRendezvousError(err);
+    if (err == CHIP_NO_ERROR)
+    {
+        RendezvousCleanup(CHIP_NO_ERROR);
+    }
+    else
+    {
+        OnRendezvousError(err);
+    }
 }
 
 void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
 {
     Device * device = nullptr;
-    VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, /**/);
+    if (mDeviceBeingPaired >= kNumMaxActiveDevices)
+    {
+        ExitNow();
+    }
+
     device = &mActiveDevices[mDeviceBeingPaired];
     switch (status)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
         ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
-        mRendezvousSession->GetPairingSession().Serializable(device->mPairing);
+        mRendezvousSession->GetPairingSession().Serializable(device->GetPairing());
 
         if (mPairingDelegate != nullptr)
         {
@@ -638,7 +644,7 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
 
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
         ChipLogDetail(Controller, "Remote device was assigned an ip address\n");
-        device->mDeviceAddr = mRendezvousSession->GetIPAddress();
+        device->SetAddress(mRendezvousSession->GetIPAddress());
         break;
 
     case RendezvousSessionDelegate::NetworkProvisioningFailed:

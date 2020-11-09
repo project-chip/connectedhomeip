@@ -57,54 +57,31 @@ struct SerializedDevice;
 class DLL_EXPORT Device
 {
 public:
-    friend class DeviceController;
-    friend class DeviceCommissioner;
-
-    void SetDelegate(DeviceStatusDelegate * delegate, void * state)
-    {
-        mStatusDelegate = delegate;
-        mAppReqState    = state;
-    }
-
-    // ----- Messaging -----
-    /**
-     * @brief
-     *   Send a message to a connected CHIP device
-     *
-     * @param[in] buffer        The Data Buffer to trasmit to the device
-     * @return CHIP_ERROR   The return status
-     */
-    CHIP_ERROR SendMessage(System::PacketBuffer * buffer);
-
-    bool GetIpAddress(Inet::IPAddress & addr) const;
-
-private:
-    enum ConnectionState
-    {
-        kConnectionState_NotConnected    = 0,
-        kConnectionState_Connecting      = 1,
-        kConnectionState_SecureConnected = 2,
-    };
-
-    NodeId mDeviceId;
-    Inet::IPAddress mDeviceAddr;
-    uint16_t mDevicePort;
-    Inet::InterfaceId mInterface;
-
-    Inet::InetLayer * mInetLayer;
-
     Device() {}
     ~Device() {}
 
-    bool mActive = false;
-    ConnectionState mState;
+    void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
-    SecurePairingSessionSerializable mPairing;
+    // ----- Messaging -----
+    CHIP_ERROR SendMessage(System::PacketBuffer * message);
 
-    DeviceStatusDelegate * mStatusDelegate;
-    void * mAppReqState;
+    bool GetIpAddress(Inet::IPAddress & addr) const;
 
-    SecureSessionMgr<Transport::UDP> * mSessionManager;
+    void Init(SecureSessionMgr<Transport::UDP> * sessionMgr, Inet::InetLayer * inetLayer)
+    {
+        mSessionManager = sessionMgr;
+        mInetLayer      = inetLayer;
+    }
+
+    void Init(SecureSessionMgr<Transport::UDP> * sessionMgr, Inet::InetLayer * inetLayer, NodeId deviceId, uint16_t devicePort,
+              Inet::InterfaceId interfaceId)
+    {
+        Init(sessionMgr, inetLayer);
+        mDeviceId   = deviceId;
+        mDevicePort = devicePort;
+        mInterface  = interfaceId;
+        mState      = kConnectionState_Connecting;
+    }
 
     /** @brief Serialize the Pairing Session to a string.
      *
@@ -121,7 +98,41 @@ private:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
                            System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr);
 
-    CHIP_ERROR EstablishSecureSession();
+    bool IsActive() { return mActive; }
+
+    void SetActive(bool active) { mActive = active; }
+
+    NodeId GetDeviceId() { return mDeviceId; }
+
+    void SetAddress(Inet::IPAddress deviceAddr) { mDeviceAddr = deviceAddr; }
+
+    SecurePairingSessionSerializable & GetPairing() { return mPairing; }
+
+private:
+    enum ConnectionState
+    {
+        kConnectionState_NotConnected,
+        kConnectionState_Connecting,
+        kConnectionState_SecureConnected,
+    };
+
+    NodeId mDeviceId;
+    Inet::IPAddress mDeviceAddr;
+    uint16_t mDevicePort;
+    Inet::InterfaceId mInterface;
+
+    Inet::InetLayer * mInetLayer;
+
+    bool mActive = false;
+    ConnectionState mState;
+
+    SecurePairingSessionSerializable mPairing;
+
+    DeviceStatusDelegate * mStatusDelegate;
+
+    SecureSessionMgr<Transport::UDP> * mSessionManager;
+
+    CHIP_ERROR LoadSecureSessionParameters();
     CHIP_ERROR ResumeSecureSession();
 };
 
