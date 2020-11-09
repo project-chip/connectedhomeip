@@ -21,21 +21,17 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libBDXTests"
 
-  sources = [
-    "TestBDXMessageUtils.cpp",
-  ]
+  sources = [ "TestBDXMessageUtils.cpp" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/lib/protocols/bdx",
+    "${chip_root}/src/protocols/bdx",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
   ]
 
   cflags = [ "-Wconversion" ]
 
-  tests = [
-    "TestBDXMessageUtils",
-  ]
+  tests = [ "TestBDXMessageUtils" ]
 }
