@@ -64,8 +64,8 @@ namespace Controller {
 
 using namespace chip::Encoding;
 
-constexpr const char kDeviceCredentialsKeyPrefix[] = "DeviceCredentials";
-constexpr const char kDeviceAddressKeyPrefix[]     = "DeviceAddress";
+constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
+constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
 
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
