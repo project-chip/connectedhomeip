@@ -192,7 +192,7 @@ void ExchangeContext::Reset()
 }
 
 ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                                         ExchangeContextDelegate* delegate)
+                                         ExchangeContextDelegate * delegate)
 {
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
