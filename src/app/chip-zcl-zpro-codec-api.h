@@ -88,9 +88,23 @@ uint16_t encodeBarrierControlClusterReadMovingStateAttribute(uint8_t * buffer, u
 
 /**
  * @brief
+ *    Encode a report command for the moving-state attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeBarrierControlClusterReportMovingStateAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                               uint16_t min_interval, uint16_t max_interval);
+
+/**
+ * @brief
  *    Encode a read command for the safety-status attribute for  server into buffer including the APS frame
  */
 uint16_t encodeBarrierControlClusterReadSafetyStatusAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a report command for the safety-status attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeBarrierControlClusterReportSafetyStatusAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                                uint16_t min_interval, uint16_t max_interval);
 
 /**
  * @brief
@@ -104,6 +118,14 @@ uint16_t encodeBarrierControlClusterReadCapabilitiesAttribute(uint8_t * buffer, 
  */
 uint16_t encodeBarrierControlClusterReadBarrierPositionAttribute(uint8_t * buffer, uint16_t buf_length,
                                                                  uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a report command for the barrier-position attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeBarrierControlClusterReportBarrierPositionAttribute(uint8_t * buffer, uint16_t buf_length,
+                                                                   uint8_t destination_endpoint, uint16_t min_interval,
+                                                                   uint16_t max_interval, uint8_t change);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Basic                                                       | 0x0000 |
@@ -334,10 +356,25 @@ uint16_t encodeColorControlClusterReadCurrentHueAttribute(uint8_t * buffer, uint
 
 /**
  * @brief
+ *    Encode a report command for the current-hue attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeColorControlClusterReportCurrentHueAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                            uint16_t min_interval, uint16_t max_interval, uint8_t change);
+
+/**
+ * @brief
  *    Encode a read command for the current-saturation attribute for  server into buffer including the APS frame
  */
 uint16_t encodeColorControlClusterReadCurrentSaturationAttribute(uint8_t * buffer, uint16_t buf_length,
                                                                  uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a report command for the current-saturation attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeColorControlClusterReportCurrentSaturationAttribute(uint8_t * buffer, uint16_t buf_length,
+                                                                   uint8_t destination_endpoint, uint16_t min_interval,
+                                                                   uint16_t max_interval, uint8_t change);
 
 /**
  * @brief
@@ -353,9 +390,23 @@ uint16_t encodeColorControlClusterReadCurrentXAttribute(uint8_t * buffer, uint16
 
 /**
  * @brief
+ *    Encode a report command for the current-x attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeColorControlClusterReportCurrentXAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                          uint16_t min_interval, uint16_t max_interval, uint16_t change);
+
+/**
+ * @brief
  *    Encode a read command for the current-y attribute for  server into buffer including the APS frame
  */
 uint16_t encodeColorControlClusterReadCurrentYAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a report command for the current-y attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeColorControlClusterReportCurrentYAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                          uint16_t min_interval, uint16_t max_interval, uint16_t change);
 
 /**
  * @brief
@@ -363,6 +414,14 @@ uint16_t encodeColorControlClusterReadCurrentYAttribute(uint8_t * buffer, uint16
  */
 uint16_t encodeColorControlClusterReadColorTemperatureMiredsAttribute(uint8_t * buffer, uint16_t buf_length,
                                                                       uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a report command for the color-temperature-mireds attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeColorControlClusterReportColorTemperatureMiredsAttribute(uint8_t * buffer, uint16_t buf_length,
+                                                                        uint8_t destination_endpoint, uint16_t min_interval,
+                                                                        uint16_t max_interval, uint16_t change);
 
 /**
  * @brief
@@ -821,6 +880,13 @@ uint16_t encodeDoorLockClusterReadLockStateAttribute(uint8_t * buffer, uint16_t 
 
 /**
  * @brief
+ *    Encode a report command for the lock-state attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeDoorLockClusterReportLockStateAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                       uint16_t min_interval, uint16_t max_interval);
+
+/**
+ * @brief
  *    Encode a read command for the lock-type attribute for  server into buffer including the APS frame
  */
 uint16_t encodeDoorLockClusterReadLockTypeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
@@ -1109,6 +1175,13 @@ uint16_t encodeLevelClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_len
  */
 uint16_t encodeLevelClusterReadCurrentLevelAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
 
+/**
+ * @brief
+ *    Encode a report command for the current-level attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeLevelClusterReportCurrentLevelAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                       uint16_t min_interval, uint16_t max_interval, uint8_t change);
+
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
 |------------------------------------------------------------------------------|
@@ -1153,6 +1226,13 @@ uint16_t encodeOnOffClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_len
  *    Encode a read command for the on-off attribute for  server into buffer including the APS frame
  */
 uint16_t encodeOnOffClusterReadOnOffAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a report command for the on-off attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeOnOffClusterReportOnOffAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                uint16_t min_interval, uint16_t max_interval);
 
 /*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |
@@ -1295,6 +1375,14 @@ uint16_t encodeTemperatureMeasurementClusterDiscoverAttributes(uint8_t * buffer,
  */
 uint16_t encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(uint8_t * buffer, uint16_t buf_length,
                                                                        uint8_t destination_endpoint);
+
+/**
+ * @brief
+ *    Encode a report command for the measured-value attribute for  server into buffer including the APS frame
+ */
+uint16_t encodeTemperatureMeasurementClusterReportMeasuredValueAttribute(uint8_t * buffer, uint16_t buf_length,
+                                                                         uint8_t destination_endpoint, uint16_t min_interval,
+                                                                         uint16_t max_interval, int16_t change);
 
 /**
  * @brief
