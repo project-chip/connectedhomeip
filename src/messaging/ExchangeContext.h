@@ -244,7 +244,7 @@ private:
     void * mAppState; // Pointer to application-specific state object.
 
     Transport::PeerConnectionState * mConnectionState; // The connection state
-    uint16_t mExchangeId; // Assigned exchange ID.
+    uint16_t mExchangeId;                              // Assigned exchange ID.
 
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
@@ -260,7 +260,8 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(Transport::PeerConnectionState * conn, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(Transport::PeerConnectionState * conn, const PacketHeader & packetHeader,
+                       const PayloadHeader & payloadHeader);
 
     void SetInitiator(bool inInitiator);
     void SetExchangeId(uint16_t exId) { mExchangeId = exId; }

@@ -81,16 +81,17 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(PeerConnectionState * state, SecureSessionMgrBase * mgr) override {
+    void OnNewConnection(PeerConnectionState * state, SecureSessionMgrBase * mgr) override
+    {
         mConnectionState = state;
         NewConnectionHandlerCallCount++;
     }
     void OnConnectionExpired(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override {}
 
-    nlTestSuite * mSuite              = nullptr;
+    nlTestSuite * mSuite                   = nullptr;
     PeerConnectionState * mConnectionState = nullptr;
-    int ReceiveHandlerCallCount       = 0;
-    int NewConnectionHandlerCallCount = 0;
+    int ReceiveHandlerCallCount            = 0;
+    int NewConnectionHandlerCallCount      = 0;
 };
 
 TestSessMgrCallback callback;

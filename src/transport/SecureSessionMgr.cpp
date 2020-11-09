@@ -78,9 +78,10 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(Transport::PeerConnectionState * st
     return SendMessage(state, payloadHeader, msgBuf);
 }
 
-CHIP_ERROR SecureSessionMgrBase::SendMessage(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf)
+CHIP_ERROR SecureSessionMgrBase::SendMessage(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader,
+                                             System::PacketBuffer * msgBuf)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
@@ -107,8 +108,7 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(Transport::PeerConnectionState * st
         payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
         VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
 
-        packetHeader
-            .SetSourceNodeId(mLocalNodeId)
+        packetHeader.SetSourceNodeId(mLocalNodeId)
             .SetDestinationNodeId(state->GetPeerNodeId())
             .SetMessageId(state->GetSendMessageIndex())
             .SetEncryptionKeyID(state->GetLocalKeyID())
@@ -186,8 +186,8 @@ CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddres
 
     mCB->OnNewConnection(state, this);
 
-    err = pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo),
-        strlen(kSpake2pI2RSessionInfo), state->GetSecureSession());
+    err = pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo), strlen(kSpake2pI2RSessionInfo),
+                                       state->GetSecureSession());
 
 exit:
     return err;

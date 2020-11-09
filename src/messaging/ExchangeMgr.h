@@ -181,7 +181,8 @@ private:
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, Transport::PeerConnectionState * conn, bool Initiator, void * AppState);
 
-    void DispatchMessage(Transport::PeerConnectionState * conn, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+    void DispatchMessage(Transport::PeerConnectionState * conn, const PacketHeader & packetHeader,
+                         const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContext::MessageReceiveFunct handler, void * appState);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);

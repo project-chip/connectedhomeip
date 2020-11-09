@@ -131,7 +131,8 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
 }
 
-ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, Transport::PeerConnectionState * conn, bool Initiator, void * AppState)
+ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, Transport::PeerConnectionState * conn, bool Initiator,
+                                                void * AppState)
 {
     ExchangeContext * ec = ContextPool;
 
@@ -150,7 +151,8 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, Transport::
     return nullptr;
 }
 
-void ExchangeManager::DispatchMessage(Transport::PeerConnectionState * conn, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, PacketBuffer * msgBuf)
+void ExchangeManager::DispatchMessage(Transport::PeerConnectionState * conn, const PacketHeader & packetHeader,
+                                      const PayloadHeader & payloadHeader, PacketBuffer * msgBuf)
 {
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;

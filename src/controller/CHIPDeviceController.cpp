@@ -617,7 +617,7 @@ void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * stat
 {
     if (mConState == kConnectionState_SecureConnecting)
     {
-        mConState = kConnectionState_SecureConnected;
+        mConState        = kConnectionState_SecureConnected;
         mConnectionState = state;
     }
 }
@@ -626,7 +626,7 @@ void ChipDeviceController::OnConnectionExpired(Transport::PeerConnectionState * 
 {
     if (mConState == kConnectionState_SecureConnected && mConnectionState == state)
     {
-        mConState = kConnectionState_NotConnected;
+        mConState        = kConnectionState_NotConnected;
         mConnectionState = nullptr;
     }
 }

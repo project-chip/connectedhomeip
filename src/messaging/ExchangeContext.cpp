@@ -192,7 +192,8 @@ void ExchangeContext::Reset()
     *this = ExchangeContext();
 }
 
-void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, Transport::PeerConnectionState * conn, bool Initiator, void * AppState)
+void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, Transport::PeerConnectionState * conn, bool Initiator,
+                            void * AppState)
 {
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
@@ -200,7 +201,7 @@ void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, Transport
     Retain();
     mExchangeMgr = em;
     em->IncrementContextsInUse();
-    mExchangeId = ExchangeId;
+    mExchangeId      = ExchangeId;
     mConnectionState = conn;
     mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
     mAppState = AppState;
@@ -233,7 +234,8 @@ void ExchangeContext::Free()
     SYSTEM_STATS_DECREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 }
 
-bool ExchangeContext::MatchExchange(Transport::PeerConnectionState * conn, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader)
+bool ExchangeContext::MatchExchange(Transport::PeerConnectionState * conn, const PacketHeader & packetHeader,
+                                    const PayloadHeader & payloadHeader)
 {
     // A given message is part of a particular exchange if...
     return
