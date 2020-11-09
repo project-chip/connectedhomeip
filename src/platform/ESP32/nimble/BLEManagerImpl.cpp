@@ -1057,7 +1057,8 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 exit:
     if (err == BLE_HS_EALREADY && connectable)
     {
-        ChipLogProgress(DeviceLayer, "Connectable advertising failed because device was already advertising , stop active advertisement");
+        ChipLogProgress(DeviceLayer,
+                        "Connectable advertising failed because device was already advertising , stop active advertisement");
         err = ble_gap_adv_stop();
         if (err != CHIP_NO_ERROR)
         {
