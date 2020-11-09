@@ -142,56 +142,48 @@ CHIP_ERROR TransferInit::Parse(System::PacketBuffer * aBuffer, TransferInit & aP
     bufStart = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
 
-    err = bufReader.Read8(&ptcByte);
-    SuccessOrExit(err);
+    SuccessOrExit(bufReader.Read8(&ptcByte).StatusCode());
 
     aParsedMessage.mSupportedVersions     = ptcByte & VERSION_MASK;
     aParsedMessage.mSupportsSenderDrive   = ((ptcByte & SENDER_DRIVE_MASK) != 0);
     aParsedMessage.mSupportsReceiverDrive = ((ptcByte & RECEIVER_DRIVE_MASK) != 0);
     aParsedMessage.mSupportsAsync         = ((ptcByte & ASYNC_MASK) != 0);
 
-    err = bufReader.Read8(&rangeCtl);
-    SuccessOrExit(err);
+    SuccessOrExit(bufReader.Read8(&rangeCtl).StatusCode());
 
     aParsedMessage.mDefLen    = (rangeCtl & DEFLEN_MASK) != 0;
     hasStartOffset            = (rangeCtl & START_OFFSET_MASK) != 0;
     aParsedMessage.mWideRange = (rangeCtl & WIDERANGE_MASK) != 0;
 
-    err = bufReader.Read16(&aParsedMessage.mMaxBlockSize);
-    SuccessOrExit(err);
+    SuccessOrExit(bufReader.Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
 
     if (hasStartOffset)
     {
         if (aParsedMessage.mWideRange)
         {
-            err = bufReader.Read64(&aParsedMessage.mStartOffset);
+            SuccessOrExit(bufReader.Read64(&aParsedMessage.mStartOffset).StatusCode());
         }
         else
         {
-            err                         = bufReader.Read32(&tmpUint32Value);
+            SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
             aParsedMessage.mStartOffset = tmpUint32Value;
         }
-
-        SuccessOrExit(err);
     }
 
     if (aParsedMessage.mDefLen)
     {
         if (aParsedMessage.mWideRange)
         {
-            err = bufReader.Read64(&aParsedMessage.mMaxLength);
+            SuccessOrExit(bufReader.Read64(&aParsedMessage.mMaxLength).StatusCode());
         }
         else
         {
-            err                       = bufReader.Read32(&tmpUint32Value);
+            SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
             aParsedMessage.mMaxLength = tmpUint32Value;
         }
-
-        SuccessOrExit(err);
     }
 
-    err = bufReader.Read16(&aParsedMessage.mFileDesLength);
-    SuccessOrExit(err);
+    SuccessOrExit(bufReader.Read16(&aParsedMessage.mFileDesLength).StatusCode());
 
     VerifyOrExit(bufReader.OctetsRead() + aParsedMessage.mFileDesLength <= aBuffer->DataLength(),
                  err = CHIP_ERROR_MESSAGE_INCOMPLETE);
@@ -266,8 +258,7 @@ CHIP_ERROR SendAccept::Parse(System::PacketBuffer * aBuffer, SendAccept & aParse
     bufStart = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
 
-    err = bufReader.Read8(&tcByte);
-    SuccessOrExit(err);
+    SuccessOrExit(bufReader.Read8(&tcByte).StatusCode());
 
     aParsedMessage.mVersion = tcByte & VERSION_MASK;
     tmpControlMode          = tcByte & CONTROL_MODE_MASK;
@@ -278,8 +269,7 @@ CHIP_ERROR SendAccept::Parse(System::PacketBuffer * aBuffer, SendAccept & aParse
                  err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     aParsedMessage.mControlMode = static_cast<ControlMode>(tmpControlMode);
 
-    err = bufReader.Read16(&aParsedMessage.mMaxBlockSize);
-    SuccessOrExit(err);
+    SuccessOrExit(bufReader.Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
 
     // Rest of message is metadata (could be empty)
     if (bufReader.OctetsRead() < aBuffer->DataLength())
@@ -388,8 +378,7 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBuffer * aBuffer, ReceiveAccept & 
     bufStart = aBuffer->Start();
     Reader bufReader(bufStart, aBuffer->DataLength());
 
-    err = bufReader.Read8(&tcByte);
-    SuccessOrExit(err);
+    SuccessOrExit(bufReader.Read8(&tcByte).StatusCode());
 
     aParsedMessage.mVersion = tcByte & VERSION_MASK;
     tmpControlMode          = tcByte & CONTROL_MODE_MASK;
@@ -400,44 +389,38 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBuffer * aBuffer, ReceiveAccept & 
                  err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     aParsedMessage.mControlMode = static_cast<ControlMode>(tmpControlMode);
 
-    err = bufReader.Read8(&rangeCtl);
-    SuccessOrExit(err);
+    SuccessOrExit(bufReader.Read8(&rangeCtl).StatusCode());
 
     aParsedMessage.mDefLen    = (rangeCtl & DEFLEN_MASK) != 0;
     hasStartOffset            = (rangeCtl & START_OFFSET_MASK) != 0;
     aParsedMessage.mWideRange = (rangeCtl & WIDERANGE_MASK) != 0;
 
-    err = bufReader.Read16(&aParsedMessage.mMaxBlockSize);
-    SuccessOrExit(err);
+    SuccessOrExit(bufReader.Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
 
     if (hasStartOffset)
     {
         if (aParsedMessage.mWideRange)
         {
-            err = bufReader.Read64(&aParsedMessage.mStartOffset);
+            SuccessOrExit(bufReader.Read64(&aParsedMessage.mStartOffset).StatusCode());
         }
         else
         {
-            err                         = bufReader.Read32(&tmpUint32Value);
+            SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
             aParsedMessage.mStartOffset = tmpUint32Value;
         }
-
-        SuccessOrExit(err);
     }
 
     if (aParsedMessage.mDefLen)
     {
         if (aParsedMessage.mWideRange)
         {
-            err = bufReader.Read64(&aParsedMessage.mLength);
+            SuccessOrExit(bufReader.Read64(&aParsedMessage.mLength).StatusCode());
         }
         else
         {
-            err                    = bufReader.Read32(&tmpUint32Value);
+            SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
             aParsedMessage.mLength = tmpUint32Value;
         }
-
-        SuccessOrExit(err);
     }
 
     // Rest of message is metadata (could be empty)
@@ -446,8 +429,6 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBuffer * aBuffer, ReceiveAccept & 
         aParsedMessage.mMetadata       = &bufStart[bufReader.OctetsRead()];
         aParsedMessage.mMetadataLength = (uint16_t)(aBuffer->DataLength() - bufReader.OctetsRead());
     }
-
-    printf("read metadata\n");
 
 exit:
     return err;
