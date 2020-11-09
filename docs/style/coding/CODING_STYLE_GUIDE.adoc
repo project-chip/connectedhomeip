@@ -104,7 +104,7 @@ standards listed in Table 2.1 below.
 |Language |Minimum Standard |Aliases
 
 |C|ISO9899:1999|ISO C99, C99
-|C{plusplus}|ISO14882:2011|ISO C{plusplus}11, C{plusplus}11
+|C{plusplus}|ISO14882:2014|ISO C{plusplus}14, C{plusplus}14
 |===
 [.text-center]
 *Table 2.1.* C and C{plusplus} language minimum standards adopted by Project CHIP
@@ -137,11 +137,11 @@ have long-since been solved by C99.
 
 === C{plusplus}
 
-Project CHIP embedded software development uses the ISO14882:2011 (aka
-ISO C{plusplus}11) language standard as a baseline for source code
+Project CHIP embedded software development uses the ISO14882:2014 (aka
+ISO C{plusplus}14) language standard as a baseline for source code
 compatibility. Conformance with other standards, for example, ISO14882:1998
 (aka ISO C{plusplus}98), may be additionally required in cases where wider
-portability is necessary, but in all cases, ISO C{plusplus}11 is the baseline
+portability is necessary, but in all cases, ISO C{plusplus}14 is the baseline
 requirement.
 
 Wherever possible, particularly in non-product-specific,
@@ -151,50 +151,12 @@ leveraged through toolchain-compatibility preprocessor macros.
 
 ==== Motivation and Rationale
 
-At the time of this writing, the C{plusplus}11 standard has been out for over
-seven years in one form or another and has been twice supplanted, once
-by C{plusplus}14 and again by C{plusplus}17. Project CHIP and the source code it has
-produced are nearly concurrent with C{plusplus}11.
+CHIP strives to use the latest C++ functionality as long as existing compilers
+support such standards.
 
-This is beyond more than adequate time for this standard to be pervasive
-throughout any toolchain vendor’s C{plusplus} compiler and saves team members
-from worrying about portability issues that have long-since been solved
-by C{plusplus}11.
-
-By contrast, ISO14882:2014 (aka ISO C{plusplus}14, C{plusplus}14) and ISO14882:2017 (aka
-ISO C{plusplus}17, C{plusplus}17), are still insufficiently broad and pervasive in their
-toolchain support to warrant the introduction of dependencies on these
-standards across all software.
-
-Note, that while C{plusplus}11 is the C{plusplus} language bar, per Figure 1, embrace of
-C{plusplus}11 language- and library-specific features should be approached
-thoughtfully and carefully, depending on the deployment context. A
-loosely-constrained embedded Linux or Darwin application may want a
-broad embrace of C{plusplus}11 language and library features whereas a
-tightly-constrained piece of shared infrastructure may want to eschew
-C{plusplus}11 entirely or conditionally depend on language-specific features,
-where appropriate.
-
-That said, suitable portability mnemonics, for example, via the C
-preprocessor should be used where possible and appropriate to maximize
-code portability, particularly for shared embedded product software. An
-example of such a portability mnemonic is shown in Listing 2.1 below.
-
-[source,C]
-----
-#ifdef __cplusplus
-# if __cplusplus >= 201103L
-# define __chipFINAL final
-# else
-# define __chipFINAL
-# endif
-#else
-#define __chipFINAL
-#endif
-----
-[.text-center]
-*Listing 2.1.* Using the C preprocessor to provide a portability mnemonic
-for the C{plusplus}11 and later final keyword.
+C{plusplus}14 is considered pervasive enough to be used. As compilers start 
+supporting standards such as C{plusplus}17, C{plusplus}20 and beyond,
+CHIP may follow suit.
 
 == Conventions and Best Practices
 

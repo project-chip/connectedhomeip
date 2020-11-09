@@ -43,6 +43,7 @@
 #include <stdarg.h>
 #include <stdint.h>
 #include <string.h>
+#include <strings.h>
 #include <support/SafeInt.h>
 
 #include <support/CHIPMem.h>
