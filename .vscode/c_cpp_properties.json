@@ -71,6 +71,17 @@
                 "path": ["${workspaceFolder}/out/debug/"],
                 "limitSymbolsToIncludedHeaders": true
             }
+        },
+        {
+            "name": "nRF Connect examples debug (GN)",
+            "cStandard": "c11",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "gcc-arm",
+            "compilerPath": "/opt/ARM-software/gcc-arm-none-eabi-9-2019-q4-major/bin/arm-none-eabi-gcc",
+            "browse": {
+                "path": ["${workspaceFolder}/out/debug/"],
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4
