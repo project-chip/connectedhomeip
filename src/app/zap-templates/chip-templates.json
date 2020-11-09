@@ -1,74 +1,72 @@
 {
-  "name": "CHIP templates",
-  "version": "chip-v1",
-  "helpers": [
-    "helper-chip.js"
-  ],
-  "templates": [
-    {
-      "path": "af-structs.zapt",
-      "name": "ZCL af-structs header",
-      "output": "af-structs.h"
-    },
-    {
-      "path": "att-storage.zapt",
-      "name": "ZCL att-storage header",
-      "output": "att-storage.h"
-    },
-    {
-      "path": "attribute-id.zapt",
-      "name": "ZCL attribute-id header",
-      "output": "attribute-id.h"
-    },
-    {
-      "path": "attribute-type.zapt",
-      "name": "ZCL attribute-type header",
-      "output": "attribute-type.h"
-    },
-    {
-      "path": "call-command-handler-src.zapt",
-      "name": "ZCL call-command-handler source",
-      "output": "call-command-handler.c"
-    },
-    {
-      "path": "call-command-handler.zapt",
-      "name": "ZCL call-command-handler header",
-      "output": "call-command-handler.h"
-    },
-    {
-      "path": "callback-stub-src.zapt",
-      "name": "ZCL callback-stub source",
-      "output": "callback-stub.c"
-    },
-    {
-      "path": "callback.zapt",
-      "name": "ZCL callback header",
-      "output": "callback.h"
-    },
-    {
-      "path": "cluster-id.zapt",
-      "name": "ZCL cluster-id header",
-      "output": "cluster-id.h"
-    },
-    {
-      "path": "command-id.zapt",
-      "name": "ZCL command-id header",
-      "output": "command-id.h"
-    },
-    {
-      "path": "enums.zapt",
-      "name": "ZCL enums header",
-      "output": "enums.h"
-    },
-    {
-      "path": "gen_config.zapt",
-      "name": "ZCL gen_config header",
-      "output": "gen_config.h"
-    },
-    {
-      "path": "print-cluster.zapt",
-      "name": "ZCL print-cluster header",
-      "output": "print-cluster.h"
-    }
-  ]
+    "name": "CHIP templates",
+    "version": "chip-v1",
+    "helpers": ["helper-chip.js"],
+    "templates": [
+        {
+            "path": "af-structs.zapt",
+            "name": "ZCL af-structs header",
+            "output": "af-structs.h"
+        },
+        {
+            "path": "att-storage.zapt",
+            "name": "ZCL att-storage header",
+            "output": "att-storage.h"
+        },
+        {
+            "path": "attribute-id.zapt",
+            "name": "ZCL attribute-id header",
+            "output": "attribute-id.h"
+        },
+        {
+            "path": "attribute-type.zapt",
+            "name": "ZCL attribute-type header",
+            "output": "attribute-type.h"
+        },
+        {
+            "path": "call-command-handler-src.zapt",
+            "name": "ZCL call-command-handler source",
+            "output": "call-command-handler.c"
+        },
+        {
+            "path": "call-command-handler.zapt",
+            "name": "ZCL call-command-handler header",
+            "output": "call-command-handler.h"
+        },
+        {
+            "path": "callback-stub-src.zapt",
+            "name": "ZCL callback-stub source",
+            "output": "callback-stub.c"
+        },
+        {
+            "path": "callback.zapt",
+            "name": "ZCL callback header",
+            "output": "callback.h"
+        },
+        {
+            "path": "cluster-id.zapt",
+            "name": "ZCL cluster-id header",
+            "output": "cluster-id.h"
+        },
+        {
+            "path": "command-id.zapt",
+            "name": "ZCL command-id header",
+            "output": "command-id.h"
+        },
+        {
+            "path": "enums.zapt",
+            "name": "ZCL enums header",
+            "output": "enums.h"
+        },
+        {
+            "path": "gen_config.zapt",
+            "name": "ZCL gen_config header",
+            "output": "gen_config.h"
+        },
+        {
+            "path": "print-cluster.zapt",
+            "name": "ZCL print-cluster header",
+            "output": "print-cluster.h"
+        }
+    ]
 }
