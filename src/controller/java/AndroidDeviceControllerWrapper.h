@@ -29,7 +29,7 @@
  *
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
-class AndroidDeviceControllerWrapper : public chip::DeviceController::DevicePairingDelegate
+class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate
 {
 public:
     ~AndroidDeviceControllerWrapper();
