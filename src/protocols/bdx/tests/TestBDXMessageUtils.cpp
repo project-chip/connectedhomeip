@@ -1,4 +1,4 @@
-#include <transport/bdx/BDXMessageUtils.h>
+#include <protocols/bdx/BDXMessageUtils.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <nlunit-test.h>
