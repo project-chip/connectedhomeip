@@ -14,23 +14,40 @@
 	<body>
 		<div class="wrapper">
 			<div class="container">
-				<h4>
-					Please scan with your CHIPTool app.
-				</h4>
-				<!-- <canvas id="qr"></canvas> -->
-				<div id="qrcode"></div>
-				<p id="error">Error, no data provided for the QR code</p>
 
-				<div id="payload-info">
-					<p id="payload"></p>
-					<p>
-						This QR code is unique for your device. You may print a
-						copy of this for subsequent use.
-					</p>
-
-					<button onclick="window.print()" class="noprint">
-						Print QR Code
+				<form onsubmit="onSubmitData()" id="qrgeneratorform">
+					<input
+						type="text"
+						id="qrcodetext"
+						placeholder="Enter QR Code Text"
+						class="input-box"
+					/>
+					<button type="submit" class="qrcode-btn">
+						Generate QRcode
 					</button>
+				</form>
+
+				<div id="qrcode-container">
+					<div class="qrconde-wrapper">
+						<div>
+							<h4>
+								Please scan with your CHIPTool app.
+							</h4>
+							<div id="qrcode"></div>
+						</div>
+
+						<div id="payload-info">
+							<p id="payload"></p>
+							<p>
+								This QR code is unique for your device. You may
+								print a copy of this for subsequent use.
+							</p>
+
+							<button onclick="window.print()" class="noprint">
+								Print QR Code
+							</button>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -47,25 +64,48 @@
 		</div>
 		<script src="qrcode.min.js"></script>
 		<script type="text/javascript">
+			let data;
+			let qrcontainer = document.querySelector('#qrcode-container');
+			let qrcodeform = document.querySelector('#qrgeneratorform');
+
 			let link = new URLSearchParams(window.location.search);
-			let data = link.get('data')
-				? link.get('data')
-				: 'Data not added. Try again later.';
-			document.querySelector('#payload').innerHTML = link.get('data')
-				? `Payload: ${link.get('data')}`
-				: '';
-			link.get('data')
-				? (document.querySelector('#error').style.display = 'none')
-				: (document.querySelector('#payload-info').style.display =
-						'none');
-			var qrcode = new QRCode(document.getElementById('qrcode'), {
-				text: data,
-				width: 250,
-				height: 250,
-				colorDark: '#000000',
-				colorLight: '#ffffff',
-				correctLevel: QRCode.CorrectLevel.H,
-			});
+			let linkdata = link.get('data');
+
+			if (linkdata) {
+				qrcodeform.style.display = 'none';
+			}
+
+			function generateQRcode(data) {
+				document.querySelector(
+					'#payload'
+				).innerHTML = `Payload: ${data}`;
+				var qrcode = new QRCode(document.getElementById('qrcode'), {
+					text: data,
+					width: 250,
+					height: 250,
+					colorDark: '#000000',
+					colorLight: '#ffffff',
+					correctLevel: QRCode.CorrectLevel.H,
+				});
+			}
+
+			function showQRcodeBlock(data) {
+				if (data) {
+					qrcontainer.style.display = 'block';
+				}
+			}
+
+			if (linkdata) {
+				showQRcodeBlock(linkdata);
+				generateQRcode(linkdata);
+			}
+
+			function onSubmitData() {
+				event.preventDefault();
+				let data = document.querySelector('#qrcodetext').value;
+				showQRcodeBlock(data);
+				generateQRcode(data);
+			}
 		</script>
 	</body>
 </html>

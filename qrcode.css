@@ -11,10 +11,6 @@ body {
 	font-family: 'Roboto', sans-serif;
 }
 
-.container {
-	padding-top: 5rem;
-}
-
 .wrapper div {
 	text-align: center;
 }
@@ -41,13 +37,7 @@ p {
 #qr {
 	margin-bottom: 3rem;
 }
-
-h4 {
-	margin-top: -0.5rem;
-}
-
 button {
-	/* display: inline-block; */
 	margin-bottom: 0;
 	font-weight: 400;
 	text-align: center;
@@ -73,6 +63,8 @@ button {
 }
 
 @media print {
+	form,
+	.footer,
 	.noprint {
 		display: none;
 	}
@@ -94,4 +86,27 @@ button {
 
 .footer:visited {
 	color: #000;
+}
+
+.input-box {
+	width: 400px;
+	padding: 0.345rem 0.75rem;
+	margin: 1rem auto;
+	font-size: 14px;
+	line-height: 1.5;
+	color: #495057;
+	background-color: #fff;
+	background-clip: padding-box;
+	border: 1px solid #ced4da;
+	border-radius: 0.25rem;
+	transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.qrcode-btn {
+	margin-top: 0;
+}
+
+#qrcode-container {
+	display: none;
+	margin: 1rem auto;
 }
