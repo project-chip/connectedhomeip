@@ -18,8 +18,8 @@ import("${chip_root}/build/chip/tools.gni")
 
 assert(chip_build_tools)
 
-executable("minimal-mdns-test") {
-  sources = [ "main.cpp" ]
+executable("minimal-client") {
+  sources = [ "client.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
