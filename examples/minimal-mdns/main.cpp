@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <memory>
 
+#include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <mdns/minimal/DnsHeader.h>
 #include <mdns/minimal/Parser.h>
@@ -35,7 +36,7 @@ namespace {
 
 constexpr uint32_t kRunTimeMs    = 500;
 constexpr uint16_t kMdnsPort     = 5353;
-constexpr uint16_t kFakeMdnsPort = 53333;
+constexpr uint16_t kFakeMdnsPort = 5388;
 
 constexpr uint32_t kTestMessageId = 0x1234;
 
@@ -44,11 +45,11 @@ constexpr size_t kMdnsMaxPacketSize = 1'024;
 // const mdns::Minimal::QNamePart kCastQnames[] = { "_googlecast", "_tcp", "local" };
 const mdns::Minimal::QNamePart kCastQnames[] = { "octopi", "local" };
 
-// IPV4 address:
-const char * kMdnsQueryDestination = "224.0.0.251";
+// const char * kMdnsQueryDestination = "224.0.0.251"; // IPV4 address:
+const char * kMdnsQueryDestination = "FF02::FB";
 
-// IPV6 address:
-// const char * kMdnsQueryDestination = "FF02::FB";
+// Use `ip -6 maddr` to list these
+#define FORCE_INTERFACE_ID 178
 
 const char * ToString(mdns::Minimal::QType t)
 {
@@ -318,7 +319,24 @@ int main(int argc, char ** args)
         return 1;
     }
 
-    if (udp->Bind(destIpAddr.Type(), chip::Inet::IPAddress::Any, kFakeMdnsPort) != CHIP_NO_ERROR)
+    chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
+#ifdef FORCE_INTERFACE_ID
+    interfaceId = FORCE_INTERFACE_ID;
+    {
+        char buff[64];
+        if (chip::Inet::GetInterfaceName(interfaceId, buff, sizeof(buff)) == CHIP_NO_ERROR)
+        {
+            printf("USING interface: %s.\n", buff);
+        }
+        else
+        {
+            printf("FAILED to get inteface id name.\n");
+        }
+    }
+
+#endif
+
+    if (udp->Bind(destIpAddr.Type(), chip::Inet::IPAddress::Any, kFakeMdnsPort, interfaceId) != CHIP_NO_ERROR)
     {
         printf("Failed to bind\n");
         return 1;
