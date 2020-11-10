@@ -67,13 +67,17 @@ private:
     SerializedQNameIterator mName;
 };
 
-/// Parses IPV4 (A) record data
+/// Parses an IPV4 (A) record data
 /// https://tools.ietf.org/html/rfc1035 (included in base RFC)
 bool ParseARecord(const BytesRange & data, chip::Inet::IPAddress * addr);
 
-/// Parses IPV6 (AAAA) record data
+/// Parses an IPV6 (AAAA) record data
 /// https://tools.ietf.org/html/rfc3596
 bool ParseAAAARecord(const BytesRange & data, chip::Inet::IPAddress * addr);
+
+/// Parses a PTR record data
+/// https://tools.ietf.org/html/rfc1035 (included in base RFC)
+bool ParsePtrRecord(const BytesRange & data, const BytesRange & packet, SerializedQNameIterator * name);
 
 } // namespace Minimal
 

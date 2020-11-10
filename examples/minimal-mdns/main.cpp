@@ -190,6 +190,19 @@ public:
                 printf("             IP:  %s\n", addr.ToString(buff, sizeof(buff)));
             }
         }
+        else if (data.GetType() == mdns::Minimal::QType::PTR)
+        {
+            mdns::Minimal::SerializedQNameIterator name;
+            if (!mdns::Minimal::ParsePtrRecord(data.GetData(), mPacketRange, &name))
+            {
+                printf("FAILED TO PARSE AAAA RECORD\n");
+            }
+            else
+            {
+                printf("             PTR:  ");
+                PrintQName(name);
+            }
+        }
     }
 
 private:
