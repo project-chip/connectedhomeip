@@ -46,11 +46,6 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
 {}
 
 void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpointId) {}
-bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
-{
-    return true;
-}
-
 } // extern "C"
 
 int main(int argc, char * argv[])
