@@ -33,7 +33,6 @@
 #include "lib/core/Optional.h"
 
 namespace chip {
-namespace Protocols {
 namespace Mdns {
 
 static constexpr uint8_t kMdnsNameMaxSize  = 33;
@@ -59,8 +58,9 @@ struct MdnsService
     char mName[kMdnsNameMaxSize + 1];
     char mType[kMdnsTypeMaxSize + 1];
     MdnsServiceProtocol mProtocol;
+    Inet::IPAddressType mAddressType;
     uint16_t mPort;
-    chip::Inet::InterfaceId interface;
+    chip::Inet::InterfaceId mInterface;
     TextEntry * mTextEntryies;
     size_t mTextEntrySize;
     Optional<chip::Inet::IPAddress> mAddress;
@@ -155,8 +155,8 @@ CHIP_ERROR ChipMdnsStopPublish();
  * @retval Error code                   The browse fails.
  *
  */
-CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip::Inet::InterfaceId interface,
-                          MdnsBrowseCallback callback, void * context);
+CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                          chip::Inet::InterfaceId interface, MdnsBrowseCallback callback, void * context);
 
 /**
  * This function resolves the services published by mdns
@@ -174,5 +174,4 @@ CHIP_ERROR ChipMdnsResolve(MdnsService * browseResult, chip::Inet::InterfaceId i
                            void * context);
 
 } // namespace Mdns
-} // namespace Protocols
 } // namespace chip
