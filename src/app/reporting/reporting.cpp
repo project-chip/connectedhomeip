@@ -156,7 +156,7 @@ void emberAfPluginReportingStackStatusCallback(EmberStatus status)
     }
 }
 
-extern "C" void emberAfPluginReportingInitCallback(void)
+void emberAfPluginReportingInitCallback(void)
 {
     // On device initialization, any attributes that have been set up to report
     // should generate an attribute report.
@@ -174,7 +174,7 @@ extern "C" void emberAfPluginReportingInitCallback(void)
     scheduleTick();
 }
 
-extern "C" void emberAfPluginReportingTickEventHandler(void)
+void emberAfPluginReportingTickEventHandler(void)
 {
     EmberApsFrame * apsFrame = NULL;
     EmberAfStatus status;
@@ -367,7 +367,7 @@ static void conditionallySendReport(EndpointId endpoint, EmberAfClusterId cluste
     }
 }
 
-extern "C" bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
+bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
 {
     EmberStatus sendStatus;
     uint16_t bufIndex = cmd->payloadStartIndex;
@@ -518,7 +518,7 @@ extern "C" bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCom
     return true;
 }
 
-extern "C" bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterCommand * cmd)
+bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterCommand * cmd)
 {
     EmberStatus sendStatus;
     uint16_t bufIndex = cmd->payloadStartIndex;
@@ -647,7 +647,7 @@ extern "C" bool emberAfReadReportingConfigurationCommandCallback(const EmberAfCl
     return true;
 }
 
-extern "C" EmberStatus emberAfClearReportTableCallback(void)
+EmberStatus emberAfClearReportTableCallback(void)
 {
     uint8_t i;
     for (i = 0; i < REPORT_TABLE_SIZE; i++)
@@ -669,9 +669,8 @@ EmberStatus emAfPluginReportingRemoveEntry(uint8_t index)
     return status;
 }
 
-extern "C" void emberAfReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
-                                                        uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type,
-                                                        uint8_t * data)
+void emberAfReportingAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                             uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data)
 {
     uint8_t i;
     for (i = 0; i < REPORT_TABLE_SIZE; i++)
@@ -1071,12 +1070,12 @@ uint8_t emAfPluginReportingConditionallyAddReportingEntry(EmberAfPluginReporting
     return 0;
 }
 
-extern "C" bool emberAfConfigureReportingResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
+bool emberAfConfigureReportingResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
 }
 
-extern "C" bool emberAfReadReportingConfigurationResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
+bool emberAfReadReportingConfigurationResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
 }

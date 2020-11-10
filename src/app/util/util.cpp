@@ -118,14 +118,12 @@ uint8_t emAfExtendedPanId[EXTENDED_PAN_ID_SIZE] = {
     0, 0, 0, 0, 0, 0, 0, 0,
 };
 
-extern "C" {
 #ifdef EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_DECLARATIONS
 #endif
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 #endif
-} // extern "C"
 
 //------------------------------------------------------------------------------
 
