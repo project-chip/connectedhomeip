@@ -51,25 +51,26 @@ extern "C" {
 #endif // __cplusplus
 
 // Remote devices writing attributes of local device
-EmberAfStatus emberAfWriteAttributeExternal(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfWriteAttributeExternal(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
                                             uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr,
                                             EmberAfAttributeType dataType);
 
-void emberAfRetrieveAttributeAndCraftResponse(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId, uint8_t mask,
-                                              uint16_t manufacturerCode, uint16_t readLength);
-EmberAfStatus emberAfAppendAttributeReportFields(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                                 uint8_t mask, uint8_t * buffer, uint8_t bufLen, uint8_t * bufIndex);
+void emberAfRetrieveAttributeAndCraftResponse(CHIPEndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId,
+                                              uint8_t mask, uint16_t manufacturerCode, uint16_t readLength);
+EmberAfStatus emberAfAppendAttributeReportFields(CHIPEndpointId endpoint, EmberAfClusterId clusterId,
+                                                 EmberAfAttributeId attributeId, uint8_t mask, uint8_t * buffer, uint8_t bufLen,
+                                                 uint8_t * bufIndex);
 void emberAfPrintAttributeTable(void);
 
-bool emberAfReadSequentialAttributesAddToResponse(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId startAttributeId,
-                                                  uint8_t mask, uint16_t manufacturerCode, uint8_t maxAttributeIds,
-                                                  bool includeAccessControl);
+bool emberAfReadSequentialAttributesAddToResponse(CHIPEndpointId endpoint, EmberAfClusterId clusterId,
+                                                  EmberAfAttributeId startAttributeId, uint8_t mask, uint16_t manufacturerCode,
+                                                  uint8_t maxAttributeIds, bool includeAccessControl);
 
-EmberAfStatus emAfWriteAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+EmberAfStatus emAfWriteAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
                                  uint16_t manufacturerCode, uint8_t * data, EmberAfAttributeType dataType,
                                  bool overrideReadOnlyAndDataType, bool justTest);
 
-EmberAfStatus emAfReadAttribute(uint8_t endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+EmberAfStatus emAfReadAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
                                 uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
 
 #ifdef __cplusplus

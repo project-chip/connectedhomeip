@@ -41,6 +41,9 @@ if (chip_device_platform != "none") {
 
     # Time the firmware was built.
     chip_device_config_firmware_build_time = ""
+
+    # By pass provision and secure session
+    chip_bypass_rendezvous = false
   }
 
   buildconfig_header("platform_buildconfig") {
@@ -70,6 +73,10 @@ if (chip_device_platform != "none") {
     }
     if (chip_device_config_firmware_build_time != "") {
       defines += [ "CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME=\"${chip_device_config_firmware_build_time}\"" ]
+    }
+
+    if (chip_bypass_rendezvous) {
+      defines += [ "CHIP_BYPASS_RENDEZVOUS=1" ]
     }
 
     if (chip_device_platform == "darwin") {
@@ -108,6 +115,16 @@ if (chip_device_platform != "none") {
         "CHIP_DEVICE_LAYER_TARGET=K32W",
       ]
     }
+  }
+} else {
+  buildconfig_header("platform_buildconfig") {
+    header = "CHIPDeviceBuildConfig.h"
+    header_dir = "platform"
+
+    defines = [
+      "CHIP_DEVICE_LAYER_NONE=1",
+      "CHIP_DEVICE_LAYER_TARGET=NONE",
+    ]
   }
 }
 
@@ -166,6 +183,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "PersistedStorage.cpp",
       "SystemEventSupport.cpp",
       "SystemTimerSupport.cpp",
+      "TestIdentity.cpp",
     ]
 
     cflags = [ "-Wconversion" ]
@@ -177,6 +195,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       "${chip_root}/src/lib/core",
       "${chip_root}/src/lib/core:chip_config_header",
       "${chip_root}/src/lib/support",
+      "${chip_root}/src/setup_payload",
       "${nlio_root}:nlio",
     ]
 
@@ -227,6 +246,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "EFR32/ConfigurationManagerImpl.h",
         "EFR32/ConnectivityManagerImpl.cpp",
         "EFR32/ConnectivityManagerImpl.h",
+        "EFR32/DeviceNetworkProvisioningDelegateImpl.cpp",
         "EFR32/DeviceNetworkProvisioningDelegateImpl.h",
         "EFR32/EFR32Config.cpp",
         "EFR32/EFR32Config.h",
@@ -438,5 +458,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
   }
 } else {
   group("platform") {
+    public_deps = [ ":platform_buildconfig" ]
   }
 }

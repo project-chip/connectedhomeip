@@ -17,8 +17,14 @@
 #ifndef EMBER_PRINT_H
 #define EMBER_PRINT_H 1
 
+#include "debug-printing.h"
+
 #include <stdbool.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif // __cplusplus
 
 /**
  * @brief Prints a log message
@@ -49,5 +55,9 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
  * @param string - Buffer to print as a string
  * */
 void emberAfPrintString(int category, const uint8_t * string);
+
+#ifdef __cplusplus
+} // extern "C"
+#endif // __cplusplus
 
 #endif // EMBER_PRINT_H

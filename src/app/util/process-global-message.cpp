@@ -52,11 +52,12 @@
 //  #include "../plugin/wwah-server-silabs/wwah-server-silabs.h"
 //#endif
 //#include "../plugin/simple-metering-server/simple-metering-server.h"
-#include "gen/znet-bookkeeping.h" // emAfRetrieveAttributeAndCraftResponse
 
 #ifdef EMBER_AF_PLUGIN_COMMS_HUB_FUNCTION_SUB_GHZ
 #include "app/framework/plugin/comms-hub-function-sub-ghz/comms-hub-function-sub-ghz.h"
 #endif
+
+using namespace chip;
 
 // flag to keep track of the fact that we just sent a read attr for time and
 // we should set our time to the result of the read attr response.
@@ -83,7 +84,7 @@ bool emAfSyncingTime = false;
      % UINT8_MAX) /* make count fit in an 8 bit integer */
 
 #if defined(EMBER_AF_SUPPORT_COMMAND_DISCOVERY)
-static void printDiscoverCommandsResponse(bool generated, uint16_t clusterId, bool discoveryComplete, uint8_t * buffer,
+static void printDiscoverCommandsResponse(bool generated, ClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
                                           uint16_t length)
 {
     uint16_t i;
@@ -137,10 +138,10 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
     // Make the ZCL header for the response
     // note: cmd byte is set below
-    frameControl = (ZCL_GLOBAL_COMMAND |
-                    (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER
-                         ? ZCL_FRAME_CONTROL_SERVER_TO_CLIENT | EMBER_AF_DEFAULT_RESPONSE_POLICY_RESPONSES
-                         : ZCL_FRAME_CONTROL_CLIENT_TO_SERVER | EMBER_AF_DEFAULT_RESPONSE_POLICY_RESPONSES));
+    frameControl = static_cast<uint8_t>(ZCL_GLOBAL_COMMAND |
+                                        (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER
+                                             ? ZCL_FRAME_CONTROL_SERVER_TO_CLIENT | EMBER_AF_DEFAULT_RESPONSE_POLICY_RESPONSES
+                                             : ZCL_FRAME_CONTROL_CLIENT_TO_SERVER | EMBER_AF_DEFAULT_RESPONSE_POLICY_RESPONSES));
     if (cmd->mfgSpecific)
     {
         frameControl |= ZCL_MANUFACTURER_SPECIFIC_MASK;
@@ -219,15 +220,11 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
             // This function reads the attribute and creates the correct response
             // in the response buffer
-            if (!emAfRetrieveAttributeAndCraftResponse(cmd->apsFrame->destinationEndpoint, clusterId, attrId, clientServerMask,
-                                                       cmd->mfgCode, (EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength)))
-            {
-                emberAfRetrieveAttributeAndCraftResponse(cmd->apsFrame->destinationEndpoint, clusterId, attrId, clientServerMask,
-                                                         cmd->mfgCode, (EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength));
-            }
-
+            emberAfRetrieveAttributeAndCraftResponse(cmd->apsFrame->destinationEndpoint, clusterId, attrId, clientServerMask,
+                                                     cmd->mfgCode,
+                                                     static_cast<uint16_t>(EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength));
             // Go to next attrID
-            msgIndex += 2;
+            msgIndex = static_cast<uint16_t>(msgIndex + 2);
         }
     }
 
@@ -285,7 +282,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
             // Increment past the attribute id (two bytes), the type (one byte), and
             // the data (N bytes, including the length byte for strings).
-            msgIndex += 3 + dataSize;
+            msgIndex = static_cast<uint16_t>(msgIndex + 3 + dataSize);
         }
         // If there are any failures, send the response and exit
         if (numFailures > 0)
@@ -385,7 +382,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
                 // Increment past the attribute id (two bytes), the type (one byte), and
                 // the data (N bytes, including the length byte for strings).
-                msgIndex += 3 + dataSize;
+                msgIndex = static_cast<uint16_t>(msgIndex + 3 + dataSize);
             }
             else
             {
@@ -542,14 +539,16 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 #endif
 
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_CLIENT)
-        emberAfPluginIasZoneClientReadAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex);
+        emberAfPluginIasZoneClientReadAttributesResponseCallback(clusterId, message + msgIndex,
+                                                                 static_cast<uint16_t>(msgLen - msgIndex));
 #endif
 
 #if defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER)
-        emberAfPluginSimpleMeteringClusterReadAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex);
+        emberAfPluginSimpleMeteringClusterReadAttributesResponseCallback(clusterId, message + msgIndex,
+                                                                         static_cast<uint16_t>(msgLen - msgIndex));
 #endif
 
-        if (!emAfReadAttributesResponse(clusterId, message + msgIndex, msgLen - msgIndex))
+        if (!emberAfReadAttributesResponseCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
         {
             emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
         }
@@ -559,14 +558,16 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
     case ZCL_WRITE_ATTRIBUTES_RESPONSE_COMMAND_ID:
 
 #if defined(EMBER_AF_PLUGIN_TEST_HARNESS)
-        emberAfPluginTestHarnessWriteAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex);
+        emberAfPluginTestHarnessWriteAttributesResponseCallback(clusterId, message + msgIndex,
+                                                                static_cast<uint16_t>(msgLen - msgIndex));
 #endif
 
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_CLIENT)
-        emberAfPluginIasZoneClientWriteAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex);
+        emberAfPluginIasZoneClientWriteAttributesResponseCallback(clusterId, message + msgIndex,
+                                                                  static_cast<uint16_t>(msgLen - msgIndex));
 #endif
 
-        if (!emberAfWriteAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex))
+        if (!emberAfWriteAttributesResponseCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
         {
             emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
         }
@@ -574,7 +575,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
     // ([status:1] [direction:1] [attribute id:2])+
     case ZCL_CONFIGURE_REPORTING_RESPONSE_COMMAND_ID:
-        if (!emberAfConfigureReportingResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex))
+        if (!emberAfConfigureReportingResponseCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
         {
             emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
         }
@@ -584,7 +585,8 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
     // ... [min interval:0/2] [max interval:0/2] [reportable change:0/V] ...
     // ... [timeout:0/2])+
     case ZCL_READ_REPORTING_CONFIGURATION_RESPONSE_COMMAND_ID:
-        if (!emberAfReadReportingConfigurationResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex))
+        if (!emberAfReadReportingConfigurationResponseCallback(clusterId, message + msgIndex,
+                                                               static_cast<uint16_t>(msgLen - msgIndex)))
         {
             emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
         }
@@ -592,7 +594,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 
     // ([attribute id:2] [type:1] [data:V])+
     case ZCL_REPORT_ATTRIBUTES_COMMAND_ID:
-        if (!emAfReportAttributes(clusterId, message + msgIndex, msgLen - msgIndex))
+        if (!emberAfReportAttributesCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
         {
             emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
         }
@@ -617,7 +619,8 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
     case ZCL_DISCOVER_ATTRIBUTES_EXTENDED_RESPONSE_COMMAND_ID: {
         bool discoveryComplete = emberAfGetInt8u(message, msgIndex, msgLen);
         msgIndex++;
-        if (!emberAfDiscoverAttributesResponseCallback(clusterId, discoveryComplete, message + msgIndex, msgLen - msgIndex,
+        if (!emberAfDiscoverAttributesResponseCallback(clusterId, discoveryComplete, message + msgIndex,
+                                                       static_cast<uint16_t>(msgLen - msgIndex),
                                                        (zclCmd == ZCL_DISCOVER_ATTRIBUTES_EXTENDED_RESPONSE_COMMAND_ID)))
         {
             emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
@@ -648,8 +651,8 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         }
         savedIndex                  = appResponseLength;
         flag                        = emberAfExtractCommandIds(flag, cmd, clusterId, appResponseData + appResponseLength + 1,
-                                        EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength - 1, &appResponseLength,
-                                        startCommandIdentifier, maximumCommandIdentifiers);
+                                        static_cast<uint16_t>(EMBER_AF_RESPONSE_BUFFER_LEN - appResponseLength - 1),
+                                        &appResponseLength, startCommandIdentifier, maximumCommandIdentifiers);
         appResponseData[savedIndex] = (flag ? 1 : 0);
         appResponseLength++;
         emberAfSendResponse();
@@ -661,9 +664,10 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         if (msgIndex <= msgLen)
         {
             printDiscoverCommandsResponse(false, // is ZCL command generated?
-                                          clusterId, discoveryComplete, message + msgIndex, msgLen - msgIndex);
+                                          clusterId, discoveryComplete, message + msgIndex,
+                                          static_cast<uint16_t>(msgLen - msgIndex));
             if (!emberAfDiscoverCommandsReceivedResponseCallback(clusterId, cmd->mfgCode, discoveryComplete, message + msgIndex,
-                                                                 msgLen - msgIndex))
+                                                                 static_cast<uint16_t>(msgLen - msgIndex)))
             {
                 emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
             }
@@ -680,9 +684,10 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         if (msgIndex <= msgLen)
         {
             printDiscoverCommandsResponse(true, // is ZCL command generated?
-                                          clusterId, discoveryComplete, message + msgIndex, msgLen - msgIndex);
+                                          clusterId, discoveryComplete, message + msgIndex,
+                                          static_cast<uint16_t>(msgLen - msgIndex));
             if (!emberAfDiscoverCommandsGeneratedResponseCallback(clusterId, cmd->mfgCode, discoveryComplete, message + msgIndex,
-                                                                  msgLen - msgIndex))
+                                                                  static_cast<uint16_t>(msgLen - msgIndex)))
             {
                 emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
             }

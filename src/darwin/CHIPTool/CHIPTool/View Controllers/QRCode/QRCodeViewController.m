@@ -510,7 +510,6 @@
 - (void)handleRendezVous:(CHIPSetupPayload *)payload
 {
     switch (payload.rendezvousInformation) {
-    case kRendezvousInformationNone:
     case kRendezvousInformationThread:
     case kRendezvousInformationEthernet:
     case kRendezvousInformationAllMask:
@@ -520,6 +519,7 @@
         NSLog(@"Rendezvous Wi-Fi");
         [self handleRendezVousWiFi:[self getNetworkName:payload.discriminator]];
         break;
+    case kRendezvousInformationNone:
     case kRendezvousInformationBLE:
         NSLog(@"Rendezvous BLE");
         [self handleRendezVousBLE:payload.discriminator.unsignedShortValue setupPINCode:payload.setUpPINCode.unsignedIntValue];

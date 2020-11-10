@@ -33,9 +33,9 @@
     <string name="rendezvous_over_ble_btn_text">Rendezvous over BLE</string>
     <string name="rendezvous_over_soft_ap_btn_text">Rendezvous over Soft AP</string>
 
-    <string name="rendezvous_over_ble_scanning_text">Scanning for BLE device</string>
+    <string name="rendezvous_over_ble_scanning_text">Scanning for BLE device %1$s</string>
     <string name="rendezvous_over_ble_scanning_failed_text">Device not found</string>
-    <string name="rendezvous_over_ble_connecting_text">Connecting to</string>
+    <string name="rendezvous_over_ble_connecting_text">Connecting to %1$s</string>
     <string name="rendezvous_over_ble_pairing_text">Pairing</string>
     <string name="rendezvous_over_ble_success_text">Secure channel established. Provisioning</string>
 
@@ -63,4 +63,8 @@
     <string name="attestation_test_btn_text">Attestation Test</string>
     <string name="attestation_fetching_status">Fetching…</string>
     <string name="attestation_app_not_found">No attestation app found</string>
+    <string name="enter_wifi_credentials_title">Enter your Wi-Fi network and password below that you want to put your CHIP device on.</string>
+    <string name="enter_wifi_ssid_hint">Enter Wi-Fi SSID</string>
+    <string name="enter_wifi_password_hint">Enter Wi-Fi password</string>
+    <string name="enter_wifi_save_network_btn">Save network</string>
 </resources>

@@ -154,12 +154,12 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
 
 void emberAfInit(void);
 void emberAfTick(void);
-uint16_t emberAfFindClusterNameIndex(uint16_t cluster);
-uint16_t emberAfFindClusterNameIndexWithMfgCode(uint16_t cluster, uint16_t mfgCode);
+uint16_t emberAfFindClusterNameIndex(CHIPClusterId cluster);
+uint16_t emberAfFindClusterNameIndexWithMfgCode(CHIPClusterId cluster, uint16_t mfgCode);
 void emberAfStackDown(void);
 
-void emberAfDecodeAndPrintCluster(uint16_t cluster);
-void emberAfDecodeAndPrintClusterWithMfgCode(uint16_t cluster, uint16_t mfgCode);
+void emberAfDecodeAndPrintCluster(CHIPClusterId cluster);
+void emberAfDecodeAndPrintClusterWithMfgCode(CHIPClusterId cluster, uint16_t mfgCode);
 
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
                            ChipNodeId source, InterPanHeader * interPanHeader);

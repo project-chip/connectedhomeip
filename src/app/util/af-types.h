@@ -248,7 +248,7 @@ typedef struct
     /**
      * Endpoint that the attribute is located on
      */
-    uint8_t endpoint;
+    CHIPEndpointId endpoint;
 
     /**
      * Cluster that the attribute is located on. If the cluster
@@ -528,15 +528,6 @@ typedef struct
     EmberKeyData preconfiguredKey;
 } EmberAfSecurityProfileData;
 
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-typedef struct
-{
-    EmberNodeType nodeType;
-    EmberAfSecurityProfile securityProfile;
-} EmAfZigbeeProNetwork;
-
-#endif
-
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 enum EmberAfEndpointBitmask;
 #else
@@ -555,7 +546,7 @@ typedef struct
     /**
      * Actual zigbee endpoint number.
      */
-    uint8_t endpoint;
+    CHIPEndpointId endpoint;
     /**
      * Profile ID of the device on this endpoint.
      */
@@ -609,14 +600,14 @@ typedef struct
     uint32_t eventId;
 #ifdef EMBER_AF_PLUGIN_DRLC_SERVER
     EmberEUI64 source;
-    uint8_t sourceEndpoint;
+    CHIPEndpointId sourceEndpoint;
 #endif // EMBER_AF_PLUGIN_DRLC_SERVER
 
 #ifdef EMBER_AF_PLUGIN_DRLC
     EmberAfPluginEsiManagementBitmask esiBitmask;
 #endif // EMBER_AF_PLUGIN_DRLC
 
-    uint8_t destinationEndpoint;
+    CHIPEndpointId destinationEndpoint;
     uint16_t deviceClass;
     uint8_t utilityEnrollmentGroup;
     /**
@@ -711,7 +702,7 @@ typedef struct
 typedef struct
 {
     uint8_t count;
-    const uint8_t * list;
+    const CHIPEndpointId * list;
 } EmberAfEndpointList;
 
 /**
@@ -721,12 +712,12 @@ typedef struct
 typedef struct
 {
     uint8_t inClusterCount;
-    const uint16_t * inClusterList;
+    const CHIPClusterId * inClusterList;
     uint8_t outClusterCount;
-    const uint16_t * outClusterList;
+    const CHIPClusterId * outClusterList;
     EmberAfProfileId profileId;
     uint16_t deviceId;
-    uint8_t endpoint;
+    CHIPEndpointId endpoint;
 } EmberAfClusterList;
 
 /**
@@ -848,7 +839,7 @@ typedef struct
     /**
      * The endpoint of the associated cluster event.
      */
-    uint8_t endpoint;
+    CHIPEndpointId endpoint;
     /**
      * The cluster id of the associated cluster event.
      */
@@ -882,7 +873,7 @@ typedef void (*EmberAfNetworkEventHandler)(void);
 /**
  * @brief Type for referring to the handler for endpoint events.
  */
-typedef void (*EmberAfEndpointEventHandler)(uint8_t endpoint);
+typedef void (*EmberAfEndpointEventHandler)(CHIPEndpointId endpoint);
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 /**
@@ -1008,7 +999,7 @@ typedef struct
     bool valid;
     bool active;
     EmberAfPluginEsiManagementBitmask esiBitmask;
-    uint8_t clientEndpoint;
+    CHIPEndpointId clientEndpoint;
     uint32_t messageId;
     uint8_t messageControl;
     uint32_t startTime;
@@ -1022,7 +1013,7 @@ typedef struct
 {
     bool valid;
     bool active;
-    uint8_t clientEndpoint;
+    CHIPEndpointId clientEndpoint;
     uint32_t providerId;
     uint8_t rateLabel[ZCL_PRICE_CLUSTER_MAXIMUM_RATE_LABEL_LENGTH + 1];
     uint32_t issuerEventId;
@@ -1083,7 +1074,7 @@ typedef struct
      * report is received.  If ::EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID,
      * the entry is unused.
      */
-    uint8_t endpoint;
+    CHIPEndpointId endpoint;
     /** The cluster where the attribute is located. */
     EmberAfClusterId clusterId;
     /** The id of the attribute being reported or received. */
@@ -1115,9 +1106,9 @@ typedef struct
         struct
         {
             /** The node id of the source of the received reports. */
-            EmberNodeId source;
+            ChipNodeId source;
             /** The remote endpoint from which the attribute is reported. */
-            uint8_t endpoint;
+            CHIPEndpointId endpoint;
             /** The maximum expected time between reports, measured in seconds. */
             uint16_t timeout;
         } received;
@@ -1181,158 +1172,12 @@ typedef struct
 typedef struct
 {
     EmberNodeId networkAddress;
-    uint8_t endpointId;
+    CHIPEndpointId endpointId;
     uint16_t profileId;
     uint16_t deviceId;
     uint8_t version;
 } EmberAfPluginZllCommissioningEndpointInformationRecord;
 #endif
-
-/**
- * @brief This is a unique identifier for referencing zigbee Over-the-air upgrade
- *   images.  It is used by the OTA plugins when passing around information about
- *   an upgrade file.
- */
-typedef struct
-{
-    uint16_t manufacturerId;
-    uint16_t imageTypeId;
-    uint32_t firmwareVersion;
-
-    /**
-     * This is only used for device specific files.
-     * It will be set to all 0's when the image does not
-     * have an upgrade destination field in it.
-     * Little endian format.
-     */
-    uint8_t deviceSpecificFileEui64[EUI64_SIZE];
-} EmberAfOtaImageId;
-
-/**
- * @brief The list of options possible for the image block request/response.
- */
-enum
-{
-    EMBER_AF_IMAGE_BLOCK_REQUEST_OPTIONS_NONE = 0x00,
-    // Client supports Min Block Request field
-    EMBER_AF_IMAGE_BLOCK_REQUEST_MIN_BLOCK_REQUEST_SUPPORTED_BY_CLIENT = 0x01,
-    // Server supports Min Block Request field
-    EMBER_AF_IMAGE_BLOCK_REQUEST_MIN_BLOCK_REQUEST_SUPPORTED_BY_SERVER = 0x02,
-    // The Image Block Request is actually simulated in place of an actually
-    // received Image Page Request
-    EMBER_AF_IMAGE_BLOCK_REQUEST_SIMULATED_FROM_PAGE_REQUEST = 0x04
-};
-typedef uint8_t EmberAfImageBlockRequestOptions;
-
-/**
- * @brief This is the data structure that is passed to the
- * emberAfImageBlockRequestCallback() to let the application decide what to do.
- */
-typedef struct
-{
-    const EmberAfOtaImageId * id;
-    uint32_t offset;
-    uint32_t waitTimeSecondsResponse;
-    EmberNodeId source;
-    EmberEUI64 sourceEui; // optionally present in messages
-    // The minBlockRequestPeriod can be treated as milliseconds or seconds on the
-    // client. The OTA server plugin has optional support to probe clients and
-    // treat this field with appropriate units (ms or sec)
-    uint16_t minBlockRequestPeriod; // optionally present in messages
-    uint8_t maxDataSize;
-    uint8_t clientEndpoint;
-    EmberAfImageBlockRequestOptions bitmask;
-} EmberAfImageBlockRequestCallbackStruct;
-
-/**
- * @brief This status contains the success or error code of an OTA storage
- *   device operation.
- */
-typedef enum
-{
-    EMBER_AF_OTA_STORAGE_SUCCESS               = 0,
-    EMBER_AF_OTA_STORAGE_ERROR                 = 1,
-    EMBER_AF_OTA_STORAGE_RETURN_DATA_TOO_LONG  = 2,
-    EMBER_AF_OTA_STORAGE_PARTIAL_FILE_FOUND    = 3,
-    EMBER_AF_OTA_STORAGE_OPERATION_IN_PROGRESS = 4,
-} EmberAfOtaStorageStatus;
-
-/**
- * @brief This status contains the success or error code of an OTA download
- * operation.
- */
-enum
-{
-    EMBER_AF_OTA_DOWNLOAD_AND_VERIFY_SUCCESS = 0,
-    EMBER_AF_OTA_DOWNLOAD_TIME_OUT           = 1,
-    EMBER_AF_OTA_VERIFY_FAILED               = 2,
-    EMBER_AF_OTA_SERVER_ABORTED              = 3,
-    EMBER_AF_OTA_CLIENT_ABORTED              = 4,
-    EMBER_AF_OTA_ERASE_FAILED                = 5,
-};
-typedef uint8_t EmberAfOtaDownloadResult;
-
-/**
- * @brief The maximum size of the string that is present in the header
- *   of the zigbee Over-the-air file format.
- */
-#define EMBER_AF_OTA_MAX_HEADER_STRING_LENGTH 32
-
-#define UID_SIZE 32
-/**
- * @brief This structure is an in-memory representation of
- *   the Over-the-air header data that resides on disk.
- *   It is not a byte-for-byte copy.
- */
-typedef struct
-{
-    // Magic Number omitted since it is always the same.
-    uint16_t headerVersion;
-    uint16_t headerLength;
-    uint16_t fieldControl;
-    uint16_t manufacturerId;
-    uint16_t imageTypeId; // a.k.a. Device ID
-    uint32_t firmwareVersion;
-    uint16_t zigbeeStackVersion;
-
-    /**
-     * @brief The spec. does NOT require that the string be NULL terminated in the
-     *   header stored on disk.  Therefore we make sure we can support a
-     *   32-character string without a NULL terminator by adding +1 in the data
-     *   structure.
-     */
-    uint8_t headerString[EMBER_AF_OTA_MAX_HEADER_STRING_LENGTH + 1];
-
-    /**
-     * @brief When reading the header this will be the complete length of
-     *  the file. When writing the header, this must be set to
-     *  the length of the MFG image data portion including all tags.
-     */
-    uint32_t imageSize;
-
-    /**
-     * @brief The remaining four fields are optional. The field control should be checked
-     *   to determine if their values are valid.
-     */
-    uint8_t securityCredentials;
-    union
-    {
-        uint8_t EUI64[EUI64_SIZE];
-        uint8_t UID[UID_SIZE];
-    } upgradeFileDestination;
-    uint16_t minimumHardwareVersion;
-    uint16_t maximumHardwareVersion;
-} EmberAfOtaHeader;
-
-/**
- * @brief This structure contains information about a tag that resides
- *   within an Over-the-air bootload file.
- */
-typedef struct
-{
-    uint16_t id;
-    uint32_t length;
-} EmberAfTagData;
 
 typedef enum
 {
@@ -1399,33 +1244,13 @@ typedef enum
     }
 
 /**
- * @brief This enumeration is used to indicate the state of an OTA bootload
- *   image undergoing verification.  This is used both for cryptographic
- *   verification and manufacturer specific verification.
- */
-typedef enum
-{
-    EMBER_AF_IMAGE_GOOD               = 0,
-    EMBER_AF_IMAGE_BAD                = 1,
-    EMBER_AF_IMAGE_VERIFY_IN_PROGRESS = 2,
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    // Internal use only.
-    EMBER_AF_IMAGE_VERIFY_WAIT       = 3,
-    EMBER_AF_IMAGE_VERIFY_ERROR      = 4,
-    EMBER_AF_IMAGE_UNKNOWN           = 5,
-    EMBER_AF_NO_IMAGE_VERIFY_SUPPORT = 6,
-#endif
-} EmberAfImageVerifyStatus;
-
-/**
  * @brief Type for referring to the tick callback for cluster.
  *
  * Tick function will be called once for each tick for each endpoint in
  * the cluster. The rate of tick is determined by the metadata of the
  * cluster.
  */
-typedef void (*EmberAfTickFunction)(uint8_t endpoint);
+typedef void (*EmberAfTickFunction)(CHIPEndpointId endpoint);
 
 /**
  * @brief Type for referring to the init callback for cluster.
@@ -1433,14 +1258,14 @@ typedef void (*EmberAfTickFunction)(uint8_t endpoint);
  * Init function is called when the application starts up, once for
  * each cluster/endpoint combination.
  */
-typedef void (*EmberAfInitFunction)(uint8_t endpoint);
+typedef void (*EmberAfInitFunction)(CHIPEndpointId endpoint);
 
 /**
  * @brief Type for referring to the attribute changed callback function.
  *
  * This function is called just after an attribute changes.
  */
-typedef void (*EmberAfClusterAttributeChangedCallback)(uint8_t endpoint, EmberAfAttributeId attributeId);
+typedef void (*EmberAfClusterAttributeChangedCallback)(CHIPEndpointId endpoint, EmberAfAttributeId attributeId);
 
 /**
  * @brief Type for referring to the manufacturer specific
@@ -1448,7 +1273,7 @@ typedef void (*EmberAfClusterAttributeChangedCallback)(uint8_t endpoint, EmberAf
  *
  * This function is called just after a manufacturer specific attribute changes.
  */
-typedef void (*EmberAfManufacturerSpecificClusterAttributeChangedCallback)(uint8_t endpoint, EmberAfAttributeId attributeId,
+typedef void (*EmberAfManufacturerSpecificClusterAttributeChangedCallback)(CHIPEndpointId endpoint, EmberAfAttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 
 /**
@@ -1456,7 +1281,7 @@ typedef void (*EmberAfManufacturerSpecificClusterAttributeChangedCallback)(uint8
  *
  * This function is called before an attribute changes.
  */
-typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(uint8_t endpoint, EmberAfAttributeId attributeId,
+typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(CHIPEndpointId endpoint, EmberAfAttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 
@@ -1466,14 +1291,14 @@ typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(uint8_t endpo
  * This function is called when default response is received, before
  * the global callback. Global callback is called immediately afterwards.
  */
-typedef void (*EmberAfDefaultResponseFunction)(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+typedef void (*EmberAfDefaultResponseFunction)(CHIPEndpointId endpoint, uint8_t commandId, EmberAfStatus status);
 
 /**
  * @brief Type for referring to the message sent callback function.
  *
  * This function is called when a message is sent.
  */
-typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                                            uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /**
@@ -1866,7 +1691,7 @@ typedef struct
     EmberAfClusterId clusterId;
     EmberAfProfileId profileId;
     uint16_t deviceId;
-    uint8_t endpoint;
+    CHIPEndpointId endpoint;
     EmberAfRemoteClusterType type;
 } EmberAfRemoteClusterStruct;
 
@@ -1876,9 +1701,9 @@ typedef struct
 typedef struct
 {
     EmberEUI64 targetEUI64;
-    uint8_t sourceEndpoint;
-    uint8_t destEndpoint;
-    uint16_t clusterId;
+    CHIPEndpointId sourceEndpoint;
+    CHIPEndpointId destEndpoint;
+    CHIPClusterId clusterId;
     EmberEUI64 destEUI64;
     EmberEUI64 sourceEUI64;
 } EmberAfRemoteBindingStruct;
@@ -1901,7 +1726,7 @@ typedef struct
     EmberAfClusterInfo clusters[EMBER_AF_MAX_CLUSTERS_PER_ENDPOINT];
     EmberAfProfileId profileId;
     uint16_t deviceId;
-    uint8_t endpoint;
+    CHIPEndpointId endpoint;
     uint8_t clusterCount;
 } EmberAfEndpointInfoStruct;
 

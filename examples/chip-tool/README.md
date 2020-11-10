@@ -34,7 +34,7 @@ ninja -C out/debug
 To initiate a client echo request to a BLE device, run the built executable and
 pass it the discriminator and pairing code of the remote device. The command
 below uses the default values hard-coded into the debug versions of the ESP32
-wifi-echo app:
+all-clusters-app:
 
     $ chip-tool echo ble 12345678 3840
 

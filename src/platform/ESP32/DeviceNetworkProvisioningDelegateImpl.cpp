@@ -28,7 +28,7 @@ CHIP_ERROR DeviceNetworkProvisioningDelegateImpl::_ProvisionWiFiNetwork(const ch
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s, key: %s", ssid, key);
+    ChipLogProgress(NetworkProvisioning, "ESP32NetworkProvisioningDelegate: SSID: %s", ssid);
     err = SetWiFiStationProvisioning(ssid, key);
     if (err != CHIP_NO_ERROR)
     {

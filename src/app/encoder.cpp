@@ -24,6 +24,8 @@
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
+#include <app/util/basic-types.h>
+
 using namespace chip;
 
 #define CHECK_FRAME_LENGTH(value, name)                                                                                            \
@@ -57,9 +59,65 @@ using namespace chip;
         case 0x21:                                                                                                                 \
             buf.PutLE16(static_cast<uint16_t>(value));                                                                             \
             break;                                                                                                                 \
+        case 0xF0:                                                                                                                 \
+            buf.PutLE64(static_cast<uint64_t>(value));                                                                             \
+            break;                                                                                                                 \
         default:                                                                                                                   \
             ChipLogError(Zcl, "Error encoding %s command", name);                                                                  \
             return 0;                                                                                                              \
+        }                                                                                                                          \
+    }                                                                                                                              \
+                                                                                                                                   \
+    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;                  \
+    if (result == 0)                                                                                                               \
+    {                                                                                                                              \
+        ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
+        return 0;                                                                                                                  \
+    }                                                                                                                              \
+    return result;
+
+#define REPORT_ATTRIBUTE(name, cluster_id, isAnalog, value)                                                                        \
+    BufBound buf = BufBound(buffer, buf_length);                                                                                   \
+    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x06))                                                         \
+    {                                                                                                                              \
+        uint8_t direction = 0x00;                                                                                                  \
+        buf.Put(direction);                                                                                                        \
+        buf.PutLE16(attr_id);                                                                                                      \
+        buf.Put(attr_type);                                                                                                        \
+        buf.PutLE16(min_interval);                                                                                                 \
+        buf.PutLE16(max_interval);                                                                                                 \
+        if (isAnalog)                                                                                                              \
+        {                                                                                                                          \
+            switch (attr_type)                                                                                                     \
+            {                                                                                                                      \
+            case 0x20:                                                                                                             \
+                buf.Put(static_cast<uint8_t>(value));                                                                              \
+                break;                                                                                                             \
+            case 0x21:                                                                                                             \
+                buf.PutLE16(static_cast<uint16_t>(value));                                                                         \
+                break;                                                                                                             \
+            case 0x23:                                                                                                             \
+                buf.PutLE32(static_cast<uint32_t>(value));                                                                         \
+                break;                                                                                                             \
+            case 0x27:                                                                                                             \
+                buf.PutLE64(static_cast<uint64_t>(value));                                                                         \
+                break;                                                                                                             \
+            case 0x28:                                                                                                             \
+                buf.Put(static_cast<uint8_t>(value));                                                                              \
+                break;                                                                                                             \
+            case 0x29:                                                                                                             \
+                buf.PutLE16(static_cast<uint16_t>(value));                                                                         \
+                break;                                                                                                             \
+            case 0x2B:                                                                                                             \
+                buf.PutLE32(static_cast<uint32_t>(value));                                                                         \
+                break;                                                                                                             \
+            case 0x2f:                                                                                                             \
+                buf.PutLE64(static_cast<uint64_t>(value));                                                                         \
+                break;                                                                                                             \
+            default:                                                                                                               \
+                ChipLogError(Zcl, "Type is not supported for report attribute: '0x%02x'", attr_type);                              \
+                break;                                                                                                             \
+            }                                                                                                                      \
         }                                                                                                                          \
     }                                                                                                                              \
                                                                                                                                    \
@@ -133,6 +191,7 @@ extern "C" {
 | ColorControl                                                        | 0x0300 |
 | DoorLock                                                            | 0x0101 |
 | Groups                                                              | 0x0004 |
+| IASZone                                                             | 0x0500 |
 | Identify                                                            | 0x0003 |
 | Level                                                               | 0x0008 |
 | OnOff                                                               | 0x0006 |
@@ -145,14 +204,15 @@ extern "C" {
 #define COLOR_CONTROL_CLUSTER_ID 0x0300
 #define DOOR_LOCK_CLUSTER_ID 0x0101
 #define GROUPS_CLUSTER_ID 0x0004
+#define IAS_ZONE_CLUSTER_ID 0x0500
 #define IDENTIFY_CLUSTER_ID 0x0003
 #define LEVEL_CLUSTER_ID 0x0008
 #define ON_OFF_CLUSTER_ID 0x0006
 #define SCENES_CLUSTER_ID 0x0005
 #define TEMPERATURE_MEASUREMENT_CLUSTER_ID 0x0402
 
-static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, uint16_t clusterId, uint8_t sourceEndpoint,
-                                 uint8_t destinationEndpoint, EmberApsOption options, GroupId groupId, uint8_t sequence,
+static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, ClusterId clusterId, EndpointId sourceEndpoint,
+                                 EndpointId destinationEndpoint, EmberApsOption options, GroupId groupId, uint8_t sequence,
                                  uint8_t radius, bool isMeasuring)
 {
 
@@ -195,7 +255,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
                             apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
 
-uint16_t _encodeCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command, uint8_t frame_control)
+uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint8_t command,
+                        uint8_t frame_control)
 {
     CHECK_FRAME_LENGTH(buf.Size(), "Buffer is empty");
 
@@ -214,7 +275,7 @@ uint16_t _encodeCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t c
     return buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
 }
 
-uint16_t _encodeClusterSpecificCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
+uint16_t _encodeClusterSpecificCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint8_t command)
 {
     // This is a cluster-specific command so low two bits are 0b01.  The command
     // is standard, so does not need a manufacturer code, and we're sending
@@ -224,7 +285,7 @@ uint16_t _encodeClusterSpecificCommand(BufBound & buf, uint8_t destination_endpo
     return _encodeCommand(buf, destination_endpoint, cluster_id, command, frame_control);
 }
 
-uint16_t _encodeGlobalCommand(BufBound & buf, uint8_t destination_endpoint, uint16_t cluster_id, uint8_t command)
+uint16_t _encodeGlobalCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint8_t command)
 {
     // This is a global command, so the low bits are 0b00.  The command is
     // standard, so does not need a manufacturer code, and we're sending client
@@ -303,6 +364,14 @@ uint16_t encodeBarrierControlClusterReadMovingStateAttribute(uint8_t * buffer, u
     READ_ATTRIBUTES("ReadBarrierControlMovingState", BARRIER_CONTROL_CLUSTER_ID);
 }
 
+uint16_t encodeBarrierControlClusterReportMovingStateAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                               uint16_t min_interval, uint16_t max_interval)
+{
+    uint16_t attr_id  = 0x0001;
+    uint8_t attr_type = { 0x30 };
+    REPORT_ATTRIBUTE("ReportBarrierControlMovingState", BARRIER_CONTROL_CLUSTER_ID, false, 0);
+}
+
 /*
  * Attribute SafetyStatus
  */
@@ -310,6 +379,14 @@ uint16_t encodeBarrierControlClusterReadSafetyStatusAttribute(uint8_t * buffer, 
 {
     uint16_t attr_ids[] = { 0x0002 };
     READ_ATTRIBUTES("ReadBarrierControlSafetyStatus", BARRIER_CONTROL_CLUSTER_ID);
+}
+
+uint16_t encodeBarrierControlClusterReportSafetyStatusAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                                uint16_t min_interval, uint16_t max_interval)
+{
+    uint16_t attr_id  = 0x0002;
+    uint8_t attr_type = { 0x19 };
+    REPORT_ATTRIBUTE("ReportBarrierControlSafetyStatus", BARRIER_CONTROL_CLUSTER_ID, false, 0);
 }
 
 /*
@@ -329,6 +406,15 @@ uint16_t encodeBarrierControlClusterReadBarrierPositionAttribute(uint8_t * buffe
 {
     uint16_t attr_ids[] = { 0x000A };
     READ_ATTRIBUTES("ReadBarrierControlBarrierPosition", BARRIER_CONTROL_CLUSTER_ID);
+}
+
+uint16_t encodeBarrierControlClusterReportBarrierPositionAttribute(uint8_t * buffer, uint16_t buf_length,
+                                                                   uint8_t destination_endpoint, uint16_t min_interval,
+                                                                   uint16_t max_interval, uint8_t change)
+{
+    uint16_t attr_id  = 0x000A;
+    uint8_t attr_type = { 0x20 };
+    REPORT_ATTRIBUTE("ReportBarrierControlBarrierPosition", BARRIER_CONTROL_CLUSTER_ID, true, change);
 }
 
 /*----------------------------------------------------------------------------*\
@@ -690,6 +776,14 @@ uint16_t encodeColorControlClusterReadCurrentHueAttribute(uint8_t * buffer, uint
     READ_ATTRIBUTES("ReadColorControlCurrentHue", COLOR_CONTROL_CLUSTER_ID);
 }
 
+uint16_t encodeColorControlClusterReportCurrentHueAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                            uint16_t min_interval, uint16_t max_interval, uint8_t change)
+{
+    uint16_t attr_id  = 0x0000;
+    uint8_t attr_type = { 0x20 };
+    REPORT_ATTRIBUTE("ReportColorControlCurrentHue", COLOR_CONTROL_CLUSTER_ID, true, change);
+}
+
 /*
  * Attribute CurrentSaturation
  */
@@ -698,6 +792,15 @@ uint16_t encodeColorControlClusterReadCurrentSaturationAttribute(uint8_t * buffe
 {
     uint16_t attr_ids[] = { 0x0001 };
     READ_ATTRIBUTES("ReadColorControlCurrentSaturation", COLOR_CONTROL_CLUSTER_ID);
+}
+
+uint16_t encodeColorControlClusterReportCurrentSaturationAttribute(uint8_t * buffer, uint16_t buf_length,
+                                                                   uint8_t destination_endpoint, uint16_t min_interval,
+                                                                   uint16_t max_interval, uint8_t change)
+{
+    uint16_t attr_id  = 0x0001;
+    uint8_t attr_type = { 0x20 };
+    REPORT_ATTRIBUTE("ReportColorControlCurrentSaturation", COLOR_CONTROL_CLUSTER_ID, true, change);
 }
 
 /*
@@ -718,6 +821,14 @@ uint16_t encodeColorControlClusterReadCurrentXAttribute(uint8_t * buffer, uint16
     READ_ATTRIBUTES("ReadColorControlCurrentX", COLOR_CONTROL_CLUSTER_ID);
 }
 
+uint16_t encodeColorControlClusterReportCurrentXAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                          uint16_t min_interval, uint16_t max_interval, uint16_t change)
+{
+    uint16_t attr_id  = 0x0003;
+    uint8_t attr_type = { 0x21 };
+    REPORT_ATTRIBUTE("ReportColorControlCurrentX", COLOR_CONTROL_CLUSTER_ID, true, change);
+}
+
 /*
  * Attribute CurrentY
  */
@@ -725,6 +836,14 @@ uint16_t encodeColorControlClusterReadCurrentYAttribute(uint8_t * buffer, uint16
 {
     uint16_t attr_ids[] = { 0x0004 };
     READ_ATTRIBUTES("ReadColorControlCurrentY", COLOR_CONTROL_CLUSTER_ID);
+}
+
+uint16_t encodeColorControlClusterReportCurrentYAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                          uint16_t min_interval, uint16_t max_interval, uint16_t change)
+{
+    uint16_t attr_id  = 0x0004;
+    uint8_t attr_type = { 0x21 };
+    REPORT_ATTRIBUTE("ReportColorControlCurrentY", COLOR_CONTROL_CLUSTER_ID, true, change);
 }
 
 /*
@@ -735,6 +854,15 @@ uint16_t encodeColorControlClusterReadColorTemperatureMiredsAttribute(uint8_t * 
 {
     uint16_t attr_ids[] = { 0x0007 };
     READ_ATTRIBUTES("ReadColorControlColorTemperatureMireds", COLOR_CONTROL_CLUSTER_ID);
+}
+
+uint16_t encodeColorControlClusterReportColorTemperatureMiredsAttribute(uint8_t * buffer, uint16_t buf_length,
+                                                                        uint8_t destination_endpoint, uint16_t min_interval,
+                                                                        uint16_t max_interval, uint16_t change)
+{
+    uint16_t attr_id  = 0x0007;
+    uint8_t attr_type = { 0x21 };
+    REPORT_ATTRIBUTE("ReportColorControlColorTemperatureMireds", COLOR_CONTROL_CLUSTER_ID, true, change);
 }
 
 /*
@@ -1427,6 +1555,14 @@ uint16_t encodeDoorLockClusterReadLockStateAttribute(uint8_t * buffer, uint16_t 
     READ_ATTRIBUTES("ReadDoorLockLockState", DOOR_LOCK_CLUSTER_ID);
 }
 
+uint16_t encodeDoorLockClusterReportLockStateAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                       uint16_t min_interval, uint16_t max_interval)
+{
+    uint16_t attr_id  = 0x0000;
+    uint8_t attr_type = { 0x30 };
+    REPORT_ATTRIBUTE("ReportDoorLockLockState", DOOR_LOCK_CLUSTER_ID, false, 0);
+}
+
 /*
  * Attribute LockType
  */
@@ -1552,6 +1688,93 @@ uint16_t encodeGroupsClusterReadNameSupportAttribute(uint8_t * buffer, uint16_t 
 {
     uint16_t attr_ids[] = { 0x0000 };
     READ_ATTRIBUTES("ReadGroupsNameSupport", GROUPS_CLUSTER_ID);
+}
+
+/*----------------------------------------------------------------------------*\
+| Cluster IASZone                                                     | 0x0500 |
+|------------------------------------------------------------------------------|
+| Responses:                                                          |        |
+|                                                                     |        |
+|------------------------------------------------------------------------------|
+| Commands:                                                           |        |
+|------------------------------------------------------------------------------|
+| Attributes:                                                         |        |
+| * ZoneState                                                         | 0x0000 |
+| * ZoneType                                                          | 0x0001 |
+| * ZoneStatus                                                        | 0x0002 |
+| * IASCIEAddress                                                     | 0x0010 |
+| * ZoneID                                                            | 0x0011 |
+\*----------------------------------------------------------------------------*/
+
+/*
+ * Command ZoneEnrollResponse
+ */
+uint16_t encodeIASZoneClusterZoneEnrollResponseCommand(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                       uint8_t enrollResponseCode, uint8_t zoneID)
+{
+    const char * kName = "IASZoneZoneEnrollResponse";
+    COMMAND_HEADER(kName, IAS_ZONE_CLUSTER_ID, 0x00);
+    buf.Put(enrollResponseCode);
+    buf.Put(zoneID);
+    COMMAND_FOOTER(kName);
+}
+
+uint16_t encodeIASZoneClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    DISCOVER_ATTRIBUTES("DiscoverIASZoneAttributes", IAS_ZONE_CLUSTER_ID);
+}
+
+/*
+ * Attribute ZoneState
+ */
+uint16_t encodeIASZoneClusterReadZoneStateAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0000 };
+    READ_ATTRIBUTES("ReadIASZoneZoneState", IAS_ZONE_CLUSTER_ID);
+}
+
+/*
+ * Attribute ZoneType
+ */
+uint16_t encodeIASZoneClusterReadZoneTypeAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0001 };
+    READ_ATTRIBUTES("ReadIASZoneZoneType", IAS_ZONE_CLUSTER_ID);
+}
+
+/*
+ * Attribute ZoneStatus
+ */
+uint16_t encodeIASZoneClusterReadZoneStatusAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0002 };
+    READ_ATTRIBUTES("ReadIASZoneZoneStatus", IAS_ZONE_CLUSTER_ID);
+}
+
+/*
+ * Attribute IASCIEAddress
+ */
+uint16_t encodeIASZoneClusterReadIASCIEAddressAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0010 };
+    READ_ATTRIBUTES("ReadIASZoneIASCIEAddress", IAS_ZONE_CLUSTER_ID);
+}
+
+uint16_t encodeIASZoneClusterWriteIASCIEAddressAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                         uint64_t iASCIEAddress)
+{
+    uint16_t attr_id  = 0x0010;
+    uint8_t attr_type = { 0xF0 };
+    WRITE_ATTRIBUTE("WriteIASZoneIASCIEAddress", IAS_ZONE_CLUSTER_ID, iASCIEAddress);
+}
+
+/*
+ * Attribute ZoneID
+ */
+uint16_t encodeIASZoneClusterReadZoneIDAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint)
+{
+    uint16_t attr_ids[] = { 0x0011 };
+    READ_ATTRIBUTES("ReadIASZoneZoneID", IAS_ZONE_CLUSTER_ID);
 }
 
 /*----------------------------------------------------------------------------*\
@@ -1767,6 +1990,14 @@ uint16_t encodeLevelClusterReadCurrentLevelAttribute(uint8_t * buffer, uint16_t 
     READ_ATTRIBUTES("ReadLevelCurrentLevel", LEVEL_CLUSTER_ID);
 }
 
+uint16_t encodeLevelClusterReportCurrentLevelAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                       uint16_t min_interval, uint16_t max_interval, uint8_t change)
+{
+    uint16_t attr_id  = 0x0000;
+    uint8_t attr_type = { 0x20 };
+    REPORT_ATTRIBUTE("ReportLevelCurrentLevel", LEVEL_CLUSTER_ID, true, change);
+}
+
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
 |------------------------------------------------------------------------------|
@@ -1824,6 +2055,14 @@ uint16_t encodeOnOffClusterReadOnOffAttribute(uint8_t * buffer, uint16_t buf_len
 {
     uint16_t attr_ids[] = { 0x0000 };
     READ_ATTRIBUTES("ReadOnOffOnOff", ON_OFF_CLUSTER_ID);
+}
+
+uint16_t encodeOnOffClusterReportOnOffAttribute(uint8_t * buffer, uint16_t buf_length, uint8_t destination_endpoint,
+                                                uint16_t min_interval, uint16_t max_interval)
+{
+    uint16_t attr_id  = 0x0000;
+    uint8_t attr_type = { 0x10 };
+    REPORT_ATTRIBUTE("ReportOnOffOnOff", ON_OFF_CLUSTER_ID, false, 0);
 }
 
 /*----------------------------------------------------------------------------*\
@@ -2027,6 +2266,15 @@ uint16_t encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(uint8_t *
 {
     uint16_t attr_ids[] = { 0x0000 };
     READ_ATTRIBUTES("ReadTemperatureMeasurementMeasuredValue", TEMPERATURE_MEASUREMENT_CLUSTER_ID);
+}
+
+uint16_t encodeTemperatureMeasurementClusterReportMeasuredValueAttribute(uint8_t * buffer, uint16_t buf_length,
+                                                                         uint8_t destination_endpoint, uint16_t min_interval,
+                                                                         uint16_t max_interval, int16_t change)
+{
+    uint16_t attr_id  = 0x0000;
+    uint8_t attr_type = { 0x29 };
+    REPORT_ATTRIBUTE("ReportTemperatureMeasurementMeasuredValue", TEMPERATURE_MEASUREMENT_CLUSTER_ID, true, change);
 }
 
 /*

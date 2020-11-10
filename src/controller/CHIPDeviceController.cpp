@@ -63,15 +63,16 @@ namespace DeviceController {
 
 using namespace chip::Encoding;
 
-constexpr const char * kDeviceCredentialsKeyPrefix = "DeviceCredentials";
-constexpr const char * kDeviceAddressKeyPrefix     = "DeviceAddress";
+constexpr const char kDeviceCredentialsKeyPrefix[] = "DeviceCredentials";
+constexpr const char kDeviceAddressKeyPrefix[]     = "DeviceAddress";
 
 // This macro generates a key using node ID an key prefix, and performs the given action
 // on that key.
 #define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
     do                                                                                                                             \
     {                                                                                                                              \
-        const size_t len = strlen(keyPrefix);                                                                                      \
+        constexpr size_t len = std::extent<decltype(keyPrefix)>::value;                                                            \
+        nlSTATIC_ASSERT_PRINT(len > 0, "keyPrefix length must be known at compile time");                                          \
         /* 2 * sizeof(NodeId) to accomodate 2 character for each byte in Node Id */                                                \
         char key[len + 2 * sizeof(NodeId) + 1];                                                                                    \
         nlSTATIC_ASSERT_PRINT(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                          \
@@ -285,7 +286,6 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mSecurePairingSession != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mDeviceAddr != IPAddress::Any, err = CHIP_ERROR_INCORRECT_STATE);
 
     mSessionManager = chip::Platform::New<SecureSessionMgr<Transport::UDP>>();
 
@@ -303,7 +303,10 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
 
     mConState = kConnectionState_SecureConnected;
 
-    SendCachedPackets();
+    if (mDeviceAddr != IPAddress::Any)
+    {
+        SendCachedPackets();
+    } // else wait for mdns discovery
 
 exit:
 
@@ -526,7 +529,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
 
         trySessionResumption = false;
 
-        if (mConState == kConnectionState_SecureConnecting)
+        if (mDeviceAddr == IPAddress::Any || mConState == kConnectionState_SecureConnecting)
         {
             // Cache the packet while connection is being established
             ExitNow(err = CachePacket(buffer));
@@ -615,6 +618,14 @@ void ChipDeviceController::ClearRequestState()
 }
 
 void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
+
+void ChipDeviceController::OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgrBase * mgr)
+{
+    if (error == CHIP_NO_ERROR && nodeId == mSecurePairingSession->GetPeerNodeId() && mDeviceAddr == IPAddress::Any)
+    {
+        SendCachedPackets();
+    }
+}
 
 void ChipDeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                                              Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,

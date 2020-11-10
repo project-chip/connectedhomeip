@@ -114,9 +114,6 @@
 //#include "app/framework/plugin/ota-storage-common/ota-storage.h"
 //#include "app/framework/plugin/partner-link-key-exchange/partner-link-key-exchange.h"
 
-// Bookkeeping header
-#include "gen/znet-bookkeeping.h"
-
 //------------------------------------------------------------------------------
 
 #define INVALID_MESSAGE_TAG 0xFF
@@ -482,7 +479,9 @@ EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint64
         // cluster in the binding is not used because bindings can be used to send
         // messages with any cluster id, not just the one set in the binding.
         EmberBindingTableEntry binding;
-        EmberStatus status = emberGetBinding(indexOrDestination, &binding);
+        // TODO: This cast should go away once
+        // https://github.com/project-chip/connectedhomeip/issues/3584 is fixed.
+        EmberStatus status = emberGetBinding(static_cast<uint8_t>(indexOrDestination), &binding);
         if (status != EMBER_SUCCESS)
         {
             return status;
@@ -681,7 +680,9 @@ EmberStatus emAfSend(EmberOutgoingMessageType type, uint64_t indexOrDestination,
     {
     case EMBER_OUTGOING_VIA_BINDING: {
         EmberBindingTableEntry binding;
-        status = emberGetBinding(indexOrDestination, &binding);
+        // TODO: This cast should go away once
+        // https://github.com/project-chip/connectedhomeip/issues/3584 is fixed.
+        status = emberGetBinding(static_cast<uint8_t>(indexOrDestination), &binding);
         if (status != EMBER_SUCCESS)
         {
             break;

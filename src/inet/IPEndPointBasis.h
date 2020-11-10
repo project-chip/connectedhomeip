@@ -79,15 +79,6 @@ public:
     } mState;
 
     /**
-     * @brief   Transmit option flags for the \c SendMsg method.
-     */
-    enum
-    {
-        /** Do not destructively queue the message directly. Queue a copy. */
-        kSendFlag_RetainBuffer = 0x0040
-    };
-
-    /**
      * @brief   Type of message text reception event handling function.
      *
      * @param[in]   endPoint    The endpoint associated with the event.

@@ -29,6 +29,11 @@ Framework including the file you are reading right now.
 This directory contains all of the cluster implementations included in the CHIP
 ZCL Application Framework.
 
+### <code>/src/app/zap-templates</code>
+
+This directory contains all of the templates and helpers specific to CHIP for
+the ZAP tool.
+
 ## Public APIs
 
 ### Attribute changes

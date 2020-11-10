@@ -50,13 +50,13 @@
 
 using namespace chip;
 
-static bool isGroupPresent(uint8_t endpoint, GroupId groupId);
+static bool isGroupPresent(EndpointId endpoint, GroupId groupId);
 
-static bool bindingGroupMatch(uint8_t endpoint, GroupId groupId, EmberBindingTableEntry * entry);
+static bool bindingGroupMatch(EndpointId endpoint, GroupId groupId, EmberBindingTableEntry * entry);
 
-static uint8_t findGroupIndex(uint8_t endpoint, GroupId groupId);
+static uint8_t findGroupIndex(EndpointId endpoint, GroupId groupId);
 
-void emberAfGroupsClusterServerInitCallback(uint8_t endpoint)
+void emberAfGroupsClusterServerInitCallback(EndpointId endpoint)
 {
     // The high bit of Name Support indicates whether group names are supported.
     // Group names are not supported by this plugin.
@@ -156,7 +156,8 @@ bool emberAfGroupsClusterAddGroupCallback(GroupId groupId, uint8_t * groupName)
     {
         return true;
     }
-    emberAfFillCommandGroupsClusterAddGroupResponse(status, groupId);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
+                              ZCL_ADD_GROUP_RESPONSE_COMMAND_ID, "uv", status, groupId);
     emberAfSendResponse();
     return true;
 }
@@ -184,7 +185,8 @@ bool emberAfGroupsClusterViewGroupCallback(GroupId groupId)
         status = EMBER_ZCL_STATUS_SUCCESS;
     }
 
-    emberAfFillCommandGroupsClusterViewGroupResponse(status, groupId, groupName);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
+                              ZCL_VIEW_GROUP_RESPONSE_COMMAND_ID, "uvs", status, groupId, groupName);
     sendStatus = emberAfSendResponse();
     if (EMBER_SUCCESS != sendStatus)
     {
@@ -223,7 +225,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
             {
                 list[listLen]     = LOW_BYTE(entry.groupId);
                 list[listLen + 1] = HIGH_BYTE(entry.groupId);
-                listLen += 2;
+                listLen           = static_cast<uint8_t>(listLen + 2);
                 count++;
             }
         }
@@ -243,7 +245,7 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
                     {
                         list[listLen]     = LOW_BYTE(groupId);
                         list[listLen + 1] = HIGH_BYTE(groupId);
-                        listLen += 2;
+                        listLen           = static_cast<uint8_t>(listLen + 2);
                         count++;
                     }
                 }
@@ -259,8 +261,8 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
         // added.  Each group requires a binding and, because the binding table is
         // used for other purposes besides groups, we can't be sure what the
         // capacity will be in the future.
-        emberAfFillCommandGroupsClusterGetGroupMembershipResponse(0xFF, // capacity
-                                                                  count, list, listLen);
+        emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
+                                  ZCL_GET_GROUP_MEMBERSHIP_RESPONSE_COMMAND_ID, "uub", 0xFF, count, list, listLen);
         status = emberAfSendResponse();
     }
     else
@@ -296,7 +298,8 @@ bool emberAfGroupsClusterRemoveGroupCallback(GroupId groupId)
     // removed the scenes associated with that group SHOULD be removed."
     emberAfScenesClusterRemoveScenesInGroupCallback(emberAfCurrentEndpoint(), groupId);
 
-    emberAfFillCommandGroupsClusterRemoveGroupResponse(status, groupId);
+    emberAfFillExternalBuffer((ZCL_CLUSTER_SPECIFIC_COMMAND | ZCL_FRAME_CONTROL_SERVER_TO_CLIENT), ZCL_GROUPS_CLUSTER_ID,
+                              ZCL_REMOVE_GROUP_RESPONSE_COMMAND_ID, "uv", status, groupId);
     sendStatus = emberAfSendResponse();
     if (EMBER_SUCCESS != sendStatus)
     {
@@ -308,8 +311,9 @@ bool emberAfGroupsClusterRemoveGroupCallback(GroupId groupId)
 bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
 {
     EmberStatus sendStatus;
-    uint8_t i, endpoint = emberAfCurrentEndpoint();
-    bool success = true;
+    uint8_t i;
+    EndpointId endpoint = emberAfCurrentEndpoint();
+    bool success        = true;
 
     emberAfGroupsClusterPrintln("RX: RemoveAllGroups");
 
@@ -384,7 +388,7 @@ bool emberAfGroupsClusterEndpointInGroupCallback(EndpointId endpoint, GroupId gr
     return isGroupPresent(endpoint, groupId);
 }
 
-void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint)
+void emberAfGroupsClusterClearGroupTableCallback(EndpointId endpoint)
 {
     uint8_t i, networkIndex = 0 /* emberGetCurrentNetwork() */;
     for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)

@@ -24,7 +24,8 @@
 
 extern "C" void pw_sys_io_Init()
 {
-    assert(console_init() == 0);
+    int err = console_init();
+    assert(err == 0);
 }
 
 namespace pw::sys_io {

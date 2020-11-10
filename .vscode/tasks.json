@@ -128,9 +128,9 @@
             }
         },
         {
-            "label": "Build ESP32 Echo Example",
+            "label": "Build ESP32 all-clusters-app Example",
             "type": "shell",
-            "command": "scripts/examples/build-wifi-echo.py",
+            "command": "scripts/examples/build-all-clusters-app.py",
             "group": "build",
             "problemMatcher": ["$gcc"]
         },
@@ -140,6 +140,58 @@
             "command": "TARGET_CPU=arm64 scripts/examples/android_app.sh",
             "group": "build",
             "problemMatcher": ["$gcc"]
+        },
+        {
+            "label": "Build nRF Connect Lock Example",
+            "type": "shell",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lock-app",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/lock-app/nrfconnect/build"
+                ]
+            }
+        },
+        {
+            "label": "Build nRF Connect Lighting Example",
+            "type": "shell",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh lighting-app",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/lighting-app/nrfconnect/build"
+                ]
+            }
+        },
+        {
+            "label": "Build nRF Connect Shell Example",
+            "type": "shell",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh shell",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/shell/nrfconnect/build"
+                ]
+            }
+        },
+        {
+            "label": "Build nRF Connect Pigweed Example",
+            "type": "shell",
+            "command": "source scripts/activate.sh && scripts/examples/nrfconnect_example.sh pigweed-app",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/examples/pigweed-app/nrfconnect/build"
+                ]
+            }
         }
     ]
 }

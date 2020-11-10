@@ -26,11 +26,10 @@ examples_plat_dir = "${chip_root}/examples/platform/qpg6100"
 qpg6100_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/qpg6100",
-    "${qpg6100_project_dir}/include/",
-    "${qpg6100_project_dir}/src/",
+    "${examples_plat_dir}/project_include",
   ]
 
-  sources = [ "${qpg6100_project_dir}/include/CHIPProjectConfig.h" ]
+  sources = [ "${examples_plat_dir}/project_include/CHIPProjectConfig.h" ]
 
   defines = []
   if (is_debug) {
@@ -59,7 +58,7 @@ qpg6100_executable("lock_app") {
   ]
 
   include_dirs += [
-    "${qpg6100_project_dir}/include/",
+    "${qpg6100_project_dir}/src/",
     "${chip_root}/src/app/util",
     "${examples_plat_dir}/",
   ]

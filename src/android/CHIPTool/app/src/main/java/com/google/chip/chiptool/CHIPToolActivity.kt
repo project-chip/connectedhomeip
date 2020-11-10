@@ -18,21 +18,28 @@
 package com.google.chip.chiptool
 
 import android.content.Intent
+import android.nfc.NdefMessage
+import android.nfc.NfcAdapter
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import chip.setuppayload.SetupPayloadParser
 import com.google.chip.chiptool.attestation.AttestationTestFragment
 import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.commissioner.CommissionerActivity
 import com.google.chip.chiptool.echoclient.EchoClientFragment
+import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
+import com.google.chip.chiptool.provisioning.EnterWifiNetworkFragment
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
+import com.google.chip.chiptool.setuppayloadscanner.QrCodeInfo
 
 class CHIPToolActivity :
     AppCompatActivity(),
     BarcodeFragment.Callback,
-    SelectActionFragment.Callback {
+    SelectActionFragment.Callback,
+    CHIPDeviceDetailsFragment.Callback {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -45,6 +52,13 @@ class CHIPToolActivity :
           .add(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
           .commit()
     }
+
+    if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED)
+      onNfcIntent(intent)
+  }
+
+  override fun onStartRendezvousOverBle(deviceInfo: CHIPDeviceInfo) {
+    showFragment(DeviceProvisioningFragment.newInstance(deviceInfo))
   }
 
   override fun onCHIPDeviceInfoReceived(deviceInfo: CHIPDeviceInfo) {
@@ -87,6 +101,31 @@ class CHIPToolActivity :
         .replace(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
         .addToBackStack(null)
         .commit()
+  }
+
+  private fun onNfcIntent(intent: Intent?) {
+    // Require 1 NDEF message containing 1 NDEF record
+    val messages = intent?.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
+    if (messages?.size != 1) return
+
+    val records = (messages[0] as NdefMessage).records
+    if (records.size != 1) return
+
+    // Require NDEF URI record starting with "ch:"
+    val uri = records[0].toUri()
+    if (!uri?.scheme.equals("ch", true)) return
+
+    val setupPayload = SetupPayloadParser().parseQrCode(uri.toString().toUpperCase())
+    val deviceInfo = CHIPDeviceInfo(
+            setupPayload.version,
+            setupPayload.vendorId,
+            setupPayload.productId,
+            setupPayload.discriminator,
+            setupPayload.setupPinCode,
+            setupPayload.optionalQRCodeInfo.mapValues { (_, info) ->  QrCodeInfo(info.tag, info.type, info.data, info.int32) }
+    )
+
+    onCHIPDeviceInfoReceived(deviceInfo)
   }
 
   companion object {

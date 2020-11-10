@@ -18,6 +18,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "debug-printing.h"
 #include "gen/gen_config.h"
 
 #include <support/logging/CHIPLogging.h>
@@ -49,6 +50,10 @@ void emberAfPrintln(int category, const char * format, ...)
     }
 }
 
+// TODO: issue #3662 - Unbounded stack in emberAfPrintBuffer()
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+
 void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, bool withSpace)
 {
     if (buffer != NULL && length > 0)
@@ -71,6 +76,8 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
         emberAfPrint(EMBER_AF_PRINT_CORE, "NULL");
     }
 }
+
+#pragma GCC diagnostic pop // -Wstack-usage
 
 void emberAfPrintString(int category, const uint8_t * string)
 {

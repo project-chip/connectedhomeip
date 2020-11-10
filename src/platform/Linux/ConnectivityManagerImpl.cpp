@@ -210,7 +210,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
         GError * err = nullptr;
-        gboolean ret = wpa_fi_w1_wpa_supplicant1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface, nullptr, &err);
+        wpa_fi_w1_wpa_supplicant1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface, nullptr, &err);
 
         if (err != nullptr)
         {

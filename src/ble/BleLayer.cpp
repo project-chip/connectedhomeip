@@ -374,7 +374,6 @@ BLE_ERROR BleLayer::NewBleConnection(void * appState, const uint16_t connDiscrim
     BLE_ERROR err = BLE_NO_ERROR;
 
     VerifyOrExit(mState == kState_Initialized, err = BLE_ERROR_INCORRECT_STATE);
-    VerifyOrExit(connDiscriminator != 0, err = BLE_ERROR_BAD_ARGS);
     VerifyOrExit(mConnectionDelegate != nullptr, err = BLE_ERROR_INCORRECT_STATE);
 
     mConnectionDelegate->OnConnectionComplete = onConnectionComplete;

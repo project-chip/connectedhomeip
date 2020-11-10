@@ -36,7 +36,7 @@ class DeviceNetworkProvisioningDelegateImpl final
 
 private:
     CHIP_ERROR _ProvisionWiFiNetwork(const char * ssid, const char * passwd) { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    CHIP_ERROR _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData) { return CHIP_ERROR_NOT_IMPLEMENTED; }
+    CHIP_ERROR _ProvisionThreadNetwork(DeviceLayer::Internal::DeviceNetworkInfo & threadData);
 };
 
 } // namespace DeviceLayer

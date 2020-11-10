@@ -19,17 +19,16 @@ import("//build_overrides/openthread.gni")
 import("${efr32_sdk_build_root}/efr32_board.gni")
 
 config("openthread_efr32_config") {
-  include_dirs = [ "${openthread_root}/examples/platforms/${efr32_family}" ]
-
   defines = [
     "RADIO_CONFIG_DMP_SUPPORT=1",
     "${efr32_board}=1",
     "${efr32_mcu}",
   ]
 
-  include_dirs += [
+  include_dirs = [
     "${chip_root}/examples/platform/efr32",
     "${chip_root}/examples/platform/efr32/${efr32_family}/${efr32_board}",
+    "${openthread_root}/examples/platforms/${efr32_family}",
   ]
 }
 
@@ -57,6 +56,7 @@ source_set("libopenthread-efr32") {
     "${openthread_root}/examples/platforms/${efr32_family}/radio.c",
     "${openthread_root}/examples/platforms/${efr32_family}/system.c",
     "${openthread_root}/examples/platforms/${efr32_family}/uart.c",
+    "${openthread_root}/third_party/silabs/rail_config/rail_config.c",
   ]
 
   public_deps = [

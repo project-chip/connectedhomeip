@@ -18,32 +18,28 @@
 
 package com.google.chip.chiptool.setuppayloadscanner
 
-import android.bluetooth.BluetoothGatt
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.fragment.app.Fragment
-import chip.devicecontroller.ChipDeviceController
-import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.R
-import com.google.chip.chiptool.bluetooth.BluetoothManager
-import kotlinx.android.synthetic.main.chip_device_info_fragment.view.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.launch
+import com.google.chip.chiptool.util.FragmentUtil
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.ble_rendezvous_btn
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.discriminatorTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.productIdTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.setupCodeTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.softap_rendezvous_btn
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorIdTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorTagsContainer
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorTagsLabelTv
+import kotlinx.android.synthetic.main.chip_device_info_fragment.view.versionTv
 
 /** Show the [CHIPDeviceInfo]. */
-class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionListener {
+class CHIPDeviceDetailsFragment : Fragment() {
 
     private lateinit var deviceInfo: CHIPDeviceInfo
-    private var gatt: BluetoothGatt? = null
-    private val scope = CoroutineScope(Dispatchers.Main + Job())
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -77,66 +73,20 @@ class CHIPDeviceDetailsFragment : Fragment(), ChipDeviceController.CompletionLis
             }
 
             ble_rendezvous_btn.setOnClickListener { onRendezvousBleClicked() }
-            softap_rendezvous_btn.setOnClickListener { onRendezvousSoftApClicked() }
+
+            // TODO: Until Rendezvous over hotspot is ready to implement
+            softap_rendezvous_btn.visibility = View.GONE
         }
     }
 
-    override fun onStop() {
-        super.onStop()
-        gatt = null
-        scope.cancel()
-    }
+
 
     private fun onRendezvousBleClicked() {
-        if (gatt == null) {
-            scope.launch {
-                val deviceController = ChipClient.getDeviceController()
-                val bluetoothManager = BluetoothManager()
-
-                showMessage(requireContext().getString(R.string.rendezvous_over_ble_scanning_text) + " " + deviceInfo.discriminator.toString())
-                val device = bluetoothManager.getBluetoothDevice(deviceInfo.discriminator) ?: run {
-                    showMessage(requireContext().getString(R.string.rendezvous_over_ble_scanning_failed_text))
-                    return@launch
-                }
-
-                showMessage(requireContext().getString(R.string.rendezvous_over_ble_connecting_text) + " " + (device.name ?: device.address.toString()))
-                gatt = bluetoothManager.connect(requireContext(), device)
-
-                showMessage(requireContext().getString(R.string.rendezvous_over_ble_pairing_text))
-                deviceController.setCompletionListener(this@CHIPDeviceDetailsFragment)
-                deviceController.beginConnectDeviceBle(gatt, deviceInfo.setupPinCode);
-            }
-        }
+        FragmentUtil.getHost(this, Callback::class.java)?.onStartRendezvousOverBle(deviceInfo)
     }
 
-    override fun onConnectDeviceComplete() {
-        showMessage(requireContext().getString(R.string.rendezvous_over_ble_success_text))
-    }
-
-    override fun onCloseBleComplete() {
-        Log.d(TAG, "onCloseBleComplete")
-    }
-
-    override fun onNotifyChipConnectionClosed() {
-        Log.d(TAG, "onNotifyChipConnectionClosed")
-    }
-
-    override fun onSendMessageComplete(message: String?) {
-        Log.d(TAG, "Message received: $message")
-    }
-
-    override fun onError(error: Throwable?) {
-        Log.d(TAG, "onError: $error")
-    }
-
-    private fun onRendezvousSoftApClicked() {
-        // TODO: once rendezvous over hotspot is ready in CHIP
-    }
-
-    private fun showMessage(msg: String) {
-        requireActivity().runOnUiThread {
-            Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
-        }
+    interface Callback {
+        fun onStartRendezvousOverBle(deviceInfo: CHIPDeviceInfo)
     }
 
     companion object {

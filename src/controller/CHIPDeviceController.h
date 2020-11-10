@@ -241,6 +241,8 @@ public:
 
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 
+    void OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgrBase * mgr) override;
+
     //////////// RendezvousSessionDelegate Implementation ///////////////
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousComplete() override;

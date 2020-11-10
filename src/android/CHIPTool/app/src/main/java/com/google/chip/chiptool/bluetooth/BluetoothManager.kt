@@ -14,8 +14,8 @@ import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
-import chip.devicecontroller.AndroidChipStack
-import chip.devicecontroller.ChipDeviceController
+import com.google.chip.chiptool.ChipClient
+import kotlinx.coroutines.CancellableContinuation
 import java.util.UUID
 import kotlin.coroutines.resume
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,112 +27,164 @@ import kotlinx.coroutines.withTimeoutOrNull
 
 @ExperimentalCoroutinesApi
 class BluetoothManager {
-    private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+  private val bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
 
-    /** Converts an integer to a ByteArray with the first [size] bytes of the [Int]. */
-    private fun Int.toByteArray(size: Int): ByteArray {
-        return ByteArray(size) { i -> (this shr (8 * i)).toByte() }
+  private fun getServiceData(discriminator: Int): ByteArray {
+    val opcode = 0
+    val version = 0
+    val versionDiscriminator = ((version and 0xf) shl 12) or (discriminator and 0xfff)
+    return intArrayOf(opcode, versionDiscriminator, versionDiscriminator shr 8)
+        .map { it.toByte() }
+        .toByteArray()
+  }
+
+  suspend fun getBluetoothDevice(discriminator: Int): BluetoothDevice? {
+    val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
+      Log.e(TAG, "No bluetooth scanner found")
+      return null
     }
 
-    private fun getServiceData(discriminator: Int): ByteArray {
-      var opcode = 0
-      var version = 0
-      var versionDiscriminator = ((version and 0xf) shl 12) or (discriminator and 0xfff)
-      return intArrayOf(
-         opcode,
-         versionDiscriminator,
-         versionDiscriminator shr 8
-      ).map { it.toByte() }.toByteArray()
-    }
+    return withTimeoutOrNull(10000) {
+      callbackFlow {
+        val scanCallback = object : ScanCallback() {
+          override fun onScanResult(callbackType: Int, result: ScanResult) {
+            val device = result.device
+            Log.i(TAG, "Bluetooth Device Scanned Addr: ${device.address}, Name ${device.name}")
 
-    suspend fun getBluetoothDevice(discriminator: Int): BluetoothDevice? {
-        val scanner = bluetoothAdapter.bluetoothLeScanner ?: run {
-            Log.e(TAG, "No bluetooth scanner found")
-            return null
+            offer(device)
+          }
+
+          override fun onScanFailed(errorCode: Int) {
+            Log.e(TAG, "Scan failed $errorCode")
+          }
         }
 
-        return withTimeoutOrNull(10000) {
-            callbackFlow {
-                val scanCallback = object : ScanCallback() {
-                    override fun onScanResult(callbackType: Int, result: ScanResult) {
-                        val device = result.device
-                        Log.i(TAG, "Bluetooth Device Scanned Addr: ${device.address}, Name ${device.name}")
+        val serviceData = getServiceData(discriminator)
+        val scanFilter =
+            ScanFilter.Builder()
+                .setServiceData(ParcelUuid(UUID.fromString(CHIP_UUID)), serviceData)
+                .build()
 
-                        offer(device)
-                    }
+        val scanSettings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .build()
 
-                    override fun onScanFailed(errorCode: Int) {
-                        Log.e(TAG, "Scan failed $errorCode")
-                    }
-                }
+        Log.i(TAG, "Starting Bluetooth scan")
+        scanner.startScan(listOf(scanFilter), scanSettings, scanCallback)
+        awaitClose { scanner.stopScan(scanCallback) }
+      }.first()
+    }
+  }
 
-                var serviceDataList = listOf(
-                   getServiceData(discriminator),
+  /**
+   * Connects to a [BluetoothDevice] and suspends until [BluetoothGattCallback.onServicesDiscovered]
+   */
+  suspend fun connect(context: Context, device: BluetoothDevice): BluetoothGatt? {
+    return suspendCancellableCoroutine { continuation ->
+      val bluetoothGattCallback = getBluetoothGattCallback(continuation)
 
-                   // TODO - Remove this incorrect format.
-                   discriminator.toByteArray(3)
-                )
+      Log.i(TAG, "Connecting")
+      val gatt = device.connectGatt(context, false, bluetoothGattCallback)
+      continuation.invokeOnCancellation { gatt.disconnect() }
+    }
+  }
 
-                serviceDataList.forEach {
-                  Log.v(TAG, "Matching service " + CHIP_UUID.substring(4, 8) + " " + it.map { String.format("%02x", it) } )
-                }
+  private fun getBluetoothGattCallback(
+      continuation: CancellableContinuation<BluetoothGatt?>
+  ): BluetoothGattCallback {
+    return object : BluetoothGattCallback() {
+      private val wrappedCallback = ChipClient.getDeviceController().callback
+      private val coroutineContinuation = continuation
 
-                val scanFilters = serviceDataList.map { ScanFilter.Builder()
-                    .setServiceData(
-                      ParcelUuid(UUID.fromString(CHIP_UUID)),
-                      it
-                    )
-                    .build()
-                }
+      override fun onConnectionStateChange(
+          gatt: BluetoothGatt?,
+          status: Int,
+          newState: Int
+      ) {
+        super.onConnectionStateChange(gatt, status, newState)
+        wrappedCallback.onConnectionStateChange(gatt, status, newState)
 
-                val scanSettings = ScanSettings.Builder()
-                    .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-                    .build()
-
-                Log.i(TAG, "Starting Bluetooth scan")
-                scanner.startScan(scanFilters, scanSettings, scanCallback)
-                awaitClose { scanner.stopScan(scanCallback) }
-            }.first()
+        if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
+          Log.i("$TAG|onConnectionStateChange", "Discovering Services...")
+          gatt?.discoverServices()
         }
-    }
+      }
 
-    /**
-     * Connects to a [BluetoothDevice] and suspends until [BluetoothGattCallback.onServicesDiscovered]
-     */
-    suspend fun connect(context: Context, device: BluetoothDevice): BluetoothGatt? {
-        return suspendCancellableCoroutine { continuation ->
-            val bluetoothGattCallback = object : AndroidChipStack.ChipGattCallback() {
-                override fun onConnectionStateChange(
-                  gatt: BluetoothGatt?,
-                  status: Int,
-                  newState: Int
-                ) {
-                    super.onConnectionStateChange(gatt, status, newState)
+      override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+        wrappedCallback.onServicesDiscovered(gatt, status)
 
-                    if (newState == BluetoothProfile.STATE_CONNECTED && status == BluetoothGatt.GATT_SUCCESS) {
-                        Log.i("$TAG|onConnectionStateChange", "Discovering Services...")
-                        gatt?.discoverServices()
-                    }
-                }
+        Log.i("$TAG|onServicesDiscovered", "Services Discovered")
+        gatt?.requestMtu(131);
+      }
 
-                override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-                    super.onServicesDiscovered(gatt, status)
+      override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
+        super.onMtuChanged(gatt, mtu, status)
+        wrappedCallback.onMtuChanged(gatt, mtu, status)
 
-                    Log.i("$TAG|onServicesDiscovered", "Services Discovered")
-                    if (continuation.isActive) {
-                        continuation.resume(gatt)
-                    }
-                }
-            }
-
-            Log.i(TAG, "Connecting")
-            val gatt = device.connectGatt(context, false, bluetoothGattCallback, BluetoothDevice.TRANSPORT_LE)
-            continuation.invokeOnCancellation { gatt.disconnect() }
+        Log.d(TAG, "MTU changed: connecting to CHIP device")
+        if (coroutineContinuation.isActive) {
+          coroutineContinuation.resume(gatt)
         }
-    }
+      }
 
-    companion object {
-        private const val TAG = "chip.BluetoothManager"
-        private const val CHIP_UUID = "0000FEAF-0000-1000-8000-00805F9B34FB"
+      override fun onCharacteristicChanged(
+          gatt: BluetoothGatt,
+          characteristic: BluetoothGattCharacteristic
+      ) {
+        Log.d(TAG, "${gatt.device.name}.onCharacteristicChanged: ${characteristic.uuid}")
+        wrappedCallback.onCharacteristicChanged(gatt, characteristic)
+      }
+
+      override fun onCharacteristicRead(
+          gatt: BluetoothGatt,
+          characteristic: BluetoothGattCharacteristic,
+          status: Int
+      ) {
+        Log.d(TAG, "${gatt.device.name}.onCharacteristicRead: ${characteristic.uuid} -> $status")
+        wrappedCallback.onCharacteristicRead(gatt, characteristic, status)
+      }
+
+      override fun onCharacteristicWrite(
+          gatt: BluetoothGatt,
+          characteristic: BluetoothGattCharacteristic,
+          status: Int
+      ) {
+        Log.d(TAG, "${gatt.device.name}.onCharacteristicWrite: ${characteristic.uuid} -> $status")
+        wrappedCallback.onCharacteristicWrite(gatt, characteristic, status)
+      }
+
+      override fun onDescriptorRead(
+          gatt: BluetoothGatt,
+          descriptor: BluetoothGattDescriptor,
+          status: Int
+      ) {
+        Log.d(TAG, "${gatt.device.name}.onDescriptorRead: ${descriptor.uuid} -> $status")
+        wrappedCallback.onDescriptorRead(gatt, descriptor, status)
+      }
+
+      override fun onDescriptorWrite(
+          gatt: BluetoothGatt,
+          descriptor: BluetoothGattDescriptor,
+          status: Int
+      ) {
+        Log.d(TAG, "${gatt.device.name}.onDescriptorWrite: ${descriptor.uuid} -> $status")
+        wrappedCallback.onDescriptorWrite(gatt, descriptor, status)
+      }
+
+      override fun onReadRemoteRssi(gatt: BluetoothGatt, rssi: Int, status: Int) {
+        Log.d(TAG, "${gatt.device.name}.onReadRemoteRssi: $rssi -> $status")
+        wrappedCallback.onReadRemoteRssi(gatt, rssi, status)
+      }
+
+      override fun onReliableWriteCompleted(gatt: BluetoothGatt, status: Int) {
+        Log.d(TAG, "${gatt.device.name}.onReliableWriteCompleted: $status")
+        wrappedCallback.onReliableWriteCompleted(gatt, status)
+      }
     }
+  }
+
+  companion object {
+    private const val TAG = "chip.BluetoothManager"
+    private const val CHIP_UUID = "0000FEAF-0000-1000-8000-00805F9B34FB"
+  }
 }
