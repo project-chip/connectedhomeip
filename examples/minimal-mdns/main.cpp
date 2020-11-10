@@ -140,16 +140,21 @@ public:
 
     void Query(const mdns::Minimal::QueryData & data) override
     {
-        printf("       QUERY TYPE:  %s\n", ToString(data.GetType()));
-        printf("       QUERY CLASS: %d\n", static_cast<int>(data.GetClass()));
-        printf("       UNICAST:     %s\n", data.GetUnicastAnswer() ? "true" : "false");
-        printf("       QUERY FOR:   ");
+        printf("       QUERY:  %s\n", ToString(data.GetType()));
+        printf("           QUERY CLASS: %d\n", static_cast<int>(data.GetClass()));
+        printf("           UNICAST:     %s\n", data.GetUnicastAnswer() ? "true" : "false");
+        printf("           QUERY FOR:   ");
         PrintQName(data.GetName());
     }
 
     void Resource(ResourceType type, const mdns::Minimal::ResourceData & data) override
     {
-        printf("       RESOURCE %d\n", static_cast<int>(type));
+        printf("       %s data:\n",
+               (type == mdns::Minimal::ParserDelegate::ResourceType::kAnswer) ? "ANSWER" :                 //
+                   (type == mdns::Minimal::ParserDelegate::ResourceType::kAuthority) ? "AUTHORITY" :       //
+                       (type == mdns::Minimal::ParserDelegate::ResourceType::kAdditional) ? "ADDITIONAL" : //
+                           "????");
+
         printf("          Type:      %s\n", ToString(data.GetType()));
         printf("          Class:     %d\n", static_cast<int>(data.GetClass()));
         printf("          TTL:       %ld\n", static_cast<long>(data.GetTtlSeconds()));
@@ -368,7 +373,7 @@ int main(int argc, char ** args)
         char buff[64];
         if (chip::Inet::GetInterfaceName(interfaceId, buff, sizeof(buff)) == CHIP_NO_ERROR)
         {
-            printf("USING Interface: %s.\n", buff);
+            printf("USING Itnterface: %s.\n", buff);
         }
         else
         {
