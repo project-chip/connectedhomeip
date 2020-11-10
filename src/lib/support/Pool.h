@@ -46,7 +46,6 @@ class BitMapObjectPool
 public:
     BitMapObjectPool()
     {
-        assert(std::atomic<tBitChunkType>{}.is_lock_free());
         for (size_t word = 0; word * kBitChunkSize < N; ++word)
         {
             mUsage[word].store(0);
@@ -130,10 +129,9 @@ private:
     const T * GetPoolHead() const { return reinterpret_cast<const T *>(mMemory); }
 
     /**
-     * Use largest data type supported by `std::atomic`. Putting multiple
-     * atomic inside a single cache line won't improve concurrency, use larger
-     * data type can improve the performance by reducing the number of outer
-     * loop. C++11 guarantees that `std::atomic` supports `uintmax_t`.
+     * Use the largest data type supported by `std::atomic`. Putting multiple atomic inside a single cache line won't improve
+     * concurrency, while the use of larger data type can improve the performance by reducing the number of outer loop iterations.
+     * C++11 guarantees that `std::atomic` supports `uintmax_t`.
      */
     using tBitChunkType                         = uintmax_t;
     static constexpr const tBitChunkType kBit1  = 1; // make sure bitshifts produce the right type
