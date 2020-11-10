@@ -116,6 +116,15 @@ void ErrorTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, !it.Next());
         NL_TEST_ASSERT(inSuite, !it.ValidData());
     }
+    {
+        // Infinite recursion
+        static const uint8_t kData[] = "\03test\xc0\x00";
+        SerializedQNameIterator it(kData, kData + 7, kData);
+
+        NL_TEST_ASSERT(inSuite, it.Next());
+        NL_TEST_ASSERT(inSuite, !it.Next());
+        NL_TEST_ASSERT(inSuite, !it.ValidData());
+    }
 }
 
 } // namespace
