@@ -43,6 +43,12 @@ using QNamePart = const char *;
 class SerializedQNameIterator
 {
 public:
+    SerializedQNameIterator() :
+        mValidDataStart(nullptr), mValidDataEnd(nullptr), mLookBehindMax(0), mCurrentPosition(nullptr), mValidData(false)
+    {}
+    SerializedQNameIterator(const SerializedQNameIterator &) = default;
+    SerializedQNameIterator & operator=(const SerializedQNameIterator &) = default;
+
     SerializedQNameIterator(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t * position) :
         mValidDataStart(dataStart), mValidDataEnd(dataEnd), mLookBehindMax(position - dataStart), mCurrentPosition(position)
     {}
@@ -70,9 +76,9 @@ private:
     static constexpr size_t kMaxValueSize = 63;
     static constexpr uint8_t kPtrMask     = 0xC0;
 
-    const uint8_t * const mValidDataStart; // valid data range start
-    const uint8_t * const mValidDataEnd;   // valid data range end
-    ptrdiff_t mLookBehindMax;              // avoid loops by limiting lookbehind
+    const uint8_t * mValidDataStart; // valid data range start
+    const uint8_t * mValidDataEnd;   // valid data range end
+    ptrdiff_t mLookBehindMax;        // avoid loops by limiting lookbehind
     const uint8_t * mCurrentPosition;
     bool mValidData = true;
 

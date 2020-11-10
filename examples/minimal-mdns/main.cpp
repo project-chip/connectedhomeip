@@ -54,7 +54,21 @@ public:
 
     void Query(const mdns::Minimal::QueryData & data) override
     {
-        // FIXME: implement
+        printf("       QUERY TYPE:  %d\n", static_cast<int>(data.GetType()));
+        printf("       QUERY CLASS: %d\n", static_cast<int>(data.GetClass()));
+        printf("       UNICAST:     %s\n", data.GetUnicastAnswer() ? "true" : "false");
+        printf("       QUERY FOR:   ");
+
+        mdns::Minimal::SerializedQNameIterator it = data.GetName();
+        while (it.Next())
+        {
+            printf("%s.", it.Value());
+        }
+        if (!it.ValidData())
+        {
+            printf("   (INVALID!)");
+        }
+        printf("\n");
     }
 
     void Resource(ResourceType type, const mdns::Minimal::ResourceData & data) override
@@ -84,8 +98,8 @@ void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
 
     builder.Header().SetMessageId(kTestMessageId);
     builder.AddQuery(mdns::Minimal::Query(kCastQnames, ArraySize(kCastQnames))
-                         .SetClass(mdns::Minimal::Query::QClass::IN)
-                         .SetType(mdns::Minimal::Query::QType::ANY)
+                         .SetClass(mdns::Minimal::QClass::IN)
+                         .SetType(mdns::Minimal::QType::ANY)
                          .SetAnswerViaUnicast(true));
 
     if (!builder.Ok())

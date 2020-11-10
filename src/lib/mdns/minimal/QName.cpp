@@ -22,11 +22,16 @@ namespace Minimal {
 
 bool SerializedQNameIterator::Next()
 {
-    return Next(true);
+    return mValidData && Next(true);
 }
 
 bool SerializedQNameIterator::Next(bool followIndirectPointers)
 {
+    if (!mValidData)
+    {
+        return false;
+    }
+
     while (true)
     {
         const uint8_t length = *mCurrentPosition;

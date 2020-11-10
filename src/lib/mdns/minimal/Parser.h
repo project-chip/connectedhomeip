@@ -19,6 +19,7 @@
 
 #include "DnsHeader.h"
 #include "QName.h"
+#include "Query.h"
 
 namespace mdns {
 namespace Minimal {
@@ -27,6 +28,35 @@ class QueryData
 {
 public:
     QueryData() {}
+    QueryData(const QueryData &) = default;
+    QueryData & operator=(const QueryData &) = default;
+
+    QueryData(QType type, QClass klass, bool unicast, const uint8_t * nameStart, const uint8_t * dataStart,
+              const uint8_t * dataEnd) :
+        mType(type),
+        mClass(klass), mAnswerViaUnicast(unicast), mNameIterator(dataStart, dataEnd, nameStart)
+    {}
+
+    QType GetType() const { return mType; }
+    QClass GetClass() const { return mClass; }
+    bool GetUnicastAnswer() const { return mAnswerViaUnicast; }
+
+    SerializedQNameIterator GetName() const { return mNameIterator; }
+
+    /// Parses a query structure
+    ///
+    /// Valid data packet is assumed between [dataStart] and [dataEnd]
+    /// Parses the query at [start] and updates start to the end of the structure.
+    /// Updates [out] with the parsed data on success.
+    ///
+    /// returns true on parse success, false on failure.
+    static bool Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start, QueryData * out);
+
+private:
+    QType mType            = QType::ANY;
+    QClass mClass          = QClass::ANY;
+    bool mAnswerViaUnicast = false;
+    SerializedQNameIterator mNameIterator; // const since we reuse it
 };
 
 class ResourceData

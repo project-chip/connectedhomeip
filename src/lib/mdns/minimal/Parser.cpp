@@ -20,6 +20,42 @@
 namespace mdns {
 namespace Minimal {
 
+bool QueryData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start, QueryData * out)
+{
+    // Structure is:
+    //    QNAME
+    //    TYPE
+    //    CLASS (plus a flag for unicast)
+    const uint8_t * nameEnd = nullptr;
+
+    {
+        SerializedQNameIterator it(dataStart, dataEnd, *start);
+        nameEnd = it.FindDataEnd();
+    }
+    if (nameEnd == nullptr)
+    {
+        return false;
+    }
+
+    if (dataEnd - nameEnd < 4)
+    {
+        return false;
+    }
+
+    uint16_t type  = chip::Encoding::BigEndian::Read16(nameEnd);
+    uint16_t klass = chip::Encoding::BigEndian::Read16(nameEnd);
+
+    bool unicast = (klass & Query::kUnicastAnswerFlag) != 0;
+    klass        = (klass & ~Query::kUnicastAnswerFlag);
+
+    *out   = QueryData(static_cast<QType>(type), static_cast<QClass>(klass),
+                     false, // FIXME: UNICAST ???
+                     *start, dataStart, dataEnd);
+    *start = nameEnd;
+
+    return true;
+}
+
 bool ParsePacket(const uint8_t * packet, size_t length, ParserDelegate * delegate)
 {
     if (length < HeaderRef::kSizeBytes)
@@ -36,6 +72,24 @@ bool ParsePacket(const uint8_t * packet, size_t length, ParserDelegate * delegat
     }
 
     delegate->Header(header);
+
+    const uint8_t * dataStart = packet;
+    const uint8_t * dataEnd   = packet + length;
+
+    const uint8_t * data = packet + HeaderRef::kSizeBytes;
+
+    {
+        QueryData queryData;
+        for (unsigned i = 0; i < header.GetQueryCount(); i++)
+        {
+            if (!queryData.Parse(dataStart, dataEnd, &data, &queryData))
+            {
+                return false;
+            }
+
+            delegate->Query(queryData);
+        }
+    }
 
     // FIXME: implement the rest
     /*

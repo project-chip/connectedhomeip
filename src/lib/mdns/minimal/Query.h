@@ -22,28 +22,32 @@
 namespace mdns {
 namespace Minimal {
 
+enum class QType : uint16_t
+{
+    A     = 1,
+    NS    = 2,
+    CNAME = 5,
+    SOA   = 6,
+    WKS   = 11,
+    PTR   = 12,
+    MX    = 15,
+    SRV   = 33,
+    AAAA  = 28,
+    ANY   = 255,
+};
+enum class QClass : uint16_t
+{
+    IN  = 1,
+    ANY = 255,
+};
+
 /// Represents a MDNS Query: QName and flags
 class Query
 {
 public:
-    enum class QType : uint16_t
-    {
-        A     = 1,
-        NS    = 2,
-        CNAME = 5,
-        SOA   = 6,
-        WKS   = 11,
-        PTR   = 12,
-        MX    = 15,
-        SRV   = 33,
-        AAAA  = 28,
-        ANY   = 255,
-    };
-    enum class QClass : uint16_t
-    {
-        IN  = 1,
-        ANY = 255,
-    };
+    /// Flag encoded in QCLASS requesting unicast answers
+    /// public for usage in parsers.
+    static constexpr uint16_t kUnicastAnswerFlag = 0x8000;
 
     Query(const QNamePart * names, uint16_t namesCount) : mQNameCount(namesCount), mQName(names) {}
 
@@ -124,9 +128,6 @@ public:
     }
 
 private:
-    /// Flag encoded in QCLASS requesting unicast answers
-    static constexpr uint16_t kUnicastAnswerFlag = 0x8000;
-
     const uint16_t mQNameCount;
     const QNamePart * mQName;
     QType mType            = QType::ANY;
