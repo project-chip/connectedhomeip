@@ -110,7 +110,5 @@ public:
 /// returns true if packet was succesfully parsed, false otherwise
 bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate);
 
-// FIXME: implement
-
 } // namespace Minimal
 } // namespace mdns
