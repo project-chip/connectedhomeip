@@ -115,6 +115,15 @@ public:
 
     void Header(const mdns::Minimal::HeaderRef & header) override
     {
+        if (header.GetFlags().IsQuery())
+        {
+            printf("   QUERY:\n");
+        }
+        else
+        {
+            printf("   REPLY:\n");
+        }
+        printf("   MESSAGE ID : %d\n", header.GetMessageId());
         printf("   Queries:     %d\n", header.GetQueryCount());
         printf("   Answers:     %d\n", header.GetAnswerCount());
         printf("   Authorities: %d\n", header.GetAuthorityCount());
