@@ -65,7 +65,7 @@ public:
     bool CanSendToPeer(const PeerAddress & address) override { return true; }
 };
 
-class MockAppDelegate : public ExchangeContextDelegate
+class MockAppDelegate : public ExchangeDelegate
 {
 public:
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
@@ -172,12 +172,12 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MockAppDelegate mockAppDelegate;
-    SimpleExchangeContextDelegateFactory mockAppDelegateFactory(&mockAppDelegate);
+    SimpleExchangeAcceptor mockAppAcceptor(&mockAppDelegate);
 
-    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, &mockAppDelegateFactory);
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, &mockAppAcceptor);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0002, 0x0001, &mockAppDelegateFactory);
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0002, 0x0001, &mockAppAcceptor);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = exchangeMgr.UnregisterUnsolicitedMessageHandler(0x0001);
@@ -225,8 +225,8 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
 
     // create unsolicited exchange
     MockAppDelegate mockUnsolicitedAppDelegate;
-    SimpleExchangeContextDelegateFactory mockUnsolicitedAppDelegateFactory(&mockUnsolicitedAppDelegate);
-    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegateFactory);
+    SimpleExchangeAcceptor mockUnsolicitedAppAcceptor(&mockUnsolicitedAppDelegate);
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppAcceptor);
 
     // send a malicious packet
     ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New());

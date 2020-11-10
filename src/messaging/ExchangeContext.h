@@ -24,7 +24,7 @@
 #pragma once
 
 #include <lib/core/ReferenceCounted.h>
-#include <messaging/ExchangeContextDelegate.h>
+#include <messaging/ExchangeDelegate.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
@@ -127,7 +127,7 @@ public:
      */
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
-    ExchangeContextDelegate * GetDelegate() const { return mDelegate; }
+    ExchangeDelegate * GetDelegate() const { return mDelegate; }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
@@ -144,7 +144,7 @@ public:
     void Abort();
 
     ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                            ExchangeContextDelegateFactory * delegateFactory);
+                            ExchangeAcceptor * acceptor);
     void Free();
     void Reset();
 
@@ -158,7 +158,7 @@ private:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ExchangeContextDelegate * mDelegate = nullptr;
+    ExchangeDelegate * mDelegate = nullptr;
     ExchangeManager * mExchangeMgr;
 
     uint64_t mPeerNodeId; // Node ID of peer node.

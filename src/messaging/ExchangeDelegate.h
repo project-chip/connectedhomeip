@@ -37,10 +37,10 @@ class ExchangeContext;
  *   is interested in receiving these callbacks, they can specialize this class and handle
  *   each trigger in their implementation of this class.
  */
-class DLL_EXPORT ExchangeContextDelegate
+class DLL_EXPORT ExchangeDelegate
 {
 public:
-    virtual ~ExchangeContextDelegate() {}
+    virtual ~ExchangeDelegate() {}
 
     /**
      * @brief
@@ -78,10 +78,10 @@ public:
  * @brief
  *   This class is the interface registered into UnsolicitedMessageHandler.
  */
-class DLL_EXPORT ExchangeContextDelegateFactory
+class DLL_EXPORT ExchangeAcceptor
 {
 public:
-    virtual ~ExchangeContextDelegateFactory() {}
+    virtual ~ExchangeAcceptor() {}
 
     /**
      * @brief
@@ -93,37 +93,37 @@ public:
      *
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
-    virtual ExchangeContextDelegate * CreateDelegate(ExchangeContext * ec) = 0;
+    virtual ExchangeDelegate * CreateDelegate(ExchangeContext * ec) = 0;
 };
 
 /**
  * @brief
- *   This is a helper class for protocols where that its Delegate and
- *   DelegateFactory are the same object. In that case, derive from this object
- *   and implementation the pure virtual function OnMessageReceived and
+ *   This is a helper class for protocols where that its Delegate and Acceptor
+ *   are the same object. In that case, derive from this object and
+ *   implementation the pure virtual function OnMessageReceived and
  *   OnResponseTimeout. Then register the derived class into
  *   UnsolicitedMessageHandler
  */
-class DLL_EXPORT SimpleExchangeContextDelegate : public ExchangeContextDelegateFactory, public ExchangeContextDelegate
+class DLL_EXPORT SimpleExchangeDelegate : public ExchangeAcceptor, public ExchangeDelegate
 {
 public:
-    virtual ~SimpleExchangeContextDelegate() override {}
-    virtual ExchangeContextDelegate * CreateDelegate(ExchangeContext * ec) override { return this; }
+    virtual ~SimpleExchangeDelegate() override {}
+    virtual ExchangeDelegate * CreateDelegate(ExchangeContext * ec) override { return this; }
 };
 
 /**
  * @brief
- *   A simple delegate factory returns given delegate
+ *   A simple acceptor returns given delegate
  */
-class SimpleExchangeContextDelegateFactory : public ExchangeContextDelegateFactory
+class SimpleExchangeAcceptor : public ExchangeAcceptor
 {
 public:
-    SimpleExchangeContextDelegateFactory(ExchangeContextDelegate * delegate) : mDelegate(delegate) {}
-    virtual ~SimpleExchangeContextDelegateFactory() override {}
-    virtual ExchangeContextDelegate * CreateDelegate(ExchangeContext * ec) override { return mDelegate; }
+    SimpleExchangeAcceptor(ExchangeDelegate * delegate) : mDelegate(delegate) {}
+    virtual ~SimpleExchangeAcceptor() override {}
+    virtual ExchangeDelegate * CreateDelegate(ExchangeContext * ec) override { return mDelegate; }
 
 private:
-    ExchangeContextDelegate * mDelegate;
+    ExchangeDelegate * mDelegate;
 };
 
 } // namespace chip

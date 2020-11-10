@@ -31,8 +31,8 @@
 namespace chip {
 
 class ExchangeContext;
-class ExchangeContextDelegate;
-class ExchangeContextDelegateFactory;
+class ExchangeDelegate;
+class ExchangeAcceptor;
 
 static constexpr int16_t kAnyMessageType = -1;
 
@@ -83,25 +83,25 @@ public:
      *
      *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext is being set up.
      *
-     *  @param[in]    delegate      A pointer to ExchangeContextDelegate.
+     *  @param[in]    delegate      A pointer to ExchangeDelegate.
      *
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(const NodeId & peerNodeId, ExchangeContextDelegate * delegate);
+    ExchangeContext * NewContext(const NodeId & peerNodeId, ExchangeDelegate * delegate);
 
     /**
      *  Find the ExchangeContext from a pool matching a given set of parameters.
      *
      *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext has been set up.
      *
-     *  @param[in]    delegate      A pointer to ExchangeContextDelegate.
+     *  @param[in]    delegate      A pointer to ExchangeDelegate.
      *
      *  @param[in]    isInitiator   Boolean indicator of whether the local node is the initiator of the exchange.
      *
      *  @return   A pointer to the ExchangeContext object matching the provided parameters On success, NULL on no match.
      */
-    ExchangeContext * FindContext(NodeId peerNodeId, ExchangeContextDelegate * delegate, bool isInitiator);
+    ExchangeContext * FindContext(NodeId peerNodeId, ExchangeDelegate * delegate, bool isInitiator);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier. This handler would be
@@ -111,13 +111,13 @@ public:
      *
      *  @param[in]    handler         The unsolicited message handler.
      *
-     *  @param[in]    delegateFactory A pointer to ExchangeContextDelegateFactory.
+     *  @param[in]    acceptor A pointer to ExchangeAcceptor.
      *
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeContextDelegateFactory * delegateFactory);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, ExchangeAcceptor * acceptor);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier and message type.
@@ -126,14 +126,14 @@ public:
      *
      *  @param[in]    msgType         The message type of the corresponding protocol.
      *
-     *  @param[in]    delegateFactory A pointer to ExchangeContextDelegateFactory.
+     *  @param[in]    acceptor A pointer to ExchangeAcceptor.
      *
      *  @retval #CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS If the unsolicited message handler pool
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType,
-                                                 ExchangeContextDelegateFactory * delegateFactory);
+                                                 ExchangeAcceptor * acceptor);
 
     /**
      *  Unregister an unsolicited message handler for a given protocol identifier.
@@ -175,7 +175,7 @@ private:
 
     struct UnsolicitedMessageHandler
     {
-        ExchangeContextDelegateFactory * DelegateFactory;
+        ExchangeAcceptor * Acceptor;
         uint32_t ProtocolId;
         int16_t MessageType;
     };
@@ -191,11 +191,11 @@ private:
     void (*OnExchangeContextChanged)(size_t numContextsInUse);
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                                   ExchangeContextDelegateFactory * delegateFactory);
+                                   ExchangeAcceptor * acceptor);
 
     void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
-    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContextDelegateFactory * delegateFactory);
+    CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeAcceptor * acceptor);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer) override;
