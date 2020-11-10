@@ -44,6 +44,7 @@
 // *
 // * Copyright 2010 by Ember Corporation. All rights reserved.              *80*
 // *******************************************************************
+#include "groups-server.h"
 
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
@@ -446,3 +447,12 @@ static uint8_t findGroupIndex(EndpointId endpoint, GroupId groupId)
     }
     return EMBER_AF_GROUP_TABLE_NULL_INDEX;
 }
+
+void emberAfPluginGroupsServerGetGroupNameCallback(EndpointId endpoint, GroupId groupId, uint8_t * groupName) {}
+
+bool emberAfPluginGroupsServerGroupNamesSupportedCallback(EndpointId endpoint)
+{
+    return false;
+}
+
+void emberAfPluginGroupsServerSetGroupNameCallback(EndpointId endpoint, GroupId groupId, uint8_t * groupName) {}
