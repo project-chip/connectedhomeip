@@ -40,14 +40,14 @@ bool ParseTxtRecord(const BytesRange & data, TxtRecordDelegate * callback)
         {
             equalPos++;
         }
+
         if (pos + length == equalPos)
         {
-            callback->OnRecord(BytesRange(pos, equalPos), nullptr);
+            callback->OnRecord(BytesRange(pos, equalPos), BytesRange());
         }
         else
         {
-            BytesRange value(equalPos + 1, pos + length);
-            callback->OnRecord(BytesRange(pos, equalPos), &value);
+            callback->OnRecord(BytesRange(pos, equalPos), BytesRange(equalPos + 1, pos + length));
         }
 
         pos += length;

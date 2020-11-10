@@ -80,23 +80,16 @@ const char * ToString(mdns::Minimal::QType t)
 class TxtReport : public mdns::Minimal::TxtRecordDelegate
 {
 public:
-    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange * value)
+    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange & value)
     {
         std::unique_ptr<char[]> nameBuff(new char[name.Size() + 1]);
-        std::unique_ptr<char[]> valueBuff(new char[value ? (value->Size() + 1) : 32]);
+        std::unique_ptr<char[]> valueBuff(new char[value.Size() + 1]);
 
         memcpy(nameBuff.get(), name.Start(), name.Size());
         nameBuff.get()[name.Size()] = 0;
 
-        if (value)
-        {
-            memcpy(valueBuff.get(), value->Start(), value->Size());
-            valueBuff.get()[value->Size()] = 0;
-        }
-        else
-        {
-            strcpy(valueBuff.get(), "!!NULL!!");
-        }
+        memcpy(valueBuff.get(), value.Start(), value.Size());
+        valueBuff.get()[value.Size()] = 0;
 
         printf("            TXT:  '%s' = '%s'\n", nameBuff.get(), valueBuff.get());
     }

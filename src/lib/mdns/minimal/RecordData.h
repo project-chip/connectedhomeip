@@ -30,8 +30,9 @@ public:
     /// Reports that a record was found
     ///
     /// name is mandatory
-    /// value is optional and may be NULL (if the TXT record does not contain a '=');
-    virtual void OnRecord(const BytesRange & name, const BytesRange * value) = 0;
+    /// value will be empty if '=' is missing in the TXT record. I.e code does
+    /// *NOT* differentiate between "foo=" and "foo" as record.
+    virtual void OnRecord(const BytesRange & name, const BytesRange & value) = 0;
 };
 
 bool ParseTxtRecord(const BytesRange & data, TxtRecordDelegate * callback);
