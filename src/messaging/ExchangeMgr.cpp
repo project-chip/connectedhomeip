@@ -124,8 +124,7 @@ CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolI
     return RegisterUMH(protocolId, kAnyMessageType, acceptor);
 }
 
-CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType,
-                                                              ExchangeAcceptor * acceptor)
+CHIP_ERROR ExchangeManager::RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeAcceptor * acceptor)
 {
     return RegisterUMH(protocolId, static_cast<int16_t>(msgType), acceptor);
 }
@@ -221,8 +220,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     // If we found a handler or we need to create a new exchange context (EC).
     if (matchingUMH != nullptr)
     {
-        ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false,
-                          matchingUMH->Acceptor);
+        ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false, matchingUMH->Acceptor);
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         ChipLogProgress(ExchangeManager, "ec id: %d, Delegate: 0x%x", (ec - ContextPool + 1), ec->GetDelegate());
@@ -265,9 +263,9 @@ CHIP_ERROR ExchangeManager::RegisterUMH(uint32_t protocolId, int16_t msgType, Ex
     if (selected == nullptr)
         return CHIP_ERROR_TOO_MANY_UNSOLICITED_MESSAGE_HANDLERS;
 
-    selected->Acceptor = acceptor;
-    selected->ProtocolId      = protocolId;
-    selected->MessageType     = msgType;
+    selected->Acceptor    = acceptor;
+    selected->ProtocolId  = protocolId;
+    selected->MessageType = msgType;
 
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumUMHandlers);
 

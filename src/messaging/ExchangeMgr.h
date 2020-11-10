@@ -132,8 +132,7 @@ public:
      *                                                             is full and a new one cannot be allocated.
      *  @retval #CHIP_NO_ERROR On success.
      */
-    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType,
-                                                 ExchangeAcceptor * acceptor);
+    CHIP_ERROR RegisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType, ExchangeAcceptor * acceptor);
 
     /**
      *  Unregister an unsolicited message handler for a given protocol identifier.
@@ -190,8 +189,7 @@ private:
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
     void (*OnExchangeContextChanged)(size_t numContextsInUse);
 
-    ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                                   ExchangeAcceptor * acceptor);
+    ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeAcceptor * acceptor);
 
     void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
