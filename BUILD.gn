@@ -28,7 +28,8 @@ import("${chip_root}/build/chip/tools.gni")
 if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   declare_args() {
     chip_enable_python_modules =
-        (current_os == "mac" || current_os == "linux") && host_cpu == "x64"
+        (current_os == "mac" || current_os == "linux") &&
+        (host_cpu == "x64" || host_cpu == "arm64")
   }
 
   # This is a real toolchain. Build CHIP.
