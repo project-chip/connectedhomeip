@@ -44,6 +44,7 @@
 // *
 // * Copyright 2007 by Ember Corporation. All rights reserved.              *80*
 // *******************************************************************
+#include "identify.h"
 
 // this file contains all the common includes for clusters in the util
 #include <app/util/af.h>
@@ -214,4 +215,16 @@ static EmberStatus scheduleIdentifyTick(EndpointId endpoint)
     state->identifying = false;
     emberAfPluginIdentifyStopFeedbackCallback(endpoint);
     return emberAfDeactivateServerTick(endpoint, ZCL_IDENTIFY_CLUSTER_ID);
+}
+
+bool emberAfPluginIdentifyStartFeedbackCallback(EndpointId endpoint, uint16_t identifyTime)
+{
+    emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Start identify callback on endpoint %d time %d", endpoint, identifyTime);
+    return false;
+}
+
+bool emberAfPluginIdentifyStopFeedbackCallback(EndpointId endpoint)
+{
+    emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Stop identify callback on endpoint %d", endpoint);
+    return false;
 }
