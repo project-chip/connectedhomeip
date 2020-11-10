@@ -19,6 +19,7 @@
 
 #include <inet/UDPEndPoint.h>
 #include <mdns/minimal/DnsHeader.h>
+#include <mdns/minimal/Parser.h>
 #include <mdns/minimal/QName.h>
 #include <mdns/minimal/QueryBuilder.h>
 #include <platform/CHIPDeviceLayer.h>
@@ -39,6 +40,28 @@ constexpr uint32_t kTestMessageId = 0x1234;
 constexpr size_t kMdnsMaxPacketSize = 1'024;
 
 const mdns::Minimal::QNamePart kCastQnames[] = { "_googlecast", "_tcp", "local" };
+
+class PacketReporter : public mdns::Minimal::ParserDelegate
+{
+public:
+    void Header(const mdns::Minimal::HeaderRef & header) override
+    {
+        printf("   Queries:     %d\n", header.GetQueryCount());
+        printf("   Answers:     %d\n", header.GetAnswerCount());
+        printf("   Authorities: %d\n", header.GetAuthorityCount());
+        printf("   Additionals: %d\n", header.GetAdditionalCount());
+    }
+
+    void Query(const mdns::Minimal::QueryData & data) override
+    {
+        // FIXME: implement
+    }
+
+    void Resource(ResourceType type, const mdns::Minimal::ResourceData & data) override
+    {
+        // FIXME: implement
+    }
+};
 
 void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
 {
@@ -87,12 +110,11 @@ void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::P
 
     printf("Packet received from: %-15s on port %d\n", addr, info->SrcPort);
 
-    mdns::Minimal::HeaderRef hdr(buffer->Start());
-
-    printf("   Queries:     %d\n", hdr.GetQueryCount());
-    printf("   Answers:     %d\n", hdr.GetAnswerCount());
-    printf("   Authorities: %d\n", hdr.GetAuthorityCount());
-    printf("   Additionals: %d\n", hdr.GetAdditionalCount());
+    PacketReporter reporter;
+    if (!mdns::Minimal::ParsePacket(buffer->Start(), buffer->DataLength(), &reporter))
+    {
+        printf("INVALID PACKET!!!!!!\n");
+    }
 }
 
 } // namespace

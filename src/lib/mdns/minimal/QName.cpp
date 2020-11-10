@@ -101,6 +101,11 @@ const uint8_t * SerializedQNameIterator::FindDataEnd()
         // nothing to do, just advance
     }
 
+    if (!ValidData())
+    {
+        return nullptr;
+    }
+
     // normal end
     if (*mCurrentPosition == 0)
     {
