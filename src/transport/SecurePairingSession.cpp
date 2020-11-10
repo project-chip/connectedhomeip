@@ -29,6 +29,7 @@
  */
 
 #include <inttypes.h>
+#include <string.h>
 
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
@@ -173,12 +174,7 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    PacketHeader packetHeader;
     PayloadHeader payloadHeader;
-
-    packetHeader
-        .SetSourceNodeId(mLocalNodeId) //
-        .SetEncryptionKeyID(mLocalKeyId);
 
     payloadHeader
         .SetMessageType(msgType) //
@@ -194,18 +190,8 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    headerSize              = packetHeader.EncodeSizeBytes();
-    actualEncodedHeaderSize = 0;
-
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
-
-    msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err =
-        packetHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize, payloadHeader.GetEncodePacketFlags());
-    SuccessOrExit(err);
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
-
-    err    = mDelegate->SendMessage(msgBuf);
+    err    = mDelegate->SendPairingMessage(PacketHeader().SetSourceNodeId(mLocalNodeId).SetEncryptionKeyID(mLocalKeyId),
+                                        payloadHeader.GetEncodePacketFlags(), msgBuf);
     msgBuf = nullptr;
     SuccessOrExit(err);
 

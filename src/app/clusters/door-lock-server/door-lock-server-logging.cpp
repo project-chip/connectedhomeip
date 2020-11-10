@@ -49,7 +49,7 @@ using namespace chip;
 static EmberAfPluginDoorLockServerLogEntry entries[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_LOG_ENTRIES];
 static uint8_t nextEntryId = 1;
 
-#define ENTRY_ID_TO_INDEX(entryId) ((entryId) -1)
+#define ENTRY_ID_TO_INDEX(entryId) static_cast<uint8_t>((entryId) -1)
 #define ENTRY_ID_IS_VALID(entryId) ((entryId) > 0 && (entryId) < nextEntryId)
 #define MOST_RECENT_ENTRY_ID() (nextEntryId - 1)
 #define LOG_IS_EMPTY() (nextEntryId == 1)

@@ -1,0 +1,6 @@
+{{chip_header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+#include "af-types.h"

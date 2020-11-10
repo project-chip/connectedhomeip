@@ -26,6 +26,7 @@
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
 #endif
+#include <lib/mdns/DiscoveryManager.h>
 
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -72,6 +73,8 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
         break;
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
         ChipLogProgress(AppServer, "Device was assigned network credentials");
+        chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice();
+
         break;
     default:
         break;

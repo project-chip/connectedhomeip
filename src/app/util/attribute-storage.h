@@ -95,7 +95,7 @@ void emAfCallInits(void);
 
 // Initial configuration
 void emberAfEndpointConfigure(void);
-bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, uint16_t clusterId, uint8_t * buffer,
+bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, CHIPClusterId clusterId, uint8_t * buffer,
                               uint16_t bufferLength, uint16_t * bufferIndex, uint8_t startId, uint8_t maxIdCount);
 
 EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord, EmberAfAttributeMetadata ** metadata,

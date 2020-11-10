@@ -19,6 +19,7 @@
 #include "TestSupport.h"
 
 #include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
 #include <support/SerializableIntegerSet.h>
 #include <support/TestUtils.h>
 
@@ -126,17 +127,17 @@ void TestSerializableIntegerSetSerialize(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf, size) == nullptr);
     NL_TEST_ASSERT(inSuite, size != 0);
 
-    char buf1[size];
-    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf1, size) == buf1);
+    chip::Platform::ScopedMemoryString buf1("", size);
+    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf1.Get(), size) == buf1.Get());
     NL_TEST_ASSERT(inSuite, size != 0);
 
     uint16_t size2 = static_cast<uint16_t>(2 * size);
-    char buf2[size2];
-    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf2, size2) == buf2);
+    chip::Platform::ScopedMemoryString buf2("", size2);
+    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf2.Get(), size2) == buf2.Get());
     NL_TEST_ASSERT(inSuite, size2 == size);
 
     chip::SerializableU64Set<8> set2;
-    NL_TEST_ASSERT(inSuite, set2.DeserializeBase64(buf2, size2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, set2.DeserializeBase64(buf2.Get(), size2) == CHIP_NO_ERROR);
 
     for (uint64_t i = 1; i <= 6; i++)
     {

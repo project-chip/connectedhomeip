@@ -1,0 +1,17 @@
+{{chip_header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+#include <stdint.h>
+#include "enums.h"
+
+{{#zcl_structs}}
+
+// Struct for {{label}}
+typedef struct _{{asType label}} {
+{{#zcl_struct_items}}
+{{ident}}{{asUnderlyingType type}} {{asSymbol label}};
+{{/zcl_struct_items}}
+} {{asUnderlyingType label}};
+{{/zcl_structs}}

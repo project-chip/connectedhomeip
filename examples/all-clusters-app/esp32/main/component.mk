@@ -23,8 +23,8 @@ COMPONENT_DEPENDS := chip QRCode tft spidriver
 
 COMPONENT_SRCDIRS :=                                                                \
   .                                                                                 \
-  gen                                                                               \
   ../third_party/connectedhomeip/examples/common/chip-app-server                    \
+  ../third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common/gen  \
   ../third_party/connectedhomeip/src/app/util                                       \
   ../third_party/connectedhomeip/src/app/clusters/on-off-server                     \
   ../third_party/connectedhomeip/src/app/clusters/level-control                     \
@@ -43,8 +43,9 @@ COMPONENT_SRCDIRS :=                                                            
 #  ../third_party/connectedhomeip/src/app/clusters/ias-zone-client                  \
 
 
-COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/util                            \
-                            $(PROJECT_PATH)/third_party/connectedhomeip/examples/common/chip-app-server/include \
+COMPONENT_EXTRA_INCLUDES := $(PROJECT_PATH)/third_party/connectedhomeip/src/app/util                                   \
+                            $(PROJECT_PATH)/third_party/connectedhomeip/examples/common/chip-app-server/include        \
+                            $(PROJECT_PATH)/third_party/connectedhomeip/examples/all-clusters-app/all-clusters-common  \
                             $(PROJECT_PATH)/third_party/connectedhomeip/src
 
 # So "gen/*" files are found by the src/app bits.

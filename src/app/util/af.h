@@ -503,11 +503,6 @@ uint8_t emberAfFindClusterServerEndpointIndex(CHIPEndpointId endpoint, EmberAfCl
 #define emberAfNetworkIndexFromEndpointIndex(index) (emAfEndpoints[(index)].networkIndex)
 
 /**
- * @brief Returns the network index of a given endpoint.
- */
-uint8_t emberAfNetworkIndexFromEndpoint(CHIPEndpointId endpoint);
-
-/**
  * @brief Macro that returns primary profile ID.
  *
  * Primary profile is the profile of a primary endpoint as defined
@@ -680,25 +675,6 @@ bool emberAfEndpointEnableDisable(CHIPEndpointId endpoint, bool enable);
  * @brief Determine if an endpoint at the specified index is enabled or disabled
  */
 bool emberAfEndpointIndexIsEnabled(uint8_t index);
-
-/**
- * @brief This indicates a new image verification is taking place.
- */
-#define EMBER_AF_NEW_IMAGE_VERIFICATION true
-
-/**
- * @brief This indicates the continuation of an image verification already
- * in progress.
- */
-#define EMBER_AF_CONTINUE_IMAGE_VERIFY false
-
-/**
- * @brief This variable defines an invalid image id.  It is used
- *   to determine if a returned EmberAfOtaImageId is valid or not.
- *   This is done by passing the data to the function
- *   emberAfIsOtaImageIdValid().
- */
-extern const EmberAfOtaImageId emberAfInvalidImageId;
 
 /**
  * @brief Returns true if a given ZCL data type is a string type.

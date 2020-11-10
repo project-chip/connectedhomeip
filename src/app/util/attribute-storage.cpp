@@ -774,10 +774,10 @@ static uint8_t findClusterEndpointIndex(EndpointId endpoint, EmberAfClusterId cl
             break;
         }
         epi = static_cast<uint8_t>(epi +
-                                           (emberAfFindClusterIncludingDisabledEndpointsWithMfgCode(
-                                                emAfEndpoints[i].endpoint, clusterId, mask, manufacturerCode) != NULL)
-                                       ? 1
-                                       : 0);
+                                   ((emberAfFindClusterIncludingDisabledEndpointsWithMfgCode(emAfEndpoints[i].endpoint, clusterId,
+                                                                                             mask, manufacturerCode) != NULL)
+                                        ? 1
+                                        : 0));
     }
 
     return epi;
@@ -1209,7 +1209,7 @@ uint16_t emAfGetManufacturerCodeForCommand(EmberAfCommandMetadata * command)
  * It returns false, if there were more commands, but were not populated
  * because of maxIdCount limitation.
  */
-bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, uint16_t clusterId, uint8_t * buffer,
+bool emberAfExtractCommandIds(bool outgoing, EmberAfClusterCommand * cmd, ClusterId clusterId, uint8_t * buffer,
                               uint16_t bufferLength, uint16_t * bufferIndex, uint8_t startId, uint8_t maxIdCount)
 {
     uint16_t i, count = 0;

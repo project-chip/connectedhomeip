@@ -45,10 +45,15 @@ public:
      * @brief
      *   Called when pairing session generates a new message that should be sent to peer.
      *
-     * @param msgBuf the new message that should be sent to the peer
+     * @param header the message header for the sent message
+     * @param payloadFlags payload encoding flags
+     * @param msgBuf the raw data for the message being sent
      * @return CHIP_ERROR Error thrown when sending the message
      */
-    virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags, System::PacketBuffer * msgBuf)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     /**
      * @brief

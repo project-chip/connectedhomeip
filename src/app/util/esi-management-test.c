@@ -79,12 +79,14 @@ uint8_t emberCopyBigEndianEui64Argument(int8_t index, EmberEUI64 destination)
 {
     // Unimplemented stub.  Should not be called.
     assert(0);
+    return 0;
 }
 
 uint32_t emberUnsignedCommandArgument(uint8_t argNum)
 {
     // Unimplemented stub.  Should not be called.
     assert(0);
+    return 0;
 }
 
 uint16_t halInternalStartSystemTimer(void)

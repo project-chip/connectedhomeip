@@ -25,6 +25,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
+#include <lib/mdns/DiscoveryManager.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -109,7 +110,7 @@ void InitServer()
 
     // This flag is used to bypass BLE in the cirque test
     // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
-#ifndef BYPASS_RENDEZVOUS
+#ifndef CHIP_BYPASS_RENDEZVOUS
     {
         RendezvousParameters params;
         uint32_t pinCode;
@@ -126,6 +127,7 @@ void InitServer()
     SuccessOrExit(err);
 
     gSessions.SetDelegate(&gCallbacks);
+    chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice(chip::Inet::kIPAddressType_IPv6);
 
 exit:
     if (err != CHIP_NO_ERROR)

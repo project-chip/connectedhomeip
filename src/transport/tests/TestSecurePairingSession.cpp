@@ -39,20 +39,10 @@ using namespace chip;
 class TestSecurePairingDelegate : public SecurePairingSessionDelegate
 {
 public:
-    CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags, System::PacketBuffer * msgBuf) override
     {
         mNumMessageSend++;
-        if (peer != nullptr)
-        {
-            PacketHeader hdr;
-            uint16_t headerSize = 0;
-
-            hdr.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
-            msgBuf->ConsumeHead(headerSize);
-
-            return peer->HandlePeerMessage(hdr, msgBuf);
-        }
-        return mMessageSendError;
+        return (peer != nullptr) ? peer->HandlePeerMessage(header, msgBuf) : mMessageSendError;
     }
 
     void OnPairingError(CHIP_ERROR error) override { mNumPairingErrors++; }

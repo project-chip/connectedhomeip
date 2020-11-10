@@ -487,8 +487,14 @@ bool ReadAttributeValue(uint8_t *& message, uint16_t & messageLen)
 | * ReadAttributesResponse                                              | 0x01 |
 | * WriteAttributesResponse                                             | 0x04 |
 | * WriteAttributesNoResponse                                           | 0x05 |
+| * ConfigureReportingResponse                                          | 0x07 |
+| * ReadReportingConfigurationResponse                                  | 0x09 |
 | * DefaultResponse                                                     | 0x0B |
 | * DiscoverAttributesResponse                                          | 0x0D |
+| * WriteAttributesStructuredResponse                                   | 0x10 |
+| * DiscoverCommandsReceivedResponse                                    | 0x12 |
+| * DiscoverCommandsGeneratedResponse                                   | 0x14 |
+| * DiscoverAttributesExtendedResponse                                  | 0x16 |
 \*----------------------------------------------------------------------------*/
 
 /*
@@ -508,10 +514,13 @@ public:
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(2);
-            ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
+            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
+            ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", attributeId);
+
             CHECK_MESSAGE_LENGTH(1);
             uint8_t status = chip::Encoding::Read8(message); // zclStatus
             success        = CheckStatus(status);
+
             if (status == 0)
             {
                 if (!ReadAttributeValue(message, messageLen))
@@ -520,7 +529,6 @@ public:
                 }
             }
         }
-
         return success;
     }
 };
@@ -544,13 +552,14 @@ public:
             CHECK_MESSAGE_LENGTH(1);
             uint8_t status = chip::Encoding::Read8(message); // zclStatus
             success        = CheckStatus(status);
+
             if (status != 0)
             {
                 CHECK_MESSAGE_LENGTH(2);
-                ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
+                uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
+                ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", attributeId);
             }
         }
-
         return success;
     }
 };
@@ -572,13 +581,113 @@ public:
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(2);
-            ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
+            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
+            ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", attributeId);
+
             if (!ReadAttributeValue(message, messageLen))
             {
                 return false;
             }
         }
+        return success;
+    }
+};
 
+/*
+ * Command ConfigureReportingResponse
+ */
+class ConfigureReportingResponse : public ModelCommandResponse
+{
+public:
+    ConfigureReportingResponse() : ModelCommandResponse(0x07) {}
+
+    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
+    {
+        bool success = true;
+        ChipLogProgress(chipTool, "ConfigureReportingResponse (0x07):");
+
+        // struct configureReportingResponseRecord[]
+        while (messageLen)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            uint8_t status = chip::Encoding::Read8(message); // zclStatus
+            success        = CheckStatus(status);
+
+            if (status != 0)
+            {
+                CHECK_MESSAGE_LENGTH(1);
+                uint8_t direction = chip::Encoding::Read8(message); // reportingRole
+                ChipLogProgress(chipTool, "  %s: 0x%02x", "direction", direction);
+            }
+
+            if (status != 0)
+            {
+                CHECK_MESSAGE_LENGTH(2);
+                uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
+                ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", attributeId);
+            }
+        }
+        return success;
+    }
+};
+
+/*
+ * Command ReadReportingConfigurationResponse
+ */
+class ReadReportingConfigurationResponse : public ModelCommandResponse
+{
+public:
+    ReadReportingConfigurationResponse() : ModelCommandResponse(0x09) {}
+
+    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
+    {
+        bool success = true;
+        ChipLogProgress(chipTool, "ReadReportingConfigurationResponse (0x09):");
+
+        // struct readReportingConfigurationResponseRecord[]
+        while (messageLen)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            uint8_t direction = chip::Encoding::Read8(message); // reportingRole
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "direction", direction);
+
+            CHECK_MESSAGE_LENGTH(2);
+            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
+            ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", attributeId);
+
+            if (direction == 0)
+            {
+                CHECK_MESSAGE_LENGTH(1);
+                uint8_t attributeType = chip::Encoding::Read8(message); // zclType
+                ChipLogProgress(chipTool, "  %s: 0x%02x", "attributeType", attributeType);
+            }
+
+            if (direction == 0)
+            {
+                CHECK_MESSAGE_LENGTH(2);
+                uint16_t minimumReportingInterval = chip::Encoding::LittleEndian::Read16(message); // uint16
+                ChipLogProgress(chipTool, "  %s: 0x%04x", "minimumReportingInterval", minimumReportingInterval);
+            }
+
+            if (direction == 0)
+            {
+                CHECK_MESSAGE_LENGTH(2);
+                uint16_t maximumReportingInterval = chip::Encoding::LittleEndian::Read16(message); // uint16
+                ChipLogProgress(chipTool, "  %s: 0x%04x", "maximumReportingInterval", maximumReportingInterval);
+            }
+
+            if (direction == 0)
+            {
+                // FIXME: unk is not supported yet.
+            }
+
+            if (direction == 1)
+            {
+                CHECK_MESSAGE_LENGTH(2);
+                uint16_t timeout = chip::Encoding::LittleEndian::Read16(message); // uint16
+                ChipLogProgress(chipTool, "  %s: 0x%04x", "timeout", timeout);
+            }
+        }
         return success;
     }
 };
@@ -597,7 +706,9 @@ public:
         ChipLogProgress(chipTool, "DefaultResponse (0x0B):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "commandId", chip::Encoding::Read8(message)); // uint8
+        uint8_t commandId = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "commandId", commandId);
+
         CHECK_MESSAGE_LENGTH(1);
         uint8_t status = chip::Encoding::Read8(message); // zclStatus
         success        = CheckStatus(status);
@@ -620,16 +731,146 @@ public:
         ChipLogProgress(chipTool, "DiscoverAttributesResponse (0x0D):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "discoveryComplete", chip::Encoding::Read8(message)); // bool
+        bool discoveryComplete = chip::Encoding::Read8(message); // bool
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "discoveryComplete", discoveryComplete);
+
         // struct discoverAttributesResponseRecord[]
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(2);
-            ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", chip::Encoding::LittleEndian::Read16(message)); // attribId
-            CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "attributeType", chip::Encoding::Read8(message)); // zclType
-        }
+            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
+            ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", attributeId);
 
+            CHECK_MESSAGE_LENGTH(1);
+            uint8_t attributeType = chip::Encoding::Read8(message); // zclType
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "attributeType", attributeType);
+        }
+        return success;
+    }
+};
+
+/*
+ * Command WriteAttributesStructuredResponse
+ */
+class WriteAttributesStructuredResponse : public ModelCommandResponse
+{
+public:
+    WriteAttributesStructuredResponse() : ModelCommandResponse(0x10) {}
+
+    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
+    {
+        bool success = true;
+        ChipLogProgress(chipTool, "WriteAttributesStructuredResponse (0x10):");
+
+        // struct writeStructuredResponseRecord[]
+        while (messageLen)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            uint8_t status = chip::Encoding::Read8(message); // zclStatus
+            success        = CheckStatus(status);
+
+            if (status != 0)
+            {
+                CHECK_MESSAGE_LENGTH(2);
+                uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
+                ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", attributeId);
+            }
+
+            if (status != 0)
+            {
+                CHECK_MESSAGE_LENGTH(2);
+                uint16_t selector = chip::Encoding::LittleEndian::Read16(message); // uint16
+                ChipLogProgress(chipTool, "  %s: 0x%04x", "selector", selector);
+            }
+        }
+        return success;
+    }
+};
+
+/*
+ * Command DiscoverCommandsReceivedResponse
+ */
+class DiscoverCommandsReceivedResponse : public ModelCommandResponse
+{
+public:
+    DiscoverCommandsReceivedResponse() : ModelCommandResponse(0x12) {}
+
+    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
+    {
+        bool success = true;
+        ChipLogProgress(chipTool, "DiscoverCommandsReceivedResponse (0x12):");
+
+        CHECK_MESSAGE_LENGTH(1);
+        bool discoveryComplete = chip::Encoding::Read8(message); // bool
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "discoveryComplete", discoveryComplete);
+
+        // uint8_t uint8[]
+        while (messageLen)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            uint8_t commandId = chip::Encoding::Read8(message); // uint8
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "commandId", commandId);
+        }
+        return success;
+    }
+};
+
+/*
+ * Command DiscoverCommandsGeneratedResponse
+ */
+class DiscoverCommandsGeneratedResponse : public ModelCommandResponse
+{
+public:
+    DiscoverCommandsGeneratedResponse() : ModelCommandResponse(0x14) {}
+
+    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
+    {
+        bool success = true;
+        ChipLogProgress(chipTool, "DiscoverCommandsGeneratedResponse (0x14):");
+
+        CHECK_MESSAGE_LENGTH(1);
+        bool discoveryComplete = chip::Encoding::Read8(message); // bool
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "discoveryComplete", discoveryComplete);
+
+        // uint8_t uint8[]
+        while (messageLen)
+        {
+            CHECK_MESSAGE_LENGTH(1);
+            uint8_t commandId = chip::Encoding::Read8(message); // uint8
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "commandId", commandId);
+        }
+        return success;
+    }
+};
+
+/*
+ * Command DiscoverAttributesExtendedResponse
+ */
+class DiscoverAttributesExtendedResponse : public ModelCommandResponse
+{
+public:
+    DiscoverAttributesExtendedResponse() : ModelCommandResponse(0x16) {}
+
+    bool HandleResponse(uint8_t * message, uint16_t messageLen) const override
+    {
+        bool success = true;
+        ChipLogProgress(chipTool, "DiscoverAttributesExtendedResponse (0x16):");
+
+        CHECK_MESSAGE_LENGTH(1);
+        bool discoveryComplete = chip::Encoding::Read8(message); // bool
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "discoveryComplete", discoveryComplete);
+
+        // struct discoverAttributesExtendedResponseRecord[]
+        while (messageLen)
+        {
+            CHECK_MESSAGE_LENGTH(2);
+            uint16_t attributeId = chip::Encoding::LittleEndian::Read16(message); // attribId
+            ChipLogProgress(chipTool, "  %s: 0x%04x", "attributeId", attributeId);
+
+            CHECK_MESSAGE_LENGTH(1);
+            uint8_t accessControl = chip::Encoding::Read8(message); // bitmap8
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "accessControl", accessControl);
+        }
         return success;
     }
 };
@@ -774,6 +1015,35 @@ public:
     }
 };
 
+class ReportBarrierControlMovingState : public ModelCommand
+{
+public:
+    ReportBarrierControlMovingState() : ModelCommand("report", kBarrierControlClusterId, 0x06)
+    {
+        AddArgument("attr-name", "moving-state");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeBarrierControlClusterReportMovingStateAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
+                                                                     mMaxInterval);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+};
+
 /*
  * Attribute SafetyStatus
  */
@@ -797,6 +1067,35 @@ public:
         ReadAttributesResponse response;
         return response.HandleCommandResponse(commandId, message, messageLen);
     }
+};
+
+class ReportBarrierControlSafetyStatus : public ModelCommand
+{
+public:
+    ReportBarrierControlSafetyStatus() : ModelCommand("report", kBarrierControlClusterId, 0x06)
+    {
+        AddArgument("attr-name", "safety-status");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeBarrierControlClusterReportSafetyStatusAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
+                                                                      mMaxInterval);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
 };
 
 /*
@@ -847,6 +1146,37 @@ public:
         ReadAttributesResponse response;
         return response.HandleCommandResponse(commandId, message, messageLen);
     }
+};
+
+class ReportBarrierControlBarrierPosition : public ModelCommand
+{
+public:
+    ReportBarrierControlBarrierPosition() : ModelCommand("report", kBarrierControlClusterId, 0x06)
+    {
+        AddArgument("attr-name", "barrier-position");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT8_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeBarrierControlClusterReportBarrierPositionAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
+                                                                         mMaxInterval, mChange);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint8_t mChange;
 };
 
 /*----------------------------------------------------------------------------*\
@@ -1578,6 +1908,37 @@ public:
     }
 };
 
+class ReportColorControlCurrentHue : public ModelCommand
+{
+public:
+    ReportColorControlCurrentHue() : ModelCommand("report", kColorControlClusterId, 0x06)
+    {
+        AddArgument("attr-name", "current-hue");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT8_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeColorControlClusterReportCurrentHueAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
+                                                                  mMaxInterval, mChange);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint8_t mChange;
+};
+
 /*
  * Attribute CurrentSaturation
  */
@@ -1601,6 +1962,37 @@ public:
         ReadAttributesResponse response;
         return response.HandleCommandResponse(commandId, message, messageLen);
     }
+};
+
+class ReportColorControlCurrentSaturation : public ModelCommand
+{
+public:
+    ReportColorControlCurrentSaturation() : ModelCommand("report", kColorControlClusterId, 0x06)
+    {
+        AddArgument("attr-name", "current-saturation");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT8_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeColorControlClusterReportCurrentSaturationAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
+                                                                         mMaxInterval, mChange);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint8_t mChange;
 };
 
 /*
@@ -1653,6 +2045,37 @@ public:
     }
 };
 
+class ReportColorControlCurrentX : public ModelCommand
+{
+public:
+    ReportColorControlCurrentX() : ModelCommand("report", kColorControlClusterId, 0x06)
+    {
+        AddArgument("attr-name", "current-x");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeColorControlClusterReportCurrentXAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval, mMaxInterval,
+                                                                mChange);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint16_t mChange;
+};
+
 /*
  * Attribute CurrentY
  */
@@ -1678,6 +2101,37 @@ public:
     }
 };
 
+class ReportColorControlCurrentY : public ModelCommand
+{
+public:
+    ReportColorControlCurrentY() : ModelCommand("report", kColorControlClusterId, 0x06)
+    {
+        AddArgument("attr-name", "current-y");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeColorControlClusterReportCurrentYAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval, mMaxInterval,
+                                                                mChange);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint16_t mChange;
+};
+
 /*
  * Attribute ColorTemperatureMireds
  */
@@ -1701,6 +2155,37 @@ public:
         ReadAttributesResponse response;
         return response.HandleCommandResponse(commandId, message, messageLen);
     }
+};
+
+class ReportColorControlColorTemperatureMireds : public ModelCommand
+{
+public:
+    ReportColorControlColorTemperatureMireds() : ModelCommand("report", kColorControlClusterId, 0x06)
+    {
+        AddArgument("attr-name", "color-temperature-mireds");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeColorControlClusterReportColorTemperatureMiredsAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
+                                                                              mMaxInterval, mChange);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint16_t mChange;
 };
 
 /*
@@ -2653,7 +3138,8 @@ public:
         ChipLogProgress(chipTool, "ClearAllPINCodesResponse (0x08):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -2673,7 +3159,8 @@ public:
         ChipLogProgress(chipTool, "ClearAllRFIDCodesResponse (0x19):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -2693,7 +3180,8 @@ public:
         ChipLogProgress(chipTool, "ClearHolidayScheduleResponse (0x13):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -2713,7 +3201,8 @@ public:
         ChipLogProgress(chipTool, "ClearPINCodeResponse (0x07):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -2733,7 +3222,8 @@ public:
         ChipLogProgress(chipTool, "ClearRFIDCodeResponse (0x18):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -2753,7 +3243,8 @@ public:
         ChipLogProgress(chipTool, "ClearWeekdayScheduleResponse (0x0D):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -2773,7 +3264,8 @@ public:
         ChipLogProgress(chipTool, "ClearYearDayScheduleResponse (0x10):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -2793,24 +3285,32 @@ public:
         ChipLogProgress(chipTool, "GetHolidayScheduleResponse (0x12):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "holidayScheduleId", chip::Encoding::Read8(message)); // uint8
+        uint8_t holidayScheduleId = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "holidayScheduleId", holidayScheduleId);
+
         CHECK_MESSAGE_LENGTH(1);
         uint8_t status = chip::Encoding::Read8(message); // zclStatus
         success        = CheckStatus(status);
+
         if (status == 0)
         {
             CHECK_MESSAGE_LENGTH(4);
-            ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+            uint32_t localStartTime = chip::Encoding::LittleEndian::Read32(message); // uint32
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", localStartTime);
         }
+
         if (status == 0)
         {
             CHECK_MESSAGE_LENGTH(4);
-            ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+            uint32_t localEndTime = chip::Encoding::LittleEndian::Read32(message); // uint32
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", localEndTime);
         }
+
         if (status == 0)
         {
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "operatingModeDuringHoliday", chip::Encoding::Read8(message)); // DrlkOperMode
+            uint8_t operatingModeDuringHoliday = chip::Encoding::Read8(message); // DrlkOperMode
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "operatingModeDuringHoliday", operatingModeDuringHoliday);
         }
 
         return success;
@@ -2831,11 +3331,17 @@ public:
         ChipLogProgress(chipTool, "GetPINCodeResponse (0x06):");
 
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        uint16_t userId = chip::Encoding::LittleEndian::Read16(message); // uint16
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", userId);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "userStatus", chip::Encoding::Read8(message)); // DrlkUserStatus
+        uint8_t userStatus = chip::Encoding::Read8(message); // DrlkUserStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "userStatus", userStatus);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message)); // DrlkUserType
+        uint8_t userType = chip::Encoding::Read8(message); // DrlkUserType
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", userType);
+
         CHECK_MESSAGE_LENGTH(1);
         {
             uint8_t codeLen = chip::Encoding::Read8(message);              // octstr
@@ -2865,11 +3371,17 @@ public:
         ChipLogProgress(chipTool, "GetRFIDCodeResponse (0x17):");
 
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        uint16_t userId = chip::Encoding::LittleEndian::Read16(message); // uint16
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", userId);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "userStatus", chip::Encoding::Read8(message)); // DrlkUserStatus
+        uint8_t userStatus = chip::Encoding::Read8(message); // DrlkUserStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "userStatus", userStatus);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message)); // DrlkUserType
+        uint8_t userType = chip::Encoding::Read8(message); // DrlkUserType
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", userType);
+
         CHECK_MESSAGE_LENGTH(1);
         {
             uint8_t rFIdCodeLen = chip::Encoding::Read8(message);                  // octstr
@@ -2899,9 +3411,12 @@ public:
         ChipLogProgress(chipTool, "GetUserTypeResponse (0x15):");
 
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        uint16_t userId = chip::Encoding::LittleEndian::Read16(message); // uint16
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", userId);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", chip::Encoding::Read8(message)); // DrlkUserType
+        uint8_t userType = chip::Encoding::Read8(message); // DrlkUserType
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "userType", userType);
 
         return success;
     }
@@ -2921,36 +3436,50 @@ public:
         ChipLogProgress(chipTool, "GetWeekdayScheduleResponse (0x0C):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", chip::Encoding::Read8(message)); // uint8
+        uint8_t scheduleId = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", scheduleId);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        uint16_t userId = chip::Encoding::LittleEndian::Read16(message); // uint16
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", userId);
+
         CHECK_MESSAGE_LENGTH(1);
         uint8_t status = chip::Encoding::Read8(message); // zclStatus
         success        = CheckStatus(status);
+
         if (status == 0)
         {
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "daysMask", chip::Encoding::Read8(message)); // DrlkDaysMask
+            uint8_t daysMask = chip::Encoding::Read8(message); // DrlkDaysMask
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "daysMask", daysMask);
         }
+
         if (status == 0)
         {
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "startHour", chip::Encoding::Read8(message)); // uint8
+            uint8_t startHour = chip::Encoding::Read8(message); // uint8
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "startHour", startHour);
         }
+
         if (status == 0)
         {
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "startMinute", chip::Encoding::Read8(message)); // uint8
+            uint8_t startMinute = chip::Encoding::Read8(message); // uint8
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "startMinute", startMinute);
         }
+
         if (status == 0)
         {
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "endHour", chip::Encoding::Read8(message)); // uint8
+            uint8_t endHour = chip::Encoding::Read8(message); // uint8
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "endHour", endHour);
         }
+
         if (status == 0)
         {
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "endMinute", chip::Encoding::Read8(message)); // uint8
+            uint8_t endMinute = chip::Encoding::Read8(message); // uint8
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "endMinute", endMinute);
         }
 
         return success;
@@ -2971,21 +3500,29 @@ public:
         ChipLogProgress(chipTool, "GetYearDayScheduleResponse (0x0F):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", chip::Encoding::Read8(message)); // uint8
+        uint8_t scheduleId = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "scheduleId", scheduleId);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        uint16_t userId = chip::Encoding::LittleEndian::Read16(message); // uint16
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "userId", userId);
+
         CHECK_MESSAGE_LENGTH(1);
         uint8_t status = chip::Encoding::Read8(message); // zclStatus
         success        = CheckStatus(status);
+
         if (status == 0)
         {
             CHECK_MESSAGE_LENGTH(4);
-            ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+            uint32_t localStartTime = chip::Encoding::LittleEndian::Read32(message); // uint32
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localStartTime", localStartTime);
         }
+
         if (status == 0)
         {
             CHECK_MESSAGE_LENGTH(4);
-            ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", chip::Encoding::LittleEndian::Read32(message)); // uint32
+            uint32_t localEndTime = chip::Encoding::LittleEndian::Read32(message); // uint32
+            ChipLogProgress(chipTool, "  %s: 0x%08x", "localEndTime", localEndTime);
         }
 
         return success;
@@ -3027,7 +3564,8 @@ public:
         ChipLogProgress(chipTool, "SetHolidayScheduleResponse (0x11):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -3047,7 +3585,8 @@ public:
         ChipLogProgress(chipTool, "SetPINCodeResponse (0x05):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkSetCodeStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkSetCodeStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -3067,7 +3606,8 @@ public:
         ChipLogProgress(chipTool, "SetRFIDCodeResponse (0x16):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkSetCodeStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkSetCodeStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -3087,7 +3627,8 @@ public:
         ChipLogProgress(chipTool, "SetUserTypeResponse (0x14):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -3107,7 +3648,8 @@ public:
         ChipLogProgress(chipTool, "SetWeekdayScheduleResponse (0x0B):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -3127,7 +3669,8 @@ public:
         ChipLogProgress(chipTool, "SetYearDayScheduleResponse (0x0E):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // DrlkPassFailStatus
+        uint8_t status = chip::Encoding::Read8(message); // DrlkPassFailStatus
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
 
         return success;
     }
@@ -4031,6 +4574,34 @@ public:
     }
 };
 
+class ReportDoorLockLockState : public ModelCommand
+{
+public:
+    ReportDoorLockLockState() : ModelCommand("report", kDoorLockClusterId, 0x06)
+    {
+        AddArgument("attr-name", "lock-state");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeDoorLockClusterReportLockStateAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval, mMaxInterval);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+};
+
 /*
  * Attribute LockType
  */
@@ -4117,9 +4688,12 @@ public:
         ChipLogProgress(chipTool, "AddGroupResponse (0x00):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
+        uint8_t status = chip::Encoding::Read8(message); // enum8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        uint16_t groupId = chip::Encoding::LittleEndian::Read16(message); // uint16
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", groupId);
 
         return success;
     }
@@ -4139,14 +4713,19 @@ public:
         ChipLogProgress(chipTool, "GetGroupMembershipResponse (0x02):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message)); // uint8
+        uint8_t capacity = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", capacity);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "groupCount", chip::Encoding::Read8(message)); // uint8
+        uint8_t groupCount = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "groupCount", groupCount);
+
         // uint16_t uint16[]
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(2);
-            ChipLogProgress(chipTool, "  %s: 0x%04x", "groupList", chip::Encoding::LittleEndian::Read16(message)); // uint16
+            uint16_t groupList = chip::Encoding::LittleEndian::Read16(message); // uint16
+            ChipLogProgress(chipTool, "  %s: 0x%04x", "groupList", groupList);
         }
 
         return success;
@@ -4167,9 +4746,12 @@ public:
         ChipLogProgress(chipTool, "RemoveGroupResponse (0x03):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
+        uint8_t status = chip::Encoding::Read8(message); // enum8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        uint16_t groupId = chip::Encoding::LittleEndian::Read16(message); // uint16
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", groupId);
 
         return success;
     }
@@ -4189,9 +4771,13 @@ public:
         ChipLogProgress(chipTool, "ViewGroupResponse (0x01):");
 
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", chip::Encoding::Read8(message)); // enum8
+        uint8_t status = chip::Encoding::Read8(message); // enum8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "status", status);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        uint16_t groupId = chip::Encoding::LittleEndian::Read16(message); // uint16
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", groupId);
+
         CHECK_MESSAGE_LENGTH(1);
         {
             uint8_t groupNameLen = chip::Encoding::Read8(message);                   // string
@@ -4667,7 +5253,8 @@ public:
         ChipLogProgress(chipTool, "IdentifyQueryResponse (0x00):");
 
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "timeout", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        uint16_t timeout = chip::Encoding::LittleEndian::Read16(message); // uint16
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "timeout", timeout);
 
         return success;
     }
@@ -5141,6 +5728,37 @@ public:
     }
 };
 
+class ReportLevelCurrentLevel : public ModelCommand
+{
+public:
+    ReportLevelCurrentLevel() : ModelCommand("report", kLevelClusterId, 0x06)
+    {
+        AddArgument("attr-name", "current-level");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", 0, UINT8_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeLevelClusterReportCurrentLevelAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval, mMaxInterval,
+                                                             mChange);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    uint8_t mChange;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster OnOff                                                       | 0x0006 |
 |------------------------------------------------------------------------------|
@@ -5265,6 +5883,34 @@ public:
     }
 };
 
+class ReportOnOffOnOff : public ModelCommand
+{
+public:
+    ReportOnOffOnOff() : ModelCommand("report", kOnOffClusterId, 0x06)
+    {
+        AddArgument("attr-name", "on-off");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeOnOffClusterReportOnOffAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval, mMaxInterval);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+};
+
 /*----------------------------------------------------------------------------*\
 | Cluster Scenes                                                      | 0x0005 |
 |------------------------------------------------------------------------------|
@@ -5310,10 +5956,14 @@ public:
         CHECK_MESSAGE_LENGTH(1);
         uint8_t status = chip::Encoding::Read8(message); // zclStatus
         success        = CheckStatus(status);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
+        uint16_t groupId = chip::Encoding::LittleEndian::Read16(message); // SGroupId
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", groupId);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
+        uint8_t sceneId = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", sceneId);
 
         return success;
     }
@@ -5335,15 +5985,21 @@ public:
         CHECK_MESSAGE_LENGTH(1);
         uint8_t status = chip::Encoding::Read8(message); // zclStatus
         success        = CheckStatus(status);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", chip::Encoding::Read8(message)); // uint8
+        uint8_t capacity = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "capacity", capacity);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
+        uint16_t groupId = chip::Encoding::LittleEndian::Read16(message); // SGroupId
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", groupId);
+
         // uint8_t uint8[]
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(1);
-            ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneList", chip::Encoding::Read8(message)); // uint8
+            uint8_t sceneList = chip::Encoding::Read8(message); // uint8
+            ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneList", sceneList);
         }
 
         return success;
@@ -5366,8 +6022,10 @@ public:
         CHECK_MESSAGE_LENGTH(1);
         uint8_t status = chip::Encoding::Read8(message); // zclStatus
         success        = CheckStatus(status);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
+        uint16_t groupId = chip::Encoding::LittleEndian::Read16(message); // SGroupId
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", groupId);
 
         return success;
     }
@@ -5389,10 +6047,14 @@ public:
         CHECK_MESSAGE_LENGTH(1);
         uint8_t status = chip::Encoding::Read8(message); // zclStatus
         success        = CheckStatus(status);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
+        uint16_t groupId = chip::Encoding::LittleEndian::Read16(message); // SGroupId
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", groupId);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
+        uint8_t sceneId = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", sceneId);
 
         return success;
     }
@@ -5414,10 +6076,14 @@ public:
         CHECK_MESSAGE_LENGTH(1);
         uint8_t status = chip::Encoding::Read8(message); // zclStatus
         success        = CheckStatus(status);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
+        uint16_t groupId = chip::Encoding::LittleEndian::Read16(message); // SGroupId
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", groupId);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
+        uint8_t sceneId = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", sceneId);
 
         return success;
     }
@@ -5439,12 +6105,19 @@ public:
         CHECK_MESSAGE_LENGTH(1);
         uint8_t status = chip::Encoding::Read8(message); // zclStatus
         success        = CheckStatus(status);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", chip::Encoding::LittleEndian::Read16(message)); // SGroupId
+        uint16_t groupId = chip::Encoding::LittleEndian::Read16(message); // SGroupId
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "groupId", groupId);
+
         CHECK_MESSAGE_LENGTH(1);
-        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", chip::Encoding::Read8(message)); // uint8
+        uint8_t sceneId = chip::Encoding::Read8(message); // uint8
+        ChipLogProgress(chipTool, "  %s: 0x%02x", "sceneId", sceneId);
+
         CHECK_MESSAGE_LENGTH(2);
-        ChipLogProgress(chipTool, "  %s: 0x%04x", "transitionTime", chip::Encoding::LittleEndian::Read16(message)); // uint16
+        uint16_t transitionTime = chip::Encoding::LittleEndian::Read16(message); // uint16
+        ChipLogProgress(chipTool, "  %s: 0x%04x", "transitionTime", transitionTime);
+
         CHECK_MESSAGE_LENGTH(1);
         {
             uint8_t sceneNameLen = chip::Encoding::Read8(message);                   // SSceneName
@@ -5455,11 +6128,14 @@ public:
             CHECK_MESSAGE_LENGTH(sceneNameLen);
             message += sceneNameLen;
         }
+
         // struct SExtensionFieldSetList[]
         while (messageLen)
         {
             CHECK_MESSAGE_LENGTH(2);
-            ChipLogProgress(chipTool, "  %s: 0x%04x", "clusterId", chip::Encoding::LittleEndian::Read16(message)); // uint16
+            uint16_t clusterId = chip::Encoding::LittleEndian::Read16(message); // uint16
+            ChipLogProgress(chipTool, "  %s: 0x%04x", "clusterId", clusterId);
+
             CHECK_MESSAGE_LENGTH(1);
             {
                 uint8_t extensionFieldSetLen = chip::Encoding::Read8(message);                           // octstr
@@ -5946,6 +6622,37 @@ public:
     }
 };
 
+class ReportTemperatureMeasurementMeasuredValue : public ModelCommand
+{
+public:
+    ReportTemperatureMeasurementMeasuredValue() : ModelCommand("report", kTempMeasurementClusterId, 0x06)
+    {
+        AddArgument("attr-name", "measured-value");
+        AddArgument("min-interval", 0, UINT16_MAX, &mMinInterval);
+        AddArgument("max-interval", 0, UINT16_MAX, &mMaxInterval);
+        AddArgument("change", INT16_MIN, INT16_MAX, &mChange);
+        ModelCommand::AddArguments();
+    }
+
+    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    {
+        return encodeTemperatureMeasurementClusterReportMeasuredValueAttribute(buffer->Start(), bufferSize, endPointId,
+                                                                               mMinInterval, mMaxInterval, mChange);
+    }
+
+    // Global Response: ConfigureReportingResponse
+    bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const override
+    {
+        ConfigureReportingResponse response;
+        return response.HandleCommandResponse(commandId, message, messageLen);
+    }
+
+private:
+    uint16_t mMinInterval;
+    uint16_t mMaxInterval;
+    int16_t mChange;
+};
+
 /*
  * Attribute MinMeasuredValue
  */
@@ -6006,8 +6713,9 @@ void registerClusterBarrierControl(Commands & commands)
     commands_list clusterCommands = {
         make_unique<BarrierControlGoToPercent>(),         make_unique<BarrierControlStop>(),
         make_unique<DiscoverBarrierControlAttributes>(),  make_unique<ReadBarrierControlMovingState>(),
-        make_unique<ReadBarrierControlSafetyStatus>(),    make_unique<ReadBarrierControlCapabilities>(),
-        make_unique<ReadBarrierControlBarrierPosition>(),
+        make_unique<ReportBarrierControlMovingState>(),   make_unique<ReadBarrierControlSafetyStatus>(),
+        make_unique<ReportBarrierControlSafetyStatus>(),  make_unique<ReadBarrierControlCapabilities>(),
+        make_unique<ReadBarrierControlBarrierPosition>(), make_unique<ReportBarrierControlBarrierPosition>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -6048,11 +6756,16 @@ void registerClusterColorControl(Commands & commands)
         make_unique<ColorControlStopMoveStep>(),
         make_unique<DiscoverColorControlAttributes>(),
         make_unique<ReadColorControlCurrentHue>(),
+        make_unique<ReportColorControlCurrentHue>(),
         make_unique<ReadColorControlCurrentSaturation>(),
+        make_unique<ReportColorControlCurrentSaturation>(),
         make_unique<ReadColorControlRemainingTime>(),
         make_unique<ReadColorControlCurrentX>(),
+        make_unique<ReportColorControlCurrentX>(),
         make_unique<ReadColorControlCurrentY>(),
+        make_unique<ReportColorControlCurrentY>(),
         make_unique<ReadColorControlColorTemperatureMireds>(),
+        make_unique<ReportColorControlColorTemperatureMireds>(),
         make_unique<ReadColorControlColorMode>(),
         make_unique<ReadColorControlOptions>(),
         make_unique<WriteColorControlOptions>(),
@@ -6110,7 +6823,8 @@ void registerClusterDoorLock(Commands & commands)
         make_unique<DoorLockSetWeekdaySchedule>(),   make_unique<DoorLockSetYearDaySchedule>(),
         make_unique<DoorLockUnlockDoor>(),           make_unique<DoorLockUnlockWithTimeout>(),
         make_unique<DiscoverDoorLockAttributes>(),   make_unique<ReadDoorLockLockState>(),
-        make_unique<ReadDoorLockLockType>(),         make_unique<ReadDoorLockActuatorEnabled>(),
+        make_unique<ReportDoorLockLockState>(),      make_unique<ReadDoorLockLockType>(),
+        make_unique<ReadDoorLockActuatorEnabled>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -6171,6 +6885,7 @@ void registerClusterLevel(Commands & commands)
         make_unique<LevelStopWithOnOff>(),
         make_unique<DiscoverLevelAttributes>(),
         make_unique<ReadLevelCurrentLevel>(),
+        make_unique<ReportLevelCurrentLevel>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -6181,8 +6896,9 @@ void registerClusterOnOff(Commands & commands)
     const char * clusterName = "OnOff";
 
     commands_list clusterCommands = {
-        make_unique<OnOffOff>(),       make_unique<OnOffOn>(), make_unique<OnOffToggle>(), make_unique<DiscoverOnOffAttributes>(),
-        make_unique<ReadOnOffOnOff>(),
+        make_unique<OnOffOff>(),       make_unique<OnOffOn>(),
+        make_unique<OnOffToggle>(),    make_unique<DiscoverOnOffAttributes>(),
+        make_unique<ReadOnOffOnOff>(), make_unique<ReportOnOffOnOff>(),
     };
 
     commands.Register(clusterName, clusterCommands);
@@ -6208,9 +6924,8 @@ void registerClusterTempMeasurement(Commands & commands)
     const char * clusterName = "TemperatureMeasurement";
 
     commands_list clusterCommands = {
-        make_unique<DiscoverTemperatureMeasurementAttributes>(),
-        make_unique<ReadTemperatureMeasurementMeasuredValue>(),
-        make_unique<ReadTemperatureMeasurementMinMeasuredValue>(),
+        make_unique<DiscoverTemperatureMeasurementAttributes>(),   make_unique<ReadTemperatureMeasurementMeasuredValue>(),
+        make_unique<ReportTemperatureMeasurementMeasuredValue>(),  make_unique<ReadTemperatureMeasurementMinMeasuredValue>(),
         make_unique<ReadTemperatureMeasurementMaxMeasuredValue>(),
     };
 
