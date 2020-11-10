@@ -16,6 +16,7 @@
  */
 
 #include "Parser.h"
+#include <stdio.h>
 
 namespace mdns {
 namespace Minimal {
@@ -99,10 +100,11 @@ bool ResourceData::Parse(const BytesRange & validData, const uint8_t ** start)
 
     uint16_t dataLen = chip::Encoding::BigEndian::Read16(nameEnd); // resource data
 
-    if (!validData.Contains(nameEnd + dataLen))
+    if (!validData.Contains(nameEnd + dataLen - 1))
     {
         return false; // no space for RDATA
     }
+    mData = BytesRange(nameEnd, nameEnd + dataLen);
 
     mNameIterator = SerializedQNameIterator(validData, *start);
 

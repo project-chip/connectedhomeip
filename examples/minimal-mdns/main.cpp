@@ -108,9 +108,10 @@ public:
     void Resource(ResourceType type, const mdns::Minimal::ResourceData & data) override
     {
         printf("       RESOURCE %d\n", static_cast<int>(type));
-        printf("          Type:  %s\n", ToString(data.GetType()));
-        printf("          Class: %d\n", static_cast<int>(data.GetClass()));
-        printf("          TTL:   %ld\n", static_cast<long>(data.GetTtlSeconds()));
+        printf("          Type:      %s\n", ToString(data.GetType()));
+        printf("          Class:     %d\n", static_cast<int>(data.GetClass()));
+        printf("          TTL:       %ld\n", static_cast<long>(data.GetTtlSeconds()));
+        printf("          Data size: %ld\n", static_cast<long>(data.GetData().Size()));
         printf("          NAME:  ");
         mdns::Minimal::SerializedQNameIterator it = data.GetName();
         while (it.Next())

@@ -67,6 +67,7 @@ public:
     QClass GetClass() const { return mClass; }
     uint64_t GetTtlSeconds() const { return mTtl; }
     SerializedQNameIterator GetName() const { return mNameIterator; }
+    const BytesRange & GetData() const { return mData; }
 
     /// Parses a resource data structure
     ///
@@ -81,6 +82,7 @@ private:
     QType mType   = QType::ANY;
     QClass mClass = QClass::ANY;
     uint64_t mTtl = 0;
+    BytesRange mData;
 };
 
 class ParserDelegate
