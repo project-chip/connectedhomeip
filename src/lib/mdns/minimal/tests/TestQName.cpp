@@ -77,8 +77,45 @@ void IteratorTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, !it.Next());
         NL_TEST_ASSERT(inSuite, it.ValidData());
     }
+}
 
-    // FIXME: Implement
+void ErrorTest(nlTestSuite * inSuite, void * inContext)
+{
+    {
+        // Truncated before the end
+        static const uint8_t kData[] = "\04test";
+        SerializedQNameIterator it(kData, kData + 5, kData);
+
+        NL_TEST_ASSERT(inSuite, !it.Next());
+        NL_TEST_ASSERT(inSuite, !it.ValidData());
+    }
+
+    {
+        // Truncated before the end
+        static const uint8_t kData[] = "\02";
+        SerializedQNameIterator it(kData, kData + 1, kData);
+
+        NL_TEST_ASSERT(inSuite, !it.Next());
+        NL_TEST_ASSERT(inSuite, !it.ValidData());
+    }
+
+    {
+        // Truncated before the end
+        static const uint8_t kData[] = "\xc0";
+        SerializedQNameIterator it(kData, kData + 1, kData);
+
+        NL_TEST_ASSERT(inSuite, !it.Next());
+        NL_TEST_ASSERT(inSuite, !it.ValidData());
+    }
+
+    {
+        // Truncated before the end (but seemingly valid in case of error)
+        static const uint8_t kData[] = "\00\xc0\x00";
+        SerializedQNameIterator it(kData, kData + 2, kData + 1);
+
+        NL_TEST_ASSERT(inSuite, !it.Next());
+        NL_TEST_ASSERT(inSuite, !it.ValidData());
+    }
 }
 
 } // namespace
@@ -87,6 +124,7 @@ void IteratorTest(nlTestSuite * inSuite, void * inContext)
 static const nlTest sTests[] =
 {
     NL_TEST_DEF("IteratorTest", IteratorTest),
+    NL_TEST_DEF("ErrorTest", ErrorTest),
 
     NL_TEST_SENTINEL()
 };

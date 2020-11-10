@@ -81,6 +81,8 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
 
             if (mCurrentPosition + 1 + length >= mValidDataEnd)
             {
+                // string outside valid data
+                mValidData = false;
                 return false;
             }
 
