@@ -112,18 +112,6 @@ void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpointId)
         cb->PluginBasicResetToFactoryDefaultsCallback(endpointId);
     }
 }
-
-bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
-{
-    CHIPDeviceManagerCallbacks * cb = CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
-    if (cb != nullptr)
-    {
-        return cb->PluginDoorLockActivateDoorLockCallback(activate);
-    }
-
-    return false;
-}
-
 } // extern "C"
 
 } // namespace DeviceManager

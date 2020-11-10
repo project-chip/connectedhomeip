@@ -774,3 +774,8 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(uint16_t timeoutS, uint8_t 
 
     return true;
 }
+
+bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
+{
+    return true;
+}
