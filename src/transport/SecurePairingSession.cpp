@@ -109,7 +109,6 @@ CHIP_ERROR SecurePairingSession::Serializable(SecurePairingSessionSerializable &
     VerifyOrExit(CanCastTo<uint16_t>(mKeLen), error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(CanCastTo<uint64_t>(localNodeId), error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(CanCastTo<uint64_t>(peerNodeId), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<uint16_t>(sizeof(SecurePairingSessionSerializable)), error = CHIP_ERROR_INTERNAL);
 
     memset(&serializable, 0, sizeof(serializable));
     serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
