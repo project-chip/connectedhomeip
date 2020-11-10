@@ -1652,31 +1652,6 @@ void halRadioPowerUpHandler(void) {}
  */
 void halSleepCallback(bool enter, SleepModes sleepMode) {}
 
-/** @brief Identify Cluster Start Feedback Callback
- *
- *
- *
- * @param endpoint Endpoint id
- * @param identifyTime Identify time
- */
-bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime)
-{
-    emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Start identify callback on endpoint %d time %d", endpoint, identifyTime);
-    return false;
-}
-
-/** @brief Identify Cluster Stop Feedback Callback
- *
- *
- *
- * @param endpoint Endpoint id
- */
-bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
-{
-    emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Stop identify callback on endpoint %d", endpoint);
-    return false;
-}
-
 /** @brief Compute Pwm from HSV
  *
  * This function is called from the color server when it is time for the PWMs to
