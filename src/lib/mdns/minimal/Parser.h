@@ -31,10 +31,8 @@ public:
     QueryData(const QueryData &) = default;
     QueryData & operator=(const QueryData &) = default;
 
-    QueryData(QType type, QClass klass, bool unicast, const uint8_t * nameStart, const uint8_t * dataStart,
-              const uint8_t * dataEnd) :
-        mType(type),
-        mClass(klass), mAnswerViaUnicast(unicast), mNameIterator(dataStart, dataEnd, nameStart)
+    QueryData(QType type, QClass klass, bool unicast, const uint8_t * nameStart, const BytesRange & validData) :
+        mType(type), mClass(klass), mAnswerViaUnicast(unicast), mNameIterator(validData, nameStart)
     {}
 
     QType GetType() const { return mType; }
@@ -45,11 +43,10 @@ public:
 
     /// Parses a query structure
     ///
-    /// Valid data packet is assumed between [dataStart] and [dataEnd]
     /// Parses the query at [start] and updates start to the end of the structure.
     ///
     /// returns true on parse success, false on failure.
-    bool Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start);
+    bool Parse(const BytesRange & validData, const uint8_t ** start);
 
 private:
     QType mType            = QType::ANY;
@@ -66,19 +63,24 @@ public:
     ResourceData(const ResourceData &) = default;
     ResourceData & operator=(const ResourceData &) = default;
 
+    QType GetType() const { return mType; }
+    QClass GetClass() const { return mClass; }
+    uint64_t GetTtlSeconds() const { return mTtl; }
     SerializedQNameIterator GetName() const { return mNameIterator; }
 
     /// Parses a resource data structure
     ///
-    /// Valid data packet is assumed between [dataStart] and [dataEnd]
     /// Parses the daata at [start] and updates start to the end of the structure.
     /// Updates [out] with the parsed data on success.
     ///
     /// returns true on parse success, false on failure.
-    bool Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start);
+    bool Parse(const BytesRange & validData, const uint8_t ** start);
 
 private:
     SerializedQNameIterator mNameIterator;
+    QType mType   = QType::ANY;
+    QClass mClass = QClass::ANY;
+    uint64_t mTtl = 0;
 };
 
 class ParserDelegate
@@ -104,7 +106,7 @@ public:
 /// Calls appropriate delegate callbacks while parsing
 ///
 /// returns true if packet was succesfully parsed, false otherwise
-bool ParsePacket(const uint8_t * packet, size_t length, ParserDelegate * delegate);
+bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate);
 
 // FIXME: implement
 

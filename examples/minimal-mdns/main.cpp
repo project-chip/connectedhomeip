@@ -41,6 +41,40 @@ constexpr size_t kMdnsMaxPacketSize = 1'024;
 
 const mdns::Minimal::QNamePart kCastQnames[] = { "_googlecast", "_tcp", "local" };
 
+const char * ToString(mdns::Minimal::QType t)
+{
+    static char buff[32];
+
+    switch (t)
+    {
+    case mdns::Minimal::QType::A:
+        return "A";
+    case mdns::Minimal::QType::NS:
+        return "NS";
+    case mdns::Minimal::QType::CNAME:
+        return "CNAME";
+    case mdns::Minimal::QType::SOA:
+        return "SOA";
+    case mdns::Minimal::QType::WKS:
+        return "WKS";
+    case mdns::Minimal::QType::PTR:
+        return "PTR";
+    case mdns::Minimal::QType::MX:
+        return "MX";
+    case mdns::Minimal::QType::SRV:
+        return "SRV";
+    case mdns::Minimal::QType::AAAA:
+        return "AAAA";
+    case mdns::Minimal::QType::ANY:
+        return "ANY";
+    case mdns::Minimal::QType::TXT:
+        return "TXT";
+    default:
+        sprintf(buff, "UNKNOWN (%d)!!", static_cast<int>(t));
+        return buff;
+    }
+}
+
 class PacketReporter : public mdns::Minimal::ParserDelegate
 {
 public:
@@ -54,7 +88,7 @@ public:
 
     void Query(const mdns::Minimal::QueryData & data) override
     {
-        printf("       QUERY TYPE:  %d\n", static_cast<int>(data.GetType()));
+        printf("       QUERY TYPE:  %s\n", ToString(data.GetType()));
         printf("       QUERY CLASS: %d\n", static_cast<int>(data.GetClass()));
         printf("       UNICAST:     %s\n", data.GetUnicastAnswer() ? "true" : "false");
         printf("       QUERY FOR:   ");
@@ -64,7 +98,7 @@ public:
         {
             printf("%s.", it.Value());
         }
-        if (!it.ValidData())
+        if (!it.IsValid())
         {
             printf("   (INVALID!)");
         }
@@ -73,14 +107,17 @@ public:
 
     void Resource(ResourceType type, const mdns::Minimal::ResourceData & data) override
     {
-        printf("       RESOURCE %d", static_cast<int>(type));
-        printf("          NAME: ");
+        printf("       RESOURCE %d\n", static_cast<int>(type));
+        printf("          Type:  %s\n", ToString(data.GetType()));
+        printf("          Class: %d\n", static_cast<int>(data.GetClass()));
+        printf("          TTL:   %ld\n", static_cast<long>(data.GetTtlSeconds()));
+        printf("          NAME:  ");
         mdns::Minimal::SerializedQNameIterator it = data.GetName();
         while (it.Next())
         {
             printf("%s.", it.Value());
         }
-        if (!it.ValidData())
+        if (!it.IsValid())
         {
             printf("   (INVALID!)");
         }
@@ -136,7 +173,7 @@ void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::P
     printf("Packet received from: %-15s on port %d\n", addr, info->SrcPort);
 
     PacketReporter reporter;
-    if (!mdns::Minimal::ParsePacket(buffer->Start(), buffer->DataLength(), &reporter))
+    if (!mdns::Minimal::ParsePacket(mdns::Minimal::BytesRange(buffer->Start(), buffer->Start() + buffer->DataLength()), &reporter))
     {
         printf("INVALID PACKET!!!!!!\n");
     }

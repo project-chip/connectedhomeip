@@ -20,16 +20,21 @@
 namespace mdns {
 namespace Minimal {
 
-bool QueryData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start)
+bool QueryData::Parse(const BytesRange & validData, const uint8_t ** start)
 {
     // Structure is:
     //    QNAME
     //    TYPE
     //    CLASS (plus a flag for unicast)
-    const uint8_t * nameEnd = nullptr;
 
+    if (!validData.Contains(*start))
     {
-        SerializedQNameIterator it(dataStart, dataEnd, *start);
+        return false;
+    }
+
+    const uint8_t * nameEnd = nullptr;
+    {
+        SerializedQNameIterator it(validData, *start);
         nameEnd = it.FindDataEnd();
     }
     if (nameEnd == nullptr)
@@ -37,7 +42,7 @@ bool QueryData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const 
         return false;
     }
 
-    if (dataEnd - nameEnd < 4)
+    if (!validData.Contains(nameEnd + 4))
     {
         return false;
     }
@@ -50,14 +55,14 @@ bool QueryData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const 
 
     mAnswerViaUnicast = (klass & Query::kUnicastAnswerFlag) != 0;
     mClass            = static_cast<QClass>(klass & ~Query::kUnicastAnswerFlag);
-    mNameIterator     = SerializedQNameIterator(dataStart, dataEnd, *start);
+    mNameIterator     = SerializedQNameIterator(validData, *start);
 
     *start = nameEnd;
 
     return true;
 }
 
-bool ResourceData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start)
+bool ResourceData::Parse(const BytesRange & validData, const uint8_t ** start)
 {
     // Structure is:
     //    QNAME
@@ -66,10 +71,15 @@ bool ResourceData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, con
     //    TTL       (32 bit)
     //    RDLENGTH  (16 bit)
     //    <DATA>    (RDLENGTH bytpes)
+    if (!validData.Contains(*start))
+    {
+        return false;
+    }
+
     const uint8_t * nameEnd = nullptr;
 
     {
-        SerializedQNameIterator it(dataStart, dataEnd, *start);
+        SerializedQNameIterator it(validData, *start);
         nameEnd = it.FindDataEnd();
     }
     if (nameEnd == nullptr)
@@ -78,37 +88,38 @@ bool ResourceData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, con
     }
 
     // need 3*u16 + u32
-    if (dataEnd - nameEnd < 10)
+    if (!validData.Contains(nameEnd + 10))
     {
         return false;
     }
 
-    chip::Encoding::BigEndian::Read16(nameEnd);                    // Type
-    chip::Encoding::BigEndian::Read16(nameEnd);                    // Class
-    chip::Encoding::BigEndian::Read32(nameEnd);                    // TTL
+    mType  = static_cast<QType>(chip::Encoding::BigEndian::Read16(nameEnd));
+    mClass = static_cast<QClass>(chip::Encoding::BigEndian::Read16(nameEnd));
+    mTtl   = chip::Encoding::BigEndian::Read32(nameEnd);
+
     uint16_t dataLen = chip::Encoding::BigEndian::Read16(nameEnd); // resource data
 
-    if (dataEnd - nameEnd < dataLen)
+    if (!validData.Contains(nameEnd + dataLen))
     {
         return false; // no space for RDATA
     }
 
-    mNameIterator = SerializedQNameIterator(dataStart, dataEnd, *start);
+    mNameIterator = SerializedQNameIterator(validData, *start);
 
     *start = nameEnd + dataLen;
 
     return true;
 }
 
-bool ParsePacket(const uint8_t * packet, size_t length, ParserDelegate * delegate)
+bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
 {
-    if (length < HeaderRef::kSizeBytes)
+    if (packetData.Size() < static_cast<ptrdiff_t>(HeaderRef::kSizeBytes))
     {
         return false;
     }
 
     // header is used as const, so cast is safe
-    HeaderRef header(const_cast<uint8_t *>(packet));
+    HeaderRef header(const_cast<uint8_t *>(packetData.Start()));
 
     if (!header.GetFlags().IsValidMdns())
     {
@@ -117,16 +128,13 @@ bool ParsePacket(const uint8_t * packet, size_t length, ParserDelegate * delegat
 
     delegate->Header(header);
 
-    const uint8_t * dataStart = packet;
-    const uint8_t * dataEnd   = packet + length;
-
-    const uint8_t * data = packet + HeaderRef::kSizeBytes;
+    const uint8_t * data = packetData.Start() + HeaderRef::kSizeBytes;
 
     {
         QueryData queryData;
         for (unsigned i = 0; i < header.GetQueryCount(); i++)
         {
-            if (!queryData.Parse(dataStart, dataEnd, &data))
+            if (!queryData.Parse(packetData, &data))
             {
                 return false;
             }
@@ -139,7 +147,7 @@ bool ParsePacket(const uint8_t * packet, size_t length, ParserDelegate * delegat
         ResourceData resourceData;
         for (unsigned i = 0; i < header.GetAnswerCount(); i++)
         {
-            if (!resourceData.Parse(dataStart, dataEnd, &data))
+            if (!resourceData.Parse(packetData, &data))
             {
                 return false;
             }
@@ -149,7 +157,7 @@ bool ParsePacket(const uint8_t * packet, size_t length, ParserDelegate * delegat
 
         for (unsigned i = 0; i < header.GetAuthorityCount(); i++)
         {
-            if (!resourceData.Parse(dataStart, dataEnd, &data))
+            if (!resourceData.Parse(packetData, &data))
             {
                 return false;
             }
@@ -159,7 +167,7 @@ bool ParsePacket(const uint8_t * packet, size_t length, ParserDelegate * delegat
 
         for (unsigned i = 0; i < header.GetAdditionalCount(); i++)
         {
-            if (!resourceData.Parse(dataStart, dataEnd, &data))
+            if (!resourceData.Parse(packetData, &data))
             {
                 return false;
             }

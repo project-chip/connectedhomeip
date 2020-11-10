@@ -16,6 +16,7 @@ import("//build_overrides/chip.gni")
 
 static_library("minimal") {
   sources = [
+    "BytesRange.h",
     "DnsHeader.h",
     "Parser.cpp",
     "Parser.h",

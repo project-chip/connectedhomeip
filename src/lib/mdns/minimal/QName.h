@@ -25,6 +25,7 @@
 
 #include <core/CHIPEncoding.h>
 
+#include "BytesRange.h"
 #include "DnsHeader.h"
 
 namespace mdns {
@@ -43,14 +44,12 @@ using QNamePart = const char *;
 class SerializedQNameIterator
 {
 public:
-    SerializedQNameIterator() :
-        mValidDataStart(nullptr), mValidDataEnd(nullptr), mLookBehindMax(0), mCurrentPosition(nullptr), mValidData(false)
-    {}
+    SerializedQNameIterator() : mLookBehindMax(0), mCurrentPosition(nullptr), mIsValid(false) {}
     SerializedQNameIterator(const SerializedQNameIterator &) = default;
     SerializedQNameIterator & operator=(const SerializedQNameIterator &) = default;
 
-    SerializedQNameIterator(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t * position) :
-        mValidDataStart(dataStart), mValidDataEnd(dataEnd), mLookBehindMax(position - dataStart), mCurrentPosition(position)
+    SerializedQNameIterator(const BytesRange validData, const uint8_t * position) :
+        mValidData(validData), mLookBehindMax(position - validData.Start()), mCurrentPosition(position)
     {}
 
     /// Advances to the next element in the sequence
@@ -60,7 +59,7 @@ public:
     /// Find out if the data parsing is ok.
     /// If invalid data is encountered during a [Next] call, this will
     /// return false. Check this after Next returns false.
-    bool ValidData() const { return mValidData; }
+    bool IsValid() const { return mIsValid; }
 
     /// Valid IFF Next() returned true.
     /// Next has to be called after construction
@@ -76,11 +75,10 @@ private:
     static constexpr size_t kMaxValueSize = 63;
     static constexpr uint8_t kPtrMask     = 0xC0;
 
-    const uint8_t * mValidDataStart; // valid data range start
-    const uint8_t * mValidDataEnd;   // valid data range end
-    ptrdiff_t mLookBehindMax;        // avoid loops by limiting lookbehind
+    BytesRange mValidData;
+    ptrdiff_t mLookBehindMax; // avoid loops by limiting lookbehind
     const uint8_t * mCurrentPosition;
-    bool mValidData = true;
+    bool mIsValid = true;
 
     char mValue[kMaxValueSize + 1] = { 0 };
 

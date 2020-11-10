@@ -14,6 +14,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <assert.h>
 
 #include "QName.h"
 
@@ -22,20 +23,21 @@ namespace Minimal {
 
 bool SerializedQNameIterator::Next()
 {
-    return mValidData && Next(true);
+    return mIsValid && Next(true);
 }
 
 bool SerializedQNameIterator::Next(bool followIndirectPointers)
 {
-    if (!mValidData)
+    if (!mIsValid)
     {
         return false;
     }
 
     while (true)
     {
-        const uint8_t length = *mCurrentPosition;
+        assert(mValidData.Contains(mCurrentPosition));
 
+        const uint8_t length = *mCurrentPosition;
         if (*mCurrentPosition == 0)
         {
             // Done with all items
@@ -51,9 +53,9 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
             }
 
             // PTR contains 2 bytes
-            if (mValidDataEnd - mCurrentPosition < 2)
+            if (!mValidData.Contains(mCurrentPosition + 1))
             {
-                mValidData = false;
+                mIsValid = false;
                 return false;
             }
 
@@ -61,18 +63,18 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
             if (offset > mLookBehindMax)
             {
                 // Potential infinite recursion.
-                mValidData = false;
+                mIsValid = false;
                 return false;
             }
-            if (offset > (mValidDataEnd - mValidDataStart))
+            if (offset > mValidData.Size())
             {
                 // offset too large
-                mValidData = false;
+                mIsValid = false;
                 return false;
             }
 
             mLookBehindMax   = offset;
-            mCurrentPosition = mValidDataStart + offset;
+            mCurrentPosition = mValidData.Start() + offset;
         }
         else
         {
@@ -80,14 +82,14 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
             if (length > kMaxValueSize)
             {
                 // limited value sizes
-                mValidData = false;
+                mIsValid = false;
                 return false;
             }
 
-            if (mCurrentPosition + 1 + length >= mValidDataEnd)
+            if (!mValidData.Contains(mCurrentPosition + 1 + length))
             {
                 // string outside valid data
-                mValidData = false;
+                mIsValid = false;
                 return false;
             }
 
@@ -106,7 +108,7 @@ const uint8_t * SerializedQNameIterator::FindDataEnd()
         // nothing to do, just advance
     }
 
-    if (!ValidData())
+    if (!IsValid())
     {
         return nullptr;
     }
@@ -121,7 +123,7 @@ const uint8_t * SerializedQNameIterator::FindDataEnd()
     // ends with a dataptr
     if ((*mCurrentPosition & kPtrMask) == kPtrMask)
     {
-        if (mValidDataEnd <= mCurrentPosition + 2)
+        if (!mValidData.Contains(mCurrentPosition + 1))
         {
             return nullptr;
         }
@@ -130,7 +132,7 @@ const uint8_t * SerializedQNameIterator::FindDataEnd()
 
     // invalid data
     return nullptr;
-}
+} // namespace Minimal
 
 } // namespace Minimal
 } // namespace mdns

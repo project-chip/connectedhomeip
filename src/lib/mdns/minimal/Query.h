@@ -22,18 +22,25 @@
 namespace mdns {
 namespace Minimal {
 
+// Assigned by IANA: https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-4
 enum class QType : uint16_t
 {
-    A     = 1,
-    NS    = 2,
-    CNAME = 5,
-    SOA   = 6,
-    WKS   = 11,
-    PTR   = 12,
-    MX    = 15,
-    SRV   = 33,
-    AAAA  = 28,
-    ANY   = 255,
+    A         = 1,
+    NS        = 2,
+    CNAME     = 5,
+    SOA       = 6,
+    NULLVALUE = 10,
+    WKS       = 11,
+    PTR       = 12,
+    HINFO     = 13,
+    MINFO     = 14,
+    MX        = 15,
+    TXT       = 16,
+    ISDN      = 20,
+    AAAA      = 28,
+    SRV       = 33,
+    DNAM      = 39,
+    ANY       = 255,
 };
 enum class QClass : uint16_t
 {
