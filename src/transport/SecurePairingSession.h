@@ -74,7 +74,7 @@ public:
 
 struct SecurePairingSessionSerialized;
 
-typedef struct SecurePairingSessionSerializable
+struct SecurePairingSessionSerializable
 {
     uint16_t mKeLen;
     uint8_t mKe[kMAX_Hash_Length];
@@ -83,7 +83,7 @@ typedef struct SecurePairingSessionSerializable
     uint64_t mPeerNodeId;
     uint16_t mLocalKeyId;
     uint16_t mPeerKeyId;
-} SecurePairingSessionSerializable;
+};
 
 class DLL_EXPORT SecurePairingSession
 {
@@ -189,7 +189,7 @@ public:
      **/
     CHIP_ERROR Deserialize(SecurePairingSessionSerialized & input);
 
-    /** @brief Return the serializable data structure for secure pairing.
+    /** @brief Serialize the SecurePairingSession to the given serializable data structure for secure pairing
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/

@@ -16,6 +16,14 @@
  *    limitations under the License.
  */
 
+/**
+ *  @file
+ *    This file contains implementation of Device class. The objects of this
+ *    class will be used by Controller applications to interact with CHIP
+ *    devices. The class provides mechanism to construct, send and receive
+ *    messages to and from the corresponding CHIP devices.
+ */
+
 #include <controller/CHIPDevice.h>
 
 #if CONFIG_DEVICE_LAYER

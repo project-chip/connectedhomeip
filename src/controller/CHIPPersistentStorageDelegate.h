@@ -88,7 +88,10 @@ public:
      *
      * @param[in]      key Key to lookup
      * @param[out]     value Value for the key
-     * @param[in, out] size Input value buffer size, output length of value
+     * @param[in, out] size Input value buffer size, output length of value.
+     *                 The output length could be larger than input value. In
+     *                 such cases, the user should allocate the buffer large
+     *                 enough (>= output length), and call the API again.
      */
     virtual CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) { return CHIP_ERROR_NOT_IMPLEMENTED; }
 

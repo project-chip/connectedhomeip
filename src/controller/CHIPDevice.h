@@ -16,6 +16,14 @@
  *    limitations under the License.
  */
 
+/**
+ *  @file
+ *    This file contains definitions for Device class. The objects of this
+ *    class will be used by Controller applications to interact with CHIP
+ *    devices. The class provides mechanism to construct, send and receive
+ *    messages to and from the corresponding CHIP devices.
+ */
+
 #pragma once
 
 #include <core/CHIPCore.h>
@@ -30,28 +38,7 @@ namespace chip {
 namespace Controller {
 
 class DeviceController;
-
-class DLL_EXPORT DeviceStatusDelegate
-{
-public:
-    virtual ~DeviceStatusDelegate() {}
-
-    /**
-     * @brief
-     *   Called when a message is received from the device.
-     *
-     * @param[in] msg Received message buffer.
-     */
-    virtual void OnMessage(System::PacketBuffer * msg) = 0;
-
-    /**
-     * @brief
-     *   Called when device status is updated.
-     *
-     */
-    virtual void OnStatusChange(void){};
-};
-
+class DeviceStatusDelegate;
 struct SerializedDevice;
 
 class DLL_EXPORT Device
@@ -63,8 +50,27 @@ public:
     void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
     // ----- Messaging -----
+    /**
+     * @brief
+     *   Send the provided message to the device
+     *
+     * @param[in] message   The message to be sent. The ownership of the message buffer
+     *                      is handed over to Device object. SendMessage() will
+     *                      decrement the reference count of the message buffer before
+     *                      returning.
+     *
+     * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
+     */
     CHIP_ERROR SendMessage(System::PacketBuffer * message);
 
+    /**
+     * @brief
+     *   Get the IP address assigned to the device.
+     *
+     * @param[out] addr   The reference to the IP address.
+     *
+     * @return true, if the IP address was filled in the out parameter, false otherwise
+     */
     bool GetIpAddress(Inet::IPAddress & addr) const;
 
     void Init(SecureSessionMgr<Transport::UDP> * sessionMgr, Inet::InetLayer * inetLayer)
@@ -134,6 +140,33 @@ private:
 
     CHIP_ERROR LoadSecureSessionParameters();
     CHIP_ERROR ResumeSecureSession();
+};
+
+/**
+ * This class defines an interface for an object that the user of Device
+ * can register as a delegate. The delegate object will be called by the
+ * Device when a new message or status update is received from the corresponding
+ * CHIP device.
+ */
+class DLL_EXPORT DeviceStatusDelegate
+{
+public:
+    virtual ~DeviceStatusDelegate() {}
+
+    /**
+     * @brief
+     *   Called when a message is received from the device.
+     *
+     * @param[in] msg Received message buffer.
+     */
+    virtual void OnMessage(System::PacketBuffer * msg) = 0;
+
+    /**
+     * @brief
+     *   Called when device status is updated.
+     *
+     */
+    virtual void OnStatusChange(void){};
 };
 
 typedef struct SerializableDevice
