@@ -17,11 +17,15 @@
 
 #include "RecordData.h"
 
+#include <inet/arpa-inet-compatibility.h>
+
 namespace mdns {
 namespace Minimal {
 
 bool ParseTxtRecord(const BytesRange & data, TxtRecordDelegate * callback)
 {
+    // FORMAT:
+    //   length-prefixed strings of the form "foo=bar" where = may be missing
     const uint8_t * pos = data.Start();
 
     while (data.Contains(pos))
@@ -56,6 +60,53 @@ bool ParseTxtRecord(const BytesRange & data, TxtRecordDelegate * callback)
     return pos == data.End();
 }
 
-} // namespace Minimal
+bool SrvRecord::Parse(const BytesRange & data, const BytesRange & packet)
+{
+    // FORMAT:
+    //   - priority
+    //   - weight
+    //   - port
+    //   - target
+    if (data.Size() < 7)
+    {
+        return false;
+    }
 
+    const uint8_t * p = data.Start();
+
+    mPriority = chip::Encoding::BigEndian::Read16(p);
+    mWeight   = chip::Encoding::BigEndian::Read16(p);
+    mPort     = chip::Encoding::BigEndian::Read16(p);
+    mName     = SerializedQNameIterator(packet, p);
+
+    return true;
+}
+
+bool ParseARecord(const BytesRange & data, chip::Inet::IPAddress * addr)
+{
+    if (data.Size() != 4)
+    {
+        return false;
+    }
+
+    addr->Addr[0] = 0;
+    addr->Addr[1] = 0;
+    addr->Addr[2] = htonl(0xFFFF);
+    addr->Addr[3] = htonl(chip::Encoding::BigEndian::Get32(data.Start()));
+
+    return true;
+}
+
+bool ParseAAAARecord(const BytesRange & data, chip::Inet::IPAddress * addr)
+{
+    if (data.Size() != 16)
+    {
+        return false;
+    }
+    const uint8_t * p = data.Start();
+    chip::Inet::IPAddress::ReadAddress(p, *addr);
+    return true;
+}
+
+} // namespace Minimal
 } // namespace mdns

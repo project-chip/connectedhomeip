@@ -17,7 +17,10 @@
 
 #pragma once
 
+#include <inet/IPAddress.h>
+
 #include "BytesRange.h"
+#include "QName.h"
 
 namespace mdns {
 namespace Minimal {
@@ -35,7 +38,42 @@ public:
     virtual void OnRecord(const BytesRange & name, const BytesRange & value) = 0;
 };
 
+/// Parses TXT record data
+/// https://tools.ietf.org/html/rfc1035 (included in base RFC)
 bool ParseTxtRecord(const BytesRange & data, TxtRecordDelegate * callback);
+
+/// Parses SRV record data
+/// https://tools.ietf.org/html/rfc2782
+class SrvRecord
+{
+public:
+    SrvRecord() {}
+
+    /// Parses a SRV record within [data]
+    ///
+    /// [packet] specifies the range of valid data for PTR addresses within
+    /// the name
+    bool Parse(const BytesRange & data, const BytesRange & packet);
+
+    uint16_t GetPriority() const { return mPriority; }
+    uint16_t GetWeight() const { return mWeight; }
+    uint16_t GetPort() const { return mPort; }
+    SerializedQNameIterator GetName() const { return mName; }
+
+private:
+    uint16_t mPriority = 0;
+    uint16_t mWeight   = 0;
+    uint16_t mPort     = 0;
+    SerializedQNameIterator mName;
+};
+
+/// Parses IPV4 (A) record data
+/// https://tools.ietf.org/html/rfc1035 (included in base RFC)
+bool ParseARecord(const BytesRange & data, chip::Inet::IPAddress * addr);
+
+/// Parses IPV6 (AAAA) record data
+/// https://tools.ietf.org/html/rfc3596
+bool ParseAAAARecord(const BytesRange & data, chip::Inet::IPAddress * addr);
 
 } // namespace Minimal
 

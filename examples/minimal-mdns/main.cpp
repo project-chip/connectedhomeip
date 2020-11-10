@@ -95,9 +95,24 @@ public:
     }
 };
 
+void PrintQName(mdns::Minimal::SerializedQNameIterator it)
+{
+    while (it.Next())
+    {
+        printf("%s.", it.Value());
+    }
+    if (!it.IsValid())
+    {
+        printf("   (INVALID!)");
+    }
+    printf("\n");
+}
+
 class PacketReporter : public mdns::Minimal::ParserDelegate
 {
 public:
+    PacketReporter(const mdns::Minimal::BytesRange & packet) : mPacketRange(packet) {}
+
     void Header(const mdns::Minimal::HeaderRef & header) override
     {
         printf("   Queries:     %d\n", header.GetQueryCount());
@@ -112,17 +127,7 @@ public:
         printf("       QUERY CLASS: %d\n", static_cast<int>(data.GetClass()));
         printf("       UNICAST:     %s\n", data.GetUnicastAnswer() ? "true" : "false");
         printf("       QUERY FOR:   ");
-
-        mdns::Minimal::SerializedQNameIterator it = data.GetName();
-        while (it.Next())
-        {
-            printf("%s.", it.Value());
-        }
-        if (!it.IsValid())
-        {
-            printf("   (INVALID!)");
-        }
-        printf("\n");
+        PrintQName(data.GetName());
     }
 
     void Resource(ResourceType type, const mdns::Minimal::ResourceData & data) override
@@ -133,23 +138,62 @@ public:
         printf("          TTL:       %ld\n", static_cast<long>(data.GetTtlSeconds()));
         printf("          Data size: %ld\n", static_cast<long>(data.GetData().Size()));
         printf("          NAME:  ");
-        mdns::Minimal::SerializedQNameIterator it = data.GetName();
-        while (it.Next())
-        {
-            printf("%s.", it.Value());
-        }
-        if (!it.IsValid())
-        {
-            printf("   (INVALID!)");
-        }
-        printf("\n");
+        PrintQName(data.GetName());
 
         if (data.GetType() == mdns::Minimal::QType::TXT)
         {
             TxtReport txtReport;
-            mdns::Minimal::ParseTxtRecord(data.GetData(), &txtReport);
+            if (!mdns::Minimal::ParseTxtRecord(data.GetData(), &txtReport))
+            {
+                printf("FAILED TO PARSE TXT RECORD\n");
+            }
+        }
+        else if (data.GetType() == mdns::Minimal::QType::SRV)
+        {
+            mdns::Minimal::SrvRecord srv;
+
+            if (!srv.Parse(data.GetData(), mPacketRange))
+            {
+                printf("Failed to parse SRV record!!!!");
+            }
+            else
+            {
+                printf("             SRV on port %d, priority %d, weight %d:  ", srv.GetPort(), srv.GetPriority(), srv.GetWeight());
+                PrintQName(data.GetName());
+            }
+        }
+        else if (data.GetType() == mdns::Minimal::QType::A)
+        {
+            chip::Inet::IPAddress addr;
+
+            if (!mdns::Minimal::ParseARecord(data.GetData(), &addr))
+            {
+                printf("FAILED TO PARSE A RECORD\n");
+            }
+            else
+            {
+                char buff[128];
+                printf("             IP:  %s\n", addr.ToString(buff, sizeof(buff)));
+            }
+        }
+        else if (data.GetType() == mdns::Minimal::QType::AAAA)
+        {
+            chip::Inet::IPAddress addr;
+
+            if (!mdns::Minimal::ParseAAAARecord(data.GetData(), &addr))
+            {
+                printf("FAILED TO PARSE AAAA RECORD\n");
+            }
+            else
+            {
+                char buff[128];
+                printf("             IP:  %s\n", addr.ToString(buff, sizeof(buff)));
+            }
         }
     }
+
+private:
+    mdns::Minimal::BytesRange mPacketRange;
 };
 
 void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
@@ -199,8 +243,10 @@ void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::P
 
     printf("Packet received from: %-15s on port %d\n", addr, info->SrcPort);
 
-    PacketReporter reporter;
-    if (!mdns::Minimal::ParsePacket(mdns::Minimal::BytesRange(buffer->Start(), buffer->Start() + buffer->DataLength()), &reporter))
+    mdns::Minimal::BytesRange packetRange(buffer->Start(), buffer->Start() + buffer->DataLength());
+    PacketReporter reporter(packetRange);
+
+    if (!mdns::Minimal::ParsePacket(packetRange, &reporter))
     {
         printf("INVALID PACKET!!!!!!\n");
     }
