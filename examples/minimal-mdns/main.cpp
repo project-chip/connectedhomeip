@@ -49,7 +49,7 @@ const mdns::Minimal::QNamePart kCastQnames[] = { "octopi", "local" };
 const char * kMdnsQueryDestination = "FF02::FB";
 
 // Use `ip -6 maddr` to list these
-#define FORCE_INTERFACE_ID 178
+// #define FORCE_INTERFACE_ID 178
 
 const char * ToString(mdns::Minimal::QType t)
 {
@@ -274,6 +274,45 @@ void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::P
     }
 }
 
+/// Heuristic to find an interface ID that is suitable
+chip::Inet::InterfaceId FindBestInterfaceId()
+{
+
+#ifdef FORCE_INTERFACE_ID
+    return FORCE_INTERFACE_ID;
+#else
+    chip::Inet::InterfaceId result = INET_NULL_INTERFACEID;
+
+    chip::Inet::InterfaceIterator intIterator;
+    for (chip::Inet::InterfaceIterator intIterator; intIterator.HasCurrent(); intIterator.Next())
+    {
+        char name[64];
+        if (!intIterator.GetInterfaceName(name, sizeof(name)) == CHIP_NO_ERROR)
+        {
+            printf("!!!! FAILED TO GET INTERFACE NAME");
+            continue;
+        }
+
+        printf("FOUND Interface: %s\n", name);
+
+        if (!intIterator.IsUp() || !intIterator.SupportsMulticast())
+        {
+            printf("   Not up or multicast. Ignoring.");
+            continue;
+        }
+
+        if (memcmp(name, "docker", 6) == 0)
+        {
+            printf("   Docker interface. Ignoring.");
+            continue;
+        }
+
+        result = intIterator.GetInterfaceId();
+    }
+    return result;
+#endif
+}
+
 } // namespace
 
 int main(int argc, char ** args)
@@ -319,9 +358,8 @@ int main(int argc, char ** args)
         return 1;
     }
 
-    chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
-#ifdef FORCE_INTERFACE_ID
-    interfaceId = FORCE_INTERFACE_ID;
+    chip::Inet::InterfaceId interfaceId = FindBestInterfaceId();
+
     {
         char buff[64];
         if (chip::Inet::GetInterfaceName(interfaceId, buff, sizeof(buff)) == CHIP_NO_ERROR)
@@ -333,8 +371,6 @@ int main(int argc, char ** args)
             printf("FAILED to get inteface id name.\n");
         }
     }
-
-#endif
 
     if (udp->Bind(destIpAddr.Type(), chip::Inet::IPAddress::Any, kFakeMdnsPort, interfaceId) != CHIP_NO_ERROR)
     {
