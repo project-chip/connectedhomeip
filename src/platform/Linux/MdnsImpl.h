@@ -55,7 +55,6 @@ struct AvahiTimeout
 };
 
 namespace chip {
-namespace Protocols {
 namespace Mdns {
 
 class Poller
@@ -105,10 +104,10 @@ public:
     CHIP_ERROR SetHostname(const char * hostname);
     CHIP_ERROR PublishService(const MdnsService & service);
     CHIP_ERROR StopPublish();
-    CHIP_ERROR Browse(const char * type, MdnsServiceProtocol protocol, chip::Inet::InterfaceId interface,
-                      MdnsBrowseCallback callback, void * context);
-    CHIP_ERROR Resolve(const char * name, const char * type, MdnsServiceProtocol protocol, chip::Inet::InterfaceId interface,
-                       MdnsResolveCallback callback, void * context);
+    CHIP_ERROR Browse(const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                      chip::Inet::InterfaceId interface, MdnsBrowseCallback callback, void * context);
+    CHIP_ERROR Resolve(const char * name, const char * type, MdnsServiceProtocol protocol, chip::Inet::IPAddressType addressType,
+                       chip::Inet::InterfaceId interface, MdnsResolveCallback callback, void * context);
 
     Poller & GetPoller() { return mPoller; }
 
@@ -164,5 +163,4 @@ void UpdateMdnsDataset(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFd
 void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet);
 
 } // namespace Mdns
-} // namespace Protocols
 } // namespace chip

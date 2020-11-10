@@ -69,17 +69,6 @@ public:
 
     /**
      * @brief
-     *    Activate Door Lock Callback
-     *
-     * @param activate True if the lock should move to the locked position,
-     *                 False if it should move to the unlocked position
-     *
-     * @returns true if the callback was able to activate/deactivate the Lock.
-     */
-    virtual bool PluginDoorLockActivateDoorLockCallback(bool activate);
-
-    /**
-     * @brief
      *   Called after an attribute has been changed
      *
      * @param endpoint           endpoint id

@@ -78,32 +78,43 @@ void TestFindByAddress(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
     PeerConnectionState * statePtr;
-    PeerConnections<2, Time::Source::kTest> connections;
+    PeerConnections<3, Time::Source::kTest> connections;
 
     PeerConnectionState * state1 = nullptr;
     PeerConnectionState * state2 = nullptr;
+    PeerConnectionState * state3 = nullptr;
 
     err = connections.CreateNewPeerConnectionState(kPeer1Addr, &state1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = connections.CreateNewPeerConnectionState(kPeer2Addr, &state2);
+    err = connections.CreateNewPeerConnectionState(kPeer1Addr, &state2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = connections.CreateNewPeerConnectionState(kPeer2Addr, &state3);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, state1 != state2);
+    NL_TEST_ASSERT(inSuite, state1 != state3);
+    NL_TEST_ASSERT(inSuite, state2 != state3);
 
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer1Addr, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr = connections.FindPeerConnectionState(kPeer1Addr, nullptr));
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerAddress() == kPeer1Addr);
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer2Addr, &statePtr));
+
+    NL_TEST_ASSERT(inSuite, statePtr = connections.FindPeerConnectionState(kPeer1Addr, statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr->GetPeerAddress() == kPeer1Addr);
+
+    NL_TEST_ASSERT(inSuite, (statePtr = connections.FindPeerConnectionState(kPeer1Addr, statePtr)) == nullptr);
+
+    NL_TEST_ASSERT(inSuite, statePtr = connections.FindPeerConnectionState(kPeer2Addr, nullptr));
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerAddress() == kPeer2Addr);
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3Addr, &statePtr));
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3Addr, nullptr));
 }
 
 void TestFindByNodeId(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
     PeerConnectionState * statePtr;
-    PeerConnections<2, Time::Source::kTest> connections;
+    PeerConnections<3, Time::Source::kTest> connections;
 
     err = connections.CreateNewPeerConnectionState(kPeer1Addr, &statePtr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -113,16 +124,28 @@ void TestFindByNodeId(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     statePtr->SetPeerNodeId(kPeer2NodeId);
 
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer1NodeId, &statePtr));
+    err = connections.CreateNewPeerConnectionState(kPeer2Addr, &statePtr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    statePtr->SetPeerNodeId(kPeer1NodeId);
+
+    NL_TEST_ASSERT(inSuite, statePtr = connections.FindPeerConnectionState(kPeer1NodeId, nullptr));
+    char buf[100];
+    statePtr->GetPeerAddress().ToString(buf, sizeof(buf));
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerAddress() == kPeer1Addr);
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerNodeId() == kPeer1NodeId);
 
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer2NodeId, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr = connections.FindPeerConnectionState(kPeer1NodeId, statePtr));
+    statePtr->GetPeerAddress().ToString(buf, sizeof(buf));
+    NL_TEST_ASSERT(inSuite, statePtr->GetPeerAddress() == kPeer2Addr);
+    NL_TEST_ASSERT(inSuite, statePtr->GetPeerNodeId() == kPeer1NodeId);
+
+    NL_TEST_ASSERT(inSuite, (statePtr = connections.FindPeerConnectionState(kPeer1NodeId, statePtr)) == nullptr);
+
+    NL_TEST_ASSERT(inSuite, statePtr = connections.FindPeerConnectionState(kPeer2NodeId, nullptr));
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerAddress() == kPeer2Addr);
     NL_TEST_ASSERT(inSuite, statePtr->GetPeerNodeId() == kPeer2NodeId);
 
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3NodeId, &statePtr));
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3NodeId, nullptr));
 }
 
 void TestFindByKeyId(nlTestSuite * inSuite, void * inContext)
@@ -136,45 +159,39 @@ void TestFindByKeyId(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Lookup using no node, and peer key
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Missing(), 1, &statePtr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Missing(), 1, nullptr));
     // Lookup using no node, and local key
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Missing(), 2, &statePtr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Missing(), 2, nullptr));
 
     // Lookup using no node, and incorrect peer key
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Missing(), 2, &statePtr));
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Missing(), 2, nullptr));
 
     // Lookup using no node, and incorrect local key
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Missing(), 1, &statePtr));
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Missing(), 1, nullptr));
 
     // Lookup using a node ID, and peer key
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 1, &statePtr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 1, nullptr));
 
     // Lookup using a node ID, and local key
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 2, &statePtr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 2, nullptr));
 
     // Some Node ID, peer key 3, local key 4
     err = connections.CreateNewPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 3, 4, &statePtr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Lookup using correct node (or no node), and correct keys
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 3, &statePtr));
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 4, &statePtr));
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Missing(), 3, &statePtr));
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Missing(), 4, &statePtr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 3, nullptr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 4, nullptr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(Optional<NodeId>::Missing(), 3, nullptr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Missing(), 4, nullptr));
 
     // Lookup using incorrect keys
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 4, &statePtr));
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 3, &statePtr));
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer1NodeId), 4, nullptr));
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer1NodeId), 3, nullptr));
 
     // Lookup using incorrect node, but correct keys
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer2NodeId), 3, &statePtr));
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer2NodeId), 4, &statePtr));
-    NL_TEST_ASSERT(inSuite, statePtr == nullptr);
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(Optional<NodeId>::Value(kPeer2NodeId), 3, nullptr));
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionStateByLocalKey(Optional<NodeId>::Value(kPeer2NodeId), 4, nullptr));
 }
 
 struct ExpiredCallInfo
@@ -220,7 +237,7 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callInfo.callCount == 1);
     NL_TEST_ASSERT(inSuite, callInfo.lastCallNodeId == kUndefinedNodeId);
     NL_TEST_ASSERT(inSuite, callInfo.lastCallPeerAddress == kPeer1Addr);
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer1NodeId, &statePtr));
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer1NodeId, nullptr));
 
     // now that the connections were expired, we can add peer3
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(300);
@@ -229,7 +246,7 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
     statePtr->SetPeerNodeId(kPeer3NodeId);
 
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(400);
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer2NodeId, &statePtr));
+    NL_TEST_ASSERT(inSuite, statePtr = connections.FindPeerConnectionState(kPeer2NodeId, nullptr));
 
     connections.MarkConnectionActive(statePtr);
     NL_TEST_ASSERT(inSuite, statePtr->GetLastActivityTimeMs() == connections.GetTimeSource().GetCurrentMonotonicTimeMs());
@@ -246,24 +263,24 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callInfo.callCount == 1);
     NL_TEST_ASSERT(inSuite, callInfo.lastCallNodeId == kPeer3NodeId);
     NL_TEST_ASSERT(inSuite, callInfo.lastCallPeerAddress == kPeer3Addr);
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer1Addr, &statePtr));
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer2Addr, &statePtr));
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3Addr, &statePtr));
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer1Addr, nullptr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer2Addr, nullptr));
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3Addr, nullptr));
 
     err = connections.CreateNewPeerConnectionState(kPeer1Addr, nullptr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer1Addr, &statePtr));
-    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer2Addr, &statePtr));
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3Addr, &statePtr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer1Addr, nullptr));
+    NL_TEST_ASSERT(inSuite, connections.FindPeerConnectionState(kPeer2Addr, nullptr));
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3Addr, nullptr));
 
     // peer 1 and 2 are active
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(1000);
     callInfo.callCount = 0;
     connections.ExpireInactiveConnections(100);
     NL_TEST_ASSERT(inSuite, callInfo.callCount == 2); // everything expired
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer1Addr, &statePtr));
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer2Addr, &statePtr));
-    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3Addr, &statePtr));
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer1Addr, nullptr));
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer2Addr, nullptr));
+    NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer3Addr, nullptr));
 }
 
 } // namespace

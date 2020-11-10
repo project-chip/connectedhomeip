@@ -155,30 +155,6 @@ void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId);
  * @param commandId The ZCL command ID being sent/received.  Ver.: always
  */
 bool emberAfClusterSecurityCustomCallback(EmberAfProfileId profileId, EmberAfClusterId clusterId, bool incoming, uint8_t commandId);
-/** @brief Configure Reporting Command
- *
- * This function is called by the application framework when a Configure
- * Reporting command is received from an external device.  The Configure
- * Reporting command contains a series of attribute reporting configuration
- * records.  The application should return true if the message was processed or
- * false if it was not.
- *
- * @param cmd   Ver.: always
- */
-bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd);
-/** @brief Configure Reporting Response
- *
- * This function is called by the application framework when a Configure
- * Reporting Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute status records.  Ver.:
- * always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfConfigureReportingResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 /** @brief Default Response
  *
  * This function is called by the application framework when a Default Response
@@ -1023,28 +999,6 @@ bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId, EmberApsFrame
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
 bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
-/** @brief Read Reporting Configuration Command
- *
- * This function is called by the application framework when a Read Reporting
- * Configuration command is received from an external device.  The application
- * should return true if the message was processed or false if it was not.
- *
- * @param cmd   Ver.: always
- */
-bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterCommand * cmd);
-/** @brief Read Reporting Configuration Response
- *
- * This function is called by the application framework when a Read Reporting
- * Configuration Response command is received from an external device.  The
- * application should return true if the message was processed or false if it
- * was not.
- *
- * @param clusterId The cluster identifier of this response.  Ver.: always
- * @param buffer Buffer containing the list of attribute reporting configuration
- * records.  Ver.: always
- * @param bufLen The length in bytes of the list.  Ver.: always
- */
-bool emberAfReadReportingConfigurationResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 /** @brief Registration Abort
  *
  * This callback is called when the device should abort the registration
@@ -1115,23 +1069,6 @@ void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
 bool emberAfReportAttributesCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
-/** @brief Reporting Attribute Change
- *
- * This function is called by the framework when an attribute managed by the
- * framework changes.  The application should call this function when an
- * externally-managed attribute changes.  The application should use the change
- * notification to inform its reporting decisions.
- *
- * @param endpoint   Ver.: always
- * @param clusterId   Ver.: always
- * @param attributeId   Ver.: always
- * @param mask   Ver.: always
- * @param manufacturerCode   Ver.: always
- * @param type   Ver.: always
- * @param data   Ver.: always
- */
-void emberAfReportingAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                             uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data);
 /** @brief Scan Complete
  *
  * This is called by the low-level stack code when an 802.15.4 active scan

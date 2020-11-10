@@ -25,11 +25,13 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <ifaddrs.h>
+#include <netpacket/packet.h>
+
 #include <core/CHIPVendorIdentifiers.hpp>
 #include <platform/ConfigurationManager.h>
 #include <platform/Linux/PosixConfig.h>
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
-
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -74,8 +76,29 @@ exit:
 
 CHIP_ERROR ConfigurationManagerImpl::_GetPrimaryWiFiMACAddress(uint8_t * buf)
 {
-    // TODO(#739): add WiFi support
-    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+    struct ifaddrs * addresses = NULL;
+    CHIP_ERROR error           = CHIP_NO_ERROR;
+    bool found                 = false;
+
+    VerifyOrExit(getifaddrs(&addresses) == 0, error = CHIP_ERROR_INTERNAL);
+    for (auto addr = addresses; addr != NULL; addr = addr->ifa_next)
+    {
+        if ((addr->ifa_addr) && (addr->ifa_addr->sa_family == AF_PACKET) && strncmp(addr->ifa_name, "lo", IFNAMSIZ) != 0)
+        {
+            struct sockaddr_ll * mac = (struct sockaddr_ll *) addr->ifa_addr;
+            memcpy(buf, mac->sll_addr, mac->sll_halen);
+            found = true;
+            break;
+        }
+    }
+    freeifaddrs(addresses);
+    if (!found)
+    {
+        error = CHIP_ERROR_NO_ENDPOINT;
+    }
+
+exit:
+    return error;
 }
 
 bool ConfigurationManagerImpl::_CanFactoryReset()

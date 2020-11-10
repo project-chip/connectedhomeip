@@ -1282,19 +1282,6 @@ bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t *
     return false;
 }
 
-/** @brief Activate Door Lock Callback
- * This function is provided by the door lock server plugin.
- *
- * @param activate True if the lock should move to the locked position,
- *  false if it should move to the unlocked position Ver.: always
- *
- * @returns true if the callback was able to activate/deactivate the Lock.
- */
-bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
-{
-    return false;
-};
-
 /** @brief Scenes Cluster Recall Saved Scene
  *
  * This function is called by the framework when the application should recall a

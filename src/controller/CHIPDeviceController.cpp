@@ -286,7 +286,6 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(mSecurePairingSession != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mDeviceAddr != IPAddress::Any, err = CHIP_ERROR_INCORRECT_STATE);
 
     mSessionManager = chip::Platform::New<SecureSessionMgr<Transport::UDP>>();
 
@@ -304,7 +303,10 @@ CHIP_ERROR ChipDeviceController::EstablishSecureSession()
 
     mConState = kConnectionState_SecureConnected;
 
-    SendCachedPackets();
+    if (mDeviceAddr != IPAddress::Any)
+    {
+        SendCachedPackets();
+    } // else wait for mdns discovery
 
 exit:
 
@@ -527,7 +529,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
 
         trySessionResumption = false;
 
-        if (mConState == kConnectionState_SecureConnecting)
+        if (mDeviceAddr == IPAddress::Any || mConState == kConnectionState_SecureConnecting)
         {
             // Cache the packet while connection is being established
             ExitNow(err = CachePacket(buffer));
@@ -616,6 +618,14 @@ void ChipDeviceController::ClearRequestState()
 }
 
 void ChipDeviceController::OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
+
+void ChipDeviceController::OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgrBase * mgr)
+{
+    if (error == CHIP_NO_ERROR && nodeId == mSecurePairingSession->GetPeerNodeId() && mDeviceAddr == IPAddress::Any)
+    {
+        SendCachedPackets();
+    }
+}
 
 void ChipDeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                                              Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,

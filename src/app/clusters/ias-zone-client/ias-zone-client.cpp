@@ -217,7 +217,8 @@ static void iasClientSaveCommand(void)
     }
     // Write something to mark the end of the file.
     fprintf(fp, "ff");
-    assert(fclose(fp) == 0);
+    int res = fclose(fp);
+    assert(res == 0);
 #endif //#if defined(EZSP_HOST) && !defined(EMBER_TEST) && defined(UNIX_HOST)
 }
 
@@ -261,7 +262,8 @@ static void iasClientLoadCommand(void)
             emberAfIasZoneClientKnownServers[i].ieeeAddress[j] = (uint8_t) data1;
         }
     }
-    assert(fclose(fp) == 0);
+    int res = fclose(fp);
+    assert(res == 0);
 #endif // #if defined(EZSP_HOST) && !defined(EMBER_TEST) && defined(UNIX_HOST)
 }
 

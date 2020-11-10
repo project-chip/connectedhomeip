@@ -142,7 +142,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysUpdate()
     }
 #endif // !(CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 #if CHIP_ENABLE_MDNS
-    chip::Protocols::Mdns::UpdateMdnsDataset(mReadSet, mWriteSet, mErrorSet, mMaxFd, mNextTimeout);
+    chip::Mdns::UpdateMdnsDataset(mReadSet, mWriteSet, mErrorSet, mMaxFd, mNextTimeout);
 #endif
 }
 
@@ -179,7 +179,7 @@ void GenericPlatformManagerImpl_POSIX<ImplClass>::SysProcess()
 
     ProcessDeviceEvents();
 #if CHIP_ENABLE_MDNS
-    chip::Protocols::Mdns::ProcessMdns(mReadSet, mWriteSet, mErrorSet);
+    chip::Mdns::ProcessMdns(mReadSet, mWriteSet, mErrorSet);
 #endif
 }
 

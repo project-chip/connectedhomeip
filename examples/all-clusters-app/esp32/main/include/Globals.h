@@ -20,12 +20,10 @@
 #include "BluetoothWidget.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"
-#include "lib/mdns/Publisher.h"
 #include "transport/raw/MessageHeader.h"
 
 extern LEDWidget statusLED1;
 extern LEDWidget statusLED2;
 extern BluetoothWidget bluetoothLED;
 extern WiFiWidget wifiLED;
-extern chip::Protocols::Mdns::Publisher publisher;
 extern const chip::NodeId kLocalNodeId;

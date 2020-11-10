@@ -30,7 +30,7 @@
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
-#include <lib/mdns/Publisher.h>
+#include <lib/mdns/DiscoveryManager.h>
 #include <support/CodeUtils.h>
 
 extern "C" {
@@ -94,7 +94,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
-        publisher.StartPublishDevice();
+        chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -104,7 +104,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
-        publisher.StartPublishDevice();
+        chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice();
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
@@ -174,11 +174,4 @@ void DeviceCallbacks::PluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint
 
 exit:
     return;
-}
-
-bool DeviceCallbacks::PluginDoorLockActivateDoorLockCallback(bool activate)
-{
-    ESP_LOGI(TAG, "PluginDoorLockActivateDoorLockCallback: '0x%02x'", activate);
-    // Simulate that locking/unlocking the door is always succesful.
-    return true;
 }

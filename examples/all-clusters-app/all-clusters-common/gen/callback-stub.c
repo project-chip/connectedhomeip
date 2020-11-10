@@ -65,39 +65,6 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
  */
 void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint) {}
 
-/** @brief Get Group Name
- *
- * This function returns the name of a group with the provided group ID, should
- * it exist.
- *
- * @param endpoint Endpoint Ver.: always
- * @param groupId Group ID Ver.: always
- * @param groupName Group Name Ver.: always
- */
-void emberAfPluginGroupsServerGetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
-
-/** @brief Group Names Supported
- *
- * This function is called by the framework when it is necessary to determine
- * whether or not group names are supported.
- *
- * @param endpoint The endpoint. Ver.: always
- */
-bool emberAfPluginGroupsServerGroupNamesSupportedCallback(uint8_t endpoint)
-{
-    return false;
-}
-
-/** @brief Set Group Name
- *
- * This function sets the name of a group with the provided group ID.
- *
- * @param endpoint Endpoint Ver.: always
- * @param groupId Group ID Ver.: always
- * @param groupName Group Name Ver.: always
- */
-void emberAfPluginGroupsServerSetGroupNameCallback(uint8_t endpoint, uint16_t groupId, uint8_t * groupName) {}
-
 /** @brief Add To Current App Tasks
  *
  * This function is only useful to sleepy end devices.  This function will note
@@ -1651,31 +1618,6 @@ void halRadioPowerUpHandler(void) {}
  * @param sleepMode    Idle/sleep mode
  */
 void halSleepCallback(bool enter, SleepModes sleepMode) {}
-
-/** @brief Identify Cluster Start Feedback Callback
- *
- *
- *
- * @param endpoint Endpoint id
- * @param identifyTime Identify time
- */
-bool emberAfPluginIdentifyStartFeedbackCallback(uint8_t endpoint, uint16_t identifyTime)
-{
-    emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Start identify callback on endpoint %d time %d", endpoint, identifyTime);
-    return false;
-}
-
-/** @brief Identify Cluster Stop Feedback Callback
- *
- *
- *
- * @param endpoint Endpoint id
- */
-bool emberAfPluginIdentifyStopFeedbackCallback(uint8_t endpoint)
-{
-    emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Stop identify callback on endpoint %d", endpoint);
-    return false;
-}
 
 /** @brief Compute Pwm from HSV
  *

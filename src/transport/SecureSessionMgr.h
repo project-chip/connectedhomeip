@@ -30,6 +30,7 @@
 #include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
+#include <lib/mdns/DiscoveryManager.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <transport/PeerConnections.h>
@@ -80,17 +81,27 @@ public:
 
     /**
      * @brief
-     *   Called when a new connection is being established
+     *   Called when a new pairing is being established
      *
      * @param state   connection state
      * @param mgr     A pointer to the SecureSessionMgr
      */
     virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
+    /**
+     * @brief
+     *   Called when the peer address is resolved from NodeID.
+     *
+     * @param error   The resolution resolve error code
+     * @param nodeId  The node ID resolved, 0 on error
+     * @param mgr     A pointer to the SecureSessionMgr
+     */
+    virtual void OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgrBase * mgr) {}
+
     virtual ~SecureSessionMgrDelegate() {}
 };
 
-class DLL_EXPORT SecureSessionMgrBase
+class DLL_EXPORT SecureSessionMgrBase : public Mdns::ResolveDelegate
 {
 public:
     /**
@@ -104,7 +115,7 @@ public:
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
     CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf);
     SecureSessionMgrBase();
-    virtual ~SecureSessionMgrBase();
+    ~SecureSessionMgrBase() override;
 
     /**
      * @brief
@@ -179,6 +190,8 @@ private:
      * Callback for timer expiry check
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
+
+    void HandleNodeIdResolve(CHIP_ERROR error, NodeId nodeId, const Mdns::MdnsService & service) override;
 };
 
 /**
