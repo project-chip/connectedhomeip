@@ -82,9 +82,6 @@ uint8_t emAfPluginReportingConditionallyAddReportingEntry(EmberAfPluginReporting
 void emberAfPluginReportingLoadReportingConfigDefaults(void);
 bool emberAfPluginReportingGetReportingConfigDefaults(EmberAfPluginReportingEntry * defaultConfiguration);
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 /** @brief Configure Reporting Command
  *
  * This function is called by the application framework when a Configure
@@ -161,7 +158,4 @@ bool emberAfReadReportingConfigurationResponseCallback(EmberAfClusterId clusterI
 void emberAfReportingAttributeChangeCallback(CHIPEndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
                                              uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data);
 
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
 #endif

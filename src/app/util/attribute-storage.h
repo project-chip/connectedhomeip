@@ -45,10 +45,6 @@
 //#include PLATFORM_HEADER
 #include "af.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 #if !defined(EMBER_SCRIPTED_TEST)
 #include "gen/att-storage.h"
 #endif
@@ -226,9 +222,5 @@ EmberAfCluster * emberAfGetClusterByIndex(CHIPEndpointId endpoint, uint8_t clust
 
 EmberAfProfileId emberAfGetProfileIdForEndpoint(CHIPEndpointId endpoint);
 uint16_t emberAfGetDeviceIdForEndpoint(CHIPEndpointId endpoint);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
 
 #endif // __AF_ATTRIBUTE_STORAGE__

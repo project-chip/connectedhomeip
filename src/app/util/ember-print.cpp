@@ -26,7 +26,6 @@
 bool emberAfPrintReceivedMessages = true;
 
 using namespace chip::Logging;
-extern "C" {
 
 void emberAfPrint(int category, const char * format, ...)
 {
@@ -82,5 +81,4 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
 void emberAfPrintString(int category, const uint8_t * string)
 {
     emberAfPrint(category, "%s", string);
-}
 }

@@ -668,7 +668,7 @@ static EmberAfStatus applyCode(uint8_t * code, uint8_t codeLength, EmberAfPlugin
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-extern "C" void emberAfPluginDoorLockServerLockoutEventHandler(void)
+void emberAfPluginDoorLockServerLockoutEventHandler(void)
 {
     emberEventControlSetInactive(&emberAfPluginDoorLockServerLockoutEventControl);
 
@@ -716,7 +716,7 @@ static void scheduleAutoRelock(uint32_t autoRelockTimeS)
     }
 }
 
-extern "C" void emberAfPluginDoorLockServerRelockEventHandler(void)
+void emberAfPluginDoorLockServerRelockEventHandler(void)
 {
     emberEventControlSetInactive(&emberAfPluginDoorLockServerRelockEventControl);
 

@@ -32,8 +32,8 @@ target_sources(app PRIVATE
                main/LightingManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${LIGHTING_COMMON}/gen/call-command-handler.c
-               ${LIGHTING_COMMON}/gen/callback-stub.c
+               ${LIGHTING_COMMON}/gen/call-command-handler.cpp
+               ${LIGHTING_COMMON}/gen/callback-stub.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp

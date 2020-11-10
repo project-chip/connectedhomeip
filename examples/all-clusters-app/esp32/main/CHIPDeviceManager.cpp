@@ -93,7 +93,6 @@ exit:
     return err;
 }
 
-extern "C" {
 void emberAfPostAttributeChangeCallback(uint8_t endpointId, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
                                         uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
@@ -123,8 +122,6 @@ bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
 
     return false;
 }
-
-} // extern "C"
 
 } // namespace DeviceManager
 } // namespace chip

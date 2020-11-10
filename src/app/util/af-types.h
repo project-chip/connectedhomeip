@@ -52,20 +52,9 @@
 #include <stddef.h>  // For NULL.
 #include <stdint.h>  // For various uint*_t types
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-#include "gen/enums.h"
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
-
 #include "basic-types.h"
+#include "gen/enums.h"
 #include "types_stub.h" // For various types.
-
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"
@@ -1804,9 +1793,5 @@ typedef struct
 #define EMBER_AF_ZDO_RESPONSE_OVERHEAD 2
 
 /** @} END addtogroup */
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
 
 #endif // SILABS_AF_API_TYPES

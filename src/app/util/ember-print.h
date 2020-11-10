@@ -22,10 +22,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 /**
  * @brief Prints a log message
  * @param category - Currently ignored as zcl categories do not map to chip categories. Defaults to kLogCategory_Progress
@@ -55,9 +51,5 @@ void emberAfPrintBuffer(int category, const uint8_t * buffer, uint16_t length, b
  * @param string - Buffer to print as a string
  * */
 void emberAfPrintString(int category, const uint8_t * string);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
 
 #endif // EMBER_PRINT_H

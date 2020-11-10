@@ -40,7 +40,6 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 
-extern "C" {
 void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {}
@@ -50,8 +49,6 @@ bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
 {
     return true;
 }
-
-} // extern "C"
 
 int main(int argc, char * argv[])
 {

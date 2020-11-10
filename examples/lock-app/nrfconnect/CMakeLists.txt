@@ -32,8 +32,8 @@ target_sources(app PRIVATE
                main/BoltLockManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${LOCK_COMMON}/gen/call-command-handler.c
-               ${LOCK_COMMON}/gen/callback-stub.c
+               ${LOCK_COMMON}/gen/call-command-handler.cpp
+               ${LOCK_COMMON}/gen/callback-stub.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp

@@ -30,13 +30,10 @@
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
-#include <lib/mdns/Publisher.h>
-#include <support/CodeUtils.h>
-
-extern "C" {
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
-} // extern "C"
+#include <lib/mdns/Publisher.h>
+#include <support/CodeUtils.h>
 
 static const char * TAG = "echo-devicecallbacks";
 

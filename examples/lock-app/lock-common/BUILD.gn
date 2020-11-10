@@ -41,8 +41,8 @@ source_set("lock-common") {
     "${chip_root}/src/app/util/process-cluster-message.cpp",
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
-    "gen/call-command-handler.c",
-    "gen/callback-stub.c",
+    "gen/call-command-handler.cpp",
+    "gen/callback-stub.cpp",
   ]
 
   deps = [

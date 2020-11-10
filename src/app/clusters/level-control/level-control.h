@@ -50,9 +50,6 @@
 
 #include <app/util/basic-types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif // #ifdef __cplusplus
 /** @brief On/off Cluster Server Post Init
  *
  * Following resolution of the On/Off state at startup for this endpoint, perform any
@@ -61,9 +58,5 @@ extern "C" {
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
 void emberAfPluginLevelControlClusterServerPostInitCallback(CHIPEndpointId endpoint);
-
-#ifdef __cplusplus
-}
-#endif // #ifdef __cplusplus
 
 #endif // #ifndef _LEVEL_CONTROL_H

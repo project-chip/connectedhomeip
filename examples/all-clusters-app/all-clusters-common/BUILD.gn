@@ -55,9 +55,9 @@ source_set("all-clusters-common") {
     "${chip_root}/src/app/util/process-cluster-message.cpp",
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
-    "gen/call-command-handler.c",
-    "gen/callback-stub.c",
-    "gen/clusters-callback-stubs.c",
+    "gen/call-command-handler.cpp",
+    "gen/callback-stub.cpp",
+    "gen/clusters-callback-stubs.cpp",
   ]
 
   deps = [
