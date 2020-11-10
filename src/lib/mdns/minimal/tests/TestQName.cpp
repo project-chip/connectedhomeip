@@ -31,17 +31,17 @@ void IteratorTest(nlTestSuite * inSuite, void * inContext)
 {
     {
         static const uint8_t kOneItem[] = "\04test\00";
-        SerializedQNameIterator it(kOneItem, kOneItem + sizeof(kOneItem), kOneItem);
+        SerializedQNameIterator it(BytesRange(kOneItem, kOneItem + sizeof(kOneItem)), kOneItem);
 
         NL_TEST_ASSERT(inSuite, it.Next());
         NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "test") == 0);
         NL_TEST_ASSERT(inSuite, !it.Next());
-        NL_TEST_ASSERT(inSuite, it.ValidData());
+        NL_TEST_ASSERT(inSuite, it.IsValid());
     }
 
     {
         static const uint8_t kManyItems[] = "\04this\02is\01a\04test\00";
-        SerializedQNameIterator it(kManyItems, kManyItems + sizeof(kManyItems), kManyItems);
+        SerializedQNameIterator it(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems);
 
         NL_TEST_ASSERT(inSuite, it.Next());
         NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "this") == 0);
@@ -56,11 +56,11 @@ void IteratorTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "test") == 0);
 
         NL_TEST_ASSERT(inSuite, !it.Next());
-        NL_TEST_ASSERT(inSuite, it.ValidData());
+        NL_TEST_ASSERT(inSuite, it.IsValid());
     }
     {
         static const uint8_t kPtrItems[] = "abc\02is\01a\04test\00\04this\xc0\03";
-        SerializedQNameIterator it(kPtrItems, kPtrItems + sizeof(kPtrItems), kPtrItems + 14);
+        SerializedQNameIterator it(BytesRange(kPtrItems, kPtrItems + sizeof(kPtrItems)), kPtrItems + 14);
 
         NL_TEST_ASSERT(inSuite, it.Next());
         NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "this") == 0);
@@ -75,7 +75,7 @@ void IteratorTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "test") == 0);
 
         NL_TEST_ASSERT(inSuite, !it.Next());
-        NL_TEST_ASSERT(inSuite, it.ValidData());
+        NL_TEST_ASSERT(inSuite, it.IsValid());
     }
 }
 
@@ -84,46 +84,46 @@ void ErrorTest(nlTestSuite * inSuite, void * inContext)
     {
         // Truncated before the end
         static const uint8_t kData[] = "\04test";
-        SerializedQNameIterator it(kData, kData + 5, kData);
+        SerializedQNameIterator it(BytesRange(kData, kData + 5), kData);
 
         NL_TEST_ASSERT(inSuite, !it.Next());
-        NL_TEST_ASSERT(inSuite, !it.ValidData());
+        NL_TEST_ASSERT(inSuite, !it.IsValid());
     }
 
     {
         // Truncated before the end
         static const uint8_t kData[] = "\02";
-        SerializedQNameIterator it(kData, kData + 1, kData);
+        SerializedQNameIterator it(BytesRange(kData, kData + 1), kData);
 
         NL_TEST_ASSERT(inSuite, !it.Next());
-        NL_TEST_ASSERT(inSuite, !it.ValidData());
+        NL_TEST_ASSERT(inSuite, !it.IsValid());
     }
 
     {
         // Truncated before the end
         static const uint8_t kData[] = "\xc0";
-        SerializedQNameIterator it(kData, kData + 1, kData);
+        SerializedQNameIterator it(BytesRange(kData, kData + 1), kData);
 
         NL_TEST_ASSERT(inSuite, !it.Next());
-        NL_TEST_ASSERT(inSuite, !it.ValidData());
+        NL_TEST_ASSERT(inSuite, !it.IsValid());
     }
 
     {
         // Truncated before the end (but seemingly valid in case of error)
         static const uint8_t kData[] = "\00\xc0\x00";
-        SerializedQNameIterator it(kData, kData + 2, kData + 1);
+        SerializedQNameIterator it(BytesRange(kData, kData + 2), kData + 1);
 
         NL_TEST_ASSERT(inSuite, !it.Next());
-        NL_TEST_ASSERT(inSuite, !it.ValidData());
+        NL_TEST_ASSERT(inSuite, !it.IsValid());
     }
     {
         // Infinite recursion
         static const uint8_t kData[] = "\03test\xc0\x00";
-        SerializedQNameIterator it(kData, kData + 7, kData);
+        SerializedQNameIterator it(BytesRange(kData, kData + 7), kData);
 
         NL_TEST_ASSERT(inSuite, it.Next());
         NL_TEST_ASSERT(inSuite, !it.Next());
-        NL_TEST_ASSERT(inSuite, !it.ValidData());
+        NL_TEST_ASSERT(inSuite, !it.IsValid());
     }
 }
 
