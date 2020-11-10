@@ -29,6 +29,35 @@ using namespace mdns::Minimal;
 
 void IteratorTest(nlTestSuite * inSuite, void * inContext)
 {
+    {
+        static const uint8_t kOneItem[] = "\x04test\x00";
+        SerializedQNameIterator it(kOneItem, kOneItem + sizeof(kOneItem), kOneItem);
+
+        NL_TEST_ASSERT(inSuite, it.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "test") == 0);
+        NL_TEST_ASSERT(inSuite, !it.Next());
+        NL_TEST_ASSERT(inSuite, it.ValidData());
+    }
+
+    {
+        static const uint8_t kManyItems[] = "\x04this\x02is\x01a\x04test\x00";
+        SerializedQNameIterator it(kManyItems, kManyItems + sizeof(kManyItems), kManyItems);
+
+        NL_TEST_ASSERT(inSuite, it.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "this") == 0);
+
+        NL_TEST_ASSERT(inSuite, it.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "is") == 0);
+
+        NL_TEST_ASSERT(inSuite, it.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "a") == 0);
+
+        NL_TEST_ASSERT(inSuite, it.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(it.Value(), "test") == 0);
+
+        NL_TEST_ASSERT(inSuite, !it.Next());
+        NL_TEST_ASSERT(inSuite, it.ValidData());
+    }
 
     // FIXME: Implement
 }

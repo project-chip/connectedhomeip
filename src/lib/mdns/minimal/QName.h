@@ -47,18 +47,23 @@ public:
         mValidDataStart(dataStart), mValidDataEnd(dataEnd), mLookBehindMax(position - dataStart), mCurrentPosition(position)
     {}
 
-    // Advances to the next element in the sequence
-    // Returns true if new data was available
+    /// Advances to the next element in the sequence
+    /// Returns true if new data was available
     bool Next();
+
+    /// Find out if the data parsing is ok.
+    /// If invalid data is encountered during a [Next] call, this will
+    /// return false. Check this after Next returns false.
+    bool ValidData() const { return mValidData; }
 
     /// Valid IFF Next() returned true.
     /// Next has to be called after construction
     QNamePart Value() const { return mValue; }
 
-    // Get the end of the sequence *without* following any
-    // backwards pointers. Changes iterator state.
-    //
-    // returs nullptr on error (invalid data)
+    /// Get the end of the sequence *without* following any
+    /// backwards pointers. Changes iterator state.
+    ///
+    /// returs nullptr on error (invalid data)
     const uint8_t * FindDataEnd();
 
 private:
@@ -69,6 +74,7 @@ private:
     const uint8_t * const mValidDataEnd;   // valid data range end
     ptrdiff_t mLookBehindMax;              // avoid loops by limiting lookbehind
     const uint8_t * mCurrentPosition;
+    bool mValidData = true;
 
     char mValue[kMaxValueSize + 1] = { 0 };
 

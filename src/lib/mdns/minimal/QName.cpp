@@ -48,6 +48,7 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
             // PTR contains 2 bytes
             if (mValidDataEnd - mCurrentPosition > 2)
             {
+                mValidData = false;
                 return false;
             }
 
@@ -55,11 +56,13 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
             if (offset > mLookBehindMax)
             {
                 // Potential infinite recursion.
+                mValidData = false;
                 return false;
             }
             if (offset > (mValidDataEnd - mValidDataStart))
             {
                 // offset too large
+                mValidData = false;
                 return false;
             }
 
@@ -72,6 +75,7 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
             if (length > kMaxValueSize)
             {
                 // limited value sizes
+                mValidData = false;
                 return false;
             }
 

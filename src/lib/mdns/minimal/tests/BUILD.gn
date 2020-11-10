@@ -29,6 +29,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/mdns/minimal",
     "${nlunit_test_root}:nlunit-test",
   ]
 
