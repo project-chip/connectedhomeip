@@ -149,8 +149,11 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     VerifyOrExit(deserializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
 
+    // The second paramter to FromString takes the strlen value. We are subtracting 1
+    // from the sizeof(serializable.mDeviceAddr) to account for null termination, since
+    // strlen doesn't include null character in the size.
     VerifyOrExit(
-        IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr), mDeviceAddr),
+        IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr) - 1, mDeviceAddr),
         error = CHIP_ERROR_INVALID_ADDRESS);
 
     memmove(&mPairing, &serializable.mOpsCreds, sizeof(mPairing));
