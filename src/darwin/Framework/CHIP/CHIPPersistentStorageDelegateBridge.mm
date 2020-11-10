@@ -109,6 +109,7 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key, ch
     } else {
         size = [valueString length];
     }
+    // Increment size to account for null termination
     size += 1;
     return CHIP_NO_ERROR;
 }

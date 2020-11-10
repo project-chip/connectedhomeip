@@ -52,10 +52,11 @@ CHIP_ERROR Device::SendMessage(System::PacketBuffer * buffer)
 
     System::PacketBuffer * resend = nullptr;
 
+    VerifyOrExit(mSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // If there is no secure connection to the device, try establishing it
-    if (mState != kConnectionState_SecureConnected)
+    if (mState != ConnectionState::SecureConnected)
     {
         err = LoadSecureSessionParameters();
         SuccessOrExit(err);
@@ -74,9 +75,11 @@ CHIP_ERROR Device::SendMessage(System::PacketBuffer * buffer)
 
     // The send could fail due to network timeouts (e.g. broken pipe)
     // Try sesion resumption if needed
-    if (err != CHIP_NO_ERROR && resend != nullptr)
+    if (err != CHIP_NO_ERROR && resend != nullptr && mState == ConnectionState::SecureConnected)
     {
-        err = ResumeSecureSession();
+        mState = ConnectionState::NotConnected;
+
+        err = LoadSecureSessionParameters();
         SuccessOrExit(err);
 
         err    = mSessionManager->SendMessage(mDeviceId, resend);
@@ -106,14 +109,17 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     uint16_t serializedLen = 0;
     SerializableDevice serializable;
 
-    VerifyOrExit(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
+    nlSTATIC_ASSERT_PRINT(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner),
+                          "Size of serializable should be <= size of output");
 
     CHIP_ZERO_AT(serializable);
 
     memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
-    mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), INET6_ADDRSTRLEN);
+    nlSTATIC_ASSERT_PRINT(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN,
+                          "Size of device address must fit within INET6_ADDRSTRLEN");
+    mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
                                        static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
@@ -137,14 +143,15 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     VerifyOrExit(CanCastTo<uint16_t>(len), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     CHIP_ZERO_AT(serializable);
-    deserializedLen =
-        Base64Decode(Uint8::to_const_char(input.inner), static_cast<uint16_t>(len), Uint8::to_uchar((uint8_t *) &serializable));
+    deserializedLen = Base64Decode(Uint8::to_const_char(input.inner), static_cast<uint16_t>(len),
+                                   Uint8::to_uchar(reinterpret_cast<uint8_t *>(&serializable)));
 
     VerifyOrExit(deserializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), mDeviceAddr),
-                 error = CHIP_ERROR_INVALID_ADDRESS);
+    VerifyOrExit(
+        IPAddress::FromString(Uint8::to_const_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr), mDeviceAddr),
+        error = CHIP_ERROR_INVALID_ADDRESS);
 
     memmove(&mPairing, &serializable.mOpsCreds, sizeof(mPairing));
     mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
@@ -157,7 +164,7 @@ exit:
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                                Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
 {
-    if (mState == kConnectionState_SecureConnected && mStatusDelegate != nullptr)
+    if (mState == ConnectionState::SecureConnected && mStatusDelegate != nullptr)
     {
         mStatusDelegate->OnMessage(msgBuf);
     }
@@ -168,7 +175,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters()
     CHIP_ERROR err = CHIP_NO_ERROR;
     SecurePairingSession pairingSession;
 
-    if (mSessionManager == nullptr || mState == kConnectionState_SecureConnected)
+    if (mSessionManager == nullptr || mState == ConnectionState::SecureConnected)
     {
         ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
     }
@@ -184,7 +191,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters()
         &pairingSession);
     SuccessOrExit(err);
 
-    mState = kConnectionState_SecureConnected;
+    mState = ConnectionState::SecureConnected;
 
 exit:
 
@@ -195,32 +202,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR Device::ResumeSecureSession()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    VerifyOrExit(mState == kConnectionState_SecureConnected, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    mState = kConnectionState_NotConnected;
-
-    err = LoadSecureSessionParameters();
-    SuccessOrExit(err);
-
-exit:
-
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "ResumeSecureSession returning error %d\n", err);
-    }
-    return err;
-}
-
 bool Device::GetIpAddress(Inet::IPAddress & addr) const
 {
-    if (mState == kConnectionState_SecureConnected)
+    if (mState == ConnectionState::SecureConnected)
         addr = mDeviceAddr;
-    return mState == kConnectionState_SecureConnected;
+    return mState == ConnectionState::SecureConnected;
 }
 
 } // namespace Controller

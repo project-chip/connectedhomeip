@@ -81,8 +81,7 @@ public:
 
     /**
      * @brief
-     *   Lookup the key and call delegate object with it's stringified value.
-     *   This is a synchronous API, where the value is returned via the output
+     *   This is a synchronous Get API, where the value is returned via the output
      *   buffer. This API should be used sparingly, since it may block for
      *   some duration.
      *

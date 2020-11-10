@@ -83,7 +83,7 @@ constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
 
 DeviceController::DeviceController()
 {
-    mState                    = kState_NotInitialized;
+    mState                    = State::NotInitialized;
     mSessionManager           = nullptr;
     mLocalDeviceId            = 0;
     mStorageDelegate          = nullptr;
@@ -95,7 +95,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mState == kState_NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::NotInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     if (systemLayer != nullptr && inetLayer != nullptr)
     {
@@ -131,7 +131,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
 
     mSessionManager->SetDelegate(this);
 
-    mState         = kState_Initialized;
+    mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
 
 exit:
@@ -142,11 +142,11 @@ CHIP_ERROR DeviceController::Shutdown()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Controller, "Shutting down the controller");
 
-    mState = kState_NotInitialized;
+    mState = State::NotInitialized;
 
 #if CONFIG_DEVICE_LAYER
     err = DeviceLayer::PlatformMgr().Shutdown();
@@ -260,7 +260,7 @@ CHIP_ERROR DeviceController::ServiceEvents()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
 #if CONFIG_DEVICE_LAYER
     err = DeviceLayer::PlatformMgr().StartEventLoopTask();
@@ -275,7 +275,7 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
 #if CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
     DeviceLayer::SystemLayer.WakeSelect();
@@ -297,7 +297,7 @@ void DeviceController::OnMessageReceived(const PacketHeader & header, const Payl
     uint16_t index = 0;
     NodeId peer;
 
-    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(header.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     peer  = header.GetSourceNodeId().Value();
@@ -411,7 +411,7 @@ CHIP_ERROR DeviceCommissioner::Shutdown()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     ChipLogDetail(Controller, "Shutting down the commissioner");
 
@@ -435,7 +435,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
 
-    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
 #if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
@@ -488,7 +488,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     SecurePairingUsingTestSecret * testSecurePairingSecret = nullptr;
 
-    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
     testSecurePairingSecret = chip::Platform::New<SecurePairingUsingTestSecret>(Optional<NodeId>::Value(remoteDeviceId),
@@ -531,7 +531,7 @@ CHIP_ERROR DeviceCommissioner::StopPairing(NodeId remoteDeviceId)
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
 
-    VerifyOrExit(mState == kState_Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
     device = &mActiveDevices[mDeviceBeingPaired];

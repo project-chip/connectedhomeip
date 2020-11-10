@@ -95,6 +95,14 @@ public:
     virtual void OnPairingDeleted(CHIP_ERROR error) {}
 };
 
+/**
+ * @brief
+ *   The controller applications can use this class to commuicate with already paired CHIP devices. The
+ *   application is required to provide access to the persistent storage, where the paired device information
+ *   is stored. This object of this class can be initialized with the data from the storage (List of devices,
+ *   and device pairing information for individual devices). Alternatively, this class can retrieve the
+ *   relevant information when the application tries to communicate with the device
+ */
 class DLL_EXPORT DeviceController : public SecureSessionMgrDelegate, public PersistentStorageResultDelegate
 {
 public:
@@ -108,12 +116,32 @@ public:
     CHIP_ERROR Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate = nullptr,
                     System::Layer * systemLayer = nullptr, Inet::InetLayer * inetLayer = nullptr);
 
-    CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
-
     virtual CHIP_ERROR Shutdown();
 
+    /**
+     * @brief
+     *   This function derserializes the provided deviceInfo object, and initialzes and output the
+     *   corresponding Device object. The lifetime of the output object is tied to that of DeviceController
+     *   object. The caller must not use the Device object If they free the DeviceController object.
+     *
+     * @param[in] deviceId   Node ID for the CHIP device
+     * @param[in] deviceInfo Serialized device info for the device
+     * @param[out] device    The output device object
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
     CHIP_ERROR GetDevice(NodeId deviceId, const SerializedDevice & deviceInfo, Device ** device);
 
+    /**
+     * @brief
+     *   This function is similar to the other GetDevice object, except it reads the serialized object from
+     *   the persistent storage.
+     *
+     * @param[in] deviceId   Node ID for the CHIP device
+     * @param[out] device    The output device object
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
     virtual void ReleaseDevice(Device * device);
@@ -135,12 +163,18 @@ public:
     CHIP_ERROR ServiceEventSignal();
 
 protected:
-    enum
+    enum class State
     {
-        kState_NotInitialized = 0,
-        kState_Initialized    = 1
-    } mState;
+        NotInitialized,
+        Initialized
+    };
 
+    State mState;
+
+    /* A list of device objects that can be used for commincating with corresponding
+       CHIP device. The list does not contain all the paired devices, but only the ones
+       which the controller application is currently accessing.
+    */
     Device mActiveDevices[kNumMaxActiveDevices];
 
     SerializableU64Set<kNumMaxPairedDevices> mPairedDevices;
@@ -154,6 +188,7 @@ protected:
     uint16_t GetAvailableDevice();
     uint16_t FindDevice(NodeId id);
     void ReleaseDevice(uint16_t index);
+    CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
 
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////
@@ -169,6 +204,12 @@ private:
     System::Layer * mSystemLayer;
 };
 
+/**
+ * @brief
+ *   The commissioner applications can use this class to pair new/unpaired CHIP devices. The application is
+ *   required to provide write access to the persistent storage, where the paired device information
+ *   will be stored.
+ */
 class DLL_EXPORT DeviceCommissioner : public DeviceController, public RendezvousSessionDelegate
 {
 public:
@@ -197,7 +238,7 @@ public:
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] params                The Rendezvous connection parameters
      * @param[in] devicePort            [Optional] The CHIP Device's port, defaults to CHIP_PORT
-     * @param[in] interfaceId           [Optional] The interface indicator to use
+     * @param[in] interfaceId           [Optional] The local inet interface to use to communicate with the device.
      *
      * @return CHIP_ERROR               The connection status
      */
@@ -208,15 +249,24 @@ public:
     PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Inet::IPAddress & deviceAddr, SerializedDevice & serialized,
                                   uint16_t devicePort = CHIP_PORT, Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID);
 
+    /**
+     * @brief
+     *   This function stops a pairing process that's in progress. It does not delete the pairing of a previously
+     *   paired device.
+     *
+     * @param[in] remoteDeviceId        The remote device Id.
+     *
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
+     */
     CHIP_ERROR StopPairing(NodeId remoteDeviceId);
 
     /**
      * @brief
-     *   Remove pairing for a paired device.
+     *   Remove pairing for a paired device. If the device is currently being paired, it'll stop the pairing process.
      *
      * @param[in] remoteDeviceId        The remote device Id.
      *
-     * @return CHIP_ERROR               The connection status
+     * @return CHIP_ERROR               CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR UnpairDevice(NodeId remoteDeviceId);
 
@@ -230,13 +280,16 @@ public:
     void ReleaseDevice(Device * device) override;
 
 private:
-    // SecurePairingUsingTestSecret * mTestSecurePairingSecret;
-
     DevicePairingDelegate * mPairingDelegate;
     RendezvousSession * mRendezvousSession;
 
+    /* This field is an index in mActiveDevices list. The object at this index in the list
+       contains the device object that's tracking the state of the device that's being paired */
     uint16_t mDeviceBeingPaired;
 
+    /* This field is true when device pairing information changes, e.g. a new device is paired, or
+       the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
+       persist the device list */
     bool mPairedDevicesUpdated;
 
     void PersistDeviceList();

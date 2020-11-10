@@ -44,9 +44,17 @@ struct SerializedDevice;
 class DLL_EXPORT Device
 {
 public:
-    Device() {}
+    Device() : mActive(false), mState(ConnectionState::NotConnected) {}
     ~Device() {}
 
+    /**
+     * @brief
+     *   Set the delegate object which will be called when a message is received.
+     *   The user of this Device object must reset the delegate (by calling
+     *   SetDelegate(nullptr)) before releasing their delegate object.
+     *
+     * @param[in] delegate   The pointer to the delegate object.
+     */
     void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
     // ----- Messaging -----
@@ -73,12 +81,44 @@ public:
      */
     bool GetIpAddress(Inet::IPAddress & addr) const;
 
+    /**
+     * @brief
+     *   Initialize the device object with secure session manager and inet layer object
+     *   references. This variant of function is typically used when the device object
+     *   is created from a serialized device information. The other parameters (address, port,
+     *   interface etc) are part of the serialized device, so those are not required to be
+     *   initialized.
+     *
+     *   Note: The lifetime of session manager, and inet layer objects must be longer than
+     *   that of this device object. If these objects are freed, while the device object is
+     *   still using them, it can lead to unknown behavior and crashes.
+     *
+     * @param[in] sessionMgr   Secure session manager object pointer
+     * @param[in] inetLayer    InetLayer object pointer
+     */
     void Init(SecureSessionMgr<Transport::UDP> * sessionMgr, Inet::InetLayer * inetLayer)
     {
         mSessionManager = sessionMgr;
         mInetLayer      = inetLayer;
     }
 
+    /**
+     * @brief
+     *   Initialize a new device object with secure session manager, inet layer object,
+     *   and other device specific parameters. This variant of function is typically used when
+     *   a new device is paired, and the corresponding device object needs to updated with
+     *   all device specifc parameters (address, port, interface etc).
+     *
+     *   This is not done as part of constructor so that the controller can have a list of
+     *   uninitialzed/unpaired device objects. The object is initialized only when the device
+     *   is actually paired.
+     *
+     * @param[in] sessionMgr   Secure session manager object pointer
+     * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] deviceId     Node ID of the device
+     * @param[in] devicePort   Port on which device is listening (typically CHIP_PORT)
+     * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
+     */
     void Init(SecureSessionMgr<Transport::UDP> * sessionMgr, Inet::InetLayer * inetLayer, NodeId deviceId, uint16_t devicePort,
               Inet::InterfaceId interfaceId)
     {
@@ -86,50 +126,76 @@ public:
         mDeviceId   = deviceId;
         mDevicePort = devicePort;
         mInterface  = interfaceId;
-        mState      = kConnectionState_Connecting;
+        mState      = ConnectionState::Connecting;
     }
 
-    /** @brief Serialize the Pairing Session to a string.
+    /** @brief Serialize the Pairing Session to a string. It's guaranteed that the string
+     *         will be null terminated, and there won't be any embedded null characters.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Serialize(SerializedDevice & output);
 
-    /** @brief Deserialize the Pairing Session from the string.
+    /** @brief Deserialize the Pairing Session from the string. It's expected that the string
+     *         will be null terminated, and there won't be any embedded null characters.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
     CHIP_ERROR Deserialize(const SerializedDevice & input);
 
+    /**
+     * @brief
+     *   This function is called when a message is received from the corresponding CHIP
+     *   device. The message ownership is transferred to the function, and it is expected
+     *   to release the message buffer before returning.
+     *
+     * @param[in] header        Reference to common packet header of the received message
+     * @param[in] payloadHeader Reference to payload header in the message
+     * @param[in] state         Pointer to the peer connection state on which message is received
+     * @param[in] msgBuf        The message buffer
+     * @param[in] mgr           Pointer to secure session manager which received the message
+     */
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
                            System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr);
 
-    bool IsActive() { return mActive; }
+    /**
+     * @brief
+     *   Return if the current device object is actively associated with a paired CHIP
+     *   device. An active object can be used to communicate with the corresponding device.
+     */
+    bool IsActive() const { return mActive; }
 
     void SetActive(bool active) { mActive = active; }
 
-    NodeId GetDeviceId() { return mDeviceId; }
+    NodeId GetDeviceId() const { return mDeviceId; }
 
-    void SetAddress(Inet::IPAddress deviceAddr) { mDeviceAddr = deviceAddr; }
+    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddr = deviceAddr; }
 
     SecurePairingSessionSerializable & GetPairing() { return mPairing; }
 
 private:
-    enum ConnectionState
+    enum class ConnectionState
     {
-        kConnectionState_NotConnected,
-        kConnectionState_Connecting,
-        kConnectionState_SecureConnected,
+        NotConnected,
+        Connecting,
+        SecureConnected,
     };
 
+    /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
+
+    /* IP Address of the CHIP device */
     Inet::IPAddress mDeviceAddr;
+
+    /* Port on which the CHIP device is receiving message. Typically it is CHIP_PORT */
     uint16_t mDevicePort;
+
+    /* Local network interface that should be used to communicate with the device */
     Inet::InterfaceId mInterface;
 
     Inet::InetLayer * mInetLayer;
 
-    bool mActive = false;
+    bool mActive;
     ConnectionState mState;
 
     SecurePairingSessionSerializable mPairing;
@@ -138,8 +204,13 @@ private:
 
     SecureSessionMgr<Transport::UDP> * mSessionManager;
 
+    /**
+     * @brief
+     *   This function loads the secure session object from the serialized operational
+     *   credentials corresponding to the device. This is typically done when the device
+     *   does not have an active secure channel.
+     */
     CHIP_ERROR LoadSecureSessionParameters();
-    CHIP_ERROR ResumeSecureSession();
 };
 
 /**
@@ -172,14 +243,16 @@ public:
 typedef struct SerializableDevice
 {
     SecurePairingSessionSerializable mOpsCreds;
-    uint64_t mDeviceId;
+    uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort;
+    uint16_t mDevicePort; /* This field is serealized in LittelEndian byte order */
 } SerializableDevice;
 
 typedef struct SerializedDevice
 {
     // Extra uint64_t to account for padding bytes (NULL termination, and some decoding overheads)
+    // The encoder may not include a NULL character, and there are maximum 2 bytes of padding.
+    // So extra 8 bytes should be sufficient to absorb this overhead.
     uint8_t inner[BASE64_ENCODED_LEN(sizeof(SerializableDevice) + sizeof(uint64_t))];
 } SerializedDevice;
 
