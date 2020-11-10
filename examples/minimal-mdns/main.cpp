@@ -41,7 +41,14 @@ constexpr uint32_t kTestMessageId = 0x1234;
 
 constexpr size_t kMdnsMaxPacketSize = 1'024;
 
-const mdns::Minimal::QNamePart kCastQnames[] = { "_googlecast", "_tcp", "local" };
+// const mdns::Minimal::QNamePart kCastQnames[] = { "_googlecast", "_tcp", "local" };
+const mdns::Minimal::QNamePart kCastQnames[] = { "octopi", "local" };
+
+// IPV4 address:
+const char * kMdnsQueryDestination = "224.0.0.251";
+
+// IPV6 address:
+// const char * kMdnsQueryDestination = "FF02::FB";
 
 const char * ToString(mdns::Minimal::QType t)
 {
@@ -266,12 +273,6 @@ void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::P
     }
 }
 
-// IPV4 address:
-const char * kMdnsQueryDestination = "224.0.0.251";
-
-// IPV6 address:
-// const char *kMdnsQueryDestination = "FF02::FB";
-
 } // namespace
 
 int main(int argc, char ** args)
@@ -320,12 +321,14 @@ int main(int argc, char ** args)
     if (udp->Bind(destIpAddr.Type(), chip::Inet::IPAddress::Any, kFakeMdnsPort) != CHIP_NO_ERROR)
     {
         printf("Failed to bind\n");
+        return 1;
     }
 
     udp->OnMessageReceived = OnUdpPacketReceived;
     if (udp->Listen() != CHIP_NO_ERROR)
     {
         printf("Failed to listen\n");
+        return 1;
     }
 
     SendPacket(udp, destIpAddr);

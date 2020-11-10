@@ -8,6 +8,15 @@ from dataclasses import dataclass
 
 from construct import *
 
+# LOCAL_ADDR = ("0.0.0.0", 5388)
+LOCAL_ADDR = ("::", 5388)
+
+# DEST_ADDR = ("224.0.0.251", 5353)
+DEST_ADDR = ("ff02::fb", 5353)
+
+# QUERY_QNAME = "_googlecast._tcp.local"
+QUERY_QNAME = "octopi.local"
+
 
 def EndsWithEmpty(x, lst, ctx):
   return not x
@@ -189,8 +198,7 @@ class EchoClientProtocol:
         "ID": 0x1234,
         "Questions": [
             {
-                "QNAME": "_googlecast._tcp.local",
-                # "QNAME": "octopi.local",
+                "QNAME": QUERY_QNAME,
                 "QCLASS": {
                     "Unicast": True
                 }
@@ -205,7 +213,7 @@ class EchoClientProtocol:
     logging.info("Sending:\n%s", DNSQuery.parse(query))
     logging.info("BINARY:\n%s", HEX.parse(query))
 
-    self.transport.sendto(query, ("224.0.0.251", 5353))
+    self.transport.sendto(query, DEST_ADDR)
     logging.info("Query sent")
 
   def datagram_received(self, data, addr):
@@ -228,7 +236,7 @@ async def main():
 
   transport, protocol = await loop.create_datagram_endpoint(
       lambda: EchoClientProtocol(client_done),
-      local_addr=("0.0.0.0", 5388),
+      local_addr=LOCAL_ADDR
   )
 
   try:
