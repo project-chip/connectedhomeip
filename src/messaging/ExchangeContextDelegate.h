@@ -63,6 +63,15 @@ public:
      *  @param[in]    ec            A pointer to the ExchangeContext object.
      */
     virtual void OnResponseTimeout(ExchangeContext * ec) = 0;
+
+    /**
+     * @brief
+     *   This function is the protocol callback to invoke when the associated
+     *   exchange context is being closed
+     *
+     *  @param[in]    ec            A pointer to the ExchangeContext object.
+     */
+    virtual void OnExchangeClosing(ExchangeContext * ec) {}
 };
 
 /**
