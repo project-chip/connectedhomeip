@@ -274,7 +274,9 @@ void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::P
     }
 }
 
-/// Heuristic to find an interface ID that is suitable
+/// Heuristic to find an interface ID that is suitable for mDNS
+/// Since mDNS is being broadcast on link-local addresses, we need to be able
+/// to pick the right one for sending/receiving
 chip::Inet::InterfaceId FindBestInterfaceId()
 {
 
@@ -283,27 +285,29 @@ chip::Inet::InterfaceId FindBestInterfaceId()
 #else
     chip::Inet::InterfaceId result = INET_NULL_INTERFACEID;
 
+    printf("Searching for a suitable INET Interface");
+
     chip::Inet::InterfaceIterator intIterator;
     for (chip::Inet::InterfaceIterator intIterator; intIterator.HasCurrent(); intIterator.Next())
     {
         char name[64];
         if (!intIterator.GetInterfaceName(name, sizeof(name)) == CHIP_NO_ERROR)
         {
-            printf("!!!! FAILED TO GET INTERFACE NAME");
+            printf("!!!! FAILED TO GET INTERFACE NAME\n");
             continue;
         }
 
-        printf("FOUND Interface: %s\n", name);
+        printf("  FOUND Interface: %s\n", name);
 
         if (!intIterator.IsUp() || !intIterator.SupportsMulticast())
         {
-            printf("   Not up or multicast. Ignoring.");
+            printf("     Not up or multicast. Ignoring.\n");
             continue;
         }
 
         if (memcmp(name, "docker", 6) == 0)
         {
-            printf("   Docker interface. Ignoring.");
+            printf("     Docker interface. Ignoring.\n");
             continue;
         }
 
@@ -364,7 +368,7 @@ int main(int argc, char ** args)
         char buff[64];
         if (chip::Inet::GetInterfaceName(interfaceId, buff, sizeof(buff)) == CHIP_NO_ERROR)
         {
-            printf("USING interface: %s.\n", buff);
+            printf("USING Interface: %s.\n", buff);
         }
         else
         {
