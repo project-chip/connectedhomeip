@@ -508,7 +508,6 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
     AvahiServiceBrowser * browser;
     BrowseContext * browseContext = static_cast<BrowseContext *>(chip::Platform::MemoryAlloc(sizeof(BrowseContext)));
     AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface);
-    AvahiProtocol avahiProtocol;
 
     browseContext->mInstance = this;
     browseContext->mContext  = context;

@@ -162,7 +162,6 @@ exit:
 CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
 {
 #if CHIP_ENABLE_MDNS
-    uint8_t mac[6]; // 6 byte wifi mac
     CHIP_ERROR error = CHIP_NO_ERROR;
     MdnsService service;
     uint16_t discriminator;
