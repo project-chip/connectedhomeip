@@ -46,7 +46,7 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
             }
 
             // PTR contains 2 bytes
-            if (mValidDataEnd - mCurrentPosition > 2)
+            if (mValidDataEnd - mCurrentPosition < 2)
             {
                 mValidData = false;
                 return false;
