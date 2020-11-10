@@ -196,7 +196,7 @@ void ExchangeContext::Reset()
 }
 
 ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                                         ExchangeContextDelegateFactory * delegateFactory)
+                                         ExchangeAcceptor * acceptor)
 {
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
@@ -214,7 +214,7 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
 
-    mDelegate = delegateFactory->CreateDelegate(this);
+    mDelegate = acceptor->CreateDelegate(this);
     if (mDelegate == nullptr)
     {
         Release();
@@ -298,7 +298,7 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
     // wants to never receive the response, they must close the exchange context.
 
-    ExchangeContextDelegate * delegate = ec->GetDelegate();
+    ExchangeDelegate * delegate = ec->GetDelegate();
 
     // Call the user's timeout handler.
     if (delegate != nullptr)

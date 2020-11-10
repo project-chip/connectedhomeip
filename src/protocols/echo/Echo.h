@@ -44,7 +44,7 @@ enum
 
 typedef void (*EchoFunct)(NodeId nodeId, System::PacketBuffer * payload);
 
-class DLL_EXPORT EchoClient : public ExchangeContextDelegate
+class DLL_EXPORT EchoClient : public ExchangeDelegate
 {
 public:
     /**
@@ -100,7 +100,7 @@ private:
     void OnResponseTimeout(ExchangeContext * ec) override;
 };
 
-class DLL_EXPORT EchoServer : public SimpleExchangeContextDelegate
+class DLL_EXPORT EchoServer : public SimpleExchangeDelegate
 {
 public:
     /**
