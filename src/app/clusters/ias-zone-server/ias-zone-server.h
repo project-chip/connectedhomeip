@@ -42,9 +42,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-//-----------------------------------------------------------------------------
-#ifndef SILABS_IAS_ZONE_SERVER_H
-#define SILABS_IAS_ZONE_SERVER_H
+#pragma once
 
 #include <app/util/af-types.h>
 
@@ -149,5 +147,3 @@ void emberAfPluginIasZoneServerPrintQueue(void);
 /** @brief Prints the satus queue config.
  */
 void emberAfPluginIasZoneServerPrintQueueConfig(void);
-
-#endif // SILABS_IAS_ZONE_SERVER_H

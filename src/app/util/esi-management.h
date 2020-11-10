@@ -39,8 +39,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef SILABS_ESI_MANAGEMENT_H
-#define SILABS_ESI_MANAGEMENT_H
+#pragma once
 
 #include "af.h"
 
@@ -173,5 +172,3 @@ bool emberAfPluginEsiManagementSubscribeToDeletionAnnouncements(EmberAfEsiManage
  *  entry could not be added since the table was full.
  **/
 uint8_t emberAfPluginEsiManagementUpdateEsiAndGetIndex(const EmberAfClusterCommand * cmd);
-
-#endif // SILABS_ESI_MANAGEMENT_H

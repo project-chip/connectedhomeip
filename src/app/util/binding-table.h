@@ -19,8 +19,7 @@
  * @file API declarations for a binding table.
  */
 
-#ifndef BINDING_TABLE_H
-#define BINDING_TABLE_H
+#pragma once
 
 #include <app/util/af-types.h>
 
@@ -40,5 +39,3 @@ EmberStatus emberDeleteBinding(uint8_t index);
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
-
-#endif // BINDING_TABLE_H

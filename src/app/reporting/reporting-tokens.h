@@ -37,6 +37,8 @@
  *******************************************************************************
  ******************************************************************************/
 
+#pragma once
+
 #define CREATOR_REPORT_TABLE (0x8725)
 // This key is used for an indexed token and the subsequent 0x7F keys are also reserved
 #define NVM3KEY_REPORT_TABLE (NVM3KEY_DOMAIN_ZIGBEE | 0x4000)

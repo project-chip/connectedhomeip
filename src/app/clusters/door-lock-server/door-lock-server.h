@@ -38,8 +38,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef SILABS_DOOR_LOCK_SERVER_H
-#define SILABS_DOOR_LOCK_SERVER_H
+#pragma once
 
 // ------------------------------------------------------------------------------
 // Core
@@ -259,5 +258,3 @@ bool emAfPluginDoorLockServerCheckForSufficientSpace(uint16_t spaceReq, uint8_t 
  * @returns true if the callback was able to activate/deactivate the Lock.
  */
 bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate);
-
-#endif // SILABS_DOOR_LOCK_SERVER_H

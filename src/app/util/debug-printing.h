@@ -35,9 +35,7 @@
 //
 //
 
-// Enclosing macro to prevent multiple inclusion
-#ifndef SILABS_EMBER_AF_DEBUG_PRINTING
-#define SILABS_EMBER_AF_DEBUG_PRINTING
+#pragma once
 
 #include "debug-printing-test.h"
 
@@ -2937,5 +2935,3 @@
 #define emberAfCustom3PrintBuffer(buffer, len, withSpace)
 #define emberAfCustom3PrintString(buffer)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_CUSTOM3)
-
-#endif // SILABS_EMBER_AF_DEBUG_PRINTING
