@@ -218,16 +218,8 @@ private:
     mdns::Minimal::BytesRange mPacketRange;
 };
 
-void SendPacket(Inet::UDPEndPoint * udp, const char * destIpString)
+void SendPacket(Inet::UDPEndPoint * udp, const Inet::IPAddress & destIpAddr)
 {
-    Inet::IPAddress destIpAddr;
-
-    if (!Inet::IPAddress::FromString(destIpString, destIpAddr))
-    {
-        printf("Cannot parse IP address: '%s'", destIpString);
-        return;
-    }
-
     System::PacketBuffer * buffer = System::PacketBuffer::NewWithAvailableSize(kMdnsMaxPacketSize);
     if (buffer == nullptr)
     {
@@ -274,6 +266,12 @@ void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::P
     }
 }
 
+// IPV4 address:
+const char * kMdnsQueryDestination = "224.0.0.251";
+
+// IPV6 address:
+// const char *kMdnsQueryDestination = "FF02::FB";
+
 } // namespace
 
 int main(int argc, char ** args)
@@ -312,7 +310,14 @@ int main(int argc, char ** args)
         printf("Failed to create the shutdown timer. Kill with ^C.\n");
     }
 
-    if (udp->Bind(chip::Inet::IPAddressType::kIPAddressType_IPv4, chip::Inet::IPAddress::Any, kFakeMdnsPort) != CHIP_NO_ERROR)
+    Inet::IPAddress destIpAddr;
+    if (!Inet::IPAddress::FromString(kMdnsQueryDestination, destIpAddr))
+    {
+        printf("Cannot parse IP address: '%s'", kMdnsQueryDestination);
+        return 1;
+    }
+
+    if (udp->Bind(destIpAddr.Type(), chip::Inet::IPAddress::Any, kFakeMdnsPort) != CHIP_NO_ERROR)
     {
         printf("Failed to bind\n");
     }
@@ -323,8 +328,7 @@ int main(int argc, char ** args)
         printf("Failed to listen\n");
     }
 
-    SendPacket(udp, "224.0.0.251");
-    // SendPacket(udp, "FF02::FB");
+    SendPacket(udp, destIpAddr);
 
     DeviceLayer::PlatformMgr().RunEventLoop();
 
