@@ -16,12 +16,14 @@
  */
 
 #include <cstdio>
+#include <memory>
 
 #include <inet/UDPEndPoint.h>
 #include <mdns/minimal/DnsHeader.h>
 #include <mdns/minimal/Parser.h>
 #include <mdns/minimal/QName.h>
 #include <mdns/minimal/QueryBuilder.h>
+#include <mdns/minimal/RecordData.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 #include <system/SystemPacketBuffer.h>
@@ -75,6 +77,31 @@ const char * ToString(mdns::Minimal::QType t)
     }
 }
 
+class TxtReport : public mdns::Minimal::TxtRecordDelegate
+{
+public:
+    void OnRecord(const mdns::Minimal::BytesRange & name, const mdns::Minimal::BytesRange * value)
+    {
+        std::unique_ptr<char[]> nameBuff(new char[name.Size() + 1]);
+        std::unique_ptr<char[]> valueBuff(new char[value ? (value->Size() + 1) : 32]);
+
+        memcpy(nameBuff.get(), name.Start(), name.Size());
+        nameBuff.get()[name.Size()] = 0;
+
+        if (value)
+        {
+            memcpy(valueBuff.get(), value->Start(), value->Size());
+            valueBuff.get()[value->Size()] = 0;
+        }
+        else
+        {
+            strcpy(valueBuff.get(), "!!NULL!!");
+        }
+
+        printf("            TXT:  '%s' = '%s'\n", nameBuff.get(), valueBuff.get());
+    }
+};
+
 class PacketReporter : public mdns::Minimal::ParserDelegate
 {
 public:
@@ -123,6 +150,12 @@ public:
             printf("   (INVALID!)");
         }
         printf("\n");
+
+        if (data.GetType() == mdns::Minimal::QType::TXT)
+        {
+            TxtReport txtReport;
+            mdns::Minimal::ParseTxtRecord(data.GetData(), &txtReport);
+        }
     }
 };
 

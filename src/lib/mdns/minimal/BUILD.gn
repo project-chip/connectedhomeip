@@ -24,6 +24,8 @@ static_library("minimal") {
     "QName.h",
     "Query.h",
     "QueryBuilder.h",
+    "RecordData.cpp",
+    "RecordData.h",
   ]
 
   public_deps = [ "${chip_root}/src/lib/core" ]
