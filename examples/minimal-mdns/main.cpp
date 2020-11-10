@@ -73,7 +73,18 @@ public:
 
     void Resource(ResourceType type, const mdns::Minimal::ResourceData & data) override
     {
-        // FIXME: implement
+        printf("       RESOURCE %d", static_cast<int>(type));
+        printf("          NAME: ");
+        mdns::Minimal::SerializedQNameIterator it = data.GetName();
+        while (it.Next())
+        {
+            printf("%s.", it.Value());
+        }
+        if (!it.ValidData())
+        {
+            printf("   (INVALID!)");
+        }
+        printf("\n");
     }
 };
 

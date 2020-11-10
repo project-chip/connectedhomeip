@@ -20,7 +20,7 @@
 namespace mdns {
 namespace Minimal {
 
-bool QueryData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start, QueryData * out)
+bool QueryData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start)
 {
     // Structure is:
     //    QNAME
@@ -42,16 +42,60 @@ bool QueryData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const 
         return false;
     }
 
-    uint16_t type  = chip::Encoding::BigEndian::Read16(nameEnd);
+    // TODO: should there be checks for valid mType/class?
+
+    mType = static_cast<QType>(chip::Encoding::BigEndian::Read16(nameEnd));
+
     uint16_t klass = chip::Encoding::BigEndian::Read16(nameEnd);
 
-    bool unicast = (klass & Query::kUnicastAnswerFlag) != 0;
-    klass        = (klass & ~Query::kUnicastAnswerFlag);
+    mAnswerViaUnicast = (klass & Query::kUnicastAnswerFlag) != 0;
+    mClass            = static_cast<QClass>(klass & ~Query::kUnicastAnswerFlag);
+    mNameIterator     = SerializedQNameIterator(dataStart, dataEnd, *start);
 
-    *out   = QueryData(static_cast<QType>(type), static_cast<QClass>(klass),
-                     false, // FIXME: UNICAST ???
-                     *start, dataStart, dataEnd);
     *start = nameEnd;
+
+    return true;
+}
+
+bool ResourceData::Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start)
+{
+    // Structure is:
+    //    QNAME
+    //    TYPE      (16 bit)
+    //    CLASS     (16 bit)
+    //    TTL       (32 bit)
+    //    RDLENGTH  (16 bit)
+    //    <DATA>    (RDLENGTH bytpes)
+    const uint8_t * nameEnd = nullptr;
+
+    {
+        SerializedQNameIterator it(dataStart, dataEnd, *start);
+        nameEnd = it.FindDataEnd();
+    }
+    if (nameEnd == nullptr)
+    {
+        return false;
+    }
+
+    // need 3*u16 + u32
+    if (dataEnd - nameEnd < 10)
+    {
+        return false;
+    }
+
+    chip::Encoding::BigEndian::Read16(nameEnd);                    // Type
+    chip::Encoding::BigEndian::Read16(nameEnd);                    // Class
+    chip::Encoding::BigEndian::Read32(nameEnd);                    // TTL
+    uint16_t dataLen = chip::Encoding::BigEndian::Read16(nameEnd); // resource data
+
+    if (dataEnd - nameEnd < dataLen)
+    {
+        return false; // no space for RDATA
+    }
+
+    mNameIterator = SerializedQNameIterator(dataStart, dataEnd, *start);
+
+    *start = nameEnd + dataLen;
 
     return true;
 }
@@ -82,7 +126,7 @@ bool ParsePacket(const uint8_t * packet, size_t length, ParserDelegate * delegat
         QueryData queryData;
         for (unsigned i = 0; i < header.GetQueryCount(); i++)
         {
-            if (!queryData.Parse(dataStart, dataEnd, &data, &queryData))
+            if (!queryData.Parse(dataStart, dataEnd, &data))
             {
                 return false;
             }
@@ -91,43 +135,38 @@ bool ParsePacket(const uint8_t * packet, size_t length, ParserDelegate * delegat
         }
     }
 
-    // FIXME: implement the rest
-    /*
-    mdns::Minimal::HeaderRef hdr(buffer->Start());
-
-    buffer->SetStart(buffer->Start() + mdns::Minimal::HeaderRef::kSizeBytes);
-
-    if (hdr.GetQueryCount() > 0)
     {
-        mdns::Minimal::SerializedQNameIterator it(buffer->Start(), buffer->Start() + buffer->DataLength(), buffer->Start());
+        ResourceData resourceData;
+        for (unsigned i = 0; i < header.GetAnswerCount(); i++)
+        {
+            if (!resourceData.Parse(dataStart, dataEnd, &data))
+            {
+                return false;
+            }
 
-        printf("      QUERY QNAME: ");
-        while (it.Next())
-        {
-            printf("%s.", it.Value());
+            delegate->Resource(ParserDelegate::ResourceType::kAnswer, resourceData);
         }
-        if (!it.ValidData())
-        {
-            printf("   (INVALID!)");
-        }
-        printf("\n");
-    }
-    else if (hdr.GetAnswerCount() > 0)
-    {
-        mdns::Minimal::SerializedQNameIterator it(buffer->Start(), buffer->Start() + buffer->DataLength(), buffer->Start());
 
-        printf("      ANSWER QNAME: ");
-        while (it.Next())
+        for (unsigned i = 0; i < header.GetAuthorityCount(); i++)
         {
-            printf("%s.", it.Value());
+            if (!resourceData.Parse(dataStart, dataEnd, &data))
+            {
+                return false;
+            }
+
+            delegate->Resource(ParserDelegate::ResourceType::kAuthority, resourceData);
         }
-        if (!it.ValidData())
+
+        for (unsigned i = 0; i < header.GetAdditionalCount(); i++)
         {
-            printf("   (INVALID!)");
+            if (!resourceData.Parse(dataStart, dataEnd, &data))
+            {
+                return false;
+            }
+
+            delegate->Resource(ParserDelegate::ResourceType::kAdditional, resourceData);
         }
-        printf("\n");
     }
-    */
 
     return true;
 }

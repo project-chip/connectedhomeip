@@ -47,10 +47,9 @@ public:
     ///
     /// Valid data packet is assumed between [dataStart] and [dataEnd]
     /// Parses the query at [start] and updates start to the end of the structure.
-    /// Updates [out] with the parsed data on success.
     ///
     /// returns true on parse success, false on failure.
-    static bool Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start, QueryData * out);
+    bool Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start);
 
 private:
     QType mType            = QType::ANY;
@@ -63,6 +62,23 @@ class ResourceData
 {
 public:
     ResourceData() {}
+
+    ResourceData(const ResourceData &) = default;
+    ResourceData & operator=(const ResourceData &) = default;
+
+    SerializedQNameIterator GetName() const { return mNameIterator; }
+
+    /// Parses a resource data structure
+    ///
+    /// Valid data packet is assumed between [dataStart] and [dataEnd]
+    /// Parses the daata at [start] and updates start to the end of the structure.
+    /// Updates [out] with the parsed data on success.
+    ///
+    /// returns true on parse success, false on failure.
+    bool Parse(const uint8_t * dataStart, const uint8_t * dataEnd, const uint8_t ** start);
+
+private:
+    SerializedQNameIterator mNameIterator;
 };
 
 class ParserDelegate
