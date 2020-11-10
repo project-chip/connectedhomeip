@@ -144,6 +144,10 @@ exit:
 void ExchangeContext::DoClose(bool clearRetransTable)
 {
     // Clear protocol callbacks
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnExchangeClosing(this);
+    }
     mDelegate = nullptr;
 
     // Cancel the response timer.
