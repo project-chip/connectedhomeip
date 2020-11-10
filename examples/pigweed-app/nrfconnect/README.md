@@ -96,8 +96,9 @@ container:
 
 > **Note**:
 >
-> -   `<board_name>` has to be replaced with a board name which might be nrf52840dk_nrf52840
->     for development kit board or nrf52840dongle_nrf52840 for dongle board.
+> -   `<board_name>` has to be replaced with a board name which might be
+>     nrf52840dk_nrf52840 for development kit board or nrf52840dongle_nrf52840
+>     for dongle board.
 
 If the build succeeds, the binary will be available under
 `/var/chip/examples/pigweed-app/nrfconnect/build/zephyr/zephyr.hex`. Note that
@@ -152,8 +153,9 @@ The following commands will build the `pigweed-app` example:
 
 > **Note**:
 >
-> -   `<board_name>` has to be replaced with a board name which might be nrf52840dk_nrf52840
->     for development kit board or nrf52840dongle_nrf52840 for dongle board.
+> -   `<board_name>` has to be replaced with a board name which might be
+>     nrf52840dk_nrf52840 for development kit board or nrf52840dongle_nrf52840
+>     for dongle board.
 
 After a successful build, the binary will be available under
 `<example-dir>/build/zephyr/zephyr.hex`
@@ -204,8 +206,9 @@ To open the configuration menu, do the following:
 
 > **Note**:
 >
-> -   `<board_name>` has to be replaced with a board name which might be nrf52840dk_nrf52840
->     for development kit board or nrf52840dongle_nrf52840 for dongle board.
+> -   `<board_name>` has to be replaced with a board name which might be
+>     nrf52840dk_nrf52840 for development kit board or nrf52840dongle_nrf52840
+>     for dongle board.
 
 Changes done with `menuconfig` will be lost, if the `build` directory is
 deleted. To make them persistent, save the configuration options in `prj.conf`
