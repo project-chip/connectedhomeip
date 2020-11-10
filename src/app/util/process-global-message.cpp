@@ -44,6 +44,10 @@
 
 #include <app/clusters/ias-zone-client/ias-zone-client.h>
 
+#ifdef EMBER_AF_PLUGIN_REPORTING
+#include <app/reporting/reporting.h>
+#endif // EMBER_AF_PLUGIN_REPORTING
+
 //#include "../plugin/key-establishment/key-establishment.h"
 //#include "../plugin/smart-energy-registration/smart-energy-registration.h"
 //#include "../plugin/trust-center-keepalive/trust-center-keepalive.h"
@@ -475,6 +479,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         return true;
     }
 
+#ifdef EMBER_AF_PLUGIN_REPORTING
     case ZCL_CONFIGURE_REPORTING_COMMAND_ID:
         if (emberAfConfigureReportingCommandCallback(cmd))
         {
@@ -488,6 +493,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
             return true;
         }
         break;
+#endif // EMBER_AF_PLUGIN_REPORTING
 
     // ([attribute id:2] [status:1] [type:0/1] [value:0/V])+
     case ZCL_READ_ATTRIBUTES_RESPONSE_COMMAND_ID:
@@ -573,6 +579,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         }
         return true;
 
+#ifdef EMBER_AF_PLUGIN_REPORTING
     // ([status:1] [direction:1] [attribute id:2])+
     case ZCL_CONFIGURE_REPORTING_RESPONSE_COMMAND_ID:
         if (!emberAfConfigureReportingResponseCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
@@ -591,6 +598,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
             emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
         }
         return true;
+#endif // EMBER_AF_PLUGIN_REPORTING
 
     // ([attribute id:2] [type:1] [data:V])+
     case ZCL_REPORT_ATTRIBUTES_COMMAND_ID:
