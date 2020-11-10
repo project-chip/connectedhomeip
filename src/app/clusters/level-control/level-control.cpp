@@ -543,10 +543,10 @@ static void moveToLevelHandler(uint8_t commandId, uint8_t level, uint16_t transi
         // Transition time comes in (or is stored, in the case of On/Off Transition
         // Time) as tenths of a second, but we work in milliseconds.
         state->transitionTimeMs = (transitionTimeDs * MILLISECOND_TICKS_PER_SECOND / 10);
-#else // ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
-      // If the Transition Time field is 0xFFFF and On/Off Transition Time,
-      // which is an optional attribute, is not present, the device shall move to
-      // its new level as fast as it is able.
+#else  // ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
+       // If the Transition Time field is 0xFFFF and On/Off Transition Time,
+       // which is an optional attribute, is not present, the device shall move to
+       // its new level as fast as it is able.
         state->transitionTimeMs = FASTEST_TRANSITION_TIME_MS;
 #endif // ZCL_USING_LEVEL_CONTROL_CLUSTER_ON_OFF_TRANSITION_TIME_ATTRIBUTE
     }
@@ -879,7 +879,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         resolvedLevel = temporaryCurrentLevelCache;
     }
 #else
-    resolvedLevel = temporaryCurrentLevelCache;
+    resolvedLevel              = temporaryCurrentLevelCache;
 #endif
 
     // Read the OnOffTransitionTime attribute.
