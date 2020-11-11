@@ -211,6 +211,12 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
+    err    = mDelegate->SendPairingMessage(PacketHeader().SetSourceNodeId(mLocalNodeId).SetEncryptionKeyID(mLocalKeyId),
+                                        payloadHeader.GetEncodePacketFlags(), mPeerAddress, msgBuf);
+    msgBuf = nullptr;
+    SuccessOrExit(err);
+
+exit:
     if (msgBuf)
         System::PacketBuffer::Free(msgBuf);
     return err;

@@ -96,7 +96,7 @@ public:
      * @param nodeId  The node ID resolved, 0 on error
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgrBase * mgr) {}
+    virtual void OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgr * mgr) {}
 
     virtual ~SecureSessionMgrDelegate() {}
 };
@@ -116,19 +116,6 @@ public:
     CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf);
     SecureSessionMgr();
     ~SecureSessionMgr() override;
-
-    /**
-     * @brief
-     *   Send a unsecured message to peerAddress
-     * @details
-     *   This function will fill packet header. and send it to
-     * transport layer on behalf of the caller.
-     *   All unsecure messages are stateless for SecureSessionMgr.
-     * This method calls <tt>chip::System::PacketBuffer::Free</tt>
-     * on behalf of the caller regardless of the return status.
-     */
-    CHIP_ERROR SendUnsecureMessage(PacketHeader & packetHeader, PayloadHeader & payloadHeader,
-                                   const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf);
 
     /**
      * @brief

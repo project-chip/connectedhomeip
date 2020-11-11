@@ -43,7 +43,7 @@ public:
                                   const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf) override
     {
         mNumMessageSend++;
-        return (peer != nullptr) ? peer->HandlePeerMessage(header, msgBuf) : mMessageSendError;
+        return (peer != nullptr) ? peer->HandlePeerMessage(header, peerAddress, msgBuf) : mMessageSendError;
     }
 
     void OnPairingError(CHIP_ERROR error) override { mNumPairingErrors++; }

@@ -302,7 +302,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                 System::PacketBuffer * msg) override
+    {
+        return CHIP_NO_ERROR;
+    }
 };
 
 typedef struct SecurePairingSessionSerialized

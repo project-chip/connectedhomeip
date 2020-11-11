@@ -123,11 +123,14 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
         mStorageDelegate->SetDelegate(this);
     }
 
-    mSessionManager = chip::Platform::New<SecureSessionMgr<Transport::UDP>>();
+    mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
+    mSessionManager = chip::Platform::New<SecureSessionMgr>();
 
-    err = mSessionManager->Init(localDeviceId, mSystemLayer,
-                                Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6));
+    err = mSessionManager->Init(localDeviceId, mSystemLayer);
     SuccessOrExit(err);
+
+    err = mTransportMgr->Init(mSessionManager, nullptr,
+                              Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6));
 
     mSessionManager->SetDelegate(this);
 
@@ -202,7 +205,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
         err = device->Deserialize(deviceInfo);
         VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-        device->Init(mSessionManager, mInetLayer);
+        device->Init(mTransportMgr, mSessionManager, mInetLayer);
     }
 
     *out_device = device;
@@ -264,7 +267,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             err = device->Deserialize(deviceInfo);
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-            device->Init(mSessionManager, mInetLayer);
+            device->Init(mTransportMgr, mSessionManager, mInetLayer);
         }
     }
 
@@ -309,11 +312,11 @@ exit:
     return err;
 }
 
-void DeviceController::OnNewConnection(Transport::PeerConnectionState * peerConnection, SecureSessionMgrBase * mgr) {}
+void DeviceController::OnNewConnection(Transport::PeerConnectionState * peerConnection, SecureSessionMgr * mgr) {}
 
 void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                                          Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
-                                         SecureSessionMgrBase * mgr)
+                                         SecureSessionMgr * mgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t index = 0;
@@ -470,7 +473,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
     SuccessOrExit(err);
 
-    device->Init(mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -513,7 +516,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     testSecurePairingSecret->ToSerializable(device->GetPairing());
 
-    device->Init(mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
 
     device->SetAddress(deviceAddr);
 

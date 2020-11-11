@@ -177,64 +177,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::SendUnsecureMessage(PacketHeader & packetBuffer, PayloadHeader & payloadHeader,
-                                                 const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
-
-    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-    {
-        uint8_t * data = nullptr;
-        PacketHeader packetHeader;
-        MessageAuthenticationCode mac;
-
-        const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
-        uint16_t actualEncodedHeaderSize;
-        uint16_t totalLen = 0;
-        uint32_t payloadLength; // Make sure it's big enough to add two 16-bit
-                                // ints without overflowing.
-        static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
-                      "Addition to generate payloadLength might overflow");
-        payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
-        VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
-
-        packetHeader
-            .SetSourceNodeId(mLocalNodeId) //
-            .SetPayloadLength(static_cast<uint16_t>(payloadLength));
-        packetHeader.GetFlags().Clear(Header::FlagValues::kSecure);
-
-        VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
-
-        msgBuf->SetStart(msgBuf->Start() - headerSize);
-        data     = msgBuf->Start();
-        totalLen = msgBuf->TotalLength();
-
-        err = payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
-        SuccessOrExit(err);
-
-        ChipLogDetail(Inet, "Transmitting unsecured msg");
-
-        err    = mTransportMgr->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), peerAddress, msgBuf);
-        msgBuf = nullptr;
-    }
-    SuccessOrExit(err);
-
-exit:
-    if (msgBuf != nullptr)
-    {
-        const char * errStr = ErrorStr(err);
-        ChipLogError(Inet, "Secure transport could not find a valid PeerConnection: %s", errStr);
-        PacketBuffer::Free(msgBuf);
-        msgBuf = nullptr;
-    }
-
-    return err;
-}
-
 CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, SecurePairingSession * pairing)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
