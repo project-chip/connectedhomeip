@@ -14,8 +14,8 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#ifndef EMBER_PRINT_H
-#define EMBER_PRINT_H 1
+
+#pragma once
 
 #include "debug-printing.h"
 
@@ -59,5 +59,3 @@ void emberAfPrintString(int category, const uint8_t * string);
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
-
-#endif // EMBER_PRINT_H

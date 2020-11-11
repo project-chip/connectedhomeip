@@ -39,14 +39,13 @@
  *******************************************************************************
  ******************************************************************************/
 
+#pragma once
+
 /** @addtogroup aftypes Zigbee Application Framework Types Reference
  * This documentation describes the types used by the Zigbee
  * Application Framework.
  * @{
  */
-
-#ifndef SILABS_AF_API_TYPES
-#define SILABS_AF_API_TYPES
 
 #include <stdbool.h> // For bool
 #include <stddef.h>  // For NULL.
@@ -1808,5 +1807,3 @@ typedef struct
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
-
-#endif // SILABS_AF_API_TYPES

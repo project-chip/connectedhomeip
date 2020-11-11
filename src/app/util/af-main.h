@@ -38,8 +38,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef SILABS_AF_MAIN_H
-#define SILABS_AF_MAIN_H
+#pragma once
 
 #include "af-types.h"
 
@@ -158,5 +157,3 @@ void emAfPrintEzspEndpointFlags(CHIPEndpointId endpoint);
 #define emberAfMoveInProgress() emberAfMoveInProgressCallback()
 #define emberAfStartMove() emberAfStartMoveCallback()
 #define emberAfStopMove() emberAfStopMoveCallback()
-
-#endif // SILABS_AF_MAIN_H

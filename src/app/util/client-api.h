@@ -38,8 +38,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef __CLIENT_API__
-#define __CLIENT_API__
+#pragma once
 
 #include "af-types.h"
 
@@ -178,5 +177,3 @@ extern EmberApsFrame * emAfCommandApsFrame;
 
 /** @} END addtogroup
  */
-
-#endif // __CLIENT_API__
