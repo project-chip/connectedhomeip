@@ -185,8 +185,8 @@ protected:
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
 
-    uint16_t GetAvailableDevice();
-    uint16_t FindDevice(NodeId id);
+    uint16_t GetInactiveDeviceIndex();
+    uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
 
@@ -214,7 +214,7 @@ class DLL_EXPORT DeviceCommissioner : public DeviceController, public Rendezvous
 {
 public:
     DeviceCommissioner();
-    ~DeviceCommissioner();
+    ~DeviceCommissioner() {}
 
     /**
      * Init function to be used when there exists a device layer that takes care of initializing
@@ -224,7 +224,7 @@ public:
                     DevicePairingDelegate * pairingDelegate = nullptr, System::Layer * systemLayer = nullptr,
                     Inet::InetLayer * inetLayer = nullptr);
 
-    CHIP_ERROR SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate);
+    void SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate) { mPairingDelegate = pairingDelegate; }
 
     CHIP_ERROR Shutdown() override;
 
@@ -234,6 +234,9 @@ public:
      *   Pair a CHIP device with the provided Rendezvous connection parameters.
      *   Use registered DevicePairingDelegate object to receive notifications on
      *   pairing status updates.
+     *
+     *   Note: Pairing process requires that the caller has registered PersistentStorageDelegate
+     *         in the Init() call.
      *
      * @param[in] remoteDeviceId        The remote device Id.
      * @param[in] params                The Rendezvous connection parameters

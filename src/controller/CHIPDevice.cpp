@@ -149,7 +149,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     VerifyOrExit(deserializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    // The second paramter to FromString takes the strlen value. We are subtracting 1
+    // The second parameter to FromString takes the strlen value. We are subtracting 1
     // from the sizeof(serializable.mDeviceAddr) to account for null termination, since
     // strlen doesn't include null character in the size.
     VerifyOrExit(

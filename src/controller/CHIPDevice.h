@@ -89,7 +89,7 @@ public:
      *   interface etc) are part of the serialized device, so those are not required to be
      *   initialized.
      *
-     *   Note: The lifetime of session manager, and inet layer objects must be longer than
+     *   Note: The lifetime of session manager and inet layer objects must be longer than
      *   that of this device object. If these objects are freed, while the device object is
      *   still using them, it can lead to unknown behavior and crashes.
      *
@@ -160,7 +160,7 @@ public:
 
     /**
      * @brief
-     *   Return if the current device object is actively associated with a paired CHIP
+     *   Return whether the current device object is actively associated with a paired CHIP
      *   device. An active object can be used to communicate with the corresponding device.
      */
     bool IsActive() const { return mActive; }
@@ -187,7 +187,7 @@ private:
     /* IP Address of the CHIP device */
     Inet::IPAddress mDeviceAddr;
 
-    /* Port on which the CHIP device is receiving message. Typically it is CHIP_PORT */
+    /* Port on which the CHIP device is receiving messages. Typically it is CHIP_PORT */
     uint16_t mDevicePort;
 
     /* Local network interface that should be used to communicate with the device */

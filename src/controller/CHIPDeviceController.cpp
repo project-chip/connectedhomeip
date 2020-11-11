@@ -161,6 +161,8 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemLayer = nullptr;
     mInetLayer   = nullptr;
 
+    mStorageDelegate = nullptr;
+
     if (mSessionManager != nullptr)
     {
         chip::Platform::Delete(mSessionManager);
@@ -175,7 +177,10 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
-    uint16_t index  = FindDevice(deviceId);
+    uint16_t index  = 0;
+
+    VerifyOrExit(out_device != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    index = FindDeviceIndex(deviceId);
 
     if (index < kNumMaxActiveDevices)
     {
@@ -185,7 +190,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
     {
         VerifyOrExit(mPairedDevices.Contains(deviceId), err = CHIP_ERROR_NOT_CONNECTED);
 
-        index = GetAvailableDevice();
+        index = GetInactiveDeviceIndex();
         VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
         device = &mActiveDevices[index];
 
@@ -195,7 +200,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
         device->Init(mSessionManager, mInetLayer);
     }
 
-    (*out_device) = device;
+    *out_device = device;
 
 exit:
     return err;
@@ -205,7 +210,11 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
-    uint16_t index  = FindDevice(deviceId);
+    uint16_t index  = 0;
+    char * buffer   = nullptr;
+
+    VerifyOrExit(out_device != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    index = FindDeviceIndex(deviceId);
 
     if (index < kNumMaxActiveDevices)
     {
@@ -213,11 +222,15 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
     }
     else
     {
+        VerifyOrExit(mStorageDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+
         if (!mPairedDevicesInitialized)
         {
-            const uint16_t max_size = CHIP_MAX_SERIALIZED_SIZE_U64(kNumMaxPairedDevices);
-            char buffer[max_size];
-            uint16_t size = max_size;
+            constexpr uint16_t max_size = CHIP_MAX_SERIALIZED_SIZE_U64(kNumMaxPairedDevices);
+            buffer                      = static_cast<char *>(chip::Platform::MemoryAlloc(max_size));
+            uint16_t size               = max_size;
+
+            VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
             PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
                               err = mStorageDelegate->GetKeyValue(key, buffer, size));
@@ -230,7 +243,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
 
         VerifyOrExit(mPairedDevices.Contains(deviceId), err = CHIP_ERROR_NOT_CONNECTED);
 
-        index = GetAvailableDevice();
+        index = GetInactiveDeviceIndex();
         VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
         device = &mActiveDevices[index];
 
@@ -250,9 +263,13 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
         }
     }
 
-    (*out_device) = device;
+    *out_device = device;
 
 exit:
+    if (buffer != nullptr)
+    {
+        chip::Platform::MemoryFree(buffer);
+    }
     return err;
 }
 
@@ -301,7 +318,7 @@ void DeviceController::OnMessageReceived(const PacketHeader & header, const Payl
     VerifyOrExit(header.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     peer  = header.GetSourceNodeId().Value();
-    index = FindDevice(peer);
+    index = FindDeviceIndex(peer);
     VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
     mActiveDevices[index].OnMessageReceived(header, payloadHeader, state, msgBuf, mgr);
@@ -310,7 +327,7 @@ exit:
     return;
 }
 
-uint16_t DeviceController::GetAvailableDevice()
+uint16_t DeviceController::GetInactiveDeviceIndex()
 {
     uint16_t i = 0;
     while (i < kNumMaxActiveDevices && mActiveDevices[i].IsActive())
@@ -336,7 +353,7 @@ void DeviceController::ReleaseDevice(uint16_t index)
     }
 }
 
-uint16_t DeviceController::FindDevice(NodeId id)
+uint16_t DeviceController::FindDeviceIndex(NodeId id)
 {
     uint16_t i = 0;
     while (i < kNumMaxActiveDevices)
@@ -375,17 +392,12 @@ void DeviceController::OnValue(const char * key, const char * value) {}
 
 void DeviceController::OnStatus(const char * key, Operation op, CHIP_ERROR err) {}
 
-DeviceCommissioner::DeviceCommissioner() : DeviceController()
+DeviceCommissioner::DeviceCommissioner()
 {
     mPairingDelegate      = nullptr;
     mRendezvousSession    = nullptr;
     mDeviceBeingPaired    = kNumMaxActiveDevices;
     mPairedDevicesUpdated = false;
-}
-
-DeviceCommissioner::~DeviceCommissioner()
-{
-    PersistDeviceList();
 }
 
 CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate,
@@ -399,12 +411,6 @@ CHIP_ERROR DeviceCommissioner::Init(NodeId localDeviceId, PersistentStorageDeleg
 
 exit:
     return err;
-}
-
-CHIP_ERROR DeviceCommissioner::SetDevicePairingDelegate(DevicePairingDelegate * pairingDelegate)
-{
-    mPairingDelegate = pairingDelegate;
-    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR DeviceCommissioner::Shutdown()
@@ -429,7 +435,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params, uint16_t devicePort,
+CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParameters & params, uint16_t remotePort,
                                           Inet::InterfaceId interfaceId)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -437,6 +443,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(mStorageDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
 #if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
     if (!params.HasBleLayer())
@@ -445,20 +452,16 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     }
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
 
-    mDeviceBeingPaired = GetAvailableDevice();
+    mDeviceBeingPaired = GetInactiveDeviceIndex();
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
-    if (mRendezvousSession != nullptr)
-    {
-        chip::Platform::Delete(mRendezvousSession);
-    }
-
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
-    err                = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
+    VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
     SuccessOrExit(err);
 
-    device->Init(mSessionManager, mInetLayer, remoteDeviceId, devicePort, interfaceId);
+    device->Init(mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -480,7 +483,7 @@ exit:
 }
 
 CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDeviceId, const Inet::IPAddress & deviceAddr,
-                                                             SerializedDevice & serialized, uint16_t devicePort,
+                                                             SerializedDevice & serialized, uint16_t remotePort,
                                                              Inet::InterfaceId interfaceId)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -495,13 +498,13 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
                                                                                 static_cast<uint16_t>(0), static_cast<uint16_t>(0));
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    mDeviceBeingPaired = GetAvailableDevice();
+    mDeviceBeingPaired = GetInactiveDeviceIndex();
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
     testSecurePairingSecret->Serializable(device->GetPairing());
 
-    device->Init(mSessionManager, mInetLayer, remoteDeviceId, devicePort, interfaceId);
+    device->Init(mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
 
     device->SetAddress(deviceAddr);
 
@@ -579,6 +582,11 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
 
     if (mDeviceBeingPaired != kNumMaxActiveDevices)
     {
+        // Let's release the device that's being paired.
+        // If pairing was successful, it's information is
+        // already persisted. The application will use GetDevice()
+        // method to get access to the device, which will fetch
+        // the device information from the persistent storage.
         DeviceController::ReleaseDevice(mDeviceBeingPaired);
         mDeviceBeingPaired = kNumMaxActiveDevices;
     }
@@ -593,18 +601,16 @@ void DeviceCommissioner::OnRendezvousComplete()
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
+    SerializedDevice serialized;
+
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
     device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
 
-    if (mStorageDelegate != nullptr)
-    {
-        SerializedDevice serialized;
-        device->Serialize(serialized);
-        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                          mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
-    }
+    device->Serialize(serialized);
+    PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
+                      mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
 
 exit:
     if (err == CHIP_NO_ERROR)
@@ -665,14 +671,19 @@ void DeviceCommissioner::PersistDeviceList()
 {
     if (mStorageDelegate != nullptr && mPairedDevicesUpdated)
     {
-        const uint16_t size = CHIP_MAX_SERIALIZED_SIZE_U64(kNumMaxPairedDevices);
-        char serialized[size];
-        uint16_t requiredSize = size;
-        const char * value    = mPairedDevices.SerializeBase64(serialized, requiredSize);
-        if (value != nullptr && requiredSize <= size)
+        constexpr uint16_t size = CHIP_MAX_SERIALIZED_SIZE_U64(kNumMaxPairedDevices);
+        char * serialized       = static_cast<char *>(chip::Platform::MemoryAlloc(size));
+        uint16_t requiredSize   = size;
+        if (serialized != nullptr)
         {
-            PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key, mStorageDelegate->SetKeyValue(key, value));
-            mPairedDevicesUpdated = false;
+            const char * value = mPairedDevices.SerializeBase64(serialized, requiredSize);
+            if (value != nullptr && requiredSize <= size)
+            {
+                PERSISTENT_KEY_OP(static_cast<uint64_t>(0), kPairedDeviceListKeyPrefix, key,
+                                  mStorageDelegate->SetKeyValue(key, value));
+                mPairedDevicesUpdated = false;
+            }
+            chip::Platform::MemoryFree(serialized);
         }
     }
 }
