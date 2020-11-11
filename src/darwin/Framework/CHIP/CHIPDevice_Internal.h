@@ -15,22 +15,22 @@
  *    limitations under the License.
  */
 
-// pull together CHIP headers
-#import <CHIP/CHIPDevice.h>
-#import <CHIP/CHIPDeviceController.h>
-#import <CHIP/CHIPDevicePairingDelegate.h>
-#import <CHIP/CHIPError.h>
-#import <CHIP/CHIPManualSetupPayloadParser.h>
-#import <CHIP/CHIPOnOff.h>
-#import <CHIP/CHIPPersistentStorageDelegate.h>
-#import <CHIP/CHIPQRCodeSetupPayloadParser.h>
-#import <CHIP/CHIPSetupPayload.h>
+#ifndef CHIP_DEVICE_INTERNAL_H
+#define CHIP_DEVICE_INTERNAL_H
 
+#import "CHIPDevice.h"
 #import <Foundation/Foundation.h>
-//! Project version number for CHIP.
-FOUNDATION_EXPORT double CHIPVersionNumber;
 
-//! Project version string for CHIP.
-FOUNDATION_EXPORT const unsigned char CHIPVersionString[];
+#include <controller/CHIPDevice.h>
 
-// In this header, you should import all the public headers of your framework using statements like #import <CHIP/PublicHeader.h>
+NS_ASSUME_NONNULL_BEGIN
+
+@interface CHIPDevice ()
+
+- (instancetype)initWithDevice:(chip::Controller::Device *)device;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+#endif /* CHIP_DEVICE_INTERNAL_H */

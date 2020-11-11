@@ -15,22 +15,24 @@
  *    limitations under the License.
  */
 
-// pull together CHIP headers
-#import <CHIP/CHIPDevice.h>
-#import <CHIP/CHIPDeviceController.h>
-#import <CHIP/CHIPDevicePairingDelegate.h>
-#import <CHIP/CHIPError.h>
-#import <CHIP/CHIPManualSetupPayloadParser.h>
-#import <CHIP/CHIPOnOff.h>
-#import <CHIP/CHIPPersistentStorageDelegate.h>
-#import <CHIP/CHIPQRCodeSetupPayloadParser.h>
-#import <CHIP/CHIPSetupPayload.h>
-
+#import "CHIPError.h"
 #import <Foundation/Foundation.h>
-//! Project version number for CHIP.
-FOUNDATION_EXPORT double CHIPVersionNumber;
 
-//! Project version string for CHIP.
-FOUNDATION_EXPORT const unsigned char CHIPVersionString[];
+NS_ASSUME_NONNULL_BEGIN
 
-// In this header, you should import all the public headers of your framework using statements like #import <CHIP/PublicHeader.h>
+/**
+ * The protocol definition for the CHIPDevicePairingDelegate
+ *
+ * All delegate methods will be called on the supplied Delegate Queue.
+ */
+@protocol CHIPDeviceStatusDelegate <NSObject>
+@required
+/**
+ * Notify the delegate when a message is received from the device
+ *
+ */
+- (void)onMessageReceived:(NSData *)message;
+
+@end
+
+NS_ASSUME_NONNULL_END

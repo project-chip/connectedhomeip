@@ -20,6 +20,7 @@
 NSString * const kCHIPToolDefaultsDomain = @"com.apple.chiptool";
 NSString * const kNetworkSSIDDefaultsKey = @"networkSSID";
 NSString * const kNetworkPasswordDefaultsKey = @"networkPassword";
+NSString * const kCHIPNextAvailableDeviceIDKey = @"nextDeviceID";
 
 id CHIPGetDomainValueForKey(NSString * domain, NSString * key)
 {
@@ -40,6 +41,25 @@ void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
 {
     CFPreferencesSetAppValue((CFStringRef) key, NULL, (CFStringRef) domain);
     CFPreferencesAppSynchronize((CFStringRef) domain);
+}
+
+uint64_t CHIPGetNextAvailableDeviceID(void)
+{
+    uint64_t nextAvailableDeviceIdentifier = 1;
+    NSNumber * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNextAvailableDeviceIDKey);
+    if (!value) {
+        CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNextAvailableDeviceIDKey,
+            [NSNumber numberWithUnsignedLongLong:nextAvailableDeviceIdentifier]);
+    } else {
+        nextAvailableDeviceIdentifier = [value unsignedLongLongValue];
+    }
+
+    return nextAvailableDeviceIdentifier;
+}
+
+void CHIPSetNextAvailableDeviceID(uint64_t id)
+{
+    CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, kCHIPNextAvailableDeviceIDKey, [NSNumber numberWithUnsignedLongLong:id]);
 }
 
 @implementation CHIPToolPersistentStorageDelegate
