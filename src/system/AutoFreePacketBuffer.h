@@ -29,13 +29,13 @@ public:
 
     ~AutoFreePacketBuffer() { Adopt(nullptr); }
 
-    PacketBuffer * operator->() { return mBuffer; }
-    PacketBuffer & operator*() { return *mBuffer; }
+    inline PacketBuffer * operator->() { return mBuffer; }
+    inline PacketBuffer & operator*() { return *mBuffer; }
 
-    const PacketBuffer * operator->() const { return mBuffer; }
-    const PacketBuffer & operator*() const { return *mBuffer; }
+    inline const PacketBuffer * operator->() const { return mBuffer; }
+    inline const PacketBuffer & operator*() const { return *mBuffer; }
 
-    void Adopt(PacketBuffer * v)
+    inline void Adopt(PacketBuffer * v)
     {
         if (mBuffer != nullptr)
         {
@@ -44,14 +44,14 @@ public:
         mBuffer = v;
     }
 
-    PacketBuffer * Release()
+    inline PacketBuffer * Release()
     {
         PacketBuffer * r = mBuffer;
         mBuffer          = nullptr;
         return r;
     }
 
-    bool IsNull() const { return mBuffer == nullptr; }
+    inline bool IsNull() const { return mBuffer == nullptr; }
 
 private:
     PacketBuffer * mBuffer;
