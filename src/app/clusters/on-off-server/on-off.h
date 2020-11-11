@@ -41,3 +41,13 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(chip::EndpointId endpoint, uin
  * @param newValue   Ver.: always
  */
 void emberAfOnOffClusterLevelControlEffectCallback(chip::EndpointId endpoint, bool newValue);
+
+/** @brief On/off Cluster Server Post Init
+ *
+ * Following resolution of the On/Off state at startup for this endpoint,
+ * perform any additional initialization needed; e.g., synchronize hardware
+ * state.
+ *
+ * @param endpoint Endpoint that is being initialized  Ver.: always
+ */
+void emberAfPluginOnOffClusterServerPostInitCallback(chip::EndpointId endpoint);

@@ -2729,15 +2729,6 @@ void emberAfOnOffClusterServerTickCallback(chip::EndpointId endpoint);
  *
  */
 bool emberAfOnOffClusterToggleCallback(void);
-/** @brief On/off Cluster Server Post Init
- *
- * Following resolution of the On/Off state at startup for this endpoint, perform any
- * additional initialization needed; e.g., synchronize hardware state.
- *
- * @param endpoint Endpoint that is being initialized  Ver.: always
- */
-void emberAfPluginOnOffClusterServerPostInitCallback(chip::EndpointId endpoint);
-
 /** @} END On/off Cluster Callbacks */
 
 /** @name On/off Switch Configuration Cluster Callbacks */
