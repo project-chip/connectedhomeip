@@ -140,7 +140,6 @@ config("disabled_warnings") {
     "-Wno-missing-field-initializers",
   ]
   cflags_cc = [
-    "-Wno-non-virtual-dtor",
     "-Wno-deprecated-copy",
   ]
   if (!is_debug) {
