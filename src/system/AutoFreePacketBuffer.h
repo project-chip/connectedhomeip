@@ -21,6 +21,7 @@
 namespace chip {
 namespace System {
 
+/// Ensures that a System::PacketBuffer is freed when it goes out of scope.
 class AutoFreePacketBuffer
 {
 public:
@@ -56,6 +57,6 @@ public:
 private:
     PacketBuffer * mBuffer;
 };
-} // namespace System
 
+} // namespace System
 } // namespace chip
