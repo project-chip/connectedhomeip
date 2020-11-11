@@ -33,10 +33,12 @@
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/AutoFreePacketBuffer.h>
 #include <transport/SecurePairingSession.h>
 
 namespace chip {
 
+using System::AutoFreePacketBuffer;
 using System::PacketBuffer;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
@@ -270,15 +272,16 @@ void SecureSessionMgrBase::CancelExpiryTimer()
 }
 
 void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                              System::PacketBuffer * msg, SecureSessionMgrBase * connection)
+                                              System::PacketBuffer * msgIn, SecureSessionMgrBase * connection)
 
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBuffer * origMsg = nullptr;
-    PeerConnectionState * state    = connection->mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(),
+    CHIP_ERROR err              = CHIP_NO_ERROR;
+    PeerConnectionState * state = connection->mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(),
                                                                                        packetHeader.GetEncryptionKeyID(), nullptr);
+    AutoFreePacketBuffer msg(msgIn);
+    AutoFreePacketBuffer origMsg;
 
-    VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
+    VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
     if (state == nullptr)
     {
@@ -309,10 +312,10 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not
            allocated as an inline buffer to PacketBuffer structure */
-        origMsg = msg;
-        msg     = PacketBuffer::NewWithAvailableSize(len);
-        VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Insufficient memory for packet buffer."));
-        msg->SetDataLength(len, msg);
+        origMsg.Adopt(msg.Release());
+        msg.Adopt(PacketBuffer::NewWithAvailableSize(len));
+        VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Insufficient memory for packet buffer."));
+        msg->SetDataLength(len);
 #endif
         plainText = msg->Start();
 
@@ -341,22 +344,11 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 
         if (connection->mCB != nullptr)
         {
-            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg, connection);
-            msg = nullptr;
+            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg.Release(), connection);
         }
     }
 
 exit:
-    if (origMsg != nullptr)
-    {
-        PacketBuffer::Free(origMsg);
-    }
-
-    if (msg != nullptr)
-    {
-        PacketBuffer::Free(msg);
-    }
-
     if (err != CHIP_NO_ERROR && connection->mCB != nullptr)
     {
         connection->mCB->OnReceiveError(err, peerAddress, connection);
