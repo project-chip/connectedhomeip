@@ -68,3 +68,6 @@
 	path = third_party/zap/repo
 	url = https://github.com/project-chip/zap.git
 	branch = master
+[submodule "third_party/gsl-lite/repo"]
+	path = third_party/gsl-lite/repo
+	url = https://github.com/gsl-lite/gsl-lite
