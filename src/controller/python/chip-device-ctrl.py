@@ -365,7 +365,7 @@ class DeviceMgrCmd(Cmd):
 
     def do_connect(self, line):
         """
-        connect [-ip [ipaddress]]|[-ble] <setup pin code>
+        connect (via BLE) <setup pin code>
 
         connect command is used for establishing a rendezvous session to the device.
         currently, only connect using setupPinCode is supported.
@@ -380,13 +380,10 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
-            if args[0] == "-ip" and len(args) <= 3:
-                self.devCtrl.ConnectIP(args[1], int(args[2]))
-            elif args[0] == "-ble" and len(args) <= 2:
-                self.devCtrl.Connect(FAKE_CONN_OBJ_VALUE, int(args[1]))
-            else:
-                print("Unexpected argument(s): " + args)
+            if len(args) > 1:
+                print("Unexpected argument: " + args[1])
                 return
+            self.devCtrl.Connect(FAKE_CONN_OBJ_VALUE, int(args[0]))
         except ChipStack.ChipStackException as ex:
             print(str(ex))
             return
