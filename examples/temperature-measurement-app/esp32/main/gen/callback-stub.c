@@ -1067,18 +1067,6 @@ bool emberAfPerformingKeyEstablishmentCallback(void)
     return false;
 }
 
-/** @brief Reset To Factory Defaults
- *
- * This function is called by the Basic server plugin when a request to reset
- * to factory defaults is received. The plugin will reset attributes managed by
- * the framework to their default values. The application should perform any
- * other necessary reset-related operations in this callback, including
- * resetting any externally-stored attributes.
- *
- * @param endpoint   Ver.: always
- */
-void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint) {}
-
 /** @brief Over temperature state changed
  *
  * This callback is generated when the temperature rises over the assert

@@ -23261,22 +23261,6 @@ void halRadioPowerDownHandler(void);
 void halSleepCallback(bool enter, SleepModes sleepMode);
 /** @} END HAL Library Plugin Callbacks */
 
-/** @name Basic Server Cluster Plugin Callbacks */
-// @{
-
-/** @brief Reset To Factory Defaults
- *
- * This function is called by the Basic server plugin when a request to reset
- * to factory defaults is received. The plugin will reset attributes managed by
- * the framework to their default values. The application should perform any
- * other necessary reset-related operations in this callback, including
- * resetting any externally-stored attributes.
- *
- * @param endpoint   Ver.: always
- */
-void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpoint);
-/** @} END Basic Server Cluster Plugin Callbacks */
-
 /** @} END addtogroup */
 #ifdef __cplusplus
 }
