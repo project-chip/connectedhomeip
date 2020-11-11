@@ -28,6 +28,9 @@ public:
     AutoFreePacketBuffer() : mBuffer(nullptr) {}
     explicit AutoFreePacketBuffer(PacketBuffer * p) : mBuffer(p) {}
 
+    AutoFreePacketBuffer(const AutoFreePacketBuffer &) = delete;
+    AutoFreePacketBuffer & operator=(const AutoFreePacketBuffer &) = delete;
+
     ~AutoFreePacketBuffer() { Adopt(nullptr); }
 
     inline PacketBuffer * operator->() { return mBuffer; }
