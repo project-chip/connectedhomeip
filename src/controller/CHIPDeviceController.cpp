@@ -161,10 +161,15 @@ CHIP_ERROR DeviceController::Shutdown()
     mSystemLayer = nullptr;
     mInetLayer   = nullptr;
 
-    mStorageDelegate = nullptr;
+    if (mStorageDelegate != nullptr)
+    {
+        mStorageDelegate->SetDelegate(nullptr);
+        mStorageDelegate = nullptr;
+    }
 
     if (mSessionManager != nullptr)
     {
+        mSessionManager->SetDelegate(nullptr);
         chip::Platform::Delete(mSessionManager);
         mSessionManager = nullptr;
     }
