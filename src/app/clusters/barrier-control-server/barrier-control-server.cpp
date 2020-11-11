@@ -129,10 +129,10 @@ static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
     return period;
 }
 
-static void setMovingState(EndpointId endpoint, uint8_t state)
+static void setMovingState(EndpointId endpoint, uint8_t newState)
 {
     EmberAfStatus status = emberAfWriteServerAttribute(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID,
-                                                       ZCL_BARRIER_MOVING_STATE_ATTRIBUTE_ID, &state, ZCL_ENUM8_ATTRIBUTE_TYPE);
+                                                       ZCL_BARRIER_MOVING_STATE_ATTRIBUTE_ID, &newState, ZCL_ENUM8_ATTRIBUTE_TYPE);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
