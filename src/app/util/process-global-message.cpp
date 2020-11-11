@@ -109,7 +109,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
     // This is a little clumsy but easier to read and port
     // from earlier implementation.
     EmberAfClusterId clusterId = cmd->apsFrame->clusterId;
-    uint8_t zclCmd             = cmd->commandId;
+    CommandId zclCmd           = cmd->commandId;
     uint8_t * message          = cmd->buffer;
     uint16_t msgLen            = cmd->bufLen;
     uint16_t msgIndex          = cmd->payloadStartIndex;

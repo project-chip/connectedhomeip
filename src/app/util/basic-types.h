@@ -32,6 +32,7 @@ typedef uint8_t CHIPEndpointId;
 typedef uint16_t CHIPClusterId;
 typedef uint16_t CHIPAttributeId;
 typedef uint16_t CHIPGroupId;
+typedef uint8_t CHIPCommandId;
 
 /**
  * Types for use by generated Silicon Labs code until we convert the generator
@@ -57,5 +58,6 @@ typedef CHIPEndpointId EndpointId;
 typedef CHIPClusterId ClusterId;
 typedef CHIPAttributeId AttributeId;
 typedef CHIPGroupId GroupId;
+typedef CHIPCommandId CommandId;
 } // namespace chip
 #endif // __cplusplus
