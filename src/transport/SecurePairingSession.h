@@ -193,7 +193,7 @@ public:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Serializable(SecurePairingSessionSerializable & output);
+    CHIP_ERROR ToSerializable(SecurePairingSessionSerializable & output);
 
     /** @brief Reconstruct secure pairing class from the serializable data structure.
      *

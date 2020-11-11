@@ -511,7 +511,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
-    testSecurePairingSecret->Serializable(device->GetPairing());
+    testSecurePairingSecret->ToSerializable(device->GetPairing());
 
     device->Init(mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
 
@@ -592,7 +592,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
     if (mDeviceBeingPaired != kNumMaxActiveDevices)
     {
         // Let's release the device that's being paired.
-        // If pairing was successful, it's information is
+        // If pairing was successful, its information is
         // already persisted. The application will use GetDevice()
         // method to get access to the device, which will fetch
         // the device information from the persistent storage.
@@ -653,7 +653,7 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
         ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
-        mRendezvousSession->GetPairingSession().Serializable(device->GetPairing());
+        mRendezvousSession->GetPairingSession().ToSerializable(device->GetPairing());
 
         if (mPairingDelegate != nullptr)
         {

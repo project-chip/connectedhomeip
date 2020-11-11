@@ -97,7 +97,7 @@ public:
 
 /**
  * @brief
- *   The controller applications can use this class to commuicate with already paired CHIP devices. The
+ *   Controller applications can use this class to communicate with already paired CHIP devices. The
  *   application is required to provide access to the persistent storage, where the paired device information
  *   is stored. This object of this class can be initialized with the data from the storage (List of devices,
  *   and device pairing information for individual devices). Alternatively, this class can retrieve the
@@ -120,9 +120,10 @@ public:
 
     /**
      * @brief
-     *   This function derserializes the provided deviceInfo object, and initialzes and output the
+     *   This function deserializes the provided deviceInfo object, and initializes and outputs the
      *   corresponding Device object. The lifetime of the output object is tied to that of DeviceController
-     *   object. The caller must not use the Device object If they free the DeviceController object.
+     *   object. The caller must not use the Device object If they free the DeviceController object, or
+     *   after they call ReleaseDevice() on the returned device object.
      *
      * @param[in] deviceId   Node ID for the CHIP device
      * @param[in] deviceInfo Serialized device info for the device
@@ -171,8 +172,8 @@ protected:
 
     State mState;
 
-    /* A list of device objects that can be used for commincating with corresponding
-       CHIP device. The list does not contain all the paired devices, but only the ones
+    /* A list of device objects that can be used for communicating with corresponding
+       CHIP devices. The list does not contain all the paired devices, but only the ones
        which the controller application is currently accessing.
     */
     Device mActiveDevices[kNumMaxActiveDevices];
@@ -287,7 +288,8 @@ private:
     RendezvousSession * mRendezvousSession;
 
     /* This field is an index in mActiveDevices list. The object at this index in the list
-       contains the device object that's tracking the state of the device that's being paired */
+       contains the device object that's tracking the state of the device that's being paired.
+       If no device is currently being paired, this value will be kNumMaxPairedDevices.  */
     uint16_t mDeviceBeingPaired;
 
     /* This field is true when device pairing information changes, e.g. a new device is paired, or

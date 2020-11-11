@@ -63,7 +63,7 @@ CHIP_ERROR SecurePairingSession::Serialize(SecurePairingSessionSerialized & outp
 
     VerifyOrExit(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = Serializable(serializable);
+    error = ToSerializable(serializable);
     SuccessOrExit(error);
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
@@ -100,7 +100,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR SecurePairingSession::Serializable(SecurePairingSessionSerializable & serializable)
+CHIP_ERROR SecurePairingSession::ToSerializable(SecurePairingSessionSerializable & serializable)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
