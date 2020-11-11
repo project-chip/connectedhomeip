@@ -121,7 +121,7 @@ public:
     /**
      * @brief
      *   This function deserializes the provided deviceInfo object, and initializes and outputs the
-     *   corresponding Device object. The lifetime of the output object is tied to that of DeviceController
+     *   corresponding Device object. The lifetime of the output object is tied to that of the DeviceController
      *   object. The caller must not use the Device object If they free the DeviceController object, or
      *   after they call ReleaseDevice() on the returned device object.
      *
