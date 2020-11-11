@@ -349,7 +349,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
     const uint8_t * buf = msg->Start();
     size_t buf_len      = msg->TotalLength();
 
-    System::PacketBuffer * resp = nullptr;
+    System::AutoFreePacketBuffer resp;
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buf_len == kMAX_Point_Length + kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -362,8 +362,8 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
     mPeerKeyId  = header.GetEncryptionKeyID();
     mPeerNodeId = header.GetSourceNodeId();
 
-    resp = System::PacketBuffer::NewWithAvailableSize(verifier_len);
-    VerifyOrExit(resp != nullptr, err = CHIP_SYSTEM_ERROR_NO_MEMORY);
+    resp.Adopt(System::PacketBuffer::NewWithAvailableSize(verifier_len));
+    VerifyOrExit(!resp.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     {
         BufBound bbuf(resp->Start(), verifier_len);
@@ -374,8 +374,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
     resp->SetDataLength(verifier_len);
 
     // Call delegate to send the Compute_cA to peer
-    err  = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_cA, resp);
-    resp = nullptr;
+    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_cA, resp.Release());
     SuccessOrExit(err);
 
     {
@@ -395,12 +394,6 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
 exit:
 
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
-
-    if (resp != nullptr)
-    {
-        System::PacketBuffer::Free(resp);
-    }
-
     return err;
 }
 
@@ -432,13 +425,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msgIn)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t headerSize = 0;
     PayloadHeader payloadHeader;
+    System::AutoFreePacketBuffer msg(msgIn);
 
-    VerifyOrExit(msg != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(msgIn != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = payloadHeader.Decode(packetHeader.GetFlags(), msg->Start(), msg->DataLength(), &headerSize);
     SuccessOrExit(err);
@@ -451,15 +445,15 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
     switch (static_cast<Spake2pMsgType>(payloadHeader.GetMessageType()))
     {
     case Spake2pMsgType::kSpake2pCompute_pA:
-        err = HandleCompute_pA(packetHeader, msg);
+        err = HandleCompute_pA(packetHeader, msg.Release());
         break;
 
     case Spake2pMsgType::kSpake2pCompute_pB_cB:
-        err = HandleCompute_pB_cB(packetHeader, msg);
+        err = HandleCompute_pB_cB(packetHeader, msg.Release());
         break;
 
     case Spake2pMsgType::kSpake2pCompute_cA:
-        err = HandleCompute_cA(packetHeader, msg);
+        err = HandleCompute_cA(packetHeader, msg.Release());
         break;
 
     default:
@@ -473,11 +467,6 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         mDelegate->OnPairingError(err);
-    }
-    else if (msg != nullptr)
-    {
-        // Free buffer only if we successfully processed it
-        System::PacketBuffer::Free(msg);
     }
 
     return err;
