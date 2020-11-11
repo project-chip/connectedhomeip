@@ -1574,7 +1574,7 @@ CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHan
 }
 
 /**
- * Position the destination reader on the next element with the given tag within its current container context
+ * Position the destination reader on the next element with the given tag within this reader's current container context
  *
  * @param[in] tag                      The destination context tag value
  * @param[in] destReader               The destination TLV reader value that was located by given tag
