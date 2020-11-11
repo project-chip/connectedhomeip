@@ -27,16 +27,18 @@
  *      (https://www.ietf.org/id/draft-bar-cfrg-spake2plus-01.html)
  *
  */
+#include <transport/SecurePairingSession.h>
 
 #include <inttypes.h>
 #include <string.h>
+
+#include <gsl/gsl-lite.hpp>
 
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
 #include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
-#include <transport/SecurePairingSession.h>
 
 namespace chip {
 
@@ -228,6 +230,13 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
 
     System::PacketBuffer * resp = nullptr;
 
+    auto clean_buffer = gsl::finally([&resp]() {
+        if (resp != nullptr)
+        {
+            System::PacketBuffer::Free(resp);
+        }
+    });
+
     CHIP_ERROR err = Init(peerSetUpPINCode, pbkdf2IterCount, salt, saltLen, myNodeId, myKeyId, delegate);
     SuccessOrExit(err);
 
@@ -260,14 +269,7 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
     return err;
 
 exit:
-
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
-
-    if (resp != nullptr)
-    {
-        System::PacketBuffer::Free(resp);
-    }
-
     return err;
 }
 
@@ -302,6 +304,13 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, S
     size_t buf_len      = msg->TotalLength();
 
     System::PacketBuffer * resp = nullptr;
+
+    auto clean_buffer = gsl::finally([&resp]() {
+        if (resp != nullptr)
+        {
+            System::PacketBuffer::Free(resp);
+        }
+    });
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buf_len == kMAX_Point_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -347,12 +356,6 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, S
 exit:
 
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
-
-    if (resp != nullptr)
-    {
-        System::PacketBuffer::Free(resp);
-    }
-
     return err;
 }
 
@@ -368,6 +371,13 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
     size_t buf_len      = msg->TotalLength();
 
     System::PacketBuffer * resp = nullptr;
+
+    auto clean_buffer = gsl::finally([&resp]() {
+        if (resp != nullptr)
+        {
+            System::PacketBuffer::Free(resp);
+        }
+    });
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buf_len == kMAX_Point_Length + kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -413,11 +423,6 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
 exit:
 
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
-
-    if (resp != nullptr)
-    {
-        System::PacketBuffer::Free(resp);
-    }
 
     return err;
 }
