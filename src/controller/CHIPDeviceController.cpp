@@ -324,6 +324,10 @@ void DeviceController::OnMessageReceived(const PacketHeader & header, const Payl
     mActiveDevices[index].OnMessageReceived(header, payloadHeader, state, msgBuf, mgr);
 
 exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to process received message: err %d", err);
+    }
     return;
 }
 
