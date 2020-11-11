@@ -828,7 +828,6 @@ INPUT                  = README.md \
                          CONTRIBUTING.md \
                          docs/README.md \
                          docs/BUILDING.md \
-                         docs/BUILDING-GN.md \
                          docs/VSCODE_DEVELOPMENT.md \
                          docs/PROJECT_FLOW.md \
                          docs/STYLE_GUIDE.md \
@@ -837,6 +836,7 @@ INPUT                  = README.md \
                          src/crypto \
                          src/include \
                          src/inet \
+                         src/lib/mdns \
                          src/lib/core \
                          src/lib/support \
                          src/lib/shell \
