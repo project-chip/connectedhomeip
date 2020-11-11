@@ -123,15 +123,15 @@ void InitServer()
     }
 #endif
 
+    // Init transport before operations with secure session mgr.
+    gTransports.Init(&gSessions, gRendezvousServer.GetRendezvousSession(),
+                     UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+
     err = gSessions.NewPairing(peer, &gTestPairing);
     SuccessOrExit(err);
 
     gSessions.SetDelegate(&gCallbacks);
     chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice(chip::Inet::kIPAddressType_IPv6);
-
-    gTransports.Init(&gSessions, gRendezvousServer.GetRendezvousSession(),
-                     UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
-
 exit:
     if (err != CHIP_NO_ERROR)
     {
