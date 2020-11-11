@@ -605,16 +605,24 @@ void DeviceCommissioner::OnRendezvousComplete()
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     Device * device = nullptr;
-    SerializedDevice serialized;
 
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
     device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
 
-    device->Serialize(serialized);
-    PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
-                      mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+    // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
+    // requires a valid storage delegate. However, test pairing usecase, that's used
+    // mainly by test applications, do not require a storage delegate. This is to
+    // reduce overheads on these tests.
+    // Let's make sure the delegate object is available before calling into it.
+    if (mStorageDelegate != nullptr)
+    {
+        SerializedDevice serialized;
+        device->Serialize(serialized);
+        PERSISTENT_KEY_OP(device->GetDeviceId(), kPairedDeviceKeyPrefix, key,
+                          mStorageDelegate->SetKeyValue(key, Uint8::to_const_char(serialized.inner)));
+    }
 
 exit:
     if (err == CHIP_NO_ERROR)
