@@ -21,7 +21,7 @@
 #include "Command.h"
 #include <map>
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 
 class Commands
 {

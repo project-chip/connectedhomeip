@@ -21,7 +21,7 @@
 
 #include <jni.h>
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
@@ -29,7 +29,7 @@
  *
  * Generally it contains the DeviceController class itself, plus any related delegates/callbacks.
  */
-class AndroidDeviceControllerWrapper : public chip::DeviceController::DevicePairingDelegate
+class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate
 {
 public:
     ~AndroidDeviceControllerWrapper();

@@ -149,7 +149,7 @@ private:
     uint16_t mNextKeyId          = 0;
 
     RendezvousSession::State mCurrentState = State::kInit;
-    void UpdateState(RendezvousSession::State newState);
+    void UpdateState(RendezvousSession::State newState, CHIP_ERROR err = CHIP_NO_ERROR);
 };
 
 } // namespace chip

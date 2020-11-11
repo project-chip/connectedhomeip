@@ -44,6 +44,12 @@ typedef void (^SendStatus)(NSString * key, Operation operation, NSError * status
 - (void)GetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler;
 
 /**
+ * Get the value for the given key
+ *
+ */
+- (NSString *)GetKeyValue:(NSString *)key;
+
+/**
  * Set the value of the key to the given value
  *
  */

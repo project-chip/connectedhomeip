@@ -18,8 +18,12 @@ static_library("controller") {
   output_name = "libChipController"
 
   sources = [
+    "CHIPDevice.cpp",
+    "CHIPDevice.h",
     "CHIPDeviceController.cpp",
     "CHIPDeviceController.h",
+    "CHIPDeviceController_deprecated.cpp",
+    "CHIPDeviceController_deprecated.h",
   ]
 
   cflags = [ "-Wconversion" ]

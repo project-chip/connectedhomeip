@@ -222,7 +222,7 @@ void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
         break;
     };
     mDelegate->OnRendezvousError(err);
-    UpdateState(State::kInit);
+    UpdateState(State::kInit, err);
 }
 
 void RendezvousSession::SetTransportMgr(TransportMgrBase * transport)
@@ -230,16 +230,30 @@ void RendezvousSession::SetTransportMgr(TransportMgrBase * transport)
     mTransportMgr = transport;
 }
 
-void RendezvousSession::UpdateState(RendezvousSession::State newState)
+void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERROR err)
 {
     switch (mCurrentState)
     {
     case State::kSecurePairing:
-        mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingSuccess, CHIP_NO_ERROR);
+        if (newState != State::kInit)
+        {
+            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingSuccess, err);
+        }
+        else
+        {
+            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::SecurePairingFailed, err);
+        }
         break;
 
     case State::kNetworkProvisioning:
-        mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess, CHIP_NO_ERROR);
+        if (newState != State::kInit)
+        {
+            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningSuccess, err);
+        }
+        else
+        {
+            mDelegate->OnRendezvousStatusUpdate(RendezvousSessionDelegate::NetworkProvisioningFailed, err);
+        }
         break;
 
     default:

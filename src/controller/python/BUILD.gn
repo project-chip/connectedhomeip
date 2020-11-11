@@ -23,7 +23,8 @@ config("controller_wno_deprecate") {
 }
 
 config("includes") {
-  include_dirs = [ "${chip_root}/src/controller/CHIPDeviceController.h" ]
+  include_dirs =
+      [ "${chip_root}/src/controller/CHIPDeviceController_deprecated.h" ]
 }
 
 shared_library("ChipDeviceCtrl") {

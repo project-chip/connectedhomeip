@@ -28,7 +28,7 @@
 #include "AndroidDeviceControllerWrapper.h"
 
 #include <ble/BleUUID.h>
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 #include <jni.h>
 #include <pthread.h>
 #include <support/CHIPMem.h>
