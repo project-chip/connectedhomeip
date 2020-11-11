@@ -18,11 +18,11 @@ config("gsl-lite-config") {
 
 source_set("gsl-lite") {
   sources = [
+    "repo/include/gsl-lite/gsl-lite.hpp",
     "repo/include/gsl.h",
     "repo/include/gsl.hpp",
     "repo/include/gsl/gsl-lite.h",
     "repo/include/gsl/gsl-lite.hpp",
-    "repo/include/gsl-lite/gsl-lite.hpp",
   ]
 
   public_configs = [ ":gsl-lite-config" ]
