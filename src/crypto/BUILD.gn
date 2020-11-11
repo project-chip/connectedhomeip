@@ -37,7 +37,7 @@ if (chip_crypto == "openssl") {
   import("//build/config/linux/pkg_config.gni")
 
   pkg_config("openssl_config") {
-    packages = [ "openssl" ]
+    packages = [ "libssl", "libcrypto" ]
   }
 } else {
   import("//build_overrides/mbedtls.gni")
