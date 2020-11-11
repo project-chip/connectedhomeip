@@ -51,10 +51,6 @@
 #ifndef SILABS_AF_API
 #define SILABS_AF_API
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 // Micro and compiler specific typedefs and macros
 //#include PLATFORM_HEADER
 
@@ -84,10 +80,6 @@ extern "C" {
 //#include "stack/include/event.h"
 //#include "stack/include/error.h"
 
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
-
 #include "af-types.h"
 
 //#include "app/framework/util/print.h"
@@ -95,10 +87,6 @@ extern "C" {
 #include "client-api.h"
 #include "debug-printing.h"
 #include "ember-print.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 
 #include "gen/af-structs.h"
 #include "gen/att-storage.h"
@@ -1875,9 +1863,5 @@ int emberAfMain(MAIN_FUNCTION_PARAMETERS);
  * generated code.
  */
 EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
 
 #endif // SILABS_AF_API

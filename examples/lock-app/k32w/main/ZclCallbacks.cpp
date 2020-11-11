@@ -27,7 +27,6 @@
 
 using namespace ::chip;
 
-extern "C" {
 void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
@@ -57,5 +56,4 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
 void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
 {
     // TODO: implement any additional On/off Cluster Server post init actions
-}
 }

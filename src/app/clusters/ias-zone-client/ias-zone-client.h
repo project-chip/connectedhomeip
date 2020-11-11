@@ -58,10 +58,6 @@ extern IasZoneDevice emberAfIasZoneClientKnownServers[];
 
 #define UNKNOWN_ZONE_ID 0xFF
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 void emAfClearServers(void);
 
 void emberAfPluginIasZoneClientZdoCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length);
@@ -69,7 +65,3 @@ void emberAfPluginIasZoneClientZdoCallback(EmberNodeId emberNodeId, EmberApsFram
 void emberAfPluginIasZoneClientWriteAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus

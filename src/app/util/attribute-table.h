@@ -45,10 +45,6 @@
 
 #define ZCL_NULL_ATTRIBUTE_TABLE_INDEX 0xFFFF
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 // Remote devices writing attributes of local device
 EmberAfStatus emberAfWriteAttributeExternal(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
                                             uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr,
@@ -71,7 +67,3 @@ EmberAfStatus emAfWriteAttribute(CHIPEndpointId endpoint, EmberAfClusterId clust
 
 EmberAfStatus emAfReadAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
                                 uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
