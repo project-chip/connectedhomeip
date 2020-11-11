@@ -349,8 +349,6 @@
 // Use this macro to check if HAL Library plugin is included
 #define EMBER_AF_PLUGIN_HAL_LIBRARY
 
-// Use this macro to check if IAS Zone Client plugin is included
-#define EMBER_AF_PLUGIN_IAS_ZONE_CLIENT
 // User options for plugin IAS Zone Client
 #define EMBER_AF_PLUGIN_IAS_ZONE_CLIENT_MAX_DEVICES 10
 
