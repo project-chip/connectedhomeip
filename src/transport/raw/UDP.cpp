@@ -34,20 +34,17 @@ namespace Transport {
 
 UDP::~UDP()
 {
-    if (mUDPEndPoint)
-    {
-        // Udp endpoint is only non null if udp endpoint is initialized and listening
-        mUDPEndPoint->Close();
-        mUDPEndPoint->Free();
-        mUDPEndPoint = nullptr;
-    }
+    Close();
 }
 
 CHIP_ERROR UDP::Init(UdpListenParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
+    if (mState != State::kNotReady)
+    {
+        Close();
+    }
 
     err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
@@ -76,6 +73,18 @@ exit:
     }
 
     return err;
+}
+
+void UDP::Close()
+{
+    if (mUDPEndPoint)
+    {
+        // Udp endpoint is only non null if udp endpoint is initialized and listening
+        mUDPEndPoint->Close();
+        mUDPEndPoint->Free();
+        mUDPEndPoint = nullptr;
+    }
+    mState = State::kNotReady;
 }
 
 CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,

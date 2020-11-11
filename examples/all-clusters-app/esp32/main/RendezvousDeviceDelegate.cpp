@@ -70,9 +70,20 @@ void RendezvousDeviceDelegate::OnRendezvousStatusUpdate(RendezvousSessionDelegat
         bluetoothLED.Set(true);
         break;
 
+    case RendezvousSessionDelegate::SecurePairingFailed:
+        ESP_LOGI(TAG, "Failed in SPAKE2+ handshake\n");
+        bluetoothLED.Set(false);
+        break;
+
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
 
         ESP_LOGI(TAG, "Device was assigned an ip address\n");
+        bluetoothLED.Set(false);
+        break;
+
+    case RendezvousSessionDelegate::NetworkProvisioningFailed:
+
+        ESP_LOGI(TAG, "Failed in network provisioning\n");
         bluetoothLED.Set(false);
         break;
 

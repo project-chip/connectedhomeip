@@ -22,7 +22,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-class CHIPDevicePairingDelegateBridge : public chip::DeviceController::DevicePairingDelegate
+class CHIPDevicePairingDelegateBridge : public chip::Controller::DevicePairingDelegate
 {
 public:
     CHIPDevicePairingDelegateBridge();

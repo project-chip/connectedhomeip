@@ -57,37 +57,20 @@ SecurePairingSession::~SecurePairingSession()
 
 CHIP_ERROR SecurePairingSession::Serialize(SecurePairingSessionSerialized & output)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+    CHIP_ERROR error       = CHIP_NO_ERROR;
+    uint16_t serializedLen = 0;
+    SecurePairingSessionSerializable serializable;
 
-    const NodeId localNodeId = (mLocalNodeId.HasValue()) ? mLocalNodeId.Value() : kUndefinedNodeId;
-    const NodeId peerNodeId  = (mPeerNodeId.HasValue()) ? mPeerNodeId.Value() : kUndefinedNodeId;
-    VerifyOrExit(CanCastTo<uint16_t>(mKeLen), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<uint64_t>(localNodeId), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<uint64_t>(peerNodeId), error = CHIP_ERROR_INTERNAL);
-    VerifyOrExit(CanCastTo<uint16_t>(sizeof(SecurePairingSessionSerializable)), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
 
-    {
-        SecurePairingSessionSerializable serializable;
-        memset(&serializable, 0, sizeof(serializable));
-        serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
-        serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
-        serializable.mLocalNodeId     = localNodeId;
-        serializable.mPeerNodeId      = peerNodeId;
-        serializable.mLocalKeyId      = mLocalKeyId;
-        serializable.mPeerKeyId       = mPeerKeyId;
+    error = ToSerializable(serializable);
+    SuccessOrExit(error);
 
-        memcpy(serializable.mKe, mKe, mKeLen);
-
-        uint16_t serializedLen = 0;
-
-        VerifyOrExit(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
-
-        serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
-                                           static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
-        VerifyOrExit(serializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-        VerifyOrExit(serializedLen < sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
-        output.inner[serializedLen] = '\0';
-    }
+    serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
+                                       static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
+    VerifyOrExit(serializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(serializedLen < sizeof(output.inner), error = CHIP_ERROR_INVALID_ARGUMENT);
+    output.inner[serializedLen] = '\0';
 
 exit:
     return error;
@@ -107,8 +90,43 @@ CHIP_ERROR SecurePairingSession::Deserialize(SecurePairingSessionSerialized & in
     memset(&serializable, 0, sizeof(serializable));
     deserializedLen =
         Base64Decode(Uint8::to_const_char(input.inner), static_cast<uint16_t>(len), Uint8::to_uchar((uint8_t *) &serializable));
+
     VerifyOrExit(deserializedLen > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    error = FromSerializable(serializable);
+
+exit:
+    return error;
+}
+
+CHIP_ERROR SecurePairingSession::ToSerializable(SecurePairingSessionSerializable & serializable)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    const NodeId localNodeId = (mLocalNodeId.HasValue()) ? mLocalNodeId.Value() : kUndefinedNodeId;
+    const NodeId peerNodeId  = (mPeerNodeId.HasValue()) ? mPeerNodeId.Value() : kUndefinedNodeId;
+    VerifyOrExit(CanCastTo<uint16_t>(mKeLen), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<uint64_t>(localNodeId), error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(CanCastTo<uint64_t>(peerNodeId), error = CHIP_ERROR_INTERNAL);
+
+    memset(&serializable, 0, sizeof(serializable));
+    serializable.mKeLen           = static_cast<uint16_t>(mKeLen);
+    serializable.mPairingComplete = (mPairingComplete) ? 1 : 0;
+    serializable.mLocalNodeId     = localNodeId;
+    serializable.mPeerNodeId      = peerNodeId;
+    serializable.mLocalKeyId      = mLocalKeyId;
+    serializable.mPeerKeyId       = mPeerKeyId;
+
+    memcpy(serializable.mKe, mKe, mKeLen);
+
+exit:
+    return error;
+}
+
+CHIP_ERROR SecurePairingSession::FromSerializable(const SecurePairingSessionSerializable & serializable)
+{
+    CHIP_ERROR error = CHIP_NO_ERROR;
 
     mPairingComplete = (serializable.mPairingComplete == 1);
     mKeLen           = static_cast<size_t>(serializable.mKeLen);

@@ -65,6 +65,8 @@ CHIP_ERROR SecureSessionMgrBase::InitInternal(NodeId localNodeId, System::Layer 
     mSystemLayer = systemLayer;
     mTransport   = transport;
 
+    ChipLogProgress(Inet, "local node id is %llu\n", mLocalNodeId);
+
     mTransport->SetMessageReceiveHandler(HandleDataReceived, this);
     mPeerConnections.SetConnectionExpiredHandler(HandleConnectionExpired, this);
 
@@ -123,6 +125,8 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(PayloadHeader & payloadHeader, Node
             .SetMessageId(state->GetSendMessageIndex()) //
             .SetEncryptionKeyID(state->GetLocalKeyID()) //
             .SetPayloadLength(static_cast<uint16_t>(payloadLength));
+
+        ChipLogProgress(Inet, "Sending msg from %llu to %llu\n", mLocalNodeId, peerNodeId);
 
         VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
