@@ -21,10 +21,12 @@
  *      This file implements the CHIP Connection object that maintains a BLE connection.
  *
  */
+#include <transport/BLE.h>
+
+#include <gsl/gsl-lite.hpp>
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/BLE.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
@@ -86,12 +88,10 @@ CHIP_ERROR BLE::InitInternal(BLE_CONNECTION_OBJECT connObj)
     SuccessOrExit(err);
 
 exit:
-    if (err != CHIP_NO_ERROR)
+    if ((err != CHIP_NO_ERROR) && mBleEndPoint)
     {
-        if (mBleEndPoint)
-        {
-            mBleEndPoint = nullptr;
-        }
+        mBleEndPoint->Close();
+        mBleEndPoint = nullptr;
     }
     return err;
 }
@@ -135,6 +135,14 @@ exit:
 CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                             System::PacketBuffer * msgBuf)
 {
+    auto clean_buffer = gsl::finally([&msgBuf]() {
+        if (msgBuf != nullptr)
+        {
+            System::PacketBuffer::Free(msgBuf);
+            msgBuf = nullptr;
+        }
+    });
+
     CHIP_ERROR err            = CHIP_NO_ERROR;
     const uint16_t headerSize = header.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
@@ -156,12 +164,6 @@ CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFl
     SuccessOrExit(err);
 
 exit:
-    if (msgBuf != nullptr)
-    {
-        System::PacketBuffer::Free(msgBuf);
-        msgBuf = nullptr;
-    }
-
     return err;
 }
 

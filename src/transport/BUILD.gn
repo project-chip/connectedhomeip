@@ -52,5 +52,6 @@ static_library("transport") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/transport/raw",
+    "${chip_root}/third_party/gsl-lite",
   ]
 }
