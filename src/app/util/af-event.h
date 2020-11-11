@@ -37,8 +37,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef SILABS_AF_EVENT_H
-#define SILABS_AF_EVENT_H
+#pragma once
 
 #include "af.h"
 
@@ -85,5 +84,3 @@ void emberEventControlSetActive(EmberEventControl * control);
 #ifdef __cplusplus
 }
 #endif
-
-#endif // SILABS_AF_EVENT_H

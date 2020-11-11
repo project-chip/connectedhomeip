@@ -103,15 +103,6 @@ void emberAfPostAttributeChangeCallback(uint8_t endpointId, EmberAfClusterId clu
         cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, mask, manufacturerCode, type, size, value);
     }
 }
-
-void emberAfPluginBasicResetToFactoryDefaultsCallback(uint8_t endpointId)
-{
-    CHIPDeviceManagerCallbacks * cb = CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
-    if (cb != nullptr)
-    {
-        cb->PluginBasicResetToFactoryDefaultsCallback(endpointId);
-    }
-}
 } // extern "C"
 
 } // namespace DeviceManager

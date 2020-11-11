@@ -153,6 +153,8 @@ public:
 
     CHIP_ERROR Skip();
 
+    CHIP_ERROR FindElementWithTag(const uint64_t tagInApiForm, TLVReader & destReader) const;
+
     uint32_t ImplicitProfileId;
     void * AppData;
 

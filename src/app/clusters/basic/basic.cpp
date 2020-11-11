@@ -37,10 +37,13 @@
  *plugin.
  *******************************************************************************
  ******************************************************************************/
+#include "basic.h"
 
 #include "af.h"
-
 #include <app/util/attribute-storage.h>
+#include <platform/CHIPDeviceLayer.h>
+
+using namespace chip;
 
 bool emberAfBasicClusterResetToFactoryDefaultsCallback(void)
 {
@@ -49,4 +52,9 @@ bool emberAfBasicClusterResetToFactoryDefaultsCallback(void)
     emberAfPluginBasicResetToFactoryDefaultsCallback(emberAfCurrentEndpoint());
     emberAfSendImmediateDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);
     return true;
+}
+
+void emberAfPluginBasicResetToFactoryDefaultsCallback(EndpointId endpoint)
+{
+    DeviceLayer::ConfigurationMgr().InitiateFactoryReset();
 }

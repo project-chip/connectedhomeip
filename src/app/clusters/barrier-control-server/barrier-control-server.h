@@ -37,8 +37,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef BARRIER_CONTROL_SERVER_H
-#define BARRIER_CONTROL_SERVER_H
+#pragma once
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -74,4 +73,3 @@ uint16_t emAfPluginBarrierControlServerGetSafetyStatus(CHIPEndpointId endpoint);
 #define MIN_POSITION_CHANGE_DELAY_MS 30
 
 #endif
-#endif // BARRIER_CONTROL_SERVER_H

@@ -37,8 +37,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef REPORTING_H
-#define REPORTING_H
+#pragma once
 
 #include <app/util/af-types.h>
 #include <app/util/types_stub.h>
@@ -164,4 +163,3 @@ void emberAfReportingAttributeChangeCallback(CHIPEndpointId endpoint, EmberAfClu
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
-#endif

@@ -39,8 +39,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef ZCL_UTIL_ATTRIBUTE_TABLE_H
-#define ZCL_UTIL_ATTRIBUTE_TABLE_H
+#pragma once
 
 #include "af.h"
 
@@ -76,5 +75,3 @@ EmberAfStatus emAfReadAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluste
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
-
-#endif // ZCL_UTIL_ATTRIBUTE_TABLE_H

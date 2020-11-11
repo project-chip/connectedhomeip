@@ -48,7 +48,15 @@ void CHIPRemoveDomainValueForKey(NSString * domain, NSString * key)
 - (void)GetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler
 {
     NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
     completionHandler(key, value);
+}
+
+- (NSString *)GetKeyValue:(NSString *)key
+{
+    NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
+    NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
+    return value;
 }
 
 - (void)SetKeyValue:(NSString *)key value:(NSString *)value handler:(SendStatus)completionHandler

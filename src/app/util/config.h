@@ -67,8 +67,7 @@
  *
  ******************************************************************************/
 
-#ifndef __EMBER_AF_CONFIG_H__
-#define __EMBER_AF_CONFIG_H__
+#pragma once
 
 // include generated configuration information from AppBuilder.
 // ZA_GENERATED_HEADER is defined in the project file
@@ -304,5 +303,3 @@
  * @brief CHIP uses millisecond ticks
  */
 #define MILLISECOND_TICKS_PER_SECOND 1000
-
-#endif // __EMBER_AF_CONFIG_H__

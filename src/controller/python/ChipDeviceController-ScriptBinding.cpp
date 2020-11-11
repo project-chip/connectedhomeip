@@ -45,7 +45,7 @@
 
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
@@ -178,7 +178,7 @@ CHIP_ERROR
 nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
                                                       const char * ssid, const char * password);
 CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
-                                                             chip::DeviceController::DevicePairingDelegate * pairingDelegate);
+                                                             chip::Controller::DevicePairingDelegate * pairingDelegate);
 
 #if CONFIG_NETWORK_LAYER_BLE
 CHIP_ERROR nl_Chip_DeviceController_ValidateBTP(chip::DeviceController::ChipDeviceController * devCtrl,
@@ -583,7 +583,7 @@ exit:
     return err;
 }
 CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
-                                                             chip::DeviceController::DevicePairingDelegate * pairingDelegate)
+                                                             chip::Controller::DevicePairingDelegate * pairingDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

@@ -37,8 +37,9 @@
  *plugin, which implements the Level Control cluster.
  *******************************************************************************
  ******************************************************************************/
-#ifndef _LEVEL_CONTROL_H
-#define _LEVEL_CONTROL_H
+
+#pragma once
+
 // Rate of level control tick execution.
 // To increase tick frequency (for more granular updates of device state based
 // on level), redefine EMBER_AF_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND.
@@ -65,5 +66,3 @@ void emberAfPluginLevelControlClusterServerPostInitCallback(CHIPEndpointId endpo
 #ifdef __cplusplus
 }
 #endif // #ifdef __cplusplus
-
-#endif // #ifndef _LEVEL_CONTROL_H

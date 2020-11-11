@@ -39,8 +39,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef __AF_ATTRIBUTE_STORAGE__
-#define __AF_ATTRIBUTE_STORAGE__
+#pragma once
 
 //#include PLATFORM_HEADER
 #include "af.h"
@@ -230,5 +229,3 @@ uint16_t emberAfGetDeviceIdForEndpoint(CHIPEndpointId endpoint);
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
-
-#endif // __AF_ATTRIBUTE_STORAGE__

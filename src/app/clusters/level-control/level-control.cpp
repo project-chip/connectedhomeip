@@ -1014,3 +1014,5 @@ static bool areStartUpLevelControlServerAttributesTokenized(EndpointId endpoint)
     return true;
 }
 #endif
+
+void emberAfPluginLevelControlClusterServerPostInitCallback(EndpointId endpoint) {}

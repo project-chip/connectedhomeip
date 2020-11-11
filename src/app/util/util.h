@@ -45,8 +45,7 @@
 // * Copyright 2007-2017 by Silicon Laboratories. All rights reserved.      *80*
 // *******************************************************************
 
-#ifndef __AF_UTIL_H__
-#define __AF_UTIL_H__
+#pragma once
 
 #ifdef __cplusplus
 extern "C" {
@@ -316,5 +315,3 @@ uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
-
-#endif // __AF_UTIL_H__

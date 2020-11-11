@@ -39,8 +39,7 @@
  *        the CHIP project
  ******************************************************************************/
 
-#ifndef TYPES_STUB_H
-#define TYPES_STUB_H
+#pragma once
 
 #include <string.h> // For mem* functions.
 
@@ -1992,5 +1991,3 @@ typedef struct
 #ifdef __cplusplus
 } // extern "C"
 #endif // __cplusplus
-
-#endif // TYPES_STUB_H

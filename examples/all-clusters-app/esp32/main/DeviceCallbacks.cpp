@@ -163,15 +163,3 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(uint8_t endpointId, 
 exit:
     return;
 }
-
-void DeviceCallbacks::PluginBasicResetToFactoryDefaultsCallback(uint8_t endpointId)
-{
-    ESP_LOGI(TAG, "PluginBasicResetToFactoryDefaultsCallback - EndPoint ID: '0x%02x'", endpointId);
-
-    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
-
-    ConfigurationMgr().InitiateFactoryReset();
-
-exit:
-    return;
-}

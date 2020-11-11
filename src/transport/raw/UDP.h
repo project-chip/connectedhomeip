@@ -105,6 +105,11 @@ public:
      */
     CHIP_ERROR Init(UdpListenParameters & params);
 
+    /**
+     * Close the open endpoint without destroying the object
+     */
+    void Close() override;
+
     CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;
 
