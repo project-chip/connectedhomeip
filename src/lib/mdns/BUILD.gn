@@ -21,6 +21,7 @@ source_set("platform_header") {
 static_library("mdns") {
   public_deps = [
     ":platform_header",
+    "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
   ]

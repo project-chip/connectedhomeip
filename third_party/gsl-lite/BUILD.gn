@@ -21,10 +21,9 @@ source_set("gsl-lite") {
     "repo/include/gsl.h",
     "repo/include/gsl.hpp",
     "repo/include/gsl/gsl-lite.h",
-    "repo/include/gsl/gsl",
     "repo/include/gsl/gsl-lite.hpp",
     "repo/include/gsl-lite/gsl-lite.hpp",
   ]
 
-  public_configs = [ ":nlassert_config" ]
+  public_configs = [ ":gsl-lite-config" ]
 }

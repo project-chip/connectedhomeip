@@ -23,6 +23,8 @@
  */
 #include <transport/raw/UDP.h>
 
+#include <gsl/gsl-lite.hpp>
+
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
@@ -90,6 +92,14 @@ void UDP::Close()
 CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                             System::PacketBuffer * msgBuf)
 {
+    auto clean_buffer = gsl::finally([&msgBuf]() {
+        if (msgBuf != nullptr)
+        {
+            System::PacketBuffer::Free(msgBuf);
+            msgBuf = nullptr;
+        }
+    });
+
     const uint16_t headerSize = header.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -119,12 +129,6 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFl
     SuccessOrExit(err);
 
 exit:
-    if (msgBuf != nullptr)
-    {
-        System::PacketBuffer::Free(msgBuf);
-        msgBuf = nullptr;
-    }
-
     return err;
 }
 
