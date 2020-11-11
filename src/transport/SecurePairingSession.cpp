@@ -104,8 +104,8 @@ CHIP_ERROR SecurePairingSession::ToSerializable(SecurePairingSessionSerializable
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
 
-    const NodeId localNodeId = (mLocalNodeId.HasValue()) ? mLocalNodeId.Value() : kUndefinedNodeId;
-    const NodeId peerNodeId  = (mPeerNodeId.HasValue()) ? mPeerNodeId.Value() : kUndefinedNodeId;
+    const NodeId localNodeId = mLocalNodeId.ValueOr(kUndefinedNodeId);
+    const NodeId peerNodeId  = mPeerNodeId.ValueOr(kUndefinedNodeId);
     VerifyOrExit(CanCastTo<uint16_t>(mKeLen), error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(CanCastTo<uint64_t>(localNodeId), error = CHIP_ERROR_INTERNAL);
     VerifyOrExit(CanCastTo<uint64_t>(peerNodeId), error = CHIP_ERROR_INTERNAL);
