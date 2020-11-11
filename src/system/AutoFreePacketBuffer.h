@@ -52,6 +52,8 @@ public:
         return r;
     }
 
+    inline PacketBuffer * Get_NoRelease() { return mBuffer; }
+
     inline bool IsNull() const { return mBuffer == nullptr; }
 
 private:
