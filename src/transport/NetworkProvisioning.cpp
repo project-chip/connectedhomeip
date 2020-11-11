@@ -14,6 +14,9 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
+#include <transport/NetworkProvisioning.h>
+
+#include <gsl/gsl-lite.hpp>
 
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -22,7 +25,6 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
-#include <transport/NetworkProvisioning.h>
 
 #if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
@@ -166,6 +168,13 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     char * addrStr                = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
     size_t addrLen                = 0;
 
+    auto clean_buffer = gsl::finally([&buffer]() {
+        if (buffer != nullptr)
+        {
+            System::PacketBuffer::Free(buffer);
+        }
+    });
+
     ChipLogProgress(NetworkProvisioning, "Sending IP Address. Delegate %p\n", mDelegate);
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(addrStr != nullptr, err = CHIP_ERROR_INVALID_ADDRESS);
@@ -181,8 +190,6 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     SuccessOrExit(err);
 
 exit:
-    if (buffer)
-        System::PacketBuffer::Free(buffer);
     if (CHIP_NO_ERROR != err)
         ChipLogError(NetworkProvisioning, "Failed in sending IP address. error %s\n", ErrorStr(err));
     return err;
@@ -193,6 +200,13 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     CHIP_ERROR err                = CHIP_NO_ERROR;
     System::PacketBuffer * buffer = System::PacketBuffer::New();
     BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
+
+    auto clean_buffer = gsl::finally([&buffer]() {
+        if (buffer != nullptr)
+        {
+            System::PacketBuffer::Free(buffer);
+        }
+    });
 
     ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -209,8 +223,6 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     SuccessOrExit(err);
 
 exit:
-    if (buffer)
-        System::PacketBuffer::Free(buffer);
     if (CHIP_NO_ERROR != err)
         ChipLogError(NetworkProvisioning, "Failed in sending Network Creds. error %s\n", ErrorStr(err));
     return err;
@@ -220,6 +232,13 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
 {
     CHIP_ERROR err                = CHIP_NO_ERROR;
     System::PacketBuffer * buffer = System::PacketBuffer::New();
+
+    auto clean_buffer = gsl::finally([&buffer]() {
+        if (buffer != nullptr)
+        {
+            System::PacketBuffer::Free(buffer);
+        }
+    });
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -247,8 +266,6 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
     }
 
 exit:
-    if (buffer)
-        System::PacketBuffer::Free(buffer);
     if (CHIP_NO_ERROR != err)
         ChipLogError(NetworkProvisioning, "Failed to send Thread Credentials: %s", ErrorStr(err));
     return err;
