@@ -194,6 +194,13 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    auto clean_buffer = gsl::finally([&msgBuf]() {
+        if (msgBuf != nullptr)
+        {
+            System::PacketBuffer::Free(msgBuf);
+        }
+    });
+
     PayloadHeader payloadHeader;
 
     payloadHeader
@@ -216,8 +223,6 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     SuccessOrExit(err);
 
 exit:
-    if (msgBuf)
-        System::PacketBuffer::Free(msgBuf);
     return err;
 }
 
