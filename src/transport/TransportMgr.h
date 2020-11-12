@@ -50,7 +50,7 @@ public:
     void SetSecureSessionMgr(SecureSessionMgr * secureSessionMgr)
     {
         mSecureSessionMgr = secureSessionMgr;
-        if (secureSessionMgr != nullptr)
+        if (mSecureSessionMgr != nullptr)
         {
             mSecureSessionMgr->SetTransportMgr(this);
         }
@@ -68,18 +68,10 @@ public:
 protected:
     void InitInternal(SecureSessionMgr * secureMgr, RendezvousSession * rendezvous, Transport::Base * transport)
     {
-        mSecureSessionMgr = secureMgr;
-        mRendezvous       = rendezvous;
         mTransport        = transport;
-        if (mSecureSessionMgr != nullptr)
-        {
-            mSecureSessionMgr->SetTransportMgr(this);
-        }
-        if (mRendezvous != nullptr)
-        {
-            mRendezvous->SetTransportMgr(this);
-        }
         mTransport->SetMessageReceiveHandler(HandleMessageReceived, this);
+        SetSecureSessionMgr(secureMgr);
+        SetRendezvousSession(rendezvous);
         ChipLogDetail(Inet, "TransportMgr initialized");
     }
 
