@@ -218,7 +218,7 @@ void emberAfSetNoReplyForNextMessage(bool set);
 // this function determines if APS Link key should be used to secure
 // the message. It is based on the clusterId and specified in the SE
 // app profile.  If the message is outgoing then the
-bool emberAfDetermineIfLinkSecurityIsRequired(uint8_t commandId, bool incoming, bool broadcast, EmberAfProfileId profileId,
+bool emberAfDetermineIfLinkSecurityIsRequired(CHIPCommandId commandId, bool incoming, bool broadcast, EmberAfProfileId profileId,
                                               EmberAfClusterId clusterId, ChipNodeId remoteNodeId);
 
 #define isThisDataTypeSentLittleEndianOTA(dataType) (!(emberAfIsThisDataTypeAStringType(dataType)))

@@ -255,7 +255,7 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
                             apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
 
-uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint8_t command,
+uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, CommandId command,
                         uint8_t frame_control)
 {
     CHECK_FRAME_LENGTH(buf.Size(), "Buffer is empty");
@@ -275,7 +275,7 @@ uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, Cluster
     return buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
 }
 
-uint16_t _encodeClusterSpecificCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint8_t command)
+uint16_t _encodeClusterSpecificCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, CommandId command)
 {
     // This is a cluster-specific command so low two bits are 0b01.  The command
     // is standard, so does not need a manufacturer code, and we're sending
@@ -285,7 +285,7 @@ uint16_t _encodeClusterSpecificCommand(BufBound & buf, EndpointId destination_en
     return _encodeCommand(buf, destination_endpoint, cluster_id, command, frame_control);
 }
 
-uint16_t _encodeGlobalCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint8_t command)
+uint16_t _encodeGlobalCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, CommandId command)
 {
     // This is a global command, so the low bits are 0b00.  The command is
     // standard, so does not need a manufacturer code, and we're sending client

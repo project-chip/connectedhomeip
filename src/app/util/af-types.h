@@ -445,7 +445,7 @@ typedef struct
     bool mfgSpecific;
     uint16_t mfgCode;
     uint8_t seqNum;
-    uint8_t commandId;
+    CHIPCommandId commandId;
     uint8_t payloadStartIndex;
     uint8_t direction;
     EmberAfInterpanHeader * interPanHeader;
