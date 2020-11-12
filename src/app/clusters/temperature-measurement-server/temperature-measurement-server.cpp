@@ -50,12 +50,12 @@ EmberEventControl emberAfPluginTemperatureMeasurementServerReadEventControl;
 // TODO: There's no header that declares this event handler, and it's not 100%
 // clear where best to declare it.
 // https://github.com/project-chip/connectedhomeip/issues/3619
-extern "C" void emberAfPluginTemperatureMeasurementServerReadEventHandler() {}
+void emberAfPluginTemperatureMeasurementServerReadEventHandler() {}
 
 // -------------------------------------------------------------------------
 // ****** callback section *******
 
-extern "C" void emberAfPluginTemperatureMeasurementServerInitCallback(void)
+void emberAfPluginTemperatureMeasurementServerInitCallback(void)
 {
     EmberAfStatus status;
     // FIXME Use real values for the temperature sensor polling the sensor using the

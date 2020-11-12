@@ -26,7 +26,6 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/MessageHeader.h>
 
-extern "C" {
 /**
  * Handle a message that should be processed via our data model processing
  * codepath.
@@ -37,4 +36,3 @@ extern "C" {
 void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::PacketBuffer * buffer,
                             chip::SecureSessionMgrBase * mgr);
 void InitDataModelHandler();
-}

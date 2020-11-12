@@ -1,6 +1,7 @@
-/**
+/*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,19 +16,13 @@
  *    limitations under the License.
  */
 
-/**
- * @file API declarations for a binding table.
- */
-
 #pragma once
 
-#include <app/util/af-types.h>
+// Include Zephyr-supplied OpenThread configuration
 
-// Should this be configurable by the app somehow?
-#define BINDING_TABLE_SIZE 10
+#include "openthread-core-zephyr-config.h"
 
-EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result);
+// Project-specific settings
 
-EmberStatus emberSetBinding(uint8_t index, EmberBindingTableEntry * result);
-
-EmberStatus emberDeleteBinding(uint8_t index);
+#undef OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS
+#define OPENTHREAD_CONFIG_NUM_MESSAGE_BUFFERS 64

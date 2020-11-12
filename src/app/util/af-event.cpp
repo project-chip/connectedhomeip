@@ -66,13 +66,11 @@ struct EmberEventData
 // Globals
 
 #ifdef EMBER_AF_GENERATED_EVENT_CODE
-extern "C" {
 // Stubs for IAS Zone Client Cluster issue #2057
 EmberEventControl emberAfPluginIasZoneClientStateMachineEventControl;
 void emberAfPluginIasZoneClientStateMachineEventHandler(void){};
 
 EMBER_AF_GENERATED_EVENT_CODE
-}
 #endif // EMBER_AF_GENERATED_EVENT_CODE
 
 #if defined(EMBER_AF_GENERATED_EVENT_CONTEXT)
@@ -121,7 +119,7 @@ const char emAfStackEventString[] = "Stack";
 // Functions
 
 // A function used to initialize events for idling
-extern "C" void emAfInitEvents(void) {}
+void emAfInitEvents(void) {}
 
 const char * emberAfGetEventString(uint8_t index)
 {

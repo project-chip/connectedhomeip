@@ -30,7 +30,7 @@ public:
 
     void setFrameworkDelegate(id<CHIPPersistentStorageDelegate> delegate, dispatch_queue_t queue);
 
-    void SetDelegate(chip::Controller::PersistentStorageResultDelegate * delegate);
+    void SetDelegate(chip::Controller::PersistentStorageResultDelegate * delegate) override;
 
     void GetKeyValue(const char * key) override;
 

@@ -76,7 +76,7 @@ static void setLanguage(void)
     }
 }
 
-extern "C" void emberAfPluginDoorLockServerInitCallback(void)
+void emberAfPluginDoorLockServerInitCallback(void)
 {
     emAfPluginDoorLockServerInitUser();
     emAfPluginDoorLockServerInitSchedule();

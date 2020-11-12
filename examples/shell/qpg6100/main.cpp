@@ -57,7 +57,7 @@ void ShellCLIMain(void * pvParameter)
         return;
     }
 
-    ChipLogDetail(Shell, "Initializing CHIP shell commands", rc);
+    ChipLogDetail(Shell, "Initializing CHIP shell commands: %d", rc);
 
     cmd_device_init();
     cmd_base64_init();
@@ -65,7 +65,7 @@ void ShellCLIMain(void * pvParameter)
     cmd_btp_init();
     cmd_otcli_init();
 
-    ChipLogDetail(Shell, "Run CHIP shell Task", rc);
+    ChipLogDetail(Shell, "Run CHIP shell Task: %d", rc);
 
     shell_task(nullptr);
 }

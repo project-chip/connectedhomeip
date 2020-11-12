@@ -73,9 +73,3 @@ EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t
 {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
-
-void emberAfPluginIasZoneClientZdoCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length) {}
-
-void emberAfPluginIasZoneClientWriteAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen) {}
-
-void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen) {}

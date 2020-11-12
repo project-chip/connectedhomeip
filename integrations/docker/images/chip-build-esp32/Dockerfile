@@ -7,7 +7,7 @@ RUN set -x \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y python \
     && mkdir -p /opt/espressif \
     && cd /opt/espressif \
-    && git clone --progress -b v4.1 https://github.com/espressif/esp-idf.git \
+    && git clone --progress -b release/v4.1 https://github.com/espressif/esp-idf.git \
     && cd esp-idf \
     && git submodule update --init --progress \
     && IDF_TOOLS_PATH=/opt/espressif/tools ./install.sh \

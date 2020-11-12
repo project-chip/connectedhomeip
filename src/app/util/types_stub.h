@@ -61,10 +61,6 @@ typedef chip::NodeId ChipNodeId;
 typedef uint64_t ChipNodeId;
 #endif // __cplusplus
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 #include "gen/gen_config.h"
 
 /**
@@ -1987,7 +1983,3 @@ typedef struct
  * @param data   A pointer to where the token data should be placed.
  */
 #define halCommonSetIndexedToken(token, index, data)
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus

@@ -47,10 +47,6 @@
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 // User asserts can override SLAB_ASSERT and should be defined as follows:
 // void userAssert (int file, int line);                   // declaration
 // #define USER_ASSERT(file, line) userAssert(file, line)  // definition
@@ -84,15 +80,7 @@ extern const EmberAfClusterName zclClusterNames[];
 
 #define ZCL_NULL_CLUSTER_ID 0xFFFF
 
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
-
 #include "af.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 
 // Override APS retry: 0 - don't touch, 1 - always set, 2 - always unset
 typedef enum
@@ -311,7 +299,3 @@ uint8_t emberAfGetChannelFrom8bitEncodedChanPg(uint8_t chanPg);
  * @return 8-bit encoded channel-page, 0xFF if invalid
  */
 uint8_t emberAfMake8bitEncodedChanPg(uint8_t page, uint8_t channel);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
