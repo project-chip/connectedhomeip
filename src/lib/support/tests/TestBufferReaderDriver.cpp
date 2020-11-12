@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This file implements a standalone/native program executable
- *      test driver for the support library BufBound unit
+ *      test driver for the support library buffer reader unit
  *      tests.
  *
  */
@@ -27,5 +27,5 @@
 
 int main()
 {
-    return TestBufBound();
+    return TestBufferReader();
 }
