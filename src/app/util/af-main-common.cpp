@@ -105,6 +105,8 @@
 #include "chip-message-send.h"
 #include "util.h"
 
+using namespace chip;
+
 // Querying the Ember Stack for what libraries are present.
 //#include "app/util/common/library.h"
 
@@ -408,7 +410,7 @@ EmberStatus emberAfSendMulticastToBindings(EmberApsFrame * apsFrame, uint16_t me
     EmberStatus status = EMBER_INVALID_BINDING_INDEX;
     uint8_t i;
     EmberBindingTableEntry binding;
-    uint16_t groupDest;
+    GroupId groupDest;
 
     if ((NULL == apsFrame) || (0 == messageLength) || (NULL == message))
     {
