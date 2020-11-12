@@ -45,6 +45,7 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/raw/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
+      "${chip_root}/src/app/tests",
     ]
 
     if (chip_device_platform != "esp32") {
