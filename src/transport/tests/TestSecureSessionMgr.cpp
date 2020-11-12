@@ -95,15 +95,15 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    TransportMgr<LoopbackTransport> tm;
-    SecureSessionMgr conn;
+    TransportMgr<LoopbackTransport> transportMgr;
+    SecureSessionMgr secureSessionMgr;
     CHIP_ERROR err;
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = tm.Init(&conn, nullptr, "LOOPBACK");
+    err = transportMgr.Init(&secureSessionMgr, nullptr, "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -125,32 +125,32 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TransportMgr<LoopbackTransport> tm;
-    SecureSessionMgr conn;
+    TransportMgr<LoopbackTransport> transportMgr;
+    SecureSessionMgr secureSessionMgr;
 
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = tm.Init(&conn, nullptr, "LOOPBACK");
+    err = transportMgr.Init(&secureSessionMgr, nullptr, "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;
 
-    conn.SetDelegate(&callback);
+    secureSessionMgr.SetDelegate(&callback);
 
     SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
     Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
 
-    err = conn.NewPairing(peer, &pairing1);
+    err = secureSessionMgr.NewPairing(peer, &pairing1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
-    err = conn.NewPairing(peer, &pairing2);
+    err = secureSessionMgr.NewPairing(peer, &pairing2);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
 
-    err = conn.SendMessage(kDestinationNodeId, buffer);
+    err = secureSessionMgr.SendMessage(kDestinationNodeId, buffer);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
