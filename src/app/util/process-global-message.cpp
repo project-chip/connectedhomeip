@@ -42,8 +42,6 @@
 #include "af.h"
 #include "common.h"
 
-#include <app/clusters/ias-zone-client/ias-zone-client.h>
-
 #ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>
 #endif // EMBER_AF_PLUGIN_REPORTING
@@ -544,11 +542,6 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         emberAfPluginTestHarnessReadAttributesResponseCallback(clusterId, message + msgIndex, msgLen - msgIndex);
 #endif
 
-#if defined(EMBER_AF_PLUGIN_IAS_ZONE_CLIENT)
-        emberAfPluginIasZoneClientReadAttributesResponseCallback(clusterId, message + msgIndex,
-                                                                 static_cast<uint16_t>(msgLen - msgIndex));
-#endif
-
 #if defined(EMBER_AF_PLUGIN_SIMPLE_METERING_SERVER)
         emberAfPluginSimpleMeteringClusterReadAttributesResponseCallback(clusterId, message + msgIndex,
                                                                          static_cast<uint16_t>(msgLen - msgIndex));
@@ -566,11 +559,6 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 #if defined(EMBER_AF_PLUGIN_TEST_HARNESS)
         emberAfPluginTestHarnessWriteAttributesResponseCallback(clusterId, message + msgIndex,
                                                                 static_cast<uint16_t>(msgLen - msgIndex));
-#endif
-
-#if defined(EMBER_AF_PLUGIN_IAS_ZONE_CLIENT)
-        emberAfPluginIasZoneClientWriteAttributesResponseCallback(clusterId, message + msgIndex,
-                                                                  static_cast<uint16_t>(msgLen - msgIndex));
 #endif
 
         if (!emberAfWriteAttributesResponseCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
