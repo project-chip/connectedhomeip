@@ -21,9 +21,9 @@ chip_test_suite("tests") {
   output_name = "libAppTests"
 
   sources = [
+    "TestApp.h",
     "TestMessageDef.cpp",
     "TestMessageDefDriver.cpp",
-    "TestApp.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -34,7 +34,5 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  tests = [
-    "TestMessageDef",
-  ]
+  tests = [ "TestMessageDef" ]
 }
