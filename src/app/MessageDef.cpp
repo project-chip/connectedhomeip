@@ -1799,9 +1799,10 @@ exit:
     return err;
 }
 
-CHIP_ERROR StatusCode::Parser::Get(uint16_t * apGeneralCode, uint32_t * apProtocolId, uint16_t * apProtocolCode, chip::ClusterId * apClusterId) const
+CHIP_ERROR StatusCode::Parser::Get(uint16_t * apGeneralCode, uint32_t * apProtocolId, uint16_t * apProtocolCode,
+                                   chip::ClusterId * apClusterId) const
 {
-    CHIP_ERROR err           = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader lReader;
     chip::TLV::TLVType OuterContainerType;
 
@@ -1991,7 +1992,8 @@ CHIP_ERROR StatusCode::Builder::Init(chip::TLV::TLVWriter * const apWriter, cons
     return _Init(apWriter, chip::TLV::ContextTag(aContextTagToUse));
 }
 
-StatusCode::Builder & StatusCode::Builder::Create(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aStatusCode, const chip::ClusterId aClusterId)
+StatusCode::Builder & StatusCode::Builder::Create(const uint16_t aGeneralCode, const uint32_t aProtocolId,
+                                                  const uint16_t aStatusCode, const chip::ClusterId aClusterId)
 {
     uint64_t tag = chip::TLV::AnonymousTag;
     TLVType metaDataContainer;

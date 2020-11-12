@@ -28,7 +28,7 @@
 /**
  * Types for use by CHIP C code, until we switch to C++.
  */
-typedef uint8_t  CHIPEndpointId;
+typedef uint8_t CHIPEndpointId;
 typedef uint16_t CHIPClusterId;
 typedef uint16_t CHIPAttributeId;
 typedef uint16_t CHIPGroupId;

@@ -334,7 +334,7 @@ public:
 
     // CHIP_END_OF_TLV if there is no such element
     // CHIP_ERROR_WRONG_TLV_TYPE if there is such element but it's not any of the defined unsigned integer types
-    CHIP_ERROR GetEventId(chip::EventId  * const apEventId) const;
+    CHIP_ERROR GetEventId(chip::EventId * const apEventId) const;
 };
 
 /**
@@ -352,7 +352,7 @@ public:
     EventPath::Builder & NodeId(const chip::NodeId aNodeId);
     EventPath::Builder & EndpointId(const chip::EndpointId aEndpointId);
     EventPath::Builder & ClusterId(const chip::ClusterId aClusterId);
-    EventPath::Builder & EventId(const chip::EventId  aEventId);
+    EventPath::Builder & EventId(const chip::EventId aEventId);
 
     EventPath::Builder & EndOfEventPath();
 
@@ -599,10 +599,10 @@ private:
 namespace StatusCode {
 enum
 {
-    kCsTag_GeneralCode   = 1,
-    kCsTag_ProtocolId    = 2,
-    kCsTag_ProtocolCode    = 3,
-    kCsTag_ClusterId     = 4
+    kCsTag_GeneralCode  = 1,
+    kCsTag_ProtocolId   = 2,
+    kCsTag_ProtocolCode = 3,
+    kCsTag_ClusterId    = 4
 };
 
 /**
@@ -633,7 +633,8 @@ public:
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
-    CHIP_ERROR Get(uint16_t * apGeneralCode, uint32_t * apProtocolId, uint16_t * apProtocolCode, chip::ClusterId * apClusterId) const;
+    CHIP_ERROR Get(uint16_t * apGeneralCode, uint32_t * apProtocolId, uint16_t * apProtocolCode,
+                   chip::ClusterId * apClusterId) const;
 };
 
 /**
@@ -648,7 +649,8 @@ public:
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter);
     CHIP_ERROR Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse);
 
-    StatusCode::Builder & Create(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode, const chip::ClusterId aClusterId);
+    StatusCode::Builder & Create(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
+                                 const chip::ClusterId aClusterId);
 
     StatusCode::Builder & EndOfStatusCode();
 
