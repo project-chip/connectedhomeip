@@ -117,8 +117,7 @@ void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     // Call the registered OnEchoResponseReceived handler, if any.
     if (echoApp->OnEchoResponseReceived != nullptr)
     {
-        echoApp->OnEchoResponseReceived(packetHeader.GetSourceNodeId().HasValue() ? packetHeader.GetSourceNodeId().Value() : 0,
-                                        payload);
+        echoApp->OnEchoResponseReceived(packetHeader.GetSourceNodeId().ValueOr(0), payload);
     }
 
 exit:
