@@ -71,7 +71,7 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
         // Form the log prefix, e.g. "[DL] "
         formattedMsg[prefixLen++] = '[';
         GetModuleName(formattedMsg + prefixLen, module);
-        prefixLen = strlen(formattedMsg);
+        prefixLen                 = strlen(formattedMsg);
         formattedMsg[prefixLen++] = ']';
         formattedMsg[prefixLen++] = ' ';
 
