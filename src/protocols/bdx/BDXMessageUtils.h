@@ -52,7 +52,7 @@ struct TransferInit
      *
      * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
      */
-    CHIP_ERROR Pack(System::PacketBuffer & aBuffer);
+    CHIP_ERROR Pack(System::PacketBuffer & aBuffer) const;
 
     /**
      * @brief
@@ -66,13 +66,13 @@ struct TransferInit
      *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
-    static CHIP_ERROR Parse(System::PacketBuffer & aBuffer, TransferInit & aParsedMessage);
+    static CHIP_ERROR Parse(const System::PacketBuffer & aBuffer, TransferInit & aParsedMessage);
 
     /**
      * @brief
      *  Get the size of the message once it is written to a buffer.
      */
-    size_t PackedSize();
+    size_t PackedSize() const;
 
     /**
      * @brief
@@ -86,14 +86,10 @@ struct TransferInit
     bool mSupportsSenderDrive;
     uint8_t mSupportedVersions;
 
-    // Range Control (required)
-    bool mWideRange;       ///< Set true to indicate mStartOffset and mDefLen are 64-bit, else 32-bit.
-    uint64_t mStartOffset; ///< Proposed start offset of data. 0 for no offset. Will be truncated if mWideRange is false.
-    bool mDefLen;          ///< True if transfer has a definite length.
-
-    uint64_t mMaxLength;    ///< Proposed max length of data in transfer, 0 for indefinite (required if mDefLen is set).
-                            ///< Will be truncated if mWideRange is false.
-    uint16_t mMaxBlockSize; ///< Proposed max block size to use in transfer (required)
+    // All required
+    uint16_t mMaxBlockSize; ///< Proposed max block size to use in transfer
+    uint64_t mStartOffset;  ///< Proposed start offset of data. 0 for no offset
+    uint64_t mMaxLength;    ///< Proposed max length of data in transfer, 0 for indefinite
 
     // File designator (required)
     uint8_t * mFileDesignator;
@@ -125,7 +121,7 @@ struct SendAccept
      *
      * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
      */
-    CHIP_ERROR Pack(System::PacketBuffer & aBuffer);
+    CHIP_ERROR Pack(System::PacketBuffer & aBuffer) const;
 
     /**
      * @brief
@@ -139,13 +135,13 @@ struct SendAccept
      *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
-    static CHIP_ERROR Parse(System::PacketBuffer & aBuffer, SendAccept & aResponse);
+    static CHIP_ERROR Parse(const System::PacketBuffer & aBuffer, SendAccept & aResponse);
 
     /**
      * @brief
      *  Get the size of the message once it is written to a buffer.
      */
-    size_t PackedSize();
+    size_t PackedSize() const;
 
     /**
      * @brief
@@ -153,10 +149,13 @@ struct SendAccept
      */
     bool operator==(const SendAccept &) const;
 
-    // All required
-    uint8_t mVersion;         ///< The agreed upon version for the transfer.
-    ControlMode mControlMode; ///< Agreed upon transfer control method
-    uint16_t mMaxBlockSize;   ///< Chosen max block size to use in transfer
+    // Transfer Control (required, only one should be set)
+    bool mUseAsync;
+    bool mUseReceiverDrive;
+    bool mUseSenderDrive;
+
+    uint8_t mVersion;       ///< The agreed upon version for the transfer (required)
+    uint16_t mMaxBlockSize; ///< Chosen max block size to use in transfer (required)
 
     // Additional metadata (optional, TLV format)
     uint8_t * mMetadata;
@@ -180,7 +179,7 @@ struct ReceiveAccept
      *
      * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
      */
-    CHIP_ERROR Pack(System::PacketBuffer & aBuffer);
+    CHIP_ERROR Pack(System::PacketBuffer & aBuffer) const;
 
     /**
      * @brief
@@ -194,13 +193,13 @@ struct ReceiveAccept
      *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
-    static CHIP_ERROR Parse(System::PacketBuffer & aBuffer, ReceiveAccept & aResponse);
+    static CHIP_ERROR Parse(const System::PacketBuffer & aBuffer, ReceiveAccept & aResponse);
 
     /**
      * @brief
      *  Get the size of the message once it is written to a buffer.
      */
-    size_t PackedSize();
+    size_t PackedSize() const;
 
     /**
      * @brief
@@ -208,19 +207,16 @@ struct ReceiveAccept
      */
     bool operator==(const ReceiveAccept &) const;
 
+    // Transfer Control (required, only one should be set)
+    bool mUseAsync;
+    bool mUseReceiverDrive;
+    bool mUseSenderDrive;
+
     // All required
-    uint8_t mVersion;         ///< The agreed upon version for the transfer
-    ControlMode mControlMode; ///< Agreed upon transfer control method
-
-    // Range Control (must fill in)
-    bool mWideRange;       ///< Set true to indicate mStartOffset and mDefLen are 64-bit, else 32-bit
-    uint64_t mStartOffset; ///< Chosen start offset of data. 0 for no offset. Will be truncated if
-                           ///< mWideRange is false.
-    bool mDefLen;          ///< Set to true if transfer has definite length
-
-    uint16_t mMaxBlockSize; ///< Chosen max block size to use in transfer (required)
-    uint64_t mLength;       ///< Length of transfer (only valid/required if mDefLen is set). Will be
-                            ///< truncated if mWideRange is false.
+    uint8_t mVersion;       ///< The agreed upon version for the transfer
+    uint16_t mMaxBlockSize; ///< Chosen max block size to use in transfer
+    uint64_t mStartOffset;  ///< Chosen start offset of data. 0 for no offset.
+    uint64_t mLength;       ///< Length of transfer. 0 if length is indefinite.
 
     // Additional metadata (optional, TLV format)
     uint8_t * mMetadata;

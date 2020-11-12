@@ -59,6 +59,18 @@ public:
     uint16_t OctetsRead() const { return static_cast<uint16_t>(mReadPtr - mBufStart); }
 
     /**
+     * Number of octets we have remaining to read.  Can be useful for logging.
+     */
+    uint16_t Remaining() const { return mAvailable; }
+
+    /**
+     * Test whether we have at least the given number of octets left to read.
+     * This takes a size_t, not uint16_t, to make life a bit simpler for
+     * consumers and avoid casting.
+     */
+    bool HasAtLeast(size_t octets) const { return octets <= Remaining(); }
+
+    /**
      * The reader status.  Once the status becomes a failure status, all later
      * read operations become no-ops and the status continues to be a failure
      * status.

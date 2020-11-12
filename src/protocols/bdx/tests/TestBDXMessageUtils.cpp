@@ -6,24 +6,25 @@
 #include <support/CodeUtils.h>
 #include <support/TestUtils.h>
 
+#include <limits>
+
 using namespace chip;
 using namespace chip::BDX;
 
 void TestTransferInitMessage(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     TransferInit testMsg;
+
     testMsg.mSupportsAsync         = false;
     testMsg.mSupportsReceiverDrive = false;
     testMsg.mSupportsSenderDrive   = true;
     testMsg.mSupportedVersions     = 1;
 
-    testMsg.mWideRange   = true;
-    testMsg.mStartOffset = true;
-    testMsg.mDefLen      = true;
+    // Make sure mMaxLength is greater than UINT32_MAX to test widerange being set
+    testMsg.mMaxLength = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
 
-    testMsg.mMaxLength    = 1024;
+    testMsg.mStartOffset  = 42;
     testMsg.mMaxBlockSize = 256;
 
     char testFileDes[9]     = { "test.txt" };
@@ -56,11 +57,13 @@ void TestTransferInitMessage(nlTestSuite * inSuite, void * inContext)
 void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     SendAccept testMsg;
-    testMsg.mVersion      = 1;
-    testMsg.mControlMode  = kReceiverDrive;
-    testMsg.mMaxBlockSize = 256;
+
+    testMsg.mVersion          = 1;
+    testMsg.mUseAsync         = false;
+    testMsg.mUseReceiverDrive = true;
+    testMsg.mUseSenderDrive   = false;
+    testMsg.mMaxBlockSize     = 256;
 
     uint8_t fakeData[5]     = { 7, 6, 5, 4, 3 };
     testMsg.mMetadataLength = 5;
@@ -88,16 +91,17 @@ void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
 void TestReceiveAcceptMessage(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-
     ReceiveAccept testMsg;
-    testMsg.mVersion     = 1;
-    testMsg.mControlMode = kReceiverDrive;
 
-    testMsg.mWideRange   = true;
-    testMsg.mStartOffset = true;
-    testMsg.mDefLen      = true;
+    testMsg.mVersion          = 1;
+    testMsg.mUseAsync         = false;
+    testMsg.mUseReceiverDrive = true;
+    testMsg.mUseSenderDrive   = false;
 
-    testMsg.mLength       = 1024;
+    // Make sure mLength is greater than UINT32_MAX to test widerange being set
+    testMsg.mLength = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
+
+    testMsg.mStartOffset  = 42;
     testMsg.mMaxBlockSize = 256;
 
     uint8_t fakeData[5]     = { 7, 6, 5, 4, 3 };
