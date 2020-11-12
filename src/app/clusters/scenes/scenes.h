@@ -82,3 +82,46 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, CHIPGroupId groupId, uint8_t sceneId,
                                             uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets);
 bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, CHIPGroupId groupId, uint8_t sceneId);
+
+/** @brief Scenes Cluster Recall Saved Scene
+ *
+ * This function is called by the framework when the application should recall a
+ * saved scene.
+ *
+ * @param endpoint The endpoint.  Ver.: always
+ * @param groupId The group identifier.  Ver.: always
+ * @param sceneId The scene identifier.  Ver.: always
+ */
+EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(CHIPEndpointId endpoint, CHIPGroupId groupId, uint8_t sceneId);
+
+/** @brief Scenes Cluster Store Current Scene
+ *
+ * This function is called by the framework when the application should store
+ * the current scene.  If an entry already exists in the scene table with the
+ * same scene and group ids, the application should update the entry with the
+ * current scene.  Otherwise, a new entry should be adde to the scene table, if
+ * possible.
+ *
+ * @param endpoint The endpoint.  Ver.: always
+ * @param groupId The group identifier.  Ver.: always
+ * @param sceneId The scene identifier.  Ver.: always
+ */
+EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(CHIPEndpointId endpoint, CHIPGroupId groupId, uint8_t sceneId);
+
+/** @brief Scenes Cluster Remove Scenes In Group
+ *
+ * This function removes the scenes from a specified group.
+ *
+ * @param endpoint Endpoint  Ver.: always
+ * @param groupId Group ID  Ver.: always
+ */
+void emberAfScenesClusterRemoveScenesInGroupCallback(CHIPEndpointId endpoint, CHIPGroupId groupId);
+
+/** @brief Scenes Cluster Make Invalid
+ *
+ * This function is called to invalidate the valid attribute in the Scenes
+ * cluster.
+ *
+ * @param endpoint   Ver.: always
+ */
+EmberAfStatus emberAfScenesClusterMakeInvalidCallback(CHIPEndpointId endpoint);

@@ -49,6 +49,10 @@
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
 
+#ifdef EMBER_AF_PLUGIN_SCENES
+#include <app/clusters/scenes/scenes.h>
+#endif // EMBER_AF_PLUGIN_SCENES
+
 using namespace chip;
 
 static bool isGroupPresent(EndpointId endpoint, GroupId groupId);

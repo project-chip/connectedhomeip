@@ -48,6 +48,10 @@
 #include <app/reporting/reporting.h>
 #endif
 
+#ifdef EMBER_AF_PLUGIN_SCENES
+#include <app/clusters/scenes/scenes.h>
+#endif // EMBER_AF_PLUGIN_SCENES
+
 #ifdef EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER
 #include "app/framework/plugin/zll-level-control-server/zll-level-control-server.h"
 #endif // EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER

@@ -2232,32 +2232,6 @@ bool emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, uint16_t grou
  * @param endpoint The endpoint.  Ver.: always
  */
 void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint);
-/** @brief Scenes Cluster Make Invalid
- *
- * This function is called to invalidate the valid attribute in the Scenes
- * cluster.
- *
- * @param endpoint   Ver.: always
- */
-EmberAfStatus emberAfScenesClusterMakeInvalidCallback(uint8_t endpoint);
-/** @brief Scenes Cluster Recall Saved Scene
- *
- * This function is called by the framework when the application should recall a
- * saved scene.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- * @param sceneId The scene identifier.  Ver.: always
- */
-EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId);
-/** @brief Scenes Cluster Remove Scenes In Group
- *
- * This function removes the scenes from a specified group.
- *
- * @param endpoint Endpoint  Ver.: always
- * @param groupId Group ID  Ver.: always
- */
-void emberAfScenesClusterRemoveScenesInGroupCallback(uint8_t endpoint, uint16_t groupId);
 /** @brief Scenes Cluster Add Scene
  *
  *
@@ -2583,20 +2557,6 @@ bool emberAfScenesClusterViewSceneCallback(uint16_t groupId, uint8_t sceneId);
  */
 bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
                                                    uint8_t * sceneName, uint8_t * extensionFieldSets);
-/** @brief Scenes Cluster Store Current Scene
- *
- * This function is called by the framework when the application should store
- * the current scene.  If an entry already exists in the scene table with the
- * same scene and group ids, the application should update the entry with the
- * current scene.  Otherwise, a new entry should be adde to the scene table, if
- * possible.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- * @param sceneId The scene identifier.  Ver.: always
- */
-EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId);
-
 /** @} END Scenes Cluster Callbacks */
 
 /** @name On/off Cluster Callbacks */
