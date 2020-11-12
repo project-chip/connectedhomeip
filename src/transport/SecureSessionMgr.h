@@ -54,7 +54,6 @@ class SecureSessionMgrBase;
 class DLL_EXPORT SecureSessionMgrDelegate
 {
 public:
-
     /**
      * @brief
      *   Called when a new message is received. The function must internally release the
@@ -67,8 +66,7 @@ public:
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, System::PacketBuffer * msgBuf,
-                                   SecureSessionMgrBase * mgr)
+                                   SecureSessionHandle session, System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
     {}
 
     /**

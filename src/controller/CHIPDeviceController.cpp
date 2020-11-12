@@ -348,8 +348,7 @@ exit:
 }
 
 void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                                         SecureSessionHandle session, System::PacketBuffer * msgBuf,
-                                         SecureSessionMgrBase * mgr)
+                                         SecureSessionHandle session, System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t index = 0;
@@ -401,7 +400,8 @@ uint16_t DeviceController::FindDeviceIndex(SecureSessionHandle session)
     uint16_t i = 0;
     while (i < kNumMaxActiveDevices)
     {
-        if (mActiveDevices[i].IsActive() && mActiveDevices[i].IsSecureConnected() && mActiveDevices[i].GetSecureSession() == session)
+        if (mActiveDevices[i].IsActive() && mActiveDevices[i].IsSecureConnected() &&
+            mActiveDevices[i].GetSecureSession() == session)
         {
             return i;
         }

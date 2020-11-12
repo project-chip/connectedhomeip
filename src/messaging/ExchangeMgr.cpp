@@ -131,8 +131,7 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
 }
 
-ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                                                void * AppState)
+ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, void * AppState)
 {
     ExchangeContext * ec = ContextPool;
 
@@ -286,8 +285,7 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, System::PacketBuffer * msgBuf,
-                                        SecureSessionMgrBase * msgLayer)
+                                        SecureSessionHandle session, System::PacketBuffer * msgBuf, SecureSessionMgrBase * msgLayer)
 {
     DispatchMessage(session, packetHeader, payloadHeader, msgBuf);
 }

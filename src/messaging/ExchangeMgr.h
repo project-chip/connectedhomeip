@@ -181,17 +181,16 @@ private:
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, void * AppState);
 
-    void DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader,
-                         const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+    void DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                         System::PacketBuffer * msgBuf);
 
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeContext::MessageReceiveFunct handler, void * appState);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer) override;
 
-    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           SecureSessionHandle session, System::PacketBuffer * msgBuf,
-                           SecureSessionMgrBase * msgLayer) override;
+    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                           System::PacketBuffer * msgBuf, SecureSessionMgrBase * msgLayer) override;
 
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgrBase * mgr) override;
 };

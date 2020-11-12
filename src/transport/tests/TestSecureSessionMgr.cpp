@@ -66,7 +66,7 @@ public:
 class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,SecureSessionHandle session,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
@@ -83,17 +83,19 @@ public:
 
     void OnNewConnection(SecureSessionHandle session, SecureSessionMgrBase * mgr) override
     {
-        if (NewConnectionHandlerCallCount == 0) mRemoteSession = session;
-        if (NewConnectionHandlerCallCount == 1) mLocalSession = session;
+        if (NewConnectionHandlerCallCount == 0)
+            mRemoteSession = session;
+        if (NewConnectionHandlerCallCount == 1)
+            mLocalSession = session;
         NewConnectionHandlerCallCount++;
     }
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgrBase * mgr) override {}
 
-    nlTestSuite * mSuite                   = nullptr;
+    nlTestSuite * mSuite = nullptr;
     SecureSessionHandle mRemoteSession;
     SecureSessionHandle mLocalSession;
-    int ReceiveHandlerCallCount            = 0;
-    int NewConnectionHandlerCallCount      = 0;
+    int ReceiveHandlerCallCount       = 0;
+    int NewConnectionHandlerCallCount = 0;
 };
 
 TestSessMgrCallback callback;

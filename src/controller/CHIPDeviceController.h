@@ -188,8 +188,7 @@ protected:
 
     uint16_t GetInactiveDeviceIndex();
     uint16_t FindDeviceIndex(SecureSessionHandle session);
-    [[deprecated("only peer node id is not sufficient to identify a device")]]
-    uint16_t FindDeviceIndex(NodeId id);
+    [[deprecated("only peer node id is not sufficient to identify a device")]] uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
 

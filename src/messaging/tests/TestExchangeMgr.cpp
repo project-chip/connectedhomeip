@@ -93,7 +93,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,SecureSessionHandle session,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override
     {
         ReceiveHandlerCallCount++;
@@ -107,8 +107,8 @@ public:
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgrBase * mgr) override {}
 
     SecureSessionHandle mSecureSession;
-    int ReceiveHandlerCallCount            = 0;
-    int NewConnectionHandlerCallCount      = 0;
+    int ReceiveHandlerCallCount       = 0;
+    int NewConnectionHandlerCallCount = 0;
 };
 
 void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)

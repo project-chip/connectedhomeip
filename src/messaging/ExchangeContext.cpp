@@ -192,8 +192,7 @@ void ExchangeContext::Reset()
     *this = ExchangeContext();
 }
 
-void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
-                            void * AppState)
+void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, void * AppState)
 {
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
@@ -201,7 +200,7 @@ void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSes
     Retain();
     mExchangeMgr = em;
     em->IncrementContextsInUse();
-    mExchangeId      = ExchangeId;
+    mExchangeId    = ExchangeId;
     mSecureSession = session;
     mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
     mAppState = AppState;

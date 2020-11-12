@@ -208,7 +208,7 @@ CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddres
         SuccessOrExit(err = Mdns::DiscoveryManager::GetInstance().ResolveNodeId(pairing->GetPeerNodeId(), fabricId));
     }
 
-    mCB->OnNewConnection({state->GetPeerNodeId(), state->GetPeerKeyID()}, this);
+    mCB->OnNewConnection({ state->GetPeerNodeId(), state->GetPeerKeyID() }, this);
 
     err = pairing->DeriveSecureSession(reinterpret_cast<const uint8_t *>(kSpake2pI2RSessionInfo), strlen(kSpake2pI2RSessionInfo),
                                        state->GetSecureSession());
@@ -339,7 +339,8 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 
         if (connection->mCB != nullptr)
         {
-            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, {state->GetPeerNodeId(), state->GetPeerKeyID()}, msg, connection);
+            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID() }, msg,
+                                               connection);
             msg = nullptr;
         }
     }
@@ -370,7 +371,7 @@ void SecureSessionMgrBase::HandleConnectionExpired(Transport::PeerConnectionStat
 
     if (mgr->mCB != nullptr)
     {
-        mgr->mCB->OnConnectionExpired({state.GetPeerNodeId(), state.GetPeerKeyID()}, mgr);
+        mgr->mCB->OnConnectionExpired({ state.GetPeerNodeId(), state.GetPeerKeyID() }, mgr);
     }
 
     mgr->mTransport->Disconnect(state.GetPeerAddress());
