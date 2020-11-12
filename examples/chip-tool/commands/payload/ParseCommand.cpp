@@ -17,20 +17,20 @@
  */
 
 #include "ParseCommand.h"
-#include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <setup_payload/ManualSetupPayloadParser.h>
+#include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceController;
 
 CHIP_ERROR ParseCommand::Run(ChipDeviceController * dc, NodeId remoteId)
-{    
+{
     std::string codeString(mCode);
     SetupPayload payload;
-    
+
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = Parse(codeString, payload);
+    err            = Parse(codeString, payload);
     SuccessOrExit(err);
 
     err = Print(payload);
@@ -39,7 +39,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR ParseCommand::Print(chip::SetupPayload payload){
+CHIP_ERROR ParseCommand::Print(chip::SetupPayload payload)
+{
     std::string serialNumber;
     std::vector<OptionalQRCodeInfo> optionalVendorData;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -52,20 +53,21 @@ CHIP_ERROR ParseCommand::Print(chip::SetupPayload payload){
     ChipLogProgress(SetupPayload, "SetUpPINCode: %u", payload.setUpPINCode);
     ChipLogProgress(SetupPayload, "RendezvousInformation: %u", payload.rendezvousInformation);
 
-    if (payload.getSerialNumber(serialNumber) == CHIP_NO_ERROR){
+    if (payload.getSerialNumber(serialNumber) == CHIP_NO_ERROR)
+    {
         ChipLogProgress(SetupPayload, "SerialNumber: %s", serialNumber.c_str());
     }
 
     optionalVendorData = payload.getAllOptionalVendorData();
     for (const OptionalQRCodeInfo & info : optionalVendorData)
-    {        
+    {
         if (info.type == optionalQRCodeInfoTypeString)
         {
-            ChipLogProgress(SetupPayload, "OptionalQRCodeInfo: tag=%u,string value=%s",info.tag, info.data.c_str());
+            ChipLogProgress(SetupPayload, "OptionalQRCodeInfo: tag=%u,string value=%s", info.tag, info.data.c_str());
         }
         else if (info.type == optionalQRCodeInfoTypeInt32)
         {
-            ChipLogProgress(SetupPayload, "OptionalQRCodeInfo: tag=%u,int value=%u",info.tag, info.int32);
+            ChipLogProgress(SetupPayload, "OptionalQRCodeInfo: tag=%u,int value=%u", info.tag, info.int32);
         }
         else
         {
@@ -79,10 +81,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR ParseCommand::Parse(std::string codeString, chip::SetupPayload &payload){
-    
+CHIP_ERROR ParseCommand::Parse(std::string codeString, chip::SetupPayload & payload)
+{
+
     CHIP_ERROR err = CHIP_NO_ERROR;
-    if(IsQRCode(codeString)) 
+    if (IsQRCode(codeString))
     {
         ChipLogDetail(SetupPayload, "Parsing base41Representation: %s", codeString.c_str());
         err = QRCodeSetupPayloadParser(codeString).populatePayload(payload);
@@ -96,6 +99,7 @@ CHIP_ERROR ParseCommand::Parse(std::string codeString, chip::SetupPayload &paylo
     return err;
 }
 
-bool ParseCommand::IsQRCode(std::string codeString){
-    return codeString.rfind(QRCODE_PREFIX)==0;
+bool ParseCommand::IsQRCode(std::string codeString)
+{
+    return codeString.rfind(QRCODE_PREFIX) == 0;
 }

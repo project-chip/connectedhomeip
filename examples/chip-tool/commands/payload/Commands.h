@@ -22,7 +22,7 @@
 
 void registerCommandsPayload(Commands & commands)
 {
-    const char * clusterName = "Payload";
+    const char * clusterName      = "Payload";
     commands_list clusterCommands = {
         make_unique<ParseCommand>(),
     };
