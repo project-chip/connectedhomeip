@@ -68,7 +68,7 @@ public:
 protected:
     void InitInternal(SecureSessionMgr * secureMgr, RendezvousSession * rendezvous, Transport::Base * transport)
     {
-        mTransport        = transport;
+        mTransport = transport;
         mTransport->SetMessageReceiveHandler(HandleMessageReceived, this);
         SetSecureSessionMgr(secureMgr);
         SetRendezvousSession(rendezvous);
