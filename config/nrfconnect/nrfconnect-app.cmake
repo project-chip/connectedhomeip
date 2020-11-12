@@ -53,6 +53,9 @@ endif()
 # ==================================================
 find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
 
+# TODO: temporary fix forcing time_t size to be equal long size - remove it after merging fix from Zephyr project.
+zephyr_compile_definitions(_USE_LONG_TIME_T)
+
 # ==================================================
 # General settings
 # ==================================================
