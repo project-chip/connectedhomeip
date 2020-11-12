@@ -34,6 +34,9 @@ typedef uint16_t ClusterId;
 typedef uint16_t AttributeId;
 typedef uint16_t GroupId;
 typedef uint8_t CommandId;
+typedef uint16_t EventId;
+typedef uint64_t NodeId;
+typedef uint64_t DataVersion;
 } // namespace chip
 
 /**

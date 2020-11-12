@@ -519,8 +519,8 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
     case CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES:
         desc = "Too many shared session end nodes";
         break;
-    case CHIP_ERROR_MALFORMED_DATA_ELEMENT:
-        desc = "Malformed DataElement";
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT:
+        desc = "Malformed Interaction Model Attribute DataElement";
         break;
     case CHIP_ERROR_WRONG_CERT_TYPE:
         desc = "Wrong certificate type";
@@ -593,6 +593,27 @@ bool FormatCHIPError(char * buf, uint16_t bufSize, int32_t err)
         break;
     case CHIP_ERROR_MDNS_COLLISSION:
         desc = "mDNS collission";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH:
+        desc = "Malformed Interacton Model Attribute Path";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_EVENT_PATH:
+        desc = "Malformed Interacton Model Event Path";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_COMMAND_PATH:
+        desc = "Malformed Interacton Model Command Path";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT:
+        desc = "Malformed Interacton Model Attribute DataElement";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT:
+        desc = "Malformed Interacton Model Attribute DataElement";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT:
+        desc = "Malformed Interacton Model Event DataElement";
+        break;
+    case CHIP_ERROR_IM_MALFORMED_STATUS_CODE:
+        desc = "Malformed Interacton Model Status Code";
         break;
     }
 #endif // !CHIP_CONFIG_SHORT_ERROR_STR
