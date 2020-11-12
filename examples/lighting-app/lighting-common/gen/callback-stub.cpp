@@ -909,18 +909,6 @@ bool emberAfMainStartCallback(int * returnCode, int argc, char ** argv)
  */
 void emberAfMainTickCallback(void) {}
 
-/** @brief Scenes Cluster Make Invalid
- *
- * This function is called to invalidate the valid attribute in the Scenes
- * cluster.
- *
- * @param endpoint   Ver.: always
- */
-EmberAfStatus emberAfScenesClusterMakeInvalidCallback(uint8_t endpoint)
-{
-    return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
-}
-
 /** @brief Mark Buffers
  *
  * This function is called when the garbage collector runs.  Any buffers held by
@@ -1281,20 +1269,6 @@ bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t *
     return false;
 }
 
-/** @brief Scenes Cluster Recall Saved Scene
- *
- * This function is called by the framework when the application should recall a
- * saved scene.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- * @param sceneId The scene identifier.  Ver.: always
- */
-EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId)
-{
-    return EMBER_ZCL_STATUS_FAILURE;
-}
-
 /** @brief Registration Abort
  *
  * This callback is called when the device should abort the registration
@@ -1367,15 +1341,6 @@ EmberStatus emberAfRemoteSetBindingPermissionCallback(const EmberBindingTableEnt
  * @param tasks   Ver.: always
  */
 void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
-
-/** @brief Scenes Cluster Remove Scenes In Group
- *
- * This function removes the scenes from a specified group.
- *
- * @param endpoint Endpoint  Ver.: always
- * @param groupId Group ID  Ver.: always
- */
-void emberAfScenesClusterRemoveScenesInGroupCallback(uint8_t endpoint, uint16_t groupId) {}
 
 /** @brief Report Attributes
  *
@@ -1611,23 +1576,6 @@ EmberStatus emberAfStartSearchForJoinableNetworkCallback(void)
  *
  */
 void emberAfStopMoveCallback(void) {}
-
-/** @brief Scenes Cluster Store Current Scene
- *
- * This function is called by the framework when the application should store
- * the current scene.  If an entry already exists in the scene table with the
- * same scene and group ids, the application should update the entry with the
- * current scene.  Otherwise, a new entry should be adde to the scene table, if
- * possible.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- * @param sceneId The scene identifier.  Ver.: always
- */
-EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(uint8_t endpoint, uint16_t groupId, uint8_t sceneId)
-{
-    return EMBER_ZCL_STATUS_FAILURE;
-}
 
 /** @brief Trust Center Join
  *
