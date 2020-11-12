@@ -13,44 +13,26 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/nlio.gni")
+import("//build_overrides/nlunit_test.gni")
 
-config("app_config") {
-  include_dirs = [
-    "gen",
-    "util",
-    ".",
-    "${target_gen_dir}/include",
-  ]
-}
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-static_library("app") {
-  output_name = "libCHIPDataModel"
+chip_test_suite("tests") {
+  output_name = "libAppTests"
 
   sources = [
-    "MessageDef.cpp",
-    "MessageDef.h",
-    "decoder.cpp",
-    "encoder.cpp",
-  ]
-
-  public_deps = [
-    ":codec_headers",
-    "${chip_root}/src/lib/support",
-    "${chip_root}/src/system",
-    "${nlio_root}:nlio",
+    "TestApp.h",
+    "TestMessageDef.cpp",
+    "TestMessageDefDriver.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
 
-  public_configs = [
-    ":app_config",
-    "${chip_root}/src:includes",
+  public_deps = [
+    "${chip_root}/src/app",
+    "${chip_root}/src/lib/core",
+    "${nlunit_test_root}:nlunit-test",
   ]
-}
 
-copy("codec_headers") {
-  sources = [ "chip-zcl-zpro-codec.h" ]
-
-  outputs = [ "${target_gen_dir}/include/app/{{source_file_part}}" ]
+  tests = [ "TestMessageDef" ]
 }

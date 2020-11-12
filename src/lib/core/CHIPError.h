@@ -1476,14 +1476,13 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES           _CHIP_ERROR(155)
 
 /**
- * @def CHIP_ERROR_MALFORMED_DATA_ELEMENT
+ * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT
  *
  * @brief
- *   The DataElement is malformed: it either does not contain
- *   the required elements, or it contais both the MergeData element
- *   and DeletedDictionaryKeyList.
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
  */
-#define CHIP_ERROR_MALFORMED_DATA_ELEMENT                      _CHIP_ERROR(156)
+#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT         _CHIP_ERROR(156)
 
 /**
  * @def CHIP_ERROR_WRONG_CERT_TYPE
@@ -1698,6 +1697,69 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
  *
  */
 #define CHIP_ERROR_MDNS_COLLISSION _CHIP_ERROR(180)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH
+ *
+ * @brief
+ *   The Attribute path is malformed: it either does not contain
+ *   the required path
+ */
+#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH                      _CHIP_ERROR(181)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_EVENT_PATH
+ *
+ * @brief
+ *   The Attribute Path is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_EVENT_PATH                         _CHIP_ERROR(182)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_COMMAND_PATH
+ *
+ * @brief
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_COMMAND_PATH                     _CHIP_ERROR(183)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT
+ *
+ * @brief
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT                      _CHIP_ERROR(184)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT
+ *
+ * @brief
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT                      _CHIP_ERROR(185)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT
+ *
+ * @brief
+ *   The Event DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT                       _CHIP_ERROR(186)
+
+/**
+ * @def CHIP_ERROR_IM_MALFORMED_STATUS_CODE
+ *
+ * @brief
+ *   The Attribute DataElement is malformed: it either does not contain
+ *   the required elements
+ */
+#define CHIP_ERROR_IM_MALFORMED_STATUS_CODE                      _CHIP_ERROR(187)
 
 /**
  *  @}
