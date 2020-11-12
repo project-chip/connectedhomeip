@@ -1828,7 +1828,7 @@ CHIP_ERROR StatusCode::Parser::Get(uint16_t * apGeneralCode, uint32_t * apProtoc
     err = lReader.Next();
     SuccessOrExit(err);
     VerifyOrExit(lReader.GetType() == chip::TLV::kTLVType_Structure, err = CHIP_ERROR_WRONG_TLV_TYPE);
-    
+
     err = lReader.EnterContainer(OuterContainerType);
     SuccessOrExit(err);
 
@@ -1837,7 +1837,7 @@ CHIP_ERROR StatusCode::Parser::Get(uint16_t * apGeneralCode, uint32_t * apProtoc
     VerifyOrExit(lReader.GetType() == chip::TLV::kTLVType_UnsignedInteger, err = CHIP_ERROR_WRONG_TLV_TYPE);
     err = lReader.Get(*apClusterId);
     SuccessOrExit(err);
-    
+
     err = lReader.ExitContainer(OuterContainerType);
     SuccessOrExit(err);
 
@@ -1995,7 +1995,7 @@ StatusCode::Builder & StatusCode::Builder::Create(const uint16_t aGeneralCode, c
 {
     uint64_t tag = chip::TLV::AnonymousTag;
     TLVType metaDataContainer;
-    
+
     SuccessOrExit(mError);
 
     mError = mpWriter->Put(tag, aGeneralCode);
