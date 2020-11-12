@@ -44,7 +44,6 @@ enum ControlMode : uint8_t
  */
 struct TransferInit
 {
-public:
     /**
      * @brief
      *  Pack (write) the message into a PacketBuffer.
@@ -53,18 +52,27 @@ public:
      *
      * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
      */
-    CHIP_ERROR Pack(System::PacketBuffer * aBuffer);
+    CHIP_ERROR Pack(System::PacketBuffer & aBuffer);
 
     /**
      * @brief
      *  Parse data from an PacketBuffer into a struct instance
      *
-     * @param[in] aBuffer Pointer to a PacketBuffer containing the data
-     * @param[out] aParsedMessage Reference to a struct instance where results will be stored
+     * @param[in] aBuffer Pointer to a PacketBuffer containing the data.
+     * @param[out] aParsedMessage Reference to a struct instance where results will be stored.
+     *             Note that this struct will store pointers into the passed PacketBuffer, so it
+     *             is essential that the PacketBuffer is not modified or freed until after the
+     *             TransferInit struct is no longer needed.
      *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
-    static CHIP_ERROR Parse(System::PacketBuffer * aBuffer, TransferInit & aParsedMessage);
+    static CHIP_ERROR Parse(System::PacketBuffer & aBuffer, TransferInit & aParsedMessage);
+
+    /**
+     * @brief
+     *  Get the size of the message once it is written to a buffer.
+     */
+    size_t PackedSize();
 
     /**
      * @brief
@@ -80,10 +88,11 @@ public:
 
     // Range Control (required)
     bool mWideRange;       ///< Set true to indicate mStartOffset and mDefLen are 64-bit, else 32-bit.
-    uint64_t mStartOffset; ///< Proposed start offset of data. 0 for no offset.
+    uint64_t mStartOffset; ///< Proposed start offset of data. 0 for no offset. Will be truncated if mWideRange is false.
     bool mDefLen;          ///< True if transfer has a definite length.
 
-    uint64_t mMaxLength;    ///< Proposed max length of data in transfer, 0 for indefinite (required if mDefLen is set)
+    uint64_t mMaxLength;    ///< Proposed max length of data in transfer, 0 for indefinite (required if mDefLen is set).
+                            ///< Will be truncated if mWideRange is false.
     uint16_t mMaxBlockSize; ///< Proposed max block size to use in transfer (required)
 
     // File designator (required)
@@ -108,7 +117,6 @@ struct ReceiveInit : public TransferInit
  */
 struct SendAccept
 {
-public:
     /**
      * @brief
      *  Pack (write) the message into a PacketBuffer.
@@ -117,18 +125,27 @@ public:
      *
      * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
      */
-    CHIP_ERROR Pack(System::PacketBuffer * aBuffer);
+    CHIP_ERROR Pack(System::PacketBuffer & aBuffer);
 
     /**
      * @brief
      *  Parse data from an PacketBuffer into a struct instance
      *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data
-     * @param[out] aParsedMessage Reference to a struct instance where results will be stored
+     * @param[out] aParsedMessage Reference to a struct instance where results will be stored.
+     *             Note that this struct will store pointers into the passed PacketBuffer, so it
+     *             is essential that the PacketBuffer is not modified or freed until after the
+     *             SendAccept struct is no longer needed.
      *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
-    static CHIP_ERROR Parse(System::PacketBuffer * aBuffer, SendAccept & aResponse);
+    static CHIP_ERROR Parse(System::PacketBuffer & aBuffer, SendAccept & aResponse);
+
+    /**
+     * @brief
+     *  Get the size of the message once it is written to a buffer.
+     */
+    size_t PackedSize();
 
     /**
      * @brief
@@ -155,7 +172,6 @@ public:
  */
 struct ReceiveAccept
 {
-public:
     /**
      * @brief
      *  Pack (write) the message into a PacketBuffer.
@@ -164,18 +180,27 @@ public:
      *
      * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
      */
-    CHIP_ERROR Pack(System::PacketBuffer * aBuffer);
+    CHIP_ERROR Pack(System::PacketBuffer & aBuffer);
 
     /**
      * @brief
      *  Parse data from an PacketBuffer into a struct instance
      *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data
-     * @param[out] aParsedMessage Reference to a struct instance where results will be stored
+     * @param[out] aParsedMessage Reference to a struct instance where results will be stored.
+     *             Note that this struct will store pointers into the passed PacketBuffer, so it
+     *             is essential that the PacketBuffer is not modified or freed until after the
+     *             ReceiveAccept struct is no longer needed.
      *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
-    static CHIP_ERROR Parse(System::PacketBuffer * aBuffer, ReceiveAccept & aResponse);
+    static CHIP_ERROR Parse(System::PacketBuffer & aBuffer, ReceiveAccept & aResponse);
+
+    /**
+     * @brief
+     *  Get the size of the message once it is written to a buffer.
+     */
+    size_t PackedSize();
 
     /**
      * @brief
@@ -189,11 +214,13 @@ public:
 
     // Range Control (must fill in)
     bool mWideRange;       ///< Set true to indicate mStartOffset and mDefLen are 64-bit, else 32-bit
-    uint64_t mStartOffset; ///< Chosen start offset of data. 0 for no offset
+    uint64_t mStartOffset; ///< Chosen start offset of data. 0 for no offset. Will be truncated if
+                           ///< mWideRange is false.
     bool mDefLen;          ///< Set to true if transfer has definite length
 
     uint16_t mMaxBlockSize; ///< Chosen max block size to use in transfer (required)
-    uint64_t mLength;       ///< Length of transfer (only valid/required if mDefLen is set)
+    uint64_t mLength;       ///< Length of transfer (only valid/required if mDefLen is set). Will be
+                            ///< truncated if mWideRange is false.
 
     // Additional metadata (optional, TLV format)
     uint8_t * mMetadata;

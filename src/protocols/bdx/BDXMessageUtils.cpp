@@ -41,18 +41,13 @@ using namespace chip;
 using namespace chip::BDX;
 using namespace chip::Encoding::LittleEndian;
 
-CHIP_ERROR TransferInit::Pack(System::PacketBuffer * aBuffer)
+CHIP_ERROR TransferInit::Pack(System::PacketBuffer & aBuffer)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
-    uint8_t rangeCtl = 0, ptcByte = 0;
+    uint8_t rangeCtl = 0;
+    uint8_t ptcByte  = 0;
 
-    // BufBound has to be initialized with aBuffer so VerifyOrExit can't be used here.
-    if (aBuffer == NULL)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    BufBound bbuf(aBuffer->Start(), aBuffer->AvailableDataLength());
+    BufBound bbuf(aBuffer.Start(), aBuffer.AvailableDataLength());
 
     ptcByte |= mSupportedVersions & VERSION_MASK;
     if (mSupportsSenderDrive)
@@ -62,9 +57,6 @@ CHIP_ERROR TransferInit::Pack(System::PacketBuffer * aBuffer)
     if (mSupportsAsync)
         ptcByte |= ASYNC_MASK;
 
-    bbuf.Put(ptcByte);
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
     if (mDefLen)
         rangeCtl |= DEFLEN_MASK;
     if (mStartOffset)
@@ -72,23 +64,19 @@ CHIP_ERROR TransferInit::Pack(System::PacketBuffer * aBuffer)
     if (mWideRange)
         rangeCtl |= WIDERANGE_MASK;
 
+    bbuf.Put(ptcByte);
     bbuf.Put(rangeCtl);
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
     bbuf.PutLE16(mMaxBlockSize);
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     if (mStartOffset > 0)
     {
         if (mWideRange)
         {
             bbuf.PutLE64(mStartOffset);
-            VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
         }
         else
         {
-            bbuf.PutLE32((uint32_t) mStartOffset);
-            VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+            bbuf.PutLE32(static_cast<uint32_t>(mStartOffset));
         }
     }
 
@@ -97,65 +85,50 @@ CHIP_ERROR TransferInit::Pack(System::PacketBuffer * aBuffer)
         if (mWideRange)
         {
             bbuf.PutLE64(mMaxLength);
-            VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
         }
         else
         {
-            bbuf.PutLE32((uint32_t) mMaxLength);
-            VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+            bbuf.PutLE32(static_cast<uint32_t>(mMaxLength));
         }
     }
 
     VerifyOrExit(mFileDesignator && mFileDesLength > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
     bbuf.PutLE16(mFileDesLength);
-    bbuf.Put(mFileDesignator, (size_t) mFileDesLength);
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    bbuf.Put(mFileDesignator, static_cast<size_t>(mFileDesLength));
 
     // Metadata is optional
     if (mMetadata && mMetadataLength > 0)
     {
-        bbuf.Put(mMetadata, (size_t) mMetadataLength);
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        bbuf.Put(mMetadata, static_cast<size_t>(mMetadataLength));
     }
 
-    aBuffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
+    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    aBuffer.SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
 exit:
     return err;
 }
 
-CHIP_ERROR TransferInit::Parse(System::PacketBuffer * aBuffer, TransferInit & aParsedMessage)
+CHIP_ERROR TransferInit::Parse(System::PacketBuffer & aBuffer, TransferInit & aParsedMessage)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t ptcByte;
     uint8_t rangeCtl;
     bool hasStartOffset     = false;
     uint32_t tmpUint32Value = 0;
-    uint8_t * bufStart;
+    uint8_t * bufStart      = aBuffer.Start();
+    Reader bufReader(bufStart, aBuffer.DataLength());
 
-    // BufBound has to be initialized with aBuffer so VerifyOrExit can't be used here.
-    if (aBuffer == NULL)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    bufStart = aBuffer->Start();
-    Reader bufReader(bufStart, aBuffer->DataLength());
-
-    SuccessOrExit(bufReader.Read8(&ptcByte).StatusCode());
+    SuccessOrExit(bufReader.Read8(&ptcByte).Read8(&rangeCtl).Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
 
     aParsedMessage.mSupportedVersions     = ptcByte & VERSION_MASK;
     aParsedMessage.mSupportsSenderDrive   = ((ptcByte & SENDER_DRIVE_MASK) != 0);
     aParsedMessage.mSupportsReceiverDrive = ((ptcByte & RECEIVER_DRIVE_MASK) != 0);
     aParsedMessage.mSupportsAsync         = ((ptcByte & ASYNC_MASK) != 0);
 
-    SuccessOrExit(bufReader.Read8(&rangeCtl).StatusCode());
-
     aParsedMessage.mDefLen    = (rangeCtl & DEFLEN_MASK) != 0;
     hasStartOffset            = (rangeCtl & START_OFFSET_MASK) != 0;
     aParsedMessage.mWideRange = (rangeCtl & WIDERANGE_MASK) != 0;
-
-    SuccessOrExit(bufReader.Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
 
     if (hasStartOffset)
     {
@@ -185,20 +158,33 @@ CHIP_ERROR TransferInit::Parse(System::PacketBuffer * aBuffer, TransferInit & aP
 
     SuccessOrExit(bufReader.Read16(&aParsedMessage.mFileDesLength).StatusCode());
 
-    VerifyOrExit(bufReader.OctetsRead() + aParsedMessage.mFileDesLength <= aBuffer->DataLength(),
+    VerifyOrExit(bufReader.OctetsRead() + aParsedMessage.mFileDesLength <= aBuffer.DataLength(),
                  err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     aParsedMessage.mFileDesignator = &bufStart[bufReader.OctetsRead()];
 
     // Rest of message is metadata (could be empty)
-    if (bufReader.OctetsRead() + aParsedMessage.mFileDesLength < aBuffer->DataLength())
+    if (bufReader.OctetsRead() + aParsedMessage.mFileDesLength < aBuffer.DataLength())
     {
-        uint16_t metadataStartIndex    = (uint16_t)(bufReader.OctetsRead() + aParsedMessage.mFileDesLength);
+        uint16_t metadataStartIndex    = static_cast<uint16_t>(bufReader.OctetsRead() + aParsedMessage.mFileDesLength);
         aParsedMessage.mMetadata       = &bufStart[metadataStartIndex];
-        aParsedMessage.mMetadataLength = (uint16_t)(aBuffer->DataLength() - metadataStartIndex);
+        aParsedMessage.mMetadataLength = static_cast<uint16_t>(aBuffer.DataLength() - metadataStartIndex);
     }
 
 exit:
+    if (bufReader.StatusCode() != CHIP_NO_ERROR)
+    {
+        err = bufReader.StatusCode();
+    }
     return err;
+}
+
+size_t TransferInit::PackedSize()
+{
+    size_t offsetSize = mWideRange ? 8 : 4;
+    size_t lengthSize = offsetSize;
+
+    // First 2 bytes are Transfer Control and Range Control bytes
+    return (2 + sizeof(mMaxBlockSize) + offsetSize + lengthSize + sizeof(mFileDesLength) + mFileDesLength + mMetadataLength);
 }
 
 bool TransferInit::operator==(const TransferInit & another) const
@@ -212,53 +198,36 @@ bool TransferInit::operator==(const TransferInit & another) const
             mMaxLength == another.mMaxLength && mMaxBlockSize == another.mMaxBlockSize && fileDesMatches && metadataMatches);
 }
 
-CHIP_ERROR SendAccept::Pack(System::PacketBuffer * aBuffer)
+CHIP_ERROR SendAccept::Pack(System::PacketBuffer & aBuffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t tcByte = 0;
 
-    // BufBound has to be initialized with aBuffer so VerifyOrExit can't be used here.
-    if (aBuffer == NULL)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    BufBound bbuf(aBuffer->Start(), aBuffer->AvailableDataLength());
+    BufBound bbuf(aBuffer.Start(), aBuffer.AvailableDataLength());
 
     tcByte |= mVersion & VERSION_MASK;
     tcByte |= mControlMode;
+
     bbuf.Put(tcByte);
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
     bbuf.PutLE16(mMaxBlockSize);
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    bbuf.Put(mMetadata, static_cast<size_t>(mMetadataLength));
 
-    bbuf.Put(mMetadata, (size_t) mMetadataLength);
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
-    aBuffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
+    aBuffer.SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
 exit:
     return err;
 }
 
-CHIP_ERROR SendAccept::Parse(System::PacketBuffer * aBuffer, SendAccept & aParsedMessage)
+CHIP_ERROR SendAccept::Parse(System::PacketBuffer & aBuffer, SendAccept & aParsedMessage)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     uint8_t tcByte         = 0;
     uint8_t tmpControlMode = 0;
-    uint8_t * bufStart     = NULL;
+    uint8_t * bufStart     = aBuffer.Start();
+    Reader bufReader(bufStart, aBuffer.DataLength());
 
-    // BufBound has to be initialized with aBuffer so VerifyOrExit can't be used here.
-    if (aBuffer == NULL)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    bufStart = aBuffer->Start();
-    Reader bufReader(bufStart, aBuffer->DataLength());
-
-    SuccessOrExit(bufReader.Read8(&tcByte).StatusCode());
+    SuccessOrExit(bufReader.Read8(&tcByte).Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
 
     aParsedMessage.mVersion = tcByte & VERSION_MASK;
     tmpControlMode          = tcByte & CONTROL_MODE_MASK;
@@ -269,17 +238,25 @@ CHIP_ERROR SendAccept::Parse(System::PacketBuffer * aBuffer, SendAccept & aParse
                  err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     aParsedMessage.mControlMode = static_cast<ControlMode>(tmpControlMode);
 
-    SuccessOrExit(bufReader.Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
-
     // Rest of message is metadata (could be empty)
-    if (bufReader.OctetsRead() < aBuffer->DataLength())
+    if (bufReader.OctetsRead() < aBuffer.DataLength())
     {
         aParsedMessage.mMetadata       = &bufStart[bufReader.OctetsRead()];
-        aParsedMessage.mMetadataLength = (uint16_t)(aBuffer->DataLength() - bufReader.OctetsRead());
+        aParsedMessage.mMetadataLength = static_cast<uint16_t>(aBuffer.DataLength() - bufReader.OctetsRead());
     }
 
 exit:
+    if (bufReader.StatusCode() != CHIP_NO_ERROR)
+    {
+        err = bufReader.StatusCode();
+    }
     return err;
+}
+
+size_t SendAccept::PackedSize()
+{
+    // First byte is Transfer Control byte
+    return (1 + sizeof(mMaxBlockSize) + mMetadataLength);
 }
 
 bool SendAccept::operator==(const SendAccept & another) const
@@ -290,24 +267,16 @@ bool SendAccept::operator==(const SendAccept & another) const
             metadataMatches);
 }
 
-CHIP_ERROR ReceiveAccept::Pack(System::PacketBuffer * aBuffer)
+CHIP_ERROR ReceiveAccept::Pack(System::PacketBuffer & aBuffer)
 {
     CHIP_ERROR err   = CHIP_NO_ERROR;
     uint8_t tcByte   = 0;
     uint8_t rangeCtl = 0;
 
-    // BufBound has to be initialized with aBuffer so VerifyOrExit can't be used here.
-    if (aBuffer == NULL)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    BufBound bbuf(aBuffer->Start(), aBuffer->AvailableDataLength());
+    BufBound bbuf(aBuffer.Start(), aBuffer.AvailableDataLength());
 
     tcByte |= mVersion & VERSION_MASK;
     tcByte |= mControlMode;
-    bbuf.Put(tcByte);
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     if (mDefLen)
         rangeCtl |= DEFLEN_MASK;
@@ -316,23 +285,19 @@ CHIP_ERROR ReceiveAccept::Pack(System::PacketBuffer * aBuffer)
     if (mWideRange)
         rangeCtl |= WIDERANGE_MASK;
 
+    bbuf.Put(tcByte);
     bbuf.Put(rangeCtl);
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-
     bbuf.PutLE16(mMaxBlockSize);
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     if (mStartOffset > 0)
     {
         if (mWideRange)
         {
             bbuf.PutLE64(mStartOffset);
-            VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
         }
         else
         {
-            bbuf.PutLE32((uint32_t) mStartOffset);
-            VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+            bbuf.PutLE32(static_cast<uint32_t>(mStartOffset));
         }
     }
 
@@ -341,61 +306,47 @@ CHIP_ERROR ReceiveAccept::Pack(System::PacketBuffer * aBuffer)
         if (mWideRange)
         {
             bbuf.PutLE64(mLength);
-            VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
         }
         else
         {
-            bbuf.PutLE32((uint32_t) mLength);
-            VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+            bbuf.PutLE32(static_cast<uint32_t>(mLength));
         }
     }
 
-    bbuf.Put(mMetadata, (size_t) mMetadataLength);
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    bbuf.Put(mMetadata, static_cast<size_t>(mMetadataLength));
 
-    aBuffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
+    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    aBuffer.SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
 exit:
     return err;
 }
 
-CHIP_ERROR ReceiveAccept::Parse(System::PacketBuffer * aBuffer, ReceiveAccept & aParsedMessage)
+CHIP_ERROR ReceiveAccept::Parse(System::PacketBuffer & aBuffer, ReceiveAccept & aParsedMessage)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     bool hasStartOffset     = false;
     uint8_t tcByte          = 0;
     uint8_t rangeCtl        = 0;
     uint8_t tmpControlMode  = 0;
-    uint8_t * bufStart      = NULL;
     uint32_t tmpUint32Value = 0;
+    uint8_t * bufStart      = aBuffer.Start();
+    Reader bufReader(bufStart, aBuffer.DataLength());
 
-    // BufBound has to be initialized with aBuffer so VerifyOrExit can't be used here.
-    if (aBuffer == NULL)
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    bufStart = aBuffer->Start();
-    Reader bufReader(bufStart, aBuffer->DataLength());
-
-    SuccessOrExit(bufReader.Read8(&tcByte).StatusCode());
+    SuccessOrExit(bufReader.Read8(&tcByte).Read8(&rangeCtl).Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
 
     aParsedMessage.mVersion = tcByte & VERSION_MASK;
     tmpControlMode          = tcByte & CONTROL_MODE_MASK;
 
     // Determine transfer control mode. Only one mode should be selected.
-    // TODO: should this verification happen here
+    // TODO: should this verification happen here?
     VerifyOrExit(tmpControlMode == kSenderDrive || tmpControlMode == kReceiverDrive || tmpControlMode == kAsync,
                  err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     aParsedMessage.mControlMode = static_cast<ControlMode>(tmpControlMode);
 
-    SuccessOrExit(bufReader.Read8(&rangeCtl).StatusCode());
-
     aParsedMessage.mDefLen    = (rangeCtl & DEFLEN_MASK) != 0;
     hasStartOffset            = (rangeCtl & START_OFFSET_MASK) != 0;
     aParsedMessage.mWideRange = (rangeCtl & WIDERANGE_MASK) != 0;
-
-    SuccessOrExit(bufReader.Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
 
     if (hasStartOffset)
     {
@@ -424,14 +375,27 @@ CHIP_ERROR ReceiveAccept::Parse(System::PacketBuffer * aBuffer, ReceiveAccept & 
     }
 
     // Rest of message is metadata (could be empty)
-    if (bufReader.OctetsRead() < aBuffer->DataLength())
+    if (bufReader.OctetsRead() < aBuffer.DataLength())
     {
         aParsedMessage.mMetadata       = &bufStart[bufReader.OctetsRead()];
-        aParsedMessage.mMetadataLength = (uint16_t)(aBuffer->DataLength() - bufReader.OctetsRead());
+        aParsedMessage.mMetadataLength = static_cast<uint16_t>(aBuffer.DataLength() - bufReader.OctetsRead());
     }
 
 exit:
+    if (bufReader.StatusCode() != CHIP_NO_ERROR)
+    {
+        err = bufReader.StatusCode();
+    }
     return err;
+}
+
+size_t ReceiveAccept::PackedSize()
+{
+    size_t offsetSize = mWideRange ? 8 : 4;
+    size_t lengthSize = offsetSize;
+
+    // First 2 bytes are Transfer Control and Range Control bytes
+    return (2 + sizeof(mMaxBlockSize) + offsetSize + lengthSize + mMetadataLength);
 }
 
 bool ReceiveAccept::operator==(const ReceiveAccept & another) const

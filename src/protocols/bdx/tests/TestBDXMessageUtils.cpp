@@ -6,8 +6,6 @@
 #include <support/CodeUtils.h>
 #include <support/TestUtils.h>
 
-#include <string>
-
 using namespace chip;
 using namespace chip::BDX;
 
@@ -36,14 +34,21 @@ void TestTransferInitMessage(nlTestSuite * inSuite, void * inContext)
     testMsg.mMetadataLength = 5;
     testMsg.mMetadata       = reinterpret_cast<uint8_t *>(fakeData);
 
-    // Verify pack is successful
-    System::PacketBuffer * buf = System::PacketBuffer::NewWithAvailableSize(512);
-    err                        = testMsg.Pack(buf);
+    size_t msgSize = testMsg.PackedSize();
+
+    System::PacketBuffer * buf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
+    NL_TEST_ASSERT(inSuite, buf != nullptr);
+
+    err = testMsg.Pack(*buf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // Verify successful unpack, and unpacked message is identical to original
+    System::PacketBuffer * rcvBuf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
+    NL_TEST_ASSERT(inSuite, rcvBuf != nullptr);
+    memcpy(rcvBuf->Start(), buf->Start(), msgSize);
+    rcvBuf->SetDataLength(static_cast<uint16_t>(msgSize));
+
     TransferInit testMsgRcvd;
-    err = TransferInit::Parse(buf, testMsgRcvd);
+    err = TransferInit::Parse(*rcvBuf, testMsgRcvd);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, testMsgRcvd == testMsg);
 }
@@ -61,14 +66,21 @@ void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
     testMsg.mMetadataLength = 5;
     testMsg.mMetadata       = reinterpret_cast<uint8_t *>(fakeData);
 
-    // Verify pack is successful
-    System::PacketBuffer * buf = System::PacketBuffer::NewWithAvailableSize(512);
-    err                        = testMsg.Pack(buf);
+    size_t msgSize = testMsg.PackedSize();
+
+    System::PacketBuffer * buf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
+    NL_TEST_ASSERT(inSuite, buf != nullptr);
+
+    err = testMsg.Pack(*buf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // Verify successful unpack, and unpacked message is identical to original
+    System::PacketBuffer * rcvBuf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
+    NL_TEST_ASSERT(inSuite, rcvBuf != nullptr);
+    memcpy(rcvBuf->Start(), buf->Start(), msgSize);
+    rcvBuf->SetDataLength(static_cast<uint16_t>(msgSize));
+
     SendAccept testMsgRcvd;
-    err = SendAccept::Parse(buf, testMsgRcvd);
+    err = SendAccept::Parse(*rcvBuf, testMsgRcvd);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, testMsgRcvd == testMsg);
 }
@@ -92,14 +104,21 @@ void TestReceiveAcceptMessage(nlTestSuite * inSuite, void * inContext)
     testMsg.mMetadataLength = 5;
     testMsg.mMetadata       = reinterpret_cast<uint8_t *>(fakeData);
 
-    // Verify pack is successful
-    System::PacketBuffer * buf = System::PacketBuffer::NewWithAvailableSize(512);
-    err                        = testMsg.Pack(buf);
+    size_t msgSize = testMsg.PackedSize();
+
+    System::PacketBuffer * buf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
+    NL_TEST_ASSERT(inSuite, buf != nullptr);
+
+    err = testMsg.Pack(*buf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    // Verify successful unpack, and unpacked message is identical to original
+    System::PacketBuffer * rcvBuf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
+    NL_TEST_ASSERT(inSuite, rcvBuf != nullptr);
+    memcpy(rcvBuf->Start(), buf->Start(), msgSize);
+    rcvBuf->SetDataLength(static_cast<uint16_t>(msgSize));
+
     ReceiveAccept testMsgRcvd;
-    err = ReceiveAccept::Parse(buf, testMsgRcvd);
+    err = ReceiveAccept::Parse(*rcvBuf, testMsgRcvd);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, testMsgRcvd == testMsg);
 }
