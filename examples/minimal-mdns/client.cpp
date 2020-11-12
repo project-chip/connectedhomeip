@@ -121,7 +121,7 @@ class PacketReporter : public mdns::Minimal::ParserDelegate
 public:
     PacketReporter(const mdns::Minimal::BytesRange & packet) : mPacketRange(packet) {}
 
-    void Header(const mdns::Minimal::HeaderRef & header) override
+    void OnHeader(const mdns::Minimal::HeaderRef & header) override
     {
         if (header.GetFlags().IsQuery())
         {
@@ -138,7 +138,7 @@ public:
         printf("   Additionals: %d\n", header.GetAdditionalCount());
     }
 
-    void Query(const mdns::Minimal::QueryData & data) override
+    void OnQuery(const mdns::Minimal::QueryData & data) override
     {
         printf("       QUERY:  %s\n", ToString(data.GetType()));
         printf("           QUERY CLASS: %d\n", static_cast<int>(data.GetClass()));
@@ -147,7 +147,7 @@ public:
         PrintQName(data.GetName());
     }
 
-    void Resource(ResourceType type, const mdns::Minimal::ResourceData & data) override
+    void OnResource(ResourceType type, const mdns::Minimal::ResourceData & data) override
     {
         printf("       %s data:\n",
                (type == mdns::Minimal::ParserDelegate::ResourceType::kAnswer) ? "ANSWER" :                 //

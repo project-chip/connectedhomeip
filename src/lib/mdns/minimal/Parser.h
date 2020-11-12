@@ -96,11 +96,11 @@ public:
     };
     virtual ~ParserDelegate() {}
 
-    virtual void Header(const HeaderRef & header) = 0;
+    virtual void OnHeader(const HeaderRef & header) = 0;
 
-    virtual void Query(const QueryData & data) = 0;
+    virtual void OnQuery(const QueryData & data) = 0;
 
-    virtual void Resource(ResourceType type, const ResourceData & data) = 0;
+    virtual void OnResource(ResourceType type, const ResourceData & data) = 0;
 };
 
 /// Parses a mMDNS packet.

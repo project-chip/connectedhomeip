@@ -128,7 +128,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
         return false;
     }
 
-    delegate->Header(header);
+    delegate->OnHeader(header);
 
     const uint8_t * data = packetData.Start() + HeaderRef::kSizeBytes;
 
@@ -141,7 +141,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
                 return false;
             }
 
-            delegate->Query(queryData);
+            delegate->OnQuery(queryData);
         }
     }
 
@@ -154,7 +154,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
                 return false;
             }
 
-            delegate->Resource(ParserDelegate::ResourceType::kAnswer, resourceData);
+            delegate->OnResource(ParserDelegate::ResourceType::kAnswer, resourceData);
         }
 
         for (unsigned i = 0; i < header.GetAuthorityCount(); i++)
@@ -164,7 +164,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
                 return false;
             }
 
-            delegate->Resource(ParserDelegate::ResourceType::kAuthority, resourceData);
+            delegate->OnResource(ParserDelegate::ResourceType::kAuthority, resourceData);
         }
 
         for (unsigned i = 0; i < header.GetAdditionalCount(); i++)
@@ -174,7 +174,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
                 return false;
             }
 
-            delegate->Resource(ParserDelegate::ResourceType::kAdditional, resourceData);
+            delegate->OnResource(ParserDelegate::ResourceType::kAdditional, resourceData);
         }
     }
 
