@@ -837,17 +837,6 @@ bool emberAfKeyEstablishmentCallback(EmberAfKeyEstablishmentNotifyMessage status
     return true;
 }
 
-/** @brief On/off Cluster Level Control Effect
- *
- * This is called by the framework when the on/off cluster initiates a command
- * that must effect a level control change. The implementation assumes that the
- * client will handle any effect on the On/Off Cluster.
- *
- * @param endpoint   Ver.: always
- * @param newValue   Ver.: always
- */
-void emberAfOnOffClusterLevelControlEffectCallback(uint8_t endpoint, bool newValue) {}
-
 /** @brief Main Init
  *
  * This function is called from the application's main function. It gives the
@@ -1499,20 +1488,6 @@ void emberAfSetSourceRouteOverheadCallback(EmberNodeId destination, uint8_t over
  * @param utcTime   Ver.: always
  */
 void emberAfSetTimeCallback(uint32_t utcTime) {}
-
-/** @brief On/off Cluster Set Value
- *
- * This function is called when the on/off value needs to be set, either through
- * normal channels or as a result of a level change.
- *
- * @param endpoint   Ver.: always
- * @param command   Ver.: always
- * @param initiatedByLevelChange   Ver.: always
- */
-EmberAfStatus emberAfOnOffClusterSetValueCallback(uint8_t endpoint, uint8_t command, bool initiatedByLevelChange)
-{
-    return EMBER_ZCL_STATUS_UNSUP_CLUSTER_COMMAND;
-}
 
 /** @brief Set Wake Timeout Bitmask
  *

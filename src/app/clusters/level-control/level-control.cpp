@@ -52,6 +52,10 @@
 #include <app/clusters/scenes/scenes.h>
 #endif // EMBER_AF_PLUGIN_SCENES
 
+#ifdef EMBER_AF_PLUGIN_ON_OFF
+#include <app/clusters/on-off-server/on-off.h>
+#endif // EMBER_AF_PLUGIN_ON_OFF
+
 #ifdef EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER
 #include "app/framework/plugin/zll-level-control-server/zll-level-control-server.h"
 #endif // EMBER_AF_PLUGIN_ZLL_LEVEL_CONTROL_SERVER
@@ -302,11 +306,13 @@ static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs)
 
 static void setOnOffValue(EndpointId endpoint, bool onOff)
 {
+#ifdef EMBER_AF_PLUGIN_ON_OFF
     if (emberAfContainsServer(endpoint, ZCL_ON_OFF_CLUSTER_ID))
     {
         emberAfLevelControlClusterPrintln("Setting on/off to %p due to level change", onOff ? "ON" : "OFF");
         emberAfOnOffClusterSetValueCallback(endpoint, (onOff ? ZCL_ON_COMMAND_ID : ZCL_OFF_COMMAND_ID), true);
     }
+#endif // EMBER_AF_PLUGIN_ON_OFF
 }
 
 static bool shouldExecuteIfOff(EndpointId endpoint, uint8_t commandId, uint8_t optionMask, uint8_t optionOverride)
