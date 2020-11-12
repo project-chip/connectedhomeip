@@ -173,14 +173,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, SecurePairingSession * pairing)
+CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
+                                            SecurePairingSession * pairing)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Optional<NodeId> peerNodeId = Optional<NodeId>::Value(pairing->GetPeerNodeId());
     uint16_t peerKeyId          = pairing->GetPeerKeyId();
     uint16_t localKeyId         = pairing->GetLocalKeyId();
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, peerKeyId, nullptr);
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, nullptr);
 
     // Find any existing connection with the same node and key ID
     if (state)
@@ -188,9 +188,10 @@ CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddres
         mPeerConnections.MarkConnectionExpired(state);
     }
 
-    ChipLogDetail(Inet, "New pairing for key %d!!", peerKeyId);
+    ChipLogDetail(Inet, "New pairing for device %llu, key %d!!", peerNodeId, peerKeyId);
+
     state = nullptr;
-    err   = mPeerConnections.CreateNewPeerConnectionState(peerNodeId, peerKeyId, localKeyId, &state);
+    err   = mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state);
     SuccessOrExit(err);
 
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
@@ -206,7 +207,7 @@ CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddres
 #if !CHIP_DEVICE_LAYER_NONE
         SuccessOrExit(err = chip::DeviceLayer::ConfigurationMgr().GetFabricId(fabricId));
 #endif
-        SuccessOrExit(err = Mdns::DiscoveryManager::GetInstance().ResolveNodeId(pairing->GetPeerNodeId(), fabricId));
+        SuccessOrExit(err = Mdns::DiscoveryManager::GetInstance().ResolveNodeId(peerNodeId, fabricId));
     }
 
     if (state != nullptr)

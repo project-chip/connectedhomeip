@@ -44,8 +44,6 @@ using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer();
-
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
@@ -113,7 +111,6 @@ extern "C" void app_main()
     }
 
     InitDataModelHandler();
-    startServer();
 
     if (isRendezvousBLE())
     {
@@ -122,7 +119,7 @@ extern "C" void app_main()
     else if (isRendezvousBypassed())
     {
         ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
-        PairingComplete(&gTestPairing);
+        PairingComplete(chip::kTestDeviceNodeId, chip::kTestControllerNodeId, &gTestPairing);
     }
 
     // Run the UI Loop

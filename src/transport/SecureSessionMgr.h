@@ -135,7 +135,7 @@ public:
      *   establishes the security keys for secure communication with the
      *   peer node.
      */
-    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, SecurePairingSession * pairing);
+    CHIP_ERROR NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId, SecurePairingSession * pairing);
 
     /**
      * @brief

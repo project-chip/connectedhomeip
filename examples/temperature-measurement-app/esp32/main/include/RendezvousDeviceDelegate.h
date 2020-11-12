@@ -27,6 +27,7 @@ public:
     RendezvousDeviceDelegate();
 
     //////////// RendezvousSession callback Implementation ///////////////
+    void OnRendezvousComplete() override;
     void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
 
 private:
