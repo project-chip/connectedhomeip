@@ -445,15 +445,15 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
     switch (static_cast<Spake2pMsgType>(payloadHeader.GetMessageType()))
     {
     case Spake2pMsgType::kSpake2pCompute_pA:
-        err = HandleCompute_pA(packetHeader, msg.Release());
+        err = HandleCompute_pA(packetHeader, msg.Get_NoRelease());
         break;
 
     case Spake2pMsgType::kSpake2pCompute_pB_cB:
-        err = HandleCompute_pB_cB(packetHeader, msg.Release());
+        err = HandleCompute_pB_cB(packetHeader, msg.Get_NoRelease());
         break;
 
     case Spake2pMsgType::kSpake2pCompute_cA:
-        err = HandleCompute_cA(packetHeader, msg.Release());
+        err = HandleCompute_cA(packetHeader, msg.Get_NoRelease());
         break;
 
     default:
