@@ -20,7 +20,8 @@ get_filename_component(CHIP_APP_SERVER ${CHIP_ROOT}/examples/common/chip-app-ser
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighting-common REALPATH)
 
-list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/overlay-sample-defaults.conf)
+set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/sample-defaults.conf prj.conf)
+set(CHIP_OPENTHREAD_CONFIG ${NRFCONNECT_COMMON}/project_include/OpenThreadConfig.h)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
 include(nrfconnect-app)
