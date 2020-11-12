@@ -48,6 +48,10 @@
 //#include "app/framework/util/time-util.h"
 //#include "hal/micro/crc.h"
 
+#ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
+#include <app/clusters/groups-server/groups-server.h>
+#endif // EMBER_AF_PLUGIN_GROUPS_SERVER
+
 using namespace chip;
 
 // TODO: Need to figure out what needs to happen wrt HAL tokens here, but for

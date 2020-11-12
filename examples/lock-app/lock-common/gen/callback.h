@@ -1988,16 +1988,6 @@ bool emberAfIdentifyClusterUpdateCommissionStateCallback(uint8_t action, uint8_t
  * @param endpoint The endpoint.  Ver.: always
  */
 void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint);
-/** @brief Groups Cluster Endpoint In Group
- *
- * This function is called by the framework when it needs to determine if an
- * endpoint is a member of a group.  The application should return true if the
- * endpoint is a member of the group and false otherwise.
- *
- * @param endpoint The endpoint.  Ver.: always
- * @param groupId The group identifier.  Ver.: always
- */
-bool emberAfGroupsClusterEndpointInGroupCallback(uint8_t endpoint, uint16_t groupId);
 /** @brief Groups Cluster Add Group
  *
  *
