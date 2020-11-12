@@ -1,4 +1,4 @@
-/**
+/*
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -16,25 +16,19 @@
  */
 
 /**
- * @file
- * @brief The include file for all the types for the data model that are not
- *        dependent on an individual application configuration.
+ *    @file
+ *      This file declares test entry points for CHIP Internet (inet)
+ *      layer library unit tests.
+ *
  */
 
 #pragma once
 
-#include <stdint.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-// Pull in NodeId
-#include <transport/raw/MessageHeader.h>
-
-namespace chip {
-typedef uint8_t EndpointId;
-typedef uint16_t ClusterId;
-typedef uint16_t AttributeId;
-typedef uint16_t GroupId;
-typedef uint8_t CommandId;
-typedef uint16_t EventId;
-typedef uint64_t NodeId;
-typedef uint64_t DataVersion;
-} // namespace chip
+int TestMessageDef(void);
+#ifdef __cplusplus
+}
+#endif
