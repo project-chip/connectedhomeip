@@ -47,20 +47,11 @@
 // Cluster: Basic, server
 EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
-// Cluster: Identify, client
-EmberAfStatus emberAfIdentifyClusterClientCommandParse(EmberAfClusterCommand * cmd);
-
 // Cluster: Identify, server
 EmberAfStatus emberAfIdentifyClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
-// Cluster: Groups, client
-EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd);
-
 // Cluster: Groups, server
 EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd);
-
-// Cluster: Scenes, client
-EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: Scenes, server
 EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd);
@@ -79,9 +70,6 @@ EmberAfStatus emberAfBarrierControlClusterServerCommandParse(EmberAfClusterComma
 
 // Cluster: Color Control, server
 EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
-
-// Cluster: IAS Zone, client
-EmberAfStatus emberAfIasZoneClusterClientCommandParse(EmberAfClusterCommand * cmd);
 
 // Cluster: IAS Zone, server
 EmberAfStatus emberAfIasZoneClusterServerCommandParse(EmberAfClusterCommand * cmd);
