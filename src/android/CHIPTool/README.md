@@ -9,7 +9,7 @@ a CHIP device
 
 # Steps to build CHIP for Android apps
 
-Pre-conditions: Have Android SDK & NDK downloaded to your machine. Set the
+Pre-conditions: Have Android SDK 21 & NDK 21.0.6113669 downloaded to your machine. Set the
 \$ANDROID_HOME environment variable to where the SDK is downloaded and the
 \$ANDROID_NDK_HOME environment variable to point to the NDK package is
 downloaded.
