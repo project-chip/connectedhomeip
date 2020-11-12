@@ -140,17 +140,16 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
     if (devName != nullptr && devName[0] != 0)
     {
         err = qvCHIP_BleSetDeviceName(devName);
     }
 
+exit:
     return err;
 }
 
@@ -230,13 +229,12 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
     CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     bool isRxHandle;
     uint16_t cId;
-    uint16_t dataLen;
+    uint16_t dataLen = data->DataLength();
 
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
     ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE TX characteristic (con %u, len %u)", conId, dataLen);
 
     isRxHandle = UUIDsMatch(&chipUUID_CHIPoBLEChar_RX, charId);
-    dataLen    = data->DataLength();
     cId        = qvCHIP_BleGetHandle(isRxHandle);
 
     qvCHIP_TxData(conId, cId, dataLen, data->Start());
