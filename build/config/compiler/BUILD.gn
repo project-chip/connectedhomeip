@@ -151,7 +151,6 @@ config("disabled_warnings") {
     cflags += [
       "-Wno-psabi",
       "-Wno-cast-function-type",
-      "-Wno-maybe-uninitialized",
     ]
   }
 }

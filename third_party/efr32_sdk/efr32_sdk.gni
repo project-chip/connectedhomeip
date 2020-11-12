@@ -169,6 +169,8 @@ template("efr32_sdk") {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
 
+    cflags += [ "-Wno-maybe-uninitialized" ]
+
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }

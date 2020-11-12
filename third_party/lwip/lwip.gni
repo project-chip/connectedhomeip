@@ -88,6 +88,7 @@ template("lwip_target") {
       "-Wno-format",
       "-Wno-type-limits",
       "-Wno-unused-variable",
+      "-Wno-maybe-uninitialized",
     ]
   }
 
