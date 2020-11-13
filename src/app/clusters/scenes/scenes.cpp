@@ -42,6 +42,10 @@
 #include "app/util/common.h"
 #include <app/util/af.h>
 
+#ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
+#include <app/clusters/groups-server/groups-server.h>
+#endif
+
 #ifdef EMBER_AF_PLUGIN_ZLL_SCENES_SERVER
 #include "../zll-scenes-server/zll-scenes-server.h"
 #endif
@@ -81,6 +85,15 @@ static EmberAfStatus writeServerAttribute(EndpointId endpoint, EmberAfClusterId 
         emberAfScenesClusterPrintln("ERR: %ping %p 0x%x", "writ", name, status);
     }
     return status;
+}
+
+bool isEndpointInGroup(EndpointId endpoint, GroupId groupId)
+{
+#ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
+    return (groupId == ZCL_SCENES_GLOBAL_SCENE_GROUP_ID || emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId));
+#else
+    return (groupId == ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+#endif // EMBER_AF_PLUGIN_GROUPS_SERVER
 }
 
 void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
@@ -214,9 +227,7 @@ bool emberAfScenesClusterRemoveSceneCallback(GroupId groupId, uint8_t sceneId)
 
     emberAfScenesClusterPrintln("RX: RemoveScene 0x%2x, 0x%x", groupId, sceneId);
 
-    // If a group id is specified but this endpoint isn't in it, take no action.
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID &&
-        !emberAfGroupsClusterEndpointInGroupCallback(emberAfCurrentEndpoint(), groupId))
+    if (!isEndpointInGroup(emberAfCurrentEndpoint(), groupId))
     {
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
     }
@@ -261,8 +272,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(GroupId groupId)
 
     emberAfScenesClusterPrintln("RX: RemoveAllScenes 0x%2x", groupId);
 
-    if (groupId == ZCL_SCENES_GLOBAL_SCENE_GROUP_ID ||
-        emberAfGroupsClusterEndpointInGroupCallback(emberAfCurrentEndpoint(), groupId))
+    if (isEndpointInGroup(emberAfCurrentEndpoint(), groupId))
     {
         uint8_t i;
         status = EMBER_ZCL_STATUS_SUCCESS;
@@ -359,8 +369,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(GroupId groupId)
 
     emberAfScenesClusterPrintln("RX: GetSceneMembership 0x%2x", groupId);
 
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID &&
-        !emberAfGroupsClusterEndpointInGroupCallback(emberAfCurrentEndpoint(), groupId))
+    if (!isEndpointInGroup(emberAfCurrentEndpoint(), groupId))
     {
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
     }
@@ -411,8 +420,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(EndpointId endpoint,
     EmberAfSceneTableEntry entry;
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
 
-    // If a group id is specified but this endpoint isn't in it, take no action.
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID && !emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId))
+    if (!isEndpointInGroup(endpoint, groupId))
     {
         return EMBER_ZCL_STATUS_INVALID_FIELD;
     }
@@ -524,7 +532,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(EndpointId endpoint,
 
 EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, GroupId groupId, uint8_t sceneId)
 {
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID && !emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId))
+    if (!isEndpointInGroup(endpoint, groupId))
     {
         return EMBER_ZCL_STATUS_INVALID_FIELD;
     }
@@ -668,7 +676,7 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
     emberAfScenesClusterPrintln("");
 
     // Add Scene commands can only reference groups to which we belong.
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID && !emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId))
+    if (!isEndpointInGroup(endpoint, groupId))
     {
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
         goto kickout;
@@ -982,7 +990,7 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
     emberAfScenesClusterPrintln("RX: %pViewScene 0x%2x, 0x%x", (enhanced ? "Enhanced" : ""), groupId, sceneId);
 
     // View Scene commands can only reference groups which we belong to.
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID && !emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId))
+    if (!isEndpointInGroup(endpoint, groupId))
     {
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
     }
