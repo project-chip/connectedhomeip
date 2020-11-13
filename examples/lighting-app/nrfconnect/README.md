@@ -15,7 +15,7 @@ An example application showing the use
         -   [Building minimal binary](#building-minimal-binary)
     -   [Configuring the example](#configuring-the-example)
     -   [Flashing and debugging](#flashing-and-debugging)
-    -   [Accessing the command line](#accessing-the-command-line)
+    -   [Testing the example](#testing-the-example)
 
 <hr>
 
@@ -286,17 +286,9 @@ To debug the application on target:
         $ cd <example-dir>
         $ west debug
 
-<a name="accessing-the-command-line"></a>
+## Testing the example
 
-## Accessing the command line
+Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
+learn how to use command-line interface of the application.
 
-The application includes a command line interface with support for logs and the
-OpenThread commands.
-
-To access it, use any serial terminal program you like, for example `minicom` or
-`GNU screen`.
-
-The UART interface is configured for `115200` baud rate.
-
-All OpenThread commands must be prefixed with `ot`, for example
-`ot thread start`.
+TODO: mention Rendezvous tutorial here
