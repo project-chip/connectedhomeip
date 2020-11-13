@@ -58,14 +58,26 @@ template("qpg6100_sdk") {
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/config",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/include",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/Portable/GCC/ARM_CM3",
+      "${qpg6100_sdk_root}/qpg6100/comps/libmbedtls",
       "${mbedtls_root}/repo/include",
     ]
 
     lib_dirs = []
 
-    libs += [ "${qpg6100_sdk_root}/qpg6100/lib/libCHIP_qpg6100.a" ]
+    libs += [
+      "${qpg6100_sdk_root}/qpg6100/lib/libCHIP_qpg6100.a",
+      "${qpg6100_sdk_root}/qpg6100/lib/libmbedtls_alt_qpg6100.a",
+    ]
 
-    defines = []
+    defines = [
+      "QORVO_CRYPTO_ENGINE",
+      "MBEDTLS_CONFIG_FILE=\"qpg6100-mbedtls-config.h\"",
+    ]
+
+    cflags = []
+
+    # Allow warning due to mbedtls
+    cflags += [ "-Wno-maybe-uninitialized" ]
 
     if (defined(invoker.defines)) {
       defines += invoker.defines
@@ -75,6 +87,71 @@ template("qpg6100_sdk") {
   source_set(sdk_target_name) {
     sources = [
       "${chip_root}/third_party/mbedtls/repo/include/mbedtls/platform.h",
+      "${chip_root}/third_party/mbedtls/repo/library/aes.c",
+      "${chip_root}/third_party/mbedtls/repo/library/aesni.c",
+      "${chip_root}/third_party/mbedtls/repo/library/arc4.c",
+      "${chip_root}/third_party/mbedtls/repo/library/asn1parse.c",
+      "${chip_root}/third_party/mbedtls/repo/library/asn1write.c",
+      "${chip_root}/third_party/mbedtls/repo/library/base64.c",
+      "${chip_root}/third_party/mbedtls/repo/library/bignum.c",
+      "${chip_root}/third_party/mbedtls/repo/library/blowfish.c",
+      "${chip_root}/third_party/mbedtls/repo/library/camellia.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ccm.c",
+      "${chip_root}/third_party/mbedtls/repo/library/certs.c",
+      "${chip_root}/third_party/mbedtls/repo/library/cipher.c",
+      "${chip_root}/third_party/mbedtls/repo/library/cipher_wrap.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ctr_drbg.c",
+      "${chip_root}/third_party/mbedtls/repo/library/debug.c",
+      "${chip_root}/third_party/mbedtls/repo/library/des.c",
+      "${chip_root}/third_party/mbedtls/repo/library/dhm.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecdh.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecdsa.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecjpake.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecp.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ecp_curves.c",
+      "${chip_root}/third_party/mbedtls/repo/library/entropy.c",
+      "${chip_root}/third_party/mbedtls/repo/library/entropy_poll.c",
+      "${chip_root}/third_party/mbedtls/repo/library/error.c",
+      "${chip_root}/third_party/mbedtls/repo/library/gcm.c",
+      "${chip_root}/third_party/mbedtls/repo/library/hkdf.c",
+      "${chip_root}/third_party/mbedtls/repo/library/hmac_drbg.c",
+      "${chip_root}/third_party/mbedtls/repo/library/md.c",
+      "${chip_root}/third_party/mbedtls/repo/library/md5.c",
+      "${chip_root}/third_party/mbedtls/repo/library/md_wrap.c",
+      "${chip_root}/third_party/mbedtls/repo/library/oid.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pem.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pk.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pk_wrap.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pkcs12.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pkcs5.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pkparse.c",
+      "${chip_root}/third_party/mbedtls/repo/library/pkwrite.c",
+      "${chip_root}/third_party/mbedtls/repo/library/platform.c",
+      "${chip_root}/third_party/mbedtls/repo/library/platform_util.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ripemd160.c",
+      "${chip_root}/third_party/mbedtls/repo/library/rsa.c",
+      "${chip_root}/third_party/mbedtls/repo/library/rsa_internal.c",
+      "${chip_root}/third_party/mbedtls/repo/library/sha1.c",
+      "${chip_root}/third_party/mbedtls/repo/library/sha256.c",
+      "${chip_root}/third_party/mbedtls/repo/library/sha512.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ssl_cache.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ssl_ciphersuites.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ssl_cli.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ssl_cookie.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ssl_srv.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ssl_ticket.c",
+      "${chip_root}/third_party/mbedtls/repo/library/ssl_tls.c",
+      "${chip_root}/third_party/mbedtls/repo/library/threading.c",
+      "${chip_root}/third_party/mbedtls/repo/library/timing.c",
+      "${chip_root}/third_party/mbedtls/repo/library/version.c",
+      "${chip_root}/third_party/mbedtls/repo/library/version_features.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509_create.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509_crl.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509_csr.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509write_crt.c",
+      "${chip_root}/third_party/mbedtls/repo/library/x509write_csr.c",
+      "${chip_root}/third_party/mbedtls/repo/library/xtea.c",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/Portable/GCC/ARM_CM3/portmacro.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/include/FreeRTOS.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/include/deprecated_definitions.h",
@@ -89,13 +166,15 @@ template("qpg6100_sdk") {
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/Source/include/timers.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/config/FreeRTOSConfig.h",
       "${qpg6100_sdk_root}/qpg6100/comps/gpFreeRTOS/config/hooks.c",
+      "${qpg6100_sdk_root}/qpg6100/comps/libmbedtls/aes_alt.h",
+      "${qpg6100_sdk_root}/qpg6100/comps/libmbedtls/ccm_alt.h",
+      "${qpg6100_sdk_root}/qpg6100/comps/libmbedtls/ecjpake_alt.h",
+      "${qpg6100_sdk_root}/qpg6100/comps/libmbedtls/ecp_alt.h",
+      "${qpg6100_sdk_root}/qpg6100/comps/libmbedtls/qpg6100-mbedtls-config.h",
+      "${qpg6100_sdk_root}/qpg6100/comps/libmbedtls/sha256_alt.h",
+      "${qpg6100_sdk_root}/qpg6100/comps/libmbedtls/trng.c",  #add this for
+                                                              # mbedtls_hardware_poll
       "${qpg6100_sdk_root}/qpg6100/comps/qvCHIP/inc/qvCHIP.h",
-    ]
-
-    public_deps = [
-      #      "${segger_rtt_root}:segger_rtt",
-      #      "${segger_rtt_root}:segger_rtt_printf",
-      #      "${segger_rtt_root}:segger_rtt_syscalls",
     ]
 
     if (defined(invoker.sources)) {
