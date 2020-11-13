@@ -37,7 +37,8 @@ Pending:
 -   Thread: Linking QPG6100 OpenThread implementation to CHIP build
 
 For more information on Qorvo and the platforms, please visit
-[the Qorvo website](http://www.qorvo.com) or contact us on LPW.support@qorvo.com.
+[the Qorvo website](http://www.qorvo.com) or contact us on
+LPW.support@qorvo.com.
 
 ## Building
 
