@@ -60,7 +60,6 @@ private:
     static void LockActionEventHandler(AppEvent * aEvent);
     static void TimerEventHandler(TimerHandle_t xTimer);
 
-
     void StartTimer(uint32_t aTimeoutMs);
 
     enum Function_t

@@ -64,7 +64,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/logging/CHIPLogging.h>
 
-//Application level logic
+// Application level logic
 #include "AppTask.h"
 
 using namespace ::chip;

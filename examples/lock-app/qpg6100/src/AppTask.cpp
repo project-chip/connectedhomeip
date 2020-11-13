@@ -19,9 +19,9 @@
 
 #include "qvCHIP.h"
 
-#include "AppTask.h"
 #include "AppConfig.h"
 #include "AppEvent.h"
+#include "AppTask.h"
 
 #include "QRCodeUtil.h"
 // TODO: PR #3486
@@ -43,7 +43,6 @@ using namespace chip::DeviceLayer;
 
 #include <platform/CHIPDeviceLayer.h>
 #if CHIP_ENABLE_OPENTHREAD
-#include <platform/qpg6100/ThreadStackManagerImpl.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 #include <platform/internal/DeviceNetworkInfo.h>
