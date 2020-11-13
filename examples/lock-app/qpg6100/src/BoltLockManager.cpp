@@ -40,7 +40,7 @@ int BoltLockManager::Init()
     if (sLockTimer == NULL)
     {
         ChipLogProgress(NotSpecified, "sLockTimer timer create failed");
-        // TODO: 
+        // TODO:
         //appError(CHIP_ERROR_MAX);
     }
 
