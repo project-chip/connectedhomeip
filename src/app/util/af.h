@@ -1702,13 +1702,6 @@ EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, CHIPEndpoi
     emberAfInitiatePartnerLinkKeyExchangeCallback(target, endpoint, callback)
 #endif
 
-/** @brief Use this function to determine if the security profile of the
- * current network was set to Smart Energy.  The security profile is configured
- * in AppBuilder.
-   @ return true if the security profile is Smart Energy or false otherwise.
- */
-bool emberAfIsCurrentSecurityProfileSmartEnergy(void);
-
 /** @} END Messaging */
 
 /** @name ZCL macros */

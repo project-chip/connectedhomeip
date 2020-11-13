@@ -2725,29 +2725,6 @@
 #define emberAfAppPrintString(buffer)
 #endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_APP)
 
-// Printing macros for Security
-// Prints messages related to security
-#if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_SECURITY)
-#define emberAfSecurityPrint(...) emberAfPrint(EMBER_AF_PRINT_SECURITY, __VA_ARGS__)
-#define emberAfSecurityPrintln(...) emberAfPrintln(EMBER_AF_PRINT_SECURITY, __VA_ARGS__)
-// Blocking IO is enabled for all serial ports, therefore flush calls are unnecessary.
-#define emberAfSecurityFlush()
-#define emberAfSecurityDebugExec(x)                                                                                                \
-    if (emberAfPrintEnabled(EMBER_AF_PRINT_SECURITY))                                                                              \
-    {                                                                                                                              \
-        x;                                                                                                                         \
-    }
-#define emberAfSecurityPrintBuffer(buffer, len, withSpace) emberAfPrintBuffer(EMBER_AF_PRINT_SECURITY, (buffer), (len), (withSpace))
-#define emberAfSecurityPrintString(buffer) emberAfPrintString(EMBER_AF_PRINT_SECURITY, (buffer))
-#else
-#define emberAfSecurityPrint(...)
-#define emberAfSecurityPrintln(...)
-#define emberAfSecurityFlush()
-#define emberAfSecurityDebugExec(x)
-#define emberAfSecurityPrintBuffer(buffer, len, withSpace)
-#define emberAfSecurityPrintString(buffer)
-#endif // defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_SECURITY)
-
 // Printing macros for Attributes
 // Prints messages related to attributes
 #if defined(EMBER_AF_PRINT_ENABLE) && defined(EMBER_AF_PRINT_ATTRIBUTES)

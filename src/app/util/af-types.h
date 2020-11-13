@@ -489,34 +489,6 @@ typedef EmberAppLinkKeyRequestPolicy EmberAfAppLinkKeyRequestPolicy;
 #endif
 
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberAfSecurityProfile
-#else
-typedef uint8_t EmberAfSecurityProfile;
-enum
-#endif
-{
-    EMBER_AF_SECURITY_PROFILE_NONE    = 0x00,
-    EMBER_AF_SECURITY_PROFILE_HA      = 0x01,
-    EMBER_AF_SECURITY_PROFILE_HA12    = 0x02,
-    EMBER_AF_SECURITY_PROFILE_SE_TEST = 0x03,
-    EMBER_AF_SECURITY_PROFILE_SE_FULL = 0x04,
-    EMBER_AF_SECURITY_PROFILE_Z3      = 0x05,
-    EMBER_AF_SECURITY_PROFILE_CUSTOM  = 0xFF,
-};
-
-typedef struct
-{
-    EmberAfSecurityProfile securityProfile;
-    uint16_t tcBitmask;
-    EmberExtendedSecurityBitmask tcExtendedBitmask;
-    uint16_t nodeBitmask;
-    EmberExtendedSecurityBitmask nodeExtendedBitmask;
-    EmberAfTcLinkKeyRequestPolicy tcLinkKeyRequestPolicy;
-    EmberAfAppLinkKeyRequestPolicy appLinkKeyRequestPolicy;
-    EmberKeyData preconfiguredKey;
-} EmberAfSecurityProfileData;
-
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
 enum EmberAfEndpointBitmask;
 #else
 typedef uint8_t EmberAfEndpointBitmask;
@@ -1475,21 +1447,6 @@ typedef struct
 #define EMBER_AF_METERING_NF5_UPDATE_SITE_ID 0x00000040
 #define EMBER_AF_METERING_NF5_RESET_BATTERY_COUNTER 0x00000080
 #define EMBER_AF_METERING_NF5_UPDATE_CIN 0x00000100
-
-/**
- * @brief CBKE Library types
- */
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberAfCbkeKeyEstablishmentSuite
-#else
-typedef uint16_t EmberAfCbkeKeyEstablishmentSuite;
-enum
-#endif
-{
-    EMBER_AF_INVALID_KEY_ESTABLISHMENT_SUITE    = 0x0000,
-    EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_163K1 = 0x0001,
-    EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_283K1 = 0x0002,
-};
 
 /**
  * @brief Device Management plugin types

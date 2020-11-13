@@ -218,21 +218,6 @@ bool emberAfAttributeReadAccessCallback(CHIPEndpointId endpoint, CHIPClusterId c
 bool emberAfAttributeWriteAccessCallback(CHIPEndpointId endpoint, CHIPClusterId clusterId, uint16_t manufacturerCode,
                                          CHIPAttributeId attributeId);
 
-/** @brief Cluster Security Custom
- *
- * This callback is fired when determining if APS encryption is required for a
- * cluster outside of the specification's required clusters.  In other words,
- * for the Smart Energy profile this would be a cluster beyond the list that
- * normally requires APS encryption.
- *
- * @param profileId The profile ID  Ver.: always
- * @param clusterId The cluster ID  Ver.: always
- * @param incoming Whether this is an incoming or outgoing message.  Ver.:
- * always
- * @param commandId The ZCL command ID being sent/received.  Ver.: always
- */
-bool emberAfClusterSecurityCustomCallback(EmberAfProfileId profileId, CHIPClusterId clusterId, bool incoming, CHIPCommandId commandId);
-
 /** @brief Default Response
  *
  * This function is called by the application framework when a Default Response
@@ -560,14 +545,6 @@ uint32_t emberAfGetCurrentTimeCallback();
  * with information about the endpoint.  Ver.: always
  */
 bool emberAfGetEndpointInfoCallback(CHIPEndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo);
-
-/** @brief Trust Center Keepalive Abort
- *
- * This callback is called when the device should abort the trust center
- * keepalive process.
- *
- */
-void emberAfTrustCenterKeepaliveAbortCallback();
 
 /** @brief Get Source Route Overhead
  *
