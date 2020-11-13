@@ -20,7 +20,7 @@ void emberAfClusterInitCallback(CHIPEndpointId endpoint, CHIPClusterId clusterId
 }
 
 {{#all_user_clusters_names}}
-void __attribute__((weak)) emberAf{{asCamelCased name false}}ClusterInitCallback(uint8_t endpoint)
+void __attribute__((weak)) emberAf{{asCamelCased name false}}ClusterInitCallback(CHIPEndpointId endpoint)
 {
     // To prevent warning
     (void) endpoint;
@@ -54,7 +54,7 @@ bool __attribute__((weak))  emberAf{{asCamelCased parent.name false}}Cluster{{as
     return false;
 }
 {{else}}
-bool __attribute__((weak))  emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(void)
+bool __attribute__((weak))  emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback()
 {
     return false;
 }
