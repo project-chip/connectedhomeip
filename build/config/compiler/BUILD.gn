@@ -153,7 +153,10 @@ config("disabled_warnings") {
 }
 
 config("strict_warnings") {
-  cflags = [ "-Wall" ]
+  cflags = [
+    "-Wall",
+    "-Wshadow",
+  ]
 
   cflags_cc = [ "-Wnon-virtual-dtor" ]
 
