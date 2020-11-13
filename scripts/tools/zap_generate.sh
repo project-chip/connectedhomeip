@@ -21,15 +21,15 @@ OUTPUT_DIRECTORY=$(cd "$(dirname "$1")" && pwd)/gen/
 FILE_PATH=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
 
 # Check if input file exist
-if [ ! -f $FILE_PATH ]; then
+if [ ! -f "$FILE_PATH" ]; then
     echo "ZAP file doesn't exist."
     exit 1
 fi
 
 # Check if output dir exist, if not create it
-if [ ! -d $OUTPUT_DIRECTORY ]; then
-    mkdir -p $OUTPUT_DIRECTORY
+if [ ! -d "$OUTPUT_DIRECTORY" ]; then
+    mkdir -p "$OUTPUT_DIRECTORY"
 fi
 
 cd ./third_party/zap/repo/
-node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ../../../src/app/zap-templates/chip-templates.json -i $FILE_PATH -o $OUTPUT_DIRECTORY
+node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ../../../src/app/zap-templates/chip-templates.json -i "$FILE_PATH" -o "$OUTPUT_DIRECTORY"
