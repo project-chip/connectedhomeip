@@ -56,17 +56,17 @@ void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::Controller::Persiste
             mStatusHandler = ^(NSString * key, Operation operation, NSError * status) {
                 dispatch_async(mWorkQueue, ^{
                     chip::Controller::PersistentStorageResultDelegate::Operation op
-                    = chip::Controller::PersistentStorageResultDelegate::Operation::kGET;
+                        = chip::Controller::PersistentStorageResultDelegate::Operation::kGET;
                     switch (operation) {
-                        case kGet:
-                            op = chip::Controller::PersistentStorageResultDelegate::Operation::kGET;
-                            break;
-                        case kSet:
-                            op = chip::Controller::PersistentStorageResultDelegate::Operation::kSET;
-                            break;
-                        case kDelete:
-                            op = chip::Controller::PersistentStorageResultDelegate::Operation::kDELETE;
-                            break;
+                    case kGet:
+                        op = chip::Controller::PersistentStorageResultDelegate::Operation::kGET;
+                        break;
+                    case kSet:
+                        op = chip::Controller::PersistentStorageResultDelegate::Operation::kSET;
+                        break;
+                    case kDelete:
+                        op = chip::Controller::PersistentStorageResultDelegate::Operation::kDELETE;
+                        break;
                     }
                     mCallback->OnStatus([key UTF8String], op, [CHIPError errorToCHIPErrorCode:status]);
                 });
