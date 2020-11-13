@@ -16,7 +16,7 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 
-executable("minimal-client") {
+executable("minimal-mdns-client") {
   sources = [ "client.cpp" ]
 
   cflags = [ "-Wconversion" ]

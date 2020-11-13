@@ -40,9 +40,9 @@ public:
     const uint8_t * Start() const { return mStart; }
     const uint8_t * End() const { return mEnd; }
 
-    bool Contains(const uint8_t * p) const { return (mStart != nullptr) && (p >= mStart) && (p < mEnd); }
+    bool Contains(const uint8_t * p) const { return ((p >= mStart) && (p < mEnd)); }
 
-    ptrdiff_t Size() const { return (mStart == nullptr) ? 0 : (mEnd - mStart); }
+    ptrdiff_t Size() const { return (mEnd - mStart); }
 
 private:
     const uint8_t * mStart = nullptr;

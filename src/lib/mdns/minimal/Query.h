@@ -81,20 +81,20 @@ public:
 
     size_t WriteSizeBytes() const
     {
-        size_t s = 2 * sizeof(uint16_t); // QTYPE and QClass
+        size_t size = 2 * sizeof(uint16_t); // QTYPE and QClass
         for (uint16_t i = 0; i < mQNameCount; i++)
         {
-            s += strlen(mQName[i]) + 1;
+            size += strlen(mQName[i]) + 1;
         }
-        s++; // final 0 for qnames end
-        return s;
+        size++; // final 0 for qnames end
+        return size;
     }
 
     /// Append the query to the specified buffer
     ///
     /// @param hdr will be updated with a query count
     /// @return nullptr on failure, end of writing on success
-    uint8_t * Append(HeaderRef & hdr, uint8_t * buffer, size_t max_size) const
+    uint8_t * Append(HeaderRef & hdr, uint8_t * buffer, size_t maxSize) const
     {
         // Questions can only be appended before any other data is added
         if ((hdr.GetAdditionalCount() != 0) || (hdr.GetAnswerCount() != 0) || (hdr.GetAuthorityCount() != 0))
@@ -105,7 +105,7 @@ public:
         for (uint16_t i = 0; i < mQNameCount; i++)
         {
             size_t namelen = strlen(mQName[i]);
-            if (max_size < namelen + 1)
+            if (maxSize < namelen + 1)
             {
                 return nullptr;
             }
@@ -116,10 +116,10 @@ public:
             *buffer = static_cast<uint8_t>(namelen);
             memcpy(buffer + 1, mQName[i], namelen);
             buffer += namelen + 1;
-            max_size -= namelen + 1;
+            maxSize -= namelen + 1;
         }
 
-        if (max_size < 1 + 2 * sizeof(uint16_t))
+        if (maxSize < 1 + 2 * sizeof(uint16_t))
         {
             return nullptr;
         }

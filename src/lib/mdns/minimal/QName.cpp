@@ -81,7 +81,7 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
             // valid data
             if (length > kMaxValueSize)
             {
-                // limited value sizes
+                // value is too large (larger than RFC limit)
                 mIsValid = false;
                 return false;
             }
@@ -132,7 +132,7 @@ const uint8_t * SerializedQNameIterator::FindDataEnd()
 
     // invalid data
     return nullptr;
-} // namespace Minimal
+}
 
 } // namespace Minimal
 } // namespace mdns

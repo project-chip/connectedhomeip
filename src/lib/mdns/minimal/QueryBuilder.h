@@ -46,26 +46,26 @@ public:
 
     HeaderRef & Header() { return mHeader; }
 
-    QueryBuilder & AddQuery(const Query & q)
+    QueryBuilder & AddQuery(const Query & query)
     {
         if (!mQueryBuidOk)
         {
             return *this;
         }
 
-        if (mPacket->AvailableDataLength() < q.WriteSizeBytes())
+        if (mPacket->AvailableDataLength() < query.WriteSizeBytes())
         {
             mQueryBuidOk = false;
             return *this;
         }
 
-        if (q.Append(mHeader, mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength()) == nullptr)
+        if (query.Append(mHeader, mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength()) == nullptr)
         {
             mQueryBuidOk = false;
             return *this;
         }
 
-        mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + q.WriteSizeBytes()));
+        mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + query.WriteSizeBytes()));
         return *this;
     }
 

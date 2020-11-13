@@ -42,20 +42,19 @@ constexpr uint32_t kTestMessageId = 0x1234;
 
 constexpr size_t kMdnsMaxPacketSize = 1'024;
 
-// const mdns::Minimal::QNamePart kCastQnames[] = { "_googlecast", "_tcp", "local" };
-const mdns::Minimal::QNamePart kCastQnames[] = { "octopi", "local" };
+const mdns::Minimal::QNamePart kCastQnames[] = { "_googlecast", "_tcp", "local" };
 
-// const char * kMdnsQueryDestination = "224.0.0.251"; // IPV4 address:
-const char * kMdnsQueryDestination = "FF02::FB";
+// const char * kMdnsQueryDestination = "224.0.0.251"; // IPV4 address
+const char * kMdnsQueryDestination = "FF02::FB"; // IPv6 address
 
 // Use `ip -6 maddr` to list these
 // #define FORCE_INTERFACE_ID 178
 
-const char * ToString(mdns::Minimal::QType t)
+const char * ToString(mdns::Minimal::QType qtype)
 {
     static char buff[32];
 
-    switch (t)
+    switch (qtype)
     {
     case mdns::Minimal::QType::A:
         return "A";
