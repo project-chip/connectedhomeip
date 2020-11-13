@@ -54,7 +54,6 @@ exit:
 
 void ShutdownChip(void)
 {
-    // Shutdown CHIP
     gExchangeManager.Shutdown();
     chip::DeviceLayer::SystemLayer.Shutdown();
 }
@@ -66,7 +65,6 @@ void DriveIO(void)
     int numFDs = 0;
     int selectRes;
 
-    // Use a sleep value of 100 milliseconds
     sleepTime.tv_sec  = 0;
     sleepTime.tv_usec = NETWORK_SLEEP_TIME_MSECS;
 

@@ -32,54 +32,50 @@
 #include <protocols/echo/Echo.h>
 #include <support/ErrorStr.h>
 
-// Max value for the number of EchoRequests sent.
-#define MAX_ECHO_COUNT (3)
-
 #define ECHO_CLIENT_PORT (CHIP_PORT + 1)
 
-// The EchoClient object.
-static Protocols::EchoClient gEchoClient;
+namespace {
 
-static SecureSessionMgr<Transport::UDP> gSessionManager;
-
-static Inet::IPAddress gDestAddr;
+// Max value for the number of EchoRequests sent.
+constexpr size_t kMaxEchoCount = 3;
 
 // The CHIP Echo interval time in microseconds.
-static int32_t gEchoInterval = 1000000;
+constexpr int32_t gEchoInterval = 1000000;
+
+// The EchoClient object.
+Protocols::EchoClient gEchoClient;
+
+SecureSessionMgr<Transport::UDP> gSessionManager;
+
+Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Echo was attempted to be sent.
-static uint64_t gLastEchoTime = 0;
+uint64_t gLastEchoTime = 0;
 
 // True, if the EchoClient is waiting for an EchoResponse
 // after sending an EchoRequest, false otherwise.
-static bool gWaitingForEchoResp = false;
+bool gWaitingForEchoResp = false;
 
 // Count of the number of EchoRequests sent.
-static uint64_t gEchoCount = 0;
+uint64_t gEchoCount = 0;
 
 // Count of the number of EchoResponses received.
-static uint64_t gEchoRespCount = 0;
+uint64_t gEchoRespCount = 0;
 
-static uint64_t Now(void)
+uint64_t Now(void)
 {
     struct timeval now;
     gettimeofday(&now, NULL);
+
     return ((uint64_t) now.tv_sec * 1000000) + (uint64_t) now.tv_usec;
 }
 
-static bool EchoIntervalExpired(void)
+bool EchoIntervalExpired(void)
 {
-    if (Now() >= gLastEchoTime + gEchoInterval)
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+    return (Now() >= gLastEchoTime + gEchoInterval);
 }
 
-static void FormulateEchoRequestBuffer(System::PacketBuffer *& payloadBuf)
+void FormulateEchoRequestBuffer(System::PacketBuffer *& payloadBuf)
 {
     payloadBuf = System::PacketBuffer::New();
     if (payloadBuf == NULL)
@@ -96,7 +92,7 @@ static void FormulateEchoRequestBuffer(System::PacketBuffer *& payloadBuf)
     payloadBuf->SetDataLength((uint16_t) len);
 }
 
-static CHIP_ERROR SendEchoRequest(void)
+CHIP_ERROR SendEchoRequest(void)
 {
     CHIP_ERROR err                    = CHIP_NO_ERROR;
     System::PacketBuffer * payloadBuf = NULL;
@@ -131,7 +127,7 @@ static CHIP_ERROR SendEchoRequest(void)
     return err;
 }
 
-static CHIP_ERROR EstablishSecureSession()
+CHIP_ERROR EstablishSecureSession()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -158,7 +154,7 @@ exit:
     return err;
 }
 
-static void HandleEchoResponseReceived(NodeId nodeId, System::PacketBuffer * payload)
+void HandleEchoResponseReceived(NodeId nodeId, System::PacketBuffer * payload)
 {
     uint32_t respTime    = Now();
     uint32_t transitTime = respTime - gLastEchoTime;
@@ -169,6 +165,8 @@ static void HandleEchoResponseReceived(NodeId nodeId, System::PacketBuffer * pay
     printf("Echo Response from node %lu : %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", nodeId, gEchoRespCount, gEchoCount,
            ((double) gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), ((double) transitTime) / 1000);
 }
+
+} // namespace
 
 int main(int argc, char * argv[])
 {
@@ -212,7 +210,7 @@ int main(int argc, char * argv[])
     SuccessOrExit(err);
 
     // Connection has been established. Now send the EchoRequests.
-    for (int i = 0; i < MAX_ECHO_COUNT; i++)
+    for (unsigned int i = 0; i < kMaxEchoCount; i++)
     {
         // Send an EchoRequest message.
         if (SendEchoRequest() != CHIP_NO_ERROR)
