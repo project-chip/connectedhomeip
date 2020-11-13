@@ -48,7 +48,7 @@ private:
     SendKeyValue mCompletionHandler;
     SendStatus mStatusHandler;
     NSUserDefaults * mDefaultPersistentStorage;
-    dispatch_queue_t mDefaultCallbackQueue;
+    dispatch_queue_t mWorkQueue;
 };
 
 NS_ASSUME_NONNULL_END
