@@ -139,10 +139,7 @@ config("disabled_warnings") {
     "-Wno-unknown-warning-option",
     "-Wno-missing-field-initializers",
   ]
-  cflags_cc = [
-    "-Wno-non-virtual-dtor",
-    "-Wno-deprecated-copy",
-  ]
+  cflags_cc = [ "-Wno-deprecated-copy" ]
   if (!is_debug) {
     # assert() causes unused variable warnings in release.
     cflags += [ "-Wno-unused" ]
@@ -157,6 +154,8 @@ config("disabled_warnings") {
 
 config("strict_warnings") {
   cflags = [ "-Wall" ]
+
+  cflags_cc = [ "-Wnon-virtual-dtor" ]
 
   ldflags = []
 

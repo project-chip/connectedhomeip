@@ -41,6 +41,8 @@ namespace Ble {
 class DLL_EXPORT BleConnectionDelegate
 {
 public:
+    virtual ~BleConnectionDelegate() {}
+
     // Public function pointers:
     typedef void (*OnConnectionCompleteFunct)(void * appState, BLE_CONNECTION_OBJECT connObj);
     OnConnectionCompleteFunct OnConnectionComplete;
