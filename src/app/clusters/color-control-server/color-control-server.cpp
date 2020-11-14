@@ -37,6 +37,7 @@
  *plugin.
  *******************************************************************************
  ******************************************************************************/
+#include "color-control-server.h"
 
 #include <app/util/af.h>
 
@@ -1855,3 +1856,9 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
     }
 #endif
 }
+
+void emberAfPluginColorControlServerComputePwmFromHsvCallback(EndpointId endpoint) {}
+
+void emberAfPluginColorControlServerComputePwmFromTempCallback(EndpointId endpoint) {}
+
+void emberAfPluginColorControlServerComputePwmFromXyCallback(EndpointId endpoint) {}
