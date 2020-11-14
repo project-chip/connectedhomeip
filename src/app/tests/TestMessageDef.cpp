@@ -73,12 +73,12 @@ void BuildAttributePath(nlTestSuite * apSuite, AttributePath::Builder & aAttribu
 void ParseAttributePath(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
 {
     AttributePath::Parser attributePathParser;
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    chip::NodeId nodeId         = 1;
-    chip::EndpointId endpointId = 2;
-    chip::ClusterId namespacedClusterId   = 3;
-    uint8_t fieldId            = 4;
-    uint16_t listIndex          = 5;
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    chip::NodeId nodeId                 = 1;
+    chip::EndpointId endpointId         = 2;
+    chip::ClusterId namespacedClusterId = 3;
+    uint8_t fieldId                     = 4;
+    uint16_t listIndex                  = 5;
 
     err = attributePathParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -143,11 +143,11 @@ void BuildEventPath(nlTestSuite * apSuite, EventPath::Builder & aEventPathBuilde
 
 void ParseEventPath(nlTestSuite * apSuite, EventPath::Parser & aEventPathParser)
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
-    chip::NodeId nodeId         = 1;
-    chip::EndpointId endpointId = 2;
-    chip::ClusterId namespacedClusterId   = 3;
-    chip::EventId eventId       = 4;
+    CHIP_ERROR err                      = CHIP_NO_ERROR;
+    chip::NodeId nodeId                 = 1;
+    chip::EndpointId endpointId         = 2;
+    chip::ClusterId namespacedClusterId = 3;
+    chip::EventId eventId               = 4;
 
     err = aEventPathParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -195,18 +195,19 @@ void ParseEventPathList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void BuildCommandPath(nlTestSuite * apSuite, CommandPath::Builder &aCommandPathBuilder)
+void BuildCommandPath(nlTestSuite * apSuite, CommandPath::Builder & aCommandPathBuilder)
 {
     aCommandPathBuilder.EndpointId(1).NamespacedClusterId(3).CommandId(4).EndOfCommandPath();
     NL_TEST_ASSERT(apSuite, aCommandPathBuilder.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseCommandPath(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader) {
+void ParseCommandPath(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
+{
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPath::Parser commandPathParser;
-    chip::EndpointId endpointId = 0;
+    chip::EndpointId endpointId         = 0;
     chip::ClusterId namespacedClusterId = 0;
-    chip::CommandId commandId = 0;
+    chip::CommandId commandId           = 0;
 
     err = commandPathParser.Init(aReader);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -305,7 +306,7 @@ void ParseEventDataElement(nlTestSuite * apSuite, EventDataElement::Parser & aEv
     }
 }
 
-void BuildEventList(nlTestSuite * apSuite, EventList::Builder &aEventListBuilder)
+void BuildEventList(nlTestSuite * apSuite, EventList::Builder & aEventListBuilder)
 {
     EventDataElement::Builder eventDataElementBuilder = aEventListBuilder.CreateEventBuilder();
     NL_TEST_ASSERT(apSuite, eventDataElementBuilder.GetError() == CHIP_NO_ERROR);
@@ -341,19 +342,20 @@ void ParseStatusElement(nlTestSuite * apSuite, StatusElement::Parser & aStatusEl
     CHIP_ERROR err = CHIP_NO_ERROR;
     StatusElement::Parser StatusElementParser;
 
-    uint16_t generalCode = 0;
-    uint32_t protocolId       = 0;
-    uint16_t protocolCode   = 0;
-    chip::ClusterId namespacedClusterId   = 0;
+    uint16_t generalCode                = 0;
+    uint32_t protocolId                 = 0;
+    uint16_t protocolCode               = 0;
+    chip::ClusterId namespacedClusterId = 0;
 
     err = aStatusElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
     err = aStatusElementParser.DecodeStatusElement(&generalCode, &protocolId, &protocolCode, &namespacedClusterId);
-    NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR && generalCode == 1 && protocolId == 2 && protocolCode == 3 && namespacedClusterId == 4);
+    NL_TEST_ASSERT(apSuite,
+                   err == CHIP_NO_ERROR && generalCode == 1 && protocolId == 2 && protocolCode == 3 && namespacedClusterId == 4);
 }
 
-void BuildAttributeStatusElement(nlTestSuite * apSuite, AttributeStatusElement::Builder &aAttributeStatusElementBuilder)
+void BuildAttributeStatusElement(nlTestSuite * apSuite, AttributeStatusElement::Builder & aAttributeStatusElementBuilder)
 {
     AttributePath::Builder attributePathBuilder = aAttributeStatusElementBuilder.CreateAttributePathBuilder();
     NL_TEST_ASSERT(apSuite, attributePathBuilder.GetError() == CHIP_NO_ERROR);
@@ -367,7 +369,7 @@ void BuildAttributeStatusElement(nlTestSuite * apSuite, AttributeStatusElement::
     NL_TEST_ASSERT(apSuite, aAttributeStatusElementBuilder.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseAttributeStatusElement(nlTestSuite * apSuite, AttributeStatusElement::Parser &aAttributeStatusElementParser)
+void ParseAttributeStatusElement(nlTestSuite * apSuite, AttributeStatusElement::Parser & aAttributeStatusElementParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePath::Parser attributePathParser;
@@ -383,7 +385,7 @@ void ParseAttributeStatusElement(nlTestSuite * apSuite, AttributeStatusElement::
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void BuildAttributeStatusList(nlTestSuite * apSuite, AttributeStatusList::Builder &aAttributeStatusListBuilder)
+void BuildAttributeStatusList(nlTestSuite * apSuite, AttributeStatusList::Builder & aAttributeStatusListBuilder)
 {
     AttributeStatusElement::Builder aAttributeStatusElementBuilder = aAttributeStatusListBuilder.CreateAttributeStatusBuilder();
     NL_TEST_ASSERT(apSuite, aAttributeStatusListBuilder.GetError() == CHIP_NO_ERROR);
@@ -405,7 +407,7 @@ void ParseAttributeStatusList(nlTestSuite * apSuite, chip::TLV::TLVReader & aRea
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void BuildAttributeDataElement(nlTestSuite * apSuite, AttributeDataElement::Builder &aAttributeDataElementBuilder)
+void BuildAttributeDataElement(nlTestSuite * apSuite, AttributeDataElement::Builder & aAttributeDataElementBuilder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -421,8 +423,8 @@ void BuildAttributeDataElement(nlTestSuite * apSuite, AttributeDataElement::Buil
     {
         chip::TLV::TLVWriter * pWriter = aAttributeDataElementBuilder.GetWriter();
         chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
-        err =
-                pWriter->StartContainer(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure, dummyType);
+        err = pWriter->StartContainer(chip::TLV::ContextTag(AttributeDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure,
+                                      dummyType);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
@@ -440,13 +442,13 @@ void BuildAttributeDataElement(nlTestSuite * apSuite, AttributeDataElement::Buil
     NL_TEST_ASSERT(apSuite, aAttributeDataElementBuilder.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseAttributeDataElement(nlTestSuite * apSuite, AttributeDataElement::Parser &aAttributeDataElementParser)
+void ParseAttributeDataElement(nlTestSuite * apSuite, AttributeDataElement::Parser & aAttributeDataElementParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     AttributePath::Parser attributePathParser;
     StatusElement::Parser statusElementParser;
     chip::DataVersion version = 0;
-    bool moreClusterDataFlag = false;
+    bool moreClusterDataFlag  = false;
 
     err = aAttributeDataElementParser.CheckSchemaValidity();
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -501,7 +503,7 @@ void ParseAttributeDataList(nlTestSuite * apSuite, chip::TLV::TLVReader & aReade
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 }
 
-void BuildCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Builder &aCommandDataElementBuilder)
+void BuildCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Builder & aCommandDataElementBuilder)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -513,8 +515,8 @@ void BuildCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Builder 
     {
         chip::TLV::TLVWriter * pWriter = aCommandDataElementBuilder.GetWriter();
         chip::TLV::TLVType dummyType   = chip::TLV::kTLVType_NotSpecified;
-        err =
-                pWriter->StartContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure, dummyType);
+        err = pWriter->StartContainer(chip::TLV::ContextTag(CommandDataElement::kCsTag_Data), chip::TLV::kTLVType_Structure,
+                                      dummyType);
         NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
         err = pWriter->PutBoolean(chip::TLV::ContextTag(1), true);
@@ -528,7 +530,7 @@ void BuildCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Builder 
     NL_TEST_ASSERT(apSuite, aCommandDataElementBuilder.GetError() == CHIP_NO_ERROR);
 }
 
-void ParseCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Parser &aCommandDataElementParser)
+void ParseCommandDataElement(nlTestSuite * apSuite, CommandDataElement::Parser & aCommandDataElementParser)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPath::Parser commandPathParser;
@@ -588,15 +590,15 @@ void BuildReportData(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWriter)
     reportDataBuilder.RequestResponse(1).SubscriptionId(2);
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
 
-    AttributeStatusList::Builder attributeStatusList= reportDataBuilder.CreateAttributeStatusListBuilder();
+    AttributeStatusList::Builder attributeStatusList = reportDataBuilder.CreateAttributeStatusListBuilder();
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributeStatusList(apSuite, attributeStatusList);
 
-    AttributeDataList::Builder attributeDataList= reportDataBuilder.CreateAttributeDataListBuilder();
+    AttributeDataList::Builder attributeDataList = reportDataBuilder.CreateAttributeDataListBuilder();
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
     BuildAttributeDataList(apSuite, attributeDataList);
 
-    EventList::Builder eventList= reportDataBuilder.CreateEventDataListBuilder();
+    EventList::Builder eventList = reportDataBuilder.CreateEventDataListBuilder();
     NL_TEST_ASSERT(apSuite, reportDataBuilder.GetError() == CHIP_NO_ERROR);
     BuildEventList(apSuite, eventList);
 
@@ -612,7 +614,7 @@ void ParseReportData(nlTestSuite * apSuite, chip::TLV::TLVReader & aReader)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReportData::Parser reportDataParser;
 
-    bool requestResponse = false;
+    bool requestResponse    = false;
     uint64_t subscriptionId = 0;
     AttributeStatusList::Parser attributeStatusListParser;
     AttributeDataList::Parser attributeDataListParser;
@@ -650,7 +652,7 @@ void BuildInvokeCommandRequest(nlTestSuite * apSuite, chip::TLV::TLVWriter & aWr
     err = invokeCommandRequestBuilder.Init(&aWriter);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
 
-    CommandList::Builder commandList= invokeCommandRequestBuilder.CreateCommandListBuilder();
+    CommandList::Builder commandList = invokeCommandRequestBuilder.CreateCommandListBuilder();
     NL_TEST_ASSERT(apSuite, invokeCommandRequestBuilder.GetError() == CHIP_NO_ERROR);
     BuildCommandList(apSuite, commandList);
 

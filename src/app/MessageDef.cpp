@@ -1800,7 +1800,7 @@ exit:
 }
 
 CHIP_ERROR StatusElement::Parser::DecodeStatusElement(uint16_t * apGeneralCode, uint32_t * apProtocolId, uint16_t * apProtocolCode,
-                                   chip::ClusterId * apClusterId) const
+                                                      chip::ClusterId * apClusterId) const
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader lReader;
@@ -1957,7 +1957,8 @@ CHIP_ERROR StatusElement::Builder::Init(chip::TLV::TLVWriter * const apWriter, c
 }
 
 StatusElement::Builder & StatusElement::Builder::EncodeStatusElement(const uint16_t aGeneralCode, const uint32_t aProtocolId,
-                                                  const uint16_t aStatusElement, const chip::ClusterId aNamespacedClusterId)
+                                                                     const uint16_t aStatusElement,
+                                                                     const chip::ClusterId aNamespacedClusterId)
 {
     uint64_t tag = chip::TLV::AnonymousTag;
 
@@ -2747,8 +2748,7 @@ CommandDataElement::Parser::ParseData(chip::TLV::TLVReader & aReader, int aDepth
         PRETTY_PRINT("%" PRIu64 ", ", value_u64);
         break;
     }
-    case chip::TLV::kTLVType_FloatingPointNumber:
-    {
+    case chip::TLV::kTLVType_FloatingPointNumber: {
         double value_fp;
 
         err = aReader.Get(value_fp);
@@ -3151,107 +3151,107 @@ CHIP_ERROR ReportData::Parser::CheckSchemaValidity() const
 
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
         {
-            case kCsTag_RequestResponse:
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_RequestResponse)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_RequestResponse);
+        case kCsTag_RequestResponse:
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_RequestResponse)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_RequestResponse);
 #if CHIP_DETAIL_LOGGING
-                if (chip::TLV::kTLVType_Boolean == reader.GetType())
-                {
-                    bool RequestResponse;
-                    err = reader.Get(RequestResponse);
-                    SuccessOrExit(err);
-                    PRETTY_PRINT("\tRequestResponse = %s, ", RequestResponse ? "true" : "false");
-                }
-                else
-                {
-                    PRETTY_PRINT("RequestResponse = ??");
-                }
+            if (chip::TLV::kTLVType_Boolean == reader.GetType())
+            {
+                bool RequestResponse;
+                err = reader.Get(RequestResponse);
+                SuccessOrExit(err);
+                PRETTY_PRINT("\tRequestResponse = %s, ", RequestResponse ? "true" : "false");
+            }
+            else
+            {
+                PRETTY_PRINT("RequestResponse = ??");
+            }
 #endif // CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_SubscriptionId:
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_SubscriptionId)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_SubscriptionId);
+            break;
+        case kCsTag_SubscriptionId:
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_SubscriptionId)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_SubscriptionId);
 #if CHIP_DETAIL_LOGGING
-                if (chip::TLV::kTLVType_UnsignedInteger == reader.GetType())
-                {
-                    uint64_t subscriptionId;
-                    err = reader.Get(subscriptionId);
-                    SuccessOrExit(err);
-                    PRETTY_PRINT("\t\tSubscriptionId = 0x%" PRIx64 ",", subscriptionId);
-                }
-                else
-                {
-                    PRETTY_PRINT("\t\tSubscriptionId = ??");
-                }
+            if (chip::TLV::kTLVType_UnsignedInteger == reader.GetType())
+            {
+                uint64_t subscriptionId;
+                err = reader.Get(subscriptionId);
+                SuccessOrExit(err);
+                PRETTY_PRINT("\t\tSubscriptionId = 0x%" PRIx64 ",", subscriptionId);
+            }
+            else
+            {
+                PRETTY_PRINT("\t\tSubscriptionId = ??");
+            }
 #endif // CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_AttributeStatusList:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeStatusList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_AttributeStatusList);
-                VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            break;
+        case kCsTag_AttributeStatusList:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeStatusList)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_AttributeStatusList);
+            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
-                PRETTY_PRINT("\t\t AttributeStatusList = ");
-                {
-                    attributeStatusList.Init(reader);
-                    PRETTY_PRINT_INCDEPTH();
-                    err = attributeStatusList.CheckSchemaValidity();
-                    SuccessOrExit(err);
-                    PRETTY_PRINT_DECDEPTH();
-                }
+            PRETTY_PRINT("\t\t AttributeStatusList = ");
+            {
+                attributeStatusList.Init(reader);
+                PRETTY_PRINT_INCDEPTH();
+                err = attributeStatusList.CheckSchemaValidity();
+                SuccessOrExit(err);
+                PRETTY_PRINT_DECDEPTH();
+            }
 #endif // CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_AttributeDataList:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeDataList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_AttributeDataList);
-                VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            break;
+        case kCsTag_AttributeDataList:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_AttributeDataList)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_AttributeDataList);
+            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
-                PRETTY_PRINT("\t\t AttributeDataList = ");
-                {
-                    attributeDataList.Init(reader);
-                    PRETTY_PRINT_INCDEPTH();
-                    err = attributeDataList.CheckSchemaValidity();
-                    SuccessOrExit(err);
-                    PRETTY_PRINT_DECDEPTH();
-                }
+            PRETTY_PRINT("\t\t AttributeDataList = ");
+            {
+                attributeDataList.Init(reader);
+                PRETTY_PRINT_INCDEPTH();
+                err = attributeDataList.CheckSchemaValidity();
+                SuccessOrExit(err);
+                PRETTY_PRINT_DECDEPTH();
+            }
 #endif // CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_EventDataList:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventDataList)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_EventDataList);
-                VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            break;
+        case kCsTag_EventDataList:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventDataList)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_EventDataList);
+            VerifyOrExit(chip::TLV::kTLVType_Array == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 #if CHIP_DETAIL_LOGGING
-                PRETTY_PRINT("\t\t EventDataList = ");
-                {
-                    eventList.Init(reader);
-                    PRETTY_PRINT_INCDEPTH();
-                    err = eventList.CheckSchemaValidity();
-                    SuccessOrExit(err);
-                    PRETTY_PRINT_DECDEPTH();
-                }
-#endif //CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_IsLastReport:
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_IsLastReport)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_IsLastReport);
-#if CHIP_DETAIL_LOGGING
-                if (chip::TLV::kTLVType_Boolean == reader.GetType())
-                    {
-                        bool isLastReport;
-                        err = reader.Get(isLastReport);
-                        SuccessOrExit(err);
-                        PRETTY_PRINT("\tisLastReport = %s, ", isLastReport ? "true" : "false");
-                    }
-                    else
-                    {
-                        PRETTY_PRINT("isLastReport = ??");
-                    }
+            PRETTY_PRINT("\t\t EventDataList = ");
+            {
+                eventList.Init(reader);
+                PRETTY_PRINT_INCDEPTH();
+                err = eventList.CheckSchemaValidity();
+                SuccessOrExit(err);
+                PRETTY_PRINT_DECDEPTH();
+            }
 #endif // CHIP_DETAIL_LOGGING
-                break;
-            default:
-                ExitNow(err = CHIP_ERROR_INVALID_TLV_TAG);
+            break;
+        case kCsTag_IsLastReport:
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_IsLastReport)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_IsLastReport);
+#if CHIP_DETAIL_LOGGING
+            if (chip::TLV::kTLVType_Boolean == reader.GetType())
+            {
+                bool isLastReport;
+                err = reader.Get(isLastReport);
+                SuccessOrExit(err);
+                PRETTY_PRINT("\tisLastReport = %s, ", isLastReport ? "true" : "false");
+            }
+            else
+            {
+                PRETTY_PRINT("isLastReport = ??");
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+        default:
+            ExitNow(err = CHIP_ERROR_INVALID_TLV_TAG);
         }
     }
 
@@ -3367,7 +3367,7 @@ ReportData::Builder & ReportData::Builder::SubscriptionId(const uint64_t aSubscr
     mError = mpWriter->Put(chip::TLV::ContextTag(kCsTag_SubscriptionId), aSubscriptionId);
     ChipLogFunctError(mError);
 
-    exit:
+exit:
     return *this;
 }
 

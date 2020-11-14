@@ -185,11 +185,11 @@ public:
 namespace AttributePath {
 enum
 {
-    kCsTag_NodeId     = 0,
-    kCsTag_EndpointId = 1,
+    kCsTag_NodeId              = 0,
+    kCsTag_EndpointId          = 1,
     kCsTag_NamespacedClusterId = 2,
-    kCsTag_FieldId   = 3,
-    kCsTag_ListIndex  = 4,
+    kCsTag_FieldId             = 3,
+    kCsTag_ListIndex           = 4,
 };
 
 /**
@@ -295,10 +295,10 @@ private:
 namespace EventPath {
 enum
 {
-    kCsTag_NodeId     = 0,
-    kCsTag_EndpointId = 1,
-    kCsTag_NamespacedClusterId  = 2,
-    kCsTag_EventId    = 3,
+    kCsTag_NodeId              = 0,
+    kCsTag_EndpointId          = 1,
+    kCsTag_NamespacedClusterId = 2,
+    kCsTag_EventId             = 3,
 };
 
 /**
@@ -407,10 +407,10 @@ private:
 namespace CommandPath {
 enum
 {
-    kCsTag_EndpointId = 0,
-    kCsTag_GroupId    = 1,
-    kCsTag_NamespacedClusterId  = 2,
-    kCsTag_CommandId  = 3,
+    kCsTag_EndpointId          = 0,
+    kCsTag_GroupId             = 1,
+    kCsTag_NamespacedClusterId = 2,
+    kCsTag_CommandId           = 3,
 };
 
 /**
@@ -599,10 +599,10 @@ private:
 namespace StatusElement {
 enum
 {
-    kCsTag_GeneralCode  = 1,
-    kCsTag_ProtocolId   = 2,
-    kCsTag_ProtocolCode = 3,
-    kCsTag_NamespacedClusterId    = 4
+    kCsTag_GeneralCode         = 1,
+    kCsTag_ProtocolId          = 2,
+    kCsTag_ProtocolCode        = 3,
+    kCsTag_NamespacedClusterId = 4
 };
 
 /**
@@ -637,7 +637,7 @@ public:
      *               type.
      */
     CHIP_ERROR DecodeStatusElement(uint16_t * apGeneralCode, uint32_t * apProtocolId, uint16_t * apProtocolCode,
-                   chip::ClusterId * apNamespacedClusterId) const;
+                                   chip::ClusterId * apNamespacedClusterId) const;
 };
 
 /**
@@ -664,8 +664,8 @@ public:
      *               element is missing. CHIP_ERROR_WRONG_TLV_TYPE if the elements are of the wrong
      *               type.
      */
-    StatusElement::Builder & EncodeStatusElement(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
-                                 const chip::ClusterId aNamespacedClusterId);
+    StatusElement::Builder & EncodeStatusElement(const uint16_t aGeneralCode, const uint32_t aProtocolId,
+                                                 const uint16_t aProtocolCode, const chip::ClusterId aNamespacedClusterId);
 
     StatusElement::Builder & EndOfStatusElement();
 };
@@ -680,8 +680,8 @@ public:
 namespace AttributeStatusElement {
 enum
 {
-    kCsTag_AttributePath    = 0,
-    kCsTag_StatusElement    = 1,
+    kCsTag_AttributePath = 0,
+    kCsTag_StatusElement = 1,
 };
 
 /**
@@ -788,9 +788,9 @@ public:
 namespace AttributeDataElement {
 enum
 {
-    kCsTag_AttributePath  = 0,
-    kCsTag_DataVersion    = 1,
-    kCsTag_Data           = 2,
+    kCsTag_AttributePath       = 0,
+    kCsTag_DataVersion         = 1,
+    kCsTag_Data                = 2,
     kCsTag_MoreClusterDataFlag = 3,
 };
 
@@ -848,7 +848,7 @@ public:
 
     AttributePath::Builder & CreateAttributePathBuilder();
 
-    //This SHALL indicate the numerical data version associated with the cluster that is referenced by the path.
+    // This SHALL indicate the numerical data version associated with the cluster that is referenced by the path.
     AttributeDataElement::Builder & DataVersion(const chip::DataVersion aDataVersion);
 
     // Nothing would be written if MoreClusterData == false, as that's the default value
@@ -913,9 +913,9 @@ private:
 namespace CommandDataElement {
 enum
 {
-    kCsTag_CommandPath = 0,
-    kCsTag_Data        = 1,
-    kCsTag_StatusElement  = 2,
+    kCsTag_CommandPath   = 0,
+    kCsTag_Data          = 1,
+    kCsTag_StatusElement = 2,
 };
 
 /**
