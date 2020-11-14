@@ -46,7 +46,7 @@ enum RangeControlFlags : uint8_t
     kWiderange   = 0x10,
 };
 
-class TransferInit;
+struct TransferInit;
 using SendInit    = TransferInit;
 using ReceiveInit = TransferInit;
 
