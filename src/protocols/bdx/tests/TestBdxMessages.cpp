@@ -1,4 +1,4 @@
-#include <protocols/bdx/BDXMessageUtils.h>
+#include <protocols/bdx/BdxMessages.h>
 
 #include <nlunit-test.h>
 
@@ -16,10 +16,9 @@ void TestTransferInitMessage(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TransferInit testMsg;
 
-    testMsg.mSupportsAsync         = false;
-    testMsg.mSupportsReceiverDrive = false;
-    testMsg.mSupportsSenderDrive   = true;
-    testMsg.mSupportedVersions     = 1;
+    testMsg.mTransferCtlFlags.SetRaw(0);
+    testMsg.mTransferCtlFlags.Set(kReceiverDrive, true);
+    testMsg.mSupportedVersions = 1;
 
     // Make sure mMaxLength is greater than UINT32_MAX to test widerange being set
     testMsg.mMaxLength = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
@@ -49,7 +48,7 @@ void TestTransferInitMessage(nlTestSuite * inSuite, void * inContext)
     rcvBuf->SetDataLength(static_cast<uint16_t>(msgSize));
 
     TransferInit testMsgRcvd;
-    err = TransferInit::Parse(*rcvBuf, testMsgRcvd);
+    err = testMsgRcvd.Parse(*rcvBuf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, testMsgRcvd == testMsg);
 }
@@ -59,11 +58,10 @@ void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     SendAccept testMsg;
 
-    testMsg.mVersion          = 1;
-    testMsg.mUseAsync         = false;
-    testMsg.mUseReceiverDrive = true;
-    testMsg.mUseSenderDrive   = false;
-    testMsg.mMaxBlockSize     = 256;
+    testMsg.mVersion = 1;
+    testMsg.mTransferCtlFlags.SetRaw(0);
+    testMsg.mTransferCtlFlags.Set(kReceiverDrive, true);
+    testMsg.mMaxBlockSize = 256;
 
     uint8_t fakeData[5]     = { 7, 6, 5, 4, 3 };
     testMsg.mMetadataLength = 5;
@@ -83,7 +81,7 @@ void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
     rcvBuf->SetDataLength(static_cast<uint16_t>(msgSize));
 
     SendAccept testMsgRcvd;
-    err = SendAccept::Parse(*rcvBuf, testMsgRcvd);
+    err = testMsgRcvd.Parse(*rcvBuf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, testMsgRcvd == testMsg);
 }
@@ -93,10 +91,9 @@ void TestReceiveAcceptMessage(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReceiveAccept testMsg;
 
-    testMsg.mVersion          = 1;
-    testMsg.mUseAsync         = false;
-    testMsg.mUseReceiverDrive = true;
-    testMsg.mUseSenderDrive   = false;
+    testMsg.mVersion = 1;
+    testMsg.mTransferCtlFlags.SetRaw(0);
+    testMsg.mTransferCtlFlags.Set(kReceiverDrive, true);
 
     // Make sure mLength is greater than UINT32_MAX to test widerange being set
     testMsg.mLength = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
@@ -122,7 +119,7 @@ void TestReceiveAcceptMessage(nlTestSuite * inSuite, void * inContext)
     rcvBuf->SetDataLength(static_cast<uint16_t>(msgSize));
 
     ReceiveAccept testMsgRcvd;
-    err = ReceiveAccept::Parse(*rcvBuf, testMsgRcvd);
+    err = testMsgRcvd.Parse(*rcvBuf);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, testMsgRcvd == testMsg);
 }
@@ -146,7 +143,7 @@ static const nlTest sTests[] =
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-BDXMessageUtils",
+    "Test-CHIP-BdxMessages",
     &sTests[0],
     nullptr,
     nullptr
@@ -156,7 +153,7 @@ static nlTestSuite sSuite =
 /**
  *  Main
  */
-int TestBDXMessageUtils()
+int TestBdxMessages()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, nullptr);
@@ -164,4 +161,4 @@ int TestBDXMessageUtils()
     return (nlTestRunnerStats(&sSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestBDXMessageUtils)
+CHIP_REGISTER_TEST_SUITE(TestBdxMessages)

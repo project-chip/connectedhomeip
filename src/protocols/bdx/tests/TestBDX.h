@@ -1,6 +1,6 @@
 #ifndef TESTBDX_H
 #define TESTBDX_H
 
-int TestBDXMessageUtils(void);
+int TestBdxMessages(void);
 
 #endif // TESTBDX_H

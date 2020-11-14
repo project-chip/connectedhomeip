@@ -21,7 +21,7 @@
  *      Implements utility methods for working with some complex BDX messages.
  */
 
-#include <protocols/bdx/BDXMessageUtils.h>
+#include <protocols/bdx/BdxMessages.h>
 
 #include <support/BufBound.h>
 #include <support/BufferReader.h>
@@ -29,14 +29,9 @@
 
 #include <limits>
 
-#define VERSION_MASK 0x0F
-#define SENDER_DRIVE_MASK 0x10
-#define RECEIVER_DRIVE_MASK 0x20
-#define ASYNC_MASK 0x40
-
-#define DEFLEN_MASK 0x01
-#define START_OFFSET_MASK 0x02
-#define WIDERANGE_MASK 0x10
+namespace {
+constexpr uint8_t kVersionMask = 0x0F;
+} // namespace
 
 using namespace chip;
 using namespace chip::BDX;
@@ -45,29 +40,20 @@ using namespace chip::Encoding::LittleEndian;
 CHIP_ERROR TransferInit::Pack(System::PacketBuffer & aBuffer) const
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
-    uint8_t rangeCtl            = 0;
     uint8_t proposedTransferCtl = 0;
     bool widerange              = ((mStartOffset | mMaxLength) > std::numeric_limits<uint32_t>::max());
-
     BufBound bbuf(aBuffer.Start(), aBuffer.AvailableDataLength());
 
-    proposedTransferCtl |= mSupportedVersions & VERSION_MASK;
-    if (mSupportsSenderDrive)
-        proposedTransferCtl |= SENDER_DRIVE_MASK;
-    if (mSupportsReceiverDrive)
-        proposedTransferCtl |= RECEIVER_DRIVE_MASK;
-    if (mSupportsAsync)
-        proposedTransferCtl |= ASYNC_MASK;
+    proposedTransferCtl |= mSupportedVersions & kVersionMask;
+    proposedTransferCtl = proposedTransferCtl | mTransferCtlFlags.Raw();
 
-    if (mMaxLength > 0)
-        rangeCtl |= DEFLEN_MASK;
-    if (mStartOffset > 0)
-        rangeCtl |= START_OFFSET_MASK;
-    if (widerange)
-        rangeCtl |= WIDERANGE_MASK;
+    BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
+    rangeCtlFlags.Set(kDefLen, mMaxLength > 0);
+    rangeCtlFlags.Set(kStartOffset, mStartOffset > 0);
+    rangeCtlFlags.Set(kWiderange, widerange);
 
     bbuf.Put(proposedTransferCtl);
-    bbuf.Put(rangeCtl);
+    bbuf.Put(rangeCtlFlags.Raw());
     bbuf.PutLE16(mMaxBlockSize);
 
     if (mStartOffset > 0)
@@ -111,72 +97,65 @@ exit:
     return err;
 }
 
-CHIP_ERROR TransferInit::Parse(const System::PacketBuffer & aBuffer, TransferInit & aParsedMessage)
+CHIP_ERROR TransferInit::Parse(const System::PacketBuffer & aBuffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t proposedTransferCtl;
     uint8_t rangeCtl;
-    bool hasStartOffset     = false;
-    bool hasDefLen          = false;
-    bool widerange          = false;
     uint32_t tmpUint32Value = 0; // Used for reading non-wide length and offset fields
     uint8_t * bufStart      = aBuffer.Start();
     Reader bufReader(bufStart, aBuffer.DataLength());
+    BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
 
-    SuccessOrExit(bufReader.Read8(&proposedTransferCtl).Read8(&rangeCtl).Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
+    SuccessOrExit(bufReader.Read8(&proposedTransferCtl).Read8(&rangeCtl).Read16(&mMaxBlockSize).StatusCode());
 
-    aParsedMessage.mSupportedVersions     = proposedTransferCtl & VERSION_MASK;
-    aParsedMessage.mSupportsSenderDrive   = ((proposedTransferCtl & SENDER_DRIVE_MASK) != 0);
-    aParsedMessage.mSupportsReceiverDrive = ((proposedTransferCtl & RECEIVER_DRIVE_MASK) != 0);
-    aParsedMessage.mSupportsAsync         = ((proposedTransferCtl & ASYNC_MASK) != 0);
+    mSupportedVersions = proposedTransferCtl & kVersionMask;
+    mTransferCtlFlags.SetRaw(static_cast<uint8_t>(proposedTransferCtl & ~kVersionMask));
+    rangeCtlFlags.SetRaw(rangeCtl);
 
-    hasDefLen      = (rangeCtl & DEFLEN_MASK) != 0;
-    hasStartOffset = (rangeCtl & START_OFFSET_MASK) != 0;
-    widerange      = (rangeCtl & WIDERANGE_MASK) != 0;
-
-    if (hasStartOffset)
+    if (rangeCtlFlags.Has(kStartOffset))
     {
-        if (widerange)
+        if (rangeCtlFlags.Has(kWiderange))
         {
-            SuccessOrExit(bufReader.Read64(&aParsedMessage.mStartOffset).StatusCode());
+            SuccessOrExit(bufReader.Read64(&mStartOffset).StatusCode());
         }
         else
         {
             SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
-            aParsedMessage.mStartOffset = tmpUint32Value;
+            mStartOffset = tmpUint32Value;
         }
     }
 
-    if (hasDefLen)
+    if (rangeCtlFlags.Has(kDefLen))
     {
-        if (widerange)
+        if (rangeCtlFlags.Has(kWiderange))
         {
-            SuccessOrExit(bufReader.Read64(&aParsedMessage.mMaxLength).StatusCode());
+            SuccessOrExit(bufReader.Read64(&mMaxLength).StatusCode());
         }
         else
         {
             SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
-            aParsedMessage.mMaxLength = tmpUint32Value;
+            mMaxLength = tmpUint32Value;
         }
     }
 
-    SuccessOrExit(bufReader.Read16(&aParsedMessage.mFileDesLength).StatusCode());
+    SuccessOrExit(bufReader.Read16(&mFileDesLength).StatusCode());
 
     // WARNING: this struct will store a pointer to the start of the file designator in the PacketBuffer,
     // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
     // or there is risk of unsafe memory access.
-    VerifyOrExit(bufReader.HasAtLeast(aParsedMessage.mFileDesLength), err = CHIP_ERROR_MESSAGE_INCOMPLETE);
-    aParsedMessage.mFileDesignator = &bufStart[bufReader.OctetsRead()];
+    VerifyOrExit(bufReader.HasAtLeast(mFileDesLength), err = CHIP_ERROR_MESSAGE_INCOMPLETE);
+    mFileDesignator = &bufStart[bufReader.OctetsRead()];
 
     // Rest of message is metadata (could be empty)
-    if (bufReader.Remaining() > aParsedMessage.mFileDesLength)
+    if (bufReader.Remaining() > mFileDesLength)
     {
         // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
         // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
         // or there is risk of unsafe memory access.
-        uint16_t metadataStartIndex    = static_cast<uint16_t>(bufReader.OctetsRead() + aParsedMessage.mFileDesLength);
-        aParsedMessage.mMetadata       = &bufStart[metadataStartIndex];
-        aParsedMessage.mMetadataLength = static_cast<uint16_t>(aBuffer.DataLength() - metadataStartIndex);
+        uint16_t metadataStartIndex = static_cast<uint16_t>(bufReader.OctetsRead() + mFileDesLength);
+        mMetadata                   = &bufStart[metadataStartIndex];
+        mMetadataLength             = static_cast<uint16_t>(aBuffer.DataLength() - metadataStartIndex);
     }
 
 exit:
@@ -199,11 +178,14 @@ size_t TransferInit::PackedSize() const
 
 bool TransferInit::operator==(const TransferInit & another) const
 {
+    if (mMetadataLength != another.mMetadataLength || mFileDesLength != another.mFileDesLength)
+    {
+        return false;
+    }
     bool fileDesMatches  = memcmp(mFileDesignator, another.mFileDesignator, mFileDesLength) == 0;
     bool metadataMatches = memcmp(mMetadata, another.mMetadata, mMetadataLength) == 0;
 
-    return (mSupportedVersions == another.mSupportedVersions && mSupportsSenderDrive == another.mSupportsSenderDrive &&
-            mSupportsReceiverDrive == another.mSupportsReceiverDrive && mSupportsAsync == another.mSupportsAsync &&
+    return (mSupportedVersions == another.mSupportedVersions && mTransferCtlFlags.Raw() == another.mTransferCtlFlags.Raw() &&
             mStartOffset == another.mStartOffset && mMaxLength == another.mMaxLength && mMaxBlockSize == another.mMaxBlockSize &&
             fileDesMatches && metadataMatches);
 }
@@ -215,13 +197,8 @@ CHIP_ERROR SendAccept::Pack(System::PacketBuffer & aBuffer) const
 
     BufBound bbuf(aBuffer.Start(), aBuffer.AvailableDataLength());
 
-    transferCtl |= mVersion & VERSION_MASK;
-    if (mUseSenderDrive)
-        transferCtl |= SENDER_DRIVE_MASK;
-    else if (mUseReceiverDrive)
-        transferCtl |= RECEIVER_DRIVE_MASK;
-    else if (mUseAsync)
-        transferCtl |= ASYNC_MASK;
+    transferCtl |= mVersion & kVersionMask;
+    transferCtl = transferCtl | mTransferCtlFlags.Raw();
 
     bbuf.Put(transferCtl);
     bbuf.PutLE16(mMaxBlockSize);
@@ -234,21 +211,19 @@ exit:
     return err;
 }
 
-CHIP_ERROR SendAccept::Parse(const System::PacketBuffer & aBuffer, SendAccept & aParsedMessage)
+CHIP_ERROR SendAccept::Parse(const System::PacketBuffer & aBuffer)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t transferCtl = 0;
     uint8_t * bufStart  = aBuffer.Start();
     Reader bufReader(bufStart, aBuffer.DataLength());
 
-    SuccessOrExit(bufReader.Read8(&transferCtl).Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
+    SuccessOrExit(bufReader.Read8(&transferCtl).Read16(&mMaxBlockSize).StatusCode());
 
-    aParsedMessage.mVersion = transferCtl & VERSION_MASK;
+    mVersion = transferCtl & kVersionMask;
 
     // Only one of these values should be set. It is up to the caller to verify this.
-    aParsedMessage.mUseAsync         = (transferCtl & ASYNC_MASK) != 0;
-    aParsedMessage.mUseReceiverDrive = (transferCtl & RECEIVER_DRIVE_MASK) != 0;
-    aParsedMessage.mUseSenderDrive   = (transferCtl & SENDER_DRIVE_MASK) != 0;
+    mTransferCtlFlags.SetRaw(static_cast<uint8_t>(transferCtl & ~kVersionMask));
 
     // Rest of message is metadata (could be empty)
     if (bufReader.Remaining() > 0)
@@ -256,8 +231,8 @@ CHIP_ERROR SendAccept::Parse(const System::PacketBuffer & aBuffer, SendAccept & 
         // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
         // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
         // or there is risk of unsafe memory access.
-        aParsedMessage.mMetadata       = &bufStart[bufReader.OctetsRead()];
-        aParsedMessage.mMetadataLength = bufReader.Remaining();
+        mMetadata       = &bufStart[bufReader.OctetsRead()];
+        mMetadataLength = bufReader.Remaining();
     }
 
 exit:
@@ -276,38 +251,34 @@ size_t SendAccept::PackedSize() const
 
 bool SendAccept::operator==(const SendAccept & another) const
 {
+    if (mMetadataLength != another.mMetadataLength)
+    {
+        return false;
+    }
     bool metadataMatches = memcmp(mMetadata, another.mMetadata, mMetadataLength) == 0;
 
-    return (mVersion == another.mVersion && mUseAsync == another.mUseAsync && mUseReceiverDrive == another.mUseReceiverDrive &&
-            mUseSenderDrive == another.mUseSenderDrive && mMaxBlockSize == another.mMaxBlockSize && metadataMatches);
+    return (mVersion == another.mVersion && mTransferCtlFlags.Raw() == another.mTransferCtlFlags.Raw() &&
+            mMaxBlockSize == another.mMaxBlockSize && metadataMatches);
 }
 
 CHIP_ERROR ReceiveAccept::Pack(System::PacketBuffer & aBuffer) const
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t transferCtl = 0;
-    uint8_t rangeCtl    = 0;
     bool widerange      = ((mStartOffset | mLength) > std::numeric_limits<uint32_t>::max());
 
     BufBound bbuf(aBuffer.Start(), aBuffer.AvailableDataLength());
 
-    transferCtl |= mVersion & VERSION_MASK;
-    if (mUseSenderDrive)
-        transferCtl |= SENDER_DRIVE_MASK;
-    else if (mUseReceiverDrive)
-        transferCtl |= RECEIVER_DRIVE_MASK;
-    else if (mUseAsync)
-        transferCtl |= ASYNC_MASK;
+    transferCtl |= mVersion & kVersionMask;
+    transferCtl = transferCtl | mTransferCtlFlags.Raw();
 
-    if (mLength > 0)
-        rangeCtl |= DEFLEN_MASK;
-    if (mStartOffset > 0)
-        rangeCtl |= START_OFFSET_MASK;
-    if (widerange)
-        rangeCtl |= WIDERANGE_MASK;
+    BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
+    rangeCtlFlags.Set(kDefLen, mLength > 0);
+    rangeCtlFlags.Set(kStartOffset, mStartOffset > 0);
+    rangeCtlFlags.Set(kWiderange, widerange);
 
     bbuf.Put(transferCtl);
-    bbuf.Put(rangeCtl);
+    bbuf.Put(rangeCtlFlags.Raw());
     bbuf.PutLE16(mMaxBlockSize);
 
     if (mStartOffset > 0)
@@ -343,54 +314,48 @@ exit:
     return err;
 }
 
-CHIP_ERROR ReceiveAccept::Parse(const System::PacketBuffer & aBuffer, ReceiveAccept & aParsedMessage)
+CHIP_ERROR ReceiveAccept::Parse(const System::PacketBuffer & aBuffer)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
-    bool hasDefLen          = false;
-    bool hasStartOffset     = false;
-    bool widerange          = false;
     uint8_t transferCtl     = 0;
     uint8_t rangeCtl        = 0;
     uint32_t tmpUint32Value = 0; // Used for reading non-wide length and offset fields
     uint8_t * bufStart      = aBuffer.Start();
     Reader bufReader(bufStart, aBuffer.DataLength());
+    BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
 
-    SuccessOrExit(bufReader.Read8(&transferCtl).Read8(&rangeCtl).Read16(&aParsedMessage.mMaxBlockSize).StatusCode());
+    SuccessOrExit(bufReader.Read8(&transferCtl).Read8(&rangeCtl).Read16(&mMaxBlockSize).StatusCode());
 
-    aParsedMessage.mVersion = transferCtl & VERSION_MASK;
+    mVersion = transferCtl & kVersionMask;
 
     // Only one of these values should be set. It is up to the caller to verify this.
-    aParsedMessage.mUseAsync         = (transferCtl & ASYNC_MASK) != 0;
-    aParsedMessage.mUseReceiverDrive = (transferCtl & RECEIVER_DRIVE_MASK) != 0;
-    aParsedMessage.mUseSenderDrive   = (transferCtl & SENDER_DRIVE_MASK) != 0;
+    mTransferCtlFlags.SetRaw(static_cast<uint8_t>(transferCtl & ~kVersionMask));
 
-    hasDefLen      = (rangeCtl & DEFLEN_MASK) != 0;
-    hasStartOffset = (rangeCtl & START_OFFSET_MASK) != 0;
-    widerange      = (rangeCtl & WIDERANGE_MASK) != 0;
+    rangeCtlFlags.SetRaw(rangeCtl);
 
-    if (hasStartOffset)
+    if (rangeCtlFlags.Has(kStartOffset))
     {
-        if (widerange)
+        if (rangeCtlFlags.Has(kWiderange))
         {
-            SuccessOrExit(bufReader.Read64(&aParsedMessage.mStartOffset).StatusCode());
+            SuccessOrExit(bufReader.Read64(&mStartOffset).StatusCode());
         }
         else
         {
             SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
-            aParsedMessage.mStartOffset = tmpUint32Value;
+            mStartOffset = tmpUint32Value;
         }
     }
 
-    if (hasDefLen)
+    if (rangeCtlFlags.Has(kDefLen))
     {
-        if (widerange)
+        if (rangeCtlFlags.Has(kWiderange))
         {
-            SuccessOrExit(bufReader.Read64(&aParsedMessage.mLength).StatusCode());
+            SuccessOrExit(bufReader.Read64(&mLength).StatusCode());
         }
         else
         {
             SuccessOrExit(bufReader.Read32(&tmpUint32Value).StatusCode());
-            aParsedMessage.mLength = tmpUint32Value;
+            mLength = tmpUint32Value;
         }
     }
 
@@ -400,8 +365,8 @@ CHIP_ERROR ReceiveAccept::Parse(const System::PacketBuffer & aBuffer, ReceiveAcc
         // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
         // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
         // or there is risk of unsafe memory access.
-        aParsedMessage.mMetadata       = &bufStart[bufReader.OctetsRead()];
-        aParsedMessage.mMetadataLength = bufReader.Remaining();
+        mMetadata       = &bufStart[bufReader.OctetsRead()];
+        mMetadataLength = bufReader.Remaining();
     }
 
 exit:
@@ -424,9 +389,13 @@ size_t ReceiveAccept::PackedSize() const
 
 bool ReceiveAccept::operator==(const ReceiveAccept & another) const
 {
+    if (mMetadataLength != another.mMetadataLength)
+    {
+        return false;
+    }
     bool metadataMatches = memcmp(mMetadata, another.mMetadata, mMetadataLength) == 0;
 
-    return (mVersion == another.mVersion && mUseAsync == another.mUseAsync && mUseReceiverDrive == another.mUseReceiverDrive &&
-            mUseSenderDrive == another.mUseSenderDrive && mStartOffset == another.mStartOffset &&
-            mMaxBlockSize == another.mMaxBlockSize && mLength == another.mLength && metadataMatches);
+    return (mVersion == another.mVersion && mTransferCtlFlags.Raw() == another.mTransferCtlFlags.Raw() &&
+            mStartOffset == another.mStartOffset && mMaxBlockSize == another.mMaxBlockSize && mLength == another.mLength &&
+            metadataMatches);
 }

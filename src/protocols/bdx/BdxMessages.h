@@ -24,19 +24,31 @@
 
 #pragma once
 
+#include <support/BitFlags.h>
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace BDX {
 
-enum ControlMode : uint8_t
+enum TransferControlFlags : uint8_t
 {
-    kNotSpecified  = 0x00,
+    // first 4 bits reserved for version
     kSenderDrive   = 0x10,
     kReceiverDrive = 0x20,
     kAsync         = 0x40,
 };
+
+enum RangeControlFlags : uint8_t
+{
+    kDefLen      = 0x01,
+    kStartOffset = 0x02,
+    kWiderange   = 0x10,
+};
+
+class TransferInit;
+using SendInit    = TransferInit;
+using ReceiveInit = TransferInit;
 
 /*
  * A structure for representing a SendInit or ReceiveInit message (both contain
@@ -52,25 +64,28 @@ struct TransferInit
      *
      * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
      */
+    CHECK_RETURN_VALUE
     CHIP_ERROR Pack(System::PacketBuffer & aBuffer) const;
 
     /**
      * @brief
-     *  Parse data from an PacketBuffer into a struct instance
+     *  Parse data from an PacketBuffer into a struct instance.
+     *
+     *  Note that this struct will store pointers that point into the passed PacketBuffer,
+     *  so it is essential that the PacketBuffer is not modified or freed until after this
+     *  struct is no longer needed.
      *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data.
-     * @param[out] aParsedMessage Reference to a struct instance where results will be stored.
-     *             Note that this struct will store pointers into the passed PacketBuffer, so it
-     *             is essential that the PacketBuffer is not modified or freed until after the
-     *             TransferInit struct is no longer needed.
+     *
      *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
-    static CHIP_ERROR Parse(const System::PacketBuffer & aBuffer, TransferInit & aParsedMessage);
+    CHECK_RETURN_VALUE
+    CHIP_ERROR Parse(const System::PacketBuffer & aBuffer);
 
     /**
      * @brief
-     *  Get the size of the message once it is written to a buffer.
+     *  Returns the size of buffer needed to write this message.
      */
     size_t PackedSize() const;
 
@@ -81,31 +96,25 @@ struct TransferInit
     bool operator==(const TransferInit &) const;
 
     // Proposed Transfer Control (required)
-    bool mSupportsAsync;
-    bool mSupportsReceiverDrive;
-    bool mSupportsSenderDrive;
-    uint8_t mSupportedVersions;
+    BitFlags<uint8_t, TransferControlFlags> mTransferCtlFlags;
+    uint8_t mSupportedVersions = 0;
 
     // All required
-    uint16_t mMaxBlockSize; ///< Proposed max block size to use in transfer
-    uint64_t mStartOffset;  ///< Proposed start offset of data. 0 for no offset
-    uint64_t mMaxLength;    ///< Proposed max length of data in transfer, 0 for indefinite
+    uint16_t mMaxBlockSize = 0; ///< Proposed max block size to use in transfer
+    uint64_t mStartOffset  = 0; ///< Proposed start offset of data. 0 for no offset
+    uint64_t mMaxLength    = 0; ///< Proposed max length of data in transfer, 0 for indefinite
 
     // File designator (required)
-    uint8_t * mFileDesignator;
-    uint16_t mFileDesLength; ///< Length of file designator string (not including null-terminator)
+    // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
+    // It is up to the caller to ensure that the memory pointed to here has not been freed.
+    uint8_t * mFileDesignator = nullptr;
+    uint16_t mFileDesLength   = 0; ///< Length of file designator string (not including null-terminator)
 
     // Additional metadata (optional, TLV format)
-    uint8_t * mMetadata;
-    uint16_t mMetadataLength;
-};
-
-struct SendInit : public TransferInit
-{
-};
-
-struct ReceiveInit : public TransferInit
-{
+    // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
+    // It is up to the caller to ensure that the memory pointed to here has not been freed.
+    uint8_t * mMetadata      = nullptr;
+    uint16_t mMetadataLength = 0;
 };
 
 /*
@@ -121,25 +130,27 @@ struct SendAccept
      *
      * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
      */
+    CHECK_RETURN_VALUE
     CHIP_ERROR Pack(System::PacketBuffer & aBuffer) const;
 
     /**
      * @brief
      *  Parse data from an PacketBuffer into a struct instance
      *
+     *  Note that this struct will store pointers that point into the passed PacketBuffer,
+     *  so it is essential that the PacketBuffer is not modified or freed until after this
+     *  struct is no longer needed.
+     *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data
-     * @param[out] aParsedMessage Reference to a struct instance where results will be stored.
-     *             Note that this struct will store pointers into the passed PacketBuffer, so it
-     *             is essential that the PacketBuffer is not modified or freed until after the
-     *             SendAccept struct is no longer needed.
      *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
-    static CHIP_ERROR Parse(const System::PacketBuffer & aBuffer, SendAccept & aResponse);
+    CHECK_RETURN_VALUE
+    CHIP_ERROR Parse(const System::PacketBuffer & aBuffer);
 
     /**
      * @brief
-     *  Get the size of the message once it is written to a buffer.
+     *  Returns the size of buffer needed to write this message.
      */
     size_t PackedSize() const;
 
@@ -150,16 +161,16 @@ struct SendAccept
     bool operator==(const SendAccept &) const;
 
     // Transfer Control (required, only one should be set)
-    bool mUseAsync;
-    bool mUseReceiverDrive;
-    bool mUseSenderDrive;
+    BitFlags<uint8_t, TransferControlFlags> mTransferCtlFlags;
 
-    uint8_t mVersion;       ///< The agreed upon version for the transfer (required)
-    uint16_t mMaxBlockSize; ///< Chosen max block size to use in transfer (required)
+    uint8_t mVersion       = 0; ///< The agreed upon version for the transfer (required)
+    uint16_t mMaxBlockSize = 0; ///< Chosen max block size to use in transfer (required)
 
     // Additional metadata (optional, TLV format)
-    uint8_t * mMetadata;
-    uint16_t mMetadataLength;
+    // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
+    // It is up to the caller to ensure that the memory pointed to here has not been freed.
+    uint8_t * mMetadata      = nullptr;
+    uint16_t mMetadataLength = 0;
 };
 
 /**
@@ -179,25 +190,27 @@ struct ReceiveAccept
      *
      * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
      */
+    CHECK_RETURN_VALUE
     CHIP_ERROR Pack(System::PacketBuffer & aBuffer) const;
 
     /**
      * @brief
      *  Parse data from an PacketBuffer into a struct instance
      *
+     *  Note that this struct will store pointers that point into the passed PacketBuffer,
+     *  so it is essential that the PacketBuffer is not modified or freed until after this
+     *  struct is no longer needed.
+     *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data
-     * @param[out] aParsedMessage Reference to a struct instance where results will be stored.
-     *             Note that this struct will store pointers into the passed PacketBuffer, so it
-     *             is essential that the PacketBuffer is not modified or freed until after the
-     *             ReceiveAccept struct is no longer needed.
      *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
-    static CHIP_ERROR Parse(const System::PacketBuffer & aBuffer, ReceiveAccept & aResponse);
+    CHECK_RETURN_VALUE
+    CHIP_ERROR Parse(const System::PacketBuffer & aBuffer);
 
     /**
      * @brief
-     *  Get the size of the message once it is written to a buffer.
+     *  Returns the size of buffer needed to write this message.
      */
     size_t PackedSize() const;
 
@@ -208,19 +221,19 @@ struct ReceiveAccept
     bool operator==(const ReceiveAccept &) const;
 
     // Transfer Control (required, only one should be set)
-    bool mUseAsync;
-    bool mUseReceiverDrive;
-    bool mUseSenderDrive;
+    BitFlags<uint8_t, TransferControlFlags> mTransferCtlFlags;
 
     // All required
-    uint8_t mVersion;       ///< The agreed upon version for the transfer
-    uint16_t mMaxBlockSize; ///< Chosen max block size to use in transfer
-    uint64_t mStartOffset;  ///< Chosen start offset of data. 0 for no offset.
-    uint64_t mLength;       ///< Length of transfer. 0 if length is indefinite.
+    uint8_t mVersion       = 0; ///< The agreed upon version for the transfer
+    uint16_t mMaxBlockSize = 0; ///< Chosen max block size to use in transfer
+    uint64_t mStartOffset  = 0; ///< Chosen start offset of data. 0 for no offset.
+    uint64_t mLength       = 0; ///< Length of transfer. 0 if length is indefinite.
 
     // Additional metadata (optional, TLV format)
-    uint8_t * mMetadata;
-    uint16_t mMetadataLength;
+    // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
+    // It is up to the caller to ensure that the memory pointed to here has not been freed.
+    uint8_t * mMetadata      = nullptr;
+    uint16_t mMetadataLength = 0;
 };
 
 } // namespace BDX

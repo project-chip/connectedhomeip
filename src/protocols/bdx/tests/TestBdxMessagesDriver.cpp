@@ -6,5 +6,5 @@ int main()
 {
     nlTestSetOutputStyle(OUTPUT_CSV);
 
-    return (TestBDXMessageUtils());
+    return (TestBdxMessages());
 }
