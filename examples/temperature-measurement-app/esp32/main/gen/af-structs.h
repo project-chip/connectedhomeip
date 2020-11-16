@@ -20,6 +20,8 @@
 #ifndef SILABS_EMBER_AF_STRUCTS
 #define SILABS_EMBER_AF_STRUCTS
 
+#include "basic-types.h"
+
 // Generated structs from the metadata
 // Struct for IasAceZoneStatusResult
 typedef struct _IasAceZoneStatusResult
@@ -31,7 +33,7 @@ typedef struct _IasAceZoneStatusResult
 // Struct for ReadAttributeStatusRecord
 typedef struct _ReadAttributeStatusRecord
 {
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
     uint8_t status;
     uint8_t attributeType;
     uint8_t * attributeLocation;
@@ -40,7 +42,7 @@ typedef struct _ReadAttributeStatusRecord
 // Struct for WriteAttributeRecord
 typedef struct _WriteAttributeRecord
 {
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t * attributeLocation;
 } WriteAttributeRecord;
@@ -49,14 +51,14 @@ typedef struct _WriteAttributeRecord
 typedef struct _WriteAttributeStatusRecord
 {
     uint8_t status;
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
 } WriteAttributeStatusRecord;
 
 // Struct for ConfigureReportingRecord
 typedef struct _ConfigureReportingRecord
 {
     uint8_t direction;
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
     uint8_t attributeType;
     uint16_t minimumReportingInterval;
     uint16_t maximumReportingInterval;
@@ -69,7 +71,7 @@ typedef struct _ConfigureReportingStatusRecord
 {
     uint8_t status;
     uint8_t direction;
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
 } ConfigureReportingStatusRecord;
 
 // Struct for ReadReportingConfigurationRecord
@@ -77,7 +79,7 @@ typedef struct _ReadReportingConfigurationRecord
 {
     uint8_t status;
     uint8_t direction;
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
     uint8_t attributeType;
     uint16_t minimumReportingInterval;
     uint16_t maximumReportingInterval;
@@ -89,13 +91,13 @@ typedef struct _ReadReportingConfigurationRecord
 typedef struct _ReadReportingConfigurationAttributeRecord
 {
     uint8_t direction;
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
 } ReadReportingConfigurationAttributeRecord;
 
 // Struct for ReportAttributeRecord
 typedef struct _ReportAttributeRecord
 {
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t * attributeLocation;
 } ReportAttributeRecord;
@@ -103,14 +105,14 @@ typedef struct _ReportAttributeRecord
 // Struct for DiscoverAttributesInfoRecord
 typedef struct _DiscoverAttributesInfoRecord
 {
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
     uint8_t attributeType;
 } DiscoverAttributesInfoRecord;
 
 // Struct for ExtendedDiscoverAttributesInfoRecord
 typedef struct _ExtendedDiscoverAttributesInfoRecord
 {
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
     uint8_t attributeType;
     uint8_t attributeAccessControl;
 } ExtendedDiscoverAttributesInfoRecord;
@@ -118,7 +120,7 @@ typedef struct _ExtendedDiscoverAttributesInfoRecord
 // Struct for ReadStructuredAttributeRecord
 typedef struct _ReadStructuredAttributeRecord
 {
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
     uint8_t indicator;
     uint16_t indicies;
 } ReadStructuredAttributeRecord;
@@ -126,7 +128,7 @@ typedef struct _ReadStructuredAttributeRecord
 // Struct for WriteStructuredAttributeRecord
 typedef struct _WriteStructuredAttributeRecord
 {
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
     uint8_t indicator;
     uint16_t indicies;
     uint8_t attributeType;
@@ -137,7 +139,7 @@ typedef struct _WriteStructuredAttributeRecord
 typedef struct _WriteStructuredAttributeStatusRecord
 {
     uint8_t status;
-    uint16_t attributeId;
+    chip::AttributeId attributeId;
     uint8_t indicator;
     uint16_t indicies;
 } WriteStructuredAttributeStatusRecord;
@@ -387,7 +389,7 @@ typedef struct _DeviceInformationRecord
 // Struct for GroupInformationRecord
 typedef struct _GroupInformationRecord
 {
-    uint16_t groupId;
+    chip::GroupId groupId;
     uint8_t groupType;
 } GroupInformationRecord;
 

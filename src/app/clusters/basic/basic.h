@@ -29,4 +29,4 @@
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPluginBasicResetToFactoryDefaultsCallback(CHIPEndpointId endpoint);
+void emberAfPluginBasicResetToFactoryDefaultsCallback(chip::EndpointId endpoint);

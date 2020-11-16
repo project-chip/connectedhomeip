@@ -90,7 +90,7 @@ void emberAfIdentifyClusterServerTickCallback(EndpointId endpoint)
     }
 }
 
-void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, EmberAfAttributeId attributeId)
+void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
 {
     if (attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID)
     {

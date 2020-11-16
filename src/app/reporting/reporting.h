@@ -123,7 +123,7 @@ EmberStatus emberAfClearReportTableCallback(void);
  * always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
-bool emberAfConfigureReportingResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
+bool emberAfConfigureReportingResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 /** @brief Read Reporting Configuration Response
  *
@@ -137,7 +137,7 @@ bool emberAfConfigureReportingResponseCallback(EmberAfClusterId clusterId, uint8
  * records.  Ver.: always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
-bool emberAfReadReportingConfigurationResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
+bool emberAfReadReportingConfigurationResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
 /** @brief Reporting Attribute Change
  *
@@ -154,5 +154,5 @@ bool emberAfReadReportingConfigurationResponseCallback(EmberAfClusterId clusterI
  * @param type   Ver.: always
  * @param data   Ver.: always
  */
-void emberAfReportingAttributeChangeCallback(CHIPEndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+void emberAfReportingAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                              uint8_t mask, uint16_t manufacturerCode, EmberAfAttributeType type, uint8_t * data);

@@ -148,7 +148,7 @@ void emberAfFormatMfgString(uint8_t * mfgString);
 extern bool emberAfPrintReceivedMessages;
 
 void emAfParseAndPrintVersion(EmberVersion versionStruct);
-void emAfPrintEzspEndpointFlags(CHIPEndpointId endpoint);
+void emAfPrintEzspEndpointFlags(chip::EndpointId endpoint);
 
 // Old names
 #define emberAfMoveInProgress() emberAfMoveInProgressCallback()

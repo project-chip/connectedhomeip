@@ -93,7 +93,7 @@ exit:
     return err;
 }
 
-void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
+void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     CHIPDeviceManagerCallbacks * cb = CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();

@@ -29,7 +29,7 @@
  * @param command   Ver.: always
  * @param initiatedByLevelChange   Ver.: always
  */
-EmberAfStatus emberAfOnOffClusterSetValueCallback(CHIPEndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
+EmberAfStatus emberAfOnOffClusterSetValueCallback(chip::EndpointId endpoint, uint8_t command, bool initiatedByLevelChange);
 
 /** @brief On/off Cluster Level Control Effect
  *
@@ -40,4 +40,4 @@ EmberAfStatus emberAfOnOffClusterSetValueCallback(CHIPEndpointId endpoint, uint8
  * @param endpoint   Ver.: always
  * @param newValue   Ver.: always
  */
-void emberAfOnOffClusterLevelControlEffectCallback(CHIPEndpointId endpoint, bool newValue);
+void emberAfOnOffClusterLevelControlEffectCallback(chip::EndpointId endpoint, bool newValue);

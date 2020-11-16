@@ -540,7 +540,7 @@ typedef struct
     /** The type of binding. */
     EmberBindingType type;
     /** The endpoint on the local node. */
-    CHIPEndpointId local;
+    chip::EndpointId local;
     /** A cluster ID that matches one from the local endpoint's simple descriptor.
      * This cluster ID is set by the provisioning application to indicate which
      * part an endpoint's functionality is bound to this particular remote node
@@ -548,9 +548,9 @@ typedef struct
      * that a binding can be used to to send messages with any cluster ID, not
      * just that listed in the binding.
      */
-    CHIPClusterId clusterId;
+    chip::ClusterId clusterId;
     /** The endpoint on the remote node (specified by \c identifier). */
-    CHIPEndpointId remote;
+    chip::EndpointId remote;
     /** A 64-bit destination identifier.  This is either:
      * - The destination ChipNodeId, for unicasts.
      * - A multicast ChipGroupId, for multicasts.
@@ -559,7 +559,7 @@ typedef struct
     union
     {
         ChipNodeId nodeId;
-        CHIPGroupId groupId;
+        chip::GroupId groupId;
     };
     /** The index of the network the binding belongs to. */
     uint8_t networkIndex;

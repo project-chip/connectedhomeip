@@ -338,9 +338,9 @@ static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestinati
     return status;
 }
 
-EmberStatus emberAfSendMulticastWithAliasWithCallback(EmberMulticastId multicastId, EmberApsFrame * apsFrame,
-                                                      uint16_t messageLength, uint8_t * message, EmberNodeId alias,
-                                                      uint8_t sequence, EmberAfMessageSentFunction callback)
+EmberStatus emberAfSendMulticastWithAliasWithCallback(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
+                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
+                                                      EmberAfMessageSentFunction callback)
 {
     apsFrame->groupId = multicastId;
     return send(EMBER_OUTGOING_MULTICAST_WITH_ALIAS, multicastId, apsFrame, messageLength, message,
@@ -348,7 +348,7 @@ EmberStatus emberAfSendMulticastWithAliasWithCallback(EmberMulticastId multicast
                 alias, sequence, callback);
 }
 
-EmberStatus emberAfSendMulticastWithCallback(EmberMulticastId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
+EmberStatus emberAfSendMulticastWithCallback(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
                                              uint8_t * message, EmberAfMessageSentFunction callback)
 {
     apsFrame->groupId = multicastId;
@@ -359,7 +359,7 @@ EmberStatus emberAfSendMulticastWithCallback(EmberMulticastId multicastId, Ember
                 callback);
 }
 
-EmberStatus emberAfSendMulticast(EmberMulticastId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
+EmberStatus emberAfSendMulticast(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
     return emberAfSendMulticastWithCallback(multicastId, apsFrame, messageLength, message, NULL);
 }
@@ -502,8 +502,8 @@ EmberStatus emberAfSendUnicastToBindings(EmberApsFrame * apsFrame, uint16_t mess
 }
 
 EmberStatus emberAfSendInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-                                EmberMulticastId multicastId, EmberAfClusterId clusterId, EmberAfProfileId profileId,
-                                uint16_t messageLength, uint8_t * messageBytes)
+                                GroupId multicastId, ClusterId clusterId, EmberAfProfileId profileId, uint16_t messageLength,
+                                uint8_t * messageBytes)
 {
     EmberAfInterpanHeader header;
     memset(&header, 0, sizeof(EmberAfInterpanHeader));

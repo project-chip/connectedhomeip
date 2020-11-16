@@ -923,15 +923,16 @@ uint16_t encodeDoorLockClusterReadActuatorEnabledAttribute(uint8_t * buffer, uin
  * @brief
  *    Encode an add-group command for Groups server into buffer including the APS frame
  */
-uint16_t encodeGroupsClusterAddGroupCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                            CHIPGroupId groupId, char * groupName);
+uint16_t encodeGroupsClusterAddGroupCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint,
+                                            chip::GroupId groupId, char * groupName);
 
 /**
  * @brief
  *    Encode an add-group-if-identifying command for Groups server into buffer including the APS frame
  */
-uint16_t encodeGroupsClusterAddGroupIfIdentifyingCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                                         CHIPGroupId groupId, char * groupName);
+uint16_t encodeGroupsClusterAddGroupIfIdentifyingCommand(uint8_t * buffer, uint16_t buf_length,
+                                                         chip::EndpointId destination_endpoint, chip::GroupId groupId,
+                                                         char * groupName);
 
 /**
  * @brief
@@ -950,15 +951,15 @@ uint16_t encodeGroupsClusterRemoveAllGroupsCommand(uint8_t * buffer, uint16_t bu
  * @brief
  *    Encode an remove-group command for Groups server into buffer including the APS frame
  */
-uint16_t encodeGroupsClusterRemoveGroupCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                               CHIPGroupId groupId);
+uint16_t encodeGroupsClusterRemoveGroupCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint,
+                                               chip::GroupId groupId);
 
 /**
  * @brief
  *    Encode an view-group command for Groups server into buffer including the APS frame
  */
-uint16_t encodeGroupsClusterViewGroupCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                             CHIPGroupId groupId);
+uint16_t encodeGroupsClusterViewGroupCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint,
+                                             chip::GroupId groupId);
 
 /**
  * @brief
@@ -1267,51 +1268,51 @@ uint16_t encodeOnOffClusterReportOnOffAttribute(uint8_t * buffer, uint16_t buf_l
  * @brief
  *    Encode an add-scene command for Scenes server into buffer including the APS frame
  */
-uint16_t encodeScenesClusterAddSceneCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                            CHIPGroupId groupID, uint8_t sceneID, uint16_t transitionTime, char * sceneName,
-                                            uint16_t clusterId, char * extensionFieldSet);
+uint16_t encodeScenesClusterAddSceneCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint,
+                                            chip::GroupId groupID, uint8_t sceneID, uint16_t transitionTime, char * sceneName,
+                                            chip::ClusterId clusterId, char * extensionFieldSet);
 
 /**
  * @brief
  *    Encode an get-scene-membership command for Scenes server into buffer including the APS frame
  */
-uint16_t encodeScenesClusterGetSceneMembershipCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                                      CHIPGroupId groupID);
+uint16_t encodeScenesClusterGetSceneMembershipCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint,
+                                                      chip::GroupId groupID);
 
 /**
  * @brief
  *    Encode an recall-scene command for Scenes server into buffer including the APS frame
  */
-uint16_t encodeScenesClusterRecallSceneCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                               CHIPGroupId groupID, uint8_t sceneID, uint16_t transitionTime);
+uint16_t encodeScenesClusterRecallSceneCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint,
+                                               chip::GroupId groupID, uint8_t sceneID, uint16_t transitionTime);
 
 /**
  * @brief
  *    Encode an remove-all-scenes command for Scenes server into buffer including the APS frame
  */
-uint16_t encodeScenesClusterRemoveAllScenesCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                                   CHIPGroupId groupID);
+uint16_t encodeScenesClusterRemoveAllScenesCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint,
+                                                   chip::GroupId groupID);
 
 /**
  * @brief
  *    Encode an remove-scene command for Scenes server into buffer including the APS frame
  */
-uint16_t encodeScenesClusterRemoveSceneCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                               CHIPGroupId groupID, uint8_t sceneID);
+uint16_t encodeScenesClusterRemoveSceneCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint,
+                                               chip::GroupId groupID, uint8_t sceneID);
 
 /**
  * @brief
  *    Encode an store-scene command for Scenes server into buffer including the APS frame
  */
-uint16_t encodeScenesClusterStoreSceneCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                              CHIPGroupId groupID, uint8_t sceneID);
+uint16_t encodeScenesClusterStoreSceneCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint,
+                                              chip::GroupId groupID, uint8_t sceneID);
 
 /**
  * @brief
  *    Encode an view-scene command for Scenes server into buffer including the APS frame
  */
-uint16_t encodeScenesClusterViewSceneCommand(uint8_t * buffer, uint16_t buf_length, CHIPEndpointId destination_endpoint,
-                                             CHIPGroupId groupID, uint8_t sceneID);
+uint16_t encodeScenesClusterViewSceneCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint,
+                                             chip::GroupId groupID, uint8_t sceneID);
 
 /**
  * @brief

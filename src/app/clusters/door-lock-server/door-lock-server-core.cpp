@@ -117,7 +117,7 @@ EmberAfStatus emAfPluginDoorLockServerNoteDoorStateChanged(EmberAfDoorState stat
     defined(ZCL_USING_DOOR_LOCK_CLUSTER_DOOR_CLOSED_EVENTS_ATTRIBUTE)
     if (state == EMBER_ZCL_DOOR_STATE_OPEN || state == EMBER_ZCL_DOOR_STATE_CLOSED)
     {
-        EmberAfAttributeId attributeId =
+        AttributeId attributeId =
             (state == EMBER_ZCL_DOOR_STATE_OPEN ? ZCL_DOOR_OPEN_EVENTS_ATTRIBUTE_ID : ZCL_DOOR_CLOSED_EVENTS_ATTRIBUTE_ID);
         uint32_t events;
         status = emberAfReadServerAttribute(DOOR_LOCK_SERVER_ENDPOINT, ZCL_DOOR_LOCK_CLUSTER_ID, attributeId, (uint8_t *) &events,
