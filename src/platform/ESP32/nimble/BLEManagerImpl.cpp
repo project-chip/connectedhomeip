@@ -658,14 +658,13 @@ exit:
 void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
-    PacketBuffer * buf = NULL;
     uint16_t data_len  = 0;
 
     ESP_LOGI(TAG, "Write request received for CHIPoBLE RX characteristic con %u %u", param->conn_handle, param->attr_handle);
 
     // Copy the data to a PacketBuffer.
-    buf = PacketBuffer::New(0);
-    VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    PacketBufferHandle buf = PacketBuffer::New(0);
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     data_len = OS_MBUF_PKTLEN(param->ctxt->om);
     VerifyOrExit(buf->AvailableDataLength() >= data_len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     ble_hs_mbuf_to_flat(param->ctxt->om, buf->Start(), data_len, NULL);
@@ -676,19 +675,14 @@ void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = param->conn_handle;
-        event.CHIPoBLEWriteReceived.Data  = buf;
+        event.CHIPoBLEWriteReceived.Data  = buf.Release();
         PlatformMgr().PostEvent(&event);
-        buf = NULL;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
-    }
-    if (buf != NULL)
-    {
-        PacketBuffer::Free(buf);
     }
 }
 

@@ -400,13 +400,12 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t
                                        uint8_t * pValue, qvCHIP_Ble_Attr_t * pAttr)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
-    PacketBuffer * buf = nullptr;
 
     ChipLogProgress(DeviceLayer, "Write request received for CHIPoBLE RX characteristic (con %u, len %u)", connId, len);
 
     // Copy the data to a PacketBuffer.
-    buf = PacketBuffer::New(0);
-    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    PacketBufferHandle buf = PacketBuffer::New(0);
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), pValue, len);
     buf->SetDataLength(len);
@@ -415,9 +414,8 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = connId;
-        event.CHIPoBLEWriteReceived.Data  = buf;
+        event.CHIPoBLEWriteReceived.Data  = buf.Release();
         PlatformMgr().PostEvent(&event);
-        buf = nullptr;
     }
 
 exit:
@@ -426,7 +424,6 @@ exit:
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
         // TODO: fail connection???
     }
-    PacketBuffer::Free(buf);
 }
 
 void BLEManagerImpl::HandleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * pEvt)
