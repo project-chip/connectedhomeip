@@ -216,7 +216,6 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
 
 static void prepareForResponse(const EmberAfClusterCommand * cmd)
 {
-    emberAfResponseApsFrame.profileId           = cmd->apsFrame->profileId;
     emberAfResponseApsFrame.clusterId           = cmd->apsFrame->clusterId;
     emberAfResponseApsFrame.sourceEndpoint      = cmd->apsFrame->destinationEndpoint;
     emberAfResponseApsFrame.destinationEndpoint = cmd->apsFrame->sourceEndpoint;
@@ -429,15 +428,6 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
         emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
         emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "network");
         emberAfDebugPrintln("%d", cmd->networkIndex);
-        return false;
-    }
-    else if (emberAfProfileIdFromIndex(index) != cmd->apsFrame->profileId &&
-             (cmd->apsFrame->profileId != EMBER_WILDCARD_PROFILE_ID ||
-              (EMBER_MAXIMUM_STANDARD_PROFILE_ID < emberAfProfileIdFromIndex(index))))
-    {
-        emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
-        emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "profile");
-        emberAfDebugPrintln("0x%02x", cmd->apsFrame->profileId);
         return false;
     }
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER

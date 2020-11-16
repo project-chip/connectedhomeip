@@ -84,15 +84,9 @@ typedef void (*EmberAfGenericClusterFunction)(void);
 
 /**
  * @brief A distinguished manufacturer code that is used to indicate the
- * absence of a manufacturer-specific profile, cluster, command, or attribute.
+ * absence of a manufacturer-specific cluster, command, or attribute.
  */
 #define EMBER_AF_NULL_MANUFACTURER_CODE 0x0000
-
-/**
- * @brief An invalid profile ID
- * This is a reserved profileId.
- */
-#define EMBER_AF_INVALID_PROFILE_ID 0xFFFF
 
 /**
  * @brief Type for default values.
@@ -387,7 +381,6 @@ typedef struct
     /**
      * APS data
      */
-    EmberAfProfileId profileId;
     chip::ClusterId clusterId;
     /**
      * The groupId is only used for
@@ -417,7 +410,6 @@ typedef uint8_t EmberAfAllowedInterpanOptions;
  */
 typedef struct
 {
-    EmberAfProfileId profileId;
     chip::ClusterId clusterId;
     chip::CommandId commandId;
     EmberAfAllowedInterpanOptions options;
@@ -507,10 +499,6 @@ typedef struct
      * Actual zigbee endpoint number.
      */
     chip::EndpointId endpoint;
-    /**
-     * Profile ID of the device on this endpoint.
-     */
-    EmberAfProfileId profileId;
     /**
      * Device ID of the device on this endpoint.
      */
@@ -675,7 +663,6 @@ typedef struct
     const chip::ClusterId * inClusterList;
     uint8_t outClusterCount;
     const chip::ClusterId * outClusterList;
-    EmberAfProfileId profileId;
     uint16_t deviceId;
     chip::EndpointId endpoint;
 } EmberAfClusterList;
@@ -1133,7 +1120,6 @@ typedef struct
 {
     EmberNodeId networkAddress;
     chip::EndpointId endpointId;
-    uint16_t profileId;
     uint16_t deviceId;
     uint8_t version;
 } EmberAfPluginZllCommissioningEndpointInformationRecord;
@@ -1634,7 +1620,6 @@ typedef uint16_t EmberAfRemoteClusterType;
 typedef struct
 {
     chip::ClusterId clusterId;
-    EmberAfProfileId profileId;
     uint16_t deviceId;
     chip::EndpointId endpoint;
     EmberAfRemoteClusterType type;
@@ -1669,7 +1654,6 @@ typedef struct
 typedef struct
 {
     EmberAfClusterInfo clusters[EMBER_AF_MAX_CLUSTERS_PER_ENDPOINT];
-    EmberAfProfileId profileId;
     uint16_t deviceId;
     chip::EndpointId endpoint;
     uint8_t clusterCount;

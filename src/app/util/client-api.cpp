@@ -351,10 +351,9 @@ EmberStatus emberAfSendCommandMulticastToBindings(void)
 // }
 
 // EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-//                                        GroupId multicastId, EmberAfProfileId profileId)
+//                                        GroupId multicastId)
 // {
 //     return emberAfSendInterPan(panId, destinationLongId, destinationShortId, multicastId, emAfCommandApsFrame->clusterId,
-//     profileId,
 //                                *emAfResponseLengthPtr, emAfZclBuffer);
 // }
 
