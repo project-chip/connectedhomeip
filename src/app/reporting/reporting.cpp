@@ -57,11 +57,11 @@ using namespace chip;
 
 #define NULL_INDEX 0xFF
 
-static void conditionallySendReport(EndpointId endpoint, EmberAfClusterId clusterId);
+static void conditionallySendReport(EndpointId endpoint, ClusterId clusterId);
 static void scheduleTick(void);
 static void removeConfiguration(uint8_t index);
 static void removeConfigurationAndScheduleTick(uint8_t index);
-static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cmd, EmberAfAttributeId attributeId, uint8_t mask,
+static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cmd, AttributeId attributeId, uint8_t mask,
                                                 uint16_t timeout);
 static void putReportableChangeInResp(const EmberAfPluginReportingEntry * entry, EmberAfAttributeType dataType);
 static void retrySendReport(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint16_t msgLen,
@@ -344,7 +344,7 @@ void emberAfPluginReportingTickEventHandler(void)
     scheduleTick();
 }
 
-static void conditionallySendReport(EndpointId endpoint, EmberAfClusterId clusterId)
+static void conditionallySendReport(EndpointId endpoint, ClusterId clusterId)
 {
     EmberStatus status;
     if (emberAfIsDeviceEnabled(endpoint) || clusterId == ZCL_IDENTIFY_CLUSTER_ID)
@@ -402,13 +402,13 @@ bool emberAfConfigureReportingCommandCallback(const EmberAfClusterCommand * cmd)
     // of the direction field.
     while (bufIndex + 3 < cmd->bufLen)
     {
-        EmberAfAttributeId attributeId;
+        AttributeId attributeId;
         EmberAfReportingDirection direction;
         EmberAfStatus status;
 
         direction = (EmberAfReportingDirection) emberAfGetInt8u(cmd->buffer, bufIndex, cmd->bufLen);
         bufIndex++;
-        attributeId = (EmberAfAttributeId) emberAfGetInt16u(cmd->buffer, bufIndex, cmd->bufLen);
+        attributeId = (AttributeId) emberAfGetInt16u(cmd->buffer, bufIndex, cmd->bufLen);
         bufIndex    = static_cast<uint16_t>(bufIndex + 2);
 
         emberAfReportingPrintln(" - direction:%x, attr:%2x", direction, attributeId);
@@ -551,7 +551,7 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
     // attribute id.
     while (bufIndex + 3 <= cmd->bufLen)
     {
-        EmberAfAttributeId attributeId;
+        AttributeId attributeId;
         EmberAfAttributeMetadata * metadata = NULL;
         EmberAfPluginReportingEntry entry;
         EmberAfReportingDirection direction;
@@ -560,7 +560,7 @@ bool emberAfReadReportingConfigurationCommandCallback(const EmberAfClusterComman
 
         direction = (EmberAfReportingDirection) emberAfGetInt8u(cmd->buffer, bufIndex, cmd->bufLen);
         bufIndex++;
-        attributeId = (EmberAfAttributeId) emberAfGetInt16u(cmd->buffer, bufIndex, cmd->bufLen);
+        attributeId = (AttributeId) emberAfGetInt16u(cmd->buffer, bufIndex, cmd->bufLen);
         bufIndex    = static_cast<uint16_t>(bufIndex + 2);
 
         switch (direction)
@@ -944,7 +944,7 @@ EmberAfStatus emberAfPluginReportingConfigureReportedAttribute(const EmberAfPlug
     return status;
 }
 
-static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cmd, EmberAfAttributeId attributeId, uint8_t mask,
+static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cmd, AttributeId attributeId, uint8_t mask,
                                                 uint16_t timeout)
 {
     EmberAfPluginReportingEntry entry;
@@ -1070,12 +1070,12 @@ uint8_t emAfPluginReportingConditionallyAddReportingEntry(EmberAfPluginReporting
     return 0;
 }
 
-bool emberAfConfigureReportingResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
+bool emberAfConfigureReportingResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
 }
 
-bool emberAfReadReportingConfigurationResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
+bool emberAfReadReportingConfigurationResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
 }

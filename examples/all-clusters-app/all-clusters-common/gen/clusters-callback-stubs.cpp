@@ -22,6 +22,8 @@
 
 #include "af.h"
 
+using namespace chip;
+
 /** @brief Identify Cluster Identify Query Response
  *
  *
@@ -62,12 +64,12 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStat
 
 // endpoint_config.h callbacks, grep'd from SDK, comment these out as clusters come in
 
-void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint) {}
+void emberAfIasZoneClusterClientInitCallback(EndpointId endpoint) {}
 
-void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
-void emberAfPollControlClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfPollControlClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId) {}
+void emberAfPollControlClusterServerInitCallback(EndpointId endpoint) {}
 void emberAfPluginPollControlServerStackStatusCallback(EmberStatus status) {}
-EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value)
 {

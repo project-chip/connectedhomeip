@@ -63,7 +63,7 @@
     extern void emberAfPluginIasZoneServerManageQueueEventHandler(void);                                                           \
     extern void emberAfPluginReportingTickEventHandler(void);                                                                      \
     extern void emberAfPluginTemperatureMeasurementServerReadEventHandler(void);                                                   \
-    static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, uint8_t endpoint)                    \
+    static void clusterTickWrapper(EmberEventControl * control, EmberAfTickFunction callback, chip::EndpointId endpoint)           \
     {                                                                                                                              \
         /* emberAfPushEndpointNetworkIndex(endpoint); */                                                                           \
         emberEventControlSetInactive(control);                                                                                     \
