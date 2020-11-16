@@ -249,6 +249,14 @@ protected:
 };
 
 /*
+ * The following constants are node IDs that test devices and test
+ * controllers use while using the SecurePairingUsingTestSecret to
+ * establish secure channel
+ */
+constexpr chip::NodeId kTestControllerNodeId = 112233;
+constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
+
+/*
  * The following class should only be used for test usecases.
  * The class is currently also used for devices that do no yet support
  * rendezvous. Once all the non-test usecases start supporting

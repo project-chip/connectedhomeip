@@ -104,14 +104,18 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key, ch
         valueString = [mDefaultPersistentStorage objectForKey:keyString];
     }
 
-    if (value != nullptr) {
-        size = strlcpy(value, [valueString UTF8String], size);
+    if (valueString != nil) {
+        if (value != nullptr) {
+            size = strlcpy(value, [valueString UTF8String], size);
+        } else {
+            size = [valueString length];
+        }
+        // Increment size to account for null termination
+        size += 1;
+        return CHIP_NO_ERROR;
     } else {
-        size = [valueString length];
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
-    // Increment size to account for null termination
-    size += 1;
-    return CHIP_NO_ERROR;
 }
 
 void CHIPPersistentStorageDelegateBridge::SetKeyValue(const char * key, const char * value)

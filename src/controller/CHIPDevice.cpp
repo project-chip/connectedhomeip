@@ -190,7 +190,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters()
     SuccessOrExit(err);
 
     err = mSessionManager->NewPairing(
-        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)),
+        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)), mDeviceId,
         &pairingSession);
     SuccessOrExit(err);
 

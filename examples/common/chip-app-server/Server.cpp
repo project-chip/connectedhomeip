@@ -40,10 +40,6 @@ using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
 
-#ifndef EXAMPLE_SERVER_NODEID
-#define EXAMPLE_SERVER_NODEID 12344321
-#endif // EXAMPLE_SERVER_NODEID
-
 namespace {
 
 class ServerCallback : public SecureSessionMgrDelegate
@@ -104,7 +100,7 @@ void InitServer()
 
     InitDataModelHandler();
 
-    err = gSessions.Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
+    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer,
                          UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
     SuccessOrExit(err);
 
@@ -117,13 +113,13 @@ void InitServer()
 
         SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
         params.SetSetupPINCode(pinCode)
-            .SetLocalNodeId(EXAMPLE_SERVER_NODEID)
+            .SetLocalNodeId(chip::kTestDeviceNodeId)
             .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
         SuccessOrExit(err = gRendezvousServer.Init(params));
     }
 #endif
 
-    err = gSessions.NewPairing(peer, &gTestPairing);
+    err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
 
     gSessions.SetDelegate(&gCallbacks);

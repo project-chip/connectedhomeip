@@ -28,7 +28,7 @@ using namespace ::chip::Inet;
 using namespace ::chip::System;
 
 extern NodeId kLocalNodeId;
-extern void PairingComplete(SecurePairingSession * pairing);
+extern void PairingComplete(NodeId assignedNodeId, NodeId peerNodeId, SecurePairingSession * pairing);
 
 static const char * TAG = "rendezvous-devicedelegate";
 
@@ -53,6 +53,20 @@ exit:
     }
 }
 
+void RendezvousDeviceDelegate::OnRendezvousComplete()
+{
+    ESP_LOGI(TAG, "Device completed Rendezvous process\n");
+    if (mRendezvousSession->GetLocalNodeId().HasValue() && mRendezvousSession->GetRemoteNodeId().HasValue())
+    {
+        PairingComplete(mRendezvousSession->GetLocalNodeId().Value(), mRendezvousSession->GetRemoteNodeId().Value(),
+                        &mRendezvousSession->GetPairingSession());
+    }
+    else
+    {
+        ESP_LOGI(TAG, "Commissioner did not assign a node ID to the device!!!\n");
+    }
+}
+
 void RendezvousDeviceDelegate::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err)
 {
     if (err != CHIP_NO_ERROR)
@@ -64,7 +78,6 @@ void RendezvousDeviceDelegate::OnRendezvousStatusUpdate(RendezvousSessionDelegat
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
         ESP_LOGI(TAG, "Device completed SPAKE2+ handshake\n");
-        PairingComplete(&mRendezvousSession->GetPairingSession());
         break;
 
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:

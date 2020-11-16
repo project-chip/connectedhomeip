@@ -35,8 +35,8 @@ static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 // NOTE: Remote device ID is in sync with the echo server device id
 //       At some point, we may want to add an option to connect to a device without
 //       knowing its id, because the ID can be learned on the first response that is received.
-constexpr chip::NodeId kLocalDeviceId = 112233;
-constexpr chip::NodeId kRemoteDeviceId = 12344321;
+constexpr chip::NodeId kLocalDeviceId = chip::kTestControllerNodeId;
+constexpr chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
 
 @implementation AddressInfo
 - (instancetype)initWithIP:(NSString *)ip

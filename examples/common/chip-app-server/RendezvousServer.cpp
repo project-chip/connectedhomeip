@@ -61,6 +61,13 @@ void RendezvousServer::OnRendezvousMessageReceived(PacketBuffer * buffer)
     chip::System::PacketBuffer::Free(buffer);
 }
 
+void RendezvousServer::OnRendezvousComplete()
+{
+    ChipLogProgress(AppServer, "Device completed Rendezvous process");
+    SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, mRendezvousSession.GetRemoteNodeId().Value(),
+                                &mRendezvousSession.GetPairingSession());
+}
+
 void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
 {
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(AppServer, "OnRendezvousStatusUpdate: %s", chip::ErrorStr(err)));
@@ -69,7 +76,6 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
         ChipLogProgress(AppServer, "Device completed SPAKE2+ handshake");
-        SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, &mRendezvousSession.GetPairingSession());
         break;
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
         ChipLogProgress(AppServer, "Device was assigned network credentials");
