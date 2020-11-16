@@ -159,7 +159,7 @@
     [label.centerYAnchor constraintEqualToAnchor:stackViewButtons.centerYAnchor].active = YES;
 
     stackViewButtons.translatesAutoresizingMaskIntoConstraints = false;
-    NSArray<UIButton *> * buttons = @[button1, button2, button3];
+    NSArray<UIButton *> * buttons = @[ button1, button2, button3 ];
     for (int i = 0; i < buttons.count; i++) {
         UIButton * buttonForStack = [buttons objectAtIndex:i];
         buttonForStack.backgroundColor = UIColor.systemBlueColor;
