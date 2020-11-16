@@ -48,7 +48,7 @@ set(CHIP_CFLAG_EXCLUDES
 )
 
 macro(chip_gn_arg_bool_if CONDITION ARGSTRING GN_VARNAME)
-    if (${${CONDITION}})
+    if (${CONDITION})
         string(APPEND ${ARGSTRING} "${GN_VARNAME} = true\n")
     else ()
         string(APPEND ${ARGSTRING} "${GN_VARNAME} = false\n")
@@ -144,13 +144,15 @@ function(chip_configure TARGET_NAME)
     chip_gn_arg_bool_if(CONFIG_NET_L2_OPENTHREAD GN_ARGS "chip_enable_openthread")
     chip_gn_arg_bool_if(CONFIG_NET_IPV4          GN_ARGS "chip_inet_config_enable_ipv4")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_build_tests")
-    chip_gn_arg_bool_if(CONFIG_CHIP_LIB_SHELL    GN_ARGS "chip_build_libshell")
-    chip_gn_arg_bool_if(CONFIG_CHIP_PW_RPC       GN_ARGS "chip_build_pw_rpc_lib")
+    chip_gn_arg_bool_if(CONFIG_DEBUG             GN_ARGS "is_debug")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_raw_endpoint")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_tcp_endpoint")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_dns_resolver")
+    chip_gn_arg_bool_if(CONFIG_CHIP_LIB_SHELL    GN_ARGS "chip_build_libshell")
+    chip_gn_arg_bool_if(CONFIG_CHIP_PW_RPC       GN_ARGS "chip_build_pw_rpc_lib")
 
     file(GENERATE OUTPUT ${CHIP_OUTPUT_DIR}/args.gn CONTENT "${GN_ARGS}")
+
     # Define target
     ExternalProject_Add(
         ${TARGET_NAME}
