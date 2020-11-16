@@ -124,7 +124,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
     }
 
     // header is used as const, so cast is safe
-    HeaderRef header(const_cast<uint8_t *>(packetData.Start()));
+    ConstHeaderRef header(packetData.Start());
 
     if (!header.GetFlags().IsValidMdns())
     {

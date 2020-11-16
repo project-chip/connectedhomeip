@@ -26,7 +26,7 @@ class PacketReporter : public mdns::Minimal::ParserDelegate
 public:
     PacketReporter(const char * prefix, const mdns::Minimal::BytesRange & packet) : mPrefix(prefix), mPacketRange(packet) {}
 
-    void OnHeader(const mdns::Minimal::HeaderRef & header) override;
+    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override;
     void OnQuery(const mdns::Minimal::QueryData & data) override;
     void OnResource(mdns::Minimal::ResourceType type, const mdns::Minimal::ResourceData & data) override;
 

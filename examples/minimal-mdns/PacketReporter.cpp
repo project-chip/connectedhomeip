@@ -126,7 +126,7 @@ void PrintQName(mdns::Minimal::SerializedQNameIterator it)
 
 } // namespace
 
-void PacketReporter::OnHeader(const mdns::Minimal::HeaderRef & header)
+void PacketReporter::OnHeader(mdns::Minimal::ConstHeaderRef & header)
 {
     printf("%s%s %d (%d, %d, %d, %d):\n", mPrefix, header.GetFlags().IsQuery() ? "QUERY" : "REPLY", header.GetMessageId(),
            header.GetQueryCount(), header.GetAnswerCount(), header.GetAuthorityCount(), header.GetAdditionalCount());

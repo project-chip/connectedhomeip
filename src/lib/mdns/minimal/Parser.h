@@ -90,7 +90,7 @@ class ParserDelegate
 public:
     virtual ~ParserDelegate() {}
 
-    virtual void OnHeader(const HeaderRef & header) = 0;
+    virtual void OnHeader(ConstHeaderRef & header) = 0;
 
     virtual void OnQuery(const QueryData & data) = 0;
 
