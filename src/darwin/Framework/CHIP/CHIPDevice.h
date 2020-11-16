@@ -15,20 +15,35 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_ONOFF_H
-#define CHIP_ONOFF_H
+#ifndef CHIP_DEVICE_H
+#define CHIP_DEVICE_H
 
-#import "CHIPDevice.h"
 #import <Foundation/Foundation.h>
+
+#import "CHIPError.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPOnOff : NSObject
+@interface CHIPDevice : NSObject
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device;
-- (BOOL)lightOn;
-- (BOOL)lightOff;
-- (BOOL)toggleLight;
+- (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
+- (BOOL)sendOnCommand;
+- (BOOL)sendOffCommand;
+- (BOOL)sendToggleCommand;
+- (BOOL)sendIdentifyCommandWithDuration:(NSTimeInterval)duration;
+- (BOOL)disconnect:(NSError * __autoreleasing *)error;
+- (BOOL)isActive;
+
+/**
+ * Test whether a given message is likely to be a data model command.
+ */
++ (BOOL)isDataModelCommand:(NSData * _Nonnull)message;
+
+/**
+ * Given a data model command, convert it to some sort of human-readable
+ * string that describes what it is, as far as we can tell.
+ */
++ (NSString *)commandToString:(NSData * _Nonnull)command;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;
@@ -37,4 +52,4 @@ NS_ASSUME_NONNULL_BEGIN
 
 NS_ASSUME_NONNULL_END
 
-#endif /* CHIP_ONOFF_H */
+#endif /* CHIP_DEVICE_H */
