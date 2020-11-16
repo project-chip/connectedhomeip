@@ -1,37 +1,98 @@
-# CHIP nRF Connect nRF52840 Pigweed Example Application
+# CHIP nRF Connect Pigweed Example Application
 
-An example application showing the use
-[CHIP](https://github.com/project-chip/connectedhomeip) on the Nordic nRF52840.
+The Pigweed example presents demonstration of application that benefits from the
+Pigweed module functionalities. It uses
+[CHIP](https://github.com/project-chip/connectedhomeip),
+[Pigweed](https://pigweed.googlesource.com/pigweed/pigweed) and the nRF Connect
+platform. The main goal of the application is to provide training ground for
+making experiments, testing Pigweed module features and checking what actions
+are necessary to make in order to fully integrate Pigweed within the CHIP
+project.
+
+Pigweed functionalities are being intergrated in CHIP and ran gradually, so
+currently there are following features available:
+
+-   **Echo RPC** - creates Remote Procedure Call server and allows sending
+    commands through the serial port to the device, which makes echo and sends
+    received commands back.
 
 <hr>
 
--   [CHIP nRF52840 Pigweed Example Application](#chip-nrf52840-pigweed-example-application)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-        -   [Using Docker container](#using-docker-container)
-        -   [Using Native shell](#using-native-shell)
-        -   [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
-    -   [Configuring the example](#configuring-the-example)
-    -   [Flashing and debugging](#flashing-and-debugging)
-        -   [Flashing nRF52840 DK](#nrf52840dk_flashing)
-        -   [Flashing nRF52840 Dongle](#nrf52840dongle_flashing)
-    -   [Currently implemented features](#currently-implemented-features)
+-   [Overview](#overview)
+-   [Requirements](#requirements)
+-   [Device UI](#device-ui)
+-   [Building](#building)
+    -   [Using Docker container](#using-docker-container)
+    -   [Using Native shell](#using-native-shell)
+    -   [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
+-   [Configuring the example](#configuring-the-example)
+-   [Flashing and debugging](#flashing-and-debugging)
+    -   [Flashing nRF52840 DK](#nrf52840dk_flashing)
+    -   [Flashing nRF52840 Dongle](#nrf52840dongle_flashing)
+-   [Testing the example](#testing-the-example)
 
 <hr>
 
-<a name="intro"></a>
+<a name="overview"></a>
 
-## Introduction
+## Overview
 
-![nrf52840 DK](../../platform/nrf528xx/doc/images/nrf52840-dk.jpg)
+This example application is running on the nRF Connect platform, which is based
+on the
+[nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
+and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
+[nRF Connect Platform Overview](TODO:...) to read more information about
+platform structure and dependencies.
 
-The nRF52840 Pigweed example app exercises functionalities in
-third_party/pigweed, to see what is needed for integrating Pigweed to CHIP, as
-well as a precursor to CHIP functionalities like on-device testing.
+Pigweed module used in this application is a collection of libraries providing
+different functionalities and targeted to the embedded systems. Libraries are
+built and organized in a way that enables faster and more reliable development.
 
-The example makes use of the CMake build system to generate the ninja build
-script. The build system takes care of invoking the CHIP library build with all
-necessary flags exported from the Zephyr environment.
+In the project CHIP context, Pigweed module is planned to be used to create
+system infrastructures, for example for performing on-device tests, but
+considering its general functionalities, it might be useful also in other cases.
+
+<hr>
+
+<a name="requirements"></a>
+
+## Requirements
+
+In order to make sure that demonstrated application will be working properly, it
+should be ran with the nRF Connect SDK 1.4 version.
+
+The example supports building and running on the following devices:
+
+| Board name                                                                                        | Board platform build name |
+| ------------------------------------------------------------------------------------------------- | ------------------------- |
+| [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF52840-Dongle) | nrf52840dongle_nrf52840   |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)         | nrf52840dk_nrf52840       |
+
+<hr>
+
+<a name="device-ui"></a>
+
+## Device UI
+
+The following elements of the development kit are used by this application to
+allow User controlling and monitoring device's state:
+
+**LED #1** shows the overall state of the device and it's lit to indicate that
+application was flashed and ran successfully.
+
+**Serial port** can be used to communicate with the device by sending commands
+and receiving responses.
+
+> **Important**:
+>
+> Please note that supported hardware platforms are using different transport
+> interfaces to perform serial communication, what leads to differences in
+> configuration. By default there are following interfaces used:
+>
+> -   nrf52840dk_nrf52840 - UART interface routed to the Segger J-Link USB port.
+> -   nrf52840dongle_nrf52840 - USB interface routed to the USB port.
+
+<hr>
 
 <a name="building"></a>
 
@@ -253,15 +314,19 @@ to read detailed information on this and other board related topics.
 
 <a name="currently-implemented-features"></a>
 
-## Currently implemented features
+## Testing the example
 
 ### Echo RPC:
+
+Run the following command to start an interactive python shell, where Echo RPC
+commands can be invoked:
 
 ```
 python -m pw_hdlc_lite.rpc_console --device /dev/ttyACM0 -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
 ```
 
-will start an interactive python shell where Echo RPC can be invoked as
+To send Echo RPC message type command presented below, where actual message is
+text in quote after the msg= phrase:
 
 ```
 rpcs.pw.rpc.EchoService.Echo(msg="hi")

@@ -1,53 +1,102 @@
-# CHIP nRF52840 Lighting Example Application
+# CHIP nRF Connect Lighting Example Application
 
-An example application showing the use
-[CHIP](https://github.com/project-chip/connectedhomeip) on the Nordic nRF52840.
+The lighting example provides demonstration of application running on the
+connected lighting device. It uses
+[CHIP](https://github.com/project-chip/connectedhomeip) and the nRF Connect
+platform. The example supports remote access and control of a lighting over a
+low-power, 802.15.4 Thread network. It is capable of being paired into an
+existing CHIP network along with other CHIP-enabled devices. Besides of the
+remote access, application also allows controlling lighting and device states
+using buttons and visualizes those states on the LEDs.
 
 <hr>
 
--   [CHIP nRF52840 Lighting Example Application](#chip-nrf52840-lighting-example-application)
-    -   [Introduction](#introduction)
-    -   [Device UI](#device-ui)
-    -   [Building](#building)
-        -   [Using Docker container](#using-docker-container)
-        -   [Using Native shell](#using-native-shell)
-        -   [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
+-   [Overview](#overview)
+-   [Requirements](#requirements)
+-   [Device UI](#device-ui)
+-   [Building](#building)
+    -   [Using Docker container](#using-docker-container)
+    -   [Using Native shell](#using-native-shell)
+    -   [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
         -   [Building minimal binary](#building-minimal-binary)
-    -   [Configuring the example](#configuring-the-example)
-    -   [Flashing and debugging](#flashing-and-debugging)
-    -   [Testing the example](#testing-the-example)
+-   [Configuring the example](#configuring-the-example)
+-   [Flashing and debugging](#flashing-and-debugging)
+-   [Testing the example](#testing-the-example)
 
 <hr>
 
-<a name="intro"></a>
+<a name="overview"></a>
 
-## Introduction
+## Overview
 
-![nrf52840 DK](../../platform/nrfconnect/doc/images/nrf52840-dk.jpg)
+This example application is running on the nRF Connect platform, which is based
+on the
+[nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
+and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
+[nRF Connect Platform Overview](TODO:...) to read more information about
+platform structure and dependencies.
 
-The nRF52840 lighting example application provides a working demonstration of a
-connected lighting device, built using CHIP, and the Nordic nRF Connect SDK. The
-example supports remote access and control of a lighting over a low-power,
-802.15.4 Thread network. It is capable of being paired into an existing CHIP
-network along with other CHIP-enabled devices. The example targets the
-[Nordic nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)
-development kit, but is readily adaptable to other nRF52840-based hardware.
+CHIP device running lighting application is controlled by the CHIP controller
+device over Thread protocol. It is assumed that CHIP device by default has
+Thread disabled, so it should be paired with CHIP controller and get
+configuration from it. There are few actions necessary to make before full
+communication is possible and they were described below. There is also a test
+mode, which allows to start Thread with default settings, by pressing button
+manually, but it does not fully guarantee that device will be able to
+communicate with CHIP controller and other devices.
 
-The lighting example is intended to serve both as a means to explore the
-workings of CHIP, as well as a template for creating real products based on the
-Nordic platform.
+### BLE Advertising
 
-The example makes use of the CMake build system to generate the ninja build
-script. The build system takes care of invoking the CHIP library build with all
-necessary flags exported from the Zephyr environment.
+After powering up device for the first time, it should start advertising over
+BLE in order to inform other devices about its presence. For security reasons
+different devices may start advertising automatically or on User demand and in
+this example case, starting is triggered by pressing button.
+
+### BLE Rendezvous
+
+In CHIP there is a commissioning procedure called Rendezvous, which is done over
+BLE between CHIP device and CHIP controller, performing the role of the
+commissioner. To start it, controller has to previously get onboarding
+information from the CHIP device. Data are encoded as a QR code payload and
+typically presented on a device's display or like in this example case, shared
+using NFC tag.
+
+### Thread Provisioning
+
+Successfully finishing Rendezvous procedure allows to perform Provisioning
+operation, whose goal is to send Thread network credentials from CHIP controller
+to the CHIP device. As a result, device is able to join the Thread network and
+communicate with other Thread devices belonging to this network.
+
+<hr>
+
+<a name="requirements"></a>
+
+## Requirements
+
+In order to make sure that demonstrated application will be working properly, it
+should be ran with the nRF Connect SDK 1.4 version.
+
+The example supports building and running on the following devices:
+
+| Board name                                                                                | Board platform build name |
+| ----------------------------------------------------------------------------------------- | ------------------------- |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | nrf52840dk_nrf52840       |
+
+<hr>
 
 <a name="device-ui"></a>
 
 ## Device UI
 
-The example application provides a simple UI that depicts the state of the
-device and offers basic user control. This UI is implemented via the
-general-purpose LEDs and buttons built in to the nRF52840 DK dev board.
+This section lists device's elements making User Interface in the example
+application. All described items should be possible to find on the board picture
+presented below:
+
+![nrf52840 DK](../../platform/nrfconnect/doc/images/nrf52840-dk.png)
+
+The following elements of the development kit are used by this application to
+allow User controlling and monitoring device's state.
 
 **LED #1** shows the overall state of the device and its connectivity. Four
 states are depicted:
@@ -63,40 +112,26 @@ states are depicted:
     provisioned, but does not yet have full network (Thread) or service
     connectivity.
 
-*   _Solid On_ &mdash; The device is fully provisioned and has full network and
-    service connectivity.
+*   _Solid On_ &mdash; The device is fully provisioned and has full Thread
+    network and service connectivity.
+
+**LED #2** shows the state of the lighting.
 
 **Button #1** can be used to initiate a OTA software update as well as to reset
 the device to a default state.
 
-Pressing and holding Button #1 for 6 seconds initiates a factory reset. After an
-initial period of 3 seconds, all four LED will flash in unison to signal the
-pending reset. Holding the button past 6 seconds will cause the device to reset
-its persistent configuration and initiate a reboot. The reset action can be
-cancelled by releasing the button at any point before the 6 second limit.
+**Button #2** can be used to manually change the state of the lighting. Pushing
+the button is changing lighting state to the opposite.
 
-**LED #2** shows the state of the lighting.
+**Button #3** can be used to manually start Thread networking in the test mode,
+using default configuration.
 
-**Button #2** can be used to change the state of the lighting. This can be used
-to mimick a user manually switching the lighting. The button behaves as a
-toggle, swapping the state every time it is pressed.
+**Button #4** can be used to start BLE advertising.
 
-**Button #3** can be used to start Thread networking using default configuration
-which was selected to match OpenThread Border Router default settings and
-network credentials.
+**Segger J-Link USB port** can be used to get logs from the device or
+communicate with it using [command line interface](TODO:).
 
-**Button #4** can be used to start BLE advertisement, which is disabled by
-default.
-
-The remaining two LEDs (#3 and #4) are unused.
-
-**NFC** can be used to scan shared tag and get information about device
-necessary to perform rendezvous and network provisioning operation.
-
-Tag can be read by bringing NFC poller e.g. smartphone supporting NFC close to
-the nRF52840's NFC antenna. Moreover in the reaction on sensing field from the
-smartphone CHIP device will start BLE advertisement, what is an alternative way
-to trigger this from manually pressing Button 4.
+<hr>
 
 <a name="building"></a>
 
