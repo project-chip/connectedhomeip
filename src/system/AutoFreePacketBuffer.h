@@ -26,7 +26,7 @@ class AutoFreePacketBuffer
 {
 public:
     AutoFreePacketBuffer() : mBuffer(nullptr) {}
-    explicit AutoFreePacketBuffer(PacketBuffer * p) : mBuffer(p) {}
+    explicit AutoFreePacketBuffer(PacketBuffer * buffer) : mBuffer(buffer) {}
 
     AutoFreePacketBuffer(const AutoFreePacketBuffer &) = delete;
     AutoFreePacketBuffer & operator=(const AutoFreePacketBuffer &) = delete;
@@ -39,21 +39,21 @@ public:
     const PacketBuffer * operator->() const { return mBuffer; }
     const PacketBuffer & operator*() const { return *mBuffer; }
 
-    void Adopt(PacketBuffer * v)
+    void Adopt(PacketBuffer * buffer)
     {
         if (mBuffer != nullptr)
         {
             PacketBuffer::Free(mBuffer);
         }
-        mBuffer = v;
+        mBuffer = buffer;
     }
 
     CHECK_RETURN_VALUE
     PacketBuffer * Release()
     {
-        PacketBuffer * r = mBuffer;
-        mBuffer          = nullptr;
-        return r;
+        PacketBuffer * buffer = mBuffer;
+        mBuffer               = nullptr;
+        return buffer;
     }
 
     PacketBuffer * Get_NoRelease() { return mBuffer; }
