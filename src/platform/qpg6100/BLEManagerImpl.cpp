@@ -399,7 +399,7 @@ void BLEManagerImpl::HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t 
 void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t operation, uint16_t offset, uint16_t len,
                                        uint8_t * pValue, qvCHIP_Ble_Attr_t * pAttr)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(DeviceLayer, "Write request received for CHIPoBLE RX characteristic (con %u, len %u)", connId, len);
 
