@@ -37,7 +37,6 @@
 #include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
-#include <system/AutoFreePacketBuffer.h>
 
 namespace chip {
 
@@ -192,7 +191,7 @@ exit:
 CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgIn)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    System::AutoFreePacketBuffer msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf(msgIn);
 
     PayloadHeader payloadHeader;
 
@@ -225,7 +224,7 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
     size_t X_len = sizeof(X);
     uint16_t data_len; // Will be the same as X_len in practice.
 
-    System::AutoFreePacketBuffer resp;
+    System::PacketBufferHandle resp;
 
     CHIP_ERROR err = Init(peerSetUpPINCode, pbkdf2IterCount, salt, saltLen, myNodeId, myKeyId, delegate);
     SuccessOrExit(err);
@@ -239,7 +238,7 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
     VerifyOrExit(CanCastTo<uint16_t>(X_len), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     data_len = static_cast<uint16_t>(X_len);
 
-    resp.Adopt(System::PacketBuffer::NewWithAvailableSize(data_len));
+    resp = System::PacketBuffer::NewWithAvailableSize(data_len);
     VerifyOrExit(!resp.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     {
@@ -291,7 +290,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, S
     const uint8_t * buf = msg->Start();
     size_t buf_len      = msg->TotalLength();
 
-    System::AutoFreePacketBuffer resp;
+    System::PacketBufferHandle resp;
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buf_len == kMAX_Point_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -314,7 +313,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, S
     VerifyOrExit(CanCastTo<uint16_t>(Y_len + verifier_len), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     data_len = static_cast<uint16_t>(Y_len + verifier_len);
 
-    resp.Adopt(System::PacketBuffer::NewWithAvailableSize(data_len));
+    resp = System::PacketBuffer::NewWithAvailableSize(data_len);
     VerifyOrExit(!resp.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     {
@@ -349,7 +348,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
     const uint8_t * buf = msg->Start();
     size_t buf_len      = msg->TotalLength();
 
-    System::AutoFreePacketBuffer resp;
+    System::PacketBufferHandle resp;
 
     VerifyOrExit(buf != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(buf_len == kMAX_Point_Length + kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -362,7 +361,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
     mPeerKeyId  = header.GetEncryptionKeyID();
     mPeerNodeId = header.GetSourceNodeId();
 
-    resp.Adopt(System::PacketBuffer::NewWithAvailableSize(verifier_len));
+    resp = System::PacketBuffer::NewWithAvailableSize(verifier_len);
     VerifyOrExit(!resp.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
     {
@@ -430,7 +429,7 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t headerSize = 0;
     PayloadHeader payloadHeader;
-    System::AutoFreePacketBuffer msg(msgIn);
+    System::PacketBufferHandle msg(msgIn);
 
     VerifyOrExit(msgIn != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 

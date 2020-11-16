@@ -2261,7 +2261,7 @@ void ChipMessageLayer::SignalMessageLayerActivityChanged()
  *  Finally, the maximum payload size returned will not result in a CHIP
  *  message that will overflow the max CHIP message size.
  *
- *  @param[in]    msgBuf        A pointer to the PacketBuffer to which the message
+ *  @param[in]    msgBuf        A handle to the PacketBuffer to which the message
  *                              payload will be written.
  *
  *  @param[in]    isUDP         True if message is a UDP message.
@@ -2270,7 +2270,7 @@ void ChipMessageLayer::SignalMessageLayerActivityChanged()
  *
  *  @return the max CHIP payload size.
  */
-uint32_t ChipMessageLayer::GetMaxChipPayloadSize(const PacketBuffer * msgBuf, bool isUDP, uint32_t udpMTU)
+uint32_t ChipMessageLayer::GetMaxChipPayloadSize(const PacketBufferHandle & msgBuf, bool isUDP, uint32_t udpMTU)
 {
     uint32_t maxChipMessageSize       = isUDP ? udpMTU - INET_CONFIG_MAX_IP_AND_UDP_HEADER_SIZE : UINT16_MAX;
     uint32_t maxChipPayloadSize       = maxChipMessageSize - CHIP_HEADER_RESERVE_SIZE - CHIP_TRAILER_RESERVE_SIZE;

@@ -408,7 +408,7 @@ void * MemoryAlloc(size_t size, bool isLongTermAlloc)
                     {
                         if (sMemBufs[blockBufferIndex] == NULL)
                         {
-                            sMemBufs[blockBufferIndex] = PacketBuffer::NewWithAvailableSize(0, kMinBufferSize);
+                            sMemBufs[blockBufferIndex] = PacketBuffer::NewWithAvailableSize(0, kMinBufferSize).Release();
                             if (sMemBufs[blockBufferIndex] == NULL)
                                 return NULL;
                         }

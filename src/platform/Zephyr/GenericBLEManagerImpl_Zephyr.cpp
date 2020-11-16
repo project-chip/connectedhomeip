@@ -718,7 +718,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
                                                                const void * buf, uint16_t len, uint16_t offset, uint8_t flags)
 {
     ChipDeviceEvent event;
-    PacketBuffer * packetBuf = PacketBuffer::NewWithAvailableSize(len);
+    PacketBufferHandle packetBuf = PacketBuffer::NewWithAvailableSize(len);
 
     // Unfortunately the Zephyr logging macros end up assigning uint16_t
     // variables to uint16_t:10 fields, which triggers integer conversion
@@ -730,7 +730,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
 #pragma GCC diagnostic pop
 
     // If successful...
-    if (packetBuf != NULL)
+    if (!packetBuf.IsNull())
     {
         // Copy the characteristic value into the packet buffer.
         memcpy(packetBuf->Start(), buf, len);
@@ -739,7 +739,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
         // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
         event.Type                            = DeviceEventType::kPlatformZephyrBleC1WriteEvent;
         event.Platform.BleC1WriteEvent.BtConn = bt_conn_ref(conId);
-        event.Platform.BleC1WriteEvent.Data   = packetBuf;
+        event.Platform.BleC1WriteEvent.Data   = packetBuf.Release();
     }
 
     // If we failed to allocate a buffer, post a kPlatformZephyrBleOutOfBuffersEvent event.

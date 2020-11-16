@@ -1945,28 +1945,26 @@ void WriteDeleteReadTest(nlTestSuite * inSuite)
  */
 void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
 {
-    PacketBuffer * buf = PacketBuffer::New(0);
+    System::PacketBufferHandle buf = PacketBuffer::New(0);
     TLVWriter writer;
     TLVReader reader;
 
-    writer.Init(buf);
+    writer.Init(buf.Get_NoRelease());
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEncoding1(inSuite, writer);
 
-    TestBufferContents(inSuite, buf, Encoding1, sizeof(Encoding1));
+    TestBufferContents(inSuite, buf.Get_NoRelease(), Encoding1, sizeof(Encoding1));
 
-    reader.Init(buf);
+    reader.Init(buf.Get_NoRelease());
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
 
-    reader.Init(buf, buf->MaxDataLength(), false);
+    reader.Init(buf.Get_NoRelease(), buf->MaxDataLength(), false);
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
-
-    PacketBuffer::Free(buf);
 }
 
 CHIP_ERROR CountEvictedMembers(CHIPCircularTLVBuffer & inBuffer, void * inAppData, TLVReader & inReader)
@@ -2447,9 +2445,9 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     TLVWriter writer;
     TLVReader reader;
 
-    PacketBuffer * buf  = PacketBuffer::New(0);
-    uint16_t maxDataLen = buf->MaxDataLength();
-    uint16_t reserve    = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
+    System::PacketBufferHandle buf = PacketBuffer::New(0);
+    uint16_t maxDataLen            = buf->MaxDataLength();
+    uint16_t reserve = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 
     // Repeatedly write and read a TLV encoding to a chain of PacketBuffers. Use progressively larger
     // and larger amounts of space in the first buffer to force the encoding/decoding to overlap the
@@ -2458,20 +2456,18 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     {
         buf->SetStart(buf->Start() + reserve);
 
-        writer.Init(buf);
+        writer.Init(buf.Get_NoRelease());
         writer.GetNewBuffer      = TLVWriter::GetNewPacketBuffer;
         writer.ImplicitProfileId = TestProfile_2;
 
         WriteEncoding1(inSuite, writer);
 
-        TestBufferContents(inSuite, buf, Encoding1, sizeof(Encoding1));
+        TestBufferContents(inSuite, buf.Get_NoRelease(), Encoding1, sizeof(Encoding1));
 
-        reader.Init(buf, 0xFFFFFFFFUL, true);
+        reader.Init(buf.Get_NoRelease(), 0xFFFFFFFFUL, true);
         reader.ImplicitProfileId = TestProfile_2;
 
         ReadEncoding1(inSuite, reader);
-
-        PacketBuffer::Free(buf);
 
         buf = PacketBuffer::New(0);
     }

@@ -25,7 +25,6 @@
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/AutoFreePacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
@@ -91,7 +90,7 @@ void UDP::Close()
 CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                             System::PacketBuffer * msgIn)
 {
-    System::AutoFreePacketBuffer msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf(msgIn);
     const uint16_t headerSize = header.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
     CHIP_ERROR err = CHIP_NO_ERROR;

@@ -305,7 +305,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                     {
                     case kBleEventType_Rx:
                         // build a packet buffer from the rxEv and send to blelayer.
-                        msgBuf = chip::System::PacketBuffer::New();
+                        msgBuf = chip::System::PacketBuffer::New().Release();
                         VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
                         memcpy(msgBuf->Start(), evu.rxEv->buffer, evu.rxEv->length);

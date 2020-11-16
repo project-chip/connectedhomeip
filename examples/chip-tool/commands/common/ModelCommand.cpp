@@ -84,9 +84,9 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
 {
     // Make sure our buffer is big enough, but this will need a better setup!
     static const uint16_t bufferSize = 1024;
-    auto * buffer                    = PacketBuffer::NewWithAvailableSize(bufferSize);
+    PacketBufferHandle buffer        = PacketBuffer::NewWithAvailableSize(bufferSize);
 
-    if (buffer == nullptr)
+    if (buffer.IsNull())
     {
         ChipLogError(chipTool, "Failed to allocate memory for packet data.");
         return false;
@@ -95,10 +95,9 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
     ChipLogProgress(chipTool, "Endpoint id: '0x%02x', Cluster id: '0x%04x', Command id: '0x%02x'", mEndPointId, mClusterId,
                     mCommandId);
 
-    uint16_t dataLength = EncodeCommand(buffer, bufferSize, mEndPointId);
+    uint16_t dataLength = EncodeCommand(buffer.Get_NoRelease(), bufferSize, mEndPointId);
     if (dataLength == 0)
     {
-        PacketBuffer::Free(buffer);
         ChipLogError(chipTool, "Error while encoding data for command: %s", GetName());
         return false;
     }
@@ -107,10 +106,10 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
     ChipLogDetail(chipTool, "Encoded data of length %d", dataLength);
 
 #ifdef DEBUG
-    PrintBuffer(buffer);
+    PrintBuffer(buffer.Get_NoRelease());
 #endif
 
-    dc->SendMessage(NULL, buffer);
+    dc->SendMessage(NULL, buffer.Release());
     return true;
 }
 

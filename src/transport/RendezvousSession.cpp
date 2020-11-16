@@ -23,7 +23,6 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
-#include <system/AutoFreePacketBuffer.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <transport/BLE.h>
@@ -82,7 +81,7 @@ RendezvousSession::~RendezvousSession()
 CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
                                                  System::PacketBuffer * msgIn)
 {
-    System::AutoFreePacketBuffer msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf(msgIn);
 
     if (mCurrentState != State::kSecurePairing)
     {
@@ -98,7 +97,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     PacketHeader packetHeader;
     PayloadHeader payloadHeader;
     MessageAuthenticationCode mac;
-    System::AutoFreePacketBuffer msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf(msgIn);
     const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
     uint8_t * data    = nullptr;
@@ -320,8 +319,8 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgIn)
     uint16_t taglen      = 0;
     uint16_t payloadlen  = 0;
 
-    System::AutoFreePacketBuffer msgBuf(msgIn);
-    System::AutoFreePacketBuffer origMsg;
+    System::PacketBufferHandle msgBuf(msgIn);
+    System::PacketBufferHandle origMsg;
 
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -348,8 +347,8 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgIn)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     /* This is a workaround for the case where PacketBuffer payload is not
        allocated as an inline buffer to PacketBuffer structure */
-    origMsg.Adopt(msgBuf.Release());
-    msgBuf.Adopt(PacketBuffer::NewWithAvailableSize(len));
+    origMsg = std::move(msgBuf);
+    msgBuf  = PacketBuffer::NewWithAvailableSize(len);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetDataLength(len);

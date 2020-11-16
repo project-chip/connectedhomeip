@@ -33,13 +33,12 @@
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/AutoFreePacketBuffer.h>
 #include <transport/SecurePairingSession.h>
 
 namespace chip {
 
-using System::AutoFreePacketBuffer;
 using System::PacketBuffer;
+using System::PacketBufferHandle;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
 
@@ -90,7 +89,7 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
 
 CHIP_ERROR SecureSessionMgrBase::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgIn)
 {
-    System::AutoFreePacketBuffer msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf(msgIn);
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
 
@@ -278,8 +277,8 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = connection->mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(),
                                                                                        packetHeader.GetEncryptionKeyID(), nullptr);
-    AutoFreePacketBuffer msg(msgIn);
-    AutoFreePacketBuffer origMsg;
+    PacketBufferHandle msg(msgIn);
+    PacketBufferHandle origMsg;
 
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
@@ -312,8 +311,8 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not
            allocated as an inline buffer to PacketBuffer structure */
-        origMsg.Adopt(msg.Release());
-        msg.Adopt(PacketBuffer::NewWithAvailableSize(len));
+        origMsg = std::move(msg);
+        msg     = PacketBuffer::NewWithAvailableSize(len);
         VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Insufficient memory for packet buffer."));
         msg->SetDataLength(len);
 #endif

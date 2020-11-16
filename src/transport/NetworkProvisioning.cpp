@@ -161,10 +161,10 @@ exit:
 
 CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    System::PacketBuffer * buffer = System::PacketBuffer::New();
-    char * addrStr                = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
-    size_t addrLen                = 0;
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    System::PacketBufferHandle buffer = System::PacketBuffer::New();
+    char * addrStr                    = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
+    size_t addrLen                    = 0;
 
     ChipLogProgress(NetworkProvisioning, "Sending IP Address. Delegate %p\n", mDelegate);
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -176,13 +176,10 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     buffer->SetDataLength(static_cast<uint16_t>(addrLen));
 
     err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning, NetworkProvisioning::MsgTypes::kIPAddressAssigned,
-                                       buffer);
-    buffer = nullptr;
+                                       buffer.Release());
     SuccessOrExit(err);
 
 exit:
-    if (buffer)
-        System::PacketBuffer::Free(buffer);
     if (CHIP_NO_ERROR != err)
         ChipLogError(NetworkProvisioning, "Failed in sending IP address. error %s\n", ErrorStr(err));
     return err;
@@ -190,12 +187,13 @@ exit:
 
 CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const char * passwd)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    System::PacketBuffer * buffer = System::PacketBuffer::New();
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    System::PacketBufferHandle buffer = System::PacketBuffer::New();
     BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
 
     ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(EncodeString(ssid, bbuf));
     SuccessOrExit(EncodeString(passwd, bbuf));
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -203,14 +201,11 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     VerifyOrExit(CanCastTo<uint16_t>(bbuf.Written()), err = CHIP_ERROR_INVALID_ARGUMENT);
     buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
-    err    = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                       NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer);
-    buffer = nullptr;
+    err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
+                                       NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer.Release());
     SuccessOrExit(err);
 
 exit:
-    if (buffer)
-        System::PacketBuffer::Free(buffer);
     if (CHIP_NO_ERROR != err)
         ChipLogError(NetworkProvisioning, "Failed in sending Network Creds. error %s\n", ErrorStr(err));
     return err;
@@ -218,12 +213,12 @@ exit:
 
 CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    System::PacketBuffer * buffer = System::PacketBuffer::New();
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    System::PacketBufferHandle buffer = System::PacketBuffer::New();
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     {
         BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
@@ -241,14 +236,11 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
         buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
-        err    = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer);
-        buffer = nullptr;
+        err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
+                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer.Release());
     }
 
 exit:
-    if (buffer)
-        System::PacketBuffer::Free(buffer);
     if (CHIP_NO_ERROR != err)
         ChipLogError(NetworkProvisioning, "Failed to send Thread Credentials: %s", ErrorStr(err));
     return err;

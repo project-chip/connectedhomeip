@@ -26,7 +26,6 @@
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/AutoFreePacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
@@ -141,7 +140,7 @@ CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFl
     CHIP_ERROR err            = CHIP_NO_ERROR;
     const uint16_t headerSize = header.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
-    AutoFreePacketBuffer msgBuf(msgIn);
+    PacketBufferHandle msgBuf(msgIn);
 
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
