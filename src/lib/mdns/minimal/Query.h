@@ -93,6 +93,8 @@ public:
     /// Append the query to the specified buffer
     ///
     /// @param hdr will be updated with a query count
+    /// @param buffer where to place the query data
+    /// @param maxSize maximum buffer space in buffer
     /// @return nullptr on failure, end of writing on success
     uint8_t * Append(HeaderRef & hdr, uint8_t * buffer, size_t maxSize) const
     {
