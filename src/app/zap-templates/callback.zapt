@@ -19,10 +19,81 @@
 void emberAfClusterInitCallback(CHIPEndpointId endpoint, CHIPClusterId clusterId);
 
 // Cluster Init Functions
-{{#all_user_clusters_names}}
-void emberAf{{asCamelCased name false}}ClusterInitCallback(CHIPEndpointId endpoint);
-{{/all_user_clusters_names}}
 
+{{#all_user_clusters}}
+
+//
+// Cluster {{name}}
+//
+
+/** @brief {{name}} Cluster Init
+ *
+ * Cluster Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAf{{asCamelCased name false}}ClusterInitCallback(CHIPEndpointId endpoint);
+
+/** @brief {{name}} Cluster {{asCamelCased side false}} Init
+ *
+ * {{asCamelCased side false}} Init
+ *
+ * @param endpoint    Endpoint that is being initialized
+ */
+void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}InitCallback(CHIPEndpointId endpoint);
+
+/** @brief {{name}} Cluster {{asCamelCased side false}} Attribute Changed
+ *
+ * {{asCamelCased side false}} Attribute Changed
+ *
+ * @param endpoint    Endpoint that is being initialized
+ * @param attributeId Attribute that changed
+ */
+void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}AttributeChangedCallback(CHIPEndpointId endpoint, CHIPAttributeId attributeId);
+
+/** @brief {{name}} Cluster {{asCamelCased side false}} Manufacturer Specific Attribute Changed
+ *
+ * {{asCamelCased side false}} Manufacturer Specific Attribute Changed
+ *
+ * @param endpoint          Endpoint that is being initialized
+ * @param attributeId       Attribute that changed
+ * @param manufacturerCode  Manufacturer Code of the attribute that changed
+ */
+void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}ManufacturerSpecificAttributeChangedCallback(CHIPEndpointId endpoint, CHIPAttributeId attributeId, uint16_t manufacturerCode);
+
+/** @brief {{name}} Cluster {{asCamelCased side false}} Message Sent
+ *
+ * {{asCamelCased side false}} Message Sent
+ *
+ * @param type               The type of message sent
+ * @param indexOrDestination The destination or address to which the message was sent
+ * @param apsFrame           The APS frame for the message
+ * @param msgLen             The length of the message
+ * @param message            The message that was sent
+ * @param status             The status of the sent message
+ */
+void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}MessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+
+/** @brief {{name}} Cluster {{asCamelCased side false}} Pre Attribute Changed
+ *
+ * {{asCamelCased side}} Pre Attribute Changed
+ *
+ * @param endpoint      Endpoint that is being initialized
+ * @param attributeId   Attribute to be changed
+ * @param attributeType Attribute type
+ * @param size          Attribute size
+ * @param value         Attribute value
+ */
+EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}PreAttributeChangedCallback(CHIPEndpointId endpoint, CHIPAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+
+/** @brief {{name}} Cluster {{asCamelCased side false}} Tick
+ *
+ * {{asCamelCased side}} Tick
+ *
+ * @param endpoint  Endpoint that is being served
+ */
+void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}TickCallback(CHIPEndpointId endpoint);
+{{/all_user_clusters}}
 
 // Cluster Commands Callback
 
@@ -43,7 +114,7 @@ void emberAf{{asCamelCased name false}}ClusterInitCallback(CHIPEndpointId endpoi
 {{#if (zcl_command_arguments_count this.id)}}
 bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}} {{asUnderlyingType type}} {{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
 {{else}}
-bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback(void);
+bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback();
 {{/if}}
 
 
