@@ -462,7 +462,7 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
                  ChipLogError(Controller, "handleIndicationReceived() called with invalid characteristic ID"));
 
     buffer = System::PacketBuffer::NewWithAvailableSize(valueLength);
-    VerifyOrExit(buffer, ChipLogError(Controller, "Failed to allocate packet buffer"));
+    VerifyOrExit(!buffer.IsNull(), ChipLogError(Controller, "Failed to allocate packet buffer"));
 
     memcpy(buffer->Start(), valueBegin, valueLength);
     buffer->SetDataLength(valueLength);
