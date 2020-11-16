@@ -38,6 +38,7 @@ int TestPersistedCounter(int argc, char * argv[]);
 int TestScopedBuffer(void);
 int TestSafeInt();
 int TestSerializableIntegerSet(void);
+int TestBufferReader();
 
 #ifdef __cplusplus
 }
