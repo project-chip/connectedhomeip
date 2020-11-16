@@ -77,7 +77,8 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint8_t s
         new_state        = kState_Off;
     }
 
-    if (aAction == LEVEL_ACTION) {
+    if (aAction == LEVEL_ACTION)
+    {
         action_initiated = true;
         Level(*value); // TODO: check size
         return action_initiated;
@@ -104,7 +105,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint8_t s
 void LightingManager::Level(uint8_t aLevel)
 {
     LOG_INF("LEVEL %u", aLevel);
-    //TODO: use the level for PWM
+    // TODO: use the level for PWM
 }
 
 void LightingManager::Set(bool aOn)

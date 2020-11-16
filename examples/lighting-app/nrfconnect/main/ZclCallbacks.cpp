@@ -39,9 +39,11 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
             return;
         }
 
-        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION, AppEvent::kEventType_Lighting, size, value);
-
-    } else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID) {
+        LightingMgr().InitiateAction(*value ? LightingManager::ON_ACTION : LightingManager::OFF_ACTION,
+                                     AppEvent::kEventType_Lighting, size, value);
+    }
+    else if (clusterId == ZCL_LEVEL_CONTROL_CLUSTER_ID)
+    {
         if (attributeId != ZCL_MOVE_TO_LEVEL_COMMAND_ID)
         {
             ChipLogProgress(Zcl, "Unknown attribute ID: %d", attributeId);
@@ -50,7 +52,9 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
 
         ChipLogProgress(Zcl, "Value: %u, length %u", *value, size);
         LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Lighting, size, value);
-    } else {
+    }
+    else
+    {
         ChipLogProgress(Zcl, "Unknown cluster ID: %d", clusterId);
         return;
     }

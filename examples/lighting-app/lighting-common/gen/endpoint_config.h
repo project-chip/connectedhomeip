@@ -45,30 +45,30 @@
 // Generated attributes
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
-        { 0x0000, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },  /* 0 / On/off / on/off*/                         \
-        { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 1 / On/off / cluster revision*/               \
-        { 0x0000, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 2 / Level Control / current level*/           \
-        { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 3 / Level Control / cluster revision*/        \
+        { 0x0000, ZCL_BOOLEAN_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },      /* 0 / On/off / on/off*/                     \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 1 / On/off / cluster revision*/           \
+            { 0x0000, ZCL_INT8U_ATTRIBUTE_TYPE, 1, (0x00), { (uint8_t *) 0x00 } },    /* 2 / Level Control / current level*/       \
+            { 0xFFFD, ZCL_INT16U_ATTRIBUTE_TYPE, 2, (0x00), { (uint8_t *) 0x0001 } }, /* 3 / Level Control / cluster revision*/    \
     }
 
 // Cluster function static arrays
 #define GENERATED_FUNCTION_ARRAYS                                                                                                  \
-    const EmberAfGenericClusterFunction emberAfFuncArrayOnOffClusterServer[] = { (                                                 \
-        EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback };                                                    \
+    const EmberAfGenericClusterFunction emberAfFuncArrayOnOffClusterServer[]        = { (                                          \
+        EmberAfGenericClusterFunction) emberAfOnOffClusterServerInitCallback };                                             \
     const EmberAfGenericClusterFunction emberAfFuncArrayLevelControlClusterServer[] = { (                                          \
-        EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback };                                             \
+        EmberAfGenericClusterFunction) emberAfLevelControlClusterServerInitCallback };
 
 // Clusters definitions
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         {                                                                                                                          \
             0x0006, (EmberAfAttributeMetadata *) &(generatedAttributes[0]), 2,                                                     \
-            3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayOnOffClusterServer,                   \
+            3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),     emberAfFuncArrayOnOffClusterServer,                    \
         },                                                                                                                         \
-        {                                                                                                                          \
-            0x0008, (EmberAfAttributeMetadata *) &(generatedAttributes[2]), 2,                                                     \
-            3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),      emberAfFuncArrayLevelControlClusterServer,            \
-        },                                                                                                                         \
+            {                                                                                                                      \
+                0x0008, (EmberAfAttributeMetadata *) &(generatedAttributes[2]), 2,                                                 \
+                3,      (CLUSTER_MASK_SERVER | CLUSTER_MASK_INIT_FUNCTION),     emberAfFuncArrayLevelControlClusterServer,         \
+            },                                                                                                                     \
     }
 
 // Endpoint types
@@ -147,17 +147,17 @@
 // Generated data for the command discovery
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0006, 0x00, COMMAND_MASK_INCOMING_SERVER }, /* On/off / Off */                          \
-        { 0x0006, 0x01, COMMAND_MASK_INCOMING_SERVER }, /* On/off / On */                           \
-        { 0x0006, 0x02, COMMAND_MASK_INCOMING_SERVER }, /* On/off / Toggle */                       \
-        { 0x0008, 0x00, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / MoveToLevel */           \
-        { 0x0008, 0x01, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / Move */                  \
-        { 0x0008, 0x02, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / Step */                  \
-        { 0x0008, 0x03, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / Stop */                  \
-        { 0x0008, 0x04, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / MoveToLevelWithOnOff */  \
-        { 0x0008, 0x05, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / MoveWithOnOff */         \
-        { 0x0008, 0x06, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / StepWithOnOff */         \
-        { 0x0008, 0x07, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / StopWithOnOff */         \
+        { 0x0006, 0x00, COMMAND_MASK_INCOMING_SERVER },     /* On/off / Off */                                                     \
+            { 0x0006, 0x01, COMMAND_MASK_INCOMING_SERVER }, /* On/off / On */                                                      \
+            { 0x0006, 0x02, COMMAND_MASK_INCOMING_SERVER }, /* On/off / Toggle */                                                  \
+            { 0x0008, 0x00, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / MoveToLevel */                                      \
+            { 0x0008, 0x01, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / Move */                                             \
+            { 0x0008, 0x02, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / Step */                                             \
+            { 0x0008, 0x03, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / Stop */                                             \
+            { 0x0008, 0x04, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / MoveToLevelWithOnOff */                             \
+            { 0x0008, 0x05, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / MoveWithOnOff */                                    \
+            { 0x0008, 0x06, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / StepWithOnOff */                                    \
+            { 0x0008, 0x07, COMMAND_MASK_INCOMING_SERVER }, /* Level Control / StopWithOnOff */                                    \
     }
 #define EMBER_AF_GENERATED_COMMAND_COUNT (11)
 
@@ -174,7 +174,7 @@
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \
     {                                                                                                                              \
         { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0006, 0x0000, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },           \
-        { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0008, 0x0000, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },           \
+            { EMBER_ZCL_REPORTING_DIRECTION_REPORTED, 1, 0x0008, 0x0000, CLUSTER_MASK_SERVER, 0x0000, { { 1, 65534, 0 } } },       \
     }
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE (2)
 #endif // SILABS_AF_ENDPOINT_CONFIG

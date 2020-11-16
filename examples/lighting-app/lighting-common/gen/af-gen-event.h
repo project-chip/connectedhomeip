@@ -49,25 +49,24 @@
         (*callback)(endpoint);                                                                                                     \
         /* emberAfPopNetworkIndex(); */                                                                                            \
     }                                                                                                                              \
-                                                                                                                             \
+                                                                                                                                   \
     void emberAfLevelControlClusterServerTickCallbackWrapperFunction1(void)                                                        \
     {                                                                                                                              \
         clusterTickWrapper(&emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallback,    \
                            1);                                                                                                     \
-    }                                                                                                                              \
+    }
 
 // EmberEventData structs used to populate the EmberEventData table
 #define EMBER_AF_GENERATED_EVENTS                                                                                                  \
-        { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },   \
+    { &emberAfLevelControlClusterServerTickCallbackControl1, emberAfLevelControlClusterServerTickCallbackWrapperFunction1 },
 
-#define EMBER_AF_GENERATED_EVENT_STRINGS                                                                                           \
-    "Level Control Cluster Server EP 1",                    \
+#define EMBER_AF_GENERATED_EVENT_STRINGS "Level Control Cluster Server EP 1",
 
 // The length of the event context table used to track and retrieve cluster events
 #define EMBER_AF_EVENT_CONTEXT_LENGTH 4
 
 // EmberAfEventContext structs used to populate the EmberAfEventContext table
 #define EMBER_AF_GENERATED_EVENT_CONTEXT                                                                                           \
-        { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },      \
+    { 0x1, 0x8, false, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP, &emberAfLevelControlClusterServerTickCallbackControl1 },
 
 #endif // __AF_GEN_EVENT__
