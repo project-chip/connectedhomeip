@@ -1371,138 +1371,138 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
         VerifyOrExit(chip::TLV::IsContextTag(reader.GetTag()), err = CHIP_ERROR_INVALID_TLV_TAG);
         switch (chip::TLV::TagNumFromTag(reader.GetTag()))
         {
-            case kCsTag_EventPath:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventPath)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_EventPath);
+        case kCsTag_EventPath:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_EventPath)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_EventPath);
 
-                VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-#if CHIP_DETAIL_LOGGING
-                {
-                    EventPath::Parser path;
-                    err = path.Init(reader);
-                    SuccessOrExit(err);
-
-                    PRETTY_PRINT("\t");
-
-                    err = path.CheckSchemaValidity();
-                    SuccessOrExit(err);
-                }
-#endif // CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_ImportanceLevel:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_ImportanceLevel)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_ImportanceLevel);
-                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+            VerifyOrExit(chip::TLV::kTLVType_Path == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
 
 #if CHIP_DETAIL_LOGGING
-                {
-                    uint64_t value;
-                    err = reader.Get(value);
-                    SuccessOrExit(err);
-
-                    PRETTY_PRINT("\t\tImportanceLevel = 0x%" PRIx64 ",", value);
-                }
-#endif // CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_Number:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_Number)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_Number);
-
-                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-#if CHIP_DETAIL_LOGGING
-                {
-                    uint64_t value;
-                    err = reader.Get(value);
-                    SuccessOrExit(err);
-
-                    PRETTY_PRINT("\t\tNumber = 0x%" PRIx64 ",", value);
-                }
-#endif // CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_UTCTimestamp:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_UTCTimestamp)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_UTCTimestamp);
-
-                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-#if CHIP_DETAIL_LOGGING
-                {
-                    uint64_t value;
-                    err = reader.Get(value);
-                    SuccessOrExit(err);
-
-                    PRETTY_PRINT("\t\tUTCTimestamp = 0x%" PRIx64 ",", value);
-                }
-#endif // CHIP_DETAIL_LOGGING
-                break;
-
-            case kCsTag_SystemTimestamp:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_SystemTimestamp)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_SystemTimestamp);
-
-                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-#if CHIP_DETAIL_LOGGING
-                {
-                    uint64_t value;
-                    err = reader.Get(value);
-                    SuccessOrExit(err);
-
-                    PRETTY_PRINT("\t\tSystemTimestamp = 0x%" PRIx64 ",", value);
-                }
-#endif // CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_DeltaUTCTime:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_DeltaUTCTime)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_DeltaUTCTime);
-
-                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-#if CHIP_DETAIL_LOGGING
-                {
-                    uint64_t value;
-                    err = reader.Get(value);
-                    SuccessOrExit(err);
-
-                    PRETTY_PRINT("\t\tDeltaUTCTime = 0x%" PRIx64 ",", value);
-                }
-#endif // CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_DeltaSystemTime:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_DeltaSystemTime)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_DeltaSystemTime);
-
-                VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
-
-#if CHIP_DETAIL_LOGGING
-                {
-                    uint64_t value;
-                    err = reader.Get(value);
-                    SuccessOrExit(err);
-
-                    PRETTY_PRINT("\t\tDeltaSystemTime = 0x%" PRIx64 ",", value);
-                }
-#endif // CHIP_DETAIL_LOGGING
-                break;
-            case kCsTag_Data:
-                // check if this tag has appeared before
-                VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_Data)), err = CHIP_ERROR_INVALID_TLV_TAG);
-                TagPresenceMask |= (1 << kCsTag_Data);
-
-                err = ParseData(reader, 0);
+            {
+                EventPath::Parser path;
+                err = path.Init(reader);
                 SuccessOrExit(err);
-                break;
-            default:
-                ExitNow(err = CHIP_ERROR_INVALID_TLV_TAG);
+
+                PRETTY_PRINT("\t");
+
+                err = path.CheckSchemaValidity();
+                SuccessOrExit(err);
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+        case kCsTag_ImportanceLevel:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_ImportanceLevel)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_ImportanceLevel);
+            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+#if CHIP_DETAIL_LOGGING
+            {
+                uint64_t value;
+                err = reader.Get(value);
+                SuccessOrExit(err);
+
+                PRETTY_PRINT("\t\tImportanceLevel = 0x%" PRIx64 ",", value);
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+        case kCsTag_Number:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_Number)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_Number);
+
+            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+#if CHIP_DETAIL_LOGGING
+            {
+                uint64_t value;
+                err = reader.Get(value);
+                SuccessOrExit(err);
+
+                PRETTY_PRINT("\t\tNumber = 0x%" PRIx64 ",", value);
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+        case kCsTag_UTCTimestamp:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_UTCTimestamp)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_UTCTimestamp);
+
+            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+#if CHIP_DETAIL_LOGGING
+            {
+                uint64_t value;
+                err = reader.Get(value);
+                SuccessOrExit(err);
+
+                PRETTY_PRINT("\t\tUTCTimestamp = 0x%" PRIx64 ",", value);
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+
+        case kCsTag_SystemTimestamp:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_SystemTimestamp)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_SystemTimestamp);
+
+            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+#if CHIP_DETAIL_LOGGING
+            {
+                uint64_t value;
+                err = reader.Get(value);
+                SuccessOrExit(err);
+
+                PRETTY_PRINT("\t\tSystemTimestamp = 0x%" PRIx64 ",", value);
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+        case kCsTag_DeltaUTCTime:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_DeltaUTCTime)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_DeltaUTCTime);
+
+            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+#if CHIP_DETAIL_LOGGING
+            {
+                uint64_t value;
+                err = reader.Get(value);
+                SuccessOrExit(err);
+
+                PRETTY_PRINT("\t\tDeltaUTCTime = 0x%" PRIx64 ",", value);
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+        case kCsTag_DeltaSystemTime:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_DeltaSystemTime)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_DeltaSystemTime);
+
+            VerifyOrExit(chip::TLV::kTLVType_UnsignedInteger == reader.GetType(), err = CHIP_ERROR_WRONG_TLV_TYPE);
+
+#if CHIP_DETAIL_LOGGING
+            {
+                uint64_t value;
+                err = reader.Get(value);
+                SuccessOrExit(err);
+
+                PRETTY_PRINT("\t\tDeltaSystemTime = 0x%" PRIx64 ",", value);
+            }
+#endif // CHIP_DETAIL_LOGGING
+            break;
+        case kCsTag_Data:
+            // check if this tag has appeared before
+            VerifyOrExit(!(TagPresenceMask & (1 << kCsTag_Data)), err = CHIP_ERROR_INVALID_TLV_TAG);
+            TagPresenceMask |= (1 << kCsTag_Data);
+
+            err = ParseData(reader, 0);
+            SuccessOrExit(err);
+            break;
+        default:
+            ExitNow(err = CHIP_ERROR_INVALID_TLV_TAG);
         }
     }
     PRETTY_PRINT("\t  },");
@@ -1511,7 +1511,8 @@ CHIP_ERROR EventDataElement::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for required fields:
-        const uint16_t RequiredFields = (1 << kCsTag_EventPath) | (1 << kCsTag_ImportanceLevel) | (1 << kCsTag_Number) | (1 << kCsTag_Data) ;
+        const uint16_t RequiredFields =
+            (1 << kCsTag_EventPath) | (1 << kCsTag_ImportanceLevel) | (1 << kCsTag_Number) | (1 << kCsTag_Data);
 
         if ((TagPresenceMask & RequiredFields) == RequiredFields)
         {

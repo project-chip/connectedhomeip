@@ -205,7 +205,7 @@ private:
     CHIP_ERROR _Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag);
 };
 
-};
+}; // namespace AttributePath
 
 namespace AttributePathList {
 class Parser : public ListParserBase
@@ -230,7 +230,7 @@ public:
 private:
     AttributePath::Builder mAttributePathBuilder;
 };
-};
+}; // namespace AttributePathList
 
 namespace EventPath {
 enum
@@ -287,7 +287,7 @@ public:
 private:
     CHIP_ERROR _Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag);
 };
-};
+}; // namespace EventPath
 
 namespace EventPathList {
 class Parser : public ListParserBase
@@ -312,7 +312,7 @@ public:
 private:
     EventPath::Builder mEventPathBuilder;
 };
-};
+}; // namespace EventPathList
 
 namespace CommandPath {
 enum
@@ -369,7 +369,7 @@ public:
 private:
     CHIP_ERROR _Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag);
 };
-};
+}; // namespace CommandPath
 
 namespace EventDataElement {
 enum
@@ -425,7 +425,7 @@ public:
 private:
     EventPath::Builder mEventPathBuilder;
 };
-};
+}; // namespace EventDataElement
 
 namespace EventList {
 class Parser : public ListParserBase
@@ -450,7 +450,7 @@ public:
 private:
     EventDataElement::Builder mEventDataElementBuilder;
 };
-};
+}; // namespace EventList
 
 namespace StatusElement {
 enum
@@ -513,7 +513,7 @@ public:
 
     StatusElement::Builder & EndOfStatusElement();
 };
-};
+}; // namespace StatusElement
 
 namespace AttributeStatusElement {
 enum
@@ -562,7 +562,7 @@ public:
     // CHIP_END_OF_TLV if there is no such element
     CHIP_ERROR GetStatusElement(StatusElement::Parser * const apStatusElement) const;
 };
-};
+}; // namespace AttributeStatusElement
 
 namespace AttributeStatusList {
 class Builder : public ListBuilderBase
@@ -585,7 +585,7 @@ class Parser : public ListParserBase
 public:
     CHIP_ERROR CheckSchemaValidity() const;
 };
-};
+}; // namespace AttributeStatusList
 
 namespace AttributeDataElement {
 enum
@@ -649,7 +649,7 @@ public:
 private:
     AttributePath::Builder mAttributePathBuilder;
 };
-};
+}; // namespace AttributeDataElement
 
 namespace AttributeDataList {
 class Parser : public ListParserBase
@@ -674,7 +674,7 @@ public:
 private:
     AttributeDataElement::Builder mAttributeDataElementBuilder;
 };
-};
+}; // namespace AttributeDataList
 
 namespace CommandDataElement {
 enum
@@ -728,7 +728,7 @@ private:
     CommandPath::Builder mCommandPathBuilder;
     StatusElement::Builder mStatusElementBuilder;
 };
-};
+}; // namespace CommandDataElement
 
 namespace CommandList {
 class Parser : public ListParserBase
@@ -750,7 +750,7 @@ public:
 private:
     CommandDataElement::Builder mCommandDataElementBuilder;
 };
-};
+}; // namespace CommandList
 
 namespace ReportData {
 enum
@@ -821,7 +821,7 @@ private:
     AttributeDataList::Builder mAttributeDataListBuilder;
     EventList::Builder mEventDataListBuilder;
 };
-};
+}; // namespace ReportData
 
 namespace InvokeCommand {
 enum
@@ -886,9 +886,9 @@ public:
 private:
     CommandList::Builder mCommandListBuilder;
 };
-};
+}; // namespace InvokeCommand
 
-};
-};
+}; // namespace app
+}; // namespace chip
 
 #endif // _CHIP_INTERACTION_MODEL_MESSAGE_DEF_H
