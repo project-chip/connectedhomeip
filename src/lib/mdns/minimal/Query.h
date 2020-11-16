@@ -55,6 +55,7 @@ public:
     /// Append the query to the specified buffer
     ///
     /// @param hdr will be updated with a query count
+    /// @param out where to write the query data
     bool Append(HeaderRef & hdr, chip::BufBound & out) const
     {
         // Questions can only be appended before any other data is added
