@@ -67,7 +67,7 @@ uint64_t Now(void)
     struct timeval now;
     gettimeofday(&now, NULL);
 
-    return ((uint64_t) now.tv_sec * 1000000) + (uint64_t) now.tv_usec;
+    return static_cast<uint64_t>((now.tv_sec * 1000000) + now.tv_usec);
 }
 
 bool EchoIntervalExpired(void)
@@ -75,21 +75,25 @@ bool EchoIntervalExpired(void)
     return (Now() >= gLastEchoTime + gEchoInterval);
 }
 
-void FormulateEchoRequestBuffer(System::PacketBuffer *& payloadBuf)
+System::PacketBuffer * FormulateEchoRequestBuffer()
 {
-    payloadBuf = System::PacketBuffer::New();
+    System::PacketBuffer * payloadBuf = System::PacketBuffer::New();
+
     if (payloadBuf == NULL)
     {
         printf("Unable to allocate PacketBuffer\n");
-        return;
+    }
+    else
+    {
+        // Add some application payload data in the buffer.
+        char * p    = reinterpret_cast<char *>(payloadBuf->Start());
+        int32_t len = snprintf(p, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, "Echo Message %" PRIu64 "\n", gEchoCount);
+
+        // Set the datalength in the buffer appropriately.
+        payloadBuf->SetDataLength((uint16_t) len);
     }
 
-    // Add some application payload data in the buffer.
-    char * p    = (char *) payloadBuf->Start();
-    int32_t len = sprintf(p, "Echo Message %" PRIu64 "\n", gEchoCount);
-
-    // Set the datalength in the buffer appropriately.
-    payloadBuf->SetDataLength((uint16_t) len);
+    return payloadBuf;
 }
 
 CHIP_ERROR SendEchoRequest(void)
@@ -99,7 +103,7 @@ CHIP_ERROR SendEchoRequest(void)
 
     gLastEchoTime = Now();
 
-    FormulateEchoRequestBuffer(payloadBuf);
+    payloadBuf = FormulateEchoRequestBuffer();
     if (payloadBuf == NULL)
     {
         return CHIP_ERROR_NO_MEMORY;
@@ -163,7 +167,7 @@ void HandleEchoResponseReceived(NodeId nodeId, System::PacketBuffer * payload)
     gEchoRespCount++;
 
     printf("Echo Response from node %lu : %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", nodeId, gEchoRespCount, gEchoCount,
-           ((double) gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), ((double) transitTime) / 1000);
+           static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
 }
 
 } // namespace

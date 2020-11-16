@@ -3,7 +3,7 @@
 ## Introduction
 
 The CHIP Echo example application shows you how to implement a CHIP application
-program using one of the supported CHIP protocol, namely the very simple CHIP
+program using one of the supported CHIP protocols, namely the very simple CHIP
 Echo protocol. This protocol allows you to send a CHIP message to a peer and
 expect a CHIP response (similar to the ICMP Echo Request/Echo Response
 messages).
@@ -21,7 +21,7 @@ transport (TCP, UDP, or CRMP).
 
 ## Building
 
-Building the example applications are quite straightforward.
+Building the example applications is quite straightforward.
 
 ```
 cd examples/echo
