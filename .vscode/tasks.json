@@ -128,6 +128,19 @@
             }
         },
         {
+            "label": "Build Minimal MDNS Example",
+            "type": "shell",
+            "command": "scripts/examples/gn_build_example.sh examples/minimal-mdns out/minimal_mdns 'chip_build_tools=false is_debug=false optimize_for_size=true'",
+            "group": "build",
+            "problemMatcher": {
+                "base": "$gcc",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}/out/minimal_mdns/"
+                ]
+            }
+        },
+        {
             "label": "Build ESP32 all-clusters-app Example",
             "type": "shell",
             "command": "scripts/examples/build-all-clusters-app.py",
