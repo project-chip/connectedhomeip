@@ -889,7 +889,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         resolvedLevel = temporaryCurrentLevelCache;
     }
 #else
-    resolvedLevel               = temporaryCurrentLevelCache;
+    resolvedLevel              = temporaryCurrentLevelCache;
 #endif
 
     // Read the OnOffTransitionTime attribute.
