@@ -104,8 +104,8 @@ bool emAfPluginBarrierControlServerIsPartialBarrierSupported(EndpointId endpoint
 
 static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
 {
-    uint16_t period                = 0;
-    EmberAfAttributeId attributeId = 0xFFFF;
+    uint16_t period         = 0;
+    AttributeId attributeId = 0xFFFF;
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_OPEN_PERIOD_ATTRIBUTE)
     if (open)
     {
@@ -169,12 +169,12 @@ void emAfPluginBarrierControlServerIncrementEvents(EndpointId endpoint, bool ope
 #endif
     );
 
-    EmberAfAttributeId baseEventAttributeId = ZCL_BARRIER_OPEN_EVENTS_ATTRIBUTE_ID;
+    AttributeId baseEventAttributeId = ZCL_BARRIER_OPEN_EVENTS_ATTRIBUTE_ID;
     for (size_t bit = 0; bit < 4; bit++)
     {
         if (READBIT(mask, bit))
         {
-            EmberAfAttributeId attributeId = static_cast<EmberAfAttributeId>(baseEventAttributeId + bit);
+            AttributeId attributeId = static_cast<AttributeId>(baseEventAttributeId + bit);
             uint16_t events;
             EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID, attributeId,
                                                               (uint8_t *) &events, sizeof(events));

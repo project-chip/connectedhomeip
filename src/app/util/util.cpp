@@ -870,7 +870,7 @@ EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberA
 }
 
 bool emberAfDetermineIfLinkSecurityIsRequired(CommandId commandId, bool incoming, bool broadcast, EmberAfProfileId profileId,
-                                              EmberAfClusterId clusterId, ChipNodeId remoteNodeId)
+                                              ClusterId clusterId, ChipNodeId remoteNodeId)
 {
     (void) afNoSecurityForDefaultResponse; // remove warning if not used
 

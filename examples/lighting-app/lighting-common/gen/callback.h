@@ -97,8 +97,8 @@ void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks);
  * @param value   Ver.: always
  * @param type   Ver.: always
  */
-EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_t endpoint, EmberAfClusterId clusterId,
-                                                                          EmberAfAttributeId attributeId, uint8_t mask,
+EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                                          chip::AttributeId attributeId, uint8_t mask,
                                                                           uint16_t manufacturerCode, uint8_t * value, uint8_t type);
 /** @brief Attribute Read Access
  *
@@ -110,8 +110,8 @@ EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_
  * @param manufacturerCode   Ver.: always
  * @param attributeId   Ver.: always
  */
-bool emberAfAttributeReadAccessCallback(uint8_t endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode,
-                                        uint16_t attributeId);
+bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
+                                        chip::AttributeId attributeId);
 /** @brief Attribute Write Access
  *
  * This function is called whenever the Application Framework needs to check
@@ -122,8 +122,8 @@ bool emberAfAttributeReadAccessCallback(uint8_t endpoint, EmberAfClusterId clust
  * @param manufacturerCode   Ver.: always
  * @param attributeId   Ver.: always
  */
-bool emberAfAttributeWriteAccessCallback(uint8_t endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode,
-                                         uint16_t attributeId);
+bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
+                                         chip::AttributeId attributeId);
 /** @brief Clear Report Table
  *
  * This function is called by the framework when the application should clear
@@ -140,7 +140,7 @@ EmberStatus emberAfClearReportTableCallback(void);
  * @param endpoint   Ver.: always
  * @param clusterId   Ver.: always
  */
-void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId);
+void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clusterId);
 /** @brief Cluster Security Custom
  *
  * This callback is fired when determining if APS encryption is required for a
@@ -154,7 +154,8 @@ void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId);
  * always
  * @param commandId The ZCL command ID being sent/received.  Ver.: always
  */
-bool emberAfClusterSecurityCustomCallback(EmberAfProfileId profileId, EmberAfClusterId clusterId, bool incoming, uint8_t commandId);
+bool emberAfClusterSecurityCustomCallback(EmberAfProfileId profileId, chip::ClusterId clusterId, bool incoming,
+                                          chip::CommandId commandId);
 /** @brief Default Response
  *
  * This function is called by the application framework when a Default Response
@@ -167,7 +168,7 @@ bool emberAfClusterSecurityCustomCallback(EmberAfProfileId profileId, EmberAfClu
  * @param status Specifies either SUCCESS or the nature of the error that was
  * detected in the received command.  Ver.: always
  */
-bool emberAfDefaultResponseCallback(EmberAfClusterId clusterId, uint8_t commandId, EmberAfStatus status);
+bool emberAfDefaultResponseCallback(chip::ClusterId clusterId, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Discover Attributes Response
  *
  * This function is called by the application framework when a Discover
@@ -188,8 +189,8 @@ bool emberAfDefaultResponseCallback(EmberAfClusterId clusterId, uint8_t commandI
  * @param extended Indicates whether the response is in the extended format or
  * not.  Ver.: always
  */
-bool emberAfDiscoverAttributesResponseCallback(EmberAfClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
-                                               uint16_t bufLen, bool extended);
+bool emberAfDiscoverAttributesResponseCallback(chip::ClusterId clusterId, bool discoveryComplete, uint8_t * buffer, uint16_t bufLen,
+                                               bool extended);
 /** @brief Discover Commands Generated Response
  *
  * This function is called by the framework when Discover Commands Generated
@@ -204,8 +205,8 @@ bool emberAfDiscoverAttributesResponseCallback(EmberAfClusterId clusterId, bool 
  * @param commandIdCount The length of bytes of the list, whish is the same as
  * the number of identifiers.  Ver.: always
  */
-bool emberAfDiscoverCommandsGeneratedResponseCallback(EmberAfClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
-                                                      uint8_t * commandIds, uint16_t commandIdCount);
+bool emberAfDiscoverCommandsGeneratedResponseCallback(chip::ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
+                                                      chip::CommandId * commandIds, uint16_t commandIdCount);
 /** @brief Discover Commands Received Response
  *
  * This function is called by the framework when Discover Commands Received
@@ -220,8 +221,8 @@ bool emberAfDiscoverCommandsGeneratedResponseCallback(EmberAfClusterId clusterId
  * @param commandIdCount The length of bytes of the list, whish is the same as
  * the number of identifiers.  Ver.: always
  */
-bool emberAfDiscoverCommandsReceivedResponseCallback(EmberAfClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
-                                                     uint8_t * commandIds, uint16_t commandIdCount);
+bool emberAfDiscoverCommandsReceivedResponseCallback(chip::ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
+                                                     chip::CommandId * commandIds, uint16_t commandIdCount);
 /** @brief Eeprom Init
  *
  * Tells the system to initialize the EEPROM if it is not already initialized.
@@ -289,7 +290,7 @@ void emberAfEnergyScanResultCallback(uint8_t channel, int8_t rssi);
  * @param buffer   Ver.: always
  * @param maxReadLength   Ver.: always
  */
-EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+EmberAfStatus emberAfExternalAttributeReadCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                    uint8_t * buffer, uint16_t maxReadLength);
 /** @brief External Attribute Write
@@ -338,7 +339,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint, EmberAfClus
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
  */
-EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+EmberAfStatus emberAfExternalAttributeWriteCallback(chip::EndpointId endpoint, chip::ClusterId clusterId,
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                     uint8_t * buffer);
 /** @brief Find Unused Pan Id And Form
@@ -454,7 +455,7 @@ bool emberAfGetEndpointByIndexCallback(uint8_t index, uint8_t * endpointReturn);
  * information is written if the callback is providing the information.  Ver.:
  * always
  */
-bool emberAfGetEndpointDescriptionCallback(uint8_t endpoint, EmberEndpointDescription * result);
+bool emberAfGetEndpointDescriptionCallback(chip::EndpointId endpoint, EmberEndpointDescription * result);
 /** @brief Get Endpoint Info
  *
  * This function is a callback to an application implemented endpoint that
@@ -472,7 +473,8 @@ bool emberAfGetEndpointDescriptionCallback(uint8_t endpoint, EmberEndpointDescri
  * @param returnEndpointInfo A pointer to a data struct that will be written
  * with information about the endpoint.  Ver.: always
  */
-bool emberAfGetEndpointInfoCallback(uint8_t endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo);
+bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex,
+                                    EmberAfEndpointInfoStruct * returnEndpointInfo);
 /** @brief Get Form And Join Extended Pan Id
  *
  * This callback is called by the framework to get the extended PAN ID used by
@@ -615,7 +617,7 @@ EmberStatus emberAfInitiateInterPanKeyEstablishmentCallback(EmberPanId panId, co
  * @param nodeId The node id of the remote device.  Ver.: always
  * @param endpoint The endpoint on the remote device.  Ver.: always
  */
-EmberStatus emberAfInitiateKeyEstablishmentCallback(EmberNodeId nodeId, uint8_t endpoint);
+EmberStatus emberAfInitiateKeyEstablishmentCallback(EmberNodeId nodeId, chip::EndpointId endpoint);
 /** @brief Initiate Partner Link Key Exchange
  *
  * This function is called by the framework to initiate a partner link key
@@ -863,8 +865,8 @@ bool emberAfPerformingKeyEstablishmentCallback(void);
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
+void emberAfPostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
+                                        uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
 /** @brief Post Em4 Reset
  *
  * A callback called by application framework, and implemented by em4 plugin
@@ -888,7 +890,7 @@ void emberAfPostEm4ResetCallback(void);
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-EmberAfStatus emberAfPreAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPreAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                                 uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
                                                 uint8_t * value);
 /** @brief Pre Cli Send
@@ -998,7 +1000,7 @@ bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId, EmberApsFrame
  * Ver.: always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
-bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
+bool emberAfReadAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 /** @brief Registration Abort
  *
  * This callback is called when the device should abort the registration
@@ -1068,7 +1070,7 @@ void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks);
  * always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
-bool emberAfReportAttributesCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
+bool emberAfReportAttributesCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 /** @brief Scan Complete
  *
  * This is called by the low-level stack code when an 802.15.4 active scan
@@ -1309,7 +1311,7 @@ void emberAfUnusedPanIdFoundCallback(EmberPanId panId, uint8_t channel);
  * Ver.: always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
-bool emberAfWriteAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
+bool emberAfWriteAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 /** @brief Zigbee Key Establishment
  *
  * A callback to the application to notify it of the status of the request for a
@@ -1332,7 +1334,7 @@ void emberAfZigbeeKeyEstablishmentCallback(EmberEUI64 partner, EmberKeyStatus st
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBasicClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBasicClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Basic Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -1342,14 +1344,14 @@ void emberAfBasicClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAf
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBasicClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBasicClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Basic Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBasicClusterClientInitCallback(uint8_t endpoint);
+void emberAfBasicClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Basic Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -1359,7 +1361,7 @@ void emberAfBasicClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfBasicClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfBasicClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 /** @brief Basic Cluster Client Message Sent
  *
@@ -1385,7 +1387,7 @@ void emberAfBasicClusterClientMessageSentCallback(EmberOutgoingMessageType type,
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBasicClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBasicClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 /** @brief Basic Cluster Client Tick
@@ -1394,7 +1396,7 @@ EmberAfStatus emberAfBasicClusterClientPreAttributeChangedCallback(uint8_t endpo
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBasicClusterClientTickCallback(uint8_t endpoint);
+void emberAfBasicClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Basic Cluster Get Locales Supported
  *
  *
@@ -1424,7 +1426,7 @@ bool emberAfBasicClusterResetToFactoryDefaultsCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBasicClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBasicClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Basic Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -1434,14 +1436,14 @@ void emberAfBasicClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAf
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBasicClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBasicClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Basic Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBasicClusterServerInitCallback(uint8_t endpoint);
+void emberAfBasicClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Basic Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -1451,7 +1453,7 @@ void emberAfBasicClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfBasicClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 /** @brief Basic Cluster Server Message Sent
  *
@@ -1477,7 +1479,7 @@ void emberAfBasicClusterServerMessageSentCallback(EmberOutgoingMessageType type,
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 /** @brief Basic Cluster Server Tick
@@ -1486,7 +1488,7 @@ EmberAfStatus emberAfBasicClusterServerPreAttributeChangedCallback(uint8_t endpo
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBasicClusterServerTickCallback(uint8_t endpoint);
+void emberAfBasicClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Basic Cluster Callbacks */
 
@@ -1500,7 +1502,7 @@ void emberAfBasicClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPowerConfigClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPowerConfigClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Power Configuration Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -1510,14 +1512,15 @@ void emberAfPowerConfigClusterClientAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPowerConfigClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPowerConfigClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Power Configuration Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPowerConfigClusterClientInitCallback(uint8_t endpoint);
+void emberAfPowerConfigClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Power Configuration Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -1527,7 +1530,8 @@ void emberAfPowerConfigClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPowerConfigClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPowerConfigClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Power Configuration Cluster Client Message Sent
  *
@@ -1554,7 +1558,7 @@ void emberAfPowerConfigClusterClientMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPowerConfigClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPowerConfigClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Power Configuration Cluster Client Tick
@@ -1563,7 +1567,7 @@ EmberAfStatus emberAfPowerConfigClusterClientPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPowerConfigClusterClientTickCallback(uint8_t endpoint);
+void emberAfPowerConfigClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Power Configuration Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -1571,7 +1575,7 @@ void emberAfPowerConfigClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPowerConfigClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPowerConfigClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Power Configuration Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -1581,14 +1585,15 @@ void emberAfPowerConfigClusterServerAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPowerConfigClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPowerConfigClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Power Configuration Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPowerConfigClusterServerInitCallback(uint8_t endpoint);
+void emberAfPowerConfigClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Power Configuration Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -1598,7 +1603,8 @@ void emberAfPowerConfigClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPowerConfigClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPowerConfigClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Power Configuration Cluster Server Message Sent
  *
@@ -1625,7 +1631,7 @@ void emberAfPowerConfigClusterServerMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPowerConfigClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPowerConfigClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Power Configuration Cluster Server Tick
@@ -1634,7 +1640,7 @@ EmberAfStatus emberAfPowerConfigClusterServerPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPowerConfigClusterServerTickCallback(uint8_t endpoint);
+void emberAfPowerConfigClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Power Configuration Cluster Callbacks */
 
@@ -1648,7 +1654,7 @@ void emberAfPowerConfigClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDeviceTempClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDeviceTempClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Device Temperature Configuration Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -1658,14 +1664,15 @@ void emberAfDeviceTempClusterClientAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDeviceTempClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDeviceTempClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief Device Temperature Configuration Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDeviceTempClusterClientInitCallback(uint8_t endpoint);
+void emberAfDeviceTempClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Device Temperature Configuration Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -1675,7 +1682,8 @@ void emberAfDeviceTempClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDeviceTempClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfDeviceTempClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief Device Temperature Configuration Cluster Client Message Sent
  *
@@ -1702,7 +1710,7 @@ void emberAfDeviceTempClusterClientMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDeviceTempClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDeviceTempClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief Device Temperature Configuration Cluster Client Tick
@@ -1711,7 +1719,7 @@ EmberAfStatus emberAfDeviceTempClusterClientPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDeviceTempClusterClientTickCallback(uint8_t endpoint);
+void emberAfDeviceTempClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Device Temperature Configuration Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -1719,7 +1727,7 @@ void emberAfDeviceTempClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDeviceTempClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDeviceTempClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Device Temperature Configuration Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -1729,14 +1737,15 @@ void emberAfDeviceTempClusterServerAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDeviceTempClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDeviceTempClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief Device Temperature Configuration Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDeviceTempClusterServerInitCallback(uint8_t endpoint);
+void emberAfDeviceTempClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Device Temperature Configuration Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -1746,7 +1755,8 @@ void emberAfDeviceTempClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDeviceTempClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfDeviceTempClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief Device Temperature Configuration Cluster Server Message Sent
  *
@@ -1773,7 +1783,7 @@ void emberAfDeviceTempClusterServerMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDeviceTempClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDeviceTempClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief Device Temperature Configuration Cluster Server Tick
@@ -1782,7 +1792,7 @@ EmberAfStatus emberAfDeviceTempClusterServerPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDeviceTempClusterServerTickCallback(uint8_t endpoint);
+void emberAfDeviceTempClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Device Temperature Configuration Cluster Callbacks */
 
@@ -1796,7 +1806,7 @@ void emberAfDeviceTempClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIdentifyClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIdentifyClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Identify Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -1806,14 +1816,15 @@ void emberAfIdentifyClusterClientAttributeChangedCallback(uint8_t endpoint, Embe
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIdentifyClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIdentifyClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                         EmberAfStatus status);
 /** @brief Identify Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIdentifyClusterClientInitCallback(uint8_t endpoint);
+void emberAfIdentifyClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Identify Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -1823,7 +1834,8 @@ void emberAfIdentifyClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfIdentifyClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfIdentifyClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               uint16_t manufacturerCode);
 /** @brief Identify Cluster Client Message Sent
  *
@@ -1850,7 +1862,7 @@ void emberAfIdentifyClusterClientMessageSentCallback(EmberOutgoingMessageType ty
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIdentifyClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIdentifyClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                       EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 /** @brief Identify Cluster Client Tick
@@ -1859,7 +1871,7 @@ EmberAfStatus emberAfIdentifyClusterClientPreAttributeChangedCallback(uint8_t en
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIdentifyClusterClientTickCallback(uint8_t endpoint);
+void emberAfIdentifyClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Identify Cluster E Z Mode Invoke
  *
  *
@@ -1894,7 +1906,7 @@ bool emberAfIdentifyClusterIdentifyQueryResponseCallback(uint16_t timeout);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIdentifyClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Identify Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -1904,14 +1916,15 @@ void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint, Embe
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIdentifyClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIdentifyClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                         EmberAfStatus status);
 /** @brief Identify Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint);
+void emberAfIdentifyClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Identify Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -1921,7 +1934,8 @@ void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfIdentifyClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfIdentifyClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               uint16_t manufacturerCode);
 /** @brief Identify Cluster Server Message Sent
  *
@@ -1948,7 +1962,7 @@ void emberAfIdentifyClusterServerMessageSentCallback(EmberOutgoingMessageType ty
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIdentifyClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIdentifyClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                       EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 /** @brief Identify Cluster Server Tick
@@ -1957,7 +1971,7 @@ EmberAfStatus emberAfIdentifyClusterServerPreAttributeChangedCallback(uint8_t en
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIdentifyClusterServerTickCallback(uint8_t endpoint);
+void emberAfIdentifyClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Identify Cluster Trigger Effect
  *
  *
@@ -1987,7 +2001,7 @@ bool emberAfIdentifyClusterUpdateCommissionStateCallback(uint8_t action, uint8_t
  *
  * @param endpoint The endpoint.  Ver.: always
  */
-void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint);
+void emberAfGroupsClusterClearGroupTableCallback(chip::EndpointId endpoint);
 /** @brief Groups Cluster Add Group
  *
  *
@@ -1995,7 +2009,7 @@ void emberAfGroupsClusterClearGroupTableCallback(uint8_t endpoint);
  * @param groupId   Ver.: always
  * @param groupName   Ver.: always
  */
-bool emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName);
+bool emberAfGroupsClusterAddGroupCallback(chip::GroupId groupId, uint8_t * groupName);
 /** @brief Groups Cluster Add Group If Identifying
  *
  *
@@ -2003,7 +2017,7 @@ bool emberAfGroupsClusterAddGroupCallback(uint16_t groupId, uint8_t * groupName)
  * @param groupId   Ver.: always
  * @param groupName   Ver.: always
  */
-bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t * groupName);
+bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(chip::GroupId groupId, uint8_t * groupName);
 /** @brief Groups Cluster Add Group Response
  *
  *
@@ -2011,7 +2025,7 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t groupId);
+bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, chip::GroupId groupId);
 /** @brief Groups Cluster Client Attribute Changed
  *
  * Client Attribute Changed
@@ -2019,7 +2033,7 @@ bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t group
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfGroupsClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfGroupsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Groups Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -2029,14 +2043,14 @@ void emberAfGroupsClusterClientAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfGroupsClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfGroupsClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Groups Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfGroupsClusterClientInitCallback(uint8_t endpoint);
+void emberAfGroupsClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Groups Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -2046,7 +2060,8 @@ void emberAfGroupsClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfGroupsClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfGroupsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief Groups Cluster Client Message Sent
  *
@@ -2073,7 +2088,7 @@ void emberAfGroupsClusterClientMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfGroupsClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfGroupsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief Groups Cluster Client Tick
@@ -2082,7 +2097,7 @@ EmberAfStatus emberAfGroupsClusterClientPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfGroupsClusterClientTickCallback(uint8_t endpoint);
+void emberAfGroupsClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Groups Cluster Get Group Membership
  *
  *
@@ -2112,7 +2127,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(void);
  *
  * @param groupId   Ver.: always
  */
-bool emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId);
+bool emberAfGroupsClusterRemoveGroupCallback(chip::GroupId groupId);
 /** @brief Groups Cluster Remove Group Response
  *
  *
@@ -2120,7 +2135,7 @@ bool emberAfGroupsClusterRemoveGroupCallback(uint16_t groupId);
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-bool emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, uint16_t groupId);
+bool emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, chip::GroupId groupId);
 /** @brief Groups Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -2128,7 +2143,7 @@ bool emberAfGroupsClusterRemoveGroupResponseCallback(uint8_t status, uint16_t gr
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfGroupsClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfGroupsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Groups Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -2138,14 +2153,14 @@ void emberAfGroupsClusterServerAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfGroupsClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfGroupsClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Groups Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfGroupsClusterServerInitCallback(uint8_t endpoint);
+void emberAfGroupsClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Groups Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -2155,7 +2170,8 @@ void emberAfGroupsClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfGroupsClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfGroupsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief Groups Cluster Server Message Sent
  *
@@ -2182,7 +2198,7 @@ void emberAfGroupsClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfGroupsClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfGroupsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief Groups Cluster Server Tick
@@ -2191,14 +2207,14 @@ EmberAfStatus emberAfGroupsClusterServerPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfGroupsClusterServerTickCallback(uint8_t endpoint);
+void emberAfGroupsClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Groups Cluster View Group
  *
  *
  *
  * @param groupId   Ver.: always
  */
-bool emberAfGroupsClusterViewGroupCallback(uint16_t groupId);
+bool emberAfGroupsClusterViewGroupCallback(chip::GroupId groupId);
 /** @brief Groups Cluster View Group Response
  *
  *
@@ -2207,7 +2223,7 @@ bool emberAfGroupsClusterViewGroupCallback(uint16_t groupId);
  * @param groupId   Ver.: always
  * @param groupName   Ver.: always
  */
-bool emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, uint16_t groupId, uint8_t * groupName);
+bool emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, chip::GroupId groupId, uint8_t * groupName);
 
 /** @} END Groups Cluster Callbacks */
 
@@ -2221,7 +2237,7 @@ bool emberAfGroupsClusterViewGroupResponseCallback(uint8_t status, uint16_t grou
  *
  * @param endpoint The endpoint.  Ver.: always
  */
-void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint);
+void emberAfScenesClusterClearSceneTableCallback(chip::EndpointId endpoint);
 /** @brief Scenes Cluster Add Scene
  *
  *
@@ -2232,7 +2248,7 @@ void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint);
  * @param sceneName   Ver.: always
  * @param extensionFieldSets   Ver.: always
  */
-bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
+bool emberAfScenesClusterAddSceneCallback(chip::GroupId groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
                                           uint8_t * extensionFieldSets);
 /** @brief Scenes Cluster Add Scene Response
  *
@@ -2242,7 +2258,7 @@ bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uin
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, chip::GroupId groupId, uint8_t sceneId);
 /** @brief Scenes Cluster Client Attribute Changed
  *
  * Client Attribute Changed
@@ -2250,7 +2266,7 @@ bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t group
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfScenesClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfScenesClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Scenes Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -2260,14 +2276,14 @@ void emberAfScenesClusterClientAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfScenesClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfScenesClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Scenes Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfScenesClusterClientInitCallback(uint8_t endpoint);
+void emberAfScenesClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Scenes Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -2277,7 +2293,8 @@ void emberAfScenesClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfScenesClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfScenesClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief Scenes Cluster Client Message Sent
  *
@@ -2304,7 +2321,7 @@ void emberAfScenesClusterClientMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfScenesClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfScenesClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief Scenes Cluster Client Tick
@@ -2313,7 +2330,7 @@ EmberAfStatus emberAfScenesClusterClientPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfScenesClusterClientTickCallback(uint8_t endpoint);
+void emberAfScenesClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Scenes Cluster Copy Scene
  *
  *
@@ -2345,8 +2362,8 @@ bool emberAfScenesClusterCopySceneResponseCallback(uint8_t status, uint16_t grou
  * @param sceneName   Ver.: always
  * @param extensionFieldSets   Ver.: always
  */
-bool emberAfScenesClusterEnhancedAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                                  uint8_t * extensionFieldSets);
+bool emberAfScenesClusterEnhancedAddSceneCallback(chip::GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
+                                                  uint8_t * sceneName, uint8_t * extensionFieldSets);
 /** @brief Scenes Cluster Enhanced Add Scene Response
  *
  *
@@ -2355,7 +2372,7 @@ bool emberAfScenesClusterEnhancedAddSceneCallback(uint16_t groupId, uint8_t scen
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-bool emberAfScenesClusterEnhancedAddSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterEnhancedAddSceneResponseCallback(uint8_t status, chip::GroupId groupId, uint8_t sceneId);
 /** @brief Scenes Cluster Enhanced View Scene
  *
  *
@@ -2363,7 +2380,7 @@ bool emberAfScenesClusterEnhancedAddSceneResponseCallback(uint8_t status, uint16
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-bool emberAfScenesClusterEnhancedViewSceneCallback(uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterEnhancedViewSceneCallback(chip::GroupId groupId, uint8_t sceneId);
 /** @brief Scenes Cluster Enhanced View Scene Response
  *
  *
@@ -2375,7 +2392,7 @@ bool emberAfScenesClusterEnhancedViewSceneCallback(uint16_t groupId, uint8_t sce
  * @param sceneName   Ver.: always
  * @param extensionFieldSets   Ver.: always
  */
-bool emberAfScenesClusterEnhancedViewSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId,
+bool emberAfScenesClusterEnhancedViewSceneResponseCallback(uint8_t status, chip::GroupId groupId, uint8_t sceneId,
                                                            uint16_t transitionTime, uint8_t * sceneName,
                                                            uint8_t * extensionFieldSets);
 /** @brief Scenes Cluster Get Scene Membership
@@ -2384,7 +2401,7 @@ bool emberAfScenesClusterEnhancedViewSceneResponseCallback(uint8_t status, uint1
  *
  * @param groupId   Ver.: always
  */
-bool emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId);
+bool emberAfScenesClusterGetSceneMembershipCallback(chip::GroupId groupId);
 /** @brief Scenes Cluster Get Scene Membership Response
  *
  *
@@ -2395,8 +2412,8 @@ bool emberAfScenesClusterGetSceneMembershipCallback(uint16_t groupId);
  * @param sceneCount   Ver.: always
  * @param sceneList   Ver.: always
  */
-bool emberAfScenesClusterGetSceneMembershipResponseCallback(uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
-                                                            uint8_t * sceneList);
+bool emberAfScenesClusterGetSceneMembershipResponseCallback(uint8_t status, uint8_t capacity, chip::GroupId groupId,
+                                                            uint8_t sceneCount, uint8_t * sceneList);
 /** @brief Scenes Cluster Recall Scene
  *
  *
@@ -2405,14 +2422,14 @@ bool emberAfScenesClusterGetSceneMembershipResponseCallback(uint8_t status, uint
  * @param sceneId   Ver.: always
  * @param transitionTime   Ver.: since zcl-7.0-07-5123-07
  */
-bool emberAfScenesClusterRecallSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime);
+bool emberAfScenesClusterRecallSceneCallback(chip::GroupId groupId, uint8_t sceneId, uint16_t transitionTime);
 /** @brief Scenes Cluster Remove All Scenes
  *
  *
  *
  * @param groupId   Ver.: always
  */
-bool emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId);
+bool emberAfScenesClusterRemoveAllScenesCallback(chip::GroupId groupId);
 /** @brief Scenes Cluster Remove All Scenes Response
  *
  *
@@ -2420,7 +2437,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(uint16_t groupId);
  * @param status   Ver.: always
  * @param groupId   Ver.: always
  */
-bool emberAfScenesClusterRemoveAllScenesResponseCallback(uint8_t status, uint16_t groupId);
+bool emberAfScenesClusterRemoveAllScenesResponseCallback(uint8_t status, chip::GroupId groupId);
 /** @brief Scenes Cluster Remove Scene
  *
  *
@@ -2428,7 +2445,7 @@ bool emberAfScenesClusterRemoveAllScenesResponseCallback(uint8_t status, uint16_
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-bool emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterRemoveSceneCallback(chip::GroupId groupId, uint8_t sceneId);
 /** @brief Scenes Cluster Remove Scene Response
  *
  *
@@ -2437,7 +2454,7 @@ bool emberAfScenesClusterRemoveSceneCallback(uint16_t groupId, uint8_t sceneId);
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-bool emberAfScenesClusterRemoveSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterRemoveSceneResponseCallback(uint8_t status, chip::GroupId groupId, uint8_t sceneId);
 /** @brief Scenes Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -2445,7 +2462,7 @@ bool emberAfScenesClusterRemoveSceneResponseCallback(uint8_t status, uint16_t gr
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfScenesClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfScenesClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Scenes Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -2455,14 +2472,14 @@ void emberAfScenesClusterServerAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfScenesClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfScenesClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Scenes Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfScenesClusterServerInitCallback(uint8_t endpoint);
+void emberAfScenesClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Scenes Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -2472,7 +2489,8 @@ void emberAfScenesClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfScenesClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfScenesClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief Scenes Cluster Server Message Sent
  *
@@ -2499,7 +2517,7 @@ void emberAfScenesClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfScenesClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfScenesClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief Scenes Cluster Server Tick
@@ -2508,7 +2526,7 @@ EmberAfStatus emberAfScenesClusterServerPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfScenesClusterServerTickCallback(uint8_t endpoint);
+void emberAfScenesClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Scenes Cluster Store Scene
  *
  *
@@ -2516,7 +2534,7 @@ void emberAfScenesClusterServerTickCallback(uint8_t endpoint);
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-bool emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterStoreSceneCallback(chip::GroupId groupId, uint8_t sceneId);
 /** @brief Scenes Cluster Store Scene Response
  *
  *
@@ -2525,7 +2543,7 @@ bool emberAfScenesClusterStoreSceneCallback(uint16_t groupId, uint8_t sceneId);
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-bool emberAfScenesClusterStoreSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterStoreSceneResponseCallback(uint8_t status, chip::GroupId groupId, uint8_t sceneId);
 /** @brief Scenes Cluster View Scene
  *
  *
@@ -2533,7 +2551,7 @@ bool emberAfScenesClusterStoreSceneResponseCallback(uint8_t status, uint16_t gro
  * @param groupId   Ver.: always
  * @param sceneId   Ver.: always
  */
-bool emberAfScenesClusterViewSceneCallback(uint16_t groupId, uint8_t sceneId);
+bool emberAfScenesClusterViewSceneCallback(chip::GroupId groupId, uint8_t sceneId);
 /** @brief Scenes Cluster View Scene Response
  *
  *
@@ -2545,7 +2563,7 @@ bool emberAfScenesClusterViewSceneCallback(uint16_t groupId, uint8_t sceneId);
  * @param sceneName   Ver.: always
  * @param extensionFieldSets   Ver.: always
  */
-bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
+bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, chip::GroupId groupId, uint8_t sceneId, uint16_t transitionTime,
                                                    uint8_t * sceneName, uint8_t * extensionFieldSets);
 /** @} END Scenes Cluster Callbacks */
 
@@ -2558,7 +2576,7 @@ bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t grou
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOnOffClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOnOffClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief On/off Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -2568,14 +2586,14 @@ void emberAfOnOffClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAf
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOnOffClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfOnOffClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief On/off Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOnOffClusterClientInitCallback(uint8_t endpoint);
+void emberAfOnOffClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief On/off Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -2585,7 +2603,7 @@ void emberAfOnOffClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfOnOffClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfOnOffClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 /** @brief On/off Cluster Client Message Sent
  *
@@ -2611,7 +2629,7 @@ void emberAfOnOffClusterClientMessageSentCallback(EmberOutgoingMessageType type,
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfOnOffClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfOnOffClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 /** @brief On/off Cluster Client Tick
@@ -2620,7 +2638,7 @@ EmberAfStatus emberAfOnOffClusterClientPreAttributeChangedCallback(uint8_t endpo
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOnOffClusterClientTickCallback(uint8_t endpoint);
+void emberAfOnOffClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief On/off Cluster Off
  *
  *
@@ -2693,7 +2711,7 @@ bool emberAfOnOffClusterSampleMfgSpecificToggleWithTransitionCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOnOffClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief On/off Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -2703,14 +2721,14 @@ void emberAfOnOffClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAf
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOnOffClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfOnOffClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief On/off Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOnOffClusterServerInitCallback(uint8_t endpoint);
+void emberAfOnOffClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief On/off Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -2720,7 +2738,7 @@ void emberAfOnOffClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 /** @brief On/off Cluster Server Message Sent
  *
@@ -2746,7 +2764,7 @@ void emberAfOnOffClusterServerMessageSentCallback(EmberOutgoingMessageType type,
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfOnOffClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfOnOffClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 /** @brief On/off Cluster Server Tick
@@ -2755,7 +2773,7 @@ EmberAfStatus emberAfOnOffClusterServerPreAttributeChangedCallback(uint8_t endpo
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOnOffClusterServerTickCallback(uint8_t endpoint);
+void emberAfOnOffClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief On/off Cluster Toggle
  *
  *
@@ -2769,7 +2787,7 @@ bool emberAfOnOffClusterToggleCallback(void);
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint);
+void emberAfPluginOnOffClusterServerPostInitCallback(chip::EndpointId endpoint);
 
 /** @} END On/off Cluster Callbacks */
 
@@ -2783,7 +2801,7 @@ void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOnOffSwitchConfigClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOnOffSwitchConfigClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief On/off Switch Configuration Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -2793,14 +2811,15 @@ void emberAfOnOffSwitchConfigClusterClientAttributeChangedCallback(uint8_t endpo
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOnOffSwitchConfigClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfOnOffSwitchConfigClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                  EmberAfStatus status);
 /** @brief On/off Switch Configuration Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOnOffSwitchConfigClusterClientInitCallback(uint8_t endpoint);
+void emberAfOnOffSwitchConfigClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief On/off Switch Configuration Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -2811,7 +2830,7 @@ void emberAfOnOffSwitchConfigClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfOnOffSwitchConfigClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId,
+                                                                                       chip::AttributeId attributeId,
                                                                                        uint16_t manufacturerCode);
 /** @brief On/off Switch Configuration Cluster Client Message Sent
  *
@@ -2838,7 +2857,8 @@ void emberAfOnOffSwitchConfigClusterClientMessageSentCallback(EmberOutgoingMessa
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfOnOffSwitchConfigClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfOnOffSwitchConfigClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                EmberAfAttributeType attributeType, uint8_t size,
                                                                                uint8_t * value);
 /** @brief On/off Switch Configuration Cluster Client Tick
@@ -2847,7 +2867,7 @@ EmberAfStatus emberAfOnOffSwitchConfigClusterClientPreAttributeChangedCallback(u
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOnOffSwitchConfigClusterClientTickCallback(uint8_t endpoint);
+void emberAfOnOffSwitchConfigClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief On/off Switch Configuration Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -2855,7 +2875,7 @@ void emberAfOnOffSwitchConfigClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOnOffSwitchConfigClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOnOffSwitchConfigClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief On/off Switch Configuration Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -2865,14 +2885,15 @@ void emberAfOnOffSwitchConfigClusterServerAttributeChangedCallback(uint8_t endpo
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOnOffSwitchConfigClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfOnOffSwitchConfigClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                  EmberAfStatus status);
 /** @brief On/off Switch Configuration Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOnOffSwitchConfigClusterServerInitCallback(uint8_t endpoint);
+void emberAfOnOffSwitchConfigClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief On/off Switch Configuration Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -2883,7 +2904,7 @@ void emberAfOnOffSwitchConfigClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfOnOffSwitchConfigClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId,
+                                                                                       chip::AttributeId attributeId,
                                                                                        uint16_t manufacturerCode);
 /** @brief On/off Switch Configuration Cluster Server Message Sent
  *
@@ -2910,7 +2931,8 @@ void emberAfOnOffSwitchConfigClusterServerMessageSentCallback(EmberOutgoingMessa
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfOnOffSwitchConfigClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfOnOffSwitchConfigClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                EmberAfAttributeType attributeType, uint8_t size,
                                                                                uint8_t * value);
 /** @brief On/off Switch Configuration Cluster Server Tick
@@ -2919,7 +2941,7 @@ EmberAfStatus emberAfOnOffSwitchConfigClusterServerPreAttributeChangedCallback(u
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOnOffSwitchConfigClusterServerTickCallback(uint8_t endpoint);
+void emberAfOnOffSwitchConfigClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END On/off Switch Configuration Cluster Callbacks */
 
@@ -2933,7 +2955,7 @@ void emberAfOnOffSwitchConfigClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfLevelControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfLevelControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Level Control Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -2943,14 +2965,15 @@ void emberAfLevelControlClusterClientAttributeChangedCallback(uint8_t endpoint, 
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfLevelControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfLevelControlClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                             EmberAfStatus status);
 /** @brief Level Control Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfLevelControlClusterClientInitCallback(uint8_t endpoint);
+void emberAfLevelControlClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Level Control Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -2960,7 +2983,8 @@ void emberAfLevelControlClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfLevelControlClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfLevelControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   uint16_t manufacturerCode);
 /** @brief Level Control Cluster Client Message Sent
  *
@@ -2987,7 +3011,7 @@ void emberAfLevelControlClusterClientMessageSentCallback(EmberOutgoingMessageTyp
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfLevelControlClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfLevelControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                           EmberAfAttributeType attributeType, uint8_t size,
                                                                           uint8_t * value);
 /** @brief Level Control Cluster Client Tick
@@ -2996,7 +3020,7 @@ EmberAfStatus emberAfLevelControlClusterClientPreAttributeChangedCallback(uint8_
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfLevelControlClusterClientTickCallback(uint8_t endpoint);
+void emberAfLevelControlClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Level Control Cluster Move
  *
  *
@@ -3041,7 +3065,7 @@ bool emberAfLevelControlClusterMoveWithOnOffCallback(uint8_t moveMode, uint8_t r
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfLevelControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfLevelControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Level Control Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -3051,14 +3075,15 @@ void emberAfLevelControlClusterServerAttributeChangedCallback(uint8_t endpoint, 
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfLevelControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfLevelControlClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                             EmberAfStatus status);
 /** @brief Level Control Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint);
+void emberAfLevelControlClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Level Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -3068,7 +3093,8 @@ void emberAfLevelControlClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfLevelControlClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfLevelControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   uint16_t manufacturerCode);
 /** @brief Level Control Cluster Server Message Sent
  *
@@ -3095,7 +3121,7 @@ void emberAfLevelControlClusterServerMessageSentCallback(EmberOutgoingMessageTyp
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfLevelControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfLevelControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                           EmberAfAttributeType attributeType, uint8_t size,
                                                                           uint8_t * value);
 /** @brief Level Control Cluster Server Tick
@@ -3104,7 +3130,7 @@ EmberAfStatus emberAfLevelControlClusterServerPreAttributeChangedCallback(uint8_
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfLevelControlClusterServerTickCallback(uint8_t endpoint);
+void emberAfLevelControlClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Level Control Cluster Step
  *
  *
@@ -3153,7 +3179,7 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(void);
  * @param alarmCode   Ver.: always
  * @param clusterId   Ver.: always
  */
-bool emberAfAlarmClusterAlarmCallback(uint8_t alarmCode, uint16_t clusterId);
+bool emberAfAlarmClusterAlarmCallback(uint8_t alarmCode, chip::ClusterId clusterId);
 /** @brief Alarms Cluster Client Attribute Changed
  *
  * Client Attribute Changed
@@ -3161,7 +3187,7 @@ bool emberAfAlarmClusterAlarmCallback(uint8_t alarmCode, uint16_t clusterId);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfAlarmClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfAlarmClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Alarms Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -3171,14 +3197,14 @@ void emberAfAlarmClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAf
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfAlarmClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfAlarmClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Alarms Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfAlarmClusterClientInitCallback(uint8_t endpoint);
+void emberAfAlarmClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Alarms Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -3188,7 +3214,7 @@ void emberAfAlarmClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfAlarmClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfAlarmClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 /** @brief Alarms Cluster Client Message Sent
  *
@@ -3214,7 +3240,7 @@ void emberAfAlarmClusterClientMessageSentCallback(EmberOutgoingMessageType type,
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfAlarmClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfAlarmClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 /** @brief Alarms Cluster Client Tick
@@ -3223,7 +3249,7 @@ EmberAfStatus emberAfAlarmClusterClientPreAttributeChangedCallback(uint8_t endpo
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfAlarmClusterClientTickCallback(uint8_t endpoint);
+void emberAfAlarmClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Alarms Cluster Get Alarm
  *
  *
@@ -3239,7 +3265,7 @@ bool emberAfAlarmClusterGetAlarmCallback(void);
  * @param clusterId   Ver.: always
  * @param timeStamp   Ver.: always
  */
-bool emberAfAlarmClusterGetAlarmResponseCallback(uint8_t status, uint8_t alarmCode, uint16_t clusterId, uint32_t timeStamp);
+bool emberAfAlarmClusterGetAlarmResponseCallback(uint8_t status, uint8_t alarmCode, chip::ClusterId clusterId, uint32_t timeStamp);
 /** @brief Alarms Cluster Reset Alarm
  *
  *
@@ -3247,7 +3273,7 @@ bool emberAfAlarmClusterGetAlarmResponseCallback(uint8_t status, uint8_t alarmCo
  * @param alarmCode   Ver.: always
  * @param clusterId   Ver.: always
  */
-bool emberAfAlarmClusterResetAlarmCallback(uint8_t alarmCode, uint16_t clusterId);
+bool emberAfAlarmClusterResetAlarmCallback(uint8_t alarmCode, chip::ClusterId clusterId);
 /** @brief Alarms Cluster Reset Alarm Log
  *
  *
@@ -3267,7 +3293,7 @@ bool emberAfAlarmClusterResetAllAlarmsCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfAlarmClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfAlarmClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Alarms Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -3277,14 +3303,14 @@ void emberAfAlarmClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAf
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfAlarmClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfAlarmClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Alarms Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfAlarmClusterServerInitCallback(uint8_t endpoint);
+void emberAfAlarmClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Alarms Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -3294,7 +3320,7 @@ void emberAfAlarmClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfAlarmClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfAlarmClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 /** @brief Alarms Cluster Server Message Sent
  *
@@ -3320,7 +3346,7 @@ void emberAfAlarmClusterServerMessageSentCallback(EmberOutgoingMessageType type,
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfAlarmClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfAlarmClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 /** @brief Alarms Cluster Server Tick
@@ -3329,7 +3355,7 @@ EmberAfStatus emberAfAlarmClusterServerPreAttributeChangedCallback(uint8_t endpo
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfAlarmClusterServerTickCallback(uint8_t endpoint);
+void emberAfAlarmClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Alarms Cluster Callbacks */
 
@@ -3343,7 +3369,7 @@ void emberAfAlarmClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfTimeClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfTimeClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Time Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -3353,14 +3379,14 @@ void emberAfTimeClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTimeClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfTimeClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Time Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTimeClusterClientInitCallback(uint8_t endpoint);
+void emberAfTimeClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Time Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -3370,7 +3396,7 @@ void emberAfTimeClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfTimeClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfTimeClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                           uint16_t manufacturerCode);
 /** @brief Time Cluster Client Message Sent
  *
@@ -3396,7 +3422,7 @@ void emberAfTimeClusterClientMessageSentCallback(EmberOutgoingMessageType type, 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfTimeClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfTimeClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                   EmberAfAttributeType attributeType, uint8_t size,
                                                                   uint8_t * value);
 /** @brief Time Cluster Client Tick
@@ -3405,7 +3431,7 @@ EmberAfStatus emberAfTimeClusterClientPreAttributeChangedCallback(uint8_t endpoi
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTimeClusterClientTickCallback(uint8_t endpoint);
+void emberAfTimeClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Time Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -3413,7 +3439,7 @@ void emberAfTimeClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfTimeClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfTimeClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Time Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -3423,14 +3449,14 @@ void emberAfTimeClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTimeClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfTimeClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Time Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTimeClusterServerInitCallback(uint8_t endpoint);
+void emberAfTimeClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Time Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -3440,7 +3466,7 @@ void emberAfTimeClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfTimeClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfTimeClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                           uint16_t manufacturerCode);
 /** @brief Time Cluster Server Message Sent
  *
@@ -3466,7 +3492,7 @@ void emberAfTimeClusterServerMessageSentCallback(EmberOutgoingMessageType type, 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfTimeClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfTimeClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                   EmberAfAttributeType attributeType, uint8_t size,
                                                                   uint8_t * value);
 /** @brief Time Cluster Server Tick
@@ -3475,7 +3501,7 @@ EmberAfStatus emberAfTimeClusterServerPreAttributeChangedCallback(uint8_t endpoi
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTimeClusterServerTickCallback(uint8_t endpoint);
+void emberAfTimeClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Time Cluster Callbacks */
 
@@ -3500,7 +3526,7 @@ bool emberAfRssiLocationClusterAnchorNodeAnnounceCallback(uint8_t * anchorNodeIe
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfRssiLocationClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfRssiLocationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief RSSI Location Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -3510,14 +3536,15 @@ void emberAfRssiLocationClusterClientAttributeChangedCallback(uint8_t endpoint, 
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfRssiLocationClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfRssiLocationClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                             EmberAfStatus status);
 /** @brief RSSI Location Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfRssiLocationClusterClientInitCallback(uint8_t endpoint);
+void emberAfRssiLocationClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief RSSI Location Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -3527,7 +3554,8 @@ void emberAfRssiLocationClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfRssiLocationClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfRssiLocationClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   uint16_t manufacturerCode);
 /** @brief RSSI Location Cluster Client Message Sent
  *
@@ -3554,7 +3582,7 @@ void emberAfRssiLocationClusterClientMessageSentCallback(EmberOutgoingMessageTyp
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfRssiLocationClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfRssiLocationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                           EmberAfAttributeType attributeType, uint8_t size,
                                                                           uint8_t * value);
 /** @brief RSSI Location Cluster Client Tick
@@ -3563,7 +3591,7 @@ EmberAfStatus emberAfRssiLocationClusterClientPreAttributeChangedCallback(uint8_
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfRssiLocationClusterClientTickCallback(uint8_t endpoint);
+void emberAfRssiLocationClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief RSSI Location Cluster Compact Location Data Notification
  *
  *
@@ -3705,7 +3733,7 @@ bool emberAfRssiLocationClusterSendPingsCallback(uint8_t * targetAddress, uint8_
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfRssiLocationClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfRssiLocationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief RSSI Location Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -3715,14 +3743,15 @@ void emberAfRssiLocationClusterServerAttributeChangedCallback(uint8_t endpoint, 
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfRssiLocationClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfRssiLocationClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                             EmberAfStatus status);
 /** @brief RSSI Location Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfRssiLocationClusterServerInitCallback(uint8_t endpoint);
+void emberAfRssiLocationClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief RSSI Location Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -3732,7 +3761,8 @@ void emberAfRssiLocationClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfRssiLocationClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfRssiLocationClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   uint16_t manufacturerCode);
 /** @brief RSSI Location Cluster Server Message Sent
  *
@@ -3759,7 +3789,7 @@ void emberAfRssiLocationClusterServerMessageSentCallback(EmberOutgoingMessageTyp
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfRssiLocationClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfRssiLocationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                           EmberAfAttributeType attributeType, uint8_t size,
                                                                           uint8_t * value);
 /** @brief RSSI Location Cluster Server Tick
@@ -3768,7 +3798,7 @@ EmberAfStatus emberAfRssiLocationClusterServerPreAttributeChangedCallback(uint8_
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfRssiLocationClusterServerTickCallback(uint8_t endpoint);
+void emberAfRssiLocationClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief RSSI Location Cluster Set Absolute Location
  *
  *
@@ -3806,7 +3836,7 @@ bool emberAfRssiLocationClusterSetDeviceConfigurationCallback(int16_t power, uin
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBinaryInputBasicClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBinaryInputBasicClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Binary Input (Basic) Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -3816,14 +3846,15 @@ void emberAfBinaryInputBasicClusterClientAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBinaryInputBasicClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBinaryInputBasicClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Binary Input (Basic) Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBinaryInputBasicClusterClientInitCallback(uint8_t endpoint);
+void emberAfBinaryInputBasicClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Binary Input (Basic) Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -3833,8 +3864,8 @@ void emberAfBinaryInputBasicClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfBinaryInputBasicClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfBinaryInputBasicClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Binary Input (Basic) Cluster Client Message Sent
  *
@@ -3861,7 +3892,8 @@ void emberAfBinaryInputBasicClusterClientMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBinaryInputBasicClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBinaryInputBasicClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Binary Input (Basic) Cluster Client Tick
@@ -3870,7 +3902,7 @@ EmberAfStatus emberAfBinaryInputBasicClusterClientPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBinaryInputBasicClusterClientTickCallback(uint8_t endpoint);
+void emberAfBinaryInputBasicClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Binary Input (Basic) Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -3878,7 +3910,7 @@ void emberAfBinaryInputBasicClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBinaryInputBasicClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBinaryInputBasicClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Binary Input (Basic) Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -3888,14 +3920,15 @@ void emberAfBinaryInputBasicClusterServerAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBinaryInputBasicClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBinaryInputBasicClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Binary Input (Basic) Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBinaryInputBasicClusterServerInitCallback(uint8_t endpoint);
+void emberAfBinaryInputBasicClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Binary Input (Basic) Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -3905,8 +3938,8 @@ void emberAfBinaryInputBasicClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfBinaryInputBasicClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfBinaryInputBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Binary Input (Basic) Cluster Server Message Sent
  *
@@ -3933,7 +3966,8 @@ void emberAfBinaryInputBasicClusterServerMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBinaryInputBasicClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBinaryInputBasicClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Binary Input (Basic) Cluster Server Tick
@@ -3942,7 +3976,7 @@ EmberAfStatus emberAfBinaryInputBasicClusterServerPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBinaryInputBasicClusterServerTickCallback(uint8_t endpoint);
+void emberAfBinaryInputBasicClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Binary Input (Basic) Cluster Callbacks */
 
@@ -3956,7 +3990,7 @@ void emberAfBinaryInputBasicClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfCommissioningClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfCommissioningClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Commissioning Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -3966,14 +4000,15 @@ void emberAfCommissioningClusterClientAttributeChangedCallback(uint8_t endpoint,
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfCommissioningClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfCommissioningClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                              EmberAfStatus status);
 /** @brief Commissioning Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfCommissioningClusterClientInitCallback(uint8_t endpoint);
+void emberAfCommissioningClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Commissioning Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -3983,7 +4018,8 @@ void emberAfCommissioningClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfCommissioningClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfCommissioningClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId,
                                                                                    uint16_t manufacturerCode);
 /** @brief Commissioning Cluster Client Message Sent
  *
@@ -4010,7 +4046,7 @@ void emberAfCommissioningClusterClientMessageSentCallback(EmberOutgoingMessageTy
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfCommissioningClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfCommissioningClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            EmberAfAttributeType attributeType, uint8_t size,
                                                                            uint8_t * value);
 /** @brief Commissioning Cluster Client Tick
@@ -4019,7 +4055,7 @@ EmberAfStatus emberAfCommissioningClusterClientPreAttributeChangedCallback(uint8
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfCommissioningClusterClientTickCallback(uint8_t endpoint);
+void emberAfCommissioningClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Commissioning Cluster Reset Startup Parameters
  *
  *
@@ -4088,7 +4124,7 @@ bool emberAfCommissioningClusterSaveStartupParametersResponseCallback(uint8_t st
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfCommissioningClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfCommissioningClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Commissioning Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -4098,14 +4134,15 @@ void emberAfCommissioningClusterServerAttributeChangedCallback(uint8_t endpoint,
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfCommissioningClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfCommissioningClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                              EmberAfStatus status);
 /** @brief Commissioning Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfCommissioningClusterServerInitCallback(uint8_t endpoint);
+void emberAfCommissioningClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Commissioning Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -4115,7 +4152,8 @@ void emberAfCommissioningClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId,
                                                                                    uint16_t manufacturerCode);
 /** @brief Commissioning Cluster Server Message Sent
  *
@@ -4142,7 +4180,7 @@ void emberAfCommissioningClusterServerMessageSentCallback(EmberOutgoingMessageTy
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfCommissioningClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            EmberAfAttributeType attributeType, uint8_t size,
                                                                            uint8_t * value);
 /** @brief Commissioning Cluster Server Tick
@@ -4151,7 +4189,7 @@ EmberAfStatus emberAfCommissioningClusterServerPreAttributeChangedCallback(uint8
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfCommissioningClusterServerTickCallback(uint8_t endpoint);
+void emberAfCommissioningClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Commissioning Cluster Callbacks */
 
@@ -4165,7 +4203,7 @@ void emberAfCommissioningClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPartitionClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPartitionClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Partition Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -4175,14 +4213,15 @@ void emberAfPartitionClusterClientAttributeChangedCallback(uint8_t endpoint, Emb
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPartitionClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPartitionClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                          EmberAfStatus status);
 /** @brief Partition Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPartitionClusterClientInitCallback(uint8_t endpoint);
+void emberAfPartitionClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Partition Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -4192,7 +4231,8 @@ void emberAfPartitionClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPartitionClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPartitionClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                uint16_t manufacturerCode);
 /** @brief Partition Cluster Client Message Sent
  *
@@ -4219,7 +4259,7 @@ void emberAfPartitionClusterClientMessageSentCallback(EmberOutgoingMessageType t
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPartitionClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPartitionClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                        EmberAfAttributeType attributeType, uint8_t size,
                                                                        uint8_t * value);
 /** @brief Partition Cluster Client Tick
@@ -4228,7 +4268,7 @@ EmberAfStatus emberAfPartitionClusterClientPreAttributeChangedCallback(uint8_t e
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPartitionClusterClientTickCallback(uint8_t endpoint);
+void emberAfPartitionClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Partition Cluster Multiple Ack
  *
  *
@@ -4260,7 +4300,7 @@ bool emberAfPartitionClusterReadHandshakeParamResponseCallback(uint16_t partitio
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPartitionClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPartitionClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Partition Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -4270,14 +4310,15 @@ void emberAfPartitionClusterServerAttributeChangedCallback(uint8_t endpoint, Emb
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPartitionClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPartitionClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                          EmberAfStatus status);
 /** @brief Partition Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPartitionClusterServerInitCallback(uint8_t endpoint);
+void emberAfPartitionClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Partition Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -4287,7 +4328,8 @@ void emberAfPartitionClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPartitionClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPartitionClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                uint16_t manufacturerCode);
 /** @brief Partition Cluster Server Message Sent
  *
@@ -4314,7 +4356,7 @@ void emberAfPartitionClusterServerMessageSentCallback(EmberOutgoingMessageType t
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPartitionClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPartitionClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                        EmberAfAttributeType attributeType, uint8_t size,
                                                                        uint8_t * value);
 /** @brief Partition Cluster Server Tick
@@ -4323,7 +4365,7 @@ EmberAfStatus emberAfPartitionClusterServerPreAttributeChangedCallback(uint8_t e
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPartitionClusterServerTickCallback(uint8_t endpoint);
+void emberAfPartitionClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Partition Cluster Transfer Partitioned Frame
  *
  *
@@ -4353,7 +4395,7 @@ bool emberAfPartitionClusterWriteHandshakeParamCallback(uint16_t partitionedClus
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOtaBootloadClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOtaBootloadClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Over the Air Bootloading Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -4363,14 +4405,15 @@ void emberAfOtaBootloadClusterClientAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOtaBootloadClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfOtaBootloadClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Over the Air Bootloading Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOtaBootloadClusterClientInitCallback(uint8_t endpoint);
+void emberAfOtaBootloadClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Over the Air Bootloading Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -4380,7 +4423,8 @@ void emberAfOtaBootloadClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfOtaBootloadClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfOtaBootloadClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Over the Air Bootloading Cluster Client Message Sent
  *
@@ -4407,7 +4451,7 @@ void emberAfOtaBootloadClusterClientMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfOtaBootloadClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfOtaBootloadClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Over the Air Bootloading Cluster Client Tick
@@ -4416,7 +4460,7 @@ EmberAfStatus emberAfOtaBootloadClusterClientPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOtaBootloadClusterClientTickCallback(uint8_t endpoint);
+void emberAfOtaBootloadClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Over the Air Bootloading Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -4424,7 +4468,7 @@ void emberAfOtaBootloadClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOtaBootloadClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOtaBootloadClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Over the Air Bootloading Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -4434,14 +4478,15 @@ void emberAfOtaBootloadClusterServerAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOtaBootloadClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfOtaBootloadClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Over the Air Bootloading Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOtaBootloadClusterServerInitCallback(uint8_t endpoint);
+void emberAfOtaBootloadClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Over the Air Bootloading Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -4451,7 +4496,8 @@ void emberAfOtaBootloadClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfOtaBootloadClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfOtaBootloadClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Over the Air Bootloading Cluster Server Message Sent
  *
@@ -4478,7 +4524,7 @@ void emberAfOtaBootloadClusterServerMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfOtaBootloadClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfOtaBootloadClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Over the Air Bootloading Cluster Server Tick
@@ -4487,7 +4533,7 @@ EmberAfStatus emberAfOtaBootloadClusterServerPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOtaBootloadClusterServerTickCallback(uint8_t endpoint);
+void emberAfOtaBootloadClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Over the Air Bootloading Cluster Callbacks */
 
@@ -4501,7 +4547,7 @@ void emberAfOtaBootloadClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPowerProfileClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPowerProfileClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Power Profile Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -4511,14 +4557,15 @@ void emberAfPowerProfileClusterClientAttributeChangedCallback(uint8_t endpoint, 
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPowerProfileClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPowerProfileClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                             EmberAfStatus status);
 /** @brief Power Profile Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPowerProfileClusterClientInitCallback(uint8_t endpoint);
+void emberAfPowerProfileClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Power Profile Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -4528,7 +4575,8 @@ void emberAfPowerProfileClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPowerProfileClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPowerProfileClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   uint16_t manufacturerCode);
 /** @brief Power Profile Cluster Client Message Sent
  *
@@ -4555,7 +4603,7 @@ void emberAfPowerProfileClusterClientMessageSentCallback(EmberOutgoingMessageTyp
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPowerProfileClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPowerProfileClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                           EmberAfAttributeType attributeType, uint8_t size,
                                                                           uint8_t * value);
 /** @brief Power Profile Cluster Client Tick
@@ -4564,7 +4612,7 @@ EmberAfStatus emberAfPowerProfileClusterClientPreAttributeChangedCallback(uint8_
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPowerProfileClusterClientTickCallback(uint8_t endpoint);
+void emberAfPowerProfileClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Power Profile Cluster Energy Phases Schedule Notification
  *
  *
@@ -4759,7 +4807,7 @@ bool emberAfPowerProfileClusterPowerProfilesStateNotificationCallback(uint8_t po
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPowerProfileClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPowerProfileClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Power Profile Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -4769,14 +4817,15 @@ void emberAfPowerProfileClusterServerAttributeChangedCallback(uint8_t endpoint, 
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPowerProfileClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPowerProfileClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                             EmberAfStatus status);
 /** @brief Power Profile Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPowerProfileClusterServerInitCallback(uint8_t endpoint);
+void emberAfPowerProfileClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Power Profile Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -4786,7 +4835,8 @@ void emberAfPowerProfileClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPowerProfileClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPowerProfileClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   uint16_t manufacturerCode);
 /** @brief Power Profile Cluster Server Message Sent
  *
@@ -4813,7 +4863,7 @@ void emberAfPowerProfileClusterServerMessageSentCallback(EmberOutgoingMessageTyp
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPowerProfileClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPowerProfileClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                           EmberAfAttributeType attributeType, uint8_t size,
                                                                           uint8_t * value);
 /** @brief Power Profile Cluster Server Tick
@@ -4822,7 +4872,7 @@ EmberAfStatus emberAfPowerProfileClusterServerPreAttributeChangedCallback(uint8_
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPowerProfileClusterServerTickCallback(uint8_t endpoint);
+void emberAfPowerProfileClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Power Profile Cluster Callbacks */
 
@@ -4836,7 +4886,7 @@ void emberAfPowerProfileClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfApplianceControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfApplianceControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Appliance Control Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -4846,14 +4896,15 @@ void emberAfApplianceControlClusterClientAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfApplianceControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfApplianceControlClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Appliance Control Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfApplianceControlClusterClientInitCallback(uint8_t endpoint);
+void emberAfApplianceControlClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Appliance Control Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -4863,8 +4914,8 @@ void emberAfApplianceControlClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfApplianceControlClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfApplianceControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Appliance Control Cluster Client Message Sent
  *
@@ -4891,7 +4942,8 @@ void emberAfApplianceControlClusterClientMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfApplianceControlClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfApplianceControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Appliance Control Cluster Client Tick
@@ -4900,14 +4952,14 @@ EmberAfStatus emberAfApplianceControlClusterClientPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfApplianceControlClusterClientTickCallback(uint8_t endpoint);
+void emberAfApplianceControlClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Appliance Control Cluster Execution Of A Command
  *
  *
  *
  * @param commandId   Ver.: always
  */
-bool emberAfApplianceControlClusterExecutionOfACommandCallback(uint8_t commandId);
+bool emberAfApplianceControlClusterExecutionOfACommandCallback(chip::CommandId commandId);
 /** @brief Appliance Control Cluster Overload Pause
  *
  *
@@ -4934,7 +4986,7 @@ bool emberAfApplianceControlClusterOverloadWarningCallback(uint8_t warningEvent)
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfApplianceControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfApplianceControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Appliance Control Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -4944,14 +4996,15 @@ void emberAfApplianceControlClusterServerAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfApplianceControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfApplianceControlClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Appliance Control Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfApplianceControlClusterServerInitCallback(uint8_t endpoint);
+void emberAfApplianceControlClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Appliance Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -4961,8 +5014,8 @@ void emberAfApplianceControlClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfApplianceControlClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfApplianceControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Appliance Control Cluster Server Message Sent
  *
@@ -4989,7 +5042,8 @@ void emberAfApplianceControlClusterServerMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfApplianceControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfApplianceControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Appliance Control Cluster Server Tick
@@ -4998,7 +5052,7 @@ EmberAfStatus emberAfApplianceControlClusterServerPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfApplianceControlClusterServerTickCallback(uint8_t endpoint);
+void emberAfApplianceControlClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Appliance Control Cluster Signal State
  *
  *
@@ -5062,7 +5116,7 @@ bool emberAfPollControlClusterCheckInResponseCallback(uint8_t startFastPolling, 
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPollControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPollControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Poll Control Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -5072,14 +5126,15 @@ void emberAfPollControlClusterClientAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPollControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPollControlClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Poll Control Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPollControlClusterClientInitCallback(uint8_t endpoint);
+void emberAfPollControlClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Poll Control Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -5089,7 +5144,8 @@ void emberAfPollControlClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPollControlClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPollControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Poll Control Cluster Client Message Sent
  *
@@ -5116,7 +5172,7 @@ void emberAfPollControlClusterClientMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPollControlClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPollControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Poll Control Cluster Client Tick
@@ -5125,7 +5181,7 @@ EmberAfStatus emberAfPollControlClusterClientPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPollControlClusterClientTickCallback(uint8_t endpoint);
+void emberAfPollControlClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Poll Control Cluster Fast Poll Stop
  *
  *
@@ -5139,7 +5195,7 @@ bool emberAfPollControlClusterFastPollStopCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPollControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Poll Control Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -5149,14 +5205,15 @@ void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPollControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPollControlClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Poll Control Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPollControlClusterServerInitCallback(uint8_t endpoint);
+void emberAfPollControlClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Poll Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -5166,7 +5223,8 @@ void emberAfPollControlClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPollControlClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPollControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Poll Control Cluster Server Message Sent
  *
@@ -5193,7 +5251,7 @@ void emberAfPollControlClusterServerMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Poll Control Cluster Server Tick
@@ -5202,7 +5260,7 @@ EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPollControlClusterServerTickCallback(uint8_t endpoint);
+void emberAfPollControlClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Poll Control Cluster Set Long Poll Interval
  *
  *
@@ -5230,7 +5288,7 @@ bool emberAfPollControlClusterSetShortPollIntervalCallback(uint16_t newShortPoll
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfGreenPowerClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfGreenPowerClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Green Power Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -5240,14 +5298,15 @@ void emberAfGreenPowerClusterClientAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfGreenPowerClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfGreenPowerClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief Green Power Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfGreenPowerClusterClientInitCallback(uint8_t endpoint);
+void emberAfGreenPowerClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Green Power Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -5257,7 +5316,8 @@ void emberAfGreenPowerClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfGreenPowerClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfGreenPowerClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief Green Power Cluster Client Message Sent
  *
@@ -5284,7 +5344,7 @@ void emberAfGreenPowerClusterClientMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfGreenPowerClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfGreenPowerClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief Green Power Cluster Client Tick
@@ -5293,7 +5353,7 @@ EmberAfStatus emberAfGreenPowerClusterClientPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfGreenPowerClusterClientTickCallback(uint8_t endpoint);
+void emberAfGreenPowerClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Green Power Cluster Gp Commissioning Notification
  *
  *
@@ -5310,7 +5370,7 @@ void emberAfGreenPowerClusterClientTickCallback(uint8_t endpoint);
  * @param mic   Ver.: since gp-1.0-09-5499-24
  */
 bool emberAfGreenPowerClusterGpCommissioningNotificationCallback(uint16_t options, uint32_t gpdSrcId, uint8_t * gpdIeee,
-                                                                 uint8_t endpoint, uint32_t gpdSecurityFrameCounter,
+                                                                 chip::EndpointId endpoint, uint32_t gpdSecurityFrameCounter,
                                                                  uint8_t gpdCommandId, uint8_t * gpdCommandPayload,
                                                                  uint16_t gppShortAddress, uint8_t gppLink, uint32_t mic);
 /** @brief Green Power Cluster Gp Notification
@@ -5398,7 +5458,7 @@ bool emberAfGreenPowerClusterGpPairingCallback(uint32_t options, uint32_t gpdSrc
  * @param reportDescriptor   Ver.: always
  */
 bool emberAfGreenPowerClusterGpPairingConfigurationCallback(
-    uint8_t actions, uint16_t options, uint32_t gpdSrcId, uint8_t * gpdIeee, uint8_t endpoint, uint8_t deviceId,
+    uint8_t actions, uint16_t options, uint32_t gpdSrcId, uint8_t * gpdIeee, chip::EndpointId endpoint, uint8_t deviceId,
     uint8_t groupListCount, uint8_t * groupList, uint16_t gpdAssignedAlias, uint8_t groupcastRadius, uint8_t securityOptions,
     uint32_t gpdSecurityFrameCounter, uint8_t * gpdSecurityKey, uint8_t numberOfPairedEndpoints, uint8_t * pairedEndpoints,
     uint8_t applicationInformation, uint16_t manufacturerId, uint16_t modeId, uint8_t numberOfGpdCommands,
@@ -5414,7 +5474,8 @@ bool emberAfGreenPowerClusterGpPairingConfigurationCallback(
  * @param gpdIeee   Ver.: since gp-1.0-09-5499-24
  * @param endpoint   Ver.: always
  */
-bool emberAfGreenPowerClusterGpPairingSearchCallback(uint16_t options, uint32_t gpdSrcId, uint8_t * gpdIeee, uint8_t endpoint);
+bool emberAfGreenPowerClusterGpPairingSearchCallback(uint16_t options, uint32_t gpdSrcId, uint8_t * gpdIeee,
+                                                     chip::EndpointId endpoint);
 /** @brief Green Power Cluster Gp Proxy Commissioning Mode
  *
  *
@@ -5462,8 +5523,8 @@ bool emberAfGreenPowerClusterGpProxyTableResponseCallback(uint8_t status, uint8_
  * @param gpdCommandPayload   Ver.: always
  */
 bool emberAfGreenPowerClusterGpResponseCallback(uint8_t options, uint16_t tempMasterShortAddress, uint8_t tempMasterTxChannel,
-                                                uint32_t gpdSrcId, uint8_t * gpdIeee, uint8_t endpoint, uint8_t gpdCommandId,
-                                                uint8_t * gpdCommandPayload);
+                                                uint32_t gpdSrcId, uint8_t * gpdIeee, chip::EndpointId endpoint,
+                                                uint8_t gpdCommandId, uint8_t * gpdCommandPayload);
 /** @brief Green Power Cluster Gp Sink Commissioning Mode
  *
  *
@@ -5532,7 +5593,7 @@ bool emberAfGreenPowerClusterGpTranslationTableResponseCallback(uint8_t status, 
  * @param translations   Ver.: since gp-1.0-09-5499-24
  */
 bool emberAfGreenPowerClusterGpTranslationTableUpdateCallback(uint16_t options, uint32_t gpdSrcId, uint8_t * gpdIeee,
-                                                              uint8_t endpoint, uint8_t * translations);
+                                                              chip::EndpointId endpoint, uint8_t * translations);
 /** @brief Green Power Cluster Gp Tunneling Stop
  *
  *
@@ -5555,7 +5616,7 @@ bool emberAfGreenPowerClusterGpTunnelingStopCallback(uint8_t options, uint32_t g
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfGreenPowerClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfGreenPowerClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Green Power Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -5565,14 +5626,15 @@ void emberAfGreenPowerClusterServerAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfGreenPowerClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfGreenPowerClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief Green Power Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfGreenPowerClusterServerInitCallback(uint8_t endpoint);
+void emberAfGreenPowerClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Green Power Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -5582,7 +5644,8 @@ void emberAfGreenPowerClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfGreenPowerClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfGreenPowerClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief Green Power Cluster Server Message Sent
  *
@@ -5609,7 +5672,7 @@ void emberAfGreenPowerClusterServerMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfGreenPowerClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfGreenPowerClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief Green Power Cluster Server Tick
@@ -5618,7 +5681,7 @@ EmberAfStatus emberAfGreenPowerClusterServerPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfGreenPowerClusterServerTickCallback(uint8_t endpoint);
+void emberAfGreenPowerClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Green Power Cluster Callbacks */
 
@@ -5632,7 +5695,7 @@ void emberAfGreenPowerClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfKeepaliveClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfKeepaliveClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Keep-Alive Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -5642,14 +5705,15 @@ void emberAfKeepaliveClusterClientAttributeChangedCallback(uint8_t endpoint, Emb
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfKeepaliveClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfKeepaliveClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                          EmberAfStatus status);
 /** @brief Keep-Alive Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfKeepaliveClusterClientInitCallback(uint8_t endpoint);
+void emberAfKeepaliveClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Keep-Alive Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -5659,7 +5723,8 @@ void emberAfKeepaliveClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfKeepaliveClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfKeepaliveClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                uint16_t manufacturerCode);
 /** @brief Keep-Alive Cluster Client Message Sent
  *
@@ -5686,7 +5751,7 @@ void emberAfKeepaliveClusterClientMessageSentCallback(EmberOutgoingMessageType t
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfKeepaliveClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfKeepaliveClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                        EmberAfAttributeType attributeType, uint8_t size,
                                                                        uint8_t * value);
 /** @brief Keep-Alive Cluster Client Tick
@@ -5695,7 +5760,7 @@ EmberAfStatus emberAfKeepaliveClusterClientPreAttributeChangedCallback(uint8_t e
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfKeepaliveClusterClientTickCallback(uint8_t endpoint);
+void emberAfKeepaliveClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Keep-Alive Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -5703,7 +5768,7 @@ void emberAfKeepaliveClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfKeepaliveClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfKeepaliveClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Keep-Alive Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -5713,14 +5778,15 @@ void emberAfKeepaliveClusterServerAttributeChangedCallback(uint8_t endpoint, Emb
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfKeepaliveClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfKeepaliveClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                          EmberAfStatus status);
 /** @brief Keep-Alive Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfKeepaliveClusterServerInitCallback(uint8_t endpoint);
+void emberAfKeepaliveClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Keep-Alive Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -5730,7 +5796,8 @@ void emberAfKeepaliveClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfKeepaliveClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfKeepaliveClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                uint16_t manufacturerCode);
 /** @brief Keep-Alive Cluster Server Message Sent
  *
@@ -5757,7 +5824,7 @@ void emberAfKeepaliveClusterServerMessageSentCallback(EmberOutgoingMessageType t
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfKeepaliveClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfKeepaliveClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                        EmberAfAttributeType attributeType, uint8_t size,
                                                                        uint8_t * value);
 /** @brief Keep-Alive Cluster Server Tick
@@ -5766,7 +5833,7 @@ EmberAfStatus emberAfKeepaliveClusterServerPreAttributeChangedCallback(uint8_t e
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfKeepaliveClusterServerTickCallback(uint8_t endpoint);
+void emberAfKeepaliveClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Keep-Alive Cluster Callbacks */
 
@@ -5780,7 +5847,7 @@ void emberAfKeepaliveClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfShadeConfigClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfShadeConfigClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Shade Configuration Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -5790,14 +5857,15 @@ void emberAfShadeConfigClusterClientAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfShadeConfigClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfShadeConfigClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Shade Configuration Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfShadeConfigClusterClientInitCallback(uint8_t endpoint);
+void emberAfShadeConfigClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Shade Configuration Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -5807,7 +5875,8 @@ void emberAfShadeConfigClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfShadeConfigClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfShadeConfigClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Shade Configuration Cluster Client Message Sent
  *
@@ -5834,7 +5903,7 @@ void emberAfShadeConfigClusterClientMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfShadeConfigClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfShadeConfigClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Shade Configuration Cluster Client Tick
@@ -5843,7 +5912,7 @@ EmberAfStatus emberAfShadeConfigClusterClientPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfShadeConfigClusterClientTickCallback(uint8_t endpoint);
+void emberAfShadeConfigClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Shade Configuration Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -5851,7 +5920,7 @@ void emberAfShadeConfigClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfShadeConfigClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfShadeConfigClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Shade Configuration Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -5861,14 +5930,15 @@ void emberAfShadeConfigClusterServerAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfShadeConfigClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfShadeConfigClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Shade Configuration Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfShadeConfigClusterServerInitCallback(uint8_t endpoint);
+void emberAfShadeConfigClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Shade Configuration Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -5878,7 +5948,8 @@ void emberAfShadeConfigClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfShadeConfigClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfShadeConfigClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Shade Configuration Cluster Server Message Sent
  *
@@ -5905,7 +5976,7 @@ void emberAfShadeConfigClusterServerMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfShadeConfigClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfShadeConfigClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Shade Configuration Cluster Server Tick
@@ -5914,7 +5985,7 @@ EmberAfStatus emberAfShadeConfigClusterServerPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfShadeConfigClusterServerTickCallback(uint8_t endpoint);
+void emberAfShadeConfigClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Shade Configuration Cluster Callbacks */
 
@@ -6026,7 +6097,7 @@ bool emberAfDoorLockClusterClearYeardayScheduleResponseCallback(uint8_t status);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDoorLockClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDoorLockClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Door Lock Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -6036,14 +6107,15 @@ void emberAfDoorLockClusterClientAttributeChangedCallback(uint8_t endpoint, Embe
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDoorLockClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDoorLockClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                         EmberAfStatus status);
 /** @brief Door Lock Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDoorLockClusterClientInitCallback(uint8_t endpoint);
+void emberAfDoorLockClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Door Lock Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -6053,7 +6125,8 @@ void emberAfDoorLockClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDoorLockClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfDoorLockClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               uint16_t manufacturerCode);
 /** @brief Door Lock Cluster Client Message Sent
  *
@@ -6080,7 +6153,7 @@ void emberAfDoorLockClusterClientMessageSentCallback(EmberOutgoingMessageType ty
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDoorLockClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDoorLockClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                       EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 /** @brief Door Lock Cluster Client Tick
@@ -6089,7 +6162,7 @@ EmberAfStatus emberAfDoorLockClusterClientPreAttributeChangedCallback(uint8_t en
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDoorLockClusterClientTickCallback(uint8_t endpoint);
+void emberAfDoorLockClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Door Lock Cluster Get Holiday Schedule
  *
  *
@@ -6288,7 +6361,7 @@ bool emberAfDoorLockClusterProgrammingEventNotificationCallback(uint8_t source, 
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDoorLockClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Door Lock Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -6298,14 +6371,15 @@ void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint, Embe
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDoorLockClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDoorLockClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                         EmberAfStatus status);
 /** @brief Door Lock Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDoorLockClusterServerInitCallback(uint8_t endpoint);
+void emberAfDoorLockClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Door Lock Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -6315,7 +6389,8 @@ void emberAfDoorLockClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDoorLockClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfDoorLockClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               uint16_t manufacturerCode);
 /** @brief Door Lock Cluster Server Message Sent
  *
@@ -6342,7 +6417,7 @@ void emberAfDoorLockClusterServerMessageSentCallback(EmberOutgoingMessageType ty
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDoorLockClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDoorLockClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                       EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 /** @brief Door Lock Cluster Server Tick
@@ -6351,7 +6426,7 @@ EmberAfStatus emberAfDoorLockClusterServerPreAttributeChangedCallback(uint8_t en
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDoorLockClusterServerTickCallback(uint8_t endpoint);
+void emberAfDoorLockClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Door Lock Cluster Set Holiday Schedule
  *
  *
@@ -6529,7 +6604,7 @@ bool emberAfDoorLockClusterUnlockWithTimeoutResponseCallback(uint8_t status);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfWindowCoveringClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfWindowCoveringClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Window Covering Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -6539,14 +6614,15 @@ void emberAfWindowCoveringClusterClientAttributeChangedCallback(uint8_t endpoint
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfWindowCoveringClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfWindowCoveringClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                               EmberAfStatus status);
 /** @brief Window Covering Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfWindowCoveringClusterClientInitCallback(uint8_t endpoint);
+void emberAfWindowCoveringClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Window Covering Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -6556,8 +6632,8 @@ void emberAfWindowCoveringClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfWindowCoveringClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                    EmberAfAttributeId attributeId,
+void emberAfWindowCoveringClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId,
                                                                                     uint16_t manufacturerCode);
 /** @brief Window Covering Cluster Client Message Sent
  *
@@ -6584,7 +6660,8 @@ void emberAfWindowCoveringClusterClientMessageSentCallback(EmberOutgoingMessageT
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfWindowCoveringClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfWindowCoveringClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             EmberAfAttributeType attributeType, uint8_t size,
                                                                             uint8_t * value);
 /** @brief Window Covering Cluster Client Tick
@@ -6593,7 +6670,7 @@ EmberAfStatus emberAfWindowCoveringClusterClientPreAttributeChangedCallback(uint
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfWindowCoveringClusterClientTickCallback(uint8_t endpoint);
+void emberAfWindowCoveringClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Window Covering Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -6601,7 +6678,7 @@ void emberAfWindowCoveringClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfWindowCoveringClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfWindowCoveringClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Window Covering Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -6611,14 +6688,15 @@ void emberAfWindowCoveringClusterServerAttributeChangedCallback(uint8_t endpoint
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfWindowCoveringClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfWindowCoveringClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                               EmberAfStatus status);
 /** @brief Window Covering Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfWindowCoveringClusterServerInitCallback(uint8_t endpoint);
+void emberAfWindowCoveringClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Window Covering Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -6628,8 +6706,8 @@ void emberAfWindowCoveringClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfWindowCoveringClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                    EmberAfAttributeId attributeId,
+void emberAfWindowCoveringClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId,
                                                                                     uint16_t manufacturerCode);
 /** @brief Window Covering Cluster Server Message Sent
  *
@@ -6656,7 +6734,8 @@ void emberAfWindowCoveringClusterServerMessageSentCallback(EmberOutgoingMessageT
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfWindowCoveringClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfWindowCoveringClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             EmberAfAttributeType attributeType, uint8_t size,
                                                                             uint8_t * value);
 /** @brief Window Covering Cluster Server Tick
@@ -6665,7 +6744,7 @@ EmberAfStatus emberAfWindowCoveringClusterServerPreAttributeChangedCallback(uint
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfWindowCoveringClusterServerTickCallback(uint8_t endpoint);
+void emberAfWindowCoveringClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Window Covering Cluster Window Covering Down Close
  *
  *
@@ -6738,7 +6817,7 @@ bool emberAfBarrierControlClusterBarrierControlStopCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBarrierControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBarrierControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Barrier Control Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -6748,14 +6827,15 @@ void emberAfBarrierControlClusterClientAttributeChangedCallback(uint8_t endpoint
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBarrierControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBarrierControlClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                               EmberAfStatus status);
 /** @brief Barrier Control Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBarrierControlClusterClientInitCallback(uint8_t endpoint);
+void emberAfBarrierControlClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Barrier Control Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -6765,8 +6845,8 @@ void emberAfBarrierControlClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfBarrierControlClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                    EmberAfAttributeId attributeId,
+void emberAfBarrierControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId,
                                                                                     uint16_t manufacturerCode);
 /** @brief Barrier Control Cluster Client Message Sent
  *
@@ -6793,7 +6873,8 @@ void emberAfBarrierControlClusterClientMessageSentCallback(EmberOutgoingMessageT
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBarrierControlClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBarrierControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             EmberAfAttributeType attributeType, uint8_t size,
                                                                             uint8_t * value);
 /** @brief Barrier Control Cluster Client Tick
@@ -6802,7 +6883,7 @@ EmberAfStatus emberAfBarrierControlClusterClientPreAttributeChangedCallback(uint
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBarrierControlClusterClientTickCallback(uint8_t endpoint);
+void emberAfBarrierControlClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Barrier Control Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -6810,7 +6891,7 @@ void emberAfBarrierControlClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBarrierControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBarrierControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Barrier Control Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -6820,14 +6901,15 @@ void emberAfBarrierControlClusterServerAttributeChangedCallback(uint8_t endpoint
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBarrierControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBarrierControlClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                               EmberAfStatus status);
 /** @brief Barrier Control Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBarrierControlClusterServerInitCallback(uint8_t endpoint);
+void emberAfBarrierControlClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Barrier Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -6837,8 +6919,8 @@ void emberAfBarrierControlClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfBarrierControlClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                    EmberAfAttributeId attributeId,
+void emberAfBarrierControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId,
                                                                                     uint16_t manufacturerCode);
 /** @brief Barrier Control Cluster Server Message Sent
  *
@@ -6865,7 +6947,8 @@ void emberAfBarrierControlClusterServerMessageSentCallback(EmberOutgoingMessageT
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBarrierControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBarrierControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             EmberAfAttributeType attributeType, uint8_t size,
                                                                             uint8_t * value);
 /** @brief Barrier Control Cluster Server Tick
@@ -6874,7 +6957,7 @@ EmberAfStatus emberAfBarrierControlClusterServerPreAttributeChangedCallback(uint
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBarrierControlClusterServerTickCallback(uint8_t endpoint);
+void emberAfBarrierControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Barrier Control Cluster Callbacks */
 
@@ -6888,7 +6971,7 @@ void emberAfBarrierControlClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPumpConfigControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPumpConfigControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Pump Configuration and Control Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -6898,14 +6981,15 @@ void emberAfPumpConfigControlClusterClientAttributeChangedCallback(uint8_t endpo
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPumpConfigControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPumpConfigControlClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                  EmberAfStatus status);
 /** @brief Pump Configuration and Control Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPumpConfigControlClusterClientInitCallback(uint8_t endpoint);
+void emberAfPumpConfigControlClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Pump Configuration and Control Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -6916,7 +7000,7 @@ void emberAfPumpConfigControlClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfPumpConfigControlClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId,
+                                                                                       chip::AttributeId attributeId,
                                                                                        uint16_t manufacturerCode);
 /** @brief Pump Configuration and Control Cluster Client Message Sent
  *
@@ -6943,7 +7027,8 @@ void emberAfPumpConfigControlClusterClientMessageSentCallback(EmberOutgoingMessa
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPumpConfigControlClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPumpConfigControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                EmberAfAttributeType attributeType, uint8_t size,
                                                                                uint8_t * value);
 /** @brief Pump Configuration and Control Cluster Client Tick
@@ -6952,7 +7037,7 @@ EmberAfStatus emberAfPumpConfigControlClusterClientPreAttributeChangedCallback(u
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPumpConfigControlClusterClientTickCallback(uint8_t endpoint);
+void emberAfPumpConfigControlClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Pump Configuration and Control Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -6960,7 +7045,7 @@ void emberAfPumpConfigControlClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPumpConfigControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPumpConfigControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Pump Configuration and Control Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -6970,14 +7055,15 @@ void emberAfPumpConfigControlClusterServerAttributeChangedCallback(uint8_t endpo
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPumpConfigControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPumpConfigControlClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                  EmberAfStatus status);
 /** @brief Pump Configuration and Control Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPumpConfigControlClusterServerInitCallback(uint8_t endpoint);
+void emberAfPumpConfigControlClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Pump Configuration and Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -6988,7 +7074,7 @@ void emberAfPumpConfigControlClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfPumpConfigControlClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId,
+                                                                                       chip::AttributeId attributeId,
                                                                                        uint16_t manufacturerCode);
 /** @brief Pump Configuration and Control Cluster Server Message Sent
  *
@@ -7015,7 +7101,8 @@ void emberAfPumpConfigControlClusterServerMessageSentCallback(EmberOutgoingMessa
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPumpConfigControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPumpConfigControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                EmberAfAttributeType attributeType, uint8_t size,
                                                                                uint8_t * value);
 /** @brief Pump Configuration and Control Cluster Server Tick
@@ -7024,7 +7111,7 @@ EmberAfStatus emberAfPumpConfigControlClusterServerPreAttributeChangedCallback(u
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPumpConfigControlClusterServerTickCallback(uint8_t endpoint);
+void emberAfPumpConfigControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Pump Configuration and Control Cluster Callbacks */
 
@@ -7044,7 +7131,7 @@ bool emberAfThermostatClusterClearWeeklyScheduleCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfThermostatClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfThermostatClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Thermostat Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -7054,14 +7141,15 @@ void emberAfThermostatClusterClientAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfThermostatClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfThermostatClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief Thermostat Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfThermostatClusterClientInitCallback(uint8_t endpoint);
+void emberAfThermostatClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Thermostat Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -7071,7 +7159,8 @@ void emberAfThermostatClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfThermostatClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfThermostatClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief Thermostat Cluster Client Message Sent
  *
@@ -7098,7 +7187,7 @@ void emberAfThermostatClusterClientMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfThermostatClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfThermostatClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief Thermostat Cluster Client Tick
@@ -7107,7 +7196,7 @@ EmberAfStatus emberAfThermostatClusterClientPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfThermostatClusterClientTickCallback(uint8_t endpoint);
+void emberAfThermostatClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Thermostat Cluster Current Weekly Schedule
  *
  *
@@ -7153,7 +7242,7 @@ bool emberAfThermostatClusterRelayStatusLogCallback(uint16_t timeOfDay, uint16_t
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfThermostatClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfThermostatClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Thermostat Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -7163,14 +7252,15 @@ void emberAfThermostatClusterServerAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfThermostatClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfThermostatClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief Thermostat Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfThermostatClusterServerInitCallback(uint8_t endpoint);
+void emberAfThermostatClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Thermostat Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -7180,7 +7270,8 @@ void emberAfThermostatClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfThermostatClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfThermostatClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief Thermostat Cluster Server Message Sent
  *
@@ -7207,7 +7298,7 @@ void emberAfThermostatClusterServerMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief Thermostat Cluster Server Tick
@@ -7216,7 +7307,7 @@ EmberAfStatus emberAfThermostatClusterServerPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfThermostatClusterServerTickCallback(uint8_t endpoint);
+void emberAfThermostatClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Thermostat Cluster Set Weekly Schedule
  *
  *
@@ -7249,7 +7340,7 @@ bool emberAfThermostatClusterSetpointRaiseLowerCallback(uint8_t mode, int8_t amo
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfFanControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfFanControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Fan Control Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -7259,14 +7350,15 @@ void emberAfFanControlClusterClientAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfFanControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfFanControlClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief Fan Control Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfFanControlClusterClientInitCallback(uint8_t endpoint);
+void emberAfFanControlClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Fan Control Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -7276,7 +7368,8 @@ void emberAfFanControlClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfFanControlClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfFanControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief Fan Control Cluster Client Message Sent
  *
@@ -7303,7 +7396,7 @@ void emberAfFanControlClusterClientMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfFanControlClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfFanControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief Fan Control Cluster Client Tick
@@ -7312,7 +7405,7 @@ EmberAfStatus emberAfFanControlClusterClientPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfFanControlClusterClientTickCallback(uint8_t endpoint);
+void emberAfFanControlClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Fan Control Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -7320,7 +7413,7 @@ void emberAfFanControlClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfFanControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfFanControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Fan Control Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -7330,14 +7423,15 @@ void emberAfFanControlClusterServerAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfFanControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfFanControlClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief Fan Control Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfFanControlClusterServerInitCallback(uint8_t endpoint);
+void emberAfFanControlClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Fan Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -7347,7 +7441,8 @@ void emberAfFanControlClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfFanControlClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfFanControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief Fan Control Cluster Server Message Sent
  *
@@ -7374,7 +7469,7 @@ void emberAfFanControlClusterServerMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfFanControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfFanControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief Fan Control Cluster Server Tick
@@ -7383,7 +7478,7 @@ EmberAfStatus emberAfFanControlClusterServerPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfFanControlClusterServerTickCallback(uint8_t endpoint);
+void emberAfFanControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Fan Control Cluster Callbacks */
 
@@ -7397,7 +7492,7 @@ void emberAfFanControlClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDehumidControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDehumidControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Dehumidification Control Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -7407,14 +7502,15 @@ void emberAfDehumidControlClusterClientAttributeChangedCallback(uint8_t endpoint
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDehumidControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDehumidControlClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                               EmberAfStatus status);
 /** @brief Dehumidification Control Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDehumidControlClusterClientInitCallback(uint8_t endpoint);
+void emberAfDehumidControlClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Dehumidification Control Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -7424,8 +7520,8 @@ void emberAfDehumidControlClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDehumidControlClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                    EmberAfAttributeId attributeId,
+void emberAfDehumidControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId,
                                                                                     uint16_t manufacturerCode);
 /** @brief Dehumidification Control Cluster Client Message Sent
  *
@@ -7452,7 +7548,8 @@ void emberAfDehumidControlClusterClientMessageSentCallback(EmberOutgoingMessageT
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDehumidControlClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDehumidControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             EmberAfAttributeType attributeType, uint8_t size,
                                                                             uint8_t * value);
 /** @brief Dehumidification Control Cluster Client Tick
@@ -7461,7 +7558,7 @@ EmberAfStatus emberAfDehumidControlClusterClientPreAttributeChangedCallback(uint
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDehumidControlClusterClientTickCallback(uint8_t endpoint);
+void emberAfDehumidControlClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Dehumidification Control Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -7469,7 +7566,7 @@ void emberAfDehumidControlClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDehumidControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDehumidControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Dehumidification Control Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -7479,14 +7576,15 @@ void emberAfDehumidControlClusterServerAttributeChangedCallback(uint8_t endpoint
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDehumidControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDehumidControlClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                               EmberAfStatus status);
 /** @brief Dehumidification Control Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDehumidControlClusterServerInitCallback(uint8_t endpoint);
+void emberAfDehumidControlClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Dehumidification Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -7496,8 +7594,8 @@ void emberAfDehumidControlClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDehumidControlClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                    EmberAfAttributeId attributeId,
+void emberAfDehumidControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId,
                                                                                     uint16_t manufacturerCode);
 /** @brief Dehumidification Control Cluster Server Message Sent
  *
@@ -7524,7 +7622,8 @@ void emberAfDehumidControlClusterServerMessageSentCallback(EmberOutgoingMessageT
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDehumidControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDehumidControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             EmberAfAttributeType attributeType, uint8_t size,
                                                                             uint8_t * value);
 /** @brief Dehumidification Control Cluster Server Tick
@@ -7533,7 +7632,7 @@ EmberAfStatus emberAfDehumidControlClusterServerPreAttributeChangedCallback(uint
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDehumidControlClusterServerTickCallback(uint8_t endpoint);
+void emberAfDehumidControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Dehumidification Control Cluster Callbacks */
 
@@ -7547,7 +7646,7 @@ void emberAfDehumidControlClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfThermostatUiConfigClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfThermostatUiConfigClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Thermostat User Interface Configuration Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -7557,14 +7656,15 @@ void emberAfThermostatUiConfigClusterClientAttributeChangedCallback(uint8_t endp
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfThermostatUiConfigClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfThermostatUiConfigClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                   EmberAfStatus status);
 /** @brief Thermostat User Interface Configuration Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfThermostatUiConfigClusterClientInitCallback(uint8_t endpoint);
+void emberAfThermostatUiConfigClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Thermostat User Interface Configuration Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -7575,7 +7675,7 @@ void emberAfThermostatUiConfigClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfThermostatUiConfigClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                        EmberAfAttributeId attributeId,
+                                                                                        chip::AttributeId attributeId,
                                                                                         uint16_t manufacturerCode);
 /** @brief Thermostat User Interface Configuration Cluster Client Message Sent
  *
@@ -7602,7 +7702,8 @@ void emberAfThermostatUiConfigClusterClientMessageSentCallback(EmberOutgoingMess
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfThermostatUiConfigClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfThermostatUiConfigClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 EmberAfAttributeType attributeType, uint8_t size,
                                                                                 uint8_t * value);
 /** @brief Thermostat User Interface Configuration Cluster Client Tick
@@ -7611,7 +7712,7 @@ EmberAfStatus emberAfThermostatUiConfigClusterClientPreAttributeChangedCallback(
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfThermostatUiConfigClusterClientTickCallback(uint8_t endpoint);
+void emberAfThermostatUiConfigClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Thermostat User Interface Configuration Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -7619,7 +7720,7 @@ void emberAfThermostatUiConfigClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfThermostatUiConfigClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfThermostatUiConfigClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Thermostat User Interface Configuration Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -7629,14 +7730,15 @@ void emberAfThermostatUiConfigClusterServerAttributeChangedCallback(uint8_t endp
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfThermostatUiConfigClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfThermostatUiConfigClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                   EmberAfStatus status);
 /** @brief Thermostat User Interface Configuration Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfThermostatUiConfigClusterServerInitCallback(uint8_t endpoint);
+void emberAfThermostatUiConfigClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Thermostat User Interface Configuration Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -7647,7 +7749,7 @@ void emberAfThermostatUiConfigClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfThermostatUiConfigClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                        EmberAfAttributeId attributeId,
+                                                                                        chip::AttributeId attributeId,
                                                                                         uint16_t manufacturerCode);
 /** @brief Thermostat User Interface Configuration Cluster Server Message Sent
  *
@@ -7674,7 +7776,8 @@ void emberAfThermostatUiConfigClusterServerMessageSentCallback(EmberOutgoingMess
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfThermostatUiConfigClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfThermostatUiConfigClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 EmberAfAttributeType attributeType, uint8_t size,
                                                                                 uint8_t * value);
 /** @brief Thermostat User Interface Configuration Cluster Server Tick
@@ -7683,7 +7786,7 @@ EmberAfStatus emberAfThermostatUiConfigClusterServerPreAttributeChangedCallback(
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfThermostatUiConfigClusterServerTickCallback(uint8_t endpoint);
+void emberAfThermostatUiConfigClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Thermostat User Interface Configuration Cluster Callbacks */
 
@@ -7697,7 +7800,7 @@ void emberAfThermostatUiConfigClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfColorControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfColorControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Color Control Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -7707,14 +7810,15 @@ void emberAfColorControlClusterClientAttributeChangedCallback(uint8_t endpoint, 
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfColorControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfColorControlClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                             EmberAfStatus status);
 /** @brief Color Control Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfColorControlClusterClientInitCallback(uint8_t endpoint);
+void emberAfColorControlClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Color Control Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -7724,7 +7828,8 @@ void emberAfColorControlClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfColorControlClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfColorControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   uint16_t manufacturerCode);
 /** @brief Color Control Cluster Client Message Sent
  *
@@ -7751,7 +7856,7 @@ void emberAfColorControlClusterClientMessageSentCallback(EmberOutgoingMessageTyp
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfColorControlClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfColorControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                           EmberAfAttributeType attributeType, uint8_t size,
                                                                           uint8_t * value);
 /** @brief Color Control Cluster Client Tick
@@ -7760,7 +7865,7 @@ EmberAfStatus emberAfColorControlClusterClientPreAttributeChangedCallback(uint8_
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfColorControlClusterClientTickCallback(uint8_t endpoint);
+void emberAfColorControlClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Color Control Cluster Color Loop Set
  *
  *
@@ -7918,7 +8023,7 @@ bool emberAfColorControlClusterMoveToSaturationCallback(uint8_t saturation, uint
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfColorControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfColorControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Color Control Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -7928,14 +8033,15 @@ void emberAfColorControlClusterServerAttributeChangedCallback(uint8_t endpoint, 
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfColorControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfColorControlClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                             EmberAfStatus status);
 /** @brief Color Control Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfColorControlClusterServerInitCallback(uint8_t endpoint);
+void emberAfColorControlClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Color Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -7945,7 +8051,8 @@ void emberAfColorControlClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfColorControlClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfColorControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   uint16_t manufacturerCode);
 /** @brief Color Control Cluster Server Message Sent
  *
@@ -7972,7 +8079,7 @@ void emberAfColorControlClusterServerMessageSentCallback(EmberOutgoingMessageTyp
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfColorControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfColorControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                           EmberAfAttributeType attributeType, uint8_t size,
                                                                           uint8_t * value);
 /** @brief Color Control Cluster Server Tick
@@ -7981,7 +8088,7 @@ EmberAfStatus emberAfColorControlClusterServerPreAttributeChangedCallback(uint8_
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfColorControlClusterServerTickCallback(uint8_t endpoint);
+void emberAfColorControlClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Color Control Cluster Step Color
  *
  *
@@ -8054,7 +8161,7 @@ bool emberAfColorControlClusterStopMoveStepCallback(uint8_t optionsMask, uint8_t
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBallastConfigurationClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBallastConfigurationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Ballast Configuration Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -8064,14 +8171,15 @@ void emberAfBallastConfigurationClusterClientAttributeChangedCallback(uint8_t en
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBallastConfigurationClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBallastConfigurationClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                     EmberAfStatus status);
 /** @brief Ballast Configuration Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBallastConfigurationClusterClientInitCallback(uint8_t endpoint);
+void emberAfBallastConfigurationClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Ballast Configuration Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -8082,7 +8190,7 @@ void emberAfBallastConfigurationClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfBallastConfigurationClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                          EmberAfAttributeId attributeId,
+                                                                                          chip::AttributeId attributeId,
                                                                                           uint16_t manufacturerCode);
 /** @brief Ballast Configuration Cluster Client Message Sent
  *
@@ -8109,7 +8217,8 @@ void emberAfBallastConfigurationClusterClientMessageSentCallback(EmberOutgoingMe
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBallastConfigurationClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBallastConfigurationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   EmberAfAttributeType attributeType, uint8_t size,
                                                                                   uint8_t * value);
 /** @brief Ballast Configuration Cluster Client Tick
@@ -8118,7 +8227,7 @@ EmberAfStatus emberAfBallastConfigurationClusterClientPreAttributeChangedCallbac
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBallastConfigurationClusterClientTickCallback(uint8_t endpoint);
+void emberAfBallastConfigurationClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Ballast Configuration Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -8126,7 +8235,7 @@ void emberAfBallastConfigurationClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBallastConfigurationClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBallastConfigurationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Ballast Configuration Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -8136,14 +8245,15 @@ void emberAfBallastConfigurationClusterServerAttributeChangedCallback(uint8_t en
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBallastConfigurationClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBallastConfigurationClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                     EmberAfStatus status);
 /** @brief Ballast Configuration Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBallastConfigurationClusterServerInitCallback(uint8_t endpoint);
+void emberAfBallastConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Ballast Configuration Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -8154,7 +8264,7 @@ void emberAfBallastConfigurationClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfBallastConfigurationClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                          EmberAfAttributeId attributeId,
+                                                                                          chip::AttributeId attributeId,
                                                                                           uint16_t manufacturerCode);
 /** @brief Ballast Configuration Cluster Server Message Sent
  *
@@ -8181,7 +8291,8 @@ void emberAfBallastConfigurationClusterServerMessageSentCallback(EmberOutgoingMe
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBallastConfigurationClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBallastConfigurationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   EmberAfAttributeType attributeType, uint8_t size,
                                                                                   uint8_t * value);
 /** @brief Ballast Configuration Cluster Server Tick
@@ -8190,7 +8301,7 @@ EmberAfStatus emberAfBallastConfigurationClusterServerPreAttributeChangedCallbac
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBallastConfigurationClusterServerTickCallback(uint8_t endpoint);
+void emberAfBallastConfigurationClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Ballast Configuration Cluster Callbacks */
 
@@ -8204,7 +8315,7 @@ void emberAfBallastConfigurationClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIllumMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIllumMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Illuminance Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -8214,14 +8325,15 @@ void emberAfIllumMeasurementClusterClientAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIllumMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIllumMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Illuminance Measurement Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIllumMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfIllumMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Illuminance Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -8231,8 +8343,8 @@ void emberAfIllumMeasurementClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfIllumMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfIllumMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Illuminance Measurement Cluster Client Message Sent
  *
@@ -8259,7 +8371,8 @@ void emberAfIllumMeasurementClusterClientMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIllumMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIllumMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Illuminance Measurement Cluster Client Tick
@@ -8268,7 +8381,7 @@ EmberAfStatus emberAfIllumMeasurementClusterClientPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIllumMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfIllumMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Illuminance Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -8276,7 +8389,7 @@ void emberAfIllumMeasurementClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIllumMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIllumMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Illuminance Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -8286,14 +8399,15 @@ void emberAfIllumMeasurementClusterServerAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIllumMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIllumMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Illuminance Measurement Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIllumMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfIllumMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Illuminance Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -8303,8 +8417,8 @@ void emberAfIllumMeasurementClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfIllumMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfIllumMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Illuminance Measurement Cluster Server Message Sent
  *
@@ -8331,7 +8445,8 @@ void emberAfIllumMeasurementClusterServerMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIllumMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIllumMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Illuminance Measurement Cluster Server Tick
@@ -8340,7 +8455,7 @@ EmberAfStatus emberAfIllumMeasurementClusterServerPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIllumMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfIllumMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Illuminance Measurement Cluster Callbacks */
 
@@ -8354,7 +8469,7 @@ void emberAfIllumMeasurementClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIllumLevelSensingClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIllumLevelSensingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Illuminance Level Sensing Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -8364,14 +8479,15 @@ void emberAfIllumLevelSensingClusterClientAttributeChangedCallback(uint8_t endpo
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIllumLevelSensingClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIllumLevelSensingClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                  EmberAfStatus status);
 /** @brief Illuminance Level Sensing Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIllumLevelSensingClusterClientInitCallback(uint8_t endpoint);
+void emberAfIllumLevelSensingClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Illuminance Level Sensing Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -8382,7 +8498,7 @@ void emberAfIllumLevelSensingClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfIllumLevelSensingClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId,
+                                                                                       chip::AttributeId attributeId,
                                                                                        uint16_t manufacturerCode);
 /** @brief Illuminance Level Sensing Cluster Client Message Sent
  *
@@ -8409,7 +8525,8 @@ void emberAfIllumLevelSensingClusterClientMessageSentCallback(EmberOutgoingMessa
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIllumLevelSensingClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIllumLevelSensingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                EmberAfAttributeType attributeType, uint8_t size,
                                                                                uint8_t * value);
 /** @brief Illuminance Level Sensing Cluster Client Tick
@@ -8418,7 +8535,7 @@ EmberAfStatus emberAfIllumLevelSensingClusterClientPreAttributeChangedCallback(u
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIllumLevelSensingClusterClientTickCallback(uint8_t endpoint);
+void emberAfIllumLevelSensingClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Illuminance Level Sensing Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -8426,7 +8543,7 @@ void emberAfIllumLevelSensingClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIllumLevelSensingClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIllumLevelSensingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Illuminance Level Sensing Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -8436,14 +8553,15 @@ void emberAfIllumLevelSensingClusterServerAttributeChangedCallback(uint8_t endpo
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIllumLevelSensingClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIllumLevelSensingClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                  EmberAfStatus status);
 /** @brief Illuminance Level Sensing Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIllumLevelSensingClusterServerInitCallback(uint8_t endpoint);
+void emberAfIllumLevelSensingClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Illuminance Level Sensing Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -8454,7 +8572,7 @@ void emberAfIllumLevelSensingClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfIllumLevelSensingClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId,
+                                                                                       chip::AttributeId attributeId,
                                                                                        uint16_t manufacturerCode);
 /** @brief Illuminance Level Sensing Cluster Server Message Sent
  *
@@ -8481,7 +8599,8 @@ void emberAfIllumLevelSensingClusterServerMessageSentCallback(EmberOutgoingMessa
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIllumLevelSensingClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIllumLevelSensingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                EmberAfAttributeType attributeType, uint8_t size,
                                                                                uint8_t * value);
 /** @brief Illuminance Level Sensing Cluster Server Tick
@@ -8490,7 +8609,7 @@ EmberAfStatus emberAfIllumLevelSensingClusterServerPreAttributeChangedCallback(u
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIllumLevelSensingClusterServerTickCallback(uint8_t endpoint);
+void emberAfIllumLevelSensingClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Illuminance Level Sensing Cluster Callbacks */
 
@@ -8504,7 +8623,7 @@ void emberAfIllumLevelSensingClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfTempMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfTempMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Temperature Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -8514,14 +8633,15 @@ void emberAfTempMeasurementClusterClientAttributeChangedCallback(uint8_t endpoin
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTempMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfTempMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                EmberAfStatus status);
 /** @brief Temperature Measurement Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTempMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfTempMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Temperature Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -8531,8 +8651,8 @@ void emberAfTempMeasurementClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfTempMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+void emberAfTempMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      uint16_t manufacturerCode);
 /** @brief Temperature Measurement Cluster Client Message Sent
  *
@@ -8559,7 +8679,8 @@ void emberAfTempMeasurementClusterClientMessageSentCallback(EmberOutgoingMessage
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfTempMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfTempMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              EmberAfAttributeType attributeType, uint8_t size,
                                                                              uint8_t * value);
 /** @brief Temperature Measurement Cluster Client Tick
@@ -8568,7 +8689,7 @@ EmberAfStatus emberAfTempMeasurementClusterClientPreAttributeChangedCallback(uin
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTempMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfTempMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Temperature Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -8576,7 +8697,7 @@ void emberAfTempMeasurementClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfTempMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfTempMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Temperature Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -8586,14 +8707,15 @@ void emberAfTempMeasurementClusterServerAttributeChangedCallback(uint8_t endpoin
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTempMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfTempMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                EmberAfStatus status);
 /** @brief Temperature Measurement Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTempMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfTempMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Temperature Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -8603,8 +8725,8 @@ void emberAfTempMeasurementClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfTempMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+void emberAfTempMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      uint16_t manufacturerCode);
 /** @brief Temperature Measurement Cluster Server Message Sent
  *
@@ -8631,7 +8753,8 @@ void emberAfTempMeasurementClusterServerMessageSentCallback(EmberOutgoingMessage
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfTempMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfTempMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              EmberAfAttributeType attributeType, uint8_t size,
                                                                              uint8_t * value);
 /** @brief Temperature Measurement Cluster Server Tick
@@ -8640,7 +8763,7 @@ EmberAfStatus emberAfTempMeasurementClusterServerPreAttributeChangedCallback(uin
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTempMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfTempMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Temperature Measurement Cluster Callbacks */
 
@@ -8654,7 +8777,7 @@ void emberAfTempMeasurementClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPressureMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPressureMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Pressure Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -8664,14 +8787,15 @@ void emberAfPressureMeasurementClusterClientAttributeChangedCallback(uint8_t end
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPressureMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPressureMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                    EmberAfStatus status);
 /** @brief Pressure Measurement Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPressureMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfPressureMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Pressure Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -8682,7 +8806,7 @@ void emberAfPressureMeasurementClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfPressureMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId,
+                                                                                         chip::AttributeId attributeId,
                                                                                          uint16_t manufacturerCode);
 /** @brief Pressure Measurement Cluster Client Message Sent
  *
@@ -8709,7 +8833,8 @@ void emberAfPressureMeasurementClusterClientMessageSentCallback(EmberOutgoingMes
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPressureMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPressureMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  EmberAfAttributeType attributeType, uint8_t size,
                                                                                  uint8_t * value);
 /** @brief Pressure Measurement Cluster Client Tick
@@ -8718,7 +8843,7 @@ EmberAfStatus emberAfPressureMeasurementClusterClientPreAttributeChangedCallback
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPressureMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfPressureMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Pressure Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -8726,7 +8851,7 @@ void emberAfPressureMeasurementClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPressureMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPressureMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Pressure Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -8736,14 +8861,15 @@ void emberAfPressureMeasurementClusterServerAttributeChangedCallback(uint8_t end
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPressureMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPressureMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                    EmberAfStatus status);
 /** @brief Pressure Measurement Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPressureMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfPressureMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Pressure Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -8754,7 +8880,7 @@ void emberAfPressureMeasurementClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfPressureMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId,
+                                                                                         chip::AttributeId attributeId,
                                                                                          uint16_t manufacturerCode);
 /** @brief Pressure Measurement Cluster Server Message Sent
  *
@@ -8781,7 +8907,8 @@ void emberAfPressureMeasurementClusterServerMessageSentCallback(EmberOutgoingMes
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPressureMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPressureMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  EmberAfAttributeType attributeType, uint8_t size,
                                                                                  uint8_t * value);
 /** @brief Pressure Measurement Cluster Server Tick
@@ -8790,7 +8917,7 @@ EmberAfStatus emberAfPressureMeasurementClusterServerPreAttributeChangedCallback
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPressureMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfPressureMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Pressure Measurement Cluster Callbacks */
 
@@ -8804,7 +8931,7 @@ void emberAfPressureMeasurementClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfFlowMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfFlowMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Flow Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -8814,14 +8941,15 @@ void emberAfFlowMeasurementClusterClientAttributeChangedCallback(uint8_t endpoin
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfFlowMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfFlowMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                EmberAfStatus status);
 /** @brief Flow Measurement Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfFlowMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfFlowMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Flow Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -8831,8 +8959,8 @@ void emberAfFlowMeasurementClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfFlowMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+void emberAfFlowMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      uint16_t manufacturerCode);
 /** @brief Flow Measurement Cluster Client Message Sent
  *
@@ -8859,7 +8987,8 @@ void emberAfFlowMeasurementClusterClientMessageSentCallback(EmberOutgoingMessage
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfFlowMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfFlowMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              EmberAfAttributeType attributeType, uint8_t size,
                                                                              uint8_t * value);
 /** @brief Flow Measurement Cluster Client Tick
@@ -8868,7 +8997,7 @@ EmberAfStatus emberAfFlowMeasurementClusterClientPreAttributeChangedCallback(uin
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfFlowMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfFlowMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Flow Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -8876,7 +9005,7 @@ void emberAfFlowMeasurementClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfFlowMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfFlowMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Flow Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -8886,14 +9015,15 @@ void emberAfFlowMeasurementClusterServerAttributeChangedCallback(uint8_t endpoin
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfFlowMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfFlowMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                EmberAfStatus status);
 /** @brief Flow Measurement Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfFlowMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfFlowMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Flow Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -8903,8 +9033,8 @@ void emberAfFlowMeasurementClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfFlowMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+void emberAfFlowMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      uint16_t manufacturerCode);
 /** @brief Flow Measurement Cluster Server Message Sent
  *
@@ -8931,7 +9061,8 @@ void emberAfFlowMeasurementClusterServerMessageSentCallback(EmberOutgoingMessage
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfFlowMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfFlowMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              EmberAfAttributeType attributeType, uint8_t size,
                                                                              uint8_t * value);
 /** @brief Flow Measurement Cluster Server Tick
@@ -8940,7 +9071,7 @@ EmberAfStatus emberAfFlowMeasurementClusterServerPreAttributeChangedCallback(uin
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfFlowMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfFlowMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Flow Measurement Cluster Callbacks */
 
@@ -8954,7 +9085,8 @@ void emberAfFlowMeasurementClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfRelativeHumidityMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfRelativeHumidityMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId);
 /** @brief Relative Humidity Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -8964,7 +9096,7 @@ void emberAfRelativeHumidityMeasurementClusterClientAttributeChangedCallback(uin
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfRelativeHumidityMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfRelativeHumidityMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                             EmberAfStatus status);
 /** @brief Relative Humidity Measurement Cluster Client Init
  *
@@ -8972,7 +9104,7 @@ void emberAfRelativeHumidityMeasurementClusterClientDefaultResponseCallback(uint
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfRelativeHumidityMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfRelativeHumidityMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Relative Humidity Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -8983,7 +9115,7 @@ void emberAfRelativeHumidityMeasurementClusterClientInitCallback(uint8_t endpoin
  * Ver.: always
  */
 void emberAfRelativeHumidityMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                 EmberAfAttributeId attributeId,
+                                                                                                 chip::AttributeId attributeId,
                                                                                                  uint16_t manufacturerCode);
 /** @brief Relative Humidity Measurement Cluster Client Message Sent
  *
@@ -9011,7 +9143,7 @@ void emberAfRelativeHumidityMeasurementClusterClientMessageSentCallback(EmberOut
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfRelativeHumidityMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId,
+                                                                                         chip::AttributeId attributeId,
                                                                                          EmberAfAttributeType attributeType,
                                                                                          uint8_t size, uint8_t * value);
 /** @brief Relative Humidity Measurement Cluster Client Tick
@@ -9020,7 +9152,7 @@ EmberAfStatus emberAfRelativeHumidityMeasurementClusterClientPreAttributeChanged
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfRelativeHumidityMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfRelativeHumidityMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Relative Humidity Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -9028,7 +9160,8 @@ void emberAfRelativeHumidityMeasurementClusterClientTickCallback(uint8_t endpoin
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfRelativeHumidityMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfRelativeHumidityMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId);
 /** @brief Relative Humidity Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -9038,7 +9171,7 @@ void emberAfRelativeHumidityMeasurementClusterServerAttributeChangedCallback(uin
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfRelativeHumidityMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfRelativeHumidityMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                             EmberAfStatus status);
 /** @brief Relative Humidity Measurement Cluster Server Init
  *
@@ -9046,7 +9179,7 @@ void emberAfRelativeHumidityMeasurementClusterServerDefaultResponseCallback(uint
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfRelativeHumidityMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfRelativeHumidityMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Relative Humidity Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -9057,7 +9190,7 @@ void emberAfRelativeHumidityMeasurementClusterServerInitCallback(uint8_t endpoin
  * Ver.: always
  */
 void emberAfRelativeHumidityMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                 EmberAfAttributeId attributeId,
+                                                                                                 chip::AttributeId attributeId,
                                                                                                  uint16_t manufacturerCode);
 /** @brief Relative Humidity Measurement Cluster Server Message Sent
  *
@@ -9085,7 +9218,7 @@ void emberAfRelativeHumidityMeasurementClusterServerMessageSentCallback(EmberOut
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfRelativeHumidityMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId,
+                                                                                         chip::AttributeId attributeId,
                                                                                          EmberAfAttributeType attributeType,
                                                                                          uint8_t size, uint8_t * value);
 /** @brief Relative Humidity Measurement Cluster Server Tick
@@ -9094,7 +9227,7 @@ EmberAfStatus emberAfRelativeHumidityMeasurementClusterServerPreAttributeChanged
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfRelativeHumidityMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfRelativeHumidityMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Relative Humidity Measurement Cluster Callbacks */
 
@@ -9108,7 +9241,7 @@ void emberAfRelativeHumidityMeasurementClusterServerTickCallback(uint8_t endpoin
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOccupancySensingClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOccupancySensingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Occupancy Sensing Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -9118,14 +9251,15 @@ void emberAfOccupancySensingClusterClientAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOccupancySensingClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfOccupancySensingClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Occupancy Sensing Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOccupancySensingClusterClientInitCallback(uint8_t endpoint);
+void emberAfOccupancySensingClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Occupancy Sensing Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -9135,8 +9269,8 @@ void emberAfOccupancySensingClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfOccupancySensingClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfOccupancySensingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Occupancy Sensing Cluster Client Message Sent
  *
@@ -9163,7 +9297,8 @@ void emberAfOccupancySensingClusterClientMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfOccupancySensingClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfOccupancySensingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Occupancy Sensing Cluster Client Tick
@@ -9172,7 +9307,7 @@ EmberAfStatus emberAfOccupancySensingClusterClientPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOccupancySensingClusterClientTickCallback(uint8_t endpoint);
+void emberAfOccupancySensingClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Occupancy Sensing Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -9180,7 +9315,7 @@ void emberAfOccupancySensingClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOccupancySensingClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOccupancySensingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Occupancy Sensing Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -9190,14 +9325,15 @@ void emberAfOccupancySensingClusterServerAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOccupancySensingClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfOccupancySensingClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Occupancy Sensing Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOccupancySensingClusterServerInitCallback(uint8_t endpoint);
+void emberAfOccupancySensingClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Occupancy Sensing Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -9207,8 +9343,8 @@ void emberAfOccupancySensingClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfOccupancySensingClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfOccupancySensingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Occupancy Sensing Cluster Server Message Sent
  *
@@ -9235,7 +9371,8 @@ void emberAfOccupancySensingClusterServerMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfOccupancySensingClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfOccupancySensingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Occupancy Sensing Cluster Server Tick
@@ -9244,7 +9381,7 @@ EmberAfStatus emberAfOccupancySensingClusterServerPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOccupancySensingClusterServerTickCallback(uint8_t endpoint);
+void emberAfOccupancySensingClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Occupancy Sensing Cluster Callbacks */
 
@@ -9259,7 +9396,7 @@ void emberAfOccupancySensingClusterServerTickCallback(uint8_t endpoint);
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfCarbonMonoxideConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                        EmberAfAttributeId attributeId);
+                                                                                        chip::AttributeId attributeId);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -9269,7 +9406,7 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterClientAttributeChangedC
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfCarbonMonoxideConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfCarbonMonoxideConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                        EmberAfStatus status);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Client Init
  *
@@ -9277,7 +9414,7 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterClientDefaultResponseCa
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfCarbonMonoxideConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfCarbonMonoxideConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -9288,7 +9425,7 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterClientInitCallback(uint
  * Ver.: always
  */
 void emberAfCarbonMonoxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -9316,14 +9453,14 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterClientMessageSentCallba
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfCarbonMonoxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfCarbonMonoxideConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfCarbonMonoxideConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -9332,7 +9469,7 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterClientTickCallback(uint
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfCarbonMonoxideConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                        EmberAfAttributeId attributeId);
+                                                                                        chip::AttributeId attributeId);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -9342,7 +9479,7 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterServerAttributeChangedC
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfCarbonMonoxideConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfCarbonMonoxideConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                        EmberAfStatus status);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Server Init
  *
@@ -9350,7 +9487,7 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterServerDefaultResponseCa
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfCarbonMonoxideConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfCarbonMonoxideConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -9361,7 +9498,7 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterServerInitCallback(uint
  * Ver.: always
  */
 void emberAfCarbonMonoxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -9389,14 +9526,14 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterServerMessageSentCallba
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfCarbonMonoxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Carbon Monoxide Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfCarbonMonoxideConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfCarbonMonoxideConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Carbon Monoxide Concentration Measurement Cluster Callbacks */
 
@@ -9411,7 +9548,7 @@ void emberAfCarbonMonoxideConcentrationMeasurementClusterServerTickCallback(uint
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfCarbonDioxideConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId);
+                                                                                       chip::AttributeId attributeId);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -9421,7 +9558,7 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterClientAttributeChangedCa
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfCarbonDioxideConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfCarbonDioxideConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                       EmberAfStatus status);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Client Init
  *
@@ -9429,7 +9566,7 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterClientDefaultResponseCal
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfCarbonDioxideConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfCarbonDioxideConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -9440,7 +9577,7 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterClientInitCallback(uint8
  * Ver.: always
  */
 void emberAfCarbonDioxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -9468,14 +9605,14 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterClientMessageSentCallbac
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfCarbonDioxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfCarbonDioxideConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfCarbonDioxideConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -9484,7 +9621,7 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterClientTickCallback(uint8
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfCarbonDioxideConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId);
+                                                                                       chip::AttributeId attributeId);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -9494,7 +9631,7 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterServerAttributeChangedCa
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfCarbonDioxideConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfCarbonDioxideConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                       EmberAfStatus status);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Server Init
  *
@@ -9502,7 +9639,7 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterServerDefaultResponseCal
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfCarbonDioxideConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfCarbonDioxideConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -9513,7 +9650,7 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterServerInitCallback(uint8
  * Ver.: always
  */
 void emberAfCarbonDioxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -9541,14 +9678,14 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterServerMessageSentCallbac
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfCarbonDioxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Carbon Dioxide Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfCarbonDioxideConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfCarbonDioxideConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Carbon Dioxide Concentration Measurement Cluster Callbacks */
 
@@ -9562,7 +9699,8 @@ void emberAfCarbonDioxideConcentrationMeasurementClusterServerTickCallback(uint8
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfEthyleneConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfEthyleneConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId);
 /** @brief Ethylene Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -9572,7 +9710,7 @@ void emberAfEthyleneConcentrationMeasurementClusterClientAttributeChangedCallbac
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfEthyleneConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfEthyleneConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                  EmberAfStatus status);
 /** @brief Ethylene Concentration Measurement Cluster Client Init
  *
@@ -9580,7 +9718,7 @@ void emberAfEthyleneConcentrationMeasurementClusterClientDefaultResponseCallback
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfEthyleneConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfEthyleneConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Ethylene Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -9590,8 +9728,9 @@ void emberAfEthyleneConcentrationMeasurementClusterClientInitCallback(uint8_t en
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfEthyleneConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+void emberAfEthyleneConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                      chip::AttributeId attributeId,
+                                                                                                      uint16_t manufacturerCode);
 /** @brief Ethylene Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -9619,7 +9758,7 @@ void emberAfEthyleneConcentrationMeasurementClusterClientMessageSentCallback(Emb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfEthyleneConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId,
+                                                                                              chip::AttributeId attributeId,
                                                                                               EmberAfAttributeType attributeType,
                                                                                               uint8_t size, uint8_t * value);
 /** @brief Ethylene Concentration Measurement Cluster Client Tick
@@ -9628,7 +9767,7 @@ EmberAfStatus emberAfEthyleneConcentrationMeasurementClusterClientPreAttributeCh
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfEthyleneConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfEthyleneConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Ethylene Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -9636,7 +9775,8 @@ void emberAfEthyleneConcentrationMeasurementClusterClientTickCallback(uint8_t en
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfEthyleneConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfEthyleneConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId);
 /** @brief Ethylene Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -9646,7 +9786,7 @@ void emberAfEthyleneConcentrationMeasurementClusterServerAttributeChangedCallbac
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfEthyleneConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfEthyleneConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                  EmberAfStatus status);
 /** @brief Ethylene Concentration Measurement Cluster Server Init
  *
@@ -9654,7 +9794,7 @@ void emberAfEthyleneConcentrationMeasurementClusterServerDefaultResponseCallback
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfEthyleneConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfEthyleneConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Ethylene Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -9664,8 +9804,9 @@ void emberAfEthyleneConcentrationMeasurementClusterServerInitCallback(uint8_t en
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfEthyleneConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+void emberAfEthyleneConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                      chip::AttributeId attributeId,
+                                                                                                      uint16_t manufacturerCode);
 /** @brief Ethylene Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -9693,7 +9834,7 @@ void emberAfEthyleneConcentrationMeasurementClusterServerMessageSentCallback(Emb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfEthyleneConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId,
+                                                                                              chip::AttributeId attributeId,
                                                                                               EmberAfAttributeType attributeType,
                                                                                               uint8_t size, uint8_t * value);
 /** @brief Ethylene Concentration Measurement Cluster Server Tick
@@ -9702,7 +9843,7 @@ EmberAfStatus emberAfEthyleneConcentrationMeasurementClusterServerPreAttributeCh
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfEthyleneConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfEthyleneConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Ethylene Concentration Measurement Cluster Callbacks */
 
@@ -9717,7 +9858,7 @@ void emberAfEthyleneConcentrationMeasurementClusterServerTickCallback(uint8_t en
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfEthyleneOxideConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId);
+                                                                                       chip::AttributeId attributeId);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -9727,7 +9868,7 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterClientAttributeChangedCa
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfEthyleneOxideConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfEthyleneOxideConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                       EmberAfStatus status);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Client Init
  *
@@ -9735,7 +9876,7 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterClientDefaultResponseCal
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfEthyleneOxideConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfEthyleneOxideConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -9746,7 +9887,7 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterClientInitCallback(uint8
  * Ver.: always
  */
 void emberAfEthyleneOxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -9774,14 +9915,14 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterClientMessageSentCallbac
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfEthyleneOxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfEthyleneOxideConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfEthyleneOxideConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -9790,7 +9931,7 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterClientTickCallback(uint8
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfEthyleneOxideConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId);
+                                                                                       chip::AttributeId attributeId);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -9800,7 +9941,7 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterServerAttributeChangedCa
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfEthyleneOxideConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfEthyleneOxideConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                       EmberAfStatus status);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Server Init
  *
@@ -9808,7 +9949,7 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterServerDefaultResponseCal
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfEthyleneOxideConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfEthyleneOxideConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -9819,7 +9960,7 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterServerInitCallback(uint8
  * Ver.: always
  */
 void emberAfEthyleneOxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -9847,14 +9988,14 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterServerMessageSentCallbac
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfEthyleneOxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Ethylene Oxide Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfEthyleneOxideConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfEthyleneOxideConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Ethylene Oxide Concentration Measurement Cluster Callbacks */
 
@@ -9868,7 +10009,8 @@ void emberAfEthyleneOxideConcentrationMeasurementClusterServerTickCallback(uint8
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfHydrogenConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfHydrogenConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId);
 /** @brief Hydrogen Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -9878,7 +10020,7 @@ void emberAfHydrogenConcentrationMeasurementClusterClientAttributeChangedCallbac
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfHydrogenConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfHydrogenConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                  EmberAfStatus status);
 /** @brief Hydrogen Concentration Measurement Cluster Client Init
  *
@@ -9886,7 +10028,7 @@ void emberAfHydrogenConcentrationMeasurementClusterClientDefaultResponseCallback
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfHydrogenConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfHydrogenConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Hydrogen Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -9896,8 +10038,9 @@ void emberAfHydrogenConcentrationMeasurementClusterClientInitCallback(uint8_t en
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfHydrogenConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+void emberAfHydrogenConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                      chip::AttributeId attributeId,
+                                                                                                      uint16_t manufacturerCode);
 /** @brief Hydrogen Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -9925,7 +10068,7 @@ void emberAfHydrogenConcentrationMeasurementClusterClientMessageSentCallback(Emb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfHydrogenConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId,
+                                                                                              chip::AttributeId attributeId,
                                                                                               EmberAfAttributeType attributeType,
                                                                                               uint8_t size, uint8_t * value);
 /** @brief Hydrogen Concentration Measurement Cluster Client Tick
@@ -9934,7 +10077,7 @@ EmberAfStatus emberAfHydrogenConcentrationMeasurementClusterClientPreAttributeCh
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfHydrogenConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfHydrogenConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Hydrogen Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -9942,7 +10085,8 @@ void emberAfHydrogenConcentrationMeasurementClusterClientTickCallback(uint8_t en
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfHydrogenConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfHydrogenConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId);
 /** @brief Hydrogen Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -9952,7 +10096,7 @@ void emberAfHydrogenConcentrationMeasurementClusterServerAttributeChangedCallbac
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfHydrogenConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfHydrogenConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                  EmberAfStatus status);
 /** @brief Hydrogen Concentration Measurement Cluster Server Init
  *
@@ -9960,7 +10104,7 @@ void emberAfHydrogenConcentrationMeasurementClusterServerDefaultResponseCallback
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfHydrogenConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfHydrogenConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Hydrogen Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -9970,8 +10114,9 @@ void emberAfHydrogenConcentrationMeasurementClusterServerInitCallback(uint8_t en
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfHydrogenConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+void emberAfHydrogenConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                      chip::AttributeId attributeId,
+                                                                                                      uint16_t manufacturerCode);
 /** @brief Hydrogen Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -9999,7 +10144,7 @@ void emberAfHydrogenConcentrationMeasurementClusterServerMessageSentCallback(Emb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfHydrogenConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId,
+                                                                                              chip::AttributeId attributeId,
                                                                                               EmberAfAttributeType attributeType,
                                                                                               uint8_t size, uint8_t * value);
 /** @brief Hydrogen Concentration Measurement Cluster Server Tick
@@ -10008,7 +10153,7 @@ EmberAfStatus emberAfHydrogenConcentrationMeasurementClusterServerPreAttributeCh
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfHydrogenConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfHydrogenConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Hydrogen Concentration Measurement Cluster Callbacks */
 
@@ -10023,7 +10168,7 @@ void emberAfHydrogenConcentrationMeasurementClusterServerTickCallback(uint8_t en
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfHydrogenSulphideConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                          EmberAfAttributeId attributeId);
+                                                                                          chip::AttributeId attributeId);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -10033,15 +10178,15 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterClientAttributeChange
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfHydrogenSulphideConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
-                                                                                         EmberAfStatus status);
+void emberAfHydrogenSulphideConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                         uint8_t commandId, EmberAfStatus status);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfHydrogenSulphideConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfHydrogenSulphideConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -10052,7 +10197,7 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterClientInitCallback(ui
  * Ver.: always
  */
 void emberAfHydrogenSulphideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -10080,14 +10225,14 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterClientMessageSentCall
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfHydrogenSulphideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfHydrogenSulphideConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfHydrogenSulphideConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -10096,7 +10241,7 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterClientTickCallback(ui
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfHydrogenSulphideConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                          EmberAfAttributeId attributeId);
+                                                                                          chip::AttributeId attributeId);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -10106,15 +10251,15 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterServerAttributeChange
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfHydrogenSulphideConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
-                                                                                         EmberAfStatus status);
+void emberAfHydrogenSulphideConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                         uint8_t commandId, EmberAfStatus status);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfHydrogenSulphideConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfHydrogenSulphideConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -10125,7 +10270,7 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterServerInitCallback(ui
  * Ver.: always
  */
 void emberAfHydrogenSulphideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -10153,14 +10298,14 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterServerMessageSentCall
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfHydrogenSulphideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Hydrogen Sulphide Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfHydrogenSulphideConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfHydrogenSulphideConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Hydrogen Sulphide Concentration Measurement Cluster Callbacks */
 
@@ -10174,8 +10319,8 @@ void emberAfHydrogenSulphideConcentrationMeasurementClusterServerTickCallback(ui
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfNitricOxideConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId);
+void emberAfNitricOxideConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId);
 /** @brief Nitric Oxide Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -10185,7 +10330,7 @@ void emberAfNitricOxideConcentrationMeasurementClusterClientAttributeChangedCall
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfNitricOxideConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfNitricOxideConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                     EmberAfStatus status);
 /** @brief Nitric Oxide Concentration Measurement Cluster Client Init
  *
@@ -10193,7 +10338,7 @@ void emberAfNitricOxideConcentrationMeasurementClusterClientDefaultResponseCallb
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfNitricOxideConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfNitricOxideConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Nitric Oxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -10204,7 +10349,7 @@ void emberAfNitricOxideConcentrationMeasurementClusterClientInitCallback(uint8_t
  * Ver.: always
  */
 void emberAfNitricOxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Nitric Oxide Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -10232,7 +10377,7 @@ void emberAfNitricOxideConcentrationMeasurementClusterClientMessageSentCallback(
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfNitricOxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                                 EmberAfAttributeId attributeId,
+                                                                                                 chip::AttributeId attributeId,
                                                                                                  EmberAfAttributeType attributeType,
                                                                                                  uint8_t size, uint8_t * value);
 /** @brief Nitric Oxide Concentration Measurement Cluster Client Tick
@@ -10241,7 +10386,7 @@ EmberAfStatus emberAfNitricOxideConcentrationMeasurementClusterClientPreAttribut
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfNitricOxideConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfNitricOxideConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Nitric Oxide Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -10249,8 +10394,8 @@ void emberAfNitricOxideConcentrationMeasurementClusterClientTickCallback(uint8_t
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfNitricOxideConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId);
+void emberAfNitricOxideConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId);
 /** @brief Nitric Oxide Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -10260,7 +10405,7 @@ void emberAfNitricOxideConcentrationMeasurementClusterServerAttributeChangedCall
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfNitricOxideConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfNitricOxideConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                     EmberAfStatus status);
 /** @brief Nitric Oxide Concentration Measurement Cluster Server Init
  *
@@ -10268,7 +10413,7 @@ void emberAfNitricOxideConcentrationMeasurementClusterServerDefaultResponseCallb
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfNitricOxideConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfNitricOxideConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Nitric Oxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -10279,7 +10424,7 @@ void emberAfNitricOxideConcentrationMeasurementClusterServerInitCallback(uint8_t
  * Ver.: always
  */
 void emberAfNitricOxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Nitric Oxide Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -10307,7 +10452,7 @@ void emberAfNitricOxideConcentrationMeasurementClusterServerMessageSentCallback(
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfNitricOxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                                 EmberAfAttributeId attributeId,
+                                                                                                 chip::AttributeId attributeId,
                                                                                                  EmberAfAttributeType attributeType,
                                                                                                  uint8_t size, uint8_t * value);
 /** @brief Nitric Oxide Concentration Measurement Cluster Server Tick
@@ -10316,7 +10461,7 @@ EmberAfStatus emberAfNitricOxideConcentrationMeasurementClusterServerPreAttribut
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfNitricOxideConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfNitricOxideConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Nitric Oxide Concentration Measurement Cluster Callbacks */
 
@@ -10331,7 +10476,7 @@ void emberAfNitricOxideConcentrationMeasurementClusterServerTickCallback(uint8_t
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfNitrogenDioxideConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId);
+                                                                                         chip::AttributeId attributeId);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -10341,15 +10486,15 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterClientAttributeChanged
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfNitrogenDioxideConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
-                                                                                        EmberAfStatus status);
+void emberAfNitrogenDioxideConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                        uint8_t commandId, EmberAfStatus status);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfNitrogenDioxideConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfNitrogenDioxideConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -10360,7 +10505,7 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterClientInitCallback(uin
  * Ver.: always
  */
 void emberAfNitrogenDioxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -10388,14 +10533,14 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterClientMessageSentCallb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfNitrogenDioxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfNitrogenDioxideConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfNitrogenDioxideConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -10404,7 +10549,7 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterClientTickCallback(uin
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfNitrogenDioxideConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId);
+                                                                                         chip::AttributeId attributeId);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -10414,15 +10559,15 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterServerAttributeChanged
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfNitrogenDioxideConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
-                                                                                        EmberAfStatus status);
+void emberAfNitrogenDioxideConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                        uint8_t commandId, EmberAfStatus status);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfNitrogenDioxideConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfNitrogenDioxideConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -10433,7 +10578,7 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterServerInitCallback(uin
  * Ver.: always
  */
 void emberAfNitrogenDioxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -10461,14 +10606,14 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterServerMessageSentCallb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfNitrogenDioxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Nitrogen Dioxide Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfNitrogenDioxideConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfNitrogenDioxideConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Nitrogen Dioxide Concentration Measurement Cluster Callbacks */
 
@@ -10482,7 +10627,8 @@ void emberAfNitrogenDioxideConcentrationMeasurementClusterServerTickCallback(uin
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOxygenConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOxygenConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId);
 /** @brief Oxygen Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -10492,7 +10638,7 @@ void emberAfOxygenConcentrationMeasurementClusterClientAttributeChangedCallback(
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOxygenConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfOxygenConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                EmberAfStatus status);
 /** @brief Oxygen Concentration Measurement Cluster Client Init
  *
@@ -10500,7 +10646,7 @@ void emberAfOxygenConcentrationMeasurementClusterClientDefaultResponseCallback(u
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOxygenConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfOxygenConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Oxygen Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -10511,7 +10657,7 @@ void emberAfOxygenConcentrationMeasurementClusterClientInitCallback(uint8_t endp
  * Ver.: always
  */
 void emberAfOxygenConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                    EmberAfAttributeId attributeId,
+                                                                                                    chip::AttributeId attributeId,
                                                                                                     uint16_t manufacturerCode);
 /** @brief Oxygen Concentration Measurement Cluster Client Message Sent
  *
@@ -10539,7 +10685,7 @@ void emberAfOxygenConcentrationMeasurementClusterClientMessageSentCallback(Ember
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfOxygenConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                            EmberAfAttributeId attributeId,
+                                                                                            chip::AttributeId attributeId,
                                                                                             EmberAfAttributeType attributeType,
                                                                                             uint8_t size, uint8_t * value);
 /** @brief Oxygen Concentration Measurement Cluster Client Tick
@@ -10548,7 +10694,7 @@ EmberAfStatus emberAfOxygenConcentrationMeasurementClusterClientPreAttributeChan
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOxygenConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfOxygenConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Oxygen Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -10556,7 +10702,8 @@ void emberAfOxygenConcentrationMeasurementClusterClientTickCallback(uint8_t endp
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOxygenConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOxygenConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId);
 /** @brief Oxygen Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -10566,7 +10713,7 @@ void emberAfOxygenConcentrationMeasurementClusterServerAttributeChangedCallback(
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOxygenConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfOxygenConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                EmberAfStatus status);
 /** @brief Oxygen Concentration Measurement Cluster Server Init
  *
@@ -10574,7 +10721,7 @@ void emberAfOxygenConcentrationMeasurementClusterServerDefaultResponseCallback(u
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOxygenConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfOxygenConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Oxygen Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -10585,7 +10732,7 @@ void emberAfOxygenConcentrationMeasurementClusterServerInitCallback(uint8_t endp
  * Ver.: always
  */
 void emberAfOxygenConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                    EmberAfAttributeId attributeId,
+                                                                                                    chip::AttributeId attributeId,
                                                                                                     uint16_t manufacturerCode);
 /** @brief Oxygen Concentration Measurement Cluster Server Message Sent
  *
@@ -10613,7 +10760,7 @@ void emberAfOxygenConcentrationMeasurementClusterServerMessageSentCallback(Ember
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfOxygenConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                            EmberAfAttributeId attributeId,
+                                                                                            chip::AttributeId attributeId,
                                                                                             EmberAfAttributeType attributeType,
                                                                                             uint8_t size, uint8_t * value);
 /** @brief Oxygen Concentration Measurement Cluster Server Tick
@@ -10622,7 +10769,7 @@ EmberAfStatus emberAfOxygenConcentrationMeasurementClusterServerPreAttributeChan
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOxygenConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfOxygenConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Oxygen Concentration Measurement Cluster Callbacks */
 
@@ -10636,7 +10783,8 @@ void emberAfOxygenConcentrationMeasurementClusterServerTickCallback(uint8_t endp
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOzoneConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOzoneConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId);
 /** @brief Ozone Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -10646,7 +10794,7 @@ void emberAfOzoneConcentrationMeasurementClusterClientAttributeChangedCallback(u
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOzoneConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfOzoneConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                               EmberAfStatus status);
 /** @brief Ozone Concentration Measurement Cluster Client Init
  *
@@ -10654,7 +10802,7 @@ void emberAfOzoneConcentrationMeasurementClusterClientDefaultResponseCallback(ui
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOzoneConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfOzoneConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Ozone Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -10665,7 +10813,7 @@ void emberAfOzoneConcentrationMeasurementClusterClientInitCallback(uint8_t endpo
  * Ver.: always
  */
 void emberAfOzoneConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                   EmberAfAttributeId attributeId,
+                                                                                                   chip::AttributeId attributeId,
                                                                                                    uint16_t manufacturerCode);
 /** @brief Ozone Concentration Measurement Cluster Client Message Sent
  *
@@ -10693,7 +10841,7 @@ void emberAfOzoneConcentrationMeasurementClusterClientMessageSentCallback(EmberO
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfOzoneConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                           EmberAfAttributeId attributeId,
+                                                                                           chip::AttributeId attributeId,
                                                                                            EmberAfAttributeType attributeType,
                                                                                            uint8_t size, uint8_t * value);
 /** @brief Ozone Concentration Measurement Cluster Client Tick
@@ -10702,7 +10850,7 @@ EmberAfStatus emberAfOzoneConcentrationMeasurementClusterClientPreAttributeChang
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOzoneConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfOzoneConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Ozone Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -10710,7 +10858,8 @@ void emberAfOzoneConcentrationMeasurementClusterClientTickCallback(uint8_t endpo
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOzoneConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOzoneConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId);
 /** @brief Ozone Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -10720,7 +10869,7 @@ void emberAfOzoneConcentrationMeasurementClusterServerAttributeChangedCallback(u
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOzoneConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfOzoneConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                               EmberAfStatus status);
 /** @brief Ozone Concentration Measurement Cluster Server Init
  *
@@ -10728,7 +10877,7 @@ void emberAfOzoneConcentrationMeasurementClusterServerDefaultResponseCallback(ui
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOzoneConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfOzoneConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Ozone Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -10739,7 +10888,7 @@ void emberAfOzoneConcentrationMeasurementClusterServerInitCallback(uint8_t endpo
  * Ver.: always
  */
 void emberAfOzoneConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                   EmberAfAttributeId attributeId,
+                                                                                                   chip::AttributeId attributeId,
                                                                                                    uint16_t manufacturerCode);
 /** @brief Ozone Concentration Measurement Cluster Server Message Sent
  *
@@ -10767,7 +10916,7 @@ void emberAfOzoneConcentrationMeasurementClusterServerMessageSentCallback(EmberO
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfOzoneConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                           EmberAfAttributeId attributeId,
+                                                                                           chip::AttributeId attributeId,
                                                                                            EmberAfAttributeType attributeType,
                                                                                            uint8_t size, uint8_t * value);
 /** @brief Ozone Concentration Measurement Cluster Server Tick
@@ -10776,7 +10925,7 @@ EmberAfStatus emberAfOzoneConcentrationMeasurementClusterServerPreAttributeChang
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOzoneConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfOzoneConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Ozone Concentration Measurement Cluster Callbacks */
 
@@ -10791,7 +10940,7 @@ void emberAfOzoneConcentrationMeasurementClusterServerTickCallback(uint8_t endpo
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfSulfurDioxideConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId);
+                                                                                       chip::AttributeId attributeId);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -10801,7 +10950,7 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterClientAttributeChangedCa
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSulfurDioxideConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfSulfurDioxideConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                       EmberAfStatus status);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Client Init
  *
@@ -10809,7 +10958,7 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterClientDefaultResponseCal
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSulfurDioxideConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfSulfurDioxideConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -10820,7 +10969,7 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterClientInitCallback(uint8
  * Ver.: always
  */
 void emberAfSulfurDioxideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -10848,14 +10997,14 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterClientMessageSentCallbac
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfSulfurDioxideConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSulfurDioxideConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfSulfurDioxideConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -10864,7 +11013,7 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterClientTickCallback(uint8
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfSulfurDioxideConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId);
+                                                                                       chip::AttributeId attributeId);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -10874,7 +11023,7 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterServerAttributeChangedCa
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSulfurDioxideConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfSulfurDioxideConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                       EmberAfStatus status);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Server Init
  *
@@ -10882,7 +11031,7 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterServerDefaultResponseCal
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSulfurDioxideConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfSulfurDioxideConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -10893,7 +11042,7 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterServerInitCallback(uint8
  * Ver.: always
  */
 void emberAfSulfurDioxideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -10921,14 +11070,14 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterServerMessageSentCallbac
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfSulfurDioxideConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Sulfur Dioxide Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSulfurDioxideConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfSulfurDioxideConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Sulfur Dioxide Concentration Measurement Cluster Callbacks */
 
@@ -10943,7 +11092,7 @@ void emberAfSulfurDioxideConcentrationMeasurementClusterServerTickCallback(uint8
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfDissolvedOxygenConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId);
+                                                                                         chip::AttributeId attributeId);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -10953,15 +11102,15 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterClientAttributeChanged
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDissolvedOxygenConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
-                                                                                        EmberAfStatus status);
+void emberAfDissolvedOxygenConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                        uint8_t commandId, EmberAfStatus status);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDissolvedOxygenConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfDissolvedOxygenConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -10972,7 +11121,7 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterClientInitCallback(uin
  * Ver.: always
  */
 void emberAfDissolvedOxygenConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -11000,14 +11149,14 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterClientMessageSentCallb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfDissolvedOxygenConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDissolvedOxygenConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfDissolvedOxygenConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -11016,7 +11165,7 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterClientTickCallback(uin
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfDissolvedOxygenConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId);
+                                                                                         chip::AttributeId attributeId);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -11026,15 +11175,15 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterServerAttributeChanged
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDissolvedOxygenConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
-                                                                                        EmberAfStatus status);
+void emberAfDissolvedOxygenConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                        uint8_t commandId, EmberAfStatus status);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDissolvedOxygenConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfDissolvedOxygenConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -11045,7 +11194,7 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterServerInitCallback(uin
  * Ver.: always
  */
 void emberAfDissolvedOxygenConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -11073,14 +11222,14 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterServerMessageSentCallb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfDissolvedOxygenConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Dissolved Oxygen Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDissolvedOxygenConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfDissolvedOxygenConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Dissolved Oxygen Concentration Measurement Cluster Callbacks */
 
@@ -11094,7 +11243,8 @@ void emberAfDissolvedOxygenConcentrationMeasurementClusterServerTickCallback(uin
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBromateConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBromateConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId);
 /** @brief Bromate Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -11104,7 +11254,7 @@ void emberAfBromateConcentrationMeasurementClusterClientAttributeChangedCallback
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBromateConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfBromateConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                 EmberAfStatus status);
 /** @brief Bromate Concentration Measurement Cluster Client Init
  *
@@ -11112,7 +11262,7 @@ void emberAfBromateConcentrationMeasurementClusterClientDefaultResponseCallback(
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBromateConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfBromateConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Bromate Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -11123,7 +11273,7 @@ void emberAfBromateConcentrationMeasurementClusterClientInitCallback(uint8_t end
  * Ver.: always
  */
 void emberAfBromateConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                     EmberAfAttributeId attributeId,
+                                                                                                     chip::AttributeId attributeId,
                                                                                                      uint16_t manufacturerCode);
 /** @brief Bromate Concentration Measurement Cluster Client Message Sent
  *
@@ -11151,7 +11301,7 @@ void emberAfBromateConcentrationMeasurementClusterClientMessageSentCallback(Embe
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfBromateConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                             EmberAfAttributeId attributeId,
+                                                                                             chip::AttributeId attributeId,
                                                                                              EmberAfAttributeType attributeType,
                                                                                              uint8_t size, uint8_t * value);
 /** @brief Bromate Concentration Measurement Cluster Client Tick
@@ -11160,7 +11310,7 @@ EmberAfStatus emberAfBromateConcentrationMeasurementClusterClientPreAttributeCha
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBromateConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfBromateConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Bromate Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -11168,7 +11318,8 @@ void emberAfBromateConcentrationMeasurementClusterClientTickCallback(uint8_t end
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBromateConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBromateConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId);
 /** @brief Bromate Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -11178,7 +11329,7 @@ void emberAfBromateConcentrationMeasurementClusterServerAttributeChangedCallback
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBromateConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfBromateConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                 EmberAfStatus status);
 /** @brief Bromate Concentration Measurement Cluster Server Init
  *
@@ -11186,7 +11337,7 @@ void emberAfBromateConcentrationMeasurementClusterServerDefaultResponseCallback(
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBromateConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfBromateConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Bromate Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -11197,7 +11348,7 @@ void emberAfBromateConcentrationMeasurementClusterServerInitCallback(uint8_t end
  * Ver.: always
  */
 void emberAfBromateConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                     EmberAfAttributeId attributeId,
+                                                                                                     chip::AttributeId attributeId,
                                                                                                      uint16_t manufacturerCode);
 /** @brief Bromate Concentration Measurement Cluster Server Message Sent
  *
@@ -11225,7 +11376,7 @@ void emberAfBromateConcentrationMeasurementClusterServerMessageSentCallback(Embe
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfBromateConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                             EmberAfAttributeId attributeId,
+                                                                                             chip::AttributeId attributeId,
                                                                                              EmberAfAttributeType attributeType,
                                                                                              uint8_t size, uint8_t * value);
 /** @brief Bromate Concentration Measurement Cluster Server Tick
@@ -11234,7 +11385,7 @@ EmberAfStatus emberAfBromateConcentrationMeasurementClusterServerPreAttributeCha
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBromateConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfBromateConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Bromate Concentration Measurement Cluster Callbacks */
 
@@ -11248,8 +11399,8 @@ void emberAfBromateConcentrationMeasurementClusterServerTickCallback(uint8_t end
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfChloraminesConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId);
+void emberAfChloraminesConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId);
 /** @brief Chloramines Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -11259,7 +11410,7 @@ void emberAfChloraminesConcentrationMeasurementClusterClientAttributeChangedCall
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfChloraminesConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfChloraminesConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                     EmberAfStatus status);
 /** @brief Chloramines Concentration Measurement Cluster Client Init
  *
@@ -11267,7 +11418,7 @@ void emberAfChloraminesConcentrationMeasurementClusterClientDefaultResponseCallb
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfChloraminesConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfChloraminesConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Chloramines Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -11278,7 +11429,7 @@ void emberAfChloraminesConcentrationMeasurementClusterClientInitCallback(uint8_t
  * Ver.: always
  */
 void emberAfChloraminesConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Chloramines Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -11306,7 +11457,7 @@ void emberAfChloraminesConcentrationMeasurementClusterClientMessageSentCallback(
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfChloraminesConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                                 EmberAfAttributeId attributeId,
+                                                                                                 chip::AttributeId attributeId,
                                                                                                  EmberAfAttributeType attributeType,
                                                                                                  uint8_t size, uint8_t * value);
 /** @brief Chloramines Concentration Measurement Cluster Client Tick
@@ -11315,7 +11466,7 @@ EmberAfStatus emberAfChloraminesConcentrationMeasurementClusterClientPreAttribut
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfChloraminesConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfChloraminesConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Chloramines Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -11323,8 +11474,8 @@ void emberAfChloraminesConcentrationMeasurementClusterClientTickCallback(uint8_t
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfChloraminesConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId);
+void emberAfChloraminesConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId);
 /** @brief Chloramines Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -11334,7 +11485,7 @@ void emberAfChloraminesConcentrationMeasurementClusterServerAttributeChangedCall
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfChloraminesConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfChloraminesConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                     EmberAfStatus status);
 /** @brief Chloramines Concentration Measurement Cluster Server Init
  *
@@ -11342,7 +11493,7 @@ void emberAfChloraminesConcentrationMeasurementClusterServerDefaultResponseCallb
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfChloraminesConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfChloraminesConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Chloramines Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -11353,7 +11504,7 @@ void emberAfChloraminesConcentrationMeasurementClusterServerInitCallback(uint8_t
  * Ver.: always
  */
 void emberAfChloraminesConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Chloramines Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -11381,7 +11532,7 @@ void emberAfChloraminesConcentrationMeasurementClusterServerMessageSentCallback(
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfChloraminesConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                                 EmberAfAttributeId attributeId,
+                                                                                                 chip::AttributeId attributeId,
                                                                                                  EmberAfAttributeType attributeType,
                                                                                                  uint8_t size, uint8_t * value);
 /** @brief Chloramines Concentration Measurement Cluster Server Tick
@@ -11390,7 +11541,7 @@ EmberAfStatus emberAfChloraminesConcentrationMeasurementClusterServerPreAttribut
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfChloraminesConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfChloraminesConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Chloramines Concentration Measurement Cluster Callbacks */
 
@@ -11404,7 +11555,8 @@ void emberAfChloraminesConcentrationMeasurementClusterServerTickCallback(uint8_t
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfChlorineConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfChlorineConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId);
 /** @brief Chlorine Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -11414,7 +11566,7 @@ void emberAfChlorineConcentrationMeasurementClusterClientAttributeChangedCallbac
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfChlorineConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfChlorineConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                  EmberAfStatus status);
 /** @brief Chlorine Concentration Measurement Cluster Client Init
  *
@@ -11422,7 +11574,7 @@ void emberAfChlorineConcentrationMeasurementClusterClientDefaultResponseCallback
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfChlorineConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfChlorineConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Chlorine Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -11432,8 +11584,9 @@ void emberAfChlorineConcentrationMeasurementClusterClientInitCallback(uint8_t en
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfChlorineConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+void emberAfChlorineConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                      chip::AttributeId attributeId,
+                                                                                                      uint16_t manufacturerCode);
 /** @brief Chlorine Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -11461,7 +11614,7 @@ void emberAfChlorineConcentrationMeasurementClusterClientMessageSentCallback(Emb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfChlorineConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId,
+                                                                                              chip::AttributeId attributeId,
                                                                                               EmberAfAttributeType attributeType,
                                                                                               uint8_t size, uint8_t * value);
 /** @brief Chlorine Concentration Measurement Cluster Client Tick
@@ -11470,7 +11623,7 @@ EmberAfStatus emberAfChlorineConcentrationMeasurementClusterClientPreAttributeCh
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfChlorineConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfChlorineConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Chlorine Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -11478,7 +11631,8 @@ void emberAfChlorineConcentrationMeasurementClusterClientTickCallback(uint8_t en
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfChlorineConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfChlorineConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId);
 /** @brief Chlorine Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -11488,7 +11642,7 @@ void emberAfChlorineConcentrationMeasurementClusterServerAttributeChangedCallbac
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfChlorineConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfChlorineConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                  EmberAfStatus status);
 /** @brief Chlorine Concentration Measurement Cluster Server Init
  *
@@ -11496,7 +11650,7 @@ void emberAfChlorineConcentrationMeasurementClusterServerDefaultResponseCallback
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfChlorineConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfChlorineConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Chlorine Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -11506,8 +11660,9 @@ void emberAfChlorineConcentrationMeasurementClusterServerInitCallback(uint8_t en
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfChlorineConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+void emberAfChlorineConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                      chip::AttributeId attributeId,
+                                                                                                      uint16_t manufacturerCode);
 /** @brief Chlorine Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -11535,7 +11690,7 @@ void emberAfChlorineConcentrationMeasurementClusterServerMessageSentCallback(Emb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfChlorineConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId,
+                                                                                              chip::AttributeId attributeId,
                                                                                               EmberAfAttributeType attributeType,
                                                                                               uint8_t size, uint8_t * value);
 /** @brief Chlorine Concentration Measurement Cluster Server Tick
@@ -11544,7 +11699,7 @@ EmberAfStatus emberAfChlorineConcentrationMeasurementClusterServerPreAttributeCh
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfChlorineConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfChlorineConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Chlorine Concentration Measurement Cluster Callbacks */
 
@@ -11559,7 +11714,7 @@ void emberAfChlorineConcentrationMeasurementClusterServerTickCallback(uint8_t en
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId);
+                                                                                               chip::AttributeId attributeId);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -11569,7 +11724,8 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientAttributeC
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                              uint8_t commandId,
                                                                                               EmberAfStatus status);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Client Init
  *
@@ -11577,7 +11733,7 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientDefaultRes
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -11588,7 +11744,7 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientInitCallba
  * Ver.: always
  */
 void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -11616,14 +11772,14 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientMessageSen
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -11632,7 +11788,7 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterClientTickCallba
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId);
+                                                                                               chip::AttributeId attributeId);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -11642,7 +11798,8 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerAttributeC
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                              uint8_t commandId,
                                                                                               EmberAfStatus status);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Server Init
  *
@@ -11650,7 +11807,7 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerDefaultRes
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -11661,7 +11818,7 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerInitCallba
  * Ver.: always
  */
 void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -11689,14 +11846,14 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerMessageSen
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Fecal coliform and E. Coli Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Fecal coliform and E. Coli Concentration Measurement Cluster Callbacks */
 
@@ -11710,7 +11867,8 @@ void emberAfFecalColiformAndEColiConcentrationMeasurementClusterServerTickCallba
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfFluorideConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfFluorideConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId);
 /** @brief Fluoride Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -11720,7 +11878,7 @@ void emberAfFluorideConcentrationMeasurementClusterClientAttributeChangedCallbac
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfFluorideConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfFluorideConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                  EmberAfStatus status);
 /** @brief Fluoride Concentration Measurement Cluster Client Init
  *
@@ -11728,7 +11886,7 @@ void emberAfFluorideConcentrationMeasurementClusterClientDefaultResponseCallback
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfFluorideConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfFluorideConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Fluoride Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -11738,8 +11896,9 @@ void emberAfFluorideConcentrationMeasurementClusterClientInitCallback(uint8_t en
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfFluorideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+void emberAfFluorideConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                      chip::AttributeId attributeId,
+                                                                                                      uint16_t manufacturerCode);
 /** @brief Fluoride Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -11767,7 +11926,7 @@ void emberAfFluorideConcentrationMeasurementClusterClientMessageSentCallback(Emb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfFluorideConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId,
+                                                                                              chip::AttributeId attributeId,
                                                                                               EmberAfAttributeType attributeType,
                                                                                               uint8_t size, uint8_t * value);
 /** @brief Fluoride Concentration Measurement Cluster Client Tick
@@ -11776,7 +11935,7 @@ EmberAfStatus emberAfFluorideConcentrationMeasurementClusterClientPreAttributeCh
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfFluorideConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfFluorideConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Fluoride Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -11784,7 +11943,8 @@ void emberAfFluorideConcentrationMeasurementClusterClientTickCallback(uint8_t en
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfFluorideConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfFluorideConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId);
 /** @brief Fluoride Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -11794,7 +11954,7 @@ void emberAfFluorideConcentrationMeasurementClusterServerAttributeChangedCallbac
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfFluorideConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfFluorideConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                  EmberAfStatus status);
 /** @brief Fluoride Concentration Measurement Cluster Server Init
  *
@@ -11802,7 +11962,7 @@ void emberAfFluorideConcentrationMeasurementClusterServerDefaultResponseCallback
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfFluorideConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfFluorideConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Fluoride Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -11812,8 +11972,9 @@ void emberAfFluorideConcentrationMeasurementClusterServerInitCallback(uint8_t en
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfFluorideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+void emberAfFluorideConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                                      chip::AttributeId attributeId,
+                                                                                                      uint16_t manufacturerCode);
 /** @brief Fluoride Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -11841,7 +12002,7 @@ void emberAfFluorideConcentrationMeasurementClusterServerMessageSentCallback(Emb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfFluorideConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId,
+                                                                                              chip::AttributeId attributeId,
                                                                                               EmberAfAttributeType attributeType,
                                                                                               uint8_t size, uint8_t * value);
 /** @brief Fluoride Concentration Measurement Cluster Server Tick
@@ -11850,7 +12011,7 @@ EmberAfStatus emberAfFluorideConcentrationMeasurementClusterServerPreAttributeCh
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfFluorideConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfFluorideConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Fluoride Concentration Measurement Cluster Callbacks */
 
@@ -11865,7 +12026,7 @@ void emberAfFluorideConcentrationMeasurementClusterServerTickCallback(uint8_t en
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId);
+                                                                                         chip::AttributeId attributeId);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -11875,15 +12036,15 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientAttributeChanged
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
-                                                                                        EmberAfStatus status);
+void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                        uint8_t commandId, EmberAfStatus status);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -11894,7 +12055,7 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientInitCallback(uin
  * Ver.: always
  */
 void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -11922,14 +12083,14 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientMessageSentCallb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfHaloaceticAcidsConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -11938,7 +12099,7 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterClientTickCallback(uin
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId);
+                                                                                         chip::AttributeId attributeId);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -11948,15 +12109,15 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerAttributeChanged
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
-                                                                                        EmberAfStatus status);
+void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                        uint8_t commandId, EmberAfStatus status);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -11967,7 +12128,7 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerInitCallback(uin
  * Ver.: always
  */
 void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -11995,14 +12156,14 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerMessageSentCallb
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfHaloaceticAcidsConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Haloacetic Acids Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Haloacetic Acids Concentration Measurement Cluster Callbacks */
 
@@ -12017,7 +12178,7 @@ void emberAfHaloaceticAcidsConcentrationMeasurementClusterServerTickCallback(uin
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId);
+                                                                                              chip::AttributeId attributeId);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -12027,7 +12188,8 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientAttributeCh
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                             uint8_t commandId,
                                                                                              EmberAfStatus status);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Client Init
  *
@@ -12035,7 +12197,7 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientDefaultResp
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -12046,7 +12208,7 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientInitCallbac
  * Ver.: always
  */
 void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -12074,14 +12236,14 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientMessageSent
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -12090,7 +12252,7 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterClientTickCallbac
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId);
+                                                                                              chip::AttributeId attributeId);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -12100,7 +12262,8 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerAttributeCh
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                             uint8_t commandId,
                                                                                              EmberAfStatus status);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Server Init
  *
@@ -12108,7 +12271,7 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerDefaultResp
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -12119,7 +12282,7 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerInitCallbac
  * Ver.: always
  */
 void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -12147,14 +12310,14 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerMessageSent
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Total Trihalomethanes Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Total Trihalomethanes Concentration Measurement Cluster Callbacks */
 
@@ -12169,7 +12332,7 @@ void emberAfTotalTrihalomethanesConcentrationMeasurementClusterServerTickCallbac
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId);
+                                                                                               chip::AttributeId attributeId);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -12179,7 +12342,8 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientAttributeC
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                              uint8_t commandId,
                                                                                               EmberAfStatus status);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Client Init
  *
@@ -12187,7 +12351,7 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientDefaultRes
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -12198,7 +12362,7 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientInitCallba
  * Ver.: always
  */
 void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -12226,14 +12390,14 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientMessageSen
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -12242,7 +12406,7 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterClientTickCallba
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId);
+                                                                                               chip::AttributeId attributeId);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -12252,7 +12416,8 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerAttributeC
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                              uint8_t commandId,
                                                                                               EmberAfStatus status);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Server Init
  *
@@ -12260,7 +12425,7 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerDefaultRes
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -12271,7 +12436,7 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerInitCallba
  * Ver.: always
  */
 void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -12299,14 +12464,14 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerMessageSen
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Total Coliform Bacteria Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Total Coliform Bacteria Concentration Measurement Cluster Callbacks */
 
@@ -12320,8 +12485,8 @@ void emberAfTotalColiformBacteriaConcentrationMeasurementClusterServerTickCallba
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfTurbidityConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                   EmberAfAttributeId attributeId);
+void emberAfTurbidityConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId);
 /** @brief Turbidity Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -12331,7 +12496,7 @@ void emberAfTurbidityConcentrationMeasurementClusterClientAttributeChangedCallba
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTurbidityConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfTurbidityConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                   EmberAfStatus status);
 /** @brief Turbidity Concentration Measurement Cluster Client Init
  *
@@ -12339,7 +12504,7 @@ void emberAfTurbidityConcentrationMeasurementClusterClientDefaultResponseCallbac
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTurbidityConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfTurbidityConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Turbidity Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -12350,7 +12515,7 @@ void emberAfTurbidityConcentrationMeasurementClusterClientInitCallback(uint8_t e
  * Ver.: always
  */
 void emberAfTurbidityConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Turbidity Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -12378,7 +12543,7 @@ void emberAfTurbidityConcentrationMeasurementClusterClientMessageSentCallback(Em
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfTurbidityConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId,
+                                                                                               chip::AttributeId attributeId,
                                                                                                EmberAfAttributeType attributeType,
                                                                                                uint8_t size, uint8_t * value);
 /** @brief Turbidity Concentration Measurement Cluster Client Tick
@@ -12387,7 +12552,7 @@ EmberAfStatus emberAfTurbidityConcentrationMeasurementClusterClientPreAttributeC
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTurbidityConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfTurbidityConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Turbidity Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -12395,8 +12560,8 @@ void emberAfTurbidityConcentrationMeasurementClusterClientTickCallback(uint8_t e
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfTurbidityConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                   EmberAfAttributeId attributeId);
+void emberAfTurbidityConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId);
 /** @brief Turbidity Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -12406,7 +12571,7 @@ void emberAfTurbidityConcentrationMeasurementClusterServerAttributeChangedCallba
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTurbidityConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfTurbidityConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                   EmberAfStatus status);
 /** @brief Turbidity Concentration Measurement Cluster Server Init
  *
@@ -12414,7 +12579,7 @@ void emberAfTurbidityConcentrationMeasurementClusterServerDefaultResponseCallbac
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTurbidityConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfTurbidityConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Turbidity Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -12425,7 +12590,7 @@ void emberAfTurbidityConcentrationMeasurementClusterServerInitCallback(uint8_t e
  * Ver.: always
  */
 void emberAfTurbidityConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Turbidity Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -12453,7 +12618,7 @@ void emberAfTurbidityConcentrationMeasurementClusterServerMessageSentCallback(Em
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfTurbidityConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId,
+                                                                                               chip::AttributeId attributeId,
                                                                                                EmberAfAttributeType attributeType,
                                                                                                uint8_t size, uint8_t * value);
 /** @brief Turbidity Concentration Measurement Cluster Server Tick
@@ -12462,7 +12627,7 @@ EmberAfStatus emberAfTurbidityConcentrationMeasurementClusterServerPreAttributeC
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTurbidityConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfTurbidityConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Turbidity Concentration Measurement Cluster Callbacks */
 
@@ -12476,7 +12641,8 @@ void emberAfTurbidityConcentrationMeasurementClusterServerTickCallback(uint8_t e
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfCopperConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfCopperConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId);
 /** @brief Copper Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -12486,7 +12652,7 @@ void emberAfCopperConcentrationMeasurementClusterClientAttributeChangedCallback(
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfCopperConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfCopperConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                EmberAfStatus status);
 /** @brief Copper Concentration Measurement Cluster Client Init
  *
@@ -12494,7 +12660,7 @@ void emberAfCopperConcentrationMeasurementClusterClientDefaultResponseCallback(u
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfCopperConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfCopperConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Copper Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -12505,7 +12671,7 @@ void emberAfCopperConcentrationMeasurementClusterClientInitCallback(uint8_t endp
  * Ver.: always
  */
 void emberAfCopperConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                    EmberAfAttributeId attributeId,
+                                                                                                    chip::AttributeId attributeId,
                                                                                                     uint16_t manufacturerCode);
 /** @brief Copper Concentration Measurement Cluster Client Message Sent
  *
@@ -12533,7 +12699,7 @@ void emberAfCopperConcentrationMeasurementClusterClientMessageSentCallback(Ember
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfCopperConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                            EmberAfAttributeId attributeId,
+                                                                                            chip::AttributeId attributeId,
                                                                                             EmberAfAttributeType attributeType,
                                                                                             uint8_t size, uint8_t * value);
 /** @brief Copper Concentration Measurement Cluster Client Tick
@@ -12542,7 +12708,7 @@ EmberAfStatus emberAfCopperConcentrationMeasurementClusterClientPreAttributeChan
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfCopperConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfCopperConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Copper Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -12550,7 +12716,8 @@ void emberAfCopperConcentrationMeasurementClusterClientTickCallback(uint8_t endp
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfCopperConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfCopperConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId);
 /** @brief Copper Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -12560,7 +12727,7 @@ void emberAfCopperConcentrationMeasurementClusterServerAttributeChangedCallback(
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfCopperConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfCopperConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                EmberAfStatus status);
 /** @brief Copper Concentration Measurement Cluster Server Init
  *
@@ -12568,7 +12735,7 @@ void emberAfCopperConcentrationMeasurementClusterServerDefaultResponseCallback(u
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfCopperConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfCopperConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Copper Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -12579,7 +12746,7 @@ void emberAfCopperConcentrationMeasurementClusterServerInitCallback(uint8_t endp
  * Ver.: always
  */
 void emberAfCopperConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                    EmberAfAttributeId attributeId,
+                                                                                                    chip::AttributeId attributeId,
                                                                                                     uint16_t manufacturerCode);
 /** @brief Copper Concentration Measurement Cluster Server Message Sent
  *
@@ -12607,7 +12774,7 @@ void emberAfCopperConcentrationMeasurementClusterServerMessageSentCallback(Ember
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfCopperConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                            EmberAfAttributeId attributeId,
+                                                                                            chip::AttributeId attributeId,
                                                                                             EmberAfAttributeType attributeType,
                                                                                             uint8_t size, uint8_t * value);
 /** @brief Copper Concentration Measurement Cluster Server Tick
@@ -12616,7 +12783,7 @@ EmberAfStatus emberAfCopperConcentrationMeasurementClusterServerPreAttributeChan
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfCopperConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfCopperConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Copper Concentration Measurement Cluster Callbacks */
 
@@ -12630,7 +12797,8 @@ void emberAfCopperConcentrationMeasurementClusterServerTickCallback(uint8_t endp
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfLeadConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfLeadConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId);
 /** @brief Lead Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -12640,7 +12808,7 @@ void emberAfLeadConcentrationMeasurementClusterClientAttributeChangedCallback(ui
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfLeadConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfLeadConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                              EmberAfStatus status);
 /** @brief Lead Concentration Measurement Cluster Client Init
  *
@@ -12648,7 +12816,7 @@ void emberAfLeadConcentrationMeasurementClusterClientDefaultResponseCallback(uin
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfLeadConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfLeadConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Lead Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -12659,7 +12827,7 @@ void emberAfLeadConcentrationMeasurementClusterClientInitCallback(uint8_t endpoi
  * Ver.: always
  */
 void emberAfLeadConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                  EmberAfAttributeId attributeId,
+                                                                                                  chip::AttributeId attributeId,
                                                                                                   uint16_t manufacturerCode);
 /** @brief Lead Concentration Measurement Cluster Client Message Sent
  *
@@ -12687,7 +12855,7 @@ void emberAfLeadConcentrationMeasurementClusterClientMessageSentCallback(EmberOu
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfLeadConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                          EmberAfAttributeId attributeId,
+                                                                                          chip::AttributeId attributeId,
                                                                                           EmberAfAttributeType attributeType,
                                                                                           uint8_t size, uint8_t * value);
 /** @brief Lead Concentration Measurement Cluster Client Tick
@@ -12696,7 +12864,7 @@ EmberAfStatus emberAfLeadConcentrationMeasurementClusterClientPreAttributeChange
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfLeadConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfLeadConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Lead Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -12704,7 +12872,8 @@ void emberAfLeadConcentrationMeasurementClusterClientTickCallback(uint8_t endpoi
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfLeadConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfLeadConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId);
 /** @brief Lead Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -12714,7 +12883,7 @@ void emberAfLeadConcentrationMeasurementClusterServerAttributeChangedCallback(ui
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfLeadConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfLeadConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                              EmberAfStatus status);
 /** @brief Lead Concentration Measurement Cluster Server Init
  *
@@ -12722,7 +12891,7 @@ void emberAfLeadConcentrationMeasurementClusterServerDefaultResponseCallback(uin
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfLeadConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfLeadConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Lead Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -12733,7 +12902,7 @@ void emberAfLeadConcentrationMeasurementClusterServerInitCallback(uint8_t endpoi
  * Ver.: always
  */
 void emberAfLeadConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                  EmberAfAttributeId attributeId,
+                                                                                                  chip::AttributeId attributeId,
                                                                                                   uint16_t manufacturerCode);
 /** @brief Lead Concentration Measurement Cluster Server Message Sent
  *
@@ -12761,7 +12930,7 @@ void emberAfLeadConcentrationMeasurementClusterServerMessageSentCallback(EmberOu
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfLeadConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                          EmberAfAttributeId attributeId,
+                                                                                          chip::AttributeId attributeId,
                                                                                           EmberAfAttributeType attributeType,
                                                                                           uint8_t size, uint8_t * value);
 /** @brief Lead Concentration Measurement Cluster Server Tick
@@ -12770,7 +12939,7 @@ EmberAfStatus emberAfLeadConcentrationMeasurementClusterServerPreAttributeChange
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfLeadConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfLeadConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Lead Concentration Measurement Cluster Callbacks */
 
@@ -12784,8 +12953,8 @@ void emberAfLeadConcentrationMeasurementClusterServerTickCallback(uint8_t endpoi
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfManganeseConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                   EmberAfAttributeId attributeId);
+void emberAfManganeseConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId);
 /** @brief Manganese Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -12795,7 +12964,7 @@ void emberAfManganeseConcentrationMeasurementClusterClientAttributeChangedCallba
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfManganeseConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfManganeseConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                   EmberAfStatus status);
 /** @brief Manganese Concentration Measurement Cluster Client Init
  *
@@ -12803,7 +12972,7 @@ void emberAfManganeseConcentrationMeasurementClusterClientDefaultResponseCallbac
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfManganeseConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfManganeseConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Manganese Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -12814,7 +12983,7 @@ void emberAfManganeseConcentrationMeasurementClusterClientInitCallback(uint8_t e
  * Ver.: always
  */
 void emberAfManganeseConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Manganese Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -12842,7 +13011,7 @@ void emberAfManganeseConcentrationMeasurementClusterClientMessageSentCallback(Em
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfManganeseConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId,
+                                                                                               chip::AttributeId attributeId,
                                                                                                EmberAfAttributeType attributeType,
                                                                                                uint8_t size, uint8_t * value);
 /** @brief Manganese Concentration Measurement Cluster Client Tick
@@ -12851,7 +13020,7 @@ EmberAfStatus emberAfManganeseConcentrationMeasurementClusterClientPreAttributeC
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfManganeseConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfManganeseConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Manganese Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -12859,8 +13028,8 @@ void emberAfManganeseConcentrationMeasurementClusterClientTickCallback(uint8_t e
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfManganeseConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                   EmberAfAttributeId attributeId);
+void emberAfManganeseConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId);
 /** @brief Manganese Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -12870,7 +13039,7 @@ void emberAfManganeseConcentrationMeasurementClusterServerAttributeChangedCallba
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfManganeseConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfManganeseConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                   EmberAfStatus status);
 /** @brief Manganese Concentration Measurement Cluster Server Init
  *
@@ -12878,7 +13047,7 @@ void emberAfManganeseConcentrationMeasurementClusterServerDefaultResponseCallbac
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfManganeseConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfManganeseConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Manganese Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -12889,7 +13058,7 @@ void emberAfManganeseConcentrationMeasurementClusterServerInitCallback(uint8_t e
  * Ver.: always
  */
 void emberAfManganeseConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Manganese Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -12917,7 +13086,7 @@ void emberAfManganeseConcentrationMeasurementClusterServerMessageSentCallback(Em
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfManganeseConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId,
+                                                                                               chip::AttributeId attributeId,
                                                                                                EmberAfAttributeType attributeType,
                                                                                                uint8_t size, uint8_t * value);
 /** @brief Manganese Concentration Measurement Cluster Server Tick
@@ -12926,7 +13095,7 @@ EmberAfStatus emberAfManganeseConcentrationMeasurementClusterServerPreAttributeC
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfManganeseConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfManganeseConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Manganese Concentration Measurement Cluster Callbacks */
 
@@ -12940,7 +13109,8 @@ void emberAfManganeseConcentrationMeasurementClusterServerTickCallback(uint8_t e
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSulfateConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSulfateConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId);
 /** @brief Sulfate Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -12950,7 +13120,7 @@ void emberAfSulfateConcentrationMeasurementClusterClientAttributeChangedCallback
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSulfateConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfSulfateConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                 EmberAfStatus status);
 /** @brief Sulfate Concentration Measurement Cluster Client Init
  *
@@ -12958,7 +13128,7 @@ void emberAfSulfateConcentrationMeasurementClusterClientDefaultResponseCallback(
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSulfateConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfSulfateConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Sulfate Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -12969,7 +13139,7 @@ void emberAfSulfateConcentrationMeasurementClusterClientInitCallback(uint8_t end
  * Ver.: always
  */
 void emberAfSulfateConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                     EmberAfAttributeId attributeId,
+                                                                                                     chip::AttributeId attributeId,
                                                                                                      uint16_t manufacturerCode);
 /** @brief Sulfate Concentration Measurement Cluster Client Message Sent
  *
@@ -12997,7 +13167,7 @@ void emberAfSulfateConcentrationMeasurementClusterClientMessageSentCallback(Embe
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfSulfateConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                             EmberAfAttributeId attributeId,
+                                                                                             chip::AttributeId attributeId,
                                                                                              EmberAfAttributeType attributeType,
                                                                                              uint8_t size, uint8_t * value);
 /** @brief Sulfate Concentration Measurement Cluster Client Tick
@@ -13006,7 +13176,7 @@ EmberAfStatus emberAfSulfateConcentrationMeasurementClusterClientPreAttributeCha
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSulfateConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfSulfateConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Sulfate Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -13014,7 +13184,8 @@ void emberAfSulfateConcentrationMeasurementClusterClientTickCallback(uint8_t end
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSulfateConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSulfateConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId);
 /** @brief Sulfate Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -13024,7 +13195,7 @@ void emberAfSulfateConcentrationMeasurementClusterServerAttributeChangedCallback
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSulfateConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfSulfateConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                 EmberAfStatus status);
 /** @brief Sulfate Concentration Measurement Cluster Server Init
  *
@@ -13032,7 +13203,7 @@ void emberAfSulfateConcentrationMeasurementClusterServerDefaultResponseCallback(
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSulfateConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfSulfateConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Sulfate Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -13043,7 +13214,7 @@ void emberAfSulfateConcentrationMeasurementClusterServerInitCallback(uint8_t end
  * Ver.: always
  */
 void emberAfSulfateConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                     EmberAfAttributeId attributeId,
+                                                                                                     chip::AttributeId attributeId,
                                                                                                      uint16_t manufacturerCode);
 /** @brief Sulfate Concentration Measurement Cluster Server Message Sent
  *
@@ -13071,7 +13242,7 @@ void emberAfSulfateConcentrationMeasurementClusterServerMessageSentCallback(Embe
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfSulfateConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                             EmberAfAttributeId attributeId,
+                                                                                             chip::AttributeId attributeId,
                                                                                              EmberAfAttributeType attributeType,
                                                                                              uint8_t size, uint8_t * value);
 /** @brief Sulfate Concentration Measurement Cluster Server Tick
@@ -13080,7 +13251,7 @@ EmberAfStatus emberAfSulfateConcentrationMeasurementClusterServerPreAttributeCha
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSulfateConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfSulfateConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Sulfate Concentration Measurement Cluster Callbacks */
 
@@ -13095,7 +13266,7 @@ void emberAfSulfateConcentrationMeasurementClusterServerTickCallback(uint8_t end
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfBromodichloromethaneConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId);
+                                                                                              chip::AttributeId attributeId);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -13105,7 +13276,8 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterClientAttributeCh
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBromodichloromethaneConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfBromodichloromethaneConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                             uint8_t commandId,
                                                                                              EmberAfStatus status);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Client Init
  *
@@ -13113,7 +13285,7 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterClientDefaultResp
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBromodichloromethaneConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfBromodichloromethaneConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -13124,7 +13296,7 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterClientInitCallbac
  * Ver.: always
  */
 void emberAfBromodichloromethaneConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -13152,14 +13324,14 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterClientMessageSent
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfBromodichloromethaneConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBromodichloromethaneConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfBromodichloromethaneConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -13168,7 +13340,7 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterClientTickCallbac
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfBromodichloromethaneConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId);
+                                                                                              chip::AttributeId attributeId);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -13178,7 +13350,8 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterServerAttributeCh
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBromodichloromethaneConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfBromodichloromethaneConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                             uint8_t commandId,
                                                                                              EmberAfStatus status);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Server Init
  *
@@ -13186,7 +13359,7 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterServerDefaultResp
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBromodichloromethaneConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfBromodichloromethaneConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -13197,7 +13370,7 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterServerInitCallbac
  * Ver.: always
  */
 void emberAfBromodichloromethaneConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -13225,14 +13398,14 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterServerMessageSent
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfBromodichloromethaneConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Bromodichloromethane Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBromodichloromethaneConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfBromodichloromethaneConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Bromodichloromethane Concentration Measurement Cluster Callbacks */
 
@@ -13246,8 +13419,8 @@ void emberAfBromodichloromethaneConcentrationMeasurementClusterServerTickCallbac
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBromoformConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                   EmberAfAttributeId attributeId);
+void emberAfBromoformConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId);
 /** @brief Bromoform Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -13257,7 +13430,7 @@ void emberAfBromoformConcentrationMeasurementClusterClientAttributeChangedCallba
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBromoformConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfBromoformConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                   EmberAfStatus status);
 /** @brief Bromoform Concentration Measurement Cluster Client Init
  *
@@ -13265,7 +13438,7 @@ void emberAfBromoformConcentrationMeasurementClusterClientDefaultResponseCallbac
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBromoformConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfBromoformConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Bromoform Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -13276,7 +13449,7 @@ void emberAfBromoformConcentrationMeasurementClusterClientInitCallback(uint8_t e
  * Ver.: always
  */
 void emberAfBromoformConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Bromoform Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -13304,7 +13477,7 @@ void emberAfBromoformConcentrationMeasurementClusterClientMessageSentCallback(Em
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfBromoformConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId,
+                                                                                               chip::AttributeId attributeId,
                                                                                                EmberAfAttributeType attributeType,
                                                                                                uint8_t size, uint8_t * value);
 /** @brief Bromoform Concentration Measurement Cluster Client Tick
@@ -13313,7 +13486,7 @@ EmberAfStatus emberAfBromoformConcentrationMeasurementClusterClientPreAttributeC
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBromoformConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfBromoformConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Bromoform Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -13321,8 +13494,8 @@ void emberAfBromoformConcentrationMeasurementClusterClientTickCallback(uint8_t e
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBromoformConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                   EmberAfAttributeId attributeId);
+void emberAfBromoformConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId);
 /** @brief Bromoform Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -13332,7 +13505,7 @@ void emberAfBromoformConcentrationMeasurementClusterServerAttributeChangedCallba
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBromoformConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfBromoformConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                   EmberAfStatus status);
 /** @brief Bromoform Concentration Measurement Cluster Server Init
  *
@@ -13340,7 +13513,7 @@ void emberAfBromoformConcentrationMeasurementClusterServerDefaultResponseCallbac
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBromoformConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfBromoformConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Bromoform Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -13351,7 +13524,7 @@ void emberAfBromoformConcentrationMeasurementClusterServerInitCallback(uint8_t e
  * Ver.: always
  */
 void emberAfBromoformConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Bromoform Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -13379,7 +13552,7 @@ void emberAfBromoformConcentrationMeasurementClusterServerMessageSentCallback(Em
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfBromoformConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId,
+                                                                                               chip::AttributeId attributeId,
                                                                                                EmberAfAttributeType attributeType,
                                                                                                uint8_t size, uint8_t * value);
 /** @brief Bromoform Concentration Measurement Cluster Server Tick
@@ -13388,7 +13561,7 @@ EmberAfStatus emberAfBromoformConcentrationMeasurementClusterServerPreAttributeC
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBromoformConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfBromoformConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Bromoform Concentration Measurement Cluster Callbacks */
 
@@ -13403,7 +13576,7 @@ void emberAfBromoformConcentrationMeasurementClusterServerTickCallback(uint8_t e
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId);
+                                                                                              chip::AttributeId attributeId);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -13413,7 +13586,8 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientAttributeCh
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                             uint8_t commandId,
                                                                                              EmberAfStatus status);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Client Init
  *
@@ -13421,7 +13595,7 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientDefaultResp
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -13432,7 +13606,7 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientInitCallbac
  * Ver.: always
  */
 void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -13460,14 +13634,14 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientMessageSent
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfChlorodibromomethaneConcentrationMeasurementClusterClientPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Client Tick
  *
  * Client Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -13476,7 +13650,7 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterClientTickCallbac
  * @param attributeId Attribute that changed  Ver.: always
  */
 void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                              EmberAfAttributeId attributeId);
+                                                                                              chip::AttributeId attributeId);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -13486,7 +13660,8 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerAttributeCh
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint,
+                                                                                             uint8_t commandId,
                                                                                              EmberAfStatus status);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Server Init
  *
@@ -13494,7 +13669,7 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerDefaultResp
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -13505,7 +13680,7 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerInitCallbac
  * Ver.: always
  */
 void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -13533,14 +13708,14 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerMessageSent
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfChlorodibromomethaneConcentrationMeasurementClusterServerPreAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, EmberAfAttributeType attributeType, uint8_t size, uint8_t * value);
 /** @brief Chlorodibromomethane Concentration Measurement Cluster Server Tick
  *
  * Server Tick
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Chlorodibromomethane Concentration Measurement Cluster Callbacks */
 
@@ -13554,8 +13729,8 @@ void emberAfChlorodibromomethaneConcentrationMeasurementClusterServerTickCallbac
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfChloroformConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint,
-                                                                                    EmberAfAttributeId attributeId);
+void emberAfChloroformConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId);
 /** @brief Chloroform Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -13565,7 +13740,7 @@ void emberAfChloroformConcentrationMeasurementClusterClientAttributeChangedCallb
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfChloroformConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfChloroformConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                    EmberAfStatus status);
 /** @brief Chloroform Concentration Measurement Cluster Client Init
  *
@@ -13573,7 +13748,7 @@ void emberAfChloroformConcentrationMeasurementClusterClientDefaultResponseCallba
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfChloroformConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfChloroformConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Chloroform Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -13584,7 +13759,7 @@ void emberAfChloroformConcentrationMeasurementClusterClientInitCallback(uint8_t 
  * Ver.: always
  */
 void emberAfChloroformConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Chloroform Concentration Measurement Cluster Client Message Sent
  *
  * Client Message Sent
@@ -13612,7 +13787,7 @@ void emberAfChloroformConcentrationMeasurementClusterClientMessageSentCallback(E
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfChloroformConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                                EmberAfAttributeId attributeId,
+                                                                                                chip::AttributeId attributeId,
                                                                                                 EmberAfAttributeType attributeType,
                                                                                                 uint8_t size, uint8_t * value);
 /** @brief Chloroform Concentration Measurement Cluster Client Tick
@@ -13621,7 +13796,7 @@ EmberAfStatus emberAfChloroformConcentrationMeasurementClusterClientPreAttribute
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfChloroformConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfChloroformConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Chloroform Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -13629,8 +13804,8 @@ void emberAfChloroformConcentrationMeasurementClusterClientTickCallback(uint8_t 
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfChloroformConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint,
-                                                                                    EmberAfAttributeId attributeId);
+void emberAfChloroformConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId);
 /** @brief Chloroform Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -13640,7 +13815,7 @@ void emberAfChloroformConcentrationMeasurementClusterServerAttributeChangedCallb
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfChloroformConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfChloroformConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                    EmberAfStatus status);
 /** @brief Chloroform Concentration Measurement Cluster Server Init
  *
@@ -13648,7 +13823,7 @@ void emberAfChloroformConcentrationMeasurementClusterServerDefaultResponseCallba
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfChloroformConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfChloroformConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Chloroform Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -13659,7 +13834,7 @@ void emberAfChloroformConcentrationMeasurementClusterServerInitCallback(uint8_t 
  * Ver.: always
  */
 void emberAfChloroformConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(
-    uint8_t endpoint, EmberAfAttributeId attributeId, uint16_t manufacturerCode);
+    chip::EndpointId endpoint, chip::AttributeId attributeId, uint16_t manufacturerCode);
 /** @brief Chloroform Concentration Measurement Cluster Server Message Sent
  *
  * Server Message Sent
@@ -13687,7 +13862,7 @@ void emberAfChloroformConcentrationMeasurementClusterServerMessageSentCallback(E
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfChloroformConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                                EmberAfAttributeId attributeId,
+                                                                                                chip::AttributeId attributeId,
                                                                                                 EmberAfAttributeType attributeType,
                                                                                                 uint8_t size, uint8_t * value);
 /** @brief Chloroform Concentration Measurement Cluster Server Tick
@@ -13696,7 +13871,7 @@ EmberAfStatus emberAfChloroformConcentrationMeasurementClusterServerPreAttribute
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfChloroformConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfChloroformConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Chloroform Concentration Measurement Cluster Callbacks */
 
@@ -13710,7 +13885,8 @@ void emberAfChloroformConcentrationMeasurementClusterServerTickCallback(uint8_t 
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSodiumConcentrationMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSodiumConcentrationMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId);
 /** @brief Sodium Concentration Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -13720,7 +13896,7 @@ void emberAfSodiumConcentrationMeasurementClusterClientAttributeChangedCallback(
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSodiumConcentrationMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfSodiumConcentrationMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                EmberAfStatus status);
 /** @brief Sodium Concentration Measurement Cluster Client Init
  *
@@ -13728,7 +13904,7 @@ void emberAfSodiumConcentrationMeasurementClusterClientDefaultResponseCallback(u
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSodiumConcentrationMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfSodiumConcentrationMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Sodium Concentration Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -13739,7 +13915,7 @@ void emberAfSodiumConcentrationMeasurementClusterClientInitCallback(uint8_t endp
  * Ver.: always
  */
 void emberAfSodiumConcentrationMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                    EmberAfAttributeId attributeId,
+                                                                                                    chip::AttributeId attributeId,
                                                                                                     uint16_t manufacturerCode);
 /** @brief Sodium Concentration Measurement Cluster Client Message Sent
  *
@@ -13767,7 +13943,7 @@ void emberAfSodiumConcentrationMeasurementClusterClientMessageSentCallback(Ember
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfSodiumConcentrationMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                            EmberAfAttributeId attributeId,
+                                                                                            chip::AttributeId attributeId,
                                                                                             EmberAfAttributeType attributeType,
                                                                                             uint8_t size, uint8_t * value);
 /** @brief Sodium Concentration Measurement Cluster Client Tick
@@ -13776,7 +13952,7 @@ EmberAfStatus emberAfSodiumConcentrationMeasurementClusterClientPreAttributeChan
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSodiumConcentrationMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfSodiumConcentrationMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Sodium Concentration Measurement Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -13784,7 +13960,8 @@ void emberAfSodiumConcentrationMeasurementClusterClientTickCallback(uint8_t endp
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSodiumConcentrationMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSodiumConcentrationMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId);
 /** @brief Sodium Concentration Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -13794,7 +13971,7 @@ void emberAfSodiumConcentrationMeasurementClusterServerAttributeChangedCallback(
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSodiumConcentrationMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfSodiumConcentrationMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                                EmberAfStatus status);
 /** @brief Sodium Concentration Measurement Cluster Server Init
  *
@@ -13802,7 +13979,7 @@ void emberAfSodiumConcentrationMeasurementClusterServerDefaultResponseCallback(u
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSodiumConcentrationMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfSodiumConcentrationMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Sodium Concentration Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -13813,7 +13990,7 @@ void emberAfSodiumConcentrationMeasurementClusterServerInitCallback(uint8_t endp
  * Ver.: always
  */
 void emberAfSodiumConcentrationMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                                    EmberAfAttributeId attributeId,
+                                                                                                    chip::AttributeId attributeId,
                                                                                                     uint16_t manufacturerCode);
 /** @brief Sodium Concentration Measurement Cluster Server Message Sent
  *
@@ -13841,7 +14018,7 @@ void emberAfSodiumConcentrationMeasurementClusterServerMessageSentCallback(Ember
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfSodiumConcentrationMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                            EmberAfAttributeId attributeId,
+                                                                                            chip::AttributeId attributeId,
                                                                                             EmberAfAttributeType attributeType,
                                                                                             uint8_t size, uint8_t * value);
 /** @brief Sodium Concentration Measurement Cluster Server Tick
@@ -13850,7 +14027,7 @@ EmberAfStatus emberAfSodiumConcentrationMeasurementClusterServerPreAttributeChan
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSodiumConcentrationMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfSodiumConcentrationMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Sodium Concentration Measurement Cluster Callbacks */
 
@@ -13864,7 +14041,7 @@ void emberAfSodiumConcentrationMeasurementClusterServerTickCallback(uint8_t endp
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIasZoneClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIasZoneClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief IAS Zone Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -13874,14 +14051,14 @@ void emberAfIasZoneClusterClientAttributeChangedCallback(uint8_t endpoint, Ember
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIasZoneClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIasZoneClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief IAS Zone Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint);
+void emberAfIasZoneClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief IAS Zone Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -13891,7 +14068,8 @@ void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfIasZoneClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfIasZoneClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              uint16_t manufacturerCode);
 /** @brief IAS Zone Cluster Client Message Sent
  *
@@ -13918,7 +14096,7 @@ void emberAfIasZoneClusterClientMessageSentCallback(EmberOutgoingMessageType typ
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIasZoneClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIasZoneClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                      EmberAfAttributeType attributeType, uint8_t size,
                                                                      uint8_t * value);
 /** @brief IAS Zone Cluster Client Tick
@@ -13927,7 +14105,7 @@ EmberAfStatus emberAfIasZoneClusterClientPreAttributeChangedCallback(uint8_t end
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIasZoneClusterClientTickCallback(uint8_t endpoint);
+void emberAfIasZoneClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief IAS Zone Cluster Initiate Normal Operation Mode
  *
  *
@@ -13961,7 +14139,7 @@ bool emberAfIasZoneClusterInitiateTestModeResponseCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIasZoneClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIasZoneClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief IAS Zone Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -13971,14 +14149,14 @@ void emberAfIasZoneClusterServerAttributeChangedCallback(uint8_t endpoint, Ember
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIasZoneClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIasZoneClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief IAS Zone Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIasZoneClusterServerInitCallback(uint8_t endpoint);
+void emberAfIasZoneClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief IAS Zone Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -13988,7 +14166,8 @@ void emberAfIasZoneClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfIasZoneClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfIasZoneClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              uint16_t manufacturerCode);
 /** @brief IAS Zone Cluster Server Message Sent
  *
@@ -14015,7 +14194,7 @@ void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType typ
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                      EmberAfAttributeType attributeType, uint8_t size,
                                                                      uint8_t * value);
 /** @brief IAS Zone Cluster Server Tick
@@ -14024,7 +14203,7 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIasZoneClusterServerTickCallback(uint8_t endpoint);
+void emberAfIasZoneClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief IAS Zone Cluster Zone Enroll Request
  *
  *
@@ -14098,7 +14277,7 @@ bool emberAfIasAceClusterBypassResponseCallback(uint8_t numberOfZones, uint8_t *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIasAceClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIasAceClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief IAS ACE Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -14108,14 +14287,14 @@ void emberAfIasAceClusterClientAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIasAceClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIasAceClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief IAS ACE Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIasAceClusterClientInitCallback(uint8_t endpoint);
+void emberAfIasAceClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief IAS ACE Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -14125,7 +14304,8 @@ void emberAfIasAceClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfIasAceClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfIasAceClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief IAS ACE Cluster Client Message Sent
  *
@@ -14152,7 +14332,7 @@ void emberAfIasAceClusterClientMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIasAceClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIasAceClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief IAS ACE Cluster Client Tick
@@ -14161,7 +14341,7 @@ EmberAfStatus emberAfIasAceClusterClientPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIasAceClusterClientTickCallback(uint8_t endpoint);
+void emberAfIasAceClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief IAS ACE Cluster Emergency
  *
  *
@@ -14292,7 +14472,7 @@ bool emberAfIasAceClusterPanicCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIasAceClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIasAceClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief IAS ACE Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -14302,14 +14482,14 @@ void emberAfIasAceClusterServerAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIasAceClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIasAceClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief IAS ACE Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIasAceClusterServerInitCallback(uint8_t endpoint);
+void emberAfIasAceClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief IAS ACE Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -14319,7 +14499,8 @@ void emberAfIasAceClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfIasAceClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfIasAceClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief IAS ACE Cluster Server Message Sent
  *
@@ -14346,7 +14527,7 @@ void emberAfIasAceClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIasAceClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIasAceClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief IAS ACE Cluster Server Tick
@@ -14355,7 +14536,7 @@ EmberAfStatus emberAfIasAceClusterServerPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIasAceClusterServerTickCallback(uint8_t endpoint);
+void emberAfIasAceClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief IAS ACE Cluster Set Bypassed Zone List
  *
  *
@@ -14388,7 +14569,7 @@ bool emberAfIasAceClusterZoneStatusChangedCallback(uint8_t zoneId, uint16_t zone
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIasWdClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIasWdClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief IAS WD Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -14398,14 +14579,14 @@ void emberAfIasWdClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAf
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIasWdClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIasWdClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief IAS WD Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIasWdClusterClientInitCallback(uint8_t endpoint);
+void emberAfIasWdClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief IAS WD Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -14415,7 +14596,7 @@ void emberAfIasWdClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfIasWdClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfIasWdClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 /** @brief IAS WD Cluster Client Message Sent
  *
@@ -14441,7 +14622,7 @@ void emberAfIasWdClusterClientMessageSentCallback(EmberOutgoingMessageType type,
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIasWdClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIasWdClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 /** @brief IAS WD Cluster Client Tick
@@ -14450,7 +14631,7 @@ EmberAfStatus emberAfIasWdClusterClientPreAttributeChangedCallback(uint8_t endpo
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIasWdClusterClientTickCallback(uint8_t endpoint);
+void emberAfIasWdClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief IAS WD Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -14458,7 +14639,7 @@ void emberAfIasWdClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIasWdClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIasWdClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief IAS WD Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -14468,14 +14649,14 @@ void emberAfIasWdClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAf
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIasWdClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIasWdClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief IAS WD Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIasWdClusterServerInitCallback(uint8_t endpoint);
+void emberAfIasWdClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief IAS WD Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -14485,7 +14666,7 @@ void emberAfIasWdClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfIasWdClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfIasWdClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 /** @brief IAS WD Cluster Server Message Sent
  *
@@ -14511,7 +14692,7 @@ void emberAfIasWdClusterServerMessageSentCallback(EmberOutgoingMessageType type,
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIasWdClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIasWdClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 /** @brief IAS WD Cluster Server Tick
@@ -14520,7 +14701,7 @@ EmberAfStatus emberAfIasWdClusterServerPreAttributeChangedCallback(uint8_t endpo
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIasWdClusterServerTickCallback(uint8_t endpoint);
+void emberAfIasWdClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief IAS WD Cluster Squawk
  *
  *
@@ -14559,7 +14740,7 @@ bool emberAfGenericTunnelClusterAdvertiseProtocolAddressCallback(uint8_t * proto
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfGenericTunnelClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfGenericTunnelClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Generic Tunnel Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -14569,14 +14750,15 @@ void emberAfGenericTunnelClusterClientAttributeChangedCallback(uint8_t endpoint,
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfGenericTunnelClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfGenericTunnelClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                              EmberAfStatus status);
 /** @brief Generic Tunnel Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfGenericTunnelClusterClientInitCallback(uint8_t endpoint);
+void emberAfGenericTunnelClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Generic Tunnel Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -14586,7 +14768,8 @@ void emberAfGenericTunnelClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfGenericTunnelClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfGenericTunnelClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId,
                                                                                    uint16_t manufacturerCode);
 /** @brief Generic Tunnel Cluster Client Message Sent
  *
@@ -14613,7 +14796,7 @@ void emberAfGenericTunnelClusterClientMessageSentCallback(EmberOutgoingMessageTy
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfGenericTunnelClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfGenericTunnelClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            EmberAfAttributeType attributeType, uint8_t size,
                                                                            uint8_t * value);
 /** @brief Generic Tunnel Cluster Client Tick
@@ -14622,7 +14805,7 @@ EmberAfStatus emberAfGenericTunnelClusterClientPreAttributeChangedCallback(uint8
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfGenericTunnelClusterClientTickCallback(uint8_t endpoint);
+void emberAfGenericTunnelClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Generic Tunnel Cluster Match Protocol Address
  *
  *
@@ -14645,7 +14828,7 @@ bool emberAfGenericTunnelClusterMatchProtocolAddressResponseCallback(uint8_t * d
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfGenericTunnelClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfGenericTunnelClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Generic Tunnel Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -14655,14 +14838,15 @@ void emberAfGenericTunnelClusterServerAttributeChangedCallback(uint8_t endpoint,
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfGenericTunnelClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfGenericTunnelClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                              EmberAfStatus status);
 /** @brief Generic Tunnel Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfGenericTunnelClusterServerInitCallback(uint8_t endpoint);
+void emberAfGenericTunnelClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Generic Tunnel Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -14672,7 +14856,8 @@ void emberAfGenericTunnelClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfGenericTunnelClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfGenericTunnelClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId,
                                                                                    uint16_t manufacturerCode);
 /** @brief Generic Tunnel Cluster Server Message Sent
  *
@@ -14699,7 +14884,7 @@ void emberAfGenericTunnelClusterServerMessageSentCallback(EmberOutgoingMessageTy
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfGenericTunnelClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfGenericTunnelClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            EmberAfAttributeType attributeType, uint8_t size,
                                                                            uint8_t * value);
 /** @brief Generic Tunnel Cluster Server Tick
@@ -14708,7 +14893,7 @@ EmberAfStatus emberAfGenericTunnelClusterServerPreAttributeChangedCallback(uint8
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfGenericTunnelClusterServerTickCallback(uint8_t endpoint);
+void emberAfGenericTunnelClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Generic Tunnel Cluster Callbacks */
 
@@ -14722,7 +14907,7 @@ void emberAfGenericTunnelClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBacnetProtocolTunnelClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBacnetProtocolTunnelClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief BACnet Protocol Tunnel Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -14732,14 +14917,15 @@ void emberAfBacnetProtocolTunnelClusterClientAttributeChangedCallback(uint8_t en
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBacnetProtocolTunnelClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBacnetProtocolTunnelClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                     EmberAfStatus status);
 /** @brief BACnet Protocol Tunnel Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBacnetProtocolTunnelClusterClientInitCallback(uint8_t endpoint);
+void emberAfBacnetProtocolTunnelClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief BACnet Protocol Tunnel Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -14750,7 +14936,7 @@ void emberAfBacnetProtocolTunnelClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfBacnetProtocolTunnelClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                          EmberAfAttributeId attributeId,
+                                                                                          chip::AttributeId attributeId,
                                                                                           uint16_t manufacturerCode);
 /** @brief BACnet Protocol Tunnel Cluster Client Message Sent
  *
@@ -14777,7 +14963,8 @@ void emberAfBacnetProtocolTunnelClusterClientMessageSentCallback(EmberOutgoingMe
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBacnetProtocolTunnelClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBacnetProtocolTunnelClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   EmberAfAttributeType attributeType, uint8_t size,
                                                                                   uint8_t * value);
 /** @brief BACnet Protocol Tunnel Cluster Client Tick
@@ -14786,7 +14973,7 @@ EmberAfStatus emberAfBacnetProtocolTunnelClusterClientPreAttributeChangedCallbac
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBacnetProtocolTunnelClusterClientTickCallback(uint8_t endpoint);
+void emberAfBacnetProtocolTunnelClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief BACnet Protocol Tunnel Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -14794,7 +14981,7 @@ void emberAfBacnetProtocolTunnelClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBacnetProtocolTunnelClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBacnetProtocolTunnelClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief BACnet Protocol Tunnel Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -14804,14 +14991,15 @@ void emberAfBacnetProtocolTunnelClusterServerAttributeChangedCallback(uint8_t en
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBacnetProtocolTunnelClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBacnetProtocolTunnelClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                     EmberAfStatus status);
 /** @brief BACnet Protocol Tunnel Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBacnetProtocolTunnelClusterServerInitCallback(uint8_t endpoint);
+void emberAfBacnetProtocolTunnelClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief BACnet Protocol Tunnel Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -14822,7 +15010,7 @@ void emberAfBacnetProtocolTunnelClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfBacnetProtocolTunnelClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                          EmberAfAttributeId attributeId,
+                                                                                          chip::AttributeId attributeId,
                                                                                           uint16_t manufacturerCode);
 /** @brief BACnet Protocol Tunnel Cluster Server Message Sent
  *
@@ -14849,7 +15037,8 @@ void emberAfBacnetProtocolTunnelClusterServerMessageSentCallback(EmberOutgoingMe
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBacnetProtocolTunnelClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBacnetProtocolTunnelClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                  chip::AttributeId attributeId,
                                                                                   EmberAfAttributeType attributeType, uint8_t size,
                                                                                   uint8_t * value);
 /** @brief BACnet Protocol Tunnel Cluster Server Tick
@@ -14858,7 +15047,7 @@ EmberAfStatus emberAfBacnetProtocolTunnelClusterServerPreAttributeChangedCallbac
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBacnetProtocolTunnelClusterServerTickCallback(uint8_t endpoint);
+void emberAfBacnetProtocolTunnelClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief BACnet Protocol Tunnel Cluster Transfer Npdu
  *
  *
@@ -14879,7 +15068,7 @@ bool emberAfBacnetProtocolTunnelClusterTransferNpduCallback(uint8_t * npdu);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAf11073ProtocolTunnelClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAf11073ProtocolTunnelClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief 11073 Protocol Tunnel Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -14889,14 +15078,15 @@ void emberAf11073ProtocolTunnelClusterClientAttributeChangedCallback(uint8_t end
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAf11073ProtocolTunnelClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAf11073ProtocolTunnelClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                    EmberAfStatus status);
 /** @brief 11073 Protocol Tunnel Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAf11073ProtocolTunnelClusterClientInitCallback(uint8_t endpoint);
+void emberAf11073ProtocolTunnelClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief 11073 Protocol Tunnel Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -14907,7 +15097,7 @@ void emberAf11073ProtocolTunnelClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAf11073ProtocolTunnelClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId,
+                                                                                         chip::AttributeId attributeId,
                                                                                          uint16_t manufacturerCode);
 /** @brief 11073 Protocol Tunnel Cluster Client Message Sent
  *
@@ -14934,7 +15124,8 @@ void emberAf11073ProtocolTunnelClusterClientMessageSentCallback(EmberOutgoingMes
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAf11073ProtocolTunnelClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAf11073ProtocolTunnelClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  EmberAfAttributeType attributeType, uint8_t size,
                                                                                  uint8_t * value);
 /** @brief 11073 Protocol Tunnel Cluster Client Tick
@@ -14943,7 +15134,7 @@ EmberAfStatus emberAf11073ProtocolTunnelClusterClientPreAttributeChangedCallback
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAf11073ProtocolTunnelClusterClientTickCallback(uint8_t endpoint);
+void emberAf11073ProtocolTunnelClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief 11073 Protocol Tunnel Cluster Connect Request
  *
  *
@@ -14976,7 +15167,7 @@ bool emberAf11073ProtocolTunnelClusterDisconnectRequestCallback(uint8_t * manage
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAf11073ProtocolTunnelClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAf11073ProtocolTunnelClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief 11073 Protocol Tunnel Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -14986,14 +15177,15 @@ void emberAf11073ProtocolTunnelClusterServerAttributeChangedCallback(uint8_t end
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAf11073ProtocolTunnelClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAf11073ProtocolTunnelClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                    EmberAfStatus status);
 /** @brief 11073 Protocol Tunnel Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAf11073ProtocolTunnelClusterServerInitCallback(uint8_t endpoint);
+void emberAf11073ProtocolTunnelClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief 11073 Protocol Tunnel Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -15004,7 +15196,7 @@ void emberAf11073ProtocolTunnelClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAf11073ProtocolTunnelClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId,
+                                                                                         chip::AttributeId attributeId,
                                                                                          uint16_t manufacturerCode);
 /** @brief 11073 Protocol Tunnel Cluster Server Message Sent
  *
@@ -15031,7 +15223,8 @@ void emberAf11073ProtocolTunnelClusterServerMessageSentCallback(EmberOutgoingMes
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAf11073ProtocolTunnelClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAf11073ProtocolTunnelClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  EmberAfAttributeType attributeType, uint8_t size,
                                                                                  uint8_t * value);
 /** @brief 11073 Protocol Tunnel Cluster Server Tick
@@ -15040,7 +15233,7 @@ EmberAfStatus emberAf11073ProtocolTunnelClusterServerPreAttributeChangedCallback
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAf11073ProtocolTunnelClusterServerTickCallback(uint8_t endpoint);
+void emberAf11073ProtocolTunnelClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief 11073 Protocol Tunnel Cluster Transfer A P D U
  *
  *
@@ -15061,7 +15254,7 @@ bool emberAf11073ProtocolTunnelClusterTransferAPDUCallback(uint8_t * apdu);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIso7816ProtocolTunnelClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIso7816ProtocolTunnelClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief ISO 7816 Protocol Tunnel Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -15071,14 +15264,15 @@ void emberAfIso7816ProtocolTunnelClusterClientAttributeChangedCallback(uint8_t e
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIso7816ProtocolTunnelClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIso7816ProtocolTunnelClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                      EmberAfStatus status);
 /** @brief ISO 7816 Protocol Tunnel Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIso7816ProtocolTunnelClusterClientInitCallback(uint8_t endpoint);
+void emberAfIso7816ProtocolTunnelClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief ISO 7816 Protocol Tunnel Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -15089,7 +15283,7 @@ void emberAfIso7816ProtocolTunnelClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfIso7816ProtocolTunnelClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                           EmberAfAttributeId attributeId,
+                                                                                           chip::AttributeId attributeId,
                                                                                            uint16_t manufacturerCode);
 /** @brief ISO 7816 Protocol Tunnel Cluster Client Message Sent
  *
@@ -15116,7 +15310,8 @@ void emberAfIso7816ProtocolTunnelClusterClientMessageSentCallback(EmberOutgoingM
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIso7816ProtocolTunnelClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIso7816ProtocolTunnelClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId,
                                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                                    uint8_t * value);
 /** @brief ISO 7816 Protocol Tunnel Cluster Client Tick
@@ -15125,7 +15320,7 @@ EmberAfStatus emberAfIso7816ProtocolTunnelClusterClientPreAttributeChangedCallba
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIso7816ProtocolTunnelClusterClientTickCallback(uint8_t endpoint);
+void emberAfIso7816ProtocolTunnelClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief ISO 7816 Protocol Tunnel Cluster Extract Smart Card
  *
  *
@@ -15145,7 +15340,7 @@ bool emberAfIso7816ProtocolTunnelClusterInsertSmartCardCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfIso7816ProtocolTunnelClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfIso7816ProtocolTunnelClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief ISO 7816 Protocol Tunnel Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -15155,14 +15350,15 @@ void emberAfIso7816ProtocolTunnelClusterServerAttributeChangedCallback(uint8_t e
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfIso7816ProtocolTunnelClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfIso7816ProtocolTunnelClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                      EmberAfStatus status);
 /** @brief ISO 7816 Protocol Tunnel Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfIso7816ProtocolTunnelClusterServerInitCallback(uint8_t endpoint);
+void emberAfIso7816ProtocolTunnelClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief ISO 7816 Protocol Tunnel Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -15173,7 +15369,7 @@ void emberAfIso7816ProtocolTunnelClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfIso7816ProtocolTunnelClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                           EmberAfAttributeId attributeId,
+                                                                                           chip::AttributeId attributeId,
                                                                                            uint16_t manufacturerCode);
 /** @brief ISO 7816 Protocol Tunnel Cluster Server Message Sent
  *
@@ -15200,7 +15396,8 @@ void emberAfIso7816ProtocolTunnelClusterServerMessageSentCallback(EmberOutgoingM
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfIso7816ProtocolTunnelClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIso7816ProtocolTunnelClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId,
                                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                                    uint8_t * value);
 /** @brief ISO 7816 Protocol Tunnel Cluster Server Tick
@@ -15209,7 +15406,7 @@ EmberAfStatus emberAfIso7816ProtocolTunnelClusterServerPreAttributeChangedCallba
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfIso7816ProtocolTunnelClusterServerTickCallback(uint8_t endpoint);
+void emberAfIso7816ProtocolTunnelClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief ISO 7816 Protocol Tunnel Cluster Transfer Apdu
  *
  *
@@ -15239,7 +15436,7 @@ bool emberAfPriceClusterCancelTariffCallback(uint32_t providerId, uint32_t issue
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPriceClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPriceClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Price Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -15249,14 +15446,14 @@ void emberAfPriceClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAf
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPriceClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPriceClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Price Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPriceClusterClientInitCallback(uint8_t endpoint);
+void emberAfPriceClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Price Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -15266,7 +15463,7 @@ void emberAfPriceClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPriceClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPriceClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 /** @brief Price Cluster Client Message Sent
  *
@@ -15292,7 +15489,7 @@ void emberAfPriceClusterClientMessageSentCallback(EmberOutgoingMessageType type,
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPriceClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPriceClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 /** @brief Price Cluster Client Tick
@@ -15301,7 +15498,7 @@ EmberAfStatus emberAfPriceClusterClientPreAttributeChangedCallback(uint8_t endpo
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPriceClusterClientTickCallback(uint8_t endpoint);
+void emberAfPriceClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Price Cluster Cpp Event Response
  *
  *
@@ -15701,7 +15898,7 @@ bool emberAfPriceClusterPublishTierLabelsCallback(uint32_t providerId, uint32_t 
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPriceClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPriceClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Price Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -15711,14 +15908,14 @@ void emberAfPriceClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAf
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPriceClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPriceClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Price Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPriceClusterServerInitCallback(uint8_t endpoint);
+void emberAfPriceClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Price Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -15728,7 +15925,7 @@ void emberAfPriceClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPriceClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPriceClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 /** @brief Price Cluster Server Message Sent
  *
@@ -15754,7 +15951,7 @@ void emberAfPriceClusterServerMessageSentCallback(EmberOutgoingMessageType type,
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPriceClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPriceClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 /** @brief Price Cluster Server Tick
@@ -15763,7 +15960,7 @@ EmberAfStatus emberAfPriceClusterServerPreAttributeChangedCallback(uint8_t endpo
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPriceClusterServerTickCallback(uint8_t endpoint);
+void emberAfPriceClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Price Cluster Callbacks */
 
@@ -15797,7 +15994,8 @@ bool emberAfDemandResponseLoadControlClusterCancelLoadControlEventCallback(uint3
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDemandResponseLoadControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDemandResponseLoadControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                           chip::AttributeId attributeId);
 /** @brief Demand Response and Load Control Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -15807,7 +16005,7 @@ void emberAfDemandResponseLoadControlClusterClientAttributeChangedCallback(uint8
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDemandResponseLoadControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfDemandResponseLoadControlClusterClientDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                           EmberAfStatus status);
 /** @brief Demand Response and Load Control Cluster Client Init
  *
@@ -15815,7 +16013,7 @@ void emberAfDemandResponseLoadControlClusterClientDefaultResponseCallback(uint8_
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDemandResponseLoadControlClusterClientInitCallback(uint8_t endpoint);
+void emberAfDemandResponseLoadControlClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Demand Response and Load Control Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -15826,7 +16024,7 @@ void emberAfDemandResponseLoadControlClusterClientInitCallback(uint8_t endpoint)
  * Ver.: always
  */
 void emberAfDemandResponseLoadControlClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId,
+                                                                                               chip::AttributeId attributeId,
                                                                                                uint16_t manufacturerCode);
 /** @brief Demand Response and Load Control Cluster Client Message Sent
  *
@@ -15854,7 +16052,7 @@ void emberAfDemandResponseLoadControlClusterClientMessageSentCallback(EmberOutgo
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfDemandResponseLoadControlClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId,
+                                                                                       chip::AttributeId attributeId,
                                                                                        EmberAfAttributeType attributeType,
                                                                                        uint8_t size, uint8_t * value);
 /** @brief Demand Response and Load Control Cluster Client Tick
@@ -15863,7 +16061,7 @@ EmberAfStatus emberAfDemandResponseLoadControlClusterClientPreAttributeChangedCa
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDemandResponseLoadControlClusterClientTickCallback(uint8_t endpoint);
+void emberAfDemandResponseLoadControlClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Demand Response and Load Control Cluster Get Scheduled Events
  *
  *
@@ -15927,7 +16125,8 @@ bool emberAfDemandResponseLoadControlClusterReportEventStatusCallback(uint32_t i
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDemandResponseLoadControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDemandResponseLoadControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                           chip::AttributeId attributeId);
 /** @brief Demand Response and Load Control Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -15937,7 +16136,7 @@ void emberAfDemandResponseLoadControlClusterServerAttributeChangedCallback(uint8
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDemandResponseLoadControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId,
+void emberAfDemandResponseLoadControlClusterServerDefaultResponseCallback(chip::EndpointId endpoint, uint8_t commandId,
                                                                           EmberAfStatus status);
 /** @brief Demand Response and Load Control Cluster Server Init
  *
@@ -15945,7 +16144,7 @@ void emberAfDemandResponseLoadControlClusterServerDefaultResponseCallback(uint8_
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDemandResponseLoadControlClusterServerInitCallback(uint8_t endpoint);
+void emberAfDemandResponseLoadControlClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Demand Response and Load Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -15956,7 +16155,7 @@ void emberAfDemandResponseLoadControlClusterServerInitCallback(uint8_t endpoint)
  * Ver.: always
  */
 void emberAfDemandResponseLoadControlClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                               EmberAfAttributeId attributeId,
+                                                                                               chip::AttributeId attributeId,
                                                                                                uint16_t manufacturerCode);
 /** @brief Demand Response and Load Control Cluster Server Message Sent
  *
@@ -15984,7 +16183,7 @@ void emberAfDemandResponseLoadControlClusterServerMessageSentCallback(EmberOutgo
  * @param value Attribute value  Ver.: always
  */
 EmberAfStatus emberAfDemandResponseLoadControlClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId,
+                                                                                       chip::AttributeId attributeId,
                                                                                        EmberAfAttributeType attributeType,
                                                                                        uint8_t size, uint8_t * value);
 /** @brief Demand Response and Load Control Cluster Server Tick
@@ -15993,7 +16192,7 @@ EmberAfStatus emberAfDemandResponseLoadControlClusterServerPreAttributeChangedCa
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDemandResponseLoadControlClusterServerTickCallback(uint8_t endpoint);
+void emberAfDemandResponseLoadControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Demand Response and Load Control Cluster Callbacks */
 
@@ -16021,7 +16220,7 @@ bool emberAfSimpleMeteringClusterChangeSupplyCallback(uint32_t providerId, uint3
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSimpleMeteringClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSimpleMeteringClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Simple Metering Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -16031,14 +16230,15 @@ void emberAfSimpleMeteringClusterClientAttributeChangedCallback(uint8_t endpoint
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSimpleMeteringClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfSimpleMeteringClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                               EmberAfStatus status);
 /** @brief Simple Metering Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSimpleMeteringClusterClientInitCallback(uint8_t endpoint);
+void emberAfSimpleMeteringClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Simple Metering Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -16048,8 +16248,8 @@ void emberAfSimpleMeteringClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfSimpleMeteringClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                    EmberAfAttributeId attributeId,
+void emberAfSimpleMeteringClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId,
                                                                                     uint16_t manufacturerCode);
 /** @brief Simple Metering Cluster Client Message Sent
  *
@@ -16076,7 +16276,8 @@ void emberAfSimpleMeteringClusterClientMessageSentCallback(EmberOutgoingMessageT
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfSimpleMeteringClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfSimpleMeteringClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             EmberAfAttributeType attributeType, uint8_t size,
                                                                             uint8_t * value);
 /** @brief Simple Metering Cluster Client Tick
@@ -16085,7 +16286,7 @@ EmberAfStatus emberAfSimpleMeteringClusterClientPreAttributeChangedCallback(uint
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSimpleMeteringClusterClientTickCallback(uint8_t endpoint);
+void emberAfSimpleMeteringClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Simple Metering Cluster Configure Mirror
  *
  *
@@ -16112,7 +16313,7 @@ bool emberAfSimpleMeteringClusterConfigureMirrorCallback(uint32_t issuerEventId,
 bool emberAfSimpleMeteringClusterConfigureNotificationFlagsCallback(uint32_t issuerEventId, uint8_t notificationScheme,
                                                                     uint16_t notificationFlagAttributeId, uint16_t clusterId,
                                                                     uint16_t manufacturerCode, uint8_t numberOfCommands,
-                                                                    uint8_t * commandIds);
+                                                                    chip::CommandId * commandIds);
 /** @brief Simple Metering Cluster Configure Notification Scheme
  *
  *
@@ -16297,7 +16498,7 @@ bool emberAfSimpleMeteringClusterScheduleSnapshotResponseCallback(uint32_t issue
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSimpleMeteringClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSimpleMeteringClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Simple Metering Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -16307,14 +16508,15 @@ void emberAfSimpleMeteringClusterServerAttributeChangedCallback(uint8_t endpoint
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSimpleMeteringClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfSimpleMeteringClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                               EmberAfStatus status);
 /** @brief Simple Metering Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSimpleMeteringClusterServerInitCallback(uint8_t endpoint);
+void emberAfSimpleMeteringClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Simple Metering Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -16324,8 +16526,8 @@ void emberAfSimpleMeteringClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfSimpleMeteringClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                    EmberAfAttributeId attributeId,
+void emberAfSimpleMeteringClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                    chip::AttributeId attributeId,
                                                                                     uint16_t manufacturerCode);
 /** @brief Simple Metering Cluster Server Message Sent
  *
@@ -16352,7 +16554,8 @@ void emberAfSimpleMeteringClusterServerMessageSentCallback(EmberOutgoingMessageT
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfSimpleMeteringClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfSimpleMeteringClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             EmberAfAttributeType attributeType, uint8_t size,
                                                                             uint8_t * value);
 /** @brief Simple Metering Cluster Server Tick
@@ -16361,7 +16564,7 @@ EmberAfStatus emberAfSimpleMeteringClusterServerPreAttributeChangedCallback(uint
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSimpleMeteringClusterServerTickCallback(uint8_t endpoint);
+void emberAfSimpleMeteringClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Simple Metering Cluster Set Supply Status
  *
  *
@@ -16465,7 +16668,7 @@ bool emberAfMessagingClusterCancelMessageCallback(uint32_t messageId, uint8_t me
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfMessagingClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfMessagingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Messaging Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -16475,14 +16678,15 @@ void emberAfMessagingClusterClientAttributeChangedCallback(uint8_t endpoint, Emb
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfMessagingClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfMessagingClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                          EmberAfStatus status);
 /** @brief Messaging Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfMessagingClusterClientInitCallback(uint8_t endpoint);
+void emberAfMessagingClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Messaging Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -16492,7 +16696,8 @@ void emberAfMessagingClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfMessagingClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfMessagingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                uint16_t manufacturerCode);
 /** @brief Messaging Cluster Client Message Sent
  *
@@ -16519,7 +16724,7 @@ void emberAfMessagingClusterClientMessageSentCallback(EmberOutgoingMessageType t
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfMessagingClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfMessagingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                        EmberAfAttributeType attributeType, uint8_t size,
                                                                        uint8_t * value);
 /** @brief Messaging Cluster Client Tick
@@ -16528,7 +16733,7 @@ EmberAfStatus emberAfMessagingClusterClientPreAttributeChangedCallback(uint8_t e
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfMessagingClusterClientTickCallback(uint8_t endpoint);
+void emberAfMessagingClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Messaging Cluster Display Message
  *
  *
@@ -16588,7 +16793,7 @@ bool emberAfMessagingClusterMessageConfirmationCallback(uint32_t messageId, uint
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfMessagingClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfMessagingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Messaging Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -16598,14 +16803,15 @@ void emberAfMessagingClusterServerAttributeChangedCallback(uint8_t endpoint, Emb
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfMessagingClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfMessagingClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                          EmberAfStatus status);
 /** @brief Messaging Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfMessagingClusterServerInitCallback(uint8_t endpoint);
+void emberAfMessagingClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Messaging Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -16615,7 +16821,8 @@ void emberAfMessagingClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfMessagingClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfMessagingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                uint16_t manufacturerCode);
 /** @brief Messaging Cluster Server Message Sent
  *
@@ -16642,7 +16849,7 @@ void emberAfMessagingClusterServerMessageSentCallback(EmberOutgoingMessageType t
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfMessagingClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfMessagingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                        EmberAfAttributeType attributeType, uint8_t size,
                                                                        uint8_t * value);
 /** @brief Messaging Cluster Server Tick
@@ -16651,7 +16858,7 @@ EmberAfStatus emberAfMessagingClusterServerPreAttributeChangedCallback(uint8_t e
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfMessagingClusterServerTickCallback(uint8_t endpoint);
+void emberAfMessagingClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Messaging Cluster Callbacks */
 
@@ -16681,7 +16888,7 @@ bool emberAfTunnelingClusterAckTransferDataServerToClientCallback(uint16_t tunne
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfTunnelingClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfTunnelingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Tunneling Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -16691,14 +16898,15 @@ void emberAfTunnelingClusterClientAttributeChangedCallback(uint8_t endpoint, Emb
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTunnelingClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfTunnelingClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                          EmberAfStatus status);
 /** @brief Tunneling Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTunnelingClusterClientInitCallback(uint8_t endpoint);
+void emberAfTunnelingClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Tunneling Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -16708,7 +16916,8 @@ void emberAfTunnelingClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfTunnelingClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfTunnelingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                uint16_t manufacturerCode);
 /** @brief Tunneling Cluster Client Message Sent
  *
@@ -16735,7 +16944,7 @@ void emberAfTunnelingClusterClientMessageSentCallback(EmberOutgoingMessageType t
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfTunnelingClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfTunnelingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                        EmberAfAttributeType attributeType, uint8_t size,
                                                                        uint8_t * value);
 /** @brief Tunneling Cluster Client Tick
@@ -16744,7 +16953,7 @@ EmberAfStatus emberAfTunnelingClusterClientPreAttributeChangedCallback(uint8_t e
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTunnelingClusterClientTickCallback(uint8_t endpoint);
+void emberAfTunnelingClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Tunneling Cluster Close Tunnel
  *
  *
@@ -16803,7 +17012,7 @@ bool emberAfTunnelingClusterRequestTunnelResponseCallback(uint16_t tunnelId, uin
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfTunnelingClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfTunnelingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Tunneling Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -16813,14 +17022,15 @@ void emberAfTunnelingClusterServerAttributeChangedCallback(uint8_t endpoint, Emb
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfTunnelingClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfTunnelingClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                          EmberAfStatus status);
 /** @brief Tunneling Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfTunnelingClusterServerInitCallback(uint8_t endpoint);
+void emberAfTunnelingClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Tunneling Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -16830,7 +17040,8 @@ void emberAfTunnelingClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfTunnelingClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfTunnelingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                uint16_t manufacturerCode);
 /** @brief Tunneling Cluster Server Message Sent
  *
@@ -16857,7 +17068,7 @@ void emberAfTunnelingClusterServerMessageSentCallback(EmberOutgoingMessageType t
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfTunnelingClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfTunnelingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                        EmberAfAttributeType attributeType, uint8_t size,
                                                                        uint8_t * value);
 /** @brief Tunneling Cluster Server Tick
@@ -16866,7 +17077,7 @@ EmberAfStatus emberAfTunnelingClusterServerPreAttributeChangedCallback(uint8_t e
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfTunnelingClusterServerTickCallback(uint8_t endpoint);
+void emberAfTunnelingClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Tunneling Cluster Supported Tunnel Protocols Response
  *
  *
@@ -16971,7 +17182,7 @@ bool emberAfPrepaymentClusterChangePaymentModeResponseCallback(uint8_t friendlyC
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPrepaymentClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPrepaymentClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Prepayment Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -16981,14 +17192,15 @@ void emberAfPrepaymentClusterClientAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPrepaymentClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPrepaymentClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief Prepayment Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPrepaymentClusterClientInitCallback(uint8_t endpoint);
+void emberAfPrepaymentClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Prepayment Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -16998,7 +17210,8 @@ void emberAfPrepaymentClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPrepaymentClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPrepaymentClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief Prepayment Cluster Client Message Sent
  *
@@ -17025,7 +17238,7 @@ void emberAfPrepaymentClusterClientMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPrepaymentClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPrepaymentClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief Prepayment Cluster Client Tick
@@ -17034,7 +17247,7 @@ EmberAfStatus emberAfPrepaymentClusterClientPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPrepaymentClusterClientTickCallback(uint8_t endpoint);
+void emberAfPrepaymentClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Prepayment Cluster Consumer Top Up
  *
  *
@@ -17154,7 +17367,7 @@ bool emberAfPrepaymentClusterSelectAvailableEmergencyCreditCallback(uint32_t com
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPrepaymentClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPrepaymentClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Prepayment Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -17164,14 +17377,15 @@ void emberAfPrepaymentClusterServerAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPrepaymentClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPrepaymentClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief Prepayment Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPrepaymentClusterServerInitCallback(uint8_t endpoint);
+void emberAfPrepaymentClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Prepayment Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -17181,7 +17395,8 @@ void emberAfPrepaymentClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPrepaymentClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPrepaymentClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief Prepayment Cluster Server Message Sent
  *
@@ -17208,7 +17423,7 @@ void emberAfPrepaymentClusterServerMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPrepaymentClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPrepaymentClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief Prepayment Cluster Server Tick
@@ -17217,7 +17432,7 @@ EmberAfStatus emberAfPrepaymentClusterServerPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPrepaymentClusterServerTickCallback(uint8_t endpoint);
+void emberAfPrepaymentClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Prepayment Cluster Set Low Credit Warning Level
  *
  *
@@ -17262,7 +17477,7 @@ bool emberAfPrepaymentClusterSetOverallDebtCapCallback(uint32_t providerId, uint
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfEnergyManagementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfEnergyManagementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Energy Management Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -17272,14 +17487,15 @@ void emberAfEnergyManagementClusterClientAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfEnergyManagementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfEnergyManagementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Energy Management Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfEnergyManagementClusterClientInitCallback(uint8_t endpoint);
+void emberAfEnergyManagementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Energy Management Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -17289,8 +17505,8 @@ void emberAfEnergyManagementClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfEnergyManagementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfEnergyManagementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Energy Management Cluster Client Message Sent
  *
@@ -17317,7 +17533,8 @@ void emberAfEnergyManagementClusterClientMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfEnergyManagementClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfEnergyManagementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Energy Management Cluster Client Tick
@@ -17326,7 +17543,7 @@ EmberAfStatus emberAfEnergyManagementClusterClientPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfEnergyManagementClusterClientTickCallback(uint8_t endpoint);
+void emberAfEnergyManagementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Energy Management Cluster Manage Event
  *
  *
@@ -17365,7 +17582,7 @@ bool emberAfEnergyManagementClusterReportEventStatusCallback(uint32_t issuerEven
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfEnergyManagementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfEnergyManagementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Energy Management Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -17375,14 +17592,15 @@ void emberAfEnergyManagementClusterServerAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfEnergyManagementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfEnergyManagementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Energy Management Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfEnergyManagementClusterServerInitCallback(uint8_t endpoint);
+void emberAfEnergyManagementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Energy Management Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -17392,8 +17610,8 @@ void emberAfEnergyManagementClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfEnergyManagementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfEnergyManagementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Energy Management Cluster Server Message Sent
  *
@@ -17420,7 +17638,8 @@ void emberAfEnergyManagementClusterServerMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfEnergyManagementClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfEnergyManagementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Energy Management Cluster Server Tick
@@ -17429,7 +17648,7 @@ EmberAfStatus emberAfEnergyManagementClusterServerPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfEnergyManagementClusterServerTickCallback(uint8_t endpoint);
+void emberAfEnergyManagementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Energy Management Cluster Callbacks */
 
@@ -17452,7 +17671,7 @@ bool emberAfCalendarClusterCancelCalendarCallback(uint32_t providerId, uint32_t 
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfCalendarClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfCalendarClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Calendar Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -17462,14 +17681,15 @@ void emberAfCalendarClusterClientAttributeChangedCallback(uint8_t endpoint, Embe
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfCalendarClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfCalendarClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                         EmberAfStatus status);
 /** @brief Calendar Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfCalendarClusterClientInitCallback(uint8_t endpoint);
+void emberAfCalendarClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Calendar Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -17479,7 +17699,8 @@ void emberAfCalendarClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfCalendarClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfCalendarClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               uint16_t manufacturerCode);
 /** @brief Calendar Cluster Client Message Sent
  *
@@ -17506,7 +17727,7 @@ void emberAfCalendarClusterClientMessageSentCallback(EmberOutgoingMessageType ty
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfCalendarClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfCalendarClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                       EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 /** @brief Calendar Cluster Client Tick
@@ -17515,7 +17736,7 @@ EmberAfStatus emberAfCalendarClusterClientPreAttributeChangedCallback(uint8_t en
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfCalendarClusterClientTickCallback(uint8_t endpoint);
+void emberAfCalendarClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Calendar Cluster Get Calendar
  *
  *
@@ -17671,7 +17892,7 @@ bool emberAfCalendarClusterPublishWeekProfileCallback(uint32_t providerId, uint3
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfCalendarClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfCalendarClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Calendar Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -17681,14 +17902,15 @@ void emberAfCalendarClusterServerAttributeChangedCallback(uint8_t endpoint, Embe
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfCalendarClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfCalendarClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                         EmberAfStatus status);
 /** @brief Calendar Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfCalendarClusterServerInitCallback(uint8_t endpoint);
+void emberAfCalendarClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Calendar Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -17698,7 +17920,8 @@ void emberAfCalendarClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfCalendarClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfCalendarClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               uint16_t manufacturerCode);
 /** @brief Calendar Cluster Server Message Sent
  *
@@ -17725,7 +17948,7 @@ void emberAfCalendarClusterServerMessageSentCallback(EmberOutgoingMessageType ty
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfCalendarClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfCalendarClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                       EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 /** @brief Calendar Cluster Server Tick
@@ -17734,7 +17957,7 @@ EmberAfStatus emberAfCalendarClusterServerPreAttributeChangedCallback(uint8_t en
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfCalendarClusterServerTickCallback(uint8_t endpoint);
+void emberAfCalendarClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Calendar Cluster Callbacks */
 
@@ -17748,7 +17971,7 @@ void emberAfCalendarClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDeviceManagementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDeviceManagementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Device Management Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -17758,14 +17981,15 @@ void emberAfDeviceManagementClusterClientAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDeviceManagementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDeviceManagementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Device Management Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDeviceManagementClusterClientInitCallback(uint8_t endpoint);
+void emberAfDeviceManagementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Device Management Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -17775,8 +17999,8 @@ void emberAfDeviceManagementClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDeviceManagementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfDeviceManagementClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Device Management Cluster Client Message Sent
  *
@@ -17803,7 +18027,8 @@ void emberAfDeviceManagementClusterClientMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDeviceManagementClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDeviceManagementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Device Management Cluster Client Tick
@@ -17812,7 +18037,7 @@ EmberAfStatus emberAfDeviceManagementClusterClientPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDeviceManagementClusterClientTickCallback(uint8_t endpoint);
+void emberAfDeviceManagementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Device Management Cluster Get C I N
  *
  *
@@ -17912,7 +18137,7 @@ bool emberAfDeviceManagementClusterRequestNewPasswordResponseCallback(uint32_t i
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDeviceManagementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDeviceManagementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Device Management Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -17922,14 +18147,15 @@ void emberAfDeviceManagementClusterServerAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDeviceManagementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDeviceManagementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Device Management Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDeviceManagementClusterServerInitCallback(uint8_t endpoint);
+void emberAfDeviceManagementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Device Management Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -17939,8 +18165,8 @@ void emberAfDeviceManagementClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDeviceManagementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfDeviceManagementClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Device Management Cluster Server Message Sent
  *
@@ -17967,7 +18193,8 @@ void emberAfDeviceManagementClusterServerMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDeviceManagementClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDeviceManagementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Device Management Cluster Server Tick
@@ -17976,7 +18203,7 @@ EmberAfStatus emberAfDeviceManagementClusterServerPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDeviceManagementClusterServerTickCallback(uint8_t endpoint);
+void emberAfDeviceManagementClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Device Management Cluster Set Event Configuration
  *
  *
@@ -18039,7 +18266,7 @@ bool emberAfEventsClusterClearEventLogResponseCallback(uint8_t clearedEventsLogs
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfEventsClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfEventsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Events Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -18049,14 +18276,14 @@ void emberAfEventsClusterClientAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfEventsClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfEventsClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Events Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfEventsClusterClientInitCallback(uint8_t endpoint);
+void emberAfEventsClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Events Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -18066,7 +18293,8 @@ void emberAfEventsClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfEventsClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfEventsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief Events Cluster Client Message Sent
  *
@@ -18093,7 +18321,7 @@ void emberAfEventsClusterClientMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfEventsClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfEventsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief Events Cluster Client Tick
@@ -18102,7 +18330,7 @@ EmberAfStatus emberAfEventsClusterClientPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfEventsClusterClientTickCallback(uint8_t endpoint);
+void emberAfEventsClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Events Cluster Get Event Log
  *
  *
@@ -18147,7 +18375,7 @@ bool emberAfEventsClusterPublishEventLogCallback(uint16_t totalNumberOfEvents, u
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfEventsClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfEventsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Events Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -18157,14 +18385,14 @@ void emberAfEventsClusterServerAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfEventsClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfEventsClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Events Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfEventsClusterServerInitCallback(uint8_t endpoint);
+void emberAfEventsClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Events Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -18174,7 +18402,8 @@ void emberAfEventsClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfEventsClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfEventsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief Events Cluster Server Message Sent
  *
@@ -18201,7 +18430,7 @@ void emberAfEventsClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfEventsClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfEventsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief Events Cluster Server Tick
@@ -18210,7 +18439,7 @@ EmberAfStatus emberAfEventsClusterServerPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfEventsClusterServerTickCallback(uint8_t endpoint);
+void emberAfEventsClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Events Cluster Callbacks */
 
@@ -18224,7 +18453,7 @@ void emberAfEventsClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfMduPairingClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfMduPairingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief MDU Pairing Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -18234,14 +18463,15 @@ void emberAfMduPairingClusterClientAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfMduPairingClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfMduPairingClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief MDU Pairing Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfMduPairingClusterClientInitCallback(uint8_t endpoint);
+void emberAfMduPairingClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief MDU Pairing Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -18251,7 +18481,8 @@ void emberAfMduPairingClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfMduPairingClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfMduPairingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief MDU Pairing Cluster Client Message Sent
  *
@@ -18278,7 +18509,7 @@ void emberAfMduPairingClusterClientMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfMduPairingClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfMduPairingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief MDU Pairing Cluster Client Tick
@@ -18287,7 +18518,7 @@ EmberAfStatus emberAfMduPairingClusterClientPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfMduPairingClusterClientTickCallback(uint8_t endpoint);
+void emberAfMduPairingClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief MDU Pairing Cluster Pairing Request
  *
  *
@@ -18315,7 +18546,7 @@ bool emberAfMduPairingClusterPairingResponseCallback(uint32_t pairingInformation
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfMduPairingClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfMduPairingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief MDU Pairing Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -18325,14 +18556,15 @@ void emberAfMduPairingClusterServerAttributeChangedCallback(uint8_t endpoint, Em
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfMduPairingClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfMduPairingClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                           EmberAfStatus status);
 /** @brief MDU Pairing Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfMduPairingClusterServerInitCallback(uint8_t endpoint);
+void emberAfMduPairingClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief MDU Pairing Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -18342,7 +18574,8 @@ void emberAfMduPairingClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfMduPairingClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfMduPairingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 uint16_t manufacturerCode);
 /** @brief MDU Pairing Cluster Server Message Sent
  *
@@ -18369,7 +18602,7 @@ void emberAfMduPairingClusterServerMessageSentCallback(EmberOutgoingMessageType 
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfMduPairingClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfMduPairingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                         EmberAfAttributeType attributeType, uint8_t size,
                                                                         uint8_t * value);
 /** @brief MDU Pairing Cluster Server Tick
@@ -18378,7 +18611,7 @@ EmberAfStatus emberAfMduPairingClusterServerPreAttributeChangedCallback(uint8_t 
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfMduPairingClusterServerTickCallback(uint8_t endpoint);
+void emberAfMduPairingClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END MDU Pairing Cluster Callbacks */
 
@@ -18392,7 +18625,7 @@ void emberAfMduPairingClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSubGhzClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSubGhzClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Sub-GHz Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -18402,14 +18635,14 @@ void emberAfSubGhzClusterClientAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSubGhzClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfSubGhzClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Sub-GHz Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSubGhzClusterClientInitCallback(uint8_t endpoint);
+void emberAfSubGhzClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Sub-GHz Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -18419,7 +18652,8 @@ void emberAfSubGhzClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfSubGhzClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfSubGhzClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief Sub-GHz Cluster Client Message Sent
  *
@@ -18446,7 +18680,7 @@ void emberAfSubGhzClusterClientMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfSubGhzClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfSubGhzClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief Sub-GHz Cluster Client Tick
@@ -18455,7 +18689,7 @@ EmberAfStatus emberAfSubGhzClusterClientPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSubGhzClusterClientTickCallback(uint8_t endpoint);
+void emberAfSubGhzClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Sub-GHz Cluster Get Suspend Zcl Messages Status
  *
  *
@@ -18469,7 +18703,7 @@ bool emberAfSubGhzClusterGetSuspendZclMessagesStatusCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSubGhzClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSubGhzClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Sub-GHz Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -18479,14 +18713,14 @@ void emberAfSubGhzClusterServerAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSubGhzClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfSubGhzClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Sub-GHz Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSubGhzClusterServerInitCallback(uint8_t endpoint);
+void emberAfSubGhzClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Sub-GHz Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -18496,7 +18730,8 @@ void emberAfSubGhzClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfSubGhzClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfSubGhzClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief Sub-GHz Cluster Server Message Sent
  *
@@ -18523,7 +18758,7 @@ void emberAfSubGhzClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfSubGhzClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfSubGhzClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief Sub-GHz Cluster Server Tick
@@ -18532,7 +18767,7 @@ EmberAfStatus emberAfSubGhzClusterServerPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSubGhzClusterServerTickCallback(uint8_t endpoint);
+void emberAfSubGhzClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Sub-GHz Cluster Suspend Zcl Messages
  *
  *
@@ -18564,7 +18799,7 @@ bool emberAfKeyEstablishmentClusterClientCommandReceivedCallback(EmberAfClusterC
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfKeyEstablishmentClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfKeyEstablishmentClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Key Establishment Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -18574,14 +18809,15 @@ void emberAfKeyEstablishmentClusterClientAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfKeyEstablishmentClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfKeyEstablishmentClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Key Establishment Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfKeyEstablishmentClusterClientInitCallback(uint8_t endpoint);
+void emberAfKeyEstablishmentClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Key Establishment Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -18591,8 +18827,8 @@ void emberAfKeyEstablishmentClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfKeyEstablishmentClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfKeyEstablishmentClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Key Establishment Cluster Client Message Sent
  *
@@ -18619,7 +18855,8 @@ void emberAfKeyEstablishmentClusterClientMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfKeyEstablishmentClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfKeyEstablishmentClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Key Establishment Cluster Client Tick
@@ -18628,7 +18865,7 @@ EmberAfStatus emberAfKeyEstablishmentClusterClientPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfKeyEstablishmentClusterClientTickCallback(uint8_t endpoint);
+void emberAfKeyEstablishmentClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Key Establishment Cluster Confirm Key Data Request
  *
  *
@@ -18688,7 +18925,7 @@ bool emberAfKeyEstablishmentClusterInitiateKeyEstablishmentResponseCallback(uint
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfKeyEstablishmentClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfKeyEstablishmentClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Key Establishment Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -18698,14 +18935,15 @@ void emberAfKeyEstablishmentClusterServerAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfKeyEstablishmentClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfKeyEstablishmentClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Key Establishment Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfKeyEstablishmentClusterServerInitCallback(uint8_t endpoint);
+void emberAfKeyEstablishmentClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Key Establishment Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -18715,8 +18953,8 @@ void emberAfKeyEstablishmentClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfKeyEstablishmentClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfKeyEstablishmentClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Key Establishment Cluster Server Message Sent
  *
@@ -18743,7 +18981,8 @@ void emberAfKeyEstablishmentClusterServerMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfKeyEstablishmentClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfKeyEstablishmentClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Key Establishment Cluster Server Tick
@@ -18752,7 +18991,7 @@ EmberAfStatus emberAfKeyEstablishmentClusterServerPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfKeyEstablishmentClusterServerTickCallback(uint8_t endpoint);
+void emberAfKeyEstablishmentClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Key Establishment Cluster Terminate Key Establishment
  *
  *
@@ -18787,7 +19026,7 @@ bool emberAfKeyEstablishmentClusterServerCommandReceivedCallback(EmberAfClusterC
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfInformationClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfInformationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Information Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -18797,14 +19036,15 @@ void emberAfInformationClusterClientAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfInformationClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfInformationClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Information Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfInformationClusterClientInitCallback(uint8_t endpoint);
+void emberAfInformationClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Information Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -18814,7 +19054,8 @@ void emberAfInformationClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfInformationClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfInformationClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Information Cluster Client Message Sent
  *
@@ -18841,7 +19082,7 @@ void emberAfInformationClusterClientMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfInformationClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfInformationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Information Cluster Client Tick
@@ -18850,7 +19091,7 @@ EmberAfStatus emberAfInformationClusterClientPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfInformationClusterClientTickCallback(uint8_t endpoint);
+void emberAfInformationClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Information Cluster Configure Delivery Enable
  *
  *
@@ -18965,7 +19206,7 @@ bool emberAfInformationClusterSendPreferenceResponseCallback(uint8_t * statusFee
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfInformationClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfInformationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Information Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -18975,14 +19216,15 @@ void emberAfInformationClusterServerAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfInformationClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfInformationClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Information Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfInformationClusterServerInitCallback(uint8_t endpoint);
+void emberAfInformationClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Information Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -18992,7 +19234,8 @@ void emberAfInformationClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfInformationClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfInformationClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Information Cluster Server Message Sent
  *
@@ -19019,7 +19262,7 @@ void emberAfInformationClusterServerMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfInformationClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfInformationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Information Cluster Server Request Preference
@@ -19034,7 +19277,7 @@ bool emberAfInformationClusterServerRequestPreferenceCallback(void);
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfInformationClusterServerTickCallback(uint8_t endpoint);
+void emberAfInformationClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Information Cluster Update
  *
  *
@@ -19064,7 +19307,7 @@ bool emberAfInformationClusterUpdateResponseCallback(uint8_t * notificationList)
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDataSharingClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDataSharingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Data Sharing Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -19074,14 +19317,15 @@ void emberAfDataSharingClusterClientAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDataSharingClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDataSharingClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Data Sharing Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDataSharingClusterClientInitCallback(uint8_t endpoint);
+void emberAfDataSharingClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Data Sharing Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -19091,7 +19335,8 @@ void emberAfDataSharingClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDataSharingClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfDataSharingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Data Sharing Cluster Client Message Sent
  *
@@ -19118,7 +19363,7 @@ void emberAfDataSharingClusterClientMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDataSharingClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDataSharingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Data Sharing Cluster Client Tick
@@ -19127,7 +19372,7 @@ EmberAfStatus emberAfDataSharingClusterClientPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDataSharingClusterClientTickCallback(uint8_t endpoint);
+void emberAfDataSharingClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Data Sharing Cluster File Transmission
  *
  *
@@ -19185,7 +19430,7 @@ bool emberAfDataSharingClusterRecordTransmissionCallback(uint8_t transmitOptions
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDataSharingClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDataSharingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Data Sharing Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -19195,14 +19440,15 @@ void emberAfDataSharingClusterServerAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDataSharingClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDataSharingClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Data Sharing Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDataSharingClusterServerInitCallback(uint8_t endpoint);
+void emberAfDataSharingClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Data Sharing Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -19212,7 +19458,8 @@ void emberAfDataSharingClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDataSharingClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfDataSharingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Data Sharing Cluster Server Message Sent
  *
@@ -19239,7 +19486,7 @@ void emberAfDataSharingClusterServerMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDataSharingClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDataSharingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Data Sharing Cluster Server Tick
@@ -19248,7 +19495,7 @@ EmberAfStatus emberAfDataSharingClusterServerPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDataSharingClusterServerTickCallback(uint8_t endpoint);
+void emberAfDataSharingClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Data Sharing Cluster Write File Request
  *
  *
@@ -19285,7 +19532,7 @@ bool emberAfGamingClusterActionControlCallback(uint32_t actions);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfGamingClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfGamingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Gaming Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -19295,14 +19542,14 @@ void emberAfGamingClusterClientAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfGamingClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfGamingClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Gaming Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfGamingClusterClientInitCallback(uint8_t endpoint);
+void emberAfGamingClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Gaming Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -19312,7 +19559,8 @@ void emberAfGamingClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfGamingClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfGamingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief Gaming Cluster Client Message Sent
  *
@@ -19339,7 +19587,7 @@ void emberAfGamingClusterClientMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfGamingClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfGamingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief Gaming Cluster Client Tick
@@ -19348,7 +19596,7 @@ EmberAfStatus emberAfGamingClusterClientPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfGamingClusterClientTickCallback(uint8_t endpoint);
+void emberAfGamingClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Gaming Cluster Download Game
  *
  *
@@ -19378,7 +19626,7 @@ bool emberAfGamingClusterGameAnnouncementCallback(uint16_t gameId, uint8_t gameM
  * @param status   Ver.: always
  * @param message   Ver.: always
  */
-bool emberAfGamingClusterGeneralResponseCallback(uint8_t commandId, uint8_t status, uint8_t * message);
+bool emberAfGamingClusterGeneralResponseCallback(chip::CommandId commandId, uint8_t status, uint8_t * message);
 /** @brief Gaming Cluster Join Game
  *
  *
@@ -19421,7 +19669,7 @@ bool emberAfGamingClusterSearchGameCallback(uint8_t specificGame, uint16_t gameI
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfGamingClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfGamingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Gaming Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -19431,14 +19679,14 @@ void emberAfGamingClusterServerAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfGamingClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfGamingClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Gaming Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfGamingClusterServerInitCallback(uint8_t endpoint);
+void emberAfGamingClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Gaming Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -19448,7 +19696,8 @@ void emberAfGamingClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfGamingClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfGamingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief Gaming Cluster Server Message Sent
  *
@@ -19475,7 +19724,7 @@ void emberAfGamingClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfGamingClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfGamingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief Gaming Cluster Server Tick
@@ -19484,7 +19733,7 @@ EmberAfStatus emberAfGamingClusterServerPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfGamingClusterServerTickCallback(uint8_t endpoint);
+void emberAfGamingClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Gaming Cluster Start Game
  *
  *
@@ -19510,7 +19759,7 @@ bool emberAfGamingClusterStartOverCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDataRateControlClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDataRateControlClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Data Rate Control Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -19520,14 +19769,15 @@ void emberAfDataRateControlClusterClientAttributeChangedCallback(uint8_t endpoin
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDataRateControlClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDataRateControlClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                EmberAfStatus status);
 /** @brief Data Rate Control Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDataRateControlClusterClientInitCallback(uint8_t endpoint);
+void emberAfDataRateControlClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Data Rate Control Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -19537,8 +19787,8 @@ void emberAfDataRateControlClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDataRateControlClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+void emberAfDataRateControlClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      uint16_t manufacturerCode);
 /** @brief Data Rate Control Cluster Client Message Sent
  *
@@ -19565,7 +19815,8 @@ void emberAfDataRateControlClusterClientMessageSentCallback(EmberOutgoingMessage
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDataRateControlClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDataRateControlClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              EmberAfAttributeType attributeType, uint8_t size,
                                                                              uint8_t * value);
 /** @brief Data Rate Control Cluster Client Tick
@@ -19574,7 +19825,7 @@ EmberAfStatus emberAfDataRateControlClusterClientPreAttributeChangedCallback(uin
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDataRateControlClusterClientTickCallback(uint8_t endpoint);
+void emberAfDataRateControlClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Data Rate Control Cluster Data Rate Control
  *
  *
@@ -19619,7 +19870,7 @@ bool emberAfDataRateControlClusterPathDeletionCallback(uint16_t originatorAddres
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDataRateControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDataRateControlClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Data Rate Control Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -19629,14 +19880,15 @@ void emberAfDataRateControlClusterServerAttributeChangedCallback(uint8_t endpoin
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDataRateControlClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDataRateControlClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                EmberAfStatus status);
 /** @brief Data Rate Control Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDataRateControlClusterServerInitCallback(uint8_t endpoint);
+void emberAfDataRateControlClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Data Rate Control Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -19646,8 +19898,8 @@ void emberAfDataRateControlClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDataRateControlClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+void emberAfDataRateControlClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      uint16_t manufacturerCode);
 /** @brief Data Rate Control Cluster Server Message Sent
  *
@@ -19674,7 +19926,8 @@ void emberAfDataRateControlClusterServerMessageSentCallback(EmberOutgoingMessage
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDataRateControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDataRateControlClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              EmberAfAttributeType attributeType, uint8_t size,
                                                                              uint8_t * value);
 /** @brief Data Rate Control Cluster Server Tick
@@ -19683,7 +19936,7 @@ EmberAfStatus emberAfDataRateControlClusterServerPreAttributeChangedCallback(uin
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDataRateControlClusterServerTickCallback(uint8_t endpoint);
+void emberAfDataRateControlClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Data Rate Control Cluster Callbacks */
 
@@ -19697,7 +19950,7 @@ void emberAfDataRateControlClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfVoiceOverZigbeeClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Voice over ZigBee Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -19707,14 +19960,15 @@ void emberAfVoiceOverZigbeeClusterClientAttributeChangedCallback(uint8_t endpoin
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfVoiceOverZigbeeClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                EmberAfStatus status);
 /** @brief Voice over ZigBee Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterClientInitCallback(uint8_t endpoint);
+void emberAfVoiceOverZigbeeClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Voice over ZigBee Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -19724,8 +19978,8 @@ void emberAfVoiceOverZigbeeClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+void emberAfVoiceOverZigbeeClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      uint16_t manufacturerCode);
 /** @brief Voice over ZigBee Cluster Client Message Sent
  *
@@ -19752,7 +20006,8 @@ void emberAfVoiceOverZigbeeClusterClientMessageSentCallback(EmberOutgoingMessage
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfVoiceOverZigbeeClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfVoiceOverZigbeeClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              EmberAfAttributeType attributeType, uint8_t size,
                                                                              uint8_t * value);
 /** @brief Voice over ZigBee Cluster Client Tick
@@ -19761,7 +20016,7 @@ EmberAfStatus emberAfVoiceOverZigbeeClusterClientPreAttributeChangedCallback(uin
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterClientTickCallback(uint8_t endpoint);
+void emberAfVoiceOverZigbeeClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Voice over ZigBee Cluster Control
  *
  *
@@ -19804,7 +20059,7 @@ bool emberAfVoiceOverZigbeeClusterEstablishmentResponseCallback(uint8_t ackNack,
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfVoiceOverZigbeeClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Voice over ZigBee Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -19814,14 +20069,15 @@ void emberAfVoiceOverZigbeeClusterServerAttributeChangedCallback(uint8_t endpoin
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfVoiceOverZigbeeClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                EmberAfStatus status);
 /** @brief Voice over ZigBee Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterServerInitCallback(uint8_t endpoint);
+void emberAfVoiceOverZigbeeClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Voice over ZigBee Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -19831,8 +20087,8 @@ void emberAfVoiceOverZigbeeClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+void emberAfVoiceOverZigbeeClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      uint16_t manufacturerCode);
 /** @brief Voice over ZigBee Cluster Server Message Sent
  *
@@ -19859,7 +20115,8 @@ void emberAfVoiceOverZigbeeClusterServerMessageSentCallback(EmberOutgoingMessage
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfVoiceOverZigbeeClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfVoiceOverZigbeeClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              EmberAfAttributeType attributeType, uint8_t size,
                                                                              uint8_t * value);
 /** @brief Voice over ZigBee Cluster Server Tick
@@ -19868,7 +20125,7 @@ EmberAfStatus emberAfVoiceOverZigbeeClusterServerPreAttributeChangedCallback(uin
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterServerTickCallback(uint8_t endpoint);
+void emberAfVoiceOverZigbeeClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Voice over ZigBee Cluster Voice Transmission
  *
  *
@@ -19915,7 +20172,7 @@ bool emberAfChattingClusterChatMessageCallback(uint16_t destinationUid, uint16_t
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfChattingClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfChattingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Chatting Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -19925,14 +20182,15 @@ void emberAfChattingClusterClientAttributeChangedCallback(uint8_t endpoint, Embe
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfChattingClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfChattingClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                         EmberAfStatus status);
 /** @brief Chatting Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfChattingClusterClientInitCallback(uint8_t endpoint);
+void emberAfChattingClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Chatting Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -19942,7 +20200,8 @@ void emberAfChattingClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfChattingClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfChattingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               uint16_t manufacturerCode);
 /** @brief Chatting Cluster Client Message Sent
  *
@@ -19969,7 +20228,7 @@ void emberAfChattingClusterClientMessageSentCallback(EmberOutgoingMessageType ty
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfChattingClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfChattingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                       EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 /** @brief Chatting Cluster Client Tick
@@ -19978,7 +20237,7 @@ EmberAfStatus emberAfChattingClusterClientPreAttributeChangedCallback(uint8_t en
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfChattingClusterClientTickCallback(uint8_t endpoint);
+void emberAfChattingClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Chatting Cluster Get Node Information Request
  *
  *
@@ -20045,7 +20304,7 @@ bool emberAfChattingClusterSearchChatResponseCallback(uint8_t options, uint8_t *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfChattingClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfChattingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Chatting Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -20055,14 +20314,15 @@ void emberAfChattingClusterServerAttributeChangedCallback(uint8_t endpoint, Embe
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfChattingClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfChattingClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                         EmberAfStatus status);
 /** @brief Chatting Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfChattingClusterServerInitCallback(uint8_t endpoint);
+void emberAfChattingClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Chatting Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -20072,7 +20332,8 @@ void emberAfChattingClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfChattingClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfChattingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               uint16_t manufacturerCode);
 /** @brief Chatting Cluster Server Message Sent
  *
@@ -20099,7 +20360,7 @@ void emberAfChattingClusterServerMessageSentCallback(EmberOutgoingMessageType ty
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfChattingClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfChattingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                       EmberAfAttributeType attributeType, uint8_t size,
                                                                       uint8_t * value);
 /** @brief Chatting Cluster Server Tick
@@ -20108,7 +20369,7 @@ EmberAfStatus emberAfChattingClusterServerPreAttributeChangedCallback(uint8_t en
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfChattingClusterServerTickCallback(uint8_t endpoint);
+void emberAfChattingClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Chatting Cluster Start Chat Request
  *
  *
@@ -20143,7 +20404,8 @@ bool emberAfChattingClusterSwitchChairmanConfirmCallback(uint16_t cid, uint8_t *
  * @param address   Ver.: always
  * @param endpoint   Ver.: always
  */
-bool emberAfChattingClusterSwitchChairmanNotificationCallback(uint16_t cid, uint16_t uid, uint16_t address, uint8_t endpoint);
+bool emberAfChattingClusterSwitchChairmanNotificationCallback(uint16_t cid, uint16_t uid, uint16_t address,
+                                                              chip::EndpointId endpoint);
 /** @brief Chatting Cluster Switch Chairman Request
  *
  *
@@ -20224,7 +20486,7 @@ bool emberAfPaymentClusterBuyRequestCallback(uint8_t * userId, uint16_t userType
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPaymentClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPaymentClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Payment Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -20234,14 +20496,14 @@ void emberAfPaymentClusterClientAttributeChangedCallback(uint8_t endpoint, Ember
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPaymentClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPaymentClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Payment Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPaymentClusterClientInitCallback(uint8_t endpoint);
+void emberAfPaymentClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Payment Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -20251,7 +20513,8 @@ void emberAfPaymentClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPaymentClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPaymentClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              uint16_t manufacturerCode);
 /** @brief Payment Cluster Client Message Sent
  *
@@ -20278,7 +20541,7 @@ void emberAfPaymentClusterClientMessageSentCallback(EmberOutgoingMessageType typ
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPaymentClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPaymentClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                      EmberAfAttributeType attributeType, uint8_t size,
                                                                      uint8_t * value);
 /** @brief Payment Cluster Client Tick
@@ -20287,7 +20550,7 @@ EmberAfStatus emberAfPaymentClusterClientPreAttributeChangedCallback(uint8_t end
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPaymentClusterClientTickCallback(uint8_t endpoint);
+void emberAfPaymentClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Payment Cluster Payment Confirm
  *
  *
@@ -20316,7 +20579,7 @@ bool emberAfPaymentClusterReceiptDeliveryCallback(uint8_t * serialNumber, uint32
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfPaymentClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfPaymentClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Payment Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -20326,14 +20589,14 @@ void emberAfPaymentClusterServerAttributeChangedCallback(uint8_t endpoint, Ember
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfPaymentClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfPaymentClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Payment Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPaymentClusterServerInitCallback(uint8_t endpoint);
+void emberAfPaymentClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Payment Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -20343,7 +20606,8 @@ void emberAfPaymentClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfPaymentClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfPaymentClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              uint16_t manufacturerCode);
 /** @brief Payment Cluster Server Message Sent
  *
@@ -20370,7 +20634,7 @@ void emberAfPaymentClusterServerMessageSentCallback(EmberOutgoingMessageType typ
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfPaymentClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPaymentClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                      EmberAfAttributeType attributeType, uint8_t size,
                                                                      uint8_t * value);
 /** @brief Payment Cluster Server Tick
@@ -20379,7 +20643,7 @@ EmberAfStatus emberAfPaymentClusterServerPreAttributeChangedCallback(uint8_t end
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfPaymentClusterServerTickCallback(uint8_t endpoint);
+void emberAfPaymentClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Payment Cluster Transaction End
  *
  *
@@ -20418,7 +20682,7 @@ bool emberAfBillingClusterCheckBillStatusCallback(uint8_t * userId, uint16_t ser
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBillingClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBillingClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Billing Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -20428,14 +20692,14 @@ void emberAfBillingClusterClientAttributeChangedCallback(uint8_t endpoint, Ember
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBillingClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBillingClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Billing Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBillingClusterClientInitCallback(uint8_t endpoint);
+void emberAfBillingClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Billing Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -20445,7 +20709,8 @@ void emberAfBillingClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfBillingClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfBillingClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              uint16_t manufacturerCode);
 /** @brief Billing Cluster Client Message Sent
  *
@@ -20472,7 +20737,7 @@ void emberAfBillingClusterClientMessageSentCallback(EmberOutgoingMessageType typ
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBillingClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBillingClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                      EmberAfAttributeType attributeType, uint8_t size,
                                                                      uint8_t * value);
 /** @brief Billing Cluster Client Tick
@@ -20481,7 +20746,7 @@ EmberAfStatus emberAfBillingClusterClientPreAttributeChangedCallback(uint8_t end
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBillingClusterClientTickCallback(uint8_t endpoint);
+void emberAfBillingClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Billing Cluster Send Bill Record
  *
  *
@@ -20501,7 +20766,7 @@ bool emberAfBillingClusterSendBillRecordCallback(uint8_t * userId, uint16_t serv
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfBillingClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfBillingClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Billing Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -20511,14 +20776,14 @@ void emberAfBillingClusterServerAttributeChangedCallback(uint8_t endpoint, Ember
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfBillingClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfBillingClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief Billing Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfBillingClusterServerInitCallback(uint8_t endpoint);
+void emberAfBillingClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Billing Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -20528,7 +20793,8 @@ void emberAfBillingClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfBillingClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfBillingClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                             chip::AttributeId attributeId,
                                                                              uint16_t manufacturerCode);
 /** @brief Billing Cluster Server Message Sent
  *
@@ -20555,7 +20821,7 @@ void emberAfBillingClusterServerMessageSentCallback(EmberOutgoingMessageType typ
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfBillingClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfBillingClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                      EmberAfAttributeType attributeType, uint8_t size,
                                                                      uint8_t * value);
 /** @brief Billing Cluster Server Tick
@@ -20564,7 +20830,7 @@ EmberAfStatus emberAfBillingClusterServerPreAttributeChangedCallback(uint8_t end
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfBillingClusterServerTickCallback(uint8_t endpoint);
+void emberAfBillingClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Billing Cluster Session Keep Alive
  *
  *
@@ -20623,7 +20889,7 @@ bool emberAfBillingClusterUnsubscribeCallback(uint8_t * userId, uint16_t service
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfApplianceIdentificationClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfApplianceIdentificationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Appliance Identification Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -20633,14 +20899,15 @@ void emberAfApplianceIdentificationClusterClientAttributeChangedCallback(uint8_t
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfApplianceIdentificationClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfApplianceIdentificationClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                        EmberAfStatus status);
 /** @brief Appliance Identification Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfApplianceIdentificationClusterClientInitCallback(uint8_t endpoint);
+void emberAfApplianceIdentificationClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Appliance Identification Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -20651,7 +20918,7 @@ void emberAfApplianceIdentificationClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfApplianceIdentificationClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                             EmberAfAttributeId attributeId,
+                                                                                             chip::AttributeId attributeId,
                                                                                              uint16_t manufacturerCode);
 /** @brief Appliance Identification Cluster Client Message Sent
  *
@@ -20678,8 +20945,8 @@ void emberAfApplianceIdentificationClusterClientMessageSentCallback(EmberOutgoin
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfApplianceIdentificationClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+EmberAfStatus emberAfApplianceIdentificationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      EmberAfAttributeType attributeType,
                                                                                      uint8_t size, uint8_t * value);
 /** @brief Appliance Identification Cluster Client Tick
@@ -20688,7 +20955,7 @@ EmberAfStatus emberAfApplianceIdentificationClusterClientPreAttributeChangedCall
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfApplianceIdentificationClusterClientTickCallback(uint8_t endpoint);
+void emberAfApplianceIdentificationClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Appliance Identification Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -20696,7 +20963,7 @@ void emberAfApplianceIdentificationClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfApplianceIdentificationClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfApplianceIdentificationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Appliance Identification Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -20706,14 +20973,15 @@ void emberAfApplianceIdentificationClusterServerAttributeChangedCallback(uint8_t
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfApplianceIdentificationClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfApplianceIdentificationClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                        EmberAfStatus status);
 /** @brief Appliance Identification Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfApplianceIdentificationClusterServerInitCallback(uint8_t endpoint);
+void emberAfApplianceIdentificationClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Appliance Identification Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -20724,7 +20992,7 @@ void emberAfApplianceIdentificationClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfApplianceIdentificationClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                             EmberAfAttributeId attributeId,
+                                                                                             chip::AttributeId attributeId,
                                                                                              uint16_t manufacturerCode);
 /** @brief Appliance Identification Cluster Server Message Sent
  *
@@ -20751,8 +21019,8 @@ void emberAfApplianceIdentificationClusterServerMessageSentCallback(EmberOutgoin
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfApplianceIdentificationClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+EmberAfStatus emberAfApplianceIdentificationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      EmberAfAttributeType attributeType,
                                                                                      uint8_t size, uint8_t * value);
 /** @brief Appliance Identification Cluster Server Tick
@@ -20761,7 +21029,7 @@ EmberAfStatus emberAfApplianceIdentificationClusterServerPreAttributeChangedCall
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfApplianceIdentificationClusterServerTickCallback(uint8_t endpoint);
+void emberAfApplianceIdentificationClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Appliance Identification Cluster Callbacks */
 
@@ -20775,7 +21043,7 @@ void emberAfApplianceIdentificationClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfMeterIdentificationClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfMeterIdentificationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Meter Identification Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -20785,14 +21053,15 @@ void emberAfMeterIdentificationClusterClientAttributeChangedCallback(uint8_t end
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfMeterIdentificationClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfMeterIdentificationClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                    EmberAfStatus status);
 /** @brief Meter Identification Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfMeterIdentificationClusterClientInitCallback(uint8_t endpoint);
+void emberAfMeterIdentificationClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Meter Identification Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -20803,7 +21072,7 @@ void emberAfMeterIdentificationClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfMeterIdentificationClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId,
+                                                                                         chip::AttributeId attributeId,
                                                                                          uint16_t manufacturerCode);
 /** @brief Meter Identification Cluster Client Message Sent
  *
@@ -20830,7 +21099,8 @@ void emberAfMeterIdentificationClusterClientMessageSentCallback(EmberOutgoingMes
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfMeterIdentificationClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfMeterIdentificationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  EmberAfAttributeType attributeType, uint8_t size,
                                                                                  uint8_t * value);
 /** @brief Meter Identification Cluster Client Tick
@@ -20839,7 +21109,7 @@ EmberAfStatus emberAfMeterIdentificationClusterClientPreAttributeChangedCallback
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfMeterIdentificationClusterClientTickCallback(uint8_t endpoint);
+void emberAfMeterIdentificationClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Meter Identification Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -20847,7 +21117,7 @@ void emberAfMeterIdentificationClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfMeterIdentificationClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfMeterIdentificationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Meter Identification Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -20857,14 +21127,15 @@ void emberAfMeterIdentificationClusterServerAttributeChangedCallback(uint8_t end
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfMeterIdentificationClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfMeterIdentificationClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                    EmberAfStatus status);
 /** @brief Meter Identification Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfMeterIdentificationClusterServerInitCallback(uint8_t endpoint);
+void emberAfMeterIdentificationClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Meter Identification Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -20875,7 +21146,7 @@ void emberAfMeterIdentificationClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfMeterIdentificationClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId,
+                                                                                         chip::AttributeId attributeId,
                                                                                          uint16_t manufacturerCode);
 /** @brief Meter Identification Cluster Server Message Sent
  *
@@ -20902,7 +21173,8 @@ void emberAfMeterIdentificationClusterServerMessageSentCallback(EmberOutgoingMes
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfMeterIdentificationClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfMeterIdentificationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  EmberAfAttributeType attributeType, uint8_t size,
                                                                                  uint8_t * value);
 /** @brief Meter Identification Cluster Server Tick
@@ -20911,7 +21183,7 @@ EmberAfStatus emberAfMeterIdentificationClusterServerPreAttributeChangedCallback
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfMeterIdentificationClusterServerTickCallback(uint8_t endpoint);
+void emberAfMeterIdentificationClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Meter Identification Cluster Callbacks */
 
@@ -20933,7 +21205,7 @@ bool emberAfApplianceEventsAndAlertClusterAlertsNotificationCallback(uint8_t ale
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfApplianceEventsAndAlertClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfApplianceEventsAndAlertClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Appliance Events and Alert Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -20943,14 +21215,15 @@ void emberAfApplianceEventsAndAlertClusterClientAttributeChangedCallback(uint8_t
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfApplianceEventsAndAlertClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfApplianceEventsAndAlertClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                        EmberAfStatus status);
 /** @brief Appliance Events and Alert Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfApplianceEventsAndAlertClusterClientInitCallback(uint8_t endpoint);
+void emberAfApplianceEventsAndAlertClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Appliance Events and Alert Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -20961,7 +21234,7 @@ void emberAfApplianceEventsAndAlertClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfApplianceEventsAndAlertClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                             EmberAfAttributeId attributeId,
+                                                                                             chip::AttributeId attributeId,
                                                                                              uint16_t manufacturerCode);
 /** @brief Appliance Events and Alert Cluster Client Message Sent
  *
@@ -20988,8 +21261,8 @@ void emberAfApplianceEventsAndAlertClusterClientMessageSentCallback(EmberOutgoin
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfApplianceEventsAndAlertClusterClientPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+EmberAfStatus emberAfApplianceEventsAndAlertClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      EmberAfAttributeType attributeType,
                                                                                      uint8_t size, uint8_t * value);
 /** @brief Appliance Events and Alert Cluster Client Tick
@@ -20998,7 +21271,7 @@ EmberAfStatus emberAfApplianceEventsAndAlertClusterClientPreAttributeChangedCall
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfApplianceEventsAndAlertClusterClientTickCallback(uint8_t endpoint);
+void emberAfApplianceEventsAndAlertClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Appliance Events and Alert Cluster Events Notification
  *
  *
@@ -21028,7 +21301,7 @@ bool emberAfApplianceEventsAndAlertClusterGetAlertsResponseCallback(uint8_t aler
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfApplianceEventsAndAlertClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfApplianceEventsAndAlertClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Appliance Events and Alert Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -21038,14 +21311,15 @@ void emberAfApplianceEventsAndAlertClusterServerAttributeChangedCallback(uint8_t
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfApplianceEventsAndAlertClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfApplianceEventsAndAlertClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                        EmberAfStatus status);
 /** @brief Appliance Events and Alert Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfApplianceEventsAndAlertClusterServerInitCallback(uint8_t endpoint);
+void emberAfApplianceEventsAndAlertClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Appliance Events and Alert Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -21056,7 +21330,7 @@ void emberAfApplianceEventsAndAlertClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfApplianceEventsAndAlertClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                             EmberAfAttributeId attributeId,
+                                                                                             chip::AttributeId attributeId,
                                                                                              uint16_t manufacturerCode);
 /** @brief Appliance Events and Alert Cluster Server Message Sent
  *
@@ -21083,8 +21357,8 @@ void emberAfApplianceEventsAndAlertClusterServerMessageSentCallback(EmberOutgoin
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfApplianceEventsAndAlertClusterServerPreAttributeChangedCallback(uint8_t endpoint,
-                                                                                     EmberAfAttributeId attributeId,
+EmberAfStatus emberAfApplianceEventsAndAlertClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                     chip::AttributeId attributeId,
                                                                                      EmberAfAttributeType attributeType,
                                                                                      uint8_t size, uint8_t * value);
 /** @brief Appliance Events and Alert Cluster Server Tick
@@ -21093,7 +21367,7 @@ EmberAfStatus emberAfApplianceEventsAndAlertClusterServerPreAttributeChangedCall
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfApplianceEventsAndAlertClusterServerTickCallback(uint8_t endpoint);
+void emberAfApplianceEventsAndAlertClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Appliance Events and Alert Cluster Callbacks */
 
@@ -21107,7 +21381,7 @@ void emberAfApplianceEventsAndAlertClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfApplianceStatisticsClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfApplianceStatisticsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Appliance Statistics Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -21117,14 +21391,15 @@ void emberAfApplianceStatisticsClusterClientAttributeChangedCallback(uint8_t end
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfApplianceStatisticsClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfApplianceStatisticsClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                    EmberAfStatus status);
 /** @brief Appliance Statistics Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfApplianceStatisticsClusterClientInitCallback(uint8_t endpoint);
+void emberAfApplianceStatisticsClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Appliance Statistics Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -21135,7 +21410,7 @@ void emberAfApplianceStatisticsClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfApplianceStatisticsClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId,
+                                                                                         chip::AttributeId attributeId,
                                                                                          uint16_t manufacturerCode);
 /** @brief Appliance Statistics Cluster Client Message Sent
  *
@@ -21162,7 +21437,8 @@ void emberAfApplianceStatisticsClusterClientMessageSentCallback(EmberOutgoingMes
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfApplianceStatisticsClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfApplianceStatisticsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  EmberAfAttributeType attributeType, uint8_t size,
                                                                                  uint8_t * value);
 /** @brief Appliance Statistics Cluster Client Tick
@@ -21171,7 +21447,7 @@ EmberAfStatus emberAfApplianceStatisticsClusterClientPreAttributeChangedCallback
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfApplianceStatisticsClusterClientTickCallback(uint8_t endpoint);
+void emberAfApplianceStatisticsClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Appliance Statistics Cluster Log Notification
  *
  *
@@ -21222,7 +21498,7 @@ bool emberAfApplianceStatisticsClusterLogResponseCallback(uint32_t timeStamp, ui
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfApplianceStatisticsClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfApplianceStatisticsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Appliance Statistics Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -21232,14 +21508,15 @@ void emberAfApplianceStatisticsClusterServerAttributeChangedCallback(uint8_t end
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfApplianceStatisticsClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfApplianceStatisticsClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                    EmberAfStatus status);
 /** @brief Appliance Statistics Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfApplianceStatisticsClusterServerInitCallback(uint8_t endpoint);
+void emberAfApplianceStatisticsClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Appliance Statistics Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -21250,7 +21527,7 @@ void emberAfApplianceStatisticsClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfApplianceStatisticsClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                         EmberAfAttributeId attributeId,
+                                                                                         chip::AttributeId attributeId,
                                                                                          uint16_t manufacturerCode);
 /** @brief Appliance Statistics Cluster Server Message Sent
  *
@@ -21277,7 +21554,8 @@ void emberAfApplianceStatisticsClusterServerMessageSentCallback(EmberOutgoingMes
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfApplianceStatisticsClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfApplianceStatisticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  EmberAfAttributeType attributeType, uint8_t size,
                                                                                  uint8_t * value);
 /** @brief Appliance Statistics Cluster Server Tick
@@ -21286,7 +21564,7 @@ EmberAfStatus emberAfApplianceStatisticsClusterServerPreAttributeChangedCallback
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfApplianceStatisticsClusterServerTickCallback(uint8_t endpoint);
+void emberAfApplianceStatisticsClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Appliance Statistics Cluster Statistics Available
  *
  *
@@ -21308,7 +21586,7 @@ bool emberAfApplianceStatisticsClusterStatisticsAvailableCallback(uint8_t logQue
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfElectricalMeasurementClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfElectricalMeasurementClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Electrical Measurement Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -21318,14 +21596,15 @@ void emberAfElectricalMeasurementClusterClientAttributeChangedCallback(uint8_t e
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfElectricalMeasurementClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfElectricalMeasurementClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                      EmberAfStatus status);
 /** @brief Electrical Measurement Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfElectricalMeasurementClusterClientInitCallback(uint8_t endpoint);
+void emberAfElectricalMeasurementClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Electrical Measurement Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -21336,7 +21615,7 @@ void emberAfElectricalMeasurementClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfElectricalMeasurementClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                           EmberAfAttributeId attributeId,
+                                                                                           chip::AttributeId attributeId,
                                                                                            uint16_t manufacturerCode);
 /** @brief Electrical Measurement Cluster Client Message Sent
  *
@@ -21363,7 +21642,8 @@ void emberAfElectricalMeasurementClusterClientMessageSentCallback(EmberOutgoingM
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfElectricalMeasurementClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfElectricalMeasurementClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId,
                                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                                    uint8_t * value);
 /** @brief Electrical Measurement Cluster Client Tick
@@ -21372,7 +21652,7 @@ EmberAfStatus emberAfElectricalMeasurementClusterClientPreAttributeChangedCallba
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfElectricalMeasurementClusterClientTickCallback(uint8_t endpoint);
+void emberAfElectricalMeasurementClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Electrical Measurement Cluster Get Measurement Profile Command
  *
  *
@@ -21381,7 +21661,7 @@ void emberAfElectricalMeasurementClusterClientTickCallback(uint8_t endpoint);
  * @param startTime   Ver.: always
  * @param numberOfIntervals   Ver.: always
  */
-bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(uint16_t attributeId, uint32_t startTime,
+bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(chip::AttributeId attributeId, uint32_t startTime,
                                                                              uint8_t numberOfIntervals);
 /** @brief Electrical Measurement Cluster Get Measurement Profile Response Command
  *
@@ -21397,7 +21677,8 @@ bool emberAfElectricalMeasurementClusterGetMeasurementProfileCommandCallback(uin
 bool emberAfElectricalMeasurementClusterGetMeasurementProfileResponseCommandCallback(uint32_t startTime, uint8_t status,
                                                                                      uint8_t profileIntervalPeriod,
                                                                                      uint8_t numberOfIntervalsDelivered,
-                                                                                     uint16_t attributeId, uint8_t * intervals);
+                                                                                     chip::AttributeId attributeId,
+                                                                                     uint8_t * intervals);
 /** @brief Electrical Measurement Cluster Get Profile Info Command
  *
  *
@@ -21423,7 +21704,7 @@ bool emberAfElectricalMeasurementClusterGetProfileInfoResponseCommandCallback(ui
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfElectricalMeasurementClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfElectricalMeasurementClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Electrical Measurement Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -21433,14 +21714,15 @@ void emberAfElectricalMeasurementClusterServerAttributeChangedCallback(uint8_t e
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfElectricalMeasurementClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfElectricalMeasurementClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                      EmberAfStatus status);
 /** @brief Electrical Measurement Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfElectricalMeasurementClusterServerInitCallback(uint8_t endpoint);
+void emberAfElectricalMeasurementClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Electrical Measurement Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -21451,7 +21733,7 @@ void emberAfElectricalMeasurementClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfElectricalMeasurementClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                           EmberAfAttributeId attributeId,
+                                                                                           chip::AttributeId attributeId,
                                                                                            uint16_t manufacturerCode);
 /** @brief Electrical Measurement Cluster Server Message Sent
  *
@@ -21478,7 +21760,8 @@ void emberAfElectricalMeasurementClusterServerMessageSentCallback(EmberOutgoingM
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfElectricalMeasurementClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfElectricalMeasurementClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                   chip::AttributeId attributeId,
                                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                                    uint8_t * value);
 /** @brief Electrical Measurement Cluster Server Tick
@@ -21487,7 +21770,7 @@ EmberAfStatus emberAfElectricalMeasurementClusterServerPreAttributeChangedCallba
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfElectricalMeasurementClusterServerTickCallback(uint8_t endpoint);
+void emberAfElectricalMeasurementClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Electrical Measurement Cluster Callbacks */
 
@@ -21501,7 +21784,7 @@ void emberAfElectricalMeasurementClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDiagnosticsClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDiagnosticsClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Diagnostics Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -21511,14 +21794,15 @@ void emberAfDiagnosticsClusterClientAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDiagnosticsClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDiagnosticsClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Diagnostics Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDiagnosticsClusterClientInitCallback(uint8_t endpoint);
+void emberAfDiagnosticsClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Diagnostics Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -21528,7 +21812,8 @@ void emberAfDiagnosticsClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDiagnosticsClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfDiagnosticsClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Diagnostics Cluster Client Message Sent
  *
@@ -21555,7 +21840,7 @@ void emberAfDiagnosticsClusterClientMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDiagnosticsClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDiagnosticsClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Diagnostics Cluster Client Tick
@@ -21564,7 +21849,7 @@ EmberAfStatus emberAfDiagnosticsClusterClientPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDiagnosticsClusterClientTickCallback(uint8_t endpoint);
+void emberAfDiagnosticsClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Diagnostics Cluster Server Attribute Changed
  *
  * Server Attribute Changed
@@ -21572,7 +21857,7 @@ void emberAfDiagnosticsClusterClientTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfDiagnosticsClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfDiagnosticsClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Diagnostics Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -21582,14 +21867,15 @@ void emberAfDiagnosticsClusterServerAttributeChangedCallback(uint8_t endpoint, E
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfDiagnosticsClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfDiagnosticsClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                            EmberAfStatus status);
 /** @brief Diagnostics Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfDiagnosticsClusterServerInitCallback(uint8_t endpoint);
+void emberAfDiagnosticsClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Diagnostics Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -21599,7 +21885,8 @@ void emberAfDiagnosticsClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                 chip::AttributeId attributeId,
                                                                                  uint16_t manufacturerCode);
 /** @brief Diagnostics Cluster Server Message Sent
  *
@@ -21626,7 +21913,7 @@ void emberAfDiagnosticsClusterServerMessageSentCallback(EmberOutgoingMessageType
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfDiagnosticsClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfDiagnosticsClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value);
 /** @brief Diagnostics Cluster Server Tick
@@ -21635,7 +21922,7 @@ EmberAfStatus emberAfDiagnosticsClusterServerPreAttributeChangedCallback(uint8_t
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfDiagnosticsClusterServerTickCallback(uint8_t endpoint);
+void emberAfDiagnosticsClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Diagnostics Cluster Callbacks */
 
@@ -21649,7 +21936,7 @@ void emberAfDiagnosticsClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfZllCommissioningClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfZllCommissioningClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief ZLL Commissioning Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -21659,14 +21946,15 @@ void emberAfZllCommissioningClusterClientAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfZllCommissioningClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfZllCommissioningClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief ZLL Commissioning Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfZllCommissioningClusterClientInitCallback(uint8_t endpoint);
+void emberAfZllCommissioningClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief ZLL Commissioning Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -21676,8 +21964,8 @@ void emberAfZllCommissioningClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfZllCommissioningClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfZllCommissioningClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief ZLL Commissioning Cluster Client Message Sent
  *
@@ -21704,7 +21992,8 @@ void emberAfZllCommissioningClusterClientMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfZllCommissioningClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfZllCommissioningClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief ZLL Commissioning Cluster Client Tick
@@ -21713,7 +22002,7 @@ EmberAfStatus emberAfZllCommissioningClusterClientPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfZllCommissioningClusterClientTickCallback(uint8_t endpoint);
+void emberAfZllCommissioningClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief ZLL Commissioning Cluster Device Information Request
  *
  *
@@ -21951,7 +22240,7 @@ bool emberAfZllCommissioningClusterScanResponseCallback(uint32_t transaction, ui
                                                         uint8_t zllInformation, uint16_t keyBitmask, uint32_t responseId,
                                                         uint8_t * extendedPanId, uint8_t networkUpdateId, uint8_t logicalChannel,
                                                         uint16_t panId, uint16_t networkAddress, uint8_t numberOfSubDevices,
-                                                        uint8_t totalGroupIds, uint8_t endpointId, uint16_t profileId,
+                                                        uint8_t totalGroupIds, chip::EndpointId endpointId, uint16_t profileId,
                                                         uint16_t deviceId, uint8_t version, uint8_t groupIdCount);
 /** @brief ZLL Commissioning Cluster Server Attribute Changed
  *
@@ -21960,7 +22249,7 @@ bool emberAfZllCommissioningClusterScanResponseCallback(uint32_t transaction, ui
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfZllCommissioningClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfZllCommissioningClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief ZLL Commissioning Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -21970,14 +22259,15 @@ void emberAfZllCommissioningClusterServerAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfZllCommissioningClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfZllCommissioningClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief ZLL Commissioning Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfZllCommissioningClusterServerInitCallback(uint8_t endpoint);
+void emberAfZllCommissioningClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief ZLL Commissioning Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -21987,8 +22277,8 @@ void emberAfZllCommissioningClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfZllCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfZllCommissioningClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief ZLL Commissioning Cluster Server Message Sent
  *
@@ -22015,7 +22305,8 @@ void emberAfZllCommissioningClusterServerMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfZllCommissioningClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfZllCommissioningClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief ZLL Commissioning Cluster Server Tick
@@ -22024,7 +22315,7 @@ EmberAfStatus emberAfZllCommissioningClusterServerPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfZllCommissioningClusterServerTickCallback(uint8_t endpoint);
+void emberAfZllCommissioningClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END ZLL Commissioning Cluster Callbacks */
 
@@ -22038,7 +22329,7 @@ void emberAfZllCommissioningClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSampleMfgSpecificClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSampleMfgSpecificClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Sample Mfg Specific Cluster Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -22048,14 +22339,15 @@ void emberAfSampleMfgSpecificClusterClientAttributeChangedCallback(uint8_t endpo
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSampleMfgSpecificClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfSampleMfgSpecificClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                  EmberAfStatus status);
 /** @brief Sample Mfg Specific Cluster Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSampleMfgSpecificClusterClientInitCallback(uint8_t endpoint);
+void emberAfSampleMfgSpecificClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Sample Mfg Specific Cluster Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -22066,7 +22358,7 @@ void emberAfSampleMfgSpecificClusterClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfSampleMfgSpecificClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId,
+                                                                                       chip::AttributeId attributeId,
                                                                                        uint16_t manufacturerCode);
 /** @brief Sample Mfg Specific Cluster Cluster Client Message Sent
  *
@@ -22093,7 +22385,8 @@ void emberAfSampleMfgSpecificClusterClientMessageSentCallback(EmberOutgoingMessa
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfSampleMfgSpecificClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfSampleMfgSpecificClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                EmberAfAttributeType attributeType, uint8_t size,
                                                                                uint8_t * value);
 /** @brief Sample Mfg Specific Cluster Cluster Client Tick
@@ -22102,7 +22395,7 @@ EmberAfStatus emberAfSampleMfgSpecificClusterClientPreAttributeChangedCallback(u
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSampleMfgSpecificClusterClientTickCallback(uint8_t endpoint);
+void emberAfSampleMfgSpecificClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Sample Mfg Specific Cluster Cluster Command One
  *
  *
@@ -22117,7 +22410,7 @@ bool emberAfSampleMfgSpecificClusterCommandOneCallback(uint8_t argOne);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSampleMfgSpecificClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSampleMfgSpecificClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Sample Mfg Specific Cluster Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -22127,14 +22420,15 @@ void emberAfSampleMfgSpecificClusterServerAttributeChangedCallback(uint8_t endpo
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSampleMfgSpecificClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfSampleMfgSpecificClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                  EmberAfStatus status);
 /** @brief Sample Mfg Specific Cluster Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSampleMfgSpecificClusterServerInitCallback(uint8_t endpoint);
+void emberAfSampleMfgSpecificClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Sample Mfg Specific Cluster Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -22145,7 +22439,7 @@ void emberAfSampleMfgSpecificClusterServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfSampleMfgSpecificClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                       EmberAfAttributeId attributeId,
+                                                                                       chip::AttributeId attributeId,
                                                                                        uint16_t manufacturerCode);
 /** @brief Sample Mfg Specific Cluster Cluster Server Message Sent
  *
@@ -22172,7 +22466,8 @@ void emberAfSampleMfgSpecificClusterServerMessageSentCallback(EmberOutgoingMessa
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfSampleMfgSpecificClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfSampleMfgSpecificClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                               chip::AttributeId attributeId,
                                                                                EmberAfAttributeType attributeType, uint8_t size,
                                                                                uint8_t * value);
 /** @brief Sample Mfg Specific Cluster Cluster Server Tick
@@ -22181,7 +22476,7 @@ EmberAfStatus emberAfSampleMfgSpecificClusterServerPreAttributeChangedCallback(u
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSampleMfgSpecificClusterServerTickCallback(uint8_t endpoint);
+void emberAfSampleMfgSpecificClusterServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Sample Mfg Specific Cluster Cluster Callbacks */
 
@@ -22195,7 +22490,7 @@ void emberAfSampleMfgSpecificClusterServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSampleMfgSpecificCluster2ClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSampleMfgSpecificCluster2ClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -22205,14 +22500,15 @@ void emberAfSampleMfgSpecificCluster2ClientAttributeChangedCallback(uint8_t endp
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSampleMfgSpecificCluster2ClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfSampleMfgSpecificCluster2ClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                   EmberAfStatus status);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSampleMfgSpecificCluster2ClientInitCallback(uint8_t endpoint);
+void emberAfSampleMfgSpecificCluster2ClientInitCallback(chip::EndpointId endpoint);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -22223,7 +22519,7 @@ void emberAfSampleMfgSpecificCluster2ClientInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfSampleMfgSpecificCluster2ClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                        EmberAfAttributeId attributeId,
+                                                                                        chip::AttributeId attributeId,
                                                                                         uint16_t manufacturerCode);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Client Message Sent
  *
@@ -22250,7 +22546,8 @@ void emberAfSampleMfgSpecificCluster2ClientMessageSentCallback(EmberOutgoingMess
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfSampleMfgSpecificCluster2ClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfSampleMfgSpecificCluster2ClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 EmberAfAttributeType attributeType, uint8_t size,
                                                                                 uint8_t * value);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Client Tick
@@ -22259,7 +22556,7 @@ EmberAfStatus emberAfSampleMfgSpecificCluster2ClientPreAttributeChangedCallback(
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSampleMfgSpecificCluster2ClientTickCallback(uint8_t endpoint);
+void emberAfSampleMfgSpecificCluster2ClientTickCallback(chip::EndpointId endpoint);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Command Two
  *
  *
@@ -22274,7 +22571,7 @@ bool emberAfSampleMfgSpecificCluster2CommandTwoCallback(uint8_t argOne);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSampleMfgSpecificCluster2ServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSampleMfgSpecificCluster2ServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -22284,14 +22581,15 @@ void emberAfSampleMfgSpecificCluster2ServerAttributeChangedCallback(uint8_t endp
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSampleMfgSpecificCluster2ServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfSampleMfgSpecificCluster2ServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                   EmberAfStatus status);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSampleMfgSpecificCluster2ServerInitCallback(uint8_t endpoint);
+void emberAfSampleMfgSpecificCluster2ServerInitCallback(chip::EndpointId endpoint);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -22302,7 +22600,7 @@ void emberAfSampleMfgSpecificCluster2ServerInitCallback(uint8_t endpoint);
  * Ver.: always
  */
 void emberAfSampleMfgSpecificCluster2ServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                        EmberAfAttributeId attributeId,
+                                                                                        chip::AttributeId attributeId,
                                                                                         uint16_t manufacturerCode);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Server Message Sent
  *
@@ -22329,7 +22627,8 @@ void emberAfSampleMfgSpecificCluster2ServerMessageSentCallback(EmberOutgoingMess
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfSampleMfgSpecificCluster2ServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfSampleMfgSpecificCluster2ServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                chip::AttributeId attributeId,
                                                                                 EmberAfAttributeType attributeType, uint8_t size,
                                                                                 uint8_t * value);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Server Tick
@@ -22338,7 +22637,7 @@ EmberAfStatus emberAfSampleMfgSpecificCluster2ServerPreAttributeChangedCallback(
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSampleMfgSpecificCluster2ServerTickCallback(uint8_t endpoint);
+void emberAfSampleMfgSpecificCluster2ServerTickCallback(chip::EndpointId endpoint);
 
 /** @} END Sample Mfg Specific Cluster 2 Cluster Callbacks */
 
@@ -22352,7 +22651,7 @@ void emberAfSampleMfgSpecificCluster2ServerTickCallback(uint8_t endpoint);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOtaConfigurationClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOtaConfigurationClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Configuration Cluster Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -22362,14 +22661,15 @@ void emberAfOtaConfigurationClusterClientAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOtaConfigurationClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfOtaConfigurationClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Configuration Cluster Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOtaConfigurationClusterClientInitCallback(uint8_t endpoint);
+void emberAfOtaConfigurationClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief Configuration Cluster Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -22379,8 +22679,8 @@ void emberAfOtaConfigurationClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfOtaConfigurationClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfOtaConfigurationClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Configuration Cluster Cluster Client Message Sent
  *
@@ -22407,7 +22707,8 @@ void emberAfOtaConfigurationClusterClientMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfOtaConfigurationClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfOtaConfigurationClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Configuration Cluster Cluster Client Tick
@@ -22416,7 +22717,7 @@ EmberAfStatus emberAfOtaConfigurationClusterClientPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOtaConfigurationClusterClientTickCallback(uint8_t endpoint);
+void emberAfOtaConfigurationClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief Configuration Cluster Cluster Lock Tokens
  *
  *
@@ -22445,7 +22746,7 @@ bool emberAfOtaConfigurationClusterReturnTokenCallback(uint16_t token, uint8_t *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfOtaConfigurationClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfOtaConfigurationClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief Configuration Cluster Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -22455,14 +22756,15 @@ void emberAfOtaConfigurationClusterServerAttributeChangedCallback(uint8_t endpoi
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfOtaConfigurationClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfOtaConfigurationClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId,
+                                                                 EmberAfStatus status);
 /** @brief Configuration Cluster Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfOtaConfigurationClusterServerInitCallback(uint8_t endpoint);
+void emberAfOtaConfigurationClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief Configuration Cluster Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -22472,8 +22774,8 @@ void emberAfOtaConfigurationClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfOtaConfigurationClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint,
-                                                                                      EmberAfAttributeId attributeId,
+void emberAfOtaConfigurationClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                                      chip::AttributeId attributeId,
                                                                                       uint16_t manufacturerCode);
 /** @brief Configuration Cluster Cluster Server Message Sent
  *
@@ -22500,7 +22802,8 @@ void emberAfOtaConfigurationClusterServerMessageSentCallback(EmberOutgoingMessag
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfOtaConfigurationClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfOtaConfigurationClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                              chip::AttributeId attributeId,
                                                                               EmberAfAttributeType attributeType, uint8_t size,
                                                                               uint8_t * value);
 /** @brief Configuration Cluster Cluster Server Tick
@@ -22509,7 +22812,7 @@ EmberAfStatus emberAfOtaConfigurationClusterServerPreAttributeChangedCallback(ui
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfOtaConfigurationClusterServerTickCallback(uint8_t endpoint);
+void emberAfOtaConfigurationClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief Configuration Cluster Cluster Set Token
  *
  *
@@ -22538,7 +22841,7 @@ bool emberAfOtaConfigurationClusterUnlockTokensCallback(uint8_t * data);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfMfglibClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfMfglibClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief MFGLIB Cluster Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -22548,14 +22851,14 @@ void emberAfMfglibClusterClientAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfMfglibClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfMfglibClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief MFGLIB Cluster Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfMfglibClusterClientInitCallback(uint8_t endpoint);
+void emberAfMfglibClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief MFGLIB Cluster Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -22565,7 +22868,8 @@ void emberAfMfglibClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfMfglibClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfMfglibClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief MFGLIB Cluster Cluster Client Message Sent
  *
@@ -22592,7 +22896,7 @@ void emberAfMfglibClusterClientMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfMfglibClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfMfglibClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief MFGLIB Cluster Cluster Client Tick
@@ -22601,7 +22905,7 @@ EmberAfStatus emberAfMfglibClusterClientPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfMfglibClusterClientTickCallback(uint8_t endpoint);
+void emberAfMfglibClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief MFGLIB Cluster Cluster Rx Mode
  *
  *
@@ -22618,7 +22922,7 @@ bool emberAfMfglibClusterRxModeCallback(uint8_t channel, int8_t power, uint16_t 
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfMfglibClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfMfglibClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief MFGLIB Cluster Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -22628,14 +22932,14 @@ void emberAfMfglibClusterServerAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfMfglibClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfMfglibClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief MFGLIB Cluster Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfMfglibClusterServerInitCallback(uint8_t endpoint);
+void emberAfMfglibClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief MFGLIB Cluster Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -22645,7 +22949,8 @@ void emberAfMfglibClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfMfglibClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfMfglibClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief MFGLIB Cluster Cluster Server Message Sent
  *
@@ -22672,7 +22977,7 @@ void emberAfMfglibClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfMfglibClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfMfglibClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief MFGLIB Cluster Cluster Server Tick
@@ -22681,7 +22986,7 @@ EmberAfStatus emberAfMfglibClusterServerPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfMfglibClusterServerTickCallback(uint8_t endpoint);
+void emberAfMfglibClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief MFGLIB Cluster Cluster Stream
  *
  *
@@ -22726,7 +23031,7 @@ bool emberAfSlWwahClusterApsAckRequirementQueryCallback(void);
  *
  * @param clusterId   Ver.: always
  */
-bool emberAfSlWwahClusterApsLinkKeyAuthorizationQueryCallback(uint16_t clusterId);
+bool emberAfSlWwahClusterApsLinkKeyAuthorizationQueryCallback(chip::ClusterId clusterId);
 /** @brief SL Works With All Hubs Cluster Aps Link Key Authorization Query Response
  *
  *
@@ -22734,7 +23039,7 @@ bool emberAfSlWwahClusterApsLinkKeyAuthorizationQueryCallback(uint16_t clusterId
  * @param clusterId   Ver.: always
  * @param apsLinkKeyAuthStatus   Ver.: always
  */
-bool emberAfSlWwahClusterApsLinkKeyAuthorizationQueryResponseCallback(uint16_t clusterId, uint8_t apsLinkKeyAuthStatus);
+bool emberAfSlWwahClusterApsLinkKeyAuthorizationQueryResponseCallback(chip::ClusterId clusterId, uint8_t apsLinkKeyAuthStatus);
 /** @brief SL Works With All Hubs Cluster Clear Binding Table
  *
  *
@@ -22748,7 +23053,7 @@ bool emberAfSlWwahClusterClearBindingTableCallback(void);
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSlWwahClusterClientAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSlWwahClusterClientAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief SL Works With All Hubs Cluster Client Default Response
  *
  * This function is called when the client receives the default response from
@@ -22758,14 +23063,14 @@ void emberAfSlWwahClusterClientAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSlWwahClusterClientDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfSlWwahClusterClientDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief SL Works With All Hubs Cluster Client Init
  *
  * Client Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSlWwahClusterClientInitCallback(uint8_t endpoint);
+void emberAfSlWwahClusterClientInitCallback(chip::EndpointId endpoint);
 /** @brief SL Works With All Hubs Cluster Client Manufacturer Specific Attribute Changed
  *
  * Client Manufacturer Specific Attribute Changed
@@ -22775,7 +23080,8 @@ void emberAfSlWwahClusterClientInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfSlWwahClusterClientManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfSlWwahClusterClientManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief SL Works With All Hubs Cluster Client Message Sent
  *
@@ -22802,7 +23108,7 @@ void emberAfSlWwahClusterClientMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfSlWwahClusterClientPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfSlWwahClusterClientPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief SL Works With All Hubs Cluster Client Tick
@@ -22811,7 +23117,7 @@ EmberAfStatus emberAfSlWwahClusterClientPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSlWwahClusterClientTickCallback(uint8_t endpoint);
+void emberAfSlWwahClusterClientTickCallback(chip::EndpointId endpoint);
 /** @brief SL Works With All Hubs Cluster Debug Report Query
  *
  *
@@ -23027,7 +23333,7 @@ bool emberAfSlWwahClusterRequireApsAcksOnUnicastsCallback(uint8_t numberExemptCl
  * @param endpoint Endpoint that is being initialized  Ver.: always
  * @param attributeId Attribute that changed  Ver.: always
  */
-void emberAfSlWwahClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId);
+void emberAfSlWwahClusterServerAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId);
 /** @brief SL Works With All Hubs Cluster Server Default Response
  *
  * This function is called when the server receives the default response from
@@ -23037,14 +23343,14 @@ void emberAfSlWwahClusterServerAttributeChangedCallback(uint8_t endpoint, EmberA
  * @param commandId Command id  Ver.: always
  * @param status Status in default response  Ver.: always
  */
-void emberAfSlWwahClusterServerDefaultResponseCallback(uint8_t endpoint, uint8_t commandId, EmberAfStatus status);
+void emberAfSlWwahClusterServerDefaultResponseCallback(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 /** @brief SL Works With All Hubs Cluster Server Init
  *
  * Server Init
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfSlWwahClusterServerInitCallback(uint8_t endpoint);
+void emberAfSlWwahClusterServerInitCallback(chip::EndpointId endpoint);
 /** @brief SL Works With All Hubs Cluster Server Manufacturer Specific Attribute Changed
  *
  * Server Manufacturer Specific Attribute Changed
@@ -23054,7 +23360,8 @@ void emberAfSlWwahClusterServerInitCallback(uint8_t endpoint);
  * @param manufacturerCode Manufacturer Code of the attribute that changed
  * Ver.: always
  */
-void emberAfSlWwahClusterServerManufacturerSpecificAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+void emberAfSlWwahClusterServerManufacturerSpecificAttributeChangedCallback(chip::EndpointId endpoint,
+                                                                            chip::AttributeId attributeId,
                                                                             uint16_t manufacturerCode);
 /** @brief SL Works With All Hubs Cluster Server Message Sent
  *
@@ -23081,7 +23388,7 @@ void emberAfSlWwahClusterServerMessageSentCallback(EmberOutgoingMessageType type
  * @param size Attribute size  Ver.: always
  * @param value Attribute value  Ver.: always
  */
-EmberAfStatus emberAfSlWwahClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfSlWwahClusterServerPreAttributeChangedCallback(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                     EmberAfAttributeType attributeType, uint8_t size,
                                                                     uint8_t * value);
 /** @brief SL Works With All Hubs Cluster Server Tick
@@ -23090,7 +23397,7 @@ EmberAfStatus emberAfSlWwahClusterServerPreAttributeChangedCallback(uint8_t endp
  *
  * @param endpoint Endpoint that is being served  Ver.: always
  */
-void emberAfSlWwahClusterServerTickCallback(uint8_t endpoint);
+void emberAfSlWwahClusterServerTickCallback(chip::EndpointId endpoint);
 /** @brief SL Works With All Hubs Cluster Set Ias Zone Enrollment Method
  *
  *

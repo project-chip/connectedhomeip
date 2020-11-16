@@ -60,7 +60,7 @@ EmberApsFrame * emAfCommandApsFrame = NULL;
 // It returns number of bytes filled
 // and 0 on error.
 static uint16_t vFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameControl, uint16_t manufacturerCode,
-                            uint8_t commandId, const char * format, va_list argPointer)
+                            CommandId commandId, const char * format, va_list argPointer)
 {
     uint32_t value;
     uint8_t valueLen;
@@ -236,8 +236,8 @@ void emberAfSetExternalBuffer(uint8_t * buffer, uint16_t bufferLen, uint16_t * l
     emAfCommandApsFrame   = apsFrame;
 }
 
-uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl, EmberAfClusterId clusterId, uint16_t manufacturerCode,
-                                                       uint8_t commandId, const char * format, ...)
+uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl, ClusterId clusterId, uint16_t manufacturerCode,
+                                                       CommandId commandId, const char * format, ...)
 {
     uint16_t returnValue;
     va_list argPointer;
@@ -251,7 +251,7 @@ uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl, Emb
     return returnValue;
 }
 
-uint16_t emberAfFillExternalBuffer(uint8_t frameControl, EmberAfClusterId clusterId, uint8_t commandId, const char * format, ...)
+uint16_t emberAfFillExternalBuffer(uint8_t frameControl, ClusterId clusterId, CommandId commandId, const char * format, ...)
 {
     uint16_t returnValue;
     va_list argPointer;
@@ -266,7 +266,8 @@ uint16_t emberAfFillExternalBuffer(uint8_t frameControl, EmberAfClusterId cluste
     return returnValue;
 }
 
-uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameControl, uint8_t commandId, const char * format, ...)
+uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameControl, CommandId commandId, const char * format,
+                           ...)
 {
     uint16_t returnValue;
     va_list argPointer;
@@ -286,12 +287,12 @@ EmberStatus emberAfSendCommandUnicastToBindings(void)
     return emberAfSendCommandUnicastToBindingsWithCallback(NULL);
 }
 
-// EmberStatus emberAfSendCommandMulticastWithCallback(EmberMulticastId multicastId, EmberAfMessageSentFunction callback)
+// EmberStatus emberAfSendCommandMulticastWithCallback(GroupId multicastId, EmberAfMessageSentFunction callback)
 // {
 //     return emberAfSendMulticastWithCallback(multicastId, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer, callback);
 // }
 
-// EmberStatus emberAfSendCommandMulticastWithAliasWithCallback(EmberMulticastId multicastId, EmberNodeId alias, uint8_t sequence,
+// EmberStatus emberAfSendCommandMulticastWithAliasWithCallback(GroupId multicastId, EmberNodeId alias, uint8_t sequence,
 //                                                              EmberAfMessageSentFunction callback)
 // {
 //     return emberAfSendMulticastWithAliasWithCallback(multicastId, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,
@@ -299,12 +300,12 @@ EmberStatus emberAfSendCommandUnicastToBindings(void)
 //                                                      sequence, callback);
 // }
 
-// EmberStatus emberAfSendCommandMulticast(EmberMulticastId multicastId)
+// EmberStatus emberAfSendCommandMulticast(GroupId multicastId)
 // {
 //     return emberAfSendCommandMulticastWithCallback(multicastId, NULL);
 // }
 
-// EmberStatus emberAfSendCommandMulticastWithAlias(EmberMulticastId multicastId, EmberNodeId alias, uint8_t sequence)
+// EmberStatus emberAfSendCommandMulticastWithAlias(GroupId multicastId, EmberNodeId alias, uint8_t sequence)
 // {
 //     return emberAfSendCommandMulticastWithAliasWithCallback(multicastId, alias, sequence, NULL);
 // }
@@ -350,7 +351,7 @@ EmberStatus emberAfSendCommandMulticastToBindings(void)
 // }
 
 // EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-//                                        EmberMulticastId multicastId, EmberAfProfileId profileId)
+//                                        GroupId multicastId, EmberAfProfileId profileId)
 // {
 //     return emberAfSendInterPan(panId, destinationLongId, destinationShortId, multicastId, emAfCommandApsFrame->clusterId,
 //     profileId,

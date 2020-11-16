@@ -89,7 +89,7 @@ static bool areStartUpLevelControlServerAttributesTokenized(EndpointId endpoint)
 
 typedef struct
 {
-    uint8_t commandId;
+    CommandId commandId;
     uint8_t moveToLevel;
     bool increasing;
     bool useOnLevel;
@@ -104,16 +104,16 @@ static EmberAfLevelControlState stateTable[EMBER_AF_LEVEL_CONTROL_CLUSTER_SERVER
 
 static EmberAfLevelControlState * getState(EndpointId endpoint);
 
-static void moveToLevelHandler(uint8_t commandId, uint8_t level, uint16_t transitionTimeDs, uint8_t optionMask,
+static void moveToLevelHandler(CommandId commandId, uint8_t level, uint16_t transitionTimeDs, uint8_t optionMask,
                                uint8_t optionOverride, uint16_t storedLevel);
-static void moveHandler(uint8_t commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride);
-static void stepHandler(uint8_t commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs, uint8_t optionMask,
+static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride);
+static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs, uint8_t optionMask,
                         uint8_t optionOverride);
-static void stopHandler(uint8_t commandId, uint8_t optionMask, uint8_t optionOverride);
+static void stopHandler(CommandId commandId, uint8_t optionMask, uint8_t optionOverride);
 
 static void setOnOffValue(EndpointId endpoint, bool onOff);
 static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTimeMs);
-static bool shouldExecuteIfOff(EndpointId endpoint, uint8_t commandId, uint8_t optionMask, uint8_t optionOverride);
+static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, uint8_t optionMask, uint8_t optionOverride);
 
 #if defined(ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE) && defined(EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP)
 static void reallyUpdateCoupledColorTemp(EndpointId endpoint);
@@ -315,7 +315,7 @@ static void setOnOffValue(EndpointId endpoint, bool onOff)
 #endif // EMBER_AF_PLUGIN_ON_OFF
 }
 
-static bool shouldExecuteIfOff(EndpointId endpoint, uint8_t commandId, uint8_t optionMask, uint8_t optionOverride)
+static bool shouldExecuteIfOff(EndpointId endpoint, CommandId commandId, uint8_t optionMask, uint8_t optionOverride)
 {
 #ifdef ZCL_USING_LEVEL_CONTROL_CLUSTER_OPTIONS_ATTRIBUTE
     // From 3.10.2.2.8.1 of ZCL7 document 14-0127-20j-zcl-ch-3-general.docx:
@@ -461,7 +461,7 @@ bool emberAfLevelControlClusterStopWithOnOffCallback(void)
     return true;
 }
 
-static void moveToLevelHandler(uint8_t commandId, uint8_t level, uint16_t transitionTimeDs, uint8_t optionMask,
+static void moveToLevelHandler(CommandId commandId, uint8_t level, uint16_t transitionTimeDs, uint8_t optionMask,
                                uint8_t optionOverride, uint16_t storedLevel)
 {
     EndpointId endpoint              = emberAfCurrentEndpoint();
@@ -595,7 +595,7 @@ send_default_response:
     }
 }
 
-static void moveHandler(uint8_t commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
+static void moveHandler(CommandId commandId, uint8_t moveMode, uint8_t rate, uint8_t optionMask, uint8_t optionOverride)
 {
     EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
@@ -706,7 +706,7 @@ send_default_response:
     emberAfSendImmediateDefaultResponse(status);
 }
 
-static void stepHandler(uint8_t commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs, uint8_t optionMask,
+static void stepHandler(CommandId commandId, uint8_t stepMode, uint8_t stepSize, uint16_t transitionTimeDs, uint8_t optionMask,
                         uint8_t optionOverride)
 {
     EndpointId endpoint              = emberAfCurrentEndpoint();
@@ -826,7 +826,7 @@ send_default_response:
     emberAfSendImmediateDefaultResponse(status);
 }
 
-static void stopHandler(uint8_t commandId, uint8_t optionMask, uint8_t optionOverride)
+static void stopHandler(CommandId commandId, uint8_t optionMask, uint8_t optionOverride)
 {
     EndpointId endpoint              = emberAfCurrentEndpoint();
     EmberAfLevelControlState * state = getState(endpoint);
@@ -889,7 +889,7 @@ void emberAfOnOffClusterLevelControlEffectCallback(EndpointId endpoint, bool new
         resolvedLevel = temporaryCurrentLevelCache;
     }
 #else
-    resolvedLevel              = temporaryCurrentLevelCache;
+    resolvedLevel               = temporaryCurrentLevelCache;
 #endif
 
     // Read the OnOffTransitionTime attribute.
