@@ -657,8 +657,8 @@ exit:
 
 void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    uint16_t data_len  = 0;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    uint16_t data_len = 0;
 
     ESP_LOGI(TAG, "Write request received for CHIPoBLE RX characteristic con %u %u", param->conn_handle, param->attr_handle);
 
