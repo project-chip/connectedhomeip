@@ -17,9 +17,9 @@
 
 #pragma once
 
+#include "Constants.h"
 #include "DnsHeader.h"
 #include "QName.h"
-#include "Query.h"
 
 namespace mdns {
 namespace Minimal {
@@ -88,12 +88,6 @@ private:
 class ParserDelegate
 {
 public:
-    enum class ResourceType
-    {
-        kAnswer,
-        kAuthority,
-        kAdditional,
-    };
     virtual ~ParserDelegate() {}
 
     virtual void OnHeader(const HeaderRef & header) = 0;

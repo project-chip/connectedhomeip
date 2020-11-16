@@ -42,7 +42,7 @@ public:
 
     bool Contains(const uint8_t * p) const { return ((p >= mStart) && (p < mEnd)); }
 
-    ptrdiff_t Size() const { return (mEnd - mStart); }
+    size_t Size() const { return (mEnd - mStart); }
 
 private:
     const uint8_t * mStart = nullptr;

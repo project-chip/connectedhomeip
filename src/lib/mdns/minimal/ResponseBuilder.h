@@ -20,15 +20,15 @@
 #include <system/SystemPacketBuffer.h>
 
 #include "DnsHeader.h"
-#include "Query.h"
+#include "ResourceRecord.h"
 
 namespace mdns {
 namespace Minimal {
 
-class QueryBuilder
+class ResponseBuilder
 {
 public:
-    QueryBuilder(chip::System::PacketBuffer * packet) : mPacket(packet), mHeader(mPacket->Start())
+    ResponseBuilder(chip::System::PacketBuffer * packet) : mPacket(packet), mHeader(mPacket->Start())
     {
 
         if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
@@ -38,26 +38,26 @@ public:
         }
         else
         {
-            mQueryBuidOk = false;
+            mBuildOk = false;
         }
 
-        mHeader.SetFlags(mHeader.GetFlags().SetQuery());
+        mHeader.SetFlags(mHeader.GetFlags().SetResponse());
     }
 
     HeaderRef & Header() { return mHeader; }
 
-    QueryBuilder & AddQuery(const Query & query)
+    ResponseBuilder & AddRecord(ResourceType type, const ResourceRecord & record)
     {
-        if (!mQueryBuidOk)
+        if (!mBuildOk)
         {
             return *this;
         }
 
         chip::BufBound out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
 
-        if (!query.Append(mHeader, out))
+        if (!record.Append(mHeader, type, out))
         {
-            mQueryBuidOk = false;
+            mBuildOk = false;
         }
         else
         {
@@ -66,12 +66,12 @@ public:
         return *this;
     }
 
-    bool Ok() const { return mQueryBuidOk; }
+    bool Ok() const { return mBuildOk; }
 
 private:
     chip::System::PacketBuffer * mPacket;
     HeaderRef mHeader;
-    bool mQueryBuidOk = true;
+    bool mBuildOk = true;
 };
 
 } // namespace Minimal

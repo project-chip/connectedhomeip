@@ -76,7 +76,7 @@ private:
     static constexpr uint8_t kPtrMask     = 0xC0;
 
     BytesRange mValidData;
-    ptrdiff_t mLookBehindMax; // avoid loops by limiting lookbehind
+    size_t mLookBehindMax; // avoid loops by limiting lookbehind
     const uint8_t * mCurrentPosition;
     bool mIsValid = true;
 
