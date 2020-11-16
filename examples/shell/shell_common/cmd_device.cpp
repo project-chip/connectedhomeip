@@ -572,6 +572,45 @@ exit:
     PlatformMgr().UnlockChipStack();
     return error;
 }
+
+int cmd_device_connect(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrExit(PlatformMgr().TryLockChipStack(), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (argc < 2)
+    {
+        streamer_printf(sout,
+                        "Invalid command: needs two arguments "
+                        "(network ssid and password)\r\n");
+        error = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else if (strlen(argv[0]) > 32)
+    {
+        streamer_printf(sout, "Invalid network SSID\r\n");
+        error = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else
+    {
+        streamer_printf(sout, "Connect to WiFi network: SSID: %s\r\n", argv[0]);
+
+        error = ConnectivityMgrImpl().ProvisionWiFiNetwork(argv[0], argv[1]);
+
+        if (error != CHIP_NO_ERROR)
+        {
+            streamer_printf(sout, "Failed to connect to WiFi network: %s\r\n", chip::ErrorStr(error));
+        }
+    }
+
+exit:
+    PlatformMgr().UnlockChipStack();
+    return error;
+}
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
@@ -696,6 +735,7 @@ static const shell_command_t cmds_device[] = {
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
     { &cmd_device_sta, "sta", "Control the WiFi sta interface. Usage: device sta <param_name>" },
+    { &cmd_device_connect, "connect", "Join the network with the given SSID and PSK. Usage: device connect <ssid> <passphrase>" },
 #endif
 };
 
