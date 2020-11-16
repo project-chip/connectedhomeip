@@ -313,7 +313,8 @@ public:
     }
 
     // The caller has access but no ownership.
-    PacketBuffer * Get_NoRelease() { return mBuffer; }
+    // This is intended to be used only to call functions that have not yet been converted to take a PacketBufferHandle.
+    [[deprecated]] PacketBuffer * Get_NoRelease() { return mBuffer; }
 
     bool IsNull() const { return mBuffer == nullptr; }
 

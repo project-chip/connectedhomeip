@@ -1102,6 +1102,7 @@ CHIP_ERROR ExchangeContext::RMPSendThrottleFlow(uint32_t pauseTimeMillis)
     uint8_t * p               = nullptr;
     uint8_t msgLen            = sizeof(pauseTimeMillis);
     PacketBufferHandle msgBuf = PacketBuffer::NewWithAvailableSize(msgLen);
+
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     p = msgBuf->Start();
