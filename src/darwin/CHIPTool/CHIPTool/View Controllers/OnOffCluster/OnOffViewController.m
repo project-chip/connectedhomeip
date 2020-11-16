@@ -110,7 +110,7 @@
         toggleButton.tag = i;
         [toggleButton setTitle:@"Toggle" forState:UIControlStateNormal];
         [toggleButton addTarget:self action:@selector(toggleButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
-        
+
         UIStackView * stackViewButtons = [CHIPUIViewUtils stackViewWithLabel:labelLight button1:onButton button2:offButton button3:toggleButton];
         stackViewButtons.axis = UILayoutConstraintAxisHorizontal;
         stackViewButtons.distribution = UIStackViewDistributionEqualSpacing;

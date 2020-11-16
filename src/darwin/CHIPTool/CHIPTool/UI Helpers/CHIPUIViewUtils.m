@@ -151,13 +151,13 @@
     stackViewButtons.distribution = UIStackViewDistributionEqualSpacing;
     stackViewButtons.alignment = UIStackViewAlignmentLeading;
     stackViewButtons.spacing = 10;
-    
+
     label.font = [UIFont systemFontOfSize:17];
     [stackViewButtons addArrangedSubview:label];
-    
+
     label.translatesAutoresizingMaskIntoConstraints = false;
     [label.centerYAnchor constraintEqualToAnchor:stackViewButtons.centerYAnchor].active = YES;
-    
+
     stackViewButtons.translatesAutoresizingMaskIntoConstraints = false;
     NSArray<UIButton *> * buttons = @[button1, button2, button3];
     for (int i = 0; i < buttons.count; i++) {
@@ -171,7 +171,7 @@
         [buttonForStack.widthAnchor constraintGreaterThanOrEqualToConstant:60].active = YES;
         [stackViewButtons addArrangedSubview:buttonForStack];
     }
-    
+
     return stackViewButtons;
 }
 @end
