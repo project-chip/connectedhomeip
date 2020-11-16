@@ -145,6 +145,8 @@ public:
     HeaderRef & SetAdditionalCount(uint16_t value) { return Set16At(kAdditionalCountOffset, value); }
 
 private:
+    /// Returns the internal buffer as writable. Const-cast is correct because
+    /// the construct took a non-const buffer as well.
     uint8_t * GetWritable() { return const_cast<uint8_t *>(mBuffer); }
 
     inline HeaderRef & Set16At(size_t offset, uint16_t value)
