@@ -27,45 +27,6 @@ void __attribute__((weak)) emberAf{{asCamelCased name false}}ClusterInitCallback
 }
 {{/all_user_clusters_names}}
 
-// Cluster Command callback
-
-{{#all_user_clusters}}
-{{#if (isEnabled enabled)}}
-{{#all_user_cluster_commands}}
-{{#if (isStrEqual clusterName parent.name)}}
-{{#if (isCommandAvailable parent.side incoming outgoing commandSource)}}
-/**
-* @brief {{parent.name}} Cluster {{name}} Command callback
-{{#if (zcl_command_arguments_count this.id)}}
-{{#zcl_command_arguments}}
-* @param {{asCamelCased label}}
-{{/zcl_command_arguments}}
-{{/if}}
-*/
-
-{{#if (zcl_command_arguments_count this.id)}}
-bool __attribute__((weak))  emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}} {{asUnderlyingType type}} {{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}})
-{
-    // To prevent warning
-    {{#zcl_command_arguments}}
-    (void) {{asSymbol label}};
-    {{/zcl_command_arguments}}
-
-    return false;
-}
-{{else}}
-bool __attribute__((weak))  emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback()
-{
-    return false;
-}
-{{/if}}
-
-{{/if}}
-{{/if}}
-{{/all_user_cluster_commands}}
-{{/if}}
-{{/all_user_clusters}}
-
 //
 // Non-Cluster Related Callbacks
 //
