@@ -379,4 +379,3 @@ EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand
     }
     return status(wasHandled, true, cmd->mfgSpecific);
 }
-
