@@ -141,20 +141,6 @@ EmberStatus emberAfClearReportTableCallback(void);
  * @param clusterId   Ver.: always
  */
 void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId);
-/** @brief Cluster Security Custom
- *
- * This callback is fired when determining if APS encryption is required for a
- * cluster outside of the specification's required clusters.  In other words,
- * for the Smart Energy profile this would be a cluster beyond the list that
- * normally requires APS encryption.
- *
- * @param profileId The profile ID  Ver.: always
- * @param clusterId The cluster ID  Ver.: always
- * @param incoming Whether this is an incoming or outgoing message.  Ver.:
- * always
- * @param commandId The ZCL command ID being sent/received.  Ver.: always
- */
-bool emberAfClusterSecurityCustomCallback(EmberAfProfileId profileId, EmberAfClusterId clusterId, bool incoming, uint8_t commandId);
 /** @brief Default Response
  *
  * This function is called by the application framework when a Default Response
@@ -1088,19 +1074,6 @@ void emberAfScanCompleteCallback(uint8_t channel, EmberStatus status);
  * @param status The status of the scan.  Ver.: always
  */
 void emberAfScanErrorCallback(EmberStatus status);
-/** @brief Security Init
- *
- * This callback is called by the framework to give the application a chance to
- * modify the security settings of the node during network initialization.
- * Depending on the context when this callback is called, the pointer to the
- * initial security state may be NULL, which means the initial security state
- * can no longer be modified as the node is already operating on the network.
- *
- * @param state   Ver.: always
- * @param extended   Ver.: always
- * @param trustCenter   Ver.: always
- */
-void emberAfSecurityInitCallback(EmberInitialSecurityState * state, EmberExtendedSecurityBitmask * extended, bool trustCenter);
 /** @brief Set Default Poll Control
  *
  * This function will set the default poll control for the current network to
@@ -1253,29 +1226,6 @@ EmberStatus emberAfStartSearchForJoinableNetworkCallback(void);
  *
  */
 void emberAfStopMoveCallback(void);
-/** @brief Trust Center Join
- *
- * This callback is called from within the application framework's
- * implementation of emberTrustCenterJoinHandler or ezspTrustCenterJoinHandler.
- * This callback provides the same arguments passed to the
- * TrustCenterJoinHandler. For more information about the TrustCenterJoinHandler
- * please see documentation included in stack/include/trust-center.h.
- *
- * @param newNodeId   Ver.: always
- * @param newNodeEui64   Ver.: always
- * @param parentOfNewNode   Ver.: always
- * @param status   Ver.: always
- * @param decision   Ver.: always
- */
-void emberAfTrustCenterJoinCallback(EmberNodeId newNodeId, EmberEUI64 newNodeEui64, EmberNodeId parentOfNewNode,
-                                    EmberDeviceUpdate status, EmberJoinDecision decision);
-/** @brief Trust Center Keepalive Abort
- *
- * This callback is called when the device should abort the trust center
- * keepalive process.
- *
- */
-void emberAfTrustCenterKeepaliveAbortCallback(void);
 /** @brief Trust Center Keepalive Update
  *
  * This callback is called when the device finishes registration (successfully

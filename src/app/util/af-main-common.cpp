@@ -203,35 +203,11 @@ void emAfInitializeMessageSentCallbackArray(void)
     }
 }
 
-EmberAfCbkeKeyEstablishmentSuite emberAfIsFullSmartEnergySecurityPresent(void)
-{
-    EmberAfCbkeKeyEstablishmentSuite cbkeKeyEstablishmentSuite = EMBER_AF_INVALID_KEY_ESTABLISHMENT_SUITE;
-
-#if defined EMBER_AF_HAS_SECURITY_PROFILE_SE
-    EmberCertificateData cert;
-    EmberCertificate283k1Data cert283k1;
-
-    if ((emberGetLibraryStatus(EMBER_ECC_LIBRARY_ID) & EMBER_LIBRARY_PRESENT_MASK) && (EMBER_SUCCESS == emberGetCertificate(&cert)))
-    {
-        cbkeKeyEstablishmentSuite |= EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_163K1;
-    }
-
-    if ((emberGetLibraryStatus(EMBER_ECC_LIBRARY_283K1_ID) & EMBER_LIBRARY_PRESENT_MASK) &&
-        (EMBER_SUCCESS == emberGetCertificate283k1(&cert283k1)))
-    {
-        cbkeKeyEstablishmentSuite |= EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_283K1;
-    }
-#endif
-
-    return cbkeKeyEstablishmentSuite;
-}
-
 static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                         uint16_t messageLength, uint8_t * message, bool broadcast, EmberNodeId alias, uint8_t sequence,
                         EmberAfMessageSentFunction callback)
 {
     EmberStatus status;
-    uint8_t commandId;
     uint8_t index;
     uint8_t messageSentIndex;
     uint8_t messageTag = INVALID_MESSAGE_TAG;
@@ -248,11 +224,6 @@ static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestinati
         {
             return EMBER_ERR_FATAL;
         }
-        commandId = message[4];
-    }
-    else
-    {
-        commandId = message[2];
     }
 
     messageSentIndex = getMessageSentCallbackIndex();
@@ -298,18 +269,6 @@ static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestinati
         return EMBER_TRANSMISSION_SUSPENDED;
     }
 #endif
-
-    // Encryption is turned on if it is required, but not turned off if it isn't.
-    // This allows the application to send encrypted messages in special cases
-    // that aren't covered by the specs by manually setting the encryption bit
-    // prior to calling the send APIs.
-    if (emberAfDetermineIfLinkSecurityIsRequired(commandId,
-                                                 false, // incoming?
-                                                 broadcast, apsFrame->profileId, apsFrame->clusterId,
-                                                 (type == EMBER_OUTGOING_DIRECT) ? indexOrDestination : EMBER_NULL_NODE_ID))
-    {
-        apsFrame->options |= EMBER_APS_OPTION_ENCRYPTION;
-    }
 
     {
         EmberAfMessageStruct messageStruct = {

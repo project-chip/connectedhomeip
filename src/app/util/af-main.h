@@ -69,8 +69,6 @@ void emberAfGetMfgString(uint8_t * returnData);
 // Functions common to both SOC and Host versions of the application.
 void emAfInitializeMessageSentCallbackArray(void);
 
-EmberAfCbkeKeyEstablishmentSuite emberAfIsFullSmartEnergySecurityPresent(void);
-
 #if defined(EZSP_HOST)
 void emAfClearNetworkCache(uint8_t networkIndex);
 #else
@@ -95,7 +93,6 @@ bool emberAfNcpNeedsReset(void);
 
 void emAfPrintStatus(const char * task, EmberStatus status);
 
-uint8_t emberAfGetSecurityLevel(void);
 uint8_t emberAfGetKeyTableSize(void);
 uint8_t emberAfGetBindingTableSize(void);
 uint8_t emberAfGetAddressTableSize(void);
