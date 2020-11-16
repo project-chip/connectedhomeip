@@ -99,7 +99,6 @@ const uint16_t attributeManufacturerCodeCount                   = GENERATED_ATTR
 
 #if !defined(EMBER_SCRIPTED_TEST)
 #define endpointNumber(x) fixedEndpoints[x]
-#define endpointProfileId(x) fixedProfileIds[x]
 #define endpointDeviceId(x) fixedDeviceIds[x]
 #define endpointDeviceVersion(x) fixedDeviceVersions[x]
 // Added 'Macro' to silence MISRA warning about conflict with synonymous vars.
@@ -122,7 +121,6 @@ void emberAfEndpointConfigure(void)
 
 #if !defined(EMBER_SCRIPTED_TEST)
     uint8_t fixedEndpoints[]            = FIXED_ENDPOINT_ARRAY;
-    uint16_t fixedProfileIds[]          = FIXED_PROFILE_IDS;
     uint16_t fixedDeviceIds[]           = FIXED_DEVICE_IDS;
     uint8_t fixedDeviceVersions[]       = FIXED_DEVICE_VERSIONS;
     uint8_t fixedEmberAfEndpointTypes[] = FIXED_ENDPOINT_TYPES;
@@ -133,7 +131,6 @@ void emberAfEndpointConfigure(void)
     for (ep = 0; ep < FIXED_ENDPOINT_COUNT; ep++)
     {
         emAfEndpoints[ep].endpoint      = endpointNumber(ep);
-        emAfEndpoints[ep].profileId     = endpointProfileId(ep);
         emAfEndpoints[ep].deviceId      = endpointDeviceId(ep);
         emAfEndpoints[ep].deviceVersion = endpointDeviceVersion(ep);
         emAfEndpoints[ep].endpointType  = endpointTypeMacro(ep);
@@ -953,22 +950,12 @@ EmberAfCluster * emberAfGetClusterByIndex(EndpointId endpoint, uint8_t clusterIn
     return &(definedEndpoint->endpointType->cluster[clusterIndex]);
 }
 
-EmberAfProfileId emberAfGetProfileIdForEndpoint(EndpointId endpoint)
-{
-    uint8_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
-    if (endpointIndex == 0xFF)
-    {
-        return EMBER_AF_INVALID_PROFILE_ID;
-    }
-    return emAfEndpoints[endpointIndex].profileId;
-}
-
 uint16_t emberAfGetDeviceIdForEndpoint(EndpointId endpoint)
 {
     uint8_t endpointIndex = emberAfIndexFromEndpoint(endpoint);
     if (endpointIndex == 0xFF)
     {
-        return EMBER_AF_INVALID_PROFILE_ID;
+        return 0xFFFF;
     }
     return emAfEndpoints[endpointIndex].deviceId;
 }

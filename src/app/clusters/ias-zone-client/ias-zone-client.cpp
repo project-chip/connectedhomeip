@@ -444,7 +444,6 @@ static void iasZoneClientServiceDiscoveryCallback(const EmberAfServiceDiscoveryR
 static void checkForIasZoneServer(EmberNodeId emberNodeId, uint8_t * ieeeAddress)
 {
     uint8_t endpointIndex = emberAfIndexFromEndpoint(myEndpoint);
-    uint16_t profileId    = emberAfProfileIdFromIndex(endpointIndex);
     uint8_t serverIndex   = addServer(emberNodeId, ieeeAddress);
 
     if (serverIndex == NO_INDEX)
@@ -465,9 +464,9 @@ static void checkForIasZoneServer(EmberNodeId emberNodeId, uint8_t * ieeeAddress
         return;
     }
 
-    EmberStatus status = emberAfFindDevicesByProfileAndCluster(emberNodeId, profileId, ZCL_IAS_ZONE_CLUSTER_ID,
-                                                               true, // server cluster?
-                                                               iasZoneClientServiceDiscoveryCallback);
+    EmberStatus status = emberAfFindDevicesByCluster(emberNodeId, ZCL_IAS_ZONE_CLUSTER_ID,
+                                                     true, // server cluster?
+                                                     iasZoneClientServiceDiscoveryCallback);
 
     if (status != EMBER_SUCCESS)
     {

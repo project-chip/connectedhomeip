@@ -414,8 +414,6 @@ enum
 
 typedef struct
 {
-    /** Identifies the endpoint's application profile. */
-    uint16_t profileId;
     /** The endpoint's device ID within the application profile. */
     uint16_t deviceId;
     /** The endpoint's device version. */
@@ -749,16 +747,6 @@ typedef struct
     uint8_t power;
     uint8_t timeout;
 } EmberChildData;
-
-/**
- * @brief The profile ID used to address all the public profiles.
- */
-#define EMBER_WILDCARD_PROFILE_ID 0xFFFF
-
-/**
- * @brief The maximum value for a profile ID in the standard profile range.
- */
-#define EMBER_MAXIMUM_STANDARD_PROFILE_ID 0x7FFF
 
 /**
  * @brief A distinguished network ID that will never be assigned
