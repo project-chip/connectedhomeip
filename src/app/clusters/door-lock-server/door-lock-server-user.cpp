@@ -724,7 +724,7 @@ void emberAfPluginDoorLockServerRelockEventHandler(void)
     emberAfDoorLockClusterPrintln("Door automatically relocked: 0x%X", status);
 }
 
-void emberAfDoorLockClusterServerAttributeChangedCallback(EndpointId endpoint, EmberAfAttributeId attributeId)
+void emberAfDoorLockClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
 {
     if (endpoint == DOOR_LOCK_SERVER_ENDPOINT && attributeId == ZCL_LOCK_STATE_ATTRIBUTE_ID)
     {

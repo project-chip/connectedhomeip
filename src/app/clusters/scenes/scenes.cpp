@@ -57,7 +57,7 @@ uint8_t emberAfPluginScenesServerEntriesInUse = 0;
 EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[EMBER_AF_PLUGIN_SCENES_TABLE_SIZE];
 #endif
 
-static bool readServerAttribute(EndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, const char * name,
+static bool readServerAttribute(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, const char * name,
                                 uint8_t * data, uint8_t size)
 {
     bool success = false;
@@ -76,8 +76,8 @@ static bool readServerAttribute(EndpointId endpoint, EmberAfClusterId clusterId,
     return success;
 }
 
-static EmberAfStatus writeServerAttribute(EndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                          const char * name, uint8_t * data, EmberAfAttributeType type)
+static EmberAfStatus writeServerAttribute(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, const char * name,
+                                          uint8_t * data, EmberAfAttributeType type)
 {
     EmberAfStatus status = emberAfWriteServerAttribute(endpoint, clusterId, attributeId, data, type);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -758,7 +758,7 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
 
     while (extensionFieldSetsIndex < extensionFieldSetsLen)
     {
-        EmberAfClusterId clusterId;
+        ClusterId clusterId;
         uint8_t length;
 
         // Each extension field set must contain a two-byte cluster id and a one-

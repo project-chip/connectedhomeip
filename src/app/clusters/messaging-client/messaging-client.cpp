@@ -62,14 +62,14 @@ static void esiDeletionCallback(uint8_t esiIndex)
     }
 }
 
-void emberAfMessagingClusterClientInitCallback(uint8_t endpoint)
+void emberAfMessagingClusterClientInitCallback(EndpointId endpoint)
 {
     emAfPluginMessagingClientClearMessage(endpoint);
     // Subscribing for ESI Management plugin deletion announcements.
     emberAfPluginEsiManagementSubscribeToDeletionAnnouncements(esiDeletionCallback);
 }
 
-void emAfPluginMessagingClientClearMessage(uint8_t endpoint)
+void emAfPluginMessagingClientClearMessage(EndpointId endpoint)
 {
     uint8_t ep = emberAfFindClusterClientEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
     if (ep != 0xFF)
@@ -86,7 +86,7 @@ void emAfPluginMessagingClientClearMessage(uint8_t endpoint)
     }
 }
 
-void emberAfMessagingClusterClientTickCallback(uint8_t endpoint)
+void emberAfMessagingClusterClientTickCallback(EndpointId endpoint)
 {
     uint8_t ep = emberAfFindClusterClientEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
 
@@ -124,10 +124,10 @@ bool emberAfMessagingClusterDisplayMessageCallback(uint32_t messageId, uint8_t m
                                                    uint16_t durationInMinutes, uint8_t * msg,
                                                    uint8_t optionalExtendedMessageControl)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
-    uint8_t ep       = emberAfFindClusterClientEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
-    uint32_t now     = emberAfGetCurrentTime();
-    uint8_t esiIndex = emberAfPluginEsiManagementUpdateEsiAndGetIndex(emberAfCurrentCommand());
+    EndpointId endpoint = emberAfCurrentEndpoint();
+    uint8_t ep          = emberAfFindClusterClientEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
+    uint32_t now        = emberAfGetCurrentTime();
+    uint8_t esiIndex    = emberAfPluginEsiManagementUpdateEsiAndGetIndex(emberAfCurrentCommand());
 
     emberAfMessagingClusterPrint("RX: DisplayMessage"
                                  " 0x%4x, 0x%x, 0x%4x, 0x%2x, \"",
@@ -242,8 +242,8 @@ kickout:
 
 bool emberAfMessagingClusterCancelMessageCallback(uint32_t messageId, uint8_t messageControl)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
-    uint8_t ep       = emberAfFindClusterClientEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
+    EndpointId endpoint = emberAfCurrentEndpoint();
+    uint8_t ep          = emberAfFindClusterClientEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
     EmberAfStatus status;
 
     if (ep == 0xFF)
@@ -270,7 +270,7 @@ bool emberAfMessagingClusterCancelMessageCallback(uint32_t messageId, uint8_t me
     return true;
 }
 
-void emAfPluginMessagingClientPrintInfo(uint8_t endpoint)
+void emAfPluginMessagingClientPrintInfo(EndpointId endpoint)
 {
     uint8_t ep = emberAfFindClusterClientEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);
 
@@ -297,7 +297,7 @@ void emAfPluginMessagingClientPrintInfo(uint8_t endpoint)
     emberAfMessagingClusterFlush();
 }
 
-EmberAfStatus emberAfPluginMessagingClientConfirmMessage(uint8_t endpoint)
+EmberAfStatus emberAfPluginMessagingClientConfirmMessage(EndpointId endpoint)
 {
     EmberAfStatus status = EMBER_ZCL_STATUS_NOT_FOUND;
     uint8_t ep           = emberAfFindClusterClientEndpointIndex(endpoint, ZCL_MESSAGING_CLUSTER_ID);

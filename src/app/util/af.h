@@ -117,12 +117,12 @@
  *
  * @return Returns pointer to the attribute metadata location.
  */
-EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(CHIPEndpointId endpoint, EmberAfClusterId clusterId,
-                                                          EmberAfAttributeId attributeId, uint8_t mask, uint16_t manufacturerCode);
+EmberAfAttributeMetadata * emberAfLocateAttributeMetadata(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                          chip::AttributeId attributeId, uint8_t mask, uint16_t manufacturerCode);
 
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /** @brief Returns true if the attribute exists. */
-bool emberAfContainsAttribute(CHIPEndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
+bool emberAfContainsAttribute(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId, uint8_t mask,
                               uint16_t manufacturerCode);
 #else
 #define emberAfContainsAttribute(endpoint, clusterId, attributeId, mask, manufacturerCode)                                         \
@@ -137,7 +137,7 @@ bool emberAfContainsAttribute(CHIPEndpointId endpoint, EmberAfClusterId clusterI
  * For standard libraries (when ClusterId < FC00),
  * the manufacturerCode is ignored.
  */
-bool emberAfContainsClusterWithMfgCode(CHIPEndpointId endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode);
+bool emberAfContainsClusterWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
 
 /**
  * @brief Returns true if endpoint contains the ZCL cluster with specified id.
@@ -150,7 +150,7 @@ bool emberAfContainsClusterWithMfgCode(CHIPEndpointId endpoint, EmberAfClusterId
  * then this will return the first cluster that it finds in the Cluster table.
  * and will not return any other clusters that share that id.
  */
-bool emberAfContainsCluster(CHIPEndpointId endpoint, EmberAfClusterId clusterId);
+bool emberAfContainsCluster(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * @brief Returns true if endpoint has cluster server, checking for mfg code.
@@ -159,7 +159,7 @@ bool emberAfContainsCluster(CHIPEndpointId endpoint, EmberAfClusterId clusterId)
  * the endpoint contains server of a given cluster.
  * For standard librarys (when ClusterId < FC00), the manufacturerCode is ignored.
  */
-bool emberAfContainsServerWithMfgCode(CHIPEndpointId endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode);
+bool emberAfContainsServerWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
 
 /**
  * @brief Returns true if endpoint contains the ZCL server with specified id.
@@ -172,7 +172,7 @@ bool emberAfContainsServerWithMfgCode(CHIPEndpointId endpoint, EmberAfClusterId 
  * then this will return the first cluster that it finds in the Cluster table.
  * and will not return any other clusters that share that id.
  */
-bool emberAfContainsServer(CHIPEndpointId endpoint, EmberAfClusterId clusterId);
+bool emberAfContainsServer(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * @brief Returns true if endpoint contains cluster client.
@@ -182,7 +182,7 @@ bool emberAfContainsServer(CHIPEndpointId endpoint, EmberAfClusterId clusterId);
  * For standard library clusters (when ClusterId < FC00),
  * the manufacturerCode is ignored.
  */
-bool emberAfContainsClientWithMfgCode(CHIPEndpointId endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode);
+bool emberAfContainsClientWithMfgCode(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode);
 
 /**
  * @brief Returns true if endpoint contains the ZCL client with specified id.
@@ -195,7 +195,7 @@ bool emberAfContainsClientWithMfgCode(CHIPEndpointId endpoint, EmberAfClusterId 
  * then this will return the first cluster that it finds in the Cluster table.
  * and will not return any other clusters that share that id.
  */
-bool emberAfContainsClient(CHIPEndpointId endpoint, EmberAfClusterId clusterId);
+bool emberAfContainsClient(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * @brief write an attribute, performing all the checks.
@@ -216,7 +216,7 @@ bool emberAfContainsClient(CHIPEndpointId endpoint, EmberAfClusterId clusterId);
  *      emberAfWriteManufacturerSpecificClientAttribute,
  *      emberAfWriteManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfWriteAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+EmberAfStatus emberAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
                                     uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
@@ -231,7 +231,7 @@ EmberAfStatus emberAfWriteAttribute(CHIPEndpointId endpoint, EmberAfClusterId cl
  *      emberAfWriteManufacturerSpecificClientAttribute,
  *      emberAfWriteManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfWriteServerAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfWriteServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                           uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
@@ -246,7 +246,7 @@ EmberAfStatus emberAfWriteServerAttribute(CHIPEndpointId endpoint, EmberAfCluste
  *      emberAfWriteManufacturerSpecificClientAttribute,
  *      emberAfWriteManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfWriteClientAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfWriteClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                           uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
@@ -261,8 +261,8 @@ EmberAfStatus emberAfWriteClientAttribute(CHIPEndpointId endpoint, EmberAfCluste
  * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
  *      emberAfWriteManufacturerSpecificClientAttribute
  */
-EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster,
-                                                              EmberAfAttributeId attributeID, uint16_t manufacturerCode,
+EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                              chip::AttributeId attributeID, uint16_t manufacturerCode,
                                                               uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
@@ -277,8 +277,8 @@ EmberAfStatus emberAfWriteManufacturerSpecificServerAttribute(CHIPEndpointId end
  * @see emberAfWriteClientAttribute, emberAfWriteServerAttribute,
  *      emberAfWriteManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster,
-                                                              EmberAfAttributeId attributeID, uint16_t manufacturerCode,
+EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                              chip::AttributeId attributeID, uint16_t manufacturerCode,
                                                               uint8_t * dataPtr, EmberAfAttributeType dataType);
 
 /**
@@ -295,7 +295,7 @@ EmberAfStatus emberAfWriteManufacturerSpecificClientAttribute(CHIPEndpointId end
  * @param buffer Location where attribute will be written from.
  * @param dataType ZCL attribute type.
  */
-EmberAfStatus emberAfVerifyAttributeWrite(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfVerifyAttributeWrite(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                           uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr,
                                           EmberAfAttributeType dataType);
 
@@ -311,7 +311,7 @@ EmberAfStatus emberAfVerifyAttributeWrite(CHIPEndpointId endpoint, EmberAfCluste
  *      emberAfReadManufacturerSpecificClientAttribute,
  *      emberAfReadManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfReadAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+EmberAfStatus emberAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
                                    uint8_t * dataPtr, uint8_t readLength, EmberAfAttributeType * dataType);
 
 /**
@@ -326,7 +326,7 @@ EmberAfStatus emberAfReadAttribute(CHIPEndpointId endpoint, EmberAfClusterId clu
  *      emberAfReadManufacturerSpecificClientAttribute,
  *      emberAfReadManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfReadServerAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfReadServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                          uint8_t * dataPtr, uint8_t readLength);
 
 /**
@@ -341,7 +341,7 @@ EmberAfStatus emberAfReadServerAttribute(CHIPEndpointId endpoint, EmberAfCluster
  *      emberAfReadManufacturerSpecificClientAttribute,
  *      emberAfReadManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfReadClientAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfReadClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                          uint8_t * dataPtr, uint8_t readLength);
 
 /**
@@ -355,8 +355,8 @@ EmberAfStatus emberAfReadClientAttribute(CHIPEndpointId endpoint, EmberAfCluster
  * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
  *      emberAfReadManufacturerSpecificClientAttribute
  */
-EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster,
-                                                             EmberAfAttributeId attributeID, uint16_t manufacturerCode,
+EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                             chip::AttributeId attributeID, uint16_t manufacturerCode,
                                                              uint8_t * dataPtr, uint8_t readLength);
 
 /**
@@ -370,8 +370,8 @@ EmberAfStatus emberAfReadManufacturerSpecificServerAttribute(CHIPEndpointId endp
  * @see emberAfReadClientAttribute, emberAfReadServerAttribute,
  *      emberAfReadManufacturerSpecificServerAttribute
  */
-EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster,
-                                                             EmberAfAttributeId attributeID, uint16_t manufacturerCode,
+EmberAfStatus emberAfReadManufacturerSpecificClientAttribute(chip::EndpointId endpoint, chip::ClusterId cluster,
+                                                             chip::AttributeId attributeID, uint16_t manufacturerCode,
                                                              uint8_t * dataPtr, uint8_t readLength);
 
 /**
@@ -446,29 +446,29 @@ extern EmberAfDefinedEndpoint emAfEndpoints[];
 /**
  * @brief Macro that takes index of endpoint, and returns Zigbee endpoint
  */
-CHIPEndpointId emberAfEndpointFromIndex(uint8_t index);
+chip::EndpointId emberAfEndpointFromIndex(uint8_t index);
 
 /**
  * Returns the index of a given endpoint
  */
-uint8_t emberAfIndexFromEndpoint(CHIPEndpointId endpoint);
+uint8_t emberAfIndexFromEndpoint(chip::EndpointId endpoint);
 
 /**
  * Returns the index of a given endpoint; Does not ignore disabled endpoints
  */
-uint8_t emberAfIndexFromEndpointIncludingDisabledEndpoints(CHIPEndpointId endpoint);
+uint8_t emberAfIndexFromEndpointIncludingDisabledEndpoints(chip::EndpointId endpoint);
 
 /**
  * Returns the endpoint index within a given cluster (Client-side),
  * looking only for standard clusters.
  */
-uint8_t emberAfFindClusterClientEndpointIndex(CHIPEndpointId endpoint, EmberAfClusterId clusterId);
+uint8_t emberAfFindClusterClientEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * Returns the endpoint index within a given cluster (Server-side),
  * looking only for standard clusters.
  */
-uint8_t emberAfFindClusterServerEndpointIndex(CHIPEndpointId endpoint, EmberAfClusterId clusterId);
+uint8_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * @brief Macro that takes index of endpoint, and returns profile Id for it
@@ -627,7 +627,7 @@ uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType, const uint8_t 
  *
  * @param endpoint Zigbee endpoint number
  */
-bool emberAfIsDeviceEnabled(CHIPEndpointId endpoint);
+bool emberAfIsDeviceEnabled(chip::EndpointId endpoint);
 
 /**
  * @brief Function that checks if endpoint is identifying
@@ -637,7 +637,7 @@ bool emberAfIsDeviceEnabled(CHIPEndpointId endpoint);
  *
  * @param endpoint Zigbee endpoint number
  */
-bool emberAfIsDeviceIdentifying(CHIPEndpointId endpoint);
+bool emberAfIsDeviceIdentifying(chip::EndpointId endpoint);
 
 /**
  * @brief Function that enables or disables an endpoint.
@@ -647,7 +647,7 @@ bool emberAfIsDeviceIdentifying(CHIPEndpointId endpoint);
  *
  * @param endpoint Zigbee endpoint number
  */
-void emberAfSetDeviceEnabled(CHIPEndpointId endpoint, bool enabled);
+void emberAfSetDeviceEnabled(chip::EndpointId endpoint, bool enabled);
 
 /** @} END Device Control */
 
@@ -657,7 +657,7 @@ void emberAfSetDeviceEnabled(CHIPEndpointId endpoint, bool enabled);
 /**
  * @brief Enable/disable endpoints
  */
-bool emberAfEndpointEnableDisable(CHIPEndpointId endpoint, bool enable);
+bool emberAfEndpointEnableDisable(chip::EndpointId endpoint, bool enable);
 
 /**
  * @brief Determine if an endpoint at the specified index is enabled or disabled
@@ -901,7 +901,7 @@ void emberAfRunEvents(void);
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleTickExtended(CHIPEndpointId endpoint, EmberAfClusterId clusterId, bool isClient, uint32_t delayMs,
+EmberStatus emberAfScheduleTickExtended(chip::EndpointId endpoint, chip::ClusterId clusterId, bool isClient, uint32_t delayMs,
                                         EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl);
 
 /**
@@ -923,7 +923,7 @@ EmberStatus emberAfScheduleTickExtended(CHIPEndpointId endpoint, EmberAfClusterI
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleClusterTick(CHIPEndpointId endpoint, EmberAfClusterId clusterId, bool isClient, uint32_t delayMs,
+EmberStatus emberAfScheduleClusterTick(chip::EndpointId endpoint, chip::ClusterId clusterId, bool isClient, uint32_t delayMs,
                                        EmberAfEventSleepControl sleepControl);
 
 /**
@@ -940,7 +940,7 @@ EmberStatus emberAfScheduleClusterTick(CHIPEndpointId endpoint, EmberAfClusterId
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleClientTickExtended(CHIPEndpointId endpoint, EmberAfClusterId clusterId, uint32_t delayMs,
+EmberStatus emberAfScheduleClientTickExtended(chip::EndpointId endpoint, chip::ClusterId clusterId, uint32_t delayMs,
                                               EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl);
 
 /**
@@ -954,7 +954,7 @@ EmberStatus emberAfScheduleClientTickExtended(CHIPEndpointId endpoint, EmberAfCl
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleClientTick(CHIPEndpointId endpoint, EmberAfClusterId clusterId, uint32_t delayMs);
+EmberStatus emberAfScheduleClientTick(chip::EndpointId endpoint, chip::ClusterId clusterId, uint32_t delayMs);
 
 /**
  * @brief A function used to schedule a cluster server event.  This function
@@ -970,7 +970,7 @@ EmberStatus emberAfScheduleClientTick(CHIPEndpointId endpoint, EmberAfClusterId 
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleServerTickExtended(CHIPEndpointId endpoint, EmberAfClusterId clusterId, uint32_t delayMs,
+EmberStatus emberAfScheduleServerTickExtended(chip::EndpointId endpoint, chip::ClusterId clusterId, uint32_t delayMs,
                                               EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl);
 
 /**
@@ -984,7 +984,7 @@ EmberStatus emberAfScheduleServerTickExtended(CHIPEndpointId endpoint, EmberAfCl
  *
  * @return EMBER_SUCCESS if the event was scheduled or an error otherwise.
  */
-EmberStatus emberAfScheduleServerTick(CHIPEndpointId endpoint, EmberAfClusterId clusterId, uint32_t delayMs);
+EmberStatus emberAfScheduleServerTick(chip::EndpointId endpoint, chip::ClusterId clusterId, uint32_t delayMs);
 
 /**
  * @brief A function used to deactivate a cluster-related event.  This function
@@ -1000,7 +1000,7 @@ EmberStatus emberAfScheduleServerTick(CHIPEndpointId endpoint, EmberAfClusterId 
  *
  * @return EMBER_SUCCESS if the event was deactivated or an error otherwise.
  */
-EmberStatus emberAfDeactivateClusterTick(CHIPEndpointId endpoint, EmberAfClusterId clusterId, bool isClient);
+EmberStatus emberAfDeactivateClusterTick(chip::EndpointId endpoint, chip::ClusterId clusterId, bool isClient);
 
 /**
  * @brief A function used to deactivate a cluster client event.  This function
@@ -1011,7 +1011,7 @@ EmberStatus emberAfDeactivateClusterTick(CHIPEndpointId endpoint, EmberAfCluster
  *
  * @return EMBER_SUCCESS if the event was deactivated or an error otherwise.
  */
-EmberStatus emberAfDeactivateClientTick(CHIPEndpointId endpoint, EmberAfClusterId clusterId);
+EmberStatus emberAfDeactivateClientTick(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * @brief A function used to deactivate a cluster server event.  This function
@@ -1022,7 +1022,7 @@ EmberStatus emberAfDeactivateClientTick(CHIPEndpointId endpoint, EmberAfClusterI
  *
  * @return EMBER_SUCCESS if the event was deactivated or an error otherwise.
  */
-EmberStatus emberAfDeactivateServerTick(CHIPEndpointId endpoint, EmberAfClusterId clusterId);
+EmberStatus emberAfDeactivateServerTick(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
  * @brief Sets the ::EmberEventControl to run "delayMs" milliseconds in the
@@ -1120,28 +1120,28 @@ EmberStatus emberAfNetworkEventControlSetDelayMinutes(EmberEventControl * contro
  * @brief Sets the ::EmberEventControl for the specified endpoint as inactive.
  * See ::emberEventControlSetInactive.
  */
-EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, CHIPEndpointId endpoint);
+EmberStatus emberAfEndpointEventControlSetInactive(EmberEventControl * controls, chip::EndpointId endpoint);
 /**
  * @brief Returns true if the event for the current number is active.  See
  * ::emberEventControlGetActive.
  */
-bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, CHIPEndpointId endpoint);
+bool emberAfEndpointEventControlGetActive(EmberEventControl * controls, chip::EndpointId endpoint);
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run at the
  * next available opportunity.  See ::emberEventControlSetActive.
  */
-EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, CHIPEndpointId endpoint);
+EmberStatus emberAfEndpointEventControlSetActive(EmberEventControl * controls, chip::EndpointId endpoint);
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run
  * "delayMs" milliseconds in the future.  See ::emberEventControlSetDelayMS.
  */
-EmberStatus emberAfEndpointEventControlSetDelayMS(EmberEventControl * controls, CHIPEndpointId endpoint, uint32_t delayMs);
+EmberStatus emberAfEndpointEventControlSetDelayMS(EmberEventControl * controls, chip::EndpointId endpoint, uint32_t delayMs);
 #ifdef DOXYGEN_SHOULD_SKIP_THIS
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run
  * "delayMs" milliseconds in the future.  See ::emberEventControlSetDelayMS.
  */
-EmberStatus emberAfEndpointEventControlSetDelay(EmberEventControl * controls, CHIPEndpointId endpoint, uint32_t delayMs);
+EmberStatus emberAfEndpointEventControlSetDelay(EmberEventControl * controls, chip::EndpointId endpoint, uint32_t delayMs);
 #else
 #define emberAfEndpointEventControlSetDelay(controls, endpoint, delayMs)                                                           \
     emberAfEndpointEventControlSetDelayMS(controls, endpoint, delayMs);
@@ -1151,12 +1151,12 @@ EmberStatus emberAfEndpointEventControlSetDelay(EmberEventControl * controls, CH
  * "delayQs" quarter seconds in the future.  See
  * ::emberAfEventControlSetDelayQS.
  */
-EmberStatus emberAfEndpointEventControlSetDelayQS(EmberEventControl * controls, CHIPEndpointId endpoint, uint32_t delayQs);
+EmberStatus emberAfEndpointEventControlSetDelayQS(EmberEventControl * controls, chip::EndpointId endpoint, uint32_t delayQs);
 /**
  * @brief Sets the ::EmberEventControl for the specified endpoint to run
  * "delayM" minutes in the future.  See ::emberAfEventControlSetDelayMinutes.
  */
-EmberStatus emberAfEndpointEventControlSetDelayMinutes(EmberEventControl * controls, CHIPEndpointId endpoint, uint16_t delayM);
+EmberStatus emberAfEndpointEventControlSetDelayMinutes(EmberEventControl * controls, chip::EndpointId endpoint, uint16_t delayM);
 
 /**
  * @brief A function used to retrieve the number of milliseconds until
@@ -1252,7 +1252,7 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
 /**
  * @brief Sends multicast.
  */
-EmberStatus emberAfSendMulticast(EmberMulticastId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
+EmberStatus emberAfSendMulticast(chip::GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Multicasts the message to the group in the binding table that
@@ -1266,14 +1266,14 @@ EmberStatus emberAfSendMulticastToBindings(EmberApsFrame * apsFrame, uint16_t me
 /**
  * @brief Sends Multicast with alias with attached message sent callback
  */
-EmberStatus emberAfSendMulticastWithAliasWithCallback(EmberMulticastId multicastId, EmberApsFrame * apsFrame,
-                                                      uint16_t messageLength, uint8_t * message, EmberNodeId alias,
-                                                      uint8_t sequence, EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendMulticastWithAliasWithCallback(chip::GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
+                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
+                                                      EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends multicast with attached message sent callback.
  */
-EmberStatus emberAfSendMulticastWithCallback(EmberMulticastId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
+EmberStatus emberAfSendMulticastWithCallback(chip::GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
                                              uint8_t * message, EmberAfMessageSentFunction callback);
 
 /**
@@ -1324,13 +1324,13 @@ EmberStatus emberAfSendUnicastToBindingsWithCallback(EmberApsFrame * apsFrame, u
  * @brief Sends interpan message.
  */
 EmberStatus emberAfSendInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-                                EmberMulticastId multicastId, EmberAfClusterId clusterId, EmberAfProfileId profileId,
+                                chip::GroupId multicastId, chip::ClusterId clusterId, EmberAfProfileId profileId,
                                 uint16_t messageLength, uint8_t * messageBytes);
 
 /**
  * @brief Sends end device binding request.
  */
-EmberStatus emberAfSendEndDeviceBind(CHIPEndpointId endpoint);
+EmberStatus emberAfSendEndDeviceBind(chip::EndpointId endpoint);
 
 /**
  * @brief Sends the command prepared with emberAfFill.... macro.
@@ -1356,7 +1356,7 @@ EmberStatus emberAfSendCommandUnicastToBindingsWithCallback(EmberAfMessageSentFu
  * using the emberAfFill... macros from the client command API. It
  * will be sent as multicast.
  */
-EmberStatus emberAfSendCommandMulticast(EmberMulticastId multicastId);
+EmberStatus emberAfSendCommandMulticast(chip::GroupId multicastId);
 
 /**
  * @brief Sends the command prepared with emberAfFill.... macro.
@@ -1365,12 +1365,12 @@ EmberStatus emberAfSendCommandMulticast(EmberMulticastId multicastId);
  * using the emberAfFill... macros from the client command API. It
  * will be sent as multicast.
  */
-EmberStatus emberAfSendCommandMulticastWithAlias(EmberMulticastId multicastId, EmberNodeId alias, uint8_t sequence);
+EmberStatus emberAfSendCommandMulticastWithAlias(chip::GroupId multicastId, EmberNodeId alias, uint8_t sequence);
 
 /**
  * @brief emberAfSendCommandMulticast with attached message sent callback.
  */
-EmberStatus emberAfSendCommandMulticastWithCallback(EmberMulticastId multicastId, EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendCommandMulticastWithCallback(chip::GroupId multicastId, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends the command prepared with emberAfFill.... macro.
@@ -1435,7 +1435,7 @@ EmberStatus emberAfSendCommandBroadcastWithAlias(EmberNodeId destination, EmberN
  * multicastId is not zero, the message will be sent using multicast mode.
  */
 EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-                                       EmberMulticastId multicastId, EmberAfProfileId profileId);
+                                       chip::GroupId multicastId, EmberAfProfileId profileId);
 
 /**
  * @brief Sends a default response to a cluster command.
@@ -1500,7 +1500,7 @@ EmberApsFrame * emberAfGetCommandApsFrame(void);
 /**
  * @brief Set the source and destination endpoints in the client API APS frame.
  */
-void emberAfSetCommandEndpoints(CHIPEndpointId sourceEndpoint, CHIPEndpointId destinationEndpoint);
+void emberAfSetCommandEndpoints(chip::EndpointId sourceEndpoint, chip::EndpointId destinationEndpoint);
 
 /**
  * @brief Friendly define for use in discovering client clusters with
@@ -1539,7 +1539,7 @@ void emberAfSetCommandEndpoints(CHIPEndpointId sourceEndpoint, CHIPEndpointId de
  *  a match is discovered.  (For broadcast discoveries, this is called once per
  *  matching node, even if a node has multiple matching endpoints.)
  */
-EmberStatus emberAfFindDevicesByProfileAndCluster(EmberNodeId target, EmberAfProfileId profileId, EmberAfClusterId clusterId,
+EmberStatus emberAfFindDevicesByProfileAndCluster(EmberNodeId target, EmberAfProfileId profileId, chip::ClusterId clusterId,
                                                   bool serverCluster, EmberAfServiceDiscoveryCallback * callback);
 
 /**
@@ -1663,7 +1663,7 @@ extern EmberAfClusterCommand * emAfCurrentCommand;
  * @param endpoint The endpoint on the remote device.
  * @return ::EMBER_SUCCESS if key establishment was initiated successfully
  */
-EmberStatus emberAfInitiateKeyEstablishment(EmberNodeId nodeId, CHIPEndpointId endpoint);
+EmberStatus emberAfInitiateKeyEstablishment(EmberNodeId nodeId, chip::EndpointId endpoint);
 
 /** @brief Use this function to initiate key establishment with a remote node on
  * a different PAN.  ::emberAfInterPanKeyEstablishmentCallback will be called
@@ -1692,7 +1692,7 @@ bool emberAfPerformingKeyEstablishment(void);
  * @return ::EMBER_SUCCESS if the partner link key exchange was initiated
  * successfully.
  */
-EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, CHIPEndpointId endpoint,
+EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, chip::EndpointId endpoint,
                                                   EmberAfPartnerLinkKeyExchangeCallback * callback);
 #else
 #define emberAfInitiateKeyEstablishment(nodeId, endpoint) emberAfInitiateKeyEstablishmentCallback(nodeId, endpoint)
@@ -1701,13 +1701,6 @@ EmberStatus emberAfInitiatePartnerLinkKeyExchange(EmberNodeId target, CHIPEndpoi
 #define emberAfInitiatePartnerLinkKeyExchange(target, endpoint, callback)                                                          \
     emberAfInitiatePartnerLinkKeyExchangeCallback(target, endpoint, callback)
 #endif
-
-/** @brief Use this function to determine if the security profile of the
- * current network was set to Smart Energy.  The security profile is configured
- * in AppBuilder.
-   @ return true if the security profile is Smart Energy or false otherwise.
- */
-bool emberAfIsCurrentSecurityProfileSmartEnergy(void);
 
 /** @} END Messaging */
 
@@ -1803,7 +1796,7 @@ EmberStatus emberAfPushCallbackNetworkIndex(void);
  * API must be paired with a subsequent call to ::emberAfPopNetworkIndex.
  */
 
-EmberStatus emberAfPushEndpointNetworkIndex(CHIPEndpointId endpoint);
+EmberStatus emberAfPushEndpointNetworkIndex(chip::EndpointId endpoint);
 /** @brief Removes the topmost network from the stack of networks maintained by
  * the framework and sets the current network to the new topmost network.
  * Every call to this API must be paired with a prior call to

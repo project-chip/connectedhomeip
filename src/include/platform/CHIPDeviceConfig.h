@@ -533,6 +533,15 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_THREAD_FTD
+ *
+ * Enable Full Thread Device features
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_FTD
+#define CHIP_DEVICE_CONFIG_THREAD_FTD 1
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_THREAD_TASK_NAME
  *
  * The name of the Thread task.

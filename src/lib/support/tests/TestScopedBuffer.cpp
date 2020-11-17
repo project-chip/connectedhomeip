@@ -160,4 +160,4 @@ int TestScopedBuffer(void)
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestBufBound)
+CHIP_REGISTER_TEST_SUITE(TestScopedBuffer)

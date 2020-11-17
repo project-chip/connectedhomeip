@@ -141,12 +141,12 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
 
 void emberAfInit(void);
 void emberAfTick(void);
-uint16_t emberAfFindClusterNameIndex(CHIPClusterId cluster);
-uint16_t emberAfFindClusterNameIndexWithMfgCode(CHIPClusterId cluster, uint16_t mfgCode);
+uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
+uint16_t emberAfFindClusterNameIndexWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 void emberAfStackDown(void);
 
-void emberAfDecodeAndPrintCluster(CHIPClusterId cluster);
-void emberAfDecodeAndPrintClusterWithMfgCode(CHIPClusterId cluster, uint16_t mfgCode);
+void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
+void emberAfDecodeAndPrintClusterWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
                            ChipNodeId source, InterPanHeader * interPanHeader);
@@ -188,16 +188,6 @@ uint8_t * emberAfPutDateInResp(EmberAfDate * value);
 
 bool emberAfIsThisMyEui64(EmberEUI64 eui64);
 
-// If the variable has not been set, APS_TEST_SECURITY_DEFAULT will
-// eventually return false.
-enum
-{
-    APS_TEST_SECURITY_ENABLED  = 0,
-    APS_TEST_SECURITY_DISABLED = 1,
-    APS_TEST_SECURITY_DEFAULT  = 2,
-};
-extern uint8_t emAfTestApsSecurityOverride;
-
 #ifdef EZSP_HOST
 // the EM260 host application is expected to provide these functions if using
 // a cluster that needs it.
@@ -214,12 +204,6 @@ extern uint8_t emberAfIncomingZclSequenceNumber;
 // reply (in the case where the app disables it and then doesnt send a
 // message that gets parsed).
 void emberAfSetNoReplyForNextMessage(bool set);
-
-// this function determines if APS Link key should be used to secure
-// the message. It is based on the clusterId and specified in the SE
-// app profile.  If the message is outgoing then the
-bool emberAfDetermineIfLinkSecurityIsRequired(CHIPCommandId commandId, bool incoming, bool broadcast, EmberAfProfileId profileId,
-                                              EmberAfClusterId clusterId, ChipNodeId remoteNodeId);
 
 #define isThisDataTypeSentLittleEndianOTA(dataType) (!(emberAfIsThisDataTypeAStringType(dataType)))
 

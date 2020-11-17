@@ -21,33 +21,33 @@
 
 @interface CHIPOnOff ()
 
-@property (readonly) CHIPDeviceController * deviceController;
+@property (readonly) CHIPDevice * device;
 
 @end
 
 @implementation CHIPOnOff
 
-- (instancetype)initWithDeviceController:(CHIPDeviceController *)deviceController
+- (instancetype)initWithDevice:(CHIPDevice *)device
 {
     if (self = [super init]) {
-        _deviceController = deviceController;
+        _device = device;
     }
     return self;
 }
 
 - (BOOL)lightOn
 {
-    return [self.deviceController sendOnCommand];
+    return [self.device sendOnCommand];
 }
 
 - (BOOL)lightOff
 {
-    return [self.deviceController sendOffCommand];
+    return [self.device sendOffCommand];
 }
 
 - (BOOL)toggleLight
 {
-    return [self.deviceController sendToggleCommand];
+    return [self.device sendToggleCommand];
 }
 
 @end

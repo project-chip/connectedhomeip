@@ -40,6 +40,7 @@ if (chip_build_tests) {
     deps = [
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
+      "${chip_root}/src/lib/mdns/minimal/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/raw/tests",

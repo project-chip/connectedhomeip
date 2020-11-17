@@ -126,11 +126,7 @@
 // the max source route overhead and broadcast radius
 // if we havent defined MAX_HOPS then define based on profile ID
 #ifndef ZA_MAX_HOPS
-#ifdef EMBER_AF_HAS_SECURITY_PROFILE_SE
-#define ZA_MAX_HOPS 6
-#else
 #define ZA_MAX_HOPS 12
-#endif
 #endif
 
 #ifndef EMBER_AF_SOURCE_ROUTING_RESERVED_PAYLOAD_LENGTH

@@ -28,7 +28,7 @@
  * @param groupId Group ID Ver.: always
  * @param groupName Group Name Ver.: always
  */
-void emberAfPluginGroupsServerGetGroupNameCallback(CHIPEndpointId endpoint, CHIPGroupId groupId, uint8_t * groupName);
+void emberAfPluginGroupsServerGetGroupNameCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t * groupName);
 
 /** @brief Set Group Name
  *
@@ -38,7 +38,7 @@ void emberAfPluginGroupsServerGetGroupNameCallback(CHIPEndpointId endpoint, CHIP
  * @param groupId Group ID Ver.: always
  * @param groupName Group Name Ver.: always
  */
-void emberAfPluginGroupsServerSetGroupNameCallback(CHIPEndpointId endpoint, CHIPGroupId groupId, uint8_t * groupName);
+void emberAfPluginGroupsServerSetGroupNameCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t * groupName);
 
 /** @brief Group Names Supported
  *
@@ -46,7 +46,7 @@ void emberAfPluginGroupsServerSetGroupNameCallback(CHIPEndpointId endpoint, CHIP
  *
  * @param endpoint Endpoint Ver.: always
  */
-bool emberAfPluginGroupsServerGroupNamesSupportedCallback(CHIPEndpointId endpoint);
+bool emberAfPluginGroupsServerGroupNamesSupportedCallback(chip::EndpointId endpoint);
 
 /** @brief Groups Cluster Endpoint In Group
  *
@@ -57,4 +57,4 @@ bool emberAfPluginGroupsServerGroupNamesSupportedCallback(CHIPEndpointId endpoin
  * @param endpoint The endpoint.  Ver.: always
  * @param groupId The group identifier.  Ver.: always
  */
-bool emberAfGroupsClusterEndpointInGroupCallback(CHIPEndpointId endpoint, CHIPGroupId groupId);
+bool emberAfGroupsClusterEndpointInGroupCallback(chip::EndpointId endpoint, chip::GroupId groupId);

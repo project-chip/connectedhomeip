@@ -60,7 +60,7 @@ typedef struct
     EmberEUI64 eui64;
     ChipNodeId nodeId;
     uint8_t networkIndex;
-    CHIPEndpointId endpoint;
+    chip::EndpointId endpoint;
     uint8_t age; // The number of discovery cycles the ESI has not been discovered.
 } EmberAfPluginEsiManagementEsiEntry;
 
@@ -72,7 +72,8 @@ typedef void (*EmberAfEsiManagementDeletionCallback)(uint8_t);
  * Returns a pointer to the entry if a matching entry was found, otherwise it
  * returns NULL.
  */
-EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByShortIdAndEndpoint(EmberNodeId shortId, uint8_t endpoint);
+EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByShortIdAndEndpoint(EmberNodeId shortId,
+                                                                                             chip::EndpointId endpoint);
 
 /**
  * Searches in the ESI table by the pair node (long ID, endopoint).
@@ -81,7 +82,7 @@ EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByShortI
  * returns NULL.
  */
 EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByLongIdAndEndpoint(EmberEUI64 longId,
-                                                                                            CHIPEndpointId endpoint);
+                                                                                            chip::EndpointId endpoint);
 
 /**
  * Allows retrieving the index of an entry that matches the passed short ID
@@ -90,7 +91,7 @@ EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByLongId
  * It returns the index of the matching entry if a matching entry was found,
  * otherwise it returns 0xFF.
  */
-uint8_t emberAfPluginEsiManagementIndexLookUpByShortIdAndEndpoint(EmberNodeId shortId, uint8_t endpoint);
+uint8_t emberAfPluginEsiManagementIndexLookUpByShortIdAndEndpoint(EmberNodeId shortId, chip::EndpointId endpoint);
 
 /**
  * Allows retrieving the index of an entry that matches the passed long ID
@@ -99,7 +100,7 @@ uint8_t emberAfPluginEsiManagementIndexLookUpByShortIdAndEndpoint(EmberNodeId sh
  * It returns the index of the matching entry if a matching entry was found,
  * otherwise it returns 0xFF.
  */
-uint8_t emberAfPluginEsiManagementIndexLookUpByLongIdAndEndpoint(EmberEUI64 longId, CHIPEndpointId endpoint);
+uint8_t emberAfPluginEsiManagementIndexLookUpByLongIdAndEndpoint(EmberEUI64 longId, chip::EndpointId endpoint);
 
 /**
  * Searches in the ESI table by the table index.
