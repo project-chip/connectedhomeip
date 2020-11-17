@@ -64,7 +64,7 @@ int main(int argc, char * argv[])
     err = gEchoServer.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, &gTestPairing);
+    err = gSessionManager.NewPairing(peer, kClientDeviceId, &gTestPairing);
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Request is received.

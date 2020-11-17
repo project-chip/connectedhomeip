@@ -21,10 +21,8 @@ transport (TCP, UDP, or CRMP).
 
 ## Building
 
-Building the example applications is quite straightforward.
-
 ```
-cd examples/echo
+cd echo
 git submodule update --init
 source third_party/connectedhomeip/scripts/activate.sh
 gn gen out/debug

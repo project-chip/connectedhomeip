@@ -142,7 +142,7 @@ CHIP_ERROR EstablishSecureSession()
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-        testSecurePairingSecret);
+        kServerDeviceId, testSecurePairingSecret);
 
 exit:
     if (err != CHIP_NO_ERROR)
