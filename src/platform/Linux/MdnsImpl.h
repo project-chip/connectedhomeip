@@ -151,7 +151,7 @@ private:
 
     MdnsAsnycReturnCallback mInitCallback;
     MdnsAsnycReturnCallback mErrorCallback;
-    MdnsNotificationDelegate *mNotificationDelegate;
+    MdnsNotificationDelegate * mNotificationDelegate;
     void * mAsyncReturnContext;
 
     std::set<std::string> mPublishedServices;
