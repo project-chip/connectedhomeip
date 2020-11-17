@@ -32,6 +32,35 @@
 
 #include <nlunit-test.h>
 
+namespace chip {
+
+template <class T, size_t N> template <typename F>
+void BitMapObjectPool<T, N>::ForEachActiveObject(F f)
+{
+    for (size_t word = 0; word * kAtomicSize < N; ++word)
+    {
+        auto & usage   = mUsage[word];
+        uint32_t value = usage.load();
+        for (size_t offset = 0; offset < kAtomicSize && offset + word * kAtomicSize < N; ++offset)
+        {
+            if ((value & (1 << offset)) != 0)
+            {
+                f(GetPoolHead() + (word * kAtomicSize + offset));
+            }
+        }
+    }
+}
+
+template <class T, size_t N>
+size_t GetNumObjectsInUse(BitMapObjectPool<T, N> & pool)
+{
+    size_t count = 0;
+    pool.ForEachActiveObject([&count](T *) { ++count; });
+    return count;
+}
+
+}
+
 namespace {
 
 using namespace chip;
@@ -41,7 +70,7 @@ void TestFreeNull(nlTestSuite * inSuite, void * inContext)
     constexpr const size_t size = 10;
     BitMapObjectPool<uint32_t, size> pool;
     pool.Delete(nullptr);
-    NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == 0);
+    NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == 0);
 }
 
 void TestNewFree(nlTestSuite * inSuite, void * inContext)
@@ -53,26 +82,26 @@ void TestNewFree(nlTestSuite * inSuite, void * inContext)
     {
         obj[i] = pool.New();
         NL_TEST_ASSERT(inSuite, obj[i] != nullptr);
-        NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == i + 1);
+        NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == i + 1);
     }
 
     uint32_t * fail = pool.New();
     NL_TEST_ASSERT(inSuite, fail == nullptr);
-    NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == size);
+    NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size);
 
     pool.Delete(obj[55]);
-    NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == size - 1);
+    NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size - 1);
     NL_TEST_ASSERT(inSuite, obj[55] == pool.New());
-    NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == size);
+    NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size);
 
     fail = pool.New();
     NL_TEST_ASSERT(inSuite, fail == nullptr);
-    NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == size);
+    NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size);
 
     for (size_t i = 0; i < pool.Size(); ++i)
     {
         pool.Delete(obj[i]);
-        NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == size - i - 1);
+        NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size - i - 1);
     }
 }
 
@@ -96,14 +125,14 @@ void TestNewFreeStruct(nlTestSuite * inSuite, void * inContext)
     {
         objs2[i] = pool.New(objs1);
         NL_TEST_ASSERT(inSuite, objs2[i] != nullptr);
-        NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == i + 1);
-        NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == objs1.size());
+        NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == i + 1);
+        NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == objs1.size());
     }
     for (size_t i = 0; i < pool.Size(); ++i)
     {
         pool.Delete(objs2[i]);
-        NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == size - i - 1);
-        NL_TEST_ASSERT(inSuite, pool.GetNumObjectsInUse() == objs1.size());
+        NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size - i - 1);
+        NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == objs1.size());
     }
 }
 
