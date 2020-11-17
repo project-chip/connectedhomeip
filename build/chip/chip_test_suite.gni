@@ -90,9 +90,11 @@ template("chip_test_suite") {
 
     if (defined(invoker.test_sources)) {
       foreach(_test, invoker.test_sources) {
-        _driver_name = "${root_gen_dir}/${_test}.GeneratedDriver.cpp"
+        _test_name = string_replace(_test, ".cpp", "")
 
-        action("${_test}_generate_driver") {
+        _driver_name = "${root_gen_dir}/${_test_name}.GeneratedDriver.cpp"
+
+        action("${_test_name}_generate_driver") {
           script = "${chip_root}/scripts/gen_test_driver.py"
 
           outputs = [ _driver_name ]
@@ -102,15 +104,15 @@ template("chip_test_suite") {
           ]
         }
 
-        chip_test(_test) {
+        chip_test(_test_name) {
           sources = [ _driver_name ]
           public_deps = [
             ":${_suite_name}_common",
-            ":${_test}_generate_driver",
+            ":${_test_name}_generate_driver",
           ]
         }
 
-        tests += [ _test ]
+        tests += [ _test_name ]
       }
     }
 
