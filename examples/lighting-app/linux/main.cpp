@@ -19,8 +19,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/PlatformManager.h>
 
-#include <platform/Linux/BLEManagerImpl.h>
-
 #include "af.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
