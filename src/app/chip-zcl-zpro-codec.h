@@ -28,8 +28,6 @@ typedef uint16_t EmberApsOption;
  */
 typedef struct
 {
-    /** The application profile ID that describes the format of the message. */
-    uint16_t profileId;
     /** The cluster ID for this message. */
     chip::ClusterId clusterId;
     /** The source endpoint. */

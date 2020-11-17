@@ -219,5 +219,4 @@ bool emberAfEndpointIsEnabled(chip::EndpointId endpoint);
 uint8_t emberAfGetClusterCountForEndpoint(chip::EndpointId endpoint);
 EmberAfCluster * emberAfGetClusterByIndex(chip::EndpointId endpoint, uint8_t clusterIndex);
 
-EmberAfProfileId emberAfGetProfileIdForEndpoint(chip::EndpointId endpoint);
 uint16_t emberAfGetDeviceIdForEndpoint(chip::EndpointId endpoint);

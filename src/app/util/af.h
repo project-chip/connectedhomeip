@@ -471,11 +471,6 @@ uint8_t emberAfFindClusterClientEndpointIndex(chip::EndpointId endpoint, chip::C
 uint8_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::ClusterId clusterId);
 
 /**
- * @brief Macro that takes index of endpoint, and returns profile Id for it
- */
-#define emberAfProfileIdFromIndex(index) (emAfEndpoints[(index)].profileId)
-
-/**
  * @brief Macro that takes index of endpoint, and returns device Id for it
  */
 #define emberAfDeviceIdFromIndex(index) (emAfEndpoints[(index)].deviceId)
@@ -489,14 +484,6 @@ uint8_t emberAfFindClusterServerEndpointIndex(chip::EndpointId endpoint, chip::C
  * @brief Macro that takes index of endpoint, and returns network index for it
  */
 #define emberAfNetworkIndexFromEndpointIndex(index) (emAfEndpoints[(index)].networkIndex)
-
-/**
- * @brief Macro that returns primary profile ID.
- *
- * Primary profile is the profile of a primary endpoint as defined
- * in AppBuilder.
- */
-#define emberAfPrimaryProfileId() emberAfProfileIdFromIndex(0)
 
 /**
  * @brief Macro that returns the primary endpoint.
@@ -1324,8 +1311,8 @@ EmberStatus emberAfSendUnicastToBindingsWithCallback(EmberApsFrame * apsFrame, u
  * @brief Sends interpan message.
  */
 EmberStatus emberAfSendInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-                                chip::GroupId multicastId, chip::ClusterId clusterId, EmberAfProfileId profileId,
-                                uint16_t messageLength, uint8_t * messageBytes);
+                                chip::GroupId multicastId, chip::ClusterId clusterId, uint16_t messageLength,
+                                uint8_t * messageBytes);
 
 /**
  * @brief Sends end device binding request.
@@ -1435,7 +1422,7 @@ EmberStatus emberAfSendCommandBroadcastWithAlias(EmberNodeId destination, EmberN
  * multicastId is not zero, the message will be sent using multicast mode.
  */
 EmberStatus emberAfSendCommandInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-                                       chip::GroupId multicastId, EmberAfProfileId profileId);
+                                       chip::GroupId multicastId);
 
 /**
  * @brief Sends a default response to a cluster command.
@@ -1504,19 +1491,19 @@ void emberAfSetCommandEndpoints(chip::EndpointId sourceEndpoint, chip::EndpointI
 
 /**
  * @brief Friendly define for use in discovering client clusters with
- * ::emberAfFindDevicesByProfileAndCluster().
+ * ::emberAfFindDevicesByCluster().
  */
 #define EMBER_AF_CLIENT_CLUSTER_DISCOVERY false
 
 /**
  * @brief Friendly define for use in discovering server clusters with
- * ::emberAfFindDevicesByProfileAndCluster().
+ * ::emberAfFindDevicesByCluster().
  */
 #define EMBER_AF_SERVER_CLUSTER_DISCOVERY true
 
 /**
  * @brief Use this function to find devices in the network with endpoints
- *   matching a given profile ID and cluster ID in their descriptors.
+ *   matching a given cluster ID in their descriptors.
  *   Target may either be a specific device, or the broadcast
  *   address EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS.
  *
@@ -1530,7 +1517,6 @@ void emberAfSetCommandEndpoints(chip::EndpointId sourceEndpoint, chip::EndpointI
  *
  * @param target The destination node ID for the discovery; either a specific
  *  node's ID or EMBER_RX_ON_WHEN_IDLE_BROADCAST_ADDRESS.
- * @param profileId The application profile for the cluster being discovered.
  * @param clusterId The cluster being discovered.
  * @param serverCluster EMBER_AF_SERVER_CLUSTER_DISCOVERY (true) if discovering
  *  servers for the target cluster; EMBER_AF_CLIENT_CLUSTER_DISCOVERY (false)
@@ -1539,8 +1525,8 @@ void emberAfSetCommandEndpoints(chip::EndpointId sourceEndpoint, chip::EndpointI
  *  a match is discovered.  (For broadcast discoveries, this is called once per
  *  matching node, even if a node has multiple matching endpoints.)
  */
-EmberStatus emberAfFindDevicesByProfileAndCluster(EmberNodeId target, EmberAfProfileId profileId, chip::ClusterId clusterId,
-                                                  bool serverCluster, EmberAfServiceDiscoveryCallback * callback);
+EmberStatus emberAfFindDevicesByCluster(EmberNodeId target, chip::ClusterId clusterId, bool serverCluster,
+                                        EmberAfServiceDiscoveryCallback * callback);
 
 /**
  * @brief Use this function to find all of the given in and out clusters

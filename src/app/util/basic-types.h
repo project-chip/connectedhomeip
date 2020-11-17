@@ -35,10 +35,3 @@ typedef uint16_t AttributeId;
 typedef uint16_t GroupId;
 typedef uint8_t CommandId;
 } // namespace chip
-
-/**
- * @brief Type for referring to zigbee application profile id
- *        TODO: This is probably not needed for CHIP and should be removed.
- *        https://github.com/project-chip/connectedhomeip/issues/3444
- */
-typedef uint16_t EmberAfProfileId;

@@ -21982,12 +21982,11 @@ bool emberAfZllCommissioningClusterDeviceInformationResponseCallback(uint32_t tr
  * @param ieeeAddress   Ver.: always
  * @param networkAddress   Ver.: always
  * @param endpointId   Ver.: always
- * @param profileId   Ver.: always
  * @param deviceId   Ver.: always
  * @param version   Ver.: always
  */
 bool emberAfZllCommissioningClusterEndpointInformationCallback(uint8_t * ieeeAddress, uint16_t networkAddress, uint8_t endpointId,
-                                                               uint16_t profileId, uint16_t deviceId, uint8_t version);
+                                                               uint16_t deviceId, uint8_t version);
 /** @brief ZLL Commissioning Cluster Get Endpoint List Request
  *
  *
@@ -22182,7 +22181,6 @@ bool emberAfZllCommissioningClusterScanRequestCallback(uint32_t transaction, uin
  * @param numberOfSubDevices   Ver.: always
  * @param totalGroupIds   Ver.: always
  * @param endpointId   Ver.: always
- * @param profileId   Ver.: always
  * @param deviceId   Ver.: always
  * @param version   Ver.: always
  * @param groupIdCount   Ver.: always
@@ -22191,8 +22189,8 @@ bool emberAfZllCommissioningClusterScanResponseCallback(uint32_t transaction, ui
                                                         uint8_t zllInformation, uint16_t keyBitmask, uint32_t responseId,
                                                         uint8_t * extendedPanId, uint8_t networkUpdateId, uint8_t logicalChannel,
                                                         uint16_t panId, uint16_t networkAddress, uint8_t numberOfSubDevices,
-                                                        uint8_t totalGroupIds, chip::EndpointId endpointId, uint16_t profileId,
-                                                        uint16_t deviceId, uint8_t version, uint8_t groupIdCount);
+                                                        uint8_t totalGroupIds, chip::EndpointId endpointId, uint16_t deviceId,
+                                                        uint8_t version, uint8_t groupIdCount);
 /** @brief ZLL Commissioning Cluster Server Attribute Changed
  *
  * Server Attribute Changed
