@@ -312,7 +312,8 @@ public:
 
     // The caller has access but no ownership.
     // This is intended to be used only to call functions that have not yet been converted to take a PacketBufferHandle;
-    // if/when the need is clear. Most uses will be converted to take a `const PacketBufferHandle &`.
+    // a permanent version may be created if/when the need is clear. Most uses will be converted to take a
+    // `const PacketBufferHandle &`.
     PacketBuffer * Get_ForNow() { return mBuffer; }
 
     bool IsNull() const { return mBuffer == nullptr; }
