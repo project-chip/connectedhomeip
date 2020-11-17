@@ -42,7 +42,9 @@ public:
     CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags, System::PacketBuffer * msgBuf) override
     {
         mNumMessageSend++;
-        return (peer != nullptr) ? peer->HandlePeerMessage(header, msgBuf) : mMessageSendError;
+        System::PacketBufferHandle msg_ForNow;
+        msg_ForNow.Adopt(msgBuf);
+        return (peer != nullptr) ? peer->HandlePeerMessage(header, std::move(msg_ForNow)) : mMessageSendError;
     }
 
     void OnPairingError(CHIP_ERROR error) override { mNumPairingErrors++; }

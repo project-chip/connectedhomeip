@@ -56,7 +56,7 @@ TestContext sContext;
 const char PAYLOAD[]        = "Hello!";
 int ReceiveHandlerCallCount = 0;
 
-void MessageReceiveHandler(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBuffer * msgBuf,
+void MessageReceiveHandler(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
                            nlTestSuite * inSuite)
 {
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
@@ -66,8 +66,6 @@ void MessageReceiveHandler(const PacketHeader & header, const Transport::PeerAdd
     size_t data_len = msgBuf->DataLength();
     int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
     NL_TEST_ASSERT(inSuite, compare == 0);
-
-    System::PacketBuffer::Free(msgBuf);
 
     ReceiveHandlerCallCount++;
 }

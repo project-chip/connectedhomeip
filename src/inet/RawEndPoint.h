@@ -95,7 +95,7 @@ private:
     uint8_t NumICMPTypes;
     const uint8_t * ICMPTypes;
 
-    void HandleDataReceived(chip::System::PacketBuffer * msg);
+    void HandleDataReceived(chip::System::PacketBufferHandle msg);
     INET_ERROR GetPCB(IPAddressType addrType);
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5

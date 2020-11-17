@@ -58,9 +58,9 @@ void ModelCommand::OnError(ChipDeviceController * dc, CHIP_ERROR err)
     UpdateWaitForResponse(false);
 }
 
-void ModelCommand::OnMessage(ChipDeviceController * dc, PacketBuffer * buffer)
+void ModelCommand::OnMessage(ChipDeviceController * dc, PacketBufferHandle buffer)
 {
-    SetCommandExitStatus(ReceiveCommandResponse(dc, buffer));
+    SetCommandExitStatus(ReceiveCommandResponse(dc, std::move(buffer)));
     UpdateWaitForResponse(false);
 }
 
@@ -95,7 +95,7 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
     ChipLogProgress(chipTool, "Endpoint id: '0x%02x', Cluster id: '0x%04x', Command id: '0x%02x'", mEndPointId, mClusterId,
                     mCommandId);
 
-    uint16_t dataLength = EncodeCommand(buffer.Get_ForNow(), bufferSize, mEndPointId);
+    uint16_t dataLength = EncodeCommand(buffer.Retain(), bufferSize, mEndPointId);
     if (dataLength == 0)
     {
         ChipLogError(chipTool, "Error while encoding data for command: %s", GetName());
@@ -106,14 +106,14 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
     ChipLogDetail(chipTool, "Encoded data of length %d", dataLength);
 
 #ifdef DEBUG
-    PrintBuffer(buffer.Get_ForNow());
+    PrintBuffer(buffer);
 #endif
 
     dc->SendMessage(NULL, buffer.Release_ForNow());
     return true;
 }
 
-bool ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer) const
+bool ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBufferHandle buffer) const
 {
     EmberApsFrame frame;
     uint8_t * message;
@@ -126,7 +126,6 @@ bool ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     if (extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) == 0)
     {
         ChipLogError(chipTool, "APS frame processing failure!");
-        PacketBuffer::Free(buffer);
         ExitNow();
     }
     ChipLogDetail(chipTool, "APS frame processing success!");
@@ -171,7 +170,7 @@ void ModelCommand::WaitForResponse()
     }
 }
 
-void ModelCommand::PrintBuffer(PacketBuffer * buffer) const
+void ModelCommand::PrintBuffer(const PacketBufferHandle & buffer) const
 {
     const size_t data_len = buffer->DataLength();
 

@@ -46,7 +46,7 @@ constexpr int kListenBacklogSize = 2;
 /**
  *  Determine if the given buffer contains a complete message
  */
-bool ContainsCompleteMessage(System::PacketBuffer * buffer, uint8_t ** start, uint16_t * size)
+bool ContainsCompleteMessage(const System::PacketBufferHandle & buffer, uint8_t ** start, uint16_t * size)
 {
     bool completeMessage = false;
 
@@ -318,7 +318,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBuffer * buffer,
+CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBufferHandle buffer,
                                                        uint16_t messageSize)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -337,9 +337,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerA
 
     // message receive handler will attempt to free the buffer, however as the buffer may
     // contain additional data, we retain it to prevent actual free
-    buffer->AddRef();
-
-    HandleMessageReceived(header, peerAddress, buffer);
+    HandleMessageReceived(header, peerAddress, buffer.Retain());
 
 exit:
     buffer->SetStart(oldStart);
@@ -349,18 +347,16 @@ exit:
 }
 
 CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
-                                          System::PacketBuffer * buffer)
+                                          System::PacketBufferHandle buffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    while (buffer != nullptr)
+    while (!buffer.IsNull())
     {
         // when a buffer is empty, it can be released back to the app
         if (buffer->DataLength() == 0)
         {
-            System::PacketBuffer * old = buffer;
-            buffer                     = old->DetachTail();
-            System::PacketBuffer::Free(old);
+            buffer.Adopt(buffer->DetachTail());
             continue;
         }
 
@@ -381,7 +377,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             //   - there is no reason to believe that an error would not occur again on the
             //     same parameters (errors are likely not transient)
             //   - this guarantees data is received and progress is made.
-            err = ProcessSingleMessageFromBufferHead(peerAddress, buffer, messageSize);
+            err = ProcessSingleMessageFromBufferHead(peerAddress, buffer.Retain(), messageSize);
             buffer->ConsumeHead(messageSize);
             SuccessOrExit(err);
 
@@ -412,16 +408,16 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
     }
 
 exit:
-    if (buffer != nullptr)
+    if (!buffer.IsNull())
     {
         // Incomplete processing will be retried
-        endPoint->PutBackReceivedData(buffer);
+        endPoint->PutBackReceivedData(buffer.Release_ForNow());
     }
 
     return err;
 }
 
-void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer)
+void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
 {
     Inet::IPAddress ipAddress;
     uint16_t port;
@@ -430,7 +426,7 @@ void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * 
     PeerAddress peerAddress = PeerAddress::TCP(ipAddress, port);
 
     TCPBase * tcp  = reinterpret_cast<TCPBase *>(endPoint->AppState);
-    CHIP_ERROR err = tcp->ProcessReceivedBuffer(endPoint, peerAddress, buffer);
+    CHIP_ERROR err = tcp->ProcessReceivedBuffer(endPoint, peerAddress, std::move(buffer));
 
     if (err != CHIP_NO_ERROR)
     {

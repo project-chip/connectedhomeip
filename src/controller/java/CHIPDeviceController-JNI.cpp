@@ -67,7 +67,7 @@ using namespace chip::DeviceController;
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
 static void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState);
-static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBufferHandle payload);
 static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, const char * operation);
 static void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 static bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
@@ -468,7 +468,7 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
     buffer->SetDataLength(valueLength);
 
     pthread_mutex_lock(&sStackLock);
-    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, buffer.Release_ForNow());
+    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, std::move(buffer));
     pthread_mutex_unlock(&sStackLock);
 exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
@@ -669,7 +669,7 @@ void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerC
     HandleSimpleOperationComplete(deviceController, (const char *) appReqState);
 }
 
-void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
+void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBufferHandle payload)
 {
     StackUnlockGuard unlockGuard;
     JNIEnv * env;
@@ -702,7 +702,6 @@ void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqSt
 
 exit:
     env->ExceptionClear();
-    System::PacketBuffer::Free(payload);
 }
 
 void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)

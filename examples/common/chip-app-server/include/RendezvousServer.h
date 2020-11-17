@@ -34,7 +34,7 @@ public:
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(System::PacketBufferHandle buffer) override;
     void OnRendezvousComplete() override;
     void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) override;
 

@@ -932,7 +932,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBarrierControlClusterGoToPercentCommand(buffer->Start(), bufferSize, endPointId, mPercentOpen);
     }
@@ -956,7 +956,7 @@ class BarrierControlStop : public ModelCommand
 public:
     BarrierControlStop() : ModelCommand("stop", kBarrierControlClusterId, 0x01) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBarrierControlClusterStopCommand(buffer->Start(), bufferSize, endPointId);
     }
@@ -977,7 +977,7 @@ class DiscoverBarrierControlAttributes : public ModelCommand
 public:
     DiscoverBarrierControlAttributes() : ModelCommand("discover", kBarrierControlClusterId, 0x0c) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBarrierControlClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -1002,7 +1002,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBarrierControlClusterReadMovingStateAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -1026,7 +1026,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBarrierControlClusterReportMovingStateAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
                                                                      mMaxInterval);
@@ -1056,7 +1056,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBarrierControlClusterReadSafetyStatusAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -1080,7 +1080,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBarrierControlClusterReportSafetyStatusAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
                                                                       mMaxInterval);
@@ -1110,7 +1110,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBarrierControlClusterReadCapabilitiesAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -1135,7 +1135,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBarrierControlClusterReadBarrierPositionAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -1160,7 +1160,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBarrierControlClusterReportBarrierPositionAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
                                                                          mMaxInterval, mChange);
@@ -1204,7 +1204,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBasicClusterResetToFactoryDefaultsCommand(buffer->Start(), bufferSize, endPointId);
     }
@@ -1225,7 +1225,7 @@ class DiscoverBasicAttributes : public ModelCommand
 public:
     DiscoverBasicAttributes() : ModelCommand("discover", kBasicClusterId, 0x0c) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBasicClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -1250,7 +1250,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBasicClusterReadZCLVersionAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -1275,7 +1275,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeBasicClusterReadPowerSourceAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -1367,7 +1367,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterMoveColorCommand(buffer->Start(), bufferSize, endPointId, mRateX, mRateY, mOptionsMask,
                                                          mOptionsOverride);
@@ -1404,7 +1404,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterMoveColorTemperatureCommand(buffer->Start(), bufferSize, endPointId, mMoveMode, mRate,
                                                                     mColorTemperatureMinimumMireds, mColorTemperatureMaximumMireds,
@@ -1442,7 +1442,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterMoveHueCommand(buffer->Start(), bufferSize, endPointId, mMoveMode, mRate, mOptionsMask,
                                                        mOptionsOverride);
@@ -1477,7 +1477,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterMoveSaturationCommand(buffer->Start(), bufferSize, endPointId, mMoveMode, mRate,
                                                               mOptionsMask, mOptionsOverride);
@@ -1513,7 +1513,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterMoveToColorCommand(buffer->Start(), bufferSize, endPointId, mColorX, mColorY,
                                                            mTransitionTime, mOptionsMask, mOptionsOverride);
@@ -1549,7 +1549,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterMoveToColorTemperatureCommand(
             buffer->Start(), bufferSize, endPointId, mColorTemperatureMireds, mTransitionTime, mOptionsMask, mOptionsOverride);
@@ -1585,7 +1585,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterMoveToHueCommand(buffer->Start(), bufferSize, endPointId, mHue, mDirection, mTransitionTime,
                                                          mOptionsMask, mOptionsOverride);
@@ -1622,7 +1622,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterMoveToHueAndSaturationCommand(buffer->Start(), bufferSize, endPointId, mHue, mSaturation,
                                                                       mTransitionTime, mOptionsMask, mOptionsOverride);
@@ -1658,7 +1658,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterMoveToSaturationCommand(buffer->Start(), bufferSize, endPointId, mSaturation,
                                                                 mTransitionTime, mOptionsMask, mOptionsOverride);
@@ -1694,7 +1694,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterStepColorCommand(buffer->Start(), bufferSize, endPointId, mStepX, mStepY, mTransitionTime,
                                                          mOptionsMask, mOptionsOverride);
@@ -1733,7 +1733,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterStepColorTemperatureCommand(buffer->Start(), bufferSize, endPointId, mStepMode, mStepSize,
                                                                     mTransitionTime, mColorTemperatureMinimumMireds,
@@ -1773,7 +1773,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterStepHueCommand(buffer->Start(), bufferSize, endPointId, mStepMode, mStepSize,
                                                        mTransitionTime, mOptionsMask, mOptionsOverride);
@@ -1810,7 +1810,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterStepSaturationCommand(buffer->Start(), bufferSize, endPointId, mStepMode, mStepSize,
                                                               mTransitionTime, mOptionsMask, mOptionsOverride);
@@ -1844,7 +1844,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterStopMoveStepCommand(buffer->Start(), bufferSize, endPointId, mOptionsMask,
                                                             mOptionsOverride);
@@ -1870,7 +1870,7 @@ class DiscoverColorControlAttributes : public ModelCommand
 public:
     DiscoverColorControlAttributes() : ModelCommand("discover", kColorControlClusterId, 0x0c) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -1895,7 +1895,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadCurrentHueAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -1920,7 +1920,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReportCurrentHueAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
                                                                   mMaxInterval, mChange);
@@ -1951,7 +1951,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadCurrentSaturationAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -1976,7 +1976,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReportCurrentSaturationAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
                                                                          mMaxInterval, mChange);
@@ -2007,7 +2007,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadRemainingTimeAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2032,7 +2032,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadCurrentXAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2057,7 +2057,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReportCurrentXAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval, mMaxInterval,
                                                                 mChange);
@@ -2088,7 +2088,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadCurrentYAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2113,7 +2113,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReportCurrentYAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval, mMaxInterval,
                                                                 mChange);
@@ -2144,7 +2144,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadColorTemperatureMiredsAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2169,7 +2169,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReportColorTemperatureMiredsAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval,
                                                                               mMaxInterval, mChange);
@@ -2200,7 +2200,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadColorModeAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2225,7 +2225,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadOptionsAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2248,7 +2248,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterWriteOptionsAttribute(buffer->Start(), bufferSize, endPointId, mOptions);
     }
@@ -2276,7 +2276,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadNumberOfPrimariesAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2301,7 +2301,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary1XAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2326,7 +2326,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary1YAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2351,7 +2351,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary1IntensityAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2376,7 +2376,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary2XAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2401,7 +2401,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary2YAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2426,7 +2426,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary2IntensityAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2451,7 +2451,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary3XAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2476,7 +2476,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary3YAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2501,7 +2501,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary3IntensityAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2526,7 +2526,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary4XAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2551,7 +2551,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary4YAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2576,7 +2576,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary4IntensityAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2601,7 +2601,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary5XAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2626,7 +2626,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary5YAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2651,7 +2651,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary5IntensityAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2676,7 +2676,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary6XAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2701,7 +2701,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary6YAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2726,7 +2726,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadPrimary6IntensityAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2751,7 +2751,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadEnhancedCurrentHueAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2776,7 +2776,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadEnhancedColorModeAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2801,7 +2801,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadColorLoopActiveAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2826,7 +2826,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadColorLoopDirectionAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2851,7 +2851,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadColorLoopTimeAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2876,7 +2876,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadColorLoopStartEnhancedHueAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2901,7 +2901,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadColorLoopStoredEnhancedHueAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2926,7 +2926,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadColorCapabilitiesAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2951,7 +2951,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadColorTempPhysicalMinMiredsAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -2976,7 +2976,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadColorTempPhysicalMaxMiredsAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -3001,7 +3001,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadCoupleColorTempToLevelMinMiredsAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -3026,7 +3026,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterReadStartUpColorTemperatureMiredsAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -3049,7 +3049,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeColorControlClusterWriteStartUpColorTemperatureMiredsAttribute(buffer->Start(), bufferSize, endPointId,
                                                                                     mStartUpColorTemperatureMireds);
@@ -3726,7 +3726,7 @@ class DoorLockClearAllPINCodes : public ModelCommand
 public:
     DoorLockClearAllPINCodes() : ModelCommand("clear-all-pincodes", kDoorLockClusterId, 0x08) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterClearAllPINCodesCommand(buffer->Start(), bufferSize, endPointId);
     }
@@ -3754,7 +3754,7 @@ class DoorLockClearAllRFIDCodes : public ModelCommand
 public:
     DoorLockClearAllRFIDCodes() : ModelCommand("clear-all-rfidcodes", kDoorLockClusterId, 0x19) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterClearAllRFIDCodesCommand(buffer->Start(), bufferSize, endPointId);
     }
@@ -3786,7 +3786,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterClearHolidayScheduleCommand(buffer->Start(), bufferSize, endPointId, mHolidayScheduleID);
     }
@@ -3821,7 +3821,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterClearPINCodeCommand(buffer->Start(), bufferSize, endPointId, mUserID);
     }
@@ -3856,7 +3856,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterClearRFIDCodeCommand(buffer->Start(), bufferSize, endPointId, mUserID);
     }
@@ -3892,7 +3892,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterClearWeekdayScheduleCommand(buffer->Start(), bufferSize, endPointId, mScheduleID, mUserID);
     }
@@ -3929,7 +3929,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterClearYearDayScheduleCommand(buffer->Start(), bufferSize, endPointId, mScheduleID, mUserID);
     }
@@ -3965,7 +3965,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterGetHolidayScheduleCommand(buffer->Start(), bufferSize, endPointId, mHolidayScheduleID);
     }
@@ -4000,7 +4000,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterGetPINCodeCommand(buffer->Start(), bufferSize, endPointId, mUserID);
     }
@@ -4035,7 +4035,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterGetRFIDCodeCommand(buffer->Start(), bufferSize, endPointId, mUserID);
     }
@@ -4070,7 +4070,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterGetUserTypeCommand(buffer->Start(), bufferSize, endPointId, mUserID);
     }
@@ -4106,7 +4106,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterGetWeekdayScheduleCommand(buffer->Start(), bufferSize, endPointId, mScheduleID, mUserID);
     }
@@ -4143,7 +4143,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterGetYearDayScheduleCommand(buffer->Start(), bufferSize, endPointId, mScheduleID, mUserID);
     }
@@ -4179,7 +4179,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterLockDoorCommand(buffer->Start(), bufferSize, endPointId, mPINOrRFIDCode);
     }
@@ -4217,7 +4217,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterSetHolidayScheduleCommand(buffer->Start(), bufferSize, endPointId, mHolidayScheduleID,
                                                               mLocalStartTime, mLocalEndTime, mOperatingModeDuringHoliday);
@@ -4259,7 +4259,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterSetPINCodeCommand(buffer->Start(), bufferSize, endPointId, mUserID, mUserStatus, mUserType,
                                                       mPIN);
@@ -4301,7 +4301,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterSetRFIDCodeCommand(buffer->Start(), bufferSize, endPointId, mUserID, mUserStatus, mUserType,
                                                        mRFIDCode);
@@ -4341,7 +4341,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterSetUserTypeCommand(buffer->Start(), bufferSize, endPointId, mUserID, mUserType);
     }
@@ -4383,7 +4383,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterSetWeekdayScheduleCommand(buffer->Start(), bufferSize, endPointId, mScheduleID, mUserID,
                                                               mDaysMask, mStartHour, mStartMinute, mEndHour, mEndMinute);
@@ -4428,7 +4428,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterSetYearDayScheduleCommand(buffer->Start(), bufferSize, endPointId, mScheduleID, mUserID,
                                                               mLocalStartTime, mLocalEndTime);
@@ -4467,7 +4467,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterUnlockDoorCommand(buffer->Start(), bufferSize, endPointId, mPINOrRFIDCode);
     }
@@ -4503,7 +4503,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterUnlockWithTimeoutCommand(buffer->Start(), bufferSize, endPointId, mTimeoutInSeconds,
                                                              mPINOrRFIDCode);
@@ -4536,7 +4536,7 @@ class DiscoverDoorLockAttributes : public ModelCommand
 public:
     DiscoverDoorLockAttributes() : ModelCommand("discover", kDoorLockClusterId, 0x0c) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -4561,7 +4561,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterReadLockStateAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -4585,7 +4585,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterReportLockStateAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval, mMaxInterval);
     }
@@ -4614,7 +4614,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterReadLockTypeAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -4639,7 +4639,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeDoorLockClusterReadActuatorEnabledAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -4806,7 +4806,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeGroupsClusterAddGroupCommand(buffer->Start(), bufferSize, endPointId, mGroupId, mGroupName);
     }
@@ -4843,7 +4843,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeGroupsClusterAddGroupIfIdentifyingCommand(buffer->Start(), bufferSize, endPointId, mGroupId, mGroupName);
     }
@@ -4875,7 +4875,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeGroupsClusterGetGroupMembershipCommand(buffer->Start(), bufferSize, endPointId, mGroupCount, mGroupList);
     }
@@ -4907,7 +4907,7 @@ class GroupsRemoveAllGroups : public ModelCommand
 public:
     GroupsRemoveAllGroups() : ModelCommand("remove-all-groups", kGroupsClusterId, 0x04) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeGroupsClusterRemoveAllGroupsCommand(buffer->Start(), bufferSize, endPointId);
     }
@@ -4932,7 +4932,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeGroupsClusterRemoveGroupCommand(buffer->Start(), bufferSize, endPointId, mGroupId);
     }
@@ -4967,7 +4967,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeGroupsClusterViewGroupCommand(buffer->Start(), bufferSize, endPointId, mGroupId);
     }
@@ -4998,7 +4998,7 @@ class DiscoverGroupsAttributes : public ModelCommand
 public:
     DiscoverGroupsAttributes() : ModelCommand("discover", kGroupsClusterId, 0x0c) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeGroupsClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -5023,7 +5023,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeGroupsClusterReadNameSupportAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -5060,7 +5060,7 @@ class DiscoverIASZoneAttributes : public ModelCommand
 public:
     DiscoverIASZoneAttributes() : ModelCommand("discover", kIASZoneClusterId, 0x0c) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIASZoneClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -5085,7 +5085,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIASZoneClusterReadZoneStateAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -5110,7 +5110,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIASZoneClusterReadZoneTypeAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -5135,7 +5135,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIASZoneClusterReadZoneStatusAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -5160,7 +5160,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIASZoneClusterReadIASCIEAddressAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -5183,7 +5183,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIASZoneClusterWriteIASCIEAddressAttribute(buffer->Start(), bufferSize, endPointId, mIASCIEAddress);
     }
@@ -5211,7 +5211,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIASZoneClusterReadZoneIDAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -5272,7 +5272,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIdentifyClusterIdentifyCommand(buffer->Start(), bufferSize, endPointId, mIdentifyTime);
     }
@@ -5296,7 +5296,7 @@ class IdentifyIdentifyQuery : public ModelCommand
 public:
     IdentifyIdentifyQuery() : ModelCommand("identify-query", kIdentifyClusterId, 0x01) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIdentifyClusterIdentifyQueryCommand(buffer->Start(), bufferSize, endPointId);
     }
@@ -5324,7 +5324,7 @@ class DiscoverIdentifyAttributes : public ModelCommand
 public:
     DiscoverIdentifyAttributes() : ModelCommand("discover", kIdentifyClusterId, 0x0c) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIdentifyClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -5349,7 +5349,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIdentifyClusterReadIdentifyTimeAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -5372,7 +5372,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeIdentifyClusterWriteIdentifyTimeAttribute(buffer->Start(), bufferSize, endPointId, mIdentifyTime);
     }
@@ -5423,7 +5423,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterMoveCommand(buffer->Start(), bufferSize, endPointId, mMoveMode, mRate, mOptionsMask,
                                              mOptionsOverride);
@@ -5458,7 +5458,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterMoveToLevelCommand(buffer->Start(), bufferSize, endPointId, mLevel, mTransitionTime, mOptionsMask,
                                                     mOptionsOverride);
@@ -5493,7 +5493,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterMoveToLevelWithOnOffCommand(buffer->Start(), bufferSize, endPointId, mLevel, mTransitionTime,
                                                              mOptionsMask, mOptionsOverride);
@@ -5528,7 +5528,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterMoveWithOnOffCommand(buffer->Start(), bufferSize, endPointId, mMoveMode, mRate, mOptionsMask,
                                                       mOptionsOverride);
@@ -5564,7 +5564,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterStepCommand(buffer->Start(), bufferSize, endPointId, mStepMode, mStepSize, mTransitionTime,
                                              mOptionsMask, mOptionsOverride);
@@ -5601,7 +5601,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterStepWithOnOffCommand(buffer->Start(), bufferSize, endPointId, mStepMode, mStepSize,
                                                       mTransitionTime, mOptionsMask, mOptionsOverride);
@@ -5635,7 +5635,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterStopCommand(buffer->Start(), bufferSize, endPointId, mOptionsMask, mOptionsOverride);
     }
@@ -5665,7 +5665,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterStopWithOnOffCommand(buffer->Start(), bufferSize, endPointId, mOptionsMask, mOptionsOverride);
     }
@@ -5690,7 +5690,7 @@ class DiscoverLevelAttributes : public ModelCommand
 public:
     DiscoverLevelAttributes() : ModelCommand("discover", kLevelClusterId, 0x0c) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -5715,7 +5715,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterReadCurrentLevelAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -5740,7 +5740,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeLevelClusterReportCurrentLevelAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval, mMaxInterval,
                                                              mChange);
@@ -5782,7 +5782,7 @@ class OnOffOff : public ModelCommand
 public:
     OnOffOff() : ModelCommand("off", kOnOffClusterId, 0x00) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeOnOffClusterOffCommand(buffer->Start(), bufferSize, endPointId);
     }
@@ -5803,7 +5803,7 @@ class OnOffOn : public ModelCommand
 public:
     OnOffOn() : ModelCommand("on", kOnOffClusterId, 0x01) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeOnOffClusterOnCommand(buffer->Start(), bufferSize, endPointId);
     }
@@ -5824,7 +5824,7 @@ class OnOffToggle : public ModelCommand
 public:
     OnOffToggle() : ModelCommand("toggle", kOnOffClusterId, 0x02) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, endPointId);
     }
@@ -5845,7 +5845,7 @@ class DiscoverOnOffAttributes : public ModelCommand
 public:
     DiscoverOnOffAttributes() : ModelCommand("discover", kOnOffClusterId, 0x0c) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeOnOffClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -5870,7 +5870,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeOnOffClusterReadOnOffAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -5894,7 +5894,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeOnOffClusterReportOnOffAttribute(buffer->Start(), bufferSize, endPointId, mMinInterval, mMaxInterval);
     }
@@ -6171,7 +6171,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterAddSceneCommand(buffer->Start(), bufferSize, endPointId, mGroupID, mSceneID, mTransitionTime,
                                                   mSceneName, mClusterId, mExtensionFieldSet);
@@ -6212,7 +6212,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterGetSceneMembershipCommand(buffer->Start(), bufferSize, endPointId, mGroupID);
     }
@@ -6249,7 +6249,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterRecallSceneCommand(buffer->Start(), bufferSize, endPointId, mGroupID, mSceneID, mTransitionTime);
     }
@@ -6279,7 +6279,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterRemoveAllScenesCommand(buffer->Start(), bufferSize, endPointId, mGroupID);
     }
@@ -6315,7 +6315,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterRemoveSceneCommand(buffer->Start(), bufferSize, endPointId, mGroupID, mSceneID);
     }
@@ -6352,7 +6352,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterStoreSceneCommand(buffer->Start(), bufferSize, endPointId, mGroupID, mSceneID);
     }
@@ -6389,7 +6389,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterViewSceneCommand(buffer->Start(), bufferSize, endPointId, mGroupID, mSceneID);
     }
@@ -6421,7 +6421,7 @@ class DiscoverScenesAttributes : public ModelCommand
 public:
     DiscoverScenesAttributes() : ModelCommand("discover", kScenesClusterId, 0x0c) { ModelCommand::AddArguments(); }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -6446,7 +6446,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterReadSceneCountAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -6471,7 +6471,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterReadCurrentSceneAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -6496,7 +6496,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterReadCurrentGroupAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -6521,7 +6521,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterReadSceneValidAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -6546,7 +6546,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeScenesClusterReadNameSupportAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -6584,7 +6584,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeTemperatureMeasurementClusterDiscoverAttributes(buffer->Start(), bufferSize, endPointId);
     }
@@ -6609,7 +6609,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeTemperatureMeasurementClusterReadMeasuredValueAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -6634,7 +6634,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeTemperatureMeasurementClusterReportMeasuredValueAttribute(buffer->Start(), bufferSize, endPointId,
                                                                                mMinInterval, mMaxInterval, mChange);
@@ -6665,7 +6665,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeTemperatureMeasurementClusterReadMinMeasuredValueAttribute(buffer->Start(), bufferSize, endPointId);
     }
@@ -6690,7 +6690,7 @@ public:
         ModelCommand::AddArguments();
     }
 
-    uint16_t EncodeCommand(PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) override
+    uint16_t EncodeCommand(PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) override
     {
         return encodeTemperatureMeasurementClusterReadMaxMeasuredValueAttribute(buffer->Start(), bufferSize, endPointId);
     }

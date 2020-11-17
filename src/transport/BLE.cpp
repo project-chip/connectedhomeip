@@ -187,13 +187,13 @@ void BLE::OnBleConnectionError(void * appState, BLE_ERROR err)
     }
 }
 
-void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBuffer * buffer)
+void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBufferHandle buffer)
 {
     BLE * ble = reinterpret_cast<BLE *>(endPoint->mAppState);
 
     if (ble->mDelegate)
     {
-        ble->mDelegate->OnRendezvousMessageReceived(buffer);
+        ble->mDelegate->OnRendezvousMessageReceived(std::move(buffer));
     }
 }
 

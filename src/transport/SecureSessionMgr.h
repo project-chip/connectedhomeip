@@ -65,7 +65,7 @@ public:
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                   Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
                                    SecureSessionMgrBase * mgr)
     {}
 
@@ -179,7 +179,7 @@ private:
     void CancelExpiryTimer();
 
     static void HandleDataReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgrBase * transport);
+                                   System::PacketBufferHandle msgBuf, SecureSessionMgrBase * transport);
 
     /**
      * Called when a specific connection expires.

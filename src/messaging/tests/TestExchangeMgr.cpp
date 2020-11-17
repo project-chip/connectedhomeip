@@ -58,7 +58,9 @@ public:
     CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
                            System::PacketBuffer * msgBuf) override
     {
-        HandleMessageReceived(header, address, msgBuf);
+        System::PacketBufferHandle msg_ForNow;
+        msg_ForNow.Adopt(msgBuf);
+        HandleMessageReceived(header, address, std::move(msg_ForNow));
         return CHIP_NO_ERROR;
     }
 
@@ -69,7 +71,7 @@ class MockAppDelegate : public ExchangeDelegate
 {
 public:
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                           System::PacketBuffer * buffer) override
+                           System::PacketBufferHandle buffer) override
     {
         IsOnMessageReceivedCalled = true;
     }

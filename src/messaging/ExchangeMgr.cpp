@@ -162,7 +162,8 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t Pe
     return nullptr;
 }
 
-void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, PacketBuffer * msgBuf)
+void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                                      System::PacketBufferHandle msgBuf)
 {
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
@@ -176,9 +177,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
         if (ec->GetReferenceCount() > 0 && ec->MatchExchange(packetHeader, payloadHeader))
         {
             // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader, payloadHeader, msgBuf);
-
-            msgBuf = nullptr;
+            ec->HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
 
             ExitNow(err = CHIP_NO_ERROR);
         }
@@ -224,19 +223,13 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
 
         ChipLogProgress(ExchangeManager, "ec id: %d, Delegate: 0x%x", (ec - ContextPool + 1), ec->GetDelegate());
 
-        ec->HandleMessage(packetHeader, payloadHeader, msgBuf);
-        msgBuf = nullptr;
+        ec->HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ExchangeManager, "DispatchMessage failed, err = %d", err);
-    }
-
-    if (msgBuf != nullptr)
-    {
-        PacketBuffer::Free(msgBuf);
     }
 }
 
@@ -289,10 +282,10 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                        Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
                                         SecureSessionMgrBase * msgLayer)
 {
-    DispatchMessage(packetHeader, payloadHeader, msgBuf);
+    DispatchMessage(packetHeader, payloadHeader, std::move(msgBuf));
 }
 
 void ExchangeManager::IncrementContextsInUse()

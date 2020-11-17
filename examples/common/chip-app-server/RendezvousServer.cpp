@@ -56,10 +56,7 @@ void RendezvousServer::OnRendezvousConnectionClosed()
     ChipLogProgress(AppServer, "OnRendezvousConnectionClosed");
 }
 
-void RendezvousServer::OnRendezvousMessageReceived(PacketBuffer * buffer)
-{
-    chip::System::PacketBuffer::Free(buffer);
-}
+void RendezvousServer::OnRendezvousMessageReceived(System::PacketBufferHandle buffer) {}
 
 void RendezvousServer::OnRendezvousComplete()
 {

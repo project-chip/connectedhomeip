@@ -56,7 +56,9 @@ public:
     CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
                            System::PacketBuffer * msgBuf) override
     {
-        HandleMessageReceived(header, address, msgBuf);
+        System::PacketBufferHandle msg_ForNow;
+        msg_ForNow.Adopt(msgBuf);
+        HandleMessageReceived(header, address, std::move(msg_ForNow));
         return CHIP_NO_ERROR;
     }
 
@@ -67,7 +69,7 @@ class TestSessMgrCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, PeerConnectionState * state,
-                           System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override
+                           System::PacketBufferHandle msgBuf, SecureSessionMgrBase * mgr) override
     {
         NL_TEST_ASSERT(mSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
         NL_TEST_ASSERT(mSuite, header.GetDestinationNodeId() == Optional<NodeId>::Value(kDestinationNodeId));

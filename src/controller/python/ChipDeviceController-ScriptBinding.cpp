@@ -64,7 +64,7 @@ typedef void (*OnConnectFunct)(chip::DeviceController::ChipDeviceController * dc
 typedef void (*OnErrorFunct)(chip::DeviceController::ChipDeviceController * dc, void * appReqState, CHIP_ERROR err,
                              const chip::Inet::IPPacketInfo * pi);
 typedef void (*OnMessageFunct)(chip::DeviceController::ChipDeviceController * dc, void * appReqState,
-                               chip::System::PacketBuffer * buffer);
+                               chip::System::PacketBufferHandle buffer);
 }
 
 enum BleEventType
@@ -240,8 +240,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
     int maxFDs = 0;
 #if CONFIG_NETWORK_LAYER_BLE
     uint8_t bleWakeByte;
-    bool result = false;
-    chip::System::PacketBuffer * msgBuf;
+    chip::System::PacketBufferHandle msgBuf;
     ChipBleUUID svcId, charId;
     union
     {
@@ -305,8 +304,8 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                     {
                     case kBleEventType_Rx:
                         // build a packet buffer from the rxEv and send to blelayer.
-                        msgBuf = chip::System::PacketBuffer::New().Release_ForNow();
-                        VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+                        msgBuf = chip::System::PacketBuffer::New();
+                        VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
                         memcpy(msgBuf->Start(), evu.rxEv->buffer, evu.rxEv->length);
                         msgBuf->SetDataLength(evu.rxEv->length);
@@ -315,14 +314,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         memcpy(svcId.bytes, evu.rxEv->svcId, sizeof(svcId.bytes));
                         memcpy(charId.bytes, evu.rxEv->charId, sizeof(charId.bytes));
 
-                        result = sBle.HandleIndicationReceived(evu.txEv->connObj, &svcId, &charId, msgBuf);
-
-                        if (!result)
-                        {
-                            chip::System::PacketBuffer::Free(msgBuf);
-                        }
-
-                        msgBuf = NULL;
+                        sBle.HandleIndicationReceived(evu.txEv->connObj, &svcId, &charId, std::move(msgBuf));
                         break;
 
                     case kBleEventType_Tx:
@@ -330,7 +322,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         memcpy(svcId.bytes, evu.txEv->svcId, sizeof(svcId.bytes));
                         memcpy(charId.bytes, evu.txEv->charId, sizeof(charId.bytes));
 
-                        result = sBle.HandleWriteConfirmation(evu.txEv->connObj, &svcId, &charId);
+                        sBle.HandleWriteConfirmation(evu.txEv->connObj, &svcId, &charId);
                         break;
 
                     case kBleEventType_Subscribe:
@@ -342,7 +334,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         case kBleSubOp_Subscribe:
                             if (evu.subscribeEv->status)
                             {
-                                result = sBle.HandleSubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
+                                sBle.HandleSubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
                             }
                             else
                             {
@@ -353,7 +345,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         case kBleSubOp_Unsubscribe:
                             if (evu.subscribeEv->status)
                             {
-                                result = sBle.HandleUnsubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
+                                sBle.HandleUnsubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
                             }
                             else
                             {

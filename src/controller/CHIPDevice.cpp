@@ -165,11 +165,12 @@ exit:
 }
 
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                               Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr)
+                               Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
+                               SecureSessionMgrBase * mgr)
 {
     if (mState == ConnectionState::SecureConnected && mStatusDelegate != nullptr)
     {
-        mStatusDelegate->OnMessage(msgBuf);
+        mStatusDelegate->OnMessage(std::move(msgBuf));
     }
 }
 

@@ -376,8 +376,12 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEWriteReceived: {
         ChipLogProgress(DeviceLayer, "_OnPlatformEvent kCHIPoBLEWriteReceived");
-        HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
-                            event->CHIPoBLEWriteReceived.Data);
+        {
+            System::PacketBufferHandle data_ForNow;
+            data_ForNow.Adopt(event->CHIPoBLEWriteReceived.Data);
+            HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
+                                std::move(data_ForNow));
+        }
     }
     break;
 

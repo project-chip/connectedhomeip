@@ -258,18 +258,18 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
     }
 }
 
-void RendezvousSession::OnRendezvousMessageReceived(PacketBuffer * msgBuf)
+void RendezvousSession::OnRendezvousMessageReceived(PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     switch (mCurrentState)
     {
     case State::kSecurePairing:
-        err = HandlePairingMessage(msgBuf);
+        err = HandlePairingMessage(std::move(msgBuf));
         break;
 
     case State::kNetworkProvisioning:
-        err = HandleSecureMessage(msgBuf);
+        err = HandleSecureMessage(std::move(msgBuf));
         break;
 
     default:
@@ -286,25 +286,26 @@ exit:
     }
 }
 
-CHIP_ERROR RendezvousSession::HandlePairingMessage(PacketBuffer * msgBuf)
+CHIP_ERROR RendezvousSession::HandlePairingMessage(PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketHeader packetHeader;
     uint16_t headerSize = 0;
+    System::PacketBufferHandle msg_ForNow;
 
     err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
     SuccessOrExit(err);
 
     msgBuf->ConsumeHead(headerSize);
 
-    err = mPairingSession.HandlePeerMessage(packetHeader, msgBuf);
+    err = mPairingSession.HandlePeerMessage(packetHeader, std::move(msgBuf));
     SuccessOrExit(err);
 
 exit:
     return err;
 }
 
-CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgIn)
+CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketHeader packetHeader;
@@ -318,10 +319,8 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgIn)
     uint16_t taglen      = 0;
     uint16_t payloadlen  = 0;
 
-    System::PacketBufferHandle msgBuf;
     System::PacketBufferHandle origMsg;
 
-    msgBuf.Adopt(msgIn);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);

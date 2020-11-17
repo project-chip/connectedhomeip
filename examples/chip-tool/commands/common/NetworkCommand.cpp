@@ -38,14 +38,12 @@ static void onError(ChipDeviceController * dc, void * appReqState, CHIP_ERROR er
     command->OnError(dc, err);
 }
 
-static void onMessage(ChipDeviceController * dc, void * appReqState, PacketBuffer * buffer)
+static void onMessage(ChipDeviceController * dc, void * appReqState, PacketBufferHandle buffer)
 {
     ChipLogDetail(chipTool, "OnMessage: Received %zu bytes", buffer->DataLength());
 
     NetworkCommand * command = reinterpret_cast<NetworkCommand *>(dc->AppState);
-    command->OnMessage(dc, buffer);
-
-    PacketBuffer::Free(buffer);
+    command->OnMessage(dc, std::move(buffer));
 }
 
 CHIP_ERROR NetworkCommand::Run(ChipDeviceController * dc, NodeId remoteId)

@@ -272,16 +272,14 @@ void SecureSessionMgrBase::CancelExpiryTimer()
 }
 
 void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                              System::PacketBuffer * msgIn, SecureSessionMgrBase * connection)
+                                              System::PacketBufferHandle msg, SecureSessionMgrBase * connection)
 
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = connection->mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(),
                                                                                        packetHeader.GetEncryptionKeyID(), nullptr);
-    PacketBufferHandle msg;
     PacketBufferHandle origMsg;
 
-    msg.Adopt(msgIn);
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
     if (state == nullptr)
@@ -345,7 +343,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 
         if (connection->mCB != nullptr)
         {
-            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg.Release_ForNow(), connection);
+            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, state, std::move(msg), connection);
         }
     }
 

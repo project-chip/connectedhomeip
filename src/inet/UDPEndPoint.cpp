@@ -64,6 +64,7 @@
 #include "arpa-inet-compatibility.h"
 
 #include <string.h>
+#include <utility>
 
 // SOCK_CLOEXEC not defined on all platforms, e.g. iOS/macOS:
 #ifdef SOCK_CLOEXEC
@@ -778,9 +779,9 @@ uint16_t UDPEndPoint::GetBoundPort()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-void UDPEndPoint::HandleDataReceived(PacketBuffer * msg)
+void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle msg)
 {
-    IPEndPointBasis::HandleDataReceived(msg);
+    IPEndPointBasis::HandleDataReceived(std::move(msg));
 }
 
 INET_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
@@ -874,7 +875,9 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
     chip::System::Layer & lSystemLayer = ep->SystemLayer();
     IPPacketInfo * pktInfo             = NULL;
 
-    pktInfo = GetPacketInfo(buf);
+    System::PacketBufferHandle buf_ForNow;
+    buf_ForNow.Adopt(buf);
+    pktInfo = GetPacketInfo(buf_ForNow.Retain());
     if (pktInfo != NULL)
     {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5

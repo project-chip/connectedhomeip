@@ -39,7 +39,7 @@ public:
     virtual void OnRendezvousConnectionClosed() {}
     virtual void OnRendezvousError(CHIP_ERROR err) {}
     virtual void OnRendezvousComplete() {}
-    virtual void OnRendezvousMessageReceived(System::PacketBuffer * buffer){};
+    virtual void OnRendezvousMessageReceived(System::PacketBufferHandle buffer){};
 
     virtual void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) {}
 };

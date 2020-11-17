@@ -46,13 +46,13 @@ class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
-                           System::PacketBuffer * buffer, SecureSessionMgrBase * mgr) override
+                           System::PacketBufferHandle buffer, SecureSessionMgrBase * mgr) override
     {
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
 
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(buffer != NULL, ChipLogProgress(AppServer, "Received data but couldn't process it..."));
+        VerifyOrExit(!buffer.IsNull(), ChipLogProgress(AppServer, "Received data but couldn't process it..."));
         VerifyOrExit(header.GetSourceNodeId().HasValue(), ChipLogProgress(AppServer, "Unknown source for received message"));
 
         VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ChipLogProgress(AppServer, "Unknown source for received message"));
@@ -61,16 +61,9 @@ public:
 
         ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 
-        HandleDataModelMessage(header, buffer, mgr);
-        buffer = NULL;
+        HandleDataModelMessage(header, std::move(buffer), mgr);
 
-    exit:
-        // HandleDataModelMessage calls Free on the buffer without an AddRef, if HandleDataModelMessage was not called, free the
-        // buffer.
-        if (buffer != NULL)
-        {
-            System::PacketBuffer::Free(buffer);
-        }
+    exit:;
     }
 
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override

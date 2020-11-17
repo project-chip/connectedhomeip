@@ -312,7 +312,7 @@ exit:
 void DeviceController::OnNewConnection(Transport::PeerConnectionState * peerConnection, SecureSessionMgrBase * mgr) {}
 
 void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                                         Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                         Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
                                          SecureSessionMgrBase * mgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -326,7 +326,7 @@ void DeviceController::OnMessageReceived(const PacketHeader & header, const Payl
     index = FindDeviceIndex(peer);
     VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
-    mActiveDevices[index].OnMessageReceived(header, payloadHeader, state, msgBuf, mgr);
+    mActiveDevices[index].OnMessageReceived(header, payloadHeader, state, std::move(msgBuf), mgr);
 
 exit:
     if (err != CHIP_NO_ERROR)

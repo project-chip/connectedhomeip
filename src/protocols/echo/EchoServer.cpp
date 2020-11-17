@@ -53,14 +53,14 @@ void EchoServer::Shutdown()
 }
 
 void EchoServer::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                   System::PacketBuffer * payload)
+                                   System::PacketBufferHandle payload)
 {
     // NOTE: we already know this is an Echo Request message because we explicitly registered with the
     // Exchange Manager for unsolicited Echo Requests.
 
     // Call the registered OnEchoRequestReceived handler, if any.
     if (OnEchoRequestReceived != nullptr)
-        OnEchoRequestReceived(ec->GetPeerNodeId(), payload);
+        OnEchoRequestReceived(ec->GetPeerNodeId(), std::move(payload));
 
     // Since we are re-using the inbound EchoRequest buffer to send the EchoResponse, if necessary,
     // adjust the position of the payload within the buffer to ensure there is enough room for the
@@ -69,7 +69,7 @@ void EchoServer::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     payload->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 
     // Send an Echo Response back to the sender.
-    ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, payload);
+    ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, payload.Release_ForNow());
 
     // Discard the exchange context.
     ec->Close();

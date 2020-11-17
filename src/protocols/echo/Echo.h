@@ -42,7 +42,7 @@ enum
     kEchoMessageType_EchoResponse = 2
 };
 
-typedef void (*EchoFunct)(NodeId nodeId, System::PacketBuffer * payload);
+typedef void (*EchoFunct)(NodeId nodeId, System::PacketBufferHandle payload);
 
 class DLL_EXPORT EchoClient : public ExchangeDelegate
 {
@@ -87,16 +87,16 @@ public:
      *         Other CHIP_ERROR codes as returned by the lower layers.
      *
      */
-    CHIP_ERROR SendEchoRequest(NodeId nodeId, System::PacketBuffer * payload);
+    CHIP_ERROR SendEchoRequest(NodeId nodeId, System::PacketBufferHandle payload);
 
 private:
     ExchangeManager * mExchangeMgr   = nullptr;
     ExchangeContext * mExchangeCtx   = nullptr;
     EchoFunct OnEchoResponseReceived = nullptr;
 
-    CHIP_ERROR SendEchoRequest(System::PacketBuffer * payload);
+    CHIP_ERROR SendEchoRequest(System::PacketBufferHandle payload);
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                           System::PacketBuffer * payload) override;
+                           System::PacketBufferHandle payload) override;
     void OnResponseTimeout(ExchangeContext * ec) override;
 };
 
@@ -138,7 +138,7 @@ private:
     EchoFunct OnEchoRequestReceived = nullptr;
 
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                           System::PacketBuffer * payload) override;
+                           System::PacketBufferHandle payload) override;
     void OnResponseTimeout(ExchangeContext * ec) override;
 };
 

@@ -50,19 +50,19 @@ public:
     /////////// IPCommand Interface /////////
     void OnConnect(ChipDeviceController * dc) override;
     void OnError(ChipDeviceController * dc, CHIP_ERROR err) override;
-    void OnMessage(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) override;
+    void OnMessage(ChipDeviceController * dc, chip::System::PacketBufferHandle buffer) override;
 
-    virtual uint16_t EncodeCommand(chip::System::PacketBuffer * buffer, uint16_t bufferSize, uint8_t endPointId) = 0;
+    virtual uint16_t EncodeCommand(chip::System::PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) = 0;
     virtual bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
     virtual bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
 
 private:
     bool SendCommand(ChipDeviceController * dc);
-    bool ReceiveCommandResponse(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) const;
+    bool ReceiveCommandResponse(ChipDeviceController * dc, chip::System::PacketBufferHandle buffer) const;
 
     void UpdateWaitForResponse(bool value);
     void WaitForResponse(void);
-    void PrintBuffer(chip::System::PacketBuffer * buffer) const;
+    void PrintBuffer(const chip::System::PacketBufferHandle & buffer) const;
 
     std::condition_variable cvWaitingForResponse;
     std::mutex cvWaitingForResponseMutex;

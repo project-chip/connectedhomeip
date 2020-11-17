@@ -151,7 +151,7 @@ public:
      * @param msg         Message sent by the peer
      * @return CHIP_ERROR The result of message processing
      */
-    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg);
+    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBufferHandle msg);
 
     /**
      * @brief
@@ -300,7 +300,10 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBufferHandle msg) override
+    {
+        return CHIP_NO_ERROR;
+    }
 };
 
 typedef struct SecurePairingSessionSerialized

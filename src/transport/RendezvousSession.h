@@ -103,7 +103,7 @@ public:
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(System::/*  */ PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(System::PacketBufferHandle buffer) override;
 
     //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
     void SendNetworkCredentials(const char * ssid, const char * passwd) override;
@@ -125,11 +125,11 @@ public:
     const Inet::IPAddress & GetIPAddress() const { return mNetworkProvision.GetIPAddress(); }
 
 private:
-    CHIP_ERROR HandlePairingMessage(System::PacketBuffer * msgBug);
+    CHIP_ERROR HandlePairingMessage(System::PacketBufferHandle msgBug);
     CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
 
-    CHIP_ERROR HandleSecureMessage(System::PacketBuffer * msgBuf);
+    CHIP_ERROR HandleSecureMessage(System::PacketBufferHandle msgBuf);
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration

@@ -194,7 +194,7 @@ protected:
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
-                           System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override;
+                           System::PacketBufferHandle msgBuf, SecureSessionMgrBase * mgr) override;
 
     void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 

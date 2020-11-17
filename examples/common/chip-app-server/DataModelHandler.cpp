@@ -40,7 +40,7 @@ using namespace ::chip;
  * @param [in] buffer The buffer holding the message.  This function guarantees
  *                    that it will free the buffer before returning.
  */
-void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
+void HandleDataModelMessage(const PacketHeader & header, System::PacketBufferHandle buffer, SecureSessionMgrBase * mgr)
 {
     EmberApsFrame frame;
     bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
@@ -51,7 +51,6 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * 
     else
     {
         ChipLogProgress(Zcl, "APS frame processing failure!");
-        System::PacketBuffer::Free(buffer);
         return;
     }
 
@@ -62,8 +61,6 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * 
                                message, messageLen,
                                header.GetSourceNodeId().Value(), // source identifier
                                NULL);
-
-    System::PacketBuffer::Free(buffer);
 
     if (ok)
     {

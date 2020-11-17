@@ -30,6 +30,7 @@
 #include "IPEndPointBasis.h"
 
 #include <string.h>
+#include <utility>
 
 #include <inet/EndPointBasis.h>
 #include <inet/InetInterface.h>
@@ -608,28 +609,23 @@ void IPEndPointBasis::Init(InetLayer * aInetLayer)
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-void IPEndPointBasis::HandleDataReceived(PacketBuffer * aBuffer)
+void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle aBuffer)
 {
     if ((mState == kState_Listening) && (OnMessageReceived != NULL))
     {
-        const IPPacketInfo * pktInfo = GetPacketInfo(aBuffer);
+        const IPPacketInfo * pktInfo = GetPacketInfo(aBuffer.Retain());
 
         if (pktInfo != NULL)
         {
             const IPPacketInfo pktInfoCopy = *pktInfo; // copy the address info so that the app can free the
                                                        // PacketBuffer without affecting access to address info.
-            OnMessageReceived(this, aBuffer, &pktInfoCopy);
+            OnMessageReceived(this, std::move(aBuffer), &pktInfoCopy);
         }
         else
         {
             if (OnReceiveError != NULL)
                 OnReceiveError(this, INET_ERROR_INBOUND_MESSAGE_TOO_BIG, NULL);
-            PacketBuffer::Free(aBuffer);
         }
-    }
-    else
-    {
-        PacketBuffer::Free(aBuffer);
     }
 }
 
@@ -659,7 +655,7 @@ void IPEndPointBasis::HandleDataReceived(PacketBuffer * aBuffer)
  *     packets that arrive without an Ethernet header.
  *
  */
-IPPacketInfo * IPEndPointBasis::GetPacketInfo(PacketBuffer * aBuffer)
+IPPacketInfo * IPEndPointBasis::GetPacketInfo(System::PacketBufferHandle aBuffer)
 {
     uintptr_t lStart;
     uintptr_t lPacketInfoStart;
@@ -1161,7 +1157,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
     if (lStatus == INET_NO_ERROR)
     {
-        OnMessageReceived(this, lBuffer.Release_ForNow(), &lPacketInfo);
+        OnMessageReceived(this, std::move(lBuffer), &lPacketInfo);
     }
     else
     {
