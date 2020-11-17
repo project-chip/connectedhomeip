@@ -34,7 +34,8 @@
 
 namespace chip {
 
-template <class T, size_t N> template <typename F>
+template <class T, size_t N>
+template <typename F>
 void BitMapObjectPool<T, N>::ForEachActiveObject(F f)
 {
     for (size_t word = 0; word * kAtomicSize < N; ++word)
@@ -59,7 +60,7 @@ size_t GetNumObjectsInUse(BitMapObjectPool<T, N> & pool)
     return count;
 }
 
-}
+} // namespace chip
 
 namespace {
 

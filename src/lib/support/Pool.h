@@ -99,7 +99,8 @@ public:
     }
 
     // Test-only function declaration
-    template <typename F> void ForEachActiveObject(F f);
+    template <typename F>
+    void ForEachActiveObject(F f);
 
 private:
     T * GetPoolHead() { return reinterpret_cast<T *>(mMemory); }
