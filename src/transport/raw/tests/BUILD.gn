@@ -35,11 +35,21 @@ chip_test_suite("tests") {
   output_name = "libRawTransportTests"
 
   sources = [
-    "TestMessageHeader.cpp",
-    "TestRawTransportLayer.h",
-    "TestTCP.cpp",
-    "TestUDP.cpp",
+    "NetworkTestHelpers.cpp",
+    "NetworkTestHelpers.h",
   ]
+
+
+  test_sources = [
+    "TestMessageHeader.cpp",
+    "TestTCP.cpp",
+  ]
+
+  if (current_os != "mac") {
+    test_sources += [
+      "TestUDP.cpp",
+    ]
+  }
 
   public_deps = [
     ":helpers",
@@ -52,13 +62,4 @@ chip_test_suite("tests") {
   ]
 
   cflags = [ "-Wconversion" ]
-
-  tests = [
-    "TestMessageHeader",
-    "TestUDP",
-  ]
-
-  if (current_os != "mac") {
-    tests += [ "TestTCP" ]
-  }
 }

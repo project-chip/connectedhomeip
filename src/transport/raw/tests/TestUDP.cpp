@@ -21,8 +21,6 @@
  *      This file implements unit tests for the UdpTransport implementation.
  */
 
-#include "TestRawTransportLayer.h"
-
 #include "NetworkTestHelpers.h"
 
 #include <core/CHIPCore.h>
