@@ -128,6 +128,7 @@ public:
     CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
+    void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
@@ -144,7 +145,7 @@ public:
     void Abort();
 
     ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                            ExchangeAcceptor * acceptor);
+                            ExchangeDelegate * delegate);
     void Free();
     void Reset();
 
@@ -177,11 +178,6 @@ private:
      *  @retval  false                                      If a match is not found.
      */
     bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
-
-    void SetInitiator(bool inInitiator);
-    void SetPeerNodeId(NodeId nodeId) { mPeerNodeId = nodeId; }
-    void SetExchangeId(uint16_t exId) { mExchangeId = exId; }
-    void SetExchangeMgr(ExchangeManager * exMgr) { mExchangeMgr = exMgr; }
 
     CHIP_ERROR StartResponseTimer();
     void CancelResponseTimer();

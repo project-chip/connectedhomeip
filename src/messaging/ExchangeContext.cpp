@@ -65,11 +65,6 @@ bool ExchangeContext::IsResponseExpected() const
     return mFlags.Has(ExFlagValues::kFlagResponseExpected);
 }
 
-void ExchangeContext::SetInitiator(bool inInitiator)
-{
-    mFlags.Set(ExFlagValues::kFlagInitiator, inInitiator);
-}
-
 void ExchangeContext::SetResponseExpected(bool inResponseExpected)
 {
     mFlags.Set(ExFlagValues::kFlagResponseExpected, inResponseExpected);
@@ -196,8 +191,9 @@ void ExchangeContext::Reset()
 }
 
 ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
-                                         ExchangeAcceptor * acceptor)
+                                         ExchangeDelegate * delegate)
 {
+    VerifyOrDie(delegate != nullptr);
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
     Reset();
@@ -207,20 +203,13 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     mExchangeId = ExchangeId;
     mPeerNodeId = PeerNodeId;
     mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
+    mDelegate = delegate;
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), em->GetContextsInUse(),
                     this);
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
-
-    mDelegate = acceptor->CreateDelegate(this);
-    if (mDelegate == nullptr)
-    {
-        Release();
-        ChipLogError(ExchangeManager, "CreateDelegate failed.");
-        return nullptr;
-    }
 
     return this;
 }

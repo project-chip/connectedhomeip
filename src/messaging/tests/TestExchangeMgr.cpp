@@ -172,12 +172,11 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MockAppDelegate mockAppDelegate;
-    SimpleExchangeAcceptor mockAppAcceptor(&mockAppDelegate);
 
-    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, &mockAppAcceptor);
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0002, 0x0001, &mockAppAcceptor);
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0002, 0x0001, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     err = exchangeMgr.UnregisterUnsolicitedMessageHandler(0x0001);
@@ -225,8 +224,7 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
 
     // create unsolicited exchange
     MockAppDelegate mockUnsolicitedAppDelegate;
-    SimpleExchangeAcceptor mockUnsolicitedAppAcceptor(&mockUnsolicitedAppDelegate);
-    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppAcceptor);
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
 
     // send a malicious packet
     ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New());
