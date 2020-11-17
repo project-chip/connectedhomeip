@@ -16,23 +16,23 @@ void TestTransferInitMessage(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     TransferInit testMsg;
 
-    testMsg.mTransferCtlFlags.SetRaw(0);
-    testMsg.mTransferCtlFlags.Set(kReceiverDrive, true);
-    testMsg.mSupportedVersions = 1;
+    testMsg.TransferCtlOptions.SetRaw(0);
+    testMsg.TransferCtlOptions.Set(kReceiverDrive, true);
+    testMsg.Version = 1;
 
-    // Make sure mMaxLength is greater than UINT32_MAX to test widerange being set
-    testMsg.mMaxLength = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
+    // Make sure MaxLength is greater than UINT32_MAX to test widerange being set
+    testMsg.MaxLength = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
 
-    testMsg.mStartOffset  = 42;
-    testMsg.mMaxBlockSize = 256;
+    testMsg.StartOffset  = 42;
+    testMsg.MaxBlockSize = 256;
 
-    char testFileDes[9]     = { "test.txt" };
-    testMsg.mFileDesLength  = 9;
-    testMsg.mFileDesignator = reinterpret_cast<uint8_t *>(testFileDes);
+    char testFileDes[9]    = { "test.txt" };
+    testMsg.FileDesLength  = 9;
+    testMsg.FileDesignator = reinterpret_cast<uint8_t *>(testFileDes);
 
-    uint8_t fakeData[5]     = { 7, 6, 5, 4, 3 };
-    testMsg.mMetadataLength = 5;
-    testMsg.mMetadata       = reinterpret_cast<uint8_t *>(fakeData);
+    uint8_t fakeData[5]    = { 7, 6, 5, 4, 3 };
+    testMsg.MetadataLength = 5;
+    testMsg.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
 
     size_t msgSize = testMsg.PackedSize();
 
@@ -58,14 +58,14 @@ void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     SendAccept testMsg;
 
-    testMsg.mVersion = 1;
-    testMsg.mTransferCtlFlags.SetRaw(0);
-    testMsg.mTransferCtlFlags.Set(kReceiverDrive, true);
-    testMsg.mMaxBlockSize = 256;
+    testMsg.Version = 1;
+    testMsg.TransferCtlFlags.SetRaw(0);
+    testMsg.TransferCtlFlags.Set(kReceiverDrive, true);
+    testMsg.MaxBlockSize = 256;
 
-    uint8_t fakeData[5]     = { 7, 6, 5, 4, 3 };
-    testMsg.mMetadataLength = 5;
-    testMsg.mMetadata       = reinterpret_cast<uint8_t *>(fakeData);
+    uint8_t fakeData[5]    = { 7, 6, 5, 4, 3 };
+    testMsg.MetadataLength = 5;
+    testMsg.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
 
     size_t msgSize = testMsg.PackedSize();
 
@@ -91,19 +91,19 @@ void TestReceiveAcceptMessage(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReceiveAccept testMsg;
 
-    testMsg.mVersion = 1;
-    testMsg.mTransferCtlFlags.SetRaw(0);
-    testMsg.mTransferCtlFlags.Set(kReceiverDrive, true);
+    testMsg.Version = 1;
+    testMsg.TransferCtlFlags.SetRaw(0);
+    testMsg.TransferCtlFlags.Set(kReceiverDrive, true);
 
-    // Make sure mLength is greater than UINT32_MAX to test widerange being set
-    testMsg.mLength = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
+    // Make sure Length is greater than UINT32_MAX to test widerange being set
+    testMsg.Length = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) + 1;
 
-    testMsg.mStartOffset  = 42;
-    testMsg.mMaxBlockSize = 256;
+    testMsg.StartOffset  = 42;
+    testMsg.MaxBlockSize = 256;
 
-    uint8_t fakeData[5]     = { 7, 6, 5, 4, 3 };
-    testMsg.mMetadataLength = 5;
-    testMsg.mMetadata       = reinterpret_cast<uint8_t *>(fakeData);
+    uint8_t fakeData[5]    = { 7, 6, 5, 4, 3 };
+    testMsg.MetadataLength = 5;
+    testMsg.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
 
     size_t msgSize = testMsg.PackedSize();
 

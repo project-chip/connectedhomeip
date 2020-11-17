@@ -19,7 +19,7 @@
 /**
  *    @file
  *      This file defines structures and utility methods for working with BDX
- *      messages.
+ *      messages, mainly for writing to and reading from PacketBuffers.
  */
 
 #pragma once
@@ -34,16 +34,16 @@ namespace BDX {
 enum TransferControlFlags : uint8_t
 {
     // first 4 bits reserved for version
-    kSenderDrive   = 0x10,
-    kReceiverDrive = 0x20,
-    kAsync         = 0x40,
+    kSenderDrive   = (1U << 4),
+    kReceiverDrive = (1U << 5),
+    kAsync         = (1U << 6),
 };
 
 enum RangeControlFlags : uint8_t
 {
-    kDefLen      = 0x01,
-    kStartOffset = 0x02,
-    kWiderange   = 0x10,
+    kDefLen      = (1U),
+    kStartOffset = (1U << 1),
+    kWiderange   = (1U << 4),
 };
 
 struct TransferInit;
@@ -96,25 +96,25 @@ struct TransferInit
     bool operator==(const TransferInit &) const;
 
     // Proposed Transfer Control (required)
-    BitFlags<uint8_t, TransferControlFlags> mTransferCtlFlags;
-    uint8_t mSupportedVersions = 0;
+    BitFlags<uint8_t, TransferControlFlags> TransferCtlOptions;
+    uint8_t Version = 0; ///< This field represents
 
     // All required
-    uint16_t mMaxBlockSize = 0; ///< Proposed max block size to use in transfer
-    uint64_t mStartOffset  = 0; ///< Proposed start offset of data. 0 for no offset
-    uint64_t mMaxLength    = 0; ///< Proposed max length of data in transfer, 0 for indefinite
+    uint16_t MaxBlockSize = 0; ///< Proposed max block size to use in transfer
+    uint64_t StartOffset  = 0; ///< Proposed start offset of data. 0 for no offset
+    uint64_t MaxLength    = 0; ///< Proposed max length of data in transfer, 0 for indefinite
 
     // File designator (required)
     // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
     // It is up to the caller to ensure that the memory pointed to here has not been freed.
-    uint8_t * mFileDesignator = nullptr;
-    uint16_t mFileDesLength   = 0; ///< Length of file designator string (not including null-terminator)
+    const uint8_t * FileDesignator = nullptr;
+    uint16_t FileDesLength         = 0; ///< Length of file designator string (not including null-terminator)
 
     // Additional metadata (optional, TLV format)
     // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
     // It is up to the caller to ensure that the memory pointed to here has not been freed.
-    uint8_t * mMetadata      = nullptr;
-    uint16_t mMetadataLength = 0;
+    const uint8_t * Metadata = nullptr;
+    uint16_t MetadataLength  = 0;
 };
 
 /*
@@ -161,16 +161,16 @@ struct SendAccept
     bool operator==(const SendAccept &) const;
 
     // Transfer Control (required, only one should be set)
-    BitFlags<uint8_t, TransferControlFlags> mTransferCtlFlags;
+    BitFlags<uint8_t, TransferControlFlags> TransferCtlFlags;
 
-    uint8_t mVersion       = 0; ///< The agreed upon version for the transfer (required)
-    uint16_t mMaxBlockSize = 0; ///< Chosen max block size to use in transfer (required)
+    uint8_t Version       = 0; ///< The agreed upon version for the transfer (required)
+    uint16_t MaxBlockSize = 0; ///< Chosen max block size to use in transfer (required)
 
     // Additional metadata (optional, TLV format)
     // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
     // It is up to the caller to ensure that the memory pointed to here has not been freed.
-    uint8_t * mMetadata      = nullptr;
-    uint16_t mMetadataLength = 0;
+    uint8_t * Metadata      = nullptr;
+    uint16_t MetadataLength = 0;
 };
 
 /**
@@ -221,19 +221,19 @@ struct ReceiveAccept
     bool operator==(const ReceiveAccept &) const;
 
     // Transfer Control (required, only one should be set)
-    BitFlags<uint8_t, TransferControlFlags> mTransferCtlFlags;
+    BitFlags<uint8_t, TransferControlFlags> TransferCtlFlags;
 
     // All required
-    uint8_t mVersion       = 0; ///< The agreed upon version for the transfer
-    uint16_t mMaxBlockSize = 0; ///< Chosen max block size to use in transfer
-    uint64_t mStartOffset  = 0; ///< Chosen start offset of data. 0 for no offset.
-    uint64_t mLength       = 0; ///< Length of transfer. 0 if length is indefinite.
+    uint8_t Version       = 0; ///< The agreed upon version for the transfer
+    uint16_t MaxBlockSize = 0; ///< Chosen max block size to use in transfer
+    uint64_t StartOffset  = 0; ///< Chosen start offset of data. 0 for no offset.
+    uint64_t Length       = 0; ///< Length of transfer. 0 if length is indefinite.
 
     // Additional metadata (optional, TLV format)
     // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
     // It is up to the caller to ensure that the memory pointed to here has not been freed.
-    uint8_t * mMetadata      = nullptr;
-    uint16_t mMetadataLength = 0;
+    uint8_t * Metadata      = nullptr;
+    uint16_t MetadataLength = 0;
 };
 
 } // namespace BDX
