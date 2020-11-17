@@ -61,14 +61,6 @@ public:
 
     /**
      * @brief
-     *   Called when the ResetToFactoryDefaults method of the Basic cluster object has been called
-     *
-     * @param endpoint           endpoint id
-     */
-    virtual void PluginBasicResetToFactoryDefaultsCallback(uint8_t endpointId);
-
-    /**
-     * @brief
      *   Called after an attribute has been changed
      *
      * @param endpoint           endpoint id
@@ -80,7 +72,7 @@ public:
      * @param size               size of the attribute
      * @param value              pointer to the new value
      */
-    virtual void PostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+    virtual void PostAttributeChangeCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                              uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
     {}
     virtual ~CHIPDeviceManagerCallbacks() {}

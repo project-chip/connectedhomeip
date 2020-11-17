@@ -234,17 +234,11 @@ SecureSessionMgr & SessionManager()
 }
 } // namespace chip
 
-void PairingComplete(SecurePairingSession * pairing)
-{
-    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
-    sessions.NewPairing(peer, pairing);
-}
-
 // The echo server assumes the platform's networking has been setup already
-void startServer()
+void startServer(NodeId localNodeId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = sessions.Init(kLocalNodeId, &DeviceLayer::SystemLayer);
+    err            = sessions.Init(localNodeId, &DeviceLayer::SystemLayer);
     SuccessOrExit(err);
     err = gTransports.Init(&sessions, nullptr,
                            UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(nullptr),
@@ -262,4 +256,11 @@ exit:
     {
         ESP_LOGI(TAG, "Echo Server Listening...");
     }
+}
+
+void PairingComplete(NodeId assignedNodeId, NodeId peerNodeId, SecurePairingSession * pairing)
+{
+    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
+    startServer(assignedNodeId);
+    sessions.NewPairing(peer, peerNodeId, pairing);
 }

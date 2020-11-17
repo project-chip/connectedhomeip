@@ -66,13 +66,11 @@ struct EmberEventData
 // Globals
 
 #ifdef EMBER_AF_GENERATED_EVENT_CODE
-extern "C" {
 // Stubs for IAS Zone Client Cluster issue #2057
 EmberEventControl emberAfPluginIasZoneClientStateMachineEventControl;
 void emberAfPluginIasZoneClientStateMachineEventHandler(void){};
 
 EMBER_AF_GENERATED_EVENT_CODE
-}
 #endif // EMBER_AF_GENERATED_EVENT_CODE
 
 #if defined(EMBER_AF_GENERATED_EVENT_CONTEXT)
@@ -121,14 +119,14 @@ const char emAfStackEventString[] = "Stack";
 // Functions
 
 // A function used to initialize events for idling
-extern "C" void emAfInitEvents(void) {}
+void emAfInitEvents(void) {}
 
 const char * emberAfGetEventString(uint8_t index)
 {
     return (index == 0XFF ? emAfStackEventString : emAfEventStrings[index]);
 }
 
-static EmberAfEventContext * findEventContext(EndpointId endpoint, EmberAfClusterId clusterId, bool isClient)
+static EmberAfEventContext * findEventContext(EndpointId endpoint, ClusterId clusterId, bool isClient)
 {
 #if defined(EMBER_AF_GENERATED_EVENT_CONTEXT)
     uint16_t i;
@@ -206,7 +204,7 @@ EmberStatus emberAfEventControlSetDelayMinutes(EmberEventControl * control, uint
     }
 }
 
-EmberStatus emberAfScheduleTickExtended(EndpointId endpoint, EmberAfClusterId clusterId, bool isClient, uint32_t delayMs,
+EmberStatus emberAfScheduleTickExtended(EndpointId endpoint, ClusterId clusterId, bool isClient, uint32_t delayMs,
                                         EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
 {
     EmberAfEventContext * context = findEventContext(endpoint, clusterId, isClient);
@@ -225,7 +223,7 @@ EmberStatus emberAfScheduleTickExtended(EndpointId endpoint, EmberAfClusterId cl
     return EMBER_BAD_ARGUMENT;
 }
 
-EmberStatus emberAfScheduleClusterTick(EndpointId endpoint, EmberAfClusterId clusterId, bool isClient, uint32_t delayMs,
+EmberStatus emberAfScheduleClusterTick(EndpointId endpoint, ClusterId clusterId, bool isClient, uint32_t delayMs,
                                        EmberAfEventSleepControl sleepControl)
 {
     return emberAfScheduleTickExtended(endpoint, clusterId, isClient, delayMs,
@@ -233,29 +231,29 @@ EmberStatus emberAfScheduleClusterTick(EndpointId endpoint, EmberAfClusterId clu
                                        (sleepControl == EMBER_AF_STAY_AWAKE ? EMBER_AF_STAY_AWAKE : EMBER_AF_OK_TO_SLEEP));
 }
 
-EmberStatus emberAfScheduleClientTickExtended(EndpointId endpoint, EmberAfClusterId clusterId, uint32_t delayMs,
+EmberStatus emberAfScheduleClientTickExtended(EndpointId endpoint, ClusterId clusterId, uint32_t delayMs,
                                               EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
 {
     return emberAfScheduleTickExtended(endpoint, clusterId, EMBER_AF_CLIENT_CLUSTER_TICK, delayMs, pollControl, sleepControl);
 }
 
-EmberStatus emberAfScheduleClientTick(EndpointId endpoint, EmberAfClusterId clusterId, uint32_t delayMs)
+EmberStatus emberAfScheduleClientTick(EndpointId endpoint, ClusterId clusterId, uint32_t delayMs)
 {
     return emberAfScheduleClientTickExtended(endpoint, clusterId, delayMs, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP);
 }
 
-EmberStatus emberAfScheduleServerTickExtended(EndpointId endpoint, EmberAfClusterId clusterId, uint32_t delayMs,
+EmberStatus emberAfScheduleServerTickExtended(EndpointId endpoint, ClusterId clusterId, uint32_t delayMs,
                                               EmberAfEventPollControl pollControl, EmberAfEventSleepControl sleepControl)
 {
     return emberAfScheduleTickExtended(endpoint, clusterId, EMBER_AF_SERVER_CLUSTER_TICK, delayMs, pollControl, sleepControl);
 }
 
-EmberStatus emberAfScheduleServerTick(EndpointId endpoint, EmberAfClusterId clusterId, uint32_t delayMs)
+EmberStatus emberAfScheduleServerTick(EndpointId endpoint, ClusterId clusterId, uint32_t delayMs)
 {
     return emberAfScheduleServerTickExtended(endpoint, clusterId, delayMs, EMBER_AF_LONG_POLL, EMBER_AF_OK_TO_SLEEP);
 }
 
-EmberStatus emberAfDeactivateClusterTick(EndpointId endpoint, EmberAfClusterId clusterId, bool isClient)
+EmberStatus emberAfDeactivateClusterTick(EndpointId endpoint, ClusterId clusterId, bool isClient)
 {
     EmberAfEventContext * context = findEventContext(endpoint, clusterId, isClient);
     if (context != NULL)
@@ -266,12 +264,12 @@ EmberStatus emberAfDeactivateClusterTick(EndpointId endpoint, EmberAfClusterId c
     return EMBER_BAD_ARGUMENT;
 }
 
-EmberStatus emberAfDeactivateClientTick(EndpointId endpoint, EmberAfClusterId clusterId)
+EmberStatus emberAfDeactivateClientTick(EndpointId endpoint, ClusterId clusterId)
 {
     return emberAfDeactivateClusterTick(endpoint, clusterId, EMBER_AF_CLIENT_CLUSTER_TICK);
 }
 
-EmberStatus emberAfDeactivateServerTick(EndpointId endpoint, EmberAfClusterId clusterId)
+EmberStatus emberAfDeactivateServerTick(EndpointId endpoint, ClusterId clusterId)
 {
     return emberAfDeactivateClusterTick(endpoint, clusterId, EMBER_AF_SERVER_CLUSTER_TICK);
 }

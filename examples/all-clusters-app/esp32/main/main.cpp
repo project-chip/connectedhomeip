@@ -56,8 +56,6 @@ using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer();
-
 #define QRCODE_BASE_URL "https://dhrishi.github.io/connectedhomeip/qrcode.html"
 
 #if CONFIG_DEVICE_TYPE_M5STACK
@@ -84,7 +82,7 @@ extern void startServer();
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-extern void PairingComplete(SecurePairingSession * pairing);
+extern void PairingComplete(NodeId assignedNodeId, NodeId peerNodeId, SecurePairingSession * pairing);
 
 const char * TAG = "all-clusters-app";
 
@@ -529,7 +527,6 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    startServer();
 
     if (isRendezvousBLE())
     {
@@ -538,7 +535,7 @@ extern "C" void app_main()
     else if (isRendezvousBypassed())
     {
         ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
-        PairingComplete(&gTestPairing);
+        PairingComplete(chip::kTestDeviceNodeId, chip::kTestControllerNodeId, &gTestPairing);
     }
 
     std::string qrCodeText = createSetupPayload();

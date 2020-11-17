@@ -31,15 +31,15 @@ typedef struct
     /** The application profile ID that describes the format of the message. */
     uint16_t profileId;
     /** The cluster ID for this message. */
-    CHIPClusterId clusterId;
+    chip::ClusterId clusterId;
     /** The source endpoint. */
-    CHIPEndpointId sourceEndpoint;
+    chip::EndpointId sourceEndpoint;
     /** The destination endpoint. */
-    CHIPEndpointId destinationEndpoint;
+    chip::EndpointId destinationEndpoint;
     /** A bitmask of options from the enumeration above. */
     EmberApsOption options;
     /** The group ID for this message, if it is multicast mode. */
-    CHIPGroupId groupId;
+    chip::GroupId groupId;
     /** The sequence number. */
     uint8_t sequence;
     uint8_t radius;

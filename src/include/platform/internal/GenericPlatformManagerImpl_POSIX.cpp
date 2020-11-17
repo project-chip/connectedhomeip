@@ -229,6 +229,7 @@ CHIP_ERROR GenericPlatformManagerImpl_POSIX<ImplClass>::_Shutdown()
     mShouldRunEventLoop.store(false, std::memory_order_relaxed);
     if (mChipTask)
     {
+        SystemLayer.WakeSelect();
         SuccessOrExit(err = pthread_join(mChipTask, nullptr));
     }
 

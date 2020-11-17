@@ -72,7 +72,7 @@ static State state;
 // TODO: There's no header that declares this callback, and it's not 100%
 // clear where best to declare it.
 // https://github.com/project-chip/connectedhomeip/issues/3619
-extern "C" void emberAfPluginBarrierControlServerInitCallback(void) {}
+void emberAfPluginBarrierControlServerInitCallback(void) {}
 
 // -----------------------------------------------------------------------------
 // Accessing attributes
@@ -104,8 +104,8 @@ bool emAfPluginBarrierControlServerIsPartialBarrierSupported(EndpointId endpoint
 
 static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
 {
-    uint16_t period                = 0;
-    EmberAfAttributeId attributeId = 0xFFFF;
+    uint16_t period         = 0;
+    AttributeId attributeId = 0xFFFF;
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_OPEN_PERIOD_ATTRIBUTE)
     if (open)
     {
@@ -129,10 +129,10 @@ static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
     return period;
 }
 
-static void setMovingState(EndpointId endpoint, uint8_t state)
+static void setMovingState(EndpointId endpoint, uint8_t newState)
 {
     EmberAfStatus status = emberAfWriteServerAttribute(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID,
-                                                       ZCL_BARRIER_MOVING_STATE_ATTRIBUTE_ID, &state, ZCL_ENUM8_ATTRIBUTE_TYPE);
+                                                       ZCL_BARRIER_MOVING_STATE_ATTRIBUTE_ID, &newState, ZCL_ENUM8_ATTRIBUTE_TYPE);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
@@ -169,12 +169,12 @@ void emAfPluginBarrierControlServerIncrementEvents(EndpointId endpoint, bool ope
 #endif
     );
 
-    EmberAfAttributeId baseEventAttributeId = ZCL_BARRIER_OPEN_EVENTS_ATTRIBUTE_ID;
+    AttributeId baseEventAttributeId = ZCL_BARRIER_OPEN_EVENTS_ATTRIBUTE_ID;
     for (size_t bit = 0; bit < 4; bit++)
     {
         if (READBIT(mask, bit))
         {
-            EmberAfAttributeId attributeId = static_cast<EmberAfAttributeId>(baseEventAttributeId + bit);
+            AttributeId attributeId = static_cast<AttributeId>(baseEventAttributeId + bit);
             uint16_t events;
             EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID, attributeId,
                                                               (uint8_t *) &events, sizeof(events));

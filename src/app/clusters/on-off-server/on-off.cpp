@@ -38,6 +38,7 @@
  *implements the On-Off server cluster.
  *******************************************************************************
  ******************************************************************************/
+#include "on-off.h"
 
 #include "af.h"
 
@@ -46,7 +47,7 @@
 #endif
 
 #ifdef EMBER_AF_PLUGIN_SCENES
-#include "../scenes/scenes.h"
+#include <app/clusters/scenes/scenes.h>
 #endif // EMBER_AF_PLUGIN_SCENES
 
 #ifdef EMBER_AF_PLUGIN_ZLL_ON_OFF_SERVER

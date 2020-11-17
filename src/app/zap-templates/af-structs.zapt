@@ -4,6 +4,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "basic-types.h"
 #include "enums.h"
 
 {{#zcl_structs}}
@@ -11,7 +12,22 @@
 // Struct for {{label}}
 typedef struct _{{asType label}} {
 {{#zcl_struct_items}}
+{{#if (isStrEqual label "endpoint")}}
+{{ident}}chip::EndpointId {{asSymbol label}};
+{{else if (isStrEqual label "endpointId")}}
+{{ident}}chip::EndpointId {{asSymbol label}};
+{{else if (isStrEqual type "CLUSTER_ID")}}
+{{ident}}chip::ClusterId {{asSymbol label}};
+{{else if (isStrEqual type "ATTRIBUTE_ID")}}
+{{ident}}chip::AttributeId {{asSymbol label}};
+{{else if (isStrEqual label "groupId")}}
+{{ident}}chip::GroupId {{asSymbol label}};
+{{else if (isStrEqual label "commandId")}}
+{{ident}}chip::CommandId {{asSymbol label}};
+{{else}}
+{{type}} {{label}}
 {{ident}}{{asUnderlyingType type}} {{asSymbol label}};
+{{/if}}
 {{/zcl_struct_items}}
 } {{asUnderlyingType label}};
 {{/zcl_structs}}

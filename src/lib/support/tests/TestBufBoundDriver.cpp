@@ -18,7 +18,7 @@
 /**
  *    @file
  *      This file implements a standalone/native program executable
- *      test driver for the support library argument parser unit
+ *      test driver for the support library BufBound unit
  *      tests.
  *
  */

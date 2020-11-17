@@ -24,9 +24,14 @@
             "output": "attribute-type.h"
         },
         {
+            "path": "attribute-size.zapt",
+            "name": "ZCL attribute-size header",
+            "output": "attribute-size.h"
+        },
+        {
             "path": "call-command-handler-src.zapt",
             "name": "ZCL call-command-handler source",
-            "output": "call-command-handler.c"
+            "output": "call-command-handler.cpp"
         },
         {
             "path": "call-command-handler.zapt",
@@ -36,7 +41,7 @@
         {
             "path": "callback-stub-src.zapt",
             "name": "ZCL callback-stub source",
-            "output": "callback-stub.c"
+            "output": "callback-stub.cpp"
         },
         {
             "path": "callback.zapt",

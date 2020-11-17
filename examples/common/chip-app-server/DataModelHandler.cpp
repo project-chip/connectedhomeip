@@ -33,7 +33,6 @@
 
 using namespace ::chip;
 
-extern "C" {
 /**
  * Handle a message that should be processed via our data model processing
  * codepath. This function will free the packet buffer.
@@ -80,5 +79,4 @@ void InitDataModelHandler()
 {
     emberAfEndpointConfigure();
     emberAfInit();
-}
 }

@@ -97,6 +97,9 @@ public:
      */
     SecurePairingSession & GetPairingSession() { return mPairingSession; }
 
+    Optional<NodeId> GetLocalNodeId() const { return mParams.GetLocalNodeId(); }
+    Optional<NodeId> GetRemoteNodeId() const { return mParams.GetRemoteNodeId(); }
+
     //////////// SecurePairingSessionDelegate Implementation ///////////////
     CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
                                   const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf) override;

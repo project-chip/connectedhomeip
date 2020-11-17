@@ -22,6 +22,8 @@
 
 #include "af.h"
 
+using namespace chip;
+
 /** @brief Identify Cluster Identify Query Response
  *
  *
@@ -352,15 +354,15 @@ bool emberAfIasZoneClusterZoneStatusChangeNotificationCallback(uint16_t zoneStat
 
 // endpoint_config.h callbacks, grep'd from SDK, comment these out as clusters come in
 
-void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
-void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint) {}
-void emberAfIasZoneClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfDoorLockClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId) {}
+void emberAfIasZoneClusterClientInitCallback(EndpointId endpoint) {}
+void emberAfIasZoneClusterServerInitCallback(EndpointId endpoint) {}
 void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                     EmberStatus status)
 {}
 
-EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId,
                                                                      EmberAfAttributeType attributeType, uint8_t size,
                                                                      uint8_t * value)
 {
@@ -368,18 +370,12 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(uint8_t end
 }
 
 void emberAfPluginDoorLockServerInitCallback(void) {}
-void emberAfPollControlClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId) {}
-void emberAfPollControlClusterServerInitCallback(uint8_t endpoint) {}
+void emberAfPollControlClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId) {}
+void emberAfPollControlClusterServerInitCallback(EndpointId endpoint) {}
 void emberAfPluginPollControlServerStackStatusCallback(EmberStatus status) {}
-EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId,
+EmberAfStatus emberAfPollControlClusterServerPreAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId,
                                                                          EmberAfAttributeType attributeType, uint8_t size,
                                                                          uint8_t * value)
 {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
-
-void emberAfPluginIasZoneClientZdoCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length) {}
-
-void emberAfPluginIasZoneClientWriteAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen) {}
-
-void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen) {}

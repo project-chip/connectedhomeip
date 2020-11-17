@@ -477,7 +477,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
     return sendStatus;
 }
 
-extern "C" void emberAfPluginIasZoneServerManageQueueEventHandler(void)
+void emberAfPluginIasZoneServerManageQueueEventHandler(void)
 {
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
     IasZoneStatusQueueEntry * bufferStart;
@@ -760,7 +760,7 @@ void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType typ
 {
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
     uint8_t frameControl;
-    uint8_t commandId;
+    CommandId commandId;
 
     IasZoneStatusQueueEntry dummyEntry;
 

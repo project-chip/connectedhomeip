@@ -33,6 +33,7 @@
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/AutoFreePacketBuffer.h>
 #include <transport/RendezvousSession.h>
 #include <transport/SecurePairingSession.h>
 #include <transport/SecureSessionMgr.h>
@@ -42,6 +43,7 @@
 
 namespace chip {
 
+using System::AutoFreePacketBuffer;
 using System::PacketBuffer;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
@@ -89,14 +91,15 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
     return SendMessage(payloadHeader, peerNodeId, msgBuf);
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf)
+CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgIn)
 {
+    System::AutoFreePacketBuffer msgBuf(msgIn);
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
@@ -152,14 +155,14 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
 
         ChipLogDetail(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
-        err    = mTransportMgr->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), state->GetPeerAddress(), msgBuf);
-        msgBuf = nullptr;
+        err = mTransportMgr->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), state->GetPeerAddress(),
+                                         msgBuf.Release());
     }
     SuccessOrExit(err);
     state->IncrementSendMessageIndex();
 
 exit:
-    if (msgBuf != nullptr)
+    if (!msgBuf.IsNull())
     {
         const char * errStr = ErrorStr(err);
         if (state == nullptr)
@@ -170,21 +173,19 @@ exit:
         {
             ChipLogError(Inet, "Secure transport failed to encrypt msg %u: %s", state->GetSendMessageIndex(), errStr);
         }
-        PacketBuffer::Free(msgBuf);
-        msgBuf = nullptr;
     }
 
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, SecurePairingSession * pairing)
+CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> & peerAddr, NodeId peerNodeId,
+                                        SecurePairingSession * pairing)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    Optional<NodeId> peerNodeId = Optional<NodeId>::Value(pairing->GetPeerNodeId());
     uint16_t peerKeyId          = pairing->GetPeerKeyId();
     uint16_t localKeyId         = pairing->GetLocalKeyId();
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, peerKeyId, nullptr);
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, nullptr);
 
     // Find any existing connection with the same node and key ID
     if (state)
@@ -192,9 +193,10 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
         mPeerConnections.MarkConnectionExpired(state);
     }
 
-    ChipLogDetail(Inet, "New pairing for key %d!!", peerKeyId);
+    ChipLogDetail(Inet, "New pairing for device %llu, key %d!!", peerNodeId, peerKeyId);
+
     state = nullptr;
-    err   = mPeerConnections.CreateNewPeerConnectionState(peerNodeId, peerKeyId, localKeyId, &state);
+    err   = mPeerConnections.CreateNewPeerConnectionState(Optional<NodeId>::Value(peerNodeId), peerKeyId, localKeyId, &state);
     SuccessOrExit(err);
 
     if (peerAddr.HasValue() && peerAddr.Value().GetIPAddress() != Inet::IPAddress::Any)
@@ -210,7 +212,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
 #if !CHIP_DEVICE_LAYER_NONE
         SuccessOrExit(err = chip::DeviceLayer::ConfigurationMgr().GetFabricId(fabricId));
 #endif
-        SuccessOrExit(err = Mdns::DiscoveryManager::GetInstance().ResolveNodeId(pairing->GetPeerNodeId(), fabricId));
+        SuccessOrExit(err = Mdns::DiscoveryManager::GetInstance().ResolveNodeId(peerNodeId, fabricId));
     }
 
     if (state != nullptr)
@@ -274,15 +276,16 @@ void SecureSessionMgr::CancelExpiryTimer()
 }
 
 void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                         System::PacketBuffer * msg)
+                                         System::PacketBuffer * msgIn)
 
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBuffer * origMsg = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     PeerConnectionState * state =
         mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(), packetHeader.GetEncryptionKeyID(), nullptr);
+    AutoFreePacketBuffer msg(msgIn);
+    AutoFreePacketBuffer origMsg;
 
-    VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
+    VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
     if (state == nullptr)
     {
@@ -313,10 +316,10 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not
            allocated as an inline buffer to PacketBuffer structure */
-        origMsg = msg;
-        msg     = PacketBuffer::NewWithAvailableSize(len);
-        VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Insufficient memory for packet buffer."));
-        msg->SetDataLength(len, msg);
+        origMsg.Adopt(msg.Release());
+        msg.Adopt(PacketBuffer::NewWithAvailableSize(len));
+        VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Insufficient memory for packet buffer."));
+        msg->SetDataLength(len);
 #endif
         plainText = msg->Start();
 
@@ -345,22 +348,11 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
 
         if (mCB != nullptr)
         {
-            mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg, this);
-            msg = nullptr;
+            mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg.Release(), this);
         }
     }
 
 exit:
-    if (origMsg != nullptr)
-    {
-        PacketBuffer::Free(origMsg);
-    }
-
-    if (msg != nullptr)
-    {
-        PacketBuffer::Free(msg);
-    }
-
     if (err != CHIP_NO_ERROR && mCB != nullptr)
     {
         mCB->OnReceiveError(err, peerAddress, this);

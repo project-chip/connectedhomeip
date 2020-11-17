@@ -67,8 +67,7 @@
  *
  ******************************************************************************/
 
-#ifndef __EMBER_AF_CONFIG_H__
-#define __EMBER_AF_CONFIG_H__
+#pragma once
 
 // include generated configuration information from AppBuilder.
 // ZA_GENERATED_HEADER is defined in the project file
@@ -127,11 +126,7 @@
 // the max source route overhead and broadcast radius
 // if we havent defined MAX_HOPS then define based on profile ID
 #ifndef ZA_MAX_HOPS
-#ifdef EMBER_AF_HAS_SECURITY_PROFILE_SE
-#define ZA_MAX_HOPS 6
-#else
 #define ZA_MAX_HOPS 12
-#endif
 #endif
 
 #ifndef EMBER_AF_SOURCE_ROUTING_RESERVED_PAYLOAD_LENGTH
@@ -304,5 +299,3 @@
  * @brief CHIP uses millisecond ticks
  */
 #define MILLISECOND_TICKS_PER_SECOND 1000
-
-#endif // __EMBER_AF_CONFIG_H__

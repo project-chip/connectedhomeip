@@ -27,19 +27,19 @@
 
 #include "CHIPDeviceManager.h"
 #include <app/util/af-types.h>
+#include <app/util/basic-types.h>
 #include <platform/CHIPDeviceLayer.h>
 
 class DeviceCallbacks : public chip::DeviceManager::CHIPDeviceManagerCallbacks
 {
 public:
     virtual void DeviceEventCallback(const chip::DeviceLayer::ChipDeviceEvent * event, intptr_t arg);
-    virtual void PluginBasicResetToFactoryDefaultsCallback(uint8_t endpointId);
-    virtual void PostAttributeChangeCallback(uint8_t endpointId, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
+    virtual void PostAttributeChangeCallback(chip::EndpointId endpointId, chip::ClusterId clusterId, chip::AttributeId attributeId,
                                              uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
 
 private:
     void OnInternetConnectivityChange(const chip::DeviceLayer::ChipDeviceEvent * event);
     void OnSessionEstablished(const chip::DeviceLayer::ChipDeviceEvent * event);
-    void OnOnOffPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value);
-    void OnIdentifyPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value);
+    void OnOnOffPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
+    void OnIdentifyPostAttributeChangeCallback(chip::EndpointId endpointId, chip::AttributeId attributeId, uint8_t * value);
 };

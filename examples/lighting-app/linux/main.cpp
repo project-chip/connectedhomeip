@@ -48,8 +48,7 @@ using namespace chip::DeviceLayer;
 
 constexpr uint32_t kDefaultSetupPinCode = 12345678; // TODO: Should be a macro in CHIPProjectConfig.h like other example apps.
 
-extern "C" {
-void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
+void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
@@ -82,10 +81,9 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
+void emberAfPluginOnOffClusterServerPostInitCallback(EndpointId endpoint)
 {
     // TODO: implement any additional On/off Cluster Server post init actions
-}
 }
 
 namespace {

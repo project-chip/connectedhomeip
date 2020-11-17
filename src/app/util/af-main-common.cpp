@@ -105,6 +105,8 @@
 #include "chip-message-send.h"
 #include "util.h"
 
+using namespace chip;
+
 // Querying the Ember Stack for what libraries are present.
 //#include "app/util/common/library.h"
 
@@ -201,35 +203,11 @@ void emAfInitializeMessageSentCallbackArray(void)
     }
 }
 
-EmberAfCbkeKeyEstablishmentSuite emberAfIsFullSmartEnergySecurityPresent(void)
-{
-    EmberAfCbkeKeyEstablishmentSuite cbkeKeyEstablishmentSuite = EMBER_AF_INVALID_KEY_ESTABLISHMENT_SUITE;
-
-#if defined EMBER_AF_HAS_SECURITY_PROFILE_SE
-    EmberCertificateData cert;
-    EmberCertificate283k1Data cert283k1;
-
-    if ((emberGetLibraryStatus(EMBER_ECC_LIBRARY_ID) & EMBER_LIBRARY_PRESENT_MASK) && (EMBER_SUCCESS == emberGetCertificate(&cert)))
-    {
-        cbkeKeyEstablishmentSuite |= EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_163K1;
-    }
-
-    if ((emberGetLibraryStatus(EMBER_ECC_LIBRARY_283K1_ID) & EMBER_LIBRARY_PRESENT_MASK) &&
-        (EMBER_SUCCESS == emberGetCertificate283k1(&cert283k1)))
-    {
-        cbkeKeyEstablishmentSuite |= EMBER_AF_CBKE_KEY_ESTABLISHMENT_SUITE_283K1;
-    }
-#endif
-
-    return cbkeKeyEstablishmentSuite;
-}
-
 static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
                         uint16_t messageLength, uint8_t * message, bool broadcast, EmberNodeId alias, uint8_t sequence,
                         EmberAfMessageSentFunction callback)
 {
     EmberStatus status;
-    uint8_t commandId;
     uint8_t index;
     uint8_t messageSentIndex;
     uint8_t messageTag = INVALID_MESSAGE_TAG;
@@ -246,11 +224,6 @@ static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestinati
         {
             return EMBER_ERR_FATAL;
         }
-        commandId = message[4];
-    }
-    else
-    {
-        commandId = message[2];
     }
 
     messageSentIndex = getMessageSentCallbackIndex();
@@ -296,18 +269,6 @@ static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestinati
         return EMBER_TRANSMISSION_SUSPENDED;
     }
 #endif
-
-    // Encryption is turned on if it is required, but not turned off if it isn't.
-    // This allows the application to send encrypted messages in special cases
-    // that aren't covered by the specs by manually setting the encryption bit
-    // prior to calling the send APIs.
-    if (emberAfDetermineIfLinkSecurityIsRequired(commandId,
-                                                 false, // incoming?
-                                                 broadcast, apsFrame->profileId, apsFrame->clusterId,
-                                                 (type == EMBER_OUTGOING_DIRECT) ? indexOrDestination : EMBER_NULL_NODE_ID))
-    {
-        apsFrame->options |= EMBER_APS_OPTION_ENCRYPTION;
-    }
 
     {
         EmberAfMessageStruct messageStruct = {
@@ -377,9 +338,9 @@ static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestinati
     return status;
 }
 
-EmberStatus emberAfSendMulticastWithAliasWithCallback(EmberMulticastId multicastId, EmberApsFrame * apsFrame,
-                                                      uint16_t messageLength, uint8_t * message, EmberNodeId alias,
-                                                      uint8_t sequence, EmberAfMessageSentFunction callback)
+EmberStatus emberAfSendMulticastWithAliasWithCallback(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
+                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
+                                                      EmberAfMessageSentFunction callback)
 {
     apsFrame->groupId = multicastId;
     return send(EMBER_OUTGOING_MULTICAST_WITH_ALIAS, multicastId, apsFrame, messageLength, message,
@@ -387,7 +348,7 @@ EmberStatus emberAfSendMulticastWithAliasWithCallback(EmberMulticastId multicast
                 alias, sequence, callback);
 }
 
-EmberStatus emberAfSendMulticastWithCallback(EmberMulticastId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
+EmberStatus emberAfSendMulticastWithCallback(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
                                              uint8_t * message, EmberAfMessageSentFunction callback)
 {
     apsFrame->groupId = multicastId;
@@ -398,7 +359,7 @@ EmberStatus emberAfSendMulticastWithCallback(EmberMulticastId multicastId, Ember
                 callback);
 }
 
-EmberStatus emberAfSendMulticast(EmberMulticastId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
+EmberStatus emberAfSendMulticast(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
     return emberAfSendMulticastWithCallback(multicastId, apsFrame, messageLength, message, NULL);
 }
@@ -408,7 +369,7 @@ EmberStatus emberAfSendMulticastToBindings(EmberApsFrame * apsFrame, uint16_t me
     EmberStatus status = EMBER_INVALID_BINDING_INDEX;
     uint8_t i;
     EmberBindingTableEntry binding;
-    uint16_t groupDest;
+    GroupId groupDest;
 
     if ((NULL == apsFrame) || (0 == messageLength) || (NULL == message))
     {
@@ -541,8 +502,8 @@ EmberStatus emberAfSendUnicastToBindings(EmberApsFrame * apsFrame, uint16_t mess
 }
 
 EmberStatus emberAfSendInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-                                EmberMulticastId multicastId, EmberAfClusterId clusterId, EmberAfProfileId profileId,
-                                uint16_t messageLength, uint8_t * messageBytes)
+                                GroupId multicastId, ClusterId clusterId, EmberAfProfileId profileId, uint16_t messageLength,
+                                uint8_t * messageBytes)
 {
     EmberAfInterpanHeader header;
     memset(&header, 0, sizeof(EmberAfInterpanHeader));

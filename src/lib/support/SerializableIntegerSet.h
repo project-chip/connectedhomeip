@@ -34,7 +34,9 @@
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
 
-#define CHIP_MAX_SERIALIZED_SIZE_U64(count) static_cast<uint16_t>(BASE64_ENCODED_LEN(sizeof(uint64_t) * (count)))
+// BASE64_ENCODED_LEN doesn't account for null termination of the string.
+// So, we are adding 1 extra byte to the size requirement.
+#define CHIP_MAX_SERIALIZED_SIZE_U64(count) static_cast<uint16_t>(BASE64_ENCODED_LEN(sizeof(uint64_t) * (count)) + 1)
 
 namespace chip {
 

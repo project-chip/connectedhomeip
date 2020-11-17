@@ -38,8 +38,6 @@ namespace chip {
 extern SecureSessionMgr & SessionManager();
 }
 
-extern "C" {
-
 EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
     uint16_t frameSize           = encodeApsFrame(nullptr, 0, apsFrame);
@@ -85,5 +83,3 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
 
     return EMBER_SUCCESS;
 }
-
-} // extern "C"

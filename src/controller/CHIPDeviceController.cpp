@@ -470,7 +470,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId));
+    err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId));
     SuccessOrExit(err);
 
     device->Init(mTransportMgr, mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
