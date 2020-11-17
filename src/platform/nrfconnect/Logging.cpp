@@ -63,7 +63,8 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
         char formattedMsg[CHIP_DEVICE_CONFIG_LOG_MESSAGE_MAX_SIZE];
         size_t prefixLen = 0;
 
-        constexpr size_t maxPrefixLen = ChipLoggingModuleNameLen + 3;
+        // Max size for "[TAG] {UINT32}"
+        constexpr size_t maxPrefixLen = ChipLoggingModuleNameLen + 10 + 3;
         static_assert(sizeof(formattedMsg) > maxPrefixLen);
 
         prefixLen += snprintf(formattedMsg, sizeof(formattedMsg), "%u", k_uptime_get_32());
