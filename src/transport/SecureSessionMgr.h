@@ -36,6 +36,7 @@
 #include <transport/PeerConnections.h>
 #include <transport/SecurePairingSession.h>
 #include <transport/SecureSession.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/Tuple.h>
 
@@ -101,7 +102,7 @@ public:
     virtual ~SecureSessionMgrDelegate() {}
 };
 
-class DLL_EXPORT SecureSessionMgr : public Mdns::ResolveDelegate
+class DLL_EXPORT SecureSessionMgr : public Mdns::ResolveDelegate, public TransportMgrDelegate
 {
 public:
     /**
@@ -125,12 +126,6 @@ public:
      *   Release if there was an existing callback object
      */
     void SetDelegate(SecureSessionMgrDelegate * cb) { mCB = cb; }
-
-    /**
-     * @brief
-     *   Set the handler for unsecured messages.
-     */
-    void SetTransportMgr(TransportMgrBase * cb) { mTransportMgr = cb; }
 
     /**
      * @brief
@@ -158,6 +153,23 @@ public:
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer);
 
+protected:
+    /**
+     * @brief
+     *   Handle received secure message. Implements TransportMgrDelegate
+     *
+     * @param header    the received message header
+     * @param source    the source address of the package
+     * @param msgBuf    the buffer of (encrypted) payload
+     */
+    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                           System::PacketBuffer * msgBuf) override;
+    /**
+     * @brief
+     *   Set the transport manager for secure session manager.
+     */
+    void SetTransportMgr(TransportMgrBase * cb) override { mTransportMgr = cb; }
+
 private:
     friend class TransportMgrBase;
     /**
@@ -182,9 +194,6 @@ private:
 
     /** Cancels any active timers for connection expiry checks. */
     void CancelExpiryTimer();
-
-    static void HandleSecureMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                            System::PacketBuffer * msgBuf, SecureSessionMgr * transport);
 
     /**
      * Called when a specific connection expires.

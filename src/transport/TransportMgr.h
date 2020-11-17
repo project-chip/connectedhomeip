@@ -27,14 +27,33 @@
 
 #pragma once
 
+#include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/RendezvousSession.h>
-#include <transport/SecureSessionMgr.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
+#include <transport/raw/Tuple.h>
 
 namespace chip {
+
+class TransportMgrBase;
+
+class TransportMgrDelegate
+{
+public:
+    virtual ~TransportMgrDelegate() = default;
+    /**
+     * @brief
+     *   Handle received secure message.
+     *
+     * @param header    the received message header
+     * @param source    the source address of the package
+     * @param msgBuf    the buffer of (encrypted) payload
+     */
+    virtual void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                                   System::PacketBuffer * msgBuf) = 0;
+    virtual void SetTransportMgr(TransportMgrBase * transport)    = 0;
+};
 
 class TransportMgrBase
 {
@@ -47,7 +66,7 @@ public:
 
     void Disconnect(const Transport::PeerAddress & address) { mTransport->Disconnect(address); }
 
-    void SetSecureSessionMgr(SecureSessionMgr * secureSessionMgr)
+    void SetSecureSessionMgr(TransportMgrDelegate * secureSessionMgr)
     {
         mSecureSessionMgr = secureSessionMgr;
         if (mSecureSessionMgr != nullptr)
@@ -56,9 +75,9 @@ public:
         }
     }
 
-    void SetRendezvousSession(RendezvousSession * rendezvous)
+    void SetRendezvousSession(TransportMgrDelegate * rendezvousSessionMgr)
     {
-        mRendezvous = rendezvous;
+        mRendezvous = rendezvousSessionMgr;
         if (mRendezvous != nullptr)
         {
             mRendezvous->SetTransportMgr(this);
@@ -66,12 +85,13 @@ public:
     }
 
 protected:
-    void InitInternal(SecureSessionMgr * secureMgr, RendezvousSession * rendezvous, Transport::Base * transport)
+    void InitInternal(TransportMgrDelegate * secureSessionMgr, TransportMgrDelegate * rendezvousSessionMgr,
+                      Transport::Base * transport)
     {
         mTransport = transport;
         mTransport->SetMessageReceiveHandler(HandleMessageReceived, this);
-        SetSecureSessionMgr(secureMgr);
-        SetRendezvousSession(rendezvous);
+        SetSecureSessionMgr(secureSessionMgr);
+        SetRendezvousSession(rendezvousSessionMgr);
         ChipLogDetail(Inet, "TransportMgr initialized");
     }
 
@@ -79,9 +99,9 @@ private:
     static void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                       System::PacketBuffer * msg, TransportMgrBase * dispatcher);
 
-    SecureSessionMgr * mSecureSessionMgr = nullptr;
-    RendezvousSession * mRendezvous      = nullptr;
-    Transport::Base * mTransport         = nullptr;
+    TransportMgrDelegate * mSecureSessionMgr = nullptr;
+    TransportMgrDelegate * mRendezvous       = nullptr;
+    Transport::Base * mTransport             = nullptr;
 };
 
 template <typename... TransportTypes>
@@ -89,7 +109,7 @@ class TransportMgr : public TransportMgrBase
 {
 public:
     template <typename... Args>
-    CHIP_ERROR Init(SecureSessionMgr * secureMgr, RendezvousSession * rendezvous, Args &&... transportInitArgs)
+    CHIP_ERROR Init(TransportMgrDelegate * secureMgr, TransportMgrDelegate * rendezvous, Args &&... transportInitArgs)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 

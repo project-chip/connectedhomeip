@@ -29,6 +29,7 @@
 #include <transport/RendezvousParameters.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecurePairingSession.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/PeerAddress.h>
 namespace chip {
@@ -65,7 +66,8 @@ class TransportMgrBase;
 class RendezvousSession : public SecurePairingSessionDelegate,
                           public RendezvousSessionDelegate,
                           public RendezvousDeviceCredentialsDelegate,
-                          public NetworkProvisioningDelegate
+                          public NetworkProvisioningDelegate,
+                          public TransportMgrDelegate
 {
 public:
     enum State : uint8_t
@@ -108,8 +110,6 @@ public:
     void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                      System::/*  */ PacketBuffer * buffer) override;
 
-    void SetTransportMgr(TransportMgrBase * transport) override;
-
     //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
     void SendNetworkCredentials(const char * ssid, const char * passwd) override;
     void SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData) override;
@@ -119,6 +119,11 @@ public:
     CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBug) override;
     void OnNetworkProvisioningError(CHIP_ERROR error) override;
     void OnNetworkProvisioningComplete() override;
+
+    //////////// TransportMgrDelegate Implementation ///////////////
+    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                           System::PacketBuffer * msgBuf) override;
+    void SetTransportMgr(TransportMgrBase * transport) override;
 
     /**
      * @brief

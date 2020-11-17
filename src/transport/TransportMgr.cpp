@@ -42,14 +42,14 @@ void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, 
     {
         if (dispatcher->mSecureSessionMgr != nullptr)
         {
-            SecureSessionMgr::HandleSecureMessageReceived(packetHeader, peerAddress, msg, dispatcher->mSecureSessionMgr);
+            dispatcher->mSecureSessionMgr->OnMessageReceived(packetHeader, peerAddress, msg);
         }
     }
     else
     {
         if (dispatcher->mRendezvous != nullptr)
         {
-            dispatcher->mRendezvous->OnRendezvousMessageReceived(packetHeader, peerAddress, msg);
+            dispatcher->mRendezvous->OnMessageReceived(packetHeader, peerAddress, msg);
             // Unsecure message received, pass it to Rendezvous Session Mgr directly.
         }
     }

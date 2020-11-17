@@ -44,9 +44,6 @@ public:
     virtual void OnRendezvousComplete() {}
     virtual void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                              System::PacketBuffer * buffer){};
-
-    virtual void SetTransportMgr(TransportMgrBase * transport) {}
-
     virtual void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) {}
 };
 

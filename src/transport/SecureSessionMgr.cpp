@@ -273,14 +273,14 @@ void SecureSessionMgr::CancelExpiryTimer()
     }
 }
 
-void SecureSessionMgr::HandleSecureMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                                   System::PacketBuffer * msg, SecureSessionMgr * connection)
+void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
+                                         System::PacketBuffer * msg)
 
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     System::PacketBuffer * origMsg = nullptr;
-    PeerConnectionState * state    = connection->mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(),
-                                                                                       packetHeader.GetEncryptionKeyID(), nullptr);
+    PeerConnectionState * state =
+        mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(), packetHeader.GetEncryptionKeyID(), nullptr);
 
     VerifyOrExit(msg != nullptr, ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
@@ -295,7 +295,7 @@ void SecureSessionMgr::HandleSecureMessageReceived(const PacketHeader & packetHe
         state->SetPeerAddress(peerAddress);
     }
 
-    connection->mPeerConnections.MarkConnectionActive(state);
+    mPeerConnections.MarkConnectionActive(state);
 
     // TODO this is where messages should be decoded
     {
@@ -343,9 +343,9 @@ void SecureSessionMgr::HandleSecureMessageReceived(const PacketHeader & packetHe
             state->SetPeerNodeId(packetHeader.GetSourceNodeId().Value());
         }
 
-        if (connection->mCB != nullptr)
+        if (mCB != nullptr)
         {
-            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg, connection);
+            mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg, this);
             msg = nullptr;
         }
     }
@@ -361,9 +361,9 @@ exit:
         PacketBuffer::Free(msg);
     }
 
-    if (err != CHIP_NO_ERROR && connection->mCB != nullptr)
+    if (err != CHIP_NO_ERROR && mCB != nullptr)
     {
-        connection->mCB->OnReceiveError(err, peerAddress, connection);
+        mCB->OnReceiveError(err, peerAddress, this);
     }
 }
 

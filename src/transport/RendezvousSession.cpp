@@ -298,6 +298,13 @@ exit:
     }
 }
 
+void RendezvousSession::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                                          System::PacketBuffer * msgBuf)
+{
+    // TODO: OnRendezvousMessageReceived can be renamed to OnMessageReceived after BLE becomes a transport.
+    this->OnRendezvousMessageReceived(header, source, msgBuf);
+}
+
 CHIP_ERROR RendezvousSession::HandlePairingMessage(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
                                                    PacketBuffer * msgBuf)
 {
