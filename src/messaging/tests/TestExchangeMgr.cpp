@@ -203,11 +203,11 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
     Optional<Transport::PeerAddress> peer1(Transport::PeerAddress::UDP(addr, 1));
-    err = conn.NewPairing(peer1, &pairing1);
+    err = conn.NewPairing(peer1, kSourceNodeId, &pairing1);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
     Optional<Transport::PeerAddress> peer2(Transport::PeerAddress::UDP(addr, 2));
-    err = conn.NewPairing(peer2, &pairing2);
+    err = conn.NewPairing(peer2, kDestinationNodeId, &pairing2);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);

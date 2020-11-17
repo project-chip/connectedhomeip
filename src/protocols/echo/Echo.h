@@ -44,7 +44,7 @@ enum
 
 typedef void (*EchoFunct)(NodeId nodeId, System::PacketBuffer * payload);
 
-class DLL_EXPORT EchoClient : public ExchangeDelegate
+class DLL_EXPORT EchoClient : public SimpleExchangeDelegate
 {
 public:
     /**

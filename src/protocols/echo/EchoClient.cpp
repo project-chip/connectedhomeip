@@ -68,9 +68,6 @@ CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * pay
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    // Set EchoClient itself as the exchange delegate to receive the message from exchange.
-    mExchangeCtx->SetDelegate(this);
-
     return SendEchoRequest(payload);
 }
 
