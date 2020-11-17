@@ -73,7 +73,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     memcpy(buffer->Start() + frameSize, message, messageLength);
     buffer->SetDataLength(dataLength);
 
-    CHIP_ERROR err = SessionManager().SendMessage(destination, buffer.Release());
+    CHIP_ERROR err = SessionManager().SendMessage(destination, buffer.Release_ForNow());
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?

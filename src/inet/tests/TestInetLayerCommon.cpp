@@ -178,7 +178,7 @@ static PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternS
     lBuffer->SetDataLength(aDesiredLength);
 
 exit:
-    return lBuffer.Release();
+    return lBuffer.Release_ForNow();
 }
 
 static PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternStartOffset)

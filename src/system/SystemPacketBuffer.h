@@ -86,8 +86,8 @@ struct pbuf
  *      The end goal is:
  *
  *        PacketBuffer objects are reference-counted, and held through `PacketBufferHandle`s. When a PacketBufferHandle goes out
- *        of scope, its reference is released. To transfer ownership, a function takes a PacketBufferHandle by value or by
- *        rvalue-reference (&&).
+ *        of scope, its reference is released. To transfer ownership, a function takes a PacketBufferHandle by value. To borrow
+ *        ownership, a function takes a `const PacketBufferHandle &`.
  *
  *      New objects of PacketBuffer class are initialized at the beginning of an allocation of memory obtained from the underlying
  *      environment, e.g. from LwIP pbuf target pools, from the standard C library heap, from an internal buffer pool. In the
@@ -254,9 +254,6 @@ public:
     PacketBufferHandle() : mBuffer(nullptr) {}
     PacketBufferHandle(decltype(nullptr)) : mBuffer(nullptr) {}
 
-    // The caller's ownership is transferred to this.
-    explicit PacketBufferHandle(PacketBuffer * buffer) : mBuffer(buffer) {}
-
     PacketBufferHandle(PacketBufferHandle && aOther)
     {
         mBuffer        = aOther.mBuffer;
@@ -264,11 +261,10 @@ public:
     }
 
     ~PacketBufferHandle() { Adopt(nullptr); }
-    void Free() { Adopt(nullptr); }
 
     PacketBufferHandle & operator=(PacketBufferHandle && aOther)
     {
-        if (mBuffer)
+        if (mBuffer != nullptr)
         {
             PacketBuffer::Free(mBuffer);
         }
@@ -305,7 +301,9 @@ public:
     }
 
     // The PacketBufferHandle's ownership is transferred to the caller.
-    CHECK_RETURN_VALUE PacketBuffer * Release()
+    // This is intended to be used only to call functions that have not yet been converted; a permanent version may be created
+    // if/when the need is clear. Most uses will be converted to take a `PacketBufferHandle` by value.
+    CHECK_RETURN_VALUE PacketBuffer * Release_ForNow()
     {
         PacketBuffer * buffer = mBuffer;
         mBuffer               = nullptr;
@@ -313,8 +311,9 @@ public:
     }
 
     // The caller has access but no ownership.
-    // This is intended to be used only to call functions that have not yet been converted to take a PacketBufferHandle.
-    [[deprecated]] PacketBuffer * Get_NoRelease() { return mBuffer; }
+    // This is intended to be used only to call functions that have not yet been converted to take a PacketBufferHandle;
+    // if/when the need is clear. Most uses will be converted to take a `const PacketBufferHandle &`.
+    PacketBuffer * Get_ForNow() { return mBuffer; }
 
     bool IsNull() const { return mBuffer == nullptr; }
 
@@ -322,7 +321,11 @@ private:
     PacketBufferHandle(const PacketBufferHandle &) = delete;
     PacketBufferHandle & operator=(const PacketBufferHandle &) = delete;
 
+    // The caller's ownership is transferred to this.
+    explicit PacketBufferHandle(PacketBuffer * buffer) : mBuffer(buffer) {}
+
     PacketBuffer * mBuffer;
+    friend class PacketBuffer;
 };
 
 } // namespace System

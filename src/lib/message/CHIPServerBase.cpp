@@ -168,7 +168,7 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
         TLVWriter statusWriter;
         TLVType outerContainerType;
 
-        statusWriter.Init(respBuf.Get_NoRelease());
+        statusWriter.Init(respBuf.Get_ForNow());
 
         err = statusWriter.StartContainer(AnonymousTag, kTLVType_Structure, outerContainerType);
         SuccessOrExit(err);

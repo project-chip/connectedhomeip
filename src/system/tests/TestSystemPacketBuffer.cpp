@@ -127,7 +127,7 @@ void BufferAlloc(struct TestContext * theContext)
 
     if (theContext->buf == nullptr)
     {
-        theContext->buf = TO_LWIP_PBUF(PacketBuffer::New(0).Release());
+        theContext->buf = TO_LWIP_PBUF(PacketBuffer::New(0).Release_ForNow());
     }
 
     if (theContext->buf == nullptr)
@@ -973,7 +973,7 @@ void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
 
         if (!buffer.IsNull())
         {
-            pb = TO_LWIP_PBUF(buffer.Get_NoRelease());
+            pb = TO_LWIP_PBUF(buffer.Get_ForNow());
 
             NL_TEST_ASSERT(inSuite, pb->len == 0);
             NL_TEST_ASSERT(inSuite, pb->tot_len == 0);
@@ -981,20 +981,24 @@ void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, pb->ref == 1);
         }
 
-        buffer.Free();
-
         theContext++;
     }
 
     // Use the rest of the buffer space
-    do
+    for (;;)
     {
         buffer = PacketBuffer::NewWithAvailableSize(0, 0);
+        if (buffer.IsNull())
+        {
+            break;
+        }
+        // Leak the buffer on purpose, to use up all the buffer space.
+        // (Compilers other than GCC recognize the `(void)` idiom, which is mandated in C++20.)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-result"
-        (void) buffer.Release();
+        (void) buffer.Release_ForNow();
 #pragma GCC diagnostic pop
-    } while (!buffer.IsNull());
+    }
 }
 
 /**

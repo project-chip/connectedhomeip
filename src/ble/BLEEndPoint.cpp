@@ -132,7 +132,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
         req.SetSupportedProtocolVersion(i, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION - i);
     }
 
-    err = req.Encode(buf.Get_NoRelease());
+    err = req.Encode(buf.Get_ForNow());
     SuccessOrExit(err);
 
     // Start connect timer. Canceled when end point freed or connection established.
@@ -140,7 +140,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
     SuccessOrExit(err);
 
     // Send BLE transport capabilities request to peripheral via GATT write.
-    if (!SendWrite(buf.Get_NoRelease()))
+    if (!SendWrite(buf.Get_ForNow()))
     {
         err = BLE_ERROR_GATT_WRITE_FAILED;
         ExitNow();
@@ -148,7 +148,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
 
     // Free request buffer on write confirmation. Stash a reference to it in mSendQueue, which we don't use anyway
     // until the connection has been set up.
-    QueueTx(buf.Release(), kType_Data);
+    QueueTx(buf.Release_ForNow(), kType_Data);
 
 exit:
     // If we failed to initiate the connection, close the end point.
@@ -974,7 +974,7 @@ BLE_ERROR BLEEndPoint::DriveStandAloneAck()
     // If stand-alone ack not already pending, allocate new payload buffer here.
     if (mAckToSend == nullptr)
     {
-        mAckToSend = PacketBuffer::New().Release();
+        mAckToSend = PacketBuffer::New().Release_ForNow();
         VerifyOrExit(mAckToSend != nullptr, err = BLE_ERROR_NO_MEMORY);
     }
 
@@ -1179,11 +1179,11 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBuffer * data)
     }
     ChipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mBtpEngine.GetRxFragmentSize(), mBtpEngine.GetTxFragmentSize());
 
-    err = resp.Encode(responseBuf.Get_NoRelease());
+    err = resp.Encode(responseBuf.Get_ForNow());
     SuccessOrExit(err);
 
     // Stash capabilities response payload and wait for subscription from central.
-    QueueTx(responseBuf.Release(), kType_Data);
+    QueueTx(responseBuf.Release_ForNow(), kType_Data);
 
     // Start receive timer. Canceled when end point freed or connection established.
     err = StartReceiveConnectionTimer();

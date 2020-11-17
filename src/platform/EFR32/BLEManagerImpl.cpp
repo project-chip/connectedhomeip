@@ -837,7 +837,7 @@ void BLEManagerImpl::HandleRXCharWrite(volatile struct gecko_cmd_packet * evt)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = evt->data.evt_gatt_server_user_write_request.connection;
-        event.CHIPoBLEWriteReceived.Data  = buf.Release();
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
     }
 

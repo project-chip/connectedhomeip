@@ -176,7 +176,7 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     buffer->SetDataLength(static_cast<uint16_t>(addrLen));
 
     err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning, NetworkProvisioning::MsgTypes::kIPAddressAssigned,
-                                       buffer.Release());
+                                       buffer.Release_ForNow());
     SuccessOrExit(err);
 
 exit:
@@ -202,7 +202,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
     err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                       NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer.Release());
+                                       NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer.Release_ForNow());
     SuccessOrExit(err);
 
 exit:
@@ -237,7 +237,7 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
         err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer.Release());
+                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer.Release_ForNow());
     }
 
 exit:

@@ -1161,7 +1161,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
     if (lStatus == INET_NO_ERROR)
     {
-        OnMessageReceived(this, lBuffer.Release(), &lPacketInfo);
+        OnMessageReceived(this, lBuffer.Release_ForNow(), &lPacketInfo);
     }
     else
     {

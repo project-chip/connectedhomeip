@@ -1949,19 +1949,19 @@ void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
     TLVWriter writer;
     TLVReader reader;
 
-    writer.Init(buf.Get_NoRelease());
+    writer.Init(buf.Get_ForNow());
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEncoding1(inSuite, writer);
 
-    TestBufferContents(inSuite, buf.Get_NoRelease(), Encoding1, sizeof(Encoding1));
+    TestBufferContents(inSuite, buf.Get_ForNow(), Encoding1, sizeof(Encoding1));
 
-    reader.Init(buf.Get_NoRelease());
+    reader.Init(buf.Get_ForNow());
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
 
-    reader.Init(buf.Get_NoRelease(), buf->MaxDataLength(), false);
+    reader.Init(buf.Get_ForNow(), buf->MaxDataLength(), false);
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
@@ -2456,15 +2456,15 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     {
         buf->SetStart(buf->Start() + reserve);
 
-        writer.Init(buf.Get_NoRelease());
+        writer.Init(buf.Get_ForNow());
         writer.GetNewBuffer      = TLVWriter::GetNewPacketBuffer;
         writer.ImplicitProfileId = TestProfile_2;
 
         WriteEncoding1(inSuite, writer);
 
-        TestBufferContents(inSuite, buf.Get_NoRelease(), Encoding1, sizeof(Encoding1));
+        TestBufferContents(inSuite, buf.Get_ForNow(), Encoding1, sizeof(Encoding1));
 
-        reader.Init(buf.Get_NoRelease(), 0xFFFFFFFFUL, true);
+        reader.Init(buf.Get_ForNow(), 0xFFFFFFFFUL, true);
         reader.ImplicitProfileId = TestProfile_2;
 
         ReadEncoding1(inSuite, reader);

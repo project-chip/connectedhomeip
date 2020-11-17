@@ -81,14 +81,12 @@ RendezvousSession::~RendezvousSession()
 CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
                                                  System::PacketBuffer * msgIn)
 {
-    System::PacketBufferHandle msgBuf(msgIn);
-
     if (mCurrentState != State::kSecurePairing)
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    return mTransport->SendMessage(header, payloadFlags, Transport::PeerAddress::BLE(), msgBuf.Release());
+    return mTransport->SendMessage(header, payloadFlags, Transport::PeerAddress::BLE(), msgIn);
 }
 
 CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgIn)
@@ -97,14 +95,15 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     PacketHeader packetHeader;
     PayloadHeader payloadHeader;
     MessageAuthenticationCode mac;
-    System::PacketBufferHandle msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf;
     const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
     uint8_t * data    = nullptr;
     uint16_t totalLen = 0;
     uint16_t taglen   = 0;
 
-    VerifyOrExit(msgIn != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    msgBuf.Adopt(msgIn);
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(CanCastTo<uint16_t>(headerSize + msgBuf->TotalLength()), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -137,7 +136,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
     err = mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(),
-                                  msgBuf.Release());
+                                  msgBuf.Release_ForNow());
     SuccessOrExit(err);
 
     mSecureMessageIndex++;
@@ -319,9 +318,10 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgIn)
     uint16_t taglen      = 0;
     uint16_t payloadlen  = 0;
 
-    System::PacketBufferHandle msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf;
     System::PacketBufferHandle origMsg;
 
+    msgBuf.Adopt(msgIn);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
@@ -387,7 +387,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgIn)
 
     if (payloadHeader.GetProtocolID() == Protocols::kProtocol_NetworkProvisioning)
     {
-        err = mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf.Get_NoRelease());
+        err = mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf.Get_ForNow());
         SuccessOrExit(err);
     }
 

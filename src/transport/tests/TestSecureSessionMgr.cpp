@@ -143,7 +143,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
 
-    err = conn.SendMessage(kDestinationNodeId, buffer.Release());
+    err = conn.SendMessage(kDestinationNodeId, buffer.Release_ForNow());
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });

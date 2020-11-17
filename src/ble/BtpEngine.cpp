@@ -328,7 +328,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceN
         data->SetStart(&(characteristic[cursor]));
 
         // Create a new buffer for use as the Rx re-assembly area.
-        mRxBuf = PacketBuffer::New().Release();
+        mRxBuf = PacketBuffer::New().Release_ForNow();
 
         VerifyOrExit(mRxBuf != nullptr, err = BLE_ERROR_NO_MEMORY);
 

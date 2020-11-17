@@ -221,9 +221,9 @@ CHIP_ERROR ReliableMessageContext::SendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err =
-        mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow,
-                              msgBuf.Release(), BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
+    err = mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow,
+                                msgBuf.Release_ForNow(),
+                                BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
 
 exit:
     return err;
@@ -278,7 +278,7 @@ CHIP_ERROR ReliableMessageContext::SendDelayedDelivery(uint32_t pauseTimeMillis,
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
     err = mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery,
-                                msgBuf.Release(),
+                                msgBuf.Release_ForNow(),
                                 BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
 exit:
@@ -454,9 +454,9 @@ CHIP_ERROR ReliableMessageContext::SendCommonNullMessage()
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err =
-        mManager->SendMessage(this, chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf.Release(),
-                              BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
+    err = mManager->SendMessage(this, chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null,
+                                msgBuf.Release_ForNow(),
+                                BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
 exit:
     if (IsSendErrorNonCritical(err))
