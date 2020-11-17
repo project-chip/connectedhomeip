@@ -14,12 +14,11 @@ using buttons and visualizes those states on the LEDs.
 -   [Overview](#overview)
 -   [Requirements](#requirements)
 -   [Device UI](#device-ui)
--   [Building](#building)
+-   [Setting up environment](#setting-up-environment)
     -   [Using Docker container](#using-docker-container)
     -   [Using Native shell](#using-native-shell)
-    -   [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
+-   [Building](#building)
         -   [Building minimal binary](#building-minimal-binary)
--   [Configuring the example](#configuring-the-example)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Testing the example](#testing-the-example)
 
@@ -136,135 +135,104 @@ communicate with it using [command line interface](TODO:).
 
 <hr>
 
-<a name="building"></a>
+## Setting up environment
 
-## Building
+First, checkout CHIP repository and sync submodules using the following command:
+
+        $ git submodule update --init
+
+The example requires nRF Connect SDK v1.4.0. You can either install it along with
+related tools directly on your system or use a Docker image which comes with the
+tools pre-installed.
+
+Note that if you're a macOS user, you won't be able to use the Docker container
+to flash the application onto a Nordic board due to
+[certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container),
+so it's recommended that you skip to the [Using native shell](#using-native-shell)
+instruction.
 
 ### Using Docker container
 
-> **Important**:
->
-> Due to
-> [certain limitations of Docker for MacOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container)
-> it is impossible to use the Docker container to communicate with a USB device
-> such as nRF 52840 DK. Therefore, MacOS users are advised to follow the
-> [Using Native shell](#using-native-shell) instruction.
-
-The easiest way to get started with the example is to use nRF Connect SDK Docker
-image for CHIP applications. Run the following commands to start a Docker
-container:
+If you don't have nRF Connect SDK installed yet, create a directory where it should be placed:
 
         $ mkdir ~/nrfconnect
-        $ mkdir ~/connectedhomeip
+
+Download the latest `nordicsemi/nrfconnect-chip` Docker image:
+
         $ docker pull nordicsemi/nrfconnect-chip
+
+The next command will start a Docker container using the image acquired in the previous step. Please read the below explanation for all specified arguments before proceeding.
+
         $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
             -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
 
 > **Note**:
 >
+> -   `~/connectedhomeip` should be replaced with an absolute path to CHIP
+>     source directory.
 > -   `~/nrfconnect` can be replaced with an absolute path to nRF Connect SDK
->     source directory in case you have it already installed.
-> -   Likewise, `~/connectedhomeip` can be replaced with an absolute path to
->     CHIP source directory.
-> -   `-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule 'c 189:* rmw`
+>     directory in case you have it already installed.
+> -   `-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule 'c 189:* rmw'`
 >     parameters can be omitted if you're not planning to flash the example onto
 >     hardware. The parameters give the container access to USB devices
->     connected to your computer such as the nRF52840 DK.
-> -   `--rm` flag can be omitted if you don't want the container to be
->     auto-removed when you exit the container shell session.
+>     connected to your computer such as Nordic development kits.
 > -   `-e RUNAS=$(id -u)` is needed to start the container session as the
 >     current user instead of root.
 
-If you use the container for the first time and you don't have nRF Connect SDK
-and CHIP sources downloaded yet, run `setup` command in the container to pull
-the sources into directories mounted as `/var/ncs` and `/var/chip`,
-respectively:
+To checkout or update nRF Connect SDK to the recommended `1.4.0` version, run:
 
         $ setup --ncs v1.4.0
         /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [v1.4.0]? [Y/N] y
         ...
-        /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
-        ...
+        /var/chip repository is initialized, skipping...
 
-Now you may build the example by running the commands below in the Docker
-container:
-
-        $ cd /var/chip/examples/lock-app/nrfconnect
-        $ west build -b nrf52840dk_nrf52840
-
-If the build succeeds, the binary will be available under
-`/var/chip/examples/lock-app/nrfconnect/build/zephyr/zephyr.hex`. Note that
-other operations described in this document like flashing or debugging can also
-be done in the container.
+Proceed with the [Building](#building) instruction.
 
 ### Using native shell
 
-Before building the example,
-[download the nRF Connect SDK and install all requirements](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html).
-Please read the
-[Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
-section to learn which version to use to avoid unexpected compatibility issues.
+Follow the [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
+to install nRF Connect SDK v1.4.0. Since further in the text we use command-line tools to build
+the example, installing SEGGER Embedded Studio is not required.
 
-If you don't want to use SEGGER Embedded Studio, you may skip the part about
-installing and configuring it.
+In case you have an older version of the SDK installed, use the following commands to update it to the recommended version. Replace `<nrfconnect-dir>` with a path to the nRF Connect SDK installation directory.
+
+        $ cd <nrfconnect-dir>/nrf
+        $ git fetch origin
+        $ git checkout v1.4.0
+        $ west update
 
 Download and install the
 [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools).
 
 Download and install [GN meta-build system](https://gn.googlesource.com/gn/).
 
-Make sure that you source the following file:
+Initialize environment variables referred to by CHIP and nRF Connect SDK build scripts. Replace `<nrfconnect-dir>` with a path to the nRF Connect SDK installation directory. Also replace `<toolchain-dir>` with a path to GNU Arm Embedded Toolchain.
 
-        $ source <ncs-dir>/zephyr/zephyr-env.sh
+        $ source <nrfconnect-dir>/zephyr/zephyr-env.sh
+        $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
+        $ export GNUARMEMB_TOOLCHAIN_PATH=<toolchain-dir>
 
-> **Note:**
->
-> Ensure that `$ZEPHYR_BASE`, `$GNUARMEMB_TOOLCHAIN_PATH`, and
-> `$ZEPHYR_TOOLCHAIN_VARIANT` environment variables are set in your current
-> terminal before building. `$GNUARMEMB_TOOLCHAIN_PATH` and
-> `$ZEPHYR_TOOLCHAIN_VARIANT` must be set manually.
+## Building
 
-After your environment is set up, you are ready to build the example. The
-recommended tool for building and flashing the device is
-[west](https://docs.zephyrproject.org/latest/guides/west/).
+Navigate to the example's directory:
 
-The following commands will build the `lock-app` example:
+        $ cd examples/lock-app/nrfconnect
 
-        $ cd ~/connectedhomeip/examples/lock-app/nrfconnect
+Run the following command to build the example. Replace `<board-name>` with name of the Nordic board you own, for example `nrf52840dk_nrf52840`.
 
-        # If this is a first time build or if `build` directory was deleted
-        $ west build -b nrf52840dk_nrf52840
+        $ west build -b <board-name>
 
-        # Any subsequent build
+You only need to specify the board name on the first build, then it's enough to run:
+
         $ west build
 
-After a successful build, the binary will be available under
-`<example-dir>/build/zephyr/zephyr.hex`
+To remove all build artifacts:
 
-### Supported nRF Connect SDK versions
+        $ rm -r build
 
-It is recommended to use the nRF Connect version which is being verified as a
-part of CHIP Continuous Integration testing, which happens to be `v1.4.0` at the
-moment. You may verify that the revision is used in
-[chip-build-nrf-platform](https://github.com/project-chip/connectedhomeip/blob/master/integrations/docker/images/chip-build-nrf-platform/Dockerfile)
-Docker image in case of doubt.
+To build the example with release configuration which disables diagnostic features like logs and command-line interface:
 
-Please refer to
-[this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories)
-in the user guide to learn how to update nRF Connect SDK repository. For example
-to checkout given `v1.4.0` revision the following commands should be called:
-
-        # Phrase <nrfconnect-dir> should be replaced with an absolute path to nRF Connect SDK source directory.
-        $ cd <nrfconnect-dir>/nrf
-
-        $ git fetch origin
-        $ git checkout v1.4.0
-        $ west update
-
-Alternatively, if you use the docker container, you may execute the following
-command instead:
-
-        $ setup --ncs v1.4.0
+        $ west build -b <board-name> -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/release.conf
 
 ### Building minimal binary
 
@@ -307,21 +275,15 @@ file.
 
 ## Flashing and debugging
 
-The example application is designed to run on the
-[Nordic nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)
-development kit.
+To flash the application onto the device, run the command below in the example's directory:
 
-To flash the application to the device, use the `west` tool:
-
-        $ cd <example-dir>
         $ west flash
 
-If you have multiple nRF52840 DK boards connected, `west` will prompt you to
+If you have multiple Nordic devices connected, `west` will prompt you to
 pick the correct one.
 
-To debug the application on target:
+To start the application with a debugger attached to your board, run:
 
-        $ cd <example-dir>
         $ west debug
 
 ## Testing the example
