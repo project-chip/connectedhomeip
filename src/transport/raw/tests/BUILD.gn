@@ -34,11 +34,6 @@ static_library("helpers") {
 chip_test_suite("tests") {
   output_name = "libRawTransportTests"
 
-  sources = [
-    "NetworkTestHelpers.cpp",
-    "NetworkTestHelpers.h",
-  ]
-
   test_sources = [
     "TestMessageHeader.cpp",
     "TestTCP.cpp",
