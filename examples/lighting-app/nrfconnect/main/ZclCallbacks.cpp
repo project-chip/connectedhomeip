@@ -54,7 +54,9 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
         if (size == 1)
         {
             LightingMgr().InitiateAction(LightingManager::LEVEL_ACTION, AppEvent::kEventType_Lighting, size, value);
-        } else {
+        }
+        else
+        {
             ChipLogError(Zcl, "wrong length for level: %d", size);
         }
     }
