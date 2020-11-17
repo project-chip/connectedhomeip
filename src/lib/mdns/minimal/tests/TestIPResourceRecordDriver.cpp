@@ -16,7 +16,14 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "TestMinimalMdns.h"
 
-int TestQName();
-int TestIPResourceRecord();
+#include <nlunit-test.h>
+
+int main()
+{
+    // Generate machine-readable, comma-separated value (CSV) output.
+    nlTestSetOutputStyle(OUTPUT_CSV);
+
+    return TestIPResourceRecord();
+}

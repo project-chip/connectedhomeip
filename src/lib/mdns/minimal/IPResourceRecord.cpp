@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -16,7 +15,27 @@
  *    limitations under the License.
  */
 
-#pragma once
+#include "IPResourceRecord.h"
 
-int TestQName();
-int TestIPResourceRecord();
+namespace mdns {
+namespace Minimal {
+
+bool IPResourceRecord::WriteData(chip::BufBound & out) const
+{
+    // IP address is already stored in network byte order. We cannot use
+    // PutBE/PutLE
+
+    if (mIPAddress.IsIPv6())
+    {
+        out.Put(mIPAddress.Addr, 16);
+    }
+    else
+    {
+        out.Put(mIPAddress.Addr + 3, 4);
+    }
+
+    return out.Fit();
+}
+
+} // namespace Minimal
+} // namespace mdns

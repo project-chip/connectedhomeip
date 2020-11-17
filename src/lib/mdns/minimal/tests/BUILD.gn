@@ -22,6 +22,7 @@ chip_test_suite("tests") {
 
   sources = [
     "TestMinimalMdns.h",
+    "TestIPResourceRecord.cpp",
     "TestQName.cpp",
   ]
 
@@ -33,5 +34,8 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  tests = [ "TestQName" ]
+  tests = [ 
+    "TestIPResourceRecord",
+    "TestQName",
+   ]
 }

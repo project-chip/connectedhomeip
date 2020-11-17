@@ -46,6 +46,9 @@ public:
 
     HeaderRef & Header() { return mHeader; }
 
+    /// Attempts to add a record to the currentsystem packet buffer.
+    /// On success, the packet buffer data length is updated.
+    /// On failure, the packet buffer data length is NOT updated and header is unchanged.
     ResponseBuilder & AddRecord(ResourceType type, const ResourceRecord & record)
     {
         if (!mBuildOk)

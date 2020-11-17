@@ -37,12 +37,14 @@ public:
     QType GetType() const { return mType; }
 
     uint64_t GetTtl() const { return mTtl; }
-    ResourceRecord & SetTtl(uint64_t & ttl)
+    ResourceRecord & SetTtl(uint64_t ttl)
     {
         mTtl = ttl;
         return *this;
     }
 
+    /// Append the given record to the underlying output.
+    /// Updates header item count on success, does NOT update header on failure.
     bool Append(HeaderRef & hdr, ResourceType asType, chip::BufBound & out) const;
 
 protected:

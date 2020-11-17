@@ -19,6 +19,8 @@ static_library("minimal") {
     "BytesRange.h",
     "Constants.h",
     "DnsHeader.h",
+    "IPResourceRecord.h",
+    "IPResourceRecord.cpp",
     "Parser.cpp",
     "Parser.h",
     "QName.cpp",

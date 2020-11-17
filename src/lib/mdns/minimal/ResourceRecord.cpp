@@ -55,6 +55,7 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, chip::BufBound
     }
     sizeOutput.PutBE16(static_cast<uint16_t>(out.Written() - sizeOutput.Written() - 2));
 
+    // This MUST be final and separated out: record count is only updated on success.
     if (out.Fit())
     {
         switch (asType)

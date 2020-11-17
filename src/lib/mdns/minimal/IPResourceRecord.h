@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -18,5 +17,27 @@
 
 #pragma once
 
-int TestQName();
-int TestIPResourceRecord();
+#include <inet/IPAddress.h>
+
+#include "ResourceRecord.h"
+
+namespace mdns {
+namespace Minimal {
+
+class IPResourceRecord : public ResourceRecord
+{
+public:
+    IPResourceRecord(const QNamePart * names, uint16_t namesCount, const chip::Inet::IPAddress & ip) :
+        ResourceRecord(ip.IsIPv6() ? QType::AAAA : QType::A, names, namesCount), mIPAddress(ip)
+    {}
+
+protected:
+    bool WriteData(chip::BufBound & out) const override;
+
+private:
+    const chip::Inet::IPAddress mIPAddress;
+};
+
+} // namespace Minimal
+
+} // namespace mdns
