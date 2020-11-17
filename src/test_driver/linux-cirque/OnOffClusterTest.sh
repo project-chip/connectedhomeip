@@ -29,9 +29,12 @@ function build_chip_tool() {
     # These files should be successfully compiled elsewhere.
     source "$REPO_DIR/scripts/activate.sh" >/dev/null
     set -x
+    gn gen out/debug >/dev/null
+    run_ninja -C out/debug TestDiscoveryManager
     cd "$chip_tool_dir"
     gn gen out/debug >/dev/null
     run_ninja -C out/debug
+    cp "$REPO_DIR"/out/debug/obj/src/lib/mdns/tests/bin/TestDiscoveryManager out/debug
     docker build -t chip_tool -f Dockerfile . 2>&1
 }
 
@@ -39,7 +42,7 @@ function build_chip_lighting() {
     source "$REPO_DIR/scripts/activate.sh" >/dev/null
     set -x
     cd "$chip_light_dir"
-    gn gen out/debug --args='bypass_rendezvous=true'
+    gn gen out/debug --args='chip_bypass_rendezvous=true'
     run_ninja -C out/debug
     docker build -t chip_server -f Dockerfile . 2>&1
     set +x
