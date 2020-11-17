@@ -360,7 +360,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
         {
             memcpy(buffer->Start(), messageStr, messageLen);
             buffer->SetDataLength(messageLen);
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release());
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
         }
     }
 
@@ -420,7 +420,7 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
             buffer->SetDataLength(dataLength);
 
             // Hardcode endpoint to 1 for now
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release());
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
         }
     }
 
@@ -468,7 +468,7 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
     buffer->SetDataLength(valueLength);
 
     pthread_mutex_lock(&sStackLock);
-    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, buffer.Release());
+    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, buffer.Release_ForNow());
     pthread_mutex_unlock(&sStackLock);
 exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);

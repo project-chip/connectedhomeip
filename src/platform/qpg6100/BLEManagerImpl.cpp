@@ -414,7 +414,7 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = connId;
-        event.CHIPoBLEWriteReceived.Data  = buf.Release();
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
     }
 

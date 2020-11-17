@@ -950,7 +950,7 @@ void BLEManagerImpl::HandleRXCharWrite(esp_ble_gatts_cb_param_t * param)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = param->write.conn_id;
-        event.CHIPoBLEWriteReceived.Data  = buf.Release();
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
     }
 

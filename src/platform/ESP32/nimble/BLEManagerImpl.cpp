@@ -675,7 +675,7 @@ void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = param->conn_handle;
-        event.CHIPoBLEWriteReceived.Data  = buf.Release();
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
     }
 
