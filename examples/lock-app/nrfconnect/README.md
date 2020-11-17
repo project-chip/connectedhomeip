@@ -141,19 +141,20 @@ First, checkout CHIP repository and sync submodules using the following command:
 
         $ git submodule update --init
 
-The example requires nRF Connect SDK v1.4.0. You can either install it along with
-related tools directly on your system or use a Docker image which comes with the
-tools pre-installed.
+The example requires nRF Connect SDK v1.4.0. You can either install it along
+with related tools directly on your system or use a Docker image which comes
+with the tools pre-installed.
 
 Note that if you're a macOS user, you won't be able to use the Docker container
 to flash the application onto a Nordic board due to
 [certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container),
-so it's recommended that you skip to the [Using native shell](#using-native-shell)
-instruction.
+so it's recommended that you skip to the
+[Using native shell](#using-native-shell) instruction.
 
 ### Using Docker container
 
-If you don't have nRF Connect SDK installed yet, create a directory where it should be placed:
+If you don't have nRF Connect SDK installed yet, create a directory where it
+should be placed:
 
         $ mkdir ~/nrfconnect
 
@@ -161,7 +162,9 @@ Download the latest `nordicsemi/nrfconnect-chip` Docker image:
 
         $ docker pull nordicsemi/nrfconnect-chip
 
-The next command will start a Docker container using the image acquired in the previous step. Please read the below explanation for all specified arguments before proceeding.
+The next command will start a Docker container using the image acquired in the
+previous step. Please read the below explanation for all specified arguments
+before proceeding.
 
         $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
             -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
@@ -190,11 +193,14 @@ Proceed with the [Building](#building) instruction.
 
 ### Using native shell
 
-Follow the [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
-to install nRF Connect SDK v1.4.0. Since further in the text we use command-line tools to build
-the example, installing SEGGER Embedded Studio is not required.
+Follow the
+[guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
+to install nRF Connect SDK v1.4.0. Since further in the text we use command-line
+tools to build the example, installing SEGGER Embedded Studio is not required.
 
-In case you have an older version of the SDK installed, use the following commands to update it to the recommended version. Replace `<nrfconnect-dir>` with a path to the nRF Connect SDK installation directory.
+In case you have an older version of the SDK installed, use the following
+commands to update it to the recommended version. Replace `<nrfconnect-dir>`
+with a path to the nRF Connect SDK installation directory.
 
         $ cd <nrfconnect-dir>/nrf
         $ git fetch origin
@@ -206,7 +212,10 @@ Download and install the
 
 Download and install [GN meta-build system](https://gn.googlesource.com/gn/).
 
-Initialize environment variables referred to by CHIP and nRF Connect SDK build scripts. Replace `<nrfconnect-dir>` with a path to the nRF Connect SDK installation directory. Also replace `<toolchain-dir>` with a path to GNU Arm Embedded Toolchain.
+Initialize environment variables referred to by CHIP and nRF Connect SDK build
+scripts. Replace `<nrfconnect-dir>` with a path to the nRF Connect SDK
+installation directory. Also replace `<toolchain-dir>` with a path to GNU Arm
+Embedded Toolchain.
 
         $ source <nrfconnect-dir>/zephyr/zephyr-env.sh
         $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
@@ -218,11 +227,13 @@ Navigate to the example's directory:
 
         $ cd examples/lock-app/nrfconnect
 
-Run the following command to build the example. Replace `<board-name>` with name of the Nordic board you own, for example `nrf52840dk_nrf52840`.
+Run the following command to build the example. Replace `<board-name>` with name
+of the Nordic board you own, for example `nrf52840dk_nrf52840`.
 
         $ west build -b <board-name>
 
-You only need to specify the board name on the first build, then it's enough to run:
+You only need to specify the board name on the first build, then it's enough to
+run:
 
         $ west build
 
@@ -230,7 +241,8 @@ To remove all build artifacts:
 
         $ rm -r build
 
-To build the example with release configuration which disables diagnostic features like logs and command-line interface:
+To build the example with release configuration which disables diagnostic
+features like logs and command-line interface:
 
         $ west build -b <board-name> -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/release.conf
 
@@ -275,12 +287,13 @@ file.
 
 ## Flashing and debugging
 
-To flash the application onto the device, run the command below in the example's directory:
+To flash the application onto the device, run the command below in the example's
+directory:
 
         $ west flash
 
-If you have multiple Nordic devices connected, `west` will prompt you to
-pick the correct one.
+If you have multiple Nordic devices connected, `west` will prompt you to pick
+the correct one.
 
 To start the application with a debugger attached to your board, run:
 
