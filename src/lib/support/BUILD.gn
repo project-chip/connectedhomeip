@@ -66,6 +66,8 @@ static_library("support") {
     "ErrorStr.h",
     "FibonacciUtils.cpp",
     "FibonacciUtils.h",
+    "HexUtils.cpp",
+    "HexUtils.h",
     "PersistedCounter.cpp",
     "PersistedCounter.h",
     "Pool.cpp",

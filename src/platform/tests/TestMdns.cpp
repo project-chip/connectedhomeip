@@ -12,6 +12,14 @@ using chip::Mdns::MdnsService;
 using chip::Mdns::MdnsServiceProtocol;
 using chip::Mdns::TextEntry;
 
+class MockNotificationDelegate : public chip::Mdns::MdnsNotificationDelegate
+{
+public:
+    void AddMdnsService(const MdnsService & service) override {}
+    void RemoveMdnsService(const MdnsService & service) override {}
+    void UpdateMdnsService(const MdnsService & service) override {}
+};
+
 static void HandleResolve(void * context, MdnsService * result, CHIP_ERROR error)
 {
     char addrBuf[100];
@@ -79,9 +87,10 @@ static void ErrorCallback(void * context, CHIP_ERROR error)
 
 void TestMdnsPubSub(nlTestSuite * inSuite, void * inContext)
 {
+    MockNotificationDelegate delegate;
     chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformMgr().InitChipStack();
-    NL_TEST_ASSERT(inSuite, chip::Mdns::ChipMdnsInit(InitCallback, ErrorCallback, inSuite) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, chip::Mdns::ChipMdnsInit(InitCallback, ErrorCallback, &delegate, inSuite) == CHIP_NO_ERROR);
 
     ChipLogProgress(DeviceLayer, "Start EventLoop");
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
