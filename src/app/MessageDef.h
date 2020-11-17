@@ -1357,7 +1357,7 @@ public:
     AttributePath::Builder & CreateAttributePathBuilder();
 
     /**
-     *  @brief Inject DataVersion into the TLV stream to indicate the numerical data version associated with 
+     *  @brief Inject DataVersion into the TLV stream to indicate the numerical data version associated with
      *  the cluster that is referenced by the path.
      *
      *  @param [in] aDataVersion The boolean variable to indicate if AttributeDataElement has version
@@ -1368,8 +1368,8 @@ public:
 
     /**
     *  @brief Inject aMoreClusterData into the TLV stream to indicate whether there is more cluster data.
-     *  This is present when there is more than one AttributeDataElement as part of a logical Changeset, 
-     *  and the entire set needs to be applied ‘atomically’ on the receiver. 
+     *  This is present when there is more than one AttributeDataElement as part of a logical Changeset,
+     *  and the entire set needs to be applied ‘atomically’ on the receiver.
      *
      *  @param [in] aMoreClusterData The boolean variable to indicate if more cluster data is needed.
      *
