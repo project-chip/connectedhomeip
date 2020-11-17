@@ -36,11 +36,11 @@ chip_test_suite("tests") {
 
   test_sources = [
     "TestMessageHeader.cpp",
-    "TestTCP.cpp",
+    "TestUDP.cpp",
   ]
 
   if (current_os != "mac") {
-    test_sources += [ "TestUDP.cpp" ]
+    test_sources += [ "TestTCP.cpp" ]
   }
 
   public_deps = [
