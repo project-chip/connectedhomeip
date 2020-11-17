@@ -360,7 +360,7 @@ private:
     CHIP_ERROR _Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag);
 };
 
-};
+}; // namespace AttributePath
 
 namespace AttributePathList {
 class Parser : public ListParserBase
@@ -402,7 +402,7 @@ public:
 private:
     AttributePath::Builder mAttributePathBuilder;
 };
-};
+}; // namespace AttributePathList
 
 namespace EventPath {
 enum
@@ -554,7 +554,7 @@ public:
 private:
     CHIP_ERROR _Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag);
 };
-};
+}; // namespace EventPath
 
 namespace EventPathList {
 class Parser : public ListParserBase
@@ -596,7 +596,7 @@ public:
 private:
     EventPath::Builder mEventPathBuilder;
 };
-};
+}; // namespace EventPathList
 
 namespace CommandPath {
 enum
@@ -748,19 +748,19 @@ public:
 private:
     CHIP_ERROR _Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag);
 };
-};
+}; // namespace CommandPath
 
 namespace EventDataElement {
 enum
 {
-    kCsTag_EventPath       = 0,
-    kCsTag_ImportanceLevel = 1,
-    kCsTag_Number          = 2,
-    kCsTag_UTCTimestamp    = 3,
-    kCsTag_SystemTimestamp = 4,
-    kCsTag_DeltaUTCTimestamp   = 5,
-    kCsTag_DeltaSystemTimestamp= 6,
-    kCsTag_Data            = 7,
+    kCsTag_EventPath            = 0,
+    kCsTag_ImportanceLevel      = 1,
+    kCsTag_Number               = 2,
+    kCsTag_UTCTimestamp         = 3,
+    kCsTag_SystemTimestamp      = 4,
+    kCsTag_DeltaUTCTimestamp    = 5,
+    kCsTag_DeltaSystemTimestamp = 6,
+    kCsTag_Data                 = 7,
 };
 
 class Parser : public ParserBase
@@ -954,8 +954,8 @@ public:
 
     /**
      *  @brief Inject DeltaSystemTimestamp into the TLV stream.
-     *  This field is present if delta encoding of the System timestamp relative to a prior event is desired for compression reasons.
-     *  When this field is present, the System Timestamp field SHALL be omitted.
+     *  This field is present if delta encoding of the System timestamp relative to a prior event is desired for compression
+     * reasons. When this field is present, the System Timestamp field SHALL be omitted.
      *
      *  @param [in] DeltaSystemTimestamp The uint64_t variable to reflect DeltaSystemTime
      *
@@ -973,7 +973,7 @@ public:
 private:
     EventPath::Builder mEventPathBuilder;
 };
-};
+}; // namespace EventDataElement
 
 namespace EventList {
 class Parser : public ListParserBase
@@ -1015,7 +1015,7 @@ public:
 private:
     EventDataElement::Builder mEventDataElementBuilder;
 };
-};
+}; // namespace EventList
 
 namespace StatusElement {
 enum
@@ -1114,7 +1114,7 @@ public:
      */
     StatusElement::Builder & EndOfStatusElement();
 };
-};
+}; // namespace StatusElement
 
 namespace AttributeStatusElement {
 enum
@@ -1210,7 +1210,7 @@ public:
      */
     CHIP_ERROR GetStatusElement(StatusElement::Parser * const apStatusElement) const;
 };
-};
+}; // namespace AttributeStatusElement
 
 namespace AttributeStatusList {
 class Builder : public ListBuilderBase
@@ -1252,7 +1252,7 @@ public:
      */
     CHIP_ERROR CheckSchemaValidity() const;
 };
-};
+}; // namespace AttributeStatusList
 
 namespace AttributeDataElement {
 enum
@@ -1367,7 +1367,7 @@ public:
     AttributeDataElement::Builder & DataVersion(const chip::DataVersion aDataVersion);
 
     /**
-    *  @brief Inject aMoreClusterData into the TLV stream to indicate whether there is more cluster data.
+     *  @brief Inject aMoreClusterData into the TLV stream to indicate whether there is more cluster data.
      *  This is present when there is more than one AttributeDataElement as part of a logical Changeset,
      *  and the entire set needs to be applied ‘atomically’ on the receiver.
      *
@@ -1387,7 +1387,7 @@ public:
 private:
     AttributePath::Builder mAttributePathBuilder;
 };
-};
+}; // namespace AttributeDataElement
 
 namespace AttributeDataList {
 class Parser : public ListParserBase
@@ -1429,7 +1429,7 @@ public:
 private:
     AttributeDataElement::Builder mAttributeDataElementBuilder;
 };
-};
+}; // namespace AttributeDataList
 
 namespace CommandDataElement {
 enum
@@ -1540,7 +1540,7 @@ private:
     CommandPath::Builder mCommandPathBuilder;
     StatusElement::Builder mStatusElementBuilder;
 };
-};
+}; // namespace CommandDataElement
 
 namespace CommandList {
 class Parser : public ListParserBase
@@ -1582,7 +1582,7 @@ public:
 private:
     CommandDataElement::Builder mCommandDataElementBuilder;
 };
-};
+}; // namespace CommandList
 
 namespace ReportData {
 enum
@@ -1762,7 +1762,7 @@ private:
     AttributeDataList::Builder mAttributeDataListBuilder;
     EventList::Builder mEventDataListBuilder;
 };
-};
+}; // namespace ReportData
 
 namespace InvokeCommand {
 enum
@@ -1837,7 +1837,7 @@ public:
 private:
     CommandList::Builder mCommandListBuilder;
 };
-};
+}; // namespace InvokeCommand
 
 }; // namespace app
 }; // namespace chip
