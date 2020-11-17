@@ -29,6 +29,7 @@
 #include <platform/ConnectivityManager.h>
 #include <platform/GeneralUtils.h>
 #include <platform/PlatformManager.h>
+#include <system/SystemClock.h>
 #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 #include <platform/SoftwareUpdateManager.h>
 #endif // CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
