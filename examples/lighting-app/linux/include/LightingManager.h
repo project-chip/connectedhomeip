@@ -51,7 +51,6 @@ public:
 private:
     friend LightingManager & LightingMgr(void);
     State_t mState;
-    uint32_t mGPIONum;
 
     LightingCallback_fn mActionInitiated_CB;
     LightingCallback_fn mActionCompleted_CB;
