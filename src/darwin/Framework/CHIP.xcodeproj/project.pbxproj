@@ -13,9 +13,9 @@
 		2C222ADC255C74D100E446B9 /* CHIPDeviceStatusDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222AD9255C74D100E446B9 /* CHIPDeviceStatusDelegateBridge.h */; };
 		2C222ADD255C74D100E446B9 /* CHIPDeviceStatusDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222ADA255C74D100E446B9 /* CHIPDeviceStatusDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2C222ADF255C811800E446B9 /* CHIPDevice_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222ADE255C811800E446B9 /* CHIPDevice_Internal.h */; };
-		2C222AEA25634E2F00E446B9 /* CHIPDeviceCallbackContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222AE825634E2F00E446B9 /* CHIPDeviceCallbackContext.h */; };
-		2C222AEB25634E2F00E446B9 /* CHIPDeviceCallbackContext.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C222AE925634E2F00E446B9 /* CHIPDeviceCallbackContext.mm */; };
 		2C222AED25634E5300E446B9 /* CHIPDeviceCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222AEC25634E5300E446B9 /* CHIPDeviceCallback.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		2C222AF025646BB100E446B9 /* CHIPCallbackBridge.mm in Sources */ = {isa = PBXBuildFile; fileRef = 2C222AEE25646BB100E446B9 /* CHIPCallbackBridge.mm */; };
+		2C222AF125646BB100E446B9 /* CHIPCallbackBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C222AEF25646BB100E446B9 /* CHIPCallbackBridge.h */; };
 		2C4DF09E248B2C60009307CB /* libmbedtls.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C4DF09D248B2C60009307CB /* libmbedtls.a */; settings = {ATTRIBUTES = (Required, ); }; };
 		2C8C8FC0253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C8C8FBD253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h */; };
 		2C8C8FC1253E0C2100797F05 /* CHIPPersistentStorageDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 2C8C8FBE253E0C2100797F05 /* CHIPPersistentStorageDelegate.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -59,9 +59,9 @@
 		2C222AD9255C74D100E446B9 /* CHIPDeviceStatusDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceStatusDelegateBridge.h; sourceTree = "<group>"; };
 		2C222ADA255C74D100E446B9 /* CHIPDeviceStatusDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceStatusDelegate.h; sourceTree = "<group>"; };
 		2C222ADE255C811800E446B9 /* CHIPDevice_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDevice_Internal.h; sourceTree = "<group>"; };
-		2C222AE825634E2F00E446B9 /* CHIPDeviceCallbackContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceCallbackContext.h; sourceTree = "<group>"; };
-		2C222AE925634E2F00E446B9 /* CHIPDeviceCallbackContext.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPDeviceCallbackContext.mm; sourceTree = "<group>"; };
 		2C222AEC25634E5300E446B9 /* CHIPDeviceCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPDeviceCallback.h; sourceTree = "<group>"; };
+		2C222AEE25646BB100E446B9 /* CHIPCallbackBridge.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CHIPCallbackBridge.mm; sourceTree = "<group>"; };
+		2C222AEF25646BB100E446B9 /* CHIPCallbackBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPCallbackBridge.h; sourceTree = "<group>"; };
 		2C4DF09D248B2C60009307CB /* libmbedtls.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmbedtls.a; path = lib/libmbedtls.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		2C8C8FBD253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPPersistentStorageDelegateBridge.h; sourceTree = "<group>"; };
 		2C8C8FBE253E0C2100797F05 /* CHIPPersistentStorageDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CHIPPersistentStorageDelegate.h; sourceTree = "<group>"; };
@@ -136,9 +136,9 @@
 		B202528F2459E34F00F97062 /* CHIP */ = {
 			isa = PBXGroup;
 			children = (
+				2C222AEF25646BB100E446B9 /* CHIPCallbackBridge.h */,
+				2C222AEE25646BB100E446B9 /* CHIPCallbackBridge.mm */,
 				2C222AEC25634E5300E446B9 /* CHIPDeviceCallback.h */,
-				2C222AE825634E2F00E446B9 /* CHIPDeviceCallbackContext.h */,
-				2C222AE925634E2F00E446B9 /* CHIPDeviceCallbackContext.mm */,
 				2C222ADE255C811800E446B9 /* CHIPDevice_Internal.h */,
 				2C222ADA255C74D100E446B9 /* CHIPDeviceStatusDelegate.h */,
 				2C222AD9255C74D100E446B9 /* CHIPDeviceStatusDelegateBridge.h */,
@@ -207,11 +207,11 @@
 				2C222AED25634E5300E446B9 /* CHIPDeviceCallback.h in Headers */,
 				2C8C8FC1253E0C2100797F05 /* CHIPPersistentStorageDelegate.h in Headers */,
 				B2E0D7B5245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.h in Headers */,
+				2C222AF125646BB100E446B9 /* CHIPCallbackBridge.h in Headers */,
 				2C8C8FC0253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.h in Headers */,
 				2C222ADF255C811800E446B9 /* CHIPDevice_Internal.h in Headers */,
 				515C401D2486BF43004C4DB3 /* CHIPOnOff.h in Headers */,
 				991DC08B247704DC00C13860 /* CHIPLogging.h in Headers */,
-				2C222AEA25634E2F00E446B9 /* CHIPDeviceCallbackContext.h in Headers */,
 				B2E0D7B4245B0B5C003C5B48 /* CHIPError.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -339,9 +339,9 @@
 				2C8C8FC2253E0C2100797F05 /* CHIPPersistentStorageDelegateBridge.mm in Sources */,
 				2CB7163C252E8A7C0026E2BB /* CHIPDevicePairingDelegateBridge.mm in Sources */,
 				515C401C2486BF43004C4DB3 /* CHIPOnOff.mm in Sources */,
-				2C222AEB25634E2F00E446B9 /* CHIPDeviceCallbackContext.mm in Sources */,
 				2C222AD1255C620600E446B9 /* CHIPDevice.mm in Sources */,
 				991DC0892475F47D00C13860 /* CHIPDeviceController.mm in Sources */,
+				2C222AF025646BB100E446B9 /* CHIPCallbackBridge.mm in Sources */,
 				B2E0D7B7245B0B5C003C5B48 /* CHIPQRCodeSetupPayloadParser.mm in Sources */,
 				B2E0D7B3245B0B5C003C5B48 /* CHIPError.mm in Sources */,
 				2C222ADB255C74D100E446B9 /* CHIPDeviceStatusDelegateBridge.mm in Sources */,

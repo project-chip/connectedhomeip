@@ -15,23 +15,26 @@
  *    limitations under the License.
  */
 
-#import "CHIPDeviceCallbackContext.h"
-#import "CHIPError.h"
 #import <Foundation/Foundation.h>
 
-CHIPDeviceCallbackContext::CHIPDeviceCallbackContext(CHIPDeviceCallback handler, dispatch_queue_t queue)
-    : mHandler(handler)
-    , mQueue(queue)
-{
-}
+#import "CHIPDeviceCallback.h"
+#import "CHIPError.h"
 
-CHIPDeviceCallbackContext::~CHIPDeviceCallbackContext() {}
+#include <controller/CHIPDevice.h>
 
-void CHIPDeviceCallbackContext::CallbackFn(CHIPDeviceCallbackContext * context)
+NS_ASSUME_NONNULL_BEGIN
+
+class CHIPCallbackBridge : public chip::Callback::Callback<>
 {
-    if (context->mQueue) {
-        dispatch_async(context->mQueue, ^{
-            context->mHandler([CHIPError errorForCHIPErrorCode:CHIP_NO_ERROR]);
-        });
-    }
-}
+public:
+    CHIPCallbackBridge(CHIPDeviceCallback handler, dispatch_queue_t queue);
+    ~CHIPCallbackBridge();
+
+    static void CallbackFn(void * context);
+
+private:
+    CHIPDeviceCallback mHandler;
+    dispatch_queue_t mQueue;
+};
+
+NS_ASSUME_NONNULL_END

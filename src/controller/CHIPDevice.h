@@ -42,19 +42,6 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-class DeviceCallbackContextBase
-{
-    friend class Device;
-
-private:
-    uint16_t mClusterId;
-    uint8_t mEndpoint;
-};
-
-typedef void (*DeviceCallBackFn)(DeviceCallbackContextBase *);
-
-typedef Callback::Callback<DeviceCallBackFn> DeviceCallback;
-
 class DLL_EXPORT Device
 {
 public:
@@ -187,8 +174,8 @@ public:
 
     SecurePairingSessionSerializable & GetPairing() { return mPairing; }
 
-    void OnResponse(uint8_t endpoint, uint16_t cluster, DeviceCallback * onResponse);
-    void OnReport(uint8_t endpoint, uint16_t cluster, DeviceCallback * onReport);
+    void OnResponse(uint8_t endpoint, uint16_t cluster, Callback::Callback<> * onResponse);
+    void OnReport(uint8_t endpoint, uint16_t cluster, Callback::Callback<> * onReport);
 
 private:
     enum class ConnectionState

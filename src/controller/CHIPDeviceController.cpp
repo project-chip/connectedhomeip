@@ -78,7 +78,6 @@ constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
         char key[len + 2 * sizeof(NodeId) + 1];                                                                                    \
         nlSTATIC_ASSERT_PRINT(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                          \
         snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                 \
-        ChipLogProgress(Controller, "PERSISTENT_KEY_OP: key %s", key);                                                             \
         action;                                                                                                                    \
     } while (0)
 
@@ -569,7 +568,6 @@ CHIP_ERROR DeviceCommissioner::UnpairDevice(NodeId remoteDeviceId)
 
     if (mStorageDelegate != nullptr)
     {
-        ChipLogProgress(Controller, "Unpairing device %llu", remoteDeviceId);
         PERSISTENT_KEY_OP(remoteDeviceId, kPairedDeviceKeyPrefix, key, mStorageDelegate->DeleteKeyValue(key));
         mPairedDevices.Remove(remoteDeviceId);
         mPairedDevicesUpdated = true;

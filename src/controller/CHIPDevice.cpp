@@ -176,22 +176,28 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
             mStatusDelegate->OnMessage(msgBuf);
         }
 
-        for (Cancelable * ca = mResponses.mNext; ca != &mResponses; ca = ca->mNext)
+        Cancelable * ca = mResponses.mNext;
+        while (ca != &mResponses)
         {
-            DeviceCallback * cb = Callback::Callback<DeviceCallBackFn>::FromCancelable(ca);
+            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
             if (cb != nullptr)
             {
+                ca = ca->mNext;
+                ChipLogProgress(Controller, "Dispatching response callback %p", cb);
                 cb->Cancel();
-                cb->mCall(reinterpret_cast<DeviceCallbackContextBase *>(cb->mContext));
+                cb->mCall(cb->mContext);
             }
         }
 
-        for (Cancelable * ca = mReports.mNext; ca != &mReports; ca = ca->mNext)
+        ca = mReports.mNext;
+        while (ca != &mReports)
         {
-            DeviceCallback * cb = Callback::Callback<DeviceCallBackFn>::FromCancelable(ca);
+            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
             if (cb != nullptr)
             {
-                cb->mCall(reinterpret_cast<DeviceCallbackContextBase *>(cb->mContext));
+                ca = ca->mNext;
+                ChipLogProgress(Controller, "Dispatching report callback %p", cb);
+                cb->mCall(cb->mContext);
             }
         }
     }
@@ -236,26 +242,18 @@ bool Device::GetIpAddress(Inet::IPAddress & addr) const
     return mState == ConnectionState::SecureConnected;
 }
 
-void Device::OnResponse(uint8_t endpoint, uint16_t cluster, DeviceCallback * onResponse)
+void Device::OnResponse(uint8_t endpoint, uint16_t cluster, Callback::Callback<> * onResponse)
 {
-    DeviceCallbackContextBase * context = reinterpret_cast<DeviceCallbackContextBase *>(onResponse->mContext);
-    if (context != nullptr)
-    {
-        context->mEndpoint  = endpoint;
-        context->mClusterId = cluster;
-        mResponses.Enqueue(onResponse->Cancel());
-    }
+    Callback::Cancelable * cancelable = onResponse->Cancel();
+    cancelable->mInfoScalar           = static_cast<uint64_t>(endpoint << 16 | cluster);
+    mResponses.Enqueue(cancelable);
 }
 
-void Device::OnReport(uint8_t endpoint, uint16_t cluster, DeviceCallback * onReport)
+void Device::OnReport(uint8_t endpoint, uint16_t cluster, Callback::Callback<> * onReport)
 {
-    DeviceCallbackContextBase * context = reinterpret_cast<DeviceCallbackContextBase *>(onReport->mContext);
-    if (context != nullptr)
-    {
-        context->mEndpoint  = endpoint;
-        context->mClusterId = cluster;
-        mReports.Enqueue(onReport->Cancel());
-    }
+    Callback::Cancelable * cancelable = onReport->Cancel();
+    cancelable->mInfoScalar           = static_cast<uint64_t>(endpoint << 16 | cluster);
+    mReports.Enqueue(cancelable);
 }
 
 } // namespace Controller

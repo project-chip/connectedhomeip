@@ -22,114 +22,54 @@
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR OnOffCluster::On(DeviceCallback * onCompletion)
+constexpr uint16_t kMaxOnOffMessageLength = 64;
+
+CHIP_ERROR OnOffCluster::On(Callback::Callback<> * onCompletion)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
-    uint16_t encodeStatus          = 0;
     System::PacketBuffer * message = nullptr;
-    VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    message = System::PacketBuffer::New();
-    VerifyOrExit(message != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    encodeStatus = encodeOnOffClusterOnCommand(message->Start(), message->AvailableDataLength(), mEndpoint);
-    VerifyOrExit(encodeStatus != 0, err = CHIP_ERROR_INTERNAL);
-
-    err = mDevice->SendMessage(message);
-    SuccessOrExit(err);
-
-    mDevice->OnResponse(mEndpoint, mClusterId, onCompletion);
-
-exit:
+    SEND_CLUSTER_COMMAND(err, mDevice, kMaxOnOffMessageLength, message,
+                         encodeOnOffClusterOnCommand(message->Start(), message->AvailableDataLength(), mEndpoint), onCompletion);
     return err;
 }
 
-CHIP_ERROR OnOffCluster::Off(DeviceCallback * onCompletion)
+CHIP_ERROR OnOffCluster::Off(Callback::Callback<> * onCompletion)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
-    uint16_t encodeStatus          = 0;
     System::PacketBuffer * message = nullptr;
-    VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    message = System::PacketBuffer::New();
-    VerifyOrExit(message != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    encodeStatus = encodeOnOffClusterOffCommand(message->Start(), message->AvailableDataLength(), mEndpoint);
-    VerifyOrExit(encodeStatus != 0, err = CHIP_ERROR_INTERNAL);
-
-    err = mDevice->SendMessage(message);
-    SuccessOrExit(err);
-
-    mDevice->OnResponse(mEndpoint, mClusterId, onCompletion);
-
-exit:
+    SEND_CLUSTER_COMMAND(err, mDevice, kMaxOnOffMessageLength, message,
+                         encodeOnOffClusterOffCommand(message->Start(), message->AvailableDataLength(), mEndpoint), onCompletion);
     return err;
 }
 
-CHIP_ERROR OnOffCluster::Toggle(DeviceCallback * onCompletion)
+CHIP_ERROR OnOffCluster::Toggle(Callback::Callback<> * onCompletion)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
-    uint16_t encodeStatus          = 0;
     System::PacketBuffer * message = nullptr;
-    VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    message = System::PacketBuffer::New();
-    VerifyOrExit(message != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    encodeStatus = encodeOnOffClusterToggleCommand(message->Start(), message->AvailableDataLength(), mEndpoint);
-    VerifyOrExit(encodeStatus != 0, err = CHIP_ERROR_INTERNAL);
-
-    err = mDevice->SendMessage(message);
-    SuccessOrExit(err);
-
-    mDevice->OnResponse(mEndpoint, mClusterId, onCompletion);
-
-exit:
+    SEND_CLUSTER_COMMAND(err, mDevice, kMaxOnOffMessageLength, message,
+                         encodeOnOffClusterToggleCommand(message->Start(), message->AvailableDataLength(), mEndpoint),
+                         onCompletion);
     return err;
 }
 
-CHIP_ERROR OnOffCluster::IsOn(DeviceCallback * onCompletion)
+CHIP_ERROR OnOffCluster::IsOn(Callback::Callback<> * onCompletion)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
-    uint16_t encodeStatus          = 0;
     System::PacketBuffer * message = nullptr;
-    VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    message = System::PacketBuffer::New();
-    VerifyOrExit(message != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    encodeStatus = encodeOnOffClusterReadOnOffAttribute(message->Start(), message->AvailableDataLength(), mEndpoint);
-    VerifyOrExit(encodeStatus != 0, err = CHIP_ERROR_INTERNAL);
-
-    err = mDevice->SendMessage(message);
-    SuccessOrExit(err);
-
-    mDevice->OnResponse(mEndpoint, mClusterId, onCompletion);
-
-exit:
+    SEND_CLUSTER_COMMAND(err, mDevice, kMaxOnOffMessageLength, message,
+                         encodeOnOffClusterReadOnOffAttribute(message->Start(), message->AvailableDataLength(), mEndpoint),
+                         onCompletion);
     return err;
 }
 
-CHIP_ERROR OnOffCluster::ReportAttributeOnOff(uint16_t minInterval, uint16_t maxInterval, DeviceCallback * onChange)
+CHIP_ERROR OnOffCluster::ReportAttributeOnOff(uint16_t minInterval, uint16_t maxInterval, Callback::Callback<> * onChange)
 {
     CHIP_ERROR err                 = CHIP_NO_ERROR;
-    uint16_t encodeStatus          = 0;
     System::PacketBuffer * message = nullptr;
-    VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-
-    message = System::PacketBuffer::New();
-    VerifyOrExit(message != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    encodeStatus = encodeOnOffClusterReportOnOffAttribute(message->Start(), message->AvailableDataLength(), mEndpoint, minInterval,
-                                                          maxInterval);
-    VerifyOrExit(encodeStatus != 0, err = CHIP_ERROR_INTERNAL);
-
-    err = mDevice->SendMessage(message);
-    SuccessOrExit(err);
-
-    mDevice->OnReport(mEndpoint, mClusterId, onChange);
-
-exit:
+    REQUEST_CLUSTER_REPORT(err, mDevice, kMaxOnOffMessageLength, message,
+                           encodeOnOffClusterReportOnOffAttribute(message->Start(), message->AvailableDataLength(), mEndpoint,
+                                                                  minInterval, maxInterval),
+                           onChange);
     return err;
 }
 
