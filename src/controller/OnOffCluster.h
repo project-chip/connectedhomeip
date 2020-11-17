@@ -32,12 +32,12 @@ public:
     OnOffCluster() : ClusterBase(kOnOffClusterId) {}
     ~OnOffCluster() {}
 
-    CHIP_ERROR On(DeviceCallback * onCompletion);
-    CHIP_ERROR Off(DeviceCallback * onCompletion);
-    CHIP_ERROR Toggle(DeviceCallback * onCompletion);
+    CHIP_ERROR On(Callback::Callback<> * onCompletion);
+    CHIP_ERROR Off(Callback::Callback<> * onCompletion);
+    CHIP_ERROR Toggle(Callback::Callback<> * onCompletion);
 
-    CHIP_ERROR IsOn(DeviceCallback * onCompletion);
-    CHIP_ERROR ReportAttributeOnOff(uint16_t minInterval, uint16_t maxInterval, DeviceCallback * onChange);
+    CHIP_ERROR IsOn(Callback::Callback<> * onCompletion);
+    CHIP_ERROR ReportAttributeOnOff(uint16_t minInterval, uint16_t maxInterval, Callback::Callback<> * onChange);
 };
 
 } // namespace Controller

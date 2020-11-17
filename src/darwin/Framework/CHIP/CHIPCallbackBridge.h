@@ -24,13 +24,13 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-class CHIPDeviceCallbackContext : public chip::Controller::DeviceCallbackContextBase
+class CHIPCallbackBridge : public chip::Callback::Callback<>
 {
 public:
-    CHIPDeviceCallbackContext(CHIPDeviceCallback handler, dispatch_queue_t queue);
-    ~CHIPDeviceCallbackContext();
+    CHIPCallbackBridge(CHIPDeviceCallback handler, dispatch_queue_t queue);
+    ~CHIPCallbackBridge();
 
-    static void CallbackFn(CHIPDeviceCallbackContext * context);
+    static void CallbackFn(void * context);
 
 private:
     CHIPDeviceCallback mHandler;

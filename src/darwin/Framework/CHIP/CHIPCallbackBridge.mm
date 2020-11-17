@@ -15,23 +15,27 @@
  *    limitations under the License.
  */
 
-#import "CHIPDeviceCallbackContext.h"
+#import "CHIPCallbackBridge.h"
 #import "CHIPError.h"
 #import <Foundation/Foundation.h>
 
-CHIPDeviceCallbackContext::CHIPDeviceCallbackContext(CHIPDeviceCallback handler, dispatch_queue_t queue)
-    : mHandler(handler)
+CHIPCallbackBridge::CHIPCallbackBridge(CHIPDeviceCallback handler, dispatch_queue_t queue)
+    : Callback::Callback<>(CallbackFn, this)
+    , mHandler(handler)
     , mQueue(queue)
 {
 }
 
-CHIPDeviceCallbackContext::~CHIPDeviceCallbackContext() {}
+CHIPCallbackBridge::~CHIPCallbackBridge() {}
 
-void CHIPDeviceCallbackContext::CallbackFn(CHIPDeviceCallbackContext * context)
+void CHIPCallbackBridge::CallbackFn(void * context)
 {
-    if (context->mQueue) {
-        dispatch_async(context->mQueue, ^{
-            context->mHandler([CHIPError errorForCHIPErrorCode:CHIP_NO_ERROR]);
+    CHIPCallbackBridge * callback = reinterpret_cast<CHIPCallbackBridge*>(context);
+    if (callback && callback->mQueue) {
+        dispatch_async(callback->mQueue, ^{
+            callback->mHandler([CHIPError errorForCHIPErrorCode:CHIP_NO_ERROR]);
+            callback->Cancel();
+            delete callback;
         });
     }
 }
