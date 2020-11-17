@@ -112,6 +112,41 @@ std::string GetFullType(const char * type, MdnsServiceProtocol protocol)
     return typeBuilder.str();
 }
 
+MdnsServiceProtocol TruncateProtocolInType(char * type)
+{
+    char * deliminator           = strrchr(type, '.');
+    MdnsServiceProtocol protocol = MdnsServiceProtocol::kMdnsProtocolUnknown;
+
+    if (deliminator != NULL)
+    {
+        if (strcmp("._tcp", deliminator) == 0)
+        {
+            protocol     = MdnsServiceProtocol::kMdnsProtocolTcp;
+            *deliminator = 0;
+        }
+        else if (strcmp("._udp", deliminator) == 0)
+        {
+            protocol     = MdnsServiceProtocol::kMdnsProtocolUdp;
+            *deliminator = 0;
+        }
+    }
+    return protocol;
+}
+
+chip::Mdns::MdnsService MakeMdnsService(const char * name, const char * type, AvahiProtocol protocol)
+{
+    chip::Mdns::MdnsService service{};
+    strncpy(service.mName, name, sizeof(service.mName));
+    strncpy(service.mType, type, sizeof(service.mType));
+    service.mName[chip::Mdns::kMdnsNameMaxSize] = 0;
+    service.mType[chip::Mdns::kMdnsTypeMaxSize] = 0;
+    service.mProtocol                           = TruncateProtocolInType(service.mType);
+    service.mAddressType                        = ToAddressType(protocol);
+    service.mPort                               = 0;
+    service.mAddress.ClearValue();
+    return service;
+}
+
 } // namespace
 
 namespace chip {
@@ -326,18 +361,21 @@ void Poller::Process(const fd_set & readFdSet, const fd_set & writeFdSet, const 
     }
 }
 
-CHIP_ERROR MdnsAvahi::Init(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context)
+CHIP_ERROR MdnsAvahi::Init(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback,
+                           MdnsNotificationDelegate * delegate, void * context)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     int avahiError   = 0;
 
     VerifyOrExit(initCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(errorCallback != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(delegate != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mClient == nullptr && mGroup == nullptr, error = CHIP_ERROR_INCORRECT_STATE);
-    mInitCallback       = initCallback;
-    mErrorCallback      = errorCallback;
-    mAsyncReturnContext = context;
-    mClient             = avahi_client_new(mPoller.GetAvahiPoll(), AVAHI_CLIENT_NO_FAIL, HandleClientState, this, &avahiError);
+    mInitCallback         = initCallback;
+    mErrorCallback        = errorCallback;
+    mNotificationDelegate = delegate;
+    mAsyncReturnContext   = context;
+    mClient               = avahi_client_new(mPoller.GetAvahiPoll(), AVAHI_CLIENT_NO_FAIL, HandleClientState, this, &avahiError);
     VerifyOrExit(mClient != nullptr, error = CHIP_ERROR_OPEN_FAILED);
     VerifyOrExit(avahiError == 0, error = CHIP_ERROR_OPEN_FAILED);
 
@@ -528,27 +566,6 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
     return browser == nullptr ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
 }
 
-MdnsServiceProtocol TruncateProtocolInType(char * type)
-{
-    char * deliminator           = strrchr(type, '.');
-    MdnsServiceProtocol protocol = MdnsServiceProtocol::kMdnsProtocolUnknown;
-
-    if (deliminator != NULL)
-    {
-        if (strcmp("._tcp", deliminator) == 0)
-        {
-            protocol     = MdnsServiceProtocol::kMdnsProtocolTcp;
-            *deliminator = 0;
-        }
-        else if (strcmp("._udp", deliminator) == 0)
-        {
-            protocol     = MdnsServiceProtocol::kMdnsProtocolUdp;
-            *deliminator = 0;
-        }
-    }
-    return protocol;
-}
-
 void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interface, AvahiProtocol protocol, AvahiBrowserEvent event,
                              const char * name, const char * type, const char * domain, AvahiLookupResultFlags /*flags*/,
                              void * userdata)
@@ -566,7 +583,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: cache new");
         if (strcmp("local", domain) == 0)
         {
-            MdnsService service;
+            MdnsService service = MakeMdnsService(name, type, protocol);
 
             strncpy(service.mName, name, sizeof(service.mName));
             strncpy(service.mType, type, sizeof(service.mType));
@@ -575,6 +592,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
             service.mProtocol               = TruncateProtocolInType(service.mType);
             service.mAddressType            = ToAddressType(protocol);
             context->mServices.push_back(service);
+            context->mInstance->mNotificationDelegate->AddMdnsService(service);
         }
         break;
     case AVAHI_BROWSER_ALL_FOR_NOW:
@@ -587,9 +605,14 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
         if (strcmp("local", domain) == 0)
         {
-            std::remove_if(context->mServices.begin(), context->mServices.end(), [name, type](const MdnsService service) {
-                return strcmp(name, service.mName) == 0 && type == GetFullType(service.mType, service.mProtocol);
+            MdnsService removedService = MakeMdnsService(name, type, protocol);
+
+            std::remove_if(context->mServices.begin(), context->mServices.end(), [removedService](const MdnsService service) {
+                return strncmp(removedService.mName, service.mName, sizeof(service.mName)) == 0 &&
+                    strncmp(removedService.mType, service.mType, sizeof(service.mType)) == 0 &&
+                    removedService.mProtocol == service.mProtocol;
             });
+            context->mInstance->mNotificationDelegate->RemoveMdnsService(removedService);
         }
         break;
     case AVAHI_BROWSER_CACHE_EXHAUSTED:
@@ -695,6 +718,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
         }
         result.mTextEntrySize = textEntries.size();
 
+        context->mInstance->mNotificationDelegate->UpdateMdnsService(result);
         context->mCallback(context->mContext, &result, CHIP_NO_ERROR);
         break;
     }
@@ -725,9 +749,10 @@ void ProcessMdns(fd_set & readFdSet, fd_set & writeFdSet, fd_set & errorFdSet)
     MdnsAvahi::GetInstance().GetPoller().Process(readFdSet, writeFdSet, errorFdSet);
 }
 
-CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context)
+CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback,
+                        MdnsNotificationDelegate * delegate, void * context)
 {
-    return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, context);
+    return MdnsAvahi::GetInstance().Init(initCallback, errorCallback, delegate, context);
 }
 
 CHIP_ERROR ChipMdnsSetHostname(const char * hostname)
