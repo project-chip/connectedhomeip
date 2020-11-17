@@ -41,6 +41,7 @@ namespace Controller {
         encodedLength = encoder;                                                                                                   \
         VerifyOrExit(encodedLength != 0, err = CHIP_ERROR_INTERNAL);                                                               \
         message->SetDataLength(encodedLength);                                                                                     \
+        VerifyOrExit(message->DataLength() >= encodedLength, err = CHIP_ERROR_NO_MEMORY);                                          \
         err     = mDevice->SendMessage(message);                                                                                   \
         message = nullptr;                                                                                                         \
         SuccessOrExit(err);                                                                                                        \

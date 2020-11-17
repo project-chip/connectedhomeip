@@ -71,8 +71,13 @@
     } else {
         buffer->SetDataLength(messageLen);
 
-        memcpy(buffer->Start(), messageChars, messageLen);
-        err = self.cppDevice->SendMessage(buffer);
+        if (buffer->DataLength() < messageLen) {
+            chip::System::PacketBuffer::Free(buffer);
+            err = CHIP_ERROR_NO_MEMORY;
+        } else {
+            memcpy(buffer->Start(), messageChars, messageLen);
+            err = self.cppDevice->SendMessage(buffer);
+        }
     }
     [self.lock unlock];
 
