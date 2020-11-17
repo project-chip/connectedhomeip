@@ -35,6 +35,8 @@ static_library("mdns") {
     "Advertiser.h",
     "DiscoveryManager.cpp",
     "DiscoveryManager.h",
+    "ServicePool.cpp",
+    "ServicePool.h",
   ]
 
   if (chip_mdns_avertiser == "none") {

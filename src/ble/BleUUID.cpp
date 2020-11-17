@@ -24,6 +24,7 @@
 #include <cstring>
 
 #include "BleUUID.h"
+#include "lib/support/HexUtils.h"
 
 namespace chip {
 namespace Ble {
@@ -31,11 +32,6 @@ namespace Ble {
 const ChipBleUUID CHIP_BLE_SVC_ID = { { // 0000FEAF-0000-1000-8000-00805F9B34FB
                                         0x00, 0x00, 0xFE, 0xAF, 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34,
                                         0xFB } };
-
-inline static uint8_t HexDigitToInt(const char c)
-{
-    return static_cast<uint8_t>(c >= '0' && c <= '9' ? c - '0' : tolower(c) - 'a' + 10);
-}
 
 bool UUIDsMatch(const ChipBleUUID * idOne, const ChipBleUUID * idTwo)
 {

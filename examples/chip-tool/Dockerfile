@@ -18,6 +18,7 @@
 from chip-cirque-device-base
 
 COPY out/debug/chip-tool /usr/bin/
+COPY out/debug/TestDiscoveryManager /usr/bin/
 COPY entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh", "tool"]
