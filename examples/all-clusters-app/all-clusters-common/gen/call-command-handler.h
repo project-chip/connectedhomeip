@@ -80,9 +80,6 @@ EmberAfStatus emberAfBarrierControlClusterServerCommandParse(EmberAfClusterComma
 // Cluster: Color Control, server
 EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
-// Cluster: IAS Zone, client
-EmberAfStatus emberAfIasZoneClusterClientCommandParse(EmberAfClusterCommand * cmd);
-
 // Cluster: IAS Zone, server
 EmberAfStatus emberAfIasZoneClusterServerCommandParse(EmberAfClusterCommand * cmd);
 
