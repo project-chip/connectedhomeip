@@ -66,6 +66,43 @@ struct MdnsService
     Optional<chip::Inet::IPAddress> mAddress;
 };
 
+class MdnsNotificationDelegate
+{
+public:
+    /**
+     * The CHIP stack callback function for adding a new cached service.
+     *
+     * The stack will NOT cache any query results unless explicitly added by calling
+     * this function. The stack will copy the service so the lifecycle beyond the
+     * function call is not required.
+     *
+     * @param[in] service    The added service.
+     *
+     */
+    virtual void AddMdnsService(const MdnsService & service) = 0;
+
+    /**
+     * The CHIP stack callback function for updating the service.
+     *
+     * The service will be copied so the lifcycle beyond the function call is not
+     * required.
+     *
+     * @param[in] service  The updated service.
+     *
+     */
+    virtual void UpdateMdnsService(const MdnsService & service) = 0;
+
+    /**
+     * The CHIP stack callback function for removing a service.
+     *
+     * @param[in] service  The reoved service.
+     *
+     */
+    virtual void RemoveMdnsService(const MdnsService & service) = 0;
+
+    virtual ~MdnsNotificationDelegate() {}
+};
+
 /**
  * The callback function for mDNS resolve.
  *
@@ -100,13 +137,15 @@ using MdnsAsnycReturnCallback = void (*)(void * context, CHIP_ERROR error);
  *
  * @param[in] initCallback    The callback for notifying the initialization result.
  * @param[in] errorCallback   The callback for notifying internal errors.
+ * @param[in] delegate        The notification delegate.
  * @param[in] context         The context passed to the callbacks.
  *
  * @retval CHIP_NO_ERROR  The initialization succeeds.
  * @retval Error code     The initialization fails
  *
  */
-CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback, void * context);
+CHIP_ERROR ChipMdnsInit(MdnsAsnycReturnCallback initCallback, MdnsAsnycReturnCallback errorCallback,
+                        MdnsNotificationDelegate * delegate, void * context);
 
 /**
  * This function sets the host name for services.

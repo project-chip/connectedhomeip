@@ -101,6 +101,9 @@ class TestOnOffCluster(CHIPVirtualHome):
             self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format(
                 "pairing unpair", ret['output']))
 
+        ret = self.execute_device_cmd(tool_device_id, "TestDiscoveryManager")
+        self.assertEqual(ret['return_code'], '0', "TestDiscoveryManager command failure: {}".format(ret['output']))
+
         time.sleep(1)
 
         for device_id in server_ids:

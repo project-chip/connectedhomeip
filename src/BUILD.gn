@@ -47,6 +47,7 @@ if (chip_build_tests) {
       "${chip_root}/src/lib/mdns/minimal/records/tests",
       "${chip_root}/src/lib/mdns/minimal/responders/tests",
       "${chip_root}/src/lib/mdns/minimal/tests",
+      "${chip_root}/src/lib/mdns/tests",
       "${chip_root}/src/lib/support/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
