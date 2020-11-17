@@ -19,6 +19,7 @@
 
 #include "core/CHIPError.h"
 #include "inet/InetInterface.h"
+#include "lib/mdns/ServicePool.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "platform/CHIPDeviceConfig.h"
 
@@ -32,7 +33,7 @@ public:
     virtual ~ResolveDelegate() {}
 };
 
-class DiscoveryManager
+class DiscoveryManager : public MdnsNotificationDelegate
 {
 public:
     /**
@@ -73,6 +74,12 @@ public:
      */
     CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, chip::Inet::IPAddressType type = chip::Inet::kIPAddressType_Any);
 
+    void AddMdnsService(const MdnsService & service) override;
+
+    void UpdateMdnsService(const MdnsService & service) override;
+
+    void RemoveMdnsService(const MdnsService & service) override;
+
     static DiscoveryManager & GetInstance() { return sManager; }
 
 private:
@@ -94,6 +101,7 @@ private:
     bool mMdnsInitialized               = false;
     bool mIsPublishingProvisionedDevice = false;
     bool mIsPublishing                  = false;
+    ServicePool mServicePool;
 #endif // CHIP_ENABLE_MDNS
     ResolveDelegate * mResolveDelegate = nullptr;
 

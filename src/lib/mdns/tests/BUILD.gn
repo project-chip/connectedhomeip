@@ -13,22 +13,30 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlunit_test.gni")
 
-source_set("platform_header") {
-  sources = [ "platform/Mdns.h" ]
-}
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-static_library("mdns") {
+chip_test_suite("tests") {
+  output_name = "libMdnsTests"
+
+  sources = [ "TestServicePool.cpp" ]
+
   public_deps = [
-    ":platform_header",
-    "${chip_root}/src/lib/support",
+    "${chip_root}/src/lib/mdns",
     "${chip_root}/src/platform",
+    "${nlunit_test_root}:nlunit-test",
   ]
 
-  sources = [
-    "DiscoveryManager.cpp",
-    "DiscoveryManager.h",
-    "ServicePool.cpp",
-    "ServicePool.h",
+  tests = [ "TestServicePool" ]
+}
+
+executable("TestDiscoveryManager") {
+  sources = [ "TestDiscoveryManager.cpp" ]
+
+  public_deps = [
+    "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/platform",
+    "${nlunit_test_root}:nlunit-test",
   ]
 }
