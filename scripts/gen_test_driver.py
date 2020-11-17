@@ -57,7 +57,7 @@ int main()
 ### Test invokation will be added here
 
 TEMPLATE_SUFFIX = '''
-    return 0;
+    return code;
 }'''
 
 def main(argv):
