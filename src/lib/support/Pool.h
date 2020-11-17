@@ -98,31 +98,9 @@ public:
         assert((value & (kBit1 << offset)) != 0); // assert fail when free an unused slot
     }
 
-#if !defined(NDEBUG)
+    // Test-only function declaration
     template <typename F>
-    void ForEachActiveObject(F f) const
-    {
-        for (size_t word = 0; word * kBitChunkSize < N; ++word)
-        {
-            auto & usage = mUsage[word];
-            auto value   = usage.load();
-            for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < N; ++offset)
-            {
-                if ((value & (kBit1 << offset)) != 0)
-                {
-                    f(GetPoolHead() + (word * kBitChunkSize + offset));
-                }
-            }
-        }
-    }
-
-    size_t GetNumObjectsInUse() const
-    {
-        size_t count = 0;
-        ForEachActiveObject([&count](const T *) { ++count; });
-        return count;
-    }
-#endif
+    void ForEachActiveObject(F f);
 
 private:
     T * GetPoolHead() { return reinterpret_cast<T *>(mMemory); }
