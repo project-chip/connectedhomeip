@@ -25,31 +25,46 @@
 #include "platform/CHIPDeviceLayer.h"
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
+#include "support/HexUtils.h"
 #include "support/RandUtils.h"
 
 #if CHIP_ENABLE_MDNS
 
 namespace {
 
-uint8_t HexToInt(char c)
+bool ParseNodeFabricId(const chip::Mdns::MdnsService & service, uint64_t * nodeId, uint64_t * fabricId)
 {
-    if ('0' <= c && c <= '9')
+    bool deliminatorFound = false;
+    *nodeId               = 0;
+    *fabricId             = 0;
+
+    for (size_t i = 0; i < sizeof(service.mName) && service.mName[i] != 0; i++)
     {
-        return static_cast<uint8_t>(c - '0');
-    }
-    else if ('a' <= c && c <= 'f')
-    {
-        return static_cast<uint8_t>(0x0a + c - 'a');
-    }
-    else if ('A' <= c && c <= 'F')
-    {
-        return static_cast<uint8_t>(0x0a + c - 'A');
+        if (service.mName[i] == '-')
+        {
+            deliminatorFound = true;
+            break;
+        }
+        else
+        {
+            uint8_t val = chip::HexDigitToInt(service.mName[i]);
+
+            if (val == UINT8_MAX)
+            {
+                break;
+            }
+            else
+            {
+                *nodeId = (*nodeId) * 16 + val;
+            }
+        }
     }
 
-    return UINT8_MAX;
+    return deliminatorFound;
 }
 
-constexpr uint64_t kUndefinedNodeId = 0;
+constexpr char kUnprovisionedServiceType[] = "_chipc";
+constexpr char kProvisionedServiceType[]   = "_chip";
 
 } // namespace
 #endif
@@ -179,7 +194,7 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     ChipLogProgress(Discovery, "setup mdns service");
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
     snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mUnprovisionedInstanceName);
-    strncpy(service.mType, "_chipc", sizeof(service.mType));
+    strncpy(service.mType, kUnprovisionedServiceType, sizeof(service.mType));
     service.mProtocol = MdnsServiceProtocol::kMdnsProtocolUdp;
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetVendorId(vendorID));
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetProductId(productID));
@@ -215,7 +230,7 @@ CHIP_ERROR DiscoveryManager::PublishProvisionedDevice(chip::Inet::IPAddressType 
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetFabricId(fabricId));
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetDeviceId(deviceId));
     snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, deviceId, fabricId);
-    strncpy(service.mType, "_chip", sizeof(service.mType));
+    strncpy(service.mType, kProvisionedServiceType, sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mPort          = CHIP_PORT;
     service.mTextEntryies  = nullptr;
@@ -257,13 +272,24 @@ CHIP_ERROR DiscoveryManager::RegisterResolveDelegate(ResolveDelegate * delegate)
 CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
 {
 #if CHIP_ENABLE_MDNS
-    MdnsService service;
+    MdnsService * foundService;
 
-    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
-    strncpy(service.mType, "_chip", sizeof(service.mType));
-    service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
-    service.mAddressType = type;
-    return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
+    if (mServicePool.FindService(nodeId, fabricId, &foundService) && foundService->mAddress.HasValue())
+    {
+        HandleNodeIdResolve(this, foundService, CHIP_NO_ERROR);
+
+        return CHIP_NO_ERROR;
+    }
+    else
+    {
+        MdnsService service;
+
+        snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
+        strncpy(service.mType, "_chip", sizeof(service.mType));
+        service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
+        service.mAddressType = type;
+        return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
+    }
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_ENABLE_MDNS
@@ -288,35 +314,16 @@ void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result,
         ChipLogError(Discovery, "Node ID resolve not found");
         mgr->mResolveDelegate->HandleNodeIdResolve(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, MdnsService{});
     }
-    else
+    else if (strncmp(result->mType, kProvisionedServiceType, sizeof(result->mType)) == 0 &&
+             result->mProtocol == MdnsServiceProtocol::kMdnsProtocolTcp)
+
     {
         // Parse '%x-%x' from the name
-        uint64_t nodeId       = 0;
-        bool deliminatorFound = false;
+        uint64_t nodeId   = 0;
+        uint64_t fabricId = 0;
+        bool validService = ParseNodeFabricId(*result, &nodeId, &fabricId);
 
-        for (size_t i = 0; i < sizeof(result->mName) && result->mName[i] != 0; i++)
-        {
-            if (result->mName[i] == '-')
-            {
-                deliminatorFound = true;
-                break;
-            }
-            else
-            {
-                uint8_t val = HexToInt(result->mName[i]);
-
-                if (val == UINT8_MAX)
-                {
-                    break;
-                }
-                else
-                {
-                    nodeId = nodeId * 16 + val;
-                }
-            }
-        }
-
-        if (deliminatorFound)
+        if (validService)
         {
             ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
             mgr->mResolveDelegate->HandleNodeIdResolve(error, nodeId, *result);
@@ -328,6 +335,81 @@ void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result,
         }
     }
 #endif // CHIP_ENABLE_MDNS
+}
+
+void DiscoveryManager::AddMdnsService(const MdnsService & service)
+{
+    if (strncmp(service.mType, kProvisionedServiceType, sizeof(service.mType)) == 0 &&
+        service.mProtocol == MdnsServiceProtocol::kMdnsProtocolTcp)
+    {
+        uint64_t nodeId   = 0;
+        uint64_t fabricId = 0;
+        bool validService = ParseNodeFabricId(service, &nodeId, &fabricId);
+
+        if (validService)
+        {
+            if (mServicePool.AddService(nodeId, fabricId, service) == 0)
+            {
+                ChipLogError(Discovery, "Failed to add service to pool");
+            }
+        }
+    }
+}
+
+void DiscoveryManager::UpdateServiceText(const MdnsService & service)
+{
+    if (strncmp(service.mType, kProvisionedServiceType, sizeof(service.mType)) == 0 &&
+        service.mProtocol == MdnsServiceProtocol::kMdnsProtocolTcp)
+    {
+        uint64_t nodeId   = 0;
+        uint64_t fabricId = 0;
+        bool validService = ParseNodeFabricId(service, &nodeId, &fabricId);
+
+        if (validService)
+        {
+            if (mServicePool.RemoveService(nodeId, fabricId) == CHIP_NO_ERROR)
+            {
+                if (mServicePool.AddService(nodeId, fabricId, service) != CHIP_NO_ERROR)
+                {
+                    ChipLogError(Discovery, "Failed to add service to pool");
+                }
+            }
+        }
+    }
+}
+
+void DiscoveryManager::RemoveService(const MdnsService & service)
+{
+    if (strncmp(service.mType, kProvisionedServiceType, sizeof(service.mType)) == 0 &&
+        service.mProtocol == MdnsServiceProtocol::kMdnsProtocolTcp)
+    {
+        uint64_t nodeId   = 0;
+        uint64_t fabricId = 0;
+        bool validService = ParseNodeFabricId(service, &nodeId, &fabricId);
+
+        if (validService)
+        {
+            if (mServicePool.RemoveService(nodeId, fabricId) != CHIP_NO_ERROR)
+            {
+                ChipLogError(Discovery, "Failed to remove service from pool");
+            }
+        }
+    }
+}
+
+void HandleMdnsServiceAdded(const MdnsService & newService)
+{
+    DiscoveryManager::GetInstance().AddMdnsService(newService);
+}
+
+void HandleMdnsServiceUpdated(const MdnsService & updatedService)
+{
+    DiscoveryManager::GetInstance().UpdateServiceText(updatedService);
+}
+
+void HandleMdnsServiceRemoved(const MdnsService & removedService)
+{
+    DiscoveryManager::GetInstance().RemoveService(removedService);
 }
 
 } // namespace Mdns

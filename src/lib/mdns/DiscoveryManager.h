@@ -19,6 +19,7 @@
 
 #include "core/CHIPError.h"
 #include "inet/InetInterface.h"
+#include "lib/mdns/ServicePool.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "platform/CHIPDeviceConfig.h"
 
@@ -73,6 +74,12 @@ public:
      */
     CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, chip::Inet::IPAddressType type = chip::Inet::kIPAddressType_Any);
 
+    void AddMdnsService(const MdnsService & service);
+
+    void UpdateServiceText(const MdnsService & service);
+
+    void RemoveService(const MdnsService & service);
+
     static DiscoveryManager & GetInstance() { return sManager; }
 
 private:
@@ -94,6 +101,7 @@ private:
     bool mMdnsInitialized               = false;
     bool mIsPublishingProvisionedDevice = false;
     bool mIsPublishing                  = false;
+    ServicePool mServicePool;
 #endif // CHIP_ENABLE_MDNS
     ResolveDelegate * mResolveDelegate = nullptr;
 

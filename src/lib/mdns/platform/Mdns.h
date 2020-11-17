@@ -175,5 +175,36 @@ CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip:
 CHIP_ERROR ChipMdnsResolve(MdnsService * browseResult, chip::Inet::InterfaceId interface, MdnsResolveCallback callback,
                            void * context);
 
+/**
+ * The CHIP stack callback function for adding a new cached service.
+ *
+ * The stack will NOT cache any query results unless explicitly added by calling
+ * this function. The stack will copy the service so the lifecycle beyond the
+ * function call is not required.
+ *
+ * @param[in] newService    The added service.
+ *
+ */
+extern void HandleMdnsServiceAdded(const MdnsService & newService);
+
+/**
+ * The CHIP stack callback function for updating the service.
+ *
+ * The service will be copied so the lifcycle beyond the function call is not
+ * required.
+ *
+ * @param[in] updatedService  The updated service.
+ *
+ */
+extern void HandleMdnsServiceUpdated(const MdnsService & updatedService);
+
+/**
+ * The CHIP stack callback function for removing a service.
+ *
+ * @param[in] removedService  The reoved service.
+ *
+ */
+extern void HandleMdnsServiceRemoved(const MdnsService & removedService);
+
 } // namespace Mdns
 } // namespace chip
