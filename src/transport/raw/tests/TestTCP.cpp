@@ -21,12 +21,11 @@
  *      This file implements unit tests for the TcpTransport implementation.
  */
 
-#include "TestRawTransportLayer.h"
-
 #include "NetworkTestHelpers.h"
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 #include <transport/raw/TCP.h>
 
 #include <nlbyteorder.h>
@@ -209,9 +208,6 @@ static int Finalize(void * aContext)
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 
-/**
- *  Main
- */
 int TestTCP()
 {
     // Run test suit against one context
@@ -219,3 +215,5 @@ int TestTCP()
 
     return (nlTestRunnerStats(&sSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestTCP);

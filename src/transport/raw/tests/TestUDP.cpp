@@ -21,12 +21,11 @@
  *      This file implements unit tests for the UdpTransport implementation.
  */
 
-#include "TestRawTransportLayer.h"
-
 #include "NetworkTestHelpers.h"
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 #include <transport/raw/UDP.h>
 
 #include <nlbyteorder.h>
@@ -201,9 +200,6 @@ static int Finalize(void * aContext)
     return (err == CHIP_NO_ERROR) ? SUCCESS : FAILURE;
 }
 
-/**
- *  Main
- */
 int TestUDP()
 {
     // Run test suit against one context
@@ -211,3 +207,5 @@ int TestUDP()
 
     return (nlTestRunnerStats(&sSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestUDP);

@@ -22,8 +22,6 @@
  *      the Message Header class within the transport layer
  *
  */
-#include "TestRawTransportLayer.h"
-
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/TestUtils.h>
