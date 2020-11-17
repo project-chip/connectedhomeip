@@ -379,7 +379,6 @@ typedef struct _DeviceInformationRecord
 {
     uint8_t * ieeeAddress;
     uint8_t endpointId;
-    uint16_t profileId;
     uint16_t deviceId;
     uint8_t version;
     uint8_t groupIdCount;
@@ -398,7 +397,6 @@ typedef struct _EndpointInformationRecord
 {
     uint16_t networkAddress;
     uint8_t endpointId;
-    uint16_t profileId;
     uint16_t deviceId;
     uint8_t version;
 } EndpointInformationRecord;
@@ -409,7 +407,6 @@ typedef struct _GpTranslationTableUpdateTranslation
     uint8_t index;
     uint8_t gpdCommandId;
     uint8_t endpoint;
-    uint16_t profile;
     uint16_t cluster;
     uint8_t zigbeeCommandId;
     uint8_t * zigbeeCommandPayload;

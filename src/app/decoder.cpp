@@ -47,7 +47,6 @@ uint16_t extractApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * 
     // Skip first byte, because that's the always-0 frame control.
     uint8_t ignored;
     err = reader.ReadOctet(&ignored)
-              .Read16(&outApsFrame->profileId)
               .ReadClusterId(&outApsFrame->clusterId)
               .ReadEndpointId(&outApsFrame->sourceEndpoint)
               .ReadEndpointId(&outApsFrame->destinationEndpoint)
@@ -64,12 +63,11 @@ exit:
 
 void printApsFrame(EmberApsFrame * frame)
 {
-    ChipLogProgress(
-        Zcl,
-        "\n<EmberApsFrame %p> profileID %d, clusterID %d, sourceEndpoint %d, destinationEndPoint %d, options %d, groupID %d, "
-        "sequence %d, radius %d\n",
-        frame, frame->profileId, frame->clusterId, frame->sourceEndpoint, frame->destinationEndpoint, frame->options,
-        frame->groupId, frame->sequence, frame->radius);
+    ChipLogProgress(Zcl,
+                    "\n<EmberApsFrame %p> clusterID %d, sourceEndpoint %d, destinationEndPoint %d, options %d, groupID %d, "
+                    "sequence %d, radius %d\n",
+                    frame, frame->clusterId, frame->sourceEndpoint, frame->destinationEndpoint, frame->options, frame->groupId,
+                    frame->sequence, frame->radius);
 }
 
 uint16_t extractMessage(uint8_t * buffer, uint16_t buffer_length, uint8_t ** msg)

@@ -21,10 +21,12 @@
 #include "AppTask.h"
 #include "BoltLockManager.h"
 
-#include "af.h"
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
+#include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>
+#include <app/util/attribute-storage.h>
+#include <app/util/util.h>
 
 using namespace ::chip;
 
@@ -43,7 +45,14 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
         return;
     }
 
-    BoltLockMgr().InitiateAction(0, *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
+    if (*value)
+    {
+        BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+    }
+    else
+    {
+        BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+    }
 }
 
 /** @brief Cluster Init
@@ -64,8 +73,5 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
  */
 void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
-    if (clusterId == ZCL_ON_OFF_CLUSTER_ID)
-    {
-        GetAppTask().UpdateClusterState();
-    }
+    GetAppTask().UpdateClusterState();
 }
