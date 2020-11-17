@@ -39,15 +39,6 @@
 namespace chip {
 namespace Transport {
 
-class DLL_EXPORT BLEConnectionDelegate
-{
-public:
-    virtual ~BLEConnectionDelegate() = default;
-    virtual void OnBleEndPointReceive(Ble::BLEEndPoint * endPoint, System::PacketBuffer * buffer);
-    virtual void OnBleEndPointConnectionComplete(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
-    virtual void OnBleEndPointConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
-};
-
 /** Implements a transport using BLE.
  *
  *  TODO: BLE transport currently does NOT receive messages as defined
