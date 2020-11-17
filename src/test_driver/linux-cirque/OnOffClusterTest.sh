@@ -34,7 +34,7 @@ function build_chip_tool() {
     cd "$chip_tool_dir"
     gn gen out/debug >/dev/null
     run_ninja -C out/debug
-    cp ${REPO_DIR}/out/debug/obj/src/lib/mdns/tests/bin/TestDiscoveryManager out/debug
+    cp "$REPO_DIR"/out/debug/obj/src/lib/mdns/tests/bin/TestDiscoveryManager out/debug
     docker build -t chip_tool -f Dockerfile . 2>&1
 }
 
