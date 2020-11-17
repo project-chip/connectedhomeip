@@ -25,47 +25,47 @@ assert(chip_build_tests)
 # Simple usage
 # chip_test_suite("tests") {
 #   output_name = "libFooTests"
-# 
+#
 #   sources = [
 #      "Common.h",      # add common sources here
 #      "Common.cpp",
 #   ]
-#  
+#
 #   test_sources = [
 #     "TestFoo.cpp",    # Files are parsed for `CHIP_REGISTER_TEST_SUITE(...)`
 #     "TestBar.cpp",    # and a driver is created automatically
 #   ]
-#  
+#
 #   public_deps = [
 #     "${chip_root}/src/lib/foo",         # add dependencies here
 #     "${nlunit_test_root}:nlunit-test",
 #   ]
 # }
-#  
+#
 #
 # Deprecated usage (writing own driver files):
 #
 # chip_test_suite("tests") {
 #   output_name = "libFooTests"
-#  
+#
 #   sources = [
 #     "TestDeclarations.h",
 #     "TestFoo.cpp",
 #     "TestBar.cpp",
 #   ]
-#  
+#
 #   public_deps = [
 #     "${chip_root}/src/lib/foo",         # add dependencies here
 #     "${nlunit_test_root}:nlunit-test",
 #   ]
-#  
-#   tests = [ 
+#
+#   tests = [
 #     "TestFoo",  # Assumes TestFooDriver.cpp exists
 #     "TestBar",  # Assumes TestBarDriver.cpp exists
 #   ]
 # }
 
-# 
+#
 template("chip_test_suite") {
   _suite_name = target_name
 
@@ -80,15 +80,10 @@ template("chip_test_suite") {
   }
 
   static_library("${_suite_name}_common") {
-    forward_variables_from(invoker,
-                           "*",
-                           [
-                             "tests",
-                           ])
+    forward_variables_from(invoker, "*", [ "tests" ])
 
     output_dir = "${root_out_dir}/lib"
   }
-
 
   if (chip_link_tests) {
     tests = []
@@ -106,13 +101,13 @@ template("chip_test_suite") {
             "--output_file=" + rebase_path(_driver_name, root_build_dir),
           ]
         }
-      
+
         chip_test(_test) {
-           sources = [ _driver_name ]
-           public_deps = [ 
-             ":${_suite_name}_common",
-             ":${_test}_generate_driver",
-           ]
+          sources = [ _driver_name ]
+          public_deps = [
+            ":${_suite_name}_common",
+            ":${_test}_generate_driver",
+          ]
         }
 
         tests += [ _test ]
@@ -120,15 +115,15 @@ template("chip_test_suite") {
     }
 
     if (defined(invoker.tests)) {
-       foreach(_test, invoker.tests) {
-         chip_test(_test) {
-           sources = [ "${_test}Driver.cpp" ]
-    
-           public_deps = [ ":${_suite_name}_common" ]
-         }
-    
-         tests += [ _test ]
-       }
+      foreach(_test, invoker.tests) {
+        chip_test(_test) {
+          sources = [ "${_test}Driver.cpp" ]
+
+          public_deps = [ ":${_suite_name}_common" ]
+        }
+
+        tests += [ _test ]
+      }
     }
 
     group(_suite_name) {
