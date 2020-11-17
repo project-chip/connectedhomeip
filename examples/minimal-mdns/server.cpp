@@ -152,7 +152,6 @@ int main(int argc, char ** args)
     {
         MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
 
-        // if (mdnsServer.Listen(&allInterfaces, kFakeMdnsPort) != CHIP_NO_ERROR)
         if (mdnsServer.Listen(&allInterfaces, gOptions.listenPort) != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces\n");
