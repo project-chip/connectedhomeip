@@ -438,7 +438,7 @@ typedef struct
      */
     EmberApsFrame * apsFrame;
     EmberIncomingMessageType type;
-    ChipNodeId source;
+    chip::NodeId source;
     uint8_t * buffer;
     uint16_t bufLen;
     bool clusterSpecific;
@@ -1066,7 +1066,7 @@ typedef struct
         struct
         {
             /** The node id of the source of the received reports. */
-            ChipNodeId source;
+            chip::NodeId source;
             /** The remote endpoint from which the attribute is reported. */
             chip::EndpointId endpoint;
             /** The maximum expected time between reports, measured in seconds. */

@@ -47,19 +47,8 @@
 
 #include "basic-types.h"
 
-/**
- * Try to use our chip::NodeId definition if we are C++; otherwise define a
- * ChipNodeId that's compatible.
- */
-#ifdef __cplusplus
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
-// Make it easier to have unified function declarations across C and C++ source
-// files.
-typedef chip::NodeId ChipNodeId;
-#else
-typedef uint64_t ChipNodeId;
-#endif // __cplusplus
 
 #include "gen/gen_config.h"
 
@@ -552,13 +541,13 @@ typedef struct
     /** The endpoint on the remote node (specified by \c identifier). */
     chip::EndpointId remote;
     /** A 64-bit destination identifier.  This is either:
-     * - The destination ChipNodeId, for unicasts.
+     * - The destination chip::NodeId, for unicasts.
      * - A multicast ChipGroupId, for multicasts.
      * Which one is being used depends on the type of this binding.
      */
     union
     {
-        ChipNodeId nodeId;
+        chip::NodeId nodeId;
         chip::GroupId groupId;
     };
     /** The index of the network the binding belongs to. */
