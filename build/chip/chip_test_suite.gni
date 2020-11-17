@@ -28,7 +28,6 @@ template("chip_test_suite") {
                            "*",
                            [
                              "tests",
-                             "c_tests",
                            ])
 
     output_dir = "${root_out_dir}/lib"
@@ -41,18 +40,6 @@ template("chip_test_suite") {
       foreach(_test, invoker.tests) {
         chip_test(_test) {
           sources = [ "${_test}Driver.cpp" ]
-
-          public_deps = [ ":${_suite_name}_common" ]
-        }
-
-        tests += [ _test ]
-      }
-    }
-
-    if (defined(invoker.c_tests)) {
-      foreach(_test, invoker.c_tests) {
-        chip_test(_test) {
-          sources = [ "${_test}Driver.c" ]
 
           public_deps = [ ":${_suite_name}_common" ]
         }
@@ -80,3 +67,4 @@ template("chip_test_suite") {
     }
   }
 }
+
