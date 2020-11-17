@@ -58,7 +58,7 @@
         deviceID--;
         NSError * error;
         self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
-        self.onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice];
+        self.onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:1];
     }
 }
 

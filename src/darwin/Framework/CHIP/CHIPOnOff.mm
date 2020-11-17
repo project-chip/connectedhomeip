@@ -31,9 +31,9 @@
 
 @implementation CHIPOnOff
 
-- (instancetype)initWithDevice:(CHIPDevice *)device
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint
 {
-    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], 1);
+    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
 
     if (err != CHIP_NO_ERROR) {
         return nil;
