@@ -54,6 +54,7 @@ if (chip_build_tests) {
       deps += [
         "${chip_root}/src/lib/asn1/tests",
         "${chip_root}/src/lib/core/tests",
+        "${chip_root}/src/lib/mdns/tests",
         "${chip_root}/src/lib/support/tests",
         "${chip_root}/src/platform/tests",
         "${chip_root}/src/setup_payload/tests",
