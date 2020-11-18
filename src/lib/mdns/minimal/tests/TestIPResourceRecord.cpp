@@ -80,7 +80,6 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
         header.Clear();
 
         const uint8_t expectedOutput[] = {
-            //
             4,  's', 'o', 'm', 'e',      // QNAME part: some
             4,  't', 'e', 's', 't',      // QNAME part: test
             5,  'l', 'o', 'c', 'a', 'l', // QNAME part: local
@@ -110,7 +109,6 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
         header.Clear();
 
         const uint8_t expectedOutput[] = {
-            //
             4,  's', 'o',  'm',  'e',      // QNAME part: some
             4,  't', 'e',  's',  't',      // QNAME part: test
             5,  'l', 'o',  'c',  'a', 'l', // QNAME part: local
