@@ -25,6 +25,7 @@
 #pragma once
 
 #include <support/BitFlags.h>
+#include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
 
@@ -46,10 +47,6 @@ enum RangeControlFlags : uint8_t
     kWiderange   = (1U << 4),
 };
 
-struct TransferInit;
-using SendInit    = TransferInit;
-using ReceiveInit = TransferInit;
-
 /*
  * A structure for representing a SendInit or ReceiveInit message (both contain
  * identical parameters).
@@ -58,14 +55,16 @@ struct TransferInit
 {
     /**
      * @brief
-     *  Pack (write) the message into a PacketBuffer.
+     *  Write the message fields to a buffer using the provided BufBound.
      *
-     * @param[out] aBuffer a PacketBuffer to use to write the message
+     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  successful. This method will also not check for correctness or completeness for
+     *  any of the fields - it is the caller's responsibility to ensure that the fields
+     *  have been filled out adequately.
      *
-     * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
+     * @param aBuffer A BufBound object that will be used to write the message
      */
-    CHECK_RETURN_VALUE
-    CHIP_ERROR Pack(System::PacketBuffer & aBuffer) const;
+    void Pack(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -117,6 +116,9 @@ struct TransferInit
     uint16_t MetadataLength  = 0;
 };
 
+using SendInit    = TransferInit;
+using ReceiveInit = TransferInit;
+
 /*
  * A structure for representing a SendAccept message.
  */
@@ -124,14 +126,16 @@ struct SendAccept
 {
     /**
      * @brief
-     *  Pack (write) the message into a PacketBuffer.
+     *  Write the message fields to a buffer using the provided BufBound.
      *
-     * @param[out] aBuffer a PacketBuffer to use to write the message
+     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  successful. This method will also not check for correctness or completeness for
+     *  any of the fields - it is the caller's responsibility to ensure that the fields
+     *  have been filled out adequately.
      *
-     * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
+     * @param aBuffer A BufBound object that will be used to write the message
      */
-    CHECK_RETURN_VALUE
-    CHIP_ERROR Pack(System::PacketBuffer & aBuffer) const;
+    void Pack(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -174,24 +178,22 @@ struct SendAccept
 };
 
 /**
- * @class ReceiveAccept
- *
- * @brief
- *   The ReceiveAccept message is used to accept a proposed exchange when the
- *   receiver is the initiator.
+ * A structure for representing ReceiveAccept messages.
  */
 struct ReceiveAccept
 {
     /**
      * @brief
-     *  Pack (write) the message into a PacketBuffer.
+     *  Write the message fields to a buffer using the provided BufBound.
      *
-     * @param[out] aBuffer a PacketBuffer to use to write the message
+     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  successful. This method will also not check for correctness or completeness for
+     *  any of the fields - it is the caller's responsibility to ensure that the fields
+     *  have been filled out adequately.
      *
-     * @return CHIP_ERROR Any error that occurs when trying to write to the PacketBuffer
+     * @param aBuffer A BufBound object that will be used to write the message
      */
-    CHECK_RETURN_VALUE
-    CHIP_ERROR Pack(System::PacketBuffer & aBuffer) const;
+    void Pack(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -235,6 +237,109 @@ struct ReceiveAccept
     uint8_t * Metadata      = nullptr;
     uint16_t MetadataLength = 0;
 };
+
+/**
+ * A struct for representing messages contiaining just a counter field. Can be used to
+ * represent BlockQuery, BlockAck, and BlockAckEOF.
+ */
+struct CounterMessage
+{
+    /**
+     * @brief
+     *  Write the message fields to a buffer using the provided BufBound.
+     *
+     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  successful. This method will also not check for correctness or completeness for
+     *  any of the fields - it is the caller's responsibility to ensure that the fields
+     *  have been filled out adequately.
+     *
+     * @param aBuffer A BufBound object that will be used to write the message
+     */
+    void Pack(BufBound & aBuffer) const;
+
+    /**
+     * @brief
+     *  Parse data from an PacketBuffer into a struct instance
+     *
+     *  Note that this struct will store pointers that point into the passed PacketBuffer,
+     *  so it is essential that the PacketBuffer is not modified or freed until after this
+     *  struct is no longer needed.
+     *
+     * @param[in] aBuffer Pointer to a PacketBuffer containing the data
+     *
+     * @return CHIP_ERROR Any error that occurs when trying to read the message
+     */
+    CHECK_RETURN_VALUE
+    CHIP_ERROR Parse(const System::PacketBuffer & aBuffer);
+
+    /**
+     * @brief
+     *  Returns the size of buffer needed to write this message.
+     */
+    size_t PackedSize() const;
+
+    /**
+     * @brief
+     *  Equality check method.
+     */
+    bool operator==(const CounterMessage &) const;
+
+    uint32_t BlockCounter = 0;
+};
+
+using BlockQuery  = CounterMessage;
+using BlockAck    = CounterMessage;
+using BlockAckEOF = CounterMessage;
+
+struct DataBlock
+{
+    /**
+     * @brief
+     *  Write the message fields to a buffer using the provided BufBound.
+     *
+     *  It is up to the caller to use BufBound::Fit() to verify that the write was
+     *  successful. This method will also not check for correctness or completeness for
+     *  any of the fields - it is the caller's responsibility to ensure that the fields
+     *  have been filled out adequately.
+     *
+     * @param aBuffer A BufBound object that will be used to write the message
+     */
+    void Pack(BufBound & aBuffer) const;
+
+    /**
+     * @brief
+     *  Parse data from an PacketBuffer into a struct instance
+     *
+     *  Note that this struct will store pointers that point into the passed PacketBuffer,
+     *  so it is essential that the PacketBuffer is not modified or freed until after this
+     *  struct is no longer needed.
+     *
+     * @param[in] aBuffer Pointer to a PacketBuffer containing the data
+     *
+     * @return CHIP_ERROR Any error that occurs when trying to read the message
+     */
+    CHECK_RETURN_VALUE
+    CHIP_ERROR Parse(const System::PacketBuffer & aBuffer);
+
+    /**
+     * @brief
+     *  Returns the size of buffer needed to write this message.
+     */
+    size_t PackedSize() const;
+
+    /**
+     * @brief
+     *  Equality check method.
+     */
+    bool operator==(const DataBlock &) const;
+
+    uint32_t BlockCounter = 0;
+    uint8_t * Data        = nullptr;
+    uint16_t DataLength;
+};
+
+using Block    = DataBlock;
+using BlockEOF = DataBlock;
 
 } // namespace BDX
 } // namespace chip

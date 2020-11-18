@@ -37,12 +37,10 @@ using namespace chip;
 using namespace chip::BDX;
 using namespace chip::Encoding::LittleEndian;
 
-CHIP_ERROR TransferInit::Pack(System::PacketBuffer & aBuffer) const
+void TransferInit::Pack(BufBound & aBuffer) const
 {
-    CHIP_ERROR err              = CHIP_NO_ERROR;
     uint8_t proposedTransferCtl = 0;
     bool widerange = (StartOffset > std::numeric_limits<uint32_t>::max()) || (MaxLength > std::numeric_limits<uint32_t>::max());
-    BufBound bbuf(aBuffer.Start(), aBuffer.AvailableDataLength());
 
     proposedTransferCtl |= Version & kVersionMask;
     proposedTransferCtl = proposedTransferCtl | TransferCtlOptions.Raw();
@@ -52,19 +50,19 @@ CHIP_ERROR TransferInit::Pack(System::PacketBuffer & aBuffer) const
     rangeCtlFlags.Set(kStartOffset, StartOffset > 0);
     rangeCtlFlags.Set(kWiderange, widerange);
 
-    bbuf.Put(proposedTransferCtl);
-    bbuf.Put(rangeCtlFlags.Raw());
-    bbuf.PutLE16(MaxBlockSize);
+    aBuffer.Put(proposedTransferCtl);
+    aBuffer.Put(rangeCtlFlags.Raw());
+    aBuffer.PutLE16(MaxBlockSize);
 
     if (StartOffset > 0)
     {
         if (widerange)
         {
-            bbuf.PutLE64(StartOffset);
+            aBuffer.PutLE64(StartOffset);
         }
         else
         {
-            bbuf.PutLE32(static_cast<uint32_t>(StartOffset));
+            aBuffer.PutLE32(static_cast<uint32_t>(StartOffset));
         }
     }
 
@@ -72,29 +70,24 @@ CHIP_ERROR TransferInit::Pack(System::PacketBuffer & aBuffer) const
     {
         if (widerange)
         {
-            bbuf.PutLE64(MaxLength);
+            aBuffer.PutLE64(MaxLength);
         }
         else
         {
-            bbuf.PutLE32(static_cast<uint32_t>(MaxLength));
+            aBuffer.PutLE32(static_cast<uint32_t>(MaxLength));
         }
     }
 
-    VerifyOrExit(FileDesignator && FileDesLength > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
-    bbuf.PutLE16(FileDesLength);
-    bbuf.Put(FileDesignator, static_cast<size_t>(FileDesLength));
-
-    // Metadata is optional
-    if (Metadata && MetadataLength > 0)
+    aBuffer.PutLE16(FileDesLength);
+    if (FileDesignator)
     {
-        bbuf.Put(Metadata, static_cast<size_t>(MetadataLength));
+        aBuffer.Put(FileDesignator, static_cast<size_t>(FileDesLength));
     }
 
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    aBuffer.SetDataLength(static_cast<uint16_t>(bbuf.Written()));
-
-exit:
-    return err;
+    if (Metadata)
+    {
+        aBuffer.Put(Metadata, static_cast<size_t>(MetadataLength));
+    }
 }
 
 CHIP_ERROR TransferInit::Parse(const System::PacketBuffer & aBuffer)
@@ -168,12 +161,10 @@ exit:
 
 size_t TransferInit::PackedSize() const
 {
-    bool widerange    = ((StartOffset | MaxLength) > std::numeric_limits<uint32_t>::max());
-    size_t offsetSize = widerange ? 8 : 4;
-    size_t lengthSize = offsetSize;
-
-    // First 2 bytes are Transfer Control and Range Control bytes
-    return (2 + sizeof(MaxBlockSize) + offsetSize + lengthSize + sizeof(FileDesLength) + FileDesLength + MetadataLength);
+    System::PacketBuffer * pbuf = System::PacketBuffer::NewWithAvailableSize(0);
+    BufBound emptyBuf(pbuf->Start(), 0);
+    Pack(emptyBuf);
+    return emptyBuf.Written();
 }
 
 bool TransferInit::operator==(const TransferInit & another) const
@@ -190,25 +181,16 @@ bool TransferInit::operator==(const TransferInit & another) const
             fileDesMatches && metadataMatches);
 }
 
-CHIP_ERROR SendAccept::Pack(System::PacketBuffer & aBuffer) const
+void SendAccept::Pack(BufBound & aBuffer) const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t transferCtl = 0;
-
-    BufBound bbuf(aBuffer.Start(), aBuffer.AvailableDataLength());
 
     transferCtl |= Version & kVersionMask;
     transferCtl = transferCtl | TransferCtlFlags.Raw();
 
-    bbuf.Put(transferCtl);
-    bbuf.PutLE16(MaxBlockSize);
-    bbuf.Put(Metadata, static_cast<size_t>(MetadataLength));
-
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    aBuffer.SetDataLength(static_cast<uint16_t>(bbuf.Written()));
-
-exit:
-    return err;
+    aBuffer.Put(transferCtl);
+    aBuffer.PutLE16(MaxBlockSize);
+    aBuffer.Put(Metadata, static_cast<size_t>(MetadataLength));
 }
 
 CHIP_ERROR SendAccept::Parse(const System::PacketBuffer & aBuffer)
@@ -245,8 +227,10 @@ exit:
 
 size_t SendAccept::PackedSize() const
 {
-    // First byte is Transfer Control byte
-    return (1 + sizeof(MaxBlockSize) + MetadataLength);
+    System::PacketBuffer * pbuf = System::PacketBuffer::NewWithAvailableSize(0);
+    BufBound emptyBuf(pbuf->Start(), 0);
+    Pack(emptyBuf);
+    return emptyBuf.Written();
 }
 
 bool SendAccept::operator==(const SendAccept & another) const
@@ -261,13 +245,10 @@ bool SendAccept::operator==(const SendAccept & another) const
             MaxBlockSize == another.MaxBlockSize && metadataMatches);
 }
 
-CHIP_ERROR ReceiveAccept::Pack(System::PacketBuffer & aBuffer) const
+void ReceiveAccept::Pack(BufBound & aBuffer) const
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t transferCtl = 0;
     bool widerange      = (StartOffset > std::numeric_limits<uint32_t>::max()) || (Length > std::numeric_limits<uint32_t>::max());
-
-    BufBound bbuf(aBuffer.Start(), aBuffer.AvailableDataLength());
 
     transferCtl |= Version & kVersionMask;
     transferCtl = transferCtl | TransferCtlFlags.Raw();
@@ -277,19 +258,19 @@ CHIP_ERROR ReceiveAccept::Pack(System::PacketBuffer & aBuffer) const
     rangeCtlFlags.Set(kStartOffset, StartOffset > 0);
     rangeCtlFlags.Set(kWiderange, widerange);
 
-    bbuf.Put(transferCtl);
-    bbuf.Put(rangeCtlFlags.Raw());
-    bbuf.PutLE16(MaxBlockSize);
+    aBuffer.Put(transferCtl);
+    aBuffer.Put(rangeCtlFlags.Raw());
+    aBuffer.PutLE16(MaxBlockSize);
 
     if (StartOffset > 0)
     {
         if (widerange)
         {
-            bbuf.PutLE64(StartOffset);
+            aBuffer.PutLE64(StartOffset);
         }
         else
         {
-            bbuf.PutLE32(static_cast<uint32_t>(StartOffset));
+            aBuffer.PutLE32(static_cast<uint32_t>(StartOffset));
         }
     }
 
@@ -297,21 +278,18 @@ CHIP_ERROR ReceiveAccept::Pack(System::PacketBuffer & aBuffer) const
     {
         if (widerange)
         {
-            bbuf.PutLE64(Length);
+            aBuffer.PutLE64(Length);
         }
         else
         {
-            bbuf.PutLE32(static_cast<uint32_t>(Length));
+            aBuffer.PutLE32(static_cast<uint32_t>(Length));
         }
     }
 
-    bbuf.Put(Metadata, static_cast<size_t>(MetadataLength));
-
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-    aBuffer.SetDataLength(static_cast<uint16_t>(bbuf.Written()));
-
-exit:
-    return err;
+    if (Metadata != nullptr)
+    {
+        aBuffer.Put(Metadata, static_cast<size_t>(MetadataLength));
+    }
 }
 
 CHIP_ERROR ReceiveAccept::Parse(const System::PacketBuffer & aBuffer)
@@ -379,12 +357,10 @@ exit:
 
 size_t ReceiveAccept::PackedSize() const
 {
-    bool widerange    = ((StartOffset | Length) > std::numeric_limits<uint32_t>::max());
-    size_t offsetSize = widerange ? 8 : 4;
-    size_t lengthSize = offsetSize;
-
-    // First 2 bytes are Transfer Control and Range Control bytes
-    return (2 + sizeof(MaxBlockSize) + offsetSize + lengthSize + MetadataLength);
+    System::PacketBuffer * pbuf = System::PacketBuffer::NewWithAvailableSize(0);
+    BufBound emptyBuf(pbuf->Start(), 0);
+    Pack(emptyBuf);
+    return emptyBuf.Written();
 }
 
 bool ReceiveAccept::operator==(const ReceiveAccept & another) const
@@ -398,4 +374,83 @@ bool ReceiveAccept::operator==(const ReceiveAccept & another) const
     return (Version == another.Version && TransferCtlFlags.Raw() == another.TransferCtlFlags.Raw() &&
             StartOffset == another.StartOffset && MaxBlockSize == another.MaxBlockSize && Length == another.Length &&
             metadataMatches);
+}
+
+void CounterMessage::Pack(BufBound & aBuffer) const
+{
+    aBuffer.PutLE32(BlockCounter);
+}
+
+CHIP_ERROR CounterMessage::Parse(const System::PacketBuffer & aBuffer)
+{
+    uint8_t * bufStart = aBuffer.Start();
+    Reader bufReader(bufStart, aBuffer.DataLength());
+    return bufReader.Read32(&BlockCounter).StatusCode();
+}
+
+size_t CounterMessage::PackedSize() const
+{
+    System::PacketBuffer * pbuf = System::PacketBuffer::NewWithAvailableSize(0);
+    BufBound emptyBuf(pbuf->Start(), 0);
+    Pack(emptyBuf);
+    return emptyBuf.Written();
+}
+
+bool CounterMessage::operator==(const CounterMessage & another) const
+{
+    return (BlockCounter == another.BlockCounter);
+}
+
+void DataBlock::Pack(BufBound & aBuffer) const
+{
+    aBuffer.PutLE32(BlockCounter);
+    if (Data != nullptr)
+    {
+        aBuffer.Put(Data, DataLength);
+    }
+}
+
+CHIP_ERROR DataBlock::Parse(const System::PacketBuffer & aBuffer)
+{
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    uint8_t * bufStart = aBuffer.Start();
+    Reader bufReader(bufStart, aBuffer.DataLength());
+
+    SuccessOrExit(bufReader.Read32(&BlockCounter).StatusCode());
+
+    // Rest of message is data (could be empty)
+    if (bufReader.Remaining() > 0)
+    {
+        // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
+        // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
+        // or there is risk of unsafe memory access.
+        Data       = &bufStart[bufReader.OctetsRead()];
+        DataLength = bufReader.Remaining();
+    }
+
+exit:
+    if (bufReader.StatusCode() != CHIP_NO_ERROR)
+    {
+        err = bufReader.StatusCode();
+    }
+    return err;
+}
+
+size_t DataBlock::PackedSize() const
+{
+    System::PacketBuffer * pbuf = System::PacketBuffer::NewWithAvailableSize(0);
+    BufBound emptyBuf(pbuf->Start(), 0);
+    Pack(emptyBuf);
+    return emptyBuf.Written();
+}
+
+bool DataBlock::operator==(const DataBlock & another) const
+{
+    if (DataLength != another.DataLength)
+    {
+        return false;
+    }
+    bool dataMatches = memcmp(Data, another.Data, DataLength) == 0;
+
+    return (BlockCounter == another.BlockCounter && dataMatches);
 }
