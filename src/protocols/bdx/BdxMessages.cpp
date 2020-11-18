@@ -168,7 +168,7 @@ exit:
 size_t TransferInit::MessageSize() const
 {
     uint8_t dummy[0];
-    BufBound emptyBuf(&dummy[0], 0);
+    BufBound emptyBuf(static_cast<uint8_t *>(dummy), 0);
     WriteToBuffer(emptyBuf);
     return emptyBuf.Written();
 }
@@ -252,7 +252,7 @@ exit:
 size_t SendAccept::MessageSize() const
 {
     uint8_t dummy[0];
-    BufBound emptyBuf(&dummy[0], 0);
+    BufBound emptyBuf(static_cast<uint8_t *>(dummy), 0);
     WriteToBuffer(emptyBuf);
     return emptyBuf.Written();
     ;
@@ -394,7 +394,7 @@ exit:
 size_t ReceiveAccept::MessageSize() const
 {
     uint8_t dummy[0];
-    BufBound emptyBuf(&dummy[0], 0);
+    BufBound emptyBuf(static_cast<uint8_t *>(dummy), 0);
     WriteToBuffer(emptyBuf);
     return emptyBuf.Written();
 }
@@ -434,7 +434,7 @@ CHIP_ERROR CounterMessage::Parse(const System::PacketBuffer & aBuffer)
 size_t CounterMessage::MessageSize() const
 {
     uint8_t dummy[0];
-    BufBound emptyBuf(&dummy[0], 0);
+    BufBound emptyBuf(static_cast<uint8_t *>(dummy), 0);
     WriteToBuffer(emptyBuf);
     return emptyBuf.Written();
 }
@@ -486,7 +486,7 @@ exit:
 size_t DataBlock::MessageSize() const
 {
     uint8_t dummy[0];
-    BufBound emptyBuf(&dummy[0], 0);
+    BufBound emptyBuf(static_cast<uint8_t *>(dummy), 0);
     WriteToBuffer(emptyBuf);
     return emptyBuf.Written();
 }
