@@ -39,7 +39,6 @@ class CHIPDeviceEvent;
 }
 
 class SecureSessionMgr;
-class TransportMgrBase;
 
 /**
  * RendezvousSession establishes and maintains the first connection between
@@ -111,7 +110,7 @@ public:
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                     System::/*  */ PacketBuffer * buffer) override;
+                                     System::PacketBuffer * buffer) override;
 
     //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
     void SendNetworkCredentials(const char * ssid, const char * passwd) override;

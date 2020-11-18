@@ -23,7 +23,6 @@
 #include <transport/raw/PeerAddress.h>
 
 namespace chip {
-class TransportMgrBase;
 
 class RendezvousSessionDelegate
 {

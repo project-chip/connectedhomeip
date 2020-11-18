@@ -43,7 +43,6 @@
 namespace chip {
 
 class SecureSessionMgr;
-class TransportMgrBase;
 
 /**
  * @brief
@@ -171,7 +170,6 @@ protected:
     void SetTransportMgr(TransportMgrBase * cb) override { mTransportMgr = cb; }
 
 private:
-    friend class TransportMgrBase;
     /**
      *    The State of a secure transport object.
      */

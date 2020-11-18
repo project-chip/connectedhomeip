@@ -83,9 +83,12 @@ using Flags   = BitFlags<uint16_t, FlagValues>;
 using ExFlags = BitFlags<uint8_t, ExFlagValues>;
 
 // Header is a 16-bit value of the form
-//  |  4 bit  | 4 bit |  4 bit  |  4 bit   |
-//  +---------+-------+---------+----------|
-//  | version | Flags | encType | reserved |
+//  |  4 bit  | 4 bit |8 bit Security Flags|
+//  +---------+-------+--------------------|
+//  | version | Flags | P | C |Reserved| E |
+//                      |   |            +---Encrypted
+//                      |   +----------------Control message (TODO: Implement this)
+//                      +--------------------Privacy enhancements (TODO: Implement this)
 static constexpr uint16_t kFlagsMask = 0x0F01;
 
 } // namespace Header

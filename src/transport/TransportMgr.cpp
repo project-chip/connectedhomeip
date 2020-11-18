@@ -38,20 +38,18 @@ namespace chip {
 void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                              System::PacketBuffer * msg, TransportMgrBase * dispatcher)
 {
-    if (packetHeader.GetFlags().Has(Header::FlagValues::kSecure))
+    TransportMgrDelegate * handler =
+        packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? dispatcher->mSecureSessionMgr : dispatcher->mRendezvous;
+    if (handler != nullptr)
     {
-        if (dispatcher->mSecureSessionMgr != nullptr)
-        {
-            dispatcher->mSecureSessionMgr->OnMessageReceived(packetHeader, peerAddress, msg);
-        }
+        handler->OnMessageReceived(packetHeader, peerAddress, msg);
     }
     else
     {
-        if (dispatcher->mRendezvous != nullptr)
-        {
-            dispatcher->mRendezvous->OnMessageReceived(packetHeader, peerAddress, msg);
-            // Unsecure message received, pass it to Rendezvous Session Mgr directly.
-        }
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        peerAddress.ToString(addrBuffer, sizeof(addrBuffer));
+        ChipLogError(Inet, "%s message from %s is dropped since no corresponding handler is set in TransportMgr.",
+                     packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? "Encrypted" : "Unencrypted", addrBuffer);
     }
 }
 } // namespace chip
