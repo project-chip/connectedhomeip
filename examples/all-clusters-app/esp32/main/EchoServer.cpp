@@ -121,7 +121,7 @@ static size_t odc(const uint8_t * bytes, size_t bytes_len, char * out, size_t ou
 class EchoServerCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const Transport::PeerConnectionState * state,
                            System::PacketBuffer * buffer, SecureSessionMgrBase * mgr) override
     {
         CHIP_ERROR err;
@@ -185,7 +185,7 @@ public:
         statusLED1.BlinkOnError();
     }
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
+    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
     {
         ESP_LOGI(TAG, "Received a new connection.");
     }

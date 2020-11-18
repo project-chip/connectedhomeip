@@ -71,7 +71,6 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgrBase * sessionMgr)
 
     mNextExchangeId = GetRandU16();
 
-    memset((void *) ContextPool, 0, sizeof(ContextPool));
     mContextsInUse = 0;
 
     memset(UMHandlerPool, 0, sizeof(UMHandlerPool));
@@ -106,13 +105,11 @@ ExchangeContext * ExchangeManager::NewContext(const NodeId & peerNodeId, Exchang
 
 ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, ExchangeDelegate * delegate, bool isInitiator)
 {
-    ExchangeContext * ec = ContextPool;
-
-    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (auto & ec : ContextPool)
     {
-        if (ec->GetReferenceCount() > 0 && ec->GetPeerNodeId() == peerNodeId && ec->GetDelegate() == delegate &&
-            ec->IsInitiator() == isInitiator)
-            return ec;
+        if (ec.GetReferenceCount() > 0 && ec.GetPeerNodeId() == peerNodeId && ec.GetDelegate() == delegate &&
+            ec.IsInitiator() == isInitiator)
+            return &ec;
     }
 
     return nullptr;
@@ -146,15 +143,13 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
 ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
                                                 ExchangeDelegate * delegate)
 {
-    ExchangeContext * ec = ContextPool;
-
     CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return nullptr);
 
-    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (auto & ec : ContextPool)
     {
-        if (ec->GetReferenceCount() == 0)
+        if (ec.GetReferenceCount() == 0)
         {
-            return ec->Alloc(this, ExchangeId, PeerNodeId, Initiator, delegate);
+            return ec.Alloc(this, ExchangeId, PeerNodeId, Initiator, delegate);
         }
     }
 
@@ -166,17 +161,15 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
 {
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
-    ExchangeContext * ec                    = nullptr;
     CHIP_ERROR err                          = CHIP_NO_ERROR;
 
     // Search for an existing exchange that the message applies to. If a match is found...
-    ec = ContextPool;
-    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (auto & ec : ContextPool)
     {
-        if (ec->GetReferenceCount() > 0 && ec->MatchExchange(packetHeader, payloadHeader))
+        if (ec.GetReferenceCount() > 0 && ec.MatchExchange(packetHeader, payloadHeader))
         {
             // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(packetHeader, payloadHeader, msgBuf);
+            ec.HandleMessage(packetHeader, payloadHeader, msgBuf);
 
             msgBuf = nullptr;
 
@@ -219,10 +212,10 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     // If we found a handler or we need to create a new exchange context (EC).
     if (matchingUMH != nullptr)
     {
-        ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false, matchingUMH->Delegate);
+        auto * ec = AllocContext(payloadHeader.GetExchangeID(), packetHeader.GetSourceNodeId().Value(), false, matchingUMH->Delegate);
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-        ChipLogProgress(ExchangeManager, "ec id: %d, Delegate: 0x%x", (ec - ContextPool + 1), ec->GetDelegate());
+        ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - ContextPool.begin(), ec->GetExchangeId(), ec->GetDelegate());
 
         ec->HandleMessage(packetHeader, payloadHeader, msgBuf);
         msgBuf = nullptr;
@@ -289,21 +282,20 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                        const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
                                         SecureSessionMgrBase * msgLayer)
 {
     DispatchMessage(packetHeader, payloadHeader, msgBuf);
 }
 
-void ExchangeManager::OnConnectionExpired(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
+void ExchangeManager::OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
 {
-    // Search for an existing exchange that the message applies to. If a match is found...
-    ExchangeContext * ec = ContextPool;
-    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+    for (auto & ec : ContextPool)
     {
-        if (ec->GetReferenceCount() > 0 && ec->mPeerNodeId == state->GetPeerNodeId())
+        if (ec.GetReferenceCount() > 0 && ec.mPeerNodeId == state->GetPeerNodeId())
         {
-            ec->Close();
+            ec.Close();
+            // Continue iterate because there can be multiple contexts associated with the connection.
         }
     }
 }

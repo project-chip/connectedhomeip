@@ -45,7 +45,7 @@ namespace {
 class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const Transport::PeerConnectionState * state,
                            System::PacketBuffer * buffer, SecureSessionMgrBase * mgr) override
     {
         const size_t data_len = buffer->DataLength();
@@ -73,7 +73,7 @@ public:
         }
     }
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
+    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
     {
         ChipLogProgress(AppServer, "Received a new connection.");
     }

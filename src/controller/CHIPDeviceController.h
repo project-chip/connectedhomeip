@@ -193,10 +193,10 @@ protected:
 
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const Transport::PeerConnectionState * state,
                            System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override;
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
+    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
     void OnValue(const char * key, const char * value) override;

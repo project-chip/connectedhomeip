@@ -60,7 +60,7 @@ namespace {
 class ResponseServerCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, const Transport::PeerConnectionState * state,
                            System::PacketBuffer * buffer, SecureSessionMgrBase * mgr) override
     {
         CHIP_ERROR err;
@@ -95,7 +95,7 @@ public:
         ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
     }
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
+    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
     {
         ESP_LOGI(TAG, "Received a new connection.");
     }
