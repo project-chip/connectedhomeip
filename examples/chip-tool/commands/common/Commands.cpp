@@ -47,8 +47,9 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
     {
 
         ChipDeviceController dc;
+        ChipToolPersistentStorageDelegate storage;
 
-        err = dc.Init(localId);
+        err = dc.Init(localId, nullptr, &storage);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure: %s", chip::ErrorStr(err)));
 
         err = dc.ServiceEvents();
