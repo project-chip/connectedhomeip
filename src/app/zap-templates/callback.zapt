@@ -20,11 +20,7 @@ void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clust
 
 // Cluster Init Functions
 
-{{#all_user_clusters}}
-
-//
-// Cluster {{name}}
-//
+{{#all_user_clusters_names}}
 
 /** @brief {{name}} Cluster Init
  *
@@ -32,8 +28,17 @@ void emberAfClusterInitCallback(chip::EndpointId endpoint, chip::ClusterId clust
  *
  * @param endpoint    Endpoint that is being initialized
  */
-{{#all_user_clusters_names}}
 void emberAf{{asCamelCased name false}}ClusterInitCallback(chip::EndpointId endpoint);
+
+{{/all_user_clusters_names}}
+
+// Cluster Server/Client Init Functions
+
+{{#all_user_clusters}}
+
+//
+// {{name}} Cluster {{side}}
+//
 
 /** @brief {{name}} Cluster {{asCamelCased side false}} Init
  *

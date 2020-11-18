@@ -25,7 +25,6 @@ typedef struct _{{asType label}} {
 {{else if (isStrEqual label "commandId")}}
 {{ident}}chip::CommandId {{asSymbol label}};
 {{else}}
-{{type}} {{label}}
 {{ident}}{{asUnderlyingType type}} {{asSymbol label}};
 {{/if}}
 {{/zcl_struct_items}}
