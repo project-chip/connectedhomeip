@@ -36,7 +36,7 @@
 #include <lib/mdns/DiscoveryManager.h>
 #include <support/CodeUtils.h>
 
-static const char * TAG = "echo-devicecallbacks";
+static const char * TAG = "app-devicecallbacks";
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -134,12 +134,11 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState, Error error)
 {
     statusLED1.Animate();
 
-    // Decrement the timer count.
-    identifyTimerCount--;
-
     if (identifyTimerCount)
     {
         SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
+        // Decrement the timer count.
+        identifyTimerCount--;
     }
 }
 
@@ -150,7 +149,7 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointI
 
     statusLED1.Blink(kIdentifyTimerDelayMS * 2);
 
-    // timerCount represents the number of callback execution before the we stopped the timer.
+    // timerCount represents the number of callback execution before we stop the timer.
     // value is expressed in seconds and the timer is fired every 250ms, so just multiply value by 4.
     // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
     identifyTimerCount = (*value) * 4;
