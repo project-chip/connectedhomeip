@@ -24,9 +24,7 @@ config("includes") {
 action("all-clusters-common-gen") {
   script = "//build/gn_run_binary.py"
 
-  sources = [
-    "${chip_root}/third_party/zap/repo/.version.json",
-  ]
+  sources = [ "${chip_root}/third_party/zap/repo/.version.json" ]
 
   args = [
     "../../scripts/tools/zap_generate.sh",
@@ -95,9 +93,7 @@ source_set("all-clusters-common") {
     "${chip_root}/src/lib",
   ]
 
-  public_deps = [
-    ":all-clusters-common-gen",
-  ]
+  public_deps = [ ":all-clusters-common-gen" ]
 
   public_configs = [ ":includes" ]
 }
