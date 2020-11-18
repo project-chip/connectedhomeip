@@ -81,8 +81,8 @@ void CHIPPersistentStorageDelegateBridge::SetDelegate(chip::Controller::Persiste
 
 void CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key)
 {
+    NSString * keyString = [NSString stringWithUTF8String:key];
     dispatch_async(mWorkQueue, ^{
-        NSString * keyString = [NSString stringWithUTF8String:key];
         NSLog(@"PersistentStorageDelegate Get Value for Key: %@", keyString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
@@ -101,8 +101,8 @@ void CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key)
 CHIP_ERROR CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key, char * value, uint16_t & size)
 {
     __block CHIP_ERROR error = CHIP_NO_ERROR;
+    NSString * keyString = [NSString stringWithUTF8String:key];
     dispatch_sync(mWorkQueue, ^{
-        NSString * keyString = [NSString stringWithUTF8String:key];
         NSLog(@"PersistentStorageDelegate Sync Get Value for Key: %@", keyString);
 
         NSString * valueString = nil;
@@ -131,9 +131,9 @@ CHIP_ERROR CHIPPersistentStorageDelegateBridge::GetKeyValue(const char * key, ch
 
 void CHIPPersistentStorageDelegateBridge::SetKeyValue(const char * key, const char * value)
 {
+    NSString * keyString = [NSString stringWithUTF8String:key];
+    NSString * valueString = [NSString stringWithUTF8String:value];
     dispatch_async(mWorkQueue, ^{
-        NSString * keyString = [NSString stringWithUTF8String:key];
-        NSString * valueString = [NSString stringWithUTF8String:value];
         NSLog(@"PersistentStorageDelegate Set Key %@, Value %@", keyString, valueString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;
@@ -150,8 +150,8 @@ void CHIPPersistentStorageDelegateBridge::SetKeyValue(const char * key, const ch
 
 void CHIPPersistentStorageDelegateBridge::DeleteKeyValue(const char * key)
 {
+    NSString * keyString = [NSString stringWithUTF8String:key];
     dispatch_async(mWorkQueue, ^{
-        NSString * keyString = [NSString stringWithUTF8String:key];
         NSLog(@"PersistentStorageDelegate Delete Key: %@", keyString);
 
         id<CHIPPersistentStorageDelegate> strongDelegate = mDelegate;

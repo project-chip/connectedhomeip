@@ -124,9 +124,6 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
             result = status(false, true, cmd->mfgSpecific);
             break;
-        case ZCL_IAS_ZONE_CLUSTER_ID:
-            result = emberAfIasZoneClusterClientCommandParse(cmd);
-            break;
         default:
             // Unrecognized cluster ID, error status will apply.
             break;
@@ -2182,81 +2179,6 @@ EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand
             }
             wasHandled = emberAfColorControlClusterStepColorTemperatureCallback(
                 stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            break;
-        }
-        }
-    }
-    return status(wasHandled, true, cmd->mfgSpecific);
-}
-
-// Cluster: IAS Zone, client
-EmberAfStatus emberAfIasZoneClusterClientCommandParse(EmberAfClusterCommand * cmd)
-{
-    bool wasHandled = false;
-    if (!cmd->mfgSpecific)
-    {
-        switch (cmd->commandId)
-        {
-        case ZCL_ZONE_STATUS_CHANGE_NOTIFICATION_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t zoneStatus;    // Ver.: always
-            uint8_t extendedStatus; // Ver.: always
-            uint8_t zoneId;         // Ver.: since ha-1.2-05-3520-29
-            uint16_t delay;         // Ver.: since ha-1.2-05-3520-29
-            // Command is not a fixed length
-            if (cmd->bufLen < payloadOffset + 2u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            zoneStatus = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset += 2u;
-            if (cmd->bufLen < payloadOffset + 1u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            extendedStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset += 1u;
-            if ((cmd->bufLen < payloadOffset + 1u))
-            {
-                // Argument is not always present:
-                // - it is present only in versions higher than: ha-1.2-05-3520-29
-                zoneId = 0xFF;
-            }
-            else
-            {
-                zoneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-                payloadOffset += 1u;
-            }
-            if ((cmd->bufLen < payloadOffset + 2u))
-            {
-                // Argument is not always present:
-                // - it is present only in versions higher than: ha-1.2-05-3520-29
-                delay = 0xFFFF;
-            }
-            else
-            {
-                delay = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            }
-            wasHandled = emberAfIasZoneClusterZoneStatusChangeNotificationCallback(zoneStatus, extendedStatus, zoneId, delay);
-            break;
-        }
-        case ZCL_ZONE_ENROLL_REQUEST_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t zoneType;         // Ver.: always
-            uint16_t manufacturerCode; // Ver.: always
-            // Command is fixed length: 4
-            if (cmd->bufLen < payloadOffset + 4u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            zoneType = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset += 2u;
-            manufacturerCode = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            wasHandled       = emberAfIasZoneClusterZoneEnrollRequestCallback(zoneType, manufacturerCode);
             break;
         }
         default: {

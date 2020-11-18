@@ -20,10 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libMinimalMdnstests"
 
-  sources = [
-    "TestMinimalMdns.h",
-    "TestQName.cpp",
-  ]
+  test_sources = [ "TestQName.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
@@ -32,6 +29,4 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/mdns/minimal",
     "${nlunit_test_root}:nlunit-test",
   ]
-
-  tests = [ "TestQName" ]
 }

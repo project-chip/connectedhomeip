@@ -79,7 +79,7 @@ const char * ToString(mdns::Minimal::QType qtype)
     case mdns::Minimal::QType::TXT:
         return "TXT";
     default:
-        sprintf(buff, "UNKNOWN (%d)!!", static_cast<int>(t));
+        sprintf(buff, "UNKNOWN (%d)!!", static_cast<int>(qtype));
         return buff;
     }
 }
@@ -291,7 +291,6 @@ chip::Inet::InterfaceId FindBestInterfaceId()
 
     printf("Searching for a suitable INET Interface");
 
-    chip::Inet::InterfaceIterator intIterator;
     for (chip::Inet::InterfaceIterator intIterator; intIterator.HasCurrent(); intIterator.Next())
     {
         char name[64];

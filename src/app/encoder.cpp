@@ -211,14 +211,12 @@ extern "C" {
 #define SCENES_CLUSTER_ID 0x0005
 #define TEMPERATURE_MEASUREMENT_CLUSTER_ID 0x0402
 
-static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, ClusterId clusterId, EndpointId sourceEndpoint,
-                                 EndpointId destinationEndpoint, EmberApsOption options, GroupId groupId, uint8_t sequence,
-                                 uint8_t radius, bool isMeasuring)
+static uint16_t doEncodeApsFrame(BufBound & buf, ClusterId clusterId, EndpointId sourceEndpoint, EndpointId destinationEndpoint,
+                                 EmberApsOption options, GroupId groupId, uint8_t sequence, uint8_t radius, bool isMeasuring)
 {
 
     uint8_t control_byte = 0;
     buf.Put(control_byte); // Put in a control byte
-    buf.PutLE16(profileID);
     buf.PutLE16(clusterId);
     buf.Put(sourceEndpoint);
     buf.Put(destinationEndpoint);
@@ -251,8 +249,8 @@ static uint16_t doEncodeApsFrame(BufBound & buf, uint16_t profileID, ClusterId c
 uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * apsFrame)
 {
     BufBound buf = BufBound(buffer, buf_length);
-    return doEncodeApsFrame(buf, apsFrame->profileId, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint,
-                            apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
+    return doEncodeApsFrame(buf, apsFrame->clusterId, apsFrame->sourceEndpoint, apsFrame->destinationEndpoint, apsFrame->options,
+                            apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
 
 uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, CommandId command,
@@ -260,12 +258,10 @@ uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, Cluster
 {
     CHECK_FRAME_LENGTH(buf.Size(), "Buffer is empty");
 
-    uint8_t seq_num         = 1;     // Transaction sequence number.  Just pick something.
-    uint8_t source_endpoint = 1;     // Pick source endpoint as 1 for now.
-    uint16_t profile_id     = 65535; // Profile is 65535 because that matches our simple generated code, but we
-                                     // should sort out the profile situation.
+    uint8_t seq_num         = 1; // Transaction sequence number.  Just pick something.
+    uint8_t source_endpoint = 1; // Pick source endpoint as 1 for now.
 
-    if (doEncodeApsFrame(buf, profile_id, cluster_id, source_endpoint, destination_endpoint, 0, 0, 0, 0, false))
+    if (doEncodeApsFrame(buf, cluster_id, source_endpoint, destination_endpoint, 0, 0, 0, 0, false))
     {
         buf.Put(frame_control);
         buf.Put(seq_num);

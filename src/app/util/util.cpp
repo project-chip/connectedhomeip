@@ -216,7 +216,6 @@ EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceTyp
 
 static void prepareForResponse(const EmberAfClusterCommand * cmd)
 {
-    emberAfResponseApsFrame.profileId           = cmd->apsFrame->profileId;
     emberAfResponseApsFrame.clusterId           = cmd->apsFrame->clusterId;
     emberAfResponseApsFrame.sourceEndpoint      = cmd->apsFrame->destinationEndpoint;
     emberAfResponseApsFrame.destinationEndpoint = cmd->apsFrame->sourceEndpoint;
@@ -431,15 +430,6 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
         emberAfDebugPrintln("%d", cmd->networkIndex);
         return false;
     }
-    else if (emberAfProfileIdFromIndex(index) != cmd->apsFrame->profileId &&
-             (cmd->apsFrame->profileId != EMBER_WILDCARD_PROFILE_ID ||
-              (EMBER_MAXIMUM_STANDARD_PROFILE_ID < emberAfProfileIdFromIndex(index))))
-    {
-        emberAfDebugPrint("Drop cluster 0x%2x command 0x%x", cmd->apsFrame->clusterId, cmd->commandId);
-        emberAfDebugPrint(" for endpoint 0x%x due to wrong %s: ", cmd->apsFrame->destinationEndpoint, "profile");
-        emberAfDebugPrintln("0x%02x", cmd->apsFrame->profileId);
-        return false;
-    }
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
     else if ((cmd->type == EMBER_INCOMING_MULTICAST || cmd->type == EMBER_INCOMING_MULTICAST_LOOPBACK) &&
              !emberAfGroupsClusterEndpointInGroupCallback(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->groupId))
@@ -457,7 +447,7 @@ static bool dispatchZclMessage(EmberAfClusterCommand * cmd)
 }
 
 bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, ChipNodeId source, InterPanHeader * interPanHeader,
+                                     uint16_t messageLength, NodeId source, InterPanHeader * interPanHeader,
                                      EmberAfClusterCommand * returnCmd)
 {
     uint8_t minLength =
@@ -503,7 +493,7 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
 
 // a single call to process global and cluster-specific messages and callbacks.
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           ChipNodeId source, InterPanHeader * interPanHeader)
+                           NodeId source, InterPanHeader * interPanHeader)
 {
     bool msgHandled = false;
     // reset/reinitialize curCmd
@@ -667,7 +657,7 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     }
 }
 
-static bool isBroadcastDestination(ChipNodeId responseDestination)
+static bool isBroadcastDestination(NodeId responseDestination)
 {
     // FIXME: Will need to actually figure out how to test for this!
     return false;
@@ -823,8 +813,8 @@ EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberA
 
 uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame)
 {
-    ChipNodeId destination = EMBER_UNKNOWN_NODE_ID;
-    uint8_t max            = EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH;
+    NodeId destination = EMBER_UNKNOWN_NODE_ID;
+    uint8_t max        = EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH;
 
     if ((apsFrame->options & EMBER_APS_OPTION_SOURCE_EUI64) != 0U)
     {
