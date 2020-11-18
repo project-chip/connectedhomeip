@@ -21,7 +21,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libBDXTests"
 
-  sources = [ "TestBdxMessages.cpp" ]
+  test_sources = [ "TestBdxMessages.cpp" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
@@ -32,6 +32,4 @@ chip_test_suite("tests") {
   ]
 
   cflags = [ "-Wconversion" ]
-
-  tests = [ "TestBdxMessages" ]
 }
