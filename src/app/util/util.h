@@ -141,18 +141,18 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
 
 void emberAfInit(void);
 void emberAfTick(void);
-uint16_t emberAfFindClusterNameIndex(CHIPClusterId cluster);
-uint16_t emberAfFindClusterNameIndexWithMfgCode(CHIPClusterId cluster, uint16_t mfgCode);
+uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
+uint16_t emberAfFindClusterNameIndexWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 void emberAfStackDown(void);
 
-void emberAfDecodeAndPrintCluster(CHIPClusterId cluster);
-void emberAfDecodeAndPrintClusterWithMfgCode(CHIPClusterId cluster, uint16_t mfgCode);
+void emberAfDecodeAndPrintCluster(chip::ClusterId cluster);
+void emberAfDecodeAndPrintClusterWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);
 
 bool emberAfProcessMessage(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message, uint16_t msgLen,
-                           ChipNodeId source, InterPanHeader * interPanHeader);
+                           chip::NodeId source, InterPanHeader * interPanHeader);
 
 bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMessageType type, uint8_t * message,
-                                     uint16_t messageLength, ChipNodeId source, InterPanHeader * interPanHeader,
+                                     uint16_t messageLength, chip::NodeId source, InterPanHeader * interPanHeader,
                                      EmberAfClusterCommand * returnCmd);
 
 /**

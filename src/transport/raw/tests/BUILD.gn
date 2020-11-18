@@ -34,12 +34,14 @@ static_library("helpers") {
 chip_test_suite("tests") {
   output_name = "libRawTransportTests"
 
-  sources = [
+  test_sources = [
     "TestMessageHeader.cpp",
-    "TestRawTransportLayer.h",
-    "TestTCP.cpp",
     "TestUDP.cpp",
   ]
+
+  if (current_os != "mac") {
+    test_sources += [ "TestTCP.cpp" ]
+  }
 
   public_deps = [
     ":helpers",
@@ -52,13 +54,4 @@ chip_test_suite("tests") {
   ]
 
   cflags = [ "-Wconversion" ]
-
-  tests = [
-    "TestMessageHeader",
-    "TestUDP",
-  ]
-
-  if (current_os != "mac") {
-    tests += [ "TestTCP" ]
-  }
 }

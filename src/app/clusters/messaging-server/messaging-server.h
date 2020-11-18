@@ -95,7 +95,7 @@ typedef struct
  * @return True if the message is valid or false is the message does not exist
  * or is expired.
  */
-bool emberAfPluginMessagingServerGetMessage(CHIPEndpointId endpoint, EmberAfPluginMessagingServerMessage * message);
+bool emberAfPluginMessagingServerGetMessage(chip::EndpointId endpoint, EmberAfPluginMessagingServerMessage * message);
 
 /**
  * @brief Sets the message used by the Messaging server plugin.
@@ -110,8 +110,8 @@ bool emberAfPluginMessagingServerGetMessage(CHIPEndpointId endpoint, EmberAfPlug
  * @param message The ::EmberAfPluginMessagingServerMessage structure
  * describing the message.  If NULL, the message is removed from the server.
  */
-void emberAfPluginMessagingServerSetMessage(CHIPEndpointId endpoint, const EmberAfPluginMessagingServerMessage * message);
+void emberAfPluginMessagingServerSetMessage(chip::EndpointId endpoint, const EmberAfPluginMessagingServerMessage * message);
 
-void emAfPluginMessagingServerPrintInfo(CHIPEndpointId endpoint);
+void emAfPluginMessagingServerPrintInfo(chip::EndpointId endpoint);
 void emberAfPluginMessagingServerDisplayMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint);
 void emberAfPluginMessagingServerCancelMessage(EmberNodeId nodeId, uint8_t srcEndpoint, uint8_t dstEndpoint);

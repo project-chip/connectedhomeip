@@ -1,5 +1,4 @@
-
-/*
+/**
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -16,7 +15,22 @@
  *    limitations under the License.
  */
 
-#pragma once
+#ifndef CHIP_DEVICE_INTERNAL_H
+#define CHIP_DEVICE_INTERNAL_H
 
-int TestQName();
-int TestIPResourceRecord();
+#import "CHIPDevice.h"
+#import <Foundation/Foundation.h>
+
+#include <controller/CHIPDevice.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
+@interface CHIPDevice ()
+
+- (instancetype)initWithDevice:(chip::Controller::Device *)device;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+#endif /* CHIP_DEVICE_INTERNAL_H */

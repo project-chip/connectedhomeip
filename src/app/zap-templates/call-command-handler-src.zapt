@@ -8,6 +8,8 @@
 #include "command-id.h"
 #include "util.h"
 
+using namespace chip;
+
 {{#all_user_clusters}}
 {{#if (isEnabled enabled)}}
 EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(EmberAfClusterCommand * cmd);

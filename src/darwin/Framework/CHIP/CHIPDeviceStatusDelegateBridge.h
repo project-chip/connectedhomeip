@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -15,20 +15,28 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP Transport Layer Message header unit
- *      tests.
- *
- */
+#import "CHIPDeviceStatusDelegate.h"
+#import <Foundation/Foundation.h>
 
-#include "TestRawTransportLayer.h"
+#include <controller/CHIPDevice.h>
 
-#include <nlunit-test.h>
+NS_ASSUME_NONNULL_BEGIN
 
-int main()
+class CHIPDeviceStatusDelegateBridge : public chip::Controller::DeviceStatusDelegate
 {
-    nlTestSetOutputStyle(OUTPUT_CSV);
-    return TestMessageHeader();
-}
+public:
+    CHIPDeviceStatusDelegateBridge();
+    ~CHIPDeviceStatusDelegateBridge();
+
+    void setDelegate(id<CHIPDeviceStatusDelegate> delegate, dispatch_queue_t queue);
+
+    void OnMessage(chip::System::PacketBuffer * message) override;
+
+    void OnStatusChange() override;
+
+private:
+    id<CHIPDeviceStatusDelegate> mDelegate;
+    dispatch_queue_t mQueue;
+};
+
+NS_ASSUME_NONNULL_END

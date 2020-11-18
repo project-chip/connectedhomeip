@@ -42,8 +42,8 @@
 #include <app/util/af-types.h>
 #include <stdint.h>
 
-EmberAfStatus emberAfScenesSetSceneCountAttribute(CHIPEndpointId endpoint, uint8_t newCount);
-EmberAfStatus emberAfScenesMakeValid(CHIPEndpointId endpoint, uint8_t sceneId, CHIPGroupId groupId);
+EmberAfStatus emberAfScenesSetSceneCountAttribute(chip::EndpointId endpoint, uint8_t newCount);
+EmberAfStatus emberAfScenesMakeValid(chip::EndpointId endpoint, uint8_t sceneId, chip::GroupId groupId);
 
 // DEPRECATED.
 #define emberAfScenesMakeInvalid emberAfScenesClusterMakeInvalidCallback
@@ -79,9 +79,9 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 #define emberAfPluginScenesServerDecrNumSceneEntriesInUse() (--emberAfPluginScenesServerEntriesInUse)
 #endif // Use tokens
 
-bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, CHIPGroupId groupId, uint8_t sceneId,
+bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, chip::GroupId groupId, uint8_t sceneId,
                                             uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets);
-bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, CHIPGroupId groupId, uint8_t sceneId);
+bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, chip::GroupId groupId, uint8_t sceneId);
 
 /** @brief Scenes Cluster Recall Saved Scene
  *
@@ -92,7 +92,7 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
  * @param groupId The group identifier.  Ver.: always
  * @param sceneId The scene identifier.  Ver.: always
  */
-EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(CHIPEndpointId endpoint, CHIPGroupId groupId, uint8_t sceneId);
+EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t sceneId);
 
 /** @brief Scenes Cluster Store Current Scene
  *
@@ -106,7 +106,7 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(CHIPEndpointId endpoi
  * @param groupId The group identifier.  Ver.: always
  * @param sceneId The scene identifier.  Ver.: always
  */
-EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(CHIPEndpointId endpoint, CHIPGroupId groupId, uint8_t sceneId);
+EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t sceneId);
 
 /** @brief Scenes Cluster Remove Scenes In Group
  *
@@ -115,7 +115,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(CHIPEndpointId endpo
  * @param endpoint Endpoint  Ver.: always
  * @param groupId Group ID  Ver.: always
  */
-void emberAfScenesClusterRemoveScenesInGroupCallback(CHIPEndpointId endpoint, CHIPGroupId groupId);
+void emberAfScenesClusterRemoveScenesInGroupCallback(chip::EndpointId endpoint, chip::GroupId groupId);
 
 /** @brief Scenes Cluster Make Invalid
  *
@@ -124,4 +124,4 @@ void emberAfScenesClusterRemoveScenesInGroupCallback(CHIPEndpointId endpoint, CH
  *
  * @param endpoint   Ver.: always
  */
-EmberAfStatus emberAfScenesClusterMakeInvalidCallback(CHIPEndpointId endpoint);
+EmberAfStatus emberAfScenesClusterMakeInvalidCallback(chip::EndpointId endpoint);

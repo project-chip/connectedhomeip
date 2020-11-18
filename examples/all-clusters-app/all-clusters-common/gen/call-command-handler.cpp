@@ -60,6 +60,8 @@
 #include "command-id.h"
 #include "util.h"
 
+using namespace chip;
+
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
     if (wasHandled)
@@ -121,9 +123,6 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             break;
         case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
             result = status(false, true, cmd->mfgSpecific);
-            break;
-        case ZCL_IAS_ZONE_CLUSTER_ID:
-            result = emberAfIasZoneClusterClientCommandParse(cmd);
             break;
         default:
             // Unrecognized cluster ID, error status will apply.
@@ -274,8 +273,8 @@ EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd
         {
         case ZCL_ADD_GROUP_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t status;   // Ver.: always
-            uint16_t groupId; // Ver.: always
+            uint8_t status;  // Ver.: always
+            GroupId groupId; // Ver.: always
             // Command is fixed length: 3
             if (cmd->bufLen < payloadOffset + 3u)
             {
@@ -290,7 +289,7 @@ EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd
         case ZCL_VIEW_GROUP_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
             uint8_t status;      // Ver.: always
-            uint16_t groupId;    // Ver.: always
+            GroupId groupId;     // Ver.: always
             uint8_t * groupName; // Ver.: always
             // Command is not a fixed length
             if (cmd->bufLen < payloadOffset + 1u)
@@ -333,8 +332,8 @@ EmberAfStatus emberAfGroupsClusterClientCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_REMOVE_GROUP_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t status;   // Ver.: always
-            uint16_t groupId; // Ver.: always
+            uint8_t status;  // Ver.: always
+            GroupId groupId; // Ver.: always
             // Command is fixed length: 3
             if (cmd->bufLen < payloadOffset + 3u)
             {
@@ -365,7 +364,7 @@ EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd
         {
         case ZCL_ADD_GROUP_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId;    // Ver.: always
+            GroupId groupId;     // Ver.: always
             uint8_t * groupName; // Ver.: always
             // Command is not a fixed length
             if (cmd->bufLen < payloadOffset + 2u)
@@ -384,7 +383,7 @@ EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_VIEW_GROUP_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId; // Ver.: always
+            GroupId groupId; // Ver.: always
             // Command is fixed length: 2
             if (cmd->bufLen < payloadOffset + 2u)
             {
@@ -411,7 +410,7 @@ EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_REMOVE_GROUP_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId; // Ver.: always
+            GroupId groupId; // Ver.: always
             // Command is fixed length: 2
             if (cmd->bufLen < payloadOffset + 2u)
             {
@@ -428,7 +427,7 @@ EmberAfStatus emberAfGroupsClusterServerCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_ADD_GROUP_IF_IDENTIFYING_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId;    // Ver.: always
+            GroupId groupId;     // Ver.: always
             uint8_t * groupName; // Ver.: always
             // Command is not a fixed length
             if (cmd->bufLen < payloadOffset + 2u)
@@ -464,9 +463,9 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
         {
         case ZCL_ADD_SCENE_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t status;   // Ver.: always
-            uint16_t groupId; // Ver.: always
-            uint8_t sceneId;  // Ver.: always
+            uint8_t status;  // Ver.: always
+            GroupId groupId; // Ver.: always
+            uint8_t sceneId; // Ver.: always
             // Command is fixed length: 4
             if (cmd->bufLen < payloadOffset + 4u)
             {
@@ -483,7 +482,7 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
         case ZCL_VIEW_SCENE_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
             uint8_t status;               // Ver.: always
-            uint16_t groupId;             // Ver.: always
+            GroupId groupId;              // Ver.: always
             uint8_t sceneId;              // Ver.: always
             uint16_t transitionTime;      // Ver.: always
             uint8_t * sceneName;          // Ver.: always
@@ -544,9 +543,9 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_REMOVE_SCENE_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t status;   // Ver.: always
-            uint16_t groupId; // Ver.: always
-            uint8_t sceneId;  // Ver.: always
+            uint8_t status;  // Ver.: always
+            GroupId groupId; // Ver.: always
+            uint8_t sceneId; // Ver.: always
             // Command is fixed length: 4
             if (cmd->bufLen < payloadOffset + 4u)
             {
@@ -562,8 +561,8 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_REMOVE_ALL_SCENES_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t status;   // Ver.: always
-            uint16_t groupId; // Ver.: always
+            uint8_t status;  // Ver.: always
+            GroupId groupId; // Ver.: always
             // Command is fixed length: 3
             if (cmd->bufLen < payloadOffset + 3u)
             {
@@ -577,9 +576,9 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_STORE_SCENE_RESPONSE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint8_t status;   // Ver.: always
-            uint16_t groupId; // Ver.: always
-            uint8_t sceneId;  // Ver.: always
+            uint8_t status;  // Ver.: always
+            GroupId groupId; // Ver.: always
+            uint8_t sceneId; // Ver.: always
             // Command is fixed length: 4
             if (cmd->bufLen < payloadOffset + 4u)
             {
@@ -597,7 +596,7 @@ EmberAfStatus emberAfScenesClusterClientCommandParse(EmberAfClusterCommand * cmd
             uint16_t payloadOffset = cmd->payloadStartIndex;
             uint8_t status;      // Ver.: always
             uint8_t capacity;    // Ver.: always
-            uint16_t groupId;    // Ver.: always
+            GroupId groupId;     // Ver.: always
             uint8_t sceneCount;  // Ver.: always
             uint8_t * sceneList; // Ver.: always
             // Command is not a fixed length
@@ -661,7 +660,7 @@ EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd
         {
         case ZCL_ADD_SCENE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId;             // Ver.: always
+            GroupId groupId;              // Ver.: always
             uint8_t sceneId;              // Ver.: always
             uint16_t transitionTime;      // Ver.: always
             uint8_t * sceneName;          // Ver.: always
@@ -697,8 +696,8 @@ EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_VIEW_SCENE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId; // Ver.: always
-            uint8_t sceneId;  // Ver.: always
+            GroupId groupId; // Ver.: always
+            uint8_t sceneId; // Ver.: always
             // Command is fixed length: 3
             if (cmd->bufLen < payloadOffset + 3u)
             {
@@ -712,8 +711,8 @@ EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_REMOVE_SCENE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId; // Ver.: always
-            uint8_t sceneId;  // Ver.: always
+            GroupId groupId; // Ver.: always
+            uint8_t sceneId; // Ver.: always
             // Command is fixed length: 3
             if (cmd->bufLen < payloadOffset + 3u)
             {
@@ -727,7 +726,7 @@ EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_REMOVE_ALL_SCENES_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId; // Ver.: always
+            GroupId groupId; // Ver.: always
             // Command is fixed length: 2
             if (cmd->bufLen < payloadOffset + 2u)
             {
@@ -739,8 +738,8 @@ EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_STORE_SCENE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId; // Ver.: always
-            uint8_t sceneId;  // Ver.: always
+            GroupId groupId; // Ver.: always
+            uint8_t sceneId; // Ver.: always
             // Command is fixed length: 3
             if (cmd->bufLen < payloadOffset + 3u)
             {
@@ -754,7 +753,7 @@ EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_RECALL_SCENE_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId;        // Ver.: always
+            GroupId groupId;         // Ver.: always
             uint8_t sceneId;         // Ver.: always
             uint16_t transitionTime; // Ver.: since zcl-7.0-07-5123-07
             // Command is not a fixed length
@@ -785,7 +784,7 @@ EmberAfStatus emberAfScenesClusterServerCommandParse(EmberAfClusterCommand * cmd
         }
         case ZCL_GET_SCENE_MEMBERSHIP_COMMAND_ID: {
             uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t groupId; // Ver.: always
+            GroupId groupId; // Ver.: always
             // Command is fixed length: 2
             if (cmd->bufLen < payloadOffset + 2u)
             {
@@ -2180,81 +2179,6 @@ EmberAfStatus emberAfColorControlClusterServerCommandParse(EmberAfClusterCommand
             }
             wasHandled = emberAfColorControlClusterStepColorTemperatureCallback(
                 stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
-            break;
-        }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            break;
-        }
-        }
-    }
-    return status(wasHandled, true, cmd->mfgSpecific);
-}
-
-// Cluster: IAS Zone, client
-EmberAfStatus emberAfIasZoneClusterClientCommandParse(EmberAfClusterCommand * cmd)
-{
-    bool wasHandled = false;
-    if (!cmd->mfgSpecific)
-    {
-        switch (cmd->commandId)
-        {
-        case ZCL_ZONE_STATUS_CHANGE_NOTIFICATION_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t zoneStatus;    // Ver.: always
-            uint8_t extendedStatus; // Ver.: always
-            uint8_t zoneId;         // Ver.: since ha-1.2-05-3520-29
-            uint16_t delay;         // Ver.: since ha-1.2-05-3520-29
-            // Command is not a fixed length
-            if (cmd->bufLen < payloadOffset + 2u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            zoneStatus = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset += 2u;
-            if (cmd->bufLen < payloadOffset + 1u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            extendedStatus = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset += 1u;
-            if ((cmd->bufLen < payloadOffset + 1u))
-            {
-                // Argument is not always present:
-                // - it is present only in versions higher than: ha-1.2-05-3520-29
-                zoneId = 0xFF;
-            }
-            else
-            {
-                zoneId = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
-                payloadOffset += 1u;
-            }
-            if ((cmd->bufLen < payloadOffset + 2u))
-            {
-                // Argument is not always present:
-                // - it is present only in versions higher than: ha-1.2-05-3520-29
-                delay = 0xFFFF;
-            }
-            else
-            {
-                delay = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            }
-            wasHandled = emberAfIasZoneClusterZoneStatusChangeNotificationCallback(zoneStatus, extendedStatus, zoneId, delay);
-            break;
-        }
-        case ZCL_ZONE_ENROLL_REQUEST_COMMAND_ID: {
-            uint16_t payloadOffset = cmd->payloadStartIndex;
-            uint16_t zoneType;         // Ver.: always
-            uint16_t manufacturerCode; // Ver.: always
-            // Command is fixed length: 4
-            if (cmd->bufLen < payloadOffset + 4u)
-            {
-                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
-            }
-            zoneType = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            payloadOffset += 2u;
-            manufacturerCode = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
-            wasHandled       = emberAfIasZoneClusterZoneEnrollRequestCallback(zoneType, manufacturerCode);
             break;
         }
         default: {

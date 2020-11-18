@@ -48,7 +48,7 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct
 {
-    EmberAfAttributeId id;
+    chip::AttributeId id;
     uint16_t value;
 } EmAfPluginDoorLockServerAttributeData;
 

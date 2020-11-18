@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -15,21 +15,24 @@
  *    limitations under the License.
  */
 
+#import "CHIPError.h"
+#import <Foundation/Foundation.h>
+
+NS_ASSUME_NONNULL_BEGIN
+
 /**
- *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP core library CHIP Connection tests.
+ * The protocol definition for the CHIPDevicePairingDelegate
+ *
+ * All delegate methods will be called on the supplied Delegate Queue.
+ */
+@protocol CHIPDeviceStatusDelegate <NSObject>
+@required
+/**
+ * Notify the delegate when a message is received from the device
  *
  */
+- (void)onMessageReceived:(NSData *)message;
 
-#include "TestRawTransportLayer.h"
+@end
 
-#include <nlunit-test.h>
-
-int main()
-{
-    // Generate machine-readable, comma-separated value (CSV) output.
-    nlTestSetOutputStyle(OUTPUT_CSV);
-
-    return (TestTCP());
-}
+NS_ASSUME_NONNULL_END

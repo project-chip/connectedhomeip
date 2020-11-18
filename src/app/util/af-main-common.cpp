@@ -233,13 +233,11 @@ static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestinati
     }
 
     // The source endpoint in the APS frame MUST be valid at this point.  We use
-    // it to set the appropriate outgoing network as well as the profile id in
-    // the APS frame.
+    // it to set the appropriate outgoing network in the APS frame.
     EmberAfEndpointInfoStruct endpointInfo;
     uint8_t networkIndex = 0;
     if (emberAfGetEndpointInfoCallback(apsFrame->sourceEndpoint, &networkIndex, &endpointInfo))
     {
-        apsFrame->profileId = endpointInfo.profileId;
         //        status              = emberAfPushNetworkIndex(networkIndex);
         //        if (status != EMBER_SUCCESS)
         //        {
@@ -258,7 +256,6 @@ static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestinati
         //        {
         //            return status;
         //        }
-        apsFrame->profileId = emberAfProfileIdFromIndex(index);
     }
 
 #ifdef EMBER_AF_PLUGIN_SUB_GHZ_CLIENT
@@ -338,9 +335,9 @@ static EmberStatus send(EmberOutgoingMessageType type, uint64_t indexOrDestinati
     return status;
 }
 
-EmberStatus emberAfSendMulticastWithAliasWithCallback(EmberMulticastId multicastId, EmberApsFrame * apsFrame,
-                                                      uint16_t messageLength, uint8_t * message, EmberNodeId alias,
-                                                      uint8_t sequence, EmberAfMessageSentFunction callback)
+EmberStatus emberAfSendMulticastWithAliasWithCallback(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
+                                                      uint8_t * message, EmberNodeId alias, uint8_t sequence,
+                                                      EmberAfMessageSentFunction callback)
 {
     apsFrame->groupId = multicastId;
     return send(EMBER_OUTGOING_MULTICAST_WITH_ALIAS, multicastId, apsFrame, messageLength, message,
@@ -348,7 +345,7 @@ EmberStatus emberAfSendMulticastWithAliasWithCallback(EmberMulticastId multicast
                 alias, sequence, callback);
 }
 
-EmberStatus emberAfSendMulticastWithCallback(EmberMulticastId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
+EmberStatus emberAfSendMulticastWithCallback(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength,
                                              uint8_t * message, EmberAfMessageSentFunction callback)
 {
     apsFrame->groupId = multicastId;
@@ -359,7 +356,7 @@ EmberStatus emberAfSendMulticastWithCallback(EmberMulticastId multicastId, Ember
                 callback);
 }
 
-EmberStatus emberAfSendMulticast(EmberMulticastId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
+EmberStatus emberAfSendMulticast(GroupId multicastId, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
     return emberAfSendMulticastWithCallback(multicastId, apsFrame, messageLength, message, NULL);
 }
@@ -502,8 +499,7 @@ EmberStatus emberAfSendUnicastToBindings(EmberApsFrame * apsFrame, uint16_t mess
 }
 
 EmberStatus emberAfSendInterPan(EmberPanId panId, const EmberEUI64 destinationLongId, EmberNodeId destinationShortId,
-                                EmberMulticastId multicastId, EmberAfClusterId clusterId, EmberAfProfileId profileId,
-                                uint16_t messageLength, uint8_t * messageBytes)
+                                GroupId multicastId, ClusterId clusterId, uint16_t messageLength, uint8_t * messageBytes)
 {
     EmberAfInterpanHeader header;
     memset(&header, 0, sizeof(EmberAfInterpanHeader));
@@ -525,7 +521,6 @@ EmberStatus emberAfSendInterPan(EmberPanId panId, const EmberEUI64 destinationLo
         header.messageType =
             (destinationShortId < EMBER_BROADCAST_ADDRESS ? EMBER_AF_INTER_PAN_UNICAST : EMBER_AF_INTER_PAN_BROADCAST);
     }
-    header.profileId = profileId;
     header.clusterId = clusterId;
     return emberAfInterpanSendMessageCallback(&header, messageLength, messageBytes);
 }
@@ -557,7 +552,7 @@ void emAfPrintStatus(const char * task, EmberStatus status)
 
 static void printMessage(EmberIncomingMessageType type, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * messageContents)
 {
-    emberAfAppPrint("Profile: 0x%2X, Cluster: 0x%2X, %d bytes,", apsFrame->profileId, apsFrame->clusterId, messageLength);
+    emberAfAppPrint("Cluster: 0x%2X, %d bytes,", apsFrame->clusterId, messageLength);
     if (messageLength >= 3)
     {
         emberAfAppPrint(" ZCL %p Cmd ID: %d", (messageContents[0] & ZCL_CLUSTER_SPECIFIC_COMMAND ? "Cluster" : "Global"),

@@ -220,7 +220,7 @@ void ServerBase::OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chi
     {
         return;
     }
-    mdns::Minimal::BytesRange data(mdns::Minimal::BytesRange(buffer->Start(), buffer->Start() + buffer->DataLength()));
+    mdns::Minimal::BytesRange data(buffer->Start(), buffer->Start() + buffer->DataLength());
 
     if (data.Size() < HeaderRef::kSizeBytes)
     {

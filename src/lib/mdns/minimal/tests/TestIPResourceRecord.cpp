@@ -17,8 +17,6 @@
  *    limitations under the License.
  */
 
-#include "TestMinimalMdns.h"
-
 #include <mdns/minimal/IPResourceRecord.h>
 #include <support/TestUtils.h>
 

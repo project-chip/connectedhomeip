@@ -68,9 +68,6 @@ CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * pay
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    // Set EchoClient itself as the exchange delegate to receive the message from exchange.
-    mExchangeCtx->SetDelegate(this);
-
     return SendEchoRequest(payload);
 }
 
@@ -93,20 +90,18 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBuffer * payload)
 void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
                                    System::PacketBuffer * payload)
 {
-    EchoClient * echoApp = static_cast<EchoClient *>(ec->GetAppState());
-
     // Assert that the exchange context matches the client's current context.
     // This should never fail because even if SendEchoRequest is called
     // back-to-back, the second call will call Close() on the first exchange,
     // which clears the OnMessageReceived callback.
-    VerifyOrDie(echoApp && ec == echoApp->mExchangeCtx);
+    VerifyOrDie(ec == mExchangeCtx);
 
     // Verify that the message is an Echo Response.
     // If not, close the exchange and free the payload.
     if (protocolId != kProtocol_Echo || msgType != kEchoMessageType_EchoResponse)
     {
         ec->Close();
-        echoApp->mExchangeCtx = nullptr;
+        mExchangeCtx = nullptr;
         ExitNow();
     }
 
@@ -114,13 +109,13 @@ void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     // SendEchoRequest and install a new one. We abort rather than close
     // because we no longer care whether the echo request message has been
     // acknowledged at the transport layer.
-    echoApp->mExchangeCtx->Abort();
-    echoApp->mExchangeCtx = nullptr;
+    mExchangeCtx->Abort();
+    mExchangeCtx = nullptr;
 
     // Call the registered OnEchoResponseReceived handler, if any.
-    if (echoApp->OnEchoResponseReceived != nullptr)
+    if (OnEchoResponseReceived != nullptr)
     {
-        echoApp->OnEchoResponseReceived(packetHeader.GetSourceNodeId().ValueOr(0), payload);
+        OnEchoResponseReceived(packetHeader.GetSourceNodeId().ValueOr(0), payload);
     }
 
 exit:
