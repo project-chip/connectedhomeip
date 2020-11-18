@@ -18,6 +18,7 @@
 #import <Foundation/Foundation.h>
 
 #import "CHIPCallbackBridge.h"
+#import "CHIPDevice.h"
 #import "CHIPDevice_Internal.h"
 #import "CHIPOnOff.h"
 

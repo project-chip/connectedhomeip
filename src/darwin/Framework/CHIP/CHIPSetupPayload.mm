@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 
+#import "CHIPError.h"
 #import "CHIPSetupPayload.h"
 #import <setup_payload/SetupPayload.h>
 
