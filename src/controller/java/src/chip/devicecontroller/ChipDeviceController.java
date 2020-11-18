@@ -229,7 +229,7 @@ public class ChipDeviceController {
     /** Notifies that the device is ready to receive Wi-Fi network credentials. */
     void onNetworkCredentialsRequested();
 
-    /** Notifies that the device is ready to receive Thread network credentials. */
+    /** Notifies that the device is ready to receive operational credentials. */
     void onOperationalCredentialsRequested(byte[] csr);
 
     /** Notifies the pairing status. */

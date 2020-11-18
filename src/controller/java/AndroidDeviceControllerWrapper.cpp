@@ -151,12 +151,25 @@ void AndroidDeviceControllerWrapper::SendNetworkCredentials(const char * ssid, c
 {
     if (mCredentialsDelegate == nullptr)
     {
-        ChipLogError(Controller, "No credential callback available to send credentials.");
+        ChipLogError(Controller, "No credential callback available to send Wi-Fi credentials.");
         return;
     }
 
     ChipLogProgress(Controller, "Sending network credentials for %s...", ssid);
     mCredentialsDelegate->SendNetworkCredentials(ssid, password);
+}
+
+void AndroidDeviceControllerWrapper::SendThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData)
+{
+    if (mCredentialsDelegate == nullptr)
+    {
+        ChipLogError(Controller, "No credential callback available to send Thread credentials.");
+        return;
+    }
+
+    ChipLogProgress(Controller, "Sending Thread credentials for channel %u, PAN ID %x...", threadData.ThreadChannel,
+                    threadData.ThreadPANId);
+    mCredentialsDelegate->SendThreadCredentials(threadData);
 }
 
 void AndroidDeviceControllerWrapper::OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback)
@@ -212,17 +225,4 @@ void AndroidDeviceControllerWrapper::OnPairingComplete(CHIP_ERROR error)
 void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
 {
     CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onPairingDeleted", static_cast<jint>(error));
-}
-
-void AndroidDeviceControllerWrapper::SendThreadCredentials(const DeviceNetworkInfo & threadData)
-{
-    if (mCredentialsDelegate == nullptr)
-    {
-        ChipLogError(Controller, "No credential callback available to send thread credentials.");
-        return;
-    }
-
-    ChipLogProgress(Controller, "Sending Thread credentials for channel %u, PAN ID %x...", threadData.ThreadChannel,
-                    threadData.ThreadPANId);
-    mCredentialsDelegate->SendThreadCredentials(threadData);
 }
