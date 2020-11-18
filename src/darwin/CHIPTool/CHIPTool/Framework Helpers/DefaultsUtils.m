@@ -65,30 +65,30 @@ void CHIPSetNextAvailableDeviceID(uint64_t id)
 @implementation CHIPToolPersistentStorageDelegate
 
 // MARK: CHIPPersistentStorageDelegate
-- (void)GetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler
+- (void)CHIPGetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler
 {
     NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
     NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
     completionHandler(key, value);
 }
 
-- (NSString *)GetKeyValue:(NSString *)key
+- (NSString *)CHIPGetKeyValue:(NSString *)key
 {
     NSString * value = CHIPGetDomainValueForKey(kCHIPToolDefaultsDomain, key);
     NSLog(@"CHIPPersistentStorageDelegate Get Value for Key: %@, value %@", key, value);
     return value;
 }
 
-- (void)SetKeyValue:(NSString *)key value:(NSString *)value handler:(SendStatus)completionHandler
+- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value handler:(SendStatus)completionHandler
 {
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
-    completionHandler(key, kSet, [CHIPError errorForCHIPErrorCode:0]);
+    completionHandler(key, kCHIPSetKeyValue, [CHIPError errorForCHIPErrorCode:0]);
 }
 
-- (void)DeleteKeyValue:(NSString *)key handler:(SendStatus)completionHandler
+- (void)CHIPDeleteKeyValue:(NSString *)key handler:(SendStatus)completionHandler
 {
     CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
-    completionHandler(key, kDelete, [CHIPError errorForCHIPErrorCode:0]);
+    completionHandler(key, kCHIPDeleteKeyValue, [CHIPError errorForCHIPErrorCode:0]);
 }
 
 @end
