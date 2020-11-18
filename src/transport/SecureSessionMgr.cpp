@@ -70,7 +70,6 @@ CHIP_ERROR SecureSessionMgrBase::InitInternal(NodeId localNodeId, System::Layer 
     ChipLogProgress(Inet, "local node id is %llu\n", mLocalNodeId);
 
     mTransport->SetMessageReceiveHandler(HandleDataReceived, this);
-    mPeerConnections.SetConnectionExpiredHandler(HandleConnectionExpired, this);
 
     Mdns::DiscoveryManager::GetInstance().Init();
     Mdns::DiscoveryManager::GetInstance().RegisterResolveDelegate(this);
@@ -186,7 +185,8 @@ CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddres
     // Find any existing connection with the same node and key ID
     if (state)
     {
-        mPeerConnections.MarkConnectionExpired(state);
+        mPeerConnections.MarkConnectionExpired(
+            state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
     }
 
     ChipLogDetail(Inet, "New pairing for device %llu, key %d!!", peerNodeId, peerKeyId);
@@ -355,19 +355,19 @@ exit:
     }
 }
 
-void SecureSessionMgrBase::HandleConnectionExpired(Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr)
+void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnectionState & state)
 {
     char addr[Transport::PeerAddress::kMaxToStringSize];
     state.GetPeerAddress().ToString(addr, sizeof(addr));
 
     ChipLogDetail(Inet, "Connection from '%s' expired", addr);
 
-    if (mgr->mCB != nullptr)
+    if (mCB != nullptr)
     {
-        mgr->mCB->OnConnectionExpired(&state, mgr);
+        mCB->OnConnectionExpired(&state, this);
     }
 
-    mgr->mTransport->Disconnect(state.GetPeerAddress());
+    mTransport->Disconnect(state.GetPeerAddress());
 }
 
 void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error)
@@ -376,7 +376,9 @@ void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * par
 #if CHIP_CONFIG_SESSION_REKEYING
     // TODO(#2279): session expiration is currently disabled until rekeying is supported
     // the #ifdef should be removed after that.
-    mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS);
+    mgr->mPeerConnections.ExpireInactiveConnections(
+        CHIP_PEER_CONNECTION_TIMEOUT_MS,
+        [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }

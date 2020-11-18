@@ -160,7 +160,7 @@ private:
 
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate = nullptr;
-    ExchangeManager * mExchangeMgr;
+    ExchangeManager * mExchangeMgr = nullptr;
 
     uint64_t mPeerNodeId; // Node ID of peer node.
     uint16_t mExchangeId; // Assigned exchange ID.
