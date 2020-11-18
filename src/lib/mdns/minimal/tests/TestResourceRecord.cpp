@@ -182,22 +182,29 @@ void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
         's', 'o', 'm', 'e', 'd', 'a', 't', 'a',
     };
 
+    header.Clear();
+    uint8_t clearHeader[HeaderRef::kSizeBytes];
+
+    memcpy(clearHeader, headerBuffer, HeaderRef::kSizeBytes);
+
     for (size_t i = 0; i < sizeof(expectedOutput); i++)
     {
-        BufBound output(dataBuffer, i);
-        header.Clear();
         memset(dataBuffer, 0, sizeof(dataBuffer));
+        BufBound output(dataBuffer, i);
 
         NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output) == false);
+
+        // header untouched
+        NL_TEST_ASSERT(inSuite, memcmp(headerBuffer, clearHeader, HeaderRef::kSizeBytes) == 0);
     }
 
-    BufBound output(dataBuffer, sizeof(expectedOutput));
-    header.Clear();
-
     memset(dataBuffer, 0, sizeof(dataBuffer));
+    BufBound output(dataBuffer, sizeof(expectedOutput));
+
     NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output));
     NL_TEST_ASSERT(inSuite, output.Written() == sizeof(expectedOutput));
     NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+    NL_TEST_ASSERT(inSuite, memcmp(headerBuffer, clearHeader, HeaderRef::kSizeBytes) != 0);
 }
 
 void RecordCount(nlTestSuite * inSuite, void * inContext)
