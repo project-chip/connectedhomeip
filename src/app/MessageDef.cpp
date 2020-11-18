@@ -277,8 +277,8 @@ ListBuilderBase::ListBuilderBase() {}
 
 CHIP_ERROR ListBuilderBase::Init(chip::TLV::TLVWriter * const apWriter, const uint8_t aContextTagToUse)
 {
-    mpWriter            = apWriter;
-    mError = mpWriter->StartContainer(chip::TLV::ContextTag(aContextTagToUse), chip::TLV::kTLVType_Array, mOuterContainerType);
+    mpWriter = apWriter;
+    mError   = mpWriter->StartContainer(chip::TLV::ContextTag(aContextTagToUse), chip::TLV::kTLVType_Array, mOuterContainerType);
     ChipLogFunctError(mError);
 
     return mError;
@@ -286,8 +286,8 @@ CHIP_ERROR ListBuilderBase::Init(chip::TLV::TLVWriter * const apWriter, const ui
 
 CHIP_ERROR ListBuilderBase::Init(chip::TLV::TLVWriter * const apWriter)
 {
-    mpWriter            = apWriter;
-    mError              = mpWriter->StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Array, mOuterContainerType);
+    mpWriter = apWriter;
+    mError   = mpWriter->StartContainer(chip::TLV::AnonymousTag, chip::TLV::kTLVType_Array, mOuterContainerType);
     ChipLogFunctError(mError);
 
     return mError;
@@ -479,8 +479,8 @@ CHIP_ERROR AttributePath::Parser::GetListIndex(uint16_t * const apListIndex) con
 
 CHIP_ERROR AttributePath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
 {
-    mpWriter            = apWriter;
-    mError              = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_Path, mOuterContainerType);
+    mpWriter = apWriter;
+    mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_Path, mOuterContainerType);
     SuccessOrExit(mError);
 
 exit:
@@ -793,8 +793,8 @@ CHIP_ERROR EventPath::Parser::GetEventId(chip::EventId * const apEventId) const
 
 CHIP_ERROR EventPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
 {
-    mpWriter            = apWriter;
-    mError              = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_Path, mOuterContainerType);
+    mpWriter = apWriter;
+    mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_Path, mOuterContainerType);
     SuccessOrExit(mError);
 
 exit:
@@ -1094,8 +1094,8 @@ CHIP_ERROR CommandPath::Parser::GetCommandId(chip::CommandId * const apCommandId
 
 CHIP_ERROR CommandPath::Builder::_Init(chip::TLV::TLVWriter * const apWriter, const uint64_t aTag)
 {
-    mpWriter            = apWriter;
-    mError              = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_Path, mOuterContainerType);
+    mpWriter = apWriter;
+    mError   = mpWriter->StartContainer(aTag, chip::TLV::kTLVType_Path, mOuterContainerType);
     SuccessOrExit(mError);
 
 exit:

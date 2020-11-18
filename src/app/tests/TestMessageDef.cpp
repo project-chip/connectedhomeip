@@ -1103,7 +1103,7 @@ const nlTest sTests[] =
                 NL_TEST_SENTINEL()
         };
 // clang-format on
-}
+} // namespace
 
 int TestMessageDef()
 {
