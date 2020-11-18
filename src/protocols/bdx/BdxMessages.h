@@ -76,7 +76,6 @@ struct TransferInit
      *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data.
      *
-     *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
     CHECK_RETURN_VALUE
@@ -96,7 +95,7 @@ struct TransferInit
 
     // Proposed Transfer Control (required)
     BitFlags<uint8_t, TransferControlFlags> TransferCtlOptions;
-    uint8_t Version = 0; ///< This field represents
+    uint8_t Version = 0; ///< The highest version supported by the sender
 
     // All required
     uint16_t MaxBlockSize = 0; ///< Proposed max block size to use in transfer
@@ -261,10 +260,6 @@ struct CounterMessage
      * @brief
      *  Parse data from an PacketBuffer into a struct instance
      *
-     *  Note that this struct will store pointers that point into the passed PacketBuffer,
-     *  so it is essential that the PacketBuffer is not modified or freed until after this
-     *  struct is no longer needed.
-     *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data
      *
      * @return CHIP_ERROR Any error that occurs when trying to read the message
@@ -291,6 +286,9 @@ using BlockQuery  = CounterMessage;
 using BlockAck    = CounterMessage;
 using BlockAckEOF = CounterMessage;
 
+/**
+ * A struct that represents a message containing actual data (Block, BlockEOF).
+ */
 struct DataBlock
 {
     /**
@@ -334,8 +332,11 @@ struct DataBlock
     bool operator==(const DataBlock &) const;
 
     uint32_t BlockCounter = 0;
-    uint8_t * Data        = nullptr;
-    uint16_t DataLength;
+
+    // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
+    // It is up to the caller to ensure that the memory pointed to here has not been freed.
+    uint8_t * Data      = nullptr;
+    uint16_t DataLength = 0;
 };
 
 using Block    = DataBlock;
