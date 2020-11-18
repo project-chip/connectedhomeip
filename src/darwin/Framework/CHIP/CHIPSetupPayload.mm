@@ -15,8 +15,8 @@
  *    limitations under the License.
  */
 
-#import "CHIPError.h"
 #import "CHIPSetupPayload.h"
+#import "CHIPError.h"
 #import <setup_payload/SetupPayload.h>
 
 @implementation CHIPOptionalQRCodeInfo
