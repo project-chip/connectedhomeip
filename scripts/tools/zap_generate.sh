@@ -33,5 +33,5 @@ if [ ! -d "$OUTPUT_DIRECTORY" ]; then
     mkdir -p "$OUTPUT_DIRECTORY"
 fi
 
-cd $CHIP_ROOT/third_party/zap/repo/
-node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g $CHIP_ROOT/src/app/zap-templates/chip-templates.json -i "$FILE_PATH" -o "$OUTPUT_DIRECTORY"
+cd "$CHIP_ROOT"/third_party/zap/repo/
+node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g "$CHIP_ROOT"/src/app/zap-templates/chip-templates.json -i "$FILE_PATH" -o "$OUTPUT_DIRECTORY"
