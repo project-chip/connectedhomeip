@@ -37,7 +37,9 @@ using namespace chip;
 using namespace chip::BDX;
 using namespace chip::Encoding::LittleEndian;
 
-void TransferInit::Pack(BufBound & aBuffer) const
+// WARNING: this function should never return early, since MessageSize() relies on it to calculate
+// the size of the message (even if the message is incomplete or filled out incorrectly).
+void TransferInit::WriteToBuffer(BufBound & aBuffer) const
 {
     uint8_t proposedTransferCtl = 0;
     bool widerange = (StartOffset > std::numeric_limits<uint32_t>::max()) || (MaxLength > std::numeric_limits<uint32_t>::max());
@@ -79,12 +81,12 @@ void TransferInit::Pack(BufBound & aBuffer) const
     }
 
     aBuffer.PutLE16(FileDesLength);
-    if (FileDesignator)
+    if (FileDesignator != nullptr)
     {
         aBuffer.Put(FileDesignator, static_cast<size_t>(FileDesLength));
     }
 
-    if (Metadata)
+    if (Metadata != nullptr)
     {
         aBuffer.Put(Metadata, static_cast<size_t>(MetadataLength));
     }
@@ -106,6 +108,7 @@ CHIP_ERROR TransferInit::Parse(const System::PacketBuffer & aBuffer)
     TransferCtlOptions.SetRaw(static_cast<uint8_t>(proposedTransferCtl & ~kVersionMask));
     rangeCtlFlags.SetRaw(rangeCtl);
 
+    StartOffset = 0;
     if (rangeCtlFlags.Has(kStartOffset))
     {
         if (rangeCtlFlags.Has(kWiderange))
@@ -119,6 +122,7 @@ CHIP_ERROR TransferInit::Parse(const System::PacketBuffer & aBuffer)
         }
     }
 
+    MaxLength = 0;
     if (rangeCtlFlags.Has(kDefLen))
     {
         if (rangeCtlFlags.Has(kWiderange))
@@ -141,6 +145,8 @@ CHIP_ERROR TransferInit::Parse(const System::PacketBuffer & aBuffer)
     FileDesignator = &bufStart[bufReader.OctetsRead()];
 
     // Rest of message is metadata (could be empty)
+    Metadata       = nullptr;
+    MetadataLength = 0;
     if (bufReader.Remaining() > FileDesLength)
     {
         // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
@@ -159,29 +165,41 @@ exit:
     return err;
 }
 
-size_t TransferInit::PackedSize() const
+size_t TransferInit::MessageSize() const
 {
-    System::PacketBuffer * pbuf = System::PacketBuffer::NewWithAvailableSize(0);
-    BufBound emptyBuf(pbuf->Start(), 0);
-    Pack(emptyBuf);
+    uint8_t dummy[0];
+    BufBound emptyBuf(&dummy[0], 0);
+    WriteToBuffer(emptyBuf);
     return emptyBuf.Written();
 }
 
 bool TransferInit::operator==(const TransferInit & another) const
 {
-    if (MetadataLength != another.MetadataLength || FileDesLength != another.FileDesLength)
+    if ((MetadataLength != another.MetadataLength) || (FileDesLength != another.FileDesLength))
     {
         return false;
     }
-    bool fileDesMatches  = memcmp(FileDesignator, another.FileDesignator, FileDesLength) == 0;
-    bool metadataMatches = memcmp(Metadata, another.Metadata, MetadataLength) == 0;
 
-    return (Version == another.Version && TransferCtlOptions.Raw() == another.TransferCtlOptions.Raw() &&
-            StartOffset == another.StartOffset && MaxLength == another.MaxLength && MaxBlockSize == another.MaxBlockSize &&
+    bool fileDesMatches = true;
+    if (FileDesLength > 0)
+    {
+        fileDesMatches = (memcmp(FileDesignator, another.FileDesignator, FileDesLength) == 0);
+    }
+
+    bool metadataMatches = true;
+    if (MetadataLength > 0)
+    {
+        metadataMatches = (memcmp(Metadata, another.Metadata, MetadataLength) == 0);
+    }
+
+    return ((Version == another.Version) && (TransferCtlOptions.Raw() == another.TransferCtlOptions.Raw()) &&
+            (StartOffset == another.StartOffset) && (MaxLength == another.MaxLength) && (MaxBlockSize == another.MaxBlockSize) &&
             fileDesMatches && metadataMatches);
 }
 
-void SendAccept::Pack(BufBound & aBuffer) const
+// WARNING: this function should never return early, since MessageSize() relies on it to calculate
+// the size of the message (even if the message is incomplete or filled out incorrectly).
+void SendAccept::WriteToBuffer(BufBound & aBuffer) const
 {
     uint8_t transferCtl = 0;
 
@@ -190,7 +208,11 @@ void SendAccept::Pack(BufBound & aBuffer) const
 
     aBuffer.Put(transferCtl);
     aBuffer.PutLE16(MaxBlockSize);
-    aBuffer.Put(Metadata, static_cast<size_t>(MetadataLength));
+
+    if (Metadata != nullptr)
+    {
+        aBuffer.Put(Metadata, static_cast<size_t>(MetadataLength));
+    }
 }
 
 CHIP_ERROR SendAccept::Parse(const System::PacketBuffer & aBuffer)
@@ -208,6 +230,8 @@ CHIP_ERROR SendAccept::Parse(const System::PacketBuffer & aBuffer)
     TransferCtlFlags.SetRaw(static_cast<uint8_t>(transferCtl & ~kVersionMask));
 
     // Rest of message is metadata (could be empty)
+    Metadata       = nullptr;
+    MetadataLength = 0;
     if (bufReader.Remaining() > 0)
     {
         // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
@@ -225,12 +249,13 @@ exit:
     return err;
 }
 
-size_t SendAccept::PackedSize() const
+size_t SendAccept::MessageSize() const
 {
-    System::PacketBuffer * pbuf = System::PacketBuffer::NewWithAvailableSize(0);
-    BufBound emptyBuf(pbuf->Start(), 0);
-    Pack(emptyBuf);
+    uint8_t dummy[0];
+    BufBound emptyBuf(&dummy[0], 0);
+    WriteToBuffer(emptyBuf);
     return emptyBuf.Written();
+    ;
 }
 
 bool SendAccept::operator==(const SendAccept & another) const
@@ -239,13 +264,20 @@ bool SendAccept::operator==(const SendAccept & another) const
     {
         return false;
     }
-    bool metadataMatches = memcmp(Metadata, another.Metadata, MetadataLength) == 0;
 
-    return (Version == another.Version && TransferCtlFlags.Raw() == another.TransferCtlFlags.Raw() &&
-            MaxBlockSize == another.MaxBlockSize && metadataMatches);
+    bool metadataMatches = true;
+    if (MetadataLength > 0)
+    {
+        metadataMatches = (memcmp(Metadata, another.Metadata, MetadataLength) == 0);
+    }
+
+    return ((Version == another.Version) && (TransferCtlFlags.Raw() == another.TransferCtlFlags.Raw()) &&
+            (MaxBlockSize == another.MaxBlockSize) && metadataMatches);
 }
 
-void ReceiveAccept::Pack(BufBound & aBuffer) const
+// WARNING: this function should never return early, since MessageSize() relies on it to calculate
+// the size of the message (even if the message is incomplete or filled out incorrectly).
+void ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
 {
     uint8_t transferCtl = 0;
     bool widerange      = (StartOffset > std::numeric_limits<uint32_t>::max()) || (Length > std::numeric_limits<uint32_t>::max());
@@ -311,6 +343,7 @@ CHIP_ERROR ReceiveAccept::Parse(const System::PacketBuffer & aBuffer)
 
     rangeCtlFlags.SetRaw(rangeCtl);
 
+    StartOffset = 0;
     if (rangeCtlFlags.Has(kStartOffset))
     {
         if (rangeCtlFlags.Has(kWiderange))
@@ -324,6 +357,7 @@ CHIP_ERROR ReceiveAccept::Parse(const System::PacketBuffer & aBuffer)
         }
     }
 
+    Length = 0;
     if (rangeCtlFlags.Has(kDefLen))
     {
         if (rangeCtlFlags.Has(kWiderange))
@@ -338,6 +372,8 @@ CHIP_ERROR ReceiveAccept::Parse(const System::PacketBuffer & aBuffer)
     }
 
     // Rest of message is metadata (could be empty)
+    Metadata       = nullptr;
+    MetadataLength = 0;
     if (bufReader.Remaining() > 0)
     {
         // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
@@ -355,11 +391,11 @@ exit:
     return err;
 }
 
-size_t ReceiveAccept::PackedSize() const
+size_t ReceiveAccept::MessageSize() const
 {
-    System::PacketBuffer * pbuf = System::PacketBuffer::NewWithAvailableSize(0);
-    BufBound emptyBuf(pbuf->Start(), 0);
-    Pack(emptyBuf);
+    uint8_t dummy[0];
+    BufBound emptyBuf(&dummy[0], 0);
+    WriteToBuffer(emptyBuf);
     return emptyBuf.Written();
 }
 
@@ -369,14 +405,21 @@ bool ReceiveAccept::operator==(const ReceiveAccept & another) const
     {
         return false;
     }
-    bool metadataMatches = memcmp(Metadata, another.Metadata, MetadataLength) == 0;
 
-    return (Version == another.Version && TransferCtlFlags.Raw() == another.TransferCtlFlags.Raw() &&
-            StartOffset == another.StartOffset && MaxBlockSize == another.MaxBlockSize && Length == another.Length &&
+    bool metadataMatches = true;
+    if (MetadataLength > 0)
+    {
+        metadataMatches = (memcmp(Metadata, another.Metadata, MetadataLength) == 0);
+    }
+
+    return ((Version == another.Version) && (TransferCtlFlags.Raw() == another.TransferCtlFlags.Raw()) &&
+            (StartOffset == another.StartOffset) && (MaxBlockSize == another.MaxBlockSize) && (Length == another.Length) &&
             metadataMatches);
 }
 
-void CounterMessage::Pack(BufBound & aBuffer) const
+// WARNING: this function should never return early, since MessageSize() relies on it to calculate
+// the size of the message (even if the message is incomplete or filled out incorrectly).
+void CounterMessage::WriteToBuffer(BufBound & aBuffer) const
 {
     aBuffer.PutLE32(BlockCounter);
 }
@@ -388,11 +431,11 @@ CHIP_ERROR CounterMessage::Parse(const System::PacketBuffer & aBuffer)
     return bufReader.Read32(&BlockCounter).StatusCode();
 }
 
-size_t CounterMessage::PackedSize() const
+size_t CounterMessage::MessageSize() const
 {
-    System::PacketBuffer * pbuf = System::PacketBuffer::NewWithAvailableSize(0);
-    BufBound emptyBuf(pbuf->Start(), 0);
-    Pack(emptyBuf);
+    uint8_t dummy[0];
+    BufBound emptyBuf(&dummy[0], 0);
+    WriteToBuffer(emptyBuf);
     return emptyBuf.Written();
 }
 
@@ -401,7 +444,9 @@ bool CounterMessage::operator==(const CounterMessage & another) const
     return (BlockCounter == another.BlockCounter);
 }
 
-void DataBlock::Pack(BufBound & aBuffer) const
+// WARNING: this function should never return early, since MessageSize() relies on it to calculate
+// the size of the message (even if the message is incomplete or filled out incorrectly).
+void DataBlock::WriteToBuffer(BufBound & aBuffer) const
 {
     aBuffer.PutLE32(BlockCounter);
     if (Data != nullptr)
@@ -419,6 +464,8 @@ CHIP_ERROR DataBlock::Parse(const System::PacketBuffer & aBuffer)
     SuccessOrExit(bufReader.Read32(&BlockCounter).StatusCode());
 
     // Rest of message is data
+    Data       = nullptr;
+    DataLength = 0;
     if (bufReader.Remaining() > 0)
     {
         // WARNING: this struct will store a pointer to the start of data in the PacketBuffer,
@@ -436,11 +483,11 @@ exit:
     return err;
 }
 
-size_t DataBlock::PackedSize() const
+size_t DataBlock::MessageSize() const
 {
-    System::PacketBuffer * pbuf = System::PacketBuffer::NewWithAvailableSize(0);
-    BufBound emptyBuf(pbuf->Start(), 0);
-    Pack(emptyBuf);
+    uint8_t dummy[0];
+    BufBound emptyBuf(&dummy[0], 0);
+    WriteToBuffer(emptyBuf);
     return emptyBuf.Written();
 }
 
@@ -450,7 +497,12 @@ bool DataBlock::operator==(const DataBlock & another) const
     {
         return false;
     }
-    bool dataMatches = memcmp(Data, another.Data, DataLength) == 0;
 
-    return (BlockCounter == another.BlockCounter && dataMatches);
+    bool dataMatches = true;
+    if (DataLength > 0)
+    {
+        dataMatches = memcmp(Data, another.Data, DataLength) == 0;
+    }
+
+    return ((BlockCounter == another.BlockCounter) && dataMatches);
 }

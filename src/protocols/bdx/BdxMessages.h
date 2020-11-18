@@ -64,7 +64,7 @@ struct TransferInit
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    void Pack(BufBound & aBuffer) const;
+    void WriteToBuffer(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -85,7 +85,7 @@ struct TransferInit
      * @brief
      *  Returns the size of buffer needed to write this message.
      */
-    size_t PackedSize() const;
+    size_t MessageSize() const;
 
     /**
      * @brief
@@ -134,7 +134,7 @@ struct SendAccept
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    void Pack(BufBound & aBuffer) const;
+    void WriteToBuffer(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -155,7 +155,7 @@ struct SendAccept
      * @brief
      *  Returns the size of buffer needed to write this message.
      */
-    size_t PackedSize() const;
+    size_t MessageSize() const;
 
     /**
      * @brief
@@ -192,7 +192,7 @@ struct ReceiveAccept
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    void Pack(BufBound & aBuffer) const;
+    void WriteToBuffer(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -213,7 +213,7 @@ struct ReceiveAccept
      * @brief
      *  Returns the size of buffer needed to write this message.
      */
-    size_t PackedSize() const;
+    size_t MessageSize() const;
 
     /**
      * @brief
@@ -254,7 +254,7 @@ struct CounterMessage
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    void Pack(BufBound & aBuffer) const;
+    void WriteToBuffer(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -271,7 +271,7 @@ struct CounterMessage
      * @brief
      *  Returns the size of buffer needed to write this message.
      */
-    size_t PackedSize() const;
+    size_t MessageSize() const;
 
     /**
      * @brief
@@ -302,7 +302,7 @@ struct DataBlock
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    void Pack(BufBound & aBuffer) const;
+    void WriteToBuffer(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -323,7 +323,7 @@ struct DataBlock
      * @brief
      *  Returns the size of buffer needed to write this message.
      */
-    size_t PackedSize() const;
+    size_t MessageSize() const;
 
     /**
      * @brief

@@ -12,20 +12,20 @@ using namespace chip;
 using namespace chip::BDX;
 
 /**
- * Helper method for testing that Pack() and Parse() are successful, and that the parsed message
+ * Helper method for testing that WriteToBuffer() and Parse() are successful, and that the parsed message
  * is identical to the origianl.
  */
 template <class MsgType>
-void TestHelperPackUnpackMatch(nlTestSuite * inSuite, void * inContext, MsgType & testMsg)
+void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, MsgType & testMsg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    size_t msgSize                = testMsg.PackedSize();
+    size_t msgSize                = testMsg.MessageSize();
     System::PacketBuffer * msgBuf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
     NL_TEST_ASSERT(inSuite, msgBuf != nullptr);
 
     BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
-    testMsg.Pack(bbuf);
+    testMsg.WriteToBuffer(bbuf);
     NL_TEST_ASSERT(inSuite, bbuf.Fit());
     msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
 
@@ -62,7 +62,7 @@ void TestTransferInitMessage(nlTestSuite * inSuite, void * inContext)
     testMsg.MetadataLength = 5;
     testMsg.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
 
-    TestHelperPackUnpackMatch<TransferInit>(inSuite, inContext, testMsg);
+    TestHelperWrittenAndParsedMatch<TransferInit>(inSuite, inContext, testMsg);
 }
 
 void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
@@ -78,7 +78,7 @@ void TestSendAcceptMessage(nlTestSuite * inSuite, void * inContext)
     testMsg.MetadataLength = 5;
     testMsg.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
 
-    TestHelperPackUnpackMatch<SendAccept>(inSuite, inContext, testMsg);
+    TestHelperWrittenAndParsedMatch<SendAccept>(inSuite, inContext, testMsg);
 }
 
 void TestReceiveAcceptMessage(nlTestSuite * inSuite, void * inContext)
@@ -99,7 +99,7 @@ void TestReceiveAcceptMessage(nlTestSuite * inSuite, void * inContext)
     testMsg.MetadataLength = 5;
     testMsg.Metadata       = reinterpret_cast<uint8_t *>(fakeData);
 
-    TestHelperPackUnpackMatch<ReceiveAccept>(inSuite, inContext, testMsg);
+    TestHelperWrittenAndParsedMatch<ReceiveAccept>(inSuite, inContext, testMsg);
 }
 
 void TestCounterMessage(nlTestSuite * inSuite, void * inContext)
@@ -108,7 +108,7 @@ void TestCounterMessage(nlTestSuite * inSuite, void * inContext)
 
     testMsg.BlockCounter = 4;
 
-    TestHelperPackUnpackMatch<CounterMessage>(inSuite, inContext, testMsg);
+    TestHelperWrittenAndParsedMatch<CounterMessage>(inSuite, inContext, testMsg);
 }
 
 void TestDataBlockMessage(nlTestSuite * inSuite, void * inContext)
@@ -120,7 +120,7 @@ void TestDataBlockMessage(nlTestSuite * inSuite, void * inContext)
     testMsg.DataLength   = 5;
     testMsg.Data         = reinterpret_cast<uint8_t *>(fakeData);
 
-    TestHelperPackUnpackMatch<DataBlock>(inSuite, inContext, testMsg);
+    TestHelperWrittenAndParsedMatch<DataBlock>(inSuite, inContext, testMsg);
 }
 
 // Test Suite
