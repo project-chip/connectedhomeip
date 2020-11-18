@@ -81,7 +81,10 @@ public:
         ReceiveHandlerCallCount++;
     }
 
-    void OnNewConnection(const PeerConnectionState * state, SecureSessionMgrBase * mgr) override { NewConnectionHandlerCallCount++; }
+    void OnNewConnection(const PeerConnectionState * state, SecureSessionMgrBase * mgr) override
+    {
+        NewConnectionHandlerCallCount++;
+    }
 
     nlTestSuite * mSuite              = nullptr;
     int ReceiveHandlerCallCount       = 0;

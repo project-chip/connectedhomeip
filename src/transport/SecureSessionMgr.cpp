@@ -185,9 +185,8 @@ CHIP_ERROR SecureSessionMgrBase::NewPairing(const Optional<Transport::PeerAddres
     // Find any existing connection with the same node and key ID
     if (state)
     {
-        mPeerConnections.MarkConnectionExpired(state, [this](const Transport::PeerConnectionState & state1) {
-            HandleConnectionExpired(state1);
-        });
+        mPeerConnections.MarkConnectionExpired(
+            state, [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
     }
 
     ChipLogDetail(Inet, "New pairing for device %llu, key %d!!", peerNodeId, peerKeyId);
@@ -377,10 +376,9 @@ void SecureSessionMgrBase::ExpiryTimerCallback(System::Layer * layer, void * par
 #if CHIP_CONFIG_SESSION_REKEYING
     // TODO(#2279): session expiration is currently disabled until rekeying is supported
     // the #ifdef should be removed after that.
-    mgr->mPeerConnections.ExpireInactiveConnections(CHIP_PEER_CONNECTION_TIMEOUT_MS,
-                                                    [this](const Transport::PeerConnectionState & state1) {
-                                                        HandleConnectionExpired(state1);
-                                                    });
+    mgr->mPeerConnections.ExpireInactiveConnections(
+        CHIP_PEER_CONNECTION_TIMEOUT_MS,
+        [this](const Transport::PeerConnectionState & state1) { HandleConnectionExpired(state1); });
 #endif
     mgr->ScheduleExpiryTimer(); // re-schedule the oneshot timer
 }

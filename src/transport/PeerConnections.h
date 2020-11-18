@@ -278,7 +278,7 @@ public:
     }
 
     /// Convenience method to expired a peer connection state and fired the related callback
-    template<typename Callback>
+    template <typename Callback>
     void MarkConnectionExpired(PeerConnectionState * state, Callback callback)
     {
         callback(*state);
@@ -291,7 +291,7 @@ public:
      *
      * Expiring a connection involves callback execution and then clearing the internal state.
      */
-    template<typename Callback>
+    template <typename Callback>
     void ExpireInactiveConnections(uint64_t maxIdleTimeMs, Callback callback)
     {
         const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
