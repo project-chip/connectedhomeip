@@ -20,7 +20,10 @@ template("mbedtls_target") {
   _mbedtls_root = "${mbedtls_root}/repo"
 
   config("${mbedtls_target_name}_warnings") {
-    cflags = [ "-Wno-maybe-uninitialized" ]
+    cflags = [
+      "-Wno-maybe-uninitialized",
+      "-Wno-string-concatenation",
+    ]
   }
 
   config("${mbedtls_target_name}_config") {
