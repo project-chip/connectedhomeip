@@ -31,67 +31,30 @@
 namespace chip {
 namespace Controller {
 
-#define SEND_MESSAGE_TO_CLUSTER(err, device, maxLength, message, encoder)                                                          \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        uint16_t encodedLength = 0;                                                                                                \
-        VerifyOrExit(device != nullptr, err = CHIP_ERROR_INCORRECT_STATE);                                                         \
-        message = System::PacketBuffer::NewWithAvailableSize(maxLength);                                                           \
-        VerifyOrExit(message != nullptr, err = CHIP_ERROR_NO_MEMORY);                                                              \
-        encodedLength = encoder;                                                                                                   \
-        VerifyOrExit(encodedLength != 0, err = CHIP_ERROR_INTERNAL);                                                               \
-        message->SetDataLength(encodedLength);                                                                                     \
-        VerifyOrExit(message->DataLength() >= encodedLength, err = CHIP_ERROR_NO_MEMORY);                                          \
-        err     = mDevice->SendMessage(message);                                                                                   \
-        message = nullptr;                                                                                                         \
-        SuccessOrExit(err);                                                                                                        \
-    exit:                                                                                                                          \
-        if (err != CHIP_NO_ERROR)                                                                                                  \
-        {                                                                                                                          \
-            if (message != nullptr)                                                                                                \
-            {                                                                                                                      \
-                System::PacketBuffer::Free(message);                                                                               \
-            }                                                                                                                      \
-            ChipLogError(Controller, "Cluster command encoding failed. Err %d", err);                                              \
-        }                                                                                                                          \
-    } while (0)
-
-#define SEND_CLUSTER_COMMAND(err, device, maxLength, message, encoder, onCompletion)                                               \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        SEND_MESSAGE_TO_CLUSTER(err, device, maxLength, message, encoder);                                                         \
-        if (err == CHIP_NO_ERROR)                                                                                                  \
-        {                                                                                                                          \
-            mDevice->OnResponse(mEndpoint, mClusterId, onCompletion);                                                              \
-        }                                                                                                                          \
-    } while (0)
-
-#define REQUEST_CLUSTER_REPORT(err, device, maxLength, message, encoder, onReport)                                                 \
-    do                                                                                                                             \
-    {                                                                                                                              \
-        SEND_MESSAGE_TO_CLUSTER(err, device, maxLength, message, encoder);                                                         \
-        if (err == CHIP_NO_ERROR)                                                                                                  \
-        {                                                                                                                          \
-            mDevice->OnReport(mEndpoint, mClusterId, onReport);                                                                    \
-        }                                                                                                                          \
-    } while (0)
-
 class DLL_EXPORT ClusterBase
 {
 public:
     virtual ~ClusterBase() {}
 
-    CHIP_ERROR Associate(Device * device, uint8_t endpoint);
+    CHIP_ERROR Associate(Device * device, EndpointId endpoint);
 
     void Dissociate();
 
-    uint16_t GetClusterId() const { return mClusterId; }
+    ClusterId GetClusterId() const { return mClusterId; }
 
 protected:
     ClusterBase(uint16_t cluster) : mClusterId(cluster) {}
-    const uint16_t mClusterId;
+
+    CHIP_ERROR SendCommand(uint16_t (*commandEncoder)(uint8_t *, uint16_t, uint8_t), uint16_t maxCmdLen,
+                           Callback::Callback<> * resposeHandler);
+
+    CHIP_ERROR RequestAttributeReporting(uint16_t (*requestEncoder)(uint8_t *, uint16_t, uint8_t, uint16_t, uint16_t),
+                                         uint16_t maxCmdLen, uint16_t minInterval, uint16_t maxInterval,
+                                         Callback::Callback<> * reportHandler);
+
+    const ClusterId mClusterId;
     Device * mDevice;
-    uint8_t mEndpoint;
+    EndpointId mEndpoint;
 };
 
 } // namespace Controller

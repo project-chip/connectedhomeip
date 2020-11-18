@@ -22,55 +22,39 @@
 namespace chip {
 namespace Controller {
 
+// TODO: Find a way to calculate maximum message length for clusters
+//       https://github.com/project-chip/connectedhomeip/issues/965
 constexpr uint16_t kMaxOnOffMessageLength = 64;
 
 CHIP_ERROR OnOffCluster::On(Callback::Callback<> * onCompletion)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBuffer * message = nullptr;
-    SEND_CLUSTER_COMMAND(err, mDevice, kMaxOnOffMessageLength, message,
-                         encodeOnOffClusterOnCommand(message->Start(), message->AvailableDataLength(), mEndpoint), onCompletion);
-    return err;
+    return SendCommand(encodeOnOffClusterOnCommand, kMaxOnOffMessageLength, onCompletion);
 }
 
 CHIP_ERROR OnOffCluster::Off(Callback::Callback<> * onCompletion)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBuffer * message = nullptr;
-    SEND_CLUSTER_COMMAND(err, mDevice, kMaxOnOffMessageLength, message,
-                         encodeOnOffClusterOffCommand(message->Start(), message->AvailableDataLength(), mEndpoint), onCompletion);
-    return err;
+    return SendCommand(encodeOnOffClusterOffCommand, kMaxOnOffMessageLength, onCompletion);
 }
 
 CHIP_ERROR OnOffCluster::Toggle(Callback::Callback<> * onCompletion)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBuffer * message = nullptr;
-    SEND_CLUSTER_COMMAND(err, mDevice, kMaxOnOffMessageLength, message,
-                         encodeOnOffClusterToggleCommand(message->Start(), message->AvailableDataLength(), mEndpoint),
-                         onCompletion);
-    return err;
+    return SendCommand(encodeOnOffClusterToggleCommand, kMaxOnOffMessageLength, onCompletion);
 }
 
-CHIP_ERROR OnOffCluster::IsOn(Callback::Callback<> * onCompletion)
+CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Callback<> * onCompletion)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBuffer * message = nullptr;
-    SEND_CLUSTER_COMMAND(err, mDevice, kMaxOnOffMessageLength, message,
-                         encodeOnOffClusterReadOnOffAttribute(message->Start(), message->AvailableDataLength(), mEndpoint),
-                         onCompletion);
-    return err;
+    return SendCommand(encodeOnOffClusterReadOnOffAttribute, kMaxOnOffMessageLength, onCompletion);
 }
 
-CHIP_ERROR OnOffCluster::ReportAttributeOnOff(uint16_t minInterval, uint16_t maxInterval, Callback::Callback<> * onChange)
+CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Callback<> * onChange, uint16_t minInterval, uint16_t maxInterval)
 {
-    CHIP_ERROR err                 = CHIP_NO_ERROR;
-    System::PacketBuffer * message = nullptr;
-    REQUEST_CLUSTER_REPORT(err, mDevice, kMaxOnOffMessageLength, message,
-                           encodeOnOffClusterReportOnOffAttribute(message->Start(), message->AvailableDataLength(), mEndpoint,
-                                                                  minInterval, maxInterval),
-                           onChange);
-    return err;
+    return RequestAttributeReporting(encodeOnOffClusterReportOnOffAttribute, kMaxOnOffMessageLength, minInterval, maxInterval,
+                                     onChange);
+}
+
+CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Callback<> * onCompletion)
+{
+    return CHIP_NO_ERROR;
 }
 
 } // namespace Controller

@@ -104,6 +104,11 @@ exit:
     return err;
 }
 
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle & message)
+{
+    return SendMessage(message.Get_ForNow());
+}
+
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
 {
     CHIP_ERROR error       = CHIP_NO_ERROR;
@@ -176,13 +181,23 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
             mStatusDelegate->OnMessage(msgBuf);
         }
 
+        // TODO: The following callback processing will need further work
+        //       1. The response needs to be parsed as per cluster definition. The response callback
+        //          should carry the parsed response values.
+        //       2. The reports callbacks should also be called with the parsed reports.
+        //       3. The callbacks would be tracked using exchange context. On receiving the
+        //          message, the exchange context in the message should be matched against
+        //          the registered callbacks.
+        // GitHub issue: https://github.com/project-chip/connectedhomeip/issues/3910
         Cancelable * ca = mResponses.mNext;
         while (ca != &mResponses)
         {
             Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
+            // Let's advance to the next cancelable, as the current one will get removed
+            // from the list (and once removed, its next will point to itself)
+            ca = ca->mNext;
             if (cb != nullptr)
             {
-                ca = ca->mNext;
                 ChipLogProgress(Controller, "Dispatching response callback %p", cb);
                 cb->Cancel();
                 cb->mCall(cb->mContext);
@@ -193,9 +208,11 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
         while (ca != &mReports)
         {
             Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
+            // Let's advance to the next cancelable, as the current one might get removed
+            // from the list in the callback (and if removed, its next will point to itself)
+            ca = ca->mNext;
             if (cb != nullptr)
             {
-                ca = ca->mNext;
                 ChipLogProgress(Controller, "Dispatching report callback %p", cb);
                 cb->mCall(cb->mContext);
             }
@@ -242,14 +259,14 @@ bool Device::GetIpAddress(Inet::IPAddress & addr) const
     return mState == ConnectionState::SecureConnected;
 }
 
-void Device::OnResponse(uint8_t endpoint, uint16_t cluster, Callback::Callback<> * onResponse)
+void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse)
 {
     Callback::Cancelable * cancelable = onResponse->Cancel();
     cancelable->mInfoScalar           = static_cast<uint64_t>(endpoint << 16 | cluster);
     mResponses.Enqueue(cancelable);
 }
 
-void Device::OnReport(uint8_t endpoint, uint16_t cluster, Callback::Callback<> * onReport)
+void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport)
 {
     Callback::Cancelable * cancelable = onReport->Cancel();
     cancelable->mInfoScalar           = static_cast<uint64_t>(endpoint << 16 | cluster);
