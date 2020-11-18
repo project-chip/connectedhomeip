@@ -1,0 +1,159 @@
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+#include <mdns/minimal/ResourceRecord.h>
+#include <support/TestUtils.h>
+
+#include <nlunit-test.h>
+
+namespace {
+
+using namespace chip;
+using namespace mdns::Minimal;
+
+constexpr uint16_t kTestQnameCount        = 2;
+const char * kTestQnames[kTestQnameCount] = { "foo", "bar" };
+
+class FakeResourceRecord : public ResourceRecord
+{
+public:
+    FakeResourceRecord(const char * data) : ResourceRecord(QType::ANY, kTestQnames, kTestQnameCount), mData(data) {}
+
+protected:
+    bool WriteData(chip::BufBound & out) const override
+    {
+        out.Put(mData);
+        return out.Fit();
+    }
+
+private:
+    const char * mData;
+};
+
+void SimpleWrite(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t headerBuffer[HeaderRef::kSizeBytes];
+    uint8_t dataBuffer[128];
+
+    HeaderRef header(headerBuffer);
+    header.Clear();
+
+    BufBound output(dataBuffer, sizeof(dataBuffer));
+    FakeResourceRecord record("somedata");
+
+    record.SetTtl(0x11223344);
+
+    const uint8_t expectedOutput[] = {
+        //
+        3,    'f',  'o',  'o',  // QNAME part: foo
+        3,    'b',  'a',  'r',  // QNAME part: bar
+        0,                      // QNAME ends
+        0,    1,                // QClass IN
+        0,    255,              // QType ANY (totally fake)
+        0x11, 0x22, 0x33, 0x44, // TTL
+        0,    8,                // data size
+        's',  'o',  'm',  'e',  'd', 'a', 't', 'a',
+    };
+
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output));
+    NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
+    NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
+    NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
+    NL_TEST_ASSERT(inSuite, output.Written() == sizeof(expectedOutput));
+    NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+}
+
+void AppendMultiple(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t headerBuffer[HeaderRef::kSizeBytes];
+    uint8_t dataBuffer[128];
+
+    HeaderRef header(headerBuffer);
+    header.Clear();
+
+    BufBound output(dataBuffer, sizeof(dataBuffer));
+    FakeResourceRecord record1("somedata");
+    FakeResourceRecord record2("moredata");
+    FakeResourceRecord record3("xyz");
+
+    record1.SetTtl(0x11223344);
+    record2.SetTtl(0);
+    record3.SetTtl(0xFF);
+
+    const uint8_t expectedOutput[] = {
+        3,    'f',  'o',  'o',                      // QNAME part: foo
+        3,    'b',  'a',  'r',                      // QNAME part: bar
+        0,                                          // QNAME ends
+        0,    1,                                    // QClass IN
+        0,    255,                                  // QType ANY (totally fake)
+        0x11, 0x22, 0x33, 0x44,                     // TTL
+        0,    8,                                    // data size
+        's',  'o',  'm',  'e',  'd', 'a', 't', 'a', //
+        3,    'f',  'o',  'o',                      // QNAME part: foo
+        3,    'b',  'a',  'r',                      // QNAME part: bar
+        0,                                          // QNAME ends
+        0,    1,                                    // QClass IN
+        0,    255,                                  // QType ANY (totally fake)
+        0,    0,    0,    0,                        // TTL
+        0,    8,                                    // data size
+        'm',  'o',  'r',  'e',  'd', 'a', 't', 'a', //
+        3,    'f',  'o',  'o',                      // QNAME part: foo
+        3,    'b',  'a',  'r',                      // QNAME part: bar
+        0,                                          // QNAME ends
+        0,    1,                                    // QClass IN
+        0,    255,                                  // QType ANY (totally fake)
+        0,    0,    0,    0xFF,                     // TTL
+        0,    3,                                    // data size
+        'x',  'y',  'z',
+    };
+
+    NL_TEST_ASSERT(inSuite, record1.Append(header, ResourceType::kAnswer, output));
+    NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
+    NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
+    NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
+
+    NL_TEST_ASSERT(inSuite, record2.Append(header, ResourceType::kAuthority, output));
+    NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
+    NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 1);
+    NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
+
+    NL_TEST_ASSERT(inSuite, record3.Append(header, ResourceType::kAdditional, output));
+    NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
+    NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 1);
+    NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 1);
+
+    NL_TEST_ASSERT(inSuite, output.Written() == sizeof(expectedOutput));
+    NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+}
+
+const nlTest sTests[] = {
+    NL_TEST_DEF("SimpleWrite", SimpleWrite),       //
+    NL_TEST_DEF("AppendMultiple", AppendMultiple), //
+    NL_TEST_SENTINEL()                             //
+};
+
+} // namespace
+
+int TestResourceRecord(void)
+{
+    nlTestSuite theSuite = { "ResourceRecord", sTests, nullptr, nullptr };
+    nlTestRunner(&theSuite, nullptr);
+    return nlTestRunnerStats(&theSuite);
+}
+
+CHIP_REGISTER_TEST_SUITE(TestResourceRecord)

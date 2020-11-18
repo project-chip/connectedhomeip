@@ -21,8 +21,9 @@ chip_test_suite("tests") {
   output_name = "libMinimalMdnstests"
 
   test_sources = [
-    "TestQName.cpp",
     "TestIPResourceRecord.cpp",
+    "TestQName.cpp",
+    "TestResourceRecord.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

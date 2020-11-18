@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -173,30 +172,18 @@ void WriteIPv6(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
 }
 
-} // namespace
-
-// clang-format off
-static const nlTest sTests[] =
-{
-    NL_TEST_DEF("IPV4", WriteIPv4),
-    NL_TEST_DEF("IPV6", WriteIPv6),
-
-    NL_TEST_SENTINEL()
+const nlTest sTests[] = {
+    NL_TEST_DEF("IPV4", WriteIPv4), //
+    NL_TEST_DEF("IPV6", WriteIPv6), //
+    NL_TEST_SENTINEL()              //
 };
-// clang-format on
+
+} // namespace
 
 int TestIPResourceRecord(void)
 {
-    // clang-format off
-    nlTestSuite theSuite =
-	{
-        "QName",
-        &sTests[0],
-        nullptr,
-        nullptr
-    };
-    // clang-format on
 
+    nlTestSuite theSuite = { "IPResourceRecord", sTests, nullptr, nullptr };
     nlTestRunner(&theSuite, nullptr);
 
     return (nlTestRunnerStats(&theSuite));
