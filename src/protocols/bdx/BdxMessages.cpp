@@ -418,10 +418,10 @@ CHIP_ERROR DataBlock::Parse(const System::PacketBuffer & aBuffer)
 
     SuccessOrExit(bufReader.Read32(&BlockCounter).StatusCode());
 
-    // Rest of message is data (could be empty)
+    // Rest of message is data
     if (bufReader.Remaining() > 0)
     {
-        // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
+        // WARNING: this struct will store a pointer to the start of data in the PacketBuffer,
         // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
         // or there is risk of unsafe memory access.
         Data       = &bufStart[bufReader.OctetsRead()];
