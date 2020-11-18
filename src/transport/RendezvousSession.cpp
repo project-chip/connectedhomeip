@@ -42,8 +42,8 @@ namespace chip {
 CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
 {
     mParams = params;
-    ReturnErrorCodeIf(mDelegate == nullptr, CHIP_ERROR_INCORRECT_STATE);
-    ReturnErrorCodeIf(!mParams.HasSetupPINCode(), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mDelegate != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mParams.HasSetupPINCode(), CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CONFIG_NETWORK_LAYER_BLE
     {

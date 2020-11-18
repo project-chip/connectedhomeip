@@ -23,29 +23,29 @@
 /// than CHIP_NO_ERROR
 ///
 /// Use like:
-///   ReturnErrorOnFailure(channel->SendMsg(mnsg));
+///   ReturnErrorOnFailure(channel->SendMsg(msg));
 #define ReturnErrorOnFailure(expr)                                                                                                 \
+    do                                                                                                                             \
     {                                                                                                                              \
         CHIP_ERROR __err = (expr);                                                                                                 \
         if (__err != CHIP_NO_ERROR)                                                                                                \
         {                                                                                                                          \
             return __err;                                                                                                          \
         }                                                                                                                          \
-    }                                                                                                                              \
-    (void) 0
+    } while (false)
 
 /// Returns a specified error code if expression evaluates to false
 ///
 /// Use like:
 ///   VerifyOrReturnError(param != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 #define VerifyOrReturnError(expr, code)                                                                                            \
+    do                                                                                                                             \
     {                                                                                                                              \
         if (!(expr))                                                                                                               \
         {                                                                                                                          \
             return code;                                                                                                           \
         }                                                                                                                          \
-    }                                                                                                                              \
-    (void) 0
+    } while (false)
 
 /// Returns a specified error code if expression evaluates to true
 ///
@@ -53,10 +53,10 @@
 ///   ReturnErrorCodeIf(state == kInitialized, CHIP_NO_ERROR);
 ///   ReturnErrorCodeIf(state == kInitialized, CHIP_ERROR_INVALID_STATE);
 #define ReturnErrorCodeIf(expr, code)                                                                                              \
+    do                                                                                                                             \
     {                                                                                                                              \
-        if ((expr))                                                                                                                \
+        if (expr)                                                                                                                  \
         {                                                                                                                          \
             return code;                                                                                                           \
         }                                                                                                                          \
-    }                                                                                                                              \
-    (void) 0
+    } while (false)
