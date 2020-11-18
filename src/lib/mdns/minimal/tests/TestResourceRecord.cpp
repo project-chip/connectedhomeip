@@ -45,7 +45,7 @@ private:
     const char * mData;
 };
 
-void SimpleWrite(nlTestSuite * inSuite, void * inContext)
+void CanWriteSimpleRecord(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
@@ -78,7 +78,7 @@ void SimpleWrite(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
 }
 
-void AppendMultiple(nlTestSuite * inSuite, void * inContext)
+void CanWriteMultipleRecords(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
@@ -141,7 +141,7 @@ void AppendMultiple(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
 }
 
-void WriteOrderCheck(nlTestSuite * inSuite, void * inContext)
+void RecordOrderIsEnforced(nlTestSuite * inSuite, void * inContext)
 {
     uint8_t headerBuffer[HeaderRef::kSizeBytes];
     uint8_t dataBuffer[128];
@@ -161,11 +161,51 @@ void WriteOrderCheck(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAuthority, output) == false);
 }
 
+void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t headerBuffer[HeaderRef::kSizeBytes];
+    uint8_t dataBuffer[123];
+
+    HeaderRef header(headerBuffer);
+
+    FakeResourceRecord record("somedata");
+
+    const uint8_t expectedOutput[] = {
+        //
+        3,   'f', 'o', 'o', // QNAME part: foo
+        3,   'b', 'a', 'r', // QNAME part: bar
+        0,                  // QNAME ends
+        0,   1,             // QClass IN
+        0,   255,           // QType ANY (totally fake)
+        0,   0,   0,   0,   // TTL
+        0,   8,             // data size
+        's', 'o', 'm', 'e', 'd', 'a', 't', 'a',
+    };
+
+    for (size_t i = 0; i < sizeof(expectedOutput); i++)
+    {
+        BufBound output(dataBuffer, i);
+        header.Clear();
+        memset(dataBuffer, 0, sizeof(dataBuffer));
+
+        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output) == false);
+    }
+
+    BufBound output(dataBuffer, sizeof(expectedOutput));
+    header.Clear();
+
+    memset(dataBuffer, 0, sizeof(dataBuffer));
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output));
+    NL_TEST_ASSERT(inSuite, output.Written() == sizeof(expectedOutput));
+    NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
+}
+
 const nlTest sTests[] = {
-    NL_TEST_DEF("SimpleWrite", SimpleWrite),         //
-    NL_TEST_DEF("AppendMultiple", AppendMultiple),   //
-    NL_TEST_DEF("WriteOrderCheck", WriteOrderCheck), //
-    NL_TEST_SENTINEL()                               //
+    NL_TEST_DEF("CanWriteSimpleRecord", CanWriteSimpleRecord),       //
+    NL_TEST_DEF("CanWriteMultipleRecords", CanWriteMultipleRecords), //
+    NL_TEST_DEF("RecordOrderIsEnforced", RecordOrderIsEnforced),     //
+    NL_TEST_DEF("ErrorsOutOnSmallBuffers", ErrorsOutOnSmallBuffers), //
+    NL_TEST_SENTINEL()                                               //
 };
 
 } // namespace
