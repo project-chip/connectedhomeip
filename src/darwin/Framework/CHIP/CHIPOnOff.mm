@@ -17,6 +17,7 @@
 
 #import <Foundation/Foundation.h>
 
+#import "CHIPDevice.h"
 #import "CHIPOnOff.h"
 
 @interface CHIPOnOff ()

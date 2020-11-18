@@ -18,8 +18,9 @@
 #ifndef CHIP_ONOFF_H
 #define CHIP_ONOFF_H
 
-#import "CHIPDevice.h"
 #import <Foundation/Foundation.h>
+
+@class CHIPDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 
