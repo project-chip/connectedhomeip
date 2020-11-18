@@ -149,7 +149,7 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointI
 
     statusLED1.Blink(kIdentifyTimerDelayMS * 2);
 
-    // timerCount represents the number of callback execution before we stop the timer.
+    // timerCount represents the number of callback executions before we stop the timer.
     // value is expressed in seconds and the timer is fired every 250ms, so just multiply value by 4.
     // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
     identifyTimerCount = (*value) * 4;
