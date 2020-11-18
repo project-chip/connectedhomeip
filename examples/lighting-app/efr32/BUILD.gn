@@ -67,6 +67,7 @@ efr32_executable("lighting_app") {
 
   public_deps = [
     ":sdk",
+    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/src/lib",
@@ -81,11 +82,9 @@ efr32_executable("lighting_app") {
     "${efr32_project_dir}/include",
     "${chip_root}/src/app/util",
     "${examples_plat_dir}",
-    "${chip_root}/examples/common/QRCode/repo/c",
   ]
 
   sources = [
-    "${chip_root}/examples/common/QRCode/repo/c/qrcodegen.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
