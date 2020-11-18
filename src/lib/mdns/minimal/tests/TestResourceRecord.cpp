@@ -200,11 +200,51 @@ void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
 }
 
+void RecordCount(nlTestSuite * inSuite, void * inContext)
+{
+    constexpr int kAppendCount = 10;
+    uint8_t headerBuffer[HeaderRef::kSizeBytes];
+    uint8_t dataBuffer[123];
+
+    HeaderRef header(headerBuffer);
+    header.Clear();
+
+    FakeResourceRecord record("somedata");
+
+    for (int i = 0; i < kAppendCount; i++)
+    {
+        BufBound output(dataBuffer, sizeof(dataBuffer));
+        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output));
+        NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == i + 1);
+        NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
+        NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
+    }
+
+    for (int i = 0; i < kAppendCount; i++)
+    {
+        BufBound output(dataBuffer, sizeof(dataBuffer));
+        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAuthority, output));
+        NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == kAppendCount);
+        NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == i + 1);
+        NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
+    }
+
+    for (int i = 0; i < kAppendCount; i++)
+    {
+        BufBound output(dataBuffer, sizeof(dataBuffer));
+        NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAdditional, output));
+        NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == kAppendCount);
+        NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == kAppendCount);
+        NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == i + 1);
+    }
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("CanWriteSimpleRecord", CanWriteSimpleRecord),       //
     NL_TEST_DEF("CanWriteMultipleRecords", CanWriteMultipleRecords), //
     NL_TEST_DEF("RecordOrderIsEnforced", RecordOrderIsEnforced),     //
     NL_TEST_DEF("ErrorsOutOnSmallBuffers", ErrorsOutOnSmallBuffers), //
+    NL_TEST_DEF("RecordCount", RecordCount),                         //
     NL_TEST_SENTINEL()                                               //
 };
 
