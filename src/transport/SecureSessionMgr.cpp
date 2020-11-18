@@ -355,7 +355,7 @@ exit:
     }
 }
 
-void SecureSessionMgrBase::HandleConnectionExpired(Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr)
+void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr)
 {
     char addr[Transport::PeerAddress::kMaxToStringSize];
     state.GetPeerAddress().ToString(addr, sizeof(addr));

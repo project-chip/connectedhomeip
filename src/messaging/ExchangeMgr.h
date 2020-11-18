@@ -202,7 +202,7 @@ private:
                            Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
                            SecureSessionMgrBase * msgLayer) override;
 
-    void OnConnectionExpired(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
+    void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 };
 
 } // namespace chip

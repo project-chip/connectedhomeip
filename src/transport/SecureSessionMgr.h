@@ -95,7 +95,7 @@ public:
      * @param state   connection state
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnConnectionExpired(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
+    virtual void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
     /**
      * @brief
@@ -193,7 +193,7 @@ private:
     /**
      * Called when a specific connection expires.
      */
-    static void HandleConnectionExpired(Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr);
+    static void HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr);
 
     /**
      * Callback for timer expiry check

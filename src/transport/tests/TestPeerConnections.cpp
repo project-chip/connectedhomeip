@@ -201,7 +201,7 @@ struct ExpiredCallInfo
     PeerAddress lastCallPeerAddress = PeerAddress::Uninitialized();
 };
 
-void OnConnectionExpired(PeerConnectionState & state, ExpiredCallInfo * info)
+void OnConnectionExpired(const PeerConnectionState & state, ExpiredCallInfo * info)
 {
     info->callCount++;
     info->lastCallNodeId      = state.GetPeerNodeId();
