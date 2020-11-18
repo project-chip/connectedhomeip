@@ -126,6 +126,17 @@ private:
     bool _IsWiFiStationProvisioned();
     void _ClearWiFiStationProvision();
     bool _CanStartWiFiScan();
+
+    WiFiAPMode _GetWiFiAPMode(void);
+    CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
+    bool _IsWiFiAPActive(void);
+    bool _IsWiFiAPApplicationControlled(void);
+    void _DemandStartWiFiAP(void);
+    void _StopOnDemandWiFiAP(void);
+    void _MaintainOnDemandWiFiAP(void);
+    uint32_t _GetWiFiAPIdleTimeoutMS(void);
+    void _SetWiFiAPIdleTimeoutMS(uint32_t val);
+
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
     static void _OnWpaInterfaceRemoved(WpaFiW1Wpa_supplicant1 * proxy, const gchar * path, GVariant * properties,
                                        gpointer user_data);
@@ -135,6 +146,15 @@ private:
 
     static uint16_t mConnectivityFlag;
     static struct GDBusWpaSupplicant mWpaSupplicant;
+#endif
+
+    // ==================== ConnectivityManager Private Methods ====================
+
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    void DriveAPState(void);
+    CHIP_ERROR ConfigureWiFiAP(void);
+    void ChangeWiFiAPState(WiFiAPState newState);
+    static void DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError);
 #endif
 
     // ===== Members for internal use by the following friends.
@@ -147,8 +167,32 @@ private:
     // ===== Private members reserved for use by this class only.
 
     ConnectivityManager::WiFiStationMode mWiFiStationMode;
+    ConnectivityManager::WiFiAPMode mWiFiAPMode;
+    WiFiAPState mWiFiAPState;
+    uint64_t mLastAPDemandTime;
     uint32_t mWiFiStationReconnectIntervalMS;
+    uint32_t mWiFiAPIdleTimeoutMS;
 };
+
+inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode(void)
+{
+    return mWiFiAPMode;
+}
+
+inline bool ConnectivityManagerImpl::_IsWiFiAPActive(void)
+{
+    return mWiFiAPState == kWiFiAPState_Active;
+}
+
+inline bool ConnectivityManagerImpl::_IsWiFiAPApplicationControlled(void)
+{
+    return mWiFiAPMode == kWiFiAPMode_ApplicationControlled;
+}
+
+inline uint32_t ConnectivityManagerImpl::_GetWiFiAPIdleTimeoutMS(void)
+{
+    return mWiFiAPIdleTimeoutMS;
+}
 
 inline bool ConnectivityManagerImpl::_HaveServiceConnectivity()
 {
