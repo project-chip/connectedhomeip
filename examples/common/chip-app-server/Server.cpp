@@ -101,7 +101,11 @@ void InitServer()
 
     InitDataModelHandler();
 
-    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer);
+    // Init transport before operations with secure session mgr.
+    err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    SuccessOrExit(err);
+
+    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
     // This flag is used to bypass BLE in the cirque test
@@ -115,13 +119,9 @@ void InitServer()
         params.SetSetupPINCode(pinCode)
             .SetLocalNodeId(chip::kTestDeviceNodeId)
             .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
-        SuccessOrExit(err = gRendezvousServer.Init(params));
+        SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
     }
 #endif
-
-    // Init transport before operations with secure session mgr.
-    gTransports.Init(&gSessions, gRendezvousServer.GetRendezvousSession(),
-                     UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
 
     err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);

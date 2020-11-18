@@ -101,9 +101,9 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = transportMgr.Init(&secureSessionMgr, nullptr, "LOOPBACK");
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -128,9 +128,9 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
 
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = transportMgr.Init(&secureSessionMgr, nullptr, "LOOPBACK");
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     callback.mSuite = inSuite;

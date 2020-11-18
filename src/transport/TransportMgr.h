@@ -52,7 +52,7 @@ public:
      */
     virtual void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
                                    System::PacketBuffer * msgBuf) = 0;
-    virtual void SetTransportMgr(TransportMgrBase * transport)    = 0;
+    // virtual void SetTransportMgr(TransportMgrBase * transport)    = 0;
 };
 
 class TransportMgrBase
@@ -66,32 +66,15 @@ public:
 
     void Disconnect(const Transport::PeerAddress & address) { mTransport->Disconnect(address); }
 
-    void SetSecureSessionMgr(TransportMgrDelegate * secureSessionMgr)
-    {
-        mSecureSessionMgr = secureSessionMgr;
-        if (mSecureSessionMgr != nullptr)
-        {
-            mSecureSessionMgr->SetTransportMgr(this);
-        }
-    }
+    void SetSecureSessionMgr(TransportMgrDelegate * secureSessionMgr) { mSecureSessionMgr = secureSessionMgr; }
 
-    void SetRendezvousSession(TransportMgrDelegate * rendezvousSessionMgr)
-    {
-        mRendezvous = rendezvousSessionMgr;
-        if (mRendezvous != nullptr)
-        {
-            mRendezvous->SetTransportMgr(this);
-        }
-    }
+    void SetRendezvousSession(TransportMgrDelegate * rendezvousSessionMgr) { mRendezvous = rendezvousSessionMgr; }
 
 protected:
-    void InitInternal(TransportMgrDelegate * secureSessionMgr, TransportMgrDelegate * rendezvousSessionMgr,
-                      Transport::Base * transport)
+    void InitInternal(Transport::Base * transport)
     {
         mTransport = transport;
         mTransport->SetMessageReceiveHandler(HandleMessageReceived, this);
-        SetSecureSessionMgr(secureSessionMgr);
-        SetRendezvousSession(rendezvousSessionMgr);
         ChipLogDetail(Inet, "TransportMgr initialized");
     }
 
@@ -109,13 +92,13 @@ class TransportMgr : public TransportMgrBase
 {
 public:
     template <typename... Args>
-    CHIP_ERROR Init(TransportMgrDelegate * secureMgr, TransportMgrDelegate * rendezvous, Args &&... transportInitArgs)
+    CHIP_ERROR Init(Args &&... transportInitArgs)
     {
         CHIP_ERROR err = CHIP_NO_ERROR;
 
         err = mTransport.Init(std::forward<Args>(transportInitArgs)...);
         SuccessOrExit(err);
-        InitInternal(secureMgr, rendezvous, &mTransport);
+        InitInternal(&mTransport);
     exit:
         return err;
     }

@@ -86,7 +86,7 @@ public:
      *
      * @ return CHIP_ERROR  The result of the initialization
      */
-    CHIP_ERROR Init(const RendezvousParameters & params);
+    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr);
 
     /**
      * @brief
@@ -125,7 +125,6 @@ public:
     //////////// TransportMgrDelegate Implementation ///////////////
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
                            System::PacketBuffer * msgBuf) override;
-    void SetTransportMgr(TransportMgrBase * transport) override;
 
     /**
      * @brief

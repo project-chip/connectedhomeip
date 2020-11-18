@@ -43,13 +43,15 @@ using namespace chip::Transport;
 
 namespace chip {
 
-CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
+CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    mParams = params;
+    mParams       = params;
+    mTransportMgr = transportMgr;
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mParams.HasSetupPINCode(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(mTransportMgr != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO: BLE Should be a transport, in that case, RendezvousSession and BLE should decouple
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
@@ -73,6 +75,7 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params)
     }
 
     mNetworkProvision.Init(this);
+    mTransportMgr->SetRendezvousSession(this);
 
 exit:
     return err;
@@ -228,11 +231,6 @@ void RendezvousSession::OnRendezvousError(CHIP_ERROR err)
         mDelegate->OnRendezvousError(err);
     }
     UpdateState(State::kInit, err);
-}
-
-void RendezvousSession::SetTransportMgr(TransportMgrBase * transport)
-{
-    mTransportMgr = transport;
 }
 
 void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERROR err)

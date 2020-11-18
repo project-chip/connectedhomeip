@@ -84,9 +84,9 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
-    transportMgr.Init(&secureSessionMgr, nullptr, "LOOPBACK");
-
+    err = transportMgr.Init("LOOPBACK");
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
@@ -104,8 +104,9 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
-    transportMgr.Init(&secureSessionMgr, nullptr, "LOOPBACK");
+    err = transportMgr.Init("LOOPBACK");
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
@@ -135,9 +136,9 @@ void CheckFindContextTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = transportMgr.Init(&secureSessionMgr, nullptr, "LOOPBACK");
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
@@ -164,9 +165,9 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer());
+    err = transportMgr.Init("LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = transportMgr.Init(&secureSessionMgr, nullptr, "LOOPBACK");
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;

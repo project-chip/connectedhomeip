@@ -147,11 +147,10 @@ SecureSessionMgr & SessionManager()
 void startServer(NodeId localNodeId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = sessions.Init(localNodeId, &DeviceLayer::SystemLayer);
-    SuccessOrExit(err);
-    err = gTransports.Init(&sessions, nullptr,
-                           UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(nullptr),
+    err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(nullptr),
                            UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
+    SuccessOrExit(err);
+    err = sessions.Init(localNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
     sessions.SetDelegate(&gCallbacks);

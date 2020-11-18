@@ -62,14 +62,16 @@ SecureSessionMgr::~SecureSessionMgr()
     CancelExpiryTimer();
 }
 
-CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLayer)
+CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(transportMgr != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    mState       = State::kInitialized;
-    mLocalNodeId = localNodeId;
-    mSystemLayer = systemLayer;
+    mState        = State::kInitialized;
+    mLocalNodeId  = localNodeId;
+    mSystemLayer  = systemLayer;
+    mTransportMgr = transportMgr;
 
     ChipLogProgress(Inet, "local node id is %llu\n", mLocalNodeId);
 
@@ -79,6 +81,8 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
     Mdns::DiscoveryManager::GetInstance().RegisterResolveDelegate(this);
 
     ScheduleExpiryTimer();
+
+    mTransportMgr->SetSecureSessionMgr(this);
 
 exit:
     return err;

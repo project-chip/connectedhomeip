@@ -27,7 +27,7 @@ class RendezvousServer : public RendezvousSessionDelegate
 public:
     RendezvousServer();
 
-    CHIP_ERROR Init(const RendezvousParameters & params);
+    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr);
 
     //////////////// RendezvousSessionDelegate Implementation ///////////////////
 

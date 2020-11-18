@@ -150,7 +150,7 @@ public:
      * @param localNodeId    Node id for the current node
      * @param systemLayer    System, layer to use
      */
-    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer);
+    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
 
 protected:
     /**
@@ -163,11 +163,6 @@ protected:
      */
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
                            System::PacketBuffer * msgBuf) override;
-    /**
-     * @brief
-     *   Set the transport manager for secure session manager.
-     */
-    void SetTransportMgr(TransportMgrBase * cb) override { mTransportMgr = cb; }
 
 private:
     /**
