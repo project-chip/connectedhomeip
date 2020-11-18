@@ -24,6 +24,7 @@ chip_test_suite("tests") {
     "TestIPResourceRecord.cpp",
     "TestQName.cpp",
     "TestResourceRecord.cpp",
+    "TestRecordData.cpp",
   ]
 
   cflags = [ "-Wconversion" ]

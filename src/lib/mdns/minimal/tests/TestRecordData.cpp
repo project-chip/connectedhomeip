@@ -1,0 +1,117 @@
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+#include <mdns/minimal/RecordData.h>
+#include <support/TestUtils.h>
+
+#include <nlunit-test.h>
+
+namespace {
+
+using namespace chip;
+using namespace mdns::Minimal;
+
+void SrvRecordSimpleParsing(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t record[] = {
+        0,    12,                       // Priority
+        0,    3,                        // weight
+        0x12, 0x34,                     // port
+        4,    's',  'o', 'm', 'e',      // QNAME part: some
+        4,    't',  'e', 's', 't',      // QNAME part: test
+        5,    'l',  'o', 'c', 'a', 'l', // QNAME part: local
+        0,                              // QNAME ends
+    };
+
+    BytesRange packet(record, record + sizeof(record));
+    BytesRange data(record, record + sizeof(record));
+
+    SrvRecord srv;
+
+    NL_TEST_ASSERT(inSuite, srv.Parse(data, packet));
+    NL_TEST_ASSERT(inSuite, srv.GetPriority() == 12);
+    NL_TEST_ASSERT(inSuite, srv.GetWeight() == 3);
+    NL_TEST_ASSERT(inSuite, srv.GetPort() == 0x1234);
+
+    // name can be read several times
+    for (int i = 0; i < 3; i++)
+    {
+        SerializedQNameIterator name = srv.GetName();
+
+        NL_TEST_ASSERT(inSuite, name.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "some") == 0);
+        NL_TEST_ASSERT(inSuite, name.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "test") == 0);
+        NL_TEST_ASSERT(inSuite, name.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "local") == 0);
+    }
+}
+
+void SrvWithPtrRecord(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t record[] = {
+        'x',  'y',  'z',           // dummy data (3 bytes)
+        4,    's',  'o', 'm', 'e', // QNAME part: some
+        4,    't',  'e', 's', 't', // QNAME part: test
+        0,                         // QNAME ends
+
+        0,    12,             // Priority
+        0,    3,              // weight
+        0x12, 0x34,           // port
+        3,    'f',  'o', 'o', // QNAME part: foo
+        0xC0, 0x03,           // PTR
+    };
+
+    BytesRange packet(record, record + sizeof(record));
+    BytesRange data(record + 14, record + sizeof(record));
+
+    SrvRecord srv;
+
+    NL_TEST_ASSERT(inSuite, srv.Parse(data, packet));
+    NL_TEST_ASSERT(inSuite, srv.GetPriority() == 12);
+    NL_TEST_ASSERT(inSuite, srv.GetWeight() == 3);
+    NL_TEST_ASSERT(inSuite, srv.GetPort() == 0x1234);
+
+    // name can be read several times
+    for (int i = 0; i < 3; i++)
+    {
+        SerializedQNameIterator name = srv.GetName();
+
+        NL_TEST_ASSERT(inSuite, name.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "foo") == 0);
+        NL_TEST_ASSERT(inSuite, name.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "some") == 0);
+        NL_TEST_ASSERT(inSuite, name.Next());
+        NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "test") == 0);
+    }
+}
+
+const nlTest sTests[] = {
+    NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing), //
+    NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),             //
+    NL_TEST_SENTINEL()                                             //
+};
+
+} // namespace
+
+int TestRecordData(void)
+{
+    nlTestSuite theSuite = { "RecordData", sTests, nullptr, nullptr };
+    nlTestRunner(&theSuite, nullptr);
+    return nlTestRunnerStats(&theSuite);
+}
+
+CHIP_REGISTER_TEST_SUITE(TestRecordData)
