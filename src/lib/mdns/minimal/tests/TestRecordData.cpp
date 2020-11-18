@@ -15,12 +15,17 @@
  *    limitations under the License.
  */
 #include <mdns/minimal/RecordData.h>
+
+#include <string>
+#include <vector>
+
 #include <support/TestUtils.h>
 
 #include <nlunit-test.h>
 
 namespace {
 
+using namespace std;
 using namespace chip;
 using namespace mdns::Minimal;
 
@@ -191,6 +196,47 @@ void PtrRecordComplexParsing(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, name.Next() == false);
 }
 
+class TxtRecordAccumulator : public TxtRecordDelegate
+{
+public:
+    using DataType = vector<pair<string, string>>;
+
+    void OnRecord(const BytesRange & name, const BytesRange & value) override
+    {
+        mData.push_back(make_pair(AsString(name), AsString(value)));
+    }
+
+    DataType & Data() { return mData; }
+    const DataType & Data() const { return mData; }
+
+private:
+    DataType mData;
+
+    static string AsString(const BytesRange & range)
+    {
+        return string(reinterpret_cast<const char *>(range.Start()), reinterpret_cast<const char *>(range.End()));
+    }
+};
+
+void TxtRecord(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t record[] = {
+        4, 's', 'o', 'm', 'e',                // some
+        7, 'f', 'o', 'o', '=', 'b', 'a', 'r', // foo=bar
+        5, 'x', '=', 'y', '=', 'z',           // x=y=z
+        2, 'a', '=',                          // a=
+    };
+
+    TxtRecordAccumulator accumulator;
+
+    NL_TEST_ASSERT(inSuite, ParseTxtRecord(BytesRange(record, record + sizeof(record)), &accumulator));
+    NL_TEST_ASSERT(inSuite, accumulator.Data().size() == 4);
+    NL_TEST_ASSERT(inSuite, accumulator.Data()[0] == make_pair("some"s, ""s));
+    NL_TEST_ASSERT(inSuite, accumulator.Data()[1] == make_pair("foo"s, "bar"s));
+    NL_TEST_ASSERT(inSuite, accumulator.Data()[2] == make_pair("x"s, "y=z"s));
+    NL_TEST_ASSERT(inSuite, accumulator.Data()[3] == make_pair("a"s, ""s));
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing),   //
     NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),               //
@@ -198,6 +244,7 @@ const nlTest sTests[] = {
     NL_TEST_DEF("AAAARecordParsing", AAAARecordParsing),             //
     NL_TEST_DEF("PtrRecordSimpleParsing", PtrRecordSimpleParsing),   //
     NL_TEST_DEF("PtrRecordComplexParsing", PtrRecordComplexParsing), //
+    NL_TEST_DEF("TxtRecord", TxtRecord),                             //
     NL_TEST_SENTINEL()                                               //
 };
 
