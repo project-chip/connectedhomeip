@@ -57,6 +57,7 @@ void SrvRecordSimpleParsing(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "test") == 0);
         NL_TEST_ASSERT(inSuite, name.Next());
         NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "local") == 0);
+        NL_TEST_ASSERT(inSuite, name.Next() == false);
     }
 }
 
@@ -96,6 +97,7 @@ void SrvWithPtrRecord(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "some") == 0);
         NL_TEST_ASSERT(inSuite, name.Next());
         NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "test") == 0);
+        NL_TEST_ASSERT(inSuite, name.Next() == false);
     }
 }
 
@@ -133,12 +135,70 @@ void AAAARecordParsing(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, addr == expected);
 }
 
+void PtrRecordSimpleParsing(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t record[] = {
+        4, 's', 'o', 'm', 'e',      // QNAME part: some
+        4, 't', 'e', 's', 't',      // QNAME part: test
+        5, 'l', 'o', 'c', 'a', 'l', // QNAME part: local
+        0,                          // QNAME ends
+    };
+
+    BytesRange packet(record, record + sizeof(record));
+    BytesRange data(record, record + sizeof(record));
+
+    SerializedQNameIterator name;
+
+    NL_TEST_ASSERT(inSuite, ParsePtrRecord(data, packet, &name));
+    NL_TEST_ASSERT(inSuite, name.Next());
+    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "some") == 0);
+    NL_TEST_ASSERT(inSuite, name.Next());
+    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "test") == 0);
+    NL_TEST_ASSERT(inSuite, name.Next());
+    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "local") == 0);
+    NL_TEST_ASSERT(inSuite, name.Next() == false);
+}
+
+void PtrRecordComplexParsing(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t record[] = {
+        'x',  'y',  'z',           // dummy data (3 bytes)
+        4,    's',  'o', 'm', 'e', // QNAME part: some
+        4,    't',  'e', 's', 't', // QNAME part: test
+        0,                         // QNAME ends
+        3,    'b',  'a', 'r',      // QNAME part: bar
+        3,    'b',  'a', 'z',      // QNAME part: baz
+        0xC0, 0x03,                // PTR
+        3,    'f',  'o', 'o',      // QNAME part: foo
+        0xC0, 0x0E,                // PTR
+    };
+
+    BytesRange packet(record, record + sizeof(record));
+    BytesRange data(record + 24, record + sizeof(record));
+    SerializedQNameIterator name;
+
+    NL_TEST_ASSERT(inSuite, ParsePtrRecord(data, packet, &name));
+    NL_TEST_ASSERT(inSuite, name.Next());
+    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "foo") == 0);
+    NL_TEST_ASSERT(inSuite, name.Next());
+    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "bar") == 0);
+    NL_TEST_ASSERT(inSuite, name.Next());
+    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "baz") == 0);
+    NL_TEST_ASSERT(inSuite, name.Next());
+    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "some") == 0);
+    NL_TEST_ASSERT(inSuite, name.Next());
+    NL_TEST_ASSERT(inSuite, strcmp(name.Value(), "test") == 0);
+    NL_TEST_ASSERT(inSuite, name.Next() == false);
+}
+
 const nlTest sTests[] = {
-    NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing), //
-    NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),             //
-    NL_TEST_DEF("ARecordParsing", ARecordParsing),                 //
-    NL_TEST_DEF("AAAARecordParsing", AAAARecordParsing),           //
-    NL_TEST_SENTINEL()                                             //
+    NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing),   //
+    NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),               //
+    NL_TEST_DEF("ARecordParsing", ARecordParsing),                   //
+    NL_TEST_DEF("AAAARecordParsing", AAAARecordParsing),             //
+    NL_TEST_DEF("PtrRecordSimpleParsing", PtrRecordSimpleParsing),   //
+    NL_TEST_DEF("PtrRecordComplexParsing", PtrRecordComplexParsing), //
+    NL_TEST_SENTINEL()                                               //
 };
 
 } // namespace
