@@ -57,6 +57,8 @@ public:
 class TransportMgrBase
 {
 public:
+    CHIP_ERROR Init(Transport::Base * transport);
+
     CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf)
     {
@@ -68,14 +70,6 @@ public:
     void SetSecureSessionMgr(TransportMgrDelegate * secureSessionMgr) { mSecureSessionMgr = secureSessionMgr; }
 
     void SetRendezvousSession(TransportMgrDelegate * rendezvousSessionMgr) { mRendezvous = rendezvousSessionMgr; }
-
-protected:
-    void InitInternal(Transport::Base * transport)
-    {
-        mTransport = transport;
-        mTransport->SetMessageReceiveHandler(HandleMessageReceived, this);
-        ChipLogDetail(Inet, "TransportMgr initialized");
-    }
 
 private:
     static void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
@@ -97,7 +91,7 @@ public:
 
         err = mTransport.Init(std::forward<Args>(transportInitArgs)...);
         SuccessOrExit(err);
-        InitInternal(&mTransport);
+        err = TransportMgrBase::Init(&mTransport);
     exit:
         return err;
     }

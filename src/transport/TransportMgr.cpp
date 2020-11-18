@@ -35,6 +35,18 @@
 
 namespace chip {
 
+CHIP_ERROR TransportMgrBase::Init(Transport::Base * transport)
+{
+    if (mTransport != nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    mTransport = transport;
+    mTransport->SetMessageReceiveHandler(HandleMessageReceived, this);
+    ChipLogDetail(Inet, "TransportMgr initialized");
+    return CHIP_NO_ERROR;
+}
+
 void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
                                              System::PacketBuffer * msg, TransportMgrBase * dispatcher)
 {
