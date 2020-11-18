@@ -99,9 +99,45 @@ void SrvWithPtrRecord(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void ARecordParsing(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t record[] = {
+        10,
+        11,
+        12,
+        13,
+    };
+
+    Inet::IPAddress addr;
+    Inet::IPAddress expected;
+
+    NL_TEST_ASSERT(inSuite, ParseARecord(BytesRange(record, record + sizeof(record)), &addr));
+    NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("10.11.12.13", expected));
+    NL_TEST_ASSERT(inSuite, addr == expected);
+}
+
+void AAAARecordParsing(nlTestSuite * inSuite, void * inContext)
+{
+    const uint8_t record[] = {
+        0x12, 0x23, 0x00, 0x00, //
+        0x00, 0x00, 0x00, 0x00, //
+        0x00, 0x00, 0x00, 0x00, //
+        0x34, 0x56, 0x78, 0x9a  //
+    };
+
+    Inet::IPAddress addr;
+    Inet::IPAddress expected;
+
+    NL_TEST_ASSERT(inSuite, ParseAAAARecord(BytesRange(record, record + sizeof(record)), &addr));
+    NL_TEST_ASSERT(inSuite, Inet::IPAddress::FromString("1223::3456:789A", expected));
+    NL_TEST_ASSERT(inSuite, addr == expected);
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("SrvRecordSimpleParsing", SrvRecordSimpleParsing), //
     NL_TEST_DEF("SrvWithPtrRecord", SrvWithPtrRecord),             //
+    NL_TEST_DEF("ARecordParsing", ARecordParsing),                 //
+    NL_TEST_DEF("AAAARecordParsing", AAAARecordParsing),           //
     NL_TEST_SENTINEL()                                             //
 };
 
