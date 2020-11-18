@@ -84,6 +84,8 @@ public:
      * @brief
      *  Initialize the underlying transport using the RendezvousParameters passed in the constructor.
      *
+     * @param params       The RendezvousParameters
+     * @param transportMgr The transport to use
      * @ return CHIP_ERROR  The result of the initialization
      */
     CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr);

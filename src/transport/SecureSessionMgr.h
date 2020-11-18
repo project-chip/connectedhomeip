@@ -149,6 +149,7 @@ public:
      *
      * @param localNodeId    Node id for the current node
      * @param systemLayer    System, layer to use
+     * @param transportMgr   Transport to use
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
 

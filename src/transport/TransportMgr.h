@@ -52,7 +52,6 @@ public:
      */
     virtual void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
                                    System::PacketBuffer * msgBuf) = 0;
-    // virtual void SetTransportMgr(TransportMgrBase * transport)    = 0;
 };
 
 class TransportMgrBase
