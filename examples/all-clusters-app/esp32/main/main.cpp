@@ -45,7 +45,6 @@
 #include <vector>
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <lib/mdns/Publisher.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
@@ -56,8 +55,6 @@
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
-
-extern void startServer();
 
 #define QRCODE_BASE_URL "https://dhrishi.github.io/connectedhomeip/qrcode.html"
 
@@ -85,21 +82,12 @@ extern void startServer();
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-extern void PairingComplete(SecurePairingSession * pairing);
+extern void PairingComplete(NodeId assignedNodeId, NodeId peerNodeId, SecurePairingSession * pairing);
 
 const char * TAG = "all-clusters-app";
 
 static DeviceCallbacks EchoCallbacks;
 RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
-
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
-const uint64_t TestDeviceId = kLocalNodeId; // For chip::DeviceLayer::GetDeviceId
-const uint64_t TestFabricId = 0;            // For chip::DeviceLayer::GetFabricId
-} // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip
 
 namespace {
 
@@ -529,8 +517,6 @@ extern "C" void app_main()
     }
 
     SetupPretendDevices();
-    publisher.Init();
-    publisher.StopPublishDevice();
 
     statusLED1.Init(STATUS_LED_GPIO_NUM);
     // Our second LED doesn't map to any physical LEDs so far, just to virtual
@@ -541,7 +527,6 @@ extern "C" void app_main()
 
     // Start the Echo Server
     InitDataModelHandler();
-    startServer();
 
     if (isRendezvousBLE())
     {
@@ -550,7 +535,7 @@ extern "C" void app_main()
     else if (isRendezvousBypassed())
     {
         ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
-        PairingComplete(&gTestPairing);
+        PairingComplete(chip::kTestDeviceNodeId, chip::kTestControllerNodeId, &gTestPairing);
     }
 
     std::string qrCodeText = createSetupPayload();

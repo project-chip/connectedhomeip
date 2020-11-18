@@ -34,6 +34,10 @@
 #include <support/Base64.h>
 #include <support/CodeUtils.h>
 
+// BASE64_ENCODED_LEN doesn't account for null termination of the string.
+// So, we are adding 1 extra byte to the size requirement.
+#define CHIP_MAX_SERIALIZED_SIZE_U64(count) static_cast<uint16_t>(BASE64_ENCODED_LEN(sizeof(uint64_t) * (count)) + 1)
+
 namespace chip {
 
 class SerializableU64SetBase
@@ -78,13 +82,13 @@ public:
      * @brief
      *   Get the length of string if the array is serialized.
      */
-    uint16_t SerializedSize() { return static_cast<uint16_t>(BASE64_ENCODED_LEN(sizeof(uint64_t) * mNextAvailable)); }
+    uint16_t SerializedSize() { return CHIP_MAX_SERIALIZED_SIZE_U64(mNextAvailable); }
 
     /**
      * @brief
      *   Get the maximum length of string if the array were full and serialized.
      */
-    uint16_t MaxSerializedSize() { return static_cast<uint16_t>(BASE64_ENCODED_LEN(sizeof(uint64_t) * mCapacity)); }
+    uint16_t MaxSerializedSize() { return CHIP_MAX_SERIALIZED_SIZE_U64(mCapacity); }
 
     /**
      * @brief

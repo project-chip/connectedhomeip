@@ -138,11 +138,6 @@ config("disabled_warnings") {
     "-Wno-deprecated-declarations",
     "-Wno-unknown-warning-option",
     "-Wno-missing-field-initializers",
-    "-Wno-unused-but-set-variable",
-  ]
-  cflags_cc = [
-    "-Wno-non-virtual-dtor",
-    "-Wno-deprecated-copy",
   ]
   if (!is_debug) {
     # assert() causes unused variable warnings in release.
@@ -152,13 +147,17 @@ config("disabled_warnings") {
     cflags += [
       "-Wno-psabi",
       "-Wno-cast-function-type",
-      "-Wno-maybe-uninitialized",
     ]
   }
 }
 
 config("strict_warnings") {
-  cflags = [ "-Wall" ]
+  cflags = [
+    "-Wall",
+    "-Wshadow",
+  ]
+
+  cflags_cc = [ "-Wnon-virtual-dtor" ]
 
   ldflags = []
 

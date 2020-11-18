@@ -87,6 +87,7 @@ class OptionSetBase : public OptionSet
 {
 public:
     OptionSetBase();
+    virtual ~OptionSetBase() {}
     virtual bool HandleOption(const char * progName, OptionSet * optSet, int id, const char * name, const char * arg) = 0;
 
 private:

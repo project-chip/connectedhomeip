@@ -30,16 +30,15 @@
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
-#include <lib/mdns/Publisher.h>
-#include <support/CodeUtils.h>
-
-extern "C" {
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
-} // extern "C"
+#include <app/util/basic-types.h>
+#include <lib/mdns/DiscoveryManager.h>
+#include <support/CodeUtils.h>
 
 static const char * TAG = "echo-devicecallbacks";
 
+using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
@@ -63,9 +62,8 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
-void DeviceCallbacks::PostAttributeChangeCallback(uint8_t endpointId, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                                  uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                                  uint8_t * value)
+void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                                  uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);
@@ -94,7 +92,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
-        publisher.StartPublishDevice();
+        chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice();
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -104,7 +102,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
-        publisher.StartPublishDevice();
+        chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice();
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
@@ -120,7 +118,7 @@ void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
     }
 }
 
-void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value)
+void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
@@ -145,7 +143,7 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState, Error error)
     }
 }
 
-void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value)
+void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
@@ -162,23 +160,4 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(uint8_t endpointId, 
 
 exit:
     return;
-}
-
-void DeviceCallbacks::PluginBasicResetToFactoryDefaultsCallback(uint8_t endpointId)
-{
-    ESP_LOGI(TAG, "PluginBasicResetToFactoryDefaultsCallback - EndPoint ID: '0x%02x'", endpointId);
-
-    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
-
-    ConfigurationMgr().InitiateFactoryReset();
-
-exit:
-    return;
-}
-
-bool DeviceCallbacks::PluginDoorLockActivateDoorLockCallback(bool activate)
-{
-    ESP_LOGI(TAG, "PluginDoorLockActivateDoorLockCallback: '0x%02x'", activate);
-    // Simulate that locking/unlocking the door is always succesful.
-    return true;
 }

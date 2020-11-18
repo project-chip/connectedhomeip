@@ -40,6 +40,8 @@ using ::chip::System::PacketBuffer;
 class DLL_EXPORT BlePlatformDelegate
 {
 public:
+    virtual ~BlePlatformDelegate() {}
+
     // Following APIs must be implemented by platform:
 
     // Subscribe to updates and indications on the specfied characteristic

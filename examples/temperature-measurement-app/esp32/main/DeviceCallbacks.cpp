@@ -24,14 +24,11 @@
  **/
 #include "DeviceCallbacks.h"
 
+#include "../gen/attribute-id.h"
+#include "../gen/cluster-id.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
 #include <support/CodeUtils.h>
-
-extern "C" {
-#include "../gen/attribute-id.h"
-#include "../gen/cluster-id.h"
-} // extern "C"
 
 static const char * TAG = "echo-devicecallbacks";
 
@@ -55,9 +52,8 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
-void DeviceCallbacks::PostAttributeChangeCallback(uint8_t endpointId, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                                  uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                                  uint8_t * value)
+void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                                  uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);

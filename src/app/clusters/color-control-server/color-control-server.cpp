@@ -37,6 +37,7 @@
  *plugin.
  *******************************************************************************
  ******************************************************************************/
+#include "color-control-server.h"
 
 #include <app/util/af.h>
 
@@ -1574,7 +1575,7 @@ static bool computeNewHueValue(ColorHueTransitionState * p)
     return false;
 }
 
-extern "C" void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
+void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
 {
     EndpointId endpoint = colorHueTransitionState.endpoint;
     bool limitReached1, limitReached2;
@@ -1676,7 +1677,7 @@ static uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * 
     return (uint16_t) transitionTime;
 }
 
-extern "C" void emberAfPluginColorControlServerXyTransitionEventHandler(void)
+void emberAfPluginColorControlServerXyTransitionEventHandler(void)
 {
     EndpointId endpoint = colorXTransitionState.endpoint;
     bool limitReachedX, limitReachedY;
@@ -1705,7 +1706,7 @@ extern "C" void emberAfPluginColorControlServerXyTransitionEventHandler(void)
     emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint);
 }
 
-extern "C" void emberAfPluginColorControlServerTempTransitionEventHandler(void)
+void emberAfPluginColorControlServerTempTransitionEventHandler(void)
 {
     EndpointId endpoint = colorTempTransitionState.endpoint;
     bool limitReached;
@@ -1855,3 +1856,9 @@ void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
     }
 #endif
 }
+
+void emberAfPluginColorControlServerComputePwmFromHsvCallback(EndpointId endpoint) {}
+
+void emberAfPluginColorControlServerComputePwmFromTempCallback(EndpointId endpoint) {}
+
+void emberAfPluginColorControlServerComputePwmFromXyCallback(EndpointId endpoint) {}

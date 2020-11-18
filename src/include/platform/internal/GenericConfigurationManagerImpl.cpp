@@ -165,7 +165,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetManufacturerDeviceId(
     err = Impl()->ReadConfigValue(ImplClass::kConfigKey_MfrDeviceId, deviceId);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         deviceId = TestDeviceId;
         err      = CHIP_NO_ERROR;
@@ -610,7 +610,7 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetFabricId(uint64_t & f
     CHIP_ERROR err = Impl()->ReadConfigValue(ImplClass::kConfigKey_FabricId, fabricId);
 
 #if CHIP_DEVICE_CONFIG_ENABLE_TEST_DEVICE_IDENTITY
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND || err == CHIP_ERROR_KEY_NOT_FOUND)
     {
         fabricId = TestFabricId;
         err      = CHIP_NO_ERROR;
@@ -856,6 +856,10 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsPairedToAccount()
 template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 {
+#if CHIP_BYPASS_RENDEZVOUS
+    return true;
+#else // CHIP_BYPASS_RENDEZVOUS
+
     return
 #if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
         ConnectivityMgr().IsWiFiStationProvisioned() &&
@@ -869,6 +873,7 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
         // TODO: Add checks regarding fabric membership (IsMemberOfFabric()) and account pairing (IsPairedToAccount()),
         // when functionalities will be implemented.
         true;
+#endif // CHIP_BYPASS_RENDEZVOUS
 }
 
 template <class ImplClass>

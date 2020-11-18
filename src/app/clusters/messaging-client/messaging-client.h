@@ -38,6 +38,8 @@
  *******************************************************************************
  ******************************************************************************/
 
+#pragma once
+
 // ----------------------------------------------------------------------------
 // Message Control byte
 // ----------------------------------------------------------------------------
@@ -58,7 +60,7 @@
  * @param endpoint The relevant endpoint.
  *
  **/
-void emAfPluginMessagingClientClearMessage(uint8_t endpoint);
+void emAfPluginMessagingClientClearMessage(chip::EndpointId endpoint);
 
 /**
  * @brief Prints information about the message.
@@ -66,7 +68,7 @@ void emAfPluginMessagingClientClearMessage(uint8_t endpoint);
  * @param endpoint The relevant endpoint.
  *
  **/
-void emAfPluginMessagingClientPrintInfo(uint8_t endpoint);
+void emAfPluginMessagingClientPrintInfo(chip::EndpointId endpoint);
 
 /**
  * @brief Confirms a message.
@@ -79,4 +81,4 @@ void emAfPluginMessagingClientPrintInfo(uint8_t endpoint);
  * ::EMBER_ZCL_STATUS_FAILURE if an error occurred, or
  * ::EMBER_ZCL_STATUS_NOT_FOUND if the message does not exist.
  */
-EmberAfStatus emberAfPluginMessagingClientConfirmMessage(uint8_t endpoint);
+EmberAfStatus emberAfPluginMessagingClientConfirmMessage(chip::EndpointId endpoint);

@@ -133,7 +133,7 @@ bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand
         // one-byte length.
         while (extensionFieldSetsIndex + 3 <= extensionFieldSetsLen)
         {
-            EmberAfClusterId clusterId;
+            ClusterId clusterId;
             uint8_t length;
             clusterId               = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
             extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);

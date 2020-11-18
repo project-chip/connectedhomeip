@@ -21,5 +21,3 @@ LEDWidget statusLED1;
 LEDWidget statusLED2;
 BluetoothWidget bluetoothLED;
 WiFiWidget wifiLED;
-chip::Protocols::Mdns::Publisher publisher;
-const chip::NodeId kLocalNodeId = 12344321;

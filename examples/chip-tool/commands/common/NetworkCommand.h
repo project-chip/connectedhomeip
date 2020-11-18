@@ -30,7 +30,9 @@ enum NetworkType
 class NetworkCommand : public Command
 {
 public:
-    NetworkCommand(const char * commandName, NetworkType type) : Command(commandName), mNetworkType(type) {}
+    NetworkCommand(const char * commandName, NetworkType type) :
+        Command(commandName), mNetworkType(type), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID }
+    {}
 
     void AddArguments()
     {

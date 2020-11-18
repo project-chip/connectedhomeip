@@ -30,7 +30,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 
-extern void PairingComplete(SecurePairingSession * pairing);
+extern void PairingComplete(NodeId assignedNodeId, NodeId peerNodeId, SecurePairingSession * pairing);
 
 static const char * TAG = "rendezvous-devicedelegate";
 
@@ -43,7 +43,7 @@ RendezvousDeviceDelegate::RendezvousDeviceDelegate()
     err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(setupPINCode);
     SuccessOrExit(err);
 
-    params.SetSetupPINCode(setupPINCode).SetLocalNodeId(kLocalNodeId).SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+    params.SetSetupPINCode(setupPINCode).SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
 
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     err                = mRendezvousSession->Init(params);
@@ -52,6 +52,20 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ESP_LOGE(TAG, "RendezvousDeviceDelegate Init failure: %s", ErrorStr(err));
+    }
+}
+
+void RendezvousDeviceDelegate::OnRendezvousComplete()
+{
+    ESP_LOGI(TAG, "Device completed Rendezvous process\n");
+    if (mRendezvousSession->GetLocalNodeId().HasValue() && mRendezvousSession->GetRemoteNodeId().HasValue())
+    {
+        PairingComplete(mRendezvousSession->GetLocalNodeId().Value(), mRendezvousSession->GetRemoteNodeId().Value(),
+                        &mRendezvousSession->GetPairingSession());
+    }
+    else
+    {
+        ESP_LOGI(TAG, "Commissioner did not assign a node ID to the device!!!\n");
     }
 }
 
@@ -66,13 +80,23 @@ void RendezvousDeviceDelegate::OnRendezvousStatusUpdate(RendezvousSessionDelegat
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
         ESP_LOGI(TAG, "Device completed SPAKE2+ handshake\n");
-        PairingComplete(&mRendezvousSession->GetPairingSession());
         bluetoothLED.Set(true);
+        break;
+
+    case RendezvousSessionDelegate::SecurePairingFailed:
+        ESP_LOGI(TAG, "Failed in SPAKE2+ handshake\n");
+        bluetoothLED.Set(false);
         break;
 
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
 
         ESP_LOGI(TAG, "Device was assigned an ip address\n");
+        bluetoothLED.Set(false);
+        break;
+
+    case RendezvousSessionDelegate::NetworkProvisioningFailed:
+
+        ESP_LOGI(TAG, "Failed in network provisioning\n");
         bluetoothLED.Set(false);
         break;
 

@@ -25,6 +25,7 @@
 
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
+#include <system/AutoFreePacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
@@ -34,20 +35,17 @@ namespace Transport {
 
 UDP::~UDP()
 {
-    if (mUDPEndPoint)
-    {
-        // Udp endpoint is only non null if udp endpoint is initialized and listening
-        mUDPEndPoint->Close();
-        mUDPEndPoint->Free();
-        mUDPEndPoint = nullptr;
-    }
+    Close();
 }
 
 CHIP_ERROR UDP::Init(UdpListenParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
+    if (mState != State::kNotReady)
+    {
+        Close();
+    }
 
     err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
@@ -78,9 +76,22 @@ exit:
     return err;
 }
 
-CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
-                            System::PacketBuffer * msgBuf)
+void UDP::Close()
 {
+    if (mUDPEndPoint)
+    {
+        // Udp endpoint is only non null if udp endpoint is initialized and listening
+        mUDPEndPoint->Close();
+        mUDPEndPoint->Free();
+        mUDPEndPoint = nullptr;
+    }
+    mState = State::kNotReady;
+}
+
+CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
+                            System::PacketBuffer * msgIn)
+{
+    System::AutoFreePacketBuffer msgBuf(msgIn);
     const uint16_t headerSize = header.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -105,17 +116,10 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFl
     // This is unexpected and means header changed while encoding
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err    = mUDPEndPoint->SendMsg(&addrInfo, msgBuf);
-    msgBuf = nullptr;
+    err = mUDPEndPoint->SendMsg(&addrInfo, msgBuf.Release());
     SuccessOrExit(err);
 
 exit:
-    if (msgBuf != nullptr)
-    {
-        System::PacketBuffer::Free(msgBuf);
-        msgBuf = nullptr;
-    }
-
     return err;
 }
 

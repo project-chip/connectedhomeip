@@ -20,6 +20,8 @@
 
 #include <platform/CHIPDeviceConfig.h>
 
+#if !CHIP_DEVICE_LAYER_NONE
+
 #include <ble/BleLayer.h>
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceError.h>
@@ -44,3 +46,5 @@ extern Inet::InetLayer InetLayer;
 
 } // namespace DeviceLayer
 } // namespace chip
+
+#endif // !CHIP_DEVICE_LAYER_NONE

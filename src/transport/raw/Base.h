@@ -82,6 +82,11 @@ public:
      */
     virtual void Disconnect(const PeerAddress & address) {}
 
+    /**
+     * Close the open endpoint without destroying the object
+     */
+    virtual void Close(){};
+
 protected:
     /**
      * Method used by subclasses to notify that a packet has been received after

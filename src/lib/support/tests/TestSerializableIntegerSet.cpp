@@ -63,7 +63,7 @@ void TestSerializableIntegerSet(nlTestSuite * inSuite, void * inContext)
     }
 
     set.Remove(8);
-    NL_TEST_ASSERT(inSuite, set.SerializedSize() == 0);
+    NL_TEST_ASSERT(inSuite, set.SerializedSize() == CHIP_MAX_SERIALIZED_SIZE_U64(0));
 }
 
 void TestSerializableIntegerSetNonZero(nlTestSuite * inSuite, void * inContext)
@@ -109,7 +109,7 @@ void TestSerializableIntegerSetNonZero(nlTestSuite * inSuite, void * inContext)
     }
 
     set.Remove(7);
-    NL_TEST_ASSERT(inSuite, set.SerializedSize() == 0);
+    NL_TEST_ASSERT(inSuite, set.SerializedSize() == CHIP_MAX_SERIALIZED_SIZE_U64(0));
 }
 
 void TestSerializableIntegerSetSerialize(nlTestSuite * inSuite, void * inContext)
@@ -182,4 +182,4 @@ int TestSerializableIntegerSet(void)
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestBufBound)
+CHIP_REGISTER_TEST_SUITE(TestSerializableIntegerSet)

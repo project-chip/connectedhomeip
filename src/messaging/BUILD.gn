@@ -22,6 +22,7 @@ static_library("messaging") {
     "ErrorCategory.h",
     "ExchangeContext.cpp",
     "ExchangeContext.h",
+    "ExchangeDelegate.h",
     "ExchangeMgr.cpp",
     "ExchangeMgr.h",
     "Flags.h",

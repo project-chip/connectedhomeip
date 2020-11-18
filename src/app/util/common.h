@@ -39,8 +39,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef SILABS_COMMON_H
-#define SILABS_COMMON_H
+#pragma once
 
 // App framework
 #include "af.h"
@@ -53,6 +52,4 @@
 extern EmberApsFrame emberAfResponseApsFrame;
 extern uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 extern uint16_t appResponseLength;
-extern ChipNodeId emberAfResponseDestination;
-
-#endif // SILABS_COMMON_H
+extern chip::NodeId emberAfResponseDestination;

@@ -38,12 +38,4 @@
  *                          frame.
  * @param[in] message The message to send after the APS frame.
  */
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
-EmberStatus chipSendUnicast(ChipNodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
+EmberStatus chipSendUnicast(chip::NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);

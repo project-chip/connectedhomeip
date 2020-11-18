@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import chip.devicecontroller.ChipCommandType
 import chip.devicecontroller.ChipDeviceController
+import chip.devicecontroller.ChipDeviceControllerException
 import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
@@ -93,7 +94,11 @@ class OnOffClientFragment : Fragment() {
     commandStatusTv.text =
         requireContext().getString(R.string.send_command_type_label_text, chipCommandType.name)
 
-    deviceController.beginSendCommand(commandType)
+    try {
+      deviceController.beginSendCommand(commandType)
+    } catch (e: ChipDeviceControllerException) {
+      commandStatusTv.text = e.toString()
+    }
   }
 
   companion object {

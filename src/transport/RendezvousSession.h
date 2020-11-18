@@ -91,6 +91,9 @@ public:
      */
     SecurePairingSession & GetPairingSession() { return mPairingSession; }
 
+    Optional<NodeId> GetLocalNodeId() const { return mParams.GetLocalNodeId(); }
+    Optional<NodeId> GetRemoteNodeId() const { return mParams.GetRemoteNodeId(); }
+
     //////////// SecurePairingSessionDelegate Implementation ///////////////
     CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags, System::PacketBuffer * msgBuf) override;
     void OnPairingError(CHIP_ERROR err) override;
@@ -138,7 +141,7 @@ private:
     uint16_t mNextKeyId          = 0;
 
     RendezvousSession::State mCurrentState = State::kInit;
-    void UpdateState(RendezvousSession::State newState);
+    void UpdateState(RendezvousSession::State newState, CHIP_ERROR err = CHIP_NO_ERROR);
 };
 
 } // namespace chip

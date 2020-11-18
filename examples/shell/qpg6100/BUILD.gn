@@ -21,7 +21,6 @@ import("${qpg6100_sdk_build_root}/qpg6100_sdk.gni")
 assert(current_os == "freertos")
 
 examples_plat_dir = "${chip_root}/examples/platform/qpg6100"
-project_dir = "${chip_root}/examples/shell"
 
 qpg6100_sdk("sdk") {
   include_dirs = [
@@ -61,7 +60,6 @@ qpg6100_executable("shell_qpg6100") {
   sources = [
     "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
     "${examples_plat_dir}/util/streamer/streamer_qpg6100.cpp",
-    "${project_dir}/test_identity.cpp",
     "main.cpp",
   ]
 

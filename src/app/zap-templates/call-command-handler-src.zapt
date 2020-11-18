@@ -1,0 +1,129 @@
+{{chip_header}}
+
+#include <stdint.h>
+
+#include "af-structs.h"
+#include "call-command-handler.h"
+#include "callback.h"
+#include "command-id.h"
+#include "util.h"
+
+using namespace chip;
+
+{{#all_user_clusters}}
+{{#if (isEnabled enabled)}}
+EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(EmberAfClusterCommand * cmd);
+{{/if}}
+{{/all_user_clusters}}
+
+
+static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
+{
+    if (wasHandled)
+    {
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+    else if (mfgSpecific)
+    {
+        return EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND;
+    }
+    else if (clusterExists)
+    {
+        return EMBER_ZCL_STATUS_UNSUP_COMMAND;
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
+    }
+}
+
+
+// Main command parsing controller.
+EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
+{
+    EmberAfStatus result = status(false, false, cmd->mfgSpecific);
+    if (cmd->direction == (uint8_t) ZCL_DIRECTION_SERVER_TO_CLIENT &&
+        emberAfContainsClientWithMfgCode(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId, cmd->mfgCode))
+    {
+        switch (cmd->apsFrame->clusterId)
+        {
+        {{#all_user_clusters}}
+        {{#if (isEnabled enabled)}}
+        {{#if (isClient side) }}
+        case ZCL_{{asDelimitedMacro define}}_ID :
+            result = emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(cmd);
+            break;
+        {{/if}}
+        {{/if}}
+        {{/all_user_clusters}}
+        default:
+            // Unrecognized cluster ID, error status will apply.
+            break;
+        }
+    }
+    else if (cmd->direction == (uint8_t) ZCL_DIRECTION_CLIENT_TO_SERVER &&
+             emberAfContainsServerWithMfgCode(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId, cmd->mfgCode))
+    {
+        switch (cmd->apsFrame->clusterId)
+        {
+        {{#all_user_clusters}}
+        {{#if (isEnabled enabled)}}
+        {{#unless (isClient  side) }}
+        case ZCL_{{asDelimitedMacro define}}_ID :
+            result = emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(cmd);
+            break;
+        {{/unless}}
+        {{/if}}
+        {{/all_user_clusters}}
+        default:
+            // Unrecognized cluster ID, error status will apply.
+            break;
+        }
+    }
+    return result;
+}
+
+// Cluster specific command parsing
+
+{{#all_user_clusters}}
+{{#if (isEnabled enabled)}}
+EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    if (!cmd->mfgSpecific)
+    {
+        switch (cmd->commandId)
+        {
+        {{#all_user_cluster_commands}}
+        {{#if (isStrEqual clusterName parent.name)}}
+        {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+        case ZCL_{{asDelimitedMacro name}}_COMMAND_ID: {
+            {{#if (zcl_command_arguments_count this.id)}}
+            uint32_t argOffset = 0;
+            {{#zcl_command_arguments}}
+            {{asUnderlyingType type}} * {{asSymbol label}} = ({{asUnderlyingType type}} *)(cmd->buffer + argOffset);
+            {{#unless (isLastElement index count)}}
+            argOffset+= sizeof({{asUnderlyingType type}});
+            {{/unless}}
+            {{/zcl_command_arguments}}
+
+            wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}} *{{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
+            {{else}}
+            wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback();
+            {{/if}}
+            break;
+        }
+        {{/if}}
+        {{/if}}
+        {{/all_user_cluster_commands}}
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+{{/if}}
+{{/all_user_clusters}}

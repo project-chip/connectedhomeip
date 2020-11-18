@@ -45,7 +45,7 @@
 
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
@@ -129,8 +129,8 @@ static chip::Inet::InetLayer sInetLayer;
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
 // knowing its id, because the ID can be learned on the first response that is received.
-chip::NodeId kLocalDeviceId  = 112233;
-chip::NodeId kRemoteDeviceId = 12344321;
+chip::NodeId kLocalDeviceId  = chip::kTestControllerNodeId;
+chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
 
 #if CONFIG_NETWORK_LAYER_BLE
 static BleLayer sBle;
@@ -178,7 +178,7 @@ CHIP_ERROR
 nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
                                                       const char * ssid, const char * password);
 CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
-                                                             chip::DeviceController::DevicePairingDelegate * pairingDelegate);
+                                                             chip::Controller::DevicePairingDelegate * pairingDelegate);
 
 #if CONFIG_NETWORK_LAYER_BLE
 CHIP_ERROR nl_Chip_DeviceController_ValidateBTP(chip::DeviceController::ChipDeviceController * devCtrl,
@@ -583,7 +583,7 @@ exit:
     return err;
 }
 CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
-                                                             chip::DeviceController::DevicePairingDelegate * pairingDelegate)
+                                                             chip::Controller::DevicePairingDelegate * pairingDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

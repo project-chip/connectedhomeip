@@ -44,8 +44,6 @@ using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-extern void startServer();
-
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
@@ -55,14 +53,6 @@ const char * TAG = "temperature-measurement-app";
 
 static DeviceCallbacks EchoCallbacks;
 RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
-namespace chip {
-namespace DeviceLayer {
-namespace Internal {
-const uint64_t TestDeviceId = kLocalNodeId; // For chip::DeviceLayer::GetDeviceId
-const uint64_t TestFabricId = 0;            // For chip::DeviceLayer::GetFabricId
-} // namespace Internal
-} // namespace DeviceLayer
-} // namespace chip
 
 namespace {
 
@@ -121,7 +111,6 @@ extern "C" void app_main()
     }
 
     InitDataModelHandler();
-    startServer();
 
     if (isRendezvousBLE())
     {
@@ -130,7 +119,7 @@ extern "C" void app_main()
     else if (isRendezvousBypassed())
     {
         ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
-        PairingComplete(&gTestPairing);
+        PairingComplete(chip::kTestDeviceNodeId, chip::kTestControllerNodeId, &gTestPairing);
     }
 
     // Run the UI Loop
