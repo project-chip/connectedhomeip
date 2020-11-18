@@ -79,16 +79,16 @@ void CHIPSetNextAvailableDeviceID(uint64_t id)
     return value;
 }
 
-- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value handler:(SendStatus)completionHandler
+- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value handler:(CHIPSendSetStatus)completionHandler
 {
     CHIPSetDomainValueForKey(kCHIPToolDefaultsDomain, key, value);
-    completionHandler(key, kCHIPSetKeyValue, [CHIPError errorForCHIPErrorCode:0]);
+    completionHandler(key, [CHIPError errorForCHIPErrorCode:0]);
 }
 
-- (void)CHIPDeleteKeyValue:(NSString *)key handler:(SendStatus)completionHandler
+- (void)CHIPDeleteKeyValue:(NSString *)key handler:(CHIPSendDeleteStatus)completionHandler
 {
     CHIPRemoveDomainValueForKey(kCHIPToolDefaultsDomain, key);
-    completionHandler(key, kCHIPDeleteKeyValue, [CHIPError errorForCHIPErrorCode:0]);
+    completionHandler(key, [CHIPError errorForCHIPErrorCode:0]);
 }
 
 @end
