@@ -92,11 +92,12 @@ template("chip_test_suite") {
       foreach(_test, invoker.test_sources) {
         _test_name = string_replace(_test, ".cpp", "")
 
-        _driver_name = "${root_gen_dir}/${_test_name}.GeneratedDriver.cpp"
+        _driver_name = "${root_gen_dir}/${_test_name}.driver.cpp"
 
         action("${_test_name}_generate_driver") {
           script = "${chip_root}/scripts/gen_test_driver.py"
 
+          inputs = [ _test ]
           outputs = [ _driver_name ]
           args = [
             "--input_file=" + rebase_path(_test, root_build_dir),
