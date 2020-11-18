@@ -17,10 +17,10 @@ import("//build_overrides/nlio.gni")
 
 config("app_config") {
   include_dirs = [
-    "gen",
     "util",
     ".",
     "${target_gen_dir}/include",
+    "${root_gen_dir}/zap/",
   ]
 }
 

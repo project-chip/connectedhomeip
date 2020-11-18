@@ -21,6 +21,37 @@ config("includes") {
   ]
 }
 
+action("all-clusters-common-gen") {
+  script = "//build/gn_run_binary.py"
+
+  sources = [
+    "${chip_root}/third_party/zap/repo/.version.json",
+  ]
+
+  args = [
+    "../../scripts/tools/zap_generate.sh",
+    "examples/all-clusters-app/all-clusters-common/all-clusters-app.zap",
+    "${root_gen_dir}/zap/gen/",
+  ]
+
+  outputs = [
+    "${root_gen_dir}/zap/gen/af-structs.h",
+    "${root_gen_dir}/zap/gen/att-storage.h",
+    "${root_gen_dir}/zap/gen/attribute-id.h",
+    "${root_gen_dir}/zap/gen/attribute-type.h",
+    "${root_gen_dir}/zap/gen/attribute-size.h",
+    "${root_gen_dir}/zap/gen/call-command-handler.cpp",
+    "${root_gen_dir}/zap/gen/call-command-handler.h",
+    "${root_gen_dir}/zap/gen/callback-stub.cpp",
+    "${root_gen_dir}/zap/gen/callback.h",
+    "${root_gen_dir}/zap/gen/cluster-id.h",
+    "${root_gen_dir}/zap/gen/command-id.h",
+    "${root_gen_dir}/zap/gen/enums.h",
+    "${root_gen_dir}/zap/gen/gen_config.h",
+    "${root_gen_dir}/zap/gen/print_cluster.h",
+  ]
+}
+
 source_set("all-clusters-common") {
   sources = [
     "${chip_root}/examples/common/chip-app-server/DataModelHandler.cpp",
@@ -55,14 +86,17 @@ source_set("all-clusters-common") {
     "${chip_root}/src/app/util/process-cluster-message.cpp",
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
-    "gen/call-command-handler.cpp",
-    "gen/callback-stub.cpp",
-    "gen/clusters-callback-stubs.cpp",
+    "${root_gen_dir}/zap/gen/call-command-handler.cpp",
+    "${root_gen_dir}/zap/gen/callback-stub.cpp",
   ]
 
   deps = [
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/src/lib",
+  ]
+
+  public_deps = [
+    ":all-clusters-common-gen",
   ]
 
   public_configs = [ ":includes" ]

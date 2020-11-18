@@ -16,9 +16,11 @@
 #    limitations under the License.
 #
 
+CHIP_ROOT=$(cd "$(dirname "$0")/../.." && pwd)
+
 # Retrieve absolute path of zap file
-OUTPUT_DIRECTORY=$(cd "$(dirname "$1")" && pwd)/gen/
-FILE_PATH=$(cd "$(dirname "$1")" && pwd)/$(basename "$1")
+FILE_PATH=$CHIP_ROOT/$1
+OUTPUT_DIRECTORY=$CHIP_ROOT/$2
 
 # Check if input file exist
 if [ ! -f "$FILE_PATH" ]; then
@@ -31,5 +33,5 @@ if [ ! -d "$OUTPUT_DIRECTORY" ]; then
     mkdir -p "$OUTPUT_DIRECTORY"
 fi
 
-cd ./third_party/zap/repo/
-node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ../../../src/app/zap-templates/chip-templates.json -i "$FILE_PATH" -o "$OUTPUT_DIRECTORY"
+cd $CHIP_ROOT/third_party/zap/repo/
+node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g $CHIP_ROOT/src/app/zap-templates/chip-templates.json -i "$FILE_PATH" -o "$OUTPUT_DIRECTORY"

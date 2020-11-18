@@ -4,16 +4,6 @@
     "helpers": ["helper-chip.js"],
     "templates": [
         {
-            "path": "Clusters.zapt",
-            "name": "CHIP Clusters header",
-            "output": "Clusters.h"
-        },
-        {
-            "path": "Clusters-src.zapt",
-            "name": "CHIP Clusters",
-            "output": "Clusters.cpp"
-        },
-        {
             "path": "af-structs.zapt",
             "name": "ZCL af-structs header",
             "output": "af-structs.h"
