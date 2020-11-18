@@ -47,7 +47,7 @@ using namespace ::chip::DeviceLayer;
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-extern void PairingComplete(SecurePairingSession * pairing);
+extern void PairingComplete(NodeId assignedNodeId, NodeId peerNodeId, SecurePairingSession * pairing);
 
 const char * TAG = "temperature-measurement-app";
 
