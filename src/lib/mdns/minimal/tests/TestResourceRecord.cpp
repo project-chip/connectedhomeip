@@ -141,10 +141,31 @@ void AppendMultiple(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
 }
 
+void WriteOrderCheck(nlTestSuite * inSuite, void * inContext)
+{
+    uint8_t headerBuffer[HeaderRef::kSizeBytes];
+    uint8_t dataBuffer[128];
+
+    HeaderRef header(headerBuffer);
+
+    BufBound output(dataBuffer, sizeof(dataBuffer));
+    FakeResourceRecord record("somedata");
+
+    header.Clear();
+    header.SetAuthorityCount(1);
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output) == false);
+
+    header.Clear();
+    header.SetAdditionalCount(1);
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output) == false);
+    NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAuthority, output) == false);
+}
+
 const nlTest sTests[] = {
-    NL_TEST_DEF("SimpleWrite", SimpleWrite),       //
-    NL_TEST_DEF("AppendMultiple", AppendMultiple), //
-    NL_TEST_SENTINEL()                             //
+    NL_TEST_DEF("SimpleWrite", SimpleWrite),         //
+    NL_TEST_DEF("AppendMultiple", AppendMultiple),   //
+    NL_TEST_DEF("WriteOrderCheck", WriteOrderCheck), //
+    NL_TEST_SENTINEL()                               //
 };
 
 } // namespace
