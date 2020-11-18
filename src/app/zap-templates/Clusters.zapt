@@ -1,0 +1,60 @@
+{{chip_header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+#include <app/clusters/CHIPCluster.h>
+#include <core/CHIPCallback.h>
+
+namespace chip {
+namespace Clusters {
+
+{{#all_user_clusters}}
+{{#if (isEnabled enabled)}}
+{{#if (isServer side)}}
+constexpr ClusterId k{{asCamelCased name false}}ClusterId = {{asHex code 4}};
+{{/if}}
+{{/if}}
+{{/all_user_clusters}}
+
+{{#all_user_clusters}}
+{{#if (isEnabled enabled)}}
+{{#if (isServer side) }}
+class DLL_EXPORT {{asCamelCased name false}}Cluster : public ClusterBase
+{
+public:
+    {{asCamelCased name false}}Cluster() : ClusterBase(k{{asCamelCased name false}}ClusterId) {}
+    ~{{asCamelCased name false}}Cluster() {}
+
+    // {{asCamelCased name false}} Cluster Commands
+    {{#all_user_cluster_commands}}
+    {{#if (isStrEqual clusterName parent.name)}}
+    {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+    CHIP_ERROR {{asCamelCased name false}}(Callback::Callback<>{{#zcl_command_arguments}}{{#first}},{{/first}} {{asUnderlyingType type}} {{asCamelCased name}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
+    {{/if}}
+    {{/if}}
+    {{/all_user_cluster_commands}}
+
+    // {{asCamelCased name false}} Cluster Attributes
+    {{#user_all_attributes}}
+    {{#if (isNumEqual clusterCode parent.code)}}
+    {{#if (isStrEqual side parent.side)}}
+    CHIP_ERROR ReadAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion);
+    {{#if (isNumEqual writable 1)}}
+    CHIP_ERROR WriteAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion, {{asUnderlyingType type}} value);
+    {{/if}}
+    {{#if (isNumEqual reportable.included 1)}}
+    CHIP_ERROR ReportAttribute{{asCamelCased name false}}(Callback::Callback<> * onChange, uint16_t minInterval, uint16_t maxInterval);
+    {{/if}}
+
+    {{/if}}
+    {{/if}}
+    {{/user_all_attributes}}
+};
+
+{{/if}}
+{{/if}}
+{{/all_user_clusters}}
+
+} // namespace Clusters
+} // namespace chip

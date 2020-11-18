@@ -1,0 +1,73 @@
+{{chip_header}}
+
+#include <app/chip-zcl-zpro-codec.api.h>
+#include <app/clusters/CHIPClusters.h>
+
+namespace chip {
+namespace Clusters {
+
+constexpr uint16_t kMaxMessageLength = 1024;
+
+{{#all_user_clusters}}
+{{#if (isEnabled enabled)}}
+{{#if (isServer side) }}
+// {{asCamelCased name false}} Cluster Commands
+{{#all_user_cluster_commands}}
+{{#if (isStrEqual clusterName parent.name)}}
+{{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::{{asCamelCased name false}}(Callback::Callback<> * onCompletion{{#zcl_command_arguments}}{{#first}},{{/first}} {{asUnderlyingType type}} {{asCamelCased name}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}})
+{
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    System::PacketBuffer * message = nullptr;
+    SEND_CLUSTER_COMMAND(err, mDevice, kMaxMessageLength, message,
+                         encode{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Command(message->Start(), message->AvailableDataLength(), mEndpoint{{#zcl_command_arguments}}{{#first}},{{/first}} {{asUnderlyingType type}} {{asCamelCased name}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}}), onCompletion);
+    return err;
+}
+
+{{/if}}
+{{/if}}
+{{/all_user_cluster_commands}}
+// {{asCamelCased name false}} Cluster Attributes
+{{#user_all_attributes}}
+{{#if (isNumEqual clusterCode parent.code)}}
+{{#if (isStrEqual side parent.side)}}
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion)
+{
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    System::PacketBuffer * message = nullptr;
+    SEND_CLUSTER_COMMAND(err, mDevice, kMaxMessageLength, message,
+                         encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(message->Start(), message->AvailableDataLength(), mEndpoint), onCompletion);
+    return err;
+}
+
+{{#if (isNumEqual writable 1)}}
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion, {{asUnderlyingType type}} value)
+{
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    System::PacketBuffer * message = nullptr;
+    SEND_CLUSTER_COMMAND(err, mDevice, kMaxMessageLength, message,
+                         encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(message->Start(), message->AvailableDataLength(), mEndpoint, {{asUnderlyingType type}} value), onChange);
+    return err;
+}
+
+{{/if}}
+{{#if (isNumEqual reportable.included 1)}}
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReportAttribute{{asCamelCased name false}}(Callback::Callback<> * onChange, uint16_t minInterval, uint16_t maxInterval)
+{
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
+    System::PacketBuffer * message = nullptr;
+    SEND_CLUSTER_COMMAND(err, mDevice, kMaxMessageLength, message,
+                         encode{{asCamelCased parent.name false}}ClusterReport{{asCamelCased name false}}Attribute(message->Start(), message->AvailableDataLength(), mEndpoint, minInterval, maxInterval), onChange);
+    return err;
+}
+
+{{/if}}
+{{/if}}
+{{/if}}
+{{/user_all_attributes}}
+{{/if}}
+{{/if}}
+{{/all_user_clusters}}
+
+} // namespace Clusters
+} // namespace chip

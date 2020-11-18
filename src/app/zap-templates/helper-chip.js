@@ -52,6 +52,8 @@ function isServer(side) { return 0 == side.localeCompare("server"); }
 
 function isStrEqual(str1, str2) { return 0 == str1.localeCompare(str2); }
 
+function isNumEqual(val1, val2) { return val1 == val2; }
+
 function isLastElement(index, count) { return index == count - 1; }
 
 function isEnabled(enable) { return 1 == enable; }
@@ -78,6 +80,7 @@ exports.chip_header = chip_header;
 exports.isClient = isClient;
 exports.isServer = isServer;
 exports.isStrEqual = isStrEqual;
+exports.isNumEqual = isNumEqual;
 exports.isLastElement = isLastElement;
 exports.isEnabled = isEnabled;
 exports.isCommandAvailable = isCommandAvailable;
