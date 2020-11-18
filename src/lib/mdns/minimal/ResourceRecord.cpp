@@ -46,7 +46,7 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, chip::BufBound
     out.PutBE16(static_cast<uint16_t>(GetType()));
     out.PutBE32(static_cast<uint32_t>(GetTtl()));
 
-    chip::BufBound sizeOutput(out);        /// copy to re-output size
+    chip::BufBound sizeOutput(out);        // copy to re-output size
     out.PutBE16(static_cast<uint32_t>(0)); // dummy, will be replaced later
 
     if (!WriteData(out))
