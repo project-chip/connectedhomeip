@@ -480,7 +480,9 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXCharWrite(const Chip
     ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX characteristic (ConnId 0x%02" PRIx16 ")",
                   bt_conn_index(c1WriteEvent->BtConn));
 
-    HandleWriteReceived(c1WriteEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX, c1WriteEvent->Data);
+    PacketBufferHandle data_ForNow;
+    data_ForNow.Adopt(c1WriteEvent->Data);
+    HandleWriteReceived(c1WriteEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX, std::move(data_ForNow));
     bt_conn_unref(c1WriteEvent->BtConn);
 
     return CHIP_NO_ERROR;
