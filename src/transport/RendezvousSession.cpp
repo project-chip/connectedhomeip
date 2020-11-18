@@ -51,7 +51,6 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     mTransportMgr = transportMgr;
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mParams.HasSetupPINCode(), err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mTransportMgr != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // TODO: BLE Should be a transport, in that case, RendezvousSession and BLE should decouple
     if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
@@ -75,7 +74,11 @@ CHIP_ERROR RendezvousSession::Init(const RendezvousParameters & params, Transpor
     }
 
     mNetworkProvision.Init(this);
-    mTransportMgr->SetRendezvousSession(this);
+    // TODO: We should assmue mTransportMgr not null for IP rendezvous.
+    if (mTransportMgr != nullptr)
+    {
+        mTransportMgr->SetRendezvousSession(this);
+    }
 
 exit:
     return err;
@@ -102,7 +105,20 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, He
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
-    return mTransport->SendMessage(header, payloadFlags, peerAddress, msgBuf.Release());
+    if (peerAddress.GetTransportType() == Transport::Type::kBle)
+    {
+
+        return mTransport->SendMessage(header, payloadFlags, peerAddress, msgBuf.Release());
+    }
+    else if (mTransportMgr != nullptr)
+    {
+        return mTransportMgr->SendMessage(header, payloadFlags, peerAddress, msgBuf.Release());
+    }
+    else
+    {
+        ChipLogError(Ble, "SendPairingMessage dropped since no transport mgr for IP rendezvous");
+        return CHIP_ERROR_INVALID_ADDRESS;
+    }
 }
 
 CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgIn)
