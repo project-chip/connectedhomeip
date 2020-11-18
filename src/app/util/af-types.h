@@ -84,15 +84,9 @@ typedef void (*EmberAfGenericClusterFunction)(void);
 
 /**
  * @brief A distinguished manufacturer code that is used to indicate the
- * absence of a manufacturer-specific profile, cluster, command, or attribute.
+ * absence of a manufacturer-specific cluster, command, or attribute.
  */
 #define EMBER_AF_NULL_MANUFACTURER_CODE 0x0000
-
-/**
- * @brief An invalid profile ID
- * This is a reserved profileId.
- */
-#define EMBER_AF_INVALID_PROFILE_ID 0xFFFF
 
 /**
  * @brief Type for default values.
@@ -169,7 +163,7 @@ typedef struct
     /**
      * Attribute ID, according to ZCL specs.
      */
-    EmberAfAttributeId attributeId;
+    chip::AttributeId attributeId;
     /**
      * Attribute type, according to ZCL specs.
      */
@@ -199,7 +193,7 @@ typedef struct
     /**
      *  ID of cluster according to ZCL spec
      */
-    EmberAfClusterId clusterId;
+    chip::ClusterId clusterId;
     /**
      * Pointer to attribute metadata array for this cluster.
      */
@@ -236,7 +230,7 @@ typedef struct
     /**
      * Endpoint that the attribute is located on
      */
-    CHIPEndpointId endpoint;
+    chip::EndpointId endpoint;
 
     /**
      * Cluster that the attribute is located on. If the cluster
@@ -244,7 +238,7 @@ typedef struct
      * The manufacturer code should also be set to the code associated
      * with the manufacturer specific cluster.
      */
-    EmberAfClusterId clusterId;
+    chip::ClusterId clusterId;
 
     /**
      * Cluster mask for the cluster, used to determine if it is
@@ -258,7 +252,7 @@ typedef struct
      * inside the manufacturer specific range 0xfc00 - 0xffff, or the manufacturer
      * code is NOT 0, the attribute is assumed to be manufacturer specific.
      */
-    EmberAfAttributeId attributeId;
+    chip::AttributeId attributeId;
 
     /**
      * Manufacturer Code associated with the cluster and or attribute.
@@ -387,13 +381,12 @@ typedef struct
     /**
      * APS data
      */
-    EmberAfProfileId profileId;
-    EmberAfClusterId clusterId;
+    chip::ClusterId clusterId;
     /**
      * The groupId is only used for
      * EMBER_AF_INTERPAN_MULTICAST
      */
-    EmberMulticastId groupId;
+    chip::GroupId groupId;
     EmberAfInterpanOptions options;
 } EmberAfInterpanHeader;
 
@@ -417,9 +410,8 @@ typedef uint8_t EmberAfAllowedInterpanOptions;
  */
 typedef struct
 {
-    EmberAfProfileId profileId;
-    EmberAfClusterId clusterId;
-    uint8_t commandId;
+    chip::ClusterId clusterId;
+    chip::CommandId commandId;
     EmberAfAllowedInterpanOptions options;
 } EmberAfAllowedInterPanMessage;
 
@@ -438,14 +430,14 @@ typedef struct
      */
     EmberApsFrame * apsFrame;
     EmberIncomingMessageType type;
-    ChipNodeId source;
+    chip::NodeId source;
     uint8_t * buffer;
     uint16_t bufLen;
     bool clusterSpecific;
     bool mfgSpecific;
     uint16_t mfgCode;
     uint8_t seqNum;
-    CHIPCommandId commandId;
+    chip::CommandId commandId;
     uint8_t payloadStartIndex;
     uint8_t direction;
     EmberAfInterpanHeader * interPanHeader;
@@ -506,11 +498,7 @@ typedef struct
     /**
      * Actual zigbee endpoint number.
      */
-    CHIPEndpointId endpoint;
-    /**
-     * Profile ID of the device on this endpoint.
-     */
-    EmberAfProfileId profileId;
+    chip::EndpointId endpoint;
     /**
      * Device ID of the device on this endpoint.
      */
@@ -560,14 +548,14 @@ typedef struct
     uint32_t eventId;
 #ifdef EMBER_AF_PLUGIN_DRLC_SERVER
     EmberEUI64 source;
-    CHIPEndpointId sourceEndpoint;
+    chip::EndpointId sourceEndpoint;
 #endif // EMBER_AF_PLUGIN_DRLC_SERVER
 
 #ifdef EMBER_AF_PLUGIN_DRLC
     EmberAfPluginEsiManagementBitmask esiBitmask;
 #endif // EMBER_AF_PLUGIN_DRLC
 
-    CHIPEndpointId destinationEndpoint;
+    chip::EndpointId destinationEndpoint;
     uint16_t deviceClass;
     uint8_t utilityEnrollmentGroup;
     /**
@@ -662,7 +650,7 @@ typedef struct
 typedef struct
 {
     uint8_t count;
-    const CHIPEndpointId * list;
+    const chip::EndpointId * list;
 } EmberAfEndpointList;
 
 /**
@@ -672,12 +660,11 @@ typedef struct
 typedef struct
 {
     uint8_t inClusterCount;
-    const CHIPClusterId * inClusterList;
+    const chip::ClusterId * inClusterList;
     uint8_t outClusterCount;
-    const CHIPClusterId * outClusterList;
-    EmberAfProfileId profileId;
+    const chip::ClusterId * outClusterList;
     uint16_t deviceId;
-    CHIPEndpointId endpoint;
+    chip::EndpointId endpoint;
 } EmberAfClusterList;
 
 /**
@@ -799,11 +786,11 @@ typedef struct
     /**
      * The endpoint of the associated cluster event.
      */
-    CHIPEndpointId endpoint;
+    chip::EndpointId endpoint;
     /**
      * The cluster id of the associated cluster event.
      */
-    EmberAfClusterId clusterId;
+    chip::ClusterId clusterId;
     /**
      * The server/client identity of the associated cluster event.
      */
@@ -833,7 +820,7 @@ typedef void (*EmberAfNetworkEventHandler)(void);
 /**
  * @brief Type for referring to the handler for endpoint events.
  */
-typedef void (*EmberAfEndpointEventHandler)(CHIPEndpointId endpoint);
+typedef void (*EmberAfEndpointEventHandler)(chip::EndpointId endpoint);
 
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
 /**
@@ -856,8 +843,8 @@ typedef void (*EmberAfEndpointEventHandler)(CHIPEndpointId endpoint);
  */
 typedef struct
 {
-    CHIPEndpointId endpoint; // 0x00 when not in use
-    CHIPGroupId groupId;
+    chip::EndpointId endpoint; // 0x00 when not in use
+    chip::GroupId groupId;
     uint8_t bindingIndex;
 #ifdef EMBER_AF_PLUGIN_GROUPS_SERVER_NAME_SUPPORT
     uint8_t name[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1];
@@ -893,8 +880,8 @@ typedef struct
  */
 typedef struct
 {
-    CHIPEndpointId endpoint; // 0x00 when this record is not in use
-    CHIPGroupId groupId;     // 0x0000 if not associated with a group
+    chip::EndpointId endpoint; // 0x00 when this record is not in use
+    chip::GroupId groupId;     // 0x0000 if not associated with a group
     uint8_t sceneId;
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
     uint8_t name[ZCL_SCENES_CLUSTER_MAXIMUM_NAME_LENGTH + 1];
@@ -959,7 +946,7 @@ typedef struct
     bool valid;
     bool active;
     EmberAfPluginEsiManagementBitmask esiBitmask;
-    CHIPEndpointId clientEndpoint;
+    chip::EndpointId clientEndpoint;
     uint32_t messageId;
     uint8_t messageControl;
     uint32_t startTime;
@@ -973,7 +960,7 @@ typedef struct
 {
     bool valid;
     bool active;
-    CHIPEndpointId clientEndpoint;
+    chip::EndpointId clientEndpoint;
     uint32_t providerId;
     uint8_t rateLabel[ZCL_PRICE_CLUSTER_MAXIMUM_RATE_LABEL_LENGTH + 1];
     uint32_t issuerEventId;
@@ -1034,11 +1021,11 @@ typedef struct
      * report is received.  If ::EMBER_AF_PLUGIN_REPORTING_UNUSED_ENDPOINT_ID,
      * the entry is unused.
      */
-    CHIPEndpointId endpoint;
+    chip::EndpointId endpoint;
     /** The cluster where the attribute is located. */
-    EmberAfClusterId clusterId;
+    chip::ClusterId clusterId;
     /** The id of the attribute being reported or received. */
-    EmberAfAttributeId attributeId;
+    chip::AttributeId attributeId;
     /** CLUSTER_MASK_SERVER for server-side attributes or CLUSTER_MASK_CLIENT for
      *  client-side attributes.
      */
@@ -1066,9 +1053,9 @@ typedef struct
         struct
         {
             /** The node id of the source of the received reports. */
-            ChipNodeId source;
+            chip::NodeId source;
             /** The remote endpoint from which the attribute is reported. */
-            CHIPEndpointId endpoint;
+            chip::EndpointId endpoint;
             /** The maximum expected time between reports, measured in seconds. */
             uint16_t timeout;
         } received;
@@ -1121,7 +1108,7 @@ enum
  */
 typedef struct
 {
-    EmberMulticastId groupId;
+    chip::GroupId groupId;
     uint8_t groupType;
 } EmberAfPluginZllCommissioningGroupInformationRecord;
 
@@ -1132,8 +1119,7 @@ typedef struct
 typedef struct
 {
     EmberNodeId networkAddress;
-    CHIPEndpointId endpointId;
-    uint16_t profileId;
+    chip::EndpointId endpointId;
     uint16_t deviceId;
     uint8_t version;
 } EmberAfPluginZllCommissioningEndpointInformationRecord;
@@ -1210,7 +1196,7 @@ typedef enum
  * the cluster. The rate of tick is determined by the metadata of the
  * cluster.
  */
-typedef void (*EmberAfTickFunction)(CHIPEndpointId endpoint);
+typedef void (*EmberAfTickFunction)(chip::EndpointId endpoint);
 
 /**
  * @brief Type for referring to the init callback for cluster.
@@ -1218,14 +1204,14 @@ typedef void (*EmberAfTickFunction)(CHIPEndpointId endpoint);
  * Init function is called when the application starts up, once for
  * each cluster/endpoint combination.
  */
-typedef void (*EmberAfInitFunction)(CHIPEndpointId endpoint);
+typedef void (*EmberAfInitFunction)(chip::EndpointId endpoint);
 
 /**
  * @brief Type for referring to the attribute changed callback function.
  *
  * This function is called just after an attribute changes.
  */
-typedef void (*EmberAfClusterAttributeChangedCallback)(CHIPEndpointId endpoint, EmberAfAttributeId attributeId);
+typedef void (*EmberAfClusterAttributeChangedCallback)(chip::EndpointId endpoint, chip::AttributeId attributeId);
 
 /**
  * @brief Type for referring to the manufacturer specific
@@ -1233,7 +1219,7 @@ typedef void (*EmberAfClusterAttributeChangedCallback)(CHIPEndpointId endpoint, 
  *
  * This function is called just after a manufacturer specific attribute changes.
  */
-typedef void (*EmberAfManufacturerSpecificClusterAttributeChangedCallback)(CHIPEndpointId endpoint, EmberAfAttributeId attributeId,
+typedef void (*EmberAfManufacturerSpecificClusterAttributeChangedCallback)(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                            uint16_t manufacturerCode);
 
 /**
@@ -1241,7 +1227,7 @@ typedef void (*EmberAfManufacturerSpecificClusterAttributeChangedCallback)(CHIPE
  *
  * This function is called before an attribute changes.
  */
-typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(CHIPEndpointId endpoint, EmberAfAttributeId attributeId,
+typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(chip::EndpointId endpoint, chip::AttributeId attributeId,
                                                                    EmberAfAttributeType attributeType, uint8_t size,
                                                                    uint8_t * value);
 
@@ -1251,7 +1237,7 @@ typedef EmberAfStatus (*EmberAfClusterPreAttributeChangedCallback)(CHIPEndpointI
  * This function is called when default response is received, before
  * the global callback. Global callback is called immediately afterwards.
  */
-typedef void (*EmberAfDefaultResponseFunction)(CHIPEndpointId endpoint, uint8_t commandId, EmberAfStatus status);
+typedef void (*EmberAfDefaultResponseFunction)(chip::EndpointId endpoint, chip::CommandId commandId, EmberAfStatus status);
 
 /**
  * @brief Type for referring to the message sent callback function.
@@ -1338,7 +1324,7 @@ typedef struct
 typedef struct
 {
     uint16_t clusterId;
-    uint8_t commandId;
+    chip::CommandId commandId;
     uint8_t mask;
 } EmberAfCommandMetadata;
 
@@ -1633,10 +1619,9 @@ typedef uint16_t EmberAfRemoteClusterType;
  */
 typedef struct
 {
-    EmberAfClusterId clusterId;
-    EmberAfProfileId profileId;
+    chip::ClusterId clusterId;
     uint16_t deviceId;
-    CHIPEndpointId endpoint;
+    chip::EndpointId endpoint;
     EmberAfRemoteClusterType type;
 } EmberAfRemoteClusterStruct;
 
@@ -1646,16 +1631,16 @@ typedef struct
 typedef struct
 {
     EmberEUI64 targetEUI64;
-    CHIPEndpointId sourceEndpoint;
-    CHIPEndpointId destEndpoint;
-    CHIPClusterId clusterId;
+    chip::EndpointId sourceEndpoint;
+    chip::EndpointId destEndpoint;
+    chip::ClusterId clusterId;
     EmberEUI64 destEUI64;
     EmberEUI64 sourceEUI64;
 } EmberAfRemoteBindingStruct;
 
 typedef struct
 {
-    EmberAfClusterId clusterId;
+    chip::ClusterId clusterId;
     bool server;
 } EmberAfClusterInfo;
 
@@ -1669,9 +1654,8 @@ typedef struct
 typedef struct
 {
     EmberAfClusterInfo clusters[EMBER_AF_MAX_CLUSTERS_PER_ENDPOINT];
-    EmberAfProfileId profileId;
     uint16_t deviceId;
-    CHIPEndpointId endpoint;
+    chip::EndpointId endpoint;
     uint8_t clusterCount;
 } EmberAfEndpointInfoStruct;
 

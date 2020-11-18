@@ -91,7 +91,8 @@
  *            copied as is to the destination buffer. The length is not
  *            included.
  */
-uint16_t emberAfFillExternalBuffer(uint8_t frameControl, EmberAfClusterId clusterId, uint8_t commandId, const char * format, ...);
+uint16_t emberAfFillExternalBuffer(uint8_t frameControl, chip::ClusterId clusterId, chip::CommandId commandId, const char * format,
+                                   ...);
 
 /**
  * @brief Function that fills in the buffer with manufacturer-specific command.
@@ -135,8 +136,8 @@ uint16_t emberAfFillExternalBuffer(uint8_t frameControl, EmberAfClusterId cluste
  *            copied as is to the destination buffer. The length is not
  *            included.
  */
-uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl, EmberAfClusterId clusterId, uint16_t manufacturerCode,
-                                                       uint8_t commandId, const char * format, ...);
+uint16_t emberAfFillExternalManufacturerSpecificBuffer(uint8_t frameControl, chip::ClusterId clusterId, uint16_t manufacturerCode,
+                                                       chip::CommandId commandId, const char * format, ...);
 
 /**
  * @brief Function that registers the buffer to use with the fill function.
@@ -156,7 +157,8 @@ void emberAfSetExternalBuffer(uint8_t * buffer, uint16_t bufferLen, uint16_t * r
  * Used internally by emberAfFillExternalBuffer, but can be used
  * for generic buffer filling.
  */
-uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameControl, uint8_t commandId, const char * format, ...);
+uint16_t emberAfFillBuffer(uint8_t * buffer, uint16_t bufferLen, uint8_t frameControl, chip::CommandId commandId,
+                           const char * format, ...);
 
 #if !defined(DOXYGEN_SHOULD_SKIP_THIS)
 // The buffer used for filling ZCL Messages.

@@ -32,7 +32,7 @@
  * @param endpoint The endpoint.  Ver.: always
  * @param identityTime  Ver.: always
  */
-bool emberAfPluginIdentifyStartFeedbackCallback(CHIPEndpointId endpoint, uint16_t identifyTime);
+bool emberAfPluginIdentifyStartFeedbackCallback(chip::EndpointId endpoint, uint16_t identifyTime);
 
 /** @brief Stop Feedback.
  *
@@ -42,4 +42,4 @@ bool emberAfPluginIdentifyStartFeedbackCallback(CHIPEndpointId endpoint, uint16_
  *
  * @param endpoint The endpoint.  Ver.: always
  */
-bool emberAfPluginIdentifyStopFeedbackCallback(CHIPEndpointId endpoint);
+bool emberAfPluginIdentifyStopFeedbackCallback(chip::EndpointId endpoint);

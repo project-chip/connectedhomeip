@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -15,20 +15,22 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the CHIP Transport Layer Message header unit
- *      tests.
- *
- */
+#ifndef CHIP_DEVICE_INTERNAL_H
+#define CHIP_DEVICE_INTERNAL_H
 
-#include "TestRawTransportLayer.h"
+#import "CHIPDevice.h"
+#import <Foundation/Foundation.h>
 
-#include <nlunit-test.h>
+#include <controller/CHIPDevice.h>
 
-int main()
-{
-    nlTestSetOutputStyle(OUTPUT_CSV);
-    return TestMessageHeader();
-}
+NS_ASSUME_NONNULL_BEGIN
+
+@interface CHIPDevice ()
+
+- (instancetype)initWithDevice:(chip::Controller::Device *)device;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+#endif /* CHIP_DEVICE_INTERNAL_H */

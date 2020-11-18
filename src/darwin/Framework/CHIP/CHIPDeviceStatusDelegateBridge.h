@@ -1,5 +1,4 @@
-
-/*
+/**
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -16,14 +15,28 @@
  *    limitations under the License.
  */
 
-#pragma once
+#import "CHIPDeviceStatusDelegate.h"
+#import <Foundation/Foundation.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <controller/CHIPDevice.h>
 
-int TestQName();
+NS_ASSUME_NONNULL_BEGIN
 
-#ifdef __cplusplus
-}
-#endif
+class CHIPDeviceStatusDelegateBridge : public chip::Controller::DeviceStatusDelegate
+{
+public:
+    CHIPDeviceStatusDelegateBridge();
+    ~CHIPDeviceStatusDelegateBridge();
+
+    void setDelegate(id<CHIPDeviceStatusDelegate> delegate, dispatch_queue_t queue);
+
+    void OnMessage(chip::System::PacketBuffer * message) override;
+
+    void OnStatusChange() override;
+
+private:
+    id<CHIPDeviceStatusDelegate> mDelegate;
+    dispatch_queue_t mQueue;
+};
+
+NS_ASSUME_NONNULL_END

@@ -47,19 +47,8 @@
 
 #include "basic-types.h"
 
-/**
- * Try to use our chip::NodeId definition if we are C++; otherwise define a
- * ChipNodeId that's compatible.
- */
-#ifdef __cplusplus
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
-// Make it easier to have unified function declarations across C and C++ source
-// files.
-typedef chip::NodeId ChipNodeId;
-#else
-typedef uint64_t ChipNodeId;
-#endif // __cplusplus
 
 #include "gen/gen_config.h"
 
@@ -414,8 +403,6 @@ enum
 
 typedef struct
 {
-    /** Identifies the endpoint's application profile. */
-    uint16_t profileId;
     /** The endpoint's device ID within the application profile. */
     uint16_t deviceId;
     /** The endpoint's device version. */
@@ -540,7 +527,7 @@ typedef struct
     /** The type of binding. */
     EmberBindingType type;
     /** The endpoint on the local node. */
-    CHIPEndpointId local;
+    chip::EndpointId local;
     /** A cluster ID that matches one from the local endpoint's simple descriptor.
      * This cluster ID is set by the provisioning application to indicate which
      * part an endpoint's functionality is bound to this particular remote node
@@ -548,18 +535,18 @@ typedef struct
      * that a binding can be used to to send messages with any cluster ID, not
      * just that listed in the binding.
      */
-    CHIPClusterId clusterId;
+    chip::ClusterId clusterId;
     /** The endpoint on the remote node (specified by \c identifier). */
-    CHIPEndpointId remote;
+    chip::EndpointId remote;
     /** A 64-bit destination identifier.  This is either:
-     * - The destination ChipNodeId, for unicasts.
+     * - The destination chip::NodeId, for unicasts.
      * - A multicast ChipGroupId, for multicasts.
      * Which one is being used depends on the type of this binding.
      */
     union
     {
-        ChipNodeId nodeId;
-        CHIPGroupId groupId;
+        chip::NodeId nodeId;
+        chip::GroupId groupId;
     };
     /** The index of the network the binding belongs to. */
     uint8_t networkIndex;
@@ -749,16 +736,6 @@ typedef struct
     uint8_t power;
     uint8_t timeout;
 } EmberChildData;
-
-/**
- * @brief The profile ID used to address all the public profiles.
- */
-#define EMBER_WILDCARD_PROFILE_ID 0xFFFF
-
-/**
- * @brief The maximum value for a profile ID in the standard profile range.
- */
-#define EMBER_MAXIMUM_STANDARD_PROFILE_ID 0x7FFF
 
 /**
  * @brief A distinguished network ID that will never be assigned

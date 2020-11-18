@@ -45,15 +45,7 @@
 //#include "hal/hal.h"
 //#include EMBER_AF_API_NETWORK_STEERING
 
-/** @brief On/off Cluster Server Post Init
- *
- * Following resolution of the On/Off state at startup for this endpoint,
- * perform any additional initialization needed; e.g., synchronize hardware
- * state.
- *
- * @param endpoint Endpoint that is being initialized  Ver.: always
- */
-void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint) {}
+using namespace chip;
 
 /** @brief Add To Current App Tasks
  *
@@ -101,8 +93,8 @@ void emberAfAddToCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
  * @param value   Ver.: always
  * @param type   Ver.: always
  */
-EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_t endpoint, EmberAfClusterId clusterId,
-                                                                          EmberAfAttributeId attributeId, uint8_t mask,
+EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(EndpointId endpoint, ClusterId clusterId,
+                                                                          AttributeId attributeId, uint8_t mask,
                                                                           uint16_t manufacturerCode, uint8_t * value, uint8_t type)
 {
     return EMBER_ZCL_ATTRIBUTE_WRITE_PERMISSION_ALLOW_WRITE_NORMAL; // Default
@@ -118,8 +110,8 @@ EmberAfAttributeWritePermission emberAfAllowNetworkWriteAttributeCallback(uint8_
  * @param manufacturerCode   Ver.: always
  * @param attributeId   Ver.: always
  */
-bool emberAfAttributeReadAccessCallback(uint8_t endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode,
-                                        uint16_t attributeId)
+bool emberAfAttributeReadAccessCallback(EndpointId endpoint, ClusterId clusterId, uint16_t manufacturerCode,
+                                        AttributeId attributeId)
 {
     return true;
 }
@@ -134,8 +126,8 @@ bool emberAfAttributeReadAccessCallback(uint8_t endpoint, EmberAfClusterId clust
  * @param manufacturerCode   Ver.: always
  * @param attributeId   Ver.: always
  */
-bool emberAfAttributeWriteAccessCallback(uint8_t endpoint, EmberAfClusterId clusterId, uint16_t manufacturerCode,
-                                         uint16_t attributeId)
+bool emberAfAttributeWriteAccessCallback(EndpointId endpoint, ClusterId clusterId, uint16_t manufacturerCode,
+                                         AttributeId attributeId)
 {
     return true;
 }
@@ -164,7 +156,7 @@ bool emberAfKeyEstablishmentClusterClientCommandReceivedCallback(EmberAfClusterC
  * @param endpoint   Ver.: always
  * @param clusterId   Ver.: always
  */
-void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId) {}
+void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId) {}
 
 /** @brief Default Response
  *
@@ -178,7 +170,7 @@ void emberAfClusterInitCallback(uint8_t endpoint, EmberAfClusterId clusterId) {}
  * @param status Specifies either SUCCESS or the nature of the error that was
  * detected in the received command.  Ver.: always
  */
-bool emberAfDefaultResponseCallback(EmberAfClusterId clusterId, uint8_t commandId, EmberAfStatus status)
+bool emberAfDefaultResponseCallback(ClusterId clusterId, CommandId commandId, EmberAfStatus status)
 {
     return false;
 }
@@ -203,8 +195,8 @@ bool emberAfDefaultResponseCallback(EmberAfClusterId clusterId, uint8_t commandI
  * @param extended Indicates whether the response is in the extended format or
  * not.  Ver.: always
  */
-bool emberAfDiscoverAttributesResponseCallback(EmberAfClusterId clusterId, bool discoveryComplete, uint8_t * buffer,
-                                               uint16_t bufLen, bool extended)
+bool emberAfDiscoverAttributesResponseCallback(ClusterId clusterId, bool discoveryComplete, uint8_t * buffer, uint16_t bufLen,
+                                               bool extended)
 {
     return false;
 }
@@ -223,8 +215,8 @@ bool emberAfDiscoverAttributesResponseCallback(EmberAfClusterId clusterId, bool 
  * @param commandIdCount The length of bytes of the list, whish is the same as
  * the number of identifiers.  Ver.: always
  */
-bool emberAfDiscoverCommandsGeneratedResponseCallback(EmberAfClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
-                                                      uint8_t * commandIds, uint16_t commandIdCount)
+bool emberAfDiscoverCommandsGeneratedResponseCallback(ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
+                                                      CommandId * commandIds, uint16_t commandIdCount)
 {
     return false;
 }
@@ -243,8 +235,8 @@ bool emberAfDiscoverCommandsGeneratedResponseCallback(EmberAfClusterId clusterId
  * @param commandIdCount The length of bytes of the list, whish is the same as
  * the number of identifiers.  Ver.: always
  */
-bool emberAfDiscoverCommandsReceivedResponseCallback(EmberAfClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
-                                                     uint8_t * commandIds, uint16_t commandIdCount)
+bool emberAfDiscoverCommandsReceivedResponseCallback(ClusterId clusterId, uint16_t manufacturerCode, bool discoveryComplete,
+                                                     CommandId * commandIds, uint16_t commandIdCount)
 {
     return false;
 }
@@ -309,7 +301,7 @@ void emberAfEepromShutdownCallback(void) {}
  * @param buffer   Ver.: always
  * @param maxReadLength   Ver.: always
  */
-EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+EmberAfStatus emberAfExternalAttributeReadCallback(EndpointId endpoint, ClusterId clusterId,
                                                    EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                    uint8_t * buffer, uint16_t maxReadLength)
 {
@@ -362,7 +354,7 @@ EmberAfStatus emberAfExternalAttributeReadCallback(uint8_t endpoint, EmberAfClus
  * @param manufacturerCode   Ver.: always
  * @param buffer   Ver.: always
  */
-EmberAfStatus emberAfExternalAttributeWriteCallback(uint8_t endpoint, EmberAfClusterId clusterId,
+EmberAfStatus emberAfExternalAttributeWriteCallback(EndpointId endpoint, ClusterId clusterId,
                                                     EmberAfAttributeMetadata * attributeMetadata, uint16_t manufacturerCode,
                                                     uint8_t * buffer)
 {
@@ -522,7 +514,7 @@ bool emberAfGetEndpointByIndexCallback(uint8_t index, uint8_t * endpointReturn)
  * information is written if the callback is providing the information.  Ver.:
  * always
  */
-bool emberAfGetEndpointDescriptionCallback(uint8_t endpoint, EmberEndpointDescription * result)
+bool emberAfGetEndpointDescriptionCallback(EndpointId endpoint, EmberEndpointDescription * result)
 {
     return false;
 }
@@ -544,7 +536,8 @@ bool emberAfGetEndpointDescriptionCallback(uint8_t endpoint, EmberEndpointDescri
  * @param returnEndpointInfo A pointer to a data struct that will be written
  * with information about the endpoint.  Ver.: always
  */
-bool emberAfGetEndpointInfoCallback(uint8_t endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
+bool emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex,
+                                    EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
     return false;
 }
@@ -733,7 +726,7 @@ EmberStatus emberAfInitiateInterPanKeyEstablishmentCallback(EmberPanId panId, co
  * @param nodeId The node id of the remote device.  Ver.: always
  * @param endpoint The endpoint on the remote device.  Ver.: always
  */
-EmberStatus emberAfInitiateKeyEstablishmentCallback(EmberNodeId nodeId, uint8_t endpoint)
+EmberStatus emberAfInitiateKeyEstablishmentCallback(EmberNodeId nodeId, EndpointId endpoint)
 {
     return EMBER_LIBRARY_NOT_PRESENT;
 }
@@ -1065,9 +1058,8 @@ void emberAfPostEm4ResetCallback(void)
  * @param size   Ver.: always
  * @param value   Ver.: always
  */
-EmberAfStatus emberAfPreAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                                uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                                uint8_t * value)
+EmberAfStatus emberAfPreAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                                uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     return EMBER_ZCL_STATUS_SUCCESS;
 }
@@ -1200,7 +1192,7 @@ bool emberAfPreZDOMessageReceivedCallback(EmberNodeId emberNodeId, EmberApsFrame
  * Ver.: always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
-bool emberAfReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
+bool emberAfReadAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
 }
@@ -1289,7 +1281,7 @@ void emberAfRemoveFromCurrentAppTasksCallback(EmberAfApplicationTask tasks) {}
  * always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
-bool emberAfReportAttributesCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
+bool emberAfReportAttributesCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
 }
@@ -1516,7 +1508,7 @@ void emberAfUnusedPanIdFoundCallback(EmberPanId panId, uint8_t channel) {}
  * Ver.: always
  * @param bufLen The length in bytes of the list.  Ver.: always
  */
-bool emberAfWriteAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
+bool emberAfWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     return false;
 }

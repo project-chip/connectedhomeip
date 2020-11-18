@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include "TestMinimalMdns.h"
-
 #include <mdns/minimal/QName.h>
 #include <support/TestUtils.h>
 

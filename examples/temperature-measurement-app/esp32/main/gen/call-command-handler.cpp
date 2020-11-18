@@ -40,6 +40,8 @@
 #include "command-id.h"
 #include "util.h"
 
+using namespace chip;
+
 static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
 {
     if (wasHandled)

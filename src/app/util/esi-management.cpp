@@ -96,7 +96,8 @@ EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementGetFreeEntry(void
     return entry;
 }
 
-EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByShortIdAndEndpoint(EmberNodeId shortId, uint8_t endpoint)
+EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByShortIdAndEndpoint(EmberNodeId shortId,
+                                                                                             EndpointId endpoint)
 {
     uint8_t index = emberAfPluginEsiManagementIndexLookUpByShortIdAndEndpoint(shortId, endpoint);
     if (index < EMBER_AF_PLUGIN_ESI_MANAGEMENT_ESI_TABLE_SIZE)
@@ -122,7 +123,7 @@ EmberAfPluginEsiManagementEsiEntry * emberAfPluginEsiManagementEsiLookUpByLongId
     }
 }
 
-uint8_t emberAfPluginEsiManagementIndexLookUpByShortIdAndEndpoint(EmberNodeId shortId, uint8_t endpoint)
+uint8_t emberAfPluginEsiManagementIndexLookUpByShortIdAndEndpoint(EmberNodeId shortId, EndpointId endpoint)
 {
     uint8_t networkIndex = 0; /*emberGetCurrentNetwork(); #2552*/
     uint8_t i;

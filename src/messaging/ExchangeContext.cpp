@@ -65,11 +65,6 @@ bool ExchangeContext::IsResponseExpected() const
     return mFlags.Has(ExFlagValues::kFlagResponseExpected);
 }
 
-void ExchangeContext::SetInitiator(bool inInitiator)
-{
-    mFlags.Set(ExFlagValues::kFlagInitiator, inInitiator);
-}
-
 void ExchangeContext::SetResponseExpected(bool inResponseExpected)
 {
     mFlags.Set(ExFlagValues::kFlagResponseExpected, inResponseExpected);
@@ -144,6 +139,10 @@ exit:
 void ExchangeContext::DoClose(bool clearRetransTable)
 {
     // Clear protocol callbacks
+    if (mDelegate != nullptr)
+    {
+        mDelegate->OnExchangeClosing(this);
+    }
     mDelegate = nullptr;
 
     // Cancel the response timer.
@@ -191,8 +190,10 @@ void ExchangeContext::Reset()
     *this = ExchangeContext();
 }
 
-void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, void * AppState)
+ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
+                                         ExchangeDelegate * delegate)
 {
+    VerifyOrDie(delegate != nullptr);
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
     Reset();
@@ -202,13 +203,15 @@ void ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t 
     mExchangeId = ExchangeId;
     mPeerNodeId = PeerNodeId;
     mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
-    mAppState = AppState;
+    mDelegate = delegate;
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), em->GetContextsInUse(),
                     this);
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
+
+    return this;
 }
 
 void ExchangeContext::Free()
@@ -284,7 +287,7 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
     // NOTE: we don't set mResponseExpected to false here because the response could still arrive. If the user
     // wants to never receive the response, they must close the exchange context.
 
-    ExchangeContextDelegate * delegate = ec->GetDelegate();
+    ExchangeDelegate * delegate = ec->GetDelegate();
 
     // Call the user's timeout handler.
     if (delegate != nullptr)
@@ -293,12 +296,6 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                           PacketBuffer * msgBuf)
-{
-    return HandleMessage(packetHeader, payloadHeader, msgBuf, nullptr);
-}
-
-CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                          PacketBuffer * msgBuf, ExchangeContext::MessageReceiveFunct umhandler)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t protocolId = 0;
@@ -320,13 +317,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // is implicitly that response.
     SetResponseExpected(false);
 
-    // Deliver the message to the app via its callback.
-    if (umhandler)
-    {
-        umhandler(this, packetHeader, protocolId, messageType, msgBuf);
-        msgBuf = nullptr;
-    }
-    else if (mDelegate != nullptr)
+    if (mDelegate != nullptr)
     {
         mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, msgBuf);
         msgBuf = nullptr;
