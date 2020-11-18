@@ -1269,8 +1269,8 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
 
             // Attempt to allocate a buffer big enough to hold the entire message.  Fail with
             // CHIP_ERROR_MESSAGE_TOO_LONG if no such buffer is available.
-            PacketBuffer * newBuf = PacketBuffer::NewWithAvailableSize(0, frameLen);
-            if (newBuf == nullptr)
+            PacketBufferHandle newBuf = PacketBuffer::NewWithAvailableSize(0, frameLen);
+            if (newBuf.IsNull())
             {
                 break;
             }
@@ -1278,7 +1278,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
             // Prepend the new buffer to the receive queue and copy the received message data into
             // the new buffer, discarding the original buffer(s).
             newBuf->AddToEnd(data);
-            data = newBuf;
+            data = newBuf.Release();
             data->CompactHead();
 
             // Try again to decode the message.

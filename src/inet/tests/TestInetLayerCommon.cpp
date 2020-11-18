@@ -164,12 +164,12 @@ exit:
 
 static PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternStartOffset, uint8_t aFirstValue)
 {
-    PacketBuffer * lBuffer = nullptr;
+    PacketBufferHandle lBuffer;
 
     VerifyOrExit(aPatternStartOffset <= aDesiredLength, );
 
     lBuffer = PacketBuffer::New();
-    VerifyOrExit(lBuffer != nullptr, );
+    VerifyOrExit(!lBuffer.IsNull(), );
 
     aDesiredLength = min(lBuffer->MaxDataLength(), aDesiredLength);
 
@@ -178,7 +178,7 @@ static PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternS
     lBuffer->SetDataLength(aDesiredLength);
 
 exit:
-    return (lBuffer);
+    return lBuffer.Release_ForNow();
 }
 
 static PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternStartOffset)

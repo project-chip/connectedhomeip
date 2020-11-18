@@ -622,7 +622,7 @@ public:
     void SetSignalMessageLayerActivityChanged(MessageLayerActivityChangeHandlerFunct messageLayerActivityChangeHandler);
     bool IsMessageLayerActive();
 
-    static uint32_t GetMaxChipPayloadSize(const PacketBuffer * msgBuf, bool isUDP, uint32_t udpMTU);
+    static uint32_t GetMaxChipPayloadSize(const PacketBufferHandle & msgBuf, bool isUDP, uint32_t udpMTU);
 
     static void GetPeerDescription(char * buf, size_t bufSize, uint64_t nodeId, const Inet::IPAddress * addr, uint16_t port,
                                    Inet::InterfaceId interfaceId, const ChipConnection * con);

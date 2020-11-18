@@ -33,13 +33,12 @@
 #include <support/CodeUtils.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/AutoFreePacketBuffer.h>
 #include <transport/SecurePairingSession.h>
 
 namespace chip {
 
-using System::AutoFreePacketBuffer;
 using System::PacketBuffer;
+using System::PacketBufferHandle;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
 
@@ -90,12 +89,13 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(NodeId peerNodeId, System::PacketBu
 
 CHIP_ERROR SecureSessionMgrBase::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgIn)
 {
-    System::AutoFreePacketBuffer msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf;
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
+    msgBuf.Adopt(msgIn);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -151,8 +151,8 @@ CHIP_ERROR SecureSessionMgrBase::SendMessage(PayloadHeader & payloadHeader, Node
 
         ChipLogDetail(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
-        err =
-            mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), state->GetPeerAddress(), msgBuf.Release());
+        err = mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), state->GetPeerAddress(),
+                                      msgBuf.Release_ForNow());
     }
     SuccessOrExit(err);
     state->IncrementSendMessageIndex();
@@ -278,9 +278,10 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = connection->mPeerConnections.FindPeerConnectionState(packetHeader.GetSourceNodeId(),
                                                                                        packetHeader.GetEncryptionKeyID(), nullptr);
-    AutoFreePacketBuffer msg(msgIn);
-    AutoFreePacketBuffer origMsg;
+    PacketBufferHandle msg;
+    PacketBufferHandle origMsg;
 
+    msg.Adopt(msgIn);
     VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Secure transport received NULL packet, discarding"));
 
     if (state == nullptr)
@@ -312,8 +313,8 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not
            allocated as an inline buffer to PacketBuffer structure */
-        origMsg.Adopt(msg.Release());
-        msg.Adopt(PacketBuffer::NewWithAvailableSize(len));
+        origMsg = std::move(msg);
+        msg     = PacketBuffer::NewWithAvailableSize(len);
         VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Insufficient memory for packet buffer."));
         msg->SetDataLength(len);
 #endif
@@ -344,7 +345,7 @@ void SecureSessionMgrBase::HandleDataReceived(const PacketHeader & packetHeader,
 
         if (connection->mCB != nullptr)
         {
-            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg.Release(), connection);
+            connection->mCB->OnMessageReceived(packetHeader, payloadHeader, state, msg.Release_ForNow(), connection);
         }
     }
 

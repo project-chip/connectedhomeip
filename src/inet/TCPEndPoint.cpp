@@ -2326,7 +2326,7 @@ void TCPEndPoint::ReceiveData()
     bool isNewBuf = true;
 
     if (mRcvQueue == nullptr)
-        rcvBuf = PacketBuffer::New(0);
+        rcvBuf = PacketBuffer::New(0).Release_ForNow();
     else
     {
         rcvBuf = mRcvQueue;
@@ -2334,7 +2334,7 @@ void TCPEndPoint::ReceiveData()
             ;
 
         if (rcvBuf->AvailableDataLength() == 0)
-            rcvBuf = PacketBuffer::New(0);
+            rcvBuf = PacketBuffer::New(0).Release_ForNow();
         else
         {
             isNewBuf = false;
