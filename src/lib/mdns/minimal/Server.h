@@ -27,6 +27,16 @@
 namespace mdns {
 namespace Minimal {
 
+/// Provides a list of intefaces to listen on.
+///
+/// When listening on IP, both IP address type (IPv4 or IPv6) and interface id
+/// are important. In particular, when using link-local IP addresses, the actual
+/// interface matters (e.g. FF02::FB will care over which IPv6 interface it is sent)
+///
+/// For MDNS in particular, you may want:
+///  - IPv4 listen on INET_NULL_INTERFACEID
+///  - IPv6 listen on every specific interface id available (except local loopback and other
+///    not usable interfaces like docker)
 class ListenIterator
 {
 public:
@@ -49,7 +59,7 @@ public:
     virtual void OnResponse(const BytesRange & data, const chip::Inet::IPPacketInfo * info) = 0;
 };
 
-// Defines an mDNS server that listends on one or more interfaces.
+// Defines an mDNS server that listens on one or more interfaces.
 //
 // I can send and receive mDNS packets (requests/replies)
 class ServerBase
