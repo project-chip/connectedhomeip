@@ -17,8 +17,9 @@
 
 /**
  *  @file
- *    basic double-ended queue, intended to be embedded as a member
- *     of an object
+ *    BufBound manages serial writes to a buffer, guarding that the bounds of
+ *     the buffer are not exceeded.
+ *
  */
 
 #pragma once
