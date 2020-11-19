@@ -77,14 +77,11 @@ public:
      * @brief
      *   Send the provided message to the device
      *
-     * @param[in] message   The message to be sent. The ownership of the message buffer
-     *                      is handed over to Device object. SendMessage() will
-     *                      decrement the reference count of the message buffer before
-     *                      returning.
+     * @param[in] message   The message to be sent.
      *
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR SendMessage(System::PacketBufferHandle & message);
+    CHIP_ERROR SendMessage(System::PacketBufferHandle message);
 
     /**
      * @brief

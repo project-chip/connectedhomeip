@@ -75,7 +75,7 @@
             err = CHIP_ERROR_NO_MEMORY;
         } else {
             memcpy(buffer->Start(), messageChars, messageLen);
-            err = self.cppDevice->SendMessage(buffer);
+            err = self.cppDevice->SendMessage(std::move(buffer));
         }
     }
     [self.lock unlock];
@@ -91,7 +91,7 @@
     return YES;
 }
 
-- (BOOL)sendCHIPCommand:(uint32_t (^)(chip::System::PacketBufferHandle &, uint16_t))encodeCommandBlock
+- (BOOL)sendCHIPCommand:(uint32_t (^)(const chip::System::PacketBufferHandle &, uint16_t))encodeCommandBlock
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -105,7 +105,7 @@
         uint32_t dataLength = encodeCommandBlock(buffer, (uint16_t) bufferSize);
         buffer->SetDataLength(dataLength);
 
-        err = self.cppDevice->SendMessage(buffer);
+        err = self.cppDevice->SendMessage(std::move(buffer));
     }
     [self.lock unlock];
     if (err != CHIP_NO_ERROR) {
@@ -122,7 +122,7 @@
         duration = UINT16_MAX;
     }
 
-    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBufferHandle & buffer, uint16_t bufferSize) {
+    return [self sendCHIPCommand:^uint32_t(const chip::System::PacketBufferHandle & buffer, uint16_t bufferSize) {
         // Hardcode endpoint to 1 for now
         return encodeIdentifyClusterIdentifyCommand(buffer->Start(), bufferSize, 1, duration);
     }];

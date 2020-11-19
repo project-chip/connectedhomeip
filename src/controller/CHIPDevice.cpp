@@ -104,7 +104,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle & message)
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle message)
 {
     return SendMessage(message.Release_ForNow());
 }

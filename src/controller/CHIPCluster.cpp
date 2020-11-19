@@ -41,16 +41,14 @@ CHIP_ERROR ClusterBase::Associate(Device * device, EndpointId endpoint)
 
 void ClusterBase::Dissociate()
 {
-    mDevice   = nullptr;
-    mEndpoint = 0;
+    mDevice = nullptr;
 }
 
-CHIP_ERROR ClusterBase::SendCommand(uint16_t (*commandEncoder)(uint8_t *, uint16_t, uint8_t), uint16_t maxCmdLen,
-                                    Callback::Callback<> * resposeHandler)
+CHIP_ERROR ClusterBase::SendCommand(CommandEncoder commandEncoder, uint16_t maxCmdLen, Callback::Callback<> * responseHandler)
 {
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    uint16_t encodedLength             = 0;
-    System::PacketBufferHandle message = nullptr;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    uint16_t encodedLength = 0;
+    System::PacketBufferHandle message;
 
     VerifyOrExit(commandEncoder != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -65,12 +63,12 @@ CHIP_ERROR ClusterBase::SendCommand(uint16_t (*commandEncoder)(uint8_t *, uint16
     message->SetDataLength(encodedLength);
     VerifyOrExit(message->DataLength() >= encodedLength, err = CHIP_ERROR_NO_MEMORY);
 
-    err = mDevice->SendMessage(message);
+    err = mDevice->SendMessage(std::move(message));
     SuccessOrExit(err);
 
-    if (resposeHandler != nullptr)
+    if (responseHandler != nullptr)
     {
-        mDevice->AddResponseHandler(mEndpoint, mClusterId, resposeHandler);
+        mDevice->AddResponseHandler(mEndpoint, mClusterId, responseHandler);
     }
 
 exit:
@@ -82,13 +80,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR ClusterBase::RequestAttributeReporting(uint16_t (*requestEncoder)(uint8_t *, uint16_t, uint8_t, uint16_t, uint16_t),
-                                                  uint16_t maxCmdLen, uint16_t minInterval, uint16_t maxInterval,
-                                                  Callback::Callback<> * reportHandler)
+CHIP_ERROR ClusterBase::RequestAttributeReporting(RequestEncoder requestEncoder, uint16_t maxCmdLen, uint16_t minInterval,
+                                                  uint16_t maxInterval, Callback::Callback<> * reportHandler)
 {
-    CHIP_ERROR err                     = CHIP_NO_ERROR;
-    uint16_t encodedLength             = 0;
-    System::PacketBufferHandle message = nullptr;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    uint16_t encodedLength = 0;
+    System::PacketBufferHandle message;
 
     VerifyOrExit(requestEncoder != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -103,7 +100,7 @@ CHIP_ERROR ClusterBase::RequestAttributeReporting(uint16_t (*requestEncoder)(uin
     message->SetDataLength(encodedLength);
     VerifyOrExit(message->DataLength() >= encodedLength, err = CHIP_ERROR_NO_MEMORY);
 
-    err = mDevice->SendMessage(message);
+    err = mDevice->SendMessage(std::move(message));
     SuccessOrExit(err);
 
     if (reportHandler != nullptr)
