@@ -46,7 +46,8 @@ private:
 
     chip::Controller::PersistentStorageResultDelegate * mCallback;
     SendKeyValue mCompletionHandler;
-    SendStatus mStatusHandler;
+    CHIPSendSetStatus mSetStatusHandler;
+    CHIPSendDeleteStatus mDeleteStatusHandler;
     NSUserDefaults * mDefaultPersistentStorage;
     dispatch_queue_t mWorkQueue;
 };
