@@ -50,7 +50,7 @@ const char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
 constexpr uint16_t kWiFi_BAND_2_4_GHZ = 2400;
 constexpr uint16_t kWiFi_BAND_5_0_GHZ = 5000;
 
-static uint16_t Map2400MHz(const uint8_t inChannel)
+uint16_t Map2400MHz(const uint8_t inChannel)
 {
     uint16_t frequency = 0;
 
@@ -66,7 +66,7 @@ static uint16_t Map2400MHz(const uint8_t inChannel)
     return frequency;
 }
 
-static uint16_t Map5000MHz(const uint8_t inChannel)
+uint16_t Map5000MHz(const uint8_t inChannel)
 {
     uint16_t frequency = 0;
 
@@ -308,7 +308,7 @@ exit:
     return err;
 }
 
-uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS(void)
+uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS()
 {
     return mWiFiStationReconnectIntervalMS;
 }
@@ -352,7 +352,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
     return mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled;
 }
 
-bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
+bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 {
     bool ret          = false;
     const gchar * bss = nullptr;
@@ -372,7 +372,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
     return ret;
 }
 
-void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
+void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 {
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
@@ -418,7 +418,7 @@ exit:
     return err;
 }
 
-void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
+void ConnectivityManagerImpl::_DemandStartWiFiAP()
 {
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
@@ -432,7 +432,7 @@ void ConnectivityManagerImpl::_DemandStartWiFiAP(void)
     }
 }
 
-void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
+void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
 {
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {
@@ -446,7 +446,7 @@ void ConnectivityManagerImpl::_StopOnDemandWiFiAP(void)
     }
 }
 
-void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP(void)
+void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
 {
     if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
     {

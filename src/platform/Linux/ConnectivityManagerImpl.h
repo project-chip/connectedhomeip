@@ -127,14 +127,14 @@ private:
     void _ClearWiFiStationProvision();
     bool _CanStartWiFiScan();
 
-    WiFiAPMode _GetWiFiAPMode(void);
+    WiFiAPMode _GetWiFiAPMode();
     CHIP_ERROR _SetWiFiAPMode(WiFiAPMode val);
-    bool _IsWiFiAPActive(void);
-    bool _IsWiFiAPApplicationControlled(void);
-    void _DemandStartWiFiAP(void);
-    void _StopOnDemandWiFiAP(void);
-    void _MaintainOnDemandWiFiAP(void);
-    uint32_t _GetWiFiAPIdleTimeoutMS(void);
+    bool _IsWiFiAPActive();
+    bool _IsWiFiAPApplicationControlled();
+    void _DemandStartWiFiAP();
+    void _StopOnDemandWiFiAP();
+    void _MaintainOnDemandWiFiAP();
+    uint32_t _GetWiFiAPIdleTimeoutMS();
     void _SetWiFiAPIdleTimeoutMS(uint32_t val);
 
     static void _OnWpaProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data);
