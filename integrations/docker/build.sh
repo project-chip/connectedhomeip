@@ -58,18 +58,24 @@ set -ex
 
 [[ -n $VERSION ]] || die "version cannot be empty"
 
-# go find and build any CHIP images this image is "FROM"
-awk -F/ '/^FROM connectedhomeip/ {print $2}' Dockerfile | while read -r dep; do
-    dep=${dep%:*}
-    (cd "../$dep" && ./build.sh "$@")
-done
-
 BUILD_ARGS=()
+
+# go find and build any CHIP images this image is "FROM"
+while read -r dep; do
+    dep=${dep%:*}
+    dep_version=$(cat ../$dep/version)
+    BUILD_ARGS+=( --build-arg "${dep//-/_}_VERSION=$dep_version" )
+    docker pull -q "$ORG/$dep:$dep_version" ||
+        (cd "../$dep" && ./build.sh "$@")
+done < <(awk -F/ '/^FROM '"$ORG"'/ {print $2}' Dockerfile )
+
 if [[ ${*/--no-cache//} != "${*}" ]]; then
     BUILD_ARGS+=(--no-cache)
 fi
 
-docker build "${BUILD_ARGS[@]}" --build-arg VERSION="$VERSION" -t "$ORG/$IMAGE:$VERSION" .
+docker -D build "${BUILD_ARGS[@]}" -t "$ORG/$IMAGE:$VERSION" .
+
+exit 0
 
 [[ ${*/--latest//} != "${*}" ]] && {
     docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest

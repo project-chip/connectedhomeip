@@ -1,9 +1,15 @@
-ARG VERSION=latest
-FROM connectedhomeip/chip-build-nrf-platform:${VERSION} AS nrf
-FROM connectedhomeip/chip-build-efr32:${VERSION} AS efr32
-FROM connectedhomeip/chip-build-android:${VERSION} AS android
-FROM connectedhomeip/chip-build-esp32-qemu:${VERSION} as esp32
-FROM connectedhomeip/chip-build:${VERSION}
+ARG chip_build_nrf_platform_VERSION=latest
+ARG chip_build_efr32_VERSION=latest
+ARG chip_build_android_VERSION=latest
+ARG chip_build_esp32_qemu_VERSION=latest
+ARG chip_build_VERSION=latest
+
+FROM connectedhomeip/chip-build-nrf-platform:${chip_build_nrf_platform_VERSION} AS nrf
+FROM connectedhomeip/chip-build-efr32:${chip_build_efr32_VERSION} AS efr32
+FROM connectedhomeip/chip-build-android:${chip_build_android_VERSION} AS android
+FROM connectedhomeip/chip-build-esp32-qemu:${chip_build_esp32_qemu_VERSION} as esp32
+FROM connectedhomeip/chip-build:${chip_build_VERSION}
+
 COPY --from=esp32 /opt/espressif/esp-idf /opt/espressif/esp-idf
 COPY --from=esp32 /opt/espressif/tools /opt/espressif/tools
 COPY --from=esp32 /opt/espressif/qemu /opt/espressif/qemu
