@@ -16,28 +16,27 @@
  */
 
 function atomicType(arg) {
-  if (arg.name == 'attribute_id') return 'chip::AttributeId'
-  if (arg.name == 'cluster_id') return 'chip::ClusterId'
-  throw 'not overriding'
+  if (arg.name == 'attribute_id')
+    return 'chip::AttributeId'
+    if (arg.name == 'cluster_id') return 'chip::ClusterId'
+    throw 'not overriding'
 }
 
 function nonAtomicType(arg) {
-    switch (arg.name) {
-      case 'Status':
-      case 'IasEnrollResponseCode':
-      case 'DoorLockUserStatus':
-      case 'DoorLockUserType':
-      case 'StepMode':
-      case 'HueStepMode':
-      case 'SaturationStepMode':
-      case 'MoveMode':
-      case 'HueMoveMode':
-      case 'SaturationMoveMode':
-      case 'HueDirection':
-        return 'uint8_t'
-      default:
-        throw 'not overriding'
-    }
+  switch (arg.name) {
+  case 'Status':
+  case 'IasEnrollResponseCode':
+  case 'DoorLockUserStatus':
+  case 'DoorLockUserType':
+  case 'StepMode':
+  case 'HueStepMode':
+  case 'SaturationStepMode':
+  case 'MoveMode':
+  case 'HueMoveMode':
+  case 'SaturationMoveMode':
+  case 'HueDirection':
+    return 'uint8_t' default: throw 'not overriding'
+  }
 }
 
 exports.atomicType = atomicType
