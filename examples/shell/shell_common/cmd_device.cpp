@@ -616,34 +616,36 @@ int cmd_device_ap(int argc, char ** argv)
         {
             streamer_printf(sout,
                             "Invalid command: needs specify mode:\r\n"
-                            "0: Disable\r\n"
-                            "1: Enable\r\n"
-                            "2: OnDemand\r\n"
-                            "3: ApplicationControlled\r\n"
-                            "4: OnDemand-NoStation\r\n");
+                            "disable\r\n"
+                            "enable\r\n"
+                            "on_demand\r\n"
+                            "on_demand_no_sta\r\n"
+                            "app_ctrl\r\n");
             error = CHIP_ERROR_INVALID_ARGUMENT;
         }
         else
         {
             ConnectivityManager::WiFiAPMode mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_NotSupported;
 
-            switch (std::stoi(argv[1]))
+            if (strcmp(argv[1], "disable") == 0)
             {
-            case 0:
                 mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_Disabled;
-                break;
-            case 1:
+            }
+            else if (strcmp(argv[1], "enable") == 0)
+            {
                 mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_Enabled;
-                break;
-            case 2:
+            }
+            else if (strcmp(argv[1], "on_demand") == 0)
+            {
                 mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_OnDemand;
-                break;
-            case 3:
-                mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_ApplicationControlled;
-                break;
-            case 4:
+            }
+            else if (strcmp(argv[1], "on_demand_no_sta") == 0)
+            {
                 mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_OnDemand_NoStationProvision;
-                break;
+            }
+            else if (strcmp(argv[1], "app_ctrl") == 0)
+            {
+                mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_ApplicationControlled;
             }
 
             if (mode != ConnectivityManager::WiFiAPMode::kWiFiAPMode_NotSupported)
@@ -652,7 +654,13 @@ int cmd_device_ap(int argc, char ** argv)
             }
             else
             {
-                streamer_printf(sout, "Invalid mode: needs to be 0~4\r\n");
+                streamer_printf(sout,
+                                "Invalid command: needs to be one of the following modes:\r\n"
+                                "disable\r\n"
+                                "enable\r\n"
+                                "on_demand\r\n"
+                                "on_demand_no_sta\r\n"
+                                "app_ctrl\r\n");
                 error = CHIP_ERROR_INVALID_ARGUMENT;
             }
         }
