@@ -63,11 +63,11 @@ BUILD_ARGS=()
 # go find and build any CHIP images this image is "FROM"
 while read -r dep; do
     dep=${dep%:*}
-    dep_version=$(cat ../$dep/version)
-    BUILD_ARGS+=( --build-arg "${dep//-/_}_VERSION=$dep_version" )
+    dep_version=$(cat ../"$dep"/version)
+    BUILD_ARGS+=(--build-arg "${dep//-/_}_VERSION=$dep_version")
     docker pull -q "$ORG/$dep:$dep_version" ||
         (cd "../$dep" && ./build.sh "$@")
-done < <(awk -F/ '/^FROM '"$ORG"'/ {print $2}' Dockerfile )
+done < <(awk -F/ '/^FROM '"$ORG"'/ {print $2}' Dockerfile)
 
 if [[ ${*/--no-cache//} != "${*}" ]]; then
     BUILD_ARGS+=(--no-cache)
