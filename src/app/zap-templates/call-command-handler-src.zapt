@@ -100,15 +100,45 @@ EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false
         {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
         case ZCL_{{asDelimitedMacro name}}_COMMAND_ID: {
             {{#if (zcl_command_arguments_count this.id)}}
-            uint32_t argOffset = 0;
+            uint32_t payloadOffset = cmd->payloadStartIndex;
             {{#zcl_command_arguments}}
-            {{asUnderlyingType type}} * {{asSymbol label}} = ({{asUnderlyingType type}} *)(cmd->buffer + argOffset);
+            {{#if isArray}}
+            uint8_t * {{asSymbol label}} = (uint8_t *)(cmd->buffer + payloadOffset);
+            {{else if (isStrEqual type "CHAR_STRING")}}
+            uint8_t * {{asSymbol label}} = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            {{else if (isStrEqual type "LONG_CHAR_STRING")}}
+            uint8_t * {{asSymbol label}} = emberAfGetLongString(cmd->buffer, payloadOffset, cmd->bufLen);
+            {{else if (isStrEqual type "OCTET_STRING")}}
+            uint8_t * {{asSymbol label}} = emberAfGetString(cmd->buffer, payloadOffset, cmd->bufLen);
+            {{else if (isStrEqual type "LONG_OCTET_STRING")}}
+            uint8_t * {{asSymbol label}} = emberAfGetLongString(cmd->buffer, payloadOffset, cmd->bufLen);
+            {{else if (isStrEqual label "endpoint")}}
+            EndpointId {{asSymbol label}} = (*(EndpointId *)(cmd->buffer + payloadOffset));
+            {{else if (isStrEqual label "endpointId")}}
+            EndpointId {{asSymbol label}} = (*(EndpointId *)(cmd->buffer + payloadOffset));
+            {{else if (isStrEqual label "groupId")}}
+            GroupId {{asSymbol label}} = (*(GroupId *)(cmd->buffer + payloadOffset));
+            {{else if (isStrEqual label "commandId")}}
+            CommandId {{asSymbol label}} = (*(CommandId *)(cmd->buffer + payloadOffset));
+            {{else}}
+            {{asUnderlyingType type}} {{asSymbol label}} = (*({{asUnderlyingType type}} *)(cmd->buffer + payloadOffset));
+            {{/if}}
             {{#unless (isLastElement index count)}}
-            argOffset+= sizeof({{asUnderlyingType type}});
+            {{#if (isStrEqual type "CHAR_STRING")}}
+            payloadOffset += emberAfStringLength({{asSymbol label}}) + 1u;
+            {{else if (isStrEqual type "CHAR_STRING")}}
+            payloadOffset += emberAfLongStringLength({{asSymbol label}}) + 2u;
+            {{else if (isStrEqual type "OCTET_STRING")}}
+            payloadOffset += emberAfStringLength({{asSymbol label}}) + 1u;
+            {{else if (isStrEqual type "LONG_OCTET_STRING")}}
+            payloadOffset += emberAfLongStringLength({{asSymbol label}}) + 2u;
+            {{else}}
+            payloadOffset += sizeof({{asUnderlyingType type}});
+            {{/if}}
             {{/unless}}
             {{/zcl_command_arguments}}
 
-            wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}} *{{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
+            wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}} {{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
             {{else}}
             wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback();
             {{/if}}
