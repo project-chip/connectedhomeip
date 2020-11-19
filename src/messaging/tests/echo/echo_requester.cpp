@@ -77,23 +77,24 @@ bool EchoIntervalExpired(void)
 
 System::PacketBuffer * FormulateEchoRequestBuffer()
 {
-    System::PacketBuffer * payloadBuf = System::PacketBuffer::New();
+    System::PacketBufferHandle buffer = System::PacketBuffer::New();
 
-    if (payloadBuf == NULL)
+    if (buffer.IsNull())
     {
         printf("Unable to allocate PacketBuffer\n");
+        return nullptr;
     }
     else
     {
         // Add some application payload data in the buffer.
-        char * p    = reinterpret_cast<char *>(payloadBuf->Start());
+        char * p    = reinterpret_cast<char *>(buffer->Start());
         int32_t len = snprintf(p, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, "Echo Message %" PRIu64 "\n", gEchoCount);
 
         // Set the datalength in the buffer appropriately.
-        payloadBuf->SetDataLength((uint16_t) len);
-    }
+        buffer->SetDataLength((uint16_t) len);
 
-    return payloadBuf;
+        return buffer.Release_ForNow();
+    }
 }
 
 CHIP_ERROR SendEchoRequest(void)
