@@ -26,10 +26,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface CHIPOnOff : NSObject
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint;
-- (BOOL)lightOn:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue;
-- (BOOL)lightOff:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue;
-- (BOOL)toggleLight:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue;
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+- (BOOL)lightOn:(CHIPDeviceCallback)onCompletion;
+- (BOOL)lightOff:(CHIPDeviceCallback)onCompletion;
+- (BOOL)toggleLight:(CHIPDeviceCallback)onCompletion;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

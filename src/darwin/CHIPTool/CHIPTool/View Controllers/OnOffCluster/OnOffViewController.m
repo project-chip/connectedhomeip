@@ -32,7 +32,6 @@
 @property (readwrite) CHIPDevice * chipDevice;
 
 @property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
-@property (readonly) dispatch_queue_t callbackQueue;
 @end
 
 @implementation OnOffViewController
@@ -47,10 +46,10 @@
     _persistentStorage = [[CHIPToolPersistentStorageDelegate alloc] init];
 
     // initialize the device controller
-    _callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.onoffvc.callback", DISPATCH_QUEUE_SERIAL);
     self.chipController = [CHIPDeviceController sharedController];
-    [self.chipController setDelegate:self queue:_callbackQueue];
-    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:_callbackQueue];
+    [self.chipController setDelegate:self queue:callbackQueue];
+    [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
 
     uint64_t deviceID = CHIPGetNextAvailableDeviceID();
     if (deviceID > 1) {
@@ -58,7 +57,7 @@
         deviceID--;
         NSError * error;
         self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
-        self.onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:1];
+        self.onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:1 queue:callbackQueue];
     }
 }
 
@@ -144,7 +143,7 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: On command completed with error %@", [error description]);
     };
-    [self.onOff lightOn:completionHandler queue:_callbackQueue];
+    [self.onOff lightOn:completionHandler];
 }
 
 - (IBAction)offButtonTapped:(id)sender
@@ -152,7 +151,7 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: Off command completed with error %@", [error description]);
     };
-    [self.onOff lightOff:completionHandler queue:_callbackQueue];
+    [self.onOff lightOff:completionHandler];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
@@ -160,7 +159,7 @@
     CHIPDeviceCallback completionHandler = ^(NSError * error) {
         NSLog(@"Status: Toggle command completed with error %@", [error description]);
     };
-    [self.onOff toggleLight:completionHandler queue:_callbackQueue];
+    [self.onOff toggleLight:completionHandler];
 }
 
 // MARK: CHIPDeviceControllerDelegate

@@ -26,12 +26,12 @@
 @interface CHIPOnOff ()
 
 @property (readonly) chip::Controller::OnOffCluster cppCluster;
-
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
 @end
 
 @implementation CHIPOnOff
 
-- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
     CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
 
@@ -39,13 +39,15 @@
         return nil;
     }
 
-    self = [super init];
+    if (self = [super init]) {
+        _callbackQueue = queue;
+    }
     return self;
 }
 
-- (BOOL)lightOn:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue
+- (BOOL)lightOn:(CHIPDeviceCallback)onCompletion
 {
-    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, queue);
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
     if (!callback) {
         return NO;
     }
@@ -59,9 +61,9 @@
     return YES;
 }
 
-- (BOOL)lightOff:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue
+- (BOOL)lightOff:(CHIPDeviceCallback)onCompletion
 {
-    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, queue);
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
     if (!callback) {
         return NO;
     }
@@ -75,9 +77,9 @@
     return YES;
 }
 
-- (BOOL)toggleLight:(CHIPDeviceCallback)onCompletion queue:(dispatch_queue_t)queue
+- (BOOL)toggleLight:(CHIPDeviceCallback)onCompletion
 {
-    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, queue);
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
     if (!callback) {
         return NO;
     }
