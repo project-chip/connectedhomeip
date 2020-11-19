@@ -211,6 +211,8 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
+    volatile intptr_t x = 0;
+    *(reinterpret_cast<int*>(x)) = 5;
     err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
