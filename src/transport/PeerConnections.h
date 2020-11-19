@@ -141,12 +141,12 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
             iter = begin + 1;
         }
 
-        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
             if (iter->GetPeerAddress() == address)
             {
@@ -172,12 +172,12 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
             iter = begin + 1;
         }
 
-        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
             if (!iter->IsInitialized())
             {
@@ -208,12 +208,12 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
             iter = begin + 1;
         }
 
-        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
             if (!iter->IsInitialized())
             {
@@ -248,12 +248,12 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
             iter = begin + 1;
         }
 
-        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
             if (!iter->IsInitialized())
             {
