@@ -60,7 +60,7 @@ public:
         for (size_t word = 0; word * kBitChunkSize < N; ++word)
         {
             auto & usage = mUsage[word];
-            auto value   = usage.load();
+            auto value   = usage.load(std::memory_order_relaxed);
             for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < N; ++offset)
             {
                 if ((value & (kBit1 << offset)) == 0)
@@ -71,7 +71,7 @@ public:
                     }
                     else
                     {
-                        value = usage.load(); // if there is a race, update new usage
+                        value = usage.load(std::memory_order_relaxed); // if there is a race, update new usage
                     }
                 }
             }
