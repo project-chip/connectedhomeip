@@ -65,7 +65,7 @@ public:
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
+                                   const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
                                    SecureSessionMgrBase * mgr)
     {}
 
@@ -86,7 +86,16 @@ public:
      * @param state   connection state
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
+    virtual void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
+
+    /**
+     * @brief
+     *   Called when a new connection is closing
+     *
+     * @param state   connection state
+     * @param mgr     A pointer to the SecureSessionMgr
+     */
+    virtual void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
 
     /**
      * @brief
@@ -184,7 +193,7 @@ private:
     /**
      * Called when a specific connection expires.
      */
-    static void HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr);
+    void HandleConnectionExpired(const Transport::PeerConnectionState & state);
 
     /**
      * Callback for timer expiry check

@@ -23,6 +23,15 @@
 
 #include <controller/CHIPDeviceController_deprecated.h>
 
+class ChipToolPersistentStorageDelegate : public chip::Controller::PersistentStorageDelegate
+{
+    void SetDelegate(chip::Controller::PersistentStorageResultDelegate * delegate) override {}
+    void GetKeyValue(const char * key) override {}
+    CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) override { return CHIP_NO_ERROR; }
+    void SetKeyValue(const char * key, const char * value) override {}
+    void DeleteKeyValue(const char * key) override {}
+};
+
 class Commands
 {
 public:

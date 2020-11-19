@@ -22,7 +22,7 @@ using namespace ::chip;
 using namespace ::chip::DeviceController;
 using namespace ::chip::System;
 
-static void onConnect(ChipDeviceController * dc, Transport::PeerConnectionState * state, void * appReqState)
+static void onConnect(ChipDeviceController * dc, const Transport::PeerConnectionState * state, void * appReqState)
 {
     ChipLogDetail(chipTool, "OnConnect");
 
