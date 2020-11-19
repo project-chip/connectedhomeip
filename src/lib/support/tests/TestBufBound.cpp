@@ -56,9 +56,14 @@ public:
             return false;
         }
 
-        size_t written;
-        bool fit = Fit(written);
-        if ((fit && (mLen < needed || written != needed)) || (fit && (mLen >= needed || written != mLen)))
+        size_t written = 0xcafebabe;
+        bool fit       = Fit(written);
+        if (written == 0xcafebabe)
+        {
+            printf("Fit(written) didn't set written\n");
+            return false;
+        }
+        if ((fit && (mLen < needed || written != needed)) || (!fit && (mLen >= needed || written != mLen)))
         {
             printf("Fit(written) is wrong: mLen == %zu, needed == %zu, written == %zu, Fit() == %s\n", mLen, needed, written,
                    fit ? "true" : "false");

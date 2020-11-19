@@ -123,43 +123,35 @@ public:
     /*
      * @brief number of bytes required to satisfy all calls to Put() so far
      */
-    size_t Needed() { return mNeeded; }
+    size_t Needed() const { return mNeeded; }
     /*
      * @brief bytes available
      */
-    size_t Available() { return mSize < mNeeded ? 0 : mSize - mNeeded; }
+    size_t Available() const { return mSize < mNeeded ? 0 : mSize - mNeeded; }
 
     /*
      * @brief whether the input fit in the buffer
      */
-    bool Fit()
+    bool Fit() const
     {
         size_t _;
         return Fit(_);
     }
 
     /*
-     * @brief whether the input fit in the buffer, output what was
+     * @brief returns whether the input fit in the buffer, outputs what was
      *        actually written
      */
-    bool Fit(size_t & written)
+    bool Fit(size_t & actually_written) const
     {
-        if (mSize >= mNeeded)
-        {
-            written = mNeeded;
-            return true;
-        }
-        else
-        {
-            written = mSize;
-            return false;
-        }
+        actually_written = mSize >= mNeeded ? mNeeded : mSize;
+        return mSize >= mNeeded;
     }
 
     /*
      * @brief Size of the buffer
      */
-    size_t Size() { return mSize; }
+    size_t Size() const { return mSize; }
 };
 
 } // namespace chip
