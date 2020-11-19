@@ -232,5 +232,9 @@ TabWidth:        8
 UseTab:          Never
 ---
 Language: JavaScript
+BasedOnStyle: WebKit
+AlignConsecutiveAssignments: true
+AllowShortFunctionsOnASingleLine: None
+IndentWidth:     2
 ColumnLimit:     132
 ...
