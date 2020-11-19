@@ -244,11 +244,11 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
 
     // send a malicious packet
-    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New());
+    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New().Release_ForNow());
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     // send a good packet
-    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New());
+    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New().Release_ForNow());
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 }
 

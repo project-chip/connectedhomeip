@@ -13,22 +13,23 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/nlio.gni")
+import("//build_overrides/nlunit_test.gni")
 
-static_library("protocols") {
-  output_name = "libChipProtocols"
+import("${chip_root}/build/chip/chip_test_suite.gni")
 
-  sources = [
-    "echo/Echo.h",
-    "echo/EchoClient.cpp",
-    "echo/EchoServer.cpp",
-  ]
+chip_test_suite("tests") {
+  output_name = "libBDXTests"
 
-  cflags = [ "-Wconversion" ]
+  test_sources = [ "TestBdxMessages.cpp" ]
 
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/messaging",
     "${chip_root}/src/protocols/bdx",
+    "${nlio_root}:nlio",
+    "${nlunit_test_root}:nlunit-test",
   ]
+
+  cflags = [ "-Wconversion" ]
 }

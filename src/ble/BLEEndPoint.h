@@ -39,6 +39,7 @@ namespace chip {
 namespace Ble {
 
 using ::chip::System::PacketBuffer;
+using ::chip::System::PacketBufferHandle;
 
 enum
 {

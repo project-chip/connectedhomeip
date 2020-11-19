@@ -35,8 +35,8 @@ void EchoCommand::SendEcho() const
 
     // Reallocate buffer on each run, as the secure transport encrypts and
     // overwrites the buffer from previous iteration.
-    auto * buffer = PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(payloadLen));
-    if (buffer == nullptr)
+    PacketBufferHandle buffer = PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(payloadLen));
+    if (buffer.IsNull())
     {
         ChipLogError(chipTool, "Failed to allocate memory for packet data.");
         return;
@@ -45,7 +45,7 @@ void EchoCommand::SendEcho() const
     memcpy(buffer->Start(), PAYLOAD, payloadLen);
     buffer->SetDataLength(static_cast<uint16_t>(payloadLen));
 
-    CHIP_ERROR err = mController->SendMessage(NULL, buffer);
+    CHIP_ERROR err = mController->SendMessage(NULL, buffer.Release_ForNow());
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Echo (%s): Message sent to server", GetNetworkName());

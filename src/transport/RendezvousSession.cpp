@@ -23,7 +23,6 @@
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/SafeInt.h>
-#include <system/AutoFreePacketBuffer.h>
 #include <transport/RendezvousSession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -98,24 +97,23 @@ RendezvousSession::~RendezvousSession()
 CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
                                                  const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgIn)
 {
-    System::AutoFreePacketBuffer msgBuf(msgIn);
-
     if (mCurrentState != State::kSecurePairing)
     {
+        PacketBuffer::Free(msgIn);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
     if (peerAddress.GetTransportType() == Transport::Type::kBle)
     {
-
-        return mTransport->SendMessage(header, payloadFlags, peerAddress, msgBuf.Release());
+        return mTransport->SendMessage(header, payloadFlags, peerAddress, msgIn);
     }
     else if (mTransportMgr != nullptr)
     {
-        return mTransportMgr->SendMessage(header, payloadFlags, peerAddress, msgBuf.Release());
+        return mTransportMgr->SendMessage(header, payloadFlags, peerAddress, msgIn);
     }
     else
     {
+        PacketBuffer::Free(msgIn);
         ChipLogError(Ble, "SendPairingMessage dropped since no transport mgr for IP rendezvous");
         return CHIP_ERROR_INVALID_ADDRESS;
     }
@@ -127,14 +125,15 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     PacketHeader packetHeader;
     PayloadHeader payloadHeader;
     MessageAuthenticationCode mac;
-    System::AutoFreePacketBuffer msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf;
     const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
     uint8_t * data    = nullptr;
     uint16_t totalLen = 0;
     uint16_t taglen   = 0;
 
-    VerifyOrExit(msgIn != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    msgBuf.Adopt(msgIn);
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(CanCastTo<uint16_t>(headerSize + msgBuf->TotalLength()), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -167,7 +166,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
     err = mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(),
-                                  msgBuf.Release());
+                                  msgBuf.Release_ForNow());
     SuccessOrExit(err);
 
     mSecureMessageIndex++;
@@ -346,9 +345,10 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     uint16_t taglen      = 0;
     uint16_t payloadlen  = 0;
 
-    System::AutoFreePacketBuffer msgBuf(msgIn);
-    System::AutoFreePacketBuffer origMsg;
+    System::PacketBufferHandle msgBuf;
+    System::PacketBufferHandle origMsg;
 
+    msgBuf.Adopt(msgIn);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Check if the source and destination node IDs match with what we already know
@@ -370,8 +370,8 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     /* This is a workaround for the case where PacketBuffer payload is not
        allocated as an inline buffer to PacketBuffer structure */
-    origMsg.Adopt(msgBuf.Release());
-    msgBuf.Adopt(PacketBuffer::NewWithAvailableSize(len));
+    origMsg = std::move(msgBuf);
+    msgBuf  = PacketBuffer::NewWithAvailableSize(len);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetDataLength(len);
@@ -410,7 +410,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
 
     if (payloadHeader.GetProtocolID() == Protocols::kProtocol_NetworkProvisioning)
     {
-        err = mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf.Get_NoRelease());
+        err = mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf.Get_ForNow());
         SuccessOrExit(err);
     }
 

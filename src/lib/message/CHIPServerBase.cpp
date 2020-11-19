@@ -150,12 +150,11 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
                                             CHIP_ERROR sysError, uint16_t sendFlags)
 {
     CHIP_ERROR err;
-    PacketBuffer * respBuf;
     uint8_t * p;
     uint8_t respLen = 18; // sizeof(statusProfileId) + sizeof(statusCode) + StartContainer(1) + kTag_SystemErrorCode TLV Len (10),
                           // EndContainer (1)
 
-    respBuf = PacketBuffer::NewWithAvailableSize(respLen);
+    PacketBufferHandle respBuf = PacketBuffer::NewWithAvailableSize(respLen);
     VerifyOrExit(respBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
     VerifyOrDie(ec != nullptr);
 
@@ -169,7 +168,7 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
         TLVWriter statusWriter;
         TLVType outerContainerType;
 
-        statusWriter.Init(respBuf);
+        statusWriter.Init(respBuf.Get_ForNow());
 
         err = statusWriter.StartContainer(AnonymousTag, kTLVType_Structure, outerContainerType);
         SuccessOrExit(err);
@@ -184,12 +183,9 @@ CHIP_ERROR ChipServerBase::SendStatusReport(ExchangeContext * ec, uint32_t statu
         SuccessOrExit(err);
     }
 
-    err     = ec->SendMessage(kChipProtocol_Common, Common::kMsgType_StatusReport, respBuf, sendFlags);
-    respBuf = nullptr;
+    err = ec->SendMessage(kChipProtocol_Common, Common::kMsgType_StatusReport, respBuf.Release(), sendFlags);
 
 exit:
-    if (respBuf != nullptr)
-        PacketBuffer::Free(respBuf);
     return err;
 }
 

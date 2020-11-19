@@ -373,12 +373,12 @@ void BLEManagerImpl::CHIPoBluez_NewConnection(BLE_CONNECTION_OBJECT conId)
 
 void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    PacketBuffer * buf = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    System::PacketBufferHandle buf;
 
     // Copy the data to a PacketBuffer.
     buf = PacketBuffer::New();
-    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), value, len);
     static_assert(std::is_same<decltype(buf->AvailableDataLength()), uint16_t>::value,
@@ -392,20 +392,14 @@ void BLEManagerImpl::HandleRXCharWrite(BLE_CONNECTION_OBJECT conId, const uint8_
         event.Type = DeviceEventType::kCHIPoBLEWriteReceived;
         ChipLogProgress(Ble, "Write request received debug %p", conId);
         event.CHIPoBLEWriteReceived.ConId = conId;
-        event.CHIPoBLEWriteReceived.Data  = buf;
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
-        buf = nullptr;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
-    }
-
-    if (nullptr != buf)
-    {
-        chip::System::PacketBuffer::Free(buf);
     }
 }
 

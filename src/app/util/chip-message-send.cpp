@@ -55,8 +55,8 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
         return EMBER_ERR_FATAL;
     }
 
-    auto * buffer = System::PacketBuffer::NewWithAvailableSize(dataLength);
-    if (!buffer)
+    System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(dataLength);
+    if (buffer.IsNull())
     {
         // FIXME: Not quite right... what's the right way to indicate "out of
         // heap"?
@@ -67,14 +67,13 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     {
         // Something is very wrong here; our first call lied to us!
         ChipLogError(Zcl, "Something wrong happened trying to encode aps frame to respond with");
-        System::PacketBuffer::Free(buffer);
         return EMBER_ERR_FATAL;
     }
 
     memcpy(buffer->Start() + frameSize, message, messageLength);
     buffer->SetDataLength(dataLength);
 
-    CHIP_ERROR err = SessionManager().SendMessage(destination, buffer);
+    CHIP_ERROR err = SessionManager().SendMessage(destination, buffer.Release_ForNow());
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?
