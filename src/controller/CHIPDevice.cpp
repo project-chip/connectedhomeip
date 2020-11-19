@@ -106,7 +106,7 @@ exit:
 
 CHIP_ERROR Device::SendMessage(System::PacketBufferHandle & message)
 {
-    return SendMessage(message.Get_ForNow());
+    return SendMessage(message.Release_ForNow());
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
