@@ -27,9 +27,6 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPDevice : NSObject
 
 - (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
-- (BOOL)sendOnCommand;
-- (BOOL)sendOffCommand;
-- (BOOL)sendToggleCommand;
 - (BOOL)sendIdentifyCommandWithDuration:(NSTimeInterval)duration;
 - (BOOL)disconnect:(NSError * __autoreleasing *)error;
 - (BOOL)isActive;

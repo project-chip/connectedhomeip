@@ -65,14 +65,13 @@
     size_t messageLen = [message length];
     const void * messageChars = [message bytes];
 
-    chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(messageLen);
-    if (!buffer) {
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(messageLen);
+    if (buffer.IsNull()) {
         err = CHIP_ERROR_NO_MEMORY;
     } else {
         buffer->SetDataLength(messageLen);
 
         if (buffer->DataLength() < messageLen) {
-            chip::System::PacketBuffer::Free(buffer);
             err = CHIP_ERROR_NO_MEMORY;
         } else {
             memcpy(buffer->Start(), messageChars, messageLen);
@@ -92,15 +91,15 @@
     return YES;
 }
 
-- (BOOL)sendCHIPCommand:(uint32_t (^)(chip::System::PacketBuffer *, uint16_t))encodeCommandBlock
+- (BOOL)sendCHIPCommand:(uint32_t (^)(chip::System::PacketBufferHandle &, uint16_t))encodeCommandBlock
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     [self.lock lock];
     // FIXME: This needs a better buffersizing setup!
     static const size_t bufferSize = 1024;
-    chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(bufferSize);
-    if (!buffer) {
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(bufferSize);
+    if (buffer.IsNull()) {
         err = CHIP_ERROR_NO_MEMORY;
     } else {
         uint32_t dataLength = encodeCommandBlock(buffer, (uint16_t) bufferSize);
@@ -117,37 +116,13 @@
     return YES;
 }
 
-- (BOOL)sendOnCommand
-{
-    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
-        // Hardcode endpoint to 1 for now
-        return encodeOnOffClusterOnCommand(buffer->Start(), bufferSize, 1);
-    }];
-}
-
-- (BOOL)sendOffCommand
-{
-    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
-        // Hardcode endpoint to 1 for now
-        return encodeOnOffClusterOffCommand(buffer->Start(), bufferSize, 1);
-    }];
-}
-
-- (BOOL)sendToggleCommand
-{
-    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
-        // Hardcode endpoint to 1 for now
-        return encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, 1);
-    }];
-}
-
 - (BOOL)sendIdentifyCommandWithDuration:(NSTimeInterval)duration
 {
     if (duration > UINT16_MAX) {
         duration = UINT16_MAX;
     }
 
-    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
+    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBufferHandle & buffer, uint16_t bufferSize) {
         // Hardcode endpoint to 1 for now
         return encodeIdentifyClusterIdentifyCommand(buffer->Start(), bufferSize, 1, duration);
     }];
