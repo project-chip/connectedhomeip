@@ -818,13 +818,13 @@ exit:
 void BLEManagerImpl::HandleRXCharWrite(volatile struct gecko_cmd_packet * evt)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    PacketBuffer * buf;
+    System::PacketBufferHandle buf;
     uint16_t writeLen = evt->data.evt_gatt_server_user_write_request.value.len;
     uint8_t * data    = (uint8_t *) evt->data.evt_gatt_server_user_write_request.value.data;
 
     // Copy the data to a PacketBuffer.
     buf = PacketBuffer::New(0);
-    VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= writeLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), data, writeLen);
     buf->SetDataLength(writeLen);
@@ -837,9 +837,8 @@ void BLEManagerImpl::HandleRXCharWrite(volatile struct gecko_cmd_packet * evt)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = evt->data.evt_gatt_server_user_write_request.connection;
-        event.CHIPoBLEWriteReceived.Data  = buf;
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
-        buf = NULL;
     }
 
 exit:
@@ -847,7 +846,6 @@ exit:
     {
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
     }
-    PacketBuffer::Free(buf);
 }
 
 void BLEManagerImpl::HandleTxConfirmationEvent(volatile struct gecko_cmd_packet * evt)

@@ -14,13 +14,12 @@
 
 import("//build_overrides/chip.gni")
 
-static_library("protocols") {
-  output_name = "libChipProtocols"
+static_library("bdx") {
+  output_name = "libBdx"
 
   sources = [
-    "echo/Echo.h",
-    "echo/EchoClient.cpp",
-    "echo/EchoServer.cpp",
+    "BdxMessages.cpp",
+    "BdxMessages.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -28,7 +27,6 @@ static_library("protocols") {
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
-    "${chip_root}/src/messaging",
-    "${chip_root}/src/protocols/bdx",
+    "${chip_root}/src/system",
   ]
 }

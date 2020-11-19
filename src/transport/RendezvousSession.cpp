@@ -24,7 +24,6 @@
 #include <support/ErrorStr.h>
 #include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
-#include <system/AutoFreePacketBuffer.h>
 
 #if CONFIG_NETWORK_LAYER_BLE
 #include <transport/BLE.h>
@@ -80,16 +79,16 @@ RendezvousSession::~RendezvousSession()
 CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
                                                  System::PacketBuffer * msgIn)
 {
-    System::AutoFreePacketBuffer msgBuf(msgIn);
-
     ReturnErrorCodeIf(mCurrentState != State::kSecurePairing, CHIP_ERROR_INCORRECT_STATE);
 
-    return mTransport->SendMessage(header, payloadFlags, Transport::PeerAddress::BLE(), msgBuf.Release());
+    return mTransport->SendMessage(header, payloadFlags, Transport::PeerAddress::BLE(), msgIn);
 }
 
 CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgIn)
 {
-    System::AutoFreePacketBuffer msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf;
+
+    msgBuf.Adopt(msgIn);
 
     PayloadHeader payloadHeader;
     payloadHeader.SetProtocolID(static_cast<uint16_t>(protocol)).SetMessageType(msgType);
@@ -129,7 +128,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
     ReturnErrorOnFailure(mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(),
-                                                 msgBuf.Release()));
+                                                 msgBuf.Release_ForNow()));
 
     mSecureMessageIndex++;
 
@@ -295,14 +294,13 @@ CHIP_ERROR RendezvousSession::HandlePairingMessage(PacketBuffer * msgBuf)
 
 CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgIn)
 {
-    System::AutoFreePacketBuffer msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf;
+    msgBuf.Adopt(msgIn);
 
     uint16_t headerSize = 0;
     uint8_t * plainText = nullptr;
     uint16_t taglen     = 0;
     uint16_t payloadlen = 0;
-
-    System::AutoFreePacketBuffer origMsg;
 
     ReturnErrorCodeIf(msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -332,6 +330,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgIn)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     /* This is a workaround for the case where PacketBuffer payload is not
        allocated as an inline buffer to PacketBuffer structure */
+    System::PacketBufferHandle origMsg;
     origMsg.Adopt(msgBuf.Release());
     msgBuf.Adopt(PacketBuffer::NewWithAvailableSize(len));
 
@@ -375,7 +374,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgIn)
     if (payloadHeader.GetProtocolID() == Protocols::kProtocol_NetworkProvisioning)
     {
         ReturnErrorOnFailure(
-            mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf.Get_NoRelease()));
+            mNetworkProvision.HandleNetworkProvisioningMessage(payloadHeader.GetMessageType(), msgBuf.Get_ForNow()));
     }
 
     return CHIP_NO_ERROR;

@@ -26,7 +26,6 @@
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/AutoFreePacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
@@ -92,7 +91,8 @@ void UDP::Close()
 CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                             System::PacketBuffer * msgIn)
 {
-    System::AutoFreePacketBuffer msgBuf(msgIn);
+    System::PacketBufferHandle msgBuf;
+    msgBuf.Adopt(msgIn);
 
     const uint16_t headerSize = header.EncodeSizeBytes();
 
@@ -114,10 +114,9 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFl
     uint16_t actualEncodedHeaderSize;
     ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags));
 
-    // This is unexpected and means header changed while encoding
     VerifyOrReturnError(headerSize == actualEncodedHeaderSize, CHIP_ERROR_INTERNAL);
 
-    return mUDPEndPoint->SendMsg(&addrInfo, msgBuf.Release());
+    return mUDPEndPoint->SendMsg(&addrInfo, msgBuf.Release_ForNow());
 }
 
 void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const Inet::IPPacketInfo * pktInfo)

@@ -111,8 +111,8 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
-    chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
-    NL_TEST_ASSERT(inSuite, buffer != nullptr);
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
     memmove(buffer->Start(), PAYLOAD, payload_len);
     buffer->SetDataLength(payload_len);
@@ -143,7 +143,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
 
-    err = conn.SendMessage(kDestinationNodeId, buffer);
+    err = conn.SendMessage(kDestinationNodeId, buffer.Release_ForNow());
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });

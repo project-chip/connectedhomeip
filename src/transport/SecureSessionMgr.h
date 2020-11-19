@@ -90,6 +90,15 @@ public:
 
     /**
      * @brief
+     *   Called when a new connection is closing
+     *
+     * @param state   connection state
+     * @param mgr     A pointer to the SecureSessionMgr
+     */
+    virtual void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
+
+    /**
+     * @brief
      *   Called when the peer address is resolved from NodeID.
      *
      * @param error   The resolution resolve error code

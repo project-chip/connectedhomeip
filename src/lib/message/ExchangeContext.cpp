@@ -598,17 +598,15 @@ exit:
  */
 CHIP_ERROR ExchangeContext::SendCommonNullMessage()
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
-    PacketBuffer * msgBuf = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Allocate a buffer for the null message
-    msgBuf = PacketBuffer::NewWithAvailableSize(0);
-    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    PacketBufferHandle msgBuf = PacketBuffer::NewWithAvailableSize(0);
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err    = SendMessage(chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf,
+    err = SendMessage(chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf.Release(),
                       kSendFlag_NoAutoRequestAck);
-    msgBuf = nullptr;
 
 exit:
     if (ChipMessageLayer::IsSendErrorNonCritical(err))
@@ -1100,13 +1098,12 @@ uint32_t ExchangeContext::GetCurrentRetransmitTimeout()
  */
 CHIP_ERROR ExchangeContext::RMPSendThrottleFlow(uint32_t pauseTimeMillis)
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
-    PacketBuffer * msgBuf = nullptr;
-    uint8_t * p           = nullptr;
-    uint8_t msgLen        = sizeof(pauseTimeMillis);
+    CHIP_ERROR err            = CHIP_NO_ERROR;
+    uint8_t * p               = nullptr;
+    uint8_t msgLen            = sizeof(pauseTimeMillis);
+    PacketBufferHandle msgBuf = PacketBuffer::NewWithAvailableSize(msgLen);
 
-    msgBuf = PacketBuffer::NewWithAvailableSize(msgLen);
-    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     p = msgBuf->Start();
 
@@ -1117,12 +1114,10 @@ CHIP_ERROR ExchangeContext::RMPSendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
+    err = SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow, msgBuf.Release(),
                       kSendFlag_NoAutoRequestAck);
 
 exit:
-    msgBuf = nullptr;
-
     return err;
 }
 
@@ -1156,13 +1151,12 @@ exit:
  */
 CHIP_ERROR ExchangeContext::RMPSendDelayedDelivery(uint32_t pauseTimeMillis, uint64_t delayedNodeId)
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
-    PacketBuffer * msgBuf = nullptr;
-    uint8_t * p           = nullptr;
-    uint8_t msgLen        = sizeof(pauseTimeMillis) + sizeof(delayedNodeId);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t * p    = nullptr;
+    uint8_t msgLen = sizeof(pauseTimeMillis) + sizeof(delayedNodeId);
 
-    msgBuf = PacketBuffer::NewWithAvailableSize(msgLen);
-    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    PacketBufferHandle msgBuf = PacketBuffer::NewWithAvailableSize(msgLen);
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     p = msgBuf->Start();
     // Set back the pointer by the length of the fields
@@ -1175,12 +1169,10 @@ CHIP_ERROR ExchangeContext::RMPSendDelayedDelivery(uint32_t pauseTimeMillis, uin
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
+    err = SendMessage(Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery, msgBuf.Release(),
                       kSendFlag_NoAutoRequestAck);
 
 exit:
-    msgBuf = nullptr;
-
     return err;
 }
 

@@ -29,7 +29,6 @@
 #include <support/CodeUtils.h>
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
-#include <system/AutoFreePacketBuffer.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
@@ -175,7 +174,8 @@ Inet::TCPEndPoint * TCPBase::FindActiveConnection(const PeerAddress & address)
 CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
                                 System::PacketBuffer * msgBuf)
 {
-    System::AutoFreePacketBuffer autofree(msgBuf);
+    System::PacketBufferHandle autofree;
+    autofree.Adopt(msgBuf);
 
     // Sent buffer data format is:
     //    - packet size as a uint16_t (inludes size of header and actual data)
@@ -211,11 +211,11 @@ CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, Header::Flags paylo
 
     if (endPoint != nullptr)
     {
-        return endPoint->Send(autofree.Release());
+        return endPoint->Send(autofree.Release_ForNow());
     }
     else
     {
-        return SendAfterConnect(address, autofree.Release());
+        return SendAfterConnect(address, autofree.Release_ForNow());
     }
 }
 

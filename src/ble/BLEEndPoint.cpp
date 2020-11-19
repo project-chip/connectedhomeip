@@ -105,7 +105,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
 {
     BLE_ERROR err = BLE_NO_ERROR;
     BleTransportCapabilitiesRequestMessage req;
-    PacketBuffer * buf = nullptr;
+    PacketBufferHandle buf;
     int i;
     int numVersions;
 
@@ -115,7 +115,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
 
     // Build BLE transport protocol capabilities request.
     buf = PacketBuffer::New();
-    VerifyOrExit(buf != nullptr, err = BLE_ERROR_NO_MEMORY);
+    VerifyOrExit(!buf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
     // Zero-initialize BLE transport capabilities request.
     memset(&req, 0, sizeof(req));
@@ -132,7 +132,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
         req.SetSupportedProtocolVersion(i, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION - i);
     }
 
-    err = req.Encode(buf);
+    err = req.Encode(buf.Get_ForNow());
     SuccessOrExit(err);
 
     // Start connect timer. Canceled when end point freed or connection established.
@@ -140,7 +140,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
     SuccessOrExit(err);
 
     // Send BLE transport capabilities request to peripheral via GATT write.
-    if (!SendWrite(buf))
+    if (!SendWrite(buf.Get_ForNow()))
     {
         err = BLE_ERROR_GATT_WRITE_FAILED;
         ExitNow();
@@ -148,15 +148,9 @@ BLE_ERROR BLEEndPoint::StartConnect()
 
     // Free request buffer on write confirmation. Stash a reference to it in mSendQueue, which we don't use anyway
     // until the connection has been set up.
-    QueueTx(buf, kType_Data);
-    buf = nullptr;
+    QueueTx(buf.Release_ForNow(), kType_Data);
 
 exit:
-    if (buf != nullptr)
-    {
-        PacketBuffer::Free(buf);
-    }
-
     // If we failed to initiate the connection, close the end point.
     if (err != BLE_NO_ERROR)
     {
@@ -980,7 +974,7 @@ BLE_ERROR BLEEndPoint::DriveStandAloneAck()
     // If stand-alone ack not already pending, allocate new payload buffer here.
     if (mAckToSend == nullptr)
     {
-        mAckToSend = PacketBuffer::New();
+        mAckToSend = PacketBuffer::New().Release_ForNow();
         VerifyOrExit(mAckToSend != nullptr, err = BLE_ERROR_NO_MEMORY);
     }
 
@@ -1115,7 +1109,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBuffer * data)
     BLE_ERROR err = BLE_NO_ERROR;
     BleTransportCapabilitiesRequestMessage req;
     BleTransportCapabilitiesResponseMessage resp;
-    PacketBuffer * responseBuf = nullptr;
+    PacketBufferHandle responseBuf;
     uint16_t mtu;
 
     VerifyOrExit(data != nullptr, err = BLE_ERROR_BAD_ARGS);
@@ -1127,7 +1121,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBuffer * data)
     SuccessOrExit(err);
 
     responseBuf = PacketBuffer::New();
-    VerifyOrExit(responseBuf != nullptr, err = BLE_ERROR_NO_MEMORY);
+    VerifyOrExit(!responseBuf.IsNull(), err = BLE_ERROR_NO_MEMORY);
 
     // Determine BLE connection's negotiated ATT MTU, if possible.
     if (req.mMtu > 0) // If MTU was observed and provided by central...
@@ -1185,23 +1179,17 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBuffer * data)
     }
     ChipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mBtpEngine.GetRxFragmentSize(), mBtpEngine.GetTxFragmentSize());
 
-    err = resp.Encode(responseBuf);
+    err = resp.Encode(responseBuf.Get_ForNow());
     SuccessOrExit(err);
 
     // Stash capabilities response payload and wait for subscription from central.
-    QueueTx(responseBuf, kType_Data);
-    responseBuf = nullptr;
+    QueueTx(responseBuf.Release_ForNow(), kType_Data);
 
     // Start receive timer. Canceled when end point freed or connection established.
     err = StartReceiveConnectionTimer();
     SuccessOrExit(err);
 
 exit:
-    if (responseBuf != nullptr)
-    {
-        PacketBuffer::Free(responseBuf);
-    }
-
     if (data != nullptr)
     {
         PacketBuffer::Free(data);

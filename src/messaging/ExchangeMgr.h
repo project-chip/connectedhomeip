@@ -201,6 +201,8 @@ private:
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
                            SecureSessionMgrBase * msgLayer) override;
+
+    void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 };
 
 } // namespace chip
