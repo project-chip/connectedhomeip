@@ -73,9 +73,7 @@ if [[ ${*/--no-cache//} != "${*}" ]]; then
     BUILD_ARGS+=(--no-cache)
 fi
 
-docker -D build "${BUILD_ARGS[@]}" -t "$ORG/$IMAGE:$VERSION" .
-
-exit 0
+docker build "${BUILD_ARGS[@]}" -t "$ORG/$IMAGE:$VERSION" .
 
 [[ ${*/--latest//} != "${*}" ]] && {
     docker tag "$ORG"/"$IMAGE":"$VERSION" "$ORG"/"$IMAGE":latest
