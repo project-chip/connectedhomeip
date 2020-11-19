@@ -16,10 +16,6 @@ typedef struct _{{asType label}} {
 {{ident}}chip::EndpointId {{asSymbol label}};
 {{else if (isStrEqual label "endpointId")}}
 {{ident}}chip::EndpointId {{asSymbol label}};
-{{else if (isStrEqual type "CLUSTER_ID")}}
-{{ident}}chip::ClusterId {{asSymbol label}};
-{{else if (isStrEqual type "ATTRIBUTE_ID")}}
-{{ident}}chip::AttributeId {{asSymbol label}};
 {{else if (isStrEqual label "groupId")}}
 {{ident}}chip::GroupId {{asSymbol label}};
 {{else if (isStrEqual label "commandId")}}

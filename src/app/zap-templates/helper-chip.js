@@ -69,6 +69,18 @@ function isCommandAvailable(clusterSide, incoming, outgoing, source, name) {
   return false;
 }
 
+function isString(type) {
+  return type == 'CHAR_STRING' || type == 'OCTET_STRING';
+}
+
+function isLongString(type) {
+  return type == 'LONG_CHAR_STRING' || type == 'LONG_OCTET_STRING';
+}
+
+function isNullable(type, isArray) {
+  return isString(type) || isLongString(type) || isArray;
+}
+
 // WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 //
 // Note: these exports are public API. Templates that might have been created in the past and are
@@ -81,3 +93,6 @@ exports.isStrEqual = isStrEqual;
 exports.isLastElement = isLastElement;
 exports.isEnabled = isEnabled;
 exports.isCommandAvailable = isCommandAvailable;
+exports.isString = isString;
+exports.isLongString = isLongString;
+exports.isNullable = isNullable;
