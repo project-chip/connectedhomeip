@@ -331,8 +331,9 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(PacketBuffer * msgIn)
     /* This is a workaround for the case where PacketBuffer payload is not
        allocated as an inline buffer to PacketBuffer structure */
     System::PacketBufferHandle origMsg;
-    origMsg.Adopt(msgBuf.Release());
-    msgBuf.Adopt(PacketBuffer::NewWithAvailableSize(len));
+
+    origMsg = std::move(msgBuf);
+    msgBuf  = PacketBuffer::NewWithAvailableSize(len);
 
     ReturnErrorCodeIf(msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
 
