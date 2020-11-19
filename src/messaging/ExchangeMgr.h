@@ -34,7 +34,6 @@ namespace chip {
 
 class ExchangeContext;
 class ExchangeDelegate;
-class ExchangeDelegate;
 
 static constexpr int16_t kAnyMessageType = -1;
 
