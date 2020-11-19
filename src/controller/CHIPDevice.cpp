@@ -165,7 +165,7 @@ exit:
 }
 
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                               Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
+                               const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
 {
     if (mState == ConnectionState::SecureConnected && mStatusDelegate != nullptr)
     {

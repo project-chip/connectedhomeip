@@ -312,10 +312,10 @@ exit:
     return err;
 }
 
-void DeviceController::OnNewConnection(Transport::PeerConnectionState * peerConnection, SecureSessionMgr * mgr) {}
+void DeviceController::OnNewConnection(const Transport::PeerConnectionState * peerConnection, SecureSessionMgr * mgr) {}
 
 void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                                         Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                         const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
                                          SecureSessionMgr * mgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

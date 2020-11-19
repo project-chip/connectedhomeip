@@ -159,8 +159,8 @@ private:
     typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
-    ExchangeDelegate * mDelegate = nullptr;
-    ExchangeManager * mExchangeMgr;
+    ExchangeDelegate * mDelegate   = nullptr;
+    ExchangeManager * mExchangeMgr = nullptr;
 
     uint64_t mPeerNodeId; // Node ID of peer node.
     uint16_t mExchangeId; // Assigned exchange ID.
