@@ -257,12 +257,11 @@ namespace DeviceLayer {
         [BleConnection fillServiceWithCharacteristicUuids:characteristic svcId:&svcId charId:&charId];
 
         // build a inet buffer from the rxEv and send to blelayer.
-        chip::System::PacketBuffer * msgBuf = chip::System::PacketBuffer::New();
+        chip::System::PacketBufferHandle msgBuf = chip::System::PacketBuffer::New();
 
-        if (NULL != msgBuf) {
+        if (!msgBuf.IsNull()) {
             if (msgBuf->MaxDataLength() < characteristic.value.length) {
                 ChipLogError(Ble, "Can't fit characteristic value into our packet buffer");
-                chip::System::PacketBuffer::Free(msgBuf);
                 _mBleLayer->HandleConnectionError((__bridge void *) peripheral, BLE_ERROR_INCORRECT_STATE);
             } else {
                 memcpy(msgBuf->Start(), characteristic.value.bytes, characteristic.value.length);
@@ -270,7 +269,7 @@ namespace DeviceLayer {
                     std::is_same<decltype(msgBuf->MaxDataLength()), uint16_t>::value, "Unexpected type for max data length");
                 msgBuf->SetDataLength(static_cast<uint16_t>(characteristic.value.length));
 
-                if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, msgBuf)) {
+                if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, msgBuf.Release_ForNow())) {
                     // since this error comes from device manager core
                     // we assume it would do the right thing, like closing the connection
                     ChipLogError(Ble, "Failed at handling incoming BLE data");
