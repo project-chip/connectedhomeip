@@ -295,6 +295,18 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
     DispatchMessage(packetHeader, payloadHeader, msgBuf);
 }
 
+void ExchangeManager::OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
+{
+    for (auto & ec : ContextPool)
+    {
+        if (ec.GetReferenceCount() > 0 && ec.mPeerNodeId == state->GetPeerNodeId())
+        {
+            ec.Close();
+            // Continue iterate because there can be multiple contexts associated with the connection.
+        }
+    }
+}
+
 void ExchangeManager::IncrementContextsInUse()
 {
     mContextsInUse++;
