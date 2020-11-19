@@ -43,8 +43,6 @@ jobs:
             - name: Setup ZAP
               run: |
                 cd third_party/zap/repo/
-                git checkout master
-                git pull
                 npm ci
                 npm run version-stamp
                 npm rebuild canvas --update-binary
