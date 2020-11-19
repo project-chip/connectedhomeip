@@ -1,73 +1,75 @@
 # Configuring nRF Connect SDK examples
 
-When you tried to build nRF Connect SDK example applications like
-[lock-app](../../examples/lock-app/nrfconnect/README.md),
-[lighting-app](../../examples/lighting-app/nrfconnect/README.md) or
-[pigweed-app](../../examples/pigweed-app/nrfconnect/README.md), you could notice
-that some default configuration is used then. Probably after testing an example
-solution you may want to change something in the application configuration or
-add new functionalities to build your own application based on sample. This page
-contains information about how to configure an application in different ways and
-also sheds some light on the configuration structure to allow you understand
-building process better.
+The nRF Connect SDK example applications all come with a default configuration for building.
+Check the information on this page if you want to modify the application configuration or
+add new functionalities to build your own application based on the provided example.
+This page also contains information about the configuration structure, which can be useful
+to better understand the building process.
+
+This guide can be used with the following examples:
+
+- [CHIP nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md)
+- [CHIP nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
+- [CHIP nRF Connect Pigweed Example Application](../../examples/pigweed-app/nrfconnect/README.md)
 
 <hr>
 
 ## Configuring application
 
-Changing default application configuration might be done in the many ways and
-you should choose the one that suits you, depending on your needs. You are
-allowed to change configuration temporarily, what will be useful for testing
-impact of changes on the application behavior, but if you want to develop own
-application, probably you will be interested in making permanent changes.
+Changing the default application configuration can be done either temporarily or permanently.
+Changing configuration temporarily is useful for testing the impact of changes
+on the application behavior. Making permanent changes is better if you want
+to develop your own application, as it helps avoid repeating the configuration process.
 
 <hr>
 
-### Temporary configuration
+### Temporary changes to configuration
 
-Temporary solution is basing on editing zephyr/.config, which is storing all
-configuration options from the whole application generated as a result of
-building process. After cleaning build and deleting this file, all changes are
-gone, so this is not possible to save changes permanently this way.
+You can change the configuration temporarily by editing the `zephyr/.config` file, which stores all
+configuration options for the application generated as a result of the build process.
+As long as you do not remove the current build directory or delete this file, your changes will be kept.
+However, if you do a clean build, your changes are gone, so it is not possible to save changes permanently this way.
 
-First thing that needs to be done is bulding the application (see:
-[Building nRF Connect examples](TODO:) for more details), by typing following
-command in the example directory:
+Complete the following steps:
+1. Build the application by typing the following command in the example directory:
 
-        # <board_name> should be replaced with the actual target board name
+        # <board_name> should be replaced with the target board name (e.g. nrf52840dk_nrf52840)
         $ west build -b <board_name>
 
-Next, run the terminal-based interface called menuconfig, by typing command:
+   See [Building nRF Connect examples](TODO:) for more details about building.
+2. Run the terminal-based interface called menuconfig by typing the following command:
 
         $ west build -t menuconfig
 
-You should be able to see menuconfig terminal window, where you can navigate
-using arrow keys and other keys, whose functions are described in the bottom of
-the window. You can make desired changes following terminal instructions and
-after that press `Q` to save and quit.
+   The menuconfig terminal window appears, in which you can navigate using arrow keys and other keys,
+   based on the description at the bottom of the window.
+3. Make the desired changes by following the menuconfig terminal instructions.
+4. Press `Q` to save and quit.
 
-At this point configuration changes are applied to the output file and it can be
+At this point, the configuration changes are applied to the output file and it can be
 flashed to the device.
 
 <hr>
 
-### Permanent configuration
+### Permanent changes to configuration
 
-Permanent solution is basing on changing configuration Kconfig files used as
-component parts of the building process and that is a reason why changes are not
-disappearing after performing another builds.
+The permanent solution is based on modifying the Kconfig files, which are used as
+components of the building process. This makes the changes persistent across builds.
 
-The simplest way to insert configuration changes is adding them to the main
-application configuration file called `prj.conf` and located in the example
-directory, what results in overriding existing configuration values. This is the
-best practice and for the majority of cases it should be enough, but if you are
-interested in understanding big picture of the configuration process see
-[Configuration structure overview](#configuration-structure-overview) section.
+The best practice to make permanent changes is to edit the main application configuration file
+`prj.conf`, which is located in the example directory.
+This will result in overriding the existing configuration values.
 
-Assigning value to the config option is done by typing its name preceded by
-`CONIG_` prefix, `=` mark and the value. Please note that configuration options
-has different types and it is possible to assign them only values of proper
-type. Example on how to use config options was presented below:
+This method is valid for the majority of cases. If you are interested in understanding the big picture
+of the configuration process, read the [Configuration structure overview](#configuration-structure-overview) section below.
+
+#### Assigning values to Kconfig options
+
+Assigning value to a configuration option is done by typing its full name preceded by the
+`CONIG_` prefix, and adding the `=` mark and the value.
+
+Configuration options have different types and it is only possible to assign them values of proper type.
+Few examples:
 
     # assigning logical boolean true value to the option
     CONFIG_SAMPLE_BOOLEAN_OPTION=y
@@ -76,16 +78,16 @@ type. Example on how to use config options was presented below:
     # assigning text string "some_text" value to the option
     CONFIG_SAMPLE_STRING_OPTION="some_text"
 
-For more detailed information visit
-[Setting Kconfig values](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/kconfig/setting.html#setting-configuration-values).
+For more detailed information, read about [setting Kconfig values](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/kconfig/setting.html#setting-configuration-values)
+in the nRF Connect SDK documentation.
 
-Please keep in mind that Kconfig files are used in building process, so after
-changing them you have rebuild your application (see:
-[Building nRF Connect examples](TODO:) for more details), by typing following
-command in the example directory:
+Because Kconfig files are used in the building process, make sure that you rebuild your application
+after editing them by typing the following command in the example directory:
 
-        # <board_name> should be replaced with the actual target board name
-        $ west build -b <board_name>
+        # board_name should be replaced with the actual target board name
+        $ west build -b board_name
+
+See Building nRF Connect examples for details.
 
 <hr>
 
@@ -93,44 +95,38 @@ command in the example directory:
 
 ## Configuration structure overview
 
-Configuration of the application is specified using Kconfig files and typically
-there are many files having impact on the final configuration shape. Actually
-most of the components have their own configuration files, but don't worry,
-there is no need to modify each one of them separately. Below you can see what
-types of files you can meet in the project and which one of them may be
-important from the user's perspective:
+The application configuration is specified using Kconfig files.
+Typically, there are many files having impact on the final configuration shape,
+because most of the components have their own configuration files.
 
--   **Software libraries' configuration files**
+There is no need to modify all these files separately.
+See the following list for types of files you can find in the project
+and which of them are important from your perspective:
 
-    As it was previously written many libraries, components and modules have
-    their own configuration files, but in the majority of cases you will be able
-    to override their configuration values in the main application config file,
-    so you will not have to modify their files unless you are interested in
-    developing those libraries.
+- **Software libraries' configuration files.**
+  Many libraries, components and modules have their own configuration files,
+  but in the majority of cases you can override their configuration values
+  in the main application configuration file, meaning that you do not need to modify
+  their files unless you are interested in developing these libraries.
 
--   **Application configuration file**
+- **Application configuration file.**
+  Every example application has its main configuration file called `prj.conf` that is
+  located in the example directory. This file contains application-specific configuration
+  or the most frequently changed options. Almost every configuration can be overridden
+  in this file and probably this file is the most important one.
 
-    Every example application has its main configuration file called `prj.conf`
-    located in the example directory. It typically contains application specific
-    configuration or most frequently changed options, but actually almost every
-    configuration can be overrided in this file and probably this file is the
-    most important for the User.
+- **Overlays.**
+  Overlay files are usually used to extract configuration for some specific
+  case or feature from the general application configuration. The main
+  difference between them and the application `prj.conf` file is that they are
+  not included automatically, so you can decide whether to build sample with
+  or without them.
 
--   **Overlays**
+- **Board configuration files.**
+  These are hardware-platform-dependent configuration files, which are
+  automatically included based on the compilation target board name.
+  They contain configuration for board and its peripherals.
 
-    Overlay files are usually used to extract configuration for some specific
-    case or feature from the general application configuration. The main
-    difference between them and the application `prj.conf` file is that they are
-    not included automatically, so User may decide whether to build sample with
-    or without them.
-
--   **Board configuration files**
-
-    These are hardware platform dependent configuration files, which are
-    automatically included basing on the compilation target board name and they
-    contain board and its peripherals configuration.
-
-Visit
-[Kconfig](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/kconfig/index.html#kconfig)
-if you are interested in getting more advanced and detailed information about
-used configuration structure.
+Read the [Kconfig](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/kconfig/index.html#kconfig)
+guide in the nRF Connect SDK's Zephyr documentation if you are interested in getting more advanced and detailed information about
+the configuration structure.
