@@ -33,7 +33,7 @@ void TestHandleReceiveInit(nlTestSuite * inSuite, void * inContext)
     BDX::RangeControlParams rangeParams       = { false, 0, 0 };
 
     // Initialize Receiver state machine
-    BDX::BDXState bdxReceiver;
+    BDX::TransferManager bdxReceiver;
     bdxReceiver.Init(BDX::kReceiver, transferParams, rangeParams, kTestMaxBlockSize, &mockDelegate);
 
     // Verify Receiver cannot respond to ReceiveInit
@@ -42,7 +42,7 @@ void TestHandleReceiveInit(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mockDelegate.mLastMessageSent == BDX::BDXMsgType::kStatusReport_Temp);
 
     // Initialize Sender state machine
-    BDX::BDXState bdxSender;
+    BDX::TransferManager bdxSender;
     bdxSender.Init(BDX::kSender, transferParams, rangeParams, kTestMaxBlockSize, &mockDelegate);
 
     // Verify Sender sends ReceiveAccept in response to ReceiveInit
@@ -67,7 +67,7 @@ static const nlTest sTests[] =
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-BDXState",
+    "Test-CHIP-TransferManager",
     &sTests[0],
     nullptr,
     nullptr

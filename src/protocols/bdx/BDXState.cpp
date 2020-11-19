@@ -4,22 +4,21 @@
  *
  */
 
-#include <transport/bdx/BDXState.h>
+#include <protocols/bdx/BDXState.h>
 
-#include <transport/bdx/BDXMessages.h>
-
+#include <protocols/bdx/BdxMessages.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
 namespace BDX {
 
-BDXState::BDXState()
+TransferManager::TransferManager()
 {
     mState = kIdle;
 }
 
-CHIP_ERROR BDXState::Init(TransferRole role, TransferControlParams controlParams, RangeControlParams rangeParams,
-                          uint16_t maxBlockSize, BDXStateDelegate * delegate)
+CHIP_ERROR TransferManager::Init(TransferRole role, TransferControlParams controlParams, RangeControlParams rangeParams,
+                                 uint16_t maxBlockSize, BDXStateDelegate * delegate)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     mRole                  = role;
@@ -32,7 +31,7 @@ CHIP_ERROR BDXState::Init(TransferRole role, TransferControlParams controlParams
 }
 
 // TODO: change parameter to PacketHeader
-CHIP_ERROR BDXState::HandleMessageReceived(uint16_t msgType, System::PacketBuffer * msgData)
+CHIP_ERROR TransferManager::HandleMessageReceived(uint16_t msgType, System::PacketBuffer * msgData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -82,23 +81,29 @@ done:
     return CHIP_NO_ERROR;
 }
 /*
-void BDXState::HandleSendInit()
+void TransferManager::HandleSendInit()
 {
 
 }
 
-void BDXState::HandleSendAccept()
+void TransferManager::HandleSendAccept()
 {
 
 }
 */
-void BDXState::HandleReceiveInit(System::PacketBuffer * msgData)
+void TransferManager::HandleReceiveInit(System::PacketBuffer * msgData)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ReceiveInit rcvInit;
+
     // must be configured as a sender
     VerifyOrExit(mRole == kSender, mDelegate->OnTransferError(kTransferMethodNotSupported));
 
     // must not be in the middle of a transfer
     VerifyOrExit(mState == kIdle, mDelegate->OnTransferError(kServerBadState));
+
+    err = rcvInit.Parse(*msgData);
+    SuccessOrExit(err);
 
     if (AreParametersCompatible())
     {
@@ -115,7 +120,7 @@ exit:
     return;
 }
 /*
-BDXState::HandleReceiveAccept(System::PacketBuffer *msgData)
+TransferManager::HandleReceiveAccept(System::PacketBuffer *msgData)
 {
     // was the last message sent a ReceiveInit?
     if (mState != kNegotiatingReceive)
@@ -143,27 +148,27 @@ BDXState::HandleReceiveAccept(System::PacketBuffer *msgData)
 
 }
 
-BDXState::HandleBlockQuery()
+TransferManager::HandleBlockQuery()
 {
 
 }
 
-BDXState::HandleBlock()
+TransferManager::HandleBlock()
 {
 
 }
 
-BDXState::HandleBlockEOF()
+TransferManager::HandleBlockEOF()
 {
 
 }
 
-BDXState::HandleBlockAck()
+TransferManager::HandleBlockAck()
 {
 
 }
 
-BDXState::HandleBlockAckEOF()
+TransferManager::HandleBlockAckEOF()
 {
     // if role != Receiver
     if (mTransferRole != kReceiver)
@@ -189,7 +194,7 @@ BDXState::HandleBlockAckEOF()
 }
 */
 
-CHIP_ERROR BDXState::StartTransfer()
+CHIP_ERROR TransferManager::StartTransfer()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -205,14 +210,14 @@ CHIP_ERROR BDXState::StartTransfer()
     return err;
 }
 
-void BDXState::EndTransfer(CHIP_ERROR error)
+void TransferManager::EndTransfer(CHIP_ERROR error)
 {
     // TODO:
     mControlMode = kNotSpecified;
     mState       = kIdle;
 }
 
-bool BDXState::AreParametersCompatible()
+bool TransferManager::AreParametersCompatible()
 {
     // TODO:
     mControlMode = kSenderDrive;

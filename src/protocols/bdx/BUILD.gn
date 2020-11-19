@@ -18,8 +18,10 @@ static_library("bdx") {
   output_name = "libBdx"
 
   sources = [
-    "BDXMessageUtils.cpp",
-    "BDXMessageUtils.h",
+    "BdxMessages.cpp",
+    "BdxMessages.h",
+    "BDXState.cpp",
+    "BDXState.h",
   ]
 
   cflags = [ "-Wconversion" ]

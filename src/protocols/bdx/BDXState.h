@@ -58,7 +58,7 @@ class DLL_EXPORT BDXStateDelegate
 public:
     /**
      * @brief
-     *   Called when a BDXState object needs to send a message to the other endpoint.
+     *   Called when a TransferManager object needs to send a message to the other endpoint.
      *
      */
     virtual CHIP_ERROR SendMessage(BDXMsgType msgType, System::PacketBuffer * msgBuf) { return CHIP_ERROR_NOT_IMPLEMENTED; }
@@ -72,10 +72,10 @@ public:
     virtual bool AreParametersAcceptable() { return CHIP_ERROR_NOT_IMPLEMENTED; }
 };
 
-class DLL_EXPORT BDXState
+class DLL_EXPORT TransferManager
 {
 public:
-    BDXState();
+    TransferManager();
 
     // TODO: Builder pattern probably works better here
     CHIP_ERROR Init(TransferRole role, TransferControlParams controlParams, RangeControlParams rangeParams, uint16_t maxBlockSize,
