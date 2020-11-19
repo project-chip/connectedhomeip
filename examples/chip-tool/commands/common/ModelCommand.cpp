@@ -95,7 +95,7 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
     ChipLogProgress(chipTool, "Endpoint id: '0x%02x', Cluster id: '0x%04x', Command id: '0x%02x'", mEndPointId, mClusterId,
                     mCommandId);
 
-    uint16_t dataLength = EncodeCommand(buffer.Retain(), bufferSize, mEndPointId);
+    uint16_t dataLength = EncodeCommand(buffer, bufferSize, mEndPointId);
     if (dataLength == 0)
     {
         ChipLogError(chipTool, "Error while encoding data for command: %s", GetName());

@@ -154,7 +154,7 @@ public:
     void SetSupportedProtocolVersion(uint8_t index, uint8_t version);
 
     /// Must be able to reserve 20 byte data length in msgBuf.
-    BLE_ERROR Encode(System::PacketBufferHandle msgBuf) const;
+    BLE_ERROR Encode(const System::PacketBufferHandle & msgBuf) const;
 
     static BLE_ERROR Decode(const PacketBuffer & msgBuf, BleTransportCapabilitiesRequestMessage & msg);
 };
@@ -188,7 +188,7 @@ public:
     uint8_t mWindowSize;
 
     /// Must be able to reserve 20 byte data length in msgBuf.
-    BLE_ERROR Encode(System::PacketBufferHandle msgBuf) const;
+    BLE_ERROR Encode(const System::PacketBufferHandle & msgBuf) const;
 
     static BLE_ERROR Decode(const PacketBuffer & msgBuf, BleTransportCapabilitiesResponseMessage & msg);
 };

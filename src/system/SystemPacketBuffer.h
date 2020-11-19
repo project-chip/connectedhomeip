@@ -284,11 +284,8 @@ public:
         return PacketBufferHandle(mBuffer);
     }
 
-    PacketBuffer * operator->() { return mBuffer; }
-    PacketBuffer & operator*() { return *mBuffer; }
-
-    const PacketBuffer * operator->() const { return mBuffer; }
-    const PacketBuffer & operator*() const { return *mBuffer; }
+    PacketBuffer * operator->() const { return mBuffer; }
+    PacketBuffer & operator*() const { return *mBuffer; }
 
     // The caller's ownership is transferred to this.
     void Adopt(PacketBuffer * buffer)

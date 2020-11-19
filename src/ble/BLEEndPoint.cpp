@@ -132,7 +132,7 @@ BLE_ERROR BLEEndPoint::StartConnect()
         req.SetSupportedProtocolVersion(i, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION - i);
     }
 
-    err = req.Encode(buf.Retain());
+    err = req.Encode(buf);
     SuccessOrExit(err);
 
     // Start connect timer. Canceled when end point freed or connection established.
@@ -1181,7 +1181,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesRequestReceived(PacketBufferHandle data
     }
     ChipLogProgress(Ble, "using BTP fragment sizes rx %d / tx %d.", mBtpEngine.GetRxFragmentSize(), mBtpEngine.GetTxFragmentSize());
 
-    err = resp.Encode(responseBuf.Retain());
+    err = resp.Encode(responseBuf);
     SuccessOrExit(err);
 
     // Stash capabilities response payload and wait for subscription from central.
@@ -1316,8 +1316,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
                 VerifyOrExit(mState == kState_Connecting, err = BLE_ERROR_INCORRECT_STATE);
                 SetFlag(mConnStateFlags, kConnState_CapabilitiesMsgReceived, true);
 
-                err  = HandleCapabilitiesResponseReceived(std::move(data));
-                data = nullptr;
+                err = HandleCapabilitiesResponseReceived(std::move(data));
                 SuccessOrExit(err);
             }
             else // Or, a peripheral receiving a capabilities request write...
@@ -1326,8 +1325,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
                 VerifyOrExit(mState == kState_Ready, err = BLE_ERROR_INCORRECT_STATE);
                 SetFlag(mConnStateFlags, kConnState_CapabilitiesMsgReceived, true);
 
-                err  = HandleCapabilitiesRequestReceived(std::move(data));
-                data = nullptr;
+                err = HandleCapabilitiesRequestReceived(std::move(data));
 
                 if (err != BLE_NO_ERROR)
                 {

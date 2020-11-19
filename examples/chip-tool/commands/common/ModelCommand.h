@@ -52,7 +52,7 @@ public:
     void OnError(ChipDeviceController * dc, CHIP_ERROR err) override;
     void OnMessage(ChipDeviceController * dc, chip::System::PacketBufferHandle buffer) override;
 
-    virtual uint16_t EncodeCommand(chip::System::PacketBufferHandle buffer, uint16_t bufferSize, uint8_t endPointId) = 0;
+    virtual uint16_t EncodeCommand(const chip::System::PacketBufferHandle & buffer, uint16_t bufferSize, uint8_t endPointId) = 0;
     virtual bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
     virtual bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
 

@@ -188,7 +188,7 @@ private:
      * @param buffer the buffer containing the message
      * @param messageSize how much of the head contains the actual message
      */
-    CHIP_ERROR ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBufferHandle buffer,
+    CHIP_ERROR ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, const System::PacketBufferHandle & buffer,
                                                   uint16_t messageSize);
 
     // Callback handler for TCPEndPoint. TCP message receive handler.

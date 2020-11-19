@@ -197,7 +197,7 @@ void BleTransportCapabilitiesRequestMessage::SetSupportedProtocolVersion(uint8_t
     mSupportedProtocolVersions[(index / 2)] |= version;
 }
 
-BLE_ERROR BleTransportCapabilitiesRequestMessage::Encode(PacketBufferHandle msgBuf) const
+BLE_ERROR BleTransportCapabilitiesRequestMessage::Encode(const PacketBufferHandle & msgBuf) const
 {
     uint8_t * p   = msgBuf->Start();
     BLE_ERROR err = BLE_NO_ERROR;
@@ -247,7 +247,7 @@ exit:
 
 // BleTransportCapabilitiesResponseMessage implementation:
 
-BLE_ERROR BleTransportCapabilitiesResponseMessage::Encode(PacketBufferHandle msgBuf) const
+BLE_ERROR BleTransportCapabilitiesResponseMessage::Encode(const PacketBufferHandle & msgBuf) const
 {
     uint8_t * p   = msgBuf->Start();
     BLE_ERROR err = BLE_NO_ERROR;
@@ -427,8 +427,7 @@ BLE_ERROR BleLayer::HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT 
 
     newEndPoint->mAppState = mAppState;
 
-    err  = newEndPoint->Receive(std::move(pBuf));
-    pBuf = nullptr;
+    err = newEndPoint->Receive(std::move(pBuf));
     SuccessOrExit(err); // If we fail here, end point will have already released connection and freed itself.
 
 exit:
@@ -470,7 +469,6 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
         if (endPoint != nullptr)
         {
             BLE_ERROR status = endPoint->Receive(std::move(pBuf));
-            pBuf             = nullptr;
             if (status != BLE_NO_ERROR)
             {
                 ChipLogError(Ble, "BLEEndPoint rcv failed, err = %d", status);
@@ -479,7 +477,6 @@ bool BleLayer::HandleWriteReceived(BLE_CONNECTION_OBJECT connObj, const ChipBleU
         else
         {
             BLE_ERROR status = HandleBleTransportConnectionInitiated(connObj, std::move(pBuf));
-            pBuf             = nullptr;
             if (status != BLE_NO_ERROR)
             {
                 ChipLogError(Ble, "failed handle new chip BLE connection, status = %d", status);

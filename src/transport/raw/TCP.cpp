@@ -318,7 +318,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBufferHandle buffer,
+CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, const System::PacketBufferHandle & buffer,
                                                        uint16_t messageSize)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -377,7 +377,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
             //   - there is no reason to believe that an error would not occur again on the
             //     same parameters (errors are likely not transient)
             //   - this guarantees data is received and progress is made.
-            err = ProcessSingleMessageFromBufferHead(peerAddress, buffer.Retain(), messageSize);
+            err = ProcessSingleMessageFromBufferHead(peerAddress, buffer, messageSize);
             buffer->ConsumeHead(messageSize);
             SuccessOrExit(err);
 

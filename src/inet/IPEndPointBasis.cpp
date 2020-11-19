@@ -613,7 +613,7 @@ void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle aBuffer)
 {
     if ((mState == kState_Listening) && (OnMessageReceived != NULL))
     {
-        const IPPacketInfo * pktInfo = GetPacketInfo(aBuffer.Retain());
+        const IPPacketInfo * pktInfo = GetPacketInfo(aBuffer);
 
         if (pktInfo != NULL)
         {
@@ -655,7 +655,7 @@ void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle aBuffer)
  *     packets that arrive without an Ethernet header.
  *
  */
-IPPacketInfo * IPEndPointBasis::GetPacketInfo(System::PacketBufferHandle aBuffer)
+IPPacketInfo * IPEndPointBasis::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
 {
     uintptr_t lStart;
     uintptr_t lPacketInfoStart;

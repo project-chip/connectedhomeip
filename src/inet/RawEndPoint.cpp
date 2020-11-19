@@ -988,7 +988,7 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
     {
         System::PacketBufferHandle buf_ForNow;
         buf_ForNow.Adopt(buf);
-        pktInfo = GetPacketInfo(buf_ForNow.Retain());
+        pktInfo = GetPacketInfo(buf_ForNow);
 
         if (pktInfo != NULL)
         {

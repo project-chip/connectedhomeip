@@ -877,7 +877,7 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
 
     System::PacketBufferHandle buf_ForNow;
     buf_ForNow.Adopt(buf);
-    pktInfo = GetPacketInfo(buf_ForNow.Retain());
+    pktInfo = GetPacketInfo(buf_ForNow);
     if (pktInfo != NULL)
     {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5

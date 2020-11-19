@@ -291,7 +291,6 @@ CHIP_ERROR RendezvousSession::HandlePairingMessage(PacketBufferHandle msgBuf)
     CHIP_ERROR err = CHIP_NO_ERROR;
     PacketHeader packetHeader;
     uint16_t headerSize = 0;
-    System::PacketBufferHandle msg_ForNow;
 
     err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
     SuccessOrExit(err);

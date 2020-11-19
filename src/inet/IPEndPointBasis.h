@@ -126,7 +126,7 @@ public:
 protected:
     void HandleDataReceived(chip::System::PacketBufferHandle aBuffer);
 
-    static IPPacketInfo * GetPacketInfo(chip::System::PacketBufferHandle aBuffer);
+    static IPPacketInfo * GetPacketInfo(const chip::System::PacketBufferHandle & aBuffer);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
