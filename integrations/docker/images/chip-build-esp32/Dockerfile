@@ -1,5 +1,5 @@
-ARG VERSION=latest
-FROM connectedhomeip/chip-build:${VERSION}
+ARG chip_build_VERSION=latest
+FROM connectedhomeip/chip-build:${chip_build_VERSION}
 
 # Setup the ESP-IDF
 RUN set -x \
