@@ -363,6 +363,11 @@ void SecureSessionMgrBase::HandleConnectionExpired(const Transport::PeerConnecti
 
     ChipLogDetail(Inet, "Connection from '%s' expired", addr);
 
+    if (mgr->mCB != nullptr)
+    {
+        mgr->mCB->OnConnectionExpired(&state, mgr);
+    }
+
     mgr->mTransport->Disconnect(state.GetPeerAddress());
 }
 
