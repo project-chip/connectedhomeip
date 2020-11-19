@@ -64,7 +64,7 @@ struct TransferInit
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    void WriteToBuffer(BufBound & aBuffer) const;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -134,7 +134,7 @@ struct SendAccept
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    void WriteToBuffer(BufBound & aBuffer) const;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -192,7 +192,7 @@ struct ReceiveAccept
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    void WriteToBuffer(BufBound & aBuffer) const;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -254,7 +254,7 @@ struct CounterMessage
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    void WriteToBuffer(BufBound & aBuffer) const;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const;
 
     /**
      * @brief
@@ -302,7 +302,7 @@ struct DataBlock
      *
      * @param aBuffer A BufBound object that will be used to write the message
      */
-    void WriteToBuffer(BufBound & aBuffer) const;
+    BufBound & WriteToBuffer(BufBound & aBuffer) const;
 
     /**
      * @brief

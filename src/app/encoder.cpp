@@ -49,7 +49,7 @@ using namespace chip;
     BufBound buf = BufBound(buffer, buf_length);                                                                                   \
     if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x02))                                                         \
     {                                                                                                                              \
-        buf.PutLE16(attr_id);                                                                                                      \
+        buf.Put16(attr_id);                                                                                                        \
         buf.Put(attr_type);                                                                                                        \
         switch (attr_type)                                                                                                         \
         {                                                                                                                          \
@@ -57,10 +57,10 @@ using namespace chip;
             buf.Put(static_cast<uint8_t>(value));                                                                                  \
             break;                                                                                                                 \
         case 0x21:                                                                                                                 \
-            buf.PutLE16(static_cast<uint16_t>(value));                                                                             \
+            buf.Put16(static_cast<uint16_t>(value));                                                                               \
             break;                                                                                                                 \
         case 0xF0:                                                                                                                 \
-            buf.PutLE64(static_cast<uint64_t>(value));                                                                             \
+            buf.Put64(static_cast<uint64_t>(value));                                                                               \
             break;                                                                                                                 \
         default:                                                                                                                   \
             ChipLogError(Zcl, "Error encoding %s command", name);                                                                  \
@@ -68,7 +68,7 @@ using namespace chip;
         }                                                                                                                          \
     }                                                                                                                              \
                                                                                                                                    \
-    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;                  \
+    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Needed()) ? static_cast<uint16_t>(buf.Needed()) : 0;                    \
     if (result == 0)                                                                                                               \
     {                                                                                                                              \
         ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
@@ -82,10 +82,10 @@ using namespace chip;
     {                                                                                                                              \
         uint8_t direction = 0x00;                                                                                                  \
         buf.Put(direction);                                                                                                        \
-        buf.PutLE16(attr_id);                                                                                                      \
+        buf.Put16(attr_id);                                                                                                        \
         buf.Put(attr_type);                                                                                                        \
-        buf.PutLE16(min_interval);                                                                                                 \
-        buf.PutLE16(max_interval);                                                                                                 \
+        buf.Put16(min_interval);                                                                                                   \
+        buf.Put16(max_interval);                                                                                                   \
         if (isAnalog)                                                                                                              \
         {                                                                                                                          \
             switch (attr_type)                                                                                                     \
@@ -94,25 +94,25 @@ using namespace chip;
                 buf.Put(static_cast<uint8_t>(value));                                                                              \
                 break;                                                                                                             \
             case 0x21:                                                                                                             \
-                buf.PutLE16(static_cast<uint16_t>(value));                                                                         \
+                buf.Put16(static_cast<uint16_t>(value));                                                                           \
                 break;                                                                                                             \
             case 0x23:                                                                                                             \
-                buf.PutLE32(static_cast<uint32_t>(value));                                                                         \
+                buf.Put32(static_cast<uint32_t>(value));                                                                           \
                 break;                                                                                                             \
             case 0x27:                                                                                                             \
-                buf.PutLE64(static_cast<uint64_t>(value));                                                                         \
+                buf.Put64(static_cast<uint64_t>(value));                                                                           \
                 break;                                                                                                             \
             case 0x28:                                                                                                             \
                 buf.Put(static_cast<uint8_t>(value));                                                                              \
                 break;                                                                                                             \
             case 0x29:                                                                                                             \
-                buf.PutLE16(static_cast<uint16_t>(value));                                                                         \
+                buf.Put16(static_cast<uint16_t>(value));                                                                           \
                 break;                                                                                                             \
             case 0x2B:                                                                                                             \
-                buf.PutLE32(static_cast<uint32_t>(value));                                                                         \
+                buf.Put32(static_cast<uint32_t>(value));                                                                           \
                 break;                                                                                                             \
             case 0x2f:                                                                                                             \
-                buf.PutLE64(static_cast<uint64_t>(value));                                                                         \
+                buf.Put64(static_cast<uint64_t>(value));                                                                           \
                 break;                                                                                                             \
             default:                                                                                                               \
                 ChipLogError(Zcl, "Type is not supported for report attribute: '0x%02x'", attr_type);                              \
@@ -121,7 +121,7 @@ using namespace chip;
         }                                                                                                                          \
     }                                                                                                                              \
                                                                                                                                    \
-    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;                  \
+    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Needed()) ? static_cast<uint16_t>(buf.Needed()) : 0;                    \
     if (result == 0)                                                                                                               \
     {                                                                                                                              \
         ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
@@ -134,11 +134,11 @@ using namespace chip;
     if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x0c))                                                         \
     {                                                                                                                              \
         /* Discover all attributes */                                                                                              \
-        buf.PutLE16(0x0000);                                                                                                       \
+        buf.Put16(0x0000);                                                                                                         \
         buf.Put(0xFF);                                                                                                             \
     }                                                                                                                              \
                                                                                                                                    \
-    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;                  \
+    uint16_t result = buf.Fit() && CanCastTo<uint16_t>(buf.Needed()) ? static_cast<uint16_t>(buf.Needed()) : 0;                    \
     if (result == 0)                                                                                                               \
     {                                                                                                                              \
         ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
@@ -156,7 +156,7 @@ using namespace chip;
     }
 
 #define COMMAND_FOOTER(name)                                                                                                       \
-    result = buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;                           \
+    result = buf.Fit() && CanCastTo<uint16_t>(buf.Needed()) ? static_cast<uint16_t>(buf.Needed()) : 0;                             \
     if (result == 0)                                                                                                               \
     {                                                                                                                              \
         ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
@@ -216,24 +216,24 @@ static uint16_t doEncodeApsFrame(BufBound & buf, ClusterId clusterId, EndpointId
 {
 
     uint8_t control_byte = 0;
-    buf.Put(control_byte); // Put in a control byte
-    buf.PutLE16(clusterId);
-    buf.Put(sourceEndpoint);
-    buf.Put(destinationEndpoint);
-    buf.PutLE(options, sizeof(EmberApsOption));
-    buf.PutLE16(groupId);
-    buf.Put(sequence);
-    buf.Put(radius);
+    buf.Put(control_byte) // Put in a control byte
+        .Put16(clusterId)
+        .Put(sourceEndpoint)
+        .Put(destinationEndpoint)
+        .Put(options, sizeof(EmberApsOption))
+        .Put16(groupId)
+        .Put(sequence)
+        .Put(radius);
 
     size_t result = 0;
     if (isMeasuring)
     {
-        result = buf.Written();
+        result = buf.Needed();
         ChipLogDetail(Zcl, "Measured APS frame size %d", result);
     }
     else
     {
-        result = buf.Fit() ? buf.Written() : 0;
+        result = buf.Fit() ? buf.Needed() : 0;
         CHECK_FRAME_LENGTH(result, "Buffer too small");
         ChipLogDetail(Zcl, "Successfully encoded %d bytes", result);
     }
@@ -268,7 +268,7 @@ uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, Cluster
         buf.Put(command);
     }
 
-    return buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
+    return buf.Fit() && CanCastTo<uint16_t>(buf.Needed()) ? static_cast<uint16_t>(buf.Needed()) : 0;
 }
 
 uint16_t _encodeClusterSpecificCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, CommandId command)
@@ -300,11 +300,11 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, Endp
         for (uint16_t i = 0; i < attr_id_count; ++i)
         {
             uint16_t attr_id = attr_ids[i];
-            buf.PutLE16(attr_id);
+            buf.Put16(attr_id);
         }
     }
 
-    return buf.Fit() && CanCastTo<uint16_t>(buf.Written()) ? static_cast<uint16_t>(buf.Written()) : 0;
+    return buf.Fit() && CanCastTo<uint16_t>(buf.Needed()) ? static_cast<uint16_t>(buf.Needed()) : 0;
 }
 
 /*----------------------------------------------------------------------------*\
@@ -536,8 +536,8 @@ uint16_t encodeColorControlClusterMoveColorCommand(uint8_t * buffer, uint16_t bu
 {
     const char * kName = "ColorControlMoveColor";
     COMMAND_HEADER(kName, COLOR_CONTROL_CLUSTER_ID, 0x08);
-    buf.PutLE16(static_cast<uint16_t>(rateX));
-    buf.PutLE16(static_cast<uint16_t>(rateY));
+    buf.Put16(static_cast<uint16_t>(rateX));
+    buf.Put16(static_cast<uint16_t>(rateY));
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -555,9 +555,9 @@ uint16_t encodeColorControlClusterMoveColorTemperatureCommand(uint8_t * buffer, 
     const char * kName = "ColorControlMoveColorTemperature";
     COMMAND_HEADER(kName, COLOR_CONTROL_CLUSTER_ID, 0x4B);
     buf.Put(moveMode);
-    buf.PutLE16(rate);
-    buf.PutLE16(colorTemperatureMinimumMireds);
-    buf.PutLE16(colorTemperatureMaximumMireds);
+    buf.Put16(rate);
+    buf.Put16(colorTemperatureMinimumMireds);
+    buf.Put16(colorTemperatureMaximumMireds);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -603,9 +603,9 @@ uint16_t encodeColorControlClusterMoveToColorCommand(uint8_t * buffer, uint16_t 
 {
     const char * kName = "ColorControlMoveToColor";
     COMMAND_HEADER(kName, COLOR_CONTROL_CLUSTER_ID, 0x07);
-    buf.PutLE16(colorX);
-    buf.PutLE16(colorY);
-    buf.PutLE16(transitionTime);
+    buf.Put16(colorX);
+    buf.Put16(colorY);
+    buf.Put16(transitionTime);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -621,8 +621,8 @@ uint16_t encodeColorControlClusterMoveToColorTemperatureCommand(uint8_t * buffer
 {
     const char * kName = "ColorControlMoveToColorTemperature";
     COMMAND_HEADER(kName, COLOR_CONTROL_CLUSTER_ID, 0x0A);
-    buf.PutLE16(colorTemperatureMireds);
-    buf.PutLE16(transitionTime);
+    buf.Put16(colorTemperatureMireds);
+    buf.Put16(transitionTime);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -639,7 +639,7 @@ uint16_t encodeColorControlClusterMoveToHueCommand(uint8_t * buffer, uint16_t bu
     COMMAND_HEADER(kName, COLOR_CONTROL_CLUSTER_ID, 0x00);
     buf.Put(hue);
     buf.Put(direction);
-    buf.PutLE16(transitionTime);
+    buf.Put16(transitionTime);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -657,7 +657,7 @@ uint16_t encodeColorControlClusterMoveToHueAndSaturationCommand(uint8_t * buffer
     COMMAND_HEADER(kName, COLOR_CONTROL_CLUSTER_ID, 0x06);
     buf.Put(hue);
     buf.Put(saturation);
-    buf.PutLE16(transitionTime);
+    buf.Put16(transitionTime);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -673,7 +673,7 @@ uint16_t encodeColorControlClusterMoveToSaturationCommand(uint8_t * buffer, uint
     const char * kName = "ColorControlMoveToSaturation";
     COMMAND_HEADER(kName, COLOR_CONTROL_CLUSTER_ID, 0x03);
     buf.Put(saturation);
-    buf.PutLE16(transitionTime);
+    buf.Put16(transitionTime);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -688,9 +688,9 @@ uint16_t encodeColorControlClusterStepColorCommand(uint8_t * buffer, uint16_t bu
 {
     const char * kName = "ColorControlStepColor";
     COMMAND_HEADER(kName, COLOR_CONTROL_CLUSTER_ID, 0x09);
-    buf.PutLE16(static_cast<uint16_t>(stepX));
-    buf.PutLE16(static_cast<uint16_t>(stepY));
-    buf.PutLE16(transitionTime);
+    buf.Put16(static_cast<uint16_t>(stepX));
+    buf.Put16(static_cast<uint16_t>(stepY));
+    buf.Put16(transitionTime);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -708,10 +708,10 @@ uint16_t encodeColorControlClusterStepColorTemperatureCommand(uint8_t * buffer, 
     const char * kName = "ColorControlStepColorTemperature";
     COMMAND_HEADER(kName, COLOR_CONTROL_CLUSTER_ID, 0x4C);
     buf.Put(stepMode);
-    buf.PutLE16(stepSize);
-    buf.PutLE16(transitionTime);
-    buf.PutLE16(colorTemperatureMinimumMireds);
-    buf.PutLE16(colorTemperatureMaximumMireds);
+    buf.Put16(stepSize);
+    buf.Put16(transitionTime);
+    buf.Put16(colorTemperatureMinimumMireds);
+    buf.Put16(colorTemperatureMaximumMireds);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -1297,7 +1297,7 @@ uint16_t encodeDoorLockClusterClearPINCodeCommand(uint8_t * buffer, uint16_t buf
 {
     const char * kName = "DoorLockClearPINCode";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x07);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     COMMAND_FOOTER(kName);
 }
 
@@ -1309,7 +1309,7 @@ uint16_t encodeDoorLockClusterClearRFIDCodeCommand(uint8_t * buffer, uint16_t bu
 {
     const char * kName = "DoorLockClearRFIDCode";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x18);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     COMMAND_FOOTER(kName);
 }
 
@@ -1322,7 +1322,7 @@ uint16_t encodeDoorLockClusterClearWeekdayScheduleCommand(uint8_t * buffer, uint
     const char * kName = "DoorLockClearWeekdaySchedule";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x0D);
     buf.Put(scheduleID);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     COMMAND_FOOTER(kName);
 }
 
@@ -1335,7 +1335,7 @@ uint16_t encodeDoorLockClusterClearYearDayScheduleCommand(uint8_t * buffer, uint
     const char * kName = "DoorLockClearYearDaySchedule";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x10);
     buf.Put(scheduleID);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     COMMAND_FOOTER(kName);
 }
 
@@ -1359,7 +1359,7 @@ uint16_t encodeDoorLockClusterGetPINCodeCommand(uint8_t * buffer, uint16_t buf_l
 {
     const char * kName = "DoorLockGetPINCode";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x06);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     COMMAND_FOOTER(kName);
 }
 
@@ -1371,7 +1371,7 @@ uint16_t encodeDoorLockClusterGetRFIDCodeCommand(uint8_t * buffer, uint16_t buf_
 {
     const char * kName = "DoorLockGetRFIDCode";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x17);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     COMMAND_FOOTER(kName);
 }
 
@@ -1383,7 +1383,7 @@ uint16_t encodeDoorLockClusterGetUserTypeCommand(uint8_t * buffer, uint16_t buf_
 {
     const char * kName = "DoorLockGetUserType";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x15);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     COMMAND_FOOTER(kName);
 }
 
@@ -1396,7 +1396,7 @@ uint16_t encodeDoorLockClusterGetWeekdayScheduleCommand(uint8_t * buffer, uint16
     const char * kName = "DoorLockGetWeekdaySchedule";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x0C);
     buf.Put(scheduleID);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     COMMAND_FOOTER(kName);
 }
 
@@ -1409,7 +1409,7 @@ uint16_t encodeDoorLockClusterGetYearDayScheduleCommand(uint8_t * buffer, uint16
     const char * kName = "DoorLockGetYearDaySchedule";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x0F);
     buf.Put(scheduleID);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     COMMAND_FOOTER(kName);
 }
 
@@ -1435,8 +1435,8 @@ uint16_t encodeDoorLockClusterSetHolidayScheduleCommand(uint8_t * buffer, uint16
     const char * kName = "DoorLockSetHolidaySchedule";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x11);
     buf.Put(holidayScheduleID);
-    buf.PutLE32(localStartTime);
-    buf.PutLE32(localEndTime);
+    buf.Put32(localStartTime);
+    buf.Put32(localEndTime);
     buf.Put(operatingModeDuringHoliday);
     COMMAND_FOOTER(kName);
 }
@@ -1449,7 +1449,7 @@ uint16_t encodeDoorLockClusterSetPINCodeCommand(uint8_t * buffer, uint16_t buf_l
 {
     const char * kName = "DoorLockSetPINCode";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x05);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     buf.Put(userStatus);
     buf.Put(userType);
     COMMAND_INSERT_STRING(kName, pIN);
@@ -1464,7 +1464,7 @@ uint16_t encodeDoorLockClusterSetRFIDCodeCommand(uint8_t * buffer, uint16_t buf_
 {
     const char * kName = "DoorLockSetRFIDCode";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x16);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     buf.Put(userStatus);
     buf.Put(userType);
     COMMAND_INSERT_STRING(kName, rFIDCode);
@@ -1479,7 +1479,7 @@ uint16_t encodeDoorLockClusterSetUserTypeCommand(uint8_t * buffer, uint16_t buf_
 {
     const char * kName = "DoorLockSetUserType";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x14);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     buf.Put(userType);
     COMMAND_FOOTER(kName);
 }
@@ -1494,7 +1494,7 @@ uint16_t encodeDoorLockClusterSetWeekdayScheduleCommand(uint8_t * buffer, uint16
     const char * kName = "DoorLockSetWeekdaySchedule";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x0B);
     buf.Put(scheduleID);
-    buf.PutLE16(userID);
+    buf.Put16(userID);
     buf.Put(daysMask);
     buf.Put(startHour);
     buf.Put(startMinute);
@@ -1513,9 +1513,9 @@ uint16_t encodeDoorLockClusterSetYearDayScheduleCommand(uint8_t * buffer, uint16
     const char * kName = "DoorLockSetYearDaySchedule";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x0E);
     buf.Put(scheduleID);
-    buf.PutLE16(userID);
-    buf.PutLE32(localStartTime);
-    buf.PutLE32(localEndTime);
+    buf.Put16(userID);
+    buf.Put32(localStartTime);
+    buf.Put32(localEndTime);
     COMMAND_FOOTER(kName);
 }
 
@@ -1539,7 +1539,7 @@ uint16_t encodeDoorLockClusterUnlockWithTimeoutCommand(uint8_t * buffer, uint16_
 {
     const char * kName = "DoorLockUnlockWithTimeout";
     COMMAND_HEADER(kName, DOOR_LOCK_CLUSTER_ID, 0x03);
-    buf.PutLE16(timeoutInSeconds);
+    buf.Put16(timeoutInSeconds);
     COMMAND_INSERT_STRING(kName, pINOrRFIDCode);
     COMMAND_FOOTER(kName);
 }
@@ -1614,7 +1614,7 @@ uint16_t encodeGroupsClusterAddGroupCommand(uint8_t * buffer, uint16_t buf_lengt
 {
     const char * kName = "GroupsAddGroup";
     COMMAND_HEADER(kName, GROUPS_CLUSTER_ID, 0x00);
-    buf.PutLE16(groupId);
+    buf.Put16(groupId);
     COMMAND_INSERT_STRING(kName, groupName);
     COMMAND_FOOTER(kName);
 }
@@ -1627,7 +1627,7 @@ uint16_t encodeGroupsClusterAddGroupIfIdentifyingCommand(uint8_t * buffer, uint1
 {
     const char * kName = "GroupsAddGroupIfIdentifying";
     COMMAND_HEADER(kName, GROUPS_CLUSTER_ID, 0x05);
-    buf.PutLE16(groupId);
+    buf.Put16(groupId);
     COMMAND_INSERT_STRING(kName, groupName);
     COMMAND_FOOTER(kName);
 }
@@ -1641,7 +1641,7 @@ uint16_t encodeGroupsClusterGetGroupMembershipCommand(uint8_t * buffer, uint16_t
     const char * kName = "GroupsGetGroupMembership";
     COMMAND_HEADER(kName, GROUPS_CLUSTER_ID, 0x02);
     buf.Put(groupCount);
-    buf.PutLE16(groupList);
+    buf.Put16(groupList);
     COMMAND_FOOTER(kName);
 }
 
@@ -1663,7 +1663,7 @@ uint16_t encodeGroupsClusterRemoveGroupCommand(uint8_t * buffer, uint16_t buf_le
 {
     const char * kName = "GroupsRemoveGroup";
     COMMAND_HEADER(kName, GROUPS_CLUSTER_ID, 0x03);
-    buf.PutLE16(groupId);
+    buf.Put16(groupId);
     COMMAND_FOOTER(kName);
 }
 
@@ -1675,7 +1675,7 @@ uint16_t encodeGroupsClusterViewGroupCommand(uint8_t * buffer, uint16_t buf_leng
 {
     const char * kName = "GroupsViewGroup";
     COMMAND_HEADER(kName, GROUPS_CLUSTER_ID, 0x01);
-    buf.PutLE16(groupId);
+    buf.Put16(groupId);
     COMMAND_FOOTER(kName);
 }
 
@@ -1803,7 +1803,7 @@ uint16_t encodeIdentifyClusterIdentifyCommand(uint8_t * buffer, uint16_t buf_len
 {
     const char * kName = "IdentifyIdentify";
     COMMAND_HEADER(kName, IDENTIFY_CLUSTER_ID, 0x00);
-    buf.PutLE16(identifyTime);
+    buf.Put16(identifyTime);
     COMMAND_FOOTER(kName);
 }
 
@@ -1883,7 +1883,7 @@ uint16_t encodeLevelClusterMoveToLevelCommand(uint8_t * buffer, uint16_t buf_len
     const char * kName = "LevelMoveToLevel";
     COMMAND_HEADER(kName, LEVEL_CLUSTER_ID, 0x00);
     buf.Put(level);
-    buf.PutLE16(transitionTime);
+    buf.Put16(transitionTime);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -1899,7 +1899,7 @@ uint16_t encodeLevelClusterMoveToLevelWithOnOffCommand(uint8_t * buffer, uint16_
     const char * kName = "LevelMoveToLevelWithOnOff";
     COMMAND_HEADER(kName, LEVEL_CLUSTER_ID, 0x04);
     buf.Put(level);
-    buf.PutLE16(transitionTime);
+    buf.Put16(transitionTime);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -1930,7 +1930,7 @@ uint16_t encodeLevelClusterStepCommand(uint8_t * buffer, uint16_t buf_length, En
     COMMAND_HEADER(kName, LEVEL_CLUSTER_ID, 0x02);
     buf.Put(stepMode);
     buf.Put(stepSize);
-    buf.PutLE16(transitionTime);
+    buf.Put16(transitionTime);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -1947,7 +1947,7 @@ uint16_t encodeLevelClusterStepWithOnOffCommand(uint8_t * buffer, uint16_t buf_l
     COMMAND_HEADER(kName, LEVEL_CLUSTER_ID, 0x06);
     buf.Put(stepMode);
     buf.Put(stepSize);
-    buf.PutLE16(transitionTime);
+    buf.Put16(transitionTime);
     buf.Put(optionsMask);
     buf.Put(optionsOverride);
     COMMAND_FOOTER(kName);
@@ -2106,11 +2106,11 @@ uint16_t encodeScenesClusterAddSceneCommand(uint8_t * buffer, uint16_t buf_lengt
 {
     const char * kName = "ScenesAddScene";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x00);
-    buf.PutLE16(groupID);
+    buf.Put16(groupID);
     buf.Put(sceneID);
-    buf.PutLE16(transitionTime);
+    buf.Put16(transitionTime);
     COMMAND_INSERT_STRING(kName, sceneName);
-    buf.PutLE16(clusterId);
+    buf.Put16(clusterId);
     COMMAND_INSERT_STRING(kName, extensionFieldSet);
     COMMAND_FOOTER(kName);
 }
@@ -2123,7 +2123,7 @@ uint16_t encodeScenesClusterGetSceneMembershipCommand(uint8_t * buffer, uint16_t
 {
     const char * kName = "ScenesGetSceneMembership";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x06);
-    buf.PutLE16(groupID);
+    buf.Put16(groupID);
     COMMAND_FOOTER(kName);
 }
 
@@ -2135,9 +2135,9 @@ uint16_t encodeScenesClusterRecallSceneCommand(uint8_t * buffer, uint16_t buf_le
 {
     const char * kName = "ScenesRecallScene";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x05);
-    buf.PutLE16(groupID);
+    buf.Put16(groupID);
     buf.Put(sceneID);
-    buf.PutLE16(transitionTime);
+    buf.Put16(transitionTime);
     COMMAND_FOOTER(kName);
 }
 
@@ -2149,7 +2149,7 @@ uint16_t encodeScenesClusterRemoveAllScenesCommand(uint8_t * buffer, uint16_t bu
 {
     const char * kName = "ScenesRemoveAllScenes";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x03);
-    buf.PutLE16(groupID);
+    buf.Put16(groupID);
     COMMAND_FOOTER(kName);
 }
 
@@ -2161,7 +2161,7 @@ uint16_t encodeScenesClusterRemoveSceneCommand(uint8_t * buffer, uint16_t buf_le
 {
     const char * kName = "ScenesRemoveScene";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x02);
-    buf.PutLE16(groupID);
+    buf.Put16(groupID);
     buf.Put(sceneID);
     COMMAND_FOOTER(kName);
 }
@@ -2174,7 +2174,7 @@ uint16_t encodeScenesClusterStoreSceneCommand(uint8_t * buffer, uint16_t buf_len
 {
     const char * kName = "ScenesStoreScene";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x04);
-    buf.PutLE16(groupID);
+    buf.Put16(groupID);
     buf.Put(sceneID);
     COMMAND_FOOTER(kName);
 }
@@ -2187,7 +2187,7 @@ uint16_t encodeScenesClusterViewSceneCommand(uint8_t * buffer, uint16_t buf_leng
 {
     const char * kName = "ScenesViewScene";
     COMMAND_HEADER(kName, SCENES_CLUSTER_ID, 0x01);
-    buf.PutLE16(groupID);
+    buf.Put16(groupID);
     buf.Put(sceneID);
     COMMAND_FOOTER(kName);
 }

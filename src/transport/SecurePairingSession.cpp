@@ -244,7 +244,7 @@ CHIP_ERROR SecurePairingSession::Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2
 
     {
         BufBound bbuf(resp->Start(), data_len);
-        VerifyOrExit(bbuf.Put(&X[0], X_len) == X_len, err = CHIP_ERROR_NO_MEMORY);
+        bbuf.Put(&X[0], X_len);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
 
