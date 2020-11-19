@@ -32,12 +32,6 @@ executable("chip-echo-requester") {
     "${chip_root}/src/system",
   ]
 
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
-
   output_dir = root_out_dir
 }
 
@@ -54,12 +48,6 @@ executable("chip-echo-responder") {
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
   ]
-
-  if (is_debug) {
-    defines = [ "BUILD_RELEASE=0" ]
-  } else {
-    defines = [ "BUILD_RELEASE=1" ]
-  }
 
   output_dir = root_out_dir
 }
