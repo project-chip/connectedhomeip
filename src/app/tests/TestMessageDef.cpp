@@ -682,7 +682,7 @@ void AttributePathTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     attributePathBuilder.Init(&writer);
     BuildAttributePath(apSuite, attributePathBuilder);
@@ -706,7 +706,7 @@ void AttributePathListTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     BuildAttributePathList(apSuite, writer);
     err = writer.Finalize();
@@ -730,7 +730,7 @@ void EventPathTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     eventPathBuilder.Init(&writer);
     BuildEventPath(apSuite, eventPathBuilder);
@@ -755,7 +755,7 @@ void EventPathListTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     BuildEventPathList(apSuite, writer);
     err = writer.Finalize();
@@ -778,7 +778,7 @@ void CommandPathTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVReader reader;
     CommandPath::Builder commandPathBuilder;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     err = commandPathBuilder.Init(&writer);
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
@@ -807,7 +807,7 @@ void EventDataElementTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     eventDataElementBuilder.Init(&writer);
     BuildEventDataElement(apSuite, eventDataElementBuilder);
@@ -833,7 +833,7 @@ void EventListTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVReader reader;
     EventList::Builder eventListBuilder;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     eventListBuilder.Init(&writer);
     BuildEventList(apSuite, eventListBuilder);
@@ -858,7 +858,7 @@ void StatusElementTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     statusElementBuilder.Init(&writer);
     BuildStatusElement(apSuite, statusElementBuilder);
@@ -885,7 +885,7 @@ void AttributeStatusElementTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     attributeStatusElementBuilder.Init(&writer);
     BuildAttributeStatusElement(apSuite, attributeStatusElementBuilder);
@@ -910,7 +910,7 @@ void AttributeStatusListTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     AttributeStatusList::Builder attributeStatusListBuilder;
     err = attributeStatusListBuilder.Init(&writer);
@@ -937,7 +937,7 @@ void AttributeDataElementTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     attributeDataElementBuilder.Init(&writer);
     BuildAttributeDataElement(apSuite, attributeDataElementBuilder);
@@ -962,7 +962,7 @@ void AttributeDataListTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     AttributeDataList::Builder attributeDataListBuilder;
     attributeDataListBuilder.Init(&writer);
@@ -988,7 +988,7 @@ void CommandDataElementTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     commandDataElementBuilder.Init(&writer);
     BuildCommandDataElement(apSuite, commandDataElementBuilder);
@@ -1014,7 +1014,7 @@ void CommandListTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVReader reader;
     CommandList::Builder commandListBuilder;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     commandListBuilder.Init(&writer);
     BuildCommandList(apSuite, commandListBuilder);
@@ -1037,7 +1037,7 @@ void ReportDataTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     BuildReportData(apSuite, writer);
     err = writer.Finalize();
@@ -1059,7 +1059,7 @@ void InvokeCommandTest(nlTestSuite * apSuite, void * apContext)
     chip::TLV::TLVWriter writer;
     chip::TLV::TLVReader reader;
     chip::System::PacketBufferHandle bufHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buf = bufHandle.Get_ForNow();
+    chip::System::PacketBuffer * buf           = bufHandle.Get_ForNow();
     writer.Init(buf);
     BuildInvokeCommand(apSuite, writer);
     err = writer.Finalize();
