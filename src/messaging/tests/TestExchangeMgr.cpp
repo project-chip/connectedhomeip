@@ -198,6 +198,11 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     CHIP_ERROR err;
 
     SecureSessionMgr<LoopbackTransport> conn;
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
     SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
@@ -207,11 +212,6 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
     Optional<Transport::PeerAddress> peer2(Transport::PeerAddress::UDP(addr, 2));
     err = conn.NewPairing(peer2, kDestinationNodeId, &pairing2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
-
-    err = conn.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), "LOOPBACK");
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
