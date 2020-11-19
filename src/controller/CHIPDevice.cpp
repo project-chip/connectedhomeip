@@ -261,15 +261,25 @@ bool Device::GetIpAddress(Inet::IPAddress & addr) const
 
 void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse)
 {
+    CallbackInfo info                 = { endpoint, cluster };
     Callback::Cancelable * cancelable = onResponse->Cancel();
-    cancelable->mInfoScalar           = static_cast<uint64_t>(endpoint << 16 | cluster);
+
+    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+
+    cancelable->mInfoScalar = 0;
+    memmove(&cancelable->mInfoScalar, &info, sizeof(info));
     mResponses.Enqueue(cancelable);
 }
 
 void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport)
 {
+    CallbackInfo info                 = { endpoint, cluster };
     Callback::Cancelable * cancelable = onReport->Cancel();
-    cancelable->mInfoScalar           = static_cast<uint64_t>(endpoint << 16 | cluster);
+
+    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+
+    cancelable->mInfoScalar = 0;
+    memmove(&cancelable->mInfoScalar, &info, sizeof(info));
     mReports.Enqueue(cancelable);
 }
 

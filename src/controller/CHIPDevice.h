@@ -199,6 +199,12 @@ private:
         SecureConnected,
     };
 
+    struct CallbackInfo
+    {
+        EndpointId endpoint;
+        ClusterId cluster;
+    };
+
     /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
 
