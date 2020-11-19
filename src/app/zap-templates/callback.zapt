@@ -117,12 +117,7 @@ void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}TickCal
 {{/if}}
 */
 
-{{#if (zcl_command_arguments_count this.id)}}
-bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}} {{asUnderlyingType type}} {{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
-{{else}}
-bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback();
-{{/if}}
-
+bool emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{asUnderlyingZclType type}} {{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
 
 {{/if}}
 {{/if}}
