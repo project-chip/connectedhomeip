@@ -24,7 +24,7 @@
 #include <cstring>
 
 #include "BleUUID.h"
-#include "lib/support/HexUtils.h"
+#include "lib/support/Hex.h"
 
 namespace chip {
 namespace Ble {

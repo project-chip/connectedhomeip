@@ -21,6 +21,8 @@
 
 namespace chip {
 
+constexpr uint8_t kInvalidDigitValue = UINT8_MAX;
+
 uint8_t HexDigitToInt(const char c);
 
-}
+} // namespace chip

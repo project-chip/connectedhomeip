@@ -25,7 +25,7 @@
 #include "platform/CHIPDeviceLayer.h"
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
-#include "support/HexUtils.h"
+#include "support/Hex.h"
 #include "support/RandUtils.h"
 
 #if CHIP_ENABLE_MDNS
@@ -43,19 +43,22 @@ bool ParseNodeFabricId(const chip::Mdns::MdnsService & service, uint64_t * nodeI
         if (service.mName[i] == '-')
         {
             deliminatorFound = true;
-            break;
         }
         else
         {
             uint8_t val = chip::HexDigitToInt(service.mName[i]);
 
-            if (val == UINT8_MAX)
+            if (val == chip::kInvalidDigitValue)
             {
-                break;
+                return false;
+            }
+            else if (!deliminatorFound)
+            {
+                *nodeId = (*nodeId) * 16 + val;
             }
             else
             {
-                *nodeId = (*nodeId) * 16 + val;
+                *fabricId = (*fabricId) * 16 + val;
             }
         }
     }
@@ -349,7 +352,7 @@ void DiscoveryManager::AddMdnsService(const MdnsService & service)
 
         if (validService)
         {
-            if (mServicePool.AddService(nodeId, fabricId, service) == 0)
+            if (mServicePool.AddService(nodeId, fabricId, service) != CHIP_NO_ERROR)
             {
                 ChipLogError(Discovery, "Failed to add service to pool");
             }
@@ -366,17 +369,21 @@ void DiscoveryManager::UpdateMdnsService(const MdnsService & service)
     {
         uint64_t nodeId   = 0;
         uint64_t fabricId = 0;
-        bool validService = ParseNodeFabricId(service, &nodeId, &fabricId);
 
-        if (validService)
+        if (!ParseNodeFabricId(service, &nodeId, &fabricId))
         {
-            if (mServicePool.RemoveService(nodeId, fabricId) == CHIP_NO_ERROR)
-            {
-                if (mServicePool.AddService(nodeId, fabricId, service) != CHIP_NO_ERROR)
-                {
-                    ChipLogError(Discovery, "Failed to add service to pool");
-                }
-            }
+            return;
+        }
+
+        if (mServicePool.RemoveService(nodeId, fabricId) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to remove service from pool");
+            return;
+        }
+
+        if (mServicePool.AddService(nodeId, fabricId, service) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to add service to pool");
         }
     }
 #endif // CHIP_ENABLE_MDNS
@@ -390,14 +397,14 @@ void DiscoveryManager::RemoveMdnsService(const MdnsService & service)
     {
         uint64_t nodeId   = 0;
         uint64_t fabricId = 0;
-        bool validService = ParseNodeFabricId(service, &nodeId, &fabricId);
 
-        if (validService)
+        if (!ParseNodeFabricId(service, &nodeId, &fabricId))
         {
-            if (mServicePool.RemoveService(nodeId, fabricId) != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to remove service from pool");
-            }
+            return;
+        }
+        if (mServicePool.RemoveService(nodeId, fabricId) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Failed to remove service from pool");
         }
     }
 #endif // CHIP_ENABLE_MDNS

@@ -41,9 +41,11 @@ public:
 
     bool ShouldReHash() { return mLazyDeleteCount > kServicePoolCapacity / 4; }
 
-private:
+    void Clear();
+
     static constexpr size_t kServicePoolCapacity = 32;
 
+private:
     struct ServicePoolEntry
     {
         MdnsService mService;
@@ -52,7 +54,7 @@ private:
         bool mLazyDelete;
     };
 
-    void Clear();
+    void ClearNoFree();
 
     ServicePool(const ServicePool &) = delete;
     ServicePool & operator=(const ServicePool &) = delete;
