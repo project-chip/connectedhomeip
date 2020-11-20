@@ -12,14 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""chip_mobly"""
+import("//build_overrides/pigweed.gni")
 
-import setuptools # type: ignore
+import("$dir_pw_build/python.gni")
 
-setuptools.setup(
-    name='chip_mobly',
-    version='0.0.1',
-    author='CHIP Authors',
-    description='Integration of Mobly with CHIP devices',
-    packages=setuptools.find_packages(),
-)
+pw_python_package("chip_mobly") {
+  setup = [ "setup.py" ]
+}
