@@ -183,8 +183,7 @@ int main(int argc, char * argv[])
 
     chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(LinuxDeviceOptions::GetInstance().mBleDevice, false);
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(
-        chip::DeviceLayer::ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
+    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
     LightingMgr().Init();
 
