@@ -42,6 +42,7 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/Tuple.h>
 #include <transport/raw/UDP.h>
 
@@ -62,7 +63,7 @@ class ResponseServerCallback : public SecureSessionMgrDelegate
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                            const Transport::PeerConnectionState * state, System::PacketBufferHandle buffer,
-                           SecureSessionMgrBase * mgr) override
+                           SecureSessionMgr * mgr) override
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();
@@ -84,12 +85,12 @@ public:
     exit:;
     }
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * mgr) override
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
     {
         ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
     }
 
-    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
+    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
     {
         ESP_LOGI(TAG, "Received a new connection.");
     }
@@ -121,16 +122,16 @@ private:
 };
 
 ResponseServerCallback gCallbacks;
-
-SecureSessionMgr<Transport::UDP, // IPV6
-                 Transport::UDP  // IPV4
-                 >
-    sessions;
+TransportMgr<Transport::UDP, // IPV6
+             Transport::UDP  // IPV4
+             >
+    gTransports;
+SecureSessionMgr sessions;
 
 } // namespace
 
 namespace chip {
-SecureSessionMgrBase & SessionManager()
+SecureSessionMgr & SessionManager()
 {
     return sessions;
 }
@@ -140,9 +141,10 @@ SecureSessionMgrBase & SessionManager()
 void startServer(NodeId localNodeId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = sessions.Init(localNodeId, &DeviceLayer::SystemLayer,
-                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(nullptr),
-                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
+    err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(nullptr),
+                           UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
+    SuccessOrExit(err);
+    err = sessions.Init(localNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
     sessions.SetDelegate(&gCallbacks);

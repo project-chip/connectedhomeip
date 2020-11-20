@@ -36,9 +36,9 @@ namespace chip {
 
 RendezvousServer::RendezvousServer() : mRendezvousSession(this) {}
 
-CHIP_ERROR RendezvousServer::Init(const RendezvousParameters & params)
+CHIP_ERROR RendezvousServer::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr)
 {
-    return mRendezvousSession.Init(params);
+    return mRendezvousSession.Init(params, transportMgr);
 }
 
 void RendezvousServer::OnRendezvousError(CHIP_ERROR err)
@@ -56,7 +56,9 @@ void RendezvousServer::OnRendezvousConnectionClosed()
     ChipLogProgress(AppServer, "OnRendezvousConnectionClosed");
 }
 
-void RendezvousServer::OnRendezvousMessageReceived(System::PacketBufferHandle buffer) {}
+void RendezvousServer::OnRendezvousMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
+                                                   System::PacketBufferHandle buffer)
+{}
 
 void RendezvousServer::OnRendezvousComplete()
 {

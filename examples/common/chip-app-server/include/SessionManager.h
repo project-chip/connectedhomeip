@@ -20,5 +20,5 @@
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
-SecureSessionMgrBase & SessionManager();
+SecureSessionMgr & SessionManager();
 } // namespace chip

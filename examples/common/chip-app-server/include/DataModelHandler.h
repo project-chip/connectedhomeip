@@ -34,5 +34,5 @@
  *                    that it will free the buffer before returning.
  */
 void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::PacketBufferHandle buffer,
-                            chip::SecureSessionMgrBase * mgr);
+                            chip::SecureSessionMgr * mgr);
 void InitDataModelHandler();

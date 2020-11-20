@@ -62,7 +62,7 @@ ExchangeManager::ExchangeManager()
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(SecureSessionMgrBase * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 {
     if (mState != State::kState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
@@ -135,7 +135,7 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protoco
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
 
-void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer)
+void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
 {
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
 }
@@ -278,12 +278,12 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                                         const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
-                                        SecureSessionMgrBase * msgLayer)
+                                        SecureSessionMgr * msgLayer)
 {
     DispatchMessage(packetHeader, payloadHeader, std::move(msgBuf));
 }
 
-void ExchangeManager::OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr)
+void ExchangeManager::OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
 {
     for (auto & ec : ContextPool)
     {

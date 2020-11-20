@@ -28,6 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface CHIPDevice ()
 
 - (instancetype)initWithDevice:(chip::Controller::Device *)device;
+- (chip::Controller::Device *)internalDevice;
 
 @end
 

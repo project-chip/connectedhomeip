@@ -47,7 +47,7 @@ class ServerCallback : public SecureSessionMgrDelegate
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                            const Transport::PeerConnectionState * state, System::PacketBufferHandle buffer,
-                           SecureSessionMgrBase * mgr) override
+                           SecureSessionMgr * mgr) override
     {
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
@@ -67,20 +67,21 @@ public:
     exit:;
     }
 
-    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
+    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
     {
         ChipLogProgress(AppServer, "Received a new connection.");
     }
 };
 
-DemoSessionManager gSessions;
+DemoTransportMgr gTransports;
+SecureSessionMgr gSessions;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 RendezvousServer gRendezvousServer;
 
 } // namespace
 
-SecureSessionMgrBase & chip::SessionManager()
+SecureSessionMgr & chip::SessionManager()
 {
     return gSessions;
 }
@@ -94,8 +95,11 @@ void InitServer()
 
     InitDataModelHandler();
 
-    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer,
-                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    // Init transport before operations with secure session mgr.
+    err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    SuccessOrExit(err);
+
+    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
     // This flag is used to bypass BLE in the cirque test
@@ -109,7 +113,7 @@ void InitServer()
         params.SetSetupPINCode(pinCode)
             .SetLocalNodeId(chip::kTestDeviceNodeId)
             .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
-        SuccessOrExit(err = gRendezvousServer.Init(params));
+        SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
     }
 #endif
 
@@ -118,7 +122,6 @@ void InitServer()
 
     gSessions.SetDelegate(&gCallbacks);
     chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice(chip::Inet::kIPAddressType_IPv6);
-
 exit:
     if (err != CHIP_NO_ERROR)
     {

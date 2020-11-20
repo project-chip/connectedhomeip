@@ -42,6 +42,7 @@
 
 using namespace chip::Inet;
 using namespace chip::System;
+using namespace chip::Callback;
 
 namespace chip {
 namespace Controller {
@@ -101,6 +102,11 @@ exit:
     }
 
     return err;
+}
+
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle message)
+{
+    return SendMessage(message.Release_ForNow());
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -166,11 +172,51 @@ exit:
 
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
                                const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
-                               SecureSessionMgrBase * mgr)
+                               SecureSessionMgr * mgr)
 {
-    if (mState == ConnectionState::SecureConnected && mStatusDelegate != nullptr)
+    if (mState == ConnectionState::SecureConnected)
     {
-        mStatusDelegate->OnMessage(std::move(msgBuf));
+        if (mStatusDelegate != nullptr)
+        {
+            mStatusDelegate->OnMessage(std::move(msgBuf));
+        }
+
+        // TODO: The following callback processing will need further work
+        //       1. The response needs to be parsed as per cluster definition. The response callback
+        //          should carry the parsed response values.
+        //       2. The reports callbacks should also be called with the parsed reports.
+        //       3. The callbacks would be tracked using exchange context. On receiving the
+        //          message, the exchange context in the message should be matched against
+        //          the registered callbacks.
+        // GitHub issue: https://github.com/project-chip/connectedhomeip/issues/3910
+        Cancelable * ca = mResponses.mNext;
+        while (ca != &mResponses)
+        {
+            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
+            // Let's advance to the next cancelable, as the current one will get removed
+            // from the list (and once removed, its next will point to itself)
+            ca = ca->mNext;
+            if (cb != nullptr)
+            {
+                ChipLogProgress(Controller, "Dispatching response callback %p", cb);
+                cb->Cancel();
+                cb->mCall(cb->mContext);
+            }
+        }
+
+        ca = mReports.mNext;
+        while (ca != &mReports)
+        {
+            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
+            // Let's advance to the next cancelable, as the current one might get removed
+            // from the list in the callback (and if removed, its next will point to itself)
+            ca = ca->mNext;
+            if (cb != nullptr)
+            {
+                ChipLogProgress(Controller, "Dispatching report callback %p", cb);
+                cb->mCall(cb->mContext);
+            }
+        }
     }
 }
 
@@ -187,7 +233,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters()
     err = pairingSession.FromSerializable(mPairing);
     SuccessOrExit(err);
 
-    err = mSessionManager->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
+    err = mTransportMgr->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
     SuccessOrExit(err);
 
     err = mSessionManager->NewPairing(
@@ -211,6 +257,30 @@ bool Device::GetIpAddress(Inet::IPAddress & addr) const
     if (mState == ConnectionState::SecureConnected)
         addr = mDeviceAddr;
     return mState == ConnectionState::SecureConnected;
+}
+
+void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse)
+{
+    CallbackInfo info                 = { endpoint, cluster };
+    Callback::Cancelable * cancelable = onResponse->Cancel();
+
+    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+
+    cancelable->mInfoScalar = 0;
+    memmove(&cancelable->mInfoScalar, &info, sizeof(info));
+    mResponses.Enqueue(cancelable);
+}
+
+void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport)
+{
+    CallbackInfo info                 = { endpoint, cluster };
+    Callback::Cancelable * cancelable = onReport->Cancel();
+
+    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+
+    cancelable->mInfoScalar = 0;
+    memmove(&cancelable->mInfoScalar, &info, sizeof(info));
+    mReports.Enqueue(cancelable);
 }
 
 } // namespace Controller

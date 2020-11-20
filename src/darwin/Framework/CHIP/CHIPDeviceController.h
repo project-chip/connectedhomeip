@@ -18,10 +18,10 @@
 #ifndef CHIP_DEVICE_CONTROLLER_H
 #define CHIP_DEVICE_CONTROLLER_H
 
-#import "CHIPDevice.h"
-#import "CHIPDeviceStatusDelegate.h"
-#import "CHIPError.h"
+#import <CHIP/CHIPDeviceStatusDelegate.h>
 #import <Foundation/Foundation.h>
+
+@class CHIPDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 

@@ -32,6 +32,7 @@
 
 static const char * TAG = "echo-devicecallbacks";
 
+using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
