@@ -2663,7 +2663,7 @@
           "mfgCode": null,
           "define": "IAS_ZONE_CLUSTER",
           "side": "client",
-          "enabled": 1,
+          "enabled": 0,
           "commands": [
             {
               "name": "ZoneEnrollResponse",
