@@ -167,6 +167,15 @@ public:
 
     void SetActive(bool active) { mActive = active; }
 
+    void Reset()
+    {
+        SetActive(false);
+        mState          = ConnectionState::NotConnected;
+        mSessionManager = nullptr;
+        mStatusDelegate = nullptr;
+        mInetLayer      = nullptr;
+    }
+
     NodeId GetDeviceId() const { return mDeviceId; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddr = deviceAddr; }
