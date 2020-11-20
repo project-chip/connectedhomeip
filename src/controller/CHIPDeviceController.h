@@ -203,6 +203,8 @@ private:
     void OnValue(const char * key, const char * value) override;
     void OnStatus(const char * key, Operation op, CHIP_ERROR err) override;
 
+    void ReleaseAllDevices();
+
     System::Layer * mSystemLayer;
 };
 

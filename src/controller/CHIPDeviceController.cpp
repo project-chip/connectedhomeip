@@ -134,6 +134,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
 
+    ReleaseAllDevices();
+
 exit:
     return err;
 }
@@ -173,6 +175,8 @@ CHIP_ERROR DeviceController::Shutdown()
         chip::Platform::Delete(mSessionManager);
         mSessionManager = nullptr;
     }
+
+    ReleaseAllDevices();
 
 exit:
     return err;
@@ -351,7 +355,7 @@ uint16_t DeviceController::GetInactiveDeviceIndex()
 
 void DeviceController::ReleaseDevice(Device * device)
 {
-    device->SetActive(false);
+    device->Reset();
 }
 
 void DeviceController::ReleaseDevice(uint16_t index)
@@ -359,6 +363,14 @@ void DeviceController::ReleaseDevice(uint16_t index)
     if (index < kNumMaxActiveDevices)
     {
         ReleaseDevice(&mActiveDevices[index]);
+    }
+}
+
+void DeviceController::ReleaseAllDevices()
+{
+    for (uint16_t i = 0; i < kNumMaxActiveDevices; i++)
+    {
+        ReleaseDevice(&mActiveDevices[i]);
     }
 }
 
