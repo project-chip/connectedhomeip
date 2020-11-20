@@ -1,4 +1,4 @@
-ARG chip_build_VERSION=latest
+ARG chip_build_VERSION
 FROM connectedhomeip/chip-build:${chip_build_VERSION}
 
 # JDK 8 access

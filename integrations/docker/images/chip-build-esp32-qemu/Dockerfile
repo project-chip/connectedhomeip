@@ -1,4 +1,4 @@
-ARG chip_build_esp32_VERSION=latest
+ARG chip_build_esp32_VERSION
 FROM connectedhomeip/chip-build-esp32:${chip_build_esp32_VERSION}
 
 # Setup QEMU emulator for ESP32 platform

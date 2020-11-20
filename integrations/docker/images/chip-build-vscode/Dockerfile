@@ -1,8 +1,8 @@
-ARG chip_build_nrf_platform_VERSION=latest
-ARG chip_build_efr32_VERSION=latest
-ARG chip_build_android_VERSION=latest
-ARG chip_build_esp32_qemu_VERSION=latest
-ARG chip_build_VERSION=latest
+ARG chip_build_nrf_platform_VERSION
+ARG chip_build_efr32_VERSION
+ARG chip_build_android_VERSION
+ARG chip_build_esp32_qemu_VERSION
+ARG chip_build_VERSION
 
 FROM connectedhomeip/chip-build-nrf-platform:${chip_build_nrf_platform_VERSION} AS nrf
 FROM connectedhomeip/chip-build-efr32:${chip_build_efr32_VERSION} AS efr32
