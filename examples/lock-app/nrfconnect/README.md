@@ -1,17 +1,21 @@
 # CHIP nRF Connect Lock Example Application
 
-The lock example provides demonstration of application running on the connected
-door lock device. It uses
-[CHIP](https://github.com/project-chip/connectedhomeip) and the nRF Connect
-platform. The example supports remote access and control of a simulated door
-lock over a low-power, 802.15.4 Thread network. It is capable of being paired
-into an existing CHIP network along with other CHIP-enabled devices. Besides of
-the remote access, application also allows controlling lock and device states
-using buttons and visualizes those states on the LEDs.
+The nRF Connect Lock Example demonstrates how to remotely control a door lock device with
+one basic bolt. It uses buttons to test changing the lock and device states and LEDs
+to show the state of these changes.
+You can use this example as a reference for creating your own application.
+
+The example is based on [CHIP](https://github.com/project-chip/connectedhomeip) and the nRF Connect
+platform, and supports remote access and control of a simulated door lock over a low-power, 802.15.4
+Thread network. It is capable of being paired into an existing CHIP network along with other
+CHIP-enabled devices.
 
 <hr>
 
 -   [Overview](#overview)
+    -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
+    -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
+    -   [Thread provisioning](#thread-provisioning)
 -   [Requirements](#requirements)
 -   [Device UI](#device-ui)
 -   [Setting up environment](#setting-up-environment)
@@ -28,44 +32,44 @@ using buttons and visualizes those states on the LEDs.
 
 ## Overview
 
-This example application is running on the nRF Connect platform, which is based
-on the
-[nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
+This example is running on the nRF Connect platform, which is based
+on the [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
 and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
 [nRF Connect Platform Overview](TODO:...) to read more information about
 platform structure and dependencies.
 
-CHIP device running lock application is controlled by the CHIP controller device
-over Thread protocol. It is assumed that CHIP device by default has Thread
-disabled, so it should be paired with CHIP controller and get configuration from
-it. There are few actions necessary to make before full communication is
-possible and they were described below. There is also a test mode, which allows
-to start Thread with default settings, by pressing button manually, but it does
-not fully guarantee that device will be able to communicate with CHIP controller
-and other devices.
+The CHIP device that runs the lock application is controlled by the CHIP controller
+device over the Thread protocol. By default, the CHIP device should have Thread disabled,
+and it should be paired with CHIP controller and get configuration from it.
+Some actions required before establishing full communication are described below.
 
-### BLE Advertising
+The example also comes with a test mode, which allows to start Thread with the default settings
+by pressing button manually. However, this mode does not guarantee that the device will be able
+to communicate with the CHIP controller and other devices.
 
-After powering up device for the first time, it should start advertising over
-BLE in order to inform other devices about its presence. For security reasons
-different devices may start advertising automatically or on User demand and in
-this example case, starting is triggered by pressing button.
+### Bluetooth LE Advertising
 
-### BLE Rendezvous
+After powering up the device for the first time, it will start advertising over
+Bluetooth LE to inform other devices about its presence. For security reasons,
+Bluetooth LE advertising won't start automatically after powering up the device.
+To make the device discoverable, you must press **Button 4**.
 
-In CHIP there is a commissioning procedure called Rendezvous, which is done over
-BLE between CHIP device and CHIP controller, performing the role of the
-commissioner. To start it, controller has to previously get onboarding
-information from the CHIP device. Data are encoded as a QR code payload and
-typically presented on a device's display or like in this example case, shared
-using NFC tag.
+### Bluetooth LE Rendezvous
 
-### Thread Provisioning
+In CHIP, there is a commissioning procedure called Rendezvous, which is done over
+Bluetooth LE between a CHIP device and the CHIP controller,
+where the controller has the commissioner role.
 
-Successfully finishing Rendezvous procedure allows to perform Provisioning
-operation, whose goal is to send Thread network credentials from CHIP controller
+To start the Rendezvous, the controller must get the onboarding information from the CHIP device.
+The data payload is encoded within a QR code and typically presented on the device's display.
+For this example, however, it is shared using **NFC**.
+
+### Thread provisioning
+
+Successfully finishing the Rendezvous procedure allows to perform Provisioning
+operation, whose goal is to send the Thread network credentials from the CHIP controller
 to the CHIP device. As a result, device is able to join the Thread network and
-communicate with other Thread devices belonging to this network.
+communicate with other Thread devices in the network.
 
 <hr>
 
@@ -73,14 +77,13 @@ communicate with other Thread devices belonging to this network.
 
 ## Requirements
 
-In order to make sure that demonstrated application will be working properly, it
-should be ran with the nRF Connect SDK 1.4 version.
+The application requires the nRF Connect SDK v1.4.0 to work correctly.
 
 The example supports building and running on the following devices:
 
 | Board name                                                                                | Board platform build name |
 | ----------------------------------------------------------------------------------------- | ------------------------- |
-| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | nrf52840dk_nrf52840       |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK) | `nrf52840dk_nrf52840`     |
 
 <hr>
 
@@ -88,163 +91,191 @@ The example supports building and running on the following devices:
 
 ## Device UI
 
-This section lists device's elements making User Interface in the example
-application. All described items should be possible to find on the board picture
-presented below:
+This section lists the User Interface elements that you can use to control and monitor the state
+of the device.
+All these elements can be located on the following board picture:
 
 ![nrf52840 DK](../../platform/nrfconnect/doc/images/nrf52840-dk.png)
 
-The following elements of the development kit are used by this application to
-allow User controlling and monitoring device's state.
+**LED 1** shows the overall state of the device and its connectivity.
+The following states are possible:
 
-**LED #1** shows the overall state of the device and its connectivity. Four
-states are depicted:
+- _Short Flash On (50 ms on/950 ms off)_ &mdash; The device is in the unprovisioned (unpaired) state
+  and is waiting for a commissioning application to connect.
 
--   _Short Flash On (50ms on/950ms off)_ &mdash; The device is in an
-    unprovisioned (unpaired) state and is waiting for a commissioning
-    application to connect.
+- _Rapid Even Flashing (100 ms on/100 ms off)_ &mdash; The device is in the unprovisioned state
+  and a commissioning application is connected through Bluetooth LE.
 
-*   _Rapid Even Flashing (100ms on/100ms off)_ &mdash; The device is in an
-    unprovisioned state and a commissioning application is connected via BLE.
+- _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully provisioned, but does not yet
+  have full Thread network or service connectivity.
 
--   _Short Flash Off (950ms on/50ms off)_ &mdash; The device is fully
-    provisioned, but does not yet have full network (Thread) or service
-    connectivity.
+- _Solid On_ &mdash; The device is fully provisioned and has full Thread
+  network and service connectivity.
 
-*   _Solid On_ &mdash; The device is fully provisioned and has full Thread
-    network and service connectivity.
+**LED 2** simulates the lock bolt and shows the state of the lock.
+The following states are possible:
 
-**LED #2** shows the state of the simulated lock bolt. When the LED is lit the
-bolt is extended (i.e. door locked); when not lit, the bolt is retracted (door
-unlocked). The LED will flash whenever the simulated bolt is in motion from one
-position to another.
+- _Solid On_ &mdash; The bolt is extended and the door is locked.
 
-**Button #1** can be used to initiate a OTA software update as well as to reset
-the device to a default state.
+- _Off_ &mdash; The bolt is retracted and the door is unlocked.
 
-**Button #2** can be used to manually change the state of the lock. Pushing the
-button is changing lock state to the opposite.
+- _Rapid Even Flashing (100 ms on/100 ms off during 2 s)_ &mdash; The simulated bolt is in motion
+  from one position to another.
 
-**Button #3** can be used to manually start Thread networking in the test mode,
-using default configuration.
+**Button 1** can be used for the following purposes:
 
-**Button #4** can be used to start BLE advertising.
+- _Pressed for 6 s_ &mdash; Initiates the factory reset of the device.
+  Releasing the button within the 6-second window cancels the factory reset procedure.
+  **LEDs 1-4** blink in unison when the factory reset procedure is initiated.
 
-**Segger J-Link USB port** can be used to get logs from the device or
-communicate with it using [command line interface](TODO:).
+- _Pressed for less than 3 s_ &mdash; Initiates the OTA software update process.
+  This feature is not currently supported.
+
+**Button 2** &mdash; Pressing the button once changes the lock state to the opposite one.
+
+**Button 3** &mdash; Pressing the button once starts the Thread networking in the test mode
+using the default configuration.
+
+**Button 4** &mdash; Pressing the button once starts the Bluetooth LE advertising
+for the predefined period of time.
+
+**SEGGER J-Link USB port** can be used to get logs from the device or
+communicate with it using the [command line interface](TODO:).
+
+**NFC port with antenna attached** can be used to start the [Rendezvous](#bluetooth-le-rendezvous)
+by providing the onboarding information from the CHIP device in a data payload that can be shared
+[using NFC](TODO:).
 
 <hr>
 
-## Setting up environment
+## Setting up the environment
 
-First, checkout CHIP repository and sync submodules using the following command:
+Before building the example, check out the CHIP repository
+and sync submodules using the following command:
 
         $ git submodule update --init
 
-The example requires nRF Connect SDK v1.4.0. You can either install it along
-with related tools directly on your system or use a Docker image which comes
-with the tools pre-installed.
+The example requires the nRF Connect SDK v1.4.0.
+You can either install it along with the related tools directly on your system or use a Docker image
+that has the tools pre-installed.
 
-Note that if you're a macOS user, you won't be able to use the Docker container
+If you are a macOS user, you won't be able to use the Docker container
 to flash the application onto a Nordic board due to
-[certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container),
-so it's recommended that you skip to the
-[Using native shell](#using-native-shell) instruction.
+[certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
+Use the [native shell](#using-native-shell) for building instead.
 
-### Using Docker container
+### Using Docker container for setup
 
-If you don't have nRF Connect SDK installed yet, create a directory where it
-should be placed:
+To use the Docker container for setup, complete the following steps:
+
+1. If you do not have the nRF Connect SDK installed yet, create a directory for it by running the following command:
 
         $ mkdir ~/nrfconnect
 
-Download the latest `nordicsemi/nrfconnect-chip` Docker image:
+2. Download the latest version of the nRF Connect SDK Docker image by running the following command:
 
         $ docker pull nordicsemi/nrfconnect-chip
 
-The next command will start a Docker container using the image acquired in the
-previous step. Please read the below explanation for all specified arguments
-before proceeding.
+3. Start Docker with the downloaded image by running the following command, customized to your needs
+   as described below:
 
         $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
             -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
 
-> **Note**:
->
-> -   `~/connectedhomeip` should be replaced with an absolute path to CHIP
->     source directory.
-> -   `~/nrfconnect` can be replaced with an absolute path to nRF Connect SDK
->     directory in case you have it already installed.
-> -   `-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule 'c 189:* rmw'`
->     parameters can be omitted if you're not planning to flash the example onto
->     hardware. The parameters give the container access to USB devices
->     connected to your computer such as Nordic development kits.
-> -   `-e RUNAS=$(id -u)` is needed to start the container session as the
->     current user instead of root.
+   In this command:
 
-To checkout or update nRF Connect SDK to the recommended `1.4.0` version, run:
+   -   *~/nrfconnect* can be replaced with an absolute path to the nRF Connect SDK
+       source directory.
+   -   *~/connectedhomeip* must be replaced with an absolute path to the CHIP source directory.
+   -   *-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw"*
+       parameters can be omitted if you are not planning to flash the example onto
+       hardware. These parameters give the container access to USB devices
+       connected to your computer such as the nRF52840 DK.
+   -   *--rm* can be omitted if you do not want the container to be
+       auto-removed when you exit the container shell session.
+   -   *-e RUNAS=$(id -u)* is needed to start the container session as the
+       current user instead of root.
+
+4. Check out or update the nRF Connect SDK to the recommended `v1.4.0` version by running
+   the following command in the Docker container:
 
         $ setup --ncs v1.4.0
         /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [v1.4.0]? [Y/N] y
         ...
         /var/chip repository is initialized, skipping...
 
-Proceed with the [Building](#building) instruction.
+Now you can proceed with the [Building](#building) instruction.
 
-### Using native shell
+### Using native shell for setup
 
-Follow the
-[guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
-to install nRF Connect SDK v1.4.0. Since further in the text we use command-line
-tools to build the example, installing SEGGER Embedded Studio is not required.
+To use the native shell for setup, complete the following steps:
 
-In case you have an older version of the SDK installed, use the following
-commands to update it to the recommended version. Replace `<nrfconnect-dir>`
-with a path to the nRF Connect SDK installation directory.
+1. Download and install the following additional software:
 
-        $ cd <nrfconnect-dir>/nrf
-        $ git fetch origin
-        $ git checkout v1.4.0
-        $ west update
+   - [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools)
+   - [GN meta-build system](https://gn.googlesource.com/gn/)
 
-Download and install the
-[nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools).
+2. Depending on whether you have the nRF Connect SDK installed:
 
-Download and install [GN meta-build system](https://gn.googlesource.com/gn/).
+   - Follow the
+     [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
+     in the nRF Connect SDK documentation to install the nRF Connect SDK v1.4.0.
+     Since command-line tools will be used for building the example, installing SEGGER Embedded Studio is not required.
 
-Initialize environment variables referred to by CHIP and nRF Connect SDK build
-scripts. Replace `<nrfconnect-dir>` with a path to the nRF Connect SDK
-installation directory. Also replace `<toolchain-dir>` with a path to GNU Arm
-Embedded Toolchain.
+   - If you have an older version of the SDK installed, use the following
+     commands to update it to the recommended version. Replace *nrfconnect-dir*
+     with the path to your nRF Connect SDK installation directory.
 
-        $ source <nrfconnect-dir>/zephyr/zephyr-env.sh
+            $ cd nrfconnect-dir/nrf
+            $ git fetch origin
+            $ git checkout v1.4.0
+            $ west update
+
+3. Initialize environment variables referred to by the CHIP and the nRF Connect SDK build
+   scripts. Replace *nrfconnect-dir* with the path to your nRF Connect SDK
+   installation directory, and *toolchain-dir* with the path to GNU Arm
+   Embedded Toolchain.
+
+        $ source nrfconnect-dir/zephyr/zephyr-env.sh
         $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
-        $ export GNUARMEMB_TOOLCHAIN_PATH=<toolchain-dir>
+        $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
+
+Now you can proceed with the [Building](#building) instruction.
+
+<hr>
+
+<a name="building"></a>
 
 ## Building
 
-Navigate to the example's directory:
+Complete the following steps, regardless of the method used for setting up the environment:
+
+1. Navigate to the example's directory:
 
         $ cd examples/lock-app/nrfconnect
 
-Run the following command to build the example. Replace `<board-name>` with name
-of the Nordic board you own, for example `nrf52840dk_nrf52840`.
+2. Run the following command to build the example, with *board-name* replaced with the name
+   of the Nordic Semiconductor's board you own, for example `nrf52840dk_nrf52840`:
 
-        $ west build -b <board-name>
+        $ west build -b board-name
 
-You only need to specify the board name on the first build, then it's enough to
-run:
+   You only need to specify the board name on the first build.
+   See [Requirements](#requirements) for the names of compatible boards.
 
-        $ west build
-
-To remove all build artifacts:
+3. Remove all build artifacts by running the following command:
 
         $ rm -r build
 
-To build the example with release configuration which disables diagnostic
-features like logs and command-line interface:
+4. Build the example with the release configuration that disables the diagnostic features
+   like logs and command-line interface by running the following command:
 
-        $ west build -b <board-name> -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/release.conf
+        $ west build -b board-name -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/release.conf
+
+   Remember to replace *board-name* with the name of the Nordic Semiconductor's board you own.
+
+The output `zephyr.hex` file will be available in the `/build/zephyr/` directory.
+
+<hr>
 
 ### Building minimal binary
 
@@ -262,42 +293,58 @@ following commands:
 
 ## Configuring the example
 
-The Zephyr ecosystem is higly configurable and allows the user to modify many
-aspects of the application. The configuration system is based on `Kconfig` and
-the settings can be modified using the `menuconfig` utility.
+The Zephyr ecosystem is highly configurable and allows you to modify many
+aspects of the application. The configuration system is based on Kconfig files and
+the settings can be modified using the menuconfig utility.
 
-To open the configuration menu, do the following:
+To open the menuconfig utility, complete the following steps:
 
-        $ cd <example-dir>
-        # First time build
-        $ west build -b nrf52840dk_nrf52840 -t menuconfig
+1. Go to the example directory by running the following command, with the *example-dir* directory
+   name updated for your configuration:
 
-        # Any subsequent build
-        $ west build -t menuconfig
+        $ cd example-dir
 
-        # Running menuconfig with ninja
-        $ cd <example-dir>/build
-        $ ninja menuconfig
+2. Choose one of the following options:
 
-Changes done with `menuconfig` will be lost, if the `build` directory is
-deleted. To make them persistent, save the configuration options in `prj.conf`
-file.
+   - If you are running the build for the first time, run the following command:
+
+            $ west build -b nrf52840dk_nrf52840 -t menuconfig
+
+   - If you are running a subsequent build, run the following command:
+
+            $ west build -t menuconfig
+
+   - If you are running menuconfig with ninja, run the following commands:
+
+            $ cd example-dir/build
+            $ ninja menuconfig
+
+Changes done with menuconfig will be lost if the `build` directory is deleted.
+To make them persistent, save the configuration options in the `prj.conf` file.
+
+For more information, see the
+[Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md) page.
+
+<hr>
 
 <a name="flashing"></a>
 
 ## Flashing and debugging
 
-To flash the application onto the device, run the command below in the example's
-directory:
+To flash the application to the device, use the west tool and run the following commands,
+with the *example-dir* directory name updated for your configuration:
 
+        $ cd example-dir
         $ west flash
 
-If you have multiple Nordic devices connected, `west` will prompt you to pick
-the correct one.
+If you have multiple nRF52840 DK boards connected, west will prompt you to pick the correct one.
 
-To start the application with a debugger attached to your board, run:
+To debug the application on target, run the following commands:
 
+        $ cd example-dir
         $ west debug
+
+<hr>
 
 ## Testing the example
 
