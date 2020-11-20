@@ -295,3 +295,23 @@ const char * Command::GetAttribute(void) const
 
     return nullptr;
 }
+
+void Command::UpdateWaitForResponse(bool value)
+{
+    {
+        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
+        mWaitingForResponse = value;
+    }
+    cvWaitingForResponse.notify_all();
+}
+
+void Command::WaitForResponse(uint16_t duration)
+{
+    std::chrono::seconds waitingForResponseTimeout(duration);
+    std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
+    auto waitingUntil = std::chrono::system_clock::now() + waitingForResponseTimeout;
+    if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
+    {
+        ChipLogError(chipTool, "No response from device");
+    }
+}

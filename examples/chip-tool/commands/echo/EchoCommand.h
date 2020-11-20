@@ -16,24 +16,16 @@
  *
  */
 
-#include "commands/common/Commands.h"
+#pragma once
 
-#include "commands/clusters/Commands.h"
-#include "commands/echo/Commands.h"
-#include "commands/pairing/Commands.h"
+#include "../common/NetworkCommand.h"
 
-#include <transport/SecurePairingSession.h>
-
-// ================================================================================
-// Main Code
-// ================================================================================
-int main(int argc, char * argv[])
+class EchoCommand : public NetworkCommand
 {
-    Commands commands;
+public:
+    EchoCommand(const char * commandName) : NetworkCommand(commandName) {}
 
-    registerCommandsEcho(commands);
-    registerCommandsPairing(commands);
-    registerClusters(commands);
-
-    return commands.Run(chip::kTestControllerNodeId, chip::kTestDeviceNodeId, argc, argv);
-}
+    /////////// NetworkCommand Interface /////////
+    uint16_t Encode(PacketBufferHandle & buffer, uint16_t bufferSize) override;
+    bool Decode(PacketBufferHandle & buffer) const override;
+};
