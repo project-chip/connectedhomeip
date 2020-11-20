@@ -28,6 +28,7 @@
 #include "RendezvousDeviceDelegate.h"
 #include "ScreenManager.h"
 #include "WiFiWidget.h"
+#include "QRCodeUtil.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
@@ -430,48 +431,6 @@ std::string createSetupPayload()
     return result;
 };
 
-bool inRfc3986UnreservedChar(const char c)
-{
-    static const char unreserved[] = { '-', '.', '_', '~' };
-    return isalpha(c) || isdigit(c) || (strchr(unreserved, c) != NULL);
-}
-
-esp_err_t urlEncode(const char * src, size_t len, char * dest, size_t max_size)
-{
-    const char upper_xdigits[] = "0123456789ABCDEF";
-    size_t i = 0, j = 0;
-    for (i = 0; i < len; ++i)
-    {
-        unsigned char c = src[i];
-        if (inRfc3986UnreservedChar(c))
-        {
-            if ((j + 1) < max_size)
-            {
-                dest[j++] = c;
-            }
-            else
-            {
-                return ESP_FAIL;
-            }
-        }
-        else
-        {
-            if ((j + 3) < max_size)
-            {
-                dest[j++] = '%';
-                dest[j++] = upper_xdigits[c >> 4];
-                dest[j++] = upper_xdigits[(c & 0x0f)];
-            }
-            else
-            {
-                return ESP_FAIL;
-            }
-        }
-    }
-    dest[j] = '\0';
-    return ESP_OK;
-}
-
 static SecurePairingUsingTestSecret gTestPairing;
 
 } // namespace
@@ -543,8 +502,8 @@ extern "C" void app_main()
 
     {
         std::vector<char> qrCode(3 * qrCodeText.size() + 1);
-        err = urlEncode(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
-        if (err == ESP_OK)
+        err = EncodeQRCodeToUrl(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
+        if (err == CHIP_NO_ERROR)
         {
             ESP_LOGI(TAG, "Copy paste the below URL in a browser to see the QR CODE:\n\t%s?data=%s", QRCODE_BASE_URL,
                      qrCode.data());

@@ -21,3 +21,4 @@
 
 void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags);
 CHIP_ERROR GetQRCode(uint32_t & setupPinCode, std::string & QRCode, chip::RendezvousInformationFlags rendezvousFlags);
+CHIP_ERROR EncodeQRCodeToUrl(const char * QRCode, size_t len, char * url, size_t maxSize);
