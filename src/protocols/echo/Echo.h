@@ -139,7 +139,7 @@ private:
 
     void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
                            System::PacketBufferHandle payload) override;
-    void OnResponseTimeout(ExchangeContext * ec) override;
+    void OnResponseTimeout(ExchangeContext * ec) override {}
 };
 
 } // namespace Protocols
