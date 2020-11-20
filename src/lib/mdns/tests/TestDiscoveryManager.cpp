@@ -29,6 +29,8 @@ public:
         }
         else
         {
+            // Exit the event loop to notify the test has passed
+            // If this is not triggered this will mean a resolution failure
             exit(0);
         }
     }
