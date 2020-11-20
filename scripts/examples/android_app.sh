@@ -36,7 +36,7 @@ fi
 
 # Build shared CHIP libs
 source scripts/activate.sh
-gn gen out/"android_$TARGET_CPU" --args="target_os=\"android\" target_cpu=\"$TARGET_CPU\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\""
+gn gen --check --fail-on-unused-args out/"android_$TARGET_CPU" --args="target_os=\"android\" target_cpu=\"$TARGET_CPU\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\""
 ninja -C out/"android_$TARGET_CPU" src/setup_payload/java src/controller/java
 
 rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs

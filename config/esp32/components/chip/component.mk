@@ -122,7 +122,7 @@ install-chip : $(OUTPUT_DIR)
 	echo esp32_cxx = \"$(CXX)\"              >> $(OUTPUT_DIR)/args.gn
 	echo esp32_cpu = \"esp32\"               >> $(OUTPUT_DIR)/args.gn
 	echo "Written file $(OUTPUT_DIR)/args.gn"
-	cd $(CHIP_ROOT) && PW_ENVSETUP_QUIET=1 . scripts/activate.sh && cd $(COMPONENT_PATH) && gn gen $(OUTPUT_DIR)
+	cd $(CHIP_ROOT) && PW_ENVSETUP_QUIET=1 . scripts/activate.sh && cd $(COMPONENT_PATH) && gn gen --check --fail-on-unused-args $(OUTPUT_DIR)
 	cd $(COMPONENT_PATH); ninja $(subst 1,-v,$(filter 1,$(V))) -C $(OUTPUT_DIR) esp32
 
 

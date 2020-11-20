@@ -136,8 +136,8 @@ echo
 
 _chip_banner "Build: GN configure"
 
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
-gn --root="$CHIP_ROOT" gen --check "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/debug" --args='target_os="all"'"$extra_args"
+gn --root="$CHIP_ROOT" gen --check --fail-on-unused-args "$CHIP_ROOT/out/release" --args='target_os="all" is_debug=false'"$extra_args"
 
 _chip_banner "Build: Ninja build"
 
