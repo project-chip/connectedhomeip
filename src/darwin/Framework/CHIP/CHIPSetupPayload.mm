@@ -16,6 +16,7 @@
  */
 
 #import "CHIPSetupPayload.h"
+#import "CHIPError.h"
 #import <setup_payload/SetupPayload.h>
 
 @implementation CHIPOptionalQRCodeInfo

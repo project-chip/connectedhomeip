@@ -16,6 +16,7 @@
  */
 
 #import "CHIPDevicePairingDelegateBridge.h"
+#import "CHIPError.h"
 #import <Foundation/Foundation.h>
 
 CHIPDevicePairingDelegateBridge::CHIPDevicePairingDelegateBridge(void)
