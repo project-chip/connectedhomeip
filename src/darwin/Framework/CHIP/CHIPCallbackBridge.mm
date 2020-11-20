@@ -15,27 +15,27 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_ONOFF_H
-#define CHIP_ONOFF_H
-
-#import "CHIPDevice.h"
-#import "CHIPDeviceCallback.h"
+#import "CHIPCallbackBridge.h"
+#import "CHIPError.h"
 #import <Foundation/Foundation.h>
 
-NS_ASSUME_NONNULL_BEGIN
+CHIPCallbackBridge::CHIPCallbackBridge(CHIPDeviceCallback handler, dispatch_queue_t queue)
+    : Callback::Callback<>(CallbackFn, this)
+    , mHandler(handler)
+    , mQueue(queue)
+{
+}
 
-@interface CHIPOnOff : NSObject
+CHIPCallbackBridge::~CHIPCallbackBridge() {}
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)lightOn:(CHIPDeviceCallback)onCompletion;
-- (BOOL)lightOff:(CHIPDeviceCallback)onCompletion;
-- (BOOL)toggleLight:(CHIPDeviceCallback)onCompletion;
-
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
-@end
-
-NS_ASSUME_NONNULL_END
-
-#endif /* CHIP_ONOFF_H */
+void CHIPCallbackBridge::CallbackFn(void * context)
+{
+    CHIPCallbackBridge * callback = reinterpret_cast<CHIPCallbackBridge *>(context);
+    if (callback && callback->mQueue) {
+        dispatch_async(callback->mQueue, ^{
+            callback->mHandler([CHIPError errorForCHIPErrorCode:CHIP_NO_ERROR]);
+            callback->Cancel();
+            delete callback;
+        });
+    }
+}

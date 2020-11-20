@@ -15,27 +15,26 @@
  *    limitations under the License.
  */
 
-#ifndef CHIP_ONOFF_H
-#define CHIP_ONOFF_H
-
-#import "CHIPDevice.h"
-#import "CHIPDeviceCallback.h"
 #import <Foundation/Foundation.h>
+
+#import "CHIPDeviceCallback.h"
+#import "CHIPError.h"
+
+#include <controller/CHIPDevice.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface CHIPOnOff : NSObject
+class CHIPCallbackBridge : public chip::Callback::Callback<>
+{
+public:
+    CHIPCallbackBridge(CHIPDeviceCallback handler, dispatch_queue_t queue);
+    ~CHIPCallbackBridge();
 
-- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
-- (BOOL)lightOn:(CHIPDeviceCallback)onCompletion;
-- (BOOL)lightOff:(CHIPDeviceCallback)onCompletion;
-- (BOOL)toggleLight:(CHIPDeviceCallback)onCompletion;
+    static void CallbackFn(void * context);
 
-- (instancetype)init NS_UNAVAILABLE;
-+ (instancetype)new NS_UNAVAILABLE;
-
-@end
+private:
+    CHIPDeviceCallback mHandler;
+    dispatch_queue_t mQueue;
+};
 
 NS_ASSUME_NONNULL_END
-
-#endif /* CHIP_ONOFF_H */

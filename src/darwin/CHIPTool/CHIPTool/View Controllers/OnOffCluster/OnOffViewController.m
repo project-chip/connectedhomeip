@@ -32,7 +32,6 @@
 @property (readwrite) CHIPDevice * chipDevice;
 
 @property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
-
 @end
 
 @implementation OnOffViewController
@@ -58,7 +57,7 @@
         deviceID--;
         NSError * error;
         self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
-        self.onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice];
+        self.onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:1 queue:callbackQueue];
     }
 }
 
@@ -141,17 +140,26 @@
 
 - (IBAction)onButtonTapped:(id)sender
 {
-    [self.onOff lightOn];
+    CHIPDeviceCallback completionHandler = ^(NSError * error) {
+        NSLog(@"Status: On command completed with error %@", [error description]);
+    };
+    [self.onOff lightOn:completionHandler];
 }
 
 - (IBAction)offButtonTapped:(id)sender
 {
-    [self.onOff lightOff];
+    CHIPDeviceCallback completionHandler = ^(NSError * error) {
+        NSLog(@"Status: Off command completed with error %@", [error description]);
+    };
+    [self.onOff lightOff:completionHandler];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
 {
-    [self.onOff toggleLight];
+    CHIPDeviceCallback completionHandler = ^(NSError * error) {
+        NSLog(@"Status: Toggle command completed with error %@", [error description]);
+    };
+    [self.onOff toggleLight:completionHandler];
 }
 
 // MARK: CHIPDeviceControllerDelegate

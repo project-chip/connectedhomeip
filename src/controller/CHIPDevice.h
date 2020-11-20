@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
+#include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
@@ -70,6 +72,16 @@ public:
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR SendMessage(System::PacketBuffer * message);
+
+    /**
+     * @brief
+     *   Send the provided message to the device
+     *
+     * @param[in] message   The message to be sent.
+     *
+     * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
+     */
+    CHIP_ERROR SendMessage(System::PacketBufferHandle message);
 
     /**
      * @brief
@@ -182,12 +194,21 @@ public:
 
     SecurePairingSessionSerializable & GetPairing() { return mPairing; }
 
+    void AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse);
+    void AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport);
+
 private:
     enum class ConnectionState
     {
         NotConnected,
         Connecting,
         SecureConnected,
+    };
+
+    struct CallbackInfo
+    {
+        EndpointId endpoint;
+        ClusterId cluster;
     };
 
     /* Node ID assigned to the CHIP device */
@@ -212,6 +233,14 @@ private:
     DeviceStatusDelegate * mStatusDelegate;
 
     SecureSessionMgr<Transport::UDP> * mSessionManager;
+
+    /* Track all outstanding response callbacks for this device. The callbacks are
+       registered when a command is sent to the device, to get notified with the results. */
+    Callback::CallbackDeque mResponses;
+
+    /* Track all outstanding callbacks for attribute reports from this device. The callbacks are
+       registered when the user requests attribute reporting for device attributes. */
+    Callback::CallbackDeque mReports;
 
     /**
      * @brief
