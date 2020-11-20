@@ -25,7 +25,7 @@
 #include <support/ScopedBuffer.h>
 #include <support/logging/CHIPLogging.h>
 
-constexpr char qrCodeBaseUrl[] = "https://dhrishi.github.io/connectedhomeip/qrcode.html";
+constexpr char qrCodeBaseUrl[]                   = "https://dhrishi.github.io/connectedhomeip/qrcode.html";
 constexpr char specialCharsUnreservedInRfc3986[] = "-._~";
 
 void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags)
@@ -41,11 +41,10 @@ void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags)
         chip::Platform::ScopedMemoryBuffer<char> qrCodeBuffer;
         const size_t qrCodeBufferMaxSize = 3 * QRCode.size() + 1;
         qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
-        if (EncodeQRCodeToUrl(QRCode.c_str(), QRCode.size(), &qrCodeBuffer[0],
-                              qrCodeBufferMaxSize) == CHIP_NO_ERROR)
+        if (EncodeQRCodeToUrl(QRCode.c_str(), QRCode.size(), &qrCodeBuffer[0], qrCodeBufferMaxSize) == CHIP_NO_ERROR)
         {
-            ChipLogProgress(AppServer, "Copy paste the below URL in a browser to see the QR Code:\n\t%s?data=%s",
-                            qrCodeBaseUrl, &qrCodeBuffer[0]);
+            ChipLogProgress(AppServer, "Copy paste the below URL in a browser to see the QR Code:\n\t%s?data=%s", qrCodeBaseUrl,
+                            &qrCodeBuffer[0]);
         }
     }
     else
@@ -98,7 +97,7 @@ static inline bool isCharUnreservedInRfc3986(const char c)
 CHIP_ERROR EncodeQRCodeToUrl(const char * QRCode, size_t len, char * url, size_t maxSize)
 {
     const char upperHexDigits[] = "0123456789ABCDEF";
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err              = CHIP_NO_ERROR;
     size_t i = 0, j = 0;
 
     VerifyOrExit((QRCode && url) != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -107,20 +106,21 @@ CHIP_ERROR EncodeQRCodeToUrl(const char * QRCode, size_t len, char * url, size_t
     for (i = 0; i < len; ++i)
     {
         unsigned char c = QRCode[i];
-        if (isCharUnreservedInRfc3986(c)) {
+        if (isCharUnreservedInRfc3986(c))
+        {
 
             VerifyOrExit((j + 1) < maxSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
             url[j++] = c;
-
-        } else {
+        }
+        else
+        {
 
             VerifyOrExit((j + 3) < maxSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
             url[j++] = '%';
             url[j++] = upperHexDigits[c >> 4];
             url[j++] = upperHexDigits[(c & 0x0f)];
-
         }
     }
 
