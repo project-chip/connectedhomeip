@@ -80,7 +80,7 @@ in the nRF Connect SDK documentation.
 
 Because Kconfig files are used in the building process, make sure that you rebuild your application
 after editing them by typing the following command in the example directory, with *board_name*
-replaced with the target board name, for example *nrf52840dk_nrf52840*::
+replaced with the target board name, for example *nrf52840dk_nrf52840*:
 
         $ west build -b board_name
 
@@ -90,9 +90,9 @@ replaced with the target board name, for example *nrf52840dk_nrf52840*::
 
 ## Configuration structure overview
 
-The application configuration is specified using Kconfig files.
-Typically, there are many files having impact on the final configuration shape,
-because most of the components have their own configuration files.
+Zephyr RTOS and related software components, like drivers and libraries, provide a set of Kconfig files which define available configuration options and assign them default values for any application.
+
+The application configuration is specified using configuration `*.conf` files, where available Kconfig options can be used and their default values overrided. Typically, there are many files having impact on the final configuration shape.
 
 There is no need to modify all these files separately.
 See the following list for types of files you can find in the project
@@ -103,24 +103,19 @@ and which of them are important from your perspective:
   automatically included based on the compilation target board name.
   They contain configuration for board and its peripherals.
 
-- **Software libraries' configuration files.**
-  Many libraries, components and modules have their own configuration files,
-  but in the majority of cases you can override their configuration values
-  in the main application configuration file, meaning that you do not need to modify
-  their files unless you are interested in developing these libraries.
-
-- **Application configuration file.**
+- **Project configuration file.**
   Every example application has its main configuration file called `prj.conf` that is
   located in the example directory. This file contains application-specific configuration
   or the most frequently changed options. Almost every configuration can be overridden
   in this file and probably this file is the most important one.
 
 - **Overlays.**
-  Overlay files are usually used to extract configuration for some specific
-  case or feature from the general application configuration. The main
+  Overlays are optional files usually used to extract configuration for some specific case or feature from the general application configuration. The main
   difference between them and the application `prj.conf` file is that they are
   not included automatically, so you can decide whether to build sample with
-  or without them.
+  or without them. Overlay files can be added to build by typing the following command in the example directory, with *board_name* replaced with the target board name (e.g. *nrf52840dk_nrf52840*) and *overlay_file_name* replaced with the overlay configuration file name (e.g. *overlay-usb_support.conf*):
+
+        $ west build -b board_name -- -DOVERLAY_CONFIG=overlay_file_name
 
 Read the [Kconfig](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/zephyr/guides/kconfig/index.html#kconfig)
 guide in the nRF Connect SDK's Zephyr documentation if you are interested in getting more advanced and detailed information about
