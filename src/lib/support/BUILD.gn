@@ -69,6 +69,7 @@ static_library("support") {
     "PersistedCounter.h",
     "RandUtils.cpp",
     "RandUtils.h",
+    "ReturnMacros.h",
     "SafeInt.h",
     "SerializableIntegerSet.cpp",
     "SerializableIntegerSet.h",

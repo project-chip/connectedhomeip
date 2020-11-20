@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include <array>
+
 #include <messaging/ExchangeContext.h>
 #include <support/DLLUtil.h>
 #include <transport/SecureSessionMgr.h>
@@ -31,7 +33,6 @@
 namespace chip {
 
 class ExchangeContext;
-class ExchangeDelegate;
 class ExchangeDelegate;
 
 static constexpr int16_t kAnyMessageType = -1;
@@ -183,7 +184,7 @@ private:
     State mState;
     SecureSessionMgrBase * mSessionMgr;
 
-    ExchangeContext ContextPool[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
+    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> ContextPool;
     size_t mContextsInUse;
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
@@ -199,8 +200,10 @@ private:
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                           const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
                            SecureSessionMgrBase * msgLayer) override;
+
+    void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
 };
 
 } // namespace chip
