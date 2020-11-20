@@ -4,6 +4,8 @@
 
 #include "lib/support/CHIPMem.h"
 
+using chip::Mdns::ServicePool;
+
 void TestServicePool(nlTestSuite * suite, void * context)
 {
 
@@ -92,4 +94,24 @@ void TestServicePool(nlTestSuite * suite, void * context)
     NL_TEST_ASSERT(suite, pool.FindService(7, 0, &foundService) == true);
     NL_TEST_ASSERT(suite, foundService->mPort == 103);
     NL_TEST_ASSERT(suite, pool.FindService(2, 0, &foundService) == false);
+
+    pool.Clear();
+
+    for (size_t i = 0; i < ServicePool::kServicePoolCapacity; i++)
+    {
+        NL_TEST_ASSERT(suite, pool.AddService(i + 1, 0, testServices[0]) == CHIP_NO_ERROR);
+    }
+
+    for (size_t i = 0; i < ServicePool::kServicePoolCapacity; i++)
+    {
+        NL_TEST_ASSERT(suite, pool.FindService(i + 1, 0, &foundService) == true);
+    }
+
+    NL_TEST_ASSERT(suite, pool.AddService(ServicePool::kServicePoolCapacity + 1, 0, testServices[0]) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(suite, pool.FindService(1, 0, &foundService) == false);
+
+    for (size_t i = 1; i < ServicePool::kServicePoolCapacity; i++)
+    {
+        NL_TEST_ASSERT(suite, pool.FindService(i + 1, 0, &foundService) == true);
+    }
 }

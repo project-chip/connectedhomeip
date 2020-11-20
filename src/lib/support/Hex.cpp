@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "HexUtils.h"
+#include "Hex.h"
 
 namespace chip {
 
@@ -34,7 +34,7 @@ uint8_t HexDigitToInt(char c)
         return static_cast<uint8_t>(0x0a + c - 'A');
     }
 
-    return UINT8_MAX;
+    return kInvalidDigitValue;
 }
 
 } // namespace chip
