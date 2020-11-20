@@ -59,3 +59,45 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp)
+
+get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
+
+set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
+include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
+include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
+
+pw_set_backend(pw_log pw_log_basic)
+pw_set_backend(pw_assert pw_assert_log)
+pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
+set(dir_pw_third_party_nanopb PRESENT CACHE STRING ${CHIP_ROOT}/third_party/nanopb/repo FORCE)
+
+add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
+add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
+add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
+
+target_include_directories(app PRIVATE main/include
+                           ${NRFCONNECT_COMMON}/util/include
+                           ${PIGWEED_ROOT}/pw_hdlc_lite/public
+                           ${PIGWEED_ROOT}/pw_sys_io/public
+                           ${PIGWEED_ROOT}/pw_span/public_overrides
+                           ${PIGWEED_ROOT}/pw_span/public
+                           ${PIGWEED_ROOT}/pw_polyfill/public
+                           ${PIGWEED_ROOT}/pw_polyfill/standard_library_public
+                           ${PIGWEED_ROOT}/pw_polyfill/public_overrides
+                           ${PIGWEED_ROOT}/pw_status/public
+                           ${PIGWEED_ROOT}/pw_stream/public
+                           ${PIGWEED_ROOT}/pw_preprocessor/public
+                           ${NRFCONNECT_COMMON}/pw_sys_io/include)
+
+pw_proto_library(pigweed_lighting_protolib
+  SOURCES
+    main/pigweed_lighting.proto
+)
+
+target_link_libraries(app PRIVATE
+   pigweed_lighting_protolib.nanopb_rpc
+   pw_hdlc_lite
+    pw_log
+    pw_rpc.nanopb.echo_service
+    pw_rpc.server
+)

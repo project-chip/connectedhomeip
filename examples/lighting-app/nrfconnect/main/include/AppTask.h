@@ -36,7 +36,7 @@ public:
     void PostEvent(AppEvent * event);
     void UpdateClusterState();
 
-private:
+    // private:
     friend AppTask & GetAppTask(void);
 
     int Init();

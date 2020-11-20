@@ -20,10 +20,16 @@
 
 #include "AppConfig.h"
 
-#include <logging/log.h>
+#include "pw_log/log.h"
 #include <zephyr.h>
 
+#ifndef CONFIG_USE_PW_LOG
+#include <logging/log.h>
 LOG_MODULE_DECLARE(app);
+#else
+#define LOG_INF(message, ...) PW_LOG_INFO(message, __VA_ARGS__)
+#define LOG_ERR(message, ...) PW_LOG_ERROR(message, __VA_ARGS__)
+#endif
 
 LightingManager LightingManager::sLight;
 
@@ -38,7 +44,11 @@ int LightingManager::Init(const char * gpioDeviceName, gpio_pin_t gpioPin)
 
     if (!mGPIODevice)
     {
+#ifndef CONFIG_USE_PW_LOG
         LOG_ERR("Cannot find GPIO port %s", log_strdup(gpioDeviceName));
+#else
+        LOG_ERR("Cannot find GPIO port %s", gpioDeviceName);
+#endif
         return -ENODEV;
     }
 

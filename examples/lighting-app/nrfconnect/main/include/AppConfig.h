@@ -35,3 +35,5 @@
 
 // Time it takes in ms for the simulated actuator to move from one state to another.
 #define ACTUATOR_MOVEMENT_PERIOS_MS 2000
+
+#define CONFIG_USE_PW_LOG 1

@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package chip.rpc;
+
+message Empty {
+}
+
+service LightingService {
+  rpc LightingEvent(Empty) returns (Empty){}
+}

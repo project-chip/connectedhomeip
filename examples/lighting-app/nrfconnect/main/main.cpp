@@ -18,19 +18,47 @@
 
 #include "AppTask.h"
 
+#include "pw_log/log.h"
+#include "pw_sys_io/sys_io.h"
+#include "pw_sys_io_nrfconnect/init.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
-#include <logging/log.h>
+#include <kernel.h>
 
-LOG_MODULE_REGISTER(app);
+#ifndef CONFIG_USE_PW_LOG
+#include <logging/log.h>
+LOG_MODULE_DECLARE(app);
+#else
+#define LOG_INF(message, ...) PW_LOG_INFO(message, __VA_ARGS__)
+#define LOG_ERR(message, ...) PW_LOG_ERROR(message, __VA_ARGS__)
+#endif
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
+namespace chip {
+namespace rpc {
+extern void RunRpcService(void *, void *, void *);
+}
+} // namespace chip
+
+namespace {
+#define ECHO_STACK_SIZE 4096
+#define ECHO_PRIORITY 5
+
+K_THREAD_STACK_DEFINE(echo_stack_area, ECHO_STACK_SIZE);
+struct k_thread echo_thread_data;
+
+} // namespace
+
 int main(void)
 {
+    pw_sys_io_Init();
+    k_tid_t my_tid = k_thread_create(&echo_thread_data, echo_stack_area, K_THREAD_STACK_SIZEOF(echo_stack_area),
+                                     chip::rpc::RunRpcService, NULL, NULL, NULL, ECHO_PRIORITY, 0, K_NO_WAIT);
+
     int ret = 0;
 
     k_thread_priority_set(k_current_get(), K_PRIO_COOP(CONFIG_NUM_COOP_PRIORITIES - 1));

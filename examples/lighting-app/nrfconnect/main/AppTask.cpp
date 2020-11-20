@@ -18,6 +18,10 @@
 
 #include "AppTask.h"
 
+#include <array>
+#include <span>
+#include <string_view>
+
 #include "AppConfig.h"
 #include "AppEvent.h"
 #include "LEDWidget.h"
@@ -36,16 +40,33 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
+#include "pw_hdlc_lite/encoder.h"
+#include "pw_hdlc_lite/rpc_channel.h"
+#include "pw_hdlc_lite/rpc_packets.h"
+#include "pw_hdlc_lite/sys_io_stream.h"
+#include "pw_log/log.h"
+#include "pw_rpc/echo_service_nanopb.h"
+#include "pw_rpc/server.h"
+
+#include "main/pigweed_lighting.rpc.pb.h"
+#include "pw_sys_io/sys_io.h"
+#include "pw_sys_io_nrfconnect/init.h"
+
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/ErrorStr.h>
 #include <system/SystemClock.h>
 
 #include <dk_buttons_and_leds.h>
-#include <logging/log.h>
 #include <zephyr.h>
 
+#ifndef CONFIG_USE_PW_LOG
+#include <logging/log.h>
 LOG_MODULE_DECLARE(app);
+#else
+#define LOG_INF(message, ...) PW_LOG_INFO(message, __VA_ARGS__)
+#define LOG_ERR(message, ...) PW_LOG_ERROR(message, __VA_ARGS__)
+#endif
 
 namespace {
 
@@ -280,6 +301,73 @@ void AppTask::ButtonEventHandler(uint32_t button_state, uint32_t has_changed)
         sAppTask.PostEvent(&button_event);
     }
 }
+
+namespace chip {
+namespace rpc {
+
+class LightingService final : public generated::LightingService<LightingService>
+{
+public:
+    pw::Status LightingEvent(ServerContext & ctx, const chip_rpc_Empty & request, chip_rpc_Empty & response)
+    {
+        // implementation
+        AppEvent button_event;
+        button_event.Type               = AppEvent::kEventType_Button;
+        button_event.ButtonEvent.PinNo  = LIGHTING_BUTTON;
+        button_event.ButtonEvent.Action = kButtonPushEvent;
+        button_event.Handler            = AppTask::LightingActionEventHandler;
+        AppTask::sAppTask.PostEvent(&button_event);
+        return pw::Status::OK;
+    }
+};
+
+using std::byte;
+
+constexpr size_t kMaxTransmissionUnit = 1500;
+
+// Used to write HDLC data to pw::sys_io.
+pw::stream::SysIoWriter writer;
+
+// Set up the output channel for the pw_rpc server to use to use.
+pw::hdlc_lite::RpcChannelOutputBuffer<kMaxTransmissionUnit> hdlc_channel_output(writer, pw::hdlc_lite::kDefaultRpcAddress,
+                                                                                "HDLC channel");
+
+pw::rpc::Channel channels[] = { pw::rpc::Channel::Create<1>(&hdlc_channel_output) };
+
+// Declare the pw_rpc server with the HDLC channel.
+pw::rpc::Server server(channels);
+
+chip::rpc::LightingService lighting_service;
+
+void RegisterServices()
+{
+    server.RegisterService(lighting_service);
+}
+
+void Start()
+{
+    // Send log messages to HDLC address 1. This prevents logs from interfering
+    // with pw_rpc communications.
+    pw::log_basic::SetOutput(
+        [](std::string_view log) { pw::hdlc_lite::WriteInformationFrame(1, std::as_bytes(std::span(log)), writer); });
+
+    // Set up the server and start processing data.
+    RegisterServices();
+
+    // Declare a buffer for decoding incoming HDLC frames.
+    std::array<std::byte, kMaxTransmissionUnit> input_buffer;
+
+    PW_LOG_INFO("Starting pw_rpc server");
+    pw::hdlc_lite::ReadAndProcessPackets(server, hdlc_channel_output, input_buffer);
+}
+
+void RunRpcService(void *, void *, void *)
+{
+    Start();
+}
+
+} // namespace rpc
+} // namespace chip
 
 void AppTask::TimerEventHandler(k_timer * timer)
 {
