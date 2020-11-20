@@ -50,8 +50,6 @@
 	path = third_party/cirque/repo
 	url = https://github.com/openweave/cirque.git
 	branch = master
-	ignore = dirty
-	commit = 905112cbeeda504223209798ec23e3754ce43fca
 [submodule "happy"]
 	path = third_party/happy/repo
 	url = https://github.com/openweave/happy.git
