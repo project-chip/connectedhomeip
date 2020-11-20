@@ -70,7 +70,7 @@ namespace Mdns {
 
 ServicePool::ServicePool()
 {
-    Clear();
+    ClearNoFree();
 }
 
 CHIP_ERROR ServicePool::AddService(uint64_t nodeId, uint64_t fabricId, const MdnsService & service, bool deepCopy)
@@ -94,8 +94,8 @@ CHIP_ERROR ServicePool::AddService(uint64_t nodeId, uint64_t fabricId, const Mdn
 
     if (!found)
     {
-        // Remove one randomly
-        i = GetRandU16() % kServicePoolCapacity;
+        // Remove the entry that just matches the hash
+        i = hashValue;
     }
 
     if (mEntries[i].mLazyDelete)
@@ -194,6 +194,20 @@ void ServicePool::Clear()
 {
     for (size_t i = 0; i < kServicePoolCapacity; i++)
     {
+        if (mEntries[i].mNodeId != kUndefinedNodeId)
+        {
+            FreeTextEntries(&mEntries[i].mService);
+        }
+        mEntries[i].mNodeId     = kUndefinedNodeId;
+        mEntries[i].mLazyDelete = false;
+    }
+    mLazyDeleteCount = 0;
+}
+
+void ServicePool::ClearNoFree()
+{
+    for (size_t i = 0; i < kServicePoolCapacity; i++)
+    {
         mEntries[i].mNodeId     = kUndefinedNodeId;
         mEntries[i].mLazyDelete = false;
     }
@@ -205,20 +219,7 @@ void ServicePool::ReHash()
     ServicePoolEntry copyEntries[kServicePoolCapacity];
 
     memcpy(&copyEntries, mEntries, sizeof(mEntries));
-    for (size_t i = 0; i < kServicePoolCapacity; i++)
-    {
-        if (!mEntries[i].mLazyDelete && mEntries[i].mNodeId != kUndefinedNodeId)
-        {
-        }
-    }
-
-    Clear();
-    for (size_t i = 0; i < kServicePoolCapacity; i++)
-    {
-        if (!copyEntries[i].mLazyDelete && copyEntries[i].mNodeId != kUndefinedNodeId)
-        {
-        }
-    }
+    ClearNoFree();
 
     for (size_t i = 0; i < kServicePoolCapacity; i++)
     {
