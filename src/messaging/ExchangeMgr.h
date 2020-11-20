@@ -56,14 +56,14 @@ public:
      *  construction until a call to Shutdown is made to terminate the
      *  instance.
      *
-     *  @param[in]    sessionMgr    A pointer to the SecureSessionMgrBase object.
+     *  @param[in]    sessionMgr    A pointer to the SecureSessionMgr object.
      *
      *  @retval #CHIP_ERROR_INCORRECT_STATE If the state is not equal to
      *          kState_NotInitialized.
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(SecureSessionMgrBase * sessionMgr);
+    CHIP_ERROR Init(SecureSessionMgr * sessionMgr);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -162,7 +162,7 @@ public:
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
-    SecureSessionMgrBase * GetSessionMgr() const { return mSessionMgr; }
+    SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
     size_t GetContextsInUse() const { return mContextsInUse; }
 
@@ -182,7 +182,7 @@ private:
 
     uint16_t mNextExchangeId;
     State mState;
-    SecureSessionMgrBase * mSessionMgr;
+    SecureSessionMgr * mSessionMgr;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> ContextPool;
     size_t mContextsInUse;
@@ -197,13 +197,13 @@ private:
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * msgLayer) override;
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
                            const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
-                           SecureSessionMgrBase * msgLayer) override;
+                           SecureSessionMgr * msgLayer) override;
 
-    void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
+    void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override;
 };
 
 } // namespace chip

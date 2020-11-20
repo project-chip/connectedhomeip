@@ -74,16 +74,22 @@ enum class FlagValues : uint16_t
     /// Header flag specifying that it is a control message for secure session.
     kSecureSessionControlMessage = 0x0800,
 
+    /// Header flag specifying that it is a encrypted message.
+    kSecure = 0x0001,
+
 };
 
 using Flags   = BitFlags<uint16_t, FlagValues>;
 using ExFlags = BitFlags<uint8_t, ExFlagValues>;
 
 // Header is a 16-bit value of the form
-//  |  4 bit  | 4 bit |  4 bit  |  4 bit   |
-//  +---------+-------+---------+----------|
-//  | version | Flags | encType | reserved |
-static constexpr uint16_t kFlagsMask = 0x0F00;
+//  |  4 bit  | 4 bit |8 bit Security Flags|
+//  +---------+-------+--------------------|
+//  | version | Flags | P | C |Reserved| E |
+//                      |   |            +---Encrypted
+//                      |   +----------------Control message (TODO: Implement this)
+//                      +--------------------Privacy enhancements (TODO: Implement this)
+static constexpr uint16_t kFlagsMask = 0x0F01;
 
 } // namespace Header
 

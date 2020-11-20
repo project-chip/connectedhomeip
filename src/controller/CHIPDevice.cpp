@@ -171,8 +171,7 @@ exit:
 }
 
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                               const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
-                               SecureSessionMgrBase * mgr)
+                               const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -233,7 +232,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters()
     err = pairingSession.FromSerializable(mPairing);
     SuccessOrExit(err);
 
-    err = mSessionManager->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
+    err = mTransportMgr->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
     SuccessOrExit(err);
 
     err = mSessionManager->NewPairing(

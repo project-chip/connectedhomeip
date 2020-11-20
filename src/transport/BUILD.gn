@@ -33,6 +33,8 @@ static_library("transport") {
     "SecureSession.h",
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
+    "TransportMgr.cpp",
+    "TransportMgr.h",
   ]
 
   if (chip_config_network_layer_ble) {

@@ -40,7 +40,7 @@ using namespace ::chip;
  * @param [in] buffer The buffer holding the message.  This function guarantees
  *                    that it will free the buffer before returning.
  */
-void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
+void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * buffer, SecureSessionMgr * mgr)
 {
     EmberApsFrame frame;
     bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;

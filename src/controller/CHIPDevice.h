@@ -33,6 +33,7 @@
 #include <support/DLLUtil.h>
 #include <transport/SecurePairingSession.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/MessageHeader.h>
 #include <transport/raw/UDP.h>
 
@@ -42,6 +43,8 @@ namespace Controller {
 class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
+
+using DeviceTransportMgr = TransportMgr<Transport::UDP>;
 
 class DLL_EXPORT Device
 {
@@ -105,11 +108,13 @@ public:
      *   that of this device object. If these objects are freed, while the device object is
      *   still using them, it can lead to unknown behavior and crashes.
      *
+     * @param[in] transportMgr Transport manager object pointer
      * @param[in] sessionMgr   Secure session manager object pointer
      * @param[in] inetLayer    InetLayer object pointer
      */
-    void Init(SecureSessionMgr<Transport::UDP> * sessionMgr, Inet::InetLayer * inetLayer)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer)
     {
+        mTransportMgr   = transportMgr;
         mSessionManager = sessionMgr;
         mInetLayer      = inetLayer;
     }
@@ -125,16 +130,17 @@ public:
      *   uninitialzed/unpaired device objects. The object is initialized only when the device
      *   is actually paired.
      *
+     * @param[in] transportMgr Transport manager object pointer
      * @param[in] sessionMgr   Secure session manager object pointer
      * @param[in] inetLayer    InetLayer object pointer
      * @param[in] deviceId     Node ID of the device
      * @param[in] devicePort   Port on which device is listening (typically CHIP_PORT)
      * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
      */
-    void Init(SecureSessionMgr<Transport::UDP> * sessionMgr, Inet::InetLayer * inetLayer, NodeId deviceId, uint16_t devicePort,
-              Inet::InterfaceId interfaceId)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, NodeId deviceId,
+              uint16_t devicePort, Inet::InterfaceId interfaceId)
     {
-        Init(sessionMgr, inetLayer);
+        Init(transportMgr, sessionMgr, inetLayer);
         mDeviceId   = deviceId;
         mDevicePort = devicePort;
         mInterface  = interfaceId;
@@ -168,7 +174,7 @@ public:
      * @param[in] mgr           Pointer to secure session manager which received the message
      */
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr);
+                           const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgr * mgr);
 
     /**
      * @brief
@@ -232,7 +238,9 @@ private:
 
     DeviceStatusDelegate * mStatusDelegate;
 
-    SecureSessionMgr<Transport::UDP> * mSessionManager;
+    SecureSessionMgr * mSessionManager;
+
+    DeviceTransportMgr * mTransportMgr;
 
     /* Track all outstanding response callbacks for this device. The callbacks are
        registered when a command is sent to the device, to get notified with the results. */

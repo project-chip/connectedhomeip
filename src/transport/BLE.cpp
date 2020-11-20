@@ -189,11 +189,24 @@ void BLE::OnBleConnectionError(void * appState, BLE_ERROR err)
 
 void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBuffer * buffer)
 {
-    BLE * ble = reinterpret_cast<BLE *>(endPoint->mAppState);
+    BLE * ble      = reinterpret_cast<BLE *>(endPoint->mAppState);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (ble->mDelegate)
     {
-        ble->mDelegate->OnRendezvousMessageReceived(buffer);
+        uint16_t headerSize = 0;
+
+        PacketHeader header;
+        err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
+        SuccessOrExit(err);
+
+        buffer->ConsumeHead(headerSize);
+        ble->mDelegate->OnRendezvousMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), buffer);
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Inet, "Failed to receive BLE message: %s", ErrorStr(err));
     }
 }
 
