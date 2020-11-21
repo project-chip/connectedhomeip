@@ -131,7 +131,7 @@ CHIP_ERROR NetworkProvisioning::EncodeString(const char * str, BufBound & bbuf)
     uint16_t u16len = static_cast<uint16_t>(length);
     VerifyOrExit(CanCastTo<uint16_t>(length), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    bbuf.PutLE16(u16len);
+    bbuf.Put16(u16len);
     bbuf.Put(str);
 
 exit:
@@ -150,7 +150,7 @@ CHIP_ERROR NetworkProvisioning::DecodeString(const uint8_t * input, size_t input
     VerifyOrExit(input_len - consumed >= length, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     bbuf.Put(&input[consumed], length);
 
-    consumed += bbuf.Written();
+    consumed += bbuf.Needed();
     bbuf.Put('\0');
 
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -198,8 +198,8 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     SuccessOrExit(EncodeString(passwd, bbuf));
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    VerifyOrExit(CanCastTo<uint16_t>(bbuf.Written()), err = CHIP_ERROR_INVALID_ARGUMENT);
-    buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
+    VerifyOrExit(CanCastTo<uint16_t>(bbuf.Needed()), err = CHIP_ERROR_INVALID_ARGUMENT);
+    buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
     err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
                                        NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer.Release_ForNow());
@@ -227,14 +227,14 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         bbuf.Put(threadData.ThreadMeshPrefix, sizeof(threadData.ThreadMeshPrefix));
         bbuf.Put(threadData.ThreadMasterKey, sizeof(threadData.ThreadMasterKey));
         bbuf.Put(threadData.ThreadPSKc, sizeof(threadData.ThreadPSKc));
-        bbuf.PutLE16(threadData.ThreadPANId);
+        bbuf.Put16(threadData.ThreadPANId);
         bbuf.Put(threadData.ThreadChannel);
         bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadExtendedPANId));
         bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadMeshPrefix));
         bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadPSKc));
 
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
+        buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
         err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
                                            NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer.Release_ForNow());

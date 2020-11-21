@@ -90,8 +90,8 @@ CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_
 
     BufBound bbuf(iv, len);
 
-    bbuf.PutLE64(header.GetSourceNodeId().ValueOr(0));
-    bbuf.PutLE32(header.GetMessageId());
+    bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
+    bbuf.Put32(header.GetMessageId());
 
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }

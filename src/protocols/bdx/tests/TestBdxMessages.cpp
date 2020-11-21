@@ -27,7 +27,7 @@ void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, Ms
     BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
     testMsg.WriteToBuffer(bbuf);
     NL_TEST_ASSERT(inSuite, bbuf.Fit());
-    msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
+    msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
     System::PacketBufferHandle rcvBuf = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgSize));
     NL_TEST_ASSERT(inSuite, !rcvBuf.IsNull());

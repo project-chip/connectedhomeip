@@ -39,7 +39,7 @@ using namespace chip::Encoding::LittleEndian;
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-void TransferInit::WriteToBuffer(BufBound & aBuffer) const
+BufBound & TransferInit::WriteToBuffer(BufBound & aBuffer) const
 {
     uint8_t proposedTransferCtl = 0;
     bool widerange = (StartOffset > std::numeric_limits<uint32_t>::max()) || (MaxLength > std::numeric_limits<uint32_t>::max());
@@ -54,17 +54,17 @@ void TransferInit::WriteToBuffer(BufBound & aBuffer) const
 
     aBuffer.Put(proposedTransferCtl);
     aBuffer.Put(rangeCtlFlags.Raw());
-    aBuffer.PutLE16(MaxBlockSize);
+    aBuffer.Put16(MaxBlockSize);
 
     if (StartOffset > 0)
     {
         if (widerange)
         {
-            aBuffer.PutLE64(StartOffset);
+            aBuffer.Put64(StartOffset);
         }
         else
         {
-            aBuffer.PutLE32(static_cast<uint32_t>(StartOffset));
+            aBuffer.Put32(static_cast<uint32_t>(StartOffset));
         }
     }
 
@@ -72,15 +72,15 @@ void TransferInit::WriteToBuffer(BufBound & aBuffer) const
     {
         if (widerange)
         {
-            aBuffer.PutLE64(MaxLength);
+            aBuffer.Put64(MaxLength);
         }
         else
         {
-            aBuffer.PutLE32(static_cast<uint32_t>(MaxLength));
+            aBuffer.Put32(static_cast<uint32_t>(MaxLength));
         }
     }
 
-    aBuffer.PutLE16(FileDesLength);
+    aBuffer.Put16(FileDesLength);
     if (FileDesignator != nullptr)
     {
         aBuffer.Put(FileDesignator, static_cast<size_t>(FileDesLength));
@@ -90,6 +90,7 @@ void TransferInit::WriteToBuffer(BufBound & aBuffer) const
     {
         aBuffer.Put(Metadata, static_cast<size_t>(MetadataLength));
     }
+    return aBuffer;
 }
 
 CHIP_ERROR TransferInit::Parse(const System::PacketBuffer & aBuffer)
@@ -167,10 +168,8 @@ exit:
 
 size_t TransferInit::MessageSize() const
 {
-    uint8_t dummy[0];
-    BufBound emptyBuf(static_cast<uint8_t *>(dummy), 0);
-    WriteToBuffer(emptyBuf);
-    return emptyBuf.Written();
+    BufBound emptyBuf(nullptr, 0);
+    return WriteToBuffer(emptyBuf).Needed();
 }
 
 bool TransferInit::operator==(const TransferInit & another) const
@@ -199,7 +198,7 @@ bool TransferInit::operator==(const TransferInit & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-void SendAccept::WriteToBuffer(BufBound & aBuffer) const
+BufBound & SendAccept::WriteToBuffer(BufBound & aBuffer) const
 {
     uint8_t transferCtl = 0;
 
@@ -207,12 +206,13 @@ void SendAccept::WriteToBuffer(BufBound & aBuffer) const
     transferCtl = transferCtl | TransferCtlFlags.Raw();
 
     aBuffer.Put(transferCtl);
-    aBuffer.PutLE16(MaxBlockSize);
+    aBuffer.Put16(MaxBlockSize);
 
     if (Metadata != nullptr)
     {
         aBuffer.Put(Metadata, static_cast<size_t>(MetadataLength));
     }
+    return aBuffer;
 }
 
 CHIP_ERROR SendAccept::Parse(const System::PacketBuffer & aBuffer)
@@ -251,11 +251,8 @@ exit:
 
 size_t SendAccept::MessageSize() const
 {
-    uint8_t dummy[0];
-    BufBound emptyBuf(static_cast<uint8_t *>(dummy), 0);
-    WriteToBuffer(emptyBuf);
-    return emptyBuf.Written();
-    ;
+    BufBound emptyBuf(nullptr, 0);
+    return WriteToBuffer(emptyBuf).Needed();
 }
 
 bool SendAccept::operator==(const SendAccept & another) const
@@ -277,7 +274,7 @@ bool SendAccept::operator==(const SendAccept & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-void ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
+BufBound & ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
 {
     uint8_t transferCtl = 0;
     bool widerange      = (StartOffset > std::numeric_limits<uint32_t>::max()) || (Length > std::numeric_limits<uint32_t>::max());
@@ -292,17 +289,17 @@ void ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
 
     aBuffer.Put(transferCtl);
     aBuffer.Put(rangeCtlFlags.Raw());
-    aBuffer.PutLE16(MaxBlockSize);
+    aBuffer.Put16(MaxBlockSize);
 
     if (StartOffset > 0)
     {
         if (widerange)
         {
-            aBuffer.PutLE64(StartOffset);
+            aBuffer.Put64(StartOffset);
         }
         else
         {
-            aBuffer.PutLE32(static_cast<uint32_t>(StartOffset));
+            aBuffer.Put32(static_cast<uint32_t>(StartOffset));
         }
     }
 
@@ -310,11 +307,11 @@ void ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
     {
         if (widerange)
         {
-            aBuffer.PutLE64(Length);
+            aBuffer.Put64(Length);
         }
         else
         {
-            aBuffer.PutLE32(static_cast<uint32_t>(Length));
+            aBuffer.Put32(static_cast<uint32_t>(Length));
         }
     }
 
@@ -322,6 +319,7 @@ void ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
     {
         aBuffer.Put(Metadata, static_cast<size_t>(MetadataLength));
     }
+    return aBuffer;
 }
 
 CHIP_ERROR ReceiveAccept::Parse(const System::PacketBuffer & aBuffer)
@@ -393,10 +391,8 @@ exit:
 
 size_t ReceiveAccept::MessageSize() const
 {
-    uint8_t dummy[0];
-    BufBound emptyBuf(static_cast<uint8_t *>(dummy), 0);
-    WriteToBuffer(emptyBuf);
-    return emptyBuf.Written();
+    BufBound emptyBuf(nullptr, 0);
+    return WriteToBuffer(emptyBuf).Needed();
 }
 
 bool ReceiveAccept::operator==(const ReceiveAccept & another) const
@@ -419,9 +415,9 @@ bool ReceiveAccept::operator==(const ReceiveAccept & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-void CounterMessage::WriteToBuffer(BufBound & aBuffer) const
+BufBound & CounterMessage::WriteToBuffer(BufBound & aBuffer) const
 {
-    aBuffer.PutLE32(BlockCounter);
+    return aBuffer.Put32(BlockCounter);
 }
 
 CHIP_ERROR CounterMessage::Parse(const System::PacketBuffer & aBuffer)
@@ -433,10 +429,8 @@ CHIP_ERROR CounterMessage::Parse(const System::PacketBuffer & aBuffer)
 
 size_t CounterMessage::MessageSize() const
 {
-    uint8_t dummy[0];
-    BufBound emptyBuf(static_cast<uint8_t *>(dummy), 0);
-    WriteToBuffer(emptyBuf);
-    return emptyBuf.Written();
+    BufBound emptyBuf(nullptr, 0);
+    return WriteToBuffer(emptyBuf).Needed();
 }
 
 bool CounterMessage::operator==(const CounterMessage & another) const
@@ -446,13 +440,14 @@ bool CounterMessage::operator==(const CounterMessage & another) const
 
 // WARNING: this function should never return early, since MessageSize() relies on it to calculate
 // the size of the message (even if the message is incomplete or filled out incorrectly).
-void DataBlock::WriteToBuffer(BufBound & aBuffer) const
+BufBound & DataBlock::WriteToBuffer(BufBound & aBuffer) const
 {
-    aBuffer.PutLE32(BlockCounter);
+    aBuffer.Put32(BlockCounter);
     if (Data != nullptr)
     {
         aBuffer.Put(Data, DataLength);
     }
+    return aBuffer;
 }
 
 CHIP_ERROR DataBlock::Parse(const System::PacketBuffer & aBuffer)
@@ -485,10 +480,8 @@ exit:
 
 size_t DataBlock::MessageSize() const
 {
-    uint8_t dummy[0];
-    BufBound emptyBuf(static_cast<uint8_t *>(dummy), 0);
-    WriteToBuffer(emptyBuf);
-    return emptyBuf.Written();
+    BufBound emptyBuf(nullptr, 0);
+    return WriteToBuffer(emptyBuf).Needed();
 }
 
 bool DataBlock::operator==(const DataBlock & another) const

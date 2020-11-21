@@ -247,7 +247,7 @@ CHIP_ERROR SecurePairingSession::Pair(const Transport::PeerAddress peerAddress, 
 
     {
         BufBound bbuf(resp->Start(), data_len);
-        VerifyOrExit(bbuf.Put(&X[0], X_len) == X_len, err = CHIP_ERROR_NO_MEMORY);
+        bbuf.Put(&X[0], X_len);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
 
