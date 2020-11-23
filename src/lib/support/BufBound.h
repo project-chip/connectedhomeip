@@ -43,7 +43,7 @@ private:
     size_t mNeeded;
 
 public:
-    BufBound(uint8_t * buf, size_t len) : mBuf(buf), mLen(len), mWritten(0) {}
+    BufBound(uint8_t * buf, size_t len) : mBuf(buf), mSize(len), mNeeded(0) {}
     BufBound(const BufBound & other) = default;
 
     /*
