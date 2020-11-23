@@ -45,7 +45,9 @@ constexpr int32_t gEchoInterval = 1000000;
 // The EchoClient object.
 Protocols::EchoClient gEchoClient;
 
-SecureSessionMgr<Transport::UDP> gSessionManager;
+TransportMgr<Transport::UDP> gTransportManager;
+
+SecureSessionMgr gSessionManager;
 
 Inet::IPAddress gDestAddr;
 
@@ -189,21 +191,19 @@ int main(int argc, char * argv[])
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    // Initialize the CHIP stack as the client.
     InitializeChip();
 
-    // Initialize Secure Session Manager.
-    err = gSessionManager.Init(kClientDeviceId, &DeviceLayer::SystemLayer,
-                               Transport::UdpListenParameters(&DeviceLayer::InetLayer)
-                                   .SetAddressType(Inet::kIPAddressType_IPv4)
-                                   .SetListenPort(ECHO_CLIENT_PORT));
+    err = gTransportManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
+                                     .SetAddressType(Inet::kIPAddressType_IPv4)
+                                     .SetListenPort(ECHO_CLIENT_PORT));
     SuccessOrExit(err);
 
-    // Initialize Exchange Manager.
+    err = gSessionManager.Init(kClientDeviceId, &DeviceLayer::SystemLayer, &gTransportManager);
+    SuccessOrExit(err);
+
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
-    // Initialize the EchoClient application.
     err = gEchoClient.Init(&gExchangeManager);
     SuccessOrExit(err);
 
@@ -217,7 +217,6 @@ int main(int argc, char * argv[])
     // Connection has been established. Now send the EchoRequests.
     for (unsigned int i = 0; i < kMaxEchoCount; i++)
     {
-        // Send an EchoRequest message.
         if (SendEchoRequest() != CHIP_NO_ERROR)
         {
             printf("Send request failed: %s\n", ErrorStr(err));
@@ -238,10 +237,8 @@ int main(int argc, char * argv[])
         }
     }
 
-    // Shutdown the EchoClient.
     gEchoClient.Shutdown();
 
-    // Shutdown the CHIP stack.
     ShutdownChip();
 
 exit:

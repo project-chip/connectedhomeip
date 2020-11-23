@@ -32,35 +32,38 @@
 #include <protocols/echo/Echo.h>
 #include <support/ErrorStr.h>
 
+namespace {
+
 // The EchoServer object.
-static Protocols::EchoServer gEchoServer;
-static SecureSessionMgr<Transport::UDP> gSessionManager;
-static SecurePairingUsingTestSecret gTestPairing;
+Protocols::EchoServer gEchoServer;
+TransportMgr<Transport::UDP> gTransportManager;
+SecureSessionMgr gSessionManager;
+SecurePairingUsingTestSecret gTestPairing;
 
 // Callback handler when a CHIP EchoRequest is received.
-static void HandleEchoRequestReceived(NodeId nodeId, System::PacketBuffer * payload)
+void HandleEchoRequestReceived(NodeId nodeId, System::PacketBuffer * payload)
 {
     printf("Echo Request from node %lu, len=%u ... sending response.\n", nodeId, payload->DataLength());
 }
+
+} // namespace
 
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
-    // Initialize the CHIP stack as the server.
     InitializeChip();
 
-    // Initialize Secure Session Manager.
-    err = gSessionManager.Init(kServerDeviceId, &DeviceLayer::SystemLayer,
-                               Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(Inet::kIPAddressType_IPv4));
+    err = gTransportManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    // Initialize Exchange Manager.
+    err = gSessionManager.Init(kServerDeviceId, &DeviceLayer::SystemLayer, &gTransportManager);
+    SuccessOrExit(err);
+
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);
 
-    // Initialize the EchoServer application.
     err = gEchoServer.Init(&gExchangeManager);
     SuccessOrExit(err);
 
@@ -81,10 +84,8 @@ exit:
         exit(EXIT_FAILURE);
     }
 
-    // Shutdown the CHIP EchoServer.
     gEchoServer.Shutdown();
 
-    // Shutdown the CHIP stack.
     ShutdownChip();
 
     return EXIT_SUCCESS;
