@@ -18,6 +18,7 @@
 
 #import "CHIPError.h"
 #import "CHIPLogging.h"
+#import "CHIPSetupPayload.h"
 
 #import <setup_payload/ManualSetupPayloadParser.h>
 #import <setup_payload/SetupPayload.h>

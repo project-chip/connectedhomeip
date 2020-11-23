@@ -45,7 +45,7 @@ constexpr uint16_t kPacketCacheMaxSize = 16;
 
 class ChipDeviceController;
 
-typedef void (*NewConnectionHandler)(ChipDeviceController * deviceController, Transport::PeerConnectionState * state,
+typedef void (*NewConnectionHandler)(ChipDeviceController * deviceController, const Transport::PeerConnectionState * state,
                                      void * appReqState);
 typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * appReqState);
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,

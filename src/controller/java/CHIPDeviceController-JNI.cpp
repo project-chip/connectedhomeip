@@ -66,7 +66,8 @@ using namespace chip::DeviceController;
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
-static void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState);
+static void HandleKeyExchange(ChipDeviceController * deviceController, const Transport::PeerConnectionState * state,
+                              void * appReqState);
 static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
 static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, const char * operation);
 static void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
@@ -351,8 +352,8 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
     {
         ScopedPthreadLock lock(&sStackLock);
 
-        auto * buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
-        if (buffer == nullptr)
+        System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
+        if (buffer.IsNull())
         {
             err = CHIP_ERROR_NO_MEMORY;
         }
@@ -360,7 +361,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
         {
             memcpy(buffer->Start(), messageStr, messageLen);
             buffer->SetDataLength(messageLen);
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer);
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
         }
     }
 
@@ -388,10 +389,10 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
         ScopedPthreadLock lock(&sStackLock);
 
         // Make sure our buffer is big enough, but this will need a better setup!
-        static const size_t bufferSize = 1024;
-        auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
+        static const size_t bufferSize    = 1024;
+        System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(bufferSize);
 
-        if (buffer == nullptr)
+        if (buffer.IsNull())
         {
             err = CHIP_ERROR_NO_MEMORY;
         }
@@ -420,7 +421,7 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
             buffer->SetDataLength(dataLength);
 
             // Hardcode endpoint to 1 for now
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer);
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
         }
     }
 
@@ -454,7 +455,7 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
 
     chip::Ble::ChipBleUUID svcUUID;
     chip::Ble::ChipBleUUID charUUID;
-    chip::System::PacketBuffer * buffer = nullptr;
+    chip::System::PacketBufferHandle buffer;
 
     VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
                  ChipLogError(Controller, "handleIndicationReceived() called with invalid service ID"));
@@ -462,13 +463,13 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
                  ChipLogError(Controller, "handleIndicationReceived() called with invalid characteristic ID"));
 
     buffer = System::PacketBuffer::NewWithAvailableSize(valueLength);
-    VerifyOrExit(buffer, ChipLogError(Controller, "Failed to allocate packet buffer"));
+    VerifyOrExit(!buffer.IsNull(), ChipLogError(Controller, "Failed to allocate packet buffer"));
 
     memcpy(buffer->Start(), valueBegin, valueLength);
     buffer->SetDataLength(valueLength);
 
     pthread_mutex_lock(&sStackLock);
-    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, buffer);
+    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, buffer.Release_ForNow());
     pthread_mutex_unlock(&sStackLock);
 exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
@@ -664,7 +665,7 @@ exit:
     env->ExceptionClear();
 }
 
-void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState)
+void HandleKeyExchange(ChipDeviceController * deviceController, const Transport::PeerConnectionState * state, void * appReqState)
 {
     HandleSimpleOperationComplete(deviceController, (const char *) appReqState);
 }

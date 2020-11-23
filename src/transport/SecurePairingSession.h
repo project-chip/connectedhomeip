@@ -30,6 +30,8 @@
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSession.h>
+#include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 
@@ -47,10 +49,12 @@ public:
      *
      * @param header the message header for the sent message
      * @param payloadFlags payload encoding flags
+     * @param peerAddress the destination of the message
      * @param msgBuf the raw data for the message being sent
      * @return CHIP_ERROR Error thrown when sending the message
      */
-    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags, System::PacketBuffer * msgBuf)
+    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
+                                          const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -117,6 +121,7 @@ public:
      * @brief
      *   Create a pairing request using peer's setup PIN code.
      *
+     * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
      * @param pbkdf2IterCount  Iteration count for PBKDF2 function
      * @param salt             Salt to be used for SPAKE2P opertation
@@ -127,8 +132,9 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                    Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount,
+                    const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId, uint16_t myKeyId,
+                    SecurePairingSessionDelegate * delegate);
 
     /**
      * @brief
@@ -148,10 +154,12 @@ public:
      *   Handler for peer's messages, exchanged during pairing handshake.
      *
      * @param packetHeader      Message header for the received message
+     * @param peerAddress Source of the message
      * @param msg         Message sent by the peer
      * @return CHIP_ERROR The result of message processing
      */
-    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg);
+    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                         System::PacketBuffer * msg);
 
     /**
      * @brief
@@ -241,6 +249,8 @@ protected:
 
     uint16_t mPeerKeyId;
 
+    Transport::PeerAddress mPeerAddress;
+
     uint8_t mKe[kMAX_Hash_Length];
 
     size_t mKeLen = sizeof(mKe);
@@ -300,7 +310,11 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg) override { return CHIP_NO_ERROR; }
+    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                 System::PacketBuffer * msg) override
+    {
+        return CHIP_NO_ERROR;
+    }
 };
 
 typedef struct SecurePairingSessionSerialized

@@ -27,16 +27,18 @@ class RendezvousServer : public RendezvousSessionDelegate
 public:
     RendezvousServer();
 
-    CHIP_ERROR Init(const RendezvousParameters & params);
+    CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr);
 
     //////////////// RendezvousSessionDelegate Implementation ///////////////////
 
     void OnRendezvousConnectionOpened() override;
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
-    void OnRendezvousMessageReceived(System::PacketBuffer * buffer) override;
+    void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                     System::PacketBuffer * buffer) override;
     void OnRendezvousComplete() override;
     void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) override;
+    RendezvousSession * GetRendezvousSession() { return &mRendezvousSession; };
 
 private:
     RendezvousSession mRendezvousSession;

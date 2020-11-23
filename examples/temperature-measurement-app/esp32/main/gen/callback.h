@@ -31,10 +31,6 @@
 
 //#include "hal/hal.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif // #ifdef __cplusplus
-
 /** @name Non-Cluster Related Callbacks */
 // @{
 /** @brief Add To Current App Tasks
@@ -109,13 +105,6 @@ bool emberAfAttributeReadAccessCallback(chip::EndpointId endpoint, chip::Cluster
  */
 bool emberAfAttributeWriteAccessCallback(chip::EndpointId endpoint, chip::ClusterId clusterId, uint16_t manufacturerCode,
                                          chip::AttributeId attributeId);
-/** @brief Clear Report Table
- *
- * This function is called by the framework when the application should clear
- * the report table.
- *
- */
-EmberStatus emberAfClearReportTableCallback(void);
 /** @brief Cluster Init
  *
  * This function is called when a specific cluster is initialized. It gives the
@@ -23446,8 +23435,5 @@ void halSleepCallback(bool enter, SleepModes sleepMode);
 /** @} END HAL Library Plugin Callbacks */
 
 /** @} END addtogroup */
-#ifdef __cplusplus
-}
-#endif // #ifdef __cplusplus
 
 #endif // SILABS_EMBER_AF_CALLBACK_PROTOTYPES

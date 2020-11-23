@@ -159,7 +159,7 @@ function(chip_configure TARGET_NAME)
         PREFIX                  ${CHIP_OUTPUT_DIR}
         SOURCE_DIR              ${CHIP_ROOT}
         BINARY_DIR              ${CHIP_OUTPUT_DIR}
-        CONFIGURE_COMMAND       gn --root=${CHIP_ROOT}/config/nrfconnect gen ${CHIP_OUTPUT_DIR}
+        CONFIGURE_COMMAND       gn --root=${CHIP_ROOT}/config/nrfconnect gen --check --fail-on-unused-args ${CHIP_OUTPUT_DIR}
         BUILD_COMMAND           ""
         INSTALL_COMMAND         ""
         BUILD_ALWAYS            TRUE

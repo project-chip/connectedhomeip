@@ -141,12 +141,12 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
             iter = begin + 1;
         }
 
-        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
             if (iter->GetPeerAddress() == address)
             {
@@ -172,12 +172,12 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
             iter = begin + 1;
         }
 
-        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
             if (!iter->IsInitialized())
             {
@@ -208,12 +208,12 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
             iter = begin + 1;
         }
 
-        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
             if (!iter->IsInitialized())
             {
@@ -248,12 +248,12 @@ public:
         PeerConnectionState * state = nullptr;
         PeerConnectionState * iter  = &mStates[0];
 
-        if (begin >= iter && begin <= &mStates[kMaxConnectionCount])
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
             iter = begin + 1;
         }
 
-        for (; iter <= &mStates[kMaxConnectionCount]; iter++)
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
         {
             if (!iter->IsInitialized())
             {
@@ -278,13 +278,10 @@ public:
     }
 
     /// Convenience method to expired a peer connection state and fired the related callback
-    void MarkConnectionExpired(PeerConnectionState * state)
+    template <typename Callback>
+    void MarkConnectionExpired(PeerConnectionState * state, Callback callback)
     {
-        if (OnConnectionExpired)
-        {
-            OnConnectionExpired(*state, mConnectionExpiredArgument);
-        }
-
+        callback(*state);
         *state = PeerConnectionState(PeerAddress::Uninitialized());
     }
 
@@ -294,7 +291,8 @@ public:
      *
      * Expiring a connection involves callback execution and then clearing the internal state.
      */
-    void ExpireInactiveConnections(uint64_t maxIdleTimeMs)
+    template <typename Callback>
+    void ExpireInactiveConnections(uint64_t maxIdleTimeMs, Callback callback)
     {
         const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
 
@@ -311,35 +309,16 @@ public:
                 continue; // not expired
             }
 
-            MarkConnectionExpired(&mStates[i]);
+            MarkConnectionExpired(&mStates[i], callback);
         }
     }
 
     /// Allows access to the underlying time source used for keeping track of connection active time
     Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
 
-    /**
-     * Sets the handler for expired connections
-     *
-     * @param[in] handler The callback to call when a connection is marked as expired
-     * @param[in] param   The argument to pass in to the handler function
-     *
-     */
-    template <class T>
-    void SetConnectionExpiredHandler(void (*handler)(const PeerConnectionState &, T *), T * param)
-    {
-        mConnectionExpiredArgument = param;
-        OnConnectionExpired        = reinterpret_cast<ConnectionExpiredHandler>(handler);
-    }
-
 private:
     Time::TimeSource<kTimeSource> mTimeSource;
     PeerConnectionState mStates[kMaxConnectionCount];
-
-    typedef void (*ConnectionExpiredHandler)(const PeerConnectionState & state, void * param);
-
-    ConnectionExpiredHandler OnConnectionExpired = nullptr; ///< Callback for connection expiry
-    void * mConnectionExpiredArgument            = nullptr; ///< Argument for callback
 };
 
 } // namespace Transport

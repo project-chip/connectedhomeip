@@ -17,37 +17,81 @@
 
 #import <Foundation/Foundation.h>
 
+#import "CHIPCallbackBridge.h"
+#import "CHIPDevice.h"
+#import "CHIPDevice_Internal.h"
 #import "CHIPOnOff.h"
+
+#include <controller/OnOffCluster.h>
 
 @interface CHIPOnOff ()
 
-@property (readonly) CHIPDevice * device;
-
+@property (readonly) chip::Controller::OnOffCluster cppCluster;
+@property (readonly, nonatomic) dispatch_queue_t callbackQueue;
 @end
 
 @implementation CHIPOnOff
 
-- (instancetype)initWithDevice:(CHIPDevice *)device
+- (instancetype)initWithDevice:(CHIPDevice *)device endpoint:(chip::EndpointId)endpoint queue:(dispatch_queue_t)queue
 {
+    CHIP_ERROR err = _cppCluster.Associate([device internalDevice], endpoint);
+
+    if (err != CHIP_NO_ERROR) {
+        return nil;
+    }
+
     if (self = [super init]) {
-        _device = device;
+        _callbackQueue = queue;
     }
     return self;
 }
 
-- (BOOL)lightOn
+- (BOOL)lightOn:(CHIPDeviceCallback)onCompletion
 {
-    return [self.device sendOnCommand];
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.On(callback);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
 }
 
-- (BOOL)lightOff
+- (BOOL)lightOff:(CHIPDeviceCallback)onCompletion
 {
-    return [self.device sendOffCommand];
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.Off(callback);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
 }
 
-- (BOOL)toggleLight
+- (BOOL)toggleLight:(CHIPDeviceCallback)onCompletion
 {
-    return [self.device sendToggleCommand];
+    CHIPCallbackBridge * callback = new CHIPCallbackBridge(onCompletion, _callbackQueue);
+    if (!callback) {
+        return NO;
+    }
+
+    CHIP_ERROR err = self.cppCluster.Toggle(callback);
+    if (err != CHIP_NO_ERROR) {
+        callback->Cancel();
+        delete callback;
+        return NO;
+    }
+    return YES;
 }
 
 @end

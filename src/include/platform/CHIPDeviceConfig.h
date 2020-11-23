@@ -337,7 +337,7 @@
  * When set, CHIPoBLE advertisements will stop while a CHIPoBLE connection is active.
  */
 #ifndef CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION
-#define CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION 0
+#define CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION 1
 #endif
 
 /**
