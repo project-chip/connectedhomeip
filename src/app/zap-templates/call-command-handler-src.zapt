@@ -48,7 +48,7 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         switch (cmd->apsFrame->clusterId)
         {
         {{#all_user_clusters}}
-        {{#if (isEnabled enabled)}}
+        {{#if (user_cluster_has_enabled_command name side)}}
         {{#if (isClient side) }}
         case ZCL_{{asDelimitedMacro define}}_ID :
             result = emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(cmd);
@@ -67,7 +67,7 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         switch (cmd->apsFrame->clusterId)
         {
         {{#all_user_clusters}}
-        {{#if (isEnabled enabled)}}
+        {{#if (user_cluster_has_enabled_command name side)}}
         {{#unless (isClient  side) }}
         case ZCL_{{asDelimitedMacro define}}_ID :
             result = emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(cmd);
@@ -86,7 +86,7 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 // Cluster specific command parsing
 
 {{#all_user_clusters}}
-{{#if (isEnabled enabled)}}
+{{#if (user_cluster_has_enabled_command name side)}}
 EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(EmberAfClusterCommand * cmd)
 {
     bool wasHandled = false;
