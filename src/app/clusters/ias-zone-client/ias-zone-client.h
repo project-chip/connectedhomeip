@@ -40,14 +40,16 @@
 
 #pragma once
 
+#include <app/util/basic-types.h>
+
 typedef struct
 {
     EmberEUI64 ieeeAddress;
-    EmberNodeId nodeId;
+    chip::NodeId nodeId;
     uint16_t zoneType;
     uint16_t zoneStatus;
     uint8_t zoneState;
-    uint8_t endpoint;
+    chip::EndpointId endpoint;
     uint8_t zoneId;
 } IasZoneDevice;
 

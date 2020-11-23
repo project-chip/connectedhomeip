@@ -1055,14 +1055,14 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 {
     INET_ERROR lStatus = INET_NO_ERROR;
     IPPacketInfo lPacketInfo;
-    PacketBuffer * lBuffer;
+    System::PacketBufferHandle lBuffer;
 
     lPacketInfo.Clear();
     lPacketInfo.DestPort = aPort;
 
     lBuffer = PacketBuffer::New(0);
 
-    if (lBuffer != nullptr)
+    if (!lBuffer.IsNull())
     {
         struct iovec msgIOV;
         PeerSockAddr lPeerSockAddr;
@@ -1160,10 +1160,11 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     }
 
     if (lStatus == INET_NO_ERROR)
-        OnMessageReceived(this, lBuffer, &lPacketInfo);
+    {
+        OnMessageReceived(this, lBuffer.Release_ForNow(), &lPacketInfo);
+    }
     else
     {
-        PacketBuffer::Free(lBuffer);
         if (OnReceiveError != nullptr && lStatus != chip::System::MapErrorPOSIX(EAGAIN))
             OnReceiveError(this, lStatus, nullptr);
     }
@@ -1307,8 +1308,8 @@ void IPEndPointBasis::HandleDataReceived(const nw_connection_t & aConnection)
 
             if (content != NULL && OnMessageReceived != NULL)
             {
-                size_t count                        = dispatch_data_get_size(content);
-                System::PacketBuffer * packetBuffer = PacketBuffer::NewWithAvailableSize(count);
+                size_t count                              = dispatch_data_get_size(content);
+                System::PacketBufferHandle * packetBuffer = System::PacketBuffer::NewWithAvailableSize(count);
                 dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void * buffer, size_t size) {
                     memmove(packetBuffer->Start() + offset, buffer, size);
                     return true;

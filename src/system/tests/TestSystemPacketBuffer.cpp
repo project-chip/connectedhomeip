@@ -54,6 +54,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 using ::chip::System::PacketBuffer;
+using ::chip::System::PacketBufferHandle;
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP
 using ::chip::System::pbuf;
@@ -126,7 +127,7 @@ void BufferAlloc(struct TestContext * theContext)
 
     if (theContext->buf == nullptr)
     {
-        theContext->buf = TO_LWIP_PBUF(PacketBuffer::New(0));
+        theContext->buf = TO_LWIP_PBUF(PacketBuffer::New(0).Release_ForNow());
     }
 
     if (theContext->buf == nullptr)
@@ -952,7 +953,7 @@ void CheckAddRef(nlTestSuite * inSuite, void * inContext)
 void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
-    PacketBuffer * buffer;
+    PacketBufferHandle buffer;
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -962,17 +963,17 @@ void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
 
         if (theContext->reserved_size > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX)
         {
-            NL_TEST_ASSERT(inSuite, buffer == nullptr);
+            NL_TEST_ASSERT(inSuite, buffer.IsNull());
             theContext++;
             continue;
         }
 
         NL_TEST_ASSERT(inSuite, theContext->reserved_size <= buffer->AllocSize());
-        NL_TEST_ASSERT(inSuite, buffer != nullptr);
+        NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-        if (buffer != nullptr)
+        if (!buffer.IsNull())
         {
-            pb = TO_LWIP_PBUF(buffer);
+            pb = TO_LWIP_PBUF(buffer.Get_ForNow());
 
             NL_TEST_ASSERT(inSuite, pb->len == 0);
             NL_TEST_ASSERT(inSuite, pb->tot_len == 0);
@@ -980,16 +981,24 @@ void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, pb->ref == 1);
         }
 
-        PacketBuffer::Free(buffer);
-
         theContext++;
     }
 
     // Use the rest of the buffer space
-    do
+    for (;;)
     {
         buffer = PacketBuffer::NewWithAvailableSize(0, 0);
-    } while (buffer != nullptr);
+        if (buffer.IsNull())
+        {
+            break;
+        }
+        // Leak the buffer on purpose, to use up all the buffer space.
+        // (Compilers other than GCC recognize the `(void)` idiom, which is mandated in C++20.)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+        (void) buffer.Release_ForNow();
+#pragma GCC diagnostic pop
+    }
 }
 
 /**

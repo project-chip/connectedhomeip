@@ -59,8 +59,8 @@ typedef void * (*GetBleEventCBFunct)(void);
 typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataLen);
 typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
 
-typedef void (*OnConnectFunct)(chip::DeviceController::ChipDeviceController * dc, chip::Transport::PeerConnectionState * state,
-                               void * appReqState);
+typedef void (*OnConnectFunct)(chip::DeviceController::ChipDeviceController * dc,
+                               const chip::Transport::PeerConnectionState * state, void * appReqState);
 typedef void (*OnErrorFunct)(chip::DeviceController::ChipDeviceController * dc, void * appReqState, CHIP_ERROR err,
                              const chip::Inet::IPPacketInfo * pi);
 typedef void (*OnMessageFunct)(chip::DeviceController::ChipDeviceController * dc, void * appReqState,
@@ -305,7 +305,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                     {
                     case kBleEventType_Rx:
                         // build a packet buffer from the rxEv and send to blelayer.
-                        msgBuf = chip::System::PacketBuffer::New();
+                        msgBuf = chip::System::PacketBuffer::New().Release_ForNow();
                         VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
 
                         memcpy(msgBuf->Start(), evu.rxEv->buffer, evu.rxEv->length);

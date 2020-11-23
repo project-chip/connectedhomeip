@@ -36,17 +36,18 @@
 #include <transport/PeerConnections.h>
 #include <transport/SecurePairingSession.h>
 #include <transport/SecureSession.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
 #include <transport/raw/Tuple.h>
 
 namespace chip {
 
-class SecureSessionMgrBase;
+class SecureSessionMgr;
 
 /**
  * @brief
  *   This class provides a skeleton for the callback functions. The functions will be
- *   called by SecureSssionMgrBase object on specific events. If the user of SecureSessionMgrBase
+ *   called by SecureSssionMgrBase object on specific events. If the user of SecureSessionMgr
  *   is interested in receiving these callbacks, they can specialize this class and handle
  *   each trigger in their implementation of this class.
  */
@@ -65,8 +66,8 @@ public:
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
-                                   SecureSessionMgrBase * mgr)
+                                   const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                   SecureSessionMgr * mgr)
     {}
 
     /**
@@ -77,7 +78,7 @@ public:
      * @param source  network entity that sent the message
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * mgr) {}
+    virtual void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) {}
 
     /**
      * @brief
@@ -86,7 +87,16 @@ public:
      * @param state   connection state
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) {}
+    virtual void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
+
+    /**
+     * @brief
+     *   Called when a new connection is closing
+     *
+     * @param state   connection state
+     * @param mgr     A pointer to the SecureSessionMgr
+     */
+    virtual void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
 
     /**
      * @brief
@@ -96,12 +106,12 @@ public:
      * @param nodeId  The node ID resolved, 0 on error
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgrBase * mgr) {}
+    virtual void OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgr * mgr) {}
 
     virtual ~SecureSessionMgrDelegate() {}
 };
 
-class DLL_EXPORT SecureSessionMgrBase : public Mdns::ResolveDelegate
+class DLL_EXPORT SecureSessionMgr : public Mdns::ResolveDelegate, public TransportMgrDelegate
 {
 public:
     /**
@@ -114,8 +124,8 @@ public:
      */
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
     CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf);
-    SecureSessionMgrBase();
-    ~SecureSessionMgrBase() override;
+    SecureSessionMgr();
+    ~SecureSessionMgr() override;
 
     /**
      * @brief
@@ -143,16 +153,27 @@ public:
      */
     System::Layer * SystemLayer() { return mSystemLayer; }
 
-protected:
     /**
      * @brief
      *   Initialize a Secure Session Manager
      *
      * @param localNodeId    Node id for the current node
      * @param systemLayer    System, layer to use
-     * @param transport Underlying Transport to use
+     * @param transportMgr   Transport to use
      */
-    CHIP_ERROR InitInternal(NodeId localNodeId, System::Layer * systemLayer, Transport::Base * transport);
+    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
+
+protected:
+    /**
+     * @brief
+     *   Handle received secure message. Implements TransportMgrDelegate
+     *
+     * @param header    the received message header
+     * @param source    the source address of the package
+     * @param msgBuf    the buffer of (encrypted) payload
+     */
+    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                           System::PacketBuffer * msgBuf) override;
 
 private:
     /**
@@ -164,13 +185,13 @@ private:
         kInitialized, /**< State when the object is ready connect to other peers. */
     };
 
-    Transport::Base * mTransport = nullptr;
     System::Layer * mSystemLayer = nullptr;
     NodeId mLocalNodeId;                                                                // < Id of the current node
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
     State mState;                                                                       // < Initialization state of the object
 
-    SecureSessionMgrDelegate * mCB = nullptr;
+    SecureSessionMgrDelegate * mCB   = nullptr;
+    TransportMgrBase * mTransportMgr = nullptr;
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
@@ -178,13 +199,10 @@ private:
     /** Cancels any active timers for connection expiry checks. */
     void CancelExpiryTimer();
 
-    static void HandleDataReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                   System::PacketBuffer * msgBuf, SecureSessionMgrBase * transport);
-
     /**
      * Called when a specific connection expires.
      */
-    static void HandleConnectionExpired(const Transport::PeerConnectionState & state, SecureSessionMgrBase * mgr);
+    void HandleConnectionExpired(const Transport::PeerConnectionState & state);
 
     /**
      * Callback for timer expiry check
@@ -192,46 +210,6 @@ private:
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
 
     void HandleNodeIdResolve(CHIP_ERROR error, NodeId nodeId, const Mdns::MdnsService & service) override;
-};
-
-/**
- * A secure session manager that includes required underlying transports.
- */
-template <typename... TransportTypes>
-class SecureSessionMgr : public SecureSessionMgrBase
-{
-public:
-    /**
-     * @brief
-     *   Initialize a Secure Session Manager
-     *
-     * @param localNodeId    Node id for the current node
-     * @param systemLayer    System, layer to use
-     * @param transportInitArgs Arguments to initialize the underlying transport
-     */
-    template <typename... Args>
-    CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, Args &&... transportInitArgs)
-    {
-        CHIP_ERROR err = CHIP_NO_ERROR;
-
-        err = mTransport.Init(std::forward<Args>(transportInitArgs)...);
-        SuccessOrExit(err);
-
-        err = InitInternal(localNodeId, systemLayer, &mTransport);
-        SuccessOrExit(err);
-
-    exit:
-        return err;
-    }
-
-    template <typename... Args>
-    CHIP_ERROR ResetTransport(Args &&... transportInitArgs)
-    {
-        return mTransport.Init(std::forward<Args>(transportInitArgs)...);
-    }
-
-private:
-    Transport::Tuple<TransportTypes...> mTransport;
 };
 
 } // namespace chip

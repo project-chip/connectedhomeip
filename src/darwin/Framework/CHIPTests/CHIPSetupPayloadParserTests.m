@@ -20,6 +20,7 @@
 // module headers
 #import "CHIPManualSetupPayloadParser.h"
 #import "CHIPQRCodeSetupPayloadParser.h"
+#import "CHIPSetupPayload.h"
 
 // additional includes
 #import "CHIPError.h"

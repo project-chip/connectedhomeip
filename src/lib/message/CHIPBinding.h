@@ -218,11 +218,12 @@ public:
 
     bool IsAuthenticMessageFromPeer(const ChipMessageInfo * msgInfo);
 
-    uint32_t GetMaxChipPayloadSize(const System::PacketBuffer * msgBuf);
+    uint32_t GetMaxChipPayloadSize(const System::PacketBufferHandle & msgBuf);
 
     static void DefaultEventHandler(void * apAppState, EventType aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
 
-    CHIP_ERROR AllocateRightSizedBuffer(PacketBuffer *& buf, uint32_t desiredSize, uint32_t minSize, uint32_t & outMaxPayloadSize);
+    CHIP_ERROR AllocateRightSizedBuffer(PacketBufferHandle & buf, uint32_t desiredSize, uint32_t minSize,
+                                        uint32_t & outMaxPayloadSize);
 
 private:
     friend class ChipExchangeManager;

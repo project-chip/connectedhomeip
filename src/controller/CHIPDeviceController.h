@@ -37,6 +37,7 @@
 #include <transport/RendezvousSession.h>
 #include <transport/RendezvousSessionDelegate.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
 namespace chip {
@@ -182,7 +183,8 @@ protected:
     bool mPairedDevicesInitialized;
 
     NodeId mLocalDeviceId;
-    SecureSessionMgr<Transport::UDP> * mSessionManager;
+    DeviceTransportMgr * mTransportMgr;
+    SecureSessionMgr * mSessionManager;
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
 
@@ -193,14 +195,17 @@ protected:
 
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
-                           System::PacketBuffer * msgBuf, SecureSessionMgrBase * mgr) override;
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
+                           const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                           SecureSessionMgr * mgr) override;
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override;
+    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override;
 
     //////////// PersistentStorageResultDelegate Implementation ///////////////
     void OnValue(const char * key, const char * value) override;
     void OnStatus(const char * key, Operation op, CHIP_ERROR err) override;
+
+    void ReleaseAllDevices();
 
     System::Layer * mSystemLayer;
 };

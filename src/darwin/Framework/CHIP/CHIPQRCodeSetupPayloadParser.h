@@ -15,10 +15,9 @@
  *    limitations under the License.
  */
 
-// module header
-#import "CHIPSetupPayload.h"
-
 #import <Foundation/Foundation.h>
+
+@class CHIPSetupPayload;
 
 NS_ASSUME_NONNULL_BEGIN
 
