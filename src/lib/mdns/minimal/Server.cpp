@@ -20,7 +20,6 @@
 #include <errno.h>
 
 #include <platform/CHIPDeviceLayer.h>
-#include <system/AutoFreePacketBuffer.h>
 
 #include "DnsHeader.h"
 
@@ -213,7 +212,8 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
 void ServerBase::OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBuffer * buffer,
                                      const chip::Inet::IPPacketInfo * info)
 {
-    chip::System::AutoFreePacketBuffer autoFree(buffer);
+    chip::System::PacketBufferHandle autoFree;
+    autoFree.Adopt(buffer);
 
     ServerBase * srv = static_cast<ServerBase *>(endPoint->AppState);
     if (!srv->mDelegate)

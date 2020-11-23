@@ -202,8 +202,8 @@ private:
 
 void BroadcastPacket(mdns::Minimal::ServerBase * server)
 {
-    System::PacketBuffer * buffer = System::PacketBuffer::NewWithAvailableSize(kMdnsMaxPacketSize);
-    if (buffer == nullptr)
+    System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(kMdnsMaxPacketSize);
+    if (buffer.IsNull())
     {
         printf("Buffer allocation failure.");
         abort();
@@ -213,7 +213,7 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
     QuerySplitter query;
     query.Split(gOptions.query);
 
-    mdns::Minimal::QueryBuilder builder(buffer);
+    mdns::Minimal::QueryBuilder builder(buffer.Get_ForNow());
 
     builder.Header().SetMessageId(kTestMessageId);
     builder.AddQuery(query.MdnsQuery()
@@ -224,11 +224,10 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
     if (!builder.Ok())
     {
         printf("Failed to build the question");
-        System::PacketBuffer::Free(buffer);
         return;
     }
 
-    if (server->BroadcastSend(buffer, gOptions.querySendPort) != CHIP_NO_ERROR)
+    if (server->BroadcastSend(buffer.Release_ForNow(), gOptions.querySendPort) != CHIP_NO_ERROR)
     {
         printf("Error sending\n");
         return;

@@ -42,9 +42,11 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, chip::BufBound
     }
     out.Put8(0); // end of qnames
 
-    out.PutBE16(static_cast<uint16_t>(GetClass()));
-    out.PutBE16(static_cast<uint16_t>(GetType()));
-    out.PutBE32(static_cast<uint32_t>(GetTtl()));
+    out                                             //
+        .PutBE16(static_cast<uint16_t>(GetClass())) //
+        .PutBE16(static_cast<uint16_t>(GetType()))  //
+        .PutBE32(static_cast<uint32_t>(GetTtl()))   //
+        ;
 
     chip::BufBound sizeOutput(out);        // copy to re-output size
     out.PutBE16(static_cast<uint32_t>(0)); // dummy, will be replaced later
@@ -53,7 +55,7 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, chip::BufBound
     {
         return false;
     }
-    sizeOutput.PutBE16(static_cast<uint16_t>(out.Written() - sizeOutput.Written() - 2));
+    sizeOutput.PutBE16(static_cast<uint16_t>(out.Needed() - sizeOutput.Needed() - 2));
 
     // This MUST be final and separated out: record count is only updated on success.
     if (out.Fit())

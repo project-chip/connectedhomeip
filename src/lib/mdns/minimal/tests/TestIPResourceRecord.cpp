@@ -65,7 +65,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
         NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
-        NL_TEST_ASSERT(inSuite, output.Written() == sizeof(expectedOutput));
+        NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
         NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
     }
 
@@ -94,7 +94,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 0);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 1);
         NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
-        NL_TEST_ASSERT(inSuite, output.Written() == sizeof(expectedOutput));
+        NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
         NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
     }
 
@@ -123,7 +123,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 0);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
         NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 1);
-        NL_TEST_ASSERT(inSuite, output.Written() == sizeof(expectedOutput));
+        NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
         NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
     }
 }
@@ -165,7 +165,7 @@ void WriteIPv6(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == 1);
     NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
     NL_TEST_ASSERT(inSuite, header.GetAdditionalCount() == 0);
-    NL_TEST_ASSERT(inSuite, output.Written() == sizeof(expectedOutput));
+    NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
     NL_TEST_ASSERT(inSuite, memcmp(dataBuffer, expectedOutput, sizeof(expectedOutput)) == 0);
 }
 

@@ -61,7 +61,7 @@ public:
         }
         else
         {
-            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Written()));
+            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Needed()));
         }
         return *this;
     }
