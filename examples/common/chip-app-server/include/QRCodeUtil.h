@@ -27,7 +27,7 @@ CHIP_ERROR GetQRCode(uint32_t & setupPinCode, std::string & QRCode, chip::Rendez
  * assumes the platform's networking has been setup already.
  *
  * Method verifies if every character of the QR Code is valid for the url encoding
- * and otherwise it encodes the invalid character using available ones. 
+ * and otherwise it encodes the invalid character using available ones.
  *
  * @param QRCode address of the array storing QR Code to encode.
  * @param len length of the given QR Code.
