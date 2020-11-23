@@ -97,49 +97,26 @@ private:
  * |       Items in AUTHORITY Section         |
  * |       Items in ADDITIONAL Section        |
  */
-class HeaderRef
+class ConstHeaderRef
 {
 public:
     static constexpr size_t kSizeBytes = 12; /// size of a DNS header structure
-
-    HeaderRef(uint8_t * buffer) : mBuffer(buffer) {}
-
-    HeaderRef & Clear()
-    {
-        memset(mBuffer, 0, kSizeBytes);
-        return *this;
-    }
+    ConstHeaderRef(const uint8_t * buffer) : mBuffer(buffer) {}
 
     uint16_t GetMessageId() const { return Get16At(kMessageIdOffset); }
-    HeaderRef & SetMessageId(uint16_t value) { return Set16At(kMessageIdOffset, value); }
 
     BitPackedFlags GetFlags() const { return BitPackedFlags(Get16At(kFlagsOffset)); }
-    HeaderRef & SetFlags(BitPackedFlags flags) { return Set16At(kFlagsOffset, flags.RawValue()); }
 
     uint16_t GetQueryCount() const { return Get16At(kQueryCountOffset); }
-    HeaderRef & SetQueryCount(uint16_t value) { return Set16At(kQueryCountOffset, value); }
-
     uint16_t GetAnswerCount() const { return Get16At(kAnswerCountOffset); }
-    HeaderRef & SetAnswerCount(uint16_t value) { return Set16At(kAnswerCountOffset, value); }
-
     uint16_t GetAuthorityCount() const { return Get16At(kAuthorityCountOffset); }
-    HeaderRef & SetAuthorityCount(uint16_t value) { return Set16At(kAuthorityCountOffset, value); }
-
     uint16_t GetAdditionalCount() const { return Get16At(kAdditionalCountOffset); }
-    HeaderRef & SetAdditionalCount(uint16_t value) { return Set16At(kAdditionalCountOffset, value); }
 
-private:
-    uint8_t * mBuffer;
+protected:
+    const uint8_t * mBuffer;
 
     inline uint16_t Get16At(size_t offset) const { return chip::Encoding::BigEndian::Get16(mBuffer + offset); }
-    inline HeaderRef & Set16At(size_t offset, uint16_t value)
-    {
-        chip::Encoding::BigEndian::Put16(mBuffer + offset, value);
-        return *this;
-    }
-
     uint16_t GetRawFlags() const { return Get16At(kFlagsOffset); }
-    HeaderRef & SetRawFlags(uint16_t value) { return Set16At(kFlagsOffset, value); }
 
     static constexpr size_t kMessageIdOffset       = 0;
     static constexpr size_t kFlagsOffset           = 2;
@@ -147,6 +124,38 @@ private:
     static constexpr size_t kAnswerCountOffset     = 6;
     static constexpr size_t kAuthorityCountOffset  = 8;
     static constexpr size_t kAdditionalCountOffset = 10;
+};
+
+class HeaderRef : public ConstHeaderRef
+{
+public:
+    HeaderRef(uint8_t * buffer) : ConstHeaderRef(buffer) {}
+
+    HeaderRef & Clear()
+    {
+        memset(GetWritable(), 0, kSizeBytes);
+        return *this;
+    }
+
+    HeaderRef & SetMessageId(uint16_t value) { return Set16At(kMessageIdOffset, value); }
+    HeaderRef & SetFlags(BitPackedFlags flags) { return Set16At(kFlagsOffset, flags.RawValue()); }
+    HeaderRef & SetQueryCount(uint16_t value) { return Set16At(kQueryCountOffset, value); }
+    HeaderRef & SetAnswerCount(uint16_t value) { return Set16At(kAnswerCountOffset, value); }
+    HeaderRef & SetAuthorityCount(uint16_t value) { return Set16At(kAuthorityCountOffset, value); }
+    HeaderRef & SetAdditionalCount(uint16_t value) { return Set16At(kAdditionalCountOffset, value); }
+
+private:
+    /// Returns the internal buffer as writable. Const-cast is correct because
+    /// the construct took a non-const buffer as well.
+    uint8_t * GetWritable() { return const_cast<uint8_t *>(mBuffer); }
+
+    inline HeaderRef & Set16At(size_t offset, uint16_t value)
+    {
+        chip::Encoding::BigEndian::Put16(GetWritable() + offset, value);
+        return *this;
+    }
+
+    HeaderRef & SetRawFlags(uint16_t value) { return Set16At(kFlagsOffset, value); }
 };
 
 } // namespace Minimal

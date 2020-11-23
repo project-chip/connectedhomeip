@@ -20,7 +20,12 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libMinimalMdnstests"
 
-  test_sources = [ "TestQName.cpp" ]
+  test_sources = [
+    "TestIPResourceRecord.cpp",
+    "TestQName.cpp",
+    "TestRecordData.cpp",
+    "TestResourceRecord.cpp",
+  ]
 
   cflags = [ "-Wconversion" ]
 

@@ -17,7 +17,10 @@ import("//build_overrides/chip.gni")
 static_library("minimal") {
   sources = [
     "BytesRange.h",
+    "Constants.h",
     "DnsHeader.h",
+    "IPResourceRecord.cpp",
+    "IPResourceRecord.h",
     "Parser.cpp",
     "Parser.h",
     "QName.cpp",
@@ -26,7 +29,16 @@ static_library("minimal") {
     "QueryBuilder.h",
     "RecordData.cpp",
     "RecordData.h",
+    "ResourceRecord.cpp",
+    "ResourceRecord.h",
+    "ResponseBuilder.h",
+    "Server.cpp",
+    "Server.h",
   ]
 
-  public_deps = [ "${chip_root}/src/lib/core" ]
+  public_deps = [
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${chip_root}/src/platform",
+  ]
 }

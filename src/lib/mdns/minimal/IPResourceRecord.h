@@ -17,36 +17,25 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
+#include <inet/IPAddress.h>
+
+#include "ResourceRecord.h"
 
 namespace mdns {
 namespace Minimal {
 
-/// Simple range of bytes with a start and an end
-class BytesRange
+class IPResourceRecord : public ResourceRecord
 {
 public:
-    BytesRange() {}
-    BytesRange(const uint8_t * start, const uint8_t * end) : mStart(start), mEnd(end)
-    {
-        // negative ranges are not allowed
-        if (mStart > mEnd)
-        {
-            mEnd = mStart;
-        }
-    }
+    IPResourceRecord(const QNamePart * names, uint16_t namesCount, const chip::Inet::IPAddress & ip) :
+        ResourceRecord(ip.IsIPv6() ? QType::AAAA : QType::A, names, namesCount), mIPAddress(ip)
+    {}
 
-    const uint8_t * Start() const { return mStart; }
-    const uint8_t * End() const { return mEnd; }
-
-    bool Contains(const uint8_t * p) const { return ((p >= mStart) && (p < mEnd)); }
-
-    size_t Size() const { return static_cast<size_t>(mEnd - mStart); }
+protected:
+    bool WriteData(chip::BufBound & out) const override;
 
 private:
-    const uint8_t * mStart = nullptr;
-    const uint8_t * mEnd   = nullptr;
+    const chip::Inet::IPAddress mIPAddress;
 };
 
 } // namespace Minimal

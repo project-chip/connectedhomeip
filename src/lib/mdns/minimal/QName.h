@@ -49,7 +49,7 @@ public:
     SerializedQNameIterator & operator=(const SerializedQNameIterator &) = default;
 
     SerializedQNameIterator(const BytesRange validData, const uint8_t * position) :
-        mValidData(validData), mLookBehindMax(position - validData.Start()), mCurrentPosition(position)
+        mValidData(validData), mLookBehindMax(static_cast<size_t>(position - validData.Start())), mCurrentPosition(position)
     {}
 
     /// Advances to the next element in the sequence
@@ -76,7 +76,7 @@ private:
     static constexpr uint8_t kPtrMask     = 0xC0;
 
     BytesRange mValidData;
-    ptrdiff_t mLookBehindMax; // avoid loops by limiting lookbehind
+    size_t mLookBehindMax; // avoid loops by limiting lookbehind
     const uint8_t * mCurrentPosition;
     bool mIsValid = true;
 

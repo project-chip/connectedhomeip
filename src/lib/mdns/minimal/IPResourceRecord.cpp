@@ -15,40 +15,27 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <cstddef>
-#include <cstdint>
+#include "IPResourceRecord.h"
 
 namespace mdns {
 namespace Minimal {
 
-/// Simple range of bytes with a start and an end
-class BytesRange
+bool IPResourceRecord::WriteData(chip::BufBound & out) const
 {
-public:
-    BytesRange() {}
-    BytesRange(const uint8_t * start, const uint8_t * end) : mStart(start), mEnd(end)
+    // IP address is already stored in network byte order. We cannot use
+    // PutBE/PutLE
+
+    if (mIPAddress.IsIPv6())
     {
-        // negative ranges are not allowed
-        if (mStart > mEnd)
-        {
-            mEnd = mStart;
-        }
+        out.Put(mIPAddress.Addr, 16);
+    }
+    else
+    {
+        out.Put(mIPAddress.Addr + 3, 4);
     }
 
-    const uint8_t * Start() const { return mStart; }
-    const uint8_t * End() const { return mEnd; }
-
-    bool Contains(const uint8_t * p) const { return ((p >= mStart) && (p < mEnd)); }
-
-    size_t Size() const { return static_cast<size_t>(mEnd - mStart); }
-
-private:
-    const uint8_t * mStart = nullptr;
-    const uint8_t * mEnd   = nullptr;
-};
+    return out.Fit();
+}
 
 } // namespace Minimal
-
 } // namespace mdns

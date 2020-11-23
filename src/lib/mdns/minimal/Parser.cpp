@@ -16,6 +16,9 @@
  */
 
 #include "Parser.h"
+
+#include "Query.h"
+
 #include <stdio.h>
 
 namespace mdns {
@@ -43,7 +46,7 @@ bool QueryData::Parse(const BytesRange & validData, const uint8_t ** start)
         return false;
     }
 
-    if (!validData.Contains(nameEnd + 4))
+    if (!validData.Contains(nameEnd + 3))
     {
         return false;
     }
@@ -54,8 +57,8 @@ bool QueryData::Parse(const BytesRange & validData, const uint8_t ** start)
 
     uint16_t klass = chip::Encoding::BigEndian::Read16(nameEnd);
 
-    mAnswerViaUnicast = (klass & Query::kUnicastAnswerFlag) != 0;
-    mClass            = static_cast<QClass>(klass & ~Query::kUnicastAnswerFlag);
+    mAnswerViaUnicast = (klass & kQClassUnicastAnswerFlag) != 0;
+    mClass            = static_cast<QClass>(klass & ~kQClassUnicastAnswerFlag);
     mNameIterator     = SerializedQNameIterator(validData, *start);
 
     *start = nameEnd;
@@ -71,7 +74,7 @@ bool ResourceData::Parse(const BytesRange & validData, const uint8_t ** start)
     //    CLASS     (16 bit)
     //    TTL       (32 bit)
     //    RDLENGTH  (16 bit)
-    //    <DATA>    (RDLENGTH bytpes)
+    //    <DATA>    (RDLENGTH bytes)
     if (!validData.Contains(*start))
     {
         return false;
@@ -89,7 +92,7 @@ bool ResourceData::Parse(const BytesRange & validData, const uint8_t ** start)
     }
 
     // need 3*u16 + u32
-    if (!validData.Contains(nameEnd + 10))
+    if (!validData.Contains(nameEnd + 9))
     {
         return false;
     }
@@ -121,7 +124,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
     }
 
     // header is used as const, so cast is safe
-    HeaderRef header(const_cast<uint8_t *>(packetData.Start()));
+    ConstHeaderRef header(packetData.Start());
 
     if (!header.GetFlags().IsValidMdns())
     {
@@ -134,7 +137,7 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
 
     {
         QueryData queryData;
-        for (unsigned i = 0; i < header.GetQueryCount(); i++)
+        for (uint16_t i = 0; i < header.GetQueryCount(); i++)
         {
             if (!queryData.Parse(packetData, &data))
             {
@@ -147,34 +150,34 @@ bool ParsePacket(const BytesRange & packetData, ParserDelegate * delegate)
 
     {
         ResourceData resourceData;
-        for (unsigned i = 0; i < header.GetAnswerCount(); i++)
+        for (uint16_t i = 0; i < header.GetAnswerCount(); i++)
         {
             if (!resourceData.Parse(packetData, &data))
             {
                 return false;
             }
 
-            delegate->OnResource(ParserDelegate::ResourceType::kAnswer, resourceData);
+            delegate->OnResource(ResourceType::kAnswer, resourceData);
         }
 
-        for (unsigned i = 0; i < header.GetAuthorityCount(); i++)
+        for (uint16_t i = 0; i < header.GetAuthorityCount(); i++)
         {
             if (!resourceData.Parse(packetData, &data))
             {
                 return false;
             }
 
-            delegate->OnResource(ParserDelegate::ResourceType::kAuthority, resourceData);
+            delegate->OnResource(ResourceType::kAuthority, resourceData);
         }
 
-        for (unsigned i = 0; i < header.GetAdditionalCount(); i++)
+        for (uint16_t i = 0; i < header.GetAdditionalCount(); i++)
         {
             if (!resourceData.Parse(packetData, &data))
             {
                 return false;
             }
 
-            delegate->OnResource(ParserDelegate::ResourceType::kAdditional, resourceData);
+            delegate->OnResource(ResourceType::kAdditional, resourceData);
         }
     }
 

@@ -59,7 +59,7 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
                 return false;
             }
 
-            ptrdiff_t offset = ((*mCurrentPosition & 0x3F) << 8) | *(mCurrentPosition + 1);
+            size_t offset = ((*mCurrentPosition & 0x3F) << 8) | *(mCurrentPosition + 1);
             if (offset > mLookBehindMax)
             {
                 // Potential infinite recursion.
@@ -78,7 +78,7 @@ bool SerializedQNameIterator::Next(bool followIndirectPointers)
         }
         else
         {
-            // valid data
+            // This branch handles non-pointer data. This will be string of size [length].
             if (length > kMaxValueSize)
             {
                 // value is too large (larger than RFC limit)

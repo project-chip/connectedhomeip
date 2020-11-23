@@ -44,6 +44,7 @@ private:
 
 public:
     BufBound(uint8_t * buf, size_t len) : mBuf(buf), mSize(len), mNeeded(0) {}
+    BufBound(const BufBound & other) = default;
 
     /*
      * @brief append a single byte
@@ -70,6 +71,7 @@ public:
         }
         return *this;
     }
+    BufBound & Put8(uint8_t c) { return Put(c); }
 
     BufBound & Put(uint64_t x, size_t size)
     {

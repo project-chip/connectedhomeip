@@ -16,12 +16,40 @@ import("//build_overrides/chip.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 
+static_library("minimal-mdns-example-common") {
+  sources = [
+    "AllInterfaceListener.h",
+    "PacketReporter.cpp",
+    "PacketReporter.h",
+  ]
+
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/mdns/minimal",
+  ]
+}
+
 executable("minimal-mdns-client") {
   sources = [ "client.cpp" ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    ":minimal-mdns-example-common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/mdns/minimal",
+  ]
+
+  output_dir = root_out_dir
+}
+
+executable("minimal-mdns-server") {
+  sources = [ "server.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/mdns/minimal",
   ]
