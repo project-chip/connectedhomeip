@@ -231,10 +231,10 @@ void TxtRecord(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, ParseTxtRecord(BytesRange(record, record + sizeof(record)), &accumulator));
     NL_TEST_ASSERT(inSuite, accumulator.Data().size() == 4);
-    NL_TEST_ASSERT(inSuite, accumulator.Data()[0] == make_pair("some"s, ""s));
-    NL_TEST_ASSERT(inSuite, accumulator.Data()[1] == make_pair("foo"s, "bar"s));
-    NL_TEST_ASSERT(inSuite, accumulator.Data()[2] == make_pair("x"s, "y=z"s));
-    NL_TEST_ASSERT(inSuite, accumulator.Data()[3] == make_pair("a"s, ""s));
+    NL_TEST_ASSERT(inSuite, (accumulator.Data()[0] == make_pair<std::string, std::string>("some", "")));
+    NL_TEST_ASSERT(inSuite, (accumulator.Data()[1] == make_pair<std::string, std::string>("foo", "bar")));
+    NL_TEST_ASSERT(inSuite, (accumulator.Data()[2] == make_pair<std::string, std::string>("x", "y=z")));
+    NL_TEST_ASSERT(inSuite, (accumulator.Data()[3] == make_pair<std::string, std::string>("a", "")));
 }
 
 const nlTest sTests[] = {
