@@ -41,7 +41,6 @@ if (chip_build_tests) {
       "${chip_root}/src/app/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
-      "${chip_root}/src/lib/mdns/minimal/tests",
       "${chip_root}/src/messaging/tests",
       "${chip_root}/src/protocols/bdx/tests",
       "${chip_root}/src/system/tests",
@@ -49,6 +48,10 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
     ]
+
+    if (chip_device_platform != "none") {
+      deps += [ "${chip_root}/src/lib/mdns/minimal/tests" ]
+    }
 
     if (chip_device_platform != "esp32") {
       deps += [
