@@ -71,7 +71,7 @@ public:
         }
         return *this;
     }
-    size_t Put8(uint8_t c) { return Put(c); }
+    BufBound & Put8(uint8_t c) { return Put(c); }
 
     BufBound & Put(uint64_t x, size_t size)
     {
