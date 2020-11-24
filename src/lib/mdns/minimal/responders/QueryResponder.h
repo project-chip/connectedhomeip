@@ -156,7 +156,7 @@ private:
         }
     }
 
-    const bool mAdditionalOnly;
+    bool mAdditionalOnly;
     Internal::QueryResponderInfo * mCurrent;
     size_t mRemaining;
 };
