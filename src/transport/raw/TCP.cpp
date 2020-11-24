@@ -342,7 +342,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
         // when a buffer is empty, it can be released back to the app
         if (buffer->DataLength() == 0)
         {
-            buffer.Adopt(buffer->DetachTail());
+            (void) buffer.DetachTail();
             continue;
         }
 
@@ -397,7 +397,7 @@ exit:
     if (!buffer.IsNull())
     {
         // Incomplete processing will be retried
-        endPoint->PutBackReceivedData(buffer.Release_ForNow());
+        endPoint->PutBackReceivedData(std::move(buffer));
     }
 
     return err;

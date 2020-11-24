@@ -361,7 +361,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
         {
             memcpy(buffer->Start(), messageStr, messageLen);
             buffer->SetDataLength(messageLen);
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", std::move(buffer));
         }
     }
 
@@ -425,7 +425,7 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
             buffer->SetDataLength(dataLength);
 
             // Hardcode endpoint to 1 for now
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", std::move(buffer));
         }
     }
 

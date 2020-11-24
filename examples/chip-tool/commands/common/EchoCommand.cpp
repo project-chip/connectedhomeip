@@ -45,7 +45,7 @@ void EchoCommand::SendEcho() const
     memcpy(buffer->Start(), PAYLOAD, payloadLen);
     buffer->SetDataLength(static_cast<uint16_t>(payloadLen));
 
-    CHIP_ERROR err = mController->SendMessage(NULL, buffer.Release_ForNow());
+    CHIP_ERROR err = mController->SendMessage(NULL, std::move(buffer));
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Echo (%s): Message sent to server", GetNetworkName());

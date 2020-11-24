@@ -121,8 +121,12 @@ public:
 
     PacketBuffer * Next() const;
 
-    void AddToEnd(PacketBuffer * aPacket);
-    PacketBuffer * DetachTail();
+    // The raw PacketBuffer version of AddToEnd() will be removed when conversion to PacketBufferHandle is complete.
+    void AddToEnd_ForNow(PacketBuffer * aPacket);
+    // The PacketBufferHandle's ownership is transferred to the `next` link at the end of the current chain.
+    void AddToEnd(PacketBufferHandle aPacket);
+    // The raw PacketBuffer version of DetachTail() will be removed when conversion to PacketBufferHandle is complete.
+    PacketBuffer * DetachTail_ForNow();
     void CompactHead();
     PacketBuffer * Consume(uint16_t aConsumeLength);
     void ConsumeHead(uint16_t aConsumeLength);
@@ -140,7 +144,8 @@ public:
     static PacketBuffer * RightSize(PacketBuffer * aPacket);
 
     static void Free(PacketBuffer * aPacket);
-    static PacketBuffer * FreeHead(PacketBuffer * aPacket);
+    // To be removed when conversion to PacketBufferHandle is complete:
+    static PacketBuffer * FreeHead_ForNow(PacketBuffer * aPacket) { return FreeHead(aPacket); }
 
 private:
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
@@ -149,6 +154,7 @@ private:
     static PacketBuffer * BuildFreeList();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
+    static PacketBuffer * FreeHead(PacketBuffer * aPacket);
     void Clear();
     friend class PacketBufferHandle;
 };
@@ -311,10 +317,29 @@ public:
     // This is intended to be used only to call functions that have not yet been converted to take a PacketBufferHandle;
     // a permanent version may be created if/when the need is clear. Most uses will be converted to take a
     // `const PacketBufferHandle &`.
-    PacketBuffer * Get_ForNow() { return mBuffer; }
-    const PacketBuffer * Get_ForNow() const { return mBuffer; }
+    PacketBuffer * Get_ForNow() const { return mBuffer; }
 
     bool IsNull() const { return mBuffer == nullptr; }
+
+    /**
+     *  Detach and return the head of a buffer chain while updating this handle to point to the remaining buffers.
+     *  The current buffer must be the head of the chain.
+     *
+     *  @return the detached bufferly formerly at the head of the buffer chain.
+     */
+    PacketBufferHandle DetachTail();
+
+    /**
+     * Free the first buffer in a chain.
+     *
+     *  @note When the buffer chain is referenced by multiple callers, `FreeHead()` will detach the head, but will not forcibly
+     *  deallocate the head buffer.
+     */
+    void FreeHead()
+    {
+        // `PacketBuffer::FreeHead()` frees the current head; this takes ownership from the `next` link.
+        mBuffer = PacketBuffer::FreeHead(mBuffer);
+    }
 
 private:
     PacketBufferHandle(const PacketBufferHandle &) = delete;
