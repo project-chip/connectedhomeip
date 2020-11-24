@@ -82,7 +82,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
         err = LoadSecureSessionParameters();
         SuccessOrExit(err);
 
-        err    = mSessionManager->SendMessage(mDeviceId, std::move(resend));
+        err = mSessionManager->SendMessage(mDeviceId, std::move(resend));
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
         SuccessOrExit(err);
     }
