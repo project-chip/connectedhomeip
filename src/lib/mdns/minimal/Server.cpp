@@ -23,8 +23,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
-#endif
-
 #include <mdns/minimal/core/DnsHeader.h>
 
 namespace mdns {
