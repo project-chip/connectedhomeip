@@ -223,8 +223,8 @@ void ServerBase::OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chi
     {
         return;
     }
-    mdns::Minimal::BytesRange data(buffer->Start(), buffer->Start() + buffer->DataLength());
 
+    mdns::Minimal::BytesRange data(buffer->Start(), buffer->Start() + buffer->DataLength());
     if (data.Size() < HeaderRef::kSizeBytes)
     {
         ChipLogError(Discovery, "Packet to small for mDNS data: %d bytes", static_cast<int>(data.Size()));
