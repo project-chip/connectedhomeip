@@ -19,7 +19,9 @@
 
 #include <errno.h>
 
+#if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
+#endif
 
 #include "DnsHeader.h"
 
@@ -86,6 +88,7 @@ CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
 {
     Shutdown(); // ensure everything starts fresh
 
+#if CONFIG_DEVICE_LAYER
     size_t endpointIndex                = 0;
     chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
     chip::Inet::IPAddressType addressType;
@@ -127,6 +130,9 @@ CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
     }
 
     return autoShutdown.ReturnSuccess();
+#else // #if CONFIG_DEVICE_LAYER
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBuffer * data, const chip::Inet::IPAddress & addr, uint16_t port,
@@ -209,19 +215,16 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
     return CHIP_NO_ERROR;
 }
 
-void ServerBase::OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBuffer * buffer,
+void ServerBase::OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle buffer,
                                      const chip::Inet::IPPacketInfo * info)
 {
-    chip::System::PacketBufferHandle autoFree;
-    autoFree.Adopt(buffer);
-
     ServerBase * srv = static_cast<ServerBase *>(endPoint->AppState);
     if (!srv->mDelegate)
     {
         return;
     }
-    mdns::Minimal::BytesRange data(buffer->Start(), buffer->Start() + buffer->DataLength());
 
+    mdns::Minimal::BytesRange data(buffer->Start(), buffer->Start() + buffer->DataLength());
     if (data.Size() < HeaderRef::kSizeBytes)
     {
         ChipLogError(Discovery, "Packet to small for mDNS data: %d bytes", static_cast<int>(data.Size()));

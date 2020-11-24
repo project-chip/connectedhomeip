@@ -103,7 +103,7 @@ public:
     }
 
 private:
-    static void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBuffer * buffer,
+    static void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle buffer,
                                     const chip::Inet::IPPacketInfo * info);
 
     EndpointInfo * mEndpoints;   // possible endpoints, to listen on multiple interfaces
