@@ -159,7 +159,7 @@ public:
      * @return CHIP_ERROR The result of message processing
      */
     virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                         System::PacketBuffer * msg);
+                                         System::PacketBufferHandle msg);
 
     /**
      * @brief
@@ -311,7 +311,7 @@ public:
     }
 
     CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                 System::PacketBuffer * msg) override
+                                 System::PacketBufferHandle msg) override
     {
         return CHIP_NO_ERROR;
     }

@@ -171,13 +171,14 @@ exit:
 }
 
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                               const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
+                               const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
+                               SecureSessionMgr * mgr)
 {
     if (mState == ConnectionState::SecureConnected)
     {
         if (mStatusDelegate != nullptr)
         {
-            mStatusDelegate->OnMessage(msgBuf);
+            mStatusDelegate->OnMessage(std::move(msgBuf));
         }
 
         // TODO: The following callback processing will need further work

@@ -66,7 +66,7 @@ public:
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                   const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
                                    SecureSessionMgr * mgr)
     {}
 
@@ -173,7 +173,7 @@ protected:
      * @param msgBuf    the buffer of (encrypted) payload
      */
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBuffer * msgBuf) override;
+                           System::PacketBufferHandle msgBuf) override;
 
 private:
     /**

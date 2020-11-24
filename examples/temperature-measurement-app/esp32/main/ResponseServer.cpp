@@ -62,14 +62,14 @@ class ResponseServerCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
+                           const Transport::PeerConnectionState * state, System::PacketBufferHandle buffer,
                            SecureSessionMgr * mgr) override
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();
 
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(mgr != nullptr && buffer != nullptr, ESP_LOGE(TAG, "Received data but couldn't process it..."));
+        VerifyOrExit(mgr != nullptr && !buffer.IsNull(), ESP_LOGE(TAG, "Received data but couldn't process it..."));
         VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ESP_LOGE(TAG, "Unknown source for received message"));
 
         {
@@ -80,16 +80,9 @@ public:
             ESP_LOGI(TAG, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
         }
 
-        HandleDataModelMessage(header, buffer, mgr);
-        buffer = nullptr;
+        HandleDataModelMessage(header, std::move(buffer), mgr);
 
-    exit:
-
-        // SendTo calls Free on the buffer without an AddRef, if SendTo was not called, free the buffer.
-        if (buffer != nullptr)
-        {
-            System::PacketBuffer::Free(buffer);
-        }
+    exit:;
     }
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
@@ -111,7 +104,7 @@ private:
      * Echo messages should generally not have a first byte with those values, so we
      * can use that to try to distinguish between the two.
      */
-    bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
+    bool ContentMayBeADataModelMessage(const System::PacketBufferHandle & buffer)
     {
         const size_t data_len      = buffer->DataLength();
         const uint8_t * data       = buffer->Start();

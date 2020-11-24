@@ -123,14 +123,14 @@ class EchoServerCallback : public SecureSessionMgrDelegate
 {
 public:
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBuffer * buffer,
+                           const Transport::PeerConnectionState * state, System::PacketBufferHandle buffer,
                            SecureSessionMgr * mgr) override
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();
 
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(mgr != NULL && buffer != NULL, ESP_LOGE(TAG, "Received data but couldn't process it..."));
+        VerifyOrExit(mgr != NULL && !buffer.IsNull(), ESP_LOGE(TAG, "Received data but couldn't process it..."));
         VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ESP_LOGE(TAG, "Unknown source for received message"));
 
         {
@@ -148,8 +148,7 @@ public:
         // port from data model processing.
         if (ContentMayBeADataModelMessage(buffer))
         {
-            HandleDataModelMessage(header, buffer, mgr);
-            buffer = NULL;
+            HandleDataModelMessage(header, std::move(buffer), mgr);
         }
         else
         {
@@ -160,8 +159,7 @@ public:
             ESP_LOGI(TAG, "Client sent: %s", logmsg);
 
             // Attempt to echo back
-            err    = mgr->SendMessage(header.GetSourceNodeId().Value(), buffer);
-            buffer = NULL;
+            err = mgr->SendMessage(header.GetSourceNodeId().Value(), buffer.Release_ForNow());
             if (err != CHIP_NO_ERROR)
             {
                 ESP_LOGE(TAG, "Unable to echo back to client: %s", ErrorStr(err));
@@ -172,13 +170,7 @@ public:
             }
         }
 
-    exit:
-
-        // SendTo calls Free on the buffer without an AddRef, if SendTo was not called, free the buffer.
-        if (buffer != NULL)
-        {
-            System::PacketBuffer::Free(buffer);
-        }
+    exit:;
     }
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
@@ -201,7 +193,7 @@ private:
      * Echo messages should generally not have a first byte with those values, so we
      * can use that to try to distinguish between the two.
      */
-    bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
+    bool ContentMayBeADataModelMessage(const System::PacketBufferHandle & buffer)
     {
         const size_t data_len      = buffer->DataLength();
         const uint8_t * data       = buffer->Start();

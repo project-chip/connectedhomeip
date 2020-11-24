@@ -131,18 +131,18 @@ extern bool IsSender();
 extern bool IsTesting(const TestStatus & aTestStatus);
 extern bool WasSuccessful(const TestStatus & aTestStatus);
 
-extern System::PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue);
-extern System::PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength);
-extern System::PacketBuffer * MakeICMPv4DataBuffer(uint16_t aDesiredUserLength);
-extern System::PacketBuffer * MakeICMPv6DataBuffer(uint16_t aDesiredUserLength);
+extern System::PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue);
+extern System::PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength);
+extern System::PacketBufferHandle MakeICMPv4DataBuffer(uint16_t aDesiredUserLength);
+extern System::PacketBufferHandle MakeICMPv6DataBuffer(uint16_t aDesiredUserLength);
 
-extern bool HandleDataReceived(const System::PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer,
-                               uint8_t aFirstValue);
-extern bool HandleDataReceived(const System::PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket,
+extern bool HandleDataReceived(const System::PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket,
+                               bool aCheckBuffer, uint8_t aFirstValue);
+extern bool HandleDataReceived(const System::PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket,
                                bool aCheckBuffer);
-extern bool HandleICMPv4DataReceived(System::PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket,
+extern bool HandleICMPv4DataReceived(System::PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket,
                                      bool aCheckBuffer);
-extern bool HandleICMPv6DataReceived(System::PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket,
+extern bool HandleICMPv6DataReceived(System::PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket,
                                      bool aCheckBuffer);
 
 // Timer Callback Handler
@@ -151,14 +151,14 @@ extern void HandleSendTimerComplete(System::Layer * aSystemLayer, void * aAppSta
 
 // Raw Endpoint Callback Handlers
 
-extern void HandleRawMessageReceived(const Inet::IPEndPointBasis * aEndPoint, const System::PacketBuffer * aBuffer,
+extern void HandleRawMessageReceived(const Inet::IPEndPointBasis * aEndPoint, const System::PacketBufferHandle & aBuffer,
                                      const Inet::IPPacketInfo * aPacketInfo);
 extern void HandleRawReceiveError(const Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
                                   const Inet::IPPacketInfo * aPacketInfo);
 
 // UDP Endpoint Callback Handlers
 
-extern void HandleUDPMessageReceived(const Inet::IPEndPointBasis * aEndPoint, const System::PacketBuffer * aBuffer,
+extern void HandleUDPMessageReceived(const Inet::IPEndPointBasis * aEndPoint, const System::PacketBufferHandle & aBuffer,
                                      const Inet::IPPacketInfo * aPacketInfo);
 extern void HandleUDPReceiveError(const Inet::IPEndPointBasis * aEndPoint, const INET_ERROR & aError,
                                   const Inet::IPPacketInfo * aPacketInfo);

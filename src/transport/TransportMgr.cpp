@@ -48,13 +48,13 @@ CHIP_ERROR TransportMgrBase::Init(Transport::Base * transport)
 }
 
 void TransportMgrBase::HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                             System::PacketBuffer * msg, TransportMgrBase * dispatcher)
+                                             System::PacketBufferHandle msg, TransportMgrBase * dispatcher)
 {
     TransportMgrDelegate * handler =
         packetHeader.GetFlags().Has(Header::FlagValues::kSecure) ? dispatcher->mSecureSessionMgr : dispatcher->mRendezvous;
     if (handler != nullptr)
     {
-        handler->OnMessageReceived(packetHeader, peerAddress, msg);
+        handler->OnMessageReceived(packetHeader, peerAddress, std::move(msg));
     }
     else
     {

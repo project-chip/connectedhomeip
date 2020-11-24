@@ -187,7 +187,7 @@ void BLE::OnBleConnectionError(void * appState, BLE_ERROR err)
     }
 }
 
-void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBuffer * buffer)
+void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBufferHandle buffer)
 {
     BLE * ble      = reinterpret_cast<BLE *>(endPoint->mAppState);
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -201,7 +201,7 @@ void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBuffer * buffer)
         SuccessOrExit(err);
 
         buffer->ConsumeHead(headerSize);
-        ble->mDelegate->OnRendezvousMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), buffer);
+        ble->mDelegate->OnRendezvousMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
     }
 exit:
     if (err != CHIP_NO_ERROR)

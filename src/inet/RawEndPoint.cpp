@@ -69,6 +69,7 @@
 #endif
 
 #include <string.h>
+#include <utility>
 
 namespace chip {
 namespace Inet {
@@ -831,9 +832,9 @@ InterfaceId RawEndPoint::GetBoundInterface()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-void RawEndPoint::HandleDataReceived(PacketBuffer * msg)
+void RawEndPoint::HandleDataReceived(System::PacketBufferHandle msg)
 {
-    IPEndPointBasis::HandleDataReceived(msg);
+    IPEndPointBasis::HandleDataReceived(std::move(msg));
 }
 
 INET_ERROR RawEndPoint::GetPCB(IPAddressType addrType)
@@ -985,7 +986,10 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
 
     if (enqueue)
     {
-        pktInfo = GetPacketInfo(buf);
+        System::PacketBufferHandle buf_ForNow;
+        buf_ForNow.Adopt(buf);
+        pktInfo = GetPacketInfo(buf_ForNow);
+        buf     = buf_ForNow.Release_ForNow();
 
         if (pktInfo != NULL)
         {

@@ -118,14 +118,15 @@ public:
      *
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *
-     *  @param[in]    msgBuf        A pointer to the PacketBuffer object holding the CHIP message.
+     *  @param[in]    msgBuf        A handle to the PacketBuffer object holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
      *  @retval  #CHIP_ERROR_INCORRECT_STATE                if the state of the exchange context is incorrect.
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
      *                                                       protocol layer.
      */
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                             System::PacketBufferHandle msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }

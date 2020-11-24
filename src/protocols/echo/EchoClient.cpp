@@ -50,7 +50,7 @@ void EchoClient::Shutdown()
     }
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * payload)
+CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBufferHandle payload)
 {
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.
@@ -64,19 +64,18 @@ CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * pay
     mExchangeCtx = mExchangeMgr->NewContext(nodeId, this);
     if (mExchangeCtx == nullptr)
     {
-        System::PacketBuffer::Free(payload);
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    return SendEchoRequest(payload);
+    return SendEchoRequest(std::move(payload));
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBuffer * payload)
+CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Send an Echo Request message.  Discard the exchange context if the send fails.
-    err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, payload);
+    err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, payload.Release_ForNow());
 
     if (err != CHIP_NO_ERROR)
     {
@@ -88,7 +87,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBuffer * payload)
 }
 
 void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                   System::PacketBuffer * payload)
+                                   System::PacketBufferHandle payload)
 {
     // Assert that the exchange context matches the client's current context.
     // This should never fail because even if SendEchoRequest is called
@@ -115,12 +114,10 @@ void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     // Call the registered OnEchoResponseReceived handler, if any.
     if (OnEchoResponseReceived != nullptr)
     {
-        OnEchoResponseReceived(packetHeader.GetSourceNodeId().ValueOr(0), payload);
+        OnEchoResponseReceived(packetHeader.GetSourceNodeId().ValueOr(0), std::move(payload));
     }
 
-exit:
-    // Free the payload buffer.
-    System::PacketBuffer::Free(payload);
+exit:;
 }
 
 void EchoClient::OnResponseTimeout(ExchangeContext * ec)

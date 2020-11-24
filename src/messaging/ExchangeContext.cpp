@@ -47,12 +47,10 @@ using namespace chip::System;
 namespace chip {
 
 static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                     PacketBuffer * payload)
+                                     PacketBufferHandle payload)
 {
     ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32, protocolId,
                  msgType, ec->GetExchangeId(), packetHeader.GetMessageId());
-
-    PacketBuffer::Free(payload);
 }
 
 bool ExchangeContext::IsInitiator() const
@@ -295,7 +293,7 @@ void ExchangeContext::HandleResponseTimeout(System::Layer * aSystemLayer, void *
 }
 
 CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                          PacketBuffer * msgBuf)
+                                          PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t protocolId = 0;
@@ -319,23 +317,17 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (mDelegate != nullptr)
     {
-        mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, msgBuf);
-        msgBuf = nullptr;
+        mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
     }
     else
     {
-        DefaultOnMessageReceived(this, packetHeader, protocolId, messageType, msgBuf);
+        DefaultOnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
     }
 
     // Release the reference to the ExchangeContext that was held at the beginning of this function.
     // This call should also do the needful of closing the ExchangeContext if the protocol has
     // already made a prior call to Close().
     Release();
-
-    if (msgBuf != nullptr)
-    {
-        PacketBuffer::Free(msgBuf);
-    }
 
     return err;
 }

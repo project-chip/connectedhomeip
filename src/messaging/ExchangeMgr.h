@@ -192,7 +192,7 @@ private:
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeDelegate * delegate);
 
-    void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+    void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
 
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
@@ -200,7 +200,7 @@ private:
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                           const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
                            SecureSessionMgr * msgLayer) override;
 
     void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override;

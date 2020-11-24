@@ -57,10 +57,8 @@ void RendezvousServer::OnRendezvousConnectionClosed()
 }
 
 void RendezvousServer::OnRendezvousMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                                   PacketBuffer * buffer)
-{
-    chip::System::PacketBuffer::Free(buffer);
-}
+                                                   System::PacketBufferHandle buffer)
+{}
 
 void RendezvousServer::OnRendezvousComplete()
 {

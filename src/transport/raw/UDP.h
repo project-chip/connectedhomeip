@@ -121,7 +121,8 @@ public:
 
 private:
     // UDP message receive handler.
-    static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const Inet::IPPacketInfo * pktInfo);
+    static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle buffer,
+                             const Inet::IPPacketInfo * pktInfo);
 
     Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                                     ///< UDP socket used by the transport
     Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type

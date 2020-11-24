@@ -174,7 +174,7 @@ public:
      * @param[in] mgr           Pointer to secure session manager which received the message
      */
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgr * mgr);
+                           const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
 
     /**
      * @brief
@@ -276,7 +276,7 @@ public:
      *
      * @param[in] msg Received message buffer.
      */
-    virtual void OnMessage(System::PacketBuffer * msg) = 0;
+    virtual void OnMessage(System::PacketBufferHandle msg) = 0;
 
     /**
      * @brief
