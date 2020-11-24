@@ -1146,9 +1146,12 @@ BLEManagerImpl::CHIPoBLEConState * BLEManagerImpl::GetConnectionState(uint16_t c
     {
         if (freeIndex < kMaxConnections)
         {
-            memset(&mCons[freeIndex], 0, sizeof(CHIPoBLEConState));
+            mCons[freeIndex].PendingIndBuf = nullptr;
+            mCons[freeIndex].ConId = conId;
+            mCons[freeIndex].MTU = 0;
             mCons[freeIndex].Allocated = 1;
-            mCons[freeIndex].ConId     = conId;
+            mCons[freeIndex].Subscribed = 0;
+            mCons[freeIndex].Unused = 0;
             return &mCons[freeIndex];
         }
 
