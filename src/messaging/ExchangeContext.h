@@ -108,7 +108,7 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBuffer * msgPayload, uint16_t sendFlags = 0,
+    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload, uint16_t sendFlags = 0,
                            void * msgCtxt = nullptr);
 
     /**

@@ -155,7 +155,7 @@ CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFl
 
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err = mBleEndPoint->Send(msgBuf.Release_ForNow());
+    err = mBleEndPoint->Send(std::move(msgBuf));
     SuccessOrExit(err);
 
 exit:

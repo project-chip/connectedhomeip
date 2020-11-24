@@ -44,6 +44,7 @@ namespace chip {
 namespace Ble {
 
 using ::chip::System::PacketBuffer;
+using ::chip::System::PacketBufferHandle;
 
 typedef uint8_t SequenceNumber_t; // If type changed from uint8_t, adjust assumptions in BtpEngine::IsValidAck and
                                   // BLEEndPoint::AdjustReceiveWindow.
@@ -118,12 +119,12 @@ public:
     inline SequenceNumber_t TxPacketSeq() { return mTxPacketSeq; }
     inline SequenceNumber_t RxPacketSeq() { return mRxPacketSeq; }
     inline bool IsCommandPacket(const PacketBufferHandle & p) { return GetFlag(*(p->Start()), kHeaderFlag_CommandMessage); }
-    inline void PushPacketTag(PacketBuffer * p, PacketType_t type)
+    inline void PushPacketTag(const PacketBufferHandle & p, PacketType_t type)
     {
         p->SetStart(p->Start() - sizeof(type));
         memcpy(p->Start(), &type, sizeof(type));
     }
-    inline PacketType_t PopPacketTag(PacketBuffer * p)
+    inline PacketType_t PopPacketTag(const PacketBufferHandle & p)
     {
         PacketType_t type;
         memcpy(&type, p->Start(), sizeof(type));
@@ -136,13 +137,12 @@ public:
 
     BLE_ERROR HandleCharacteristicReceived(System::PacketBufferHandle data, SequenceNumber_t & receivedAck, bool & didReceiveAck);
     bool HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack);
-    BLE_ERROR EncodeStandAloneAck(PacketBuffer * data);
+    BLE_ERROR EncodeStandAloneAck(const PacketBufferHandle & data);
 
-    PacketBuffer * RxPacket();
-    PacketBuffer * TxPacket();
-
-    bool ClearRxPacket();
-    bool ClearTxPacket();
+    PacketBufferHandle TakeRxPacket() { return std::move(mRxBuf); }
+    PacketBufferHandle BorrowRxPacket() { return mRxBuf.Retain(); }
+    PacketBufferHandle TakeTxPacket() { return std::move(mTxBuf); }
+    PacketBufferHandle BorrowTxPacket() { return mTxBuf.Retain(); }
 
     void LogState() const;
     void LogStateDebug() const;
@@ -158,7 +158,7 @@ private:
     State_t mRxState;
     uint16_t mRxLength;
     void * mAppState;
-    PacketBuffer * mRxBuf;
+    System::PacketBufferHandle mRxBuf;
     SequenceNumber_t mRxNextSeqNum;
     SequenceNumber_t mRxNewestUnackedSeqNum;
     SequenceNumber_t mRxOldestUnackedSeqNum;
@@ -166,7 +166,7 @@ private:
 
     State_t mTxState;
     uint16_t mTxLength;
-    PacketBuffer * mTxBuf;
+    System::PacketBufferHandle mTxBuf;
     SequenceNumber_t mTxNextSeqNum;
     SequenceNumber_t mTxNewestUnackedSeqNum;
     SequenceNumber_t mTxOldestUnackedSeqNum;

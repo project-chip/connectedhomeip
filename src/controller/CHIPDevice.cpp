@@ -47,14 +47,14 @@ using namespace chip::Callback;
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR Device::SendMessage(System::PacketBuffer * buffer)
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    System::PacketBuffer * resend = nullptr;
+    System::PacketBufferHandle resend;
 
     VerifyOrExit(mSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // If there is no secure connection to the device, try establishing it
     if (mState != ConnectionState::SecureConnected)
@@ -66,47 +66,29 @@ CHIP_ERROR Device::SendMessage(System::PacketBuffer * buffer)
     {
         // Secure connection already exists
         // Hold on to the buffer, in case session resumption and resend is needed
-        buffer->AddRef();
-        resend = buffer;
+        resend = buffer.Retain();
     }
 
-    err    = mSessionManager->SendMessage(mDeviceId, buffer);
+    err    = mSessionManager->SendMessage(mDeviceId, std::move(buffer));
     buffer = nullptr;
     ChipLogDetail(Controller, "SendMessage returned %d", err);
 
     // The send could fail due to network timeouts (e.g. broken pipe)
     // Try sesion resumption if needed
-    if (err != CHIP_NO_ERROR && resend != nullptr && mState == ConnectionState::SecureConnected)
+    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
     {
         mState = ConnectionState::NotConnected;
 
         err = LoadSecureSessionParameters();
         SuccessOrExit(err);
 
-        err    = mSessionManager->SendMessage(mDeviceId, resend);
-        resend = nullptr;
+        err    = mSessionManager->SendMessage(mDeviceId, std::move(resend));
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
         SuccessOrExit(err);
     }
 
 exit:
-
-    if (buffer != nullptr)
-    {
-        PacketBuffer::Free(buffer);
-    }
-
-    if (resend != nullptr)
-    {
-        PacketBuffer::Free(resend);
-    }
-
     return err;
-}
-
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle message)
-{
-    return SendMessage(message.Release_ForNow());
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)

@@ -236,7 +236,7 @@ uint16_t PacketBuffer::ReservedSize() const
  *
  * @param[in] aPacket - the packet buffer to be added to the end of the current chain.
  */
-void PacketBuffer::AddToEnd(PacketBuffer * aPacket)
+void PacketBuffer::AddToEnd_ForNow(PacketBuffer * aPacket)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_cat(this, aPacket);
@@ -257,13 +257,18 @@ void PacketBuffer::AddToEnd(PacketBuffer * aPacket)
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
+void PacketBuffer::AddToEnd(PacketBufferHandle aPacket)
+{
+    AddToEnd_ForNow(aPacket.Release_ForNow());
+}
+
 /**
  *  Detach the current buffer from its chain and return a pointer to the remaining buffers.  The current buffer must be the head of
  *  the chain.
  *
  *  @return the tail of the current buffer chain or NULL if the current buffer is the only buffer in the chain.
  */
-PacketBuffer * PacketBuffer::DetachTail()
+PacketBuffer * PacketBuffer::DetachTail_ForNow()
 {
     PacketBuffer & lReturn = *static_cast<PacketBuffer *>(this->next);
 
@@ -706,6 +711,20 @@ PacketBuffer * PacketBuffer::BuildFreeList()
 }
 
 #endif //  !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+
+PacketBufferHandle PacketBufferHandle::DetachTail()
+{
+    PacketBuffer * head = mBuffer;
+
+    // This takes ownership from the `next` link.
+    mBuffer = static_cast<PacketBuffer *>(mBuffer->next);
+
+    head->next    = nullptr;
+    head->tot_len = head->len;
+
+    // The returned handle takes ownership from this.
+    return PacketBufferHandle(head);
+}
 
 } // namespace System
 } // namespace chip

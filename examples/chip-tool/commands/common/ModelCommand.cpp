@@ -109,7 +109,7 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
     PrintBuffer(buffer);
 #endif
 
-    dc->SendMessage(NULL, buffer.Release_ForNow());
+    dc->SendMessage(NULL, std::move(buffer));
     return true;
 }
 

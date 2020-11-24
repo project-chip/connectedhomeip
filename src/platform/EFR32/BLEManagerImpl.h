@@ -70,11 +70,11 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     bool CloseConnection(BLE_CONNECTION_OBJECT conId) override;
     uint16_t GetMTU(BLE_CONNECTION_OBJECT conId) const override;
     bool SendIndication(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                        System::PacketBuffer * pBuf) override;
+                        System::PacketBufferHandle pBuf) override;
     bool SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                          System::PacketBuffer * pBuf) override;
+                          System::PacketBufferHandle pBuf) override;
     bool SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                         System::PacketBuffer * pBuf) override;
+                         System::PacketBufferHandle pBuf) override;
     bool SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext, const Ble::ChipBleUUID * svcId,
                           const Ble::ChipBleUUID * charId) override;
 

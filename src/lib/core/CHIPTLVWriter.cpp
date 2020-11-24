@@ -1853,7 +1853,7 @@ CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHand
     {
         newBuf = PacketBuffer::New(0).Release_ForNow();
         if (newBuf != nullptr)
-            buf->AddToEnd(newBuf);
+            buf->AddToEnd_ForNow(newBuf);
     }
 
     if (newBuf != nullptr)

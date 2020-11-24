@@ -495,7 +495,7 @@ void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
                 buffer_2 = PrepareTestBuffer(theSecondContext);
                 buffer_3 = PrepareTestBuffer(theThirdContext);
 
-                buffer_1->AddToEnd(buffer_2);
+                buffer_1->AddToEnd_ForNow(buffer_2);
 
                 NL_TEST_ASSERT(inSuite, theFirstContext->buf->tot_len == (theFirstContext->init_len + theSecondContext->init_len));
                 NL_TEST_ASSERT(inSuite, theFirstContext->buf->next == theSecondContext->buf);
@@ -503,7 +503,7 @@ void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
 
                 NL_TEST_ASSERT(inSuite, theThirdContext->buf->next == nullptr);
 
-                buffer_1->AddToEnd(buffer_3);
+                buffer_1->AddToEnd_ForNow(buffer_3);
 
                 NL_TEST_ASSERT(inSuite,
                                theFirstContext->buf->tot_len ==
@@ -552,7 +552,7 @@ void CheckDetachTail(nlTestSuite * inSuite, void * inContext)
                 theFirstContext->buf->tot_len = static_cast<uint16_t>(theFirstContext->buf->tot_len + theSecondContext->init_len);
             }
 
-            returned = buffer_1->DetachTail();
+            returned = buffer_1->DetachTail_ForNow();
 
             NL_TEST_ASSERT(inSuite, theFirstContext->buf->next == nullptr);
             NL_TEST_ASSERT(inSuite, theFirstContext->buf->tot_len == theFirstContext->init_len);
@@ -1113,7 +1113,7 @@ void CheckFreeHead(nlTestSuite * inSuite, void * inContext)
 
             theFirstContext->buf->next = theSecondContext->buf;
 
-            returned = PacketBuffer::FreeHead(buffer_1);
+            returned = PacketBuffer::FreeHead_ForNow(buffer_1);
 
             NL_TEST_ASSERT(inSuite, returned == buffer_2);
 

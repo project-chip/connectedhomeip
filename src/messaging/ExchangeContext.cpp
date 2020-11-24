@@ -68,7 +68,7 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
     mFlags.Set(ExFlagValues::kFlagResponseExpected, inResponseExpected);
 }
 
-CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
+CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, PacketBufferHandle msgBuf, uint16_t sendFlags,
                                         void * msgCtxt)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -109,8 +109,12 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
 
     payloadHeader.SetInitiator(IsInitiator());
 
-    err    = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, msgBuf);
-    msgBuf = nullptr;
+    // TODO: caller should just Retain the PacketBufferHandle.
+    if (sendFlags & kSendFlag_RetainBuffer)
+    {
+        msgBuf->AddRef();
+    }
+    err = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, std::move(msgBuf));
     SuccessOrExit(err);
 
 exit:
@@ -118,10 +122,6 @@ exit:
     {
         CancelResponseTimer();
         SetResponseExpected(false);
-    }
-    if (msgBuf != nullptr && (sendFlags & kSendFlag_RetainBuffer) == 0)
-    {
-        PacketBuffer::Free(msgBuf);
     }
 
     // Release the reference to the exchange context acquired above. Under normal circumstances

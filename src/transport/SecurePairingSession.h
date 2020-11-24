@@ -213,9 +213,9 @@ private:
     CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
                     uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
-    CHIP_ERROR HandleCompute_pA(const PacketHeader & header, System::PacketBuffer * msg);
-    CHIP_ERROR HandleCompute_pB_cB(const PacketHeader & header, System::PacketBuffer * msg);
-    CHIP_ERROR HandleCompute_cA(const PacketHeader & header, System::PacketBuffer * msg);
+    CHIP_ERROR HandleCompute_pA(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleCompute_pB_cB(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleCompute_cA(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgBuf);
 

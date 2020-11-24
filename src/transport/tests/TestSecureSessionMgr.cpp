@@ -152,7 +152,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
 
-    err = secureSessionMgr.SendMessage(kDestinationNodeId, buffer.Release_ForNow());
+    err = secureSessionMgr.SendMessage(kDestinationNodeId, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
