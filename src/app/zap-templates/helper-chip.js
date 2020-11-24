@@ -21,8 +21,7 @@
  * @module Templating API: toplevel utility helpers
  */
 
-
- // Import Zcl helper from zap core
+// Import Zcl helper from zap core
 const helperZcl = require('../../../third_party/zap/repo/src-electron/generator/helper-zcl.js')
 
 /**
@@ -40,7 +39,6 @@ function example_helper(str1, str2) {
     return 'The two strings are different'
   }
 }
-
 
 /**
  * Produces the top-of-the-file header for a C file.
@@ -66,7 +64,6 @@ function chip_header() {
   *    limitations under the License.
   */`;
 }
-
 
 // WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 //
