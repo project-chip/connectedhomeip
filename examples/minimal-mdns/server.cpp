@@ -133,12 +133,12 @@ public:
     }
 
     // ParserDelegate
-    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override {}
+    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override { mMessageId = header.GetMessageId(); }
     void OnResource(mdns::Minimal::ResourceType type, const mdns::Minimal::ResourceData & data) override {}
 
     void OnQuery(const mdns::Minimal::QueryData & data) override
     {
-        if (mResponder->Respond(data, mCurrentSource) != CHIP_NO_ERROR)
+        if (mResponder->Respond(mMessageId, data, mCurrentSource) != CHIP_NO_ERROR)
         {
             printf("FAILED to respond!\n");
         }
@@ -156,6 +156,7 @@ private:
 
     mdns::Minimal::ResponseSender * mResponder;
     const chip::Inet::IPPacketInfo * mCurrentSource = nullptr;
+    uint32_t mMessageId                             = 0;
 };
 
 } // namespace

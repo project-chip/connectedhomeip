@@ -35,7 +35,7 @@ public:
     ResponseSender(ServerBase * server, QueryResponderBase * responder) : mServer(server), mResponder(responder) {}
 
     /// Send back the response to a particular query
-    CHIP_ERROR Respond(const QueryData & query, const chip::Inet::IPPacketInfo * querySource);
+    CHIP_ERROR Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource);
 
     // Implementation of ResponderDelegate
     void AddResponse(const ResourceRecord & record) override;
@@ -51,6 +51,7 @@ private:
     chip::System::PacketBufferHandle mCurrentPacket; // packet currently being built
     ResponseBuilder mResponseBuilder;
     const chip::Inet::IPPacketInfo * mCurrentSource = nullptr;
+    uint32_t mCurrentMessageId                      = 0;
     bool mSendUnicast                               = false;
     ResourceType mCurrentResourceType               = ResourceType::kAnswer;
     CHIP_ERROR mSendError                           = CHIP_NO_ERROR;

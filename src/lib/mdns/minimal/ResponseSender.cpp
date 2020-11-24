@@ -40,12 +40,13 @@ constexpr uint16_t kPacketSizeBytes  = 512;
 
 } // namespace
 
-CHIP_ERROR ResponseSender::Respond(const QueryData & query, const chip::Inet::IPPacketInfo * querySource)
+CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource)
 {
     mSendError = CHIP_NO_ERROR;
 
-    mCurrentSource = querySource;
-    mSendUnicast   = query.GetUnicastAnswer();
+    mCurrentSource    = querySource;
+    mCurrentMessageId = messageId;
+    mSendUnicast      = query.GetUnicastAnswer();
 
     mResponder->ResetAdditionals();
 
@@ -116,6 +117,8 @@ CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
     ReturnErrorCodeIf(mCurrentPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
 
     mResponseBuilder.Reset(mCurrentPacket.Get_ForNow());
+
+    mResponseBuilder.Header().SetMessageId(mCurrentMessageId);
 
     return CHIP_NO_ERROR;
 }
