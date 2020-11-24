@@ -44,7 +44,7 @@ public:
     QClass GetQClass() const { return QClass::IN; }
     QType GetQType() const { return mQType; }
 
-    /// Full name as: <Instance>.<Servicer>.<Domain>
+    /// Full name as: "Instance"."Servicer"."Domain"
     /// Domain name is generally just 'local'
     FullQName GetQName() const { return mQName; }
 
