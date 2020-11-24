@@ -19,7 +19,9 @@
 
 #include <errno.h>
 
+#if CONFIG_DEVICE_LAYER
 #include <platform/CHIPDeviceLayer.h>
+#endif
 
 #include "DnsHeader.h"
 
@@ -86,6 +88,7 @@ CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
 {
     Shutdown(); // ensure everything starts fresh
 
+#if CONFIG_DEVICE_LAYER
     size_t endpointIndex                = 0;
     chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
     chip::Inet::IPAddressType addressType;
@@ -127,6 +130,9 @@ CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
     }
 
     return autoShutdown.ReturnSuccess();
+#else // #if CONFIG_DEVICE_LAYER
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+#endif
 }
 
 CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBuffer * data, const chip::Inet::IPAddress & addr, uint16_t port,
