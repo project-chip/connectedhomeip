@@ -20,6 +20,7 @@
 #include <core/CHIPError.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
+#include <inet/InetLayer.h>
 #include <inet/UDPEndPoint.h>
 
 #include <mdns/minimal/core/BytesRange.h>
@@ -87,7 +88,7 @@ public:
     ///
     /// Since mDNS uses link-local addresses, one generally wants to listen on all
     /// non-loopback interfaces.
-    CHIP_ERROR Listen(ListenIterator * it, uint16_t port);
+    CHIP_ERROR Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port);
 
     /// Send the specified packet to a destination IP address over the specified address
     CHIP_ERROR DirectSend(chip::System::PacketBuffer * data, const chip::Inet::IPAddress & addr, uint16_t port,

@@ -19,10 +19,6 @@
 
 #include <errno.h>
 
-#if CONFIG_DEVICE_LAYER
-#include <platform/CHIPDeviceLayer.h>
-#endif
-
 #include <mdns/minimal/core/DnsHeader.h>
 
 namespace mdns {
@@ -84,11 +80,10 @@ void ServerBase::Shutdown()
     }
 }
 
-CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
+CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port)
 {
     Shutdown(); // ensure everything starts fresh
 
-#if CONFIG_DEVICE_LAYER
     size_t endpointIndex                = 0;
     chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
     chip::Inet::IPAddressType addressType;
@@ -105,7 +100,7 @@ CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
         EndpointInfo * info = &mEndpoints[endpointIndex];
         info->addressType   = addressType;
 
-        CHIP_ERROR err = chip::DeviceLayer::InetLayer.NewUDPEndPoint(&info->udp);
+        CHIP_ERROR err = inetLayer->NewUDPEndPoint(&info->udp);
         if (err != CHIP_NO_ERROR)
         {
             return err;
@@ -130,10 +125,6 @@ CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
     }
 
     return autoShutdown.ReturnSuccess();
-#else // #if CONFIG_DEVICE_LAYER
-    ChipLogError(Discovery, "Current MinMDNS server implementation requires a device layer");
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
 
 CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBuffer * data, const chip::Inet::IPAddress & addr, uint16_t port,
