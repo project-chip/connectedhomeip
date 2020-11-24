@@ -215,12 +215,9 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
     return CHIP_NO_ERROR;
 }
 
-void ServerBase::OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBuffer * buffer,
+void ServerBase::OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle buffer,
                                      const chip::Inet::IPPacketInfo * info)
 {
-    chip::System::PacketBufferHandle autoFree;
-    autoFree.Adopt(buffer);
-
     ServerBase * srv = static_cast<ServerBase *>(endPoint->AppState);
     if (!srv->mDelegate)
     {
