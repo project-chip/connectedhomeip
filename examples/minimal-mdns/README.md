@@ -79,7 +79,7 @@ B75AFB458ECD.local.                  AAAA  ba2a:b311:742e:b44c:f515:576f:9783:3f
 #### Simmulated commisionable node
 
 ```sh
-dns-sd -R DD200C20D25AE5F7 _chipd._udp,S052,L0840,V123 . 11111 D=0840 VP=123+456 PH=8 PI="Hold power button for 5 seconds"
+dns-sd -R DD200C20D25AE5F7 _chipd._udp,S052,L0840,V123 . 11111 D=0840 VP=123+456 PH=3
 ```
 
 Will create the following records:
@@ -89,7 +89,7 @@ _chipd._udp.local.              PTR   DD200C20D25AE5F7._chipd._udp.local.
 S052._sub._chipd._udp.local.    PTR   DD200C20D25AE5F7._chipd._udp.local.
 V123._sub._chipd._udp.local.    PTR   DD200C20D25AE5F7._chipd._udp.local.
 D0840._sub._chipd._udp.local.   PTR   DD200C20D25AE5F7._chipd._udp.local.
-DD200C20D25AE5F7._chipd._udp.local.  TXT   "D=0840" "VP=123+456" "PH=3" "PI=Hold power button for 5 seconds"
+DD200C20D25AE5F7._chipd._udp.local.  TXT   "D=0840" "VP=123+456" "PH=3"
 DD200C20D25AE5F7._chipd._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
 B75AFB458ECD.local.             AAAA  ba2a:b311:742e:b44c:f515:576f:9783:3f30
 ```

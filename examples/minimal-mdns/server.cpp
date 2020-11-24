@@ -212,7 +212,7 @@ int main(int argc, char ** args)
         "D0840=yes",
         "VP=123+456",
         "PH=3",
-        "PI=Hold power button for 5 seconds",
+        "OTH=Some text here...",
     };
     mdns::Minimal::TxtResponder tcpTxtResponder(mdns::Minimal::TxtResourceRecord(tcpServerServiceName, txtEntries));
     mdns::Minimal::TxtResponder udpTxtResponder(mdns::Minimal::TxtResourceRecord(udpServerServiceName, txtEntries));
