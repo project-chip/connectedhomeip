@@ -134,5 +134,22 @@ const uint8_t * SerializedQNameIterator::FindDataEnd()
     return nullptr;
 }
 
+bool SerializedQNameIterator::operator==(const FullQName & other) const
+{
+    SerializedQNameIterator self = *this; // allow iteration
+    size_t idx                   = 0;
+
+    while ((idx < other.nameCount) && self.Next())
+    {
+        if (strcmp(self.Value(), other.names[idx]) != 0)
+        {
+            return false;
+        }
+        idx++;
+    }
+
+    return ((idx == other.nameCount) && !self.Next());
+}
+
 } // namespace Minimal
 } // namespace mdns

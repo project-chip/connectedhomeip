@@ -164,7 +164,7 @@ void PacketReporter::OnResource(mdns::Minimal::ResourceType type, const mdns::Mi
         else
         {
             printf("%s      SRV on port %d, priority %d, weight %d:  ", mPrefix, srv.GetPort(), srv.GetPriority(), srv.GetWeight());
-            PrintQName(data.GetName());
+            PrintQName(srv.GetName());
         }
     }
     else if (data.GetType() == mdns::Minimal::QType::A)

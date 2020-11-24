@@ -20,10 +20,14 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <mdns/minimal/DnsHeader.h>
-#include <mdns/minimal/QName.h>
 #include <mdns/minimal/QueryBuilder.h>
+#include <mdns/minimal/ResponseSender.h>
 #include <mdns/minimal/Server.h>
+#include <mdns/minimal/core/QName.h>
+#include <mdns/minimal/responders/IP.h>
+#include <mdns/minimal/responders/Ptr.h>
+#include <mdns/minimal/responders/Srv.h>
+#include <mdns/minimal/responders/Txt.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
@@ -39,14 +43,16 @@ namespace {
 
 struct Options
 {
-    bool enableIpV4     = false;
-    uint16_t listenPort = 5353;
+    bool enableIpV4           = false;
+    uint16_t listenPort       = 5353;
+    const char * instanceName = "chip-mdns-demo";
 } gOptions;
 
 using namespace chip::ArgParser;
 
-constexpr uint16_t kOptionEnableIpV4 = '4';
-constexpr uint16_t kOptionListenPort = 'p';
+constexpr uint16_t kOptionEnableIpV4   = '4';
+constexpr uint16_t kOptionListenPort   = 'p';
+constexpr uint16_t kOptionInstanceName = 'i';
 
 bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier, const char * aName, const char * aValue)
 {
@@ -54,6 +60,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier
     {
     case kOptionEnableIpV4:
         gOptions.enableIpV4 = true;
+        return true;
+
+    case kOptionInstanceName:
+        gOptions.instanceName = aValue;
         return true;
 
     case kOptionListenPort:
@@ -73,6 +83,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier
 OptionDef cmdLineOptionsDef[] = {
     { "listen-port", kArgumentRequired, kOptionListenPort },
     { "enable-ip-v4", kNoArgument, kOptionEnableIpV4 },
+    { "instance-name", kArgumentRequired, kOptionInstanceName },
     nullptr,
 };
 
@@ -83,15 +94,20 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -4\n"
                              "  --enable-ip-v4\n"
                              "        enable listening on IPv4\n"
+                             "  -i <name>\n"
+                             "  --instance-name <name>\n"
+                             "        instance name to advertise.\n"
                              "\n" };
 
 HelpOptions helpOptions("minimal-mdns-server", "Usage: minimal-mdns-server [options]", "1.0");
 
 OptionSet * allOptions[] = { &cmdLineOptions, &helpOptions, nullptr };
 
-class ReplyDelegate : public mdns::Minimal::ServerDelegate
+class ReplyDelegate : public mdns::Minimal::ServerDelegate, public mdns::Minimal::ParserDelegate
 {
 public:
+    ReplyDelegate(mdns::Minimal::ResponseSender * responder) : mResponder(responder) {}
+
     void OnQuery(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
         char addr[32];
@@ -99,6 +115,12 @@ public:
 
         printf("QUERY from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
         Report("QUERY: ", data);
+
+        mCurrentSource = info;
+        if (!mdns::Minimal::ParsePacket(data, this))
+        {
+            printf("Parsing failure may result in reply failure!\n");
+        }
     }
 
     void OnResponse(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
@@ -106,8 +128,20 @@ public:
         char addr[32];
         info->SrcAddress.ToString(addr, sizeof(addr));
 
-        printf("RESPONSE from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
-        Report("RESPONSE: ", data);
+        // printf("RESPONSE from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
+        // Report("RESPONSE: ", data);
+    }
+
+    // ParserDelegate
+    void OnHeader(mdns::Minimal::ConstHeaderRef & header) override {}
+    void OnResource(mdns::Minimal::ResourceType type, const mdns::Minimal::ResourceData & data) override {}
+
+    void OnQuery(const mdns::Minimal::QueryData & data) override
+    {
+        if (mResponder->Respond(data, mCurrentSource) != CHIP_NO_ERROR)
+        {
+            printf("FAILED to respond!\n");
+        }
     }
 
 private:
@@ -119,6 +153,9 @@ private:
             printf("INVALID PACKET!!!!!!\n");
         }
     }
+
+    mdns::Minimal::ResponseSender * mResponder;
+    const chip::Inet::IPPacketInfo * mCurrentSource = nullptr;
 };
 
 } // namespace
@@ -144,9 +181,61 @@ int main(int argc, char ** args)
 
     printf("Running on port %d using %s...\n", gOptions.listenPort, gOptions.enableIpV4 ? "IPv4 AND IPv6" : "IPv6 ONLY");
 
-    mdns::Minimal::Server<10> mdnsServer;
+    mdns::Minimal::Server<10 /* endpoints */> mdnsServer;
+    mdns::Minimal::QueryResponder<16 /* maxRecords */> queryResponder;
 
-    ReplyDelegate delegate;
+    mdns::Minimal::QNamePart tcpServiceName[]       = { "_chip", "_tcp", "local" };
+    mdns::Minimal::QNamePart tcpServerServiceName[] = { gOptions.instanceName, "_chip", "_tcp", "local" };
+    mdns::Minimal::QNamePart udpServiceName[]       = { "_chip", "_udp", "local" };
+    mdns::Minimal::QNamePart udpServerServiceName[] = { gOptions.instanceName, "_chip", "_udp", "local" };
+
+    // several UDP versions for discriminators
+    mdns::Minimal::QNamePart udpDiscriminator1[] = { "S052", "_sub", "_chip", "_udp", "local" };
+    mdns::Minimal::QNamePart udpDiscriminator2[] = { "V123", "_sub", "_chip", "_udp", "local" };
+    mdns::Minimal::QNamePart udpDiscriminator3[] = { "L0840", "_sub", "_chip", "_udp", "local" };
+
+    mdns::Minimal::QNamePart serverName[] = { gOptions.instanceName, "local" };
+
+    mdns::Minimal::IPv4Responder ipv4Responder(serverName);
+    mdns::Minimal::IPv6Responder ipv6Responder(serverName);
+    mdns::Minimal::SrvResourceRecord srvRecord(tcpServerServiceName, serverName, CHIP_PORT);
+    mdns::Minimal::SrvResponder tcpSrvResponder(tcpServerServiceName, srvRecord);
+    mdns::Minimal::SrvResponder udpSrvResponder(udpServerServiceName, srvRecord);
+    mdns::Minimal::PtrResponder ptrTcpResponder(tcpServiceName, tcpServerServiceName);
+    mdns::Minimal::PtrResponder ptrUdpResponder(udpServiceName, udpServerServiceName);
+    mdns::Minimal::PtrResponder ptrUdpDiscriminator1Responder(udpDiscriminator1, udpServerServiceName);
+    mdns::Minimal::PtrResponder ptrUdpDiscriminator2Responder(udpDiscriminator2, udpServerServiceName);
+    mdns::Minimal::PtrResponder ptrUdpDiscriminator3Responder(udpDiscriminator3, udpServerServiceName);
+
+    // report TXT records for our service.
+    const char * txtEntries[] = {
+        "D0840=yes",
+        "VP=123+456",
+        "PH=3",
+        "PI=Hold power button for 5 seconds",
+    };
+    mdns::Minimal::TxtResponder tcpTxtResponder(mdns::Minimal::TxtResourceRecord(tcpServerServiceName, txtEntries));
+    mdns::Minimal::TxtResponder udpTxtResponder(mdns::Minimal::TxtResourceRecord(udpServerServiceName, txtEntries));
+
+    queryResponder.AddResponder(&ptrTcpResponder).SetReportInServiceListing(true).SetReportAdditional(tcpServerServiceName);
+    queryResponder.AddResponder(&ptrUdpResponder).SetReportInServiceListing(true).SetReportAdditional(udpServerServiceName);
+    queryResponder.AddResponder(&ptrUdpDiscriminator1Responder).SetReportAdditional(udpServerServiceName);
+    queryResponder.AddResponder(&ptrUdpDiscriminator2Responder).SetReportAdditional(udpServerServiceName);
+    queryResponder.AddResponder(&ptrUdpDiscriminator3Responder).SetReportAdditional(udpServerServiceName);
+    queryResponder.AddResponder(&tcpTxtResponder);
+    queryResponder.AddResponder(&udpTxtResponder);
+    queryResponder.AddResponder(&tcpSrvResponder).SetReportAdditional(serverName);
+    queryResponder.AddResponder(&udpSrvResponder).SetReportAdditional(serverName);
+    queryResponder.AddResponder(&ipv6Responder);
+
+    if (gOptions.enableIpV4)
+    {
+        queryResponder.AddResponder(&ipv4Responder);
+    }
+
+    mdns::Minimal::ResponseSender responseSender(&mdnsServer, &queryResponder);
+
+    ReplyDelegate delegate(&responseSender);
     mdnsServer.SetDelegate(&delegate);
 
     {

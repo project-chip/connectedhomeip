@@ -15,8 +15,7 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include <mdns/minimal/IPResourceRecord.h>
+#include <mdns/minimal/records/IP.h>
 #include <support/TestUtils.h>
 
 #include <nlunit-test.h>
@@ -27,8 +26,7 @@ using namespace mdns::Minimal;
 using namespace chip;
 using namespace chip::Inet;
 
-constexpr uint16_t kTestQnameCount        = 3;
-const char * kTestQnames[kTestQnameCount] = { "some", "test", "local" };
+const QNamePart kNames[] = { "some", "test", "local" };
 
 void WriteIPv4(nlTestSuite * inSuite, void * inContext)
 {
@@ -43,7 +41,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
 
     {
         BufBound output(dataBuffer, sizeof(dataBuffer));
-        IPResourceRecord ipResourceRecord(kTestQnames, kTestQnameCount, ipAddress);
+        IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
         ipResourceRecord.SetTtl(123);
 
@@ -72,7 +70,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
     {
         BufBound output(dataBuffer, sizeof(dataBuffer));
 
-        IPResourceRecord ipResourceRecord(kTestQnames, kTestQnameCount, ipAddress);
+        IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
         ipResourceRecord.SetTtl(234);
 
@@ -101,7 +99,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
     {
         BufBound output(dataBuffer, sizeof(dataBuffer));
 
-        IPResourceRecord ipResourceRecord(kTestQnames, kTestQnameCount, ipAddress);
+        IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
         ipResourceRecord.SetTtl(0x1234);
 
@@ -140,7 +138,7 @@ void WriteIPv6(nlTestSuite * inSuite, void * inContext)
     HeaderRef header(headerBuffer);
 
     BufBound output(dataBuffer, sizeof(dataBuffer));
-    IPResourceRecord ipResourceRecord(kTestQnames, kTestQnameCount, ipAddress);
+    IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
     ipResourceRecord.SetTtl(0x12345678);
 
@@ -151,8 +149,8 @@ void WriteIPv6(nlTestSuite * inSuite, void * inContext)
                                        4,    't',  'e',  's',  't',      // QNAME part: test
                                        5,    'l',  'o',  'c',  'a', 'l', // QNAME part: local
                                        0,                                // QNAME ends
-                                       0,    1,                          // QClass IN
                                        0,    28,                         // QType AAAA
+                                       0,    1,                          // QClass IN
                                        0x12, 0x34, 0x56, 0x78,           // TTL
                                        0,    16,                         // data size - size for IPv4
                                        0xfe, 0x80, 0x00, 0x00,           // IPv6

@@ -21,7 +21,7 @@
 
 #include <platform/CHIPDeviceLayer.h>
 
-#include "DnsHeader.h"
+#include <mdns/minimal/core/DnsHeader.h>
 
 namespace mdns {
 namespace Minimal {
@@ -157,6 +157,54 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBuffer * data, const chip:
 
     chip::System::PacketBuffer::Free(data);
     return CHIP_ERROR_NOT_CONNECTED;
+}
+
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t port, chip::Inet::InterfaceId interface)
+{
+    for (size_t i = 0; i < mEndpointCount; i++)
+    {
+        EndpointInfo * info = &mEndpoints[i];
+
+        if (info->udp == nullptr)
+        {
+            continue;
+        }
+
+        if ((info->udp->GetBoundInterface() != interface) && (info->udp->GetBoundInterface() != INET_NULL_INTERFACEID))
+        {
+            continue;
+        }
+
+        // data may be sent over multiple packets. Keep the one ref active all the time
+        data->AddRef();
+
+        CHIP_ERROR err;
+
+        if (info->addressType == chip::Inet::kIPAddressType_IPv6)
+        {
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), data);
+        }
+        else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
+        {
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), data);
+        }
+        else
+        {
+            // remove extra ref and then also clear it
+            chip::System::PacketBuffer::Free(data);
+            chip::System::PacketBuffer::Free(data);
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            chip::System::PacketBuffer::Free(data);
+            return err;
+        }
+    }
+
+    chip::System::PacketBuffer::Free(data);
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t port)

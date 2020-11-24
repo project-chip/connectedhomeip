@@ -15,27 +15,30 @@
  *    limitations under the License.
  */
 
-#include "IPResourceRecord.h"
+#pragma once
+
+#include <mdns/minimal/records/Ptr.h>
+#include <mdns/minimal/responders/Responder.h>
 
 namespace mdns {
 namespace Minimal {
 
-bool IPResourceRecord::WriteData(chip::BufBound & out) const
+class PtrResponder : public Responder
 {
-    // IP address is already stored in network byte order. We cannot use
-    // PutBE/PutLE
+public:
+    PtrResponder(const FullQName & qname, const FullQName & target) : Responder(QType::PTR, qname), mTarget(target) {}
 
-    if (mIPAddress.IsIPv6())
+    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
     {
-        out.Put(mIPAddress.Addr, 16);
-    }
-    else
-    {
-        out.Put(mIPAddress.Addr + 3, 4);
+        PtrResourceRecord record(GetQName(), mTarget);
+        record.SetTtl(4500);
+
+        delegate->AddResponse(record);
     }
 
-    return out.Fit();
-}
+private:
+    const FullQName mTarget;
+};
 
 } // namespace Minimal
 } // namespace mdns

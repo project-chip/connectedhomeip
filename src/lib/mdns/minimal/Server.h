@@ -22,7 +22,7 @@
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 
-#include "BytesRange.h"
+#include <mdns/minimal/core/BytesRange.h>
 
 namespace mdns {
 namespace Minimal {
@@ -95,6 +95,9 @@ public:
 
     /// Send a specific packet broadcast to all interfaces
     CHIP_ERROR BroadcastSend(chip::System::PacketBuffer * data, uint16_t port);
+
+    /// Send a specific packet broadcast to a specific interface
+    CHIP_ERROR BroadcastSend(chip::System::PacketBuffer * data, uint16_t port, chip::Inet::InterfaceId interface);
 
     ServerBase & SetDelegate(ServerDelegate * d)
     {

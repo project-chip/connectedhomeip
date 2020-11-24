@@ -19,20 +19,82 @@
 
 #include <string.h>
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <utility>
 
 #include <core/CHIPEncoding.h>
+#include <support/BufBound.h>
 
-#include "BytesRange.h"
-#include "DnsHeader.h"
+#include <mdns/minimal/core/BytesRange.h>
+#include <mdns/minimal/core/DnsHeader.h>
 
 namespace mdns {
 namespace Minimal {
 
 /// A QName part is a null-terminated string
 using QNamePart = const char *;
+
+/// A list of QNames that is simple to pass around
+///
+/// As the struct may be copied, the lifetime of 'names' has to extend beyond
+/// the objects that use this struyct.
+struct FullQName
+{
+    const QNamePart * names;
+    size_t nameCount;
+
+    FullQName() : names(nullptr), nameCount(0) {}
+    FullQName(const FullQName &) = default;
+    FullQName & operator=(const FullQName &) = default;
+
+    template <size_t N>
+    FullQName(const QNamePart (&data)[N]) : names(data), nameCount(N)
+    {}
+
+    void Put(chip::BufBound & out) const
+    {
+        for (uint16_t i = 0; i < nameCount; i++)
+        {
+
+            out.Put8(static_cast<uint8_t>(strlen(names[i])));
+            out.Put(names[i]);
+        }
+        out.Put8(0); // end of qnames
+    }
+
+    bool operator==(const FullQName & other) const
+    {
+        if (nameCount != other.nameCount)
+        {
+            return false;
+        }
+        for (size_t i = 0; i < nameCount; i++)
+        {
+            if (strcmp(names[i], other.names[i]) != 0)
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+    bool operator!=(const FullQName & other) const { return !(*this == other); }
+
+    // Get a new FullQName without the first element in the qname
+    FullQName SkipHead() const
+    {
+        if (nameCount == 0)
+        {
+            return *this;
+        }
+
+        FullQName tail;
+        tail.names     = names + 1;
+        tail.nameCount = nameCount - 1;
+        return tail;
+    }
+};
 
 /// A serialized QNAME is comprised of
 ///  - length-prefixed parts
@@ -71,6 +133,9 @@ public:
     /// returs nullptr on error (invalid data)
     const uint8_t * FindDataEnd();
 
+    bool operator==(const FullQName & other) const;
+    bool operator!=(const FullQName & other) const { return !(*this == other); }
+
 private:
     static constexpr size_t kMaxValueSize = 63;
     static constexpr uint8_t kPtrMask     = 0xC0;
@@ -87,5 +152,4 @@ private:
 };
 
 } // namespace Minimal
-
 } // namespace mdns

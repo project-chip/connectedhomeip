@@ -17,27 +17,25 @@
 
 #pragma once
 
-#include <inet/IPAddress.h>
-
-#include "ResourceRecord.h"
+#include <mdns/minimal/records/Txt.h>
+#include <mdns/minimal/responders/Responder.h>
 
 namespace mdns {
 namespace Minimal {
 
-class IPResourceRecord : public ResourceRecord
+class TxtResponder : public Responder
 {
 public:
-    IPResourceRecord(const QNamePart * names, uint16_t namesCount, const chip::Inet::IPAddress & ip) :
-        ResourceRecord(ip.IsIPv6() ? QType::AAAA : QType::A, names, namesCount), mIPAddress(ip)
-    {}
+    TxtResponder(const TxtResourceRecord & record) : Responder(QType::TXT, record.GetName()), mRecord(record) {}
 
-protected:
-    bool WriteData(chip::BufBound & out) const override;
+    void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
+    {
+        delegate->AddResponse(mRecord);
+    }
 
 private:
-    const chip::Inet::IPAddress mIPAddress;
+    const TxtResourceRecord mRecord;
 };
 
 } // namespace Minimal
-
 } // namespace mdns

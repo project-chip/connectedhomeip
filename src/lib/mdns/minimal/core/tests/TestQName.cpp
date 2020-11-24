@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <mdns/minimal/QName.h>
+#include <mdns/minimal/core/QName.h>
 #include <support/TestUtils.h>
 
 #include <nlunit-test.h>
@@ -125,6 +125,53 @@ void ErrorTest(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void Comparison(nlTestSuite * inSuite, void * inContext)
+{
+    static const uint8_t kManyItems[] = "\04this\02is\01a\04test\00";
+
+    {
+        const QNamePart kTestName[] = { "this" };
+        NL_TEST_ASSERT(inSuite,
+                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) !=
+                           FullQName(kTestName));
+    }
+
+    {
+        const QNamePart kTestName[] = { "this", "is" };
+        NL_TEST_ASSERT(inSuite,
+                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) !=
+                           FullQName(kTestName));
+    }
+
+    {
+        const QNamePart kTestName[] = { "is", "a", "test" };
+        NL_TEST_ASSERT(inSuite,
+                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) !=
+                           FullQName(kTestName));
+    }
+
+    {
+        const QNamePart kTestName[] = { "this", "is", "a", "test" };
+        NL_TEST_ASSERT(inSuite,
+                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) ==
+                           FullQName(kTestName));
+    }
+
+    {
+        const QNamePart kTestName[] = { "this", "is", "a", "test", "suffix" };
+        NL_TEST_ASSERT(inSuite,
+                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) !=
+                           FullQName(kTestName));
+    }
+
+    {
+        const QNamePart kTestName[] = { "prefix", "this", "is", "a", "test" };
+        NL_TEST_ASSERT(inSuite,
+                       SerializedQNameIterator(BytesRange(kManyItems, kManyItems + sizeof(kManyItems)), kManyItems) !=
+                           FullQName(kTestName));
+    }
+}
+
 } // namespace
 
 // clang-format off
@@ -132,6 +179,7 @@ static const nlTest sTests[] =
 {
     NL_TEST_DEF("IteratorTest", IteratorTest),
     NL_TEST_DEF("ErrorTest", ErrorTest),
+    NL_TEST_DEF("Comparison", Comparison),
 
     NL_TEST_SENTINEL()
 };
