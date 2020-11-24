@@ -112,7 +112,7 @@ public:
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                     System::PacketBuffer * buffer) override;
+                                     System::PacketBufferHandle buffer) override;
 
     //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
     void SendNetworkCredentials(const char * ssid, const char * passwd) override;
@@ -126,7 +126,7 @@ public:
 
     //////////// TransportMgrDelegate Implementation ///////////////
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBuffer * msgBuf) override;
+                           System::PacketBufferHandle msgBuf) override;
 
     /**
      * @brief
@@ -139,12 +139,12 @@ public:
 
 private:
     CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                    System::PacketBuffer * msgBug);
+                                    System::PacketBufferHandle msgBuf);
     CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
 
     CHIP_ERROR HandleSecureMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                   System::PacketBuffer * msgBuf);
+                                   System::PacketBufferHandle msgBuf);
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration

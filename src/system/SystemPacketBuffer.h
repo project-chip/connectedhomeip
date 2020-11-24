@@ -278,17 +278,14 @@ public:
         return *this;
     }
 
-    PacketBufferHandle Clone() const
+    PacketBufferHandle Retain() const
     {
         mBuffer->AddRef();
         return PacketBufferHandle(mBuffer);
     }
 
-    PacketBuffer * operator->() { return mBuffer; }
-    PacketBuffer & operator*() { return *mBuffer; }
-
-    const PacketBuffer * operator->() const { return mBuffer; }
-    const PacketBuffer & operator*() const { return *mBuffer; }
+    PacketBuffer * operator->() const { return mBuffer; }
+    PacketBuffer & operator*() const { return *mBuffer; }
 
     // The caller's ownership is transferred to this.
     void Adopt(PacketBuffer * buffer)
@@ -315,6 +312,7 @@ public:
     // a permanent version may be created if/when the need is clear. Most uses will be converted to take a
     // `const PacketBufferHandle &`.
     PacketBuffer * Get_ForNow() { return mBuffer; }
+    const PacketBuffer * Get_ForNow() const { return mBuffer; }
 
     bool IsNull() const { return mBuffer == nullptr; }
 

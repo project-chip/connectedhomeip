@@ -429,14 +429,12 @@ exit:
 }
 
 CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                                   System::PacketBuffer * msgIn)
+                                                   System::PacketBufferHandle msg)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t headerSize = 0;
     PayloadHeader payloadHeader;
-    System::PacketBufferHandle msg;
 
-    msg.Adopt(msgIn);
     VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     err = payloadHeader.Decode(packetHeader.GetFlags(), msg->Start(), msg->DataLength(), &headerSize);

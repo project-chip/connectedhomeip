@@ -117,7 +117,7 @@ public:
     inline SequenceNumber_t SetRxPacketSeq(SequenceNumber_t seq) { return (mRxPacketSeq = seq); }
     inline SequenceNumber_t TxPacketSeq() { return mTxPacketSeq; }
     inline SequenceNumber_t RxPacketSeq() { return mRxPacketSeq; }
-    inline bool IsCommandPacket(PacketBuffer * p) { return GetFlag(*(p->Start()), kHeaderFlag_CommandMessage); }
+    inline bool IsCommandPacket(const PacketBufferHandle & p) { return GetFlag(*(p->Start()), kHeaderFlag_CommandMessage); }
     inline void PushPacketTag(PacketBuffer * p, PacketType_t type)
     {
         p->SetStart(p->Start() - sizeof(type));
@@ -134,8 +134,8 @@ public:
 
     bool HasUnackedData() const;
 
-    BLE_ERROR HandleCharacteristicReceived(PacketBuffer * data, SequenceNumber_t & receivedAck, bool & didReceiveAck);
-    bool HandleCharacteristicSend(PacketBuffer * data, bool send_ack);
+    BLE_ERROR HandleCharacteristicReceived(System::PacketBufferHandle data, SequenceNumber_t & receivedAck, bool & didReceiveAck);
+    bool HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack);
     BLE_ERROR EncodeStandAloneAck(PacketBuffer * data);
 
     PacketBuffer * RxPacket();

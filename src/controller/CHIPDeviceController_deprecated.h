@@ -50,7 +50,8 @@ typedef void (*NewConnectionHandler)(ChipDeviceController * deviceController, co
 typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * appReqState);
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
                              const Inet::IPPacketInfo * pktInfo);
-typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState,
+                                      System::PacketBufferHandle payload);
 
 class DLL_EXPORT ChipDeviceController : public Controller::DeviceStatusDelegate
 {
@@ -181,7 +182,7 @@ public:
     CHIP_ERROR SetDevicePairingDelegate(Controller::DevicePairingDelegate * pairingDelegate);
 
     //////////// DeviceStatusDelegate Implementation ///////////////
-    void OnMessage(System::PacketBuffer * msg) override;
+    void OnMessage(System::PacketBufferHandle msg) override;
 
 private:
     enum

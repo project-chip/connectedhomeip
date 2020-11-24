@@ -51,7 +51,7 @@ public:
      * @param msgBuf    the buffer of (encrypted) payload
      */
     virtual void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                   System::PacketBuffer * msgBuf) = 0;
+                                   System::PacketBufferHandle msgBuf) = 0;
 };
 
 class TransportMgrBase
@@ -73,7 +73,7 @@ public:
 
 private:
     static void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                      System::PacketBuffer * msg, TransportMgrBase * dispatcher);
+                                      System::PacketBufferHandle msg, TransportMgrBase * dispatcher);
 
     TransportMgrDelegate * mSecureSessionMgr = nullptr;
     TransportMgrDelegate * mRendezvous       = nullptr;

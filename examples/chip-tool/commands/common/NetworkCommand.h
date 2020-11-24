@@ -51,9 +51,9 @@ public:
 
     const char * GetNetworkName(void) const { return mName; }
 
-    virtual void OnConnect(ChipDeviceController * dc)                                      = 0;
-    virtual void OnError(ChipDeviceController * dc, CHIP_ERROR err)                        = 0;
-    virtual void OnMessage(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) = 0;
+    virtual void OnConnect(ChipDeviceController * dc)                                          = 0;
+    virtual void OnError(ChipDeviceController * dc, CHIP_ERROR err)                            = 0;
+    virtual void OnMessage(ChipDeviceController * dc, chip::System::PacketBufferHandle buffer) = 0;
 
     CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) override;
 

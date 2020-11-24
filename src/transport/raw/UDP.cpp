@@ -119,7 +119,7 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFl
     return mUDPEndPoint->SendMsg(&addrInfo, msgBuf.Release_ForNow());
 }
 
-void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const Inet::IPPacketInfo * pktInfo)
+void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle buffer, const Inet::IPPacketInfo * pktInfo)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
@@ -131,7 +131,7 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * 
     SuccessOrExit(err);
 
     buffer->ConsumeHead(headerSize);
-    udp->HandleMessageReceived(header, peerAddress, buffer);
+    udp->HandleMessageReceived(header, peerAddress, std::move(buffer));
 
 exit:
     if (err != CHIP_NO_ERROR)

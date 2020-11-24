@@ -77,7 +77,7 @@ static inline bool DidReceiveData(uint8_t rx_flags)
             GetFlag(rx_flags, BtpEngine::kHeaderFlag_EndMessage));
 }
 
-static void PrintBufDebug(PacketBuffer * buf)
+static void PrintBufDebug(const System::PacketBuffer * buf)
 {
 #ifdef CHIP_BTP_PROTOCOL_ENGINE_DEBUG_LOGGING_ENABLED
     uint8_t * b = buf->Start();
@@ -258,14 +258,15 @@ exit:
 //   function returns.
 //
 //   Upper layer must immediately clean up and reinitialize protocol engine if returned err != BLE_NO_ERROR.
-BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceNumber_t & receivedAck, bool & didReceiveAck)
+BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle data, SequenceNumber_t & receivedAck,
+                                                  bool & didReceiveAck)
 {
     BLE_ERROR err            = BLE_NO_ERROR;
     uint8_t rx_flags         = 0;
     uint8_t cursor           = 0;
     uint8_t * characteristic = data->Start();
 
-    VerifyOrExit(data != nullptr, err = BLE_ERROR_BAD_ARGS);
+    VerifyOrExit(!data.IsNull(), err = BLE_ERROR_BAD_ARGS);
 
     mRxCharCount++;
 
@@ -301,10 +302,6 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceN
     // If fragment was stand-alone ack, we're done here; no payload for message reassembler.
     if (!DidReceiveData(rx_flags))
     {
-        // Free stand-alone ack buffer.
-        PacketBuffer::Free(data);
-        data = nullptr;
-
         ExitNow();
     }
 
@@ -313,7 +310,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceN
     data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
 
     ChipLogDebugBtpEngine(Ble, ">>> BTP reassembler received data:");
-    PrintBufDebug(data);
+    PrintBufDebug(data.Get_ForNow());
 
     if (mRxState == kState_Idle)
     {
@@ -332,9 +329,8 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceN
 
         VerifyOrExit(mRxBuf != nullptr, err = BLE_ERROR_NO_MEMORY);
 
-        mRxBuf->AddToEnd(data);
+        mRxBuf->AddToEnd(data.Release_ForNow());
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
-        data = nullptr;
     }
     else if (mRxState == kState_InProgress)
     {
@@ -347,9 +343,8 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(PacketBuffer * data, SequenceN
 
         // Add received fragment to reassembled message buffer.
         data->SetStart(&(characteristic[cursor]));
-        mRxBuf->AddToEnd(data);
+        mRxBuf->AddToEnd(data.Release_ForNow());
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
-        data = nullptr;
 
         // For now, limit BtpEngine message size to max length of 1 pbuf, as we do for chip messages sent via IP.
         // TODO add support for BtpEngine messages longer than 1 pbuf
@@ -396,16 +391,16 @@ exit:
         }
         LogState();
 
-        if (data != nullptr)
+        if (!data.IsNull())
         {
             // Tack received data onto rx buffer, to be freed when end point resets protocol engine on close.
             if (mRxBuf != nullptr)
             {
-                mRxBuf->AddToEnd(data);
+                mRxBuf->AddToEnd(data.Release_ForNow());
             }
             else
             {
-                mRxBuf = data;
+                mRxBuf = data.Release_ForNow();
             }
         }
     }
@@ -434,8 +429,9 @@ bool BtpEngine::ClearRxPacket()
 // Calling convention:
 //   May only be called if data arg is commited for immediate, synchronous subsequent transmission.
 //   Returns false on error. Caller must free data arg on error.
-bool BtpEngine::HandleCharacteristicSend(PacketBuffer * data, bool send_ack)
+bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data_ForNow, bool send_ack)
 {
+    PacketBuffer * data = data_ForNow.Release_ForNow();
     uint8_t * characteristic;
     mTxCharCount++;
 

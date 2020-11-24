@@ -56,7 +56,7 @@ void EchoCommand::SendEcho() const
     }
 }
 
-void EchoCommand::ReceiveEcho(PacketBuffer * buffer) const
+void EchoCommand::ReceiveEcho(PacketBufferHandle buffer) const
 {
     // attempt to print the incoming message
     size_t data_len               = buffer->DataLength();

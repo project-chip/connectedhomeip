@@ -42,7 +42,7 @@ public:
     virtual void OnRendezvousError(CHIP_ERROR err) {}
     virtual void OnRendezvousComplete() {}
     virtual void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                             System::PacketBuffer * buffer){};
+                                             System::PacketBufferHandle buffer){};
     virtual void OnRendezvousStatusUpdate(Status status, CHIP_ERROR err) {}
 };
 

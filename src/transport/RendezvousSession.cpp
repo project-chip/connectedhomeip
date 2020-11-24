@@ -288,7 +288,7 @@ void RendezvousSession::UpdateState(RendezvousSession::State newState, CHIP_ERRO
 }
 
 void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                                    PacketBuffer * msgBuf)
+                                                    PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // TODO: RendezvousSession should handle SecurePairing messages only
@@ -296,11 +296,11 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
     switch (mCurrentState)
     {
     case State::kSecurePairing:
-        err = HandlePairingMessage(packetHeader, peerAddress, msgBuf);
+        err = HandlePairingMessage(packetHeader, peerAddress, std::move(msgBuf));
         break;
 
     case State::kNetworkProvisioning:
-        err = HandleSecureMessage(packetHeader, peerAddress, msgBuf);
+        err = HandleSecureMessage(packetHeader, peerAddress, std::move(msgBuf));
         break;
 
     default:
@@ -315,24 +315,21 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
 }
 
 void RendezvousSession::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                          System::PacketBuffer * msgBuf)
+                                          System::PacketBufferHandle msgBuf)
 {
     // TODO: OnRendezvousMessageReceived can be renamed to OnMessageReceived after BLE becomes a transport.
-    this->OnRendezvousMessageReceived(header, source, msgBuf);
+    this->OnRendezvousMessageReceived(header, source, std::move(msgBuf));
 }
 
 CHIP_ERROR RendezvousSession::HandlePairingMessage(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                                   PacketBuffer * msgBuf)
+                                                   PacketBufferHandle msgBuf)
 {
-    return mPairingSession.HandlePeerMessage(packetHeader, peerAddress, msgBuf);
+    return mPairingSession.HandlePeerMessage(packetHeader, peerAddress, std::move(msgBuf));
 }
 
 CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
-                                                  PacketBuffer * msgIn)
+                                                  PacketBufferHandle msgBuf)
 {
-    System::PacketBufferHandle msgBuf;
-    msgBuf.Adopt(msgIn);
-
     uint16_t headerSize = 0;
     uint8_t * plainText = nullptr;
     uint16_t taglen     = 0;
