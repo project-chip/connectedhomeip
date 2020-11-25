@@ -61,7 +61,7 @@ chip_test_suite("tests") {
   # x64.
   if (current_os != "mac" && chip_device_platform != "esp32" &&
       current_cpu == "x64") {
-    test_sources +=  [ "TestInetLayerDNS.cpp" ]
+    test_sources += [ "TestInetLayerDNS.cpp" ]
     sources += [ "TestLwIPDNS.cpp" ]
   }
 }

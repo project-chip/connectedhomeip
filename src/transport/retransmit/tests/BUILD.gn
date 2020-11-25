@@ -23,9 +23,7 @@ chip_test_suite("tests") {
 
   cflags = [ "-Wconversion" ]
 
-  test_sources = [
-    "TestCache.cpp",
-  ]
+  test_sources = [ "TestCache.cpp" ]
 
   public_deps = [
     "${chip_root}/src/transport/retransmit",
