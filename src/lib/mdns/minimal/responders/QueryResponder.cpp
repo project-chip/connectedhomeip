@@ -104,7 +104,7 @@ size_t QueryResponderBase::MarkAdditional(const FullQName & qname)
     return count;
 }
 
-void QueryResponderBase::MarkAdditionalReplyesFor(QueryResponderIterator it)
+void QueryResponderBase::MarkAdditionalRepliesFor(QueryResponderIterator it)
 {
     Internal::QueryResponderInfo * info = it.GetInternal();
 

@@ -36,7 +36,13 @@ namespace Minimal {
 namespace {
 
 constexpr uint16_t kMdnsStandardPort = 5353;
-constexpr uint16_t kPacketSizeBytes  = 512;
+
+// Restriction for UDP packets:  https://tools.ietf.org/html/rfc1035#section-4.2.1
+//
+//    Messages carried by UDP are restricted to 512 bytes (not counting the IP
+//    or UDP headers).  Longer messages are truncated and the TC bit is set in
+//    the header.
+constexpr uint16_t kPacketSizeBytes = 512;
 
 } // namespace
 
@@ -46,8 +52,14 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
 
     mCurrentSource    = querySource;
     mCurrentMessageId = messageId;
-    mSendUnicast      = query.GetUnicastAnswer();
+    mSendUnicast      = query.RequestedUnicastAnswer() || (querySource->SrcPort != kMdnsStandardPort);
+    // TODO: at this point we may want to ensure we protect against excessive multicast packet flooding.
+    // According to https://tools.ietf.org/html/rfc6762#section-6  we should multicast at most 1/sec
+    // TBD: do we filter out frequent multicasts or should we switch to unicast in those cases
 
+    // Responder has a stateful 'additional replies required' that is used within the response
+    // loop. 'no additionals required' is set at the start and additionals are marked as the query
+    // reply is built.
     mResponder->ResetAdditionals();
 
     mCurrentResourceType = ResourceType::kAnswer; // direct answer
@@ -56,7 +68,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
     {
         Responder * responder = it->responder;
 
-        if (!filter.SendAnswer(responder->GetQType(), responder->GetQClass(), responder->GetQName()))
+        if (!filter.Accept(responder->GetQType(), responder->GetQClass(), responder->GetQName()))
         {
             continue;
         }
@@ -64,7 +76,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
         responder->AddAllResponses(querySource, this);
         ReturnErrorOnFailure(mSendError);
 
-        mResponder->MarkAdditionalReplyesFor(it);
+        mResponder->MarkAdditionalRepliesFor(it);
     }
 
     mCurrentResourceType = ResourceType::kAdditional; // Additional parts
@@ -73,7 +85,7 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
     {
         Responder * responder = it->responder;
 
-        if (!filter.SendAnswer(responder->GetQType(), responder->GetQClass(), responder->GetQName()))
+        if (!filter.Accept(responder->GetQType(), responder->GetQClass(), responder->GetQName()))
         {
             continue;
         }
@@ -92,17 +104,17 @@ CHIP_ERROR ResponseSender::FlushReply()
     if (mResponseBuilder.HasResponseRecords())
     {
 
-        if (!mSendUnicast && (mCurrentSource->SrcPort == kMdnsStandardPort))
-        {
-            ChipLogProgress(Discovery, "Broadcasting mDns reply");
-            ReturnErrorOnFailure(
-                mServer->BroadcastSend(mCurrentPacket.Release_ForNow(), kMdnsStandardPort, mCurrentSource->Interface));
-        }
-        else
+        if (mSendUnicast)
         {
             ChipLogProgress(Discovery, "Directly sending mDns reply to peer on port %d", mCurrentSource->SrcPort);
             ReturnErrorOnFailure(mServer->DirectSend(mCurrentPacket.Release_ForNow(), mCurrentSource->SrcAddress,
                                                      mCurrentSource->SrcPort, mCurrentSource->Interface));
+        }
+        else
+        {
+            ChipLogProgress(Discovery, "Broadcasting mDns reply");
+            ReturnErrorOnFailure(
+                mServer->BroadcastSend(mCurrentPacket.Release_ForNow(), kMdnsStandardPort, mCurrentSource->Interface));
         }
         mResponseBuilder.Invalidate();
         mCurrentPacket.Adopt(nullptr);
@@ -140,6 +152,10 @@ void ResponseSender::AddResponse(const ResourceRecord & record)
     }
 
     mResponseBuilder.AddRecord(mCurrentResourceType, record);
+
+    // respons build AddRecord will only fail if insufficient space is available (or at least this is
+    // the assumption here). It also guarantees that existing data and header are unchanged on
+    // failure, hence we can flush and try again. This allows for split replies.
     if (!mResponseBuilder.Ok())
     {
         mResponseBuilder.Header().SetFlags(mResponseBuilder.Header().GetFlags().SetTruncated(true));
@@ -153,6 +169,8 @@ void ResponseSender::AddResponse(const ResourceRecord & record)
         mResponseBuilder.AddRecord(mCurrentResourceType, record);
         if (!mResponseBuilder.Ok())
         {
+            // Very much unexpected: single record addtion should fit (our records should not be that big).
+            ChipLogError(Discovery, "Failed to add single record to mDNS response.");
             mSendError = CHIP_ERROR_INTERNAL;
         }
     }

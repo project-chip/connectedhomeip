@@ -30,7 +30,7 @@ public:
     virtual ~ReplyFilter() {}
 
     /// Returns true if specified answer should be sent back as a reply
-    virtual bool SendAnswer(QType qType, QClass qClass, FullQName qname) = 0;
+    virtual bool Accept(QType qType, QClass qClass, FullQName qname) = 0;
 };
 
 } // namespace Minimal

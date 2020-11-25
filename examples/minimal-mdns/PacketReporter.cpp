@@ -135,7 +135,7 @@ void PacketReporter::OnHeader(mdns::Minimal::ConstHeaderRef & header)
 void PacketReporter::OnQuery(const mdns::Minimal::QueryData & data)
 {
     printf("%s    QUERY %s/%s%s: ", mPrefix, ToString(data.GetType()), ToString(data.GetClass()),
-           data.GetUnicastAnswer() ? " UNICAST" : "");
+           data.RequestedUnicastAnswer() ? " UNICAST" : "");
     PrintQName(data.GetName());
 }
 

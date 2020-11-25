@@ -51,43 +51,35 @@ void TestQueryReplyFilter(nlTestSuite * inSuite, void * inContext)
 
     // Acceptable cases
     NL_TEST_ASSERT(
-        inSuite,
-        QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName1)));
-    NL_TEST_ASSERT(
-        inSuite,
-        QueryReplyFilter(buildQueryData(QType::A, QClass::ANY, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName1)));
+        inSuite, QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
+    NL_TEST_ASSERT(inSuite,
+                   QueryReplyFilter(buildQueryData(QType::A, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 
-    NL_TEST_ASSERT(
-        inSuite,
-        QueryReplyFilter(buildQueryData(QType::ANY, QClass::IN, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName1)));
+    NL_TEST_ASSERT(inSuite,
+                   QueryReplyFilter(buildQueryData(QType::ANY, QClass::IN, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 
-    NL_TEST_ASSERT(
-        inSuite, QueryReplyFilter(buildQueryData(QType::A, QClass::IN, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName1)));
+    NL_TEST_ASSERT(inSuite,
+                   QueryReplyFilter(buildQueryData(QType::A, QClass::IN, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 
     // Reject cases
     NL_TEST_ASSERT(
-        inSuite,
-        !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName2)));
+        inSuite, !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName2)));
+
+    NL_TEST_ASSERT(
+        inSuite, !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName3)));
+
+    NL_TEST_ASSERT(
+        inSuite, !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName4)));
 
     NL_TEST_ASSERT(
         inSuite,
-        !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName3)));
+        !QueryReplyFilter(buildQueryData(QType::AAAA, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 
     NL_TEST_ASSERT(
-        inSuite,
-        !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName4)));
+        inSuite, !QueryReplyFilter(buildQueryData(QType::SRV, QClass::IN, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 
     NL_TEST_ASSERT(
-        inSuite,
-        !QueryReplyFilter(buildQueryData(QType::AAAA, QClass::ANY, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName1)));
-
-    NL_TEST_ASSERT(
-        inSuite,
-        !QueryReplyFilter(buildQueryData(QType::SRV, QClass::IN, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName1)));
-
-    NL_TEST_ASSERT(
-        inSuite,
-        !QueryReplyFilter(buildQueryData(QType::PTR, QClass::ANY, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName1)));
+        inSuite, !QueryReplyFilter(buildQueryData(QType::PTR, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
 }
 
 void TestLongerQueryPath(nlTestSuite * inSuite, void * inContext)
@@ -107,11 +99,9 @@ void TestLongerQueryPath(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, SerializedQNameIterator(BytesRange(query, query + sizeof(query)), query) != FullQName(kName4));
 
     NL_TEST_ASSERT(
-        inSuite,
-        !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName1)));
+        inSuite, !QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName1)));
     NL_TEST_ASSERT(
-        inSuite,
-        QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).SendAnswer(QType::A, QClass::IN, FullQName(kName3)));
+        inSuite, QueryReplyFilter(buildQueryData(QType::ANY, QClass::ANY, query)).Accept(QType::A, QClass::IN, FullQName(kName3)));
 }
 
 const nlTest sTests[] = {

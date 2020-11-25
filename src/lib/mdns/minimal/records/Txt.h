@@ -48,7 +48,7 @@ protected:
         for (size_t i = 0; i < mEntryCount; i++)
         {
             size_t len = strlen(mEntries[i]);
-            if (len > 0xFF)
+            if (len > kMaxQNamePartLength)
             {
                 return false;
             }

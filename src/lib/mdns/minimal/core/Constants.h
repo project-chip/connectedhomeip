@@ -16,6 +16,7 @@
  */
 #pragma once
 
+#include <cstddef>
 #include <cstdint>
 
 namespace mdns {
@@ -60,6 +61,8 @@ enum class ResourceType
     kAuthority,
     kAdditional,
 };
+
+constexpr size_t kMaxQNamePartLength = 255;
 
 } // namespace Minimal
 } // namespace mdns

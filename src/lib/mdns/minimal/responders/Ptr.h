@@ -30,10 +30,7 @@ public:
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
     {
-        PtrResourceRecord record(GetQName(), mTarget);
-        record.SetTtl(4500);
-
-        delegate->AddResponse(record);
+        delegate->AddResponse(PtrResourceRecord(GetQName(), mTarget));
     }
 
 private:

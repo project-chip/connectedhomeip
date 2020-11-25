@@ -50,7 +50,7 @@ void TestPtrResourceRecord(nlTestSuite * inSuite, void * inContext)
         0, 12,                      // QType PTR
         0, 1,                       // QClass IN
         0, 0,   0,   123,           // TTL
-        0, 10,                      // data size - size for IPv4
+        0, 10,                      // data size - size data
         3, 'p', 't', 'r',           // QNAME part: ptr
         4, 'a', 'd', 'd', 'r',      // QNAME part: addr
         0                           // QNAME ends

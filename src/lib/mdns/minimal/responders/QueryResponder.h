@@ -126,6 +126,11 @@ public:
     const Internal::QueryResponderInfo * GetInternal() const { return mCurrent; }
 
 private:
+    /// Checks if the value pointed to by 'mCurrent' is a valid reply value.
+    ///
+    /// Valid is being described as
+    ///   - has a responder
+    ///   - record type matches the 'addtional only' setting for the iterator.
     bool isCurrentValid() const
     {
         if (mCurrent->responder == nullptr)
@@ -176,15 +181,15 @@ public:
     QueryResponderBase(Internal::QueryResponderInfo * infos, size_t infoSizes);
     virtual ~QueryResponderBase() {}
 
-    // Setup initial settings (clears all infos and sets up dns-sd query replies)
+    /// Setup initial settings (clears all infos and sets up dns-sd query replies)
     void Init();
 
     /// Add a new responder to be processed
     ///
-    /// Return true if add was succesful.
+    /// Return true if adding was succesful.
     QueryResponderSettings AddResponder(Responder * responder);
 
-    /// Implementation ofthe responder delegate
+    /// Implementation of the responder delegate
     ///
     /// adds responses for all known _dns-sd services
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
@@ -201,7 +206,7 @@ public:
     size_t MarkAdditional(const FullQName & qname);
 
     /// Flag any additional responses required for the given iterator
-    void MarkAdditionalReplyesFor(QueryResponderIterator it);
+    void MarkAdditionalRepliesFor(QueryResponderIterator it);
 
     QueryResponderIterator additional_begin() { return QueryResponderIterator(true, mResponderInfos, mResponderInfoSize); }
     QueryResponderIterator additional_end() { return QueryResponderIterator(); }

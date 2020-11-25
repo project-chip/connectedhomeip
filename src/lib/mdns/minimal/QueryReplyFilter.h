@@ -29,7 +29,7 @@ class QueryReplyFilter : public ReplyFilter
 public:
     QueryReplyFilter(const QueryData & queryData) : mQueryData(queryData) {}
 
-    bool SendAnswer(QType qType, QClass qClass, FullQName qname) override
+    bool Accept(QType qType, QClass qClass, FullQName qname) override
     {
         // resource type is ignored
         if ((mQueryData.GetType() != QType::ANY) && (mQueryData.GetType() != qType))
