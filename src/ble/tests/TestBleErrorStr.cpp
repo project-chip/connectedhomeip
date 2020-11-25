@@ -32,8 +32,6 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TestBleLayer.h"
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>

@@ -24,6 +24,7 @@
  *      decode interfaces.
  *
  */
+#include <nlunit-test.h>
 
 #include <stdint.h>
 #include <stdio.h>
