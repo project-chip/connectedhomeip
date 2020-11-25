@@ -34,7 +34,7 @@
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 ReliableMessageManager::RetransTableEntry::RetransTableEntry() :
     rc(nullptr), msgBuf(nullptr), msgId(0), msgSendFlags(0), nextRetransTimeTick(0), sendCount(0)
@@ -642,5 +642,5 @@ int ReliableMessageManager::TestGetCountRetransTable()
     return count;
 }
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip

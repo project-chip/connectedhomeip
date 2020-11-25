@@ -24,9 +24,10 @@
 #pragma once
 
 #include <stdint.h>
+#include <support/BitFlags.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 /**
  *  @brief
@@ -60,6 +61,7 @@ enum class MessageFlagValues : uint32_t
 
 enum class SendMessageFlags : uint16_t
 {
+    kSendFlag_Default = 0x0000,
     /**< Used to indicate that automatic retransmission is enabled. */
     kSendFlag_AutoRetrans = 0x0001,
     /**< Used to indicate that a response is expected within a specified timeout. */
@@ -82,5 +84,7 @@ enum class SendMessageFlags : uint16_t
     kSendFlag_NoAutoRequestAck = 0x0800,
 };
 
-} // namespace messaging
+using SendFlags = BitFlags<uint16_t, SendMessageFlags>;
+
+} // namespace Messaging
 } // namespace chip

@@ -34,7 +34,7 @@
 #include <support/CodeUtils.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 void ReliableMessageContextDeletor::Release(ReliableMessageContext * obj)
 {
@@ -472,5 +472,5 @@ exit:
     return err;
 }
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip

@@ -27,11 +27,11 @@
 #include <support/DLLUtil.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 CHIP_ERROR FilterUDPSendError(CHIP_ERROR err, bool isMulticast);
 bool IsIgnoredMulticastSendError(CHIP_ERROR err);
 bool IsSendErrorNonCritical(CHIP_ERROR err);
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip

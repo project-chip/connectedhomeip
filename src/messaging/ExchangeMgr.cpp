@@ -47,6 +47,7 @@ using namespace chip::Inet;
 using namespace chip::System;
 
 namespace chip {
+namespace Messaging {
 
 /**
  *  Constructor for the ExchangeManager class.
@@ -312,4 +313,5 @@ void ExchangeManager::DecrementContextsInUse()
     }
 }
 
+} // namespace Messaging
 } // namespace chip

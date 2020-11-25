@@ -28,7 +28,7 @@
 #include <system/SystemConfig.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 /**
  *  @def CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
@@ -121,5 +121,5 @@ const ReliableMessageProtocolConfig gDefaultReliableMessageProtocolConfig = { CH
 
 // clang-format on
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip
