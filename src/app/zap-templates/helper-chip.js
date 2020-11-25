@@ -21,6 +21,9 @@
  * @module Templating API: toplevel utility helpers
  */
 
+const cHelper = require('../../../third_party/zap/repo/src-electron/generator/helper-c.js')
+const zclHelper = require('../../../third_party/zap/repo/src-electron/generator/helper-zcl.js')
+
 /**
  * Produces the top-of-the-file header for a C file.
  *
@@ -69,6 +72,35 @@ function isCommandAvailable(clusterSide, incoming, outgoing, source, name) {
   return false;
 }
 
+/**
+ * Returns CHIP specific type for ZCL framework
+ * This function is flawed since it relies on the
+ * type label for CHIP type conversion. CHIP specific XML should have the
+ * correct type directly embedded inside.
+ *
+ * @param {*} type : The xml type to be converted
+ */
+function asChipUnderlyingType(label, type) {
+
+  if (zclHelper.isStrEqual(label, "endpoint")) {
+    return 'chip::EndpointId'
+  } else if (zclHelper.isStrEqual(label, "endpointId")) {
+    return 'chip::EndpointId'
+  } else if (zclHelper.isStrEqual(label, "CLUSTER_ID")) {
+    return 'chip::ClusterId'
+  } else if (zclHelper.isStrEqual(label, "ATTRIBUTE_ID")){
+    return 'chip::AttributeId'
+  } else if (zclHelper.isStrEqual(label, "groupId")) {
+    return 'chip::GroupId'
+  } else if (zclHelper.isStrEqual(label, "commandId")) {
+    return 'chip::CommandId'
+  } else {
+    // Might want to use asZclUnderlyingType instead. TBD
+    return cHelper.asUnderlyingType.call(this, type)
+  }
+}
+
+
 // WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 //
 // Note: these exports are public API. Templates that might have been created in the past and are
@@ -81,3 +113,4 @@ exports.isStrEqual = isStrEqual;
 exports.isLastElement = isLastElement;
 exports.isEnabled = isEnabled;
 exports.isCommandAvailable = isCommandAvailable;
+exports.asChipUnderlyingType = asChipUnderlyingType;
