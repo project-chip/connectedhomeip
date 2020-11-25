@@ -15,8 +15,6 @@
  *    limitations under the License.
  */
 
-#include "TestRetransmit.h"
-
 #include <support/TestUtils.h>
 #include <transport/retransmit/Cache.h>
 
