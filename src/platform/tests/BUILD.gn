@@ -61,6 +61,7 @@ if (chip_device_platform != "none") {
       sources = [
         "TestCHIPoBLEStackMgr.cpp",
         "TestCHIPoBLEStackMgr.h",
+        "TestCHIPoBLEStackMgrDriver.cpp",
       ]
       tests = [ "TestCHIPoBLEStackMgr" ]
     }
