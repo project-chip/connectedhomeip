@@ -62,7 +62,7 @@ public:
             SerializedQNameIterator target;
             const uint8_t * start = buffer;
 
-            NL_TEST_ASSERT(mSuite, out.Needed() <= sizeof(buffer));
+            NL_TEST_ASSERT(mSuite, out.Fit());
 
             BytesRange validDataRange(buffer, buffer + out.Needed());
 

@@ -76,7 +76,7 @@ DD200C20D25AE5F7._chipc._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
 B75AFB458ECD.local.                  AAAA  ba2a:b311:742e:b44c:f515:576f:9783:3f30
 ```
 
-#### Simmulated commisionable node
+#### Simulated commisionable node
 
 ```sh
 dns-sd -R DD200C20D25AE5F7 _chipd._udp,S052,L0840,V123 . 11111 D=0840 VP=123+456 PH=3
@@ -94,7 +94,7 @@ DD200C20D25AE5F7._chipd._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
 B75AFB458ECD.local.             AAAA  ba2a:b311:742e:b44c:f515:576f:9783:3f30
 ```
 
-#### Simmulated commisioned node
+#### Simulated commisioned node
 
 ```sh
 dns-sd -R 2906C908D115D362-8FC7772401CD0696 _chip._tcp . 22222

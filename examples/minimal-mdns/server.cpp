@@ -18,6 +18,8 @@
 #include <cstdio>
 #include <memory>
 
+#include <arpa/inet.h>
+
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
 #include <mdns/minimal/QueryBuilder.h>
@@ -110,7 +112,7 @@ public:
 
     void OnQuery(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
-        char addr[32];
+        char addr[INET6_ADDRSTRLEN];
         info->SrcAddress.ToString(addr, sizeof(addr));
 
         printf("QUERY from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
@@ -121,6 +123,7 @@ public:
         {
             printf("Parsing failure may result in reply failure!\n");
         }
+        mCurrentSource = nullptr;
     }
 
     void OnResponse(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
