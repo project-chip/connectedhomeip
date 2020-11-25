@@ -53,7 +53,7 @@ if (chip_device_platform != "none") {
     if (chip_enable_ble) {
       # FIXME: TestCHIPoBLEStackMgr requires bluetoothd daemon to be running
       #
-      # TODO: Driver code had a strange check for only running the test
+      # TODO: Driver code has a check for only running the test
       #       if the first argument to the test is a '1'.
       #       This is very odd and test should probably be moved as an integration
       #       test rather than a unit test
