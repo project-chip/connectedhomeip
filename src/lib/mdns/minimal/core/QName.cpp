@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include <assert.h>
+#include <strings.h>
 
 #include "QName.h"
 
@@ -141,7 +142,7 @@ bool SerializedQNameIterator::operator==(const FullQName & other) const
 
     while ((idx < other.nameCount) && self.Next())
     {
-        if (strcmp(self.Value(), other.names[idx]) != 0)
+        if (strcasecmp(self.Value(), other.names[idx]) != 0)
         {
             return false;
         }
@@ -149,6 +150,22 @@ bool SerializedQNameIterator::operator==(const FullQName & other) const
     }
 
     return ((idx == other.nameCount) && !self.Next());
+}
+
+bool FullQName::operator==(const FullQName & other) const
+{
+    if (nameCount != other.nameCount)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < nameCount; i++)
+    {
+        if (strcasecmp(names[i], other.names[i]) != 0)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 } // namespace Minimal

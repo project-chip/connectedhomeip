@@ -64,21 +64,7 @@ struct FullQName
         out.Put8(0); // end of qnames
     }
 
-    bool operator==(const FullQName & other) const
-    {
-        if (nameCount != other.nameCount)
-        {
-            return false;
-        }
-        for (size_t i = 0; i < nameCount; i++)
-        {
-            if (strcmp(names[i], other.names[i]) != 0)
-            {
-                return false;
-            }
-        }
-        return true;
-    }
+    bool operator==(const FullQName & other) const;
     bool operator!=(const FullQName & other) const { return !(*this == other); }
 
     // Get a new FullQName without the first element in the qname
