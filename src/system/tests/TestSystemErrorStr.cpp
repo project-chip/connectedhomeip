@@ -32,8 +32,6 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TestSystemLayer.h"
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>

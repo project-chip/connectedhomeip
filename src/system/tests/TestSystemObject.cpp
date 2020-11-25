@@ -28,8 +28,6 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TestSystemLayer.h"
-
 // Install a sleep in the high water mark function, to force
 // collisions between the threads that call it.
 
@@ -528,6 +526,9 @@ static int Finalize(void * aContext)
 
 int TestSystemObject(void)
 {
+    // Initialize standard pseudo-random number generator
+    srand(0);
+
     // Run test suit againt one lContext.
     nlTestRunner(&sTestSuite, &chip::System::sContext);
 
