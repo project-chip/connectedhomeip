@@ -78,12 +78,12 @@ uint16_t emberAfAttributeValueSize(EmberAfAttributeType dataType, const uint8_t 
             if (emberAfIsStringAttributeType(dataType))
             {
                 // size is string length plus 1-byte length prefix
-                dataSize = ((uint16_t) emberAfStringLength(buffer)) + 1u;
+                dataSize = static_cast<uint16_t>(static_cast<uint16_t>(emberAfStringLength(buffer)) + 1u);
             }
             else
             {
                 // size is long string length plus 2-byte length prefix
-                dataSize = emberAfLongStringLength(buffer) + 2u;
+                dataSize = static_cast<uint16_t>(emberAfLongStringLength(buffer) + 2u);
             }
         }
     }

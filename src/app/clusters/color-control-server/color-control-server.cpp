@@ -37,6 +37,7 @@
  *plugin.
  *******************************************************************************
  ******************************************************************************/
+#include "color-control-server.h"
 
 #include <app/util/af.h>
 
@@ -47,6 +48,8 @@
 #ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>
 #endif
+
+using namespace chip;
 
 #define COLOR_TEMP_CONTROL emberAfPluginColorControlServerTempTransitionEventControl
 #define COLOR_XY_CONTROL emberAfPluginColorControlServerXyTransitionEventControl
@@ -109,7 +112,7 @@ typedef struct
     uint8_t finalHue;
     uint16_t stepsRemaining;
     uint16_t stepsTotal;
-    uint8_t endpoint;
+    EndpointId endpoint;
     bool up;
     bool repeat;
 } ColorHueTransitionState;
@@ -125,7 +128,7 @@ typedef struct
     uint16_t stepsTotal;
     uint16_t lowLimit;
     uint16_t highLimit;
-    uint8_t endpoint;
+    EndpointId endpoint;
 } Color16uTransitionState;
 
 static Color16uTransitionState colorXTransitionState;
@@ -138,51 +141,57 @@ static Color16uTransitionState colorSaturationTransitionState;
 // Forward declarations:
 static bool computeNewColor16uValue(Color16uTransitionState * p);
 static void stopAllColorTransitions(void);
-static void handleModeSwitch(uint8_t endpoint, uint8_t newColorMode);
-static bool shouldExecuteIfOff(uint8_t endpoint, uint8_t optionMask, uint8_t optionOverride);
+static void handleModeSwitch(EndpointId endpoint, uint8_t newColorMode);
+static bool shouldExecuteIfOff(EndpointId endpoint, uint8_t optionMask, uint8_t optionOverride);
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_HSV
 static uint8_t addHue(uint8_t hue1, uint8_t hue2);
 static uint8_t subtractHue(uint8_t hue1, uint8_t hue2);
 static uint8_t addSaturation(uint8_t saturation1, uint8_t saturation2);
 static uint8_t subtractSaturation(uint8_t saturation1, uint8_t saturation2);
-static void initHueSat(uint8_t endpoint);
-static uint8_t readHue(uint8_t endpoint);
-static uint8_t readSaturation(uint8_t endpoint);
+static void initHueSat(EndpointId endpoint);
+static uint8_t readHue(EndpointId endpoint);
+static uint8_t readSaturation(EndpointId endpoint);
 #endif
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_XY
 static uint16_t findNewColorValueFromStep(uint16_t oldValue, int16_t step);
-static uint16_t readColorX(uint8_t endpoint);
-static uint16_t readColorY(uint8_t endpoint);
+static uint16_t readColorX(EndpointId endpoint);
+static uint16_t readColorY(EndpointId endpoint);
 #endif
 
 static uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * p, uint16_t rate);
 
 // convenient token handling functions
-static uint8_t readColorMode(uint8_t endpoint)
+static uint8_t readColorMode(EndpointId endpoint)
 {
     uint8_t colorMode;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID,
-                                      (uint8_t *) &colorMode, sizeof(uint8_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID,
+                                   (uint8_t *) &colorMode, sizeof(uint8_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return colorMode;
 }
 
-static uint16_t readColorTemperature(uint8_t endpoint)
+static uint16_t readColorTemperature(EndpointId endpoint)
 {
     uint16_t colorTemperature;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
-                                      (uint8_t *) &colorTemperature, sizeof(uint16_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
+                                   (uint8_t *) &colorTemperature, sizeof(uint16_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return colorTemperature;
 }
 
-static uint16_t readColorTemperatureMin(uint8_t endpoint)
+static uint16_t readColorTemperatureMin(EndpointId endpoint)
 {
     uint16_t colorTemperatureMin;
     EmberStatus status;
@@ -199,7 +208,7 @@ static uint16_t readColorTemperatureMin(uint8_t endpoint)
     return colorTemperatureMin;
 }
 
-static uint16_t readColorTemperatureMax(uint8_t endpoint)
+static uint16_t readColorTemperatureMax(EndpointId endpoint)
 {
     uint16_t colorTemperatureMax;
     EmberStatus status;
@@ -216,7 +225,7 @@ static uint16_t readColorTemperatureMax(uint8_t endpoint)
     return colorTemperatureMax;
 }
 
-static uint16_t readColorTemperatureCoupleToLevelMin(uint8_t endpoint)
+static uint16_t readColorTemperatureCoupleToLevelMin(EndpointId endpoint)
 {
     uint16_t colorTemperatureCoupleToLevelMin;
     EmberStatus status;
@@ -234,7 +243,7 @@ static uint16_t readColorTemperatureCoupleToLevelMin(uint8_t endpoint)
     return colorTemperatureCoupleToLevelMin;
 }
 
-static uint8_t readLevelControlCurrentLevel(uint8_t endpoint)
+static uint8_t readLevelControlCurrentLevel(EndpointId endpoint)
 {
     uint8_t currentLevel;
     EmberStatus status;
@@ -250,57 +259,81 @@ static uint8_t readLevelControlCurrentLevel(uint8_t endpoint)
     return currentLevel;
 }
 
-static void writeRemainingTime(uint8_t endpoint, uint16_t remainingTime)
+static void writeRemainingTime(EndpointId endpoint, uint16_t remainingTime)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_REMAINING_TIME_ATTRIBUTE_ID,
-                                       (uint8_t *) &remainingTime, ZCL_INT16U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_REMAINING_TIME_ATTRIBUTE_ID,
+                                    (uint8_t *) &remainingTime, ZCL_INT16U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
-static void writeColorMode(uint8_t endpoint, uint8_t colorMode)
+static void writeColorMode(EndpointId endpoint, uint8_t colorMode)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID,
-                                       (uint8_t *) &colorMode, ZCL_INT8U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_ENHANCED_COLOR_MODE_ATTRIBUTE_ID,
+                                    (uint8_t *) &colorMode, ZCL_INT8U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID,
-                                       (uint8_t *) &colorMode, ZCL_INT8U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_MODE_ATTRIBUTE_ID,
+                                    (uint8_t *) &colorMode, ZCL_INT8U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
-static void writeHue(uint8_t endpoint, uint8_t hue)
+static void writeHue(EndpointId endpoint, uint8_t hue)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
-                                       (uint8_t *) &hue, ZCL_INT8U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
+                                    (uint8_t *) &hue, ZCL_INT8U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
-static void writeSaturation(uint8_t endpoint, uint8_t saturation)
+static void writeSaturation(EndpointId endpoint, uint8_t saturation)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                       (uint8_t *) &saturation, ZCL_INT8U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                    (uint8_t *) &saturation, ZCL_INT8U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
-static void writeColorX(uint8_t endpoint, uint16_t colorX)
+static void writeColorX(EndpointId endpoint, uint16_t colorX)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
-                                       (uint8_t *) &colorX, ZCL_INT16U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
+                                    (uint8_t *) &colorX, ZCL_INT16U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
-static void writeColorY(uint8_t endpoint, uint16_t colorY)
+static void writeColorY(EndpointId endpoint, uint16_t colorY)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
-                                       (uint8_t *) &colorY, ZCL_INT16U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
+                                    (uint8_t *) &colorY, ZCL_INT16U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
-static void writeColorTemperature(uint8_t endpoint, uint16_t colorTemperature)
+static void writeColorTemperature(EndpointId endpoint, uint16_t colorTemperature)
 {
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
-                                       (uint8_t *) &colorTemperature, ZCL_INT16U_ATTRIBUTE_TYPE));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfWriteServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_COLOR_TEMPERATURE_ATTRIBUTE_ID,
+                                    (uint8_t *) &colorTemperature, ZCL_INT16U_ATTRIBUTE_TYPE);
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
 // -------------------------------------------------------------------------
@@ -318,8 +351,8 @@ static void writeColorTemperature(uint8_t endpoint, uint16_t colorTemperature)
 bool emberAfColorControlClusterMoveToHueAndSaturationCallback(uint8_t hue, uint8_t saturation, uint16_t transitionTime,
                                                               uint8_t optionsMask, uint8_t optionsOverride)
 {
-    uint8_t endpoint   = emberAfCurrentEndpoint();
-    uint8_t currentHue = readHue(endpoint);
+    EndpointId endpoint = emberAfCurrentEndpoint();
+    uint8_t currentHue  = readHue(endpoint);
     bool moveUp;
 
     if (transitionTime == 0)
@@ -389,7 +422,7 @@ bool emberAfColorControlClusterMoveToHueAndSaturationCallback(uint8_t hue, uint8
 
 bool emberAfColorControlClusterMoveHueCallback(uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -448,7 +481,7 @@ bool emberAfColorControlClusterMoveHueCallback(uint8_t moveMode, uint8_t rate, u
 
 bool emberAfColorControlClusterMoveSaturationCallback(uint8_t moveMode, uint8_t rate, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -506,7 +539,7 @@ bool emberAfColorControlClusterMoveSaturationCallback(uint8_t moveMode, uint8_t 
 bool emberAfColorControlClusterMoveToHueCallback(uint8_t hue, uint8_t hueMoveMode, uint16_t transitionTime, uint8_t optionsMask,
                                                  uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -599,7 +632,7 @@ bool emberAfColorControlClusterMoveToHueCallback(uint8_t hue, uint8_t hueMoveMod
 bool emberAfColorControlClusterMoveToSaturationCallback(uint8_t saturation, uint16_t transitionTime, uint8_t optionsMask,
                                                         uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -652,7 +685,7 @@ bool emberAfColorControlClusterMoveToSaturationCallback(uint8_t saturation, uint
 bool emberAfColorControlClusterStepHueCallback(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime, uint8_t optionsMask,
                                                uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -714,7 +747,7 @@ bool emberAfColorControlClusterStepHueCallback(uint8_t stepMode, uint8_t stepSiz
 bool emberAfColorControlClusterStepSaturationCallback(uint8_t stepMode, uint8_t stepSize, uint8_t transitionTime,
                                                       uint8_t optionsMask, uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -777,7 +810,7 @@ static uint8_t addSaturation(uint8_t saturation1, uint8_t saturation2)
     uint16_t saturation16;
 
     saturation16 = ((uint16_t) saturation1);
-    saturation16 += ((uint16_t) saturation2);
+    saturation16 = static_cast<uint16_t>(saturation16 + static_cast<uint16_t>(saturation2));
 
     if (saturation16 > MAX_SATURATION_VALUE)
     {
@@ -794,13 +827,13 @@ static uint8_t subtractSaturation(uint8_t saturation1, uint8_t saturation2)
         return 0;
     }
 
-    return saturation1 - saturation2;
+    return static_cast<uint8_t>(saturation1 - saturation2);
 }
 
 // any time we call a hue or saturation transition, we need to assume certain
 // things about the hue and saturation data structures.  This function will
 // properly initialize them.
-static void initHueSat(uint8_t endpoint)
+static void initHueSat(EndpointId endpoint)
 {
     colorHueTransitionState.stepsRemaining = 0;
     colorHueTransitionState.currentHue     = readHue(endpoint);
@@ -811,24 +844,30 @@ static void initHueSat(uint8_t endpoint)
     colorSaturationTransitionState.endpoint       = endpoint;
 }
 
-static uint8_t readHue(uint8_t endpoint)
+static uint8_t readHue(EndpointId endpoint)
 {
     uint8_t hue;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
-                                      (uint8_t *) &hue, sizeof(uint8_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_HUE_ATTRIBUTE_ID,
+                                   (uint8_t *) &hue, sizeof(uint8_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return hue;
 }
 
-static uint8_t readSaturation(uint8_t endpoint)
+static uint8_t readSaturation(EndpointId endpoint)
 {
     uint8_t saturation;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
-                                      (uint8_t *) &saturation, sizeof(uint8_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_SATURATION_ATTRIBUTE_ID,
+                                   (uint8_t *) &saturation, sizeof(uint8_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return saturation;
 }
@@ -840,7 +879,7 @@ static uint8_t readSaturation(uint8_t endpoint)
 bool emberAfColorControlClusterMoveToColorCallback(uint16_t colorX, uint16_t colorY, uint16_t transitionTime, uint8_t optionsMask,
                                                    uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -889,7 +928,7 @@ bool emberAfColorControlClusterMoveToColorCallback(uint16_t colorX, uint16_t col
 
 bool emberAfColorControlClusterMoveColorCallback(int16_t rateX, int16_t rateY, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -970,7 +1009,7 @@ bool emberAfColorControlClusterMoveColorCallback(int16_t rateX, int16_t rateY, u
 bool emberAfColorControlClusterStepColorCallback(int16_t stepX, int16_t stepY, uint16_t transitionTime, uint8_t optionsMask,
                                                  uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1043,24 +1082,30 @@ static uint16_t findNewColorValueFromStep(uint16_t oldValue, int16_t step)
     return newValue;
 }
 
-static uint16_t readColorX(uint8_t endpoint)
+static uint16_t readColorX(EndpointId endpoint)
 {
     uint16_t colorX;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
-                                      (uint8_t *) &colorX, sizeof(uint16_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_X_ATTRIBUTE_ID,
+                                   (uint8_t *) &colorX, sizeof(uint16_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return colorX;
 }
 
-static uint16_t readColorY(uint8_t endpoint)
+static uint16_t readColorY(EndpointId endpoint)
 {
     uint16_t colorY;
 
-    assert(EMBER_ZCL_STATUS_SUCCESS ==
-           emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
-                                      (uint8_t *) &colorY, sizeof(uint16_t)));
+#ifndef NDEBUG
+    EmberAfStatus status =
+#endif // NDEBUG
+        emberAfReadServerAttribute(endpoint, ZCL_COLOR_CONTROL_CLUSTER_ID, ZCL_COLOR_CONTROL_CURRENT_Y_ATTRIBUTE_ID,
+                                   (uint8_t *) &colorY, sizeof(uint16_t));
+    assert(status == EMBER_ZCL_STATUS_SUCCESS);
 
     return colorY;
 }
@@ -1069,7 +1114,7 @@ static uint16_t readColorY(uint8_t endpoint)
 
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
 
-static void moveToColorTemp(uint8_t endpoint, uint16_t colorTemperature, uint16_t transitionTime)
+static void moveToColorTemp(EndpointId endpoint, uint16_t colorTemperature, uint16_t transitionTime)
 {
     uint16_t temperatureMin = readColorTemperatureMin(endpoint);
     uint16_t temperatureMax = readColorTemperatureMax(endpoint);
@@ -1112,7 +1157,7 @@ static void moveToColorTemp(uint8_t endpoint, uint16_t colorTemperature, uint16_
 bool emberAfColorControlClusterMoveToColorTemperatureCallback(uint16_t colorTemperature, uint16_t transitionTime,
                                                               uint8_t optionsMask, uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1130,7 +1175,7 @@ bool emberAfColorControlClusterMoveColorTemperatureCallback(uint8_t moveMode, ui
                                                             uint16_t colorTemperatureMaximum, uint8_t optionsMask,
                                                             uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1214,7 +1259,7 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(uint8_t stepMode, ui
                                                             uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
                                                             uint8_t optionsMask, uint8_t optionsOverride)
 {
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (!shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1256,11 +1301,11 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(uint8_t stepMode, ui
     colorTempTransitionState.currentValue = readColorTemperature(endpoint);
     if (stepMode == MOVE_MODE_UP)
     {
-        colorTempTransitionState.finalValue = readColorTemperature(endpoint) + stepSize;
+        colorTempTransitionState.finalValue = static_cast<uint16_t>(readColorTemperature(endpoint) + stepSize);
     }
     else
     {
-        colorTempTransitionState.finalValue = readColorTemperature(endpoint) - stepSize;
+        colorTempTransitionState.finalValue = static_cast<uint16_t>(readColorTemperature(endpoint) - stepSize);
     }
     colorTempTransitionState.stepsRemaining = transitionTime;
     colorTempTransitionState.stepsTotal     = transitionTime;
@@ -1277,7 +1322,7 @@ bool emberAfColorControlClusterStepColorTemperatureCallback(uint8_t stepMode, ui
     return true;
 }
 
-void emberAfPluginLevelControlCoupledColorTempChangeCallback(uint8_t endpoint)
+void emberAfPluginLevelControlCoupledColorTempChangeCallback(EndpointId endpoint)
 {
     // ZCL 5.2.2.1.1 Coupling color temperature to Level Control
     //
@@ -1350,7 +1395,7 @@ void emberAfPluginLevelControlCoupledColorTempChangeCallback(uint8_t endpoint)
 bool emberAfColorControlClusterStopMoveStepCallback(uint8_t optionsMask, uint8_t optionsOverride)
 {
     // Received a stop command.  This is all we need to do.
-    uint8_t endpoint = emberAfCurrentEndpoint();
+    EndpointId endpoint = emberAfCurrentEndpoint();
 
     if (shouldExecuteIfOff(endpoint, optionsMask, optionsOverride))
     {
@@ -1381,7 +1426,7 @@ void emberAfPluginColorControlServerStopTransition(void)
 // the new mode, this must be avoided.
 // I am putting in this function to compute the new attributes based on the old
 // color mode.
-static void handleModeSwitch(uint8_t endpoint, uint8_t newColorMode)
+static void handleModeSwitch(EndpointId endpoint, uint8_t newColorMode)
 {
     uint8_t oldColorMode = readColorMode(endpoint);
     uint8_t colorModeTransition;
@@ -1395,7 +1440,7 @@ static void handleModeSwitch(uint8_t endpoint, uint8_t newColorMode)
         writeColorMode(endpoint, newColorMode);
     }
 
-    colorModeTransition = (newColorMode << 4) + oldColorMode;
+    colorModeTransition = static_cast<uint8_t>((newColorMode << 4) + oldColorMode);
 
     // Note:  It may be OK to not do anything here.
     switch (colorModeTransition)
@@ -1433,11 +1478,11 @@ static uint8_t addHue(uint8_t hue1, uint8_t hue2)
     uint16_t hue16;
 
     hue16 = ((uint16_t) hue1);
-    hue16 += ((uint16_t) hue2);
+    hue16 = static_cast<uint16_t>(hue16 + static_cast<uint16_t>(hue2));
 
     if (hue16 > MAX_HUE_VALUE)
     {
-        hue16 -= MAX_HUE_VALUE;
+        hue16 = static_cast<uint16_t>(hue16 - MAX_HUE_VALUE);
     }
 
     return ((uint8_t) hue16);
@@ -1450,10 +1495,10 @@ static uint8_t subtractHue(uint8_t hue1, uint8_t hue2)
     hue16 = ((uint16_t) hue1);
     if (hue2 > hue1)
     {
-        hue16 += MAX_HUE_VALUE;
+        hue16 = static_cast<uint16_t>(hue16 + MAX_HUE_VALUE);
     }
 
-    hue16 -= ((uint16_t) hue2);
+    hue16 = static_cast<uint16_t>(hue16 - static_cast<uint16_t>(hue2));
 
     return ((uint8_t) hue16);
 }
@@ -1530,9 +1575,9 @@ static bool computeNewHueValue(ColorHueTransitionState * p)
     return false;
 }
 
-extern "C" void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
+void emberAfPluginColorControlServerHueSatTransitionEventHandler(void)
 {
-    uint8_t endpoint = colorHueTransitionState.endpoint;
+    EndpointId endpoint = colorHueTransitionState.endpoint;
     bool limitReached1, limitReached2;
 
     limitReached1 = computeNewHueValue(&colorHueTransitionState);
@@ -1580,14 +1625,14 @@ static bool computeNewColor16uValue(Color16uTransitionState * p)
         newValue32u = ((uint32_t)(p->finalValue - p->initialValue));
         newValue32u *= ((uint32_t)(p->stepsRemaining));
         newValue32u /= ((uint32_t)(p->stepsTotal));
-        p->currentValue = p->finalValue - ((uint16_t)(newValue32u));
+        p->currentValue = static_cast<uint16_t>(p->finalValue - static_cast<uint16_t>(newValue32u));
     }
     else
     {
         newValue32u = ((uint32_t)(p->initialValue - p->finalValue));
         newValue32u *= ((uint32_t)(p->stepsRemaining));
         newValue32u /= ((uint32_t)(p->stepsTotal));
-        p->currentValue = p->finalValue + ((uint16_t)(newValue32u));
+        p->currentValue = static_cast<uint16_t>(p->finalValue + static_cast<uint16_t>(newValue32u));
     }
 
     if (p->stepsRemaining == 0)
@@ -1632,9 +1677,9 @@ static uint16_t computeTransitionTimeFromStateAndRate(Color16uTransitionState * 
     return (uint16_t) transitionTime;
 }
 
-extern "C" void emberAfPluginColorControlServerXyTransitionEventHandler(void)
+void emberAfPluginColorControlServerXyTransitionEventHandler(void)
 {
-    uint8_t endpoint = colorXTransitionState.endpoint;
+    EndpointId endpoint = colorXTransitionState.endpoint;
     bool limitReachedX, limitReachedY;
 
     // compute new values for X and Y.
@@ -1661,9 +1706,9 @@ extern "C" void emberAfPluginColorControlServerXyTransitionEventHandler(void)
     emberAfPluginColorControlServerComputePwmFromXyCallback(endpoint);
 }
 
-extern "C" void emberAfPluginColorControlServerTempTransitionEventHandler(void)
+void emberAfPluginColorControlServerTempTransitionEventHandler(void)
 {
-    uint8_t endpoint = colorTempTransitionState.endpoint;
+    EndpointId endpoint = colorTempTransitionState.endpoint;
     bool limitReached;
 
     limitReached = computeNewColor16uValue(&colorTempTransitionState);
@@ -1684,7 +1729,7 @@ extern "C" void emberAfPluginColorControlServerTempTransitionEventHandler(void)
     emberAfPluginColorControlServerComputePwmFromTempCallback(endpoint);
 }
 
-static bool shouldExecuteIfOff(uint8_t endpoint, uint8_t optionMask, uint8_t optionOverride)
+static bool shouldExecuteIfOff(EndpointId endpoint, uint8_t optionMask, uint8_t optionOverride)
 {
     // From 5.2.2.2.1.10 of ZCL7 document 14-0129-15f-zcl-ch-5-lighting.docx:
     //   "Command execution SHALL NOT continue beyond the Options processing if
@@ -1757,7 +1802,7 @@ static bool shouldExecuteIfOff(uint8_t endpoint, uint8_t optionMask, uint8_t opt
     return (READBITS(options, EMBER_ZCL_COLOR_CONTROL_OPTIONS_EXECUTE_IF_OFF));
 }
 
-void emberAfColorControlClusterServerInitCallback(uint8_t endpoint)
+void emberAfColorControlClusterServerInitCallback(EndpointId endpoint)
 {
 #ifdef EMBER_AF_PLUGIN_COLOR_CONTROL_SERVER_TEMP
     // 07-5123-07 (i.e. ZCL 7) 5.2.2.2.1.22 StartUpColorTemperatureMireds Attribute
@@ -1811,3 +1856,9 @@ void emberAfColorControlClusterServerInitCallback(uint8_t endpoint)
     }
 #endif
 }
+
+void emberAfPluginColorControlServerComputePwmFromHsvCallback(EndpointId endpoint) {}
+
+void emberAfPluginColorControlServerComputePwmFromTempCallback(EndpointId endpoint) {}
+
+void emberAfPluginColorControlServerComputePwmFromXyCallback(EndpointId endpoint) {}

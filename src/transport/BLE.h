@@ -98,7 +98,7 @@ private:
     static void OnBleConnectionError(void * appState, BLE_ERROR err);
 
     // Those functions are BLEEndPoint callbacks
-    static void OnBleEndPointReceive(Ble::BLEEndPoint * endPoint, System::PacketBuffer * buffer);
+    static void OnBleEndPointReceive(Ble::BLEEndPoint * endPoint, System::PacketBufferHandle buffer);
     static void OnBleEndPointConnectionComplete(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
     static void OnBleEndPointConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
 

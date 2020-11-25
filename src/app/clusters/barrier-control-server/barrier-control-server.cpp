@@ -46,6 +46,8 @@
 // We need this for initializating default reporting configurations.
 #include <app/reporting/reporting.h>
 
+using namespace chip;
+
 typedef struct
 {
     uint8_t currentPosition;
@@ -70,12 +72,12 @@ static State state;
 // TODO: There's no header that declares this callback, and it's not 100%
 // clear where best to declare it.
 // https://github.com/project-chip/connectedhomeip/issues/3619
-extern "C" void emberAfPluginBarrierControlServerInitCallback(void) {}
+void emberAfPluginBarrierControlServerInitCallback(void) {}
 
 // -----------------------------------------------------------------------------
 // Accessing attributes
 
-uint8_t emAfPluginBarrierControlServerGetBarrierPosition(uint8_t endpoint)
+uint8_t emAfPluginBarrierControlServerGetBarrierPosition(EndpointId endpoint)
 {
     uint8_t position;
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_POSITION_ATTRIBUTE_ID,
@@ -84,14 +86,14 @@ uint8_t emAfPluginBarrierControlServerGetBarrierPosition(uint8_t endpoint)
     return position;
 }
 
-void emAfPluginBarrierControlServerSetBarrierPosition(uint8_t endpoint, uint8_t position)
+void emAfPluginBarrierControlServerSetBarrierPosition(EndpointId endpoint, uint8_t position)
 {
     EmberAfStatus status = emberAfWriteServerAttribute(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID, ZCL_BARRIER_POSITION_ATTRIBUTE_ID,
                                                        &position, ZCL_INT8U_ATTRIBUTE_TYPE);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
-bool emAfPluginBarrierControlServerIsPartialBarrierSupported(uint8_t endpoint)
+bool emAfPluginBarrierControlServerIsPartialBarrierSupported(EndpointId endpoint)
 {
     uint8_t bitmap;
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID,
@@ -100,10 +102,10 @@ bool emAfPluginBarrierControlServerIsPartialBarrierSupported(uint8_t endpoint)
     return READBITS(bitmap, EMBER_AF_BARRIER_CONTROL_CAPABILITIES_PARTIAL_BARRIER);
 }
 
-static uint16_t getOpenOrClosePeriod(uint8_t endpoint, bool open)
+static uint16_t getOpenOrClosePeriod(EndpointId endpoint, bool open)
 {
-    uint16_t period                = 0;
-    EmberAfAttributeId attributeId = 0xFFFF;
+    uint16_t period         = 0;
+    AttributeId attributeId = 0xFFFF;
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_OPEN_PERIOD_ATTRIBUTE)
     if (open)
     {
@@ -127,14 +129,14 @@ static uint16_t getOpenOrClosePeriod(uint8_t endpoint, bool open)
     return period;
 }
 
-static void setMovingState(uint8_t endpoint, uint8_t state)
+static void setMovingState(EndpointId endpoint, uint8_t newState)
 {
     EmberAfStatus status = emberAfWriteServerAttribute(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID,
-                                                       ZCL_BARRIER_MOVING_STATE_ATTRIBUTE_ID, &state, ZCL_ENUM8_ATTRIBUTE_TYPE);
+                                                       ZCL_BARRIER_MOVING_STATE_ATTRIBUTE_ID, &newState, ZCL_ENUM8_ATTRIBUTE_TYPE);
     assert(status == EMBER_ZCL_STATUS_SUCCESS);
 }
 
-uint16_t emAfPluginBarrierControlServerGetSafetyStatus(uint8_t endpoint)
+uint16_t emAfPluginBarrierControlServerGetSafetyStatus(EndpointId endpoint)
 {
     uint16_t safetyStatus;
     EmberAfStatus status =
@@ -144,13 +146,13 @@ uint16_t emAfPluginBarrierControlServerGetSafetyStatus(uint8_t endpoint)
     return safetyStatus;
 }
 
-static bool isRemoteLockoutOn(uint8_t endpoint)
+static bool isRemoteLockoutOn(EndpointId endpoint)
 {
     uint16_t safetyStatus = emAfPluginBarrierControlServerGetSafetyStatus(endpoint);
     return READBITS(safetyStatus, EMBER_AF_BARRIER_CONTROL_SAFETY_STATUS_REMOTE_LOCKOUT);
 }
 
-void emAfPluginBarrierControlServerIncrementEvents(uint8_t endpoint, bool open, bool command)
+void emAfPluginBarrierControlServerIncrementEvents(EndpointId endpoint, bool open, bool command)
 {
     uint8_t mask = (0
 #if defined(ZCL_USING_BARRIER_CONTROL_CLUSTER_BARRIER_OPEN_EVENTS_ATTRIBUTE)
@@ -167,12 +169,12 @@ void emAfPluginBarrierControlServerIncrementEvents(uint8_t endpoint, bool open, 
 #endif
     );
 
-    EmberAfAttributeId baseEventAttributeId = ZCL_BARRIER_OPEN_EVENTS_ATTRIBUTE_ID;
+    AttributeId baseEventAttributeId = ZCL_BARRIER_OPEN_EVENTS_ATTRIBUTE_ID;
     for (size_t bit = 0; bit < 4; bit++)
     {
         if (READBIT(mask, bit))
         {
-            EmberAfAttributeId attributeId = baseEventAttributeId + bit;
+            AttributeId attributeId = static_cast<AttributeId>(baseEventAttributeId + bit);
             uint16_t events;
             EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID, attributeId,
                                                               (uint8_t *) &events, sizeof(events));
@@ -195,7 +197,7 @@ void emAfPluginBarrierControlServerIncrementEvents(uint8_t endpoint, bool open, 
 // -----------------------------------------------------------------------------
 // Opening/closing barrier
 
-static uint8_t getCurrentPosition(uint8_t endpoint)
+static uint8_t getCurrentPosition(EndpointId endpoint)
 {
     // If the BarrierPosition attribute does not store the exact position of the
     // barrier, then it will be set to 0xFF. If this is the case, then we have no
@@ -203,15 +205,15 @@ static uint8_t getCurrentPosition(uint8_t endpoint)
     // open so that we don't leave the barrier open when it should be closed.
     uint8_t currentPositionFromAttribute = emAfPluginBarrierControlServerGetBarrierPosition(endpoint);
     return ((currentPositionFromAttribute == EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_UNKNOWN)
-                ? EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN
+                ? static_cast<uint8_t>(EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_OPEN)
                 : currentPositionFromAttribute);
 }
 
-static uint32_t calculateDelayMs(uint8_t endpoint, uint8_t targetPosition, bool * opening)
+static uint32_t calculateDelayMs(EndpointId endpoint, uint8_t targetPosition, bool * opening)
 {
-    uint8_t currentPosition      = emAfPluginBarrierControlServerGetBarrierPosition(endpoint);
-    *opening                     = targetPosition > currentPosition;
-    uint8_t positionDelta        = (*opening ? targetPosition - currentPosition : currentPosition - targetPosition);
+    uint8_t currentPosition = emAfPluginBarrierControlServerGetBarrierPosition(endpoint);
+    *opening                = targetPosition > currentPosition;
+    uint8_t positionDelta   = static_cast<uint8_t>(*opening ? targetPosition - currentPosition : currentPosition - targetPosition);
     uint16_t openOrClosePeriodDs = getOpenOrClosePeriod(endpoint, *opening);
     uint32_t openOrClosePeriodMs = openOrClosePeriodDs * MILLISECOND_TICKS_PER_DECISECOND;
 
@@ -228,7 +230,7 @@ static uint32_t calculateDelayMs(uint8_t endpoint, uint8_t targetPosition, bool 
     }
 }
 
-void emberAfBarrierControlClusterServerTickCallback(uint8_t endpoint)
+void emberAfBarrierControlClusterServerTickCallback(EndpointId endpoint)
 {
     if (state.currentPosition == state.targetPosition)
     {
@@ -254,10 +256,11 @@ void emberAfBarrierControlClusterServerTickCallback(uint8_t endpoint)
                 emAfPluginBarrierControlServerIncrementEvents(endpoint, false, false);
             }
         }
-        emAfPluginBarrierControlServerSetBarrierPosition(endpoint,
-                                                         (emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint)
-                                                              ? state.currentPosition
-                                                              : EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_UNKNOWN));
+        emAfPluginBarrierControlServerSetBarrierPosition(
+            endpoint,
+            (emAfPluginBarrierControlServerIsPartialBarrierSupported(endpoint)
+                 ? state.currentPosition
+                 : static_cast<uint8_t>(EMBER_ZCL_BARRIER_CONTROL_BARRIER_POSITION_UNKNOWN)));
         setMovingState(
             endpoint,
             (state.increasing ? EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_OPENING : EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_CLOSING));
@@ -278,7 +281,7 @@ static void sendDefaultResponse(EmberAfStatus status)
 
 bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t percentOpen)
 {
-    uint8_t endpoint     = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
+    EndpointId endpoint  = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
     EmberAfStatus status = EMBER_ZCL_STATUS_SUCCESS;
 
     emberAfBarrierControlClusterPrintln("RX: GoToPercentCallback p=%d", percentOpen);
@@ -320,7 +323,7 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t perce
 
 bool emberAfBarrierControlClusterBarrierControlStopCallback(void)
 {
-    uint8_t endpoint = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
+    EndpointId endpoint = emberAfCurrentCommand()->apsFrame->destinationEndpoint;
     emberAfDeactivateServerTick(endpoint, ZCL_BARRIER_CONTROL_CLUSTER_ID);
     setMovingState(endpoint, EMBER_ZCL_BARRIER_CONTROL_MOVING_STATE_STOPPED);
     sendDefaultResponse(EMBER_ZCL_STATUS_SUCCESS);

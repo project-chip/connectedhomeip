@@ -19,7 +19,7 @@
 set -x
 env
 
-root=examples/wifi-echo/server/esp32/
+root=examples/all-clusters-app/esp32/
 
 # shellcheck source=/dev/null
 source "$root"/idf.sh

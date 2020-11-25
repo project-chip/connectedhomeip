@@ -248,10 +248,13 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         break;
 
-    case DeviceEventType::kCHIPoBLEWriteReceived:
+    case DeviceEventType::kCHIPoBLEWriteReceived: {
+        System::PacketBufferHandle data_ForNow;
+        data_ForNow.Adopt(event->CHIPoBLEWriteReceived.Data);
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
-                            event->CHIPoBLEWriteReceived.Data);
-        break;
+                            std::move(data_ForNow));
+    }
+    break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
@@ -922,9 +925,9 @@ void BLEManagerImpl::HandleGATTCommEvent(esp_gatts_cb_event_t event, esp_gatt_if
 
 void BLEManagerImpl::HandleRXCharWrite(esp_ble_gatts_cb_param_t * param)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    PacketBuffer * buf = NULL;
-    bool needResp      = param->write.need_rsp;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    bool needResp  = param->write.need_rsp;
+    PacketBufferHandle buf;
 
     ESP_LOGD(TAG, "Write request received for CHIPoBLE RX characteristic (con %u, len %u)", param->write.conn_id, param->write.len);
 
@@ -933,7 +936,7 @@ void BLEManagerImpl::HandleRXCharWrite(esp_ble_gatts_cb_param_t * param)
 
     // Copy the data to a PacketBuffer.
     buf = PacketBuffer::New(0);
-    VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= param->write.len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), param->write.value, param->write.len);
     buf->SetDataLength(param->write.len);
@@ -950,9 +953,8 @@ void BLEManagerImpl::HandleRXCharWrite(esp_ble_gatts_cb_param_t * param)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = param->write.conn_id;
-        event.CHIPoBLEWriteReceived.Data  = buf;
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
-        buf = NULL;
     }
 
 exit:
@@ -965,7 +967,6 @@ exit:
         }
         // TODO: fail connection???
     }
-    PacketBuffer::Free(buf);
 }
 
 void BLEManagerImpl::HandleTXCharRead(esp_ble_gatts_cb_param_t * param)

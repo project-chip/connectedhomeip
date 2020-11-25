@@ -15,19 +15,13 @@
  *    limitations under the License.
  */
 
-#import "CHIPError.h"
 #import <Foundation/Foundation.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NS_ENUM(NSUInteger, Operation) {
-    kGet = 0,
-    kSet,
-    kDelete,
-};
-
 typedef void (^SendKeyValue)(NSString * key, NSString * value);
-typedef void (^SendStatus)(NSString * key, Operation operation, NSError * status);
+typedef void (^CHIPSendSetStatus)(NSString * key, NSError * status);
+typedef void (^CHIPSendDeleteStatus)(NSString * key, NSError * status);
 
 /**
  * The protocol definition for the CHIPPersistenStorageDelegate
@@ -41,19 +35,25 @@ typedef void (^SendStatus)(NSString * key, Operation operation, NSError * status
  * Get the value for the given key
  *
  */
-- (void)GetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler;
+- (void)CHIPGetKeyValue:(NSString *)key handler:(SendKeyValue)completionHandler;
+
+/**
+ * Get the value for the given key
+ *
+ */
+- (NSString *)CHIPGetKeyValue:(NSString *)key;
 
 /**
  * Set the value of the key to the given value
  *
  */
-- (void)SetKeyValue:(NSString *)key value:(NSString *)value handler:(SendStatus)completionHandler;
+- (void)CHIPSetKeyValue:(NSString *)key value:(NSString *)value handler:(CHIPSendSetStatus)completionHandler;
 
 /**
  * Delete the key and corresponding value
  *
  */
-- (void)DeleteKeyValue:(NSString *)key handler:(SendStatus)completionHandler;
+- (void)CHIPDeleteKeyValue:(NSString *)key handler:(CHIPSendDeleteStatus)completionHandler;
 
 @end
 

@@ -48,8 +48,8 @@ _SubscribeBleCharacteristicFunct = CFUNCTYPE(
 )
 _CloseBleFunct = CFUNCTYPE(c_bool, c_void_p)
 
-# typedef void (*OnConnectFunct)(Chip::DeviceController::hipDeviceController * dc, chip::Transport::PeerConnectionState * state,
-#                                void * appReqState);
+# typedef void (*OnConnectFunct)(Chip::DeviceController::hipDeviceController * dc,
+#                                const chip::Transport::PeerConnectionState * state, void * appReqState);
 # typedef void (*OnErrorFunct)(Chip::DeviceController::ChipDeviceController * dc, void * appReqState, CHIP_ERROR err,
 #                              const Inet::IPPacketInfo * pi);
 # typedef void (*OnMessageFunct)(Chip::DeviceController::ChipDeviceController * dc, void * appReqState, PacketBuffer * buffer);

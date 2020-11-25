@@ -30,6 +30,8 @@
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSession.h>
+#include <transport/raw/MessageHeader.h>
+#include <transport/raw/PeerAddress.h>
 
 namespace chip {
 
@@ -45,10 +47,17 @@ public:
      * @brief
      *   Called when pairing session generates a new message that should be sent to peer.
      *
-     * @param msgBuf the new message that should be sent to the peer
+     * @param header the message header for the sent message
+     * @param payloadFlags payload encoding flags
+     * @param peerAddress the destination of the message
+     * @param msgBuf the raw data for the message being sent
      * @return CHIP_ERROR Error thrown when sending the message
      */
-    virtual CHIP_ERROR SendMessage(System::PacketBuffer * msgBuf) { return CHIP_NO_ERROR; }
+    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
+                                          const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf)
+    {
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
 
     /**
      * @brief
@@ -68,6 +77,17 @@ public:
 };
 
 struct SecurePairingSessionSerialized;
+
+struct SecurePairingSessionSerializable
+{
+    uint16_t mKeLen;
+    uint8_t mKe[kMAX_Hash_Length];
+    uint8_t mPairingComplete;
+    uint64_t mLocalNodeId;
+    uint64_t mPeerNodeId;
+    uint16_t mLocalKeyId;
+    uint16_t mPeerKeyId;
+};
 
 class DLL_EXPORT SecurePairingSession
 {
@@ -101,6 +121,7 @@ public:
      * @brief
      *   Create a pairing request using peer's setup PIN code.
      *
+     * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
      * @param pbkdf2IterCount  Iteration count for PBKDF2 function
      * @param salt             Salt to be used for SPAKE2P opertation
@@ -111,8 +132,9 @@ public:
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen,
-                    Optional<NodeId> myNodeId, uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount,
+                    const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId, uint16_t myKeyId,
+                    SecurePairingSessionDelegate * delegate);
 
     /**
      * @brief
@@ -132,10 +154,12 @@ public:
      *   Handler for peer's messages, exchanged during pairing handshake.
      *
      * @param packetHeader      Message header for the received message
+     * @param peerAddress Source of the message
      * @param msg         Message sent by the peer
      * @return CHIP_ERROR The result of message processing
      */
-    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg);
+    virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                         System::PacketBufferHandle msg);
 
     /**
      * @brief
@@ -173,6 +197,18 @@ public:
      **/
     CHIP_ERROR Deserialize(SecurePairingSessionSerialized & input);
 
+    /** @brief Serialize the SecurePairingSession to the given serializable data structure for secure pairing
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR ToSerializable(SecurePairingSessionSerializable & output);
+
+    /** @brief Reconstruct secure pairing class from the serializable data structure.
+     *
+     * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
+     **/
+    CHIP_ERROR FromSerializable(const SecurePairingSessionSerializable & output);
+
 private:
     CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
                     uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
@@ -204,12 +240,6 @@ private:
     /* w0s and w1s */
     uint8_t mWS[2][kSpake2p_WS_Length];
 
-    uint8_t mKe[kMAX_Hash_Length];
-
-    size_t mKeLen = sizeof(mKe);
-
-    bool mPairingComplete = false;
-
 protected:
     Optional<NodeId> mLocalNodeId = Optional<NodeId>::Value(kUndefinedNodeId);
 
@@ -218,7 +248,23 @@ protected:
     uint16_t mLocalKeyId;
 
     uint16_t mPeerKeyId;
+
+    Transport::PeerAddress mPeerAddress;
+
+    uint8_t mKe[kMAX_Hash_Length];
+
+    size_t mKeLen = sizeof(mKe);
+
+    bool mPairingComplete = false;
 };
+
+/*
+ * The following constants are node IDs that test devices and test
+ * controllers use while using the SecurePairingUsingTestSecret to
+ * establish secure channel
+ */
+constexpr chip::NodeId kTestControllerNodeId = 112233;
+constexpr chip::NodeId kTestDeviceNodeId     = 12344321;
 
 /*
  * The following class should only be used for test usecases.
@@ -229,12 +275,25 @@ protected:
 class SecurePairingUsingTestSecret : public SecurePairingSession
 {
 public:
-    SecurePairingUsingTestSecret() {}
+    SecurePairingUsingTestSecret()
+    {
+        const char * secret = "Test secret for key derivation";
+        size_t secretLen    = strlen(secret);
+        mKeLen              = secretLen;
+        memmove(mKe, secret, mKeLen);
+        mPairingComplete = true;
+    }
+
     SecurePairingUsingTestSecret(Optional<NodeId> peerNodeId, uint16_t peerKeyId, uint16_t localKeyId)
     {
-        mPeerNodeId = peerNodeId;
-        mPeerKeyId  = peerKeyId;
-        mLocalKeyId = localKeyId;
+        const char * secret = "Test secret for key derivation";
+        size_t secretLen    = strlen(secret);
+        mPeerNodeId         = peerNodeId;
+        mPeerKeyId          = peerKeyId;
+        mLocalKeyId         = localKeyId;
+        mKeLen              = secretLen;
+        memmove(mKe, secret, mKeLen);
+        mPairingComplete = true;
     }
 
     ~SecurePairingUsingTestSecret() override {}
@@ -251,27 +310,12 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    CHIP_ERROR DeriveSecureSession(const uint8_t * info, size_t info_len, SecureSession & session) override
+    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
+                                 System::PacketBufferHandle msg) override
     {
-        const char * secret = "Test secret for key derivation";
-        size_t secretLen    = strlen(secret);
-        return session.InitFromSecret(reinterpret_cast<const uint8_t *>(secret), secretLen, reinterpret_cast<const uint8_t *>(""),
-                                      0, reinterpret_cast<const uint8_t *>(secret), secretLen);
+        return CHIP_NO_ERROR;
     }
-
-    CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, System::PacketBuffer * msg) override { return CHIP_NO_ERROR; }
 };
-
-typedef struct SecurePairingSessionSerializable
-{
-    uint16_t mKeLen;
-    uint8_t mKe[kMAX_Hash_Length];
-    uint8_t mPairingComplete;
-    uint64_t mLocalNodeId;
-    uint64_t mPeerNodeId;
-    uint16_t mLocalKeyId;
-    uint16_t mPeerKeyId;
-} SecurePairingSessionSerializable;
 
 typedef struct SecurePairingSessionSerialized
 {

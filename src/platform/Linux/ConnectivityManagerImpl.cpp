@@ -46,6 +46,179 @@ using namespace ::chip::DeviceLayer::Internal;
 namespace {
 const char kWpaSupplicantServiceName[] = "fi.w1.wpa_supplicant1";
 const char kWpaSupplicantObjectPath[]  = "/fi/w1/wpa_supplicant1";
+
+constexpr uint16_t kWiFi_BAND_2_4_GHZ = 2400;
+constexpr uint16_t kWiFi_BAND_5_0_GHZ = 5000;
+
+uint16_t Map2400MHz(const uint8_t inChannel)
+{
+    uint16_t frequency = 0;
+
+    if (inChannel >= 1 && inChannel <= 13)
+    {
+        frequency = static_cast<uint16_t>(2412 + ((inChannel - 1) * 5));
+    }
+    else if (inChannel == 14)
+    {
+        frequency = 2484;
+    }
+
+    return frequency;
+}
+
+uint16_t Map5000MHz(const uint8_t inChannel)
+{
+    uint16_t frequency = 0;
+
+    switch (inChannel)
+    {
+
+    case 183:
+        frequency = 4915;
+        break;
+    case 184:
+        frequency = 4920;
+        break;
+    case 185:
+        frequency = 4925;
+        break;
+    case 187:
+        frequency = 4935;
+        break;
+    case 188:
+        frequency = 4940;
+        break;
+    case 189:
+        frequency = 4945;
+        break;
+    case 192:
+        frequency = 4960;
+        break;
+    case 196:
+        frequency = 4980;
+        break;
+    case 7:
+        frequency = 5035;
+        break;
+    case 8:
+        frequency = 5040;
+        break;
+    case 9:
+        frequency = 5045;
+        break;
+    case 11:
+        frequency = 5055;
+        break;
+    case 12:
+        frequency = 5060;
+        break;
+    case 16:
+        frequency = 5080;
+        break;
+    case 34:
+        frequency = 5170;
+        break;
+    case 36:
+        frequency = 5180;
+        break;
+    case 38:
+        frequency = 5190;
+        break;
+    case 40:
+        frequency = 5200;
+        break;
+    case 42:
+        frequency = 5210;
+        break;
+    case 44:
+        frequency = 5220;
+        break;
+    case 46:
+        frequency = 5230;
+        break;
+    case 48:
+        frequency = 5240;
+        break;
+    case 52:
+        frequency = 5260;
+        break;
+    case 56:
+        frequency = 5280;
+        break;
+    case 60:
+        frequency = 5300;
+        break;
+    case 64:
+        frequency = 5320;
+        break;
+    case 100:
+        frequency = 5500;
+        break;
+    case 104:
+        frequency = 5520;
+        break;
+    case 108:
+        frequency = 5540;
+        break;
+    case 112:
+        frequency = 5560;
+        break;
+    case 116:
+        frequency = 5580;
+        break;
+    case 120:
+        frequency = 5600;
+        break;
+    case 124:
+        frequency = 5620;
+        break;
+    case 128:
+        frequency = 5640;
+        break;
+    case 132:
+        frequency = 5660;
+        break;
+    case 136:
+        frequency = 5680;
+        break;
+    case 140:
+        frequency = 5700;
+        break;
+    case 149:
+        frequency = 5745;
+        break;
+    case 153:
+        frequency = 5765;
+        break;
+    case 157:
+        frequency = 5785;
+        break;
+    case 161:
+        frequency = 5805;
+        break;
+    case 165:
+        frequency = 5825;
+        break;
+    }
+
+    return frequency;
+}
+
+static uint16_t MapFrequency(const uint16_t inBand, const uint8_t inChannel)
+{
+    uint16_t frequency = 0;
+
+    if (inBand == kWiFi_BAND_2_4_GHZ)
+    {
+        frequency = Map2400MHz(inChannel);
+    }
+    else if (inBand == kWiFi_BAND_5_0_GHZ)
+    {
+        frequency = Map5000MHz(inChannel);
+    }
+
+    return frequency;
+}
 } // namespace
 #endif
 
@@ -135,7 +308,7 @@ exit:
     return err;
 }
 
-uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS(void)
+uint32_t ConnectivityManagerImpl::_GetWiFiStationReconnectIntervalMS()
 {
     return mWiFiStationReconnectIntervalMS;
 }
@@ -179,7 +352,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationApplicationControlled()
     return mWiFiStationMode == ConnectivityManager::kWiFiStationMode_ApplicationControlled;
 }
 
-bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
+bool ConnectivityManagerImpl::_IsWiFiStationProvisioned()
 {
     bool ret          = false;
     const gchar * bss = nullptr;
@@ -199,7 +372,7 @@ bool ConnectivityManagerImpl::_IsWiFiStationProvisioned(void)
     return ret;
 }
 
-void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
+void ConnectivityManagerImpl::_ClearWiFiStationProvision()
 {
     if (mWpaSupplicant.state != GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED)
     {
@@ -210,7 +383,7 @@ void ConnectivityManagerImpl::_ClearWiFiStationProvision(void)
     if (mWiFiStationMode != kWiFiStationMode_ApplicationControlled)
     {
         GError * err = nullptr;
-        gboolean ret = wpa_fi_w1_wpa_supplicant1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface, nullptr, &err);
+        wpa_fi_w1_wpa_supplicant1_interface_call_remove_all_networks_sync(mWpaSupplicant.iface, nullptr, &err);
 
         if (err != nullptr)
         {
@@ -225,6 +398,69 @@ bool ConnectivityManagerImpl::_CanStartWiFiScan()
 {
     return mWpaSupplicant.state == GDBusWpaSupplicant::WPA_INTERFACE_CONNECTED &&
         mWpaSupplicant.scanState == GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
+}
+
+CHIP_ERROR ConnectivityManagerImpl::_SetWiFiAPMode(WiFiAPMode val)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    VerifyOrExit(val != kWiFiAPMode_NotSupported, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (mWiFiAPMode != val)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi AP mode change: %s -> %s", WiFiAPModeToStr(mWiFiAPMode), WiFiAPModeToStr(val));
+        mWiFiAPMode = val;
+
+        SystemLayer.ScheduleWork(DriveAPState, NULL);
+    }
+
+exit:
+    return err;
+}
+
+void ConnectivityManagerImpl::_DemandStartWiFiAP()
+{
+    if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand start WiFi AP");
+        mLastAPDemandTime = System::Layer::GetClock_MonotonicMS();
+        SystemLayer.ScheduleWork(DriveAPState, NULL);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand start WiFi AP ignored, mode: %s", WiFiAPModeToStr(mWiFiAPMode));
+    }
+}
+
+void ConnectivityManagerImpl::_StopOnDemandWiFiAP()
+{
+    if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP");
+        mLastAPDemandTime = 0;
+        SystemLayer.ScheduleWork(DriveAPState, NULL);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: Demand stop WiFi AP ignored, mode: %s", WiFiAPModeToStr(mWiFiAPMode));
+    }
+}
+
+void ConnectivityManagerImpl::_MaintainOnDemandWiFiAP()
+{
+    if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
+    {
+        if (mWiFiAPState == kWiFiAPState_Active)
+        {
+            mLastAPDemandTime = System::Layer::GetClock_MonotonicMS();
+        }
+    }
+}
+
+void ConnectivityManagerImpl::_SetWiFiAPIdleTimeoutMS(uint32_t val)
+{
+    mWiFiAPIdleTimeoutMS = val;
+    SystemLayer.ScheduleWork(DriveAPState, NULL);
 }
 
 void ConnectivityManagerImpl::_OnWpaInterfaceProxyReady(GObject * source_object, GAsyncResult * res, gpointer user_data)
@@ -392,6 +628,209 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 
     if (err != nullptr)
         g_error_free(err);
+}
+
+void ConnectivityManagerImpl::DriveAPState()
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    WiFiAPState targetState;
+    uint64_t now;
+    uint32_t apTimeout;
+
+    // If the AP interface is not under application control...
+    if (mWiFiAPMode != kWiFiAPMode_ApplicationControlled)
+    {
+        // Determine the target (desired) state for AP interface...
+
+        // The target state is 'NotActive' if the application has expressly disabled the AP interface.
+        if (mWiFiAPMode == kWiFiAPMode_Disabled)
+        {
+            targetState = kWiFiAPState_NotActive;
+        }
+
+        // The target state is 'Active' if the application has expressly enabled the AP interface.
+        else if (mWiFiAPMode == kWiFiAPMode_Enabled)
+        {
+            targetState = kWiFiAPState_Active;
+        }
+
+        // The target state is 'Active' if the AP mode is 'On demand, when no station is available'
+        // and the station interface is not provisioned or the application has disabled the station
+        // interface.
+        else if (mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision &&
+                 (!IsWiFiStationProvisioned() || GetWiFiStationMode() == kWiFiStationMode_Disabled))
+        {
+            targetState = kWiFiAPState_Active;
+        }
+
+        // The target state is 'Active' if the AP mode is one of the 'On demand' modes and there
+        // has been demand for the AP within the idle timeout period.
+        else if (mWiFiAPMode == kWiFiAPMode_OnDemand || mWiFiAPMode == kWiFiAPMode_OnDemand_NoStationProvision)
+        {
+            now = System::Layer::GetClock_MonotonicMS();
+
+            if (mLastAPDemandTime != 0 && now < (mLastAPDemandTime + mWiFiAPIdleTimeoutMS))
+            {
+                targetState = kWiFiAPState_Active;
+
+                // Compute the amount of idle time before the AP should be deactivated and
+                // arm a timer to fire at that time.
+                apTimeout = (uint32_t)((mLastAPDemandTime + mWiFiAPIdleTimeoutMS) - now);
+                err       = SystemLayer.StartTimer(apTimeout, DriveAPState, NULL);
+                SuccessOrExit(err);
+                ChipLogProgress(DeviceLayer, "Next WiFi AP timeout in %" PRIu32 " s", apTimeout / 1000);
+            }
+            else
+            {
+                targetState = kWiFiAPState_NotActive;
+            }
+        }
+
+        // Otherwise the target state is 'NotActive'.
+        else
+        {
+            targetState = kWiFiAPState_NotActive;
+        }
+
+        // If the current AP state does not match the target state...
+        if (mWiFiAPState != targetState)
+        {
+            if (targetState == kWiFiAPState_Active)
+            {
+                err = ConfigureWiFiAP();
+                SuccessOrExit(err);
+
+                ChangeWiFiAPState(kWiFiAPState_Active);
+            }
+            else
+            {
+                if (mWpaSupplicant.networkPath)
+                {
+                    GError * error = nullptr;
+
+                    gboolean result = wpa_fi_w1_wpa_supplicant1_interface_call_remove_network_sync(
+                        mWpaSupplicant.iface, mWpaSupplicant.networkPath, nullptr, &error);
+
+                    if (result)
+                    {
+                        ChipLogProgress(DeviceLayer, "wpa_supplicant: removed network: %s", mWpaSupplicant.networkPath);
+                        g_free(mWpaSupplicant.networkPath);
+                        mWpaSupplicant.networkPath = nullptr;
+                        ChangeWiFiAPState(kWiFiAPState_NotActive);
+                    }
+                    else
+                    {
+                        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to stop AP mode with error: %s",
+                                        error ? error->message : "unknown error");
+                        err = CHIP_ERROR_INTERNAL;
+                    }
+
+                    if (error != nullptr)
+                        g_error_free(error);
+                }
+            }
+        }
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        SetWiFiAPMode(kWiFiAPMode_Disabled);
+        ChipLogError(DeviceLayer, "Drive AP state failed: %s", ErrorStr(err));
+    }
+}
+
+CHIP_ERROR ConnectivityManagerImpl::ConfigureWiFiAP()
+{
+    CHIP_ERROR ret  = CHIP_NO_ERROR;
+    GError * err    = nullptr;
+    GVariant * args = nullptr;
+    GVariantBuilder builder;
+
+    uint16_t channel       = 1;
+    uint16_t discriminator = 0;
+    char ssid[32];
+
+    channel = MapFrequency(kWiFi_BAND_2_4_GHZ, CHIP_DEVICE_CONFIG_WIFI_AP_CHANNEL);
+
+    if (ConfigurationMgr().GetSetupDiscriminator(discriminator) != CHIP_NO_ERROR)
+        discriminator = 0;
+
+    snprintf(ssid, 32, "%s%04u", CHIP_DEVICE_CONFIG_WIFI_AP_SSID_PREFIX, discriminator);
+
+    ChipLogProgress(DeviceLayer, "wpa_supplicant: ConfigureWiFiAP, ssid: %s, channel: %d", ssid, channel);
+
+    // Clean up current network if exists
+    if (mWpaSupplicant.networkPath)
+    {
+        g_object_unref(mWpaSupplicant.networkPath);
+        mWpaSupplicant.networkPath = nullptr;
+    }
+
+    g_variant_builder_init(&builder, G_VARIANT_TYPE_VARDICT);
+    g_variant_builder_add(&builder, "{sv}", "ssid", g_variant_new_string(ssid));
+    g_variant_builder_add(&builder, "{sv}", "key_mgmt", g_variant_new_string("NONE"));
+    g_variant_builder_add(&builder, "{sv}", "mode", g_variant_new_int32(2));
+    g_variant_builder_add(&builder, "{sv}", "frequency", g_variant_new_int32(channel));
+    args = g_variant_builder_end(&builder);
+
+    gboolean result = wpa_fi_w1_wpa_supplicant1_interface_call_add_network_sync(mWpaSupplicant.iface, args,
+                                                                                &mWpaSupplicant.networkPath, nullptr, &err);
+
+    if (result)
+    {
+        GError * error = nullptr;
+
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: added network: SSID: %s: %s", ssid, mWpaSupplicant.networkPath);
+
+        result = wpa_fi_w1_wpa_supplicant1_interface_call_select_network_sync(mWpaSupplicant.iface, mWpaSupplicant.networkPath,
+                                                                              nullptr, &error);
+        if (result)
+        {
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: succeeded to start softAP: SSID: %s", ssid);
+        }
+        else
+        {
+            ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to start softAP: SSID: %s: %s", ssid,
+                            error ? error->message : "unknown error");
+
+            ret = CHIP_ERROR_INTERNAL;
+        }
+
+        if (error != nullptr)
+            g_error_free(error);
+    }
+    else
+    {
+        ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to add network: %s: %s", ssid, err ? err->message : "unknown error");
+
+        if (mWpaSupplicant.networkPath)
+        {
+            g_object_unref(mWpaSupplicant.networkPath);
+            mWpaSupplicant.networkPath = nullptr;
+        }
+
+        ret = CHIP_ERROR_INTERNAL;
+    }
+
+    if (err != nullptr)
+        g_error_free(err);
+
+    return ret;
+}
+
+void ConnectivityManagerImpl::ChangeWiFiAPState(WiFiAPState newState)
+{
+    if (mWiFiAPState != newState)
+    {
+        ChipLogProgress(DeviceLayer, "WiFi AP state change: %s -> %s", WiFiAPStateToStr(mWiFiAPState), WiFiAPStateToStr(newState));
+        mWiFiAPState = newState;
+    }
+}
+
+void ConnectivityManagerImpl::DriveAPState(::chip::System::Layer * aLayer, void * aAppState, ::chip::System::Error aError)
+{
+    sInstance.DriveAPState();
 }
 #endif // CHIP_DEVICE_CONFIG_ENABLE_WPA
 

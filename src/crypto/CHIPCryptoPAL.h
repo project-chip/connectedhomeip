@@ -106,6 +106,7 @@ template <typename Sig>
 class ECPKey
 {
 public:
+    virtual ~ECPKey() {}
     virtual SupportedECPKeyTypes Type() const = 0;
     virtual size_t Length() const             = 0;
     virtual operator const uint8_t *() const  = 0;
@@ -181,6 +182,8 @@ template <typename PK, typename Secret, typename Sig>
 class ECPKeypair
 {
 public:
+    virtual ~ECPKeypair() {}
+
     /** @brief Generate a new Certificate Signing Request (CSR).
      * @param csr Newly generated CSR
      * @param csr_length The caller provides the length of input buffer (csr). The function returns the actual length of generated

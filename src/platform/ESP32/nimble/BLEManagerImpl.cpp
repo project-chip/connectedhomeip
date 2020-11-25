@@ -241,10 +241,13 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
         break;
 
-    case DeviceEventType::kCHIPoBLEWriteReceived:
+    case DeviceEventType::kCHIPoBLEWriteReceived: {
+        System::PacketBufferHandle data_ForNow;
+        data_ForNow.Adopt(event->CHIPoBLEWriteReceived.Data);
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
-                            event->CHIPoBLEWriteReceived.Data);
-        break;
+                            std::move(data_ForNow));
+    }
+    break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
@@ -442,7 +445,7 @@ void BLEManagerImpl::DriveBLEState(void)
             err = StartAdvertising();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Configure Adv Data failed: %s", ErrorStr(err));
+                ChipLogError(DeviceLayer, "Start advertising failed: %s", ErrorStr(err));
                 ExitNow();
             }
 
@@ -657,15 +660,14 @@ exit:
 
 void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    PacketBuffer * buf = NULL;
-    uint16_t data_len  = 0;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    uint16_t data_len = 0;
 
     ESP_LOGI(TAG, "Write request received for CHIPoBLE RX characteristic con %u %u", param->conn_handle, param->attr_handle);
 
     // Copy the data to a PacketBuffer.
-    buf = PacketBuffer::New(0);
-    VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    PacketBufferHandle buf = PacketBuffer::New(0);
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     data_len = OS_MBUF_PKTLEN(param->ctxt->om);
     VerifyOrExit(buf->AvailableDataLength() >= data_len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     ble_hs_mbuf_to_flat(param->ctxt->om, buf->Start(), data_len, NULL);
@@ -676,19 +678,14 @@ void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = param->conn_handle;
-        event.CHIPoBLEWriteReceived.Data  = buf;
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
-        buf = NULL;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
-    }
-    if (buf != NULL)
-    {
-        PacketBuffer::Free(buf);
     }
 }
 
@@ -931,8 +928,6 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
         break;
 
     case BLE_GAP_EVENT_ADV_COMPLETE:
-        err = sInstance.StartAdvertising();
-        SuccessOrExit(err);
         ESP_LOGD(TAG, "BLE_GAP_EVENT_ADV_COMPLETE event");
         break;
 
@@ -1057,6 +1052,24 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
 
 exit:
+    if (err == BLE_HS_EALREADY && connectable)
+    {
+        ChipLogProgress(DeviceLayer,
+                        "Connectable advertising failed because device was already advertising , stop active advertisement");
+        err = ble_gap_adv_stop();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
+        }
+        else
+        {
+            err = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Retried adv start; ble_gap_adv_start() failed: %s", ErrorStr(err));
+            }
+        }
+    }
     return err;
 }
 

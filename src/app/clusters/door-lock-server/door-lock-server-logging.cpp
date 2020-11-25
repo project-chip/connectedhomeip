@@ -44,10 +44,12 @@
 
 #include <support/CodeUtils.h>
 
+using namespace chip;
+
 static EmberAfPluginDoorLockServerLogEntry entries[EMBER_AF_PLUGIN_DOOR_LOCK_SERVER_MAX_LOG_ENTRIES];
 static uint8_t nextEntryId = 1;
 
-#define ENTRY_ID_TO_INDEX(entryId) ((entryId) -1)
+#define ENTRY_ID_TO_INDEX(entryId) static_cast<uint8_t>((entryId) -1)
 #define ENTRY_ID_IS_VALID(entryId) ((entryId) > 0 && (entryId) < nextEntryId)
 #define MOST_RECENT_ENTRY_ID() (nextEntryId - 1)
 #define LOG_IS_EMPTY() (nextEntryId == 1)
@@ -55,7 +57,7 @@ static uint8_t nextEntryId = 1;
 static bool loggingIsEnabled(void)
 {
     // This is hardcoded to endpoint 1 because...we need to add endpoint support...
-    uint8_t endpoint     = 1;
+    EndpointId endpoint  = 1;
     bool logging         = false;
     EmberAfStatus status = emberAfReadServerAttribute(endpoint, ZCL_DOOR_LOCK_CLUSTER_ID, ZCL_ENABLE_LOGGING_ATTRIBUTE_ID,
                                                       (uint8_t *) &logging, sizeof(logging));
@@ -101,7 +103,7 @@ bool emberAfPluginDoorLockServerGetLogEntry(uint16_t * entryId, EmberAfPluginDoo
 
     if (!ENTRY_ID_IS_VALID(*entryId))
     {
-        *entryId = MOST_RECENT_ENTRY_ID();
+        *entryId = static_cast<uint16_t>(MOST_RECENT_ENTRY_ID());
     }
     assert(ENTRY_ID_IS_VALID(*entryId));
 

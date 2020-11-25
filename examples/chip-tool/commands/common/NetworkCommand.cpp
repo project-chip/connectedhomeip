@@ -22,7 +22,7 @@ using namespace ::chip;
 using namespace ::chip::DeviceController;
 using namespace ::chip::System;
 
-static void onConnect(ChipDeviceController * dc, Transport::PeerConnectionState * state, void * appReqState)
+static void onConnect(ChipDeviceController * dc, const Transport::PeerConnectionState * state, void * appReqState)
 {
     ChipLogDetail(chipTool, "OnConnect");
 
@@ -38,14 +38,12 @@ static void onError(ChipDeviceController * dc, void * appReqState, CHIP_ERROR er
     command->OnError(dc, err);
 }
 
-static void onMessage(ChipDeviceController * dc, void * appReqState, PacketBuffer * buffer)
+static void onMessage(ChipDeviceController * dc, void * appReqState, PacketBufferHandle buffer)
 {
     ChipLogDetail(chipTool, "OnMessage: Received %zu bytes", buffer->DataLength());
 
     NetworkCommand * command = reinterpret_cast<NetworkCommand *>(dc->AppState);
-    command->OnMessage(dc, buffer);
-
-    PacketBuffer::Free(buffer);
+    command->OnMessage(dc, std::move(buffer));
 }
 
 CHIP_ERROR NetworkCommand::Run(ChipDeviceController * dc, NodeId remoteId)

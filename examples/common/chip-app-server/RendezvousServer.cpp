@@ -26,6 +26,7 @@
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
 #endif
+#include <lib/mdns/DiscoveryManager.h>
 
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -35,9 +36,9 @@ namespace chip {
 
 RendezvousServer::RendezvousServer() : mRendezvousSession(this) {}
 
-CHIP_ERROR RendezvousServer::Init(const RendezvousParameters & params)
+CHIP_ERROR RendezvousServer::Init(const RendezvousParameters & params, TransportMgrBase * transportMgr)
 {
-    return mRendezvousSession.Init(params);
+    return mRendezvousSession.Init(params, transportMgr);
 }
 
 void RendezvousServer::OnRendezvousError(CHIP_ERROR err)
@@ -55,9 +56,15 @@ void RendezvousServer::OnRendezvousConnectionClosed()
     ChipLogProgress(AppServer, "OnRendezvousConnectionClosed");
 }
 
-void RendezvousServer::OnRendezvousMessageReceived(PacketBuffer * buffer)
+void RendezvousServer::OnRendezvousMessageReceived(const PacketHeader & packetHeader, const PeerAddress & peerAddress,
+                                                   System::PacketBufferHandle buffer)
+{}
+
+void RendezvousServer::OnRendezvousComplete()
 {
-    chip::System::PacketBuffer::Free(buffer);
+    ChipLogProgress(AppServer, "Device completed Rendezvous process");
+    SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, mRendezvousSession.GetRemoteNodeId().Value(),
+                                &mRendezvousSession.GetPairingSession());
 }
 
 void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
@@ -68,10 +75,11 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
         ChipLogProgress(AppServer, "Device completed SPAKE2+ handshake");
-        SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, &mRendezvousSession.GetPairingSession());
         break;
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
         ChipLogProgress(AppServer, "Device was assigned network credentials");
+        chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice();
+
         break;
     default:
         break;

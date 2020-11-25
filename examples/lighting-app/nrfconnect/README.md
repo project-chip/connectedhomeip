@@ -12,6 +12,7 @@ An example application showing the use
         -   [Using Docker container](#using-docker-container)
         -   [Using Native shell](#using-native-shell)
         -   [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
+        -   [Building minimal binary](#building-minimal-binary)
     -   [Configuring the example](#configuring-the-example)
     -   [Flashing and debugging](#flashing-and-debugging)
     -   [Accessing the command line](#accessing-the-command-line)
@@ -118,7 +119,8 @@ container:
         $ mkdir ~/nrfconnect
         $ mkdir ~/connectedhomeip
         $ docker pull nordicsemi/nrfconnect-chip
-        $ docker run --rm -it -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
+        $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
+            -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
 
 > **Note**:
 >
@@ -132,14 +134,16 @@ container:
 >     connected to your computer such as the nRF52840 DK.
 > -   `--rm` flag can be omitted if you don't want the container to be
 >     auto-removed when you exit the container shell session.
+> -   `-e RUNAS=$(id -u)` is needed to start the container session as the
+>     current user instead of root.
 
 If you use the container for the first time and you don't have nRF Connect SDK
 and CHIP sources downloaded yet, run `setup` command in the container to pull
 the sources into directories mounted as `/var/ncs` and `/var/chip`,
 respectively:
 
-        $ setup --ncs 83764f
-        /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [83764f]? [Y/N] y
+        $ setup --ncs v1.4.0
+        /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [v1.4.0]? [Y/N] y
         ...
         /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
         ...
@@ -202,14 +206,39 @@ After a successful build, the binary will be available under
 ### Supported nRF Connect SDK versions
 
 It is recommended to use the nRF Connect version which is being verified as a
-part of CHIP Continuous Integration testing, which happens to be `83764f` at the
+part of CHIP Continuous Integration testing, which happens to be `v1.4.0` at the
 moment. You may verify that the revision is used in
 [chip-build-nrf-platform](https://github.com/project-chip/connectedhomeip/blob/master/integrations/docker/images/chip-build-nrf-platform/Dockerfile)
 Docker image in case of doubt.
 
 Please refer to
 [this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories)
-in the user guide to learn how to update nRF Connect SDK repository.
+in the user guide to learn how to update nRF Connect SDK repository. For example
+to checkout given `v1.4.0` revision the following commands should be called:
+
+        # Phrase <nrfconnect-dir> should be replaced with an absolute path to nRF Connect SDK source directory.
+        $ cd <nrfconnect-dir>/nrf
+
+        $ git fetch origin
+        $ git checkout v1.4.0
+        $ west update
+
+Alternatively, if you use the docker container, you may execute the following
+command instead:
+
+        $ setup --ncs v1.4.0
+
+### Building minimal binary
+
+In order to build the example with no diagnostic features like UART console or
+application logs, which should result in significantly smaller binary, run the
+following commands:
+
+        # Delete the build directory to make sure that no settings are cached
+        $ rm -rf build/
+
+        # Build the example using release config overlay
+        $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/release.conf
 
 <a name="configuring"></a>
 

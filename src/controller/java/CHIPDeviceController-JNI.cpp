@@ -28,7 +28,7 @@
 #include "AndroidDeviceControllerWrapper.h"
 
 #include <ble/BleUUID.h>
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 #include <jni.h>
 #include <pthread.h>
 #include <support/CHIPMem.h>
@@ -66,8 +66,9 @@ using namespace chip::DeviceController;
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
-static void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState);
-static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+static void HandleKeyExchange(ChipDeviceController * deviceController, const Transport::PeerConnectionState * state,
+                              void * appReqState);
+static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBufferHandle payload);
 static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, const char * operation);
 static void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 static bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
@@ -106,7 +107,6 @@ pthread_t sIOThread        = PTHREAD_NULL;
 bool sShutdown             = false;
 
 jclass sAndroidChipStackCls              = NULL;
-jclass sChipDeviceControllerCls          = NULL;
 jclass sChipDeviceControllerExceptionCls = NULL;
 
 /** A scoped lock/unlock around a mutex. */
@@ -128,13 +128,27 @@ struct StackUnlockGuard
     ~StackUnlockGuard() { pthread_mutex_lock(&sStackLock); }
 };
 
+class JniUtfString
+{
+public:
+    JniUtfString(JNIEnv * env, jstring string) : mEnv(env), mString(string) { mChars = env->GetStringUTFChars(string, 0); }
+    ~JniUtfString() { mEnv->ReleaseStringUTFChars(mString, mChars); }
+
+    const char * c_str() const { return mChars; }
+
+private:
+    JNIEnv * mEnv;
+    jstring mString;
+    const char * mChars;
+};
+
 } // namespace
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
 // knowing its id, because the ID can be learned on the first response that is received.
-chip::NodeId kLocalDeviceId  = 112233;
-chip::NodeId kRemoteDeviceId = 12344321;
+chip::NodeId kLocalDeviceId  = chip::kTestControllerNodeId;
+chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
 
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
@@ -155,8 +169,6 @@ jint JNI_OnLoad(JavaVM * jvm, void * reserved)
     ChipLogProgress(Controller, "Loading Java class references.");
 
     // Get various class references need by the API.
-    err = GetClassRef(env, "chip/devicecontroller/ChipDeviceController", sChipDeviceControllerCls);
-    SuccessOrExit(err);
     err = GetClassRef(env, "chip/devicecontroller/AndroidChipStack", sAndroidChipStackCls);
     SuccessOrExit(err);
     err = GetClassRef(env, "chip/devicecontroller/ChipDeviceControllerException", sChipDeviceControllerExceptionCls);
@@ -243,18 +255,14 @@ JNI_METHOD(jlong, newDeviceController)(JNIEnv * env, jobject self)
     wrapper = AndroidDeviceControllerWrapper::AllocateNew(kLocalDeviceId, &sSystemLayer, &sInetLayer, &err);
     SuccessOrExit(err);
 
-    wrapper->Controller()->AppState = (void *) env->NewGlobalRef(self);
-    result                          = wrapper->ToJNIHandle();
+    wrapper->SetJavaObjectRef(sJVM, self);
+    result = wrapper->ToJNIHandle();
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         if (wrapper != NULL)
         {
-            if (wrapper->Controller()->AppState != NULL)
-            {
-                env->DeleteGlobalRef((jobject) wrapper->Controller()->AppState);
-            }
             delete wrapper;
         }
 
@@ -292,6 +300,20 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong handle, j
     }
 }
 
+JNI_METHOD(void, sendWiFiCredentials)(JNIEnv * env, jobject self, jlong handle, jstring ssid, jstring password)
+{
+    JniUtfString ssidStr(env, ssid);
+    JniUtfString passwordStr(env, password);
+
+    ChipLogProgress(Controller, "Sending Wi-Fi credentials for: %s", ssidStr.c_str());
+    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
+}
+
+JNI_METHOD(void, deprecatedHardcodeThreadCredentials)(JNIEnv * env, jobject self, jlong handle)
+{
+    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->DeprecatedHardcodeThreadCredentials();
+}
+
 JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
@@ -306,8 +328,8 @@ JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong handle,
 
     {
         ScopedPthreadLock lock(&sStackLock);
-        err = wrapper->Controller()->ConnectDeviceWithoutSecurePairing(kRemoteDeviceId, deviceIPAddr, nullptr, HandleKeyExchange,
-                                                                       HandleEchoResponse, HandleError, CHIP_PORT);
+        err = wrapper->Controller()->ConnectDeviceWithoutSecurePairing(
+            kRemoteDeviceId, deviceIPAddr, (void *) "ConnectDevice", HandleKeyExchange, HandleEchoResponse, HandleError, CHIP_PORT);
     }
 
     if (err != CHIP_NO_ERROR)
@@ -330,8 +352,8 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
     {
         ScopedPthreadLock lock(&sStackLock);
 
-        auto * buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
-        if (buffer == nullptr)
+        System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
+        if (buffer.IsNull())
         {
             err = CHIP_ERROR_NO_MEMORY;
         }
@@ -339,7 +361,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
         {
             memcpy(buffer->Start(), messageStr, messageLen);
             buffer->SetDataLength(messageLen);
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer);
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
         }
     }
 
@@ -367,10 +389,10 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
         ScopedPthreadLock lock(&sStackLock);
 
         // Make sure our buffer is big enough, but this will need a better setup!
-        static const size_t bufferSize = 1024;
-        auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
+        static const size_t bufferSize    = 1024;
+        System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(bufferSize);
 
-        if (buffer == nullptr)
+        if (buffer.IsNull())
         {
             err = CHIP_ERROR_NO_MEMORY;
         }
@@ -399,7 +421,7 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
             buffer->SetDataLength(dataLength);
 
             // Hardcode endpoint to 1 for now
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer);
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
         }
     }
 
@@ -433,7 +455,7 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
 
     chip::Ble::ChipBleUUID svcUUID;
     chip::Ble::ChipBleUUID charUUID;
-    chip::System::PacketBuffer * buffer = nullptr;
+    chip::System::PacketBufferHandle buffer;
 
     VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
                  ChipLogError(Controller, "handleIndicationReceived() called with invalid service ID"));
@@ -441,13 +463,13 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
                  ChipLogError(Controller, "handleIndicationReceived() called with invalid characteristic ID"));
 
     buffer = System::PacketBuffer::NewWithAvailableSize(valueLength);
-    VerifyOrExit(buffer, ChipLogError(Controller, "Failed to allocate packet buffer"));
+    VerifyOrExit(!buffer.IsNull(), ChipLogError(Controller, "Failed to allocate packet buffer"));
 
     memcpy(buffer->Start(), valueBegin, valueLength);
     buffer->SetDataLength(valueLength);
 
     pthread_mutex_lock(&sStackLock);
-    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, buffer);
+    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, std::move(buffer));
     pthread_mutex_unlock(&sStackLock);
 exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
@@ -577,10 +599,6 @@ JNI_METHOD(void, deleteDeviceController)(JNIEnv * env, jobject self, jlong handl
 
     if (wrapper != NULL)
     {
-        if (wrapper->Controller()->AppState != NULL)
-        {
-            env->DeleteGlobalRef((jobject) wrapper->Controller()->AppState);
-        }
         delete wrapper;
     }
 }
@@ -592,7 +610,7 @@ void HandleSimpleOperationComplete(ChipDeviceController * deviceController, cons
     jclass deviceControllerCls;
     jmethodID methodID;
     char methodName[128];
-    jobject self   = (jobject) deviceController->AppState;
+    jobject self   = AndroidDeviceControllerWrapper::FromController(deviceController)->JavaObjectRef();
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(Controller, "Received response to %s request", operation);
@@ -647,18 +665,18 @@ exit:
     env->ExceptionClear();
 }
 
-void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState)
+void HandleKeyExchange(ChipDeviceController * deviceController, const Transport::PeerConnectionState * state, void * appReqState)
 {
     HandleSimpleOperationComplete(deviceController, (const char *) appReqState);
 }
 
-void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
+void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBufferHandle payload)
 {
     StackUnlockGuard unlockGuard;
     JNIEnv * env;
     jclass deviceControllerCls;
     jmethodID methodID;
-    jobject self      = (jobject) deviceController->AppState;
+    jobject self      = AndroidDeviceControllerWrapper::FromController(deviceController)->JavaObjectRef();
     jstring msgString = NULL;
     CHIP_ERROR err    = CHIP_NO_ERROR;
 
@@ -685,7 +703,6 @@ void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqSt
 
 exit:
     env->ExceptionClear();
-    System::PacketBuffer::Free(payload);
 }
 
 void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)
@@ -924,7 +941,8 @@ void HandleNewConnection(void * appState, const uint16_t discriminator)
     JNIEnv * env;
     jmethodID method;
     jclass deviceControllerCls;
-    jobject self = (jobject) appState;
+    AndroidDeviceControllerWrapper * wrapper = reinterpret_cast<AndroidDeviceControllerWrapper *>(appState);
+    jobject self                             = wrapper->JavaObjectRef();
 
     ChipLogProgress(Controller, "Received New Connection");
 
@@ -957,7 +975,7 @@ void HandleError(ChipDeviceController * deviceController, void * appReqState, CH
     jclass cls;
     jmethodID method;
     jthrowable ex;
-    jobject self = (jobject) deviceController->AppState;
+    jobject self = AndroidDeviceControllerWrapper::FromController(deviceController)->JavaObjectRef();
 
     ChipLogError(Controller, "HandleError");
 

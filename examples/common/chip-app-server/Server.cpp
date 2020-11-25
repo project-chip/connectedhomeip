@@ -25,6 +25,7 @@
 #include <inet/IPAddress.h>
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
+#include <lib/mdns/DiscoveryManager.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -39,23 +40,20 @@ using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
 
-#ifndef EXAMPLE_SERVER_NODEID
-#define EXAMPLE_SERVER_NODEID 12344321
-#endif // EXAMPLE_SERVER_NODEID
-
 namespace {
 
 class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
-                           System::PacketBuffer * buffer, SecureSessionMgrBase * mgr) override
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
+                           const Transport::PeerConnectionState * state, System::PacketBufferHandle buffer,
+                           SecureSessionMgr * mgr) override
     {
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
 
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(buffer != NULL, ChipLogProgress(AppServer, "Received data but couldn't process it..."));
+        VerifyOrExit(!buffer.IsNull(), ChipLogProgress(AppServer, "Received data but couldn't process it..."));
         VerifyOrExit(header.GetSourceNodeId().HasValue(), ChipLogProgress(AppServer, "Unknown source for received message"));
 
         VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ChipLogProgress(AppServer, "Unknown source for received message"));
@@ -64,32 +62,26 @@ public:
 
         ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
 
-        HandleDataModelMessage(header, buffer, mgr);
-        buffer = NULL;
+        HandleDataModelMessage(header, std::move(buffer), mgr);
 
-    exit:
-        // HandleDataModelMessage calls Free on the buffer without an AddRef, if HandleDataModelMessage was not called, free the
-        // buffer.
-        if (buffer != NULL)
-        {
-            System::PacketBuffer::Free(buffer);
-        }
+    exit:;
     }
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
+    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
     {
         ChipLogProgress(AppServer, "Received a new connection.");
     }
 };
 
-DemoSessionManager gSessions;
+DemoTransportMgr gTransports;
+SecureSessionMgr gSessions;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
 RendezvousServer gRendezvousServer;
 
 } // namespace
 
-SecureSessionMgrBase & chip::SessionManager()
+SecureSessionMgr & chip::SessionManager()
 {
     return gSessions;
 }
@@ -103,30 +95,33 @@ void InitServer()
 
     InitDataModelHandler();
 
-    err = gSessions.Init(EXAMPLE_SERVER_NODEID, &DeviceLayer::SystemLayer,
-                         UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    // Init transport before operations with secure session mgr.
+    err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+    SuccessOrExit(err);
+
+    err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
     // This flag is used to bypass BLE in the cirque test
     // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
-#ifndef BYPASS_RENDEZVOUS
+#ifndef CHIP_BYPASS_RENDEZVOUS
     {
         RendezvousParameters params;
         uint32_t pinCode;
 
         SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
         params.SetSetupPINCode(pinCode)
-            .SetLocalNodeId(EXAMPLE_SERVER_NODEID)
+            .SetLocalNodeId(chip::kTestDeviceNodeId)
             .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
-        SuccessOrExit(err = gRendezvousServer.Init(params));
+        SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
     }
 #endif
 
-    err = gSessions.NewPairing(peer, &gTestPairing);
+    err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
 
     gSessions.SetDelegate(&gCallbacks);
-
+    chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice(chip::Inet::kIPAddressType_IPv6);
 exit:
     if (err != CHIP_NO_ERROR)
     {

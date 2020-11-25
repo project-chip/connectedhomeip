@@ -62,6 +62,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <utility>
 
 // SOCK_CLOEXEC not defined on all platforms, e.g. iOS/macOS:
 #ifdef SOCK_CLOEXEC
@@ -1385,7 +1386,9 @@ void TCPEndPoint::DriveReceiving()
     {
         PacketBuffer * rcvQueue = mRcvQueue;
         mRcvQueue               = nullptr;
-        OnDataReceived(this, rcvQueue);
+        System::PacketBufferHandle rcvQueue_ForNow;
+        rcvQueue_ForNow.Adopt(rcvQueue);
+        OnDataReceived(this, std::move(rcvQueue_ForNow));
     }
 
     // If the connection is closing, and the receive queue is now empty, call DoClose() to complete
@@ -2326,7 +2329,7 @@ void TCPEndPoint::ReceiveData()
     bool isNewBuf = true;
 
     if (mRcvQueue == nullptr)
-        rcvBuf = PacketBuffer::New(0);
+        rcvBuf = PacketBuffer::New(0).Release_ForNow();
     else
     {
         rcvBuf = mRcvQueue;
@@ -2334,7 +2337,7 @@ void TCPEndPoint::ReceiveData()
             ;
 
         if (rcvBuf->AvailableDataLength() == 0)
-            rcvBuf = PacketBuffer::New(0);
+            rcvBuf = PacketBuffer::New(0).Release_ForNow();
         else
         {
             isNewBuf = false;

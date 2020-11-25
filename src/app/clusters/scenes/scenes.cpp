@@ -42,6 +42,10 @@
 #include "app/util/common.h"
 #include <app/util/af.h>
 
+#ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
+#include <app/clusters/groups-server/groups-server.h>
+#endif
+
 #ifdef EMBER_AF_PLUGIN_ZLL_SCENES_SERVER
 #include "../zll-scenes-server/zll-scenes-server.h"
 #endif
@@ -53,7 +57,7 @@ uint8_t emberAfPluginScenesServerEntriesInUse = 0;
 EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[EMBER_AF_PLUGIN_SCENES_TABLE_SIZE];
 #endif
 
-static bool readServerAttribute(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, const char * name,
+static bool readServerAttribute(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, const char * name,
                                 uint8_t * data, uint8_t size)
 {
     bool success = false;
@@ -72,8 +76,8 @@ static bool readServerAttribute(uint8_t endpoint, EmberAfClusterId clusterId, Em
     return success;
 }
 
-static EmberAfStatus writeServerAttribute(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                          const char * name, uint8_t * data, EmberAfAttributeType type)
+static EmberAfStatus writeServerAttribute(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, const char * name,
+                                          uint8_t * data, EmberAfAttributeType type)
 {
     EmberAfStatus status = emberAfWriteServerAttribute(endpoint, clusterId, attributeId, data, type);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
@@ -83,7 +87,16 @@ static EmberAfStatus writeServerAttribute(uint8_t endpoint, EmberAfClusterId clu
     return status;
 }
 
-void emberAfScenesClusterServerInitCallback(uint8_t endpoint)
+bool isEndpointInGroup(EndpointId endpoint, GroupId groupId)
+{
+#ifdef EMBER_AF_PLUGIN_GROUPS_SERVER
+    return (groupId == ZCL_SCENES_GLOBAL_SCENE_GROUP_ID || emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId));
+#else
+    return (groupId == ZCL_SCENES_GLOBAL_SCENE_GROUP_ID);
+#endif // EMBER_AF_PLUGIN_GROUPS_SERVER
+}
+
+void emberAfScenesClusterServerInitCallback(EndpointId endpoint)
 {
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
     {
@@ -109,13 +122,13 @@ void emberAfScenesClusterServerInitCallback(uint8_t endpoint)
     emberAfScenesSetSceneCountAttribute(endpoint, emberAfPluginScenesServerNumSceneEntriesInUse());
 }
 
-EmberAfStatus emberAfScenesSetSceneCountAttribute(uint8_t endpoint, uint8_t newCount)
+EmberAfStatus emberAfScenesSetSceneCountAttribute(EndpointId endpoint, uint8_t newCount)
 {
     return writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_SCENE_COUNT_ATTRIBUTE_ID, "scene count", (uint8_t *) &newCount,
                                 ZCL_INT8U_ATTRIBUTE_TYPE);
 }
 
-EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, GroupId groupId)
+EmberAfStatus emberAfScenesMakeValid(EndpointId endpoint, uint8_t sceneId, GroupId groupId)
 {
     EmberAfStatus status;
     bool valid = true;
@@ -141,7 +154,7 @@ EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, GroupId 
     return status;
 }
 
-EmberAfStatus emberAfScenesClusterMakeInvalidCallback(uint8_t endpoint)
+EmberAfStatus emberAfScenesClusterMakeInvalidCallback(EndpointId endpoint)
 {
     bool valid = false;
     return writeServerAttribute(endpoint, ZCL_SCENES_CLUSTER_ID, ZCL_SCENE_VALID_ATTRIBUTE_ID, "scene valid", (uint8_t *) &valid,
@@ -214,9 +227,7 @@ bool emberAfScenesClusterRemoveSceneCallback(GroupId groupId, uint8_t sceneId)
 
     emberAfScenesClusterPrintln("RX: RemoveScene 0x%2x, 0x%x", groupId, sceneId);
 
-    // If a group id is specified but this endpoint isn't in it, take no action.
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID &&
-        !emberAfGroupsClusterEndpointInGroupCallback(emberAfCurrentEndpoint(), groupId))
+    if (!isEndpointInGroup(emberAfCurrentEndpoint(), groupId))
     {
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
     }
@@ -261,8 +272,7 @@ bool emberAfScenesClusterRemoveAllScenesCallback(GroupId groupId)
 
     emberAfScenesClusterPrintln("RX: RemoveAllScenes 0x%2x", groupId);
 
-    if (groupId == ZCL_SCENES_GLOBAL_SCENE_GROUP_ID ||
-        emberAfGroupsClusterEndpointInGroupCallback(emberAfCurrentEndpoint(), groupId))
+    if (isEndpointInGroup(emberAfCurrentEndpoint(), groupId))
     {
         uint8_t i;
         status = EMBER_ZCL_STATUS_SUCCESS;
@@ -359,8 +369,7 @@ bool emberAfScenesClusterGetSceneMembershipCallback(GroupId groupId)
 
     emberAfScenesClusterPrintln("RX: GetSceneMembership 0x%2x", groupId);
 
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID &&
-        !emberAfGroupsClusterEndpointInGroupCallback(emberAfCurrentEndpoint(), groupId))
+    if (!isEndpointInGroup(emberAfCurrentEndpoint(), groupId))
     {
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
     }
@@ -411,8 +420,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(EndpointId endpoint,
     EmberAfSceneTableEntry entry;
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
 
-    // If a group id is specified but this endpoint isn't in it, take no action.
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID && !emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId))
+    if (!isEndpointInGroup(endpoint, groupId))
     {
         return EMBER_ZCL_STATUS_INVALID_FIELD;
     }
@@ -524,7 +532,7 @@ EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(EndpointId endpoint,
 
 EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, GroupId groupId, uint8_t sceneId)
 {
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID && !emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId))
+    if (!isEndpointInGroup(endpoint, groupId))
     {
         return EMBER_ZCL_STATUS_INVALID_FIELD;
     }
@@ -646,50 +654,18 @@ EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(EndpointId endpoint, 
     return EMBER_ZCL_STATUS_NOT_FOUND;
 }
 
-void emberAfScenesClusterClearSceneTableCallback(uint8_t endpoint)
-{
-    uint8_t i, networkIndex = 0 /* emberGetCurrentNetwork() */;
-    for (i = 0; i < EMBER_AF_PLUGIN_SCENES_TABLE_SIZE; i++)
-    {
-        EmberAfSceneTableEntry entry;
-        emberAfPluginScenesServerRetrieveSceneEntry(entry, i);
-        if (entry.endpoint != EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID &&
-            (endpoint == entry.endpoint ||
-             (endpoint == EMBER_BROADCAST_ENDPOINT && (networkIndex == emberAfNetworkIndexFromEndpoint(entry.endpoint)))))
-        {
-            entry.endpoint = EMBER_AF_SCENE_TABLE_UNUSED_ENDPOINT_ID;
-            emberAfPluginScenesServerSaveSceneEntry(entry, i);
-        }
-    }
-    emberAfPluginScenesServerSetNumSceneEntriesInUse(0);
-    if (endpoint == EMBER_BROADCAST_ENDPOINT)
-    {
-        for (i = 0; i < emberAfEndpointCount(); i++)
-        {
-            if (emberAfNetworkIndexFromEndpointIndex(i) == networkIndex)
-            {
-                emberAfScenesSetSceneCountAttribute(emberAfEndpointFromIndex(i), 0);
-            }
-        }
-    }
-    else
-    {
-        emberAfScenesSetSceneCountAttribute(endpoint, 0);
-    }
-}
-
 bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, GroupId groupId, uint8_t sceneId,
                                             uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets)
 {
     EmberAfSceneTableEntry entry;
     EmberAfStatus status;
     EmberStatus sendStatus;
-    bool enhanced                    = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
-    uint16_t extensionFieldSetsLen   = (cmd->bufLen -
-                                      (cmd->payloadStartIndex + sizeof(groupId) + sizeof(sceneId) + sizeof(transitionTime) +
-                                       emberAfStringLength(sceneName) + 1));
+    bool enhanced                  = (cmd->commandId == ZCL_ENHANCED_ADD_SCENE_COMMAND_ID);
+    uint16_t extensionFieldSetsLen = static_cast<uint16_t>(
+        cmd->bufLen -
+        (cmd->payloadStartIndex + sizeof(groupId) + sizeof(sceneId) + sizeof(transitionTime) + emberAfStringLength(sceneName) + 1));
     uint16_t extensionFieldSetsIndex = 0;
-    uint8_t endpoint                 = cmd->apsFrame->destinationEndpoint;
+    EndpointId endpoint              = cmd->apsFrame->destinationEndpoint;
     uint8_t i, index = EMBER_AF_SCENE_TABLE_NULL_INDEX;
 
     emberAfScenesClusterPrint("RX: %pAddScene 0x%2x, 0x%x, 0x%2x, \"", (enhanced ? "Enhanced" : ""), groupId, sceneId,
@@ -700,7 +676,7 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
     emberAfScenesClusterPrintln("");
 
     // Add Scene commands can only reference groups to which we belong.
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID && !emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId))
+    if (!isEndpointInGroup(endpoint, groupId))
     {
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
         goto kickout;
@@ -782,7 +758,7 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
 
     while (extensionFieldSetsIndex < extensionFieldSetsLen)
     {
-        EmberAfClusterId clusterId;
+        ClusterId clusterId;
         uint8_t length;
 
         // Each extension field set must contain a two-byte cluster id and a one-
@@ -793,9 +769,9 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
             goto kickout;
         }
 
-        clusterId = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-        extensionFieldSetsIndex += 2;
-        length = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+        clusterId               = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+        extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+        length                  = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
         extensionFieldSetsIndex++;
 
         // If the length is off, the command is also malformed.
@@ -866,10 +842,10 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
             {
                 break;
             }
-            entry.hasCurrentXValue = true;
-            entry.currentXValue    = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-            extensionFieldSetsIndex += 2;
-            length -= 2;
+            entry.hasCurrentXValue  = true;
+            entry.currentXValue     = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+            length                  = static_cast<uint8_t>(length - 2);
             if (length < 2)
             {
                 break;
@@ -878,8 +854,9 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
             entry.currentYValue    = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
             if (enhanced)
             {
-                extensionFieldSetsIndex += 2;
-                length -= 2;
+                extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+                length                  = static_cast<uint8_t>(length - 2);
+                ;
                 if (length < 2)
                 {
                     break;
@@ -887,8 +864,8 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
                 entry.hasEnhancedCurrentHueValue = true;
                 entry.enhancedCurrentHueValue =
                     emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-                extensionFieldSetsIndex += 2;
-                length -= 2;
+                extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+                length                  = static_cast<uint8_t>(length - 2);
                 if (length < 1)
                 {
                     break;
@@ -919,8 +896,8 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
                 }
                 entry.hasColorLoopTimeValue = true;
                 entry.colorLoopTimeValue    = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-                extensionFieldSetsIndex += 2;
-                length -= 2;
+                extensionFieldSetsIndex     = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+                length                      = static_cast<uint8_t>(length - 2);
                 if (length < 2)
                 {
                     break;
@@ -967,7 +944,7 @@ bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, G
             break;
         }
 
-        extensionFieldSetsIndex += length;
+        extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + length);
     }
 
     // If we got this far, we either added a new entry or updated an existing one.
@@ -1007,13 +984,13 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
     EmberAfSceneTableEntry entry = {};
     EmberAfStatus status         = EMBER_ZCL_STATUS_NOT_FOUND;
     EmberStatus sendStatus;
-    bool enhanced    = (cmd->commandId == ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID);
-    uint8_t endpoint = cmd->apsFrame->destinationEndpoint;
+    bool enhanced       = (cmd->commandId == ZCL_ENHANCED_VIEW_SCENE_COMMAND_ID);
+    EndpointId endpoint = cmd->apsFrame->destinationEndpoint;
 
     emberAfScenesClusterPrintln("RX: %pViewScene 0x%2x, 0x%x", (enhanced ? "Enhanced" : ""), groupId, sceneId);
 
     // View Scene commands can only reference groups which we belong to.
-    if (groupId != ZCL_SCENES_GLOBAL_SCENE_GROUP_ID && !emberAfGroupsClusterEndpointInGroupCallback(endpoint, groupId))
+    if (!isEndpointInGroup(endpoint, groupId))
     {
         status = EMBER_ZCL_STATUS_INVALID_FIELD;
     }
@@ -1042,7 +1019,8 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
     {
         // The transition time is returned in seconds in the regular version of the
         // command and tenths of a second in the enhanced version.
-        emberAfPutInt16uInResp(enhanced ? entry.transitionTime * 10 + entry.transitionTime100ms : entry.transitionTime);
+        emberAfPutInt16uInResp(
+            static_cast<uint16_t>(enhanced ? entry.transitionTime * 10 + entry.transitionTime100ms : entry.transitionTime));
 #ifdef EMBER_AF_PLUGIN_SCENES_NAME_SUPPORT
         emberAfPutStringInResp(entry.name);
 #else
@@ -1093,17 +1071,17 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
             length = &appResponseData[appResponseLength];
             emberAfPutInt8uInResp(0); // temporary length
             emberAfPutInt16uInResp(entry.currentXValue);
-            *length += 2;
+            *length = static_cast<uint8_t>(*length + 2);
             if (entry.hasCurrentYValue)
             {
                 emberAfPutInt16uInResp(entry.currentYValue);
-                *length += 2;
+                *length = static_cast<uint8_t>(*length + 2);
                 if (enhanced)
                 {
                     if (entry.hasEnhancedCurrentHueValue)
                     {
                         emberAfPutInt16uInResp(entry.enhancedCurrentHueValue);
-                        *length += 2;
+                        *length = static_cast<uint8_t>(*length + 2);
                         if (entry.hasCurrentSaturationValue)
                         {
                             emberAfPutInt8uInResp(entry.currentSaturationValue);
@@ -1119,11 +1097,11 @@ bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, 
                                     if (entry.hasColorLoopTimeValue)
                                     {
                                         emberAfPutInt16uInResp(entry.colorLoopTimeValue);
-                                        *length += 2;
+                                        *length = static_cast<uint8_t>(*length + 2);
                                         if (entry.hasColorTemperatureMiredsValue)
                                         {
                                             emberAfPutInt16uInResp(entry.colorTemperatureMiredsValue);
-                                            *length += 2;
+                                            *length = static_cast<uint8_t>(*length + 2);
                                         }
                                     }
                                 }

@@ -33,7 +33,6 @@
 
 using namespace ::chip;
 
-extern "C" {
 /**
  * Handle a message that should be processed via our data model processing
  * codepath. This function will free the packet buffer.
@@ -41,7 +40,7 @@ extern "C" {
  * @param [in] buffer The buffer holding the message.  This function guarantees
  *                    that it will free the buffer before returning.
  */
-void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * buffer, SecureSessionMgrBase * mgr)
+void HandleDataModelMessage(const PacketHeader & header, System::PacketBufferHandle buffer, SecureSessionMgr * mgr)
 {
     EmberApsFrame frame;
     bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
@@ -52,7 +51,6 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * 
     else
     {
         ChipLogProgress(Zcl, "APS frame processing failure!");
-        System::PacketBuffer::Free(buffer);
         return;
     }
 
@@ -63,8 +61,6 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * 
                                message, messageLen,
                                header.GetSourceNodeId().Value(), // source identifier
                                NULL);
-
-    System::PacketBuffer::Free(buffer);
 
     if (ok)
     {
@@ -80,5 +76,4 @@ void InitDataModelHandler()
 {
     emberAfEndpointConfigure();
     emberAfInit();
-}
 }

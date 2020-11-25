@@ -119,9 +119,10 @@ bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand
     // the payload if the status is SUCCESS.
     if (status == EMBER_ZCL_STATUS_SUCCESS)
     {
-        uint16_t extensionFieldSetsLen   = (emberAfCurrentCommand()->bufLen -
-                                          (emberAfCurrentCommand()->payloadStartIndex + sizeof(status) + sizeof(groupId) +
-                                           sizeof(sceneId) + sizeof(transitionTime) + emberAfStringLength(sceneName) + 1));
+        uint16_t extensionFieldSetsLen =
+            static_cast<uint16_t>(emberAfCurrentCommand()->bufLen -
+                                  (emberAfCurrentCommand()->payloadStartIndex + sizeof(status) + sizeof(groupId) + sizeof(sceneId) +
+                                   sizeof(transitionTime) + emberAfStringLength(sceneName) + 1));
         uint16_t extensionFieldSetsIndex = 0;
 
         emberAfScenesClusterPrint(", 0x%2x, \"", transitionTime);
@@ -132,11 +133,11 @@ bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand
         // one-byte length.
         while (extensionFieldSetsIndex + 3 <= extensionFieldSetsLen)
         {
-            EmberAfClusterId clusterId;
+            ClusterId clusterId;
             uint8_t length;
-            clusterId = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
-            extensionFieldSetsIndex += 2;
-            length = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            clusterId               = emberAfGetInt16u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
+            extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + 2);
+            length                  = emberAfGetInt8u(extensionFieldSets, extensionFieldSetsIndex, extensionFieldSetsLen);
             extensionFieldSetsIndex++;
             emberAfScenesClusterPrint(" [0x%2x 0x%x ", clusterId, length);
             if (extensionFieldSetsIndex + length <= extensionFieldSetsLen)
@@ -145,7 +146,7 @@ bool emberAfPluginScenesClientParseViewSceneResponse(const EmberAfClusterCommand
             }
             emberAfScenesClusterPrint("]");
             emberAfScenesClusterFlush();
-            extensionFieldSetsIndex += length;
+            extensionFieldSetsIndex = static_cast<uint16_t>(extensionFieldSetsIndex + length);
         }
     }
 

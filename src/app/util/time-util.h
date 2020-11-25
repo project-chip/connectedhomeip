@@ -38,8 +38,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef __TIME_UTIL_H__
-#define __TIME_UTIL_H__
+#pragma once
 
 #define SECONDS_IN_MINUTE 60
 #define SECONDS_IN_HOUR 3600
@@ -159,5 +158,3 @@ void emberAfPrintTime(uint32_t utcTime);
  *                 year 2000.
  */
 void emberAfPrintTimeIsoFormat(uint32_t utcTime);
-
-#endif // __TIME_UTIL_H__

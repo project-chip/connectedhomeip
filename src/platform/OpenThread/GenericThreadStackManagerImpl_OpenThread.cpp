@@ -28,13 +28,17 @@
 
 #include <openthread/cli.h>
 #include <openthread/dataset.h>
-#include <openthread/dataset_ftd.h>
 #include <openthread/joiner.h>
 #include <openthread/link.h>
 #include <openthread/netdata.h>
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
+
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+#include <openthread/dataset_ftd.h>
 #include <openthread/thread_ftd.h>
+#endif
+
 #include <platform/OpenThread/GenericThreadStackManagerImpl_OpenThread.h>
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
@@ -281,36 +285,24 @@ bool GenericThreadStackManagerImpl_OpenThread<ImplClass>::_IsThreadAttached(void
 template <class ImplClass>
 ConnectivityManager::ThreadDeviceType GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetThreadDeviceType(void)
 {
-    otLinkModeConfig linkMode;
     ConnectivityManager::ThreadDeviceType deviceType;
 
     Impl()->LockThreadStack();
 
-    linkMode = otThreadGetLinkMode(mOTInst);
+    const otLinkModeConfig linkMode = otThreadGetLinkMode(mOTInst);
 
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    if (linkMode.mDeviceType && otThreadIsRouterEligible(mOTInst))
+        ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_Router);
     if (linkMode.mDeviceType)
-    {
-        if (otThreadIsRouterEligible(mOTInst))
-        {
-            deviceType = ConnectivityManager::kThreadDeviceType_Router;
-        }
-        else
-        {
-            deviceType = ConnectivityManager::kThreadDeviceType_FullEndDevice;
-        }
-    }
-    else
-    {
-        if (linkMode.mRxOnWhenIdle)
-        {
-            deviceType = ConnectivityManager::kThreadDeviceType_MinimalEndDevice;
-        }
-        else
-        {
-            deviceType = ConnectivityManager::kThreadDeviceType_SleepyEndDevice;
-        }
-    }
+        ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_FullEndDevice);
+#endif
+    if (linkMode.mRxOnWhenIdle)
+        ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_MinimalEndDevice);
 
+    ExitNow(deviceType = ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
+
+exit:
     Impl()->UnlockThreadStack();
 
     return deviceType;
@@ -323,11 +315,18 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
     CHIP_ERROR err = CHIP_NO_ERROR;
     otLinkModeConfig linkMode;
 
-    VerifyOrExit(deviceType == ConnectivityManager::kThreadDeviceType_Router ||
-                     deviceType == ConnectivityManager::kThreadDeviceType_FullEndDevice ||
-                     deviceType == ConnectivityManager::kThreadDeviceType_MinimalEndDevice ||
-                     deviceType == ConnectivityManager::kThreadDeviceType_SleepyEndDevice,
-                 err = CHIP_ERROR_INVALID_ARGUMENT);
+    switch (deviceType)
+    {
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
+    case ConnectivityManager::kThreadDeviceType_Router:
+    case ConnectivityManager::kThreadDeviceType_FullEndDevice:
+#endif
+    case ConnectivityManager::kThreadDeviceType_MinimalEndDevice:
+    case ConnectivityManager::kThreadDeviceType_SleepyEndDevice:
+        break;
+    default:
+        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
 
 #if CHIP_PROGRESS_LOGGING
 
@@ -362,12 +361,14 @@ GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadDeviceType(Connec
 
     switch (deviceType)
     {
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
     case ConnectivityManager::kThreadDeviceType_Router:
     case ConnectivityManager::kThreadDeviceType_FullEndDevice:
         linkMode.mDeviceType   = true;
         linkMode.mRxOnWhenIdle = true;
         otThreadSetRouterEligible(mOTInst, deviceType == ConnectivityManager::kThreadDeviceType_Router);
         break;
+#endif
     case ConnectivityManager::kThreadDeviceType_MinimalEndDevice:
         linkMode.mDeviceType   = false;
         linkMode.mRxOnWhenIdle = true;
@@ -607,8 +608,9 @@ exit:
 #define TELEM_NEIGHBOR_TABLE_SIZE (64)
 #define TELEM_PRINT_BUFFER_SIZE (64)
 
+#if CHIP_DEVICE_CONFIG_THREAD_FTD
 template <class ImplClass>
-CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyFull(void)
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyFull()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     otError otErr;
@@ -762,6 +764,13 @@ exit:
     }
     return err;
 }
+#else // CHIP_DEVICE_CONFIG_THREAD_FTD
+template <class ImplClass>
+CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetAndLogThreadTopologyFull()
+{
+    return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
+}
+#endif
 
 template <class ImplClass>
 CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_GetPrimary802154MACAddress(uint8_t * buf)

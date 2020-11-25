@@ -42,6 +42,7 @@
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/Tuple.h>
 #include <transport/raw/UDP.h>
 
@@ -60,14 +61,15 @@ namespace {
 class ResponseServerCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, Transport::PeerConnectionState * state,
-                           System::PacketBuffer * buffer, SecureSessionMgrBase * mgr) override
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
+                           const Transport::PeerConnectionState * state, System::PacketBufferHandle buffer,
+                           SecureSessionMgr * mgr) override
     {
         CHIP_ERROR err;
         const size_t data_len = buffer->DataLength();
 
         // as soon as a client connects, assume it is connected
-        VerifyOrExit(mgr != nullptr && buffer != nullptr, ESP_LOGE(TAG, "Received data but couldn't process it..."));
+        VerifyOrExit(mgr != nullptr && !buffer.IsNull(), ESP_LOGE(TAG, "Received data but couldn't process it..."));
         VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ESP_LOGE(TAG, "Unknown source for received message"));
 
         {
@@ -78,24 +80,17 @@ public:
             ESP_LOGI(TAG, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
         }
 
-        HandleDataModelMessage(header, buffer, mgr);
-        buffer = nullptr;
+        HandleDataModelMessage(header, std::move(buffer), mgr);
 
-    exit:
-
-        // SendTo calls Free on the buffer without an AddRef, if SendTo was not called, free the buffer.
-        if (buffer != nullptr)
-        {
-            System::PacketBuffer::Free(buffer);
-        }
+    exit:;
     }
 
-    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgrBase * mgr) override
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
     {
         ESP_LOGE(TAG, "ERROR: %s\n Got UDP error", ErrorStr(error));
     }
 
-    void OnNewConnection(Transport::PeerConnectionState * state, SecureSessionMgrBase * mgr) override
+    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
     {
         ESP_LOGI(TAG, "Received a new connection.");
     }
@@ -109,7 +104,7 @@ private:
      * Echo messages should generally not have a first byte with those values, so we
      * can use that to try to distinguish between the two.
      */
-    bool ContentMayBeADataModelMessage(System::PacketBuffer * buffer)
+    bool ContentMayBeADataModelMessage(const System::PacketBufferHandle & buffer)
     {
         const size_t data_len      = buffer->DataLength();
         const uint8_t * data       = buffer->Start();
@@ -127,34 +122,29 @@ private:
 };
 
 ResponseServerCallback gCallbacks;
-
-SecureSessionMgr<Transport::UDP, // IPV6
-                 Transport::UDP  // IPV4
-                 >
-    sessions;
+TransportMgr<Transport::UDP, // IPV6
+             Transport::UDP  // IPV4
+             >
+    gTransports;
+SecureSessionMgr sessions;
 
 } // namespace
 
 namespace chip {
-SecureSessionMgrBase & SessionManager()
+SecureSessionMgr & SessionManager()
 {
     return sessions;
 }
 } // namespace chip
 
-void PairingComplete(SecurePairingSession * pairing)
-{
-    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
-    sessions.NewPairing(peer, pairing);
-}
-
 // The echo server assumes the platform's networking has been setup already
-void startServer()
+void startServer(NodeId localNodeId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = sessions.Init(kLocalNodeId, &DeviceLayer::SystemLayer,
-                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(nullptr),
-                        UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
+    err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6).SetInterfaceId(nullptr),
+                           UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
+    SuccessOrExit(err);
+    err = sessions.Init(localNodeId, &DeviceLayer::SystemLayer, &gTransports);
     SuccessOrExit(err);
 
     sessions.SetDelegate(&gCallbacks);
@@ -168,4 +158,11 @@ exit:
     {
         ESP_LOGI(TAG, "Echo Server Listening...");
     }
+}
+
+void PairingComplete(NodeId assignedNodeId, NodeId peerNodeId, SecurePairingSession * pairing)
+{
+    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
+    startServer(assignedNodeId);
+    sessions.NewPairing(peer, peerNodeId, pairing);
 }

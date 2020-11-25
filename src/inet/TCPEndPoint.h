@@ -444,7 +444,7 @@ public:
      *  the \c AckReceive method. The \c Free method on the data buffer must
      *  also be invoked unless the \c PutBackReceivedData is used instead.
      */
-    typedef void (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBuffer * data);
+    typedef void (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle data);
 
     /**
      * The endpoint's message text reception event handling function delegate.

@@ -131,7 +131,7 @@ CHIP_ERROR NetworkProvisioning::EncodeString(const char * str, BufBound & bbuf)
     uint16_t u16len = static_cast<uint16_t>(length);
     VerifyOrExit(CanCastTo<uint16_t>(length), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    bbuf.PutLE16(u16len);
+    bbuf.Put16(u16len);
     bbuf.Put(str);
 
 exit:
@@ -150,7 +150,7 @@ CHIP_ERROR NetworkProvisioning::DecodeString(const uint8_t * input, size_t input
     VerifyOrExit(input_len - consumed >= length, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     bbuf.Put(&input[consumed], length);
 
-    consumed += bbuf.Written();
+    consumed += bbuf.Needed();
     bbuf.Put('\0');
 
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
@@ -161,10 +161,10 @@ exit:
 
 CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    System::PacketBuffer * buffer = System::PacketBuffer::New();
-    char * addrStr                = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
-    size_t addrLen                = 0;
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    System::PacketBufferHandle buffer = System::PacketBuffer::New();
+    char * addrStr                    = addr.ToString(Uint8::to_char(buffer->Start()), buffer->AvailableDataLength());
+    size_t addrLen                    = 0;
 
     ChipLogProgress(NetworkProvisioning, "Sending IP Address. Delegate %p\n", mDelegate);
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -176,13 +176,10 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     buffer->SetDataLength(static_cast<uint16_t>(addrLen));
 
     err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning, NetworkProvisioning::MsgTypes::kIPAddressAssigned,
-                                       buffer);
-    buffer = nullptr;
+                                       buffer.Release_ForNow());
     SuccessOrExit(err);
 
 exit:
-    if (buffer)
-        System::PacketBuffer::Free(buffer);
     if (CHIP_NO_ERROR != err)
         ChipLogError(NetworkProvisioning, "Failed in sending IP address. error %s\n", ErrorStr(err));
     return err;
@@ -190,27 +187,25 @@ exit:
 
 CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const char * passwd)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    System::PacketBuffer * buffer = System::PacketBuffer::New();
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    System::PacketBufferHandle buffer = System::PacketBuffer::New();
     BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
 
     ChipLogProgress(NetworkProvisioning, "Sending Network Creds. Delegate %p\n", mDelegate);
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     SuccessOrExit(EncodeString(ssid, bbuf));
     SuccessOrExit(EncodeString(passwd, bbuf));
     VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
-    VerifyOrExit(CanCastTo<uint16_t>(bbuf.Written()), err = CHIP_ERROR_INVALID_ARGUMENT);
-    buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
+    VerifyOrExit(CanCastTo<uint16_t>(bbuf.Needed()), err = CHIP_ERROR_INVALID_ARGUMENT);
+    buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
-    err    = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                       NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer);
-    buffer = nullptr;
+    err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
+                                       NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer.Release_ForNow());
     SuccessOrExit(err);
 
 exit:
-    if (buffer)
-        System::PacketBuffer::Free(buffer);
     if (CHIP_NO_ERROR != err)
         ChipLogError(NetworkProvisioning, "Failed in sending Network Creds. error %s\n", ErrorStr(err));
     return err;
@@ -218,12 +213,12 @@ exit:
 
 CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    System::PacketBuffer * buffer = System::PacketBuffer::New();
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    System::PacketBufferHandle buffer = System::PacketBuffer::New();
 
     ChipLogProgress(NetworkProvisioning, "Sending Thread Credentials");
     VerifyOrExit(mDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     {
         BufBound bbuf(buffer->Start(), buffer->AvailableDataLength());
@@ -232,23 +227,20 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         bbuf.Put(threadData.ThreadMeshPrefix, sizeof(threadData.ThreadMeshPrefix));
         bbuf.Put(threadData.ThreadMasterKey, sizeof(threadData.ThreadMasterKey));
         bbuf.Put(threadData.ThreadPSKc, sizeof(threadData.ThreadPSKc));
-        bbuf.PutLE16(threadData.ThreadPANId);
+        bbuf.Put16(threadData.ThreadPANId);
         bbuf.Put(threadData.ThreadChannel);
         bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadExtendedPANId));
         bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadMeshPrefix));
         bbuf.Put(static_cast<uint8_t>(threadData.FieldPresent.ThreadPSKc));
 
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        buffer->SetDataLength(static_cast<uint16_t>(bbuf.Written()));
+        buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
-        err    = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer);
-        buffer = nullptr;
+        err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
+                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer.Release_ForNow());
     }
 
 exit:
-    if (buffer)
-        System::PacketBuffer::Free(buffer);
     if (CHIP_NO_ERROR != err)
         ChipLogError(NetworkProvisioning, "Failed to send Thread Credentials: %s", ErrorStr(err));
     return err;

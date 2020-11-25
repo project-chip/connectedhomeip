@@ -38,8 +38,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef SILABS_AF_MAIN_H
-#define SILABS_AF_MAIN_H
+#pragma once
 
 #include "af-types.h"
 
@@ -70,8 +69,6 @@ void emberAfGetMfgString(uint8_t * returnData);
 // Functions common to both SOC and Host versions of the application.
 void emAfInitializeMessageSentCallbackArray(void);
 
-EmberAfCbkeKeyEstablishmentSuite emberAfIsFullSmartEnergySecurityPresent(void);
-
 #if defined(EZSP_HOST)
 void emAfClearNetworkCache(uint8_t networkIndex);
 #else
@@ -96,7 +93,6 @@ bool emberAfNcpNeedsReset(void);
 
 void emAfPrintStatus(const char * task, EmberStatus status);
 
-uint8_t emberAfGetSecurityLevel(void);
 uint8_t emberAfGetKeyTableSize(void);
 uint8_t emberAfGetBindingTableSize(void);
 uint8_t emberAfGetAddressTableSize(void);
@@ -152,11 +148,9 @@ void emberAfFormatMfgString(uint8_t * mfgString);
 extern bool emberAfPrintReceivedMessages;
 
 void emAfParseAndPrintVersion(EmberVersion versionStruct);
-void emAfPrintEzspEndpointFlags(uint8_t endpoint);
+void emAfPrintEzspEndpointFlags(chip::EndpointId endpoint);
 
 // Old names
 #define emberAfMoveInProgress() emberAfMoveInProgressCallback()
 #define emberAfStartMove() emberAfStartMoveCallback()
 #define emberAfStopMove() emberAfStopMoveCallback()
-
-#endif // SILABS_AF_MAIN_H

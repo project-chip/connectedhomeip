@@ -58,9 +58,9 @@ void ModelCommand::OnError(ChipDeviceController * dc, CHIP_ERROR err)
     UpdateWaitForResponse(false);
 }
 
-void ModelCommand::OnMessage(ChipDeviceController * dc, PacketBuffer * buffer)
+void ModelCommand::OnMessage(ChipDeviceController * dc, PacketBufferHandle buffer)
 {
-    SetCommandExitStatus(ReceiveCommandResponse(dc, buffer));
+    SetCommandExitStatus(ReceiveCommandResponse(dc, std::move(buffer)));
     UpdateWaitForResponse(false);
 }
 
@@ -84,9 +84,9 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
 {
     // Make sure our buffer is big enough, but this will need a better setup!
     static const uint16_t bufferSize = 1024;
-    auto * buffer                    = PacketBuffer::NewWithAvailableSize(bufferSize);
+    PacketBufferHandle buffer        = PacketBuffer::NewWithAvailableSize(bufferSize);
 
-    if (buffer == nullptr)
+    if (buffer.IsNull())
     {
         ChipLogError(chipTool, "Failed to allocate memory for packet data.");
         return false;
@@ -98,7 +98,6 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
     uint16_t dataLength = EncodeCommand(buffer, bufferSize, mEndPointId);
     if (dataLength == 0)
     {
-        PacketBuffer::Free(buffer);
         ChipLogError(chipTool, "Error while encoding data for command: %s", GetName());
         return false;
     }
@@ -110,11 +109,11 @@ bool ModelCommand::SendCommand(ChipDeviceController * dc)
     PrintBuffer(buffer);
 #endif
 
-    dc->SendMessage(NULL, buffer);
+    dc->SendMessage(NULL, buffer.Release_ForNow());
     return true;
 }
 
-bool ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffer * buffer) const
+bool ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBufferHandle buffer) const
 {
     EmberApsFrame frame;
     uint8_t * message;
@@ -127,7 +126,6 @@ bool ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
     if (extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) == 0)
     {
         ChipLogError(chipTool, "APS frame processing failure!");
-        PacketBuffer::Free(buffer);
         ExitNow();
     }
     ChipLogDetail(chipTool, "APS frame processing success!");
@@ -172,7 +170,7 @@ void ModelCommand::WaitForResponse()
     }
 }
 
-void ModelCommand::PrintBuffer(PacketBuffer * buffer) const
+void ModelCommand::PrintBuffer(const PacketBufferHandle & buffer) const
 {
     const size_t data_len = buffer->DataLength();
 

@@ -33,6 +33,8 @@ static_library("transport") {
     "SecureSession.h",
     "SecureSessionMgr.cpp",
     "SecureSessionMgr.h",
+    "TransportMgr.cpp",
+    "TransportMgr.h",
   ]
 
   if (chip_config_network_layer_ble) {
@@ -48,6 +50,7 @@ static_library("transport") {
     "${chip_root}/src/crypto",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/transport/raw",

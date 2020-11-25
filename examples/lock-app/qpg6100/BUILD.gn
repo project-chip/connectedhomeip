@@ -22,15 +22,15 @@ assert(current_os == "freertos")
 
 qpg6100_project_dir = "${chip_root}/examples/lock-app/qpg6100"
 examples_plat_dir = "${chip_root}/examples/platform/qpg6100"
+examples_common_dir = "${chip_root}/examples/common"
 
 qpg6100_sdk("sdk") {
   include_dirs = [
     "${chip_root}/src/platform/qpg6100",
-    "${qpg6100_project_dir}/include/",
-    "${qpg6100_project_dir}/src/",
+    "${examples_plat_dir}/project_include",
   ]
 
-  sources = [ "${qpg6100_project_dir}/include/CHIPProjectConfig.h" ]
+  sources = [ "${examples_plat_dir}/project_include/CHIPProjectConfig.h" ]
 
   defines = []
   if (is_debug) {
@@ -49,6 +49,7 @@ qpg6100_executable("lock_app") {
     ":sdk",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
+    "${examples_common_dir}/chip-app-server:chip-app-server",
 
     #    OpenThread to be enabled
     #    https://github.com/project-chip/connectedhomeip/issues/293
@@ -64,7 +65,20 @@ qpg6100_executable("lock_app") {
     "${examples_plat_dir}/",
   ]
 
-  sources = [ "src/main.cpp" ]
+  sources = [
+    "${examples_common_dir}/chip-app-server/QRCodeUtil.cpp",
+    "src/AppTask.cpp",
+    "src/BoltLockManager.cpp",
+    "src/ZclCallbacks.cpp",
+    "src/main.cpp",
+  ]
+
+  deps = [
+    "${chip_root}/examples/common/chip-app-server:chip-app-server",
+    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+  ]
 
   output_dir = root_out_dir
 

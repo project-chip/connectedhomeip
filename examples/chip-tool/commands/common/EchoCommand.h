@@ -30,12 +30,12 @@ public:
 
     /////////// IPCommand Interface /////////
     void OnConnect(ChipDeviceController * dc) override { mController = dc; }
-    void OnMessage(ChipDeviceController * dc, chip::System::PacketBuffer * buffer) override { ReceiveEcho(buffer); }
+    void OnMessage(ChipDeviceController * dc, chip::System::PacketBufferHandle buffer) override { ReceiveEcho(std::move(buffer)); }
     void OnError(ChipDeviceController * dc, CHIP_ERROR err) override { mController = nullptr; }
 
 private:
     void SendEcho(void) const;
-    void ReceiveEcho(chip::System::PacketBuffer * buffer) const;
+    void ReceiveEcho(chip::System::PacketBufferHandle buffer) const;
 
     ChipDeviceController * mController = nullptr;
 };

@@ -90,9 +90,11 @@ static void TestInetPre(nlTestSuite * inSuite, void * inContext)
 #if INET_CONFIG_ENABLE_TCP_ENDPOINT
     TCPEndPoint * testTCPEP = nullptr;
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
-    INET_ERROR err         = INET_NO_ERROR;
+    INET_ERROR err = INET_NO_ERROR;
+#if INET_CONFIG_ENABLE_DNS_RESOLVER
     IPAddress testDestAddr = IPAddress::Any;
     char testHostName[20]  = "www.nest.com";
+#endif // INET_CONFIG_ENABLE_DNS_RESOLVER
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     err = gInet.NewRawEndPoint(kIPVersion_6, kIPProtocol_ICMPv6, &testRawEP);
@@ -319,7 +321,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 #endif // INET_CONFIG_ENABLE_IPV4
     UDPEndPoint * testUDPEP  = nullptr;
     TCPEndPoint * testTCPEP1 = nullptr;
-    PacketBuffer * buf       = PacketBuffer::New();
+    PacketBufferHandle buf   = PacketBuffer::New();
     bool didBind             = false;
     bool didListen           = false;
 
@@ -404,7 +406,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, addr.Type() == kIPAddressType_IPv6);
 
-    err = testRaw4EP->SendTo(addr, buf);
+    err = testRaw4EP->SendTo(addr, buf.Release_ForNow());
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
     testRaw4EP->Free();
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -440,7 +442,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = testUDPEP->Bind(kIPAddressType_IPv4, addr_v4, 3000, intId);
     NL_TEST_ASSERT(inSuite, err != INET_NO_ERROR);
     buf = PacketBuffer::New();
-    err = testUDPEP->SendTo(addr_v4, 3000, buf);
+    err = testUDPEP->SendTo(addr_v4, 3000, buf.Release_ForNow());
     testUDPEP->Free();
 #endif // INET_CONFIG_ENABLE_IPV4
 
@@ -448,7 +450,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = testTCPEP1->GetPeerInfo(nullptr, nullptr);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
     buf = PacketBuffer::New();
-    err = testTCPEP1->Send(buf, false);
+    err = testTCPEP1->Send(buf.Release_ForNow(), false);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
     err = testTCPEP1->EnableKeepAlive(10, 100);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);

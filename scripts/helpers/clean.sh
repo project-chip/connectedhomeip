@@ -18,4 +18,4 @@
 
 set -ex
 
-rm -rf out/
+rm -rf out/ examples/*/nrfconnect/build/

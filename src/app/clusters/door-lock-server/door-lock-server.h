@@ -38,8 +38,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef SILABS_DOOR_LOCK_SERVER_H
-#define SILABS_DOOR_LOCK_SERVER_H
+#pragma once
 
 // ------------------------------------------------------------------------------
 // Core
@@ -49,7 +48,7 @@
 #ifndef DOXYGEN_SHOULD_SKIP_THIS
 typedef struct
 {
-    EmberAfAttributeId id;
+    chip::AttributeId id;
     uint16_t value;
 } EmAfPluginDoorLockServerAttributeData;
 
@@ -228,7 +227,7 @@ typedef struct
 // space available (spaceAvail) and if so it will send a DefaultResponse
 // command with the status of EMBER_ZCL_STATUS_INSUFFICIENT_SPACE and return
 // false. Otherwise, it will return true.
-bool emAfPluginDoorLockServerCheckForSufficientSpace(uint8_t spaceReq, uint8_t spaceAvail);
+bool emAfPluginDoorLockServerCheckForSufficientSpace(uint16_t spaceReq, uint8_t spaceAvail);
 #endif
 
 // Critical Message Queue
@@ -250,4 +249,12 @@ bool emAfPluginDoorLockServerCheckForSufficientSpace(uint8_t spaceReq, uint8_t s
 #define EmberAfDoorLockScheduleEntry EmberAfPluginDoorLockServerWeekdayScheduleEntry
 #define EmberAfDoorLockUser EmberAfPluginDoorLockServerUser
 
-#endif // SILABS_DOOR_LOCK_SERVER_H
+/** @brief Activate Door Lock Callback
+ * This function is provided by the door lock server plugin.
+ *
+ * @param activate True if the lock should move to the locked position,
+ *  false if it should move to the unlocked position Ver.: always
+ *
+ * @returns true if the callback was able to activate/deactivate the Lock.
+ */
+bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate);

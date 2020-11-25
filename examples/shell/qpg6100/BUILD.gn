@@ -1,0 +1,83 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/defaults.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/qpg6100_sdk.gni")
+import("${qpg6100_sdk_build_root}/qpg6100_executable.gni")
+import("${qpg6100_sdk_build_root}/qpg6100_sdk.gni")
+
+assert(current_os == "freertos")
+
+examples_plat_dir = "${chip_root}/examples/platform/qpg6100"
+
+qpg6100_sdk("sdk") {
+  include_dirs = [
+    "${chip_root}/src/platform/qpg6100",
+    "${examples_plat_dir}/project_include",
+    "${chip_root}/src/app/util",
+  ]
+
+  sources = [ "${examples_plat_dir}/project_include/CHIPProjectConfig.h" ]
+
+  defines = []
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+}
+
+qpg6100_executable("shell_qpg6100") {
+  include_dirs = []
+  defines = []
+  output_name = "shell-qpg6100.out"
+
+  public_deps = [
+    ":sdk",
+    "${chip_root}/examples/shell/shell_common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/shell",
+    "${chip_root}/src/setup_payload",
+
+    #    OpenThread to be enabled
+    #    https://github.com/project-chip/connectedhomeip/issues/293
+  ]
+
+  include_dirs += [ "${chip_root}/src/app/util" ]
+
+  sources = [
+    "${examples_plat_dir}/project_include/CHIPProjectConfig.h",
+    "${examples_plat_dir}/util/streamer/streamer_qpg6100.cpp",
+    "main.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  ldscript = "${qpg6100_sdk_root}/qpg6100/ldscripts/chip-qpg6100-example.ld"
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+  defines = [
+    "QPG6100_SHELL_STREAMER",
+    "SHELL_STREAMER_APP_SPECIFIC",
+  ]
+}
+
+group("qpg6100") {
+  deps = [ ":shell_qpg6100" ]
+}
+
+group("default") {
+  deps = [ ":qpg6100" ]
+}

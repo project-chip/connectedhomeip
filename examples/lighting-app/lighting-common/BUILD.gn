@@ -25,6 +25,8 @@ source_set("lighting-common") {
   sources = [
     "${chip_root}/examples/common/chip-app-server/DataModelHandler.cpp",
     "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
+    "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
+    "${chip_root}/src/app/reporting/reporting.cpp",
     "${chip_root}/src/app/util/af-event.cpp",
     "${chip_root}/src/app/util/af-main-common.cpp",
     "${chip_root}/src/app/util/attribute-size.cpp",
@@ -38,8 +40,8 @@ source_set("lighting-common") {
     "${chip_root}/src/app/util/process-cluster-message.cpp",
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
-    "gen/call-command-handler.c",
-    "gen/callback-stub.c",
+    "gen/call-command-handler.cpp",
+    "gen/callback-stub.cpp",
   ]
 
   deps = [

@@ -18,7 +18,7 @@
 
 #pragma once
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 #include <inet/InetInterface.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -72,6 +72,7 @@ public:
     using ChipDeviceController = ::chip::DeviceController::ChipDeviceController;
     using IPAddress            = ::chip::Inet::IPAddress;
     using PacketBuffer         = ::chip::System::PacketBuffer;
+    using PacketBufferHandle   = ::chip::System::PacketBufferHandle;
     using NodeId               = ::chip::NodeId;
 
     struct AddressWithInterface

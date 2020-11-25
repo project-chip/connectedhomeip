@@ -45,7 +45,7 @@
 
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
@@ -59,12 +59,12 @@ typedef void * (*GetBleEventCBFunct)(void);
 typedef void (*ConstructBytesArrayFunct)(const uint8_t * dataBuf, uint32_t dataLen);
 typedef void (*LogMessageFunct)(uint64_t time, uint64_t timeUS, const char * moduleName, uint8_t category, const char * msg);
 
-typedef void (*OnConnectFunct)(chip::DeviceController::ChipDeviceController * dc, chip::Transport::PeerConnectionState * state,
-                               void * appReqState);
+typedef void (*OnConnectFunct)(chip::DeviceController::ChipDeviceController * dc,
+                               const chip::Transport::PeerConnectionState * state, void * appReqState);
 typedef void (*OnErrorFunct)(chip::DeviceController::ChipDeviceController * dc, void * appReqState, CHIP_ERROR err,
                              const chip::Inet::IPPacketInfo * pi);
 typedef void (*OnMessageFunct)(chip::DeviceController::ChipDeviceController * dc, void * appReqState,
-                               chip::System::PacketBuffer * buffer);
+                               chip::System::PacketBufferHandle buffer);
 }
 
 enum BleEventType
@@ -129,8 +129,8 @@ static chip::Inet::InetLayer sInetLayer;
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
 // knowing its id, because the ID can be learned on the first response that is received.
-chip::NodeId kLocalDeviceId  = 112233;
-chip::NodeId kRemoteDeviceId = 12344321;
+chip::NodeId kLocalDeviceId  = chip::kTestControllerNodeId;
+chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
 
 #if CONFIG_NETWORK_LAYER_BLE
 static BleLayer sBle;
@@ -178,7 +178,7 @@ CHIP_ERROR
 nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(chip::DeviceController::ScriptDevicePairingDelegate * pairingDelegate,
                                                       const char * ssid, const char * password);
 CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
-                                                             chip::DeviceController::DevicePairingDelegate * pairingDelegate);
+                                                             chip::Controller::DevicePairingDelegate * pairingDelegate);
 
 #if CONFIG_NETWORK_LAYER_BLE
 CHIP_ERROR nl_Chip_DeviceController_ValidateBTP(chip::DeviceController::ChipDeviceController * devCtrl,
@@ -240,8 +240,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
     int maxFDs = 0;
 #if CONFIG_NETWORK_LAYER_BLE
     uint8_t bleWakeByte;
-    bool result = false;
-    chip::System::PacketBuffer * msgBuf;
+    chip::System::PacketBufferHandle msgBuf;
     ChipBleUUID svcId, charId;
     union
     {
@@ -306,7 +305,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                     case kBleEventType_Rx:
                         // build a packet buffer from the rxEv and send to blelayer.
                         msgBuf = chip::System::PacketBuffer::New();
-                        VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+                        VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
                         memcpy(msgBuf->Start(), evu.rxEv->buffer, evu.rxEv->length);
                         msgBuf->SetDataLength(evu.rxEv->length);
@@ -315,14 +314,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         memcpy(svcId.bytes, evu.rxEv->svcId, sizeof(svcId.bytes));
                         memcpy(charId.bytes, evu.rxEv->charId, sizeof(charId.bytes));
 
-                        result = sBle.HandleIndicationReceived(evu.txEv->connObj, &svcId, &charId, msgBuf);
-
-                        if (!result)
-                        {
-                            chip::System::PacketBuffer::Free(msgBuf);
-                        }
-
-                        msgBuf = NULL;
+                        sBle.HandleIndicationReceived(evu.txEv->connObj, &svcId, &charId, std::move(msgBuf));
                         break;
 
                     case kBleEventType_Tx:
@@ -330,7 +322,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         memcpy(svcId.bytes, evu.txEv->svcId, sizeof(svcId.bytes));
                         memcpy(charId.bytes, evu.txEv->charId, sizeof(charId.bytes));
 
-                        result = sBle.HandleWriteConfirmation(evu.txEv->connObj, &svcId, &charId);
+                        sBle.HandleWriteConfirmation(evu.txEv->connObj, &svcId, &charId);
                         break;
 
                     case kBleEventType_Subscribe:
@@ -342,7 +334,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         case kBleSubOp_Subscribe:
                             if (evu.subscribeEv->status)
                             {
-                                result = sBle.HandleSubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
+                                sBle.HandleSubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
                             }
                             else
                             {
@@ -353,7 +345,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         case kBleSubOp_Unsubscribe:
                             if (evu.subscribeEv->status)
                             {
-                                result = sBle.HandleUnsubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
+                                sBle.HandleUnsubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
                             }
                             else
                             {
@@ -583,7 +575,7 @@ exit:
     return err;
 }
 CHIP_ERROR nl_Chip_DeviceController_SetDevicePairingDelegate(chip::DeviceController::ChipDeviceController * devCtrl,
-                                                             chip::DeviceController::DevicePairingDelegate * pairingDelegate)
+                                                             chip::Controller::DevicePairingDelegate * pairingDelegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

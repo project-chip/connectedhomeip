@@ -40,12 +40,18 @@ static uint32_t shortPayloadRepresentation(const SetupPayload & payload)
     return result;
 }
 
+// TODO: issue #3663 - Unbounded stack in src/setup_payload
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wstack-usage="
+
 static std::string decimalStringWithPadding(uint32_t number, int minLength)
 {
     char buf[minLength + 1];
     snprintf(buf, sizeof(buf), "%0*" PRIu32, minLength, number);
     return std::string(buf);
 }
+
+#pragma GCC diagnostic pop
 
 CHIP_ERROR ManualSetupPayloadGenerator::payloadDecimalStringRepresentation(std::string & outDecimalString)
 {

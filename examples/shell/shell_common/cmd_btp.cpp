@@ -55,21 +55,37 @@ int cmd_btp_adv(int argc, char ** argv)
 {
     CHIP_ERROR error  = CHIP_NO_ERROR;
     streamer_t * sout = streamer_get();
+    bool adv_enabled;
 
     if (argc == 0)
     {
         ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
+    adv_enabled = ConnectivityMgr().IsBLEAdvertisingEnabled();
     if (strcmp(argv[0], "start") == 0)
     {
-        streamer_printf(sout, "Starting BLE advertising");
-        // TODO: start advertising
+        if (adv_enabled)
+        {
+            streamer_printf(sout, "BLE advertising already enabled");
+        }
+        else
+        {
+            streamer_printf(sout, "Starting BLE advertising");
+            ConnectivityMgr().SetBLEAdvertisingEnabled(true);
+        }
     }
     else if (strcmp(argv[0], "stop") == 0)
     {
-        streamer_printf(sout, "Stopping BLE advertising");
-        // TODO: stop advertising
+        if (adv_enabled)
+        {
+            streamer_printf(sout, "Stopping BLE advertising");
+            ConnectivityMgr().SetBLEAdvertisingEnabled(false);
+        }
+        else
+        {
+            streamer_printf(sout, "BLE advertising already stopped");
+        }
     }
     else
     {
@@ -162,7 +178,7 @@ static const shell_command_t cmds_btp[] = {
     { &cmd_btp_help, "help", "Usage: btp <subcommand>" },
     { &cmd_btp_scan, "scan", "Enable or disable scan. Usage: btp scan <start timeout|stop>" },
     { &cmd_btp_connect, "connect", "Connect or disconnect to a device. Usage: btp connect <start address|stop>" },
-    { &cmd_btp_adv, "adv", "Enable or disable advertisement. Usage: device dump" },
+    { &cmd_btp_adv, "adv", "Enable or disable advertisement. Usage: btp adv <start|stop>" },
     { &cmd_btp_send, "send", "Send binary data. Usage: device dump" },
 };
 

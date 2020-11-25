@@ -33,8 +33,22 @@ include(ExternalProject)
 # Directory for CHIP build artifacts
 set(CHIP_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/chip")
 
+# Define Zephyr C/C++ compiler flags which should not be forwarded to CHIP
+# build system (e.g. because CHIP configures them on its own).
+set(CHIP_CFLAG_EXCLUDES 
+    "-fno-asynchronous-unwind-tables"
+    "-fno-common"
+    "-fno-defer-pop"
+    "-fno-reorder-functions"
+    "-ffunction-sections"
+    "-fdata-sections"
+    "-g*"
+    "-O*"
+    "-W*"
+)
+
 macro(chip_gn_arg_bool_if CONDITION ARGSTRING GN_VARNAME)
-    if (${${CONDITION}})
+    if (${CONDITION})
         string(APPEND ${ARGSTRING} "${GN_VARNAME} = true\n")
     else ()
         string(APPEND ${ARGSTRING} "${GN_VARNAME} = false\n")
@@ -43,6 +57,15 @@ endmacro()
 
 macro(chip_gn_arg_string ARGSTRING GN_STRING)
     string(APPEND ${ARGSTRING} "${GN_STRING}\n")
+endmacro()
+
+macro(chip_gn_arg_cflags ARGSTRING ARG CFLAGS)
+    set(CFLAG_EXCLUDES "[")
+    foreach(cflag ${CHIP_CFLAG_EXCLUDES})
+        string(APPEND CFLAG_EXCLUDES "\"${cflag}\", ")
+    endforeach()
+    string(APPEND CFLAG_EXCLUDES "]")
+    string(APPEND ${ARGSTRING} "${ARG} = filter_exclude(string_split(\"${CFLAGS}\"), ${CFLAG_EXCLUDES})\n")
 endmacro()
 
 # Function to retrieve Zephyr compilation flags for the given language (C or CXX)
@@ -101,8 +124,8 @@ function(chip_configure TARGET_NAME)
     convert_list_of_flags_to_string_of_flags(CHIP_CXXFLAGS CHIP_CXXFLAGS)
 
     set(GN_ARGS "")
-    chip_gn_arg_string(GN_ARGS "target_cflags_c = string_split(\"${CHIP_CFLAGS}\")")
-    chip_gn_arg_string(GN_ARGS "target_cflags_cc = string_split(\"${CHIP_CXXFLAGS}\")")
+    chip_gn_arg_cflags(GN_ARGS "target_cflags_c" ${CHIP_CFLAGS})
+    chip_gn_arg_cflags(GN_ARGS "target_cflags_cc" ${CHIP_CXXFLAGS})
     chip_gn_arg_string(GN_ARGS "zephyr_ar = \"${CMAKE_AR}\"")
     chip_gn_arg_string(GN_ARGS "zephyr_cc = \"${CMAKE_C_COMPILER}\"")
     chip_gn_arg_string(GN_ARGS "zephyr_cxx = \"${CMAKE_CXX_COMPILER}\"")
@@ -121,26 +144,25 @@ function(chip_configure TARGET_NAME)
     chip_gn_arg_bool_if(CONFIG_NET_L2_OPENTHREAD GN_ARGS "chip_enable_openthread")
     chip_gn_arg_bool_if(CONFIG_NET_IPV4          GN_ARGS "chip_inet_config_enable_ipv4")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_build_tests")
-    chip_gn_arg_bool_if(CONFIG_CHIP_LIB_SHELL    GN_ARGS "chip_build_libshell")
-    chip_gn_arg_bool_if(CONFIG_CHIP_PW_RPC       GN_ARGS "chip_build_pw_rpc_lib")
+    chip_gn_arg_bool_if(CONFIG_DEBUG             GN_ARGS "is_debug")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_raw_endpoint")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_tcp_endpoint")
     chip_gn_arg_bool_if(CHIP_BUILD_TESTS         GN_ARGS "chip_inet_config_enable_dns_resolver")
+    chip_gn_arg_bool_if(CONFIG_CHIP_LIB_SHELL    GN_ARGS "chip_build_libshell")
+    chip_gn_arg_bool_if(CONFIG_CHIP_PW_RPC       GN_ARGS "chip_build_pw_rpc_lib")
 
-    file(
-        GENERATE OUTPUT ${CHIP_OUTPUT_DIR}/args.gn
-        CONTENT "${GN_ARGS}"
-    )
+    file(GENERATE OUTPUT ${CHIP_OUTPUT_DIR}/args.gn CONTENT "${GN_ARGS}")
+
     # Define target
     ExternalProject_Add(
         ${TARGET_NAME}
-        PREFIX              ${CHIP_OUTPUT_DIR}
-        SOURCE_DIR          ${CHIP_ROOT}
-        BINARY_DIR          ${CHIP_OUTPUT_DIR}
-        CONFIGURE_COMMAND   gn --root=${CHIP_ROOT}/config/nrfconnect gen ${CHIP_OUTPUT_DIR}
-        BUILD_COMMAND       ""
-        INSTALL_COMMAND     ""
-        BUILD_ALWAYS        TRUE
+        PREFIX                  ${CHIP_OUTPUT_DIR}
+        SOURCE_DIR              ${CHIP_ROOT}
+        BINARY_DIR              ${CHIP_OUTPUT_DIR}
+        CONFIGURE_COMMAND       gn --root=${CHIP_ROOT}/config/nrfconnect gen --check --fail-on-unused-args ${CHIP_OUTPUT_DIR}
+        BUILD_COMMAND           ""
+        INSTALL_COMMAND         ""
+        BUILD_ALWAYS            TRUE
         USES_TERMINAL_CONFIGURE TRUE
     )
 endfunction()

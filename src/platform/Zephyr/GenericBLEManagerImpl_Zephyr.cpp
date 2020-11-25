@@ -480,7 +480,9 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXCharWrite(const Chip
     ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX characteristic (ConnId 0x%02" PRIx16 ")",
                   bt_conn_index(c1WriteEvent->BtConn));
 
-    HandleWriteReceived(c1WriteEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX, c1WriteEvent->Data);
+    PacketBufferHandle data_ForNow;
+    data_ForNow.Adopt(c1WriteEvent->Data);
+    HandleWriteReceived(c1WriteEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX, std::move(data_ForNow));
     bt_conn_unref(c1WriteEvent->BtConn);
 
     return CHIP_NO_ERROR;
@@ -718,7 +720,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
                                                                const void * buf, uint16_t len, uint16_t offset, uint8_t flags)
 {
     ChipDeviceEvent event;
-    PacketBuffer * packetBuf = PacketBuffer::NewWithAvailableSize(len);
+    PacketBufferHandle packetBuf = PacketBuffer::NewWithAvailableSize(len);
 
     // Unfortunately the Zephyr logging macros end up assigning uint16_t
     // variables to uint16_t:10 fields, which triggers integer conversion
@@ -730,7 +732,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
 #pragma GCC diagnostic pop
 
     // If successful...
-    if (packetBuf != NULL)
+    if (!packetBuf.IsNull())
     {
         // Copy the characteristic value into the packet buffer.
         memcpy(packetBuf->Start(), buf, len);
@@ -739,7 +741,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
         // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
         event.Type                            = DeviceEventType::kPlatformZephyrBleC1WriteEvent;
         event.Platform.BleC1WriteEvent.BtConn = bt_conn_ref(conId);
-        event.Platform.BleC1WriteEvent.Data   = packetBuf;
+        event.Platform.BleC1WriteEvent.Data   = packetBuf.Release_ForNow();
     }
 
     // If we failed to allocate a buffer, post a kPlatformZephyrBleOutOfBuffersEvent event.

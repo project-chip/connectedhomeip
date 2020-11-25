@@ -337,7 +337,7 @@
  * When set, CHIPoBLE advertisements will stop while a CHIPoBLE connection is active.
  */
 #ifndef CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION
-#define CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION 0
+#define CHIP_DEVICE_CONFIG_CHIPOBLE_SINGLE_CONNECTION 1
 #endif
 
 /**
@@ -530,6 +530,15 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_ENABLE_THREAD
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 0
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_THREAD_FTD
+ *
+ * Enable Full Thread Device features
+ */
+#ifndef CHIP_DEVICE_CONFIG_THREAD_FTD
+#define CHIP_DEVICE_CONFIG_THREAD_FTD 1
 #endif
 
 /**

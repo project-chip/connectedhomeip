@@ -20,16 +20,67 @@ import("${dir_pw_unit_test}/test.gni")
 
 assert(chip_build_tests)
 
+# Define CHIP unit tests
+#
+# Simple usage
+# chip_test_suite("tests") {
+#   output_name = "libFooTests"
+#
+#   sources = [
+#      "Common.h",      # add common sources here
+#      "Common.cpp",
+#   ]
+#
+#   test_sources = [
+#     "TestFoo.cpp",    # Files are parsed for `CHIP_REGISTER_TEST_SUITE(...)`
+#     "TestBar.cpp",    # and a driver is created automatically
+#   ]
+#
+#   public_deps = [
+#     "${chip_root}/src/lib/foo",         # add dependencies here
+#     "${nlunit_test_root}:nlunit-test",
+#   ]
+# }
+#
+#
+# Deprecated usage (writing own driver files):
+#
+# chip_test_suite("tests") {
+#   output_name = "libFooTests"
+#
+#   sources = [
+#     "TestDeclarations.h",
+#     "TestFoo.cpp",
+#     "TestBar.cpp",
+#   ]
+#
+#   public_deps = [
+#     "${chip_root}/src/lib/foo",         # add dependencies here
+#     "${nlunit_test_root}:nlunit-test",
+#   ]
+#
+#   tests = [
+#     "TestFoo",  # Assumes TestFooDriver.cpp exists
+#     "TestBar",  # Assumes TestBarDriver.cpp exists
+#   ]
+# }
+
+#
 template("chip_test_suite") {
   _suite_name = target_name
 
+  # Ensures that the common library has sources containing both common
+  # and individual unit tests.
+  if (!defined(invoker.sources)) {
+    invoker.sources = []
+  }
+
+  if (defined(invoker.test_sources)) {
+    invoker.sources += invoker.test_sources
+  }
+
   static_library("${_suite_name}_common") {
-    forward_variables_from(invoker,
-                           "*",
-                           [
-                             "tests",
-                             "c_tests",
-                           ])
+    forward_variables_from(invoker, "*", [ "tests" ])
 
     output_dir = "${root_out_dir}/lib"
   }
@@ -37,22 +88,39 @@ template("chip_test_suite") {
   if (chip_link_tests) {
     tests = []
 
+    if (defined(invoker.test_sources)) {
+      foreach(_test, invoker.test_sources) {
+        _test_name = string_replace(_test, ".cpp", "")
+
+        _driver_name = "${root_gen_dir}/${_test_name}.driver.cpp"
+
+        action("${_test_name}_generate_driver") {
+          script = "${chip_root}/scripts/gen_test_driver.py"
+
+          inputs = [ _test ]
+          outputs = [ _driver_name ]
+          args = [
+            "--input_file=" + rebase_path(_test, root_build_dir),
+            "--output_file=" + rebase_path(_driver_name, root_build_dir),
+          ]
+        }
+
+        chip_test(_test_name) {
+          sources = [ _driver_name ]
+          public_deps = [
+            ":${_suite_name}_common",
+            ":${_test_name}_generate_driver",
+          ]
+        }
+
+        tests += [ _test_name ]
+      }
+    }
+
     if (defined(invoker.tests)) {
       foreach(_test, invoker.tests) {
         chip_test(_test) {
           sources = [ "${_test}Driver.cpp" ]
-
-          public_deps = [ ":${_suite_name}_common" ]
-        }
-
-        tests += [ _test ]
-      }
-    }
-
-    if (defined(invoker.c_tests)) {
-      foreach(_test, invoker.c_tests) {
-        chip_test(_test) {
-          sources = [ "${_test}Driver.c" ]
 
           public_deps = [ ":${_suite_name}_common" ]
         }

@@ -91,7 +91,7 @@ class Flasher(firmware_utils.Flasher):
             self.err = 3
             return self
 
-        shutil.copyfile(image, os.path.join(self.option.drive, image))
+        shutil.copyfile(image, os.path.join(self.option.drive, os.path.basename(image)))
         return self
 
     def reset(self):

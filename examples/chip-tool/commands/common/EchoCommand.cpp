@@ -22,7 +22,7 @@ using namespace ::chip;
 using namespace ::chip::DeviceController;
 
 #define SEND_DELAY 5
-static const char * PAYLOAD = "Message from Standalone CHIP echo client!";
+static const char PAYLOAD[] = "Message from Standalone CHIP echo client!";
 
 void EchoCommand::SendEcho() const
 {
@@ -35,8 +35,8 @@ void EchoCommand::SendEcho() const
 
     // Reallocate buffer on each run, as the secure transport encrypts and
     // overwrites the buffer from previous iteration.
-    auto * buffer = PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(payloadLen));
-    if (buffer == nullptr)
+    PacketBufferHandle buffer = PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(payloadLen));
+    if (buffer.IsNull())
     {
         ChipLogError(chipTool, "Failed to allocate memory for packet data.");
         return;
@@ -45,7 +45,7 @@ void EchoCommand::SendEcho() const
     memcpy(buffer->Start(), PAYLOAD, payloadLen);
     buffer->SetDataLength(static_cast<uint16_t>(payloadLen));
 
-    CHIP_ERROR err = mController->SendMessage(NULL, buffer);
+    CHIP_ERROR err = mController->SendMessage(NULL, buffer.Release_ForNow());
     if (err == CHIP_NO_ERROR)
     {
         ChipLogProgress(chipTool, "Echo (%s): Message sent to server", GetNetworkName());
@@ -56,22 +56,18 @@ void EchoCommand::SendEcho() const
     }
 }
 
-void EchoCommand::ReceiveEcho(PacketBuffer * buffer) const
+void EchoCommand::ReceiveEcho(PacketBufferHandle buffer) const
 {
     // attempt to print the incoming message
-    size_t data_len = buffer->DataLength();
-    char msg_buffer[data_len];
-    msg_buffer[data_len] = 0; // Null-terminate whatever we received and treat like a string...
-    memcpy(msg_buffer, buffer->Start(), data_len);
-
-    bool isEchoIdenticalToMessage = strncmp(msg_buffer, PAYLOAD, data_len) == 0;
+    size_t data_len               = buffer->DataLength();
+    bool isEchoIdenticalToMessage = (data_len + 1 == sizeof PAYLOAD) && (memcmp(buffer->Start(), PAYLOAD, data_len) == 0);
     if (isEchoIdenticalToMessage)
     {
         ChipLogProgress(chipTool, "Echo (%s): Received expected message !", GetNetworkName());
     }
     else
     {
-        ChipLogError(chipTool, "Echo: (%s): Error \nSend: %s \nRecv: %s", GetNetworkName(), PAYLOAD, msg_buffer);
+        ChipLogError(chipTool, "Echo: (%s): Error \nSend: %s \nRecv: %.*s", GetNetworkName(), PAYLOAD, data_len, buffer->Start());
     }
 }
 

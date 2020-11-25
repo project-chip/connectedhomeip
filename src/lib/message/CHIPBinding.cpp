@@ -1159,12 +1159,12 @@ bool Binding::IsAuthenticMessageFromPeer(const chip::ChipMessageHeader * msgInfo
  *  Additionally, this method will ensure the CHIP payload will not overflow
  *  the supplied PacketBuffer.
  *
- *  @param[in]    msgBuf        A pointer to the PacketBuffer to which the message
+ *  @param[in]    msgBuf        A handle to the PacketBuffer to which the message
  *                              payload will be written.
  *
  *  @return                     The max CHIP payload size.
  */
-uint32_t Binding::GetMaxChipPayloadSize(const System::PacketBuffer * msgBuf)
+uint32_t Binding::GetMaxChipPayloadSize(const System::PacketBufferHandle & msgBuf)
 {
     // Constrain the max CHIP payload size by the UDP MTU if we are using UDP.
     // TODO: Eventually, we may configure a custom UDP MTU size on the binding
@@ -1285,7 +1285,7 @@ exit:
  * the minimum size cannot be met.
  *
  */
-CHIP_ERROR Binding::AllocateRightSizedBuffer(PacketBuffer *& buf, const uint32_t desiredSize, const uint32_t minSize,
+CHIP_ERROR Binding::AllocateRightSizedBuffer(PacketBufferHandle & buf, const uint32_t desiredSize, const uint32_t minSize,
                                              uint32_t & outMaxPayloadSize)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -1302,7 +1302,7 @@ CHIP_ERROR Binding::AllocateRightSizedBuffer(PacketBuffer *& buf, const uint32_t
     bufferAllocSize += weaveTrailerSize;
 
     buf = PacketBuffer::NewWithAvailableSize(weaveHeaderSize, bufferAllocSize);
-    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     maxChipPayloadSize = GetMaxChipPayloadSize(buf);
 
@@ -1311,8 +1311,6 @@ CHIP_ERROR Binding::AllocateRightSizedBuffer(PacketBuffer *& buf, const uint32_t
     if (outMaxPayloadSize < minSize)
     {
         err = CHIP_ERROR_BUFFER_TOO_SMALL;
-
-        PacketBuffer::Free(buf);
         buf = nullptr;
     }
 

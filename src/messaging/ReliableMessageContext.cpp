@@ -205,13 +205,12 @@ uint64_t ReliableMessageContext::GetCurrentRetransmitTimeoutTick()
  */
 CHIP_ERROR ReliableMessageContext::SendThrottleFlow(uint32_t pauseTimeMillis)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    System::PacketBuffer * msgBuf = nullptr;
-    uint8_t * p                   = nullptr;
-    uint8_t msgLen                = sizeof(pauseTimeMillis);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t * p    = nullptr;
+    uint8_t msgLen = sizeof(pauseTimeMillis);
 
-    msgBuf = System::PacketBuffer::NewWithAvailableSize(msgLen);
-    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    System::PacketBufferHandle msgBuf = System::PacketBuffer::NewWithAvailableSize(msgLen);
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     p = msgBuf->Start();
 
@@ -222,7 +221,8 @@ CHIP_ERROR ReliableMessageContext::SendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow, msgBuf,
+    err = mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow,
+                                msgBuf.Release_ForNow(),
                                 BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
 
 exit:
@@ -259,13 +259,12 @@ exit:
  */
 CHIP_ERROR ReliableMessageContext::SendDelayedDelivery(uint32_t pauseTimeMillis, uint64_t delayedNodeId)
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    System::PacketBuffer * msgBuf = nullptr;
-    uint8_t * p                   = nullptr;
-    uint8_t msgLen                = sizeof(pauseTimeMillis) + sizeof(delayedNodeId);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint8_t * p    = nullptr;
+    uint8_t msgLen = sizeof(pauseTimeMillis) + sizeof(delayedNodeId);
 
-    msgBuf = System::PacketBuffer::NewWithAvailableSize(msgLen);
-    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    System::PacketBufferHandle msgBuf = System::PacketBuffer::NewWithAvailableSize(msgLen);
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     p = msgBuf->Start();
     // Set back the pointer by the length of the fields
@@ -278,7 +277,8 @@ CHIP_ERROR ReliableMessageContext::SendDelayedDelivery(uint32_t pauseTimeMillis,
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery, msgBuf,
+    err = mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery,
+                                msgBuf.Release_ForNow(),
                                 BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
 exit:
@@ -342,7 +342,7 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     return err;
 }
 
-CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<uint32_t, MessageFlagValues> Flags)
+CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<uint32_t, MessageFlagValues> MsgFlags)
 
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -351,7 +351,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
     mManager->ExpireTicks();
 
     // If the message IS a duplicate.
-    if (Flags.Has(MessageFlagValues::kChipMessageFlag_DuplicateMessage))
+    if (MsgFlags.Has(MessageFlagValues::kChipMessageFlag_DuplicateMessage))
     {
 #if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Forcing tx of solitary ack for duplicate MsgId:%08" PRIX32, MessageId);
@@ -447,15 +447,15 @@ CHIP_ERROR ReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
  */
 CHIP_ERROR ReliableMessageContext::SendCommonNullMessage()
 {
-    CHIP_ERROR err                = CHIP_NO_ERROR;
-    System::PacketBuffer * msgBuf = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Allocate a buffer for the null message
-    msgBuf = System::PacketBuffer::NewWithAvailableSize(0);
-    VerifyOrExit(msgBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    System::PacketBufferHandle msgBuf = System::PacketBuffer::NewWithAvailableSize(0);
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err = mManager->SendMessage(this, chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null, msgBuf,
+    err = mManager->SendMessage(this, chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null,
+                                msgBuf.Release_ForNow(),
                                 BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
 exit:

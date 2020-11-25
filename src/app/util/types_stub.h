@@ -39,8 +39,7 @@
  *        the CHIP project
  ******************************************************************************/
 
-#ifndef TYPES_STUB_H
-#define TYPES_STUB_H
+#pragma once
 
 #include <string.h> // For mem* functions.
 
@@ -48,23 +47,8 @@
 
 #include "basic-types.h"
 
-/**
- * Try to use our chip::NodeId definition if we are C++; otherwise define a
- * ChipNodeId that's compatible.
- */
-#ifdef __cplusplus
 #include <transport/raw/MessageHeader.h>
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
-// Make it easier to have unified function declarations across C and C++ source
-// files.
-typedef chip::NodeId ChipNodeId;
-#else
-typedef uint64_t ChipNodeId;
-#endif // __cplusplus
-
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
 
 #include "gen/gen_config.h"
 
@@ -221,9 +205,6 @@ enum
         details about this requirement.
      */
     EMBER_APS_OPTION_DSA_SIGN = 0x0010,
-    /** Send the message using APS Encryption using the Link Key shared
-        with the destination node to encrypt the data at the APS Level. */
-    EMBER_APS_OPTION_ENCRYPTION = 0x0020,
     /** Resend the message using the APS retry mechanism.
         This option and the enable route discovery option must be enabled for
         an existing route to be repaired automatically. */
@@ -326,63 +307,6 @@ enum
     EMBER_ALLOW_APP_LINK_KEY_REQUEST = 0x01
 };
 
-/** @brief This is the Extended Security Bitmask that controls the use
- *  of various extended security features.
- */
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberExtendedSecurityBitmask
-#else
-typedef uint16_t EmberExtendedSecurityBitmask;
-enum
-#endif
-{
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    // If this bit is set, the 'key token data' field is set in the Initial
-    // Security Bitmask to 0 (No Preconfig Key token). Otherwise, the
-    // field is left as is.
-    EMBER_PRECONFIG_KEY_NOT_VALID = 0x0001,
-#endif
-
-    // bits 2-3 are unused.
-    /** This denotes that the network key update can only happen if the network
-        key update request is unicast and encrypted i.e. broadcast network key update
-        requests will not be processed if bit 1 is set*/
-    EMBER_SECURE_NETWORK_KEY_ROTATION = 0x0002,
-
-    /** This denotes whether a joiner node (router or end-device) uses a Global
-        Link Key or a Unique Link Key. */
-    EMBER_JOINER_GLOBAL_LINK_KEY = 0x0010,
-
-    /** This denotes whether the device's outgoing frame counter is allowed to
-        be reset during forming or joining. If the flag is set, the outgoing frame
-        counter is not allowed to be reset. If the flag is not set, the frame
-        counter is allowed to be reset. */
-
-    EMBER_EXT_NO_FRAME_COUNTER_RESET = 0x0020,
-
-    /** This denotes whether a device should discard or accept network leave
-        without rejoin commands. */
-    EMBER_NWK_LEAVE_WITHOUT_REJOIN_NOT_ALLOWED = 0x0040,
-
-    // Bit 7 reserved for future use (stored in TOKEN).
-
-    /** This denotes whether a router node should discard or accept network Leave
-        Commands. */
-    EMBER_NWK_LEAVE_REQUEST_NOT_ALLOWED = 0x0100,
-
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    /** This denotes whether a node is running the latest stack specification or
-        is emulating R18 specs behavior. If this flag is enabled, a router
-        node should only send encrypted Update Device messages while the TC should
-        only accept encrypted Updated Device messages.*/
-    EMBER_R18_STACK_BEHAVIOR = 0x0200,
-#endif
-
-    // Bit 10 is reserved for future use (stored in TOKEN).
-    // Bit 11 is reserved for future use(stored in RAM).
-    // Bits 12-15 are unused.
-};
-
 /** @brief This data structure contains the key data that is passed
  *   into various other functions. */
 typedef struct
@@ -479,8 +403,6 @@ enum
 
 typedef struct
 {
-    /** Identifies the endpoint's application profile. */
-    uint16_t profileId;
     /** The endpoint's device ID within the application profile. */
     uint16_t deviceId;
     /** The endpoint's device version. */
@@ -605,7 +527,7 @@ typedef struct
     /** The type of binding. */
     EmberBindingType type;
     /** The endpoint on the local node. */
-    uint8_t local;
+    chip::EndpointId local;
     /** A cluster ID that matches one from the local endpoint's simple descriptor.
      * This cluster ID is set by the provisioning application to indicate which
      * part an endpoint's functionality is bound to this particular remote node
@@ -613,83 +535,22 @@ typedef struct
      * that a binding can be used to to send messages with any cluster ID, not
      * just that listed in the binding.
      */
-    uint16_t clusterId;
+    chip::ClusterId clusterId;
     /** The endpoint on the remote node (specified by \c identifier). */
-    uint8_t remote;
+    chip::EndpointId remote;
     /** A 64-bit destination identifier.  This is either:
-     * - The destination ChipNodeId, for unicasts.
+     * - The destination chip::NodeId, for unicasts.
      * - A multicast ChipGroupId, for multicasts.
      * Which one is being used depends on the type of this binding.
      */
     union
     {
-        ChipNodeId nodeId;
-        CHIPGroupId groupId;
+        chip::NodeId nodeId;
+        chip::GroupId groupId;
     };
     /** The index of the network the binding belongs to. */
     uint8_t networkIndex;
 } EmberBindingTableEntry;
-
-/** @brief This describes the Initial Security features and requirements that
- *  will be used when forming or joining the network.  */
-typedef struct
-{
-    /** This bitmask enumerates which security features should be used
-        and the presence of valid data within other elements of the
-        ::EmberInitialSecurityState data structure.  For more details, see the
-        ::EmberInitialSecurityBitmask. */
-    uint16_t bitmask;
-    /** This is the pre-configured key that can be used by devices when joining the
-     *  network if the Trust Center does not send the initial security data
-     *  in-the-clear.
-     *  For the Trust Center, it will be the global link key and <b>must</b> be set
-     *  regardless of whether joining devices are expected to have a pre-configured
-     *  Link Key.
-     *  This parameter will only be used if the EmberInitialSecurityState::bitmask
-     *  sets the bit indicating ::EMBER_HAVE_PRECONFIGURED_KEY. */
-    EmberKeyData preconfiguredKey;
-    /** This is the Network Key used when initially forming the network.
-     *  It must be set on the Trust Center and is not needed for devices
-     *  joining the network.  This parameter will only be used if the
-     *  EmberInitialSecurityState::bitmask sets the bit indicating
-     *  ::EMBER_HAVE_NETWORK_KEY.  */
-    EmberKeyData networkKey;
-    /** This is the sequence number associated with the network key.  It must
-     *  be set if the Network Key is set and is used to indicate a particular
-     *  of the network key for updating and switching.  This parameter will
-     *  only be used if the ::EMBER_HAVE_NETWORK_KEY is set. Generally, it should
-     *  be set to 0 when forming the network; joining devices can ignore
-     *  this value.  */
-    uint8_t networkKeySequenceNumber;
-    /** This is the long address of the trust center on the network that will
-     *  be joined.  It is usually NOT set prior to joining the network and
-     *  is learned during the joining message exchange.  This field
-     *  is only examined if ::EMBER_HAVE_TRUST_CENTER_EUI64 is set in the
-     *  EmberInitialSecurityState::bitmask.  Most devices should clear that
-     *  bit and leave this field alone.  This field must be set when using
-     *  commissioning mode.  It is required to be in little-endian format. */
-    EmberEUI64 preconfiguredTrustCenterEui64;
-} EmberInitialSecurityState;
-
-/** @brief The Status of the Update Device message sent to the Trust Center.
- *  The device may have joined or rejoined insecurely, rejoined securely, or
- *  left.  MAC Security has been deprecated and therefore there is no secure
- *  join.
- */
-// These map to the actual values within the APS Command frame so they cannot
-// be arbitrarily changed.
-#ifdef DOXYGEN_SHOULD_SKIP_THIS
-enum EmberDeviceUpdate
-#else
-typedef uint8_t EmberDeviceUpdate;
-enum
-#endif
-{
-    EMBER_STANDARD_SECURITY_SECURED_REJOIN   = 0,
-    EMBER_STANDARD_SECURITY_UNSECURED_JOIN   = 1,
-    EMBER_DEVICE_LEFT                        = 2,
-    EMBER_STANDARD_SECURITY_UNSECURED_REJOIN = 3,
-};
 
 /**
  * @brief The decision made by the Trust Center when a node attempts to join.
@@ -875,16 +736,6 @@ typedef struct
     uint8_t power;
     uint8_t timeout;
 } EmberChildData;
-
-/**
- * @brief The profile ID used to address all the public profiles.
- */
-#define EMBER_WILDCARD_PROFILE_ID 0xFFFF
-
-/**
- * @brief The maximum value for a profile ID in the standard profile range.
- */
-#define EMBER_MAXIMUM_STANDARD_PROFILE_ID 0x7FFF
 
 /**
  * @brief A distinguished network ID that will never be assigned
@@ -1988,9 +1839,3 @@ typedef struct
  * @param data   A pointer to where the token data should be placed.
  */
 #define halCommonSetIndexedToken(token, index, data)
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
-
-#endif // TYPES_STUB_H
