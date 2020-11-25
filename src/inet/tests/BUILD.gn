@@ -27,16 +27,18 @@ config("tests_config") {
 chip_test_suite("tests") {
   output_name = "libInetLayerTests"
 
-  sources = [
+  test_sources = [
     "TestInetAddress.cpp",
+    "TestInetEndPoint.cpp",
+    "TestInetErrorStr.cpp",
+  ]
+
+  sources = [
     "TestInetCommon.cpp",
     "TestInetCommon.h",
     "TestInetCommonOptions.cpp",
     "TestInetCommonOptions.h",
-    "TestInetEndPoint.cpp",
-    "TestInetErrorStr.cpp",
     "TestInetLayer.cpp",
-    "TestInetLayer.h",
     "TestInetLayerCommon.cpp",
   ]
 
@@ -55,21 +57,12 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  tests = [
-    "TestInetAddress",
-    "TestInetErrorStr",
-    "TestInetEndPoint",
-  ]
-
   # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
   # x64.
   if (current_os != "mac" && chip_device_platform != "esp32" &&
       current_cpu == "x64") {
-    sources += [
-      "TestInetLayerDNS.cpp",
-      "TestLwIPDNS.cpp",
-    ]
-    tests += [ "TestInetLayerDNS" ]
+    test_sources +=  [ "TestInetLayerDNS.cpp" ]
+    sources += [ "TestLwIPDNS.cpp" ]
   }
 }
 
