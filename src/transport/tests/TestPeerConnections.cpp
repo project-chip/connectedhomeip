@@ -22,8 +22,6 @@
  *      the PeerConnections class within the transport layer
  *
  */
-#include "TestTransportLayer.h"
-
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/TestUtils.h>

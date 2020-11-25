@@ -21,10 +21,9 @@
  *      This file implements unit tests for the SecureSessionMgr implementation.
  */
 
-#include "TestTransportLayer.h"
-
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -218,3 +217,5 @@ int TestSecureSessionMgr()
 
     return (nlTestRunnerStats(&sSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestSecureSessionMgr);
