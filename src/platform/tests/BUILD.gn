@@ -23,9 +23,7 @@ if (chip_device_platform != "none") {
   chip_test_suite("tests") {
     output_name = "libPlatformTests"
 
-    test_sources = [
-      "TestPlatformMgr.cpp",
-    ]
+    test_sources = [ "TestPlatformMgr.cpp" ]
 
     if (chip_enable_mdns && chip_enable_happy_tests &&
         chip_device_platform == "linux") {
@@ -60,11 +58,11 @@ if (chip_device_platform != "none") {
       #       This is very odd and test should probably be moved as an integration
       #       test rather than a unit test
       #
-      sources = [ 
+      sources = [
         "TestCHIPoBLEStackMgr.cpp",
         "TestCHIPoBLEStackMgr.h",
       ]
-      tests = [ "TestCHIPoBLEStackMgr"]
+      tests = [ "TestCHIPoBLEStackMgr" ]
     }
   }
 } else {
