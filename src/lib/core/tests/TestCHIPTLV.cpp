@@ -23,8 +23,6 @@
  *
  */
 
-#include "TestCore.h"
-
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
