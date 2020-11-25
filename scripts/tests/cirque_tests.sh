@@ -72,6 +72,7 @@ function cirquetest_bootstrap() {
     cd "$REPO_DIR"/third_party/cirque/repo
     pip3 install pycodestyle==2.5.0 wheel
     make NO_GRPC=1 install -j
+    "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh
     ./dependency_modules.sh
     pip3 install -r requirements_nogrpc.txt
 

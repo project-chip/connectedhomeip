@@ -15,7 +15,7 @@
 #   limitations under the License.
 #
 
-from generic_node_image
+from chip-cirque-device-base
 RUN apt-get install -y libglib2.0 avahi-daemon libavahi-client3
 COPY out/debug/chip-tool /usr/bin/
 COPY entrypoint.sh /
