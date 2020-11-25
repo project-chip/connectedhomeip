@@ -15,7 +15,7 @@
  *    limitations under the License.
  */
 
-#include "TestShell.h"
+#include <nlunit-test.h>
 
 #include <shell/shell.h>
 #include <support/CodeUtils.h>

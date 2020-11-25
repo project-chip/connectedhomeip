@@ -20,9 +20,8 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTestShell"
 
-  sources = [
+  test_sources = [
     "TestShell.cpp",
-    "TestShell.h",
     "TestStreamerStdio.cpp",
   ]
 
@@ -32,10 +31,5 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/shell",
     "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestShell",
-    "TestStreamerStdio",
   ]
 }

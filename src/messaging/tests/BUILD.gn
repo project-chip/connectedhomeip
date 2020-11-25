@@ -21,9 +21,8 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libMessagingLayerTests"
 
-  sources = [
+  test_sources = [
     "TestExchangeMgr.cpp",
-    "TestMessagingLayer.h",
     "TestReliableMessageProtocol.cpp",
   ]
 
@@ -38,10 +37,5 @@ chip_test_suite("tests") {
     "${chip_root}/src/transport/raw/tests:helpers",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestExchangeMgr",
-    "TestReliableMessageProtocol",
   ]
 }

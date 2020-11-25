@@ -22,13 +22,12 @@
  *      implementation.
  */
 
-#include "TestMessagingLayer.h"
-
 #include <core/CHIPCore.h>
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageManager.h>
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
 
 #include <nlbyteorder.h>
@@ -270,3 +269,5 @@ int TestReliableMessageProtocol()
 
     return (nlTestRunnerStats(&sSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestReliableMessageProtocol);
