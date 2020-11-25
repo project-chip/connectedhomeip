@@ -22,8 +22,6 @@
  *
  */
 
-#include "TestManualCode.h"
-
 #include <nlunit-test.h>
 #include <stdio.h>
 
@@ -32,6 +30,7 @@
 #include "SetupPayload.cpp"
 #include "SetupPayload.h"
 
+#include <support/TestUtils.h>
 #include <support/verhoeff/Verhoeff.h>
 
 using namespace chip;
@@ -597,3 +596,5 @@ int TestManualSetupCode()
 
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestManualSetupCode);
