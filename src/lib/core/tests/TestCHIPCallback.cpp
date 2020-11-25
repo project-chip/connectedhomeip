@@ -21,9 +21,6 @@
  *      This file implements a test for  CHIP Callback
  *
  */
-
-#include "TestCore.h"
-
 #include <core/CHIPCallback.h>
 #include <support/CHIPMem.h>
 #include <support/TestUtils.h>
