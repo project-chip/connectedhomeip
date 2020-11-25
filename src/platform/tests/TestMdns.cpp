@@ -7,6 +7,7 @@
 #include "lib/mdns/platform/Mdns.h"
 #include "platform/CHIPDeviceLayer.h"
 #include "support/CHIPMem.h"
+#include "support/TestUtils.h"
 
 using chip::Mdns::MdnsService;
 using chip::Mdns::MdnsServiceProtocol;
@@ -114,3 +115,5 @@ int TestMdns()
     }
     return retVal;
 }
+
+CHIP_REGISTER_TEST_SUITE(TestMdns);
