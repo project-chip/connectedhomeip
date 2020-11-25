@@ -77,7 +77,7 @@ static int TestTeardown(void * inContext)
     return (SUCCESS);
 }
 
-extern "C" int TestCHIPCounter(void)
+int TestCHIPCounter(void)
 {
     // clang-format off
     nlTestSuite theSuite = {

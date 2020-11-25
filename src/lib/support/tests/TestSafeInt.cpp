@@ -22,8 +22,6 @@
  *
  */
 
-#include "TestSupport.h"
-
 #include <support/SafeInt.h>
 #include <support/TestUtils.h>
 

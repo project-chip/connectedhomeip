@@ -20,7 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libSupportTests"
 
-  sources = [
+  test_sources = [
     "TestBufBound.cpp",
     "TestBufferReader.cpp",
     "TestCHIPArgParser.cpp",
@@ -28,13 +28,15 @@ chip_test_suite("tests") {
     "TestCHIPMem.cpp",
     "TestErrorStr.cpp",
     "TestPersistedCounter.cpp",
-    "TestPersistedStorageImplementation.cpp",
-    "TestPersistedStorageImplementation.h",
     "TestSafeInt.cpp",
     "TestScopedBuffer.cpp",
     "TestSerializableIntegerSet.cpp",
-    "TestSupport.h",
     "TestTimeUtils.cpp",
+  ]
+
+  sources = [
+    "TestPersistedStorageImplementation.cpp",
+    "TestPersistedStorageImplementation.h",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -43,19 +45,5 @@ chip_test_suite("tests") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestBufBound",
-    "TestBufferReader",
-    "TestErrorStr",
-    "TestCHIPArgParser",
-    "TestTimeUtils",
-    "TestCHIPMem",
-    "TestCHIPCounter",
-    "TestPersistedCounter",
-    "TestSafeInt",
-    "TestScopedBuffer",
-    "TestSerializableIntegerSet",
   ]
 }

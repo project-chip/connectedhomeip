@@ -22,8 +22,6 @@
  *
  */
 
-#include "TestSupport.h"
-
 #include <support/BufBound.h>
 #include <support/TestUtils.h>
 
