@@ -42,8 +42,8 @@ are available:
 This example is running on the nRF Connect platform, which is based
 on the [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
 and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
-[nRF Connect Platform Overview](TODO:...) to read more information about
-platform structure and dependencies.
+[nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
+to read more about the platform structure and dependencies.
 
 Pigweed libraries are built and organized in a way that enables faster and more reliable development.
 In the CHIP project, the Pigweed module is planned to be used to create

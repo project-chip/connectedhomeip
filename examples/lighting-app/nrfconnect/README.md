@@ -7,13 +7,15 @@ You can use this example as a reference for creating your own application.
 
 The example is based on [CHIP](https://github.com/project-chip/connectedhomeip) and the nRF Connect
 platform, and supports remote access and control of a lighting over a low-power, 802.15.4 Thread network.
-It is capable of being paired into an existing CHIP network along with other CHIP-enabled devices.
+
+When configured, the example becomes a CHIP accessory, that is a device
+that can be paired into an existing CHIP network and can be controlled by this network.
 
 <hr>
 
 -   [Overview](#overview)
-    -   [Bluetooth LE Advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE Rendezvous](#bluetooth-le-rendezvous)
+    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
+    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
     -   [Thread provisioning](#thread-provisioning)
 -   [Requirements](#requirements)
 -   [Device UI](#device-ui)
@@ -35,8 +37,8 @@ It is capable of being paired into an existing CHIP network along with other CHI
 This example is running on the nRF Connect platform, which is based
 on the [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
 and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
-[nRF Connect Platform Overview](TODO:...) to read more information about
-platform structure and dependencies.
+[nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
+to read more about the platform structure and dependencies.
 
 The CHIP device that runs the lighting application is controlled by the CHIP controller
 device over the Thread protocol. By default, the CHIP device should have Thread disabled,
@@ -47,26 +49,26 @@ The example also comes with a test mode, which allows to start Thread with the d
 by pressing button manually. However, this mode does not guarantee that the device will be able
 to communicate with the CHIP controller and other devices.
 
-### Bluetooth LE Advertising
+### Bluetooth LE advertising
 
 After powering up the device for the first time, it will start advertising over
 Bluetooth LE to inform other devices about its presence. For security reasons,
 Bluetooth LE advertising won't start automatically after powering up the device.
 To make the device discoverable, you must press **Button 4**.
 
-### Bluetooth LE Rendezvous
+### Bluetooth LE rendezvous
 
-In CHIP, there is a commissioning procedure called Rendezvous, which is done over
+In CHIP, the commissioning procedure (called rendezvous) is done over
 Bluetooth LE between a CHIP device and the CHIP controller,
 where the controller has the commissioner role.
 
-To start the Rendezvous, the controller must get the onboarding information from the CHIP device.
+To start the rendezvous, the controller must get the commissioning information from the CHIP device.
 The data payload is encoded within a QR code and typically presented on the device's display.
 For this example, however, it is shared using **NFC**.
 
 ### Thread provisioning
 
-Successfully finishing the Rendezvous procedure allows to perform Provisioning
+Successfully finishing the rendezvous procedure allows to perform the provisioning
 operation, whose goal is to send the Thread network credentials from the CHIP controller
 to the CHIP device. As a result, device is able to join the Thread network and
 communicate with other Thread devices in the network.
@@ -137,11 +139,11 @@ using the default configuration.
 for the predefined period of time.
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
-communicate with it using the [command line interface](TODO:).
+communicate with it using the [command line interface](../../../docs/guides/nrfconnect_examples_cli.md).
 
-**NFC port with antenna attached** can be used to start the [Rendezvous](#bluetooth-le-rendezvous)
-by providing the onboarding information from the CHIP device in a data payload that can be shared
-[using NFC](TODO:).
+**NFC port with antenna attached** can be used to start the [rendezvous](#bluetooth-le-rendezvous)
+by providing the commissioning information from the CHIP device in a data payload that can be shared
+using NFC.
 
 <hr>
 
@@ -335,5 +337,3 @@ To debug the application on target, run the following commands:
 
 Check the [CLI tutorial](../../../docs/guides/nrfconnect_examples_cli.md) to
 learn how to use command-line interface of the application.
-
-TODO: mention Rendezvous tutorial here
