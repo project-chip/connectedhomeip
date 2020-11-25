@@ -178,6 +178,34 @@ function asReadType(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
+/**
+ * Returns CHIP specific type for ZCL framework
+ * This function is flawed since it relies on the
+ * type label for CHIP type conversion. CHIP specific XML should have the
+ * correct type directly embedded inside.
+ *
+ * @param {*} type : The xml type to be converted
+ */
+function asChipUnderlyingType(label, type) {
+
+  if (zclHelper.isStrEqual(label, "endpoint")) {
+    return 'chip::EndpointId'
+  } else if (zclHelper.isStrEqual(label, "endpointId")) {
+    return 'chip::EndpointId'
+  } else if (zclHelper.isStrEqual(label, "CLUSTER_ID")) {
+    return 'chip::ClusterId'
+  } else if (zclHelper.isStrEqual(label, "ATTRIBUTE_ID")){
+    return 'chip::AttributeId'
+  } else if (zclHelper.isStrEqual(label, "groupId")) {
+    return 'chip::GroupId'
+  } else if (zclHelper.isStrEqual(label, "commandId")) {
+    return 'chip::CommandId'
+  } else {
+    // Might want to use asZclUnderlyingType instead. TBD
+    return cHelper.asUnderlyingType.call(this, type)
+  }
+}
+
 // WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 //
 // Note: these exports are public API. Templates that might have been created in the past and are
@@ -188,3 +216,4 @@ exports.isString            = isString;
 exports.asReadType          = asReadType;
 exports.asReadTypeLength    = asReadTypeLength;
 exports.asValueIfNotPresent = asValueIfNotPresent;
+exports.asChipUnderlyingType = asChipUnderlyingType;
