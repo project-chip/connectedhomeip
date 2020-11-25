@@ -67,8 +67,8 @@ efr32_executable("lock_app") {
 
   public_deps = [
     ":sdk",
-    "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/common/QRCode",
+    "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
