@@ -22,8 +22,6 @@
  *
  */
 
-#include "TestPlatformMgr.h"
-
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -33,6 +31,7 @@
 #include <nlunit-test.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/TestUtils.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -129,3 +128,5 @@ int TestPlatformMgr()
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestPlatformMgr);
