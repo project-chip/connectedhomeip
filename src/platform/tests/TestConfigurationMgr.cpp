@@ -22,8 +22,6 @@
  *
  */
 
-#include "TestConfigurationMgr.h"
-
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
