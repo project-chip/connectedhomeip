@@ -202,7 +202,7 @@ static const nlTest sTests[] = {
 
 int TestPlatformTime()
 {
-    nlTestSuite theSuite = { "CHIP DeviceLayer tests", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "PlatformTime tests", &sTests[0], nullptr, nullptr };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);

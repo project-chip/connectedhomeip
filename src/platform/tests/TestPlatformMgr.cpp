@@ -122,7 +122,7 @@ int TestPlatformMgr_Teardown(void * inContext)
 
 int TestPlatformMgr()
 {
-    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], TestPlatformMgr_Setup, TestPlatformMgr_Teardown };
+    nlTestSuite theSuite = { "PlatformMgr tests", &sTests[0], TestPlatformMgr_Setup, TestPlatformMgr_Teardown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);
