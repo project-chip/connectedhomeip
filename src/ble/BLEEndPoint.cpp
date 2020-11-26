@@ -410,6 +410,13 @@ void BLEEndPoint::FinalizeClose(uint8_t oldState, uint8_t flags, BLE_ERROR err)
                 // If unsubscribe fails, release BLE connection and free end point immediately.
                 Free();
             }
+            if (!mBle->mPlatformDelegate->UnsubscribeCharacteristic(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_3_ID))
+            {
+                ChipLogError(Ble, "BtpEngine unsub failed");
+
+                // If unsubscribe fails, release BLE connection and free end point immediately.
+                Free();
+            }
             else if (mConnObj != BLE_CONNECTION_UNINITIALIZED)
             {
                 // Unsubscribe request was sent successfully, and a confirmation wasn't spontaneously generated or

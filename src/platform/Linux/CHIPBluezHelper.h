@@ -75,6 +75,7 @@ namespace Internal {
 
 #define CHIP_PLAT_BLE_UUID_C1_STRING "18ee2ef5-263d-4559-959f-4f9c429f9d11"
 #define CHIP_PLAT_BLE_UUID_C2_STRING "18ee2ef5-263d-4559-959f-4f9c429f9d12"
+#define CHIP_PLAT_BLE_UUID_C3_STRING "18ee2ef5-263d-4559-959f-4f9c429f9d13"
 
 #define CHIP_BLE_BASE_SERVICE_UUID_STRING "-0000-1000-8000-00805f9b34fb"
 #define CHIP_BLE_SERVICE_PREFIX_LENGTH 8
@@ -161,6 +162,8 @@ struct BluezEndpoint
     BluezGattService1 * mpService;
     BluezGattCharacteristic1 * mpC1;
     BluezGattCharacteristic1 * mpC2;
+    // additional data characteristics
+    BluezGattCharacteristic1 * mpC3;
 
     // map device path to the connection
     GHashTable * mpConnMap;
@@ -185,6 +188,9 @@ struct BluezConnection
     BluezGattService1 * mpService;
     BluezGattCharacteristic1 * mpC1;
     BluezGattCharacteristic1 * mpC2;
+    // additional data characteristics
+    BluezGattCharacteristic1 * mpC3;
+
     bool mIsNotify;
     uint16_t mMtu;
     struct IOChannel mC1Channel;
