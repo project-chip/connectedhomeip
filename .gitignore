@@ -9,6 +9,7 @@
 
 # Build System
 out/
+src/test_driver/nrfconnect/build/
 
 # Temporary Directories
 .tmp/

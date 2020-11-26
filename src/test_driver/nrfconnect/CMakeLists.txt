@@ -63,16 +63,25 @@ set(CHIP_COMMON_FLAGS
 set(CHIP_LIBRARIES
     -lCHIP
     -lInetLayerTests
+    -lNetworkTestHelpers
     -lnlunit-test
 )
 
 set(CHIP_TESTS
-    -lSupportTests
+    # TODO: this list is hard to maintain manually (and currently incomplete).
+    # An automated way that includes figuring out dependencies would be much better
+    -lAppTests
+    -lASN1Tests
+    -lBleLayerTests
+    -lChipCryptoTests
     -lCoreTests
+    -lMessagingLayerTests
+    -lPlatformTests
+    -lRawTransportTests
+    -lRetransmitTests
+    -lSupportTests
     -lSystemLayerTests
     -lTransportLayerTests
-    -lChipCryptoTests
-    -lPlatformTests
 )
 
 # ==================================================

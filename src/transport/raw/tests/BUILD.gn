@@ -20,6 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 
 static_library("helpers") {
   output_name = "libNetworkTestHelpers"
+  output_dir = "${root_out_dir}/lib"
 
   sources = [
     "NetworkTestHelpers.cpp",
