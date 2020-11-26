@@ -3,10 +3,11 @@
 #include <nlunit-test.h>
 
 #include "lib/support/CHIPMem.h"
+#include "lib/support/TestUtils.h"
 
 using chip::Mdns::ServicePool;
 
-void TestServicePool(nlTestSuite * suite, void * context)
+void TestAddDeleteFind(nlTestSuite * suite, void * context)
 {
 
     chip::Mdns::ServicePool pool;
@@ -94,12 +95,19 @@ void TestServicePool(nlTestSuite * suite, void * context)
     NL_TEST_ASSERT(suite, pool.FindService(7, 0, &foundService) == true);
     NL_TEST_ASSERT(suite, foundService->mPort == 103);
     NL_TEST_ASSERT(suite, pool.FindService(2, 0, &foundService) == false);
+}
+
+void TestReplace(nlTestSuite * suite, void * context)
+{
+    chip::Mdns::ServicePool pool;
+    chip::Mdns::MdnsService testService;
+    chip::Mdns::MdnsService * foundService;
 
     pool.Clear();
 
     for (size_t i = 0; i < ServicePool::kServicePoolCapacity; i++)
     {
-        NL_TEST_ASSERT(suite, pool.AddService(i + 1, 0, testServices[0]) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(suite, pool.AddService(i + 1, 0, testService) == CHIP_NO_ERROR);
     }
 
     for (size_t i = 0; i < ServicePool::kServicePoolCapacity; i++)
@@ -107,7 +115,7 @@ void TestServicePool(nlTestSuite * suite, void * context)
         NL_TEST_ASSERT(suite, pool.FindService(i + 1, 0, &foundService) == true);
     }
 
-    NL_TEST_ASSERT(suite, pool.AddService(ServicePool::kServicePoolCapacity + 1, 0, testServices[0]) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(suite, pool.AddService(ServicePool::kServicePoolCapacity + 1, 0, testService) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(suite, pool.FindService(1, 0, &foundService) == false);
 
     for (size_t i = 1; i < ServicePool::kServicePoolCapacity; i++)
@@ -115,3 +123,20 @@ void TestServicePool(nlTestSuite * suite, void * context)
         NL_TEST_ASSERT(suite, pool.FindService(i + 1, 0, &foundService) == true);
     }
 }
+
+// clang-format off
+static const nlTest sTests[] = {
+  NL_TEST_DEF("TestAddDeleteFind", TestAddDeleteFind),
+  NL_TEST_DEF("TestReplace", TestReplace),
+  NL_TEST_SENTINEL()
+};
+// clang-format on
+int TestServicePool()
+{
+    nlTestSuite theSuite = { "ServicePool", &sTests[0], nullptr, nullptr };
+    nlTestRunner(&theSuite, nullptr);
+
+    return nlTestRunnerStats(&theSuite);
+}
+
+CHIP_REGISTER_TEST_SUITE(TestServicePool)
