@@ -27,8 +27,6 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TestInetLayer.h"
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
