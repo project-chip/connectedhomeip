@@ -419,7 +419,7 @@ CHIP_ERROR ReliableMessageManager::SendFromRetransTable(RetransTableEntry * entr
 
         // Send the message through
         uint16_t msgSendFlags = entry->msgSendFlags;
-        SetFlag(msgSendFlags, MessageFlagValues::kChipMessageFlag_RetainBuffer);
+        SetFlag(msgSendFlags, MessageFlagValues::kMessageFlag_RetainBuffer);
         err = SendMessage(rc, entry->msgBuf, msgSendFlags);
 
         // Reset the msgBuf start pointer and data length after sending

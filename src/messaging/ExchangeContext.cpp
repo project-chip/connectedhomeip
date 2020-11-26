@@ -121,7 +121,7 @@ exit:
         SetResponseExpected(false);
     }
 
-    if (msgBuf != nullptr && sendFlags.Has(SendMessageFlags::kSendFlag_RetainBuffer))
+    if (msgBuf != nullptr && !sendFlags.Has(SendMessageFlags::kSendFlag_RetainBuffer))
     {
         PacketBuffer::Free(msgBuf);
     }
