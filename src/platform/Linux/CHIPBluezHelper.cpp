@@ -695,6 +695,11 @@ static void BluezConnectionInit(BluezConnection * apConn)
                 {
                     apConn->mpC2 = char1;
                 }
+                else if ((BluezIsCharOnService(char1, apConn->mpService) == TRUE) &&
+                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), CHIP_PLAT_BLE_UUID_C3_STRING) == 0))
+                {
+                    apConn->mpC3 = char1;
+                }
                 else
                 {
                     g_object_unref(char1);
@@ -1261,6 +1266,7 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
 
     static const char * const c1_flags[] = { "write", nullptr };
     static const char * const c2_flags[] = { "read", "indicate", nullptr };
+    static const char * const c3_flags[] = { "read", nullptr };
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -1290,8 +1296,21 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
     g_signal_connect(endpoint->mpC2, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), apClosure);
     g_signal_connect(endpoint->mpC2, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), apClosure);
 
+    // Additional data characteristics
+    endpoint->mpC3 =
+        BluezCharacteristicCreate(endpoint->mpService, g_strdup("c3"), g_strdup(CHIP_PLAT_BLE_UUID_C3_STRING), endpoint->mpRoot);
+    bluez_gatt_characteristic1_set_flags(endpoint->mpC3, c3_flags);
+    g_signal_connect(endpoint->mpC3, "handle-read-value", G_CALLBACK(BluezCharacteristicReadValue), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-write-value", G_CALLBACK(BluezCharacteristicWriteValueError), NULL);
+    g_signal_connect(endpoint->mpC3, "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), NULL);
+    g_signal_connect(endpoint->mpC3, "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotify), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-start-notify", G_CALLBACK(BluezCharacteristicStartNotify), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), apClosure);
+
     ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC1));
     ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC2));
+    ChipLogDetail(DeviceLayer, "CHIP BTP C3 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC3));
 
 exit:
     return;
