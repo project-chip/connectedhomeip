@@ -31,7 +31,7 @@ chip_test_suite("tests") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/inet/tests:tests_common",
+    "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/transport",

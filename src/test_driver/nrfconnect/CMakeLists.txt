@@ -62,7 +62,7 @@ set(CHIP_COMMON_FLAGS
 
 set(CHIP_LIBRARIES
     -lCHIP
-    -lInetLayerTests
+    -lInetTestHelpers
     -lNetworkTestHelpers
     -lnlunit-test
 )
@@ -75,6 +75,7 @@ set(CHIP_TESTS
     -lBleLayerTests
     -lChipCryptoTests
     -lCoreTests
+    -lInetLayerTests
     -lMessagingLayerTests
     -lPlatformTests
     -lRawTransportTests
