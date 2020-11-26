@@ -29,13 +29,10 @@ function build_chip_tool() {
     # These files should be successfully compiled elsewhere.
     source "$REPO_DIR/scripts/activate.sh" >/dev/null
     set -x
-    gn gen out/debug >/dev/null
-    run_ninja -C out/debug TestDiscoveryManager
-    cd "$chip_tool_dir"
     gn gen --check --fail-on-unused-args out/debug >/dev/null
-    run_ninja -C out/debug
-    cp "$SOURCE_DIR"/out/debug/obj/src/lib/mdns/tests/bin/TestDiscoveryManager out/debug
-    docker build -t chip_tool -f Dockerfile . 2>&1
+    run_ninja -C out/debug TestDiscoveryManager chip-tool
+    cp "$chip_tool_dir"/entrypoint.sh out/debug/
+    docker build -t chip_tool -f "$chip_tool_dir"/Dockerfile out/debug 2>&1
 }
 
 function build_chip_lighting() {

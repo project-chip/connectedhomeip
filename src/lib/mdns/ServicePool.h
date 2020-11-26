@@ -51,7 +51,7 @@ private:
         MdnsService mService;
         uint64_t mNodeId;
         uint64_t mFabricId;
-        bool mLazyDelete;
+        bool mLazyDelete; // Only marked as deleted and needs to be handled in rehash
     };
 
     void ClearNoFree();
