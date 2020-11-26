@@ -31,7 +31,7 @@ public:
         {
             // Exit the event loop to notify the test has passed
             // If this is not triggered this will mean a resolution failure
-            exit(0);
+            chip::DeviceLayer::PlatformMgr().Shutdown();
         }
     }
 
@@ -79,5 +79,6 @@ int main()
         fprintf(stderr, "mDNS test timeout, is avahi daemon running?");
         retVal = EXIT_FAILURE;
     }
+    t.join();
     return retVal;
 }

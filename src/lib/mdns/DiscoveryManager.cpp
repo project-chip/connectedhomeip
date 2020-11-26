@@ -34,9 +34,11 @@ namespace {
 
 bool ParseNodeFabricId(const chip::Mdns::MdnsService & service, uint64_t * nodeId, uint64_t * fabricId)
 {
-    bool deliminatorFound = false;
-    *nodeId               = 0;
-    *fabricId             = 0;
+    bool deliminatorFound             = false;
+    *nodeId                           = 0;
+    *fabricId                         = 0;
+    int digitCount                    = 0;
+    constexpr uint8_t kMaxHexInUint64 = 16;
 
     for (size_t i = 0; i < sizeof(service.mName) && service.mName[i] != 0; i++)
     {
@@ -51,14 +53,22 @@ bool ParseNodeFabricId(const chip::Mdns::MdnsService & service, uint64_t * nodeI
             if (val == chip::kInvalidDigitValue)
             {
                 return false;
+                digitCount = 0;
             }
             else if (!deliminatorFound)
             {
                 *nodeId = (*nodeId) * 16 + val;
+                digitCount++;
             }
             else
             {
                 *fabricId = (*fabricId) * 16 + val;
+                digitCount++;
+            }
+
+            if (digitCount > kMaxHexInUint64)
+            {
+                return false;
             }
         }
     }
@@ -77,23 +87,19 @@ namespace Mdns {
 
 DiscoveryManager DiscoveryManager::sManager;
 
+#if CHIP_ENABLE_MDNS
 CHIP_ERROR DiscoveryManager::Init()
 {
-#if CHIP_ENABLE_MDNS
     CHIP_ERROR error;
 
     mUnprovisionedInstanceName = GetRandU64();
     SuccessOrExit(error = ChipMdnsInit(HandleMdnsInit, HandleMdnsError, this, this));
 exit:
     return error;
-#else
-    return CHIP_NO_ERROR;
-#endif // CHIP_ENABLE_MDNS
 }
 
 void DiscoveryManager::HandleMdnsInit(void * context, CHIP_ERROR initError)
 {
-#if CHIP_ENABLE_MDNS
     DiscoveryManager * publisher = static_cast<DiscoveryManager *>(context);
 
     if (initError == CHIP_NO_ERROR)
@@ -104,12 +110,10 @@ void DiscoveryManager::HandleMdnsInit(void * context, CHIP_ERROR initError)
     {
         ChipLogError(Discovery, "mDNS initialization failed with %s", chip::ErrorStr(initError));
     }
-#endif // CHIP_ENABLE_MDNS
 }
 
 void DiscoveryManager::HandleMdnsError(void * context, CHIP_ERROR error)
 {
-#if CHIP_ENABLE_MDNS
     DiscoveryManager * publisher = static_cast<DiscoveryManager *>(context);
     if (error == CHIP_ERROR_FORCED_RESET && publisher->mIsPublishing)
     {
@@ -119,12 +123,10 @@ void DiscoveryManager::HandleMdnsError(void * context, CHIP_ERROR error)
     {
         ChipLogError(Discovery, "mDNS error: %s", chip::ErrorStr(error));
     }
-#endif // CHIP_ENABLE_MDNS
 }
 
 CHIP_ERROR DiscoveryManager::StartPublishDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
 {
-#if CHIP_ENABLE_MDNS
     CHIP_ERROR error;
 
     // TODO: after multi-admin is decided we may need to publish both _chipc._udp and _chip._tcp service
@@ -151,14 +153,10 @@ CHIP_ERROR DiscoveryManager::StartPublishDevice(chip::Inet::IPAddressType addres
     mIsPublishing = true;
 exit:
     return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
 }
 
 CHIP_ERROR DiscoveryManager::SetupHostname()
 {
-#if CHIP_ENABLE_MDNS
     uint8_t mac[6];    // 6 byte wifi mac
     char hostname[13]; // Hostname will be the hex representation of mac.
     CHIP_ERROR error;
@@ -172,14 +170,10 @@ CHIP_ERROR DiscoveryManager::SetupHostname()
 
 exit:
     return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
 }
 
 CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
 {
-#if CHIP_ENABLE_MDNS
     CHIP_ERROR error = CHIP_NO_ERROR;
     MdnsService service;
     uint16_t discriminator;
@@ -216,14 +210,10 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
 
 exit:
     return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
 }
 
 CHIP_ERROR DiscoveryManager::PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
 {
-#if CHIP_ENABLE_MDNS
     uint64_t deviceId;
     uint64_t fabricId;
     MdnsService service;
@@ -244,37 +234,16 @@ CHIP_ERROR DiscoveryManager::PublishProvisionedDevice(chip::Inet::IPAddressType 
 
 exit:
     return error;
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
 }
 
 CHIP_ERROR DiscoveryManager::StopPublishDevice()
 {
-#if CHIP_ENABLE_MDNS
     mIsPublishing = false;
     return ChipMdnsStopPublish();
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
-}
-
-CHIP_ERROR DiscoveryManager::RegisterResolveDelegate(ResolveDelegate * delegate)
-{
-    if (mResolveDelegate != nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-    else
-    {
-        mResolveDelegate = delegate;
-        return CHIP_NO_ERROR;
-    }
 }
 
 CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
 {
-#if CHIP_ENABLE_MDNS
     MdnsService * foundService;
 
     if (mServicePool.FindService(nodeId, fabricId, &foundService) && foundService->mAddress.HasValue())
@@ -288,19 +257,15 @@ CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, I
         MdnsService service;
 
         snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
-        strncpy(service.mType, "_chip", sizeof(service.mType));
+        strncpy(service.mType, kProvisionedServiceType, sizeof(service.mType));
         service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
         service.mAddressType = type;
         return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
     }
-#else
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif // CHIP_ENABLE_MDNS
 }
 
 void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error)
 {
-#if CHIP_ENABLE_MDNS
     DiscoveryManager * mgr = static_cast<DiscoveryManager *>(context);
 
     if (mgr->mResolveDelegate == nullptr)
@@ -337,12 +302,10 @@ void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result,
             mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, *result);
         }
     }
-#endif // CHIP_ENABLE_MDNS
 }
 
 void DiscoveryManager::AddMdnsService(const MdnsService & service)
 {
-#if CHIP_ENABLE_MDNS
     if (strncmp(service.mType, kProvisionedServiceType, sizeof(service.mType)) == 0 &&
         service.mProtocol == MdnsServiceProtocol::kMdnsProtocolTcp)
     {
@@ -357,13 +320,15 @@ void DiscoveryManager::AddMdnsService(const MdnsService & service)
                 ChipLogError(Discovery, "Failed to add service to pool");
             }
         }
+        else
+        {
+            ChipLogError(Discovery, "Invalid service format during service add");
+        }
     }
-#endif // CHIP_ENABLE_MDNS
 }
 
 void DiscoveryManager::UpdateMdnsService(const MdnsService & service)
 {
-#if CHIP_ENABLE_MDNS
     if (strncmp(service.mType, kProvisionedServiceType, sizeof(service.mType)) == 0 &&
         service.mProtocol == MdnsServiceProtocol::kMdnsProtocolTcp)
     {
@@ -372,6 +337,7 @@ void DiscoveryManager::UpdateMdnsService(const MdnsService & service)
 
         if (!ParseNodeFabricId(service, &nodeId, &fabricId))
         {
+            ChipLogError(Discovery, "Invalid service format during service update");
             return;
         }
 
@@ -386,12 +352,10 @@ void DiscoveryManager::UpdateMdnsService(const MdnsService & service)
             ChipLogError(Discovery, "Failed to add service to pool");
         }
     }
-#endif // CHIP_ENABLE_MDNS
 }
 
 void DiscoveryManager::RemoveMdnsService(const MdnsService & service)
 {
-#if CHIP_ENABLE_MDNS
     if (strncmp(service.mType, kProvisionedServiceType, sizeof(service.mType)) == 0 &&
         service.mProtocol == MdnsServiceProtocol::kMdnsProtocolTcp)
     {
@@ -407,7 +371,54 @@ void DiscoveryManager::RemoveMdnsService(const MdnsService & service)
             ChipLogError(Discovery, "Failed to remove service from pool");
         }
     }
+}
+
+#else // CHIP_ENABLE_MDNS
+
+CHIP_ERROR DiscoveryManager::Init()
+{
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR DiscoveryManager::StartPublishDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR DiscoveryManager::SetupHostname()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR DiscoveryManager::StopPublishDevice()
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+void DiscoveryManager::AddMdnsService(const MdnsService & service) {}
+
+void DiscoveryManager::UpdateMdnsService(const MdnsService & service) {}
+
+void DiscoveryManager::RemoveMdnsService(const MdnsService & service) {}
+
 #endif // CHIP_ENABLE_MDNS
+
+CHIP_ERROR DiscoveryManager::RegisterResolveDelegate(ResolveDelegate * delegate)
+{
+    if (mResolveDelegate != nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    else
+    {
+        mResolveDelegate = delegate;
+        return CHIP_NO_ERROR;
+    }
 }
 
 } // namespace Mdns
