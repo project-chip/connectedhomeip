@@ -21,8 +21,6 @@
  *      This file implements unit tests for the SecureSession implementation.
  */
 
-#include "TestTransportLayer.h"
-
 #include <errno.h>
 #include <nlunit-test.h>
 
