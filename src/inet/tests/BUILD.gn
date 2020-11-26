@@ -52,9 +52,13 @@ chip_test_suite("tests") {
 
   sources = [
     "TestInetAddress.cpp",
-    "TestInetEndPoint.cpp",
     "TestInetErrorStr.cpp",
   ]
+
+  if (current_os != "zephyr") {
+    sources += [ "TestInetEndPoint.cpp" ]
+    tests += [ "TestInetEndPoint" ]
+  }
 
   if (lwip_platform == "standalone") {
     sources += [
@@ -75,14 +79,12 @@ chip_test_suite("tests") {
   tests = [
     "TestInetAddress",
     "TestInetErrorStr",
-    "TestInetEndPoint",
   ]
 
   # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
   # x64.
   if (current_os != "mac" && current_os != "zephyr" &&
-      chip_device_platform != "esp32" &&
-      current_cpu == "x64") {
+      chip_device_platform != "esp32" && current_cpu == "x64") {
     sources += [
       "TestInetLayerDNS.cpp",
       "TestLwIPDNS.cpp",
