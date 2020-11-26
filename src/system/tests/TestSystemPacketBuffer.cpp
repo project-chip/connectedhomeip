@@ -27,8 +27,6 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TestSystemLayer.h"
-
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
@@ -1208,6 +1206,10 @@ int TestTeardown(void * inContext)
 
 int TestSystemPacketBuffer(void)
 {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    tcpip_init(NULL, NULL);
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
     // clang-format off
     nlTestSuite theSuite =
 	{
