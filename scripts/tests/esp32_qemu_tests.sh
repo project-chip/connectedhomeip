@@ -61,8 +61,19 @@ run_suite() {
 SUITES=(
 )
 
+run_suite libAppTests.a
+run_suite libASN1Tests.a
+run_suite libBleLayerTests.a
+run_suite libCoreTests.a
 run_suite libInetLayerTests.a
+run_suite libRetransmitTests.a
 run_suite libSystemLayerTests.a
+
+# TODO: Transport layer tests do not link:
+#    - getpid undefined
+#    - ArgParser for IPAddresses are not linked in
+#    - std::__throw_bad_alloc() linker errors
+# run_suite libRawTransportTests.a "-lNetworkTestHelpers -lInetTestHelpers"
 
 # TODO: Transport layer tests do not link:
 #    - getpid undefined
