@@ -55,11 +55,6 @@ chip_test_suite("tests") {
     "TestInetErrorStr.cpp",
   ]
 
-  if (current_os != "zephyr") {
-    sources += [ "TestInetEndPoint.cpp" ]
-    tests += [ "TestInetEndPoint" ]
-  }
-
   if (lwip_platform == "standalone") {
     sources += [
       "TapAddrAutoconf.cpp",
@@ -80,6 +75,11 @@ chip_test_suite("tests") {
     "TestInetAddress",
     "TestInetErrorStr",
   ]
+
+  if (current_os != "zephyr") {
+    sources += [ "TestInetEndPoint.cpp" ]
+    tests += [ "TestInetEndPoint" ]
+  }
 
   # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
   # x64.
