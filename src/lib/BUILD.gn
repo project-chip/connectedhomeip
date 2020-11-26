@@ -28,6 +28,7 @@ static_library("lib") {
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/asn1",
     "${chip_root}/src/lib/core",
+    "${chip_root}/src/lib/mdns",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
@@ -35,10 +36,6 @@ static_library("lib") {
     "${chip_root}/src/system",
     "${chip_root}/src/transport",
   ]
-
-  if (chip_enable_mdns) {
-    public_deps += [ "${chip_root}/src/lib/mdns" ]
-  }
 
   cflags = [ "-Wconversion" ]
 
