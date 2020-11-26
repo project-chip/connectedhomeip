@@ -24,8 +24,6 @@
  *
  */
 
-#include "TestBleLayer.h"
-
 #include <ble/BleUUID.h>
 #include <support/TestUtils.h>
 
