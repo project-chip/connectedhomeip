@@ -118,8 +118,10 @@ public:
      * @brief
      *   Send a message to a currently connected peer
      */
-    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgIn, uint32_t & msgId,
+                           uint32_t & payloadLength, bool isResend);
     SecureSessionMgr();
     ~SecureSessionMgr() override;
 

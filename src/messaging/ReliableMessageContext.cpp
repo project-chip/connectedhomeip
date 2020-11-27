@@ -36,15 +36,31 @@
 namespace chip {
 namespace Messaging {
 
-void ReliableMessageContextDeletor::Release(ReliableMessageContext * obj)
+ReliableMessageContext::ReliableMessageContext() :
+    mManager(nullptr), mExchange(nullptr), mDelegate(nullptr), mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0),
+    mThrottleTimeoutTick(0), mPendingPeerAckId(0)
+{}
+
+void ReliableMessageContext::Init(ReliableMessageManager * manager, ExchangeContext * exchange)
 {
-    obj->mManager->FreeContext(obj);
+    mManager  = manager;
+    mExchange = exchange;
+    mDelegate = nullptr;
+
+    SetDropAckDebug(false);
+    SetAckPending(false);
+    SetPeerRequestedAck(false);
+    SetMsgRcvdFromPeer(false);
+    SetAutoRequestAck(true);
 }
 
-ReliableMessageContext::ReliableMessageContext() :
-    mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0), mThrottleTimeoutTick(0), mPendingPeerAckId(0),
-    mDelegate(nullptr)
-{}
+/**
+ * Returns whether an acknowledgment will be requested whenever a message is sent.
+ */
+bool ReliableMessageContext::AutoRequestAck() const
+{
+    return mFlags.Has(Flags::kFlagAutoRequestAck);
+}
 
 /**
  *  Determine whether there is already an acknowledgment pending to be sent
@@ -76,6 +92,18 @@ bool ReliableMessageContext::HasPeerRequestedAck() const
 bool ReliableMessageContext::HasRcvdMsgFromPeer() const
 {
     return mFlags.Has(Flags::kFlagMsgRcvdFromPeer);
+}
+
+/**
+ * Set whether an acknowledgment should be requested whenever a message is sent.
+ *
+ * @param[in] autoReqAck            A Boolean indicating whether or not an
+ *                                  acknowledgment should be requested whenever a
+ *                                  message is sent.
+ */
+void ReliableMessageContext::SetAutoRequestAck(bool autoReqAck)
+{
+    mFlags.Set(Flags::kFlagAutoRequestAck, autoReqAck);
 }
 
 /**
@@ -168,6 +196,11 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
     return err;
 }
 
+uint64_t ReliableMessageContext::GetPeerNodeId()
+{
+    return (mExchange ? mExchange->GetPeerNodeId() : 0);
+}
+
 /**
  *  Get the current retransmit timeout. It would be either the initial or
  *  the active retransmit timeout based on whether the ExchangeContext has
@@ -221,9 +254,16 @@ CHIP_ERROR ReliableMessageContext::SendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = mManager->SendMessage(this, Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow,
-                                msgBuf.Release_ForNow(),
-                                BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
+    if (mExchange != nullptr)
+    {
+        err = mExchange->SendMessage(Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow,
+                                     msgBuf.Release_ForNow(), SendFlags(SendMessageFlags::kSendFlag_NoAutoRequestAck));
+    }
+    else
+    {
+        ChipLogError(ExchangeManager, "ExchangeContext is not initilized in ReliableMessageContext");
+        err = CHIP_ERROR_NOT_CONNECTED;
+    }
 
 exit:
     return err;
@@ -277,9 +317,16 @@ CHIP_ERROR ReliableMessageContext::SendDelayedDelivery(uint32_t pauseTimeMillis,
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = mManager->SendMessage(this, Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery,
-                                msgBuf.Release_ForNow(),
-                                BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
+    if (mExchange != nullptr)
+    {
+        err = mExchange->SendMessage(Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery,
+                                     msgBuf.Release_ForNow(), SendFlags(SendMessageFlags::kSendFlag_NoAutoRequestAck));
+    }
+    else
+    {
+        ChipLogError(ExchangeManager, "ExchangeContext is not initilized in ReliableMessageContext");
+        err = CHIP_ERROR_NOT_CONNECTED;
+    }
 
 exit:
     return err;
@@ -292,27 +339,7 @@ exit:
  *  @note
  *    This message is part of the CHIP Reliable Messaging protocol.
  *
- *  @param[in]    exchHeader         CHIP exchange information for incoming Ack message.
- *
- *  @retval  #CHIP_ERROR_INVALID_ACK_ID                 if the msgId of received Ack is not in the RetransTable.
- *  @retval  #CHIP_NO_ERROR                             if the context was removed.
- *
- */
-CHIP_ERROR ReliableMessageContext::HandleDelayedDeliveryMessage(uint32_t PauseTimeMillis)
-{
-    mManager->ProcessDelayedDeliveryMessage(this, PauseTimeMillis);
-    mDelegate->OnDelayedDeliveryRcvd(PauseTimeMillis);
-    return CHIP_NO_ERROR;
-}
-
-/**
- *  Process received Ack. Remove the corresponding message context from the RetransTable and execute the application
- *  callback
- *
- *  @note
- *    This message is part of the CHIP Reliable Messaging protocol.
- *
- *  @param[in]    exchHeader         CHIP exchange information for incoming Ack message.
+ *  @param[in]    AckMsgId         The msgId of incoming Ack message.
  *
  *  @retval  #CHIP_ERROR_INVALID_ACK_ID                 if the msgId of received Ack is not in the RetransTable.
  *  @retval  #CHIP_NO_ERROR                             if the context was removed.
@@ -333,7 +360,11 @@ CHIP_ERROR ReliableMessageContext::HandleRcvdAck(uint32_t AckMsgId)
     }
     else
     {
-        mDelegate->OnAckRcvd();
+        if (mDelegate)
+        {
+            mDelegate->OnAckRcvd();
+        }
+
 #if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Removed CHIP MsgId:%08" PRIX32 " from RetransTable", AckMsgId);
 #endif
@@ -426,7 +457,10 @@ CHIP_ERROR ReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
     }
 
     // Call OnThrottleRcvd application callback
-    mDelegate->OnThrottleRcvd(PauseTimeMillis);
+    if (mDelegate)
+    {
+        mDelegate->OnThrottleRcvd(PauseTimeMillis);
+    }
 
     // Schedule next physical wakeup
     mManager->StartTimer();
@@ -454,9 +488,16 @@ CHIP_ERROR ReliableMessageContext::SendCommonNullMessage()
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err = mManager->SendMessage(this, chip::Protocols::kProtocol_Protocol_Common, chip::Protocols::Common::kMsgType_Null,
-                                msgBuf.Release_ForNow(),
-                                BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
+    if (mExchange != nullptr)
+    {
+        err = mExchange->SendMessage(Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_Null,
+                                     msgBuf.Release_ForNow(), SendFlags(SendMessageFlags::kSendFlag_NoAutoRequestAck));
+    }
+    else
+    {
+        ChipLogError(ExchangeManager, "ExchangeContext is not initilized in ReliableMessageContext");
+        err = CHIP_ERROR_NOT_CONNECTED;
+    }
 
 exit:
     if (IsSendErrorNonCritical(err))

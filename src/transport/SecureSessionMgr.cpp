@@ -94,6 +94,16 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
 
 CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf)
 {
+    uint32_t msgId  = 0;
+    uint32_t length = 0;
+
+    return SendMessage(payloadHeader, peerNodeId, msgIn, msgId, length, false);
+}
+
+CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgIn,
+                                         uint32_t & msgId, uint32_t & payloadLength, bool isResend)
+{
+    System::PacketBufferHandle msgBuf;
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
 
@@ -111,6 +121,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
 
     {
         uint8_t * data = nullptr;
+        uint8_t * p    = nullptr;
+        uint16_t len   = 0;
         PacketHeader packetHeader;
         MessageAuthenticationCode mac;
 
@@ -118,47 +130,64 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         uint16_t actualEncodedHeaderSize;
         uint16_t totalLen = 0;
         uint16_t taglen   = 0;
-        uint32_t payloadLength; // Make sure it's big enough to add two 16-bit
-                                // ints without overflowing.
-        static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
-                      "Addition to generate payloadLength might overflow");
-        payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
-        VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
+
+        if (!isResend)
+        {
+            msgId = state->GetSendMessageIndex();
+
+            static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
+                          "Addition to generate payloadLength might overflow");
+            payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
+            VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
+        }
 
         packetHeader
             .SetSourceNodeId(mLocalNodeId)              //
             .SetDestinationNodeId(peerNodeId)           //
-            .SetMessageId(state->GetSendMessageIndex()) //
+            .SetMessageId(msgId)                        //
             .SetEncryptionKeyID(state->GetLocalKeyID()) //
             .SetPayloadLength(static_cast<uint16_t>(payloadLength));
         packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
 
         ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, peerNodeId);
 
-        VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+        // Skip encryption process if the packet is resent by CRMP
+        if (!isResend)
+        {
+            VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
-        msgBuf->SetStart(msgBuf->Start() - headerSize);
-        data     = msgBuf->Start();
-        totalLen = msgBuf->TotalLength();
+            msgBuf->SetStart(msgBuf->Start() - headerSize);
+            data     = msgBuf->Start();
+            totalLen = msgBuf->TotalLength();
 
-        err = payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
-        SuccessOrExit(err);
+            err = payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
+            SuccessOrExit(err);
 
-        err = state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, mac);
-        SuccessOrExit(err);
+            err = state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, mac);
+            SuccessOrExit(err);
+            err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
+            SuccessOrExit(err);
 
-        err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
-        SuccessOrExit(err);
+            VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INTERNAL);
+            msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen), nullptr);
 
-        VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INTERNAL);
-        msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen), nullptr);
+            ChipLogDetail(Inet, "Secure transport transmitting msg %u after encryption", msgId);
+        }
 
-        ChipLogDetail(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
+        // Locally store the start and length;
+        p   = msgBuf->Start();
+        len = msgBuf->DataLength();
 
         err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), msgBuf.Release_ForNow());
+
+        // Reset the msgBuf start pointer and data length after sending in case for retransmition
+        msgIn->SetStart(p);
+        msgIn->SetDataLength(len);
     }
     SuccessOrExit(err);
-    state->IncrementSendMessageIndex();
+
+    if (!isResend)
+        state->IncrementSendMessageIndex();
 
 exit:
     if (!msgBuf.IsNull())
