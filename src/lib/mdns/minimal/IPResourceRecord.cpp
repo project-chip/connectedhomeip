@@ -20,11 +20,9 @@
 namespace mdns {
 namespace Minimal {
 
-bool IPResourceRecord::WriteData(chip::BufBound & out) const
+bool IPResourceRecord::WriteData(chip::Encoding::BigEndian::BufferWriter & out) const
 {
-    // IP address is already stored in network byte order. We cannot use
-    // PutBE/PutLE
-
+    // IP address is already stored in network byte order, hence raw bytes put
     if (mIPAddress.IsIPv6())
     {
         out.Put(mIPAddress.Addr, 16);

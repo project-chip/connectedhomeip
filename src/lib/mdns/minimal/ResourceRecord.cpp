@@ -20,7 +20,7 @@
 namespace mdns {
 namespace Minimal {
 
-bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, chip::BufBound & out) const
+bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, chip::Encoding::BigEndian::BufferWriter & out) const
 {
     // order is important based on resource type. First come answers, then authorityAnswers
     // and then additional:
@@ -42,20 +42,20 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, chip::BufBound
     }
     out.Put8(0); // end of qnames
 
-    out                                             //
-        .PutBE16(static_cast<uint16_t>(GetClass())) //
-        .PutBE16(static_cast<uint16_t>(GetType()))  //
-        .PutBE32(static_cast<uint32_t>(GetTtl()))   //
+    out                                           //
+        .Put16(static_cast<uint16_t>(GetClass())) //
+        .Put16(static_cast<uint16_t>(GetType()))  //
+        .Put32(static_cast<uint32_t>(GetTtl()))   //
         ;
 
-    chip::BufBound sizeOutput(out);        // copy to re-output size
-    out.PutBE16(static_cast<uint32_t>(0)); // dummy, will be replaced later
+    chip::Encoding::BigEndian::BufferWriter sizeOutput(out); // copy to re-output size
+    out.Put16(static_cast<uint32_t>(0));                     // dummy, will be replaced later
 
     if (!WriteData(out))
     {
         return false;
     }
-    sizeOutput.PutBE16(static_cast<uint16_t>(out.Needed() - sizeOutput.Needed() - 2));
+    sizeOutput.Put16(static_cast<uint16_t>(out.Needed() - sizeOutput.Needed() - 2));
 
     // This MUST be final and separated out: record count is only updated on success.
     if (out.Fit())

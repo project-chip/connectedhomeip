@@ -52,9 +52,13 @@ public:
         return *this;
     }
 
-    /*
-     * @brief append a single byte
-     */
+    BufferWriterBase & Skip(size_t len)
+    {
+        mNeeded += len;
+        return *this;
+    }
+
+    /// Append a single byte
     BufferWriterBase & Put(uint8_t c)
     {
         if (mNeeded < mSize)
@@ -95,7 +99,12 @@ public:
     /// Size of the output buffer
     size_t Size() const { return mSize; }
 
-protected:
+    uint8_t * Buffer() { return mBuf; }
+    const uint8_t * Buffer() const { return mBuf; }
+
+private:
+    friend Derived;
+
     uint8_t * mBuf;
     size_t mSize;
     size_t mNeeded;
@@ -124,6 +133,17 @@ public:
         }
         return *this;
     }
+
+    // allows treating of a buffer stream to a different endianess
+    template <typename T>
+    static BufferWriter StartingFrom(BufferWriterBase<T> & other)
+    {
+        if (!other.Fit())
+        {
+            return BufferWriter(nullptr, 0);
+        }
+        return BufferWriter(other.Buffer() + other.Needed(), other.Size() - other.Needed());
+    }
 };
 
 } // namespace LittleEndian
@@ -145,6 +165,17 @@ public:
             Put(c);
         }
         return *this;
+    }
+
+    // allows treating of a buffer stream to a different endianess
+    template <typename T>
+    static BufferWriter StartingFrom(BufferWriterBase<T> & other)
+    {
+        if (!other.Fit())
+        {
+            return BufferWriter(nullptr, 0);
+        }
+        return BufferWriter(other.Buffer() + other.Needed(), other.Size() - other.Needed());
     }
 };
 

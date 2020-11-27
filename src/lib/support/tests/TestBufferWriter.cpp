@@ -40,11 +40,13 @@ public:
         {
             if (mBuf[i] != kGuard)
             {
+                printf("Guards failure at index %d\n", static_cast<int>(i));
                 return false;
             }
         }
         if (mBuf[0] != kGuard)
         {
+            printf("Guards failure at index 0: buffer underflow\n");
             return false;
         }
 
@@ -65,6 +67,7 @@ public:
         // check everything else
         if (memcmp(mBuf + 1, val, needed < mLen ? needed : mLen) != 0)
         {
+            printf("Memory comparison failed.\n");
             return false;
         }
 
@@ -177,11 +180,28 @@ void TestPutBigEndian(nlTestSuite * inSuite, void * inContext)
     }
 }
 
+void TestEndianessSwitch(nlTestSuite * inSuite, void * inContext)
+{
+    BWTest<BigEndian::BufferWriter> bb(6);
+    bb.Put16('i' + 'h' * 256);
+
+    LittleEndian::BufferWriter leWriter = LittleEndian::BufferWriter::StartingFrom(bb);
+    leWriter.Put16('i' + 'h' * 256);
+    bb.Skip(2);
+
+    BigEndian::BufferWriter beWriter = BigEndian::BufferWriter::StartingFrom(leWriter);
+    beWriter.Put16('i' + 'h' * 256);
+    bb.Skip(2);
+
+    NL_TEST_ASSERT(inSuite, bb.expect("hiihhi", 6, 0));
+}
+
 const nlTest sTests[] = {
     NL_TEST_DEF("TestStringWrite", TestStringWrite),         //
     NL_TEST_DEF("TestBufferWrite", TestBufferWrite),         //
     NL_TEST_DEF("TestPutLittleEndian", TestPutLittleEndian), //
     NL_TEST_DEF("TestPutBigEndian", TestPutBigEndian),       //
+    NL_TEST_DEF("TestEndianessSwitch", TestEndianessSwitch), //
     NL_TEST_SENTINEL()                                       //
 };
 
