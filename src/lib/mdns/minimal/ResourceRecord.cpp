@@ -49,7 +49,7 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, chip::Encoding
         ;
 
     chip::Encoding::BigEndian::BufferWriter sizeOutput(out); // copy to re-output size
-    out.Put16(static_cast<uint32_t>(0));                     // dummy, will be replaced later
+    out.Put16(0);                                            // dummy, will be replaced later
 
     if (!WriteData(out))
     {
