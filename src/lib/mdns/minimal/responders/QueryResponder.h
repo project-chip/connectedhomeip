@@ -186,7 +186,7 @@ public:
 
     /// Add a new responder to be processed
     ///
-    /// Return true if adding was succesful.
+    /// Return valid QueryResponderSettings on add success.
     QueryResponderSettings AddResponder(Responder * responder);
 
     /// Implementation of the responder delegate
