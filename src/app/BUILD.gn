@@ -32,6 +32,8 @@ static_library("app") {
     "MessageDef.h",
     "decoder.cpp",
     "encoder.cpp",
+    "CHIPDeviceManager.cpp",
+    "CHIPDeviceManager.h",
   ]
 
   public_deps = [

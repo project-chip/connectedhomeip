@@ -24,7 +24,9 @@
 
 #include <stdlib.h>
 
-#include "CHIPDeviceManager.h"
+#include "CHIPDeviceLocalManager.h"
+
+#include <app/CHIPDeviceManager.h>
 #include <app/util/basic-types.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
@@ -39,7 +41,7 @@ namespace DeviceManager {
 
 using namespace ::chip::DeviceLayer;
 
-void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
+void CHIPDeviceLocalManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, intptr_t arg)
 {
     CHIPDeviceManagerCallbacks * cb = reinterpret_cast<CHIPDeviceManagerCallbacks *>(arg);
     if (cb != nullptr)
@@ -51,10 +53,13 @@ void CHIPDeviceManager::CommonDeviceEventHandler(const ChipDeviceEvent * event, 
 /**
  *
  */
-CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
+CHIP_ERROR CHIPDeviceLocalManager::Init(CHIPDeviceManagerCallbacks * cb)
 {
     CHIP_ERROR err;
     mCB = cb;
+
+    // get device manager instance
+    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
 
     // Initialize the CHIP stack.
     err = PlatformMgr().InitChipStack();
@@ -86,7 +91,7 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 
     // Register a function to receive events from the CHIP device layer.  Note that calls to
     // this function will happen on the CHIP event loop thread, not the app_main thread.
-    PlatformMgr().AddEventHandler(CHIPDeviceManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
+    PlatformMgr().AddEventHandler(CHIPDeviceLocalManager::CommonDeviceEventHandler, reinterpret_cast<intptr_t>(cb));
 
     // Start a task to run the CHIP Device event loop.
     err = PlatformMgr().StartEventLoopTask();
@@ -102,7 +107,7 @@ void emberAfPostAttributeChangeCallback(EndpointId endpointId, ClusterId cluster
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
-        chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
+        chip::DeviceManager::CHIPDeviceLocalManager::GetInstance().GetCHIPDeviceManagerCallbacks();
     if (cb != nullptr)
     {
         cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, mask, manufacturerCode, type, size, value);

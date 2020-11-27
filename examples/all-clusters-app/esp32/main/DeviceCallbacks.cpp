@@ -24,7 +24,7 @@
  **/
 #include "DeviceCallbacks.h"
 
-#include "CHIPDeviceManager.h"
+#include "CHIPDeviceLocalManager.h"
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "WiFiWidget.h"

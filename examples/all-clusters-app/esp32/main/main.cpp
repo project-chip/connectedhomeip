@@ -17,7 +17,7 @@
 
 #include "BluetoothWidget.h"
 #include "Button.h"
-#include "CHIPDeviceManager.h"
+#include "CHIPDeviceLocalManager.h"
 #include "DataModelHandler.h"
 #include "DeviceCallbacks.h"
 #include "Display.h"
@@ -466,7 +466,7 @@ extern "C" void app_main()
         return;
     }
 
-    CHIPDeviceManager & deviceMgr = CHIPDeviceManager::GetInstance();
+    CHIPDeviceLocalManager & deviceMgr = CHIPDeviceLocalManager::GetInstance();
 
     err = deviceMgr.Init(&EchoCallbacks);
     if (err != CHIP_NO_ERROR)

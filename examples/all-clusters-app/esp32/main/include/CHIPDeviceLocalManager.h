@@ -83,16 +83,16 @@ public:
  * @brief
  *   A common class that drives other components of the CHIP stack
  */
-class DLL_EXPORT CHIPDeviceManager
+class DLL_EXPORT CHIPDeviceLocalManager
 {
 public:
-    CHIPDeviceManager(const CHIPDeviceManager &)  = delete;
-    CHIPDeviceManager(const CHIPDeviceManager &&) = delete;
-    CHIPDeviceManager & operator=(const CHIPDeviceManager &) = delete;
+    CHIPDeviceLocalManager(const CHIPDeviceLocalManager &)  = delete;
+    CHIPDeviceLocalManager(const CHIPDeviceLocalManager &&) = delete;
+    CHIPDeviceLocalManager & operator=(const CHIPDeviceLocalManager &) = delete;
 
-    static CHIPDeviceManager & GetInstance()
+    static CHIPDeviceLocalManager & GetInstance()
     {
-        static CHIPDeviceManager instance;
+        static CHIPDeviceLocalManager instance;
         return instance;
     }
 
@@ -118,7 +118,7 @@ public:
 
 private:
     CHIPDeviceManagerCallbacks * mCB = nullptr;
-    CHIPDeviceManager() {}
+    CHIPDeviceLocalManager() {}
 };
 
 } // namespace DeviceManager
