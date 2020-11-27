@@ -128,11 +128,10 @@ public:
 
     void OnResponse(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info) override
     {
-        char addr[32];
+        char addr[INET6_ADDRSTRLEN];
         info->SrcAddress.ToString(addr, sizeof(addr));
 
-        // printf("RESPONSE from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
-        // Report("RESPONSE: ", data);
+        printf("RESPONSE from: %-15s on port %d, via interface %d\n", addr, info->SrcPort, info->Interface);
     }
 
     // ParserDelegate
