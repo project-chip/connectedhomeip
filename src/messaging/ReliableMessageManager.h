@@ -25,6 +25,7 @@
 
 #include <stdint.h>
 
+#include <messaging/ExchangeContext.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 
 #include <core/CHIPError.h>
@@ -57,10 +58,10 @@ public:
     {
         RetransTableEntry();
 
-        ReliableMessageContext * rc;       /**< The context for the stored CHIP message. */
-        System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding the CHIP message. */
-        uint32_t msgId;                    /**< The message identifier of the CHIP message awaiting acknowledgment. */
-        uint16_t msgSendFlags;
+        ReliableMessageContext * rc;                     /**< The context for the stored CHIP message. */
+        System::EncryptedPacketBufferHandle retainedBuf; /**< The PacketBuffer object holding the CHIP message. */
+        PayloadHeader payloadHeader;                     /**< Exchange Header for the stored CHIP message. */
+        uint64_t peerNodeId;                             /**< Node ID of peer node. */
         uint16_t nextRetransTimeTick; /**< A counter representing the next retransmission time for the message. */
         uint8_t sendCount;            /**< A counter representing the number of times the message has been sent. */
     };
@@ -69,26 +70,25 @@ public:
     ReliableMessageManager();
     ~ReliableMessageManager();
 
-    void Init(chip::System::Layer & system) { mSystemLayer = &system; }
-    void Shutdown() {}
-
-    void FreeContext(ReliableMessageContext * rc);
+    void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr, ExchangeContext * contextPool);
+    void Shutdown();
 
     uint64_t GetTickCounterFromTimePeriod(uint64_t period);
     uint64_t GetTickCounterFromTimeDelta(uint64_t newTime);
 
     void ExecuteActions();
-    void ProcessDelayedDeliveryMessage(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
+    void ProcessDelayedDeliveryMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
     static void Timeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
-    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, System::PacketBufferHandle msgBuf, uint32_t messageId,
-                                 uint16_t msgSendFlags, RetransTableEntry ** rEntry);
+    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, PayloadHeader & payloadHeader, NodeId nodeId,
+                                 RetransTableEntry ** rEntry);
+    void StartFromRetransTable(RetransTableEntry * entry);
     void PauseRetransTable(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
     void ResumeRetransTable(ReliableMessageContext * rc);
     bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t msgId);
     CHIP_ERROR SendFromRetransTable(RetransTableEntry * entry);
-    void ClearRetransmitTable(ReliableMessageContext * rc);
-    void ClearRetransmitTable(RetransTableEntry & rEntry);
+    void ClearRetransTable(ReliableMessageContext * rc);
+    void ClearRetransTable(RetransTableEntry & rEntry);
     void FailRetransmitTableEntries(ReliableMessageContext * rc, CHIP_ERROR err);
 
     void StartTimer();
@@ -99,14 +99,10 @@ public:
     int TestGetCountRetransTable();
     void TestSetIntervalShift(uint16_t value) { mTimerIntervalShift = value; }
 
-public:
-    // public functions for ReliableMessageProtocol internal usage
-    CHIP_ERROR SendMessage(ReliableMessageContext * context, System::PacketBufferHandle msgBuf, uint16_t sendFlags);
-    CHIP_ERROR SendMessage(ReliableMessageContext * context, uint32_t profileId, uint8_t msgType, System::PacketBufferHandle msgBuf,
-                           BitFlags<uint16_t, SendMessageFlags> sendFlags);
-
 private:
     chip::System::Layer * mSystemLayer;
+    ExchangeContext * mContextPool;
+    SecureSessionMgr * mSessionMgr;
     uint64_t mTimeStampBase;                  // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
     System::Timer::Epoch mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
     uint16_t mTimerIntervalShift;             // ReliableMessageProtocol Timer tick period shift
@@ -114,7 +110,17 @@ private:
     /* Placeholder function to run a function for all exchanges */
     template <typename Function>
     void ExecuteForAllContext(Function function)
-    {}
+    {
+        ExchangeContext * ec = mContextPool;
+
+        if (ec != nullptr)
+        {
+            for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+            {
+                function(ec->GetReliableMessageContext());
+            }
+        }
+    }
 
     void TicklessDebugDumpRetransTable(const char * log);
 

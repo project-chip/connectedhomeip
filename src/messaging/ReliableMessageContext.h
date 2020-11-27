@@ -39,6 +39,7 @@ namespace chip {
 namespace Messaging {
 
 class ChipMessageInfo;
+class ExchangeContext;
 enum class MessageFlagValues : uint32_t;
 class ReliableMessageContext;
 class ReliableMessageManager;
@@ -55,30 +56,27 @@ public:
     virtual void OnAckRcvd()                               = 0; /**< Application callback for received acknowledgment. */
 };
 
-class ReliableMessageContextDeletor
+class ReliableMessageContext
 {
-public:
-    static void Release(ReliableMessageContext * obj);
-};
+    friend class ExchangeContext;
 
-class ReliableMessageContext : public ReferenceCounted<ReliableMessageContext, ReliableMessageContextDeletor>
-{
 public:
-    friend class ReliableMessageContextDeletor;
-
     ReliableMessageContext();
 
-    void Init(ReliableMessageManager * manager) { mManager = manager; }
+    void Init(ReliableMessageManager * manager, ExchangeContext * exchange);
     void SetConfig(ReliableMessageProtocolConfig config) { mConfig = config; }
     void SetDelegate(ReliableMessageDelegate * delegate) { mDelegate = delegate; }
 
     CHIP_ERROR FlushAcks();
+    uint64_t GetPeerNodeId();
     uint64_t GetCurrentRetransmitTimeoutTick();
 
     CHIP_ERROR SendThrottleFlow(uint32_t PauseTimeMillis);
     CHIP_ERROR SendDelayedDelivery(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
     CHIP_ERROR SendCommonNullMessage();
 
+    bool AutoRequestAck() const;
+    void SetAutoRequestAck(bool autoReqAck);
     bool ShouldDropAckDebug() const;
     void SetDropAckDebug(bool inDropAckDebug);
     bool IsAckPending() const;
@@ -87,6 +85,7 @@ public:
     void SetPeerRequestedAck(bool inPeerRequestedAck);
     bool HasRcvdMsgFromPeer() const;
     void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
+    bool IsThrottling() const { return (mThrottleTimeoutTick != 0); }
 
 private:
     enum class Flags : uint16_t
@@ -114,7 +113,6 @@ private:
 
     BitFlags<uint16_t, Flags> mFlags; // Internal state flags
 
-    CHIP_ERROR HandleDelayedDeliveryMessage(uint32_t PauseTimeMillis);
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
     CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<uint32_t, MessageFlagValues> Flags);
     CHIP_ERROR HandleThrottleFlow(uint32_t PauseTimeMillis);
@@ -123,12 +121,12 @@ private:
     friend class ReliableMessageManager;
 
     ReliableMessageManager * mManager;
+    ExchangeContext * mExchange;
+    ReliableMessageDelegate * mDelegate;
     ReliableMessageProtocolConfig mConfig;
     uint16_t mNextAckTimeTick;     // Next time for triggering Solo Ack
     uint16_t mThrottleTimeoutTick; // Timeout until when Throttle is On when ThrottleEnabled is set
     uint32_t mPendingPeerAckId;
-
-    ReliableMessageDelegate * mDelegate;
 };
 
 } // namespace Messaging

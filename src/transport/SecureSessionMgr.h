@@ -110,6 +110,8 @@ public:
      */
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
     CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf, uint32_t & msgId,
+                           uint32_t & payloadLength, bool isResend);
     SecureSessionMgr();
     ~SecureSessionMgr() override;
 
