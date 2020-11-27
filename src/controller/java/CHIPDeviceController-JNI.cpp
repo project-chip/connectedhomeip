@@ -374,7 +374,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
     }
 }
 
-JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, jobject commandObj)
+JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, jobject commandObj, jint aValue)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -412,6 +412,10 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
                 break;
             case 2:
                 dataLength = encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, endpoint);
+                break;
+            case 3:
+                dataLength = encodeLevelClusterMoveToLevelCommand(buffer->Start(), bufferSize, endpoint, (uint8_t)(aValue & 0xff),
+                                                                  0xFFFF, 0, 0);
                 break;
             default:
                 ChipLogError(Controller, "Unknown command: %d", commandID);
