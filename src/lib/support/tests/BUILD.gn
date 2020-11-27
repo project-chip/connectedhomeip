@@ -20,6 +20,10 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libSupportTests"
 
+  test_sources = [
+    "TestBufferWriter.cpp",
+  ]
+
   sources = [
     "TestBufBound.cpp",
     "TestBufferReader.cpp",
