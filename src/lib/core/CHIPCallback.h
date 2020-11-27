@@ -26,6 +26,14 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include <app/util/basic-types.h>
+
+typedef enum
+{
+    kPostAttributeChangeCallbackType,
+    kPreAttributeChangeCallbackType,
+} CallbackType;
+
 namespace chip {
 
 namespace Callback {
@@ -49,6 +57,10 @@ public:
      */
     Cancelable * mNext;
     Cancelable * mPrev;
+
+    CallbackType callbackType;
+    EndpointId endpointID;
+    ClusterId clusterID;
 
     void * mInfoPtr;
     uint64_t mInfoScalar;

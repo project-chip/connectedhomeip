@@ -26,6 +26,7 @@
 
 #pragma once
 
+#include <core/CHIPCallbackManager.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPError.h>
 #include <platform/CHIPDeviceLayer.h>
