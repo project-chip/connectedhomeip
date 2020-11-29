@@ -146,7 +146,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         err = payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
         SuccessOrExit(err);
 
-        err = state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
+        err = state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, mac);
         SuccessOrExit(err);
 
         err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
@@ -157,8 +157,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
 
         ChipLogDetail(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
-        err = mTransportMgr->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), state->GetPeerAddress(),
-                                         msgBuf.Release_ForNow());
+        err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), msgBuf.Release_ForNow());
     }
     SuccessOrExit(err);
     state->IncrementSendMessageIndex();
@@ -333,10 +332,10 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         len = static_cast<uint16_t>(len - taglen);
         msg->SetDataLength(len, nullptr);
 
-        err = state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
+        err = state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, mac);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decrypt msg: err %d", err));
 
-        err = payloadHeader.Decode(packetHeader.GetFlags(), plainText, len, &decodedSize);
+        err = payloadHeader.Decode(plainText, len, &decodedSize);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode encrypted header: err %d", err));
         VerifyOrExit(headerSize == decodedSize, ChipLogError(Inet, "Secure transport decode encrypted header length mismatched"));
 
