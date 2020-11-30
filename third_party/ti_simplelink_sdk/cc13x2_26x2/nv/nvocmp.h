@@ -8,7 +8,7 @@
  Target Device: cc13x2_26x2
 
  ******************************************************************************
- 
+
  Copyright (c) 2017-2020, Texas Instruments Incorporated
  All rights reserved.
 
@@ -40,8 +40,8 @@
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************
- 
- 
+
+
  *****************************************************************************/
 
 #ifndef NVOCMP_H
@@ -171,4 +171,3 @@ extern NVS_Handle nvsHandle;
 #endif
 
 #endif /* NVOCMP_H */
-

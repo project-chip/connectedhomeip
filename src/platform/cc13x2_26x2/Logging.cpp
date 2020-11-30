@@ -46,7 +46,7 @@ extern "C" int cc13x2_26x2LogInit(void)
     UART_Params uartParams;
 
     UART_init();
-    
+
     UART_Params_init(&uartParams);
     // Most params can be default because we only send data, we don't receive
     uartParams.baudRate = 115200;

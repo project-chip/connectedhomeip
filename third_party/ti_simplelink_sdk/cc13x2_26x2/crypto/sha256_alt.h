@@ -8,7 +8,7 @@
  Target Device: cc13x2_26x2
 
  ******************************************************************************
- 
+
  Copyright (c) 2017-2020, Texas Instruments Incorporated
  All rights reserved.
 
@@ -40,8 +40,8 @@
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************
- 
- 
+
+
  *****************************************************************************/
 
 
@@ -78,4 +78,3 @@ mbedtls_sha256_context;
 #endif /* MBEDTLS_SHA256_ALT */
 
 #endif /* MBEDTLS_SHA256_ALT_H */
-

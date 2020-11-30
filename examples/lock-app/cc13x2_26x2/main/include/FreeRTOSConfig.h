@@ -207,8 +207,8 @@
 #define configUSE_TRACE_FACILITY        1
 
 /*
- * Runtime Object View is a Texas Instrument host tool that helps visualize 
- * the application. When enabled, the ISR stack will be initialized in the 
+ * Runtime Object View is a Texas Instrument host tool that helps visualize
+ * the application. When enabled, the ISR stack will be initialized in the
  * startup_<device>_<compiler>.c file to 0xa5a5a5a5. The stack peak can then
  * be displayed in Runtime Object View.
  */

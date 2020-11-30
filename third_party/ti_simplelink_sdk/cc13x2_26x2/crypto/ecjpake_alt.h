@@ -8,7 +8,7 @@
  Target Device: cc13x2_26x2
 
  ******************************************************************************
- 
+
  Copyright (c) 2017-2020, Texas Instruments Incorporated
  All rights reserved.
 
@@ -40,8 +40,8 @@
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************
- 
- 
+
+
  *****************************************************************************/
 
 
@@ -282,4 +282,3 @@ void mbedtls_ecjpake_free( mbedtls_ecjpake_context *ctx );
 #endif /* MBEDTLS_ECJPAKE_ALT */
 
 #endif /* MBEDTLS_ECJPAKE_ALT_H */
-

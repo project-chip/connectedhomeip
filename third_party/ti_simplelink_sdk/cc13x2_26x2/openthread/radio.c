@@ -8,7 +8,7 @@
  Target Device: cc13x2_26x2
 
  ******************************************************************************
- 
+
  Copyright (c) 2017-2020, Texas Instruments Incorporated
  All rights reserved.
 
@@ -40,8 +40,8 @@
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************
- 
- 
+
+
  *****************************************************************************/
 
 #include <openthread/config.h>
@@ -2470,7 +2470,7 @@ void platformRadioProcess(otInstance *aInstance)
             {
                 clearRxQueue();
             }
-            
+
             /* Re-start the RX command since we are still in the state. */
             if (arg & RF_EVENT_RX_CMD_STOP)
             {
@@ -2489,4 +2489,3 @@ void platformRadioProcess(otInstance *aInstance)
             break;
     }
 }
-

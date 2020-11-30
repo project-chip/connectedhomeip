@@ -8,7 +8,7 @@
  Target Device: cc13x2_26x2
 
  ******************************************************************************
- 
+
  Copyright (c) 2017-2020, Texas Instruments Incorporated
  All rights reserved.
 
@@ -40,8 +40,8 @@
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************
- 
- 
+
+
  *****************************************************************************/
 
 #ifndef MBEDTLS_AES_ALT_H
@@ -133,4 +133,3 @@ int mbedtls_aes_crypt_ecb( mbedtls_aes_context *ctx,
 #endif /* MBEDTLS_AES_ALT */
 
 #endif /* MBEDTLS_AES_ALT_H */
-

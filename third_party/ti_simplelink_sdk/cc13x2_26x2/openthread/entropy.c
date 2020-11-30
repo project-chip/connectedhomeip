@@ -4,7 +4,7 @@
  Target Device: cc13x2_26x2
 
  ******************************************************************************
- 
+
  Copyright (c) 2017-2020, Texas Instruments Incorporated
  All rights reserved.
 
@@ -36,8 +36,8 @@
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************
- 
- 
+
+
  *****************************************************************************/
 
 
@@ -85,7 +85,7 @@ static int getRandom(uint8_t *aOutput, size_t aLen)
     rtn = TRNG_generateEntropy(TRNG_handle, &entropyKey);
     if (rtn != TRNG_STATUS_SUCCESS)
     	return OT_ERROR_FAILED;
-    	
+
     return OT_ERROR_NONE;
 }
 
@@ -145,4 +145,3 @@ otError otPlatEntropyGet(uint8_t *aOutput, uint16_t aOutputLength)
 
     return error;
 }
-

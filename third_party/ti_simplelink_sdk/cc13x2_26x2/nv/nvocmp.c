@@ -8,7 +8,7 @@
  Target Device: cc13x2_26x2
 
  ******************************************************************************
- 
+
  Copyright (c) 2017-2020, Texas Instruments Incorporated
  All rights reserved.
 
@@ -40,8 +40,8 @@
  EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
  ******************************************************************************
- 
- 
+
+
  *****************************************************************************/
 
 //*****************************************************************************
@@ -931,7 +931,7 @@ static uint8_t NVOCMP_initNvApi(void *param)
         NVS_getAttrs(NVOCMP_nvsHandle,&NVOCMP_nvsAttrs);
 #else
         NV_LINUX_init();
-        
+
         NVOCMP_nvsHandle = NVS_HANDLE;
         NVOCMP_nvsAttrs.sectorSize = FLASH_PAGE_SIZE;
         NVOCMP_nvsAttrs.regionSize = FLASH_PAGE_SIZE * NVOCMP_NVPAGES;
@@ -1122,14 +1122,14 @@ static uint8_t NVOCMP_compactNvApi(uint16_t minAvail)
             err = NVINTF_BADPARAM;
         }
     }
-    
+
 #ifdef NV_LINUX
     if(err == NVINTF_SUCCESS)
     {
         NV_LINUX_save();
     }
 #endif
-    
+
     NVOCMP_UNLOCK();
     return(err);
 }
