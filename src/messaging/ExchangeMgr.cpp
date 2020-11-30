@@ -75,7 +75,6 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
     mContextsInUse = 0;
 
     memset(UMHandlerPool, 0, sizeof(UMHandlerPool));
-    OnExchangeContextChanged = nullptr;
 
     sessionMgr->SetDelegate(this);
 
@@ -91,8 +90,6 @@ CHIP_ERROR ExchangeManager::Shutdown()
         mSessionMgr->SetDelegate(nullptr);
         mSessionMgr = nullptr;
     }
-
-    OnExchangeContextChanged = nullptr;
 
     mState = State::kState_NotInitialized;
 
@@ -134,6 +131,18 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protoco
 CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType)
 {
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
+}
+
+ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate)
+{
+    // TODO: not implemented
+    return { nullptr };
+}
+
+ExchangeContext * ExchangeManager::NewExchange(ChannelHandle &)
+{
+    // TODO: not implemented
+    return nullptr;
 }
 
 void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)

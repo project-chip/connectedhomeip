@@ -26,6 +26,8 @@
 
 #include <array>
 
+#include <messaging/Channel.h>
+#include <messaging/ChannelContext.h>
 #include <messaging/ExchangeContext.h>
 #include <support/DLLUtil.h>
 #include <transport/SecureSessionMgr.h>
@@ -160,6 +162,9 @@ public:
      */
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType);
 
+    ChannelHandle EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate);
+    ExchangeContext * NewExchange(ChannelHandle &);
+
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
@@ -168,6 +173,8 @@ public:
     size_t GetContextsInUse() const { return mContextsInUse; }
 
 private:
+    using SessionHandle = Transport::PeerConnectionState;
+
     enum class State
     {
         kState_NotInitialized = 0, // Used to indicate that the ExchangeManager is not initialized.
@@ -181,6 +188,12 @@ private:
         int16_t MessageType;
     };
 
+    struct SessionUsage
+    {
+        SessionHandle mSessionHandle;
+        int mUsageCount;
+    };
+
     uint16_t mNextExchangeId;
     State mState;
     SecureSessionMgr * mSessionMgr;
@@ -189,7 +202,8 @@ private:
     size_t mContextsInUse;
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
-    void (*OnExchangeContextChanged)(size_t numContextsInUse);
+    ChannelContext mChannelContext[CHIP_CONFIG_MAX_ACTIVE_CHANNELS];
+    SessionUsage mSessionUsage[CHIP_CONFIG_MAX_ACTIVE_SESSIONS];
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeDelegate * delegate);
 

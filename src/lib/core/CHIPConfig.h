@@ -1251,6 +1251,25 @@
 #define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS                  16
 #endif // CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
 
+/**
+ *  @def CHIP_CONFIG_MAX_ACTIVE_CHANNELS
+ *
+ *  @brief
+ *    Maximum number of simultaneously active channels
+ */
+#ifndef CHIP_CONFIG_MAX_ACTIVE_CHANNELS
+#define CHIP_CONFIG_MAX_ACTIVE_CHANNELS                    16
+#endif // CHIP_CONFIG_MAX_ACTIVE_CHANNELS
+
+/**
+ *  @def CHIP_CONFIG_MAX_ACTIVE_SESSIONS
+ *
+ *  @brief
+ *    Maximum number of simultaneously active secure sessions
+ */
+#ifndef CHIP_CONFIG_MAX_ACTIVE_SESSIONS
+#define CHIP_CONFIG_MAX_ACTIVE_SESSIONS                    16
+#endif // CHIP_CONFIG_MAX_ACTIVE_SESSIONS
 
 /**
  *  @def CHIP_CONFIG_CONNECT_IP_ADDRS
