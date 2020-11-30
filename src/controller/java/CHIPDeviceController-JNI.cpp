@@ -288,7 +288,8 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong handle, j
         RendezvousParameters params = RendezvousParameters()
                                           .SetSetupPINCode(pinCode)
                                           .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
-                                          .SetBleLayer(&sBleLayer);
+                                          .SetBleLayer(&sBleLayer)
+                                          .SetPeerAddress(Transport::PeerAddress::BLE());
         err = wrapper->Controller()->ConnectDevice(kRemoteDeviceId, params, (void *) "ConnectDevice", HandleKeyExchange,
                                                    HandleEchoResponse, HandleError);
     }
