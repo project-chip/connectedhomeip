@@ -1565,7 +1565,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
         // Clear clear the send and receive queues.
         PacketBuffer::Free(mSendQueue);
         mSendQueue = nullptr;
-        mRcvQueue = nullptr;
+        mRcvQueue  = nullptr;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         mUnackedLength = 0;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
