@@ -55,7 +55,8 @@ const size_t kP256_PublicKey_Length  = 65;
  * the implementation files.
  */
 const size_t kMAX_Spake2p_Context_Size     = 1024;
-const size_t kMAX_Hash_SHA256_Context_Size = 256;
+// XXX: had to change for cc13x2_26x2 for SHA acceleration
+const size_t kMAX_Hash_SHA256_Context_Size = 512;
 const size_t kMAX_P256Keypair_Context_Size = 512;
 
 /**

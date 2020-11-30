@@ -1,0 +1,143 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build/config/defaults.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/ti_simplelink_sdk.gni")
+import("${ti_simplelink_sdk_build_root}/ti_simplelink_executable.gni")
+import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
+
+assert(current_os == "freertos")
+
+project_dir = "${chip_root}/examples/lock-app/cc13x2_26x2"
+
+ti_simplelink_sdk("sdk") {
+  include_dirs = [
+    "${project_dir}",
+    "${project_dir}/main",
+    "${project_dir}/main/include",
+    "${chip_root}/src/platform/cc13x2_26x2",
+    "${project_dir}/main/include/",
+    "${project_dir}/main/",
+  ]
+
+  sources = [
+    "${project_dir}/main/include/CHIPProjectConfig.h",
+    "${project_dir}/main/include/FreeRTOSConfig.h",
+  ]
+
+  defines = [
+    "NVOCMP_FREERTOS_MUTEX=1"
+  ]
+  if (is_debug) {
+    defines += [ "BUILD_RELEASE=0" ]
+  } else {
+    defines += [ "BUILD_RELEASE=1" ]
+  }
+}
+
+ti_sysconfig("sysconfig") {
+  sources = [ "${project_dir}/chip.syscfg" ]
+  outputs = [
+    "ti_devices_config.c",
+    "ti_radio_config.c",
+    "ti_radio_config.h",
+    "ti_drivers_config.c",
+    "ti_drivers_config.h",
+
+    # disabled until upstream generation is aligned
+    #"tiop_config.h",
+    #"tiop_config.c",
+
+    # not traditional source files
+    #"ti_utils_build_linker.cmd.genlibs",
+    #"syscfg_c.rov.xs",
+    #"ti_utils_runtime_model.gv",
+    #"ti_utils_runtime_Makefile",
+  ]
+}
+
+ti_simplelink_executable("lock_app") {
+  include_dirs = [
+    "${project_dir}",
+    "${project_dir}/main",
+    "${project_dir}/main/include",
+    "${chip_root}/src/include",
+    "${chip_root}/src/lib",
+    "${chip_root}/src",
+    "${chip_root}/src/app/util",
+    "${chip_root}/src/system",
+    "${chip_root}/examples/common/chip-app-server/include",
+    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/third_party/openthread/repo/examples/platforms",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2",
+  ]
+  defines = []
+  output_name = "chip-cc13x2_26x2-lock-example.out"
+
+  public_deps = [
+    ":sysconfig",
+    ":sdk",
+    "${chip_root}/examples/common/chip-app-server:chip-app-server",
+    "${chip_root}/examples/lock-app/lock-common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+    "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+  ]
+
+  sources = [
+    "${project_dir}/main/main.cpp",
+    "${project_dir}/main/AppTask.cpp",
+    "${project_dir}/main/BoltLockManager.cpp",
+    "${project_dir}/main/ZclCallbacks.cpp",
+    "${project_dir}/main/CXXExceptionStubs.cpp",
+
+    # platform drivers here because they need sysconfig headers
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/radio.h",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/system.h",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/alarm.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/diag.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/entropy.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/misc.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/radio.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/settings.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/system.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/uart.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/aes_alt.h",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/cc13x2_26x2-mbedtls-config.h",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/ecjpake_alt.h",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/sha256_alt.h",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/aes_alt.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/ecjpake_alt.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/sha256_alt.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/nv/crc.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/nv/nvocmp.c",
+    "${chip_root}/src/platform/cc13x2_26x2/Logging.cpp",
+  ]
+
+  output_dir = root_out_dir
+
+  ldscript = "${ti_simplelink_sdk_root}/source/ti/boards/cc13x2_cc26x2/cc13x2_cc26x2_freertos.lds"
+
+  ldflags = [ "-T" + rebase_path(ldscript, root_build_dir) ]
+}
+
+group("cc13x2_26x2") {
+  deps = [ ":lock_app" ]
+}
+
+group("default") {
+  deps = [ ":cc13x2_26x2" ]
+}
