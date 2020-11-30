@@ -264,7 +264,6 @@ public:
     void OnFail(ChannelHandle & handle, CHIP_ERROR err) override {}
 };
 
-
 // Enable this test when Channel implementation is ready
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-function"

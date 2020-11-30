@@ -138,7 +138,7 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protoco
 ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate)
 {
     // TODO: not implemented
-    return {nullptr};
+    return { nullptr };
 }
 
 ExchangeContext * ExchangeManager::NewExchange(ChannelHandle &)

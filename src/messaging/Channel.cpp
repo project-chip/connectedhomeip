@@ -34,7 +34,8 @@ ChannelState ChannelHandle::GetState()
         return ChannelState::kChanneState_None;
 }
 
-void ChannelHandle::Release() {
+void ChannelHandle::Release()
+{
     // TODO: not implemented
 }
 

@@ -74,9 +74,9 @@ public:
 
     enum class TransportPreference
     {
-        kTransport_Connectionless, // default
+        kTransport_Connectionless,           // default
         kTransport_PreferConnectionOriented, // will fallback to connectionless TCP is not supported
-        kTransport_ConnectionOriented, // will fail if TCP is not supported
+        kTransport_ConnectionOriented,       // will fail if TCP is not supported
     };
 
     enum class SessionType
@@ -86,23 +86,39 @@ public:
         kSession_CASE, // Use SIGMA key exchange
     };
 
-    ChannelBuilder & SetPeerNodeId(NodeId peerNodeId) { mPeerNodeId = peerNodeId; return *this; }
+    ChannelBuilder & SetPeerNodeId(NodeId peerNodeId)
+    {
+        mPeerNodeId = peerNodeId;
+        return *this;
+    }
     NodeId GetPeerNodeId() { return mPeerNodeId; }
 
-    ChannelBuilder & SetNetworkPreference(NetworkPreference preference) { mNetworkPreference = preference; return *this; }
+    ChannelBuilder & SetNetworkPreference(NetworkPreference preference)
+    {
+        mNetworkPreference = preference;
+        return *this;
+    }
     NetworkPreference GetNetworkPreference() { return mNetworkPreference; }
 
-    ChannelBuilder & SetTransportPreference(TransportPreference preference) { mTransportPreference = preference; return *this; }
+    ChannelBuilder & SetTransportPreference(TransportPreference preference)
+    {
+        mTransportPreference = preference;
+        return *this;
+    }
     TransportPreference GetTransportPreference() { return mTransportPreference; }
 
-    ChannelBuilder & SetSessionType(SessionType preference) { mSessionType = preference; return *this; }
+    ChannelBuilder & SetSessionType(SessionType preference)
+    {
+        mSessionType = preference;
+        return *this;
+    }
     SessionType GetSessionType() { return mSessionType; }
 
 private:
     NodeId mPeerNodeId;
-    NetworkPreference mNetworkPreference = NetworkPreference::kNetwork_Default;
+    NetworkPreference mNetworkPreference     = NetworkPreference::kNetwork_Default;
     TransportPreference mTransportPreference = TransportPreference::kTransport_Connectionless;
-    SessionType mSessionType = SessionType::kSession_CASE;
+    SessionType mSessionType                 = SessionType::kSession_CASE;
 };
 
 enum class ChannelState
@@ -134,16 +150,25 @@ class ChannelContext;
 class ChannelHandle
 {
 public:
-    ChannelHandle(ChannelContext *channelContext) : mChannelContext(channelContext) {}
+    ChannelHandle(ChannelContext * channelContext) : mChannelContext(channelContext) {}
     ~ChannelHandle() { Release(); } // Release on destruction
 
     // non copyable
     ChannelHandle(const ChannelHandle &) = delete;
-    ChannelHandle& operator=(const ChannelHandle &) = delete;
+    ChannelHandle & operator=(const ChannelHandle &) = delete;
 
     // movable
-    ChannelHandle(ChannelHandle && that) { this->mChannelContext = that.mChannelContext; that.mChannelContext = nullptr; }
-    ChannelHandle& operator=(ChannelHandle && that) { this->mChannelContext = that.mChannelContext; that.mChannelContext = nullptr; return *this; }
+    ChannelHandle(ChannelHandle && that)
+    {
+        this->mChannelContext = that.mChannelContext;
+        that.mChannelContext  = nullptr;
+    }
+    ChannelHandle & operator=(ChannelHandle && that)
+    {
+        this->mChannelContext = that.mChannelContext;
+        that.mChannelContext  = nullptr;
+        return *this;
+    }
 
     // public APIs
     ChannelState GetState();
@@ -162,8 +187,8 @@ class ChannelDelegate
 public:
     virtual ~ChannelDelegate() {}
 
-    virtual void OnEstablished(ChannelHandle & handle) = 0;
-    virtual void OnClosed(ChannelHandle & handle) = 0;
+    virtual void OnEstablished(ChannelHandle & handle)          = 0;
+    virtual void OnClosed(ChannelHandle & handle)               = 0;
     virtual void OnFail(ChannelHandle & handle, CHIP_ERROR err) = 0;
 };
 
