@@ -26,6 +26,7 @@
 
 #include <array>
 
+#include <messaging/Channel.h>
 #include <messaging/ExchangeContext.h>
 #include <support/DLLUtil.h>
 #include <transport/SecureSessionMgr.h>
@@ -158,6 +159,9 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      */
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType);
+
+    ChannelHandle EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate);
+    ExchangeContext * NewExchange(ChannelHandle &);
 
     void IncrementContextsInUse();
     void DecrementContextsInUse();

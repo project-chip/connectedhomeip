@@ -135,6 +135,18 @@ CHIP_ERROR ExchangeManager::UnregisterUnsolicitedMessageHandler(uint32_t protoco
     return UnregisterUMH(protocolId, static_cast<int16_t>(msgType));
 }
 
+ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate)
+{
+    // TODO: not implemented
+    return {nullptr};
+}
+
+ExchangeContext * ExchangeManager::NewExchange(ChannelHandle &)
+{
+    // TODO: not implemented
+    return nullptr;
+}
+
 void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer)
 {
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
