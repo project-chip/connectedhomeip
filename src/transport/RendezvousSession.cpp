@@ -184,6 +184,11 @@ void RendezvousSession::OnPairingComplete()
     if (mParams.GetPeerAddress().GetTransportType() != Transport::Type::kBle || // For rendezvous initializer
         mPeerAddress.GetTransportType() != Transport::Type::kBle)               // For rendezvous target
     {
+        if (mRendezvousRemoteNodeId.HasValue() && !mParams.HasRemoteNodeId())
+        {
+            ChipLogProgress(Ble, "Completed rendezvous with %llu", mRendezvousRemoteNodeId.Value());
+            mParams.SetRemoteNodeId(mRendezvousRemoteNodeId.Value());
+        }
         UpdateState(State::kRendezvousComplete);
         if (!mParams.IsController())
         {
@@ -228,6 +233,7 @@ void RendezvousSession::OnRendezvousConnectionClosed()
     }
 
     mSecureSession.Reset();
+    mRendezvousRemoteNodeId.ClearValue();
 
     CHIP_ERROR err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
     if (err != CHIP_NO_ERROR)
@@ -308,6 +314,11 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
     switch (mCurrentState)
     {
     case State::kSecurePairing:
+        if (packetHeader.GetSourceNodeId().HasValue())
+        {
+            ChipLogProgress(Ble, "Received rendezvous message from %llu", packetHeader.GetSourceNodeId().Value());
+            mRendezvousRemoteNodeId.SetValue(packetHeader.GetSourceNodeId().Value());
+        }
         err = HandlePairingMessage(packetHeader, peerAddress, std::move(msgBuf));
         break;
 
