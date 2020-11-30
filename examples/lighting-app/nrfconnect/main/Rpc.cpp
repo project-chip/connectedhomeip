@@ -52,8 +52,8 @@ namespace {
 
 using std::byte;
 
-constexpr size_t kRpcTaskSize = 4096;
-constexpr int kRpcPriority = 5;
+constexpr size_t kRpcTaskSize         = 4096;
+constexpr int kRpcPriority            = 5;
 constexpr size_t kMaxTransmissionUnit = 1500;
 
 K_THREAD_STACK_DEFINE(rpc_stack_area, kRpcTaskSize);
@@ -63,8 +63,8 @@ struct k_thread rpc_thread_data;
 pw::stream::SysIoWriter writer;
 
 // Set up the output channel for the pw_rpc server to use.
-pw::hdlc_lite::RpcChannelOutputBuffer<kMaxTransmissionUnit> hdlc_channel_output(
-    writer, pw::hdlc_lite::kDefaultRpcAddress, "HDLC channel");
+pw::hdlc_lite::RpcChannelOutputBuffer<kMaxTransmissionUnit> hdlc_channel_output(writer, pw::hdlc_lite::kDefaultRpcAddress,
+                                                                                "HDLC channel");
 
 pw::rpc::Channel channels[] = { pw::rpc::Channel::Create<1>(&hdlc_channel_output) };
 
