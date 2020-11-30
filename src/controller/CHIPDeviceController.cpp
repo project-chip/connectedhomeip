@@ -42,6 +42,10 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
+#include <errno.h>
+#include <inttypes.h>
+#include <stdint.h>
+#include <stdlib.h>
 #include <support/Base64.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
@@ -49,11 +53,6 @@
 #include <support/SafeInt.h>
 #include <support/TimeUtils.h>
 #include <support/logging/CHIPLogging.h>
-
-#include <errno.h>
-#include <inttypes.h>
-#include <stdint.h>
-#include <stdlib.h>
 #include <time.h>
 
 using namespace chip::Inet;
@@ -67,14 +66,15 @@ using namespace chip::Encoding;
 constexpr const char kPairedDeviceListKeyPrefix[] = "ListPairedDevices";
 constexpr const char kPairedDeviceKeyPrefix[]     = "PairedDevice";
 
-// This macro generates a key using node ID an key prefix, and performs the given action
-// on that key.
+// This macro generates a key using node ID an key prefix, and performs the
+// given action on that key.
 #define PERSISTENT_KEY_OP(node, keyPrefix, key, action)                                                                            \
     do                                                                                                                             \
     {                                                                                                                              \
         constexpr size_t len = std::extent<decltype(keyPrefix)>::value;                                                            \
         nlSTATIC_ASSERT_PRINT(len > 0, "keyPrefix length must be known at compile time");                                          \
-        /* 2 * sizeof(NodeId) to accomodate 2 character for each byte in Node Id */                                                \
+        /* 2 * sizeof(NodeId) to accomodate 2 character for each byte in Node Id                                                   \
+         */                                                                                                                        \
         char key[len + 2 * sizeof(NodeId) + 1];                                                                                    \
         nlSTATIC_ASSERT_PRINT(sizeof(node) <= sizeof(uint64_t), "Node ID size is greater than expected");                          \
         snprintf(key, sizeof(key), "%s%" PRIx64, keyPrefix, node);                                                                 \
@@ -310,7 +310,8 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
     DeviceLayer::SystemLayer.WakeSelect();
 #else
     err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-#endif // CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
+#endif // CONFIG_DEVICE_LAYER && (CHIP_SYSTEM_CONFIG_USE_SOCKETS ||
+       // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK)
 
 exit:
     return err;
@@ -468,12 +469,15 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
-#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
-    if (!params.HasBleLayer())
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
     {
-        params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
-    }
+#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+        if (!params.HasBleLayer())
+        {
+            params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+        }
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+    }
 
     mDeviceBeingPaired = GetInactiveDeviceIndex();
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
@@ -485,6 +489,12 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     SuccessOrExit(err);
 
     device->Init(mTransportMgr, mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
+
+    if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
+    {
+        // IP Rendezvous
+        mRendezvousSession->OnRendezvousConnectionOpened();
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -630,11 +640,11 @@ void DeviceCommissioner::OnRendezvousComplete()
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
 
-    // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
-    // requires a valid storage delegate. However, test pairing usecase, that's used
-    // mainly by test applications, do not require a storage delegate. This is to
-    // reduce overheads on these tests.
-    // Let's make sure the delegate object is available before calling into it.
+    // mStorageDelegate would not be null for a typical pairing scenario, as
+    // Pair() requires a valid storage delegate. However, test pairing usecase,
+    // that's used mainly by test applications, do not require a storage delegate.
+    // This is to reduce overheads on these tests. Let's make sure the delegate
+    // object is available before calling into it.
     if (mStorageDelegate != nullptr)
     {
         SerializedDevice serialized;

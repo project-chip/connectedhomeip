@@ -44,6 +44,7 @@
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
+#include "ChipDeviceController-StorageDelegate.h"
 
 #include <controller/CHIPDeviceController_deprecated.h>
 #include <support/CHIPMem.h>
@@ -125,6 +126,7 @@ public:
 
 static chip::System::Layer sSystemLayer;
 static chip::Inet::InetLayer sInetLayer;
+static chip::Controller::PythonPersistentStorageDelegate sStorageDelegate;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -170,6 +172,9 @@ CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceControlle
 CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceController * devCtrl, BLE_CONNECTION_OBJECT connObj,
                                             uint32_t setupPinCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
                                             OnErrorFunct onError);
+CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerAddrStr,
+                                              uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                              OnErrorFunct onError);
 
 // Network Provisioning
 CHIP_ERROR
@@ -204,7 +209,7 @@ CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::
     *outDevCtrl = new chip::DeviceController::ChipDeviceController();
     VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-    err = (*outDevCtrl)->Init(kLocalDeviceId, &sSystemLayer, &sInetLayer);
+    err = (*outDevCtrl)->Init(kLocalDeviceId, &sSystemLayer, &sInetLayer, nullptr, &sStorageDelegate);
     SuccessOrExit(err);
 
 exit:
@@ -534,6 +539,28 @@ CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceCo
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::RendezvousParameters params =
         chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetConnectionObject(connObj).SetBleLayer(&sBle);
+    err = devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
+    SuccessOrExit(err);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerAddrStr,
+                                              uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                              OnErrorFunct onError)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::Inet::IPAddress peerAddr;
+    chip::Transport::PeerAddress addr;
+    chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
+
+    VerifyOrExit(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), err = CHIP_ERROR_INVALID_ARGUMENT);
+    addr.SetIPAddress(peerAddr);
+    // TODO: IP rendezvous should use TCP connection.
+    addr.SetTransportType(chip::Transport::Type::kUdp);
+    params.SetPeerAddress(addr);
+    params.SetDiscriminator(0);
     err = devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
     SuccessOrExit(err);
 

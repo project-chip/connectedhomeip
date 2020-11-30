@@ -40,6 +40,7 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-ScriptBinding.cpp",
     "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
     "ChipDeviceController-ScriptDevicePairingDelegate.h",
+    "ChipDeviceController-StorageDelegate.h",
   ]
 
   public_deps = [

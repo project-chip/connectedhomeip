@@ -405,6 +405,10 @@ CHIP_ERROR SecurePairingSession::HandleCompute_cA(const PacketHeader & header, c
     CHIP_ERROR err       = CHIP_NO_ERROR;
     const uint8_t * hash = msg->Start();
 
+    // We will set NextExpectedMsg to kSpake2pMsgTypeMax in all cases
+    // However, when we are using IP rendezvous, we might set it to kSpake2pCompute_pA.
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
+
     VerifyOrExit(hash != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(msg->TotalLength() == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
@@ -423,8 +427,6 @@ CHIP_ERROR SecurePairingSession::HandleCompute_cA(const PacketHeader & header, c
     mDelegate->OnPairingComplete();
 
 exit:
-
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
     return err;
 }
 

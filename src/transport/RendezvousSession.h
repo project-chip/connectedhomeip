@@ -152,6 +152,7 @@ private:
     SecurePairingSession mPairingSession;
     NetworkProvisioning mNetworkProvision;
     SecureSession mSecureSession;
+    Transport::PeerAddress mPeerAddress; // Current peer address we are doing rendezvous with.
     TransportMgrBase * mTransportMgr;
     uint32_t mSecureMessageIndex = 0;
     uint16_t mNextKeyId          = 0;

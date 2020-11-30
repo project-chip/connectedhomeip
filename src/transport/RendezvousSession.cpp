@@ -181,7 +181,19 @@ void RendezvousSession::OnPairingComplete()
         return;
     }
 
-    UpdateState(State::kNetworkProvisioning);
+    if (mParams.GetPeerAddress().GetTransportType() != Transport::Type::kBle || // For rendezvous initializer
+        mPeerAddress.GetTransportType() != Transport::Type::kBle)               // For rendezvous target
+    {
+        UpdateState(State::kRendezvousComplete);
+        if (!mParams.IsController())
+        {
+            OnRendezvousConnectionClosed();
+        }
+    }
+    else
+    {
+        UpdateState(State::kNetworkProvisioning);
+    }
 }
 
 void RendezvousSession::OnNetworkProvisioningError(CHIP_ERROR err)
@@ -290,6 +302,7 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
                                                     PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    mPeerAddress   = peerAddress;
     // TODO: RendezvousSession should handle SecurePairing messages only
 
     switch (mCurrentState)
