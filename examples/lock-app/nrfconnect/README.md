@@ -9,7 +9,7 @@ The example is based on [CHIP](https://github.com/project-chip/connectedhomeip) 
 platform, and supports remote access and control of a simulated door lock over a low-power, 802.15.4
 Thread network.
 
-When configured, the example becomes a CHIP accessory, that is a device
+The example behaves as a CHIP accessory, that is a device
 that can be paired into an existing CHIP network and can be controlled by this network.
 
 <hr>
@@ -17,14 +17,13 @@ that can be paired into an existing CHIP network and can be controlled by this n
 -   [Overview](#overview)
     -   [Bluetooth LE advertising](#bluetooth-le-advertising)
     -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
-    -   [Thread provisioning](#thread-provisioning)
 -   [Requirements](#requirements)
 -   [Device UI](#device-ui)
--   [Setting up environment](#setting-up-environment)
-    -   [Using Docker container](#using-docker-container)
-    -   [Using Native shell](#using-native-shell)
+-   [Setting up the environment](#setting-up-the-environment)
+    -   [Using Docker container for setup](#using-docker-container-for-setup)
+    -   [Using native shell for setup](#using-native-shell-for-setup)
 -   [Building](#building)
-        -   [Building minimal binary](#building-minimal-binary)
+-   [Configuring the example](#configuring-the-example)
 -   [Flashing and debugging](#flashing-and-debugging)
 -   [Testing the example](#testing-the-example)
 
@@ -41,7 +40,7 @@ and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
 to read more about the platform structure and dependencies.
 
 The CHIP device that runs the lock application is controlled by the CHIP controller
-device over the Thread protocol. By default, the CHIP device should have Thread disabled,
+device over the Thread protocol. By default, the CHIP device has Thread disabled,
 and it should be paired with CHIP controller and get configuration from it.
 Some actions required before establishing full communication are described below.
 
@@ -51,10 +50,8 @@ to communicate with the CHIP controller and other devices.
 
 ### Bluetooth LE advertising
 
-After powering up the device for the first time, it will start advertising over
-Bluetooth LE to inform other devices about its presence. For security reasons,
-Bluetooth LE advertising won't start automatically after powering up the device.
-To make the device discoverable, you must press **Button 4**.
+To commission the device onto a CHIP network, the device must be discoverable over Bluetooth LE. 
+For security reasons, you must start Bluetooth LE advertising manually after powering up the device by pressing **Button 4**.
 
 ### Bluetooth LE rendezvous
 
@@ -63,13 +60,12 @@ Bluetooth LE between a CHIP device and the CHIP controller,
 where the controller has the commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information from the CHIP device.
-The data payload is encoded within a QR code and typically presented on the device's display.
-For this example, however, it is shared using **NFC**.
+The data payload is encoded within a QR code, printed to the UART console, and shared using an NFC tag.
 
-### Thread provisioning
+#### Thread provisioning
 
-Successfully finishing the rendezvous procedure allows to perform the provisioning
-operation, whose goal is to send the Thread network credentials from the CHIP controller
+Last part of the rendezvous procedure, the provisioning
+operation involves sending the Thread network credentials from the CHIP controller
 to the CHIP device. As a result, device is able to join the Thread network and
 communicate with other Thread devices in the network.
 
@@ -97,7 +93,7 @@ This section lists the User Interface elements that you can use to control and m
 of the device.
 All these elements can be located on the following board picture:
 
-![nrf52840 DK](../../platform/nrfconnect/doc/images/nrf52840-dk.png)
+![nrf52840 DK](../../platform/nrfconnect/doc/images/nrf52840-dk.jpg)
 
 **LED 1** shows the overall state of the device and its connectivity.
 The following states are possible:
@@ -263,67 +259,40 @@ Complete the following steps, regardless of the method used for setting up the e
 
    You only need to specify the board name on the first build.
    See [Requirements](#requirements) for the names of compatible boards.
+   
+The output `zephyr.hex` file will be available in the `build/zephyr/` directory.
 
-3. Remove all build artifacts by running the following command:
+### Removing build artifacts
 
-        $ rm -r build
+If you're planning to build the example for a different board or make changes to the configuration, remove all build artifacts before building. 
+To do so, use the following command:
 
-4. Build the example with the release configuration that disables the diagnostic features
-   like logs and command-line interface by running the following command:
+    $ rm -r build
 
-        $ west build -b board-name -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/release.conf
+### Building with release configuration
 
-   Remember to replace *board-name* with the name of the Nordic Semiconductor's board you own.
+To build the example with release configuration that disables the diagnostic features like logs and command-line interface, run the following command:
 
-The output `zephyr.hex` file will be available in the `/build/zephyr/` directory.
+    $ west build -b board-name -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/release.conf
+
+Remember to replace *board-name* with the name of the Nordic Semiconductor's board you own.
 
 <hr>
-
-### Building minimal binary
-
-In order to build the example with no diagnostic features like UART console or
-application logs, which should result in significantly smaller binary, run the
-following commands:
-
-        # Delete the build directory to make sure that no settings are cached
-        $ rm -rf build/
-
-        # Build the example using release config overlay
-        $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/release.conf
 
 <a name="configuring"></a>
 
 ## Configuring the example
 
-The Zephyr ecosystem is highly configurable and allows you to modify many
-aspects of the application. The configuration system is based on Kconfig files and
-the settings can be modified using the menuconfig utility.
+The Zephyr ecosystem is based on Kconfig files and the settings can be modified using the menuconfig utility.
 
-To open the menuconfig utility, complete the following steps:
+To open the menuconfig utility, run the following command from the example directory:
 
-1. Go to the example directory by running the following command, with the *example-dir* directory
-   name updated for your configuration:
-
-        $ cd example-dir
-
-2. Choose one of the following options:
-
-   - If you are running the build for the first time, run the following command:
-
-            $ west build -b nrf52840dk_nrf52840 -t menuconfig
-
-   - If you are running a subsequent build, run the following command:
-
-            $ west build -t menuconfig
-
-   - If you are running menuconfig with ninja, run the following commands:
-
-            $ cd example-dir/build
-            $ ninja menuconfig
+    $ west build -b board-name -t menuconfig
+    
+Remember to replace *board-name* with the name of the Nordic Semiconductor's board you own.
 
 Changes done with menuconfig will be lost if the `build` directory is deleted.
 To make them persistent, save the configuration options in the `prj.conf` file.
-
 For more information, see the
 [Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md) page.
 
@@ -333,17 +302,14 @@ For more information, see the
 
 ## Flashing and debugging
 
-To flash the application to the device, use the west tool and run the following commands,
-with the *example-dir* directory name updated for your configuration:
+To flash the application to the device, use the west tool and run the following command from the example directory:
 
-        $ cd example-dir
         $ west flash
 
 If you have multiple nRF52840 DK boards connected, west will prompt you to pick the correct one.
 
-To debug the application on target, run the following commands:
+To debug the application on target, run the following command from the example directory:
 
-        $ cd example-dir
         $ west debug
 
 <hr>

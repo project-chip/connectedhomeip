@@ -13,11 +13,11 @@ only the most important ones for a typical CHIP application.
 
 <hr>
 
-### nRF Connect SDK
+## nRF Connect SDK
 
 Nordic Semiconductor's [nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
 allows to build a range of applications, including cellular IoT (LTE-M and NB-IoT),
-Bluetooth Low Energy, Thread, Zigbee, and Bluetooth mesh. The SDK containes samples, libraries
+Bluetooth Low Energy, Thread, Zigbee, and Bluetooth mesh. The SDK contains samples, libraries
 and a full set of drivers for Nordic Semiconductor's
 [nRF9160](https://www.nordicsemi.com/Products/Low-power-cellular-IoT/nRF9160),
 [nRF5340](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF5340-PDK),
@@ -32,7 +32,7 @@ MCU bootloader or the [OpenThread](https://openthread.io/) implementation of the
 
 <hr>
 
-### Bluetooth LE and Thread stacks
+## Bluetooth LE and Thread stacks
 
 In the nRF Connect platform applications, the Bluetooth LE interface is used to perform pairing
 and Thread network provisioning operations between the CHIP device and the CHIP controller.
@@ -54,7 +54,7 @@ and Thread concurrently on the same radio chip.
 
 <hr>
 
-### CHIP integration
+## CHIP integration
 
 CHIP is located on the top application layer of the presented model, looking from the networking
 point of view. The Bluetooth LE and Thread stacks provided by the nRF Connect SDK and Zephyr
@@ -67,7 +67,7 @@ and no additional platform-related actions are needed to perform communication t
 
 <hr>
 
-### Build system
+## Build system
 
 The nRF Connect platform makes use of the following build systems to generate ninja build scripts:
 

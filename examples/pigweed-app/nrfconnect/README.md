@@ -212,19 +212,15 @@ Use the following command:
 
    You only need to specify the board name on the first build.
    See [Requirements](#requirements) for the names of compatible boards.
+   
+The output `zephyr.hex` file will be available in the `build/zephyr/` directory.
 
-4. Remove all build artifacts by running the following command:
+### Removing build artifacts
 
-        $ rm -r build
+If you're planning to build the example for a different board or make changes to the configuration, remove all build artifacts before building. 
+To do so, use the following command:
 
-5. Build the example with the release configuration that disables the diagnostic features
-   like logs and command-line interface by running the following command:
-
-        $ west build -b board-name -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/release.conf
-
-   Remember to replace *board-name* with the name of the Nordic Semiconductor's board you own.
-
-The output `zephyr.hex` file will be available in the `/build/zephyr/` directory.
+    $ rm -r build
 
 <hr>
 
