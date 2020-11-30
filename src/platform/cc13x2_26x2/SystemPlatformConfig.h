@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef SYSTEM_PLATFORM_CONFIG_H
-#define SYSTEM_PLATFORM_CONFIG_H
+#pragma once
 
 #include <stdint.h>
 
@@ -54,5 +53,3 @@ struct ChipDeviceEvent;
 // ========== Platform-specific Configuration Overrides =========
 
 /* none yet */
-
-#endif // SYSTEM_PLATFORM_CONFIG_H

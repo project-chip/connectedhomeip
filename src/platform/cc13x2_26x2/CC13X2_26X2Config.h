@@ -22,8 +22,7 @@
  *          Texas Instruments cc13x2_26x2 SoCs.
  */
 
-#ifndef CC13X2_26X2_CONFIG_H
-#define CC13X2_26X2_CONFIG_H
+#pragma once
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
@@ -39,10 +38,11 @@ public:
     struct Key;
 
     // TODO: Define a proper system ID in upstream driver
-    #define NVINTF_SYSID_CHIP (13)
-    static const uint16_t kCC13X2_26X2ChipConfig_Sysid = (NVINTF_SYSID_CHIP);
-    static const uint16_t kCC13X2_26X2ChipFactory_Sysid = (NVINTF_SYSID_CHIP);
-    static const uint16_t kCC13X2_26X2ChipCounters_Sysid = (NVINTF_SYSID_CHIP);
+    static constexpr uint16_t kNvinf_sysid_chip = (13);
+
+    static const uint16_t kCC13X2_26X2ChipConfig_Sysid = kNvinf_sysid_chip;
+    static const uint16_t kCC13X2_26X2ChipFactory_Sysid = kNvinf_sysid_chip;
+    static const uint16_t kCC13X2_26X2ChipCounters_Sysid = kNvinf_sysid_chip;
 
     // Key definitions for well-known keys.
     static const Key kConfigKey_SerialNum;
@@ -106,5 +106,3 @@ inline bool CC13X2_26X2Config::Key::operator==(const Key & other) const
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CC13X2_26X2_CONFIG_H

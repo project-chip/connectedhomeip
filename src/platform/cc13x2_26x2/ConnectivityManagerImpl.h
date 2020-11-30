@@ -22,8 +22,7 @@
  */
 
 
-#ifndef CONNECTIVITY_MANAGER_IMPL_H
-#define CONNECTIVITY_MANAGER_IMPL_H
+#pragma once
 
 #include <platform/ConnectivityManager.h>
 #include <platform/internal/GenericConnectivityManagerImpl.h>
@@ -38,14 +37,6 @@
 #include <platform/internal/GenericConnectivityManagerImpl_NoThread.h>
 #endif
 #include <platform/internal/GenericConnectivityManagerImpl_NoWiFi.h>
-
-namespace chip {
-namespace Inet {
-
-class IPAddress;
-
-} // namespace Inet
-} // namespace chip
 
 namespace chip {
 namespace DeviceLayer {
@@ -127,5 +118,3 @@ inline ConnectivityManagerImpl & ConnectivityMgrImpl(void)
 
 } // namespace DeviceLayer
 } // namespace chip
-
-#endif // CONNECTIVITY_MANAGER_IMPL_H

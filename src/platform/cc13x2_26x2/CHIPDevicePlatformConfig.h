@@ -24,8 +24,7 @@
  * NOTE: currently a bare-bones implementation to allow for building.
  */
 
-#ifndef CHIP_DEVICE_PLATFORM_CONFIG_H
-#define CHIP_DEVICE_PLATFORM_CONFIG_H
+#pragma once
 
 // ==================== Platform Adaptations ====================
 
@@ -43,5 +42,3 @@
 // ========== CHIP Platform Configuration =========
 
 #define CHIP_DEVICE_CONFIG_ENABLE_THREAD 1
-
-#endif // CHIP_DEVICE_PLATFORM_CONFIG_H

@@ -102,7 +102,7 @@ ti_simplelink_executable("lock_app") {
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/BoltLockManager.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
-    "${project_dir}/main/CXXExceptionStubs.cpp",
+    #"${project_dir}/main/CXXExceptionStubs.cpp",
 
     # platform drivers here because they need sysconfig headers
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/radio.h",

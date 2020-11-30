@@ -24,8 +24,7 @@
  * NOTE: currently a bare-bones implementation to allow for building.
  */
 
-#ifndef CHIP_PLATFORM_CONFIG_H
-#define CHIP_PLATFORM_CONFIG_H
+#pragma once
 
 #include <stdint.h>
 
@@ -79,5 +78,3 @@
 // ==================== General Configuration Overrides ====================
 
 /* none yet */
-
-#endif /* CHIP_PLATFORM_CONFIG_H */

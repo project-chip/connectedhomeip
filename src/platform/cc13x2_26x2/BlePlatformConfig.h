@@ -25,9 +25,6 @@
  *       to be included by the build configuration.
  */
 
-#ifndef BLE_PLATFORM_CONFIG_H
-#define BLE_PLATFORM_CONFIG_H
+#pragma once
 
 #define BLE_CONFIG_ERROR_TYPE int32_t
-
-#endif // BLE_PLATFORM_CONFIG_H

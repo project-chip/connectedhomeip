@@ -53,17 +53,12 @@ ConnectivityManagerImpl ConnectivityManagerImpl::sInstance;
 
 CHIP_ERROR ConnectivityManagerImpl::_Init()
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
     // Initialize the generic base classes that require it.
 #if CHIP_DEVICE_CONFIG_ENABLE_THREAD
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
 
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 void ConnectivityManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
