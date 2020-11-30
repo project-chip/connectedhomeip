@@ -58,10 +58,6 @@ public:
     Cancelable * mNext;
     Cancelable * mPrev;
 
-    CallbackType callbackType;
-    EndpointId endpointID;
-    ClusterId clusterID;
-
     void * mInfoPtr;
     uint64_t mInfoScalar;
 
@@ -136,6 +132,10 @@ public:
      */
     T mCall;
 
+    CallbackType mCallbackType;
+    EndpointId mEndpointID;
+    ClusterId mClusterID;
+
     /**
      * Indication that the Callback is registered with a notifier
      */
@@ -174,6 +174,33 @@ public:
      *    here.  https://github.com/project-chip/connectedhomeip/issues/1350
      */
     static Callback * FromCancelable(Cancelable * ca) { return static_cast<Callback *>(ca); }
+};
+
+typedef void (*PostAttributeChangeFn)(void *, EndpointId, ClusterId, AttributeId, uint8_t, uint16_t, uint8_t, uint8_t, uint8_t *);
+
+template <class T = PostAttributeChangeFn>
+class PostAttributeChangeCallback : public Callback<>
+{
+public:
+    /**
+     * attribute id that was changed
+     */
+    AttributeId mAttributeID;
+
+    /**
+     * public constructor
+     */
+    PostAttributeChangeCallback(T call, void * context)
+    {
+        mCallbackType = kPostAttributeChangeCallbackType;
+        Callback(context, call);
+    }
+
+    /**
+     * TODO: type-safety? It'd be nice if Cancelables that aren't Callbacks returned null
+     *    here.  https://github.com/project-chip/connectedhomeip/issues/1350
+     */
+    static PostAttributeChangeCallback * FromCancelable(Cancelable * ca) { return static_cast<PostAttributeChangeCallback *>(ca); }
 };
 
 /**

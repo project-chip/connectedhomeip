@@ -30,18 +30,37 @@
 using namespace chip;
 using namespace Callback;
 
-void CallbackManager::AddPostAttributeChangeHandler(EndpointId endpoint, ClusterId cluster,
-                                                    Callback::Callback<> * onPostAttributeChange)
+void CallbackManager::AddPostAttributeChangeHandler(Callback::PostAttributeChangeCallback<> * onResponse, EndpointId endpointId,
+                                                    ClusterId clusterId, AttributeId attributeId)
 {
-    CallbackType callbackType = kPostAttributeChangeCallbackType;
+    // Since a cb is binded to endpoint and other args, should we have the init take those arguments to
+    // make that relationship explicit. Or should we bind somewhere else?
+    onResponse->mAttributeID = attributeId;
+    onResponse->mEndpointID  = endpointId;
+    onResponse->mClusterID   = clusterId;
 
-    // CallbackInfo info                 = { endpoint, cluster };
-    // Callback::Cancelable * cancelable = onReport->Cancel();
+    Callback::Cancelable * cancelable = onResponse->Cancel();
+    mCallbacks.Enqueue(cancelable);
+}
 
-    // nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of
-    // mInfoScalar");
+bool CallbackManager::ProcessPostAttributeChangeCallbacks(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId,
+                                                          uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
+                                                          uint8_t * value)
+{
+    Cancelable * ca = &mCallbacks;
+    while (ca->mNext != &mCallbacks)
+    {
+        Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca->mNext);
+        if (cb != nullptr && cb->mCallbackType == kPostAttributeChangeCallbackType && cb->mEndpointID == endpoint &&
+            cb->mClusterID == clusterId)
+        {
+            Callback::PostAttributeChangeCallback<PostAttributeChangeFn> * postAttributeCb =
+                Callback::PostAttributeChangeCallback<PostAttributeChangeFn>::FromCancelable(ca->mNext);
+            postAttributeCb->mCall(cb->mContext, endpoint, clusterId, attributeId, mask, manufacturerCode, type, size, value);
+            return true;
+        }
+        ca = ca->mNext;
+    }
 
-    // cancelable->mInfoScalar = 0;
-    // memmove(&cancelable->mInfoScalar, &info, sizeof(info));
-    // mReports.Enqueue(cancelable);
+    return false;
 }

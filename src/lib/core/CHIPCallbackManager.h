@@ -38,7 +38,13 @@ namespace chip {
 class CallbackManager
 {
 public:
-    void AddPostAttributeChangeHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onPostAttributeChange);
+    CallbackManager() {}
+    ~CallbackManager() {}
+
+    void AddPostAttributeChangeHandler(Callback::PostAttributeChangeCallback<> * onResponse, EndpointId endpointId,
+                                       ClusterId clusterId, AttributeId attributeId);
+    bool ProcessPostAttributeChangeCallbacks(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                             uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value);
 
 private:
     /* Track all outstanding response callbacks for this manager. */
