@@ -39,8 +39,8 @@
  * -------- Unencrypted header -----------------------------------------------------
  *  16 bit: | VERSION: 4 bit | FLAGS: 4 bit | ENCRYPTTYPE: 4 bit | RESERVED: 4 bit |
  *  32 bit: | MESSAGE_ID                                                           |
- *  64 bit: | SOURCE_NODE_ID (if source node flag is set)                          |
- *  64 bit: | DEST_NODE_ID (if destination node flag is set)                       |
+ *  64 bit: | SOURCE_NODE_ID (iff source node flag is set)                         |
+ *  64 bit: | DEST_NODE_ID (iff destination node flag is set)                      |
  *  16 bit: | Encryption Key ID                                                    |
  *  16 bit: | Payload Length                                                       |
  * -------- Encrypted header -------------------------------------------------------
