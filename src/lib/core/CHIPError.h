@@ -1762,6 +1762,14 @@ typedef CHIP_CONFIG_ERROR_TYPE CHIP_ERROR;
 #define CHIP_ERROR_IM_MALFORMED_STATUS_CODE                      _CHIP_ERROR(187)
 
 /**
+ * @def CHIP_ERROR_PEER_NODE_NOT_FOUND
+ *
+ * @brief
+ *   Unable to find the peer node
+ */
+#define CHIP_ERROR_PEER_NODE_NOT_FOUND                           _CHIP_ERROR(188)
+
+/**
  *  @}
  */
 

@@ -1251,6 +1251,36 @@
 #define CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS                  16
 #endif // CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS
 
+/**
+ *  @def CHIP_CONFIG_MAX_ACTIVE_CHANNELS
+ *
+ *  @brief
+ *    Maximum number of simultaneously active channels
+ */
+#ifndef CHIP_CONFIG_MAX_ACTIVE_CHANNELS
+#define CHIP_CONFIG_MAX_ACTIVE_CHANNELS                    16
+#endif // CHIP_CONFIG_MAX_ACTIVE_CHANNELS
+
+/**
+ *  @def CHIP_CONFIG_MAX_CHANNEL_HANDLES
+ *
+ *  @brief
+ *    Maximum number of channel handles
+ */
+#ifndef CHIP_CONFIG_MAX_CHANNEL_HANDLES
+#define CHIP_CONFIG_MAX_CHANNEL_HANDLES                    64
+#endif // CHIP_CONFIG_MAX_CHANNEL_HANDLES
+
+/**
+ *  @def CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS
+ *
+ *  @brief
+ *    This is the default timeout for node addres resolve over mDNS
+ *
+ */
+#ifndef CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS
+#define CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS  (5000)
+#endif // CHIP_CONFIG_NODE_ADDRESS_RESOLVE_TIMEOUT_MSECS
 
 /**
  *  @def CHIP_CONFIG_CONNECT_IP_ADDRS

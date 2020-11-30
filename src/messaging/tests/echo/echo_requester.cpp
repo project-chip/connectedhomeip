@@ -228,7 +228,7 @@ int main(int argc, char * argv[])
 
     gSessionManager.SetDelegate(&gTestSecureSessionMgrDelegate);
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = gExchangeManager.Init(chip::kTestControllerNodeId, &gUDPManager, &gSessionManager);
     SuccessOrExit(err);
 
     // Start the CHIP connection to the CHIP echo responder.

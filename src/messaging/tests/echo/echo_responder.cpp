@@ -94,7 +94,7 @@ int main(int argc, char * argv[])
         SuccessOrExit(err);
     }
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = gExchangeManager.Init(chip::kTestDeviceNodeId, &gUDPManager, &gSessionManager);
     SuccessOrExit(err);
 
     err = gEchoServer.Init(&gExchangeManager);
