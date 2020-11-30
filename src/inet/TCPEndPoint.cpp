@@ -1198,9 +1198,9 @@ INET_ERROR TCPEndPoint::DriveSending()
         {
             // Find first packet buffer with remaining data to send by skipping
             // all sent but un-acked data.
-            TCPEndPoint::BufferOffset startOfUnsent = FindStartOfUnsent();
+            TCPEndPoint::BufferOffset startOfUnsent             = FindStartOfUnsent();
             const chip::System::PacketBuffer * currentUnsentBuf = startOfUnsent.buffer;
-            uint16_t unsentOffset = startOfUnsent.offset;
+            uint16_t unsentOffset                               = startOfUnsent.offset;
 
             // While there's data to be sent and a window to send it in...
             do
@@ -1241,7 +1241,7 @@ INET_ERROR TCPEndPoint::DriveSending()
                 if (unsentOffset == bufDataLen)
                 {
                     currentUnsentBuf = currentUnsentBuf->Next();
-                    unsentOffset = 0;
+                    unsentOffset     = 0;
                 }
 
                 // Adjust the remaining window size.
@@ -1783,8 +1783,8 @@ TCPEndPoint::BufferOffset TCPEndPoint::FindStartOfUnsent()
     // traverse all sent-but-unacked data in the chain to reach the beginning
     // of ready-to-send data.
     chip::System::PacketBuffer * currentUnsentBuf = mSendQueue;
-    uint16_t unsentOffset = 0;
-    uint16_t leftToSkip = mUnackedLength;
+    uint16_t unsentOffset                         = 0;
+    uint16_t leftToSkip                           = mUnackedLength;
 
     VerifyOrDie(leftToSkip < mSendQueue->TotalLength());
 
@@ -1797,14 +1797,14 @@ TCPEndPoint::BufferOffset TCPEndPoint::FindStartOfUnsent()
             // We have more to skip than current packet buffer size.
             // Follow the chain to continue.
             currentUnsentBuf = currentUnsentBuf->Next();
-            leftToSkip = static_cast<uint16_t>(leftToSkip - bufDataLen);
+            leftToSkip       = static_cast<uint16_t>(leftToSkip - bufDataLen);
         }
         else
         {
             // Done skipping all data, currentUnsentBuf is first packet buffer
             // containing unsent data.
             unsentOffset = leftToSkip;
-            leftToSkip = 0;
+            leftToSkip   = 0;
         }
     }
 
@@ -1910,19 +1910,19 @@ void TCPEndPoint::HandleDataSent(uint16_t lenSent)
         // could cause invalid pointer accesses.
         if (lenSent > mUnackedLength)
         {
-            ChipLogError(Inet, "Got more ACKed bytes (%d) than were pending (%d)", (int)lenSent, (int)mUnackedLength);
+            ChipLogError(Inet, "Got more ACKed bytes (%d) than were pending (%d)", (int) lenSent, (int) mUnackedLength);
             DoClose(INET_ERROR_UNEXPECTED_EVENT, false);
             return;
         }
         else if (mSendQueue == NULL)
         {
-            ChipLogError(Inet, "Got ACK for %d bytes but data backing gone", (int)lenSent);
+            ChipLogError(Inet, "Got ACK for %d bytes but data backing gone", (int) lenSent);
             DoClose(INET_ERROR_UNEXPECTED_EVENT, false);
             return;
         }
 
         // Consume data off the head of the send queue equal to the amount of data being acknowledged.
-        mSendQueue = mSendQueue->Consume(lenSent);
+        mSendQueue     = mSendQueue->Consume(lenSent);
         mUnackedLength = static_cast<uint16_t>(mUnackedLength - lenSent);
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT

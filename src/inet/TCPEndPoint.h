@@ -634,13 +634,14 @@ private:
     void StopConnectTimer();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    struct BufferOffset {
+    struct BufferOffset
+    {
         const chip::System::PacketBuffer * buffer;
         uint16_t offset;
     };
 
-    uint16_t mUnackedLength;                            // Amount sent but awaiting ACK. Used as a form of reference count
-                                                        // to hang-on to backing packet buffers until they are no longer needed.
+    uint16_t mUnackedLength; // Amount sent but awaiting ACK. Used as a form of reference count
+                             // to hang-on to backing packet buffers until they are no longer needed.
 
     uint16_t RemainingToSend();
     BufferOffset FindStartOfUnsent();
