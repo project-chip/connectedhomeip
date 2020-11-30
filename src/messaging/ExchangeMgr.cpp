@@ -64,19 +64,23 @@ ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
     mState = State::kState_NotInitialized;
 }
 
-CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
+CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr)
 {
     if (mState != State::kState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    mSessionMgr = sessionMgr;
+    mLocalNodeId  = localNodeId;
+    mTransportMgr = transportMgr;
+    mSessionMgr   = sessionMgr;
 
     mNextExchangeId = GetRandU16();
+    mNextKeyId      = 0;
 
     mContextsInUse = 0;
 
     memset(UMHandlerPool, 0, sizeof(UMHandlerPool));
-    OnExchangeContextChanged = nullptr;
+
+    mTransportMgr->SetRendezvousSession(this);
 
     sessionMgr->SetDelegate(this);
 
@@ -94,8 +98,6 @@ CHIP_ERROR ExchangeManager::Shutdown()
         mSessionMgr->SetDelegate(nullptr);
         mSessionMgr = nullptr;
     }
-
-    OnExchangeContextChanged = nullptr;
 
     mState = State::kState_NotInitialized;
 
@@ -297,6 +299,50 @@ exit:
     }
 }
 
+ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate)
+{
+    ChannelContext * channelContext = nullptr;
+
+    // Find an existing Channel matching the builder
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->MatchesBuilder(builder, mSessionMgr))
+        {
+            channelContext = context;
+            return false;
+        }
+        return true;
+    });
+
+    if (channelContext == nullptr)
+    {
+        // create a new channel if not found
+        channelContext = mChannelContexts.CreateObject(this);
+        if (channelContext == nullptr)
+            return ChannelHandle{ nullptr };
+        channelContext->Start(builder);
+    }
+    else
+    {
+        channelContext->Retain();
+    }
+
+    auto association = mChannelHandles.CreateObject(channelContext, delegate);
+    channelContext->Release();
+    return ChannelHandle{ association };
+}
+
+void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->MatchesSession(session, mgr))
+        {
+            context->OnNewConnection(session);
+            return false;
+        }
+        return true;
+    });
+}
+
 void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
     for (auto & ec : mContextPool)
@@ -306,6 +352,50 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
             ec.Close();
             // Continue iterate because there can be multiple contexts associated with the connection.
         }
+    }
+
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->MatchesSession(session, mgr))
+        {
+            context->OnConnectionExpired(session);
+            return false;
+        }
+        return true;
+    });
+}
+
+void ExchangeManager::OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                                        System::PacketBufferHandle msgBuf)
+{
+    auto peer = header.GetSourceNodeId();
+    if (!peer.HasValue())
+    {
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        source.ToString(addrBuffer, sizeof(addrBuffer));
+        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no source node id in packet header.",
+                     addrBuffer);
+        return;
+    }
+
+    auto node     = peer.Value();
+    auto notFound = mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
+        if (context->MatchesPaseParingSessoin(node))
+        {
+            CHIP_ERROR err = context->HandlePairingMessage(header, source, std::move(msgBuf));
+            if (err != CHIP_NO_ERROR)
+                ChipLogError(ExchangeManager, "HandlePairingMessage error %s from node %llu.", chip::ErrorStr(err), node);
+            return false;
+        }
+        return true;
+    });
+
+    if (notFound)
+    {
+        char addrBuffer[Transport::PeerAddress::kMaxToStringSize];
+        source.ToString(addrBuffer, sizeof(addrBuffer));
+        ChipLogError(ExchangeManager, "Unencrypted message from %s is dropped since no session found for node %llu.", addrBuffer,
+                     node);
+        return;
     }
 }
 
