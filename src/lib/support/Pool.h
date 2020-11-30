@@ -63,11 +63,7 @@ public:
     void * Allocate();
     void Deallocate(void * element);
 
-    // Test-only function declaration
-    template <typename F>
-    void ForEachActiveObject(F f);
-
-private:
+protected:
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
     size_t IndexOf(void * element)
     {
@@ -117,6 +113,36 @@ public:
 
         element->~T();
         Deallocate(element);
+    }
+
+    /**
+     * @brief
+     *   Run a functor for each active object in the pool
+     *
+     *  @param     f    The functor of type `bool (*)(T*)`, return false to break the iteration
+     *  @return    bool Returns false if broke during iteration
+     *
+     * caution
+     *   this function is not thread-safe, make sure all usage of the
+     *   pool is protected by a lock, or else avoid using this function
+     */
+    template <typename F>
+    bool ForEachActiveObject(F f)
+    {
+        for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
+        {
+            auto & usage = mUsage[word];
+            auto value   = usage.load(std::memory_order_relaxed);
+            for (size_t offset = 0; offset < kBitChunkSize && offset + word * kBitChunkSize < Capacity(); ++offset)
+            {
+                if ((value & (kBit1 << offset)) != 0)
+                {
+                    if (!f(static_cast<T *>(At(word * kBitChunkSize + offset))))
+                        return false;
+                }
+            }
+        }
+        return true;
     }
 
 private:

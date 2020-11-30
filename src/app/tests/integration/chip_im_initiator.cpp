@@ -205,7 +205,7 @@ int main(int argc, char * argv[])
     err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
     SuccessOrExit(err);
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = gExchangeManager.Init(chip::kTestControllerNodeId, &gTransportManager, &gSessionManager);
     SuccessOrExit(err);
 
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);

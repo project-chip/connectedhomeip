@@ -153,6 +153,54 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 }
 
+class MockChannelDelegate : public ChannelDelegate
+{
+public:
+    ~MockChannelDelegate() override {}
+
+    void OnEstablished() override {}
+    void OnClosed() override {}
+    void OnFail(CHIP_ERROR err) override {}
+};
+
+// Enable this test when Channel implementation is ready
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    // create unsolicited exchange
+    MockAppDelegate mockUnsolicitedAppDelegate;
+    CHIP_ERROR err = ctx.GetExchangeManager().RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // create the channel
+    ChannelBuilder channelBuilder;
+    channelBuilder.SetPeerNodeId(ctx.GetDestinationNodeId());
+    MockChannelDelegate channelDelegate;
+    auto channelHandle = ctx.GetExchangeManager().EstablishChannel(channelBuilder, &channelDelegate);
+
+    // wait for channel establishment
+    // ...
+    // ...
+    // assume channel has been established
+    MockAppDelegate mockAppDelegate;
+    ExchangeContext * ec1 = channelHandle.NewExchange(&mockAppDelegate);
+
+    // send a malicious packet
+    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kNone));
+    NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+
+    // send a good packet
+    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kNone));
+    NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+
+    ec1->Close();
+    channelHandle.Release();
+}
+#pragma GCC diagnostic pop
+
 // Test Suite
 
 /**

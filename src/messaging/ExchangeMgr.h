@@ -26,10 +26,14 @@
 
 #include <array>
 
+#include <messaging/Channel.h>
+#include <messaging/ChannelContext.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ReliableMessageManager.h>
 #include <support/DLLUtil.h>
+#include <support/Pool.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/TransportMgr.h>
 
 namespace chip {
 namespace Messaging {
@@ -45,7 +49,7 @@ static constexpr int16_t kAnyMessageType = -1;
  *    It works on be behalf of higher layers, creating ExchangeContexts and
  *    handling the registration/unregistration of unsolicited message handlers.
  */
-class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate
+class DLL_EXPORT ExchangeManager : public SecureSessionMgrDelegate, public TransportMgrDelegate
 {
 public:
     ExchangeManager();
@@ -65,7 +69,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -148,13 +152,34 @@ public:
      */
     CHIP_ERROR UnregisterUnsolicitedMessageHandler(uint32_t protocolId, uint8_t msgType);
 
+    // Channel public APIs
+    ChannelHandle EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate);
+
+    // Internal APIs used for channel
+    void ReleaseChannelContext(ChannelContext * channel) { mChannelContexts.ReleaseObject(channel); }
+
+    void ReleaseChannelHandle(ChannelContextHandleAssociation * association) { mChannelHandles.ReleaseObject(association); }
+
+    template <typename Event>
+    void NotifyChannelEvent(ChannelContext * channel, Event event)
+    {
+        mChannelHandles.ForEachActiveObject([&](ChannelContextHandleAssociation * association) {
+            if (association->mChannelContext == channel)
+                event(association->mChannelDelegate);
+            return true;
+        });
+    }
+
     void IncrementContextsInUse();
     void DecrementContextsInUse();
 
+    TransportMgrBase * GetTransportManager() const { return mTransportMgr; }
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
     ReliableMessageManager * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
+    NodeId GetLocalNodeId() { return mLocalNodeId; }
+    uint16_t GetNextKeyId() { return ++mNextKeyId; }
     size_t GetContextsInUse() const { return mContextsInUse; }
 
 private:
@@ -171,8 +196,11 @@ private:
         int16_t MessageType;
     };
 
+    NodeId mLocalNodeId; // < Id of the current node
     uint16_t mNextExchangeId;
+    uint16_t mNextKeyId;
     State mState;
+    TransportMgrBase * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageManager mReliableMessageMgr;
 
@@ -180,7 +208,8 @@ private:
     size_t mContextsInUse;
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
-    void (*OnExchangeContextChanged)(size_t numContextsInUse);
+    BitMapObjectPool<ChannelContext, CHIP_CONFIG_MAX_ACTIVE_CHANNELS> mChannelContexts;
+    BitMapObjectPool<ChannelContextHandleAssociation, CHIP_CONFIG_MAX_CHANNEL_HANDLES> mChannelHandles;
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate);
 
@@ -192,7 +221,12 @@ private:
     void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
                            System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
 
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override;
     void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
+
+    // TransportMgrDelegate interface for rendezvous sessions
+    void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
+                           System::PacketBufferHandle msgBuf) override;
 };
 
 } // namespace Messaging
