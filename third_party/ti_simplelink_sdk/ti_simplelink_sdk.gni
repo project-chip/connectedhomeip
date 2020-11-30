@@ -13,11 +13,11 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-import("//build_overrides/ti_simplelink_sdk.gni")
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/ti_simplelink_sdk.gni")
 
-import("ti_simplelink_board.gni")
 import("${mbedtls_root}/mbedtls.gni")
+import("ti_simplelink_board.gni")
 
 declare_args() {
   # Location of the TI SimpleLink SDK.
@@ -44,7 +44,8 @@ assert(freertos_root != "", "freertos_root must be specified")
 
 template("ti_sysconfig") {
   assert(ti_sysconfig_root != "", "ti_sysconfig_root must be specified")
-  assert(ti_simplelink_sdk_root != "", "ti_simplelink_sdk_root must be specified")
+  assert(ti_simplelink_sdk_root != "",
+         "ti_simplelink_sdk_root must be specified")
 
   output_dir = "${target_gen_dir}/${target_name}"
   gen_outputs = []
@@ -53,7 +54,6 @@ template("ti_sysconfig") {
   }
 
   config("${target_name}_config") {
-
     include_dirs = [
       output_dir,
       "${ti_simplelink_sdk_root}/source",
@@ -66,15 +66,11 @@ template("ti_sysconfig") {
     }
 
     if (ti_simplelink_device_family == "cc13x2_26x2") {
+      assert(ti_simplelink_soc_family != "",
+             "ti_simplelink_soc_family must be specified")
 
-      assert(ti_simplelink_soc_family != "", "ti_simplelink_soc_family must be specified")
-
-      ldflags += [
-        "-nostartfiles",
-      ]
-      defines += [
-        "DeviceFamily_CC13X2_CC26X2",
-      ]
+      ldflags += [ "-nostartfiles" ]
+      defines += [ "DeviceFamily_CC13X2_CC26X2" ]
     }
   }
 
@@ -82,17 +78,21 @@ template("ti_sysconfig") {
     script = "${ti_simplelink_sdk_build_root}/run_sysconfig.py"
     sources = invoker.sources
     outputs = gen_outputs
-    
+
     args = [
       ti_sysconfig_root,
-      "-s", ti_simplelink_sdk_root + "/.metadata/product.json",
-      "-o", rebase_path(output_dir, root_build_dir),
-      "--compiler", "gcc",
-      "--board", "/ti/boards/" + ti_simplelink_board
+      "-s",
+      ti_simplelink_sdk_root + "/.metadata/product.json",
+      "-o",
+      rebase_path(output_dir, root_build_dir),
+      "--compiler",
+      "gcc",
+      "--board",
+      "/ti/boards/" + ti_simplelink_board,
     ]
 
     foreach(source, sources) {
-      args += [ rebase_path(source, root_build_dir)]
+      args += [ rebase_path(source, root_build_dir) ]
     }
   }
 
@@ -109,7 +109,8 @@ template("ti_simplelink_sdk") {
     ti_simplelink_sdk_root = invoker.ti_simplelink_sdk_root
   }
 
-  assert(ti_simplelink_sdk_root != "", "ti_simplelink_sdk_root must be specified")
+  assert(ti_simplelink_sdk_root != "",
+         "ti_simplelink_sdk_root must be specified")
 
   sdk_target_name = target_name
 
@@ -137,12 +138,10 @@ template("ti_simplelink_sdk") {
     defines = []
 
     if (ti_simplelink_device_family == "cc13x2_26x2") {
+      assert(ti_simplelink_soc_family != "",
+             "ti_simplelink_soc_family must be specified")
 
-      assert(ti_simplelink_soc_family != "", "ti_simplelink_soc_family must be specified")
-
-      defines += [
-        "DeviceFamily_CC13X2_CC26X2",
-      ]
+      defines += [ "DeviceFamily_CC13X2_CC26X2" ]
 
       libs += [
         "${ti_simplelink_sdk_root}/source/ti/drivers/lib/gcc/m4f/drivers_${ti_simplelink_soc_family}.a",
@@ -170,7 +169,6 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/SwiP_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/SystemP_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/TimerPCC26XX_freertos.c",
-
       "${ti_simplelink_sdk_root}/kernel/freertos/startup/startup_cc13x2_cc26x2_gcc.c",
 
       # TI-POSIX port temporarily disabled
@@ -190,12 +188,12 @@ template("ti_simplelink_sdk") {
       "${freertos_root}/FreeRTOS/Source/croutine.c",
       "${freertos_root}/FreeRTOS/Source/event_groups.c",
       "${freertos_root}/FreeRTOS/Source/list.c",
+      "${freertos_root}/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c",
+      "${freertos_root}/FreeRTOS/Source/portable/MemMang/heap_4.c",
       "${freertos_root}/FreeRTOS/Source/queue.c",
       "${freertos_root}/FreeRTOS/Source/stream_buffer.c",
       "${freertos_root}/FreeRTOS/Source/tasks.c",
       "${freertos_root}/FreeRTOS/Source/timers.c",
-      "${freertos_root}/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c",
-      "${freertos_root}/FreeRTOS/Source/portable/MemMang/heap_4.c",
     ]
 
     if (defined(invoker.sources)) {

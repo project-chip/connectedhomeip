@@ -34,15 +34,16 @@ assert(ti_simplelink_board != "", "ti_simplelink_board must be specified")
 if (ti_simplelink_board == "CC1352R1_LAUNCHXL") {
   ti_simplelink_device_family = "cc13x2_26x2"
   ti_simplelink_soc_family = "cc13x2"
+
   # set -DDeviceFamily_CC13X2?
   ti_simplelink_soc = "cc1352r1f3"
 } else if (ti_simplelink_board == "CC2652R1_LAUNCHXL") {
   ti_simplelink_device_family = "cc13x2_26x2"
   ti_simplelink_soc_family = "cc26x2"
+
   # set -DDeviceFamily_CC26X2?
   ti_simplelink_soc = "cc2652r1f3"
 } else {
   print("Please provide a valid value for TI_SIMPLELINK_BOARD env variable")
   assert(false, "The board ${ti_simplelink_board} is unsupported as for now.")
 }
-

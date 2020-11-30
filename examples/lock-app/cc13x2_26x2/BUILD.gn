@@ -37,9 +37,7 @@ ti_simplelink_sdk("sdk") {
     "${project_dir}/main/include/FreeRTOSConfig.h",
   ]
 
-  defines = [
-    "NVOCMP_FREERTOS_MUTEX=1"
-  ]
+  defines = [ "NVOCMP_FREERTOS_MUTEX=1" ]
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
   } else {
@@ -87,8 +85,8 @@ ti_simplelink_executable("lock_app") {
   output_name = "chip-cc13x2_26x2-lock-example.out"
 
   public_deps = [
-    ":sysconfig",
     ":sdk",
+    ":sysconfig",
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
@@ -98,15 +96,25 @@ ti_simplelink_executable("lock_app") {
   ]
 
   sources = [
-    "${project_dir}/main/main.cpp",
     "${project_dir}/main/AppTask.cpp",
     "${project_dir}/main/BoltLockManager.cpp",
     "${project_dir}/main/ZclCallbacks.cpp",
+    "${project_dir}/main/main.cpp",
+
     #"${project_dir}/main/CXXExceptionStubs.cpp",
 
     # platform drivers here because they need sysconfig headers
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/radio.h",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/system.h",
+    "${chip_root}/src/platform/cc13x2_26x2/Logging.cpp",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/aes_alt.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/aes_alt.h",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/cc13x2_26x2-mbedtls-config.h",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/ecjpake_alt.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/ecjpake_alt.h",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/sha256_alt.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/sha256_alt.h",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/nv/crc.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/nv/nvocmp.c",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/alarm.c",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/diag.c",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/entropy.c",
@@ -114,17 +122,8 @@ ti_simplelink_executable("lock_app") {
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/radio.c",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/settings.c",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/system.c",
+    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/system.h",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/uart.c",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/aes_alt.h",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/cc13x2_26x2-mbedtls-config.h",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/ecjpake_alt.h",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/sha256_alt.h",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/aes_alt.c",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/ecjpake_alt.c",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/sha256_alt.c",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/nv/crc.c",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/nv/nvocmp.c",
-    "${chip_root}/src/platform/cc13x2_26x2/Logging.cpp",
   ]
 
   output_dir = root_out_dir

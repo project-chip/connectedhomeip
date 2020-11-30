@@ -20,16 +20,15 @@ declare_args() {
   ti_simplelink_sdk_target = ""
 }
 
-assert(ti_simplelink_sdk_target != "", "ti_simplelink_sdk_target must be specified")
+assert(ti_simplelink_sdk_target != "",
+       "ti_simplelink_sdk_target must be specified")
 
 group("ti_simplelink_sdk") {
   public_deps = [ ti_simplelink_sdk_target ]
 }
 
 config("ti_simplelink_mbedtls_config") {
-  defines = [
-    "MBEDTLS_CONFIG_FILE=\"cc13x2_26x2-mbedtls-config.h\""
-  ]
+  defines = [ "MBEDTLS_CONFIG_FILE=\"cc13x2_26x2-mbedtls-config.h\"" ]
 
   include_dirs = [
     "${chip_root}/src/platform/cc13x2_26x2",
@@ -44,10 +43,7 @@ mbedtls_target("mbedtls") {
     # XXX: fill in hardware accelerated versions, how to link sysconfig dependent code?
   ]
 
-  public_configs = [
-    ":ti_simplelink_mbedtls_config",
-  ]
+  public_configs = [ ":ti_simplelink_mbedtls_config" ]
 
-  public_deps = [
-  ]
+  public_deps = []
 }
