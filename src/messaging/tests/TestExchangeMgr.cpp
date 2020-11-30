@@ -98,7 +98,7 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
+    err = exchangeMgr.Init(kSourceNodeId, &transportMgr, &secureSessionMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
@@ -156,7 +156,7 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
+    err = exchangeMgr.Init(kSourceNodeId, &transportMgr, &secureSessionMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MockAppDelegate mockAppDelegate;
@@ -190,7 +190,7 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
+    err = exchangeMgr.Init(kSourceNodeId, &transportMgr, &secureSessionMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MockAppDelegate mockAppDelegate;
@@ -246,7 +246,7 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
+    err = exchangeMgr.Init(kSourceNodeId, &transportMgr, &secureSessionMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // create solicited exchange
@@ -265,6 +265,68 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 }
+
+class MockChannelDelegate : public ChannelDelegate
+{
+public:
+    ~MockChannelDelegate() override {}
+
+    void OnEstablished() override {}
+    void OnClosed() override {}
+    void OnFail(CHIP_ERROR err) override {}
+};
+
+// Enable this test when Channel implementation is ready
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+void CheckExchangeChannels(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+    CHIP_ERROR err;
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    TransportMgr<LoopbackTransport> transportMgr;
+    err = transportMgr.Init("LOOPBACK");
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SecureSessionMgr secureSessionMgr;
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ExchangeManager exchangeMgr;
+    err = exchangeMgr.Init(kSourceNodeId, &transportMgr, &secureSessionMgr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // create unsolicited exchange
+    MockAppDelegate mockUnsolicitedAppDelegate;
+    err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
+
+    // create the channel
+    ChannelBuilder channelBuilder;
+    channelBuilder.SetPeerNodeId(kDestinationNodeId);
+    MockChannelDelegate channelDelegate;
+    auto channelHandle = exchangeMgr.EstablishChannel(channelBuilder, &channelDelegate);
+
+    // wait for channel establishment
+    // ...
+    // ...
+    // assume channel has been established
+    MockAppDelegate mockAppDelegate;
+    ExchangeContext * ec1 = channelHandle.NewExchange(&mockAppDelegate);
+
+    // send a malicious packet
+    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kNone));
+    NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+
+    // send a good packet
+    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kNone));
+    NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
+
+    ec1->Close();
+    channelHandle.Release();
+}
+#pragma GCC diagnostic pop
 
 // Test Suite
 

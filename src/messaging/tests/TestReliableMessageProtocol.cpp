@@ -141,7 +141,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
+    err = exchangeMgr.Init(kSourceNodeId, &transportMgr, &secureSessionMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MockAppDelegate mockAppDelegate;
@@ -179,7 +179,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
+    err = exchangeMgr.Init(kSourceNodeId, &transportMgr, &secureSessionMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     MockAppDelegate mockAppDelegate;
@@ -231,7 +231,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
+    err = exchangeMgr.Init(kSourceNodeId, &transportMgr, &secureSessionMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
