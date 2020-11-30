@@ -40,13 +40,12 @@
 #ifndef CRC_H
 #define CRC_H
 
-#include <stdlib.h>
 #include <stdint.h>
+#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
 
 /**
  * The definition of the used algorithm.
@@ -56,14 +55,12 @@ extern "C" {
  */
 #define CRC_ALGO_TABLE_DRIVEN 1
 
-
 /**
  * The type of the CRC values.
  *
  * This type must be big enough to contain at least 8 bits.
  */
 typedef uint8_t crc_t;
-
 
 /**
  * Calculate the initial crc value.
@@ -75,7 +72,6 @@ static inline crc_t crc_init(void)
     return 0x00;
 }
 
-
 /**
  * Update the crc value with new data.
  *
@@ -84,8 +80,7 @@ static inline crc_t crc_init(void)
  * \param[in] data_len Number of bytes in the \a data buffer.
  * \return             The updated crc value.
  */
-crc_t crc_update(crc_t crc, const void *data, size_t data_len);
-
+crc_t crc_update(crc_t crc, const void * data, size_t data_len);
 
 /**
  * Calculate the final crc value.
@@ -98,9 +93,8 @@ static inline crc_t crc_finalize(crc_t crc)
     return crc;
 }
 
-
 #ifdef __cplusplus
-}           /* closing brace for extern "C" */
+} /* closing brace for extern "C" */
 #endif
 
-#endif      /* CRC_H */
+#endif /* CRC_H */

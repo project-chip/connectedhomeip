@@ -44,16 +44,15 @@
 
  *****************************************************************************/
 
-
 #include <openthread/config.h>
 
-#include "mbedtls/aes.h"
 #include "aes_alt.h"
+#include "mbedtls/aes.h"
 
 #if defined(MBEDTLS_AES_ALT)
 
-#include <string.h>
 #include <assert.h>
+#include <string.h>
 
 #include <ti/devices/DeviceFamily.h>
 #include <ti/drivers/AESECB.h>
@@ -66,13 +65,12 @@ static unsigned int ref_num = 0;
 
 static AESECB_Handle AESECB_handle = NULL;
 
-
 /**
  * @brief Initialize AES context
  *
  * @param [in,out] ctx AES context to be initialized
  */
-void mbedtls_aes_init(mbedtls_aes_context *ctx)
+void mbedtls_aes_init(mbedtls_aes_context * ctx)
 {
     AESECB_Params AESECBParams;
 
@@ -80,7 +78,7 @@ void mbedtls_aes_init(mbedtls_aes_context *ctx)
     {
         AESECB_Params_init(&AESECBParams);
         AESECBParams.returnBehavior = AESECB_RETURN_BEHAVIOR_POLLING;
-        AESECB_handle = AESECB_open(0 , &AESECBParams);
+        AESECB_handle               = AESECB_open(0, &AESECBParams);
         assert(AESECB_handle != 0);
     }
 }
@@ -90,7 +88,7 @@ void mbedtls_aes_init(mbedtls_aes_context *ctx)
  *
  * \param ctx      AES context to be cleared
  */
-void mbedtls_aes_free(mbedtls_aes_context *ctx)
+void mbedtls_aes_free(mbedtls_aes_context * ctx)
 {
     if (--ref_num == 0)
     {
@@ -99,7 +97,7 @@ void mbedtls_aes_free(mbedtls_aes_context *ctx)
         AESECB_handle = NULL;
     }
 
-    memset((void *)ctx, 0x00, sizeof(ctx));
+    memset((void *) ctx, 0x00, sizeof(ctx));
 }
 
 /**
@@ -111,16 +109,16 @@ void mbedtls_aes_free(mbedtls_aes_context *ctx)
  *
  * \return         0 if successful, or MBEDTLS_ERR_AES_INVALID_KEY_LENGTH
  */
-int mbedtls_aes_setkey_enc(mbedtls_aes_context *ctx, const unsigned char *key, unsigned int keybits)
+int mbedtls_aes_setkey_enc(mbedtls_aes_context * ctx, const unsigned char * key, unsigned int keybits)
 {
     int_fast16_t statusCrypto = 0;
 
     /* Initialize AES key */
     memcpy(ctx->keyMaterial, key, (keybits >> 3));
-    statusCrypto = CryptoKeyPlaintext_initKey(&ctx->cryptoKey, (uint8_t*) ctx->keyMaterial, (keybits >> 3));
+    statusCrypto = CryptoKeyPlaintext_initKey(&ctx->cryptoKey, (uint8_t *) ctx->keyMaterial, (keybits >> 3));
     assert(statusCrypto == 0);
 
-    return (int)statusCrypto;
+    return (int) statusCrypto;
 }
 
 /**
@@ -132,15 +130,15 @@ int mbedtls_aes_setkey_enc(mbedtls_aes_context *ctx, const unsigned char *key, u
  *
  * \return         0 if successful, or MBEDTLS_ERR_AES_INVALID_KEY_LENGTH
  */
-int mbedtls_aes_setkey_dec(mbedtls_aes_context *ctx, const unsigned char *key, unsigned int keybits)
+int mbedtls_aes_setkey_dec(mbedtls_aes_context * ctx, const unsigned char * key, unsigned int keybits)
 {
     int_fast16_t statusCrypto;
 
     /* Initialize AES key */
-    statusCrypto = CryptoKeyPlaintext_initKey(&ctx->cryptoKey, (uint8_t*) key, (keybits >> 3));
+    statusCrypto = CryptoKeyPlaintext_initKey(&ctx->cryptoKey, (uint8_t *) key, (keybits >> 3));
     assert(statusCrypto == 0);
 
-    return (int)statusCrypto;
+    return (int) statusCrypto;
 }
 
 /**
@@ -154,7 +152,7 @@ int mbedtls_aes_setkey_dec(mbedtls_aes_context *ctx, const unsigned char *key, u
  * \return         0 if successful
  */
 
-int mbedtls_aes_crypt_ecb(mbedtls_aes_context *ctx, int mode, const unsigned char input[16], unsigned char output[16])
+int mbedtls_aes_crypt_ecb(mbedtls_aes_context * ctx, int mode, const unsigned char input[16], unsigned char output[16])
 {
     int statusCrypto;
     AESECB_Operation operationOneStepEncrypt;
@@ -162,10 +160,10 @@ int mbedtls_aes_crypt_ecb(mbedtls_aes_context *ctx, int mode, const unsigned cha
     /* run it through the authentication + encryption, pass the ccmLVal = 2 */
     AESECB_Operation_init(&operationOneStepEncrypt);
 
-    operationOneStepEncrypt.key = &ctx->cryptoKey;
+    operationOneStepEncrypt.key         = &ctx->cryptoKey;
     operationOneStepEncrypt.inputLength = 16;
-    operationOneStepEncrypt.input = (uint8_t *)input;
-    operationOneStepEncrypt.output = (uint8_t *)output;
+    operationOneStepEncrypt.input       = (uint8_t *) input;
+    operationOneStepEncrypt.output      = (uint8_t *) output;
 
     statusCrypto = AESECB_oneStepEncrypt(AESECB_handle, &operationOneStepEncrypt);
     assert(statusCrypto == 0);

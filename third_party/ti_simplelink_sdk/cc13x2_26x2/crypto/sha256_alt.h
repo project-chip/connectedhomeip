@@ -44,7 +44,6 @@
 
  *****************************************************************************/
 
-
 #ifndef MBEDTLS_SHA256_ALT_H
 #define MBEDTLS_SHA256_ALT_H
 
@@ -66,11 +65,10 @@ extern "C" {
  */
 typedef struct
 {
-    SHA2_Handle hndl;             /*!< A handle that is returned by the SHA driver  */
-    SHA2_Config config;           /*!< structure containing SHA2 driver specific implementation  */
-    SHA2CC26X2_Object object;     /*!< Pointer to a driver specific data object */
-}
-mbedtls_sha256_context;
+    SHA2_Handle hndl;         /*!< A handle that is returned by the SHA driver  */
+    SHA2_Config config;       /*!< structure containing SHA2 driver specific implementation  */
+    SHA2CC26X2_Object object; /*!< Pointer to a driver specific data object */
+} mbedtls_sha256_context;
 
 #ifdef __cplusplus
 }

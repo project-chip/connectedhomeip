@@ -24,8 +24,8 @@
 
 #pragma once
 
-#include <platform/internal/GenericConfigurationManagerImpl.h>
 #include <platform/cc13x2_26x2/CC13X2_26X2Config.h>
+#include <platform/internal/GenericConfigurationManagerImpl.h>
 
 namespace chip {
 namespace DeviceLayer {

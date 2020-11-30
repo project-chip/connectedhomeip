@@ -40,24 +40,23 @@
 
  *****************************************************************************/
 
-
 #ifndef RTOS_PLATFORM_H_
 #define RTOS_PLATFORM_H_
 
-#include <stdint.h>
 #include <openthread/instance.h>
+#include <stdint.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 // Global OpenThread instance structure
-extern otInstance *sInstance;
+extern otInstance * sInstance;
 
 /**
  * Initialize the platform support modules.
  */
-void otSysInit(int argc, char *argv[]);
+void otSysInit(int argc, char * argv[]);
 
 /**
  * Process the platform drivers.
@@ -85,7 +84,7 @@ void platformAlarmSignal(void);
  * This method performs alarm driver processing.
  *
  */
-void platformAlarmProcess(otInstance *aInstance);
+void platformAlarmProcess(otInstance * aInstance);
 
 /**
  * This method initializes the alarm service used by OpenThread.
@@ -103,7 +102,7 @@ void platformAlarmMicroSignal(void);
  * This method performs alarm driver processing.
  *
  */
-void platformAlarmMicroProcess(otInstance *aInstance);
+void platformAlarmMicroProcess(otInstance * aInstance);
 
 /**
  * This method initializes the radio service used by OpenThread.
@@ -120,7 +119,7 @@ void platformRadioSignal();
  * This method performs radio driver processing.
  *
  */
-void platformRadioProcess(otInstance *aInstance);
+void platformRadioProcess(otInstance * aInstance);
 
 /**
  * This method initializes the random number service used by OpenThread.
@@ -170,7 +169,7 @@ void platformSpiProcess(void);
 otError otPlatUartFlush(void);
 
 #ifdef __cplusplus
-}  // extern "C"
+} // extern "C"
 #endif
 
-#endif  // RTOS_PLATFORM_H_
+#endif // RTOS_PLATFORM_H_

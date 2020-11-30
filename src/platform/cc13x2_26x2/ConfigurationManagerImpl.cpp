@@ -40,7 +40,7 @@
 
 // BSP header cannot handle conversions
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib/sys_ctrl.h)
+#include DeviceFamily_constructPath(driverlib / sys_ctrl.h)
 
 #pragma GCC diagnostic pop
 

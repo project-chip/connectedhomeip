@@ -39,7 +39,6 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
     CHIP_ERROR err;
 
-
     // Initialize the configuration system.
     err = Internal::CC13X2_26X2Config::Init();
     SuccessOrExit(err);

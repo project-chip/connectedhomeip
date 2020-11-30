@@ -156,14 +156,14 @@ Requires API's in a crc.h to implement CRC functionality.
 #else
 #include <ti/sysbios/gates/GateMutexPri.h>
 #endif
-#include "nvocmp.h"
 #include "crc.h"
+#include "nvocmp.h"
 
 #ifndef NV_LINUX
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib/vims.h)
+#include DeviceFamily_constructPath(driverlib / vims.h)
 #ifdef NVOCMP_MIN_VDD_FLASH_MV
-#include DeviceFamily_constructPath(driverlib/aon_batmon.h)
+#include DeviceFamily_constructPath(driverlib / aon_batmon.h)
 #endif /* NVOCMP_MIN_VDD_FLASH_MV */
 #endif /* NV_LINUX */
 
@@ -175,79 +175,85 @@ Requires API's in a crc.h to implement CRC functionality.
 // Constants and Definitions
 //*****************************************************************************
 #ifndef NVOCMP_NVPAGES
-#define NVOCMP_NVPAGES      2     //1 ~ 5 are supported
+#define NVOCMP_NVPAGES 2 // 1 ~ 5 are supported
 #endif
 
 #if (NVOCMP_NVPAGES > 5)
 #error "NVOCMP_NVPAGES should be in between 1 and 5"
 #endif
 
-#define NVOCMP_FASTCP       1           // Fast Compaction by Skipping All Active Item Pages
-#define NVOCMP_COMPR        0           // Order Change When Compaction
-#define NVOCMP_HDRLE        0           // Little Endian Format Item Header
-#define NVOCMP_FASTOFF      1           // Fast Search Offset
-#define NVOCMP_FASTITEM     0           // Fast Find Item
+#define NVOCMP_FASTCP 1   // Fast Compaction by Skipping All Active Item Pages
+#define NVOCMP_COMPR 0    // Order Change When Compaction
+#define NVOCMP_HDRLE 0    // Little Endian Format Item Header
+#define NVOCMP_FASTOFF 1  // Fast Search Offset
+#define NVOCMP_FASTITEM 0 // Fast Find Item
 
 #ifndef NVOCMP_NWSAMEITEM
-#define NVOCMP_NWSAMEITEM   0           // Not Write Same Item
+#define NVOCMP_NWSAMEITEM 0 // Not Write Same Item
 #endif
 
-#define NVOCMP_NVONEP       1           // One Page NV
-#define NVOCMP_NVTWOP       2           // Two Page NV
+#define NVOCMP_NVONEP 1 // One Page NV
+#define NVOCMP_NVTWOP 2 // Two Page NV
 
-#define NVOCMP_NVSIZE       NVOCMP_size
-#define NVOCMP_ADDPAGE(p,n) (((p) + (n)) % NVOCMP_NVSIZE)
-#define NVOCMP_INCPAGE(p)   NVOCMP_ADDPAGE(p,1)
-#define NVOCMP_DECPAGE(p)   NVOCMP_ADDPAGE(p,NVOCMP_NVSIZE - 1)
+#define NVOCMP_NVSIZE NVOCMP_size
+#define NVOCMP_ADDPAGE(p, n) (((p) + (n)) % NVOCMP_NVSIZE)
+#define NVOCMP_INCPAGE(p) NVOCMP_ADDPAGE(p, 1)
+#define NVOCMP_DECPAGE(p) NVOCMP_ADDPAGE(p, NVOCMP_NVSIZE - 1)
 // Which NVS_config indice is used to initialize NVS.
 #ifndef NVOCMP_NVS_INDEX
-#define NVOCMP_NVS_INDEX    0
+#define NVOCMP_NVS_INDEX 0
 #endif // NVOCMP_NVS_INDEX
 
 // Maximum ID parameters - must be coordinated with header format
-#define NVOCMP_MAXSYSID     0x003F  //  6 bits
-#define NVOCMP_MAXITEMID    0x03FF  // 10 bits
-#define NVOCMP_MAXSUBID     0x03FF  // 10 bits
-#define NVOCMP_MAXLEN       0x0FFF  // 12 bits
-#define NVOCMP_INVALIDSUBID 0xFFFF  // Invalid Sub Id
+#define NVOCMP_MAXSYSID 0x003F     //  6 bits
+#define NVOCMP_MAXITEMID 0x03FF    // 10 bits
+#define NVOCMP_MAXSUBID 0x03FF     // 10 bits
+#define NVOCMP_MAXLEN 0x0FFF       // 12 bits
+#define NVOCMP_INVALIDSUBID 0xFFFF // Invalid Sub Id
 
 // Contents of an erased Flash memory locations
-#define NVOCMP_ERASEDBYTE   0xFF
-#define NVOCMP_ERASEDWORD   0xFFFFFFFF
+#define NVOCMP_ERASEDBYTE 0xFF
+#define NVOCMP_ERASEDWORD 0xFFFFFFFF
 
 // Size of byte
-#define NVOCMP_ONEBYTE      1
+#define NVOCMP_ONEBYTE 1
 
 // Compressed ID bit spacing
-#define NVOCMP_CMPSPACE     12
+#define NVOCMP_CMPSPACE 12
 
 // Invalid NV page - if 0xFF is ever used, change this definition
-#define NVOCMP_NULLPAGE     0xFF
+#define NVOCMP_NULLPAGE 0xFF
 
 // Block size for Flash-Flash XFER (Bytes)
-#define NVOCMP_XFERBLKMAX   32
+#define NVOCMP_XFERBLKMAX 32
 
 // Size in bytes of biggest item size that will be concatenated
 // in RAM before write, instead of header/data written separately
-#define NVOCMP_SMALLITEM    12
+#define NVOCMP_SMALLITEM 12
 
-#if defined (NVOCMP_STATS)
+#if defined(NVOCMP_STATS)
 // NV item ID for driver diagnostics
 static const NVINTF_itemID_t diagId = NVOCMP_NVID_DIAG;
-#endif  // NVOCMP_STATS
+#endif // NVOCMP_STATS
 
 // CRC options
 // When not NULL, reads will result in a CRC check before returning
-#define NVOCMP_CRCONREAD    1
+#define NVOCMP_CRCONREAD 1
 
 // findItem search types
 // Find any item, item of spec'd sysid, item of spec'd sys and item id
 // or find the exact item specified
-enum {NVOCMP_FINDANY = 0x00, NVOCMP_FINDSYSID, NVOCMP_FINDITMID, NVOCMP_FINDSTRICT,
-      NVOCMP_FINDCONTENT = 0x10};
+enum
+{
+    NVOCMP_FINDANY = 0x00,
+    NVOCMP_FINDSYSID,
+    NVOCMP_FINDITMID,
+    NVOCMP_FINDSTRICT,
+    NVOCMP_FINDCONTENT = 0x10
+};
 
-#define NVOCMP_FINDLMASK    0x0F
-#define NVOCMP_FINDHMASK    0xF0
+#define NVOCMP_FINDLMASK 0x0F
+#define NVOCMP_FINDHMASK 0xF0
 //*****************************************************************************
 // Macros
 //*****************************************************************************
@@ -258,8 +264,16 @@ enum {NVOCMP_FINDANY = 0x00, NVOCMP_FINDSYSID, NVOCMP_FINDITMID, NVOCMP_FINDSTRI
 // Optional user provided function is called before writes/erases
 // Intention is to check for sufficient voltage for operation
 #ifndef NV_LINUX
-#define NVOCMP_FLASHACCESS(err) {if (NVOCMP_voltCheckFptr)\
-    { if (!NVOCMP_voltCheckFptr()) { err = NVINTF_LOWPOWER;}}}
+#define NVOCMP_FLASHACCESS(err)                                                                                                    \
+    {                                                                                                                              \
+        if (NVOCMP_voltCheckFptr)                                                                                                  \
+        {                                                                                                                          \
+            if (!NVOCMP_voltCheckFptr())                                                                                           \
+            {                                                                                                                      \
+                err = NVINTF_LOWPOWER;                                                                                             \
+            }                                                                                                                      \
+        }                                                                                                                          \
+    }
 #endif
 
 #ifdef NVOCMP_POSIX_MUTEX
@@ -286,15 +300,15 @@ enum {NVOCMP_FINDANY = 0x00, NVOCMP_FINDSYSID, NVOCMP_FINDITMID, NVOCMP_FINDSTRI
 #endif
 
 // Generate a compressed NV ID (NOTE: bit31 must be zero)
-#define NVOCMP_CMPRID(s,i,b) ((uint32_t)((((((s) & NVOCMP_MAXSYSID) << NVOCMP_CMPSPACE)   | \
-                                            ((i) & NVOCMP_MAXITEMID)) << NVOCMP_CMPSPACE) | \
-                                            ((b) & NVOCMP_MAXSUBID)))
+#define NVOCMP_CMPRID(s, i, b)                                                                                                     \
+    ((uint32_t)((((((s) &NVOCMP_MAXSYSID) << NVOCMP_CMPSPACE) | ((i) &NVOCMP_MAXITEMID)) << NVOCMP_CMPSPACE) |                     \
+                ((b) &NVOCMP_MAXSUBID)))
 
 // NVOCMP Unit Test Assert Macro/Function
 #ifdef NVDEBUG
 extern void nvprint(char * message);
 extern void Main_assertHandler(uint8_t assertReason);
-static void NVOCMP_assert(bool cond, char *message, bool fatal)
+static void NVOCMP_assert(bool cond, char * message, bool fatal)
 {
     if (!cond)
     {
@@ -306,15 +320,20 @@ static void NVOCMP_assert(bool cond, char *message, bool fatal)
         }
     }
 }
-#define NVOCMP_ASSERT(cond, message)    NVOCMP_assert((cond), (message), true);
-#define NVOCMP_ALERT(cond, message)     NVOCMP_assert((cond), (message), false);
+#define NVOCMP_ASSERT(cond, message) NVOCMP_assert((cond), (message), true);
+#define NVOCMP_ALERT(cond, message) NVOCMP_assert((cond), (message), false);
 #else
 #ifdef NV_LINUX
-#define NVOCMP_ASSERT1(cond)            NVOCMP_ASSERT((cond), "NVOCMP_ASSERT1")
+#define NVOCMP_ASSERT1(cond) NVOCMP_ASSERT((cond), "NVOCMP_ASSERT1")
 #else
 #define NVOCMP_ASSERT(cond, message)
 #define NVOCMP_ALERT(cond, message)
-#define NVOCMP_ASSERT1(cond)  {if(!cond)  while(1);}
+#define NVOCMP_ASSERT1(cond)                                                                                                       \
+    {                                                                                                                              \
+        if (!cond)                                                                                                                 \
+            while (1)                                                                                                              \
+                ;                                                                                                                  \
+    }
 #endif
 #endif // NVDEBUG
 
@@ -323,18 +342,18 @@ static void NVOCMP_assert(bool cond, char *message, bool fatal)
 //*****************************************************************************
 // CC26x2/CC13x2 devices flash page size is (1 << 13) or 0x2000
 #define PAGE_SIZE_LSHIFT 13
-#if !defined (FLASH_PAGE_SIZE)
-#define FLASH_PAGE_SIZE  (1 << PAGE_SIZE_LSHIFT)
+#if !defined(FLASH_PAGE_SIZE)
+#define FLASH_PAGE_SIZE (1 << PAGE_SIZE_LSHIFT)
 #endif // FLASH_PAGE_SIZE
 
-#if !defined (NVOCMP_VERSION)
+#if !defined(NVOCMP_VERSION)
 // Version of NV page format (do not use 0xFF)
-#define NVOCMP_VERSION  0x03
+#define NVOCMP_VERSION 0x03
 #endif // NVOCMP_VERSION
 
-#if !defined (NVOCMP_SIGNATURE)
+#if !defined(NVOCMP_SIGNATURE)
 // Page header validation byte (do not use 0xFF)
-#define NVOCMP_SIGNATURE  0x96
+#define NVOCMP_SIGNATURE 0x96
 #endif // NVOCMP_SIGNATURE
 
 // Compact Memory
@@ -343,89 +362,91 @@ static void NVOCMP_assert(bool cond, char *message, bool fatal)
 #endif
 
 #ifdef NVOCMP_GPRAM
-#define RAM_BUFFER_ADDRESS    (uint8_t *)0x11000000
+#define RAM_BUFFER_ADDRESS (uint8_t *) 0x11000000
 #else
-uint32_t tBuffer[FLASH_PAGE_SIZE >> 2];               // this is for debugging
+uint32_t tBuffer[FLASH_PAGE_SIZE >> 2]; // this is for debugging
 #endif
 
 // Page header structure
 typedef struct
 {
-    uint32_t state:8;
-    uint32_t cycle:8;       // Rolling page compaction count (0x00, 0xFF not used)
-    uint32_t allActive:2;
-    uint32_t version:6;     // Version of NV page format
-    uint32_t signature:8;   // Signature for formatted NV page
+    uint32_t state : 8;
+    uint32_t cycle : 8; // Rolling page compaction count (0x00, 0xFF not used)
+    uint32_t allActive : 2;
+    uint32_t version : 6;   // Version of NV page format
+    uint32_t signature : 8; // Signature for formatted NV page
 } NVOCMP_pageHdr_t;
 
 typedef struct
 {
-  uint16_t pageOffset;
-  uint8_t page;
-  uint8_t signature;
+    uint16_t pageOffset;
+    uint8_t page;
+    uint8_t signature;
 } NVOCMP_compactHdr_t;
 
 // Page header size (bytes)
-#define NVOCMP_PGHDRLEN  (sizeof(NVOCMP_pageHdr_t))
-#define NVOCMP_COMPACTHDRLEN  (sizeof(NVOCMP_compactHdr_t))
+#define NVOCMP_PGHDRLEN (sizeof(NVOCMP_pageHdr_t))
+#define NVOCMP_COMPACTHDRLEN (sizeof(NVOCMP_compactHdr_t))
 
 // Page header offsets (from 1st byte of page)
-#define NVOCMP_PGHDROFS  0
-#define NVOCMP_PGHDRPST  0  // Page state
-#define NVOCMP_PGHDRCYC  1  // Cycle count
-#define NVOCMP_PGHDRVER  2  // Format version
-#define NVOCMP_PGHDRSIG  3  // Page signature
+#define NVOCMP_PGHDROFS 0
+#define NVOCMP_PGHDRPST 0 // Page state
+#define NVOCMP_PGHDRCYC 1 // Cycle count
+#define NVOCMP_PGHDRVER 2 // Format version
+#define NVOCMP_PGHDRSIG 3 // Page signature
 
 // Compact header offsets
-#define NVOCMP_COMPMODEOFS  6 // Compact Mode Offset
+#define NVOCMP_COMPMODEOFS 6 // Compact Mode Offset
 
 // Number of Compact headers
-#define NVOCMP_NOCOMPHDR    3
+#define NVOCMP_NOCOMPHDR 3
 
 // Page data size, offset into page
-#define NVOCMP_PGDATAOFS  (NVOCMP_PGHDRLEN + NVOCMP_NOCOMPHDR*NVOCMP_COMPACTHDRLEN)
-#define NVOCMP_PGDATAEND  (FLASH_PAGE_SIZE - 1)
-#define NVOCMP_PGDATALEN  (FLASH_PAGE_SIZE - NVOCMP_PGDATAOFS)
+#define NVOCMP_PGDATAOFS (NVOCMP_PGHDRLEN + NVOCMP_NOCOMPHDR * NVOCMP_COMPACTHDRLEN)
+#define NVOCMP_PGDATAEND (FLASH_PAGE_SIZE - 1)
+#define NVOCMP_PGDATALEN (FLASH_PAGE_SIZE - NVOCMP_PGDATAOFS)
 
 // Page mode of operation
-#define NVOCMP_PGNORMAL   0xFF  // normal operation
-#define NVOCMP_PGCDST     0xFE  // used as compact destination
-#define NVOCMP_PGCDONE    0xFC
-#define NVOCMP_PGCSRC     0xF8  // used as compact source
-#define NVOCMP_PGMODEBIT  0x04
+#define NVOCMP_PGNORMAL 0xFF // normal operation
+#define NVOCMP_PGCDST 0xFE   // used as compact destination
+#define NVOCMP_PGCDONE 0xFC
+#define NVOCMP_PGCSRC 0xF8 // used as compact source
+#define NVOCMP_PGMODEBIT 0x04
 
 // NVOCTP header defines
-#define NVOCTP_PGACTIVE   0xA5  // Current active page
-#define NVOCTP_PGXFER     0x24  // Active page being compacted
-#define NVOCTP_PGDATAOFS  NVOCMP_PGHDRLEN
-#define NVOCTP_VERSION    0x02
-#define NVOCTP_SIGNATURE  0x96
+#define NVOCTP_PGACTIVE 0xA5 // Current active page
+#define NVOCTP_PGXFER 0x24   // Active page being compacted
+#define NVOCTP_PGDATAOFS NVOCMP_PGHDRLEN
+#define NVOCTP_VERSION 0x02
+#define NVOCTP_SIGNATURE 0x96
 
 // Page header state values - transitions change 1 bit in each nybble
-typedef enum NVOCMP_pageState {
-  NVOCMP_PGNACT = 0xFF,
-  NVOCMP_PGXDST = 0xFE,
-  NVOCMP_PGRDY  = 0x7E,
-  NVOCMP_PGACT  = 0x7C,
-  NVOCMP_PGFULL = 0x78,
-  NVOCMP_PGXSRC = 0x70,
-  NVOCMP_PGNDEF = 0x00,
+typedef enum NVOCMP_pageState
+{
+    NVOCMP_PGNACT = 0xFF,
+    NVOCMP_PGXDST = 0xFE,
+    NVOCMP_PGRDY  = 0x7E,
+    NVOCMP_PGACT  = 0x7C,
+    NVOCMP_PGFULL = 0x78,
+    NVOCMP_PGXSRC = 0x70,
+    NVOCMP_PGNDEF = 0x00,
 } NVOCMP_pageState_t;
 
-typedef enum NVOCMP_compactStatus {
-  NVOCMP_COMPACT_SUCCESS = 0x00,
-  NVOCMP_COMPACT_SRCDONE = 0x01,
-  NVOCMP_COMPACT_DSTDONE = 0x02,
-  NVOCMP_COMPACT_BOTHDOE = 0x03,
-  NVOCMP_COMPACT_FAILURE = 0x10,
+typedef enum NVOCMP_compactStatus
+{
+    NVOCMP_COMPACT_SUCCESS = 0x00,
+    NVOCMP_COMPACT_SRCDONE = 0x01,
+    NVOCMP_COMPACT_DSTDONE = 0x02,
+    NVOCMP_COMPACT_BOTHDOE = 0x03,
+    NVOCMP_COMPACT_FAILURE = 0x10,
 } NVOCMP_compactStatus_t;
 
 // Page compaction cycle count limits (0x00 and 0xFF not used)
-#define NVOCMP_MINCYCLE  0x01  // Minimum cycle count (after rollover)
-#define NVOCMP_MAXCYCLE  0xFE  // Maximum cycle count (before rollover)
+#define NVOCMP_MINCYCLE 0x01 // Minimum cycle count (after rollover)
+#define NVOCMP_MAXCYCLE 0xFE // Maximum cycle count (before rollover)
 
-#define NVOCMP_ALLACTIVE      0x3 // All Items are active
-#define NVOCMP_SOMEINACTIVE   0x0 // Some Items are inactive
+#define NVOCMP_ALLACTIVE 0x3    // All Items are active
+#define NVOCMP_SOMEINACTIVE 0x0 // Some Items are inactive
 
 //*****************************************************************************
 // Item Header Definitions
@@ -434,27 +455,27 @@ typedef enum NVOCMP_compactStatus {
 // Item header structure
 typedef struct
 {
-    uint32_t cmpid; // Compressed ID
-    uint16_t subid; // Sub ID
+    uint32_t cmpid;  // Compressed ID
+    uint16_t subid;  // Sub ID
     uint16_t itemid; // Item ID
-    uint8_t  sysid; // System ID
-    uint8_t  crc8;  // crc byte
-    uint8_t  sig;   // signature byte
-    uint8_t  stats; // Status 'marks'
-    uint16_t hofs;  // Header offset
-    uint16_t len;   // Data length
-    uint8_t  hpage; // Header page
+    uint8_t sysid;   // System ID
+    uint8_t crc8;    // crc byte
+    uint8_t sig;     // signature byte
+    uint8_t stats;   // Status 'marks'
+    uint16_t hofs;   // Header offset
+    uint16_t len;    // Data length
+    uint8_t hpage;   // Header page
 } NVOCMP_itemHdr_t;
 
 // Length (bytes) of compressed header
-#define NVOCMP_ITEMHDRLEN  7
+#define NVOCMP_ITEMHDRLEN 7
 
 // Offset from beginning (low address) of header to fields in the header
-#define NVOCMP_HDRSIGOFS    6
-#define NVOCMP_HDRVLDOFS    5
+#define NVOCMP_HDRSIGOFS 6
+#define NVOCMP_HDRVLDOFS 5
 
 // Number of bytes in header to include in CRC calculation
-#define NVOCMP_HDRCRCINC    5
+#define NVOCMP_HDRCRCINC 5
 
 // Compressed item header information <-- Lower Addr    Higher Addr-->
 // Byte: [0]      [1]      [2]      [3]      [4]      [5]      [6]
@@ -475,13 +496,13 @@ typedef struct
 
 // Bit47 in compressed header - '1' indicates 'active' NV item
 // A deleted item is 'inactive'
-#define NVOCMP_ACTIVEIDBIT   0x2
+#define NVOCMP_ACTIVEIDBIT 0x2
 // Bit46 in compressed header - '0' indicates 'valid' NV item
 // A corrupted item is 'invalid'
-#define NVOCMP_VALIDIDBIT    0x1
+#define NVOCMP_VALIDIDBIT 0x1
 // This bit is NOT included in the NV item itself but is encoded
 // the 'stats' field of the itemHdr_t struct when the item is read
-#define NVOCMP_FOLLOWBIT     0x4
+#define NVOCMP_FOLLOWBIT 0x4
 
 // Index of last item header byte
 #define NVOCMP_ITEMHDREND (NVOCMP_ITEMHDRLEN - 1)
@@ -492,85 +513,87 @@ typedef uint8_t cmpIH_t[NVOCMP_ITEMHDRLEN];
 // Item write parameters
 typedef struct
 {
-    NVOCMP_itemHdr_t *iHdr;   // Ptr to item header
-    uint16_t          dOfs;   // Source data offset
-    uint16_t          bOfs;   // Buffer data offset
-    uint16_t          len;    // Buffer data length
-    uint8_t          *pBuf;   // Ptr to data buffer
+    NVOCMP_itemHdr_t * iHdr; // Ptr to item header
+    uint16_t dOfs;           // Source data offset
+    uint16_t bOfs;           // Buffer data offset
+    uint16_t len;            // Buffer data length
+    uint8_t * pBuf;          // Ptr to data buffer
 } NVOCMP_itemWrp_t;
 
 typedef struct
 {
-  void *cBuf;                 // Pointer to content to search
-  uint16_t clength;           // Length of content to search
-  uint16_t coff;              // Offset content to search
-  void *rBuf;                 // Pointer to content to read
-  uint16_t rlength;           // Length content to read
+    void * cBuf;      // Pointer to content to search
+    uint16_t clength; // Length of content to search
+    uint16_t coff;    // Offset content to search
+    void * rBuf;      // Pointer to content to read
+    uint16_t rlength; // Length content to read
 } NVOCMP_itemInfo_t;
 
-typedef enum NVOCMP_initAction {
-  NVOCMP_NORMAL_INIT = 0,
-  NVOCMP_NORMAL_RESUME,
-  NVOCMP_RECOVER_COMPACT,
-  NVOCMP_RECOVER_ERASE,
-  NVOCMP_FORCE_CLEAN,
-  NVOCMP_NORMAL_MIGRATE,
-  NVOCMP_ERROR_UNKNOWN,
+typedef enum NVOCMP_initAction
+{
+    NVOCMP_NORMAL_INIT = 0,
+    NVOCMP_NORMAL_RESUME,
+    NVOCMP_RECOVER_COMPACT,
+    NVOCMP_RECOVER_ERASE,
+    NVOCMP_FORCE_CLEAN,
+    NVOCMP_NORMAL_MIGRATE,
+    NVOCMP_ERROR_UNKNOWN,
 } NVOCMP_initAction_t;
 
-typedef enum NVOCMP_writeMode {
-  NVOCMP_WRITE = 0,
-  NVOCMP_CREATE,
-  NVOCMP_UPDATE,
+typedef enum NVOCMP_writeMode
+{
+    NVOCMP_WRITE = 0,
+    NVOCMP_CREATE,
+    NVOCMP_UPDATE,
 } NVOCMP_writeMode_t;
 
 typedef struct
 {
-  uint8_t state;    // page state
-  uint8_t cycle;    // page compaction cycle count. Used to select the 'newest' active page
-                    // at device reset, in the very unlikely scenario that both pages are active.
-  uint8_t mode;     // compact mode
-  uint8_t allActive;  //all items are active or not
-  uint8_t sPage;
-  uint8_t ePage;
-  uint16_t offset;  // page offset
-  uint16_t sOffset;
-  uint16_t eOffset;
+    uint8_t state;     // page state
+    uint8_t cycle;     // page compaction cycle count. Used to select the 'newest' active page
+                       // at device reset, in the very unlikely scenario that both pages are active.
+    uint8_t mode;      // compact mode
+    uint8_t allActive; // all items are active or not
+    uint8_t sPage;
+    uint8_t ePage;
+    uint16_t offset; // page offset
+    uint16_t sOffset;
+    uint16_t eOffset;
 } NVOCMP_pageInfo_t;
 
 typedef struct
 {
-  uint8_t xDstPage;         // xdst page
-  uint8_t xSrcSPage;    // xsrc start page
-  uint8_t xSrcEPage;      // xsrc end page
-  uint8_t xSrcPages;    // no of xsrc pages
-  uint16_t xDstOffset;      // xdst offset
-  uint16_t xSrcSOffset;    // xsrc start offset
-  uint16_t xSrcEOffset;    // xsrc end offset
+    uint8_t xDstPage;     // xdst page
+    uint8_t xSrcSPage;    // xsrc start page
+    uint8_t xSrcEPage;    // xsrc end page
+    uint8_t xSrcPages;    // no of xsrc pages
+    uint16_t xDstOffset;  // xdst offset
+    uint16_t xSrcSOffset; // xsrc start offset
+    uint16_t xSrcEOffset; // xsrc end offset
 } NVOCMP_compactInfo_t;
 
 typedef struct
 {
-  uint8_t nvSize;       // no of NV pages
-  uint8_t headPage;     // head active page
-  uint8_t tailPage;     // transfer destination page
-  uint8_t actPage;      // current active page
-  uint8_t xsrcPage;     // transfer source page
-  uint16_t actOffset;   // active page offset
-  uint16_t xsrcOffset;  // transfer source page offset
-  uint16_t xdstOffset;  // transfer destination page offset
-  NVOCMP_compactInfo_t compactInfo;
-  NVOCMP_pageInfo_t pageInfo[NVOCMP_NVPAGES];
+    uint8_t nvSize;      // no of NV pages
+    uint8_t headPage;    // head active page
+    uint8_t tailPage;    // transfer destination page
+    uint8_t actPage;     // current active page
+    uint8_t xsrcPage;    // transfer source page
+    uint16_t actOffset;  // active page offset
+    uint16_t xsrcOffset; // transfer source page offset
+    uint16_t xdstOffset; // transfer destination page offset
+    NVOCMP_compactInfo_t compactInfo;
+    NVOCMP_pageInfo_t pageInfo[NVOCMP_NVPAGES];
 } NVOCMP_nvHandle_t;
 //*****************************************************************************
 // Local variables
 //*****************************************************************************
-#define NVOCMP_NULLOFFSET     0xFFFF
-#define DEFAULT_COMPACTHDR   {NVOCMP_NULLOFFSET, NVOCMP_NULLPAGE, NVOCMP_SIGNATURE};
-#define THISPAGEHDR           0
-#define XSRCSTARTHDR          1
-#define XSRCENDHDR            2
-#define NVOCMP_COMPACTHDRLEN  (sizeof(NVOCMP_compactHdr_t))
+#define NVOCMP_NULLOFFSET 0xFFFF
+#define DEFAULT_COMPACTHDR { NVOCMP_NULLOFFSET, NVOCMP_NULLPAGE, NVOCMP_SIGNATURE };
+#define THISPAGEHDR 0
+#define XSRCSTARTHDR 1
+#define XSRCENDHDR 2
+#define NVOCMP_COMPACTHDRLEN (sizeof(NVOCMP_compactHdr_t))
 // NVS Objects
 #ifdef NVDEBUG
 // Expose these in debug mode
@@ -619,74 +642,63 @@ uint8_t NVOCMP_size;
 // NV API Function Prototypes
 //*****************************************************************************
 
-static uint8_t    NVOCMP_initNvApi(void *param);
-static uint8_t    NVOCMP_compactNvApi(uint16_t min);
-static uint8_t    NVOCMP_createItemApi(NVINTF_itemID_t id, uint32_t len, void *buf);
-static uint8_t    NVOCMP_updateItemApi(NVINTF_itemID_t id, uint32_t len, void *buf);
-static uint8_t    NVOCMP_deleteItemApi(NVINTF_itemID_t id);
-static uint32_t   NVOCMP_getItemLenApi(NVINTF_itemID_t id);
-static uint8_t    NVOCMP_readItemApi(NVINTF_itemID_t id, uint16_t ofs, uint16_t len,
-                                     void *buf);
-static uint8_t    NVOCMP_readContItemApi(NVINTF_itemID_t id, uint16_t ofs,
-                                      uint16_t rlen, void *rBuf,
-                                      uint16_t clen, uint16_t coff, void *cBuf, uint16_t *pSubId);
-static uint8_t    NVOCMP_writeItemApi(NVINTF_itemID_t id, uint16_t len, const void *buf);
-static uint8_t    NVOCMP_doNextApi(NVINTF_nvProxy_t * prx);
-static int32_t    NVOCMP_lockNvApi(void);
-static void       NVOCMP_unlockNvApi(int32_t);
-static bool       NVOCMP_expectCompApi(uint16_t len);
-static uint8_t    NVOCMP_eraseNvApi(void);
-static uint32_t   NVOCMP_getFreeNvApi(void);
+static uint8_t NVOCMP_initNvApi(void * param);
+static uint8_t NVOCMP_compactNvApi(uint16_t min);
+static uint8_t NVOCMP_createItemApi(NVINTF_itemID_t id, uint32_t len, void * buf);
+static uint8_t NVOCMP_updateItemApi(NVINTF_itemID_t id, uint32_t len, void * buf);
+static uint8_t NVOCMP_deleteItemApi(NVINTF_itemID_t id);
+static uint32_t NVOCMP_getItemLenApi(NVINTF_itemID_t id);
+static uint8_t NVOCMP_readItemApi(NVINTF_itemID_t id, uint16_t ofs, uint16_t len, void * buf);
+static uint8_t NVOCMP_readContItemApi(NVINTF_itemID_t id, uint16_t ofs, uint16_t rlen, void * rBuf, uint16_t clen, uint16_t coff,
+                                      void * cBuf, uint16_t * pSubId);
+static uint8_t NVOCMP_writeItemApi(NVINTF_itemID_t id, uint16_t len, const void * buf);
+static uint8_t NVOCMP_doNextApi(NVINTF_nvProxy_t * prx);
+static int32_t NVOCMP_lockNvApi(void);
+static void NVOCMP_unlockNvApi(int32_t);
+static bool NVOCMP_expectCompApi(uint16_t len);
+static uint8_t NVOCMP_eraseNvApi(void);
+static uint32_t NVOCMP_getFreeNvApi(void);
 
 //*****************************************************************************
 // NV Local Function Prototypes
 //*****************************************************************************
 
-static void       NVOCMP_initNv(NVOCMP_nvHandle_t *pNvHandle);
-static uint8_t    NVOCMP_scanPage(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
-                                  NVOCMP_pageInfo_t *pPageInfo);
-static uint8_t    NVOCMP_findDstPage(NVOCMP_nvHandle_t *pNvHandle);
-static int8_t     NVOCMP_findItem(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg, uint16_t ofs,
-                                  NVOCMP_itemHdr_t *pHdr, int8_t flag, NVOCMP_itemInfo_t *pInfo);
-static uint8_t    NVOCMP_addItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *iHdr,
-                                 const uint8_t *pBuf, NVOCMP_writeMode_t wm);
-static void       NVOCMP_writeItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *pHdr,
-                                   uint8_t dstPg, uint16_t dstOff, const uint8_t *pBuf);
-static uint8_t    NVOCMP_erase(NVOCMP_nvHandle_t *pNvHandle, uint8_t dstPg);
-static int16_t    NVOCMP_compactPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t nBytes);
-static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle);
-static uint8_t    NVOCMP_getDstPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t len);
-static void       NVOCMP_changePageState(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
-                                         NVOCMP_pageState_t state);
-static void       NVOCMP_setPageState(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
-                                      NVOCMP_pageState_t state);
-static void       NVOCMP_setItemInactive(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
-                                         uint16_t iOfs);
-static uint8_t    NVOCMP_readItem(NVOCMP_itemHdr_t *iHdr, uint16_t ofs, uint16_t len,
-                                  void *pBuf, bool flag);
-static uint8_t    NVOCMP_checkItem(NVINTF_itemID_t *id, uint16_t len, NVOCMP_itemHdr_t *iHdr,
-                                   uint8_t flag);
-static inline void NVOCMP_read(uint8_t pg, uint16_t off, uint8_t *pBuf, uint16_t len);
-static uint8_t    NVOCMP_write(uint8_t dstPg, uint16_t off, const uint8_t *pBuf, uint16_t len);
+static void NVOCMP_initNv(NVOCMP_nvHandle_t * pNvHandle);
+static uint8_t NVOCMP_scanPage(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, NVOCMP_pageInfo_t * pPageInfo);
+static uint8_t NVOCMP_findDstPage(NVOCMP_nvHandle_t * pNvHandle);
+static int8_t NVOCMP_findItem(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, uint16_t ofs, NVOCMP_itemHdr_t * pHdr, int8_t flag,
+                              NVOCMP_itemInfo_t * pInfo);
+static uint8_t NVOCMP_addItem(NVOCMP_nvHandle_t * pNvHandle, NVOCMP_itemHdr_t * iHdr, const uint8_t * pBuf, NVOCMP_writeMode_t wm);
+static void NVOCMP_writeItem(NVOCMP_nvHandle_t * pNvHandle, NVOCMP_itemHdr_t * pHdr, uint8_t dstPg, uint16_t dstOff,
+                             const uint8_t * pBuf);
+static uint8_t NVOCMP_erase(NVOCMP_nvHandle_t * pNvHandle, uint8_t dstPg);
+static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t * pNvHandle, uint16_t nBytes);
+static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t * pNvHandle);
+static uint8_t NVOCMP_getDstPage(NVOCMP_nvHandle_t * pNvHandle, uint16_t len);
+static void NVOCMP_changePageState(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, NVOCMP_pageState_t state);
+static void NVOCMP_setPageState(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, NVOCMP_pageState_t state);
+static void NVOCMP_setItemInactive(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, uint16_t iOfs);
+static uint8_t NVOCMP_readItem(NVOCMP_itemHdr_t * iHdr, uint16_t ofs, uint16_t len, void * pBuf, bool flag);
+static uint8_t NVOCMP_checkItem(NVINTF_itemID_t * id, uint16_t len, NVOCMP_itemHdr_t * iHdr, uint8_t flag);
+static inline void NVOCMP_read(uint8_t pg, uint16_t off, uint8_t * pBuf, uint16_t len);
+static uint8_t NVOCMP_write(uint8_t dstPg, uint16_t off, const uint8_t * pBuf, uint16_t len);
 
-static void       NVOCMP_readHeader(uint8_t pg, uint16_t ofs, NVOCMP_itemHdr_t *iHdr, bool flag);
-static void       NVOCMP_setCompactHdr(uint8_t dstPg, uint8_t pg, int16_t offset,
-                                       uint16_t location);
-static void       NVOCMP_getCompactHdr(uint8_t dstPg, uint16_t location,
-                                       NVOCMP_compactHdr_t *pHdr);
-static uint16_t   NVOCMP_findOffset(uint8_t pg, uint16_t ofs);
-static uint8_t    NVOCMP_doNVCRC(uint8_t pg, uint16_t ofs, uint16_t len, uint8_t crc, bool flag);
-static uint8_t    NVOCMP_doRAMCRC(const uint8_t *input, uint16_t len, uint8_t crc);
-static uint8_t    NVOCMP_verifyCRC(uint16_t iOfs, uint16_t len, uint8_t crc, uint8_t pg, bool flag);
-static uint8_t    NVOCMP_readByte(uint8_t pg, uint16_t ofs);
-static void       NVOCMP_writeByte(uint8_t pg, uint16_t ofs, uint8_t bwv);
+static void NVOCMP_readHeader(uint8_t pg, uint16_t ofs, NVOCMP_itemHdr_t * iHdr, bool flag);
+static void NVOCMP_setCompactHdr(uint8_t dstPg, uint8_t pg, int16_t offset, uint16_t location);
+static void NVOCMP_getCompactHdr(uint8_t dstPg, uint16_t location, NVOCMP_compactHdr_t * pHdr);
+static uint16_t NVOCMP_findOffset(uint8_t pg, uint16_t ofs);
+static uint8_t NVOCMP_doNVCRC(uint8_t pg, uint16_t ofs, uint16_t len, uint8_t crc, bool flag);
+static uint8_t NVOCMP_doRAMCRC(const uint8_t * input, uint16_t len, uint8_t crc);
+static uint8_t NVOCMP_verifyCRC(uint16_t iOfs, uint16_t len, uint8_t crc, uint8_t pg, bool flag);
+static uint8_t NVOCMP_readByte(uint8_t pg, uint16_t ofs);
+static void NVOCMP_writeByte(uint8_t pg, uint16_t ofs, uint8_t bwv);
 
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-static uint8_t    NVOCMP_cleanPage(NVOCMP_nvHandle_t *pNvHandle);
-static uint8_t    NVOCMP_findPage(NVOCMP_pageState_t state);
+static uint8_t NVOCMP_cleanPage(NVOCMP_nvHandle_t * pNvHandle);
+static uint8_t NVOCMP_findPage(NVOCMP_pageState_t state);
 #if !defined(NVOCMP_MIGRATE_DISABLED)
-static void       NVOCMP_copyItem(uint8_t srcPg, uint8_t xPg, uint16_t sOfs, uint16_t dOfs, uint16_t len);
-static void       NVOCMP_migratePage(NVOCMP_nvHandle_t *pNvHandle, uint8_t page);
+static void NVOCMP_copyItem(uint8_t srcPg, uint8_t xPg, uint16_t sOfs, uint16_t dOfs, uint16_t len);
+static void NVOCMP_migratePage(NVOCMP_nvHandle_t * pNvHandle, uint8_t page);
 #endif
 #endif
 
@@ -704,7 +716,7 @@ static void       NVOCMP_migratePage(NVOCMP_nvHandle_t *pNvHandle, uint8_t page)
  *
  * @return  none
  */
-void NVOCMP_loadApiPtrs(NVINTF_nvFuncts_t *pfn)
+void NVOCMP_loadApiPtrs(NVINTF_nvFuncts_t * pfn)
 {
     // Load caller's structure with pointers to the NV API functions
     pfn->initNV       = &NVOCMP_initNvApi;
@@ -736,7 +748,7 @@ void NVOCMP_loadApiPtrs(NVINTF_nvFuncts_t *pfn)
  *
  * @return  none
  */
-void NVOCMP_loadApiPtrsMin(NVINTF_nvFuncts_t *pfn)
+void NVOCMP_loadApiPtrsMin(NVINTF_nvFuncts_t * pfn)
 {
     // Load caller's structure with pointers to the NV API functions
     pfn->initNV       = &NVOCMP_initNvApi;
@@ -767,7 +779,7 @@ void NVOCMP_loadApiPtrsMin(NVINTF_nvFuncts_t *pfn)
  *
  * @return  none
  */
-void NVOCMP_loadApiPtrsExt(NVINTF_nvFuncts_t *pfn)
+void NVOCMP_loadApiPtrsExt(NVINTF_nvFuncts_t * pfn)
 {
     // Load caller's structure with pointers to the NV API functions
     pfn->initNV       = &NVOCMP_initNvApi;
@@ -801,13 +813,13 @@ void NVOCMP_loadApiPtrsExt(NVINTF_nvFuncts_t *pfn)
  *
  * @return  none
  */
-extern void NVOCMP_setCheckVoltage(void *funcPtr)
+extern void NVOCMP_setCheckVoltage(void * funcPtr)
 {
 #ifndef NV_LINUX
     NVOCMP_voltCheckFptr = (bool (*)()) funcPtr;
 #else
     // Do nothing
-    (void)NVOCMP_voltCheckFptr;
+    (void) NVOCMP_voltCheckFptr;
 #endif
 }
 
@@ -827,10 +839,10 @@ static lowVoltCbFptr NVOCMP_lowVoltCbFptr = NULL;
 extern void NVOCMP_setLowVoltageCb(lowVoltCbFptr funcPtr)
 {
 #ifndef NV_LINUX
-  NVOCMP_lowVoltCbFptr = (lowVoltCbFptr) funcPtr;
+    NVOCMP_lowVoltCbFptr = (lowVoltCbFptr) funcPtr;
 #else
     // Do nothing
-    (void)NVOCMP_lowVoltCbFptr;
+    (void) NVOCMP_lowVoltCbFptr;
 #endif
 }
 
@@ -848,18 +860,18 @@ extern void NVOCMP_setLowVoltageCb(lowVoltCbFptr funcPtr)
 static bool NVOCMP_checkVoltage(void)
 {
     uint32_t voltage = AONBatMonBatteryVoltageGet();
-    voltage = (voltage * 1000) >> AON_BATMON_BAT_FRAC_W;
-    if(voltage < NVOCMP_MIN_VDD_FLASH_MV)
+    voltage          = (voltage * 1000) >> AON_BATMON_BAT_FRAC_W;
+    if (voltage < NVOCMP_MIN_VDD_FLASH_MV)
     {
         // Measured device voltage is below threshold
-        if(NVOCMP_lowVoltCbFptr)
+        if (NVOCMP_lowVoltCbFptr)
         {
-          NVOCMP_lowVoltCbFptr(voltage);
+            NVOCMP_lowVoltCbFptr(voltage);
         }
-        return(false);
+        return (false);
     }
 
-    return(true);
+    return (true);
 }
 #endif
 
@@ -872,12 +884,12 @@ static bool NVOCMP_checkVoltage(void)
  *
  * @return  NVINTF_SUCCESS or specific failure code
  */
-static uint8_t NVOCMP_initNvApi(void *param)
+static uint8_t NVOCMP_initNvApi(void * param)
 {
     NVOCMP_ALERT(false, "NVOCMP Init. Called!")
     NVOCMP_failW = NVOCMP_failF;
 
-    if(NVOCMP_failF == NVINTF_NOTREADY)
+    if (NVOCMP_failF == NVINTF_NOTREADY)
     {
 #ifdef NVOCMP_POSIX_MUTEX
         pthread_mutexattr_t attr;
@@ -892,9 +904,10 @@ static uint8_t NVOCMP_initNvApi(void *param)
 
         // Create a priority gate mutex for the NV driver
 #ifdef NVOCMP_POSIX_MUTEX
-        if (pthread_mutexattr_init(&attr) != 0) {
+        if (pthread_mutexattr_init(&attr) != 0)
+        {
             NVOCMP_failF = NVINTF_FAILURE;
-            return(NVOCMP_failF);
+            return (NVOCMP_failF);
         }
 
 #ifndef NV_LINUX
@@ -905,7 +918,7 @@ static uint8_t NVOCMP_initNvApi(void *param)
         if (pthread_mutex_init(&NVOCMP_gPosixMutex, &attr) != 0)
         {
             NVOCMP_failF = NVINTF_FAILURE;
-            return(NVOCMP_failF);
+            return (NVOCMP_failF);
         }
 #elif NVOCMP_FREERTOS_MUTEX
         NVOCMP_gFreeRTOSMutex = xSemaphoreCreateRecursiveMutex();
@@ -919,7 +932,7 @@ static uint8_t NVOCMP_initNvApi(void *param)
 
 #ifndef NV_LINUX
 #ifdef NVOCMP_MIN_VDD_FLASH_MV
-        NVOCMP_setCheckVoltage((void *)&NVOCMP_checkVoltage);
+        NVOCMP_setCheckVoltage((void *) &NVOCMP_checkVoltage);
 #endif
         // Initialize NVS objects
         NVS_init();
@@ -928,57 +941,55 @@ static uint8_t NVOCMP_initNvApi(void *param)
         NVOCMP_nvsHandle = NVS_open(NVOCMP_NVS_INDEX, param);
 
         // Get NV hardware attributes
-        NVS_getAttrs(NVOCMP_nvsHandle,&NVOCMP_nvsAttrs);
+        NVS_getAttrs(NVOCMP_nvsHandle, &NVOCMP_nvsAttrs);
 #else
         NV_LINUX_init();
 
-        NVOCMP_nvsHandle = NVS_HANDLE;
+        NVOCMP_nvsHandle           = NVS_HANDLE;
         NVOCMP_nvsAttrs.sectorSize = FLASH_PAGE_SIZE;
         NVOCMP_nvsAttrs.regionSize = FLASH_PAGE_SIZE * NVOCMP_NVPAGES;
 #endif
 
-        NVOCMP_nvHandle.nvSize = NVOCMP_nvsAttrs.regionSize/NVOCMP_nvsAttrs.sectorSize;
+        NVOCMP_nvHandle.nvSize = NVOCMP_nvsAttrs.regionSize / NVOCMP_nvsAttrs.sectorSize;
         NVOCMP_nvHandle.nvSize = NVOCMP_nvHandle.nvSize > NVOCMP_NVPAGES ? NVOCMP_NVPAGES : NVOCMP_nvHandle.nvSize;
-        NVOCMP_size = NVOCMP_nvHandle.nvSize;
+        NVOCMP_size            = NVOCMP_nvHandle.nvSize;
 
         // Confirm NV region has expected characteristics
-        if (FLASH_PAGE_SIZE != NVOCMP_nvsAttrs.sectorSize ||
-                (NVOCMP_NVSIZE * FLASH_PAGE_SIZE > NVOCMP_nvsAttrs.regionSize))
+        if (FLASH_PAGE_SIZE != NVOCMP_nvsAttrs.sectorSize || (NVOCMP_NVSIZE * FLASH_PAGE_SIZE > NVOCMP_nvsAttrs.regionSize))
         {
             NVOCMP_failF = NVINTF_FAILURE;
             NVOCMP_EXCEPTION(pg, NVINTF_FAILURE)
-            return(NVOCMP_failF);
+            return (NVOCMP_failF);
         }
 
         // Confirm that the NVS region opened properly
         if (NVOCMP_nvsHandle == NULL)
         {
             NVOCMP_failF = NVINTF_FAILURE;
-            NVOCMP_ASSERT(false,"NVS HANDLE IS NULL")
+            NVOCMP_ASSERT(false, "NVS HANDLE IS NULL")
             NVOCMP_EXCEPTION(pg, NVINTF_NOTREADY);
-            return(NVOCMP_failF);
+            return (NVOCMP_failF);
         }
 
         // Look for active page and clean up the other if necessary
-        NVOCMP_nvHandle.actPage = NVOCMP_NULLPAGE;
+        NVOCMP_nvHandle.actPage   = NVOCMP_NULLPAGE;
         NVOCMP_nvHandle.actOffset = FLASH_PAGE_SIZE;
 
         NVOCMP_initNv(&NVOCMP_nvHandle);
 
-#if defined (NVOCMP_STATS)
+#if defined(NVOCMP_STATS)
         {
             uint8_t err;
             NVOCMP_diag_t diags;
 
             // Look for a copy of diagnostic info
             err = NVOCMP_readItemApi(diagId, 0, sizeof(diags), &diags);
-            if(err == NVINTF_NOTFOUND)
+            if (err == NVINTF_NOTFOUND)
             {
                 // Assume this is the first time,
                 memset(&diags, 0, sizeof(diags));
                 // Space available for everything else
-                diags.available = FLASH_PAGE_SIZE - (NVOCMP_nvHandle.actOffset +
-                        NVOCMP_ITEMHDRLEN + sizeof(diags));
+                diags.available = FLASH_PAGE_SIZE - (NVOCMP_nvHandle.actOffset + NVOCMP_ITEMHDRLEN + sizeof(diags));
             }
             // Remember this reset
             diags.resets += 1;
@@ -988,7 +999,7 @@ static uint8_t NVOCMP_initNvApi(void *param)
 #endif // NVOCMP_STATS
     }
 
-    return(NVOCMP_failW);
+    return (NVOCMP_failW);
 }
 
 /******************************************************************************
@@ -1002,43 +1013,43 @@ static uint8_t NVOCMP_initNvApi(void *param)
  */
 static uint8_t NVOCMP_eraseNvApi(void)
 {
-  uint8_t pg;
-  uint8_t err = NVINTF_SUCCESS;
+    uint8_t pg;
+    uint8_t err = NVINTF_SUCCESS;
 
-  // Check voltage if possible
-  NVOCMP_FLASHACCESS(err)
-  if(err)
-  {
-    return(err);
-  }
+    // Check voltage if possible
+    NVOCMP_FLASHACCESS(err)
+    if (err)
+    {
+        return (err);
+    }
 
-  NVOCMP_LOCK();
+    NVOCMP_LOCK();
 
-  // Erase All pages before start
-  for(pg = 0; pg < NVOCMP_NVSIZE; pg++)
-  {
-    NVOCMP_failW |= NVOCMP_erase(&NVOCMP_nvHandle, pg);
-  }
+    // Erase All pages before start
+    for (pg = 0; pg < NVOCMP_NVSIZE; pg++)
+    {
+        NVOCMP_failW |= NVOCMP_erase(&NVOCMP_nvHandle, pg);
+    }
 
-  err = NVOCMP_failW;
+    err = NVOCMP_failW;
 
-  // initial state, set head page, act page and tail page
-  NVOCMP_nvHandle.headPage = 0;
-  NVOCMP_nvHandle.tailPage = NVOCMP_NVSIZE - 1;
-  NVOCMP_nvHandle.actPage = 0;
-  NVOCMP_nvHandle.actOffset = NVOCMP_nvHandle.pageInfo[NVOCMP_nvHandle.actPage].offset;
-  NVOCMP_changePageState(&NVOCMP_nvHandle, NVOCMP_nvHandle.headPage, NVOCMP_PGRDY);
-  NVOCMP_changePageState(&NVOCMP_nvHandle, NVOCMP_nvHandle.tailPage, NVOCMP_PGXDST);
+    // initial state, set head page, act page and tail page
+    NVOCMP_nvHandle.headPage  = 0;
+    NVOCMP_nvHandle.tailPage  = NVOCMP_NVSIZE - 1;
+    NVOCMP_nvHandle.actPage   = 0;
+    NVOCMP_nvHandle.actOffset = NVOCMP_nvHandle.pageInfo[NVOCMP_nvHandle.actPage].offset;
+    NVOCMP_changePageState(&NVOCMP_nvHandle, NVOCMP_nvHandle.headPage, NVOCMP_PGRDY);
+    NVOCMP_changePageState(&NVOCMP_nvHandle, NVOCMP_nvHandle.tailPage, NVOCMP_PGXDST);
 
 #ifdef NV_LINUX
-    if(err == NVINTF_SUCCESS)
+    if (err == NVINTF_SUCCESS)
     {
         NV_LINUX_save();
     }
 #endif
 
-  NVOCMP_UNLOCK();
-  return(err);
+    NVOCMP_UNLOCK();
+    return (err);
 }
 
 /******************************************************************************
@@ -1052,27 +1063,27 @@ static uint8_t NVOCMP_eraseNvApi(void)
  */
 static uint32_t NVOCMP_getFreeNvApi(void)
 {
-  uint8_t pg;
-  NVOCMP_pageHdr_t pageHdr;
-  uint16_t nvSearched = 0;
-  uint32_t freespace = 0;
+    uint8_t pg;
+    NVOCMP_pageHdr_t pageHdr;
+    uint16_t nvSearched = 0;
+    uint32_t freespace  = 0;
 
-  for(pg = NVOCMP_nvHandle.actPage; nvSearched < NVOCMP_NVSIZE; pg = NVOCMP_INCPAGE(pg))
-  {
-    nvSearched++;
+    for (pg = NVOCMP_nvHandle.actPage; nvSearched < NVOCMP_NVSIZE; pg = NVOCMP_INCPAGE(pg))
+    {
+        nvSearched++;
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-    if(pg == NVOCMP_nvHandle.tailPage)
-    {
-      continue;
-    }
+        if (pg == NVOCMP_nvHandle.tailPage)
+        {
+            continue;
+        }
 #endif
-    NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
-    if((pageHdr.state == NVOCMP_PGNACT) || (pageHdr.state == NVOCMP_PGRDY) || (pageHdr.state == NVOCMP_PGACT))
-    {
-      freespace += (FLASH_PAGE_SIZE - NVOCMP_nvHandle.pageInfo[pg].offset);
+        NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *) &pageHdr, NVOCMP_PGHDRLEN);
+        if ((pageHdr.state == NVOCMP_PGNACT) || (pageHdr.state == NVOCMP_PGRDY) || (pageHdr.state == NVOCMP_PGACT))
+        {
+            freespace += (FLASH_PAGE_SIZE - NVOCMP_nvHandle.pageInfo[pg].offset);
+        }
     }
-  }
-  return(freespace);
+    return (freespace);
 }
 
 /******************************************************************************
@@ -1091,9 +1102,9 @@ static uint8_t NVOCMP_compactNvApi(uint16_t minAvail)
 
     // Check voltage if possible
     NVOCMP_FLASHACCESS(err)
-    if(err)
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Prevent RTOS thread contention
@@ -1101,7 +1112,7 @@ static uint8_t NVOCMP_compactNvApi(uint16_t minAvail)
     NVOCMP_ALERT(false, "API Compaction Request.")
     err = NVOCMP_failF;
     // Check for a fatal error
-    if(err == NVINTF_SUCCESS)
+    if (err == NVINTF_SUCCESS)
     {
         int16_t left;
 
@@ -1109,10 +1120,10 @@ static uint8_t NVOCMP_compactNvApi(uint16_t minAvail)
         left = FLASH_PAGE_SIZE - NVOCMP_nvHandle.actOffset;
 
         // Time to do a compaction?
-        if((left < minAvail) || (minAvail == 0))
+        if ((left < minAvail) || (minAvail == 0))
         {
             // Transfer all items to non-ACTIVE page
-            (void)NVOCMP_compactPage(&NVOCMP_nvHandle, 0);
+            (void) NVOCMP_compactPage(&NVOCMP_nvHandle, 0);
             // 'failW' indicates compaction status
             err = NVOCMP_failW;
         }
@@ -1124,14 +1135,14 @@ static uint8_t NVOCMP_compactNvApi(uint16_t minAvail)
     }
 
 #ifdef NV_LINUX
-    if(err == NVINTF_SUCCESS)
+    if (err == NVINTF_SUCCESS)
     {
         NV_LINUX_save();
     }
 #endif
 
     NVOCMP_UNLOCK();
-    return(err);
+    return (err);
 }
 
 //*****************************************************************************
@@ -1150,7 +1161,7 @@ static uint8_t NVOCMP_compactNvApi(uint16_t minAvail)
  *
  * @return  NVINTF_SUCCESS or specific failure code
  */
-static uint8_t NVOCMP_createItemApi(NVINTF_itemID_t id, uint32_t len, void *pBuf)
+static uint8_t NVOCMP_createItemApi(NVINTF_itemID_t id, uint32_t len, void * pBuf)
 {
     uint8_t err;
     NVOCMP_itemHdr_t iHdr;
@@ -1158,57 +1169,56 @@ static uint8_t NVOCMP_createItemApi(NVINTF_itemID_t id, uint32_t len, void *pBuf
     // Parameter Sanity Check
     if (pBuf == NULL || len == 0)
     {
-        return(NVINTF_BADPARAM);
+        return (NVINTF_BADPARAM);
     }
 
     err = NVOCMP_checkItem(&id, len, &iHdr, NVOCMP_FINDSTRICT);
-    if(err)
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Check voltage if possible
     NVOCMP_FLASHACCESS(err)
-    if(err)
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Prevent RTOS thread contention
     NVOCMP_LOCK();
 
-    err = NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr,
-                          NVOCMP_FINDSTRICT, NULL);
+    err = NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr, NVOCMP_FINDSTRICT, NULL);
 
-    if(err == NVINTF_SUCCESS)
+    if (err == NVINTF_SUCCESS)
     {
-      err = NVINTF_EXIST;
+        err = NVINTF_EXIST;
     }
-    else if(err == NVINTF_NOTFOUND)
+    else if (err == NVINTF_NOTFOUND)
     {
-      // Create the new item
-      err = NVOCMP_addItem(&NVOCMP_nvHandle, &iHdr, pBuf, NVOCMP_CREATE);
-      if(err != NVINTF_SUCCESS)
-      {
-        NVOCMP_ALERT(false, "createItem failed.")
-        err = NVINTF_FAILURE;
-      }
+        // Create the new item
+        err = NVOCMP_addItem(&NVOCMP_nvHandle, &iHdr, pBuf, NVOCMP_CREATE);
+        if (err != NVINTF_SUCCESS)
+        {
+            NVOCMP_ALERT(false, "createItem failed.")
+            err = NVINTF_FAILURE;
+        }
     }
     else
     {
-      NVOCMP_ALERT(false, "createItem failed.")
-      err = NVINTF_FAILURE;
+        NVOCMP_ALERT(false, "createItem failed.")
+        err = NVINTF_FAILURE;
     }
 
 #ifdef NV_LINUX
-    if(err == NVINTF_SUCCESS)
+    if (err == NVINTF_SUCCESS)
     {
         NV_LINUX_save();
     }
 #endif
 
     NVOCMP_UNLOCK();
-    return(err);
+    return (err);
 }
 
 /******************************************************************************
@@ -1223,7 +1233,7 @@ static uint8_t NVOCMP_createItemApi(NVINTF_itemID_t id, uint32_t len, void *pBuf
  *
  * @return  NVINTF_SUCCESS or specific failure code
  */
-static uint8_t NVOCMP_updateItemApi(NVINTF_itemID_t id, uint32_t len, void *pBuf)
+static uint8_t NVOCMP_updateItemApi(NVINTF_itemID_t id, uint32_t len, void * pBuf)
 {
     uint8_t err;
     NVOCMP_itemHdr_t iHdr;
@@ -1231,59 +1241,58 @@ static uint8_t NVOCMP_updateItemApi(NVINTF_itemID_t id, uint32_t len, void *pBuf
     // Parameter Sanity Check
     if (pBuf == NULL || len == 0)
     {
-        return(NVINTF_BADPARAM);
+        return (NVINTF_BADPARAM);
     }
 
     err = NVOCMP_checkItem(&id, len, &iHdr, NVOCMP_FINDSTRICT);
-    if(err)
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Check voltage if possible
     NVOCMP_FLASHACCESS(err)
-    if(err)
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Prevent RTOS thread contention
     NVOCMP_LOCK();
 
-    err = NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr,
-                          NVOCMP_FINDSTRICT, NULL);
+    err = NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr, NVOCMP_FINDSTRICT, NULL);
 
-    if(err == NVINTF_SUCCESS)
+    if (err == NVINTF_SUCCESS)
     {
-      // Create the new item
-      err = NVOCMP_addItem(&NVOCMP_nvHandle, &iHdr, pBuf, NVOCMP_UPDATE);
-      if((err == NVINTF_SUCCESS) && (iHdr.hofs > 0))
-      {
-          // Mark old item as inactive
-          NVOCMP_setItemInactive(&NVOCMP_nvHandle, iHdr.hpage, iHdr.hofs);
+        // Create the new item
+        err = NVOCMP_addItem(&NVOCMP_nvHandle, &iHdr, pBuf, NVOCMP_UPDATE);
+        if ((err == NVINTF_SUCCESS) && (iHdr.hofs > 0))
+        {
+            // Mark old item as inactive
+            NVOCMP_setItemInactive(&NVOCMP_nvHandle, iHdr.hpage, iHdr.hofs);
 
-          err = NVOCMP_failW;
-      }
+            err = NVOCMP_failW;
+        }
     }
-    else if(err == NVINTF_NOTFOUND)
+    else if (err == NVINTF_NOTFOUND)
     {
-      err = NVINTF_NOTFOUND;
+        err = NVINTF_NOTFOUND;
     }
     else
     {
-      NVOCMP_ALERT(false, "updateItem failed.")
-      err = NVINTF_FAILURE;
+        NVOCMP_ALERT(false, "updateItem failed.")
+        err = NVINTF_FAILURE;
     }
 
 #ifdef NV_LINUX
-    if(err == NVINTF_SUCCESS)
+    if (err == NVINTF_SUCCESS)
     {
         NV_LINUX_save();
     }
 #endif
 
     NVOCMP_UNLOCK();
-    return(err);
+    return (err);
 }
 
 /******************************************************************************
@@ -1302,56 +1311,56 @@ static uint8_t NVOCMP_deleteItemApi(NVINTF_itemID_t id)
     uint8_t err;
     NVOCMP_itemHdr_t iHdr;
 
-#if defined (NVOCMP_STATS)
-    if(!memcmp(&id, &diagId, sizeof(NVINTF_itemID_t)))
+#if defined(NVOCMP_STATS)
+    if (!memcmp(&id, &diagId, sizeof(NVINTF_itemID_t)))
     {
         // Protect NV driver item(s)
-        return(NVINTF_BADSYSID);
+        return (NVINTF_BADSYSID);
     }
 #endif // NVOCMP_STATS
 
     err = NVOCMP_checkItem(&id, 0, &iHdr, NVOCMP_FINDSTRICT);
-    if(err)
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Check voltage if possible
     NVOCMP_FLASHACCESS(err)
-    if(err)
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Prevent RTOS thread contention
     NVOCMP_LOCK();
 
-    err = NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr,
-                          NVOCMP_FINDSTRICT, NULL);
+    err = NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr, NVOCMP_FINDSTRICT, NULL);
 
-    if(!err)
+    if (!err)
     {
-      // Mark this item as inactive
-      NVOCMP_setItemInactive(&NVOCMP_nvHandle, iHdr.hpage, iHdr.hofs);
+        // Mark this item as inactive
+        NVOCMP_setItemInactive(&NVOCMP_nvHandle, iHdr.hpage, iHdr.hofs);
 
-      // Verify that item has been removed
-      err = (NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset,
-                             &iHdr, NVOCMP_FINDSTRICT, NULL) == NVINTF_NOTFOUND) ?
-                             NVOCMP_failW : NVINTF_FAILURE;
+        // Verify that item has been removed
+        err = (NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr, NVOCMP_FINDSTRICT,
+                               NULL) == NVINTF_NOTFOUND)
+            ? NVOCMP_failW
+            : NVINTF_FAILURE;
 
-      // If item did get deleted, report 'failW' status
-      NVOCMP_ALERT(err == NVOCMP_failW, "Item delete failed.")
+        // If item did get deleted, report 'failW' status
+        NVOCMP_ALERT(err == NVOCMP_failW, "Item delete failed.")
     }
 
 #ifdef NV_LINUX
-    if(err == NVINTF_SUCCESS)
+    if (err == NVINTF_SUCCESS)
     {
         NV_LINUX_save();
     }
 #endif
 
     NVOCMP_UNLOCK();
-    return(err);
+    return (err);
 }
 
 /******************************************************************************
@@ -1370,20 +1379,22 @@ static uint32_t NVOCMP_getItemLenApi(NVINTF_itemID_t id)
     NVOCMP_itemHdr_t iHdr;
 
     err = NVOCMP_checkItem(&id, 0, &iHdr, NVOCMP_FINDSTRICT);
-    if(err)
+    if (err)
     {
-      return(len);
+        return (len);
     }
 
     // Prevent RTOS thread contention
     NVOCMP_LOCK();
 
     // If there was any error, report zero length
-    len = (NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr,
-                           NVOCMP_FINDSTRICT, NULL) != NVINTF_SUCCESS) ? 0 : iHdr.len;
+    len = (NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr, NVOCMP_FINDSTRICT, NULL) !=
+           NVINTF_SUCCESS)
+        ? 0
+        : iHdr.len;
 
     NVOCMP_UNLOCK();
-    return(len);
+    return (len);
 }
 
 /******************************************************************************
@@ -1402,9 +1413,8 @@ static uint32_t NVOCMP_getItemLenApi(NVINTF_itemID_t id)
  *
  * @return  NVINTF_SUCCESS or specific failure code
  */
-static uint8_t NVOCMP_readContItemApi(NVINTF_itemID_t id, uint16_t ofs,
-                                   uint16_t rlen, void *rBuf,
-                                   uint16_t clen, uint16_t coff, void *cBuf, uint16_t *pSubId)
+static uint8_t NVOCMP_readContItemApi(NVINTF_itemID_t id, uint16_t ofs, uint16_t rlen, void * rBuf, uint16_t clen, uint16_t coff,
+                                      void * cBuf, uint16_t * pSubId)
 {
     uint8_t err;
     NVOCMP_itemHdr_t iHdr;
@@ -1414,33 +1424,33 @@ static uint8_t NVOCMP_readContItemApi(NVINTF_itemID_t id, uint16_t ofs,
     // Parameter Sanity Check
     if (rBuf == NULL || rlen == 0 || cBuf == NULL || clen == 0 || coff > FLASH_PAGE_SIZE)
     {
-        return(NVINTF_BADPARAM);
+        return (NVINTF_BADPARAM);
     }
 
     err = NVOCMP_checkItem(&id, rlen, &iHdr, NVOCMP_FINDSTRICT);
-    if(err)
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Prevent RTOS thread contention
     NVOCMP_LOCK();
 
-    itemInfo.cBuf = cBuf;
+    itemInfo.cBuf    = cBuf;
     itemInfo.clength = clen;
-    itemInfo.coff = coff;
-    itemInfo.rBuf = rBuf;
+    itemInfo.coff    = coff;
+    itemInfo.rBuf    = rBuf;
     itemInfo.rlength = rlen;
-    err = NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr,
-                          NVOCMP_FINDITMID|NVOCMP_FINDCONTENT, &itemInfo);
+    err              = NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr,
+                          NVOCMP_FINDITMID | NVOCMP_FINDCONTENT, &itemInfo);
 
-    if(!err)
+    if (!err)
     {
         *pSubId = iHdr.subid;
     }
 
     NVOCMP_UNLOCK();
-    return(err);
+    return (err);
 }
 
 /******************************************************************************
@@ -1455,8 +1465,7 @@ static uint8_t NVOCMP_readContItemApi(NVINTF_itemID_t id, uint16_t ofs,
  *
  * @return  NVINTF_SUCCESS or specific failure code
  */
-static uint8_t NVOCMP_readItemApi(NVINTF_itemID_t id, uint16_t ofs, uint16_t len,
-                                  void *pBuf)
+static uint8_t NVOCMP_readItemApi(NVINTF_itemID_t id, uint16_t ofs, uint16_t len, void * pBuf)
 {
     uint8_t err;
     NVOCMP_itemHdr_t iHdr;
@@ -1464,20 +1473,19 @@ static uint8_t NVOCMP_readItemApi(NVINTF_itemID_t id, uint16_t ofs, uint16_t len
     // Parameter Sanity Check
     if (pBuf == NULL || len == 0)
     {
-        return(NVINTF_BADPARAM);
+        return (NVINTF_BADPARAM);
     }
 
     err = NVOCMP_checkItem(&id, len, &iHdr, NVOCMP_FINDSTRICT);
-    if(err)
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Prevent RTOS thread contention
     NVOCMP_LOCK();
 
-    err = NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr,
-                          NVOCMP_FINDSTRICT, NULL);
+    err = NVOCMP_findItem(&NVOCMP_nvHandle, NVOCMP_nvHandle.actPage, NVOCMP_nvHandle.actOffset, &iHdr, NVOCMP_FINDSTRICT, NULL);
 
     // Read Item
     if (!err)
@@ -1486,7 +1494,7 @@ static uint8_t NVOCMP_readItemApi(NVINTF_itemID_t id, uint16_t ofs, uint16_t len
     }
 
     NVOCMP_UNLOCK();
-    return(err);
+    return (err);
 }
 
 /******************************************************************************
@@ -1505,7 +1513,7 @@ static uint8_t NVOCMP_readItemApi(NVINTF_itemID_t id, uint16_t ofs, uint16_t len
  *
  * @return  NVINTF_SUCCESS or specific failure code
  */
-static uint8_t NVOCMP_writeItemApi(NVINTF_itemID_t id, uint16_t len, const void *pBuf)
+static uint8_t NVOCMP_writeItemApi(NVINTF_itemID_t id, uint16_t len, const void * pBuf)
 {
     uint8_t err;
     NVOCMP_itemHdr_t iHdr;
@@ -1513,20 +1521,20 @@ static uint8_t NVOCMP_writeItemApi(NVINTF_itemID_t id, uint16_t len, const void 
     // Parameter Sanity Check
     if (pBuf == NULL || len == 0)
     {
-        return(NVINTF_BADPARAM);
+        return (NVINTF_BADPARAM);
     }
 
-    err  = NVOCMP_checkItem(&id, len, &iHdr, NVOCMP_FINDSTRICT);
-    if(err)
+    err = NVOCMP_checkItem(&id, len, &iHdr, NVOCMP_FINDSTRICT);
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Check voltage if possible
     NVOCMP_FLASHACCESS(err)
-    if(err)
+    if (err)
     {
-      return(err);
+        return (err);
     }
 
     // Prevent RTOS thread contention
@@ -1534,7 +1542,7 @@ static uint8_t NVOCMP_writeItemApi(NVINTF_itemID_t id, uint16_t len, const void 
 
     // Create a new item
     err = NVOCMP_addItem(&NVOCMP_nvHandle, &iHdr, pBuf, NVOCMP_WRITE);
-    if((err == NVINTF_SUCCESS) && (iHdr.hofs > 0))
+    if ((err == NVINTF_SUCCESS) && (iHdr.hofs > 0))
     {
         // Mark old item as inactive
         NVOCMP_setItemInactive(&NVOCMP_nvHandle, iHdr.hpage, iHdr.hofs);
@@ -1543,14 +1551,14 @@ static uint8_t NVOCMP_writeItemApi(NVINTF_itemID_t id, uint16_t len, const void 
     }
 
 #ifdef NV_LINUX
-    if(err == NVINTF_SUCCESS)
+    if (err == NVINTF_SUCCESS)
     {
         NV_LINUX_save();
     }
 #endif
 
     NVOCMP_UNLOCK();
-    return(err);
+    return (err);
 }
 
 //*****************************************************************************
@@ -1631,7 +1639,7 @@ static void NVOCMP_unlockNvApi(int32_t key)
 
 static uint8_t NVOCMP_doNextApi(NVINTF_nvProxy_t * prx)
 {
-    static enum {doFind, doRead, doDelete} op = doFind;
+    static enum { doFind, doRead, doDelete } op = doFind;
     NVOCMP_itemHdr_t hdr;
     static uint8_t search;
     static uint8_t sPage;
@@ -1643,11 +1651,11 @@ static uint8_t NVOCMP_doNextApi(NVINTF_nvProxy_t * prx)
     // Sanitize inputs
     if (NULL == prx)
     {
-        return(NVINTF_BADPARAM);
+        return (NVINTF_BADPARAM);
     }
     else if (0 == prx->flag)
     {
-        return(NVINTF_BADPARAM);
+        return (NVINTF_BADPARAM);
     }
 
     // Locks NV
@@ -1660,7 +1668,7 @@ static uint8_t NVOCMP_doNextApi(NVINTF_nvProxy_t * prx)
         prx->flag &= ~NVINTF_DOSTART;
         // Start at latest item
         sPage = NVOCMP_nvHandle.actPage;
-        fOfs = NVOCMP_nvHandle.actOffset;
+        fOfs  = NVOCMP_nvHandle.actOffset;
         // Read in buffer len
         bufLen = prx->len;
 
@@ -1691,9 +1699,9 @@ static uint8_t NVOCMP_doNextApi(NVINTF_nvProxy_t * prx)
         }
     }
 
-    hdr.sysid = prx->sysid;
+    hdr.sysid  = prx->sysid;
     hdr.itemid = prx->itemid;
-    hdr.subid = prx->subid;
+    hdr.subid  = prx->subid;
 
     // Look for item
     if (!NVOCMP_findItem(&NVOCMP_nvHandle, sPage, fOfs, &hdr, search, NULL))
@@ -1705,7 +1713,7 @@ static uint8_t NVOCMP_doNextApi(NVINTF_nvProxy_t * prx)
         prx->subid  = hdr.subid;
         prx->len    = hdr.len;
         // start from this item on next findItem()
-        fOfs = iOfs - hdr.len;
+        fOfs  = iOfs - hdr.len;
         sPage = hdr.hpage;
 
         // Do operation based on flag
@@ -1740,7 +1748,7 @@ static uint8_t NVOCMP_doNextApi(NVINTF_nvProxy_t * prx)
 
     // Unlocks NV
     NVOCMP_UNLOCK();
-    return(status);
+    return (status);
 }
 
 /******************************************************************************
@@ -1754,21 +1762,21 @@ static uint8_t NVOCMP_doNextApi(NVINTF_nvProxy_t * prx)
  */
 static bool NVOCMP_expectCompApi(uint16_t len)
 {
-  uint8_t dstPg;
-  uint16_t iLen;
-  bool compact = false;
+    uint8_t dstPg;
+    uint16_t iLen;
+    bool compact = false;
 
-  if(len)
-  {
-    iLen = NVOCMP_ITEMHDRLEN + len;
-    dstPg = NVOCMP_getDstPage(&NVOCMP_nvHandle, iLen);
-
-    if(dstPg == NVOCMP_NULLPAGE)
+    if (len)
     {
-      compact = true;
+        iLen  = NVOCMP_ITEMHDRLEN + len;
+        dstPg = NVOCMP_getDstPage(&NVOCMP_nvHandle, iLen);
+
+        if (dstPg == NVOCMP_NULLPAGE)
+        {
+            compact = true;
+        }
     }
-  }
-  return(compact);
+    return (compact);
 }
 
 //*****************************************************************************
@@ -1777,33 +1785,34 @@ static bool NVOCMP_expectCompApi(uint16_t len)
 
 #ifdef NVOCMP_GPRAM
 /******************************************************************************
-* @fn      NVOCMP_disableCache
-*
-* @brief   Local function to disable cache
-*
-* @param   vm - pointer to mode storage
-*
-* @return  none
-*/
-static void NVOCMP_disableCache(uint32_t *vm)
+ * @fn      NVOCMP_disableCache
+ *
+ * @brief   Local function to disable cache
+ *
+ * @param   vm - pointer to mode storage
+ *
+ * @return  none
+ */
+static void NVOCMP_disableCache(uint32_t * vm)
 {
     // Save current cache mode
     *vm = VIMSModeGet(VIMS_BASE) & VIMS_STAT_MODE_M;
     // Disable the cache
     VIMSModeSet(VIMS_BASE, VIMS_MODE_DISABLED);
     // Wait until it is
-    while(VIMSModeGet(VIMS_BASE) != VIMS_MODE_DISABLED);
+    while (VIMSModeGet(VIMS_BASE) != VIMS_MODE_DISABLED)
+        ;
 }
 
 /******************************************************************************
-* @fn      NVOCMP_restoreCache
-*
-* @brief   Local function to disable cache
-*
-* @param   vm - mode
-*
-* @return  none
-*/
+ * @fn      NVOCMP_restoreCache
+ *
+ * @brief   Local function to disable cache
+ *
+ * @param   vm - mode
+ *
+ * @return  none
+ */
 static void NVOCMP_restoreCache(uint32_t vm)
 {
     // Restore cache to previous state
@@ -1823,19 +1832,19 @@ static void NVOCMP_restoreCache(uint32_t vm)
  */
 static uint8_t NVOCMP_findPage(NVOCMP_pageState_t state)
 {
-  uint8_t pg;
-  NVOCMP_pageHdr_t pageHdr;
+    uint8_t pg;
+    NVOCMP_pageHdr_t pageHdr;
 
-  for(pg = 0; pg < NVOCMP_NVSIZE; pg++)
-  {
-    // Get page header
-    NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
-    if(pageHdr.state == state)
+    for (pg = 0; pg < NVOCMP_NVSIZE; pg++)
     {
-      return(pg);
+        // Get page header
+        NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *) &pageHdr, NVOCMP_PGHDRLEN);
+        if (pageHdr.state == state)
+        {
+            return (pg);
+        }
     }
-  }
-  return(NVOCMP_NULLPAGE);
+    return (NVOCMP_NULLPAGE);
 }
 
 #if !defined(NVOCMP_MIGRATE_DISABLED)
@@ -1849,65 +1858,65 @@ static uint8_t NVOCMP_findPage(NVOCMP_pageState_t state)
  *
  * @return  none
  */
-static void NVOCMP_migratePage(NVOCMP_nvHandle_t *pNvHandle, uint8_t page)
+static void NVOCMP_migratePage(NVOCMP_nvHandle_t * pNvHandle, uint8_t page)
 {
-  uint8_t dstPg;
-  uint8_t tmp;
-  uint16_t offset1;
-  uint16_t offset2;
-  NVOCMP_itemHdr_t iHdr;
+    uint8_t dstPg;
+    uint8_t tmp;
+    uint16_t offset1;
+    uint16_t offset2;
+    NVOCMP_itemHdr_t iHdr;
 
-  offset1 = pNvHandle->pageInfo[page].offset;
-  offset2 = NVOCTP_PGDATAOFS;
-  if(offset1 - NVOCTP_PGDATAOFS > FLASH_PAGE_SIZE - NVOCMP_PGDATAOFS)
-  {
-    offset2 = offset1;
-    while(offset2 - NVOCTP_PGDATAOFS > FLASH_PAGE_SIZE - NVOCMP_PGDATAOFS)
-    {
-      NVOCMP_findItem(pNvHandle, page, offset2, &iHdr, NVOCMP_FINDANY, NULL);
-      offset2 = iHdr.hofs - iHdr.len;
-    }
-  }
-  if((pNvHandle->nvSize <= NVOCMP_NVTWOP) && (offset2 != NVOCTP_PGDATAOFS))
-  {
-    offset1 = offset2;
+    offset1 = pNvHandle->pageInfo[page].offset;
     offset2 = NVOCTP_PGDATAOFS;
-  }
+    if (offset1 - NVOCTP_PGDATAOFS > FLASH_PAGE_SIZE - NVOCMP_PGDATAOFS)
+    {
+        offset2 = offset1;
+        while (offset2 - NVOCTP_PGDATAOFS > FLASH_PAGE_SIZE - NVOCMP_PGDATAOFS)
+        {
+            NVOCMP_findItem(pNvHandle, page, offset2, &iHdr, NVOCMP_FINDANY, NULL);
+            offset2 = iHdr.hofs - iHdr.len;
+        }
+    }
+    if ((pNvHandle->nvSize <= NVOCMP_NVTWOP) && (offset2 != NVOCTP_PGDATAOFS))
+    {
+        offset1 = offset2;
+        offset2 = NVOCTP_PGDATAOFS;
+    }
 
-  dstPg = page;
-  // copy from offset2 to top
-  if(offset2 - NVOCTP_PGDATAOFS > 0)
-  {
-    dstPg = NVOCMP_INCPAGE(dstPg);
-    NVOCMP_copyItem(page, dstPg, NVOCTP_PGDATAOFS, NVOCMP_PGDATAOFS, offset2 - NVOCTP_PGDATAOFS);
-    NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGFULL);
-    pNvHandle->pageInfo[dstPg].allActive = NVOCMP_SOMEINACTIVE;
-    pNvHandle->pageInfo[dstPg].offset = NVOCMP_PGDATAOFS + offset2 - NVOCTP_PGDATAOFS;
-    pNvHandle->actPage = dstPg;
-    pNvHandle->actOffset = pNvHandle->pageInfo[dstPg].offset;
-    tmp = NVOCMP_readByte(dstPg, NVOCMP_PGHDRVER);
-    tmp &= ~NVOCMP_ALLACTIVE;
-    NVOCMP_writeByte(dstPg, NVOCMP_PGHDRVER, tmp);
-  }
-  // copy from offset 1 to offset2
-  if(offset1 - offset2 > 0)
-  {
-    dstPg = NVOCMP_INCPAGE(dstPg);
-    NVOCMP_copyItem(page, dstPg, offset2, NVOCMP_PGDATAOFS, offset1 - offset2);
-    NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGFULL);
-    pNvHandle->pageInfo[dstPg].allActive = NVOCMP_SOMEINACTIVE;
-    pNvHandle->pageInfo[dstPg].offset = NVOCMP_PGDATAOFS + offset1 - offset2;
-    pNvHandle->actPage = dstPg;
-    pNvHandle->actOffset = pNvHandle->pageInfo[dstPg].offset;
-    tmp = NVOCMP_readByte(dstPg, NVOCMP_PGHDRVER);
-    tmp &= ~NVOCMP_ALLACTIVE;
-    NVOCMP_writeByte(dstPg, NVOCMP_PGHDRVER, tmp);
-  }
+    dstPg = page;
+    // copy from offset2 to top
+    if (offset2 - NVOCTP_PGDATAOFS > 0)
+    {
+        dstPg = NVOCMP_INCPAGE(dstPg);
+        NVOCMP_copyItem(page, dstPg, NVOCTP_PGDATAOFS, NVOCMP_PGDATAOFS, offset2 - NVOCTP_PGDATAOFS);
+        NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGFULL);
+        pNvHandle->pageInfo[dstPg].allActive = NVOCMP_SOMEINACTIVE;
+        pNvHandle->pageInfo[dstPg].offset    = NVOCMP_PGDATAOFS + offset2 - NVOCTP_PGDATAOFS;
+        pNvHandle->actPage                   = dstPg;
+        pNvHandle->actOffset                 = pNvHandle->pageInfo[dstPg].offset;
+        tmp                                  = NVOCMP_readByte(dstPg, NVOCMP_PGHDRVER);
+        tmp &= ~NVOCMP_ALLACTIVE;
+        NVOCMP_writeByte(dstPg, NVOCMP_PGHDRVER, tmp);
+    }
+    // copy from offset 1 to offset2
+    if (offset1 - offset2 > 0)
+    {
+        dstPg = NVOCMP_INCPAGE(dstPg);
+        NVOCMP_copyItem(page, dstPg, offset2, NVOCMP_PGDATAOFS, offset1 - offset2);
+        NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGFULL);
+        pNvHandle->pageInfo[dstPg].allActive = NVOCMP_SOMEINACTIVE;
+        pNvHandle->pageInfo[dstPg].offset    = NVOCMP_PGDATAOFS + offset1 - offset2;
+        pNvHandle->actPage                   = dstPg;
+        pNvHandle->actOffset                 = pNvHandle->pageInfo[dstPg].offset;
+        tmp                                  = NVOCMP_readByte(dstPg, NVOCMP_PGHDRVER);
+        tmp &= ~NVOCMP_ALLACTIVE;
+        NVOCMP_writeByte(dstPg, NVOCMP_PGHDRVER, tmp);
+    }
 
-  NVOCMP_failW |= NVOCMP_erase(pNvHandle, page);
-  pNvHandle->tailPage = page;
-  pNvHandle->headPage = NVOCMP_INCPAGE(page);
-  NVOCMP_changePageState(pNvHandle, page, NVOCMP_PGXDST);
+    NVOCMP_failW |= NVOCMP_erase(pNvHandle, page);
+    pNvHandle->tailPage = page;
+    pNvHandle->headPage = NVOCMP_INCPAGE(page);
+    NVOCMP_changePageState(pNvHandle, page, NVOCMP_PGXDST);
 }
 #endif
 #endif
@@ -1923,85 +1932,80 @@ static void NVOCMP_migratePage(NVOCMP_nvHandle_t *pNvHandle, uint8_t page)
  *
  * @return  NVINTF_SUCCESS or specific failure code
  */
-static uint8_t NVOCMP_scanPage(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
-                               NVOCMP_pageInfo_t *pPageInfo)
+static uint8_t NVOCMP_scanPage(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, NVOCMP_pageInfo_t * pPageInfo)
 {
-  uint32_t pageHdr;
-  NVOCMP_compactHdr_t thisHdr;
-  NVOCMP_compactHdr_t startHdr;
-  NVOCMP_compactHdr_t endHdr;
-  NVOCMP_pageHdr_t *pHdr = (NVOCMP_pageHdr_t *)&pageHdr;
+    uint32_t pageHdr;
+    NVOCMP_compactHdr_t thisHdr;
+    NVOCMP_compactHdr_t startHdr;
+    NVOCMP_compactHdr_t endHdr;
+    NVOCMP_pageHdr_t * pHdr = (NVOCMP_pageHdr_t *) &pageHdr;
 
-  // Get page header
-  NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *)pHdr, NVOCMP_PGHDRLEN);
+    // Get page header
+    NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *) pHdr, NVOCMP_PGHDRLEN);
 #if ((NVOCMP_NVPAGES != NVOCMP_NVONEP) && !defined(NVOCMP_MIGRATE_DISABLED))
-  uint8_t version = (pHdr->version << 2)|(pHdr->allActive);
-  if((pHdr->signature == NVOCTP_SIGNATURE) && (version == NVOCTP_VERSION))
-  {
-    pPageInfo->state = pHdr->state;
-    pPageInfo->cycle = pHdr->cycle;
-    pPageInfo->allActive = NVOCMP_SOMEINACTIVE;
-    pPageInfo->mode = NVOCMP_PGNORMAL;
-    pPageInfo->offset = NVOCMP_findOffset(pg, FLASH_PAGE_SIZE);
-    return(NVINTF_SUCCESS);
-  }
-#endif
-  NVOCMP_getCompactHdr(pg, THISPAGEHDR, &thisHdr);
-  NVOCMP_getCompactHdr(pg, XSRCSTARTHDR, &startHdr);
-  NVOCMP_getCompactHdr(pg, XSRCENDHDR, &endHdr);
-  uint8_t corruptFlag = ((pHdr->state != NVOCMP_PGNACT)
-                      && (pHdr->state != NVOCMP_PGXDST)
-                      && (pHdr->state != NVOCMP_PGRDY)
-                      && (pHdr->state != NVOCMP_PGACT)
-                      && (pHdr->state != NVOCMP_PGFULL)
-                      && (pHdr->state != NVOCMP_PGXSRC));
-
-  if(corruptFlag || (pHdr->version != NVOCMP_VERSION) || (pHdr->signature != NVOCMP_SIGNATURE))
-  {
-    // NV page and NV driver versions are different
-    NVOCMP_ALERT(false, "Corrupted or Version/Signature mismatch.")
-    NVOCMP_EXCEPTION(pg, NVINTF_BADVERSION);
-    NVOCMP_failW = NVOCMP_erase(pNvHandle, pg);
-    if(NVOCMP_failW == NVINTF_SUCCESS)
+    uint8_t version = (pHdr->version << 2) | (pHdr->allActive);
+    if ((pHdr->signature == NVOCTP_SIGNATURE) && (version == NVOCTP_VERSION))
     {
-      // Get page header
-      NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *)pHdr, NVOCMP_PGHDRLEN);
-      NVOCMP_getCompactHdr(pg, THISPAGEHDR, &thisHdr);
-      NVOCMP_getCompactHdr(pg, XSRCSTARTHDR, &startHdr);
-      NVOCMP_getCompactHdr(pg, XSRCENDHDR, &endHdr);
+        pPageInfo->state     = pHdr->state;
+        pPageInfo->cycle     = pHdr->cycle;
+        pPageInfo->allActive = NVOCMP_SOMEINACTIVE;
+        pPageInfo->mode      = NVOCMP_PGNORMAL;
+        pPageInfo->offset    = NVOCMP_findOffset(pg, FLASH_PAGE_SIZE);
+        return (NVINTF_SUCCESS);
     }
-    else if(NVOCMP_failW == NVINTF_LOWPOWER)
+#endif
+    NVOCMP_getCompactHdr(pg, THISPAGEHDR, &thisHdr);
+    NVOCMP_getCompactHdr(pg, XSRCSTARTHDR, &startHdr);
+    NVOCMP_getCompactHdr(pg, XSRCENDHDR, &endHdr);
+    uint8_t corruptFlag = ((pHdr->state != NVOCMP_PGNACT) && (pHdr->state != NVOCMP_PGXDST) && (pHdr->state != NVOCMP_PGRDY) &&
+                           (pHdr->state != NVOCMP_PGACT) && (pHdr->state != NVOCMP_PGFULL) && (pHdr->state != NVOCMP_PGXSRC));
+
+    if (corruptFlag || (pHdr->version != NVOCMP_VERSION) || (pHdr->signature != NVOCMP_SIGNATURE))
     {
-      return(NVINTF_LOWPOWER);
+        // NV page and NV driver versions are different
+        NVOCMP_ALERT(false, "Corrupted or Version/Signature mismatch.")
+        NVOCMP_EXCEPTION(pg, NVINTF_BADVERSION);
+        NVOCMP_failW = NVOCMP_erase(pNvHandle, pg);
+        if (NVOCMP_failW == NVINTF_SUCCESS)
+        {
+            // Get page header
+            NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *) pHdr, NVOCMP_PGHDRLEN);
+            NVOCMP_getCompactHdr(pg, THISPAGEHDR, &thisHdr);
+            NVOCMP_getCompactHdr(pg, XSRCSTARTHDR, &startHdr);
+            NVOCMP_getCompactHdr(pg, XSRCENDHDR, &endHdr);
+        }
+        else if (NVOCMP_failW == NVINTF_LOWPOWER)
+        {
+            return (NVINTF_LOWPOWER);
+        }
+        else
+        {
+            return (NVINTF_FAILURE);
+        }
+    }
+
+    pPageInfo->state     = pHdr->state;
+    pPageInfo->cycle     = pHdr->cycle;
+    pPageInfo->allActive = pHdr->allActive;
+    pPageInfo->mode      = thisHdr.page;
+    if ((pPageInfo->state == NVOCMP_PGNACT) || (pPageInfo->state == NVOCMP_PGXDST))
+    {
+        pPageInfo->offset = NVOCMP_PGDATAOFS;
+    }
+    else if (thisHdr.pageOffset != NVOCMP_NULLOFFSET)
+    {
+        pPageInfo->offset = thisHdr.pageOffset;
     }
     else
     {
-      return(NVINTF_FAILURE);
+        pPageInfo->offset = NVOCMP_findOffset(pg, FLASH_PAGE_SIZE);
     }
-  }
+    pPageInfo->sPage   = startHdr.page;
+    pPageInfo->sOffset = startHdr.pageOffset;
+    pPageInfo->ePage   = endHdr.page;
+    pPageInfo->eOffset = endHdr.pageOffset;
 
-  pPageInfo->state = pHdr->state;
-  pPageInfo->cycle = pHdr->cycle;
-  pPageInfo->allActive = pHdr->allActive;
-  pPageInfo->mode = thisHdr.page;
-  if((pPageInfo->state == NVOCMP_PGNACT) || (pPageInfo->state == NVOCMP_PGXDST))
-  {
-    pPageInfo->offset = NVOCMP_PGDATAOFS;
-  }
-  else if(thisHdr.pageOffset != NVOCMP_NULLOFFSET)
-  {
-    pPageInfo->offset = thisHdr.pageOffset;
-  }
-  else
-  {
-    pPageInfo->offset = NVOCMP_findOffset(pg, FLASH_PAGE_SIZE);
-  }
-  pPageInfo->sPage = startHdr.page;
-  pPageInfo->sOffset = startHdr.pageOffset;
-  pPageInfo->ePage = endHdr.page;
-  pPageInfo->eOffset = endHdr.pageOffset;
-
-  return(NVINTF_SUCCESS);
+    return (NVINTF_SUCCESS);
 }
 
 /******************************************************************************
@@ -2013,17 +2017,17 @@ static uint8_t NVOCMP_scanPage(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
  *
  * @return  page
  */
-static uint8_t NVOCMP_findDstPage(NVOCMP_nvHandle_t *pNvHandle)
+static uint8_t NVOCMP_findDstPage(NVOCMP_nvHandle_t * pNvHandle)
 {
-  uint8_t pg;
-  for(pg = 0; pg < NVOCMP_NVSIZE; pg++)
-  {
-    if(pNvHandle->pageInfo[pg].mode == NVOCMP_PGCDST)
+    uint8_t pg;
+    for (pg = 0; pg < NVOCMP_NVSIZE; pg++)
     {
-      return(pg);
+        if (pNvHandle->pageInfo[pg].mode == NVOCMP_PGCDST)
+        {
+            return (pg);
+        }
     }
-  }
-  return(NVOCMP_NVSIZE);
+    return (NVOCMP_NVSIZE);
 }
 
 /******************************************************************************
@@ -2035,387 +2039,388 @@ static uint8_t NVOCMP_findDstPage(NVOCMP_nvHandle_t *pNvHandle)
  *
  * @return  none
  */
-static void NVOCMP_initNv(NVOCMP_nvHandle_t *pNvHandle)
+static void NVOCMP_initNv(NVOCMP_nvHandle_t * pNvHandle)
 {
-  uint8_t status;
-  uint8_t pg;
-  uint8_t tmpPg;
-  NVOCMP_initAction_t action = NVOCMP_NORMAL_INIT;
-  NVOCMP_pageInfo_t *pPageInfo;
-  uint8_t noPgNact = 0;
-  uint8_t noPgXdst = 0;
-  uint8_t noPgRdy = 0;
-  uint8_t noPgAct = 0;
-  uint8_t noPgFull = 0;
-  uint8_t noPgXsrc = 0;
-  uint8_t noPgNdef = 0;
+    uint8_t status;
+    uint8_t pg;
+    uint8_t tmpPg;
+    NVOCMP_initAction_t action = NVOCMP_NORMAL_INIT;
+    NVOCMP_pageInfo_t * pPageInfo;
+    uint8_t noPgNact = 0;
+    uint8_t noPgXdst = 0;
+    uint8_t noPgRdy  = 0;
+    uint8_t noPgAct  = 0;
+    uint8_t noPgFull = 0;
+    uint8_t noPgXsrc = 0;
+    uint8_t noPgNdef = 0;
 #if (NVOCMP_NVPAGES == NVOCMP_NVONEP)
-  NVOCMP_compactHdr_t startHdr;
-  NVOCMP_compactHdr_t endHdr;
+    NVOCMP_compactHdr_t startHdr;
+    NVOCMP_compactHdr_t endHdr;
 #else
-  uint16_t pgXdst = NVOCMP_NULLPAGE;
-  uint16_t pgRdy = NVOCMP_NULLPAGE;
-  uint16_t pgAct = NVOCMP_NULLPAGE;
-  uint16_t pgNact = NVOCMP_NULLPAGE;
+    uint16_t pgXdst     = NVOCMP_NULLPAGE;
+    uint16_t pgRdy      = NVOCMP_NULLPAGE;
+    uint16_t pgAct      = NVOCMP_NULLPAGE;
+    uint16_t pgNact     = NVOCMP_NULLPAGE;
 #if !defined(NVOCMP_MIGRATE_DISABLED)
-  uint8_t noPgLeg = 0;
-  uint16_t pgLegAct = NVOCMP_NULLPAGE;
-  uint16_t pgLegXsrc = NVOCMP_NULLPAGE;
+    uint8_t noPgLeg     = 0;
+    uint16_t pgLegAct   = NVOCMP_NULLPAGE;
+    uint16_t pgLegXsrc  = NVOCMP_NULLPAGE;
 #endif
-  uint16_t cleanPages = 0;
+    uint16_t cleanPages = 0;
 #endif
 
-  // Scan Pages
-  for(pg = 0; pg < NVOCMP_NVSIZE; pg++)
-  {
-    pPageInfo = &pNvHandle->pageInfo[pg];
-    status = NVOCMP_scanPage(pNvHandle, pg, pPageInfo);
-    if(status != NVINTF_SUCCESS)
+    // Scan Pages
+    for (pg = 0; pg < NVOCMP_NVSIZE; pg++)
     {
-      return;
-    }
-    if(pPageInfo->state == NVOCMP_PGNACT)
-    {
-      noPgNact++;
-      pgNact = pg;
-    }
-    else if(pPageInfo->state == NVOCMP_PGXDST)
-    {
+        pPageInfo = &pNvHandle->pageInfo[pg];
+        status    = NVOCMP_scanPage(pNvHandle, pg, pPageInfo);
+        if (status != NVINTF_SUCCESS)
+        {
+            return;
+        }
+        if (pPageInfo->state == NVOCMP_PGNACT)
+        {
+            noPgNact++;
+            pgNact = pg;
+        }
+        else if (pPageInfo->state == NVOCMP_PGXDST)
+        {
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-      pgXdst = pg;
+            pgXdst = pg;
 #endif
-      noPgXdst++;
-    }
-    else if(pPageInfo->state == NVOCMP_PGRDY)
-    {
+            noPgXdst++;
+        }
+        else if (pPageInfo->state == NVOCMP_PGRDY)
+        {
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-      pgRdy = pg;
+            pgRdy = pg;
 #endif
-      noPgRdy++;
-    }
-    else if(pPageInfo->state == NVOCMP_PGACT)
-    {
+            noPgRdy++;
+        }
+        else if (pPageInfo->state == NVOCMP_PGACT)
+        {
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-      pgAct = pg;
+            pgAct = pg;
 #endif
-      noPgAct++;
-    }
-    else if(pPageInfo->state == NVOCMP_PGFULL)
-    {
+            noPgAct++;
+        }
+        else if (pPageInfo->state == NVOCMP_PGFULL)
+        {
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
 //      pgFull = pg;
 #endif
-      noPgFull++;
-    }
-    else if(pPageInfo->state == NVOCMP_PGXSRC)
-    {
+            noPgFull++;
+        }
+        else if (pPageInfo->state == NVOCMP_PGXSRC)
+        {
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
 //      pgXsrc = pg;
 #endif
-      noPgXsrc++;
-    }
+            noPgXsrc++;
+        }
 #if ((NVOCMP_NVPAGES != NVOCMP_NVONEP) && !defined(NVOCMP_MIGRATE_DISABLED))
-    else if(pPageInfo->state == NVOCTP_PGACTIVE)
-    {
-      pgLegAct = pg;
-      noPgLeg++;
-    }
-    else if(pPageInfo->state == NVOCTP_PGXFER)
-    {
-      pgLegXsrc = pg;
-      noPgLeg++;
-    }
+        else if (pPageInfo->state == NVOCTP_PGACTIVE)
+        {
+            pgLegAct = pg;
+            noPgLeg++;
+        }
+        else if (pPageInfo->state == NVOCTP_PGXFER)
+        {
+            pgLegXsrc = pg;
+            noPgLeg++;
+        }
 #endif
+        else
+        {
+            noPgNdef++;
+        }
+    }
+
+    // Decide Action based on Page Informations
+#if ((NVOCMP_NVPAGES != NVOCMP_NVONEP) && !defined(NVOCMP_MIGRATE_DISABLED))
+    if (noPgLeg > 0)
+    {
+        action = NVOCMP_NORMAL_MIGRATE;
+    }
+    else
+#endif
+        if ((noPgNdef > 0) || (noPgXdst > 1) || (noPgXsrc > 1) || (noPgRdy > 1))
+    {
+        // This should not happen
+        NVOCMP_ASSERT(false, "Something wrong serious");
+        action = NVOCMP_FORCE_CLEAN;
+    }
     else
     {
-      noPgNdef++;
-    }
-  }
-
-  // Decide Action based on Page Informations
-#if ((NVOCMP_NVPAGES != NVOCMP_NVONEP) && !defined(NVOCMP_MIGRATE_DISABLED))
-  if(noPgLeg > 0)
-  {
-    action = NVOCMP_NORMAL_MIGRATE;
-  }
-  else
-#endif
-  if((noPgNdef > 0) ||(noPgXdst > 1) || (noPgXsrc > 1) || (noPgRdy > 1))
-  {
-    // This should not happen
-    NVOCMP_ASSERT(false, "Something wrong serious");
-    action = NVOCMP_FORCE_CLEAN;
-  }
-  else
-  {
-    if(noPgNact == NVOCMP_NVSIZE)
-    {
-      action = NVOCMP_NORMAL_INIT;
-    }
-#if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-    else if(noPgXsrc)
-    {
-      // Power lost during compaction in progress
-      if(noPgXdst)
-      {
-        action = NVOCMP_RECOVER_COMPACT;
-      }
-      // Corrupted due to power lost while writing onto XDST page and erased the XDST page
-      else if(noPgNact)
-      {
-        pgXdst = pgNact;
-        action = NVOCMP_RECOVER_COMPACT;
-      }
-      // Power lost after compaction done, but before erasing PGXSRC page
-      else
-      {
-        if(NVOCMP_findDstPage(pNvHandle) < NVOCMP_NVSIZE)
+        if (noPgNact == NVOCMP_NVSIZE)
         {
-          action = NVOCMP_RECOVER_ERASE;
+            action = NVOCMP_NORMAL_INIT;
+        }
+#if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
+        else if (noPgXsrc)
+        {
+            // Power lost during compaction in progress
+            if (noPgXdst)
+            {
+                action = NVOCMP_RECOVER_COMPACT;
+            }
+            // Corrupted due to power lost while writing onto XDST page and erased the XDST page
+            else if (noPgNact)
+            {
+                pgXdst = pgNact;
+                action = NVOCMP_RECOVER_COMPACT;
+            }
+            // Power lost after compaction done, but before erasing PGXSRC page
+            else
+            {
+                if (NVOCMP_findDstPage(pNvHandle) < NVOCMP_NVSIZE)
+                {
+                    action = NVOCMP_RECOVER_ERASE;
+                }
+                else
+                {
+                    action = NVOCMP_ERROR_UNKNOWN;
+                }
+            }
+        }
+        else if (noPgXdst)
+        {
+            action = NVOCMP_NORMAL_RESUME;
+        }
+        else if (noPgAct || noPgFull)
+        {
+            if (NVOCMP_findDstPage(pNvHandle) < NVOCMP_NVSIZE)
+            {
+                action = NVOCMP_RECOVER_ERASE;
+            }
+            else if (noPgNact)
+            {
+                pgXdst = pgNact;
+                NVOCMP_changePageState(pNvHandle, pNvHandle->tailPage, NVOCMP_PGXDST);
+                action = NVOCMP_NORMAL_RESUME;
+            }
+            else
+            {
+                action = NVOCMP_ERROR_UNKNOWN;
+            }
         }
         else
         {
-          action = NVOCMP_ERROR_UNKNOWN;
+            // This case should be considered more
+            NVOCMP_ASSERT(false, "Something wrong serious");
+            action = NVOCMP_FORCE_CLEAN;
         }
-      }
-    }
-    else if(noPgXdst)
-    {
-      action = NVOCMP_NORMAL_RESUME;
-    }
-    else if(noPgAct || noPgFull)
-    {
-      if(NVOCMP_findDstPage(pNvHandle) < NVOCMP_NVSIZE)
-      {
-        action = NVOCMP_RECOVER_ERASE;
-      }
-      else if(noPgNact)
-      {
-        pgXdst = pgNact;
-        NVOCMP_changePageState(pNvHandle, pNvHandle->tailPage, NVOCMP_PGXDST);
-        action = NVOCMP_NORMAL_RESUME;
-      }
-      else
-      {
-        action = NVOCMP_ERROR_UNKNOWN;
-      }
-    }
-    else
-    {
-      // This case should be considered more
-      NVOCMP_ASSERT(false, "Something wrong serious");
-      action = NVOCMP_FORCE_CLEAN;
-    }
 #else
-    else if(noPgXsrc)
-    {
-      // Power lost during compaction in progress
-      action = NVOCMP_RECOVER_COMPACT;
-    }
-    else if(noPgXdst)
-    {
-      action = NVOCMP_RECOVER_ERASE;
-    }
-    else if(noPgAct || noPgFull)
-    {
-      action = NVOCMP_NORMAL_RESUME;
-    }
-    else
-    {
-      // This case should be considered more
-      NVOCMP_ASSERT(false, "Something wrong serious");
-      action = NVOCMP_FORCE_CLEAN;
-    }
+        else if (noPgXsrc)
+        {
+            // Power lost during compaction in progress
+            action = NVOCMP_RECOVER_COMPACT;
+        }
+        else if (noPgXdst)
+        {
+            action = NVOCMP_RECOVER_ERASE;
+        }
+        else if (noPgAct || noPgFull)
+        {
+            action = NVOCMP_NORMAL_RESUME;
+        }
+        else
+        {
+            // This case should be considered more
+            NVOCMP_ASSERT(false, "Something wrong serious");
+            action = NVOCMP_FORCE_CLEAN;
+        }
 #endif
-  }
+    }
 
-  gAction = action;
+    gAction = action;
 
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-  switch(action)
-  {
-  case NVOCMP_FORCE_CLEAN :
-      // Erase All pages before start
-      for(pg = 0; pg < NVOCMP_NVSIZE; pg++)
-      {
-        NVOCMP_failW |= NVOCMP_erase(pNvHandle, pg);
-      }
-      // init should be followed by force clean
-  case NVOCMP_NORMAL_INIT :
-      // initial state, set head page, act page and tail page
-      pNvHandle->headPage = 0;
-      pNvHandle->tailPage = NVOCMP_NVSIZE - 1;
-      pNvHandle->actPage = 0;
-      pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
-      NVOCMP_changePageState(pNvHandle, pNvHandle->headPage, NVOCMP_PGRDY);
-      NVOCMP_changePageState(pNvHandle, pNvHandle->tailPage, NVOCMP_PGXDST);
-      break;
-  case NVOCMP_NORMAL_RESUME :
-      // resume state, set head page, act page and tail page
-      pNvHandle->tailPage = pgXdst;
-      pNvHandle->headPage = NVOCMP_INCPAGE(pgXdst);
-      if(pgAct != NVOCMP_NULLPAGE)
-      {
-        pNvHandle->actPage = pgAct;
-        pNvHandle->actOffset = pNvHandle->pageInfo[pgAct].offset;
-
-        NVOCMP_itemHdr_t iHdr;
-        if(pNvHandle->actOffset > NVOCMP_PGDATAOFS + NVOCMP_ITEMHDRLEN)
+    switch (action)
+    {
+    case NVOCMP_FORCE_CLEAN:
+        // Erase All pages before start
+        for (pg = 0; pg < NVOCMP_NVSIZE; pg++)
         {
-          NVOCMP_readHeader(pNvHandle->actPage, pNvHandle->actOffset - NVOCMP_ITEMHDRLEN , &iHdr, false);
-          if(iHdr.stats & NVOCMP_FOLLOWBIT)
-          {
-            if((NVOCMP_findItem(pNvHandle, pNvHandle->actPage, pNvHandle->actOffset - NVOCMP_ITEMHDRLEN - iHdr.len,
-                            &iHdr, NVOCMP_FINDSTRICT, NULL) == NVINTF_SUCCESS) && (iHdr.hofs > 0))
-            {
-              NVOCMP_setItemInactive(pNvHandle, iHdr.hpage, iHdr.hofs);
-            }
-          }
-          else
-          {
-            NVOCMP_compactPage(pNvHandle, 0);
-          }
+            NVOCMP_failW |= NVOCMP_erase(pNvHandle, pg);
         }
-      }
-      else if(pgRdy != NVOCMP_NULLPAGE)
-      {
-        pNvHandle->actPage = pgRdy;
-        pNvHandle->actOffset = pNvHandle->pageInfo[pgRdy].offset;
-      }
-      else
-      {
-        pNvHandle->actPage = pNvHandle->headPage;
+        // init should be followed by force clean
+    case NVOCMP_NORMAL_INIT:
+        // initial state, set head page, act page and tail page
+        pNvHandle->headPage  = 0;
+        pNvHandle->tailPage  = NVOCMP_NVSIZE - 1;
+        pNvHandle->actPage   = 0;
         pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
-      }
-#ifdef NVOCMP_COMPACT_WHEN_RESUME
-      NVOCMP_compactPage(pNvHandle, 0);
-#endif
-      break;
-  case NVOCMP_RECOVER_COMPACT :
-      pNvHandle->tailPage = pgXdst;
-      pNvHandle->headPage = NVOCMP_INCPAGE(pgXdst);
-      NVOCMP_failW = NVOCMP_erase(pNvHandle, pgXdst);
-      NVOCMP_changePageState(pNvHandle, pgXdst, NVOCMP_PGXDST);
-      NVOCMP_compactPage(pNvHandle, 0);
-      break;
-  case NVOCMP_RECOVER_ERASE :
-      pg = NVOCMP_findDstPage(pNvHandle);
-      pNvHandle->compactInfo.xDstPage = pg;
-      pNvHandle->compactInfo.xSrcSPage = pNvHandle->pageInfo[pg].sPage;
-      pNvHandle->compactInfo.xSrcEPage = pNvHandle->pageInfo[pg].ePage;
-      cleanPages = NVOCMP_cleanPage(pNvHandle);
-      pNvHandle->tailPage = NVOCMP_ADDPAGE(pg, cleanPages);
-      pNvHandle->headPage = NVOCMP_INCPAGE(pNvHandle->tailPage);
-
-      tmpPg = NVOCMP_findPage(NVOCMP_PGACT);
-      if(tmpPg == NVOCMP_NULLPAGE)
-      {
-        tmpPg = NVOCMP_findPage(NVOCMP_PGRDY);
-        if(tmpPg == NVOCMP_NULLPAGE)
+        NVOCMP_changePageState(pNvHandle, pNvHandle->headPage, NVOCMP_PGRDY);
+        NVOCMP_changePageState(pNvHandle, pNvHandle->tailPage, NVOCMP_PGXDST);
+        break;
+    case NVOCMP_NORMAL_RESUME:
+        // resume state, set head page, act page and tail page
+        pNvHandle->tailPage = pgXdst;
+        pNvHandle->headPage = NVOCMP_INCPAGE(pgXdst);
+        if (pgAct != NVOCMP_NULLPAGE)
         {
-          tmpPg = NVOCMP_findPage(NVOCMP_PGNACT);
-          if(tmpPg == NVOCMP_NULLPAGE)
-          {
-            tmpPg = NVOCMP_findPage(NVOCMP_PGFULL);
-            if(tmpPg == NVOCMP_NULLPAGE)
+            pNvHandle->actPage   = pgAct;
+            pNvHandle->actOffset = pNvHandle->pageInfo[pgAct].offset;
+
+            NVOCMP_itemHdr_t iHdr;
+            if (pNvHandle->actOffset > NVOCMP_PGDATAOFS + NVOCMP_ITEMHDRLEN)
             {
-              tmpPg = pNvHandle->headPage;
-//                NVOCMP_changePageState(tmpPg, NVOCMP_PGRDY);
+                NVOCMP_readHeader(pNvHandle->actPage, pNvHandle->actOffset - NVOCMP_ITEMHDRLEN, &iHdr, false);
+                if (iHdr.stats & NVOCMP_FOLLOWBIT)
+                {
+                    if ((NVOCMP_findItem(pNvHandle, pNvHandle->actPage, pNvHandle->actOffset - NVOCMP_ITEMHDRLEN - iHdr.len, &iHdr,
+                                         NVOCMP_FINDSTRICT, NULL) == NVINTF_SUCCESS) &&
+                        (iHdr.hofs > 0))
+                    {
+                        NVOCMP_setItemInactive(pNvHandle, iHdr.hpage, iHdr.hofs);
+                    }
+                }
+                else
+                {
+                    NVOCMP_compactPage(pNvHandle, 0);
+                }
             }
-          }
         }
-      }
-
-      pNvHandle->actPage = tmpPg;
-      pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
-      NVOCMP_changePageState(pNvHandle, pNvHandle->tailPage, NVOCMP_PGXDST);
-
-      /* This looks not necessary */
-//        (void)NVOCMP_compactPage(pNvHandle, 0);
-      break;
-#if !defined(NVOCMP_MIGRATE_DISABLED)
-  case NVOCMP_NORMAL_MIGRATE :
-      if(pgLegAct != NVOCMP_NULLPAGE)
-      {
-        pNvHandle->actPage = pgLegAct;
-      }
-      else
-      {
-        pNvHandle->actPage = pgLegXsrc;
-      }
-      pNvHandle->headPage = pNvHandle->actPage;
-      pNvHandle->tailPage = NVOCMP_DECPAGE(pNvHandle->headPage);
-      pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
-      NVOCMP_migratePage(pNvHandle, pNvHandle->actPage);
-      NVOCMP_compactPage(pNvHandle, 0);
-      break;
-#endif
-  case NVOCMP_ERROR_UNKNOWN :
-      /* When this error happens, NV area should be erased to restart.
-       * This while loop is for only debug purpose */
-      NVOCMP_ASSERT1(0);
-  default :
-      break;
-  }
-#else
-  switch(action)
-  {
-  case NVOCMP_FORCE_CLEAN :
-      // Erase All pages before start
-      for(pg = 0; pg < NVOCMP_NVSIZE; pg++)
-      {
-        NVOCMP_failW |= NVOCMP_erase(pNvHandle, pg);
-      }
-      // init should be followed by force clean
-  case NVOCMP_NORMAL_INIT :
-      // initial state, set head page, act page and tail page
-      pNvHandle->headPage = 0;
-      pNvHandle->tailPage = 0;
-      pNvHandle->actPage = 0;
-      pNvHandle->actOffset = pNvHandle->pageInfo[0].offset;
-      NVOCMP_changePageState(pNvHandle, pNvHandle->headPage, NVOCMP_PGRDY);
-      break;
-  case NVOCMP_NORMAL_RESUME :
-      // resume state, set head page, act page and tail page
-      pNvHandle->tailPage = 0;
-      pNvHandle->headPage = 0;
-      pNvHandle->actPage = 0;
-      pNvHandle->actOffset = pNvHandle->pageInfo[0].offset;
+        else if (pgRdy != NVOCMP_NULLPAGE)
+        {
+            pNvHandle->actPage   = pgRdy;
+            pNvHandle->actOffset = pNvHandle->pageInfo[pgRdy].offset;
+        }
+        else
+        {
+            pNvHandle->actPage   = pNvHandle->headPage;
+            pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
+        }
 #ifdef NVOCMP_COMPACT_WHEN_RESUME
-      NVOCMP_compactPage(pNvHandle, 0);
+        NVOCMP_compactPage(pNvHandle, 0);
 #endif
-      break;
-  case NVOCMP_RECOVER_COMPACT :
-      pNvHandle->tailPage = 0;
-      pNvHandle->headPage = 0;
-      pNvHandle->actPage = 0;
-      pNvHandle->actOffset = pNvHandle->pageInfo[0].offset;
-      NVOCMP_compactPage(pNvHandle, 0);
-      break;
-  case NVOCMP_RECOVER_ERASE :
-      NVOCMP_getCompactHdr(pg, XSRCSTARTHDR, &startHdr);
-      NVOCMP_getCompactHdr(pg, XSRCENDHDR, &endHdr);
-      if((startHdr.pageOffset != 0xFFFF) && (endHdr.pageOffset != 0xFFFF))
-      {
-        NVOCMP_changePageState(pNvHandle, 0, NVOCMP_PGACT);
-      }
-      else
-      {
-        NVOCMP_failW |= NVOCMP_erase(pNvHandle, 0);
-        pNvHandle->headPage = 0;
-        pNvHandle->tailPage = 0;
-        pNvHandle->actPage = 0;
+        break;
+    case NVOCMP_RECOVER_COMPACT:
+        pNvHandle->tailPage = pgXdst;
+        pNvHandle->headPage = NVOCMP_INCPAGE(pgXdst);
+        NVOCMP_failW        = NVOCMP_erase(pNvHandle, pgXdst);
+        NVOCMP_changePageState(pNvHandle, pgXdst, NVOCMP_PGXDST);
+        NVOCMP_compactPage(pNvHandle, 0);
+        break;
+    case NVOCMP_RECOVER_ERASE:
+        pg                               = NVOCMP_findDstPage(pNvHandle);
+        pNvHandle->compactInfo.xDstPage  = pg;
+        pNvHandle->compactInfo.xSrcSPage = pNvHandle->pageInfo[pg].sPage;
+        pNvHandle->compactInfo.xSrcEPage = pNvHandle->pageInfo[pg].ePage;
+        cleanPages                       = NVOCMP_cleanPage(pNvHandle);
+        pNvHandle->tailPage              = NVOCMP_ADDPAGE(pg, cleanPages);
+        pNvHandle->headPage              = NVOCMP_INCPAGE(pNvHandle->tailPage);
+
+        tmpPg = NVOCMP_findPage(NVOCMP_PGACT);
+        if (tmpPg == NVOCMP_NULLPAGE)
+        {
+            tmpPg = NVOCMP_findPage(NVOCMP_PGRDY);
+            if (tmpPg == NVOCMP_NULLPAGE)
+            {
+                tmpPg = NVOCMP_findPage(NVOCMP_PGNACT);
+                if (tmpPg == NVOCMP_NULLPAGE)
+                {
+                    tmpPg = NVOCMP_findPage(NVOCMP_PGFULL);
+                    if (tmpPg == NVOCMP_NULLPAGE)
+                    {
+                        tmpPg = pNvHandle->headPage;
+                        //                NVOCMP_changePageState(tmpPg, NVOCMP_PGRDY);
+                    }
+                }
+            }
+        }
+
+        pNvHandle->actPage   = tmpPg;
+        pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
+        NVOCMP_changePageState(pNvHandle, pNvHandle->tailPage, NVOCMP_PGXDST);
+
+        /* This looks not necessary */
+        //        (void)NVOCMP_compactPage(pNvHandle, 0);
+        break;
+#if !defined(NVOCMP_MIGRATE_DISABLED)
+    case NVOCMP_NORMAL_MIGRATE:
+        if (pgLegAct != NVOCMP_NULLPAGE)
+        {
+            pNvHandle->actPage = pgLegAct;
+        }
+        else
+        {
+            pNvHandle->actPage = pgLegXsrc;
+        }
+        pNvHandle->headPage  = pNvHandle->actPage;
+        pNvHandle->tailPage  = NVOCMP_DECPAGE(pNvHandle->headPage);
+        pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
+        NVOCMP_migratePage(pNvHandle, pNvHandle->actPage);
+        NVOCMP_compactPage(pNvHandle, 0);
+        break;
+#endif
+    case NVOCMP_ERROR_UNKNOWN:
+        /* When this error happens, NV area should be erased to restart.
+         * This while loop is for only debug purpose */
+        NVOCMP_ASSERT1(0);
+    default:
+        break;
+    }
+#else
+    switch (action)
+    {
+    case NVOCMP_FORCE_CLEAN:
+        // Erase All pages before start
+        for (pg = 0; pg < NVOCMP_NVSIZE; pg++)
+        {
+            NVOCMP_failW |= NVOCMP_erase(pNvHandle, pg);
+        }
+        // init should be followed by force clean
+    case NVOCMP_NORMAL_INIT:
+        // initial state, set head page, act page and tail page
+        pNvHandle->headPage  = 0;
+        pNvHandle->tailPage  = 0;
+        pNvHandle->actPage   = 0;
         pNvHandle->actOffset = pNvHandle->pageInfo[0].offset;
         NVOCMP_changePageState(pNvHandle, pNvHandle->headPage, NVOCMP_PGRDY);
-      }
-      break;
-  case NVOCMP_ERROR_UNKNOWN :
-      //shoud not hit here
-      NVOCMP_ASSERT1(0);
-      break;
-  default :
-      break;
-  }
+        break;
+    case NVOCMP_NORMAL_RESUME:
+        // resume state, set head page, act page and tail page
+        pNvHandle->tailPage  = 0;
+        pNvHandle->headPage  = 0;
+        pNvHandle->actPage   = 0;
+        pNvHandle->actOffset = pNvHandle->pageInfo[0].offset;
+#ifdef NVOCMP_COMPACT_WHEN_RESUME
+        NVOCMP_compactPage(pNvHandle, 0);
+#endif
+        break;
+    case NVOCMP_RECOVER_COMPACT:
+        pNvHandle->tailPage  = 0;
+        pNvHandle->headPage  = 0;
+        pNvHandle->actPage   = 0;
+        pNvHandle->actOffset = pNvHandle->pageInfo[0].offset;
+        NVOCMP_compactPage(pNvHandle, 0);
+        break;
+    case NVOCMP_RECOVER_ERASE:
+        NVOCMP_getCompactHdr(pg, XSRCSTARTHDR, &startHdr);
+        NVOCMP_getCompactHdr(pg, XSRCENDHDR, &endHdr);
+        if ((startHdr.pageOffset != 0xFFFF) && (endHdr.pageOffset != 0xFFFF))
+        {
+            NVOCMP_changePageState(pNvHandle, 0, NVOCMP_PGACT);
+        }
+        else
+        {
+            NVOCMP_failW |= NVOCMP_erase(pNvHandle, 0);
+            pNvHandle->headPage  = 0;
+            pNvHandle->tailPage  = 0;
+            pNvHandle->actPage   = 0;
+            pNvHandle->actOffset = pNvHandle->pageInfo[0].offset;
+            NVOCMP_changePageState(pNvHandle, pNvHandle->headPage, NVOCMP_PGRDY);
+        }
+        break;
+    case NVOCMP_ERROR_UNKNOWN:
+        // shoud not hit here
+        NVOCMP_ASSERT1(0);
+        break;
+    default:
+        break;
+    }
 #endif
 }
 
@@ -2431,50 +2436,49 @@ static void NVOCMP_initNv(NVOCMP_nvHandle_t *pNvHandle)
  *
  * @return  NVINTF_SUCCESS or specific failure code
  */
-static uint8_t NVOCMP_checkItem(NVINTF_itemID_t *id, uint16_t len, NVOCMP_itemHdr_t *pHdr,
-                                uint8_t flag)
+static uint8_t NVOCMP_checkItem(NVINTF_itemID_t * id, uint16_t len, NVOCMP_itemHdr_t * pHdr, uint8_t flag)
 {
-    if(len > NVOCMP_MAXLEN)
+    if (len > NVOCMP_MAXLEN)
     {
         // Item data is too long
         NVOCMP_ALERT(false, "Item data too large.")
-        return(NVINTF_BADLENGTH);
+        return (NVINTF_BADLENGTH);
     }
-    if(id->systemID > NVOCMP_MAXSYSID)
+    if (id->systemID > NVOCMP_MAXSYSID)
     {
         // Too large for compressed header
         NVOCMP_ALERT(false, "Item sysid too large.")
-        return(NVINTF_BADSYSID);
+        return (NVINTF_BADSYSID);
     }
-    if(id->itemID > NVOCMP_MAXITEMID)
+    if (id->itemID > NVOCMP_MAXITEMID)
     {
         // Too large for compressed header
         NVOCMP_ALERT(false, "Item itemid too large.")
-        return(NVINTF_BADITEMID);
+        return (NVINTF_BADITEMID);
     }
-    if(id->subID > NVOCMP_MAXSUBID)
+    if (id->subID > NVOCMP_MAXSUBID)
     {
         // Too large for compressed header
         NVOCMP_ALERT(false, "Item subid too large.")
-        return(NVINTF_BADSUBID);
+        return (NVINTF_BADSUBID);
     }
 
-    if(NVOCMP_failF == NVINTF_NOTREADY)
+    if (NVOCMP_failF == NVINTF_NOTREADY)
     {
         // NV driver has not been initialized
         NVOCMP_ASSERT(false, "Driver uninitialized.")
-        return(NVINTF_NOTREADY);
+        return (NVINTF_NOTREADY);
     }
 
     pHdr->len    = len;
     pHdr->hofs   = 0;
-    pHdr->cmpid  = NVOCMP_CMPRID(id->systemID,id->itemID,id->subID);
+    pHdr->cmpid  = NVOCMP_CMPRID(id->systemID, id->itemID, id->subID);
     pHdr->subid  = id->subID;
     pHdr->itemid = id->itemID;
     pHdr->sysid  = id->systemID;
     pHdr->sig    = NVOCMP_SIGNATURE;
 
-    return(NVINTF_SUCCESS);
+    return (NVINTF_SUCCESS);
 }
 
 /******************************************************************************
@@ -2487,45 +2491,45 @@ static uint8_t NVOCMP_checkItem(NVINTF_itemID_t *id, uint16_t len, NVOCMP_itemHd
  *
  * @return  page number or NVOCMP_NULLPAGE
  */
-static uint8_t NVOCMP_getDstPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t len)
+static uint8_t NVOCMP_getDstPage(NVOCMP_nvHandle_t * pNvHandle, uint16_t len)
 {
-  uint8_t dstPg = NVOCMP_NULLPAGE;
-  uint8_t pg;
-  NVOCMP_pageHdr_t pageHdr;
-  uint16_t nvSearched = 0;
+    uint8_t dstPg = NVOCMP_NULLPAGE;
+    uint8_t pg;
+    NVOCMP_pageHdr_t pageHdr;
+    uint16_t nvSearched = 0;
 
-  for(pg = pNvHandle->actPage; nvSearched < NVOCMP_NVSIZE; pg = NVOCMP_INCPAGE(pg))
-  {
-    nvSearched++;
+    for (pg = pNvHandle->actPage; nvSearched < NVOCMP_NVSIZE; pg = NVOCMP_INCPAGE(pg))
+    {
+        nvSearched++;
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-    if(pg == pNvHandle->tailPage)
-    {
-      continue;
-    }
+        if (pg == pNvHandle->tailPage)
+        {
+            continue;
+        }
 #endif
-    NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
-    if(pageHdr.state == NVOCMP_PGFULL)
-    {
-      continue;
-    }
-    if((pageHdr.state == NVOCMP_PGNACT) || (pageHdr.state == NVOCMP_PGRDY))
-    {
-      NVOCMP_changePageState(pNvHandle, pg, NVOCMP_PGACT);
-    }
+        NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *) &pageHdr, NVOCMP_PGHDRLEN);
+        if (pageHdr.state == NVOCMP_PGFULL)
+        {
+            continue;
+        }
+        if ((pageHdr.state == NVOCMP_PGNACT) || (pageHdr.state == NVOCMP_PGRDY))
+        {
+            NVOCMP_changePageState(pNvHandle, pg, NVOCMP_PGACT);
+        }
 
-    pNvHandle->actPage = pg;
-    pNvHandle->actOffset = pNvHandle->pageInfo[pg].offset;
-    if((pNvHandle->pageInfo[pg].offset + len) <= FLASH_PAGE_SIZE)
-    {
-      dstPg = pNvHandle->actPage;
-      break;
+        pNvHandle->actPage   = pg;
+        pNvHandle->actOffset = pNvHandle->pageInfo[pg].offset;
+        if ((pNvHandle->pageInfo[pg].offset + len) <= FLASH_PAGE_SIZE)
+        {
+            dstPg = pNvHandle->actPage;
+            break;
+        }
+        else
+        {
+            NVOCMP_changePageState(pNvHandle, pg, NVOCMP_PGFULL);
+        }
     }
-    else
-    {
-      NVOCMP_changePageState(pNvHandle, pg, NVOCMP_PGFULL);
-    }
-  }
-  return(dstPg);
+    return (dstPg);
 }
 
 /******************************************************************************
@@ -2540,8 +2544,7 @@ static uint8_t NVOCMP_getDstPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t len)
  *
  * @return  NVINTF_SUCCESS or specific failure code
  */
-static uint8_t NVOCMP_addItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *iHdr,
-                              const uint8_t *pBuf, NVOCMP_writeMode_t wm)
+static uint8_t NVOCMP_addItem(NVOCMP_nvHandle_t * pNvHandle, NVOCMP_itemHdr_t * iHdr, const uint8_t * pBuf, NVOCMP_writeMode_t wm)
 {
     uint8_t err;
     uint8_t dstPg;
@@ -2549,74 +2552,71 @@ static uint8_t NVOCMP_addItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *iH
     bool compact = false;
     NVOCMP_itemHdr_t hdr;
 
-    iLen = NVOCMP_ITEMHDRLEN + iHdr->len;
+    iLen  = NVOCMP_ITEMHDRLEN + iHdr->len;
     dstPg = NVOCMP_getDstPage(pNvHandle, iLen);
 
-    if(dstPg == NVOCMP_NULLPAGE)
+    if (dstPg == NVOCMP_NULLPAGE)
     {
-      compact = true;
-      // Won't fit on the active page, compact and check again
-      if(NVOCMP_compactPage(pNvHandle, iLen) < iLen)
-      {
-          // Failure means there's no place to put this item
-          NVOCMP_ALERT(false, "Out of NV.")
-          err = (NVOCMP_failW != NVINTF_SUCCESS) ?
-                  NVOCMP_failW : NVINTF_BADLENGTH;
-          return(err);
-      }
+        compact = true;
+        // Won't fit on the active page, compact and check again
+        if (NVOCMP_compactPage(pNvHandle, iLen) < iLen)
+        {
+            // Failure means there's no place to put this item
+            NVOCMP_ALERT(false, "Out of NV.")
+            err = (NVOCMP_failW != NVINTF_SUCCESS) ? NVOCMP_failW : NVINTF_BADLENGTH;
+            return (err);
+        }
     }
 
-    if((NVOCMP_failW == NVINTF_SUCCESS)
-    && ((wm == NVOCMP_WRITE) || ((wm == NVOCMP_UPDATE) && (compact == true))))
+    if ((NVOCMP_failW == NVINTF_SUCCESS) && ((wm == NVOCMP_WRITE) || ((wm == NVOCMP_UPDATE) && (compact == true))))
     {
         /* get item offset after compaction */
-      hdr.sysid = iHdr->sysid;
-      hdr.itemid = iHdr->itemid;
-      hdr.subid = iHdr->subid;
-      (void)NVOCMP_findItem(pNvHandle, pNvHandle->actPage, pNvHandle->actOffset, &hdr,
-                            NVOCMP_FINDSTRICT, NULL);
-      iHdr->hpage = hdr.hpage;
-      iHdr->hofs = hdr.hofs;
+        hdr.sysid  = iHdr->sysid;
+        hdr.itemid = iHdr->itemid;
+        hdr.subid  = iHdr->subid;
+        (void) NVOCMP_findItem(pNvHandle, pNvHandle->actPage, pNvHandle->actOffset, &hdr, NVOCMP_FINDSTRICT, NULL);
+        iHdr->hpage = hdr.hpage;
+        iHdr->hofs  = hdr.hofs;
     }
 
 #if NVOCMP_NWSAMEITEM
     bool changed = false;
-    if((iHdr->hofs) && (iHdr->len))
+    if ((iHdr->hofs) && (iHdr->len))
     {
-      #define NVOCMP_COMPARE_SIZE   32
-      uint8_t readBuf[NVOCMP_COMPARE_SIZE];
-      uint16_t iOfs = (iHdr->hofs - iHdr->len);
-      uint16_t dOfs = 0;
-      uint16_t len2cmp = 0;
+#define NVOCMP_COMPARE_SIZE 32
+        uint8_t readBuf[NVOCMP_COMPARE_SIZE];
+        uint16_t iOfs    = (iHdr->hofs - iHdr->len);
+        uint16_t dOfs    = 0;
+        uint16_t len2cmp = 0;
 
-      // Failure to parse the command
-      NVOCMP_ALERT(iHdr->hofs >= iHdr->len, "Something wrong in parsing.")
+        // Failure to parse the command
+        NVOCMP_ALERT(iHdr->hofs >= iHdr->len, "Something wrong in parsing.")
 
-      do
-      {
-        len2cmp = (iHdr->len - dOfs) > NVOCMP_COMPARE_SIZE ? NVOCMP_COMPARE_SIZE : (iHdr->len - dOfs);
-        NVOCMP_read(iHdr->hpage, iOfs + dOfs, readBuf, len2cmp);
-        if(memcmp(readBuf, pBuf + dOfs, len2cmp))
+        do
         {
-          changed = true;
-          break;
-        }
-        dOfs += len2cmp;
-      } while(dOfs < iHdr->len);
+            len2cmp = (iHdr->len - dOfs) > NVOCMP_COMPARE_SIZE ? NVOCMP_COMPARE_SIZE : (iHdr->len - dOfs);
+            NVOCMP_read(iHdr->hpage, iOfs + dOfs, readBuf, len2cmp);
+            if (memcmp(readBuf, pBuf + dOfs, len2cmp))
+            {
+                changed = true;
+                break;
+            }
+            dOfs += len2cmp;
+        } while (dOfs < iHdr->len);
     }
     else
     {
-      changed = true;
+        changed = true;
     }
 
-    if(changed)
+    if (changed)
     {
-    // Create the new NV item
-      NVOCMP_writeItem(pNvHandle, iHdr, pNvHandle->actPage, pNvHandle->actOffset, pBuf);
+        // Create the new NV item
+        NVOCMP_writeItem(pNvHandle, iHdr, pNvHandle->actPage, pNvHandle->actOffset, pBuf);
     }
     else
     {
-      iHdr->hofs = 0;
+        iHdr->hofs = 0;
     }
 #else
     // Create the new NV item
@@ -2624,7 +2624,7 @@ static uint8_t NVOCMP_addItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *iH
 #endif
 
     // Status of writing/erasing Flash
-    return(NVOCMP_failW);
+    return (NVOCMP_failW);
 }
 
 /******************************************************************************
@@ -2639,10 +2639,10 @@ static uint8_t NVOCMP_addItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *iH
  *
  * @return  NVS_STATUS_SUCCESS or other NVS status code
  */
-static inline void NVOCMP_read(uint8_t pg, uint16_t off, uint8_t *pBuf, uint16_t len)
+static inline void NVOCMP_read(uint8_t pg, uint16_t off, uint8_t * pBuf, uint16_t len)
 {
 #ifndef NV_LINUX
-    NVS_read(NVOCMP_nvsHandle, NVOCMP_FLASHOFFSET(pg, off), (uint8_t *)pBuf, len);
+    NVS_read(NVOCMP_nvsHandle, NVOCMP_FLASHOFFSET(pg, off), (uint8_t *) pBuf, len);
 #else
     NV_LINUX_read(pg, off, pBuf, len);
 #endif
@@ -2660,9 +2660,9 @@ static inline void NVOCMP_read(uint8_t pg, uint16_t off, uint8_t *pBuf, uint16_t
  *
  * @return  NVS_STATUS_SUCCESS or other NVS status code
  */
-static uint8_t NVOCMP_write(uint8_t dstPg, uint16_t off, const uint8_t *pBuf, uint16_t len)
+static uint8_t NVOCMP_write(uint8_t dstPg, uint16_t off, const uint8_t * pBuf, uint16_t len)
 {
-    uint8_t err = NVINTF_SUCCESS;
+    uint8_t err         = NVINTF_SUCCESS;
     int_fast16_t nvsRes = 0;
 
     // check voltage if possible
@@ -2671,10 +2671,9 @@ static uint8_t NVOCMP_write(uint8_t dstPg, uint16_t off, const uint8_t *pBuf, ui
     if (NVINTF_SUCCESS == err)
     {
 #ifndef NV_LINUX
-        nvsRes = NVS_write(NVOCMP_nvsHandle, NVOCMP_FLASHOFFSET(dstPg, off),
-                           (uint8_t *)pBuf, len, NVS_WRITE_POST_VERIFY);
+        nvsRes = NVS_write(NVOCMP_nvsHandle, NVOCMP_FLASHOFFSET(dstPg, off), (uint8_t *) pBuf, len, NVS_WRITE_POST_VERIFY);
 #else
-        nvsRes = NV_LINUX_write(dstPg, off, pBuf, len);
+        nvsRes  = NV_LINUX_write(dstPg, off, pBuf, len);
 #endif
     }
     else
@@ -2693,7 +2692,7 @@ static uint8_t NVOCMP_write(uint8_t dstPg, uint16_t off, const uint8_t *pBuf, ui
         NVOCMP_ALERT(NVINTF_FAILURE != err, "NVS write failure.")
     }
 
-    return(err);
+    return (err);
 }
 
 /******************************************************************************
@@ -2706,9 +2705,9 @@ static uint8_t NVOCMP_write(uint8_t dstPg, uint16_t off, const uint8_t *pBuf, ui
  *
  * @return  NVINT_SUCCESS or other NVINTF status code
  */
-static uint8_t NVOCMP_erase(NVOCMP_nvHandle_t *pNvHandle, uint8_t dstPg)
+static uint8_t NVOCMP_erase(NVOCMP_nvHandle_t * pNvHandle, uint8_t dstPg)
 {
-    uint8_t err = NVINTF_SUCCESS;
+    uint8_t err         = NVINTF_SUCCESS;
     int_fast16_t nvsRes = 0;
 
     // Check voltage if possible
@@ -2717,26 +2716,25 @@ static uint8_t NVOCMP_erase(NVOCMP_nvHandle_t *pNvHandle, uint8_t dstPg)
     if (NVINTF_SUCCESS == err)
     {
 #ifndef NV_LINUX
-        nvsRes = NVS_erase(NVOCMP_nvsHandle, NVOCMP_FLASHOFFSET(dstPg, 0),
-                           NVOCMP_nvsAttrs.sectorSize);
+        nvsRes = NVS_erase(NVOCMP_nvsHandle, NVOCMP_FLASHOFFSET(dstPg, 0), NVOCMP_nvsAttrs.sectorSize);
 #else
-        nvsRes = NV_LINUX_erase(dstPg);
+        nvsRes  = NV_LINUX_erase(dstPg);
 #endif
         if (nvsRes < 0)
         {
-          err = NVINTF_FAILURE;
+            err = NVINTF_FAILURE;
         }
         else
         {
-          // Bump the compaction cycle counter, wrap-around if at maximum
-          pNvHandle->pageInfo[dstPg].cycle = (pNvHandle->pageInfo[dstPg].cycle < NVOCMP_MAXCYCLE) ?
-                                           (pNvHandle->pageInfo[dstPg].cycle + 1) : NVOCMP_MINCYCLE;
-          NVOCMP_setPageState(pNvHandle, dstPg, NVOCMP_PGNACT);
-          NVOCMP_setCompactHdr(dstPg, NVOCMP_NULLPAGE, NVOCMP_NULLOFFSET, THISPAGEHDR);
-          NVOCMP_setCompactHdr(dstPg, NVOCMP_NULLPAGE, NVOCMP_NULLOFFSET, XSRCSTARTHDR);
-          NVOCMP_setCompactHdr(dstPg, NVOCMP_NULLPAGE, NVOCMP_NULLOFFSET, XSRCENDHDR);
-          pNvHandle->pageInfo[dstPg].offset = NVOCMP_PGDATAOFS;
-          pNvHandle->pageInfo[dstPg].mode = NVOCMP_PGNORMAL;
+            // Bump the compaction cycle counter, wrap-around if at maximum
+            pNvHandle->pageInfo[dstPg].cycle =
+                (pNvHandle->pageInfo[dstPg].cycle < NVOCMP_MAXCYCLE) ? (pNvHandle->pageInfo[dstPg].cycle + 1) : NVOCMP_MINCYCLE;
+            NVOCMP_setPageState(pNvHandle, dstPg, NVOCMP_PGNACT);
+            NVOCMP_setCompactHdr(dstPg, NVOCMP_NULLPAGE, NVOCMP_NULLOFFSET, THISPAGEHDR);
+            NVOCMP_setCompactHdr(dstPg, NVOCMP_NULLPAGE, NVOCMP_NULLOFFSET, XSRCSTARTHDR);
+            NVOCMP_setCompactHdr(dstPg, NVOCMP_NULLPAGE, NVOCMP_NULLOFFSET, XSRCENDHDR);
+            pNvHandle->pageInfo[dstPg].offset = NVOCMP_PGDATAOFS;
+            pNvHandle->pageInfo[dstPg].mode   = NVOCMP_PGNORMAL;
         }
     }
     else
@@ -2747,7 +2745,7 @@ static uint8_t NVOCMP_erase(NVOCMP_nvHandle_t *pNvHandle, uint8_t dstPg)
     NVOCMP_ALERT(NVINTF_LOWPOWER != err, "Voltage check failed.")
     NVOCMP_ALERT(NVINTF_FAILURE != err, "NVS erase failure.")
 
-    return(err);
+    return (err);
 }
 
 /******************************************************************************
@@ -2766,22 +2764,22 @@ static uint8_t NVOCMP_erase(NVOCMP_nvHandle_t *pNvHandle, uint8_t dstPg)
  *
  * @return  none
  */
-static void NVOCMP_writeItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *pHdr,
-                             uint8_t dstPg, uint16_t dstOff, const uint8_t *pBuf)
+static void NVOCMP_writeItem(NVOCMP_nvHandle_t * pNvHandle, NVOCMP_itemHdr_t * pHdr, uint8_t dstPg, uint16_t dstOff,
+                             const uint8_t * pBuf)
 {
     uint16_t iLen;
     NVOCMP_pageHdr_t pageHdr;
 
-    NVOCMP_read(dstPg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
-    if(pageHdr.state == NVOCMP_PGRDY)
+    NVOCMP_read(dstPg, NVOCMP_PGHDROFS, (uint8_t *) &pageHdr, NVOCMP_PGHDRLEN);
+    if (pageHdr.state == NVOCMP_PGRDY)
     {
-      NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGACT);
+        NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGACT);
     }
 
-    if(pageHdr.state != NVOCMP_PGACT)
+    if (pageHdr.state != NVOCMP_PGACT)
     {
-      NVOCMP_failW = NVINTF_FAILURE;
-      return;
+        NVOCMP_failW = NVINTF_FAILURE;
+        return;
     }
 
     NVOCMP_ALERT(pageHdr.state == NVOCMP_PGACT, "Something wrong.")
@@ -2789,7 +2787,7 @@ static void NVOCMP_writeItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *pHd
     // Total length of this item
     iLen = NVOCMP_ITEMHDRLEN + pHdr->len;
 
-    if((dstOff + iLen) <= FLASH_PAGE_SIZE)
+    if ((dstOff + iLen) <= FLASH_PAGE_SIZE)
     {
         cmpIH_t cHdr;
         uint16_t hOfs, dLen;
@@ -2820,13 +2818,11 @@ static void NVOCMP_writeItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *pHd
         {
             // Construct item in one buffer
             // Put data into buffer
-            memcpy(NVOCMP_itemBuffer, (const void *)pBuf, dLen);
+            memcpy(NVOCMP_itemBuffer, (const void *) pBuf, dLen);
             // Put most of header into buffer
-            memcpy(NVOCMP_itemBuffer + dLen, (const void *)cHdr,
-                   NVOCMP_HDRCRCINC);
+            memcpy(NVOCMP_itemBuffer + dLen, (const void *) cHdr, NVOCMP_HDRCRCINC);
             // Calculate CRC
-            newCRC = NVOCMP_doRAMCRC(NVOCMP_itemBuffer, dLen +
-                                     NVOCMP_HDRCRCINC, 0);
+            newCRC = NVOCMP_doRAMCRC(NVOCMP_itemBuffer, dLen + NVOCMP_HDRCRCINC, 0);
 #if NVOCMP_HDRLE
             // Insert CRC and last bytes
             cHdr[4] |= ((newCRC & 0x3) << 6);
@@ -2839,11 +2835,9 @@ static void NVOCMP_writeItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *pHd
             cHdr[5] = ((newCRC & 0x3F) << 2) | NVOCMP_ACTIVEIDBIT;
 #endif
             cHdr[6] = NVOCMP_SIGNATURE;
-            memcpy(NVOCMP_itemBuffer + dLen, (const void *)cHdr,
-                   NVOCMP_ITEMHDRLEN);
+            memcpy(NVOCMP_itemBuffer + dLen, (const void *) cHdr, NVOCMP_ITEMHDRLEN);
             // NVS_write
-            NVOCMP_failW = NVOCMP_write(dstPg, dstOff,
-                                        NVOCMP_itemBuffer, iLen);
+            NVOCMP_failW = NVOCMP_write(dstPg, dstOff, NVOCMP_itemBuffer, iLen);
             // Advance to next location
             dstOff += iLen;
             pNvHandle->actOffset += iLen;
@@ -2875,7 +2869,7 @@ static void NVOCMP_writeItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *pHd
             NVOCMP_failW |= NVOCMP_write(dstPg, hOfs, cHdr, NVOCMP_ITEMHDRLEN);
             // Advance to next location
             NVOCMP_ASSERT(dstOff < (dstOff + iLen), "Page offset overflow!")
-            if(!NVOCMP_failW)
+            if (!NVOCMP_failW)
             {
                 dstOff += iLen;
                 pNvHandle->actOffset += iLen;
@@ -2912,28 +2906,28 @@ static void NVOCMP_writeItem(NVOCMP_nvHandle_t *pNvHandle, NVOCMP_itemHdr_t *pHd
  *
  * @return  none
  */
-static void NVOCMP_readHeader(uint8_t pg, uint16_t ofs, NVOCMP_itemHdr_t *pHdr, bool flag)
+static void NVOCMP_readHeader(uint8_t pg, uint16_t ofs, NVOCMP_itemHdr_t * pHdr, bool flag)
 {
 #ifdef NVOCMP_GPRAM
-    uint8_t *pTBuffer = RAM_BUFFER_ADDRESS;
+    uint8_t * pTBuffer = RAM_BUFFER_ADDRESS;
 #else
-    uint8_t *pTBuffer = (uint8_t *)tBuffer;
+    uint8_t * pTBuffer = (uint8_t *) tBuffer;
 #endif
 #if 0
     uint8_t sigOfItemBehind;
 #endif
     cmpIH_t cHdr;
-    if(flag)
+    if (flag)
     {
-      memcpy((uint8_t *)cHdr, (uint8_t *)(pTBuffer + ofs), NVOCMP_ITEMHDRLEN);
+        memcpy((uint8_t *) cHdr, (uint8_t *) (pTBuffer + ofs), NVOCMP_ITEMHDRLEN);
     }
     else
     {
-      // Get item header from Flash
-      NVOCMP_read(pg, ofs, (uint8_t *)cHdr, NVOCMP_ITEMHDRLEN);
+        // Get item header from Flash
+        NVOCMP_read(pg, ofs, (uint8_t *) cHdr, NVOCMP_ITEMHDRLEN);
     }
     // Offset to compressed header
-    pHdr->hofs = ofs;
+    pHdr->hofs  = ofs;
     pHdr->hpage = pg;
 
     // Compressed item header information <-- Lower Addr    Higher Addr-->
@@ -2949,26 +2943,26 @@ static void NVOCMP_readHeader(uint8_t pg, uint16_t ofs, NVOCMP_itemHdr_t *pHdr, 
     pHdr->stats  = (cHdr[5] >> 6) & (NVOCMP_VALIDIDBIT | NVOCMP_ACTIVEIDBIT);
     pHdr->sig    = cHdr[6];
 #else
-    pHdr->sysid  = (cHdr[0] >> 2) & 0x3F;
-    pHdr->itemid = ((cHdr[0] & 0x3) << 8) | cHdr[1];
-    pHdr->subid  = (cHdr[2] << 2) | ((cHdr[3] >> 6) & 0x3);
-    pHdr->len    = ((cHdr[3] & 0x3F) << 6) | ((cHdr[4] >> 2) & 0x3F);
-    pHdr->crc8   = ((cHdr[4] & 0x3) << 6) | ((cHdr[5] >> 2) & 0x3F);
-    pHdr->stats  = cHdr[5] & (NVOCMP_VALIDIDBIT | NVOCMP_ACTIVEIDBIT);
-    pHdr->sig    = cHdr[6];
+    pHdr->sysid        = (cHdr[0] >> 2) & 0x3F;
+    pHdr->itemid       = ((cHdr[0] & 0x3) << 8) | cHdr[1];
+    pHdr->subid        = (cHdr[2] << 2) | ((cHdr[3] >> 6) & 0x3);
+    pHdr->len          = ((cHdr[3] & 0x3F) << 6) | ((cHdr[4] >> 2) & 0x3F);
+    pHdr->crc8         = ((cHdr[4] & 0x3) << 6) | ((cHdr[5] >> 2) & 0x3F);
+    pHdr->stats        = cHdr[5] & (NVOCMP_VALIDIDBIT | NVOCMP_ACTIVEIDBIT);
+    pHdr->sig          = cHdr[6];
 #endif
-    pHdr->cmpid  = NVOCMP_CMPRID(pHdr->sysid, pHdr->itemid, pHdr->subid);
+    pHdr->cmpid = NVOCMP_CMPRID(pHdr->sysid, pHdr->itemid, pHdr->subid);
     // Our item has correct signature?
     if (pHdr->sig != NVOCMP_SIGNATURE)
     {
         // Indicate item is invalid
         NVOCMP_ALERT(false, "Invalid signature detected! Item corrupted.")
-        pHdr->stats |=  NVOCMP_VALIDIDBIT;
+        pHdr->stats |= NVOCMP_VALIDIDBIT;
     }
     else
     {
-#if 0   // remove this since looks not necessary
-        // Check for item behind us
+#if 0 // remove this since looks not necessary
+      // Check for item behind us
         uint16_t nextItemSigOfs = ofs - (pHdr->len + 1);
         if (nextItemSigOfs < ofs)
         {
@@ -2981,8 +2975,7 @@ static void NVOCMP_readHeader(uint8_t pg, uint16_t ofs, NVOCMP_itemHdr_t *pHdr, 
 #else
         (pHdr->stats) |= NVOCMP_FOLLOWBIT;
 #endif
-        NVOCMP_ALERT(pHdr->stats & NVOCMP_FOLLOWBIT,
-                     "Item gap detected. Item not followed.")
+        NVOCMP_ALERT(pHdr->stats & NVOCMP_FOLLOWBIT, "Item gap detected. Item not followed.")
     }
 }
 
@@ -2999,15 +2992,14 @@ static void NVOCMP_readHeader(uint8_t pg, uint16_t ofs, NVOCMP_itemHdr_t *pHdr, 
  *
  * @return  NVINTF_SUCCESS or specific failure code
  */
-static uint8_t NVOCMP_readItem(NVOCMP_itemHdr_t *iHdr, uint16_t ofs, uint16_t len,
-                               void *pBuf, bool flag)
+static uint8_t NVOCMP_readItem(NVOCMP_itemHdr_t * iHdr, uint16_t ofs, uint16_t len, void * pBuf, bool flag)
 {
     uint8_t err = NVINTF_SUCCESS;
     uint16_t dOfs, iOfs;
 #ifdef NVOCMP_GPRAM
-    uint8_t *pTBuffer = RAM_BUFFER_ADDRESS;
+    uint8_t * pTBuffer = RAM_BUFFER_ADDRESS;
 #else
-    uint8_t *pTBuffer = (uint8_t *)tBuffer;
+    uint8_t * pTBuffer = (uint8_t *) tBuffer;
 #endif
     iOfs = (iHdr->hofs - iHdr->len);
 
@@ -3016,21 +3008,21 @@ static uint8_t NVOCMP_readItem(NVOCMP_itemHdr_t *iHdr, uint16_t ofs, uint16_t le
     {
         err = NVOCMP_verifyCRC(iOfs, iHdr->len, iHdr->crc8, iHdr->hpage, flag);
     }
-    if(err == NVINTF_SUCCESS)
+    if (err == NVINTF_SUCCESS)
     {
         // Offset to start of item data
         dOfs = iOfs + ofs;
-        if((dOfs + len) <= iHdr->hofs)
+        if ((dOfs + len) <= iHdr->hofs)
         {
-            if(flag)
+            if (flag)
             {
-              // Copy from RAM
-              memcpy((uint8_t *)pBuf, (uint8_t *)(pTBuffer+dOfs), len);
+                // Copy from RAM
+                memcpy((uint8_t *) pBuf, (uint8_t *) (pTBuffer + dOfs), len);
             }
             else
             {
-              // Copy NV data block to caller's buffer
-              NVOCMP_read(iHdr->hpage, dOfs, (uint8_t *)pBuf, len);
+                // Copy NV data block to caller's buffer
+                NVOCMP_read(iHdr->hpage, dOfs, (uint8_t *) pBuf, len);
             }
         }
         else
@@ -3040,7 +3032,7 @@ static uint8_t NVOCMP_readItem(NVOCMP_itemHdr_t *iHdr, uint16_t ofs, uint16_t le
         }
     }
 
-    return(err);
+    return (err);
 }
 
 /******************************************************************************
@@ -3054,8 +3046,7 @@ static uint8_t NVOCMP_readItem(NVOCMP_itemHdr_t *iHdr, uint16_t ofs, uint16_t le
  *
  * @return  none
  */
-static void NVOCMP_setItemInactive(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
-                                   uint16_t iOfs)
+static void NVOCMP_setItemInactive(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, uint16_t iOfs)
 {
     uint8_t tmp;
 
@@ -3071,12 +3062,12 @@ static void NVOCMP_setItemInactive(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
     // Mark the item as inactive
     NVOCMP_writeByte(pg, iOfs + NVOCMP_HDRVLDOFS, tmp);
 
-    if(pNvHandle->pageInfo[pg].allActive)
+    if (pNvHandle->pageInfo[pg].allActive)
     {
-      tmp = NVOCMP_readByte(pg, NVOCMP_PGHDRVER);
-      tmp &= ~NVOCMP_ALLACTIVE;
-      NVOCMP_writeByte(pg, NVOCMP_PGHDRVER, tmp);
-      pNvHandle->pageInfo[pg].allActive = NVOCMP_SOMEINACTIVE;
+        tmp = NVOCMP_readByte(pg, NVOCMP_PGHDRVER);
+        tmp &= ~NVOCMP_ALLACTIVE;
+        NVOCMP_writeByte(pg, NVOCMP_PGHDRVER, tmp);
+        pNvHandle->pageInfo[pg].allActive = NVOCMP_SOMEINACTIVE;
     }
 }
 
@@ -3092,15 +3083,13 @@ static void NVOCMP_setItemInactive(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
  *
  * @return  none
  */
-static void NVOCMP_setCompactHdr(uint8_t dstPg, uint8_t pg, int16_t offset,
-                                 uint16_t location)
+static void NVOCMP_setCompactHdr(uint8_t dstPg, uint8_t pg, int16_t offset, uint16_t location)
 {
-  NVOCMP_compactHdr_t hdr = DEFAULT_COMPACTHDR;
-  hdr.page = pg;
-  hdr.pageOffset = offset;
+    NVOCMP_compactHdr_t hdr = DEFAULT_COMPACTHDR;
+    hdr.page                = pg;
+    hdr.pageOffset          = offset;
 
-  NVOCMP_failW = NVOCMP_write(dstPg, (location + 1) * NVOCMP_COMPACTHDRLEN,
-                 (uint8_t *)&hdr, NVOCMP_COMPACTHDRLEN);
+    NVOCMP_failW = NVOCMP_write(dstPg, (location + 1) * NVOCMP_COMPACTHDRLEN, (uint8_t *) &hdr, NVOCMP_COMPACTHDRLEN);
 }
 
 /******************************************************************************
@@ -3114,11 +3103,9 @@ static void NVOCMP_setCompactHdr(uint8_t dstPg, uint8_t pg, int16_t offset,
  *
  * @return  none
  */
-static void NVOCMP_getCompactHdr(uint8_t dstPg, uint16_t location,
-                                 NVOCMP_compactHdr_t *pHdr)
+static void NVOCMP_getCompactHdr(uint8_t dstPg, uint16_t location, NVOCMP_compactHdr_t * pHdr)
 {
-  NVOCMP_read(dstPg, (location + 1) * NVOCMP_COMPACTHDRLEN,
-              (uint8_t *)pHdr, NVOCMP_COMPACTHDRLEN);
+    NVOCMP_read(dstPg, (location + 1) * NVOCMP_COMPACTHDRLEN, (uint8_t *) pHdr, NVOCMP_COMPACTHDRLEN);
 }
 
 /******************************************************************************
@@ -3132,30 +3119,29 @@ static void NVOCMP_getCompactHdr(uint8_t dstPg, uint16_t location,
  *
  * @return  none
  */
-static void NVOCMP_setPageState(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
-                                NVOCMP_pageState_t state)
+static void NVOCMP_setPageState(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, NVOCMP_pageState_t state)
 {
     NVOCMP_pageHdr_t pHdr;
 
     // Load header
-    pHdr.state = (uint8_t)state;
-    pHdr.cycle = (uint8_t)pNvHandle->pageInfo[pg].cycle;
+    pHdr.state     = (uint8_t) state;
+    pHdr.cycle     = (uint8_t) pNvHandle->pageInfo[pg].cycle;
     pHdr.allActive = NVOCMP_ALLACTIVE;
-    pHdr.version = (uint8_t)NVOCMP_VERSION;
-    pHdr.signature = (uint8_t)NVOCMP_SIGNATURE;
+    pHdr.version   = (uint8_t) NVOCMP_VERSION;
+    pHdr.signature = (uint8_t) NVOCMP_SIGNATURE;
 
     // Write to page
-    NVOCMP_failW = NVOCMP_write(pg, 0, (uint8_t *)&pHdr, NVOCMP_PGHDRLEN);
+    NVOCMP_failW = NVOCMP_write(pg, 0, (uint8_t *) &pHdr, NVOCMP_PGHDRLEN);
 
-    if(NVOCMP_failW == NVINTF_SUCCESS)
+    if (NVOCMP_failW == NVINTF_SUCCESS)
     {
-      if(state == NVOCMP_PGACT)
-      {
-        // No errors, switch active page
-        pNvHandle->actPage = pg;
-      }
-      pNvHandle->pageInfo[pg].state = state;
-      pNvHandle->pageInfo[pg].allActive = NVOCMP_ALLACTIVE;
+        if (state == NVOCMP_PGACT)
+        {
+            // No errors, switch active page
+            pNvHandle->actPage = pg;
+        }
+        pNvHandle->pageInfo[pg].state     = state;
+        pNvHandle->pageInfo[pg].allActive = NVOCMP_ALLACTIVE;
     }
 }
 
@@ -3170,20 +3156,19 @@ static void NVOCMP_setPageState(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
  *
  * @return  none
  */
-static void NVOCMP_changePageState(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
-                                   NVOCMP_pageState_t state)
+static void NVOCMP_changePageState(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, NVOCMP_pageState_t state)
 {
-  NVOCMP_writeByte(pg, NVOCMP_PGHDROFS, (uint8_t)state);
+    NVOCMP_writeByte(pg, NVOCMP_PGHDROFS, (uint8_t) state);
 
-  if(NVOCMP_failW == NVINTF_SUCCESS)
-  {
-    if(state == NVOCMP_PGACT)
+    if (NVOCMP_failW == NVINTF_SUCCESS)
     {
-      // No errors, switch active page
-      pNvHandle->actPage = pg;
+        if (state == NVOCMP_PGACT)
+        {
+            // No errors, switch active page
+            pNvHandle->actPage = pg;
+        }
+        pNvHandle->pageInfo[pg].state = state;
     }
-    pNvHandle->pageInfo[pg].state = state;
-  }
 }
 
 /******************************************************************************
@@ -3199,37 +3184,37 @@ static void NVOCMP_changePageState(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg,
 #if NVOCMP_FASTOFF
 static uint16_t NVOCMP_findOffset(uint8_t pg, uint16_t ofs)
 {
-    uint8_t i,j;
-    uint32_t *tmp;
+    uint8_t i, j;
+    uint32_t * tmp;
 #ifdef NVOCMP_GPRAM
     uint32_t vm;
-    uint8_t *pTBuffer = RAM_BUFFER_ADDRESS;
+    uint8_t * pTBuffer = RAM_BUFFER_ADDRESS;
 #else
-    uint8_t *pTBuffer = (uint8_t *)tBuffer;
+    uint8_t * pTBuffer = (uint8_t *) tBuffer;
 #endif
 
 #ifdef NVOCMP_GPRAM
     NVOCMP_disableCache(&vm);
 #endif
 
-    NVOCMP_read(pg, 0, (uint8_t *)pTBuffer, FLASH_PAGE_SIZE);
+    NVOCMP_read(pg, 0, (uint8_t *) pTBuffer, FLASH_PAGE_SIZE);
 
     // Find first non-erased 4-byte location
-    tmp = (uint32_t *)pTBuffer;
-    while(ofs >= sizeof(uint32_t))
+    tmp = (uint32_t *) pTBuffer;
+    while (ofs >= sizeof(uint32_t))
     {
         ofs -= sizeof(uint32_t);
-        tmp = (uint32_t *)(pTBuffer + ofs);
-        if((*tmp) != 0xFFFFFFFF)
+        tmp = (uint32_t *) (pTBuffer + ofs);
+        if ((*tmp) != 0xFFFFFFFF)
         {
             break;
         }
     }
 
     // Starting with LSB, look for non-erased byte
-    for(i = j = 1; i <= 4; i++)
+    for (i = j = 1; i <= 4; i++)
     {
-        if(((*tmp) & 0xFF) != 0xFF)
+        if (((*tmp) & 0xFF) != 0xFF)
         {
             // Last non-erased byte so far
             j = i;
@@ -3238,32 +3223,32 @@ static uint16_t NVOCMP_findOffset(uint8_t pg, uint16_t ofs)
     }
 
 #ifdef NVOCMP_GPRAM
-        NVOCMP_restoreCache(vm);
+    NVOCMP_restoreCache(vm);
 #endif
 
-    return(ofs + j);
+    return (ofs + j);
 }
 #else
 static uint16_t NVOCMP_findOffset(uint8_t pg, uint16_t ofs)
 {
-    uint8_t i,j;
+    uint8_t i, j;
     uint32_t tmp = 0;
 
     // Find first non-erased 4-byte location
-    while(ofs >= sizeof(tmp))
+    while (ofs >= sizeof(tmp))
     {
         ofs -= sizeof(tmp);
-        NVOCMP_read(pg, ofs, (uint8_t *)&tmp, sizeof(tmp));
-        if(tmp != NVOCMP_ERASEDWORD)
+        NVOCMP_read(pg, ofs, (uint8_t *) &tmp, sizeof(tmp));
+        if (tmp != NVOCMP_ERASEDWORD)
         {
             break;
         }
     }
 
     // Starting with LSB, look for non-erased byte
-    for(i = j = 1; i <= 4; i++)
+    for (i = j = 1; i <= 4; i++)
     {
-        if((tmp & 0xFF) != NVOCMP_ERASEDBYTE)
+        if ((tmp & 0xFF) != NVOCMP_ERASEDBYTE)
         {
             // Last non-erased byte so far
             j = i;
@@ -3271,7 +3256,7 @@ static uint16_t NVOCMP_findOffset(uint8_t pg, uint16_t ofs)
         tmp >>= 8;
     }
 
-    return(ofs + j);
+    return (ofs + j);
 }
 #endif
 
@@ -3292,150 +3277,150 @@ static uint16_t NVOCMP_findOffset(uint8_t pg, uint16_t ofs)
  *
  */
 #if NVOCMP_FASTITEM
-static int8_t NVOCMP_findItem(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg, uint16_t ofs,
-                              NVOCMP_itemHdr_t *pHdr, int8_t flag, NVOCMP_itemInfo_t *pInfo)
+static int8_t NVOCMP_findItem(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, uint16_t ofs, NVOCMP_itemHdr_t * pHdr, int8_t flag,
+                              NVOCMP_itemInfo_t * pInfo)
 {
     bool found = false;
     uint8_t p;
-    uint16_t items = 0;
+    uint16_t items      = 0;
     uint16_t nvSearched = 0;
 #ifdef NVOCMP_GPRAM
     uint32_t vm;
-    uint8_t *pTBuffer = RAM_BUFFER_ADDRESS;
+    uint8_t * pTBuffer = RAM_BUFFER_ADDRESS;
 #else
-    uint8_t *pTBuffer = (uint8_t *)tBuffer;
+    uint8_t * pTBuffer = (uint8_t *) tBuffer;
 #endif
-    uint32_t cid = NVOCMP_CMPRID(pHdr->sysid,pHdr->itemid,pHdr->subid);
+    uint32_t cid = NVOCMP_CMPRID(pHdr->sysid, pHdr->itemid, pHdr->subid);
 
 #ifdef NVOCMP_GPRAM
     NVOCMP_disableCache(&vm);
 #endif
 
-    for(p = pg; nvSearched < NVOCMP_NVSIZE; p = NVOCMP_DECPAGE(p), ofs = pNvHandle->pageInfo[p].offset)
+    for (p = pg; nvSearched < NVOCMP_NVSIZE; p = NVOCMP_DECPAGE(p), ofs = pNvHandle->pageInfo[p].offset)
     {
-      nvSearched++;
+        nvSearched++;
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-      if(p == pNvHandle->tailPage)
-      {
-        continue;
-      }
+        if (p == pNvHandle->tailPage)
+        {
+            continue;
+        }
 #endif
-      NVOCMP_read(pg, 0, (uint8_t *)pTBuffer, FLASH_PAGE_SIZE);
+        NVOCMP_read(pg, 0, (uint8_t *) pTBuffer, FLASH_PAGE_SIZE);
 
-      while(ofs >= (NVOCMP_PGDATAOFS + NVOCMP_ITEMHDRLEN))
-      {
-          NVOCMP_itemHdr_t iHdr;
+        while (ofs >= (NVOCMP_PGDATAOFS + NVOCMP_ITEMHDRLEN))
+        {
+            NVOCMP_itemHdr_t iHdr;
 
-          // Align to start of item header
-          ofs -= NVOCMP_ITEMHDRLEN;
+            // Align to start of item header
+            ofs -= NVOCMP_ITEMHDRLEN;
 
-          // Read and decompress item header
-          NVOCMP_readHeader(p, ofs, &iHdr, true);
+            // Read and decompress item header
+            NVOCMP_readHeader(p, ofs, &iHdr, true);
 
-          if((iHdr.stats & NVOCMP_ACTIVEIDBIT) &&
-            !(iHdr.stats & NVOCMP_VALIDIDBIT))
-          {
-              uint32_t sysid = pHdr->sysid;
-              uint32_t itemid = pHdr->itemid;
+            if ((iHdr.stats & NVOCMP_ACTIVEIDBIT) && !(iHdr.stats & NVOCMP_VALIDIDBIT))
+            {
+                uint32_t sysid  = pHdr->sysid;
+                uint32_t itemid = pHdr->itemid;
 
-              switch (flag & NVOCMP_FINDLMASK)
-              {
-              case NVOCMP_FINDANY:
-                  found = true;
-                  break;
-              case NVOCMP_FINDSTRICT:
-                  // Return first cid match
-                  if (cid == iHdr.cmpid)
-                  {
-                      found = true;
-                  }
-                  break;
-              case NVOCMP_FINDSYSID:
-                  // return first sysid match
-                  if (sysid == iHdr.sysid)
-                  {
-                      found = true;
-                  }
-                  break;
-              case NVOCMP_FINDITMID:
-                  // return first sysid AND itemid match
-                  if (sysid == iHdr.sysid && itemid == iHdr.itemid)
-                  {
-                      found = true;
-                  }
-                  break;
-              default:
-                  // Should not get here
-                  NVOCMP_EXCEPTION(p, NVINTF_BADPARAM);
-                  NVOCMP_ASSERT(false, "Unhandled case in findItem().")
-#ifdef NVOCMP_GPRAM
-                  NVOCMP_restoreCache(vm);
-#endif
-                  return(NVINTF_BADPARAM);
-              }
-              // Item found - return offset of item header
-              if (found)
-              {
-                if((pInfo) && ((flag & NVOCMP_FINDHMASK) == NVOCMP_FINDCONTENT))
+                switch (flag & NVOCMP_FINDLMASK)
                 {
-                  if(!NVOCMP_readItem(&iHdr, 0, pInfo->rlength, pInfo->rBuf, false))
-                  {
-                    if(!memcmp((uint8_t *)pInfo->rBuf + pInfo->coff, pInfo->cBuf, pInfo->clength))
+                case NVOCMP_FINDANY:
+                    found = true;
+                    break;
+                case NVOCMP_FINDSTRICT:
+                    // Return first cid match
+                    if (cid == iHdr.cmpid)
                     {
-                      memcpy(pHdr, &iHdr, sizeof(NVOCMP_itemHdr_t));
-#ifdef NVOCMP_GPRAM
-                      NVOCMP_restoreCache(vm);
-#endif
-                      return(NVINTF_SUCCESS);
+                        found = true;
                     }
-                  }
-                  found = false;
+                    break;
+                case NVOCMP_FINDSYSID:
+                    // return first sysid match
+                    if (sysid == iHdr.sysid)
+                    {
+                        found = true;
+                    }
+                    break;
+                case NVOCMP_FINDITMID:
+                    // return first sysid AND itemid match
+                    if (sysid == iHdr.sysid && itemid == iHdr.itemid)
+                    {
+                        found = true;
+                    }
+                    break;
+                default:
+                    // Should not get here
+                    NVOCMP_EXCEPTION(p, NVINTF_BADPARAM);
+                    NVOCMP_ASSERT(false, "Unhandled case in findItem().")
+#ifdef NVOCMP_GPRAM
+                    NVOCMP_restoreCache(vm);
+#endif
+                    return (NVINTF_BADPARAM);
+                }
+                // Item found - return offset of item header
+                if (found)
+                {
+                    if ((pInfo) && ((flag & NVOCMP_FINDHMASK) == NVOCMP_FINDCONTENT))
+                    {
+                        if (!NVOCMP_readItem(&iHdr, 0, pInfo->rlength, pInfo->rBuf, false))
+                        {
+                            if (!memcmp((uint8_t *) pInfo->rBuf + pInfo->coff, pInfo->cBuf, pInfo->clength))
+                            {
+                                memcpy(pHdr, &iHdr, sizeof(NVOCMP_itemHdr_t));
+#ifdef NVOCMP_GPRAM
+                                NVOCMP_restoreCache(vm);
+#endif
+                                return (NVINTF_SUCCESS);
+                            }
+                        }
+                        found = false;
+                    }
+                    else
+                    {
+                        memcpy(pHdr, &iHdr, sizeof(NVOCMP_itemHdr_t));
+#ifdef NVOCMP_GPRAM
+                        NVOCMP_restoreCache(vm);
+#endif
+                        return (NVINTF_SUCCESS);
+                    }
+                }
+            }
+            // Try to jump to next item
+            if (iHdr.stats & NVOCMP_FOLLOWBIT)
+            {
+                // Appears to be an item there, check bounds
+                if (iHdr.len < ofs)
+                {
+                    // Adjust offset for next try
+                    ofs -= iHdr.len;
                 }
                 else
                 {
-                  memcpy(pHdr, &iHdr, sizeof(NVOCMP_itemHdr_t));
+                    // Length is corrupt, mark item invalid and compact
+                    NVOCMP_ALERT(false, "Item length corrupted. Deleting item.")
+                    NVOCMP_setItemInactive(pNvHandle, p, ofs);
 #ifdef NVOCMP_GPRAM
-                  NVOCMP_restoreCache(vm);
+                    NVOCMP_restoreCache(vm);
 #endif
-                  return(NVINTF_SUCCESS);
+                    NVOCMP_compactPage(pNvHandle, 0);
+                    return (NVINTF_CORRUPT);
                 }
-              }
-          }
-          // Try to jump to next item
-          if(iHdr.stats & NVOCMP_FOLLOWBIT)
-          {
-              // Appears to be an item there, check bounds
-              if(iHdr.len < ofs)
-              {
-                  // Adjust offset for next try
-                  ofs -= iHdr.len;
-              }
-              else
-              {
-                  // Length is corrupt, mark item invalid and compact
-                  NVOCMP_ALERT(false, "Item length corrupted. Deleting item.")
-                  NVOCMP_setItemInactive(pNvHandle, p, ofs);
+            }
+            else
+            {
+                // Something is corrupted, compact to fix
+                NVOCMP_ALERT(false,
+                             "No item following current item, "
+                             "compaction needed.")
 #ifdef NVOCMP_GPRAM
-                  NVOCMP_restoreCache(vm);
+                NVOCMP_restoreCache(vm);
 #endif
-                  NVOCMP_compactPage(pNvHandle, 0);
-                  return(NVINTF_CORRUPT);
-              }
-          }
-          else
-          {
-              // Something is corrupted, compact to fix
-              NVOCMP_ALERT(false, "No item following current item, "
-                      "compaction needed.")
-#ifdef NVOCMP_GPRAM
-              NVOCMP_restoreCache(vm);
-#endif
-              NVOCMP_compactPage(pNvHandle, 0);
-              return(NVINTF_CORRUPT);
-          }
-          // Running count of items searched
-          items += 1;
-      }
+                NVOCMP_compactPage(pNvHandle, 0);
+                return (NVINTF_CORRUPT);
+            }
+            // Running count of items searched
+            items += 1;
+        }
     }
 #ifdef NVOCMP_GPRAM
     NVOCMP_restoreCache(vm);
@@ -3443,131 +3428,131 @@ static int8_t NVOCMP_findItem(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg, uint16_t
     // Item not found (negate number of items searched)
     // or nth not found, return last found
     pHdr->hofs = 0;
-    return(NVINTF_NOTFOUND);
+    return (NVINTF_NOTFOUND);
 }
 #else
-static int8_t NVOCMP_findItem(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg, uint16_t ofs,
-                              NVOCMP_itemHdr_t *pHdr, int8_t flag, NVOCMP_itemInfo_t *pInfo)
+static int8_t NVOCMP_findItem(NVOCMP_nvHandle_t * pNvHandle, uint8_t pg, uint16_t ofs, NVOCMP_itemHdr_t * pHdr, int8_t flag,
+                              NVOCMP_itemInfo_t * pInfo)
 {
     bool found = false;
     uint8_t p;
-    uint16_t items = 0;
+    uint16_t items      = 0;
     uint16_t nvSearched = 0;
-    uint32_t cid = NVOCMP_CMPRID(pHdr->sysid,pHdr->itemid,pHdr->subid);
+    uint32_t cid        = NVOCMP_CMPRID(pHdr->sysid, pHdr->itemid, pHdr->subid);
 
-    for(p = pg; nvSearched < NVOCMP_NVSIZE; p = NVOCMP_DECPAGE(p), ofs = pNvHandle->pageInfo[p].offset)
+    for (p = pg; nvSearched < NVOCMP_NVSIZE; p = NVOCMP_DECPAGE(p), ofs = pNvHandle->pageInfo[p].offset)
     {
-      nvSearched++;
+        nvSearched++;
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-      if(p == pNvHandle->tailPage)
-      {
-        continue;
-      }
+        if (p == pNvHandle->tailPage)
+        {
+            continue;
+        }
 #endif
-      while(ofs >= (NVOCMP_PGDATAOFS + NVOCMP_ITEMHDRLEN))
-      {
-          NVOCMP_itemHdr_t iHdr;
+        while (ofs >= (NVOCMP_PGDATAOFS + NVOCMP_ITEMHDRLEN))
+        {
+            NVOCMP_itemHdr_t iHdr;
 
-          // Align to start of item header
-          ofs -= NVOCMP_ITEMHDRLEN;
+            // Align to start of item header
+            ofs -= NVOCMP_ITEMHDRLEN;
 
-          // Read and decompress item header
-          NVOCMP_readHeader(p, ofs, &iHdr, false);
+            // Read and decompress item header
+            NVOCMP_readHeader(p, ofs, &iHdr, false);
 
-          if((iHdr.stats & NVOCMP_ACTIVEIDBIT) &&
-            !(iHdr.stats & NVOCMP_VALIDIDBIT))
-          {
-              uint32_t sysid = pHdr->sysid;
-              uint32_t itemid = pHdr->itemid;
+            if ((iHdr.stats & NVOCMP_ACTIVEIDBIT) && !(iHdr.stats & NVOCMP_VALIDIDBIT))
+            {
+                uint32_t sysid  = pHdr->sysid;
+                uint32_t itemid = pHdr->itemid;
 
-              switch (flag & NVOCMP_FINDLMASK)
-              {
-              case NVOCMP_FINDANY:
-                  found = true;
-                  break;
-              case NVOCMP_FINDSTRICT:
-                  // Return first cid match
-                  if (cid == iHdr.cmpid)
-                  {
-                      found = true;
-                  }
-                  break;
-              case NVOCMP_FINDSYSID:
-                  // return first sysid match
-                  if (sysid == iHdr.sysid)
-                  {
-                      found = true;
-                  }
-                  break;
-              case NVOCMP_FINDITMID:
-                  // return first sysid AND itemid match
-                  if (sysid == iHdr.sysid && itemid == iHdr.itemid)
-                  {
-                      found = true;
-                  }
-                  break;
-              default:
-                  // Should not get here
-                  NVOCMP_EXCEPTION(p, NVINTF_BADPARAM);
-                  NVOCMP_ASSERT(false, "Unhandled case in findItem().")
-                  return(NVINTF_BADPARAM);
-              }
-              // Item found - return offset of item header
-              if (found)
-              {
-                if((pInfo) && ((flag & NVOCMP_FINDHMASK) == NVOCMP_FINDCONTENT))
+                switch (flag & NVOCMP_FINDLMASK)
                 {
-                  if(!NVOCMP_readItem(&iHdr, 0, pInfo->rlength, pInfo->rBuf, false))
-                  {
-                    if(!memcmp((uint8_t *)pInfo->rBuf + pInfo->coff, pInfo->cBuf, pInfo->clength))
+                case NVOCMP_FINDANY:
+                    found = true;
+                    break;
+                case NVOCMP_FINDSTRICT:
+                    // Return first cid match
+                    if (cid == iHdr.cmpid)
                     {
-                      memcpy(pHdr, &iHdr, sizeof(NVOCMP_itemHdr_t));
-                      return(NVINTF_SUCCESS);
+                        found = true;
                     }
-                  }
-                  found = false;
+                    break;
+                case NVOCMP_FINDSYSID:
+                    // return first sysid match
+                    if (sysid == iHdr.sysid)
+                    {
+                        found = true;
+                    }
+                    break;
+                case NVOCMP_FINDITMID:
+                    // return first sysid AND itemid match
+                    if (sysid == iHdr.sysid && itemid == iHdr.itemid)
+                    {
+                        found = true;
+                    }
+                    break;
+                default:
+                    // Should not get here
+                    NVOCMP_EXCEPTION(p, NVINTF_BADPARAM);
+                    NVOCMP_ASSERT(false, "Unhandled case in findItem().")
+                    return (NVINTF_BADPARAM);
+                }
+                // Item found - return offset of item header
+                if (found)
+                {
+                    if ((pInfo) && ((flag & NVOCMP_FINDHMASK) == NVOCMP_FINDCONTENT))
+                    {
+                        if (!NVOCMP_readItem(&iHdr, 0, pInfo->rlength, pInfo->rBuf, false))
+                        {
+                            if (!memcmp((uint8_t *) pInfo->rBuf + pInfo->coff, pInfo->cBuf, pInfo->clength))
+                            {
+                                memcpy(pHdr, &iHdr, sizeof(NVOCMP_itemHdr_t));
+                                return (NVINTF_SUCCESS);
+                            }
+                        }
+                        found = false;
+                    }
+                    else
+                    {
+                        memcpy(pHdr, &iHdr, sizeof(NVOCMP_itemHdr_t));
+                        return (NVINTF_SUCCESS);
+                    }
+                }
+            }
+            // Try to jump to next item
+            if (iHdr.stats & NVOCMP_FOLLOWBIT)
+            {
+                // Appears to be an item there, check bounds
+                if (iHdr.len < ofs)
+                {
+                    // Adjust offset for next try
+                    ofs -= iHdr.len;
                 }
                 else
                 {
-                  memcpy(pHdr, &iHdr, sizeof(NVOCMP_itemHdr_t));
-                  return(NVINTF_SUCCESS);
+                    // Length is corrupt, mark item invalid and compact
+                    NVOCMP_ALERT(false, "Item length corrupted. Deleting item.")
+                    NVOCMP_setItemInactive(pNvHandle, p, ofs);
+                    NVOCMP_compactPage(pNvHandle, 0);
+                    return (NVINTF_CORRUPT);
                 }
-              }
-          }
-          // Try to jump to next item
-          if(iHdr.stats & NVOCMP_FOLLOWBIT)
-          {
-              // Appears to be an item there, check bounds
-              if(iHdr.len < ofs)
-              {
-                  // Adjust offset for next try
-                  ofs -= iHdr.len;
-              }
-              else
-              {
-                  // Length is corrupt, mark item invalid and compact
-                  NVOCMP_ALERT(false, "Item length corrupted. Deleting item.")
-                  NVOCMP_setItemInactive(pNvHandle, p, ofs);
-                  NVOCMP_compactPage(pNvHandle, 0);
-                  return(NVINTF_CORRUPT);
-              }
-          }
-          else
-          {
-              // Something is corrupted, compact to fix
-              NVOCMP_ALERT(false, "No item following current item, "
-                      "compaction needed.")
-              NVOCMP_compactPage(pNvHandle, 0);
-              return(NVINTF_CORRUPT);
-          }
-          // Running count of items searched
-          items += 1;
-      }
+            }
+            else
+            {
+                // Something is corrupted, compact to fix
+                NVOCMP_ALERT(false,
+                             "No item following current item, "
+                             "compaction needed.")
+                NVOCMP_compactPage(pNvHandle, 0);
+                return (NVINTF_CORRUPT);
+            }
+            // Running count of items searched
+            items += 1;
+        }
     }
     // Item not found (negate number of items searched)
     // or nth not found, return last found
     pHdr->hofs = 0;
-    return(NVINTF_NOTFOUND);
+    return (NVINTF_NOTFOUND);
 }
 #endif
 
@@ -3581,60 +3566,58 @@ static int8_t NVOCMP_findItem(NVOCMP_nvHandle_t *pNvHandle, uint8_t pg, uint16_t
  *
  * @return  Number of pages cleaned
  */
-static uint8_t NVOCMP_cleanPage(NVOCMP_nvHandle_t *pNvHandle)
+static uint8_t NVOCMP_cleanPage(NVOCMP_nvHandle_t * pNvHandle)
 {
-  uint8_t pg;
-  uint8_t pages = 0;
-  NVOCMP_pageHdr_t pageHdr;
-  NVOCMP_compactHdr_t startHdr;
-  NVOCMP_compactHdr_t endHdr;
+    uint8_t pg;
+    uint8_t pages = 0;
+    NVOCMP_pageHdr_t pageHdr;
+    NVOCMP_compactHdr_t startHdr;
+    NVOCMP_compactHdr_t endHdr;
 
-  /* correct ofset */
-  pg = pNvHandle->compactInfo.xDstPage;
-  NVOCMP_getCompactHdr(pg, XSRCSTARTHDR, &startHdr);
-  NVOCMP_getCompactHdr(pg, XSRCENDHDR, &endHdr);
-  for(pg = pNvHandle->compactInfo.xSrcSPage;
-      pg != NVOCMP_INCPAGE(pNvHandle->compactInfo.xSrcEPage);
-      pg = NVOCMP_INCPAGE(pg))
-  {
-    if(pg == endHdr.page)
+    /* correct ofset */
+    pg = pNvHandle->compactInfo.xDstPage;
+    NVOCMP_getCompactHdr(pg, XSRCSTARTHDR, &startHdr);
+    NVOCMP_getCompactHdr(pg, XSRCENDHDR, &endHdr);
+    for (pg = pNvHandle->compactInfo.xSrcSPage; pg != NVOCMP_INCPAGE(pNvHandle->compactInfo.xSrcEPage); pg = NVOCMP_INCPAGE(pg))
     {
-      pNvHandle->pageInfo[pg].offset = endHdr.pageOffset;
-    }
-    else
-    {
-      pNvHandle->pageInfo[pg].offset = NVOCMP_PGDATAOFS;
-    }
-  }
-  /* end of correction */
-
-  for(pg = pNvHandle->compactInfo.xSrcSPage; pg != NVOCMP_INCPAGE(pNvHandle->compactInfo.xSrcEPage); pg = NVOCMP_INCPAGE(pg))
-  {
-    if(pNvHandle->pageInfo[pg].offset == NVOCMP_PGDATAOFS)
-    {
-      pages++;
-      NVOCMP_failW = NVOCMP_erase(pNvHandle, pg);
-    }
-    else
-    {
-      NVOCMP_failW = NVOCMP_write(pg, (THISPAGEHDR + 1) * NVOCMP_COMPACTHDRLEN,
-                                  (uint8_t *)&pNvHandle->pageInfo[pg].offset, sizeof(pNvHandle->pageInfo[pg].offset));
-      NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
-      if(pageHdr.state == NVOCMP_PGACT)
-      {
-        NVOCMP_changePageState(pNvHandle, pg, NVOCMP_PGFULL);
-      }
-      else
-      {
-        //this should not hit
-        if(pageHdr.state == NVOCMP_PGXDST)
+        if (pg == endHdr.page)
         {
-          NVOCMP_ASSERT1(0);
+            pNvHandle->pageInfo[pg].offset = endHdr.pageOffset;
         }
-      }
+        else
+        {
+            pNvHandle->pageInfo[pg].offset = NVOCMP_PGDATAOFS;
+        }
     }
-  }
-  return(pages);
+    /* end of correction */
+
+    for (pg = pNvHandle->compactInfo.xSrcSPage; pg != NVOCMP_INCPAGE(pNvHandle->compactInfo.xSrcEPage); pg = NVOCMP_INCPAGE(pg))
+    {
+        if (pNvHandle->pageInfo[pg].offset == NVOCMP_PGDATAOFS)
+        {
+            pages++;
+            NVOCMP_failW = NVOCMP_erase(pNvHandle, pg);
+        }
+        else
+        {
+            NVOCMP_failW = NVOCMP_write(pg, (THISPAGEHDR + 1) * NVOCMP_COMPACTHDRLEN, (uint8_t *) &pNvHandle->pageInfo[pg].offset,
+                                        sizeof(pNvHandle->pageInfo[pg].offset));
+            NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *) &pageHdr, NVOCMP_PGHDRLEN);
+            if (pageHdr.state == NVOCMP_PGACT)
+            {
+                NVOCMP_changePageState(pNvHandle, pg, NVOCMP_PGFULL);
+            }
+            else
+            {
+                // this should not hit
+                if (pageHdr.state == NVOCMP_PGXDST)
+                {
+                    NVOCMP_ASSERT1(0);
+                }
+            }
+        }
+    }
+    return (pages);
 }
 #endif
 
@@ -3657,187 +3640,187 @@ static uint8_t NVOCMP_cleanPage(NVOCMP_nvHandle_t *pNvHandle)
  *
  * @return  Number of available bytes on compacted page, -1 if error
  */
-static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t nBytes)
+static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t * pNvHandle, uint16_t nBytes)
 {
-  uint8_t pg;
-  uint8_t mode;
-  uint8_t srcPg;
-  uint8_t dstPg;
-  uint16_t needBytes;
-  uint16_t compactPages;
-  uint16_t cleanPages;
-  uint16_t skipPages = 0;
-  bool foundRoom = false;
-  NVOCMP_compactStatus_t status;
-  NVOCMP_pageHdr_t pageHdr;
-  uint8_t allActivePages = 0;
-  uint8_t err = NVINTF_SUCCESS;
+    uint8_t pg;
+    uint8_t mode;
+    uint8_t srcPg;
+    uint8_t dstPg;
+    uint16_t needBytes;
+    uint16_t compactPages;
+    uint16_t cleanPages;
+    uint16_t skipPages = 0;
+    bool foundRoom     = false;
+    NVOCMP_compactStatus_t status;
+    NVOCMP_pageHdr_t pageHdr;
+    uint8_t allActivePages = 0;
+    uint8_t err            = NVINTF_SUCCESS;
 
-  // Check voltage if possible
-  NVOCMP_FLASHACCESS(err)
-  if(err)
-  {
-    return(0);
-  }
-
-  srcPg = pNvHandle->headPage;
-  dstPg = pNvHandle->tailPage;
-  compactPages = NVOCMP_NVSIZE - 1;
-  if(nBytes)
-  {
-    pNvHandle->compactInfo.xSrcPages = 1;
-  }
-  else
-  {
-    pNvHandle->compactInfo.xSrcPages = NVOCMP_NVSIZE - 1;
-  }
-
-  // mark page mode
-  for(pg = 0; pg < NVOCMP_NVSIZE; pg++)
-  {
-    if(pg != dstPg)
+    // Check voltage if possible
+    NVOCMP_FLASHACCESS(err)
+    if (err)
     {
-      NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
-      if(pageHdr.allActive)
-      {
-        allActivePages++;
-      }
-      if(pageHdr.state == NVOCMP_PGACT || pageHdr.state == NVOCMP_PGFULL)
-      {
-        mode = NVOCMP_PGCSRC;
-        NVOCMP_writeByte(pg, NVOCMP_COMPMODEOFS, mode);
-        pNvHandle->pageInfo[pg].mode = mode;
-      }
+        return (0);
     }
-  }
 
-  if(allActivePages == NVOCMP_NVSIZE - 1)
-  {
-    return(0);
-  }
-
-  while(compactPages)
-  {
-    if(pNvHandle->compactInfo.xSrcPages == 0)
+    srcPg        = pNvHandle->headPage;
+    dstPg        = pNvHandle->tailPage;
+    compactPages = NVOCMP_NVSIZE - 1;
+    if (nBytes)
     {
-      pNvHandle->compactInfo.xSrcPages = 1;
+        pNvHandle->compactInfo.xSrcPages = 1;
     }
-    // Get page header
-    NVOCMP_read(srcPg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
+    else
+    {
+        pNvHandle->compactInfo.xSrcPages = NVOCMP_NVSIZE - 1;
+    }
+
+    // mark page mode
+    for (pg = 0; pg < NVOCMP_NVSIZE; pg++)
+    {
+        if (pg != dstPg)
+        {
+            NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *) &pageHdr, NVOCMP_PGHDRLEN);
+            if (pageHdr.allActive)
+            {
+                allActivePages++;
+            }
+            if (pageHdr.state == NVOCMP_PGACT || pageHdr.state == NVOCMP_PGFULL)
+            {
+                mode = NVOCMP_PGCSRC;
+                NVOCMP_writeByte(pg, NVOCMP_COMPMODEOFS, mode);
+                pNvHandle->pageInfo[pg].mode = mode;
+            }
+        }
+    }
+
+    if (allActivePages == NVOCMP_NVSIZE - 1)
+    {
+        return (0);
+    }
+
+    while (compactPages)
+    {
+        if (pNvHandle->compactInfo.xSrcPages == 0)
+        {
+            pNvHandle->compactInfo.xSrcPages = 1;
+        }
+        // Get page header
+        NVOCMP_read(srcPg, NVOCMP_PGHDROFS, (uint8_t *) &pageHdr, NVOCMP_PGHDRLEN);
 #if NVOCMP_FASTCP
-    if(nBytes && pageHdr.allActive)
-    {
-      srcPg = NVOCMP_INCPAGE(srcPg);
-      pNvHandle->compactInfo.xDstOffset = FLASH_PAGE_SIZE;
-      pNvHandle->compactInfo.xSrcSPage = srcPg;
-      pNvHandle->compactInfo.xSrcPages--;
-      compactPages--;
-      skipPages++;
-      continue;
-    }
+        if (nBytes && pageHdr.allActive)
+        {
+            srcPg                             = NVOCMP_INCPAGE(srcPg);
+            pNvHandle->compactInfo.xDstOffset = FLASH_PAGE_SIZE;
+            pNvHandle->compactInfo.xSrcSPage  = srcPg;
+            pNvHandle->compactInfo.xSrcPages--;
+            compactPages--;
+            skipPages++;
+            continue;
+        }
 #endif
-    // Mark source page to be in PGXSRC state
-    if(pageHdr.state != NVOCMP_PGXSRC)
-    {
-      NVOCMP_changePageState(pNvHandle, srcPg, NVOCMP_PGXSRC);
-    }
-    // Get page header
-    NVOCMP_read(dstPg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
-    // Mark destination page to be in PGXDST state
-    if(pageHdr.state != NVOCMP_PGXDST)
-    {
-      NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGXDST);
+        // Mark source page to be in PGXSRC state
+        if (pageHdr.state != NVOCMP_PGXSRC)
+        {
+            NVOCMP_changePageState(pNvHandle, srcPg, NVOCMP_PGXSRC);
+        }
+        // Get page header
+        NVOCMP_read(dstPg, NVOCMP_PGHDROFS, (uint8_t *) &pageHdr, NVOCMP_PGHDRLEN);
+        // Mark destination page to be in PGXDST state
+        if (pageHdr.state != NVOCMP_PGXDST)
+        {
+            NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGXDST);
+        }
+
+        mode = NVOCMP_PGCDST;
+        NVOCMP_writeByte(dstPg, NVOCMP_COMPMODEOFS, mode);
+        pNvHandle->pageInfo[dstPg].mode = mode;
+
+        pNvHandle->compactInfo.xDstPage    = dstPg;
+        pNvHandle->compactInfo.xDstOffset  = FLASH_PAGE_SIZE;
+        pNvHandle->compactInfo.xSrcSPage   = srcPg;
+        pNvHandle->compactInfo.xSrcSOffset = pNvHandle->pageInfo[srcPg].offset;
+        pNvHandle->compactInfo.xSrcEPage   = NVOCMP_NULLPAGE;
+        pNvHandle->compactInfo.xSrcEOffset = 0;
+        status                             = NVOCMP_compact(pNvHandle);
+
+        if (status == NVOCMP_COMPACT_FAILURE)
+        {
+            return (0);
+        }
+
+        needBytes = nBytes ? nBytes : 16;
+
+        if (nBytes)
+        {
+            if (FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset >= needBytes)
+            {
+                foundRoom = true;
+            }
+        }
+        // change XDST page state
+        if (FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset >= needBytes)
+        {
+            NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGACT);
+        }
+        else
+        {
+            NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGFULL);
+        }
+        // clean XSRC pages
+        cleanPages = NVOCMP_cleanPage(pNvHandle);
+        compactPages -= cleanPages;
+        pNvHandle->compactInfo.xSrcPages -= cleanPages;
+
+        // mark XDST page as done
+        mode = NVOCMP_PGCDONE;
+        NVOCMP_writeByte(dstPg, NVOCMP_COMPMODEOFS, mode);
+        pNvHandle->pageInfo[dstPg].mode = mode;
+
+        // move tail page and head page
+        pNvHandle->tailPage = NVOCMP_ADDPAGE(pNvHandle->tailPage, cleanPages + skipPages);
+        pNvHandle->headPage = NVOCMP_INCPAGE(pNvHandle->tailPage);
+        skipPages           = 0;
+        // set next source page
+        if (pNvHandle->pageInfo[pNvHandle->compactInfo.xSrcEPage].offset == NVOCMP_PGDATAOFS)
+        {
+            srcPg = NVOCMP_INCPAGE(pNvHandle->compactInfo.xSrcEPage);
+        }
+        else
+        {
+            srcPg = pNvHandle->compactInfo.xSrcEPage;
+        }
+
+        // set next destination page
+        dstPg = pNvHandle->tailPage;
+        if (nBytes && foundRoom)
+        {
+            break;
+        }
     }
 
-    mode = NVOCMP_PGCDST;
-    NVOCMP_writeByte(dstPg, NVOCMP_COMPMODEOFS, mode);
-    pNvHandle->pageInfo[dstPg].mode = mode;
-
-    pNvHandle->compactInfo.xDstPage = dstPg;
-    pNvHandle->compactInfo.xDstOffset = FLASH_PAGE_SIZE;
-    pNvHandle->compactInfo.xSrcSPage = srcPg;
-    pNvHandle->compactInfo.xSrcSOffset = pNvHandle->pageInfo[srcPg].offset;
-    pNvHandle->compactInfo.xSrcEPage = NVOCMP_NULLPAGE;
-    pNvHandle->compactInfo.xSrcEOffset = 0;
-    status = NVOCMP_compact(pNvHandle);
-
-    if(status == NVOCMP_COMPACT_FAILURE)
+    pg = NVOCMP_findPage(NVOCMP_PGACT);
+    if (pg == NVOCMP_NULLPAGE)
     {
-      return(0);
+        pg = NVOCMP_findPage(NVOCMP_PGRDY);
+        if (pg == NVOCMP_NULLPAGE)
+        {
+            if (pNvHandle->pageInfo[pNvHandle->headPage].state == NVOCMP_PGNACT)
+            {
+                pg = pNvHandle->headPage;
+                NVOCMP_changePageState(pNvHandle, pg, NVOCMP_PGRDY);
+            }
+            else
+            {
+                pg = NVOCMP_DECPAGE(pNvHandle->tailPage);
+            }
+        }
     }
 
-    needBytes = nBytes ? nBytes : 16;
-
-    if(nBytes)
-    {
-      if(FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset >= needBytes)
-      {
-        foundRoom = true;
-      }
-    }
-    // change XDST page state
-    if(FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset >= needBytes)
-    {
-      NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGACT);
-    }
-    else
-    {
-      NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGFULL);
-    }
-    // clean XSRC pages
-    cleanPages = NVOCMP_cleanPage(pNvHandle);
-    compactPages -= cleanPages;
-    pNvHandle->compactInfo.xSrcPages -= cleanPages;
-
-    // mark XDST page as done
-    mode = NVOCMP_PGCDONE;
-    NVOCMP_writeByte(dstPg, NVOCMP_COMPMODEOFS, mode);
-    pNvHandle->pageInfo[dstPg].mode = mode;
-
-    // move tail page and head page
-    pNvHandle->tailPage = NVOCMP_ADDPAGE(pNvHandle->tailPage, cleanPages + skipPages);
-    pNvHandle->headPage = NVOCMP_INCPAGE(pNvHandle->tailPage);
-    skipPages = 0;
-    // set next source page
-    if(pNvHandle->pageInfo[pNvHandle->compactInfo.xSrcEPage].offset == NVOCMP_PGDATAOFS)
-    {
-      srcPg = NVOCMP_INCPAGE(pNvHandle->compactInfo.xSrcEPage);
-    }
-    else
-    {
-      srcPg = pNvHandle->compactInfo.xSrcEPage;
-    }
-
-    // set next destination page
-    dstPg = pNvHandle->tailPage;
-    if(nBytes && foundRoom)
-    {
-      break;
-    }
-  }
-
-  pg = NVOCMP_findPage(NVOCMP_PGACT);
-  if(pg == NVOCMP_NULLPAGE)
-  {
-    pg = NVOCMP_findPage(NVOCMP_PGRDY);
-    if(pg == NVOCMP_NULLPAGE)
-    {
-      if(pNvHandle->pageInfo[pNvHandle->headPage].state == NVOCMP_PGNACT)
-      {
-        pg = pNvHandle->headPage;
-        NVOCMP_changePageState(pNvHandle, pg, NVOCMP_PGRDY);
-      }
-      else
-      {
-        pg = NVOCMP_DECPAGE(pNvHandle->tailPage);
-      }
-    }
-  }
-
-  pNvHandle->actPage = pg;
-  pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
-  NVOCMP_changePageState(pNvHandle, pNvHandle->tailPage, NVOCMP_PGXDST);
-  return(FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset);
+    pNvHandle->actPage   = pg;
+    pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
+    NVOCMP_changePageState(pNvHandle, pNvHandle->tailPage, NVOCMP_PGXDST);
+    return (FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset);
 }
 #else
 /******************************************************************************
@@ -3858,147 +3841,147 @@ static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t nBytes)
  *
  * @return  Number of available bytes on compacted page, -1 if error
  */
-static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t *pNvHandle, uint16_t nBytes)
+static int16_t NVOCMP_compactPage(NVOCMP_nvHandle_t * pNvHandle, uint16_t nBytes)
 {
-  uint8_t pg;
-  uint8_t mode;
-  uint8_t srcPg;
-  uint8_t dstPg;
-  uint16_t needBytes;
+    uint8_t pg;
+    uint8_t mode;
+    uint8_t srcPg;
+    uint8_t dstPg;
+    uint16_t needBytes;
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
-  uint16_t compactPages;
-  uint16_t cleanPages;
-  uint16_t skipPages = 0;
-  bool foundRoom = false;
+    uint16_t compactPages;
+    uint16_t cleanPages;
+    uint16_t skipPages = 0;
+    bool foundRoom     = false;
 #endif
-  NVOCMP_compactStatus_t status;
-  NVOCMP_pageHdr_t pageHdr;
-  uint8_t allActivePages = 0;
+    NVOCMP_compactStatus_t status;
+    NVOCMP_pageHdr_t pageHdr;
+    uint8_t allActivePages = 0;
 
-  srcPg = 0;
-  dstPg = 0;
-  pNvHandle->compactInfo.xSrcPages = 1;
+    srcPg                            = 0;
+    dstPg                            = 0;
+    pNvHandle->compactInfo.xSrcPages = 1;
 
-  // mark page mode
-  pg = 0;
-  NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
-  if(pageHdr.allActive)
-  {
-    allActivePages++;
-  }
-  if(pageHdr.state == NVOCMP_PGACT || pageHdr.state == NVOCMP_PGFULL)
-  {
-    mode = NVOCMP_PGCSRC;
-    NVOCMP_writeByte(pg, NVOCMP_COMPMODEOFS, mode);
-    pNvHandle->pageInfo[pg].mode = mode;
-  }
-
-  if(allActivePages)
-  {
-    return(0);
-  }
-
-  // Get page header
-  NVOCMP_read(srcPg, NVOCMP_PGHDROFS, (uint8_t *)&pageHdr, NVOCMP_PGHDRLEN);
-  // Mark source page to be in PGXSRC state
-  if(pageHdr.state != NVOCMP_PGXSRC)
-  {
-    NVOCMP_changePageState(pNvHandle, srcPg, NVOCMP_PGXSRC);
-  }
-
-  pNvHandle->compactInfo.xDstPage = dstPg;
-  pNvHandle->compactInfo.xDstOffset = FLASH_PAGE_SIZE;
-  pNvHandle->compactInfo.xSrcSPage = srcPg;
-  pNvHandle->compactInfo.xSrcSOffset = pNvHandle->pageInfo[srcPg].offset;
-  pNvHandle->compactInfo.xSrcEPage = NVOCMP_NULLPAGE;
-  pNvHandle->compactInfo.xSrcEOffset = 0;
-  status = NVOCMP_compact(pNvHandle);
-
-  if(status == NVOCMP_COMPACT_FAILURE)
-  {
-    return(0);
-  }
-
-  needBytes = nBytes ? nBytes : 16;
-
-  // change XDST page state
-  if(FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset >= needBytes)
-  {
-    NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGACT);
-  }
-  else
-  {
-    NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGFULL);
-  }
-
-  // mark XDST page as done
-  mode = NVOCMP_PGCDONE;
-  NVOCMP_writeByte(dstPg, NVOCMP_COMPMODEOFS, mode);
-  pNvHandle->pageInfo[dstPg].mode = mode;
-
-  // move tail page and head page
-  pNvHandle->tailPage = 0;
-  pNvHandle->headPage = 0;
-
-  pNvHandle->actPage = 0;
-  pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
-  return(FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset);
-}
-#endif
-
-/******************************************************************************
-* @fn      NVOCMP_findSignature
-*
-* @brief   Local function to scan page to get page information
-*
-* @param   pg - page to search
-* @param   pSrcOff - source off to start search from
-*
-* @return  NVINTF_SUCCESS or specific failure code
-*/
-static bool NVOCMP_findSignature(uint8_t pg, uint16_t *pSrcOff)
-{
-  uint16_t i;
-  uint16_t rdLen;
-  uint8_t readBuffer[NVOCMP_XFERBLKMAX];
-  uint16_t srcOff = *pSrcOff;
-  uint16_t endOff = NVOCMP_PGDATAOFS + NVOCMP_ITEMHDRLEN - 1;
-
-  while(srcOff > endOff)
-  {
-    rdLen = (srcOff - NVOCMP_XFERBLKMAX > endOff) ? NVOCMP_XFERBLKMAX : srcOff - endOff;
-    srcOff -= rdLen;
-    NVOCMP_read(pg, srcOff, readBuffer, rdLen);
-    for(i = rdLen; i > 0; i--)
+    // mark page mode
+    pg = 0;
+    NVOCMP_read(pg, NVOCMP_PGHDROFS, (uint8_t *) &pageHdr, NVOCMP_PGHDRLEN);
+    if (pageHdr.allActive)
     {
-      if(readBuffer[i-1] == NVOCMP_SIGNATURE)
-      {
-        // Found possible header, resume normal operation
-        NVOCMP_ALERT(false, "Found possible signature.")
-        srcOff += i;        // srcOff should point to one byte ahead
-        *pSrcOff = srcOff;
-        return(true);
-      }
+        allActivePages++;
     }
-  }
-  return(false);
+    if (pageHdr.state == NVOCMP_PGACT || pageHdr.state == NVOCMP_PGFULL)
+    {
+        mode = NVOCMP_PGCSRC;
+        NVOCMP_writeByte(pg, NVOCMP_COMPMODEOFS, mode);
+        pNvHandle->pageInfo[pg].mode = mode;
+    }
+
+    if (allActivePages)
+    {
+        return (0);
+    }
+
+    // Get page header
+    NVOCMP_read(srcPg, NVOCMP_PGHDROFS, (uint8_t *) &pageHdr, NVOCMP_PGHDRLEN);
+    // Mark source page to be in PGXSRC state
+    if (pageHdr.state != NVOCMP_PGXSRC)
+    {
+        NVOCMP_changePageState(pNvHandle, srcPg, NVOCMP_PGXSRC);
+    }
+
+    pNvHandle->compactInfo.xDstPage    = dstPg;
+    pNvHandle->compactInfo.xDstOffset  = FLASH_PAGE_SIZE;
+    pNvHandle->compactInfo.xSrcSPage   = srcPg;
+    pNvHandle->compactInfo.xSrcSOffset = pNvHandle->pageInfo[srcPg].offset;
+    pNvHandle->compactInfo.xSrcEPage   = NVOCMP_NULLPAGE;
+    pNvHandle->compactInfo.xSrcEOffset = 0;
+    status                             = NVOCMP_compact(pNvHandle);
+
+    if (status == NVOCMP_COMPACT_FAILURE)
+    {
+        return (0);
+    }
+
+    needBytes = nBytes ? nBytes : 16;
+
+    // change XDST page state
+    if (FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset >= needBytes)
+    {
+        NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGACT);
+    }
+    else
+    {
+        NVOCMP_changePageState(pNvHandle, dstPg, NVOCMP_PGFULL);
+    }
+
+    // mark XDST page as done
+    mode = NVOCMP_PGCDONE;
+    NVOCMP_writeByte(dstPg, NVOCMP_COMPMODEOFS, mode);
+    pNvHandle->pageInfo[dstPg].mode = mode;
+
+    // move tail page and head page
+    pNvHandle->tailPage = 0;
+    pNvHandle->headPage = 0;
+
+    pNvHandle->actPage   = 0;
+    pNvHandle->actOffset = pNvHandle->pageInfo[pNvHandle->actPage].offset;
+    return (FLASH_PAGE_SIZE - pNvHandle->compactInfo.xDstOffset);
+}
+#endif
+
+/******************************************************************************
+ * @fn      NVOCMP_findSignature
+ *
+ * @brief   Local function to scan page to get page information
+ *
+ * @param   pg - page to search
+ * @param   pSrcOff - source off to start search from
+ *
+ * @return  NVINTF_SUCCESS or specific failure code
+ */
+static bool NVOCMP_findSignature(uint8_t pg, uint16_t * pSrcOff)
+{
+    uint16_t i;
+    uint16_t rdLen;
+    uint8_t readBuffer[NVOCMP_XFERBLKMAX];
+    uint16_t srcOff = *pSrcOff;
+    uint16_t endOff = NVOCMP_PGDATAOFS + NVOCMP_ITEMHDRLEN - 1;
+
+    while (srcOff > endOff)
+    {
+        rdLen = (srcOff - NVOCMP_XFERBLKMAX > endOff) ? NVOCMP_XFERBLKMAX : srcOff - endOff;
+        srcOff -= rdLen;
+        NVOCMP_read(pg, srcOff, readBuffer, rdLen);
+        for (i = rdLen; i > 0; i--)
+        {
+            if (readBuffer[i - 1] == NVOCMP_SIGNATURE)
+            {
+                // Found possible header, resume normal operation
+                NVOCMP_ALERT(false, "Found possible signature.")
+                srcOff += i; // srcOff should point to one byte ahead
+                *pSrcOff = srcOff;
+                return (true);
+            }
+        }
+    }
+    return (false);
 }
 
 #if (NVOCMP_NVPAGES != NVOCMP_NVONEP)
 /******************************************************************************
-* @fn      NVOCMP_compact
-*
-* @brief   Local function to compact NV
-*
-* @param   pNvHandle - pointer to NV handler
-*
-* @return  NVINTF_SUCCESS or specific failure code
-*/
-static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
+ * @fn      NVOCMP_compact
+ *
+ * @brief   Local function to compact NV
+ *
+ * @param   pNvHandle - pointer to NV handler
+ *
+ * @return  NVINTF_SUCCESS or specific failure code
+ */
+static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t * pNvHandle)
 {
     bool needScan = false;
     bool needSkip = false;
-    bool dstFull = false;
+    bool dstFull  = false;
     uint16_t dstOff;
     uint16_t endOff;
     uint16_t srcOff;
@@ -4007,12 +3990,12 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
     uint8_t srcEndPg;
     uint8_t dstPg;
     uint8_t srcPg;
-    uint32_t aItem=0;
+    uint32_t aItem = 0;
 #ifdef NVOCMP_GPRAM
     uint32_t vm;
-    uint8_t *pTBuffer = RAM_BUFFER_ADDRESS;
+    uint8_t * pTBuffer = RAM_BUFFER_ADDRESS;
 #else
-    uint8_t *pTBuffer = (uint8_t *)tBuffer;
+    uint8_t * pTBuffer = (uint8_t *) tBuffer;
 #endif
     NVOCMP_compactStatus_t status = NVOCMP_COMPACT_SUCCESS;
 
@@ -4021,15 +4004,15 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
 #endif
     // Reset Flash erase/write fail indicator
     NVOCMP_failW = NVINTF_SUCCESS;
-    srcStartPg = pNvHandle->compactInfo.xSrcSPage;
-    srcEndPg = NVOCMP_ADDPAGE(srcStartPg, pNvHandle->compactInfo.xSrcPages - 1);
+    srcStartPg   = pNvHandle->compactInfo.xSrcSPage;
+    srcEndPg     = NVOCMP_ADDPAGE(srcStartPg, pNvHandle->compactInfo.xSrcPages - 1);
 
     // Stop looking when we get to this offset
     endOff = NVOCMP_PGDATAOFS + NVOCMP_ITEMHDRLEN - 1;
 
-    srcPg = srcStartPg;
+    srcPg  = srcStartPg;
     srcOff = pNvHandle->pageInfo[srcPg].offset;
-    dstPg = pNvHandle->compactInfo.xDstPage;
+    dstPg  = pNvHandle->compactInfo.xDstPage;
     dstOff = pNvHandle->pageInfo[dstPg].offset;
 
     NVOCMP_ALERT(false, "Compaction triggered.")
@@ -4037,37 +4020,37 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
 #ifdef NVOCMP_GPRAM
     NVOCMP_disableCache(&vm);
 #endif
-    while(srcPg != dstPg)
+    while (srcPg != dstPg)
     {
-        if(dstFull)
+        if (dstFull)
         {
-          if(aItem)
-          {
-            pNvHandle->pageInfo[srcPg].offset = srcOff;
-          }
-          break;
-        }
-
-        if(srcOff <= endOff)
-        {
-          if(aItem)
-          {
-            pNvHandle->pageInfo[srcPg].offset = srcOff;
-          }
-          if(srcPg == srcEndPg)
-          {
+            if (aItem)
+            {
+                pNvHandle->pageInfo[srcPg].offset = srcOff;
+            }
             break;
-          }
-          else
-          {
-            srcPg = NVOCMP_INCPAGE(srcPg);
-            srcOff = pNvHandle->pageInfo[srcPg].offset;
-            aItem = 0;
-            continue;
-          }
         }
 
-        if(NVOCMP_failW == NVINTF_SUCCESS)
+        if (srcOff <= endOff)
+        {
+            if (aItem)
+            {
+                pNvHandle->pageInfo[srcPg].offset = srcOff;
+            }
+            if (srcPg == srcEndPg)
+            {
+                break;
+            }
+            else
+            {
+                srcPg  = NVOCMP_INCPAGE(srcPg);
+                srcOff = pNvHandle->pageInfo[srcPg].offset;
+                aItem  = 0;
+                continue;
+            }
+        }
+
+        if (NVOCMP_failW == NVINTF_SUCCESS)
         {
             NVOCMP_itemHdr_t srcHdr;
             uint16_t dataLen;
@@ -4082,83 +4065,81 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
             itemSize = NVOCMP_ITEMHDRLEN + dataLen;
 
             // Check if length is safe
-            if (srcOff < (dataLen + NVOCMP_PGDATAOFS) ||
-                    (NVOCMP_SIGNATURE != srcHdr.sig))
+            if (srcOff < (dataLen + NVOCMP_PGDATAOFS) || (NVOCMP_SIGNATURE != srcHdr.sig))
             {
                 needScan = true;
             }
             else
             {
-              if(!(srcHdr.stats & NVOCMP_VALIDIDBIT) && srcHdr.stats & NVOCMP_ACTIVEIDBIT)
-              {
-                NVOCMP_ALERT(srcOff >= (dataLen + NVOCMP_PGDATAOFS),
-                             "Item header corrupted, data length too long.")
-                crcOff    = srcOff - dataLen;
-                if(NVOCMP_verifyCRC(crcOff,dataLen,srcHdr.crc8, srcPg, false))
+                if (!(srcHdr.stats & NVOCMP_VALIDIDBIT) && srcHdr.stats & NVOCMP_ACTIVEIDBIT)
                 {
-                  // Invalid CRC, corruption
-                  NVOCMP_ALERT(false, "Item CRC incorrect!")
-                  needScan = true;
-                  srcOff--;
+                    NVOCMP_ALERT(srcOff >= (dataLen + NVOCMP_PGDATAOFS), "Item header corrupted, data length too long.")
+                    crcOff = srcOff - dataLen;
+                    if (NVOCMP_verifyCRC(crcOff, dataLen, srcHdr.crc8, srcPg, false))
+                    {
+                        // Invalid CRC, corruption
+                        NVOCMP_ALERT(false, "Item CRC incorrect!")
+                        needScan = true;
+                        srcOff--;
+                    }
+                    else
+                    {
+                        needScan = false;
+                        needSkip = false;
+                    }
                 }
                 else
                 {
-                  needScan = false;
-                  needSkip = false;
+                    needScan = false;
+                    needSkip = true;
                 }
-              }
-              else
-              {
-                needScan = false;
-                needSkip = true;
-              }
             }
 
-            if(needScan)
+            if (needScan)
             {
-              // Detected a problem, find next header (scan for signature)
-              NVOCMP_ALERT(false, "Attempting to find signature...")
-              bool foundSig = NVOCMP_findSignature(srcPg, &srcOff);
-              if(!foundSig)
-              {
+                // Detected a problem, find next header (scan for signature)
+                NVOCMP_ALERT(false, "Attempting to find signature...")
+                bool foundSig = NVOCMP_findSignature(srcPg, &srcOff);
+                if (!foundSig)
+                {
 #ifdef NVOCMP_GPRAM
-                NVOCMP_restoreCache(vm);
+                    NVOCMP_restoreCache(vm);
 #endif
-                // If we get here and foundSig is false, we never found another
-                // item in the page
-                NVOCMP_ALERT(foundSig, "Attempt to find signature failed.")
-                return(NVOCMP_COMPACT_FAILURE);
-              }
+                    // If we get here and foundSig is false, we never found another
+                    // item in the page
+                    NVOCMP_ALERT(foundSig, "Attempt to find signature failed.")
+                    return (NVOCMP_COMPACT_FAILURE);
+                }
             }
             else
             {
-              if(!needSkip)
-              {
-                if(dstOff + itemSize > FLASH_PAGE_SIZE)
+                if (!needSkip)
                 {
-                  // cannot fit one page temp buffer and revert srcOff change
-                  srcOff += NVOCMP_ITEMHDRLEN;
-                  dstFull = true;
-                  continue;
-                }
-                else
-                {
-                  // Get block of bytes from source page
+                    if (dstOff + itemSize > FLASH_PAGE_SIZE)
+                    {
+                        // cannot fit one page temp buffer and revert srcOff change
+                        srcOff += NVOCMP_ITEMHDRLEN;
+                        dstFull = true;
+                        continue;
+                    }
+                    else
+                    {
+                        // Get block of bytes from source page
 #if NVOCMP_COMPR
-                  NVOCMP_read(srcPg, crcOff, (uint8_t *)(pTBuffer + dstOff), itemSize);
+                        NVOCMP_read(srcPg, crcOff, (uint8_t *) (pTBuffer + dstOff), itemSize);
 #else
-                  NVOCMP_read(srcPg, crcOff, (uint8_t *)(pTBuffer + FLASH_PAGE_SIZE - dstOff - itemSize), itemSize);
+                        NVOCMP_read(srcPg, crcOff, (uint8_t *) (pTBuffer + FLASH_PAGE_SIZE - dstOff - itemSize), itemSize);
 #endif
-                  dstOff += itemSize;
-                  aItem++;
-                  if (dstOff == FLASH_PAGE_SIZE)
-                  {
-                    dstFull = true;
-                  }
+                        dstOff += itemSize;
+                        aItem++;
+                        if (dstOff == FLASH_PAGE_SIZE)
+                        {
+                            dstFull = true;
+                        }
+                    }
                 }
-              }
-              NVOCMP_ALERT(srcOff > dataLen, "Offset overflow: srcOff")
-              srcOff -= dataLen;
+                NVOCMP_ALERT(srcOff > dataLen, "Offset overflow: srcOff")
+                srcOff -= dataLen;
             }
         }
         else
@@ -4168,18 +4149,18 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
 #endif
             // Failure during item xfer makes next findItem() unreliable
             NVOCMP_ASSERT(false, "COMPACTION FAILURE")
-            return(NVOCMP_COMPACT_FAILURE);
+            return (NVOCMP_COMPACT_FAILURE);
         }
     } // end of while
 
-    if(NVOCMP_failW != NVINTF_SUCCESS)
+    if (NVOCMP_failW != NVINTF_SUCCESS)
     {
 #ifdef NVOCMP_GPRAM
         NVOCMP_restoreCache(vm);
 #endif
         // Something bad happened when trying to compact the page
         NVOCMP_ASSERT(false, "COMPACTION FAILURE")
-        return(NVOCMP_COMPACT_FAILURE);
+        return (NVOCMP_COMPACT_FAILURE);
     }
 
     // Write block to destination page
@@ -4195,12 +4176,12 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
       len -= num;
     }
 #else
-    NVOCMP_failW |= NVOCMP_write(dstPg, off, (uint8_t *)(pTBuffer + off), len);
+    NVOCMP_failW |= NVOCMP_write(dstPg, off, (uint8_t *) (pTBuffer + off), len);
 #endif
 #else
-    uint16_t off = NVOCMP_PGDATAOFS;
+    uint16_t off  = NVOCMP_PGDATAOFS;
     uint16_t doff = FLASH_PAGE_SIZE - dstOff;
-    uint16_t len = dstOff - NVOCMP_PGDATAOFS;
+    uint16_t len  = dstOff - NVOCMP_PGDATAOFS;
 #if 0
     while(len)
     {
@@ -4211,7 +4192,7 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
       len -= num;
     }
 #else
-    NVOCMP_failW |= NVOCMP_write(dstPg, off, (uint8_t *)(pTBuffer + doff), len);
+    NVOCMP_failW |= NVOCMP_write(dstPg, off, (uint8_t *) (pTBuffer + doff), len);
 #endif
 #endif
 
@@ -4219,57 +4200,57 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
     NVOCMP_restoreCache(vm);
 #endif
 
-    if(srcPg == dstPg)
+    if (srcPg == dstPg)
     {
-      srcPg = NVOCMP_DECPAGE(srcPg);
-      srcOff = pNvHandle->pageInfo[srcPg].offset;
+        srcPg  = NVOCMP_DECPAGE(srcPg);
+        srcOff = pNvHandle->pageInfo[srcPg].offset;
     }
-    pNvHandle->compactInfo.xDstOffset = off;
+    pNvHandle->compactInfo.xDstOffset  = off;
     pNvHandle->compactInfo.xSrcEOffset = srcOff;
 
-    pNvHandle->compactInfo.xSrcEPage = srcPg;
+    pNvHandle->compactInfo.xSrcEPage  = srcPg;
     pNvHandle->pageInfo[dstPg].offset = dstOff;
 
     NVOCMP_setCompactHdr(dstPg, pNvHandle->compactInfo.xSrcSPage, pNvHandle->compactInfo.xSrcSOffset, XSRCSTARTHDR);
     NVOCMP_setCompactHdr(dstPg, pNvHandle->compactInfo.xSrcEPage, pNvHandle->compactInfo.xSrcEOffset, XSRCENDHDR);
 
-    if(srcOff <= endOff)
+    if (srcOff <= endOff)
     {
-      status |= NVOCMP_COMPACT_SRCDONE;
+        status |= NVOCMP_COMPACT_SRCDONE;
     }
-    if(dstOff >= FLASH_PAGE_SIZE)
+    if (dstOff >= FLASH_PAGE_SIZE)
     {
-      status |= NVOCMP_COMPACT_DSTDONE;
+        status |= NVOCMP_COMPACT_DSTDONE;
     }
-    return(status);
+    return (status);
 }
 #else
 /******************************************************************************
-* @fn      NVOCMP_compact
-*
-* @brief   Local function to compact NV
-*
-* @param   pNvHandle - pointer to NV handler
-*
-* @return  NVINTF_SUCCESS or specific failure code
-*/
-static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
+ * @fn      NVOCMP_compact
+ *
+ * @brief   Local function to compact NV
+ *
+ * @param   pNvHandle - pointer to NV handler
+ *
+ * @return  NVINTF_SUCCESS or specific failure code
+ */
+static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t * pNvHandle)
 {
     bool needScan = false;
     bool needSkip = false;
-    bool dstFull = false;
+    bool dstFull  = false;
     uint16_t dstOff;
     uint16_t endOff;
     uint16_t srcOff;
     uint16_t crcOff;
     uint8_t dstPg;
     uint8_t srcPg;
-    uint32_t aItem=0;
+    uint32_t aItem = 0;
 #ifdef NVOCMP_GPRAM
     uint32_t vm;
-    uint8_t *pTBuffer = RAM_BUFFER_ADDRESS;
+    uint8_t * pTBuffer            = RAM_BUFFER_ADDRESS;
 #else
-    uint8_t *pTBuffer = (uint8_t *)tBuffer;
+    uint8_t * pTBuffer = (uint8_t *) tBuffer;
 #endif
     NVOCMP_compactStatus_t status = NVOCMP_COMPACT_SUCCESS;
 
@@ -4282,9 +4263,9 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
     // Stop looking when we get to this offset
     endOff = NVOCMP_PGDATAOFS + NVOCMP_ITEMHDRLEN - 1;
 
-    srcPg = 0;
+    srcPg  = 0;
     srcOff = pNvHandle->pageInfo[srcPg].offset;
-    dstPg = NVOCMP_NULLPAGE;
+    dstPg  = NVOCMP_NULLPAGE;
     dstOff = NVOCMP_PGDATAOFS;
 
     NVOCMP_ALERT(false, "Compaction triggered.")
@@ -4292,19 +4273,19 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
 #ifdef NVOCMP_GPRAM
     NVOCMP_disableCache(&vm);
 #endif
-    while(srcPg != dstPg)
+    while (srcPg != dstPg)
     {
-        if((srcOff <= endOff) || dstFull)
+        if ((srcOff <= endOff) || dstFull)
         {
-          if(aItem)
-          {
-            pNvHandle->pageInfo[srcPg].offset = srcOff;
-          }
-          dstPg = srcPg;
-          continue;
+            if (aItem)
+            {
+                pNvHandle->pageInfo[srcPg].offset = srcOff;
+            }
+            dstPg = srcPg;
+            continue;
         }
 
-        if(NVOCMP_failW == NVINTF_SUCCESS)
+        if (NVOCMP_failW == NVINTF_SUCCESS)
         {
             NVOCMP_itemHdr_t srcHdr;
             uint16_t dataLen;
@@ -4319,83 +4300,81 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
             itemSize = NVOCMP_ITEMHDRLEN + dataLen;
 
             // Check if length is safe
-            if (srcOff < (dataLen + NVOCMP_PGDATAOFS) ||
-                    (NVOCMP_SIGNATURE != srcHdr.sig))
+            if (srcOff < (dataLen + NVOCMP_PGDATAOFS) || (NVOCMP_SIGNATURE != srcHdr.sig))
             {
                 needScan = true;
             }
             else
             {
-              if(!(srcHdr.stats & NVOCMP_VALIDIDBIT) && srcHdr.stats & NVOCMP_ACTIVEIDBIT)
-              {
-                NVOCMP_ALERT(srcOff >= (dataLen + NVOCMP_PGDATAOFS),
-                             "Item header corrupted, data length too long.")
-                crcOff    = srcOff - dataLen;
-                if(NVOCMP_verifyCRC(crcOff,dataLen,srcHdr.crc8, srcPg, false))
+                if (!(srcHdr.stats & NVOCMP_VALIDIDBIT) && srcHdr.stats & NVOCMP_ACTIVEIDBIT)
                 {
-                  // Invalid CRC, corruption
-                  NVOCMP_ALERT(false, "Item CRC incorrect!")
-                  needScan = true;
-                  srcOff--;
+                    NVOCMP_ALERT(srcOff >= (dataLen + NVOCMP_PGDATAOFS), "Item header corrupted, data length too long.")
+                    crcOff = srcOff - dataLen;
+                    if (NVOCMP_verifyCRC(crcOff, dataLen, srcHdr.crc8, srcPg, false))
+                    {
+                        // Invalid CRC, corruption
+                        NVOCMP_ALERT(false, "Item CRC incorrect!")
+                        needScan = true;
+                        srcOff--;
+                    }
+                    else
+                    {
+                        needScan = false;
+                        needSkip = false;
+                    }
                 }
                 else
                 {
-                  needScan = false;
-                  needSkip = false;
+                    needScan = false;
+                    needSkip = true;
                 }
-              }
-              else
-              {
-                needScan = false;
-                needSkip = true;
-              }
             }
 
-            if(needScan)
+            if (needScan)
             {
-              // Detected a problem, find next header (scan for signature)
-              NVOCMP_ALERT(false, "Attempting to find signature...")
-              bool foundSig = NVOCMP_findSignature(srcPg, &srcOff);
-              if(!foundSig)
-              {
+                // Detected a problem, find next header (scan for signature)
+                NVOCMP_ALERT(false, "Attempting to find signature...")
+                bool foundSig = NVOCMP_findSignature(srcPg, &srcOff);
+                if (!foundSig)
+                {
 #ifdef NVOCMP_GPRAM
-                NVOCMP_restoreCache(vm);
+                    NVOCMP_restoreCache(vm);
 #endif
-                // If we get here and foundSig is false, we never found another
-                // item in the page
-                NVOCMP_ALERT(foundSig, "Attempt to find signature failed.")
-                return(NVOCMP_COMPACT_FAILURE);
-              }
+                    // If we get here and foundSig is false, we never found another
+                    // item in the page
+                    NVOCMP_ALERT(foundSig, "Attempt to find signature failed.")
+                    return (NVOCMP_COMPACT_FAILURE);
+                }
             }
             else
             {
-              if(!needSkip)
-              {
-                if(dstOff + itemSize > FLASH_PAGE_SIZE)
+                if (!needSkip)
                 {
-                  // cannot fit one page temp buffer and revert srcOff change
-                  srcOff += NVOCMP_ITEMHDRLEN;
-                  dstFull = true;
-                  continue;
-                }
-                else
-                {
-                  // Get block of bytes from source page
+                    if (dstOff + itemSize > FLASH_PAGE_SIZE)
+                    {
+                        // cannot fit one page temp buffer and revert srcOff change
+                        srcOff += NVOCMP_ITEMHDRLEN;
+                        dstFull = true;
+                        continue;
+                    }
+                    else
+                    {
+                        // Get block of bytes from source page
 #if NVOCMP_COMPR
-                  NVOCMP_read(srcPg, crcOff, (uint8_t *)(pTBuffer + dstOff), itemSize);
+                        NVOCMP_read(srcPg, crcOff, (uint8_t *) (pTBuffer + dstOff), itemSize);
 #else
-                  NVOCMP_read(srcPg, crcOff, (uint8_t *)(pTBuffer + FLASH_PAGE_SIZE - dstOff - itemSize), itemSize);
+                        NVOCMP_read(srcPg, crcOff, (uint8_t *) (pTBuffer + FLASH_PAGE_SIZE - dstOff - itemSize), itemSize);
 #endif
-                  dstOff += itemSize;
-                  aItem++;
-                  if (dstOff == FLASH_PAGE_SIZE)
-                  {
-                    dstFull = true;
-                  }
+                        dstOff += itemSize;
+                        aItem++;
+                        if (dstOff == FLASH_PAGE_SIZE)
+                        {
+                            dstFull = true;
+                        }
+                    }
                 }
-              }
-              NVOCMP_ALERT(srcOff > dataLen, "Offset overflow: srcOff")
-              srcOff -= dataLen;
+                NVOCMP_ALERT(srcOff > dataLen, "Offset overflow: srcOff")
+                srcOff -= dataLen;
             }
         }
         else
@@ -4405,18 +4384,18 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
 #endif
             // Failure during item xfer makes next findItem() unreliable
             NVOCMP_ASSERT(false, "COMPACTION FAILURE")
-            return(NVOCMP_COMPACT_FAILURE);
+            return (NVOCMP_COMPACT_FAILURE);
         }
     } // end of while
 
-    if(NVOCMP_failW != NVINTF_SUCCESS)
+    if (NVOCMP_failW != NVINTF_SUCCESS)
     {
 #ifdef NVOCMP_GPRAM
         NVOCMP_restoreCache(vm);
 #endif
         // Something bad happened when trying to compact the page
         NVOCMP_ASSERT(false, "COMPACTION FAILURE")
-        return(NVOCMP_COMPACT_FAILURE);
+        return (NVOCMP_COMPACT_FAILURE);
     }
 
     // Get XDST page ready
@@ -4427,24 +4406,24 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
 #if NVOCMP_COMPR
     uint16_t off = NVOCMP_PGDATAOFS;
     uint16_t len = dstOff - NVOCMP_PGDATAOFS;
-    while(len)
+    while (len)
     {
-      uint16_t num = (len < NVOCMP_XFERBLKMAX) ? len : NVOCMP_XFERBLKMAX;
-      NVOCMP_failW |= NVOCMP_write(dstPg, off, (uint8_t *)(pTBuffer + off), num);
-      off += num;
-      len -= num;
+        uint16_t num = (len < NVOCMP_XFERBLKMAX) ? len : NVOCMP_XFERBLKMAX;
+        NVOCMP_failW |= NVOCMP_write(dstPg, off, (uint8_t *) (pTBuffer + off), num);
+        off += num;
+        len -= num;
     }
 #else
-    uint16_t off = NVOCMP_PGDATAOFS;
+    uint16_t off  = NVOCMP_PGDATAOFS;
     uint16_t doff = FLASH_PAGE_SIZE - dstOff;
-    uint16_t len = dstOff - NVOCMP_PGDATAOFS;
-    while(len)
+    uint16_t len  = dstOff - NVOCMP_PGDATAOFS;
+    while (len)
     {
-      uint16_t num = (len < NVOCMP_XFERBLKMAX) ? len : NVOCMP_XFERBLKMAX;
-      NVOCMP_failW |= NVOCMP_write(dstPg, off, (uint8_t *)(pTBuffer + doff), num);
-      off += num;
-      doff += num;
-      len -= num;
+        uint16_t num = (len < NVOCMP_XFERBLKMAX) ? len : NVOCMP_XFERBLKMAX;
+        NVOCMP_failW |= NVOCMP_write(dstPg, off, (uint8_t *) (pTBuffer + doff), num);
+        off += num;
+        doff += num;
+        len -= num;
     }
 #endif
 
@@ -4454,24 +4433,24 @@ static NVOCMP_compactStatus_t NVOCMP_compact(NVOCMP_nvHandle_t *pNvHandle)
 
     srcOff = pNvHandle->pageInfo[srcPg].offset;
 
-    pNvHandle->compactInfo.xDstOffset = off;
+    pNvHandle->compactInfo.xDstOffset  = off;
     pNvHandle->compactInfo.xSrcEOffset = srcOff;
 
-    pNvHandle->compactInfo.xSrcEPage = srcPg;
+    pNvHandle->compactInfo.xSrcEPage  = srcPg;
     pNvHandle->pageInfo[dstPg].offset = dstOff;
 
     NVOCMP_setCompactHdr(dstPg, pNvHandle->compactInfo.xSrcSPage, pNvHandle->compactInfo.xSrcSOffset, XSRCSTARTHDR);
     NVOCMP_setCompactHdr(dstPg, pNvHandle->compactInfo.xSrcEPage, pNvHandle->compactInfo.xSrcEOffset, XSRCENDHDR);
 
-    if(srcOff <= endOff)
+    if (srcOff <= endOff)
     {
-      status |= NVOCMP_COMPACT_SRCDONE;
+        status |= NVOCMP_COMPACT_SRCDONE;
     }
-    if(dstOff >= FLASH_PAGE_SIZE)
+    if (dstOff >= FLASH_PAGE_SIZE)
     {
-      status |= NVOCMP_COMPACT_DSTDONE;
+        status |= NVOCMP_COMPACT_DSTDONE;
     }
-    return(status);
+    return (status);
 }
 #endif
 
@@ -4495,20 +4474,20 @@ static void NVOCMP_copyItem(uint8_t srcPg, uint8_t dstPg, uint16_t sOfs, uint16_
     uint8_t tmp[NVOCMP_XFERBLKMAX];
 
     // Copy over the data: Flash to RAM, then RAM to Flash
-    while(len > 0 && !NVOCMP_failW)
+    while (len > 0 && !NVOCMP_failW)
     {
         // Number of bytes to transfer in this block
         num = (len < NVOCMP_XFERBLKMAX) ? len : NVOCMP_XFERBLKMAX;
 
         // Get block of bytes from source page
-        NVOCMP_read(srcPg, sOfs, (uint8_t *)&tmp, num);
+        NVOCMP_read(srcPg, sOfs, (uint8_t *) &tmp, num);
 
         // Write block to destination page
-        NVOCMP_failW = NVOCMP_write(dstPg, dOfs, (uint8_t *)&tmp, num);
+        NVOCMP_failW = NVOCMP_write(dstPg, dOfs, (uint8_t *) &tmp, num);
 
         dOfs += num;
         sOfs += num;
-        len  -= num;
+        len -= num;
     }
 }
 #endif
@@ -4527,9 +4506,8 @@ static uint8_t NVOCMP_readByte(uint8_t pg, uint16_t ofs)
     uint8_t byteVal;
     NVOCMP_read(pg, ofs, &byteVal, NVOCMP_ONEBYTE);
 
-    return(byteVal);
+    return (byteVal);
 }
-
 
 /******************************************************************************
  * @fn      NVOCMP_writeByte
@@ -4546,7 +4524,6 @@ static void NVOCMP_writeByte(uint8_t pg, uint16_t ofs, uint8_t bwv)
 {
     NVOCMP_failW = NVOCMP_write(pg, ofs, &bwv, 1);
 }
-
 
 /******************************************************************************
  * @fn      NVOCMP_doNVCRC
@@ -4566,31 +4543,31 @@ static uint8_t NVOCMP_doNVCRC(uint8_t pg, uint16_t ofs, uint16_t len, uint8_t cr
 {
     uint16_t rdLen = 0;
 #ifdef NVOCMP_GPRAM
-    uint8_t *pTBuffer = RAM_BUFFER_ADDRESS;
+    uint8_t * pTBuffer = RAM_BUFFER_ADDRESS;
 #else
-    uint8_t *pTBuffer = (uint8_t *)tBuffer;
+    uint8_t * pTBuffer = (uint8_t *) tBuffer;
 #endif
     uint8_t tmp[NVOCMP_XFERBLKMAX];
-    crc_t newCRC = (crc_t)crc;
+    crc_t newCRC = (crc_t) crc;
 
     // Read flash and compute CRC in blocks
-    while(len > 0)
+    while (len > 0)
     {
-        rdLen  = (len < NVOCMP_XFERBLKMAX ? len : NVOCMP_XFERBLKMAX);
-        if(flag)
+        rdLen = (len < NVOCMP_XFERBLKMAX ? len : NVOCMP_XFERBLKMAX);
+        if (flag)
         {
-          memcpy((uint8_t *)tmp, (uint8_t *)(pTBuffer+ofs), rdLen);
+            memcpy((uint8_t *) tmp, (uint8_t *) (pTBuffer + ofs), rdLen);
         }
         else
         {
-          NVOCMP_read(pg, ofs, tmp, rdLen);
+            NVOCMP_read(pg, ofs, tmp, rdLen);
         }
-        newCRC = crc_update(newCRC,tmp,rdLen);
-        len   -= rdLen;
-        ofs   += rdLen;
+        newCRC = crc_update(newCRC, tmp, rdLen);
+        len -= rdLen;
+        ofs += rdLen;
     }
 
-    return(newCRC);
+    return (newCRC);
 }
 
 /******************************************************************************
@@ -4605,11 +4582,11 @@ static uint8_t NVOCMP_doNVCRC(uint8_t pg, uint16_t ofs, uint16_t len, uint8_t cr
  *
  * @return  CRC8 byte
  */
-static uint8_t NVOCMP_doRAMCRC(const uint8_t *input, uint16_t len, uint8_t crc)
+static uint8_t NVOCMP_doRAMCRC(const uint8_t * input, uint16_t len, uint8_t crc)
 {
-    crc_t newCRC = crc_update((crc_t)crc, input, len);
+    crc_t newCRC = crc_update((crc_t) crc, input, len);
 
-    return((uint8_t)newCRC);
+    return ((uint8_t) newCRC);
 }
 
 /******************************************************************************
@@ -4628,16 +4605,16 @@ static uint8_t NVOCMP_doRAMCRC(const uint8_t *input, uint16_t len, uint8_t crc)
 static uint8_t NVOCMP_verifyCRC(uint16_t iOfs, uint16_t len, uint8_t crc, uint8_t pg, bool flag)
 {
     uint8_t newCRC;
-    uint16_t crcLen   = len + NVOCMP_HDRCRCINC - 1;
+    uint16_t crcLen = len + NVOCMP_HDRCRCINC - 1;
 #if NVOCMP_HDRLE
     uint8_t finalByte = (len >> 6) & 0x3F;
 #else
-    uint8_t finalByte = (len & 0x3F) << 2;
+    uint8_t finalByte  = (len & 0x3F) << 2;
 #endif
     // CRC calculations stop at the length field of header
     // So the last byte must be done separately
     newCRC = NVOCMP_doNVCRC(pg, iOfs, crcLen, 0, flag);
-    newCRC = NVOCMP_doRAMCRC(&finalByte,sizeof(finalByte),newCRC);
+    newCRC = NVOCMP_doRAMCRC(&finalByte, sizeof(finalByte), newCRC);
     NVOCMP_ALERT(newCRC == crc, "Invalid CRC detected.")
 #ifdef NVOCMP_STATS
     if (newCRC != crc)
@@ -4645,7 +4622,7 @@ static uint8_t NVOCMP_verifyCRC(uint16_t iOfs, uint16_t len, uint8_t crc, uint8_
         NVOCMP_badCRCCount++;
     }
 #endif // NVOCMP_STATS
-    return(newCRC == crc ? NVINTF_SUCCESS : NVINTF_CORRUPT);
+    return (newCRC == crc ? NVINTF_SUCCESS : NVINTF_CORRUPT);
 }
 
 //*****************************************************************************

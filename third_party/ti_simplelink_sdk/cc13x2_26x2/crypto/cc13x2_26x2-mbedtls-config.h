@@ -44,7 +44,6 @@
 
  *****************************************************************************/
 
-
 #ifndef CC13X2_26X2_MBEDTLS_CONFIG_H
 #define CC13X2_26X2_MBEDTLS_CONFIG_H
 
@@ -132,18 +131,18 @@
 #define MBEDTLS_X509_CRT_PARSE_C
 #define MBEDTLS_PKCS5_C
 
-#define MBEDTLS_MPI_WINDOW_SIZE            1 /**< Maximum windows size used. */
-#define MBEDTLS_MPI_MAX_SIZE              32 /**< Maximum number of bytes for usable MPIs. */
-#define MBEDTLS_ECP_MAX_BITS             256 /**< Maximum bit size of groups */
-#define MBEDTLS_ECP_WINDOW_SIZE            2 /**< Maximum window size used */
-#define MBEDTLS_ECP_FIXED_POINT_OPTIM      0 /**< Enable fixed-point speed-up */
-#define MBEDTLS_ENTROPY_MAX_SOURCES        1 /**< Maximum number of sources supported */
+#define MBEDTLS_MPI_WINDOW_SIZE 1       /**< Maximum windows size used. */
+#define MBEDTLS_MPI_MAX_SIZE 32         /**< Maximum number of bytes for usable MPIs. */
+#define MBEDTLS_ECP_MAX_BITS 256        /**< Maximum bit size of groups */
+#define MBEDTLS_ECP_WINDOW_SIZE 2       /**< Maximum window size used */
+#define MBEDTLS_ECP_FIXED_POINT_OPTIM 0 /**< Enable fixed-point speed-up */
+#define MBEDTLS_ENTROPY_MAX_SOURCES 1   /**< Maximum number of sources supported */
 
 #define MBEDTLS_MEMORY_BUFFER_ALLOC_C
 
-#define MBEDTLS_SSL_MAX_CONTENT_LEN      900 /**< Maxium fragment length in bytes */
+#define MBEDTLS_SSL_MAX_CONTENT_LEN 900 /**< Maxium fragment length in bytes */
 
-#define MBEDTLS_SSL_CIPHERSUITES         MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
+#define MBEDTLS_SSL_CIPHERSUITES MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
 #include "mbedtls/check_config.h"
 

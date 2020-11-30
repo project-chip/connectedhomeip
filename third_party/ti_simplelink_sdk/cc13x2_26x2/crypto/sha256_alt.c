@@ -44,15 +44,14 @@
 
  *****************************************************************************/
 
-
 #include <mbedtls/sha256.h>
 
 #if defined(MBEDTLS_SHA256_ALT)
 
 #include <openthread/config.h>
 
-#include <string.h>
 #include <assert.h>
+#include <string.h>
 
 #include <ti/drivers/SHA2.h>
 #include <ti/drivers/sha2/SHA2CC26X2.h>
@@ -63,7 +62,7 @@
  *  SHA2CC26X2 hardware attributes are used by the SHA2_Config struct.
  */
 const SHA2CC26X2_HWAttrs sha2CC26X2HWAttrs_sha = {
-    .intPriority       = ~0,
+    .intPriority = ~0,
 };
 
 /**
@@ -71,7 +70,7 @@ const SHA2CC26X2_HWAttrs sha2CC26X2HWAttrs_sha = {
  *
  * \param ctx      SHA-256 context to be initialized
  */
-void mbedtls_sha256_init(mbedtls_sha256_context *ctx)
+void mbedtls_sha256_init(mbedtls_sha256_context * ctx)
 {
     memset(ctx, 0, sizeof(mbedtls_sha256_context));
 }
@@ -81,14 +80,14 @@ void mbedtls_sha256_init(mbedtls_sha256_context *ctx)
  *
  * \param ctx      SHA-256 context to be cleared
  */
-void mbedtls_sha256_free(mbedtls_sha256_context *ctx)
+void mbedtls_sha256_free(mbedtls_sha256_context * ctx)
 {
     if (NULL == ctx)
     {
         return;
     }
 
-    if(ctx->hndl != NULL)
+    if (ctx->hndl != NULL)
     {
         SHA2_close(ctx->hndl);
 
@@ -105,7 +104,7 @@ void mbedtls_sha256_free(mbedtls_sha256_context *ctx)
  * \retval         0                                  on success
  * \retval         MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED on failure to open driver
  */
-int mbedtls_sha256_starts_ret(mbedtls_sha256_context *ctx, int is224)
+int mbedtls_sha256_starts_ret(mbedtls_sha256_context * ctx, int is224)
 {
     SHA2_HashType type;
 
@@ -117,7 +116,7 @@ int mbedtls_sha256_starts_ret(mbedtls_sha256_context *ctx, int is224)
 
         sha2Params.returnBehavior = SHA2_RETURN_BEHAVIOR_POLLING;
 
-        ctx->config.object = &ctx->object;
+        ctx->config.object  = &ctx->object;
         ctx->config.hwAttrs = &sha2CC26X2HWAttrs_sha;
 
         ctx->hndl = SHA2_construct(&ctx->config, &sha2Params);
@@ -152,24 +151,21 @@ int mbedtls_sha256_starts_ret(mbedtls_sha256_context *ctx, int is224)
  * \param dst      The destination context
  * \param src      The context to be cloned
  */
-void mbedtls_sha256_clone(mbedtls_sha256_context *dst,
-                          const mbedtls_sha256_context *src)
+void mbedtls_sha256_clone(mbedtls_sha256_context * dst, const mbedtls_sha256_context * src)
 {
-    mbedtls_sha256_context *ctx = dst;
+    mbedtls_sha256_context * ctx = dst;
     SHA2_Params sha2Params;
 
     SHA2_Params_init(&sha2Params);
 
     sha2Params.returnBehavior = SHA2_RETURN_BEHAVIOR_POLLING;
 
-
-    ctx->config.object = &ctx->object;
+    ctx->config.object  = &ctx->object;
     ctx->config.hwAttrs = &sha2CC26X2HWAttrs_sha;
 
     ctx->hndl = SHA2_construct(&ctx->config, &sha2Params);
     /*clone */
     ctx->object = src->object;
-
 }
 
 /**
@@ -181,8 +177,7 @@ void mbedtls_sha256_clone(mbedtls_sha256_context *dst,
  * \retval         0                                  on success
  * \retval         MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED on driver failure
  */
-int mbedtls_sha256_finish_ret(mbedtls_sha256_context *ctx,
-                              unsigned char output[32])
+int mbedtls_sha256_finish_ret(mbedtls_sha256_context * ctx, unsigned char output[32])
 {
     int_fast16_t result;
 
@@ -198,7 +193,6 @@ int mbedtls_sha256_finish_ret(mbedtls_sha256_context *ctx,
     }
 }
 
-
 /**
  * \brief          SHA-256 process buffer
  *
@@ -209,8 +203,7 @@ int mbedtls_sha256_finish_ret(mbedtls_sha256_context *ctx,
  * \retval         0                                  on success
  * \retval         MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED on driver failure
  */
-int mbedtls_sha256_update_ret(mbedtls_sha256_context *ctx,
-                              const unsigned char *input, size_t ilen)
+int mbedtls_sha256_update_ret(mbedtls_sha256_context * ctx, const unsigned char * input, size_t ilen)
 {
     int_fast16_t result;
 
@@ -236,8 +229,7 @@ int mbedtls_sha256_update_ret(mbedtls_sha256_context *ctx,
  * \retval         0                                  on success
  * \retval         MBEDTLS_ERR_SHA256_HW_ACCEL_FAILED on driver failure
  */
-int mbedtls_internal_sha256_process(mbedtls_sha256_context *ctx,
-                                    const unsigned char data[64])
+int mbedtls_internal_sha256_process(mbedtls_sha256_context * ctx, const unsigned char data[64])
 {
     int_fast16_t result;
 

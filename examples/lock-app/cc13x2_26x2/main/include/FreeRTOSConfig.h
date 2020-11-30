@@ -49,63 +49,69 @@
 
 /* Constants related to the behaviour or the scheduler. */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
-#define configTICK_RATE_HZ              ( ( TickType_t ) 1000 )
-#define configUSE_PREEMPTION            1
-#define configUSE_TIME_SLICING          0
-#define configMAX_PRIORITIES            ( 10UL )
-#define configIDLE_SHOULD_YIELD         0
-#define configUSE_16_BIT_TICKS          0 /* Only for 8 and 16-bit hardware. */
+#define configTICK_RATE_HZ ((TickType_t) 1000)
+#define configUSE_PREEMPTION 1
+#define configUSE_TIME_SLICING 0
+#define configMAX_PRIORITIES (10UL)
+#define configIDLE_SHOULD_YIELD 0
+#define configUSE_16_BIT_TICKS 0 /* Only for 8 and 16-bit hardware. */
 
 /* Constants that describe the hardware and memory usage. */
-#define configCPU_CLOCK_HZ              ( ( unsigned long ) 48000000 )
-#define configMINIMAL_STACK_SIZE        ( ( unsigned short ) 256 )
-#define configMAX_TASK_NAME_LEN         ( 12 )
+#define configCPU_CLOCK_HZ ((unsigned long) 48000000)
+#define configMINIMAL_STACK_SIZE ((unsigned short) 256)
+#define configMAX_TASK_NAME_LEN (12)
 
-#define configTOTAL_HEAP_SIZE           ( ( size_t ) ( 0x8000 ) )
+#define configTOTAL_HEAP_SIZE ((size_t)(0x8000))
 #define configSUPPORT_STATIC_ALLOCATION 1
 
 /* Default stack size for TI-POSIX threads (in words) */
-#define configPOSIX_STACK_SIZE          ( ( unsigned short ) 512 )
+#define configPOSIX_STACK_SIZE ((unsigned short) 512)
 
 /* Constants that build features in or out. */
-#define configUSE_MUTEXES               1
-#define configUSE_TICKLESS_IDLE         1
-#define configUSE_APPLICATION_TASK_TAG  1  /* Need by POSIX/pthread */
-#define configUSE_CO_ROUTINES           0
-#define configUSE_COUNTING_SEMAPHORES   1
-#define configUSE_RECURSIVE_MUTEXES     1
-#define configUSE_QUEUE_SETS            0
-#define configUSE_TASK_NOTIFICATIONS    1
+#define configUSE_MUTEXES 1
+#define configUSE_TICKLESS_IDLE 1
+#define configUSE_APPLICATION_TASK_TAG 1 /* Need by POSIX/pthread */
+#define configUSE_CO_ROUTINES 0
+#define configUSE_COUNTING_SEMAPHORES 1
+#define configUSE_RECURSIVE_MUTEXES 1
+#define configUSE_QUEUE_SETS 0
+#define configUSE_TASK_NOTIFICATIONS 1
 
 /* Constants that define which hook (callback) functions should be used. */
-#define configUSE_IDLE_HOOK             0
-#define configUSE_TICK_HOOK             0
-#define configUSE_MALLOC_FAILED_HOOK    0
+#define configUSE_IDLE_HOOK 0
+#define configUSE_TICK_HOOK 0
+#define configUSE_MALLOC_FAILED_HOOK 0
 
 /* Constants provided for debugging and optimisation assistance. */
-#define configCHECK_FOR_STACK_OVERFLOW  2
-#define configASSERT( x ) if( ( x ) == 0 ) { taskDISABLE_INTERRUPTS(); for( ;; ); }
-#define configQUEUE_REGISTRY_SIZE       0
+#define configCHECK_FOR_STACK_OVERFLOW 2
+#define configASSERT(x)                                                                                                            \
+    if ((x) == 0)                                                                                                                  \
+    {                                                                                                                              \
+        taskDISABLE_INTERRUPTS();                                                                                                  \
+        for (;;)                                                                                                                   \
+            ;                                                                                                                      \
+    }
+#define configQUEUE_REGISTRY_SIZE 0
 
 /* Minimum FreeRTOS tick periods of idle before invoking Power policy */
 /* TODO: find way to reduce this; FreeRTOS requires it to be 2 or more */
-#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP   2
+#define configEXPECTED_IDLE_TIME_BEFORE_SLEEP 2
 
 /* Software timer definitions. */
-#define configUSE_TIMERS                1
-#define configTIMER_TASK_PRIORITY       (5)
-#define configTIMER_QUEUE_LENGTH        (20)
-#define configTIMER_TASK_STACK_DEPTH    (configMINIMAL_STACK_SIZE * 2)
+#define configUSE_TIMERS 1
+#define configTIMER_TASK_PRIORITY (5)
+#define configTIMER_QUEUE_LENGTH (20)
+#define configTIMER_TASK_STACK_DEPTH (configMINIMAL_STACK_SIZE * 2)
 
 #define configENABLE_BACKWARD_COMPATIBILITY 1
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__ti_version__)
 #include <ti/posix/freertos/PTLS.h>
-#define traceTASK_DELETE( pxTCB ) PTLS_taskDeleteHook( pxTCB )
+#define traceTASK_DELETE(pxTCB) PTLS_taskDeleteHook(pxTCB)
 #elif defined(__IAR_SYSTEMS_ICC__)
 #ifndef __IAR_SYSTEMS_ASM__
 #include <ti/posix/freertos/Mtx.h>
-#define traceTASK_DELETE( pxTCB ) Mtx_taskDeleteHook( pxTCB )
+#define traceTASK_DELETE(pxTCB) Mtx_taskDeleteHook(pxTCB)
 #endif
 #endif
 
@@ -121,18 +127,18 @@
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 2
 
 #if defined(__TI_COMPILER_VERSION__) || defined(__ti_version__)
-#define PTLS_TLS_INDEX 0  /* ti.posix.freertos.PTLS */
+#define PTLS_TLS_INDEX 0 /* ti.posix.freertos.PTLS */
 #elif defined(__IAR_SYSTEMS_ICC__)
-#define MTX_TLS_INDEX 0  /* ti.posix.freertos.Mtx */
+#define MTX_TLS_INDEX 0 /* ti.posix.freertos.Mtx */
 #endif
 
-#define NDK_TLS_INDEX 1  /* Reserve an index for NDK TLS */
+#define NDK_TLS_INDEX 1 /* Reserve an index for NDK TLS */
 
 #elif defined(__GNUC__)
 
 #define configNUM_THREAD_LOCAL_STORAGE_POINTERS 1
 
-#define NDK_TLS_INDEX 0  /* Reserve an index for NDK TLS */
+#define NDK_TLS_INDEX 0 /* Reserve an index for NDK TLS */
 
 /* note: system locks required by newlib are not implemented */
 #define configUSE_NEWLIB_REENTRANT 1
@@ -144,37 +150,36 @@
  * only necessary if the linker does not automatically remove functions that
  * are not referenced anyway.
  */
-#define INCLUDE_vTaskPrioritySet                1
-#define INCLUDE_uxTaskPriorityGet               1
-#define INCLUDE_vTaskDelete                     1
-#define INCLUDE_vTaskCleanUpResources           0
-#define INCLUDE_vTaskSuspend                    1
-#define INCLUDE_vTaskDelayUntil                 1
-#define INCLUDE_vTaskDelay                      1
-#define INCLUDE_uxTaskGetStackHighWaterMark     0
-#define INCLUDE_xTaskGetIdleTaskHandle          0
-#define INCLUDE_eTaskGetState                   1
-#define INCLUDE_xTaskResumeFromISR              0
-#define INCLUDE_xTaskGetCurrentTaskHandle       1
-#define INCLUDE_xTaskGetSchedulerState          1
-#define INCLUDE_xSemaphoreGetMutexHolder        0
-#define INCLUDE_xTimerPendFunctionCall          0
-
+#define INCLUDE_vTaskPrioritySet 1
+#define INCLUDE_uxTaskPriorityGet 1
+#define INCLUDE_vTaskDelete 1
+#define INCLUDE_vTaskCleanUpResources 0
+#define INCLUDE_vTaskSuspend 1
+#define INCLUDE_vTaskDelayUntil 1
+#define INCLUDE_vTaskDelay 1
+#define INCLUDE_uxTaskGetStackHighWaterMark 0
+#define INCLUDE_xTaskGetIdleTaskHandle 0
+#define INCLUDE_eTaskGetState 1
+#define INCLUDE_xTaskResumeFromISR 0
+#define INCLUDE_xTaskGetCurrentTaskHandle 1
+#define INCLUDE_xTaskGetSchedulerState 1
+#define INCLUDE_xSemaphoreGetMutexHolder 0
+#define INCLUDE_xTimerPendFunctionCall 0
 
 /* Cortex-M3/4 interrupt priority configuration follows...................... */
 
 /* Use the system definition, if there is one. */
 #ifdef __NVIC_PRIO_BITS
-    #define configPRIO_BITS       __NVIC_PRIO_BITS
+#define configPRIO_BITS __NVIC_PRIO_BITS
 #else
-    #define configPRIO_BITS       3     /* 8 priority levels */
+#define configPRIO_BITS 3 /* 8 priority levels */
 #endif
 
 /*
  * The lowest interrupt priority that can be used in a call to a "set priority"
  * function.
  */
-#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY         0x07
+#define configLIBRARY_LOWEST_INTERRUPT_PRIORITY 0x07
 
 /*
  * The highest interrupt priority that can be used by any interrupt service
@@ -182,7 +187,7 @@
  * CALL INTERRUPT SAFE FREERTOS API FUNCTIONS FROM ANY INTERRUPT THAT HAS A
  * HIGHER PRIORITY THAN THIS! (higher priorities are lower numeric values.
  */
-#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY    1
+#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY 1
 
 /*
  * Interrupt priorities used by the kernel port layer itself.  These are generic
@@ -198,13 +203,13 @@
  * Priority 1 is the second highest priority.
  * Priority 0 is the highest priority.
  */
-#define configMAX_SYSCALL_INTERRUPT_PRIORITY  (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
 
 /*
  * The trace facility is turned on to make some functions available for use in
  * CLI commands.
  */
-#define configUSE_TRACE_FACILITY        1
+#define configUSE_TRACE_FACILITY 1
 
 /*
  * Runtime Object View is a Texas Instrument host tool that helps visualize
@@ -212,6 +217,6 @@
  * startup_<device>_<compiler>.c file to 0xa5a5a5a5. The stack peak can then
  * be displayed in Runtime Object View.
  */
-#define configENABLE_ISR_STACK_INIT  1
+#define configENABLE_ISR_STACK_INIT 1
 
 #endif /* FREERTOS_CONFIG_H */

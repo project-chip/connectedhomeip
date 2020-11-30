@@ -40,7 +40,6 @@
 
  *****************************************************************************/
 
-
 /**
  * @file
  *   This file implements an alarm for openthread based on FreeRTOS timers.
@@ -54,10 +53,10 @@
 #include "system.h"
 
 #include <FreeRTOS.h>
-#include <timers.h>
-#include <task.h>
-#include <projdefs.h>
 #include <portmacro.h>
+#include <projdefs.h>
+#include <task.h>
+#include <timers.h>
 
 /*
  *  The maximum number of ticks before the tick count rolls over.  We use
@@ -71,10 +70,10 @@
 /* The total number of system ticks in MAX_SECONDS seconds */
 #define MAX_SECONDS_TICKS (MAX_SECONDS * configTICK_RATE_HZ)
 
-TimerHandle_t   sTimer;
+TimerHandle_t sTimer;
 static uint32_t sTime0   = 0;
 static uint32_t sTimeout = 0;
-static bool     sRunning = false;
+static bool sRunning     = false;
 
 void otPlatAlarmCallbackFunction(TimerHandle_t xTimer)
 {
@@ -83,20 +82,19 @@ void otPlatAlarmCallbackFunction(TimerHandle_t xTimer)
 
 void platformAlarmInit(void)
 {
-    sTimer = xTimerCreate("ot_alarm", (TickType_t)-1, pdFALSE, NULL,
-            otPlatAlarmCallbackFunction);
+    sTimer = xTimerCreate("ot_alarm", (TickType_t) -1, pdFALSE, NULL, otPlatAlarmCallbackFunction);
 }
 
 uint32_t otPlatAlarmMilliGetNow(void)
 {
-    unsigned long   secs;
-    TickType_t      ticks;
-    TickType_t      remTicks;
-    unsigned long   remSecs;
-    unsigned long   totSecs;
-    unsigned long   totMsecs;
-    uint32_t        numRollovers;
-    TimeOut_t       timeout;
+    unsigned long secs;
+    TickType_t ticks;
+    TickType_t remTicks;
+    unsigned long remSecs;
+    unsigned long totSecs;
+    unsigned long totMsecs;
+    uint32_t numRollovers;
+    TimeOut_t timeout;
 
     /*
      *  This gets the number of tick count overflows as well as the tick
@@ -106,8 +104,8 @@ uint32_t otPlatAlarmMilliGetNow(void)
      */
     vTaskInternalSetTimeOutState(&timeout);
 
-    ticks           = timeout.xTimeOnEntering;
-    numRollovers    = timeout.xOverflowCount;
+    ticks        = timeout.xTimeOnEntering;
+    numRollovers = timeout.xOverflowCount;
 
     /* Number of seconds in tick count */
     secs = ticks / configTICK_RATE_HZ;
@@ -118,22 +116,22 @@ uint32_t otPlatAlarmMilliGetNow(void)
     /* Add contribution of remaining ticks from tick count rollovers */
     remTicks = remTicks + (((MAX_TICKS - MAX_SECONDS_TICKS) + 1) * numRollovers);
 
-    remSecs = remTicks / configTICK_RATE_HZ;
+    remSecs  = remTicks / configTICK_RATE_HZ;
     remTicks = remTicks - (remSecs * configTICK_RATE_HZ);
 
-    totSecs  = (unsigned long)secs + remSecs + (MAX_SECONDS * numRollovers);
-    totMsecs = (unsigned long)(remTicks * (1000 / configTICK_RATE_HZ));
+    totSecs  = (unsigned long) secs + remSecs + (MAX_SECONDS * numRollovers);
+    totMsecs = (unsigned long) (remTicks * (1000 / configTICK_RATE_HZ));
 
     return (totSecs * 1000U) + (totMsecs % 1000);
 }
 
-void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
+void otPlatAlarmMilliStartAt(otInstance * aInstance, uint32_t aT0, uint32_t aDt)
 {
-    (void)aInstance;
-    uint32_t          delta     = (otPlatAlarmMilliGetNow() - aT0);
+    (void) aInstance;
+    uint32_t delta = (otPlatAlarmMilliGetNow() - aT0);
 
     sTime0   = aT0;
-    sTimeout    = aDt;
+    sTimeout = aDt;
     sRunning = true;
 
     if (delta >= aDt)
@@ -146,29 +144,30 @@ void otPlatAlarmMilliStartAt(otInstance *aInstance, uint32_t aT0, uint32_t aDt)
         TickType_t timeoutTicks;
         BaseType_t status;
 
-        timeoutTicks = ((aDt - delta) / 1000U) * configTICK_RATE_HZ +
-                ((aDt - delta) % 1000U) * (uint64_t)configTICK_RATE_HZ / 1000L;
+        timeoutTicks =
+            ((aDt - delta) / 1000U) * configTICK_RATE_HZ + ((aDt - delta) % 1000U) * (uint64_t) configTICK_RATE_HZ / 1000L;
 
-        status = xTimerChangePeriod(sTimer, timeoutTicks, (TickType_t)-1);
-        if (status == pdPASS) {
-            xTimerStart(sTimer, (TickType_t)-1);
+        status = xTimerChangePeriod(sTimer, timeoutTicks, (TickType_t) -1);
+        if (status == pdPASS)
+        {
+            xTimerStart(sTimer, (TickType_t) -1);
         }
-
     }
 }
 
-void otPlatAlarmMilliStop(otInstance *aInstance)
+void otPlatAlarmMilliStop(otInstance * aInstance)
 {
-    (void)aInstance;
+    (void) aInstance;
     BaseType_t status;
 
-    status = xTimerStop(sTimer, (TickType_t)-1);
-    if (status == pdPASS) {
+    status = xTimerStop(sTimer, (TickType_t) -1);
+    if (status == pdPASS)
+    {
         sRunning = false;
     }
 }
 
-void platformAlarmProcess(otInstance *aInstance)
+void platformAlarmProcess(otInstance * aInstance)
 {
     if (sRunning)
     {

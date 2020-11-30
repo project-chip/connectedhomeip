@@ -48,8 +48,7 @@
 #define NVOCMP_H
 
 #ifdef __cplusplus
-extern "C"
-{
+extern "C" {
 #endif
 
 #ifndef NV_LINUX
@@ -63,7 +62,10 @@ extern "C"
 //*****************************************************************************
 
 // NV driver item ID definitions
-#define NVOCMP_NVID_DIAG {NVINTF_SYSID_NVDRVR, 1, 0}
+#define NVOCMP_NVID_DIAG                                                                                                           \
+    {                                                                                                                              \
+        NVINTF_SYSID_NVDRVR, 1, 0                                                                                                  \
+    }
 
 //*****************************************************************************
 // Typedefs
@@ -78,8 +80,7 @@ typedef struct
     uint16_t active;    // Number of active items after last compaction
     uint16_t deleted;   // Number of items not transferred during compaction
     uint16_t badCRC;    // Number of bad CRCs encountered
-}
-NVOCMP_diag_t;
+} NVOCMP_diag_t;
 
 // Low Voltage Check Callback function, voltage is measured voltage value
 typedef void (*lowVoltCbFptr)(uint32_t voltage);
@@ -97,7 +98,7 @@ typedef void (*lowVoltCbFptr)(uint32_t voltage);
  *
  * @return  none
  */
-extern void NVOCMP_loadApiPtrs(NVINTF_nvFuncts_t *pfn);
+extern void NVOCMP_loadApiPtrs(NVINTF_nvFuncts_t * pfn);
 
 /**
  * @fn      NVOCMP_loadApiPtrsExt
@@ -110,7 +111,7 @@ extern void NVOCMP_loadApiPtrs(NVINTF_nvFuncts_t *pfn);
  *
  * @return  none
  */
-extern void NVOCMP_loadApiPtrsExt(NVINTF_nvFuncts_t *pfn);
+extern void NVOCMP_loadApiPtrsExt(NVINTF_nvFuncts_t * pfn);
 
 /**
  * @fn      NVOCMP_loadApiPtrsMin
@@ -124,7 +125,7 @@ extern void NVOCMP_loadApiPtrsExt(NVINTF_nvFuncts_t *pfn);
  *
  * @return  none
  */
-extern void NVOCMP_loadApiPtrsMin(NVINTF_nvFuncts_t *pfn);
+extern void NVOCMP_loadApiPtrsMin(NVINTF_nvFuncts_t * pfn);
 
 /**
  * @fn      NVOCMP_setCheckVoltage
@@ -140,7 +141,7 @@ extern void NVOCMP_loadApiPtrsMin(NVINTF_nvFuncts_t *pfn);
  *
  * @return  none
  */
-extern void NVOCMP_setCheckVoltage(void *funcPtr);
+extern void NVOCMP_setCheckVoltage(void * funcPtr);
 
 /**
  * @fn      NVOCMP_setLowVoltageCb
@@ -157,7 +158,7 @@ extern void NVOCMP_setLowVoltageCb(lowVoltCbFptr funcPtr);
 
 // Exception function can be defined to handle NV corruption issues
 // If none provided, NV module attempts to proceed ignoring problem
-#if !defined (NVOCMP_EXCEPTION)
+#if !defined(NVOCMP_EXCEPTION)
 #define NVOCMP_EXCEPTION(pg, err)
 #endif
 

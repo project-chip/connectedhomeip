@@ -40,60 +40,54 @@
 
  *****************************************************************************/
 
-
 #include <openthread/config.h>
 
 #include <openthread/platform/misc.h>
 
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib/sys_ctrl.h)
+#include DeviceFamily_constructPath(driverlib / sys_ctrl.h)
 
 /**
  * Function documented in platform/misc.h
  */
-void otPlatReset(otInstance *aInstance)
+void otPlatReset(otInstance * aInstance)
 {
-    (void)aInstance;
+    (void) aInstance;
     SysCtrlSystemReset();
 }
 
 /**
  * Function documented in platform/misc.h
  */
-otPlatResetReason otPlatGetResetReason(otInstance *aInstance)
+otPlatResetReason otPlatGetResetReason(otInstance * aInstance)
 {
-    (void)aInstance;
+    (void) aInstance;
 
     switch (SysCtrlResetSourceGet())
     {
-        case RSTSRC_PWR_ON:
-        {
-            return OT_PLAT_RESET_REASON_POWER_ON;
-        }
+    case RSTSRC_PWR_ON: {
+        return OT_PLAT_RESET_REASON_POWER_ON;
+    }
 
-        case RSTSRC_PIN_RESET:
-        {
-            return OT_PLAT_RESET_REASON_EXTERNAL;
-        }
+    case RSTSRC_PIN_RESET: {
+        return OT_PLAT_RESET_REASON_EXTERNAL;
+    }
 
-        case RSTSRC_VDDS_LOSS:
-        case RSTSRC_VDDR_LOSS:
-        case RSTSRC_CLK_LOSS:
-        {
-            return OT_PLAT_RESET_REASON_CRASH;
-        }
+    case RSTSRC_VDDS_LOSS:
+    case RSTSRC_VDDR_LOSS:
+    case RSTSRC_CLK_LOSS: {
+        return OT_PLAT_RESET_REASON_CRASH;
+    }
 
-        case RSTSRC_WARMRESET:
-        case RSTSRC_SYSRESET:
-        case RSTSRC_WAKEUP_FROM_SHUTDOWN:
-        {
-            return OT_PLAT_RESET_REASON_SOFTWARE;
-        }
+    case RSTSRC_WARMRESET:
+    case RSTSRC_SYSRESET:
+    case RSTSRC_WAKEUP_FROM_SHUTDOWN: {
+        return OT_PLAT_RESET_REASON_SOFTWARE;
+    }
 
-        default:
-        {
-            return OT_PLAT_RESET_REASON_UNKNOWN;
-        }
+    default: {
+        return OT_PLAT_RESET_REASON_UNKNOWN;
+    }
     }
 }
 

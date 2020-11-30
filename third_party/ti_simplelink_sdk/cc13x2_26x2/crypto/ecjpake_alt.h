@@ -44,7 +44,6 @@
 
  *****************************************************************************/
 
-
 #ifndef MBEDTLS_ECJPAKE_ALT_H
 #define MBEDTLS_ECJPAKE_ALT_H
 
@@ -53,8 +52,8 @@
 #include "mbedtls/ecp.h"
 #include "mbedtls/md.h"
 
-#include <ti/drivers/cryptoutils/cryptokey/CryptoKey.h>
 #include <ti/drivers/ECJPAKE.h>
+#include <ti/drivers/cryptoutils/cryptokey/CryptoKey.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -65,7 +64,7 @@ extern "C" {
  *
  * ECJ-PAKE is only defined for p256r1
  */
-#define NISTP256_CURVE_LENGTH_BYTES         (32)
+#define NISTP256_CURVE_LENGTH_BYTES (32)
 
 /**
  * Size in bytes of the identifier at the beginning of the point format
@@ -77,64 +76,64 @@ extern "C" {
  *
  * id_byte || X coord || Y coord
  */
-#define NISTP256_PUBLIC_KEY_LENGTH_BYTES    (OCTET_STRING_OFFSET + (NISTP256_CURVE_LENGTH_BYTES * 2))
+#define NISTP256_PUBLIC_KEY_LENGTH_BYTES (OCTET_STRING_OFFSET + (NISTP256_CURVE_LENGTH_BYTES * 2))
 
 /**
  * EC J-PAKE context structure.
  */
 typedef struct
 {
-    const mbedtls_md_info_t *md_info;
-    mbedtls_ecp_group_id    curve;
-    mbedtls_ecjpake_role    role;
-    int                     point_format;
+    const mbedtls_md_info_t * md_info;
+    mbedtls_ecp_group_id curve;
+    mbedtls_ecjpake_role role;
+    int point_format;
 
-    bool                    roundTwoGenerated;
+    bool roundTwoGenerated;
     /*
      * XXX: possible size reduction by moving ephemeral material to round
      * calculations.
      */
-    unsigned char           myPrivateKeyMaterial1[NISTP256_CURVE_LENGTH_BYTES];
-    unsigned char           myPrivateKeyMaterial2[NISTP256_CURVE_LENGTH_BYTES];
-    unsigned char           myPrivateVMaterial1[NISTP256_CURVE_LENGTH_BYTES];
-    unsigned char           myPrivateVMaterial2[NISTP256_CURVE_LENGTH_BYTES];
-    unsigned char           myPrivateVMaterial3[NISTP256_CURVE_LENGTH_BYTES];
-    unsigned char           myPublicKeyMaterial1[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           myPublicKeyMaterial2[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           myPublicVMaterial1[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           myPublicVMaterial2[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           myPublicVMaterial3[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           myCombinedPublicKeyMaterial1[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           myCombinedPrivateKeyMaterial1[NISTP256_CURVE_LENGTH_BYTES];
-    unsigned char           nistP256Generator[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           myGenerator[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           theirPublicKeyMaterial1[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           theirPublicKeyMaterial2[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           theirCombinedPublicKeyMaterial1[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           theirGenerator[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
-    unsigned char           preSharedSecretKeyingMaterial[NISTP256_CURVE_LENGTH_BYTES];
+    unsigned char myPrivateKeyMaterial1[NISTP256_CURVE_LENGTH_BYTES];
+    unsigned char myPrivateKeyMaterial2[NISTP256_CURVE_LENGTH_BYTES];
+    unsigned char myPrivateVMaterial1[NISTP256_CURVE_LENGTH_BYTES];
+    unsigned char myPrivateVMaterial2[NISTP256_CURVE_LENGTH_BYTES];
+    unsigned char myPrivateVMaterial3[NISTP256_CURVE_LENGTH_BYTES];
+    unsigned char myPublicKeyMaterial1[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char myPublicKeyMaterial2[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char myPublicVMaterial1[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char myPublicVMaterial2[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char myPublicVMaterial3[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char myCombinedPublicKeyMaterial1[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char myCombinedPrivateKeyMaterial1[NISTP256_CURVE_LENGTH_BYTES];
+    unsigned char nistP256Generator[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char myGenerator[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char theirPublicKeyMaterial1[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char theirPublicKeyMaterial2[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char theirCombinedPublicKeyMaterial1[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char theirGenerator[NISTP256_PUBLIC_KEY_LENGTH_BYTES];
+    unsigned char preSharedSecretKeyingMaterial[NISTP256_CURVE_LENGTH_BYTES];
 
-    CryptoKey               nistP256GeneratorCryptoKey;
-    CryptoKey               preSharedSecretCryptoKey;
-    CryptoKey               myPrivateCryptoKey1;
-    CryptoKey               myPrivateCryptoKey2;
-    CryptoKey               myPrivateCryptoV1;
-    CryptoKey               myPrivateCryptoV2;
-    CryptoKey               myPrivateCryptoV3;
-    CryptoKey               myCombinedPrivateKey;
-    CryptoKey               myPublicCryptoKey1;
-    CryptoKey               myPublicCryptoKey2;
-    CryptoKey               myPublicCryptoV1;
-    CryptoKey               myPublicCryptoV2;
-    CryptoKey               myPublicCryptoV3;
-    CryptoKey               myCombinedPublicKey;
-    CryptoKey               myGeneratorKey;
-    CryptoKey               theirPublicCryptoKey1;
-    CryptoKey               theirPublicCryptoKey2;
-    CryptoKey               theirCombinedPublicKey;
-    CryptoKey               theirGeneratorKey;
+    CryptoKey nistP256GeneratorCryptoKey;
+    CryptoKey preSharedSecretCryptoKey;
+    CryptoKey myPrivateCryptoKey1;
+    CryptoKey myPrivateCryptoKey2;
+    CryptoKey myPrivateCryptoV1;
+    CryptoKey myPrivateCryptoV2;
+    CryptoKey myPrivateCryptoV3;
+    CryptoKey myCombinedPrivateKey;
+    CryptoKey myPublicCryptoKey1;
+    CryptoKey myPublicCryptoKey2;
+    CryptoKey myPublicCryptoV1;
+    CryptoKey myPublicCryptoV2;
+    CryptoKey myPublicCryptoV3;
+    CryptoKey myCombinedPublicKey;
+    CryptoKey myGeneratorKey;
+    CryptoKey theirPublicCryptoKey1;
+    CryptoKey theirPublicCryptoKey2;
+    CryptoKey theirCombinedPublicKey;
+    CryptoKey theirGeneratorKey;
 
-    ECJPAKE_Handle          handle;
+    ECJPAKE_Handle handle;
 } mbedtls_ecjpake_context;
 
 /**
@@ -143,7 +142,7 @@ typedef struct
  *
  * \param ctx       context to initialize
  */
-void mbedtls_ecjpake_init( mbedtls_ecjpake_context *ctx );
+void mbedtls_ecjpake_init(mbedtls_ecjpake_context * ctx);
 
 /**
  * \brief           Set up a context for use
@@ -161,12 +160,8 @@ void mbedtls_ecjpake_init( mbedtls_ecjpake_context *ctx );
  * \return          0 if successful,
  *                  a negative error code otherwise
  */
-int mbedtls_ecjpake_setup( mbedtls_ecjpake_context *ctx,
-                           mbedtls_ecjpake_role role,
-                           mbedtls_md_type_t hash,
-                           mbedtls_ecp_group_id curve,
-                           const unsigned char *secret,
-                           size_t len );
+int mbedtls_ecjpake_setup(mbedtls_ecjpake_context * ctx, mbedtls_ecjpake_role role, mbedtls_md_type_t hash,
+                          mbedtls_ecp_group_id curve, const unsigned char * secret, size_t len);
 
 /*
  * \brief           Check if a context is ready for use
@@ -176,7 +171,7 @@ int mbedtls_ecjpake_setup( mbedtls_ecjpake_context *ctx,
  * \return          0 if the context is ready for use,
  *                  MBEDTLS_ERR_ECP_BAD_INPUT_DATA otherwise
  */
-int mbedtls_ecjpake_check( const mbedtls_ecjpake_context *ctx );
+int mbedtls_ecjpake_check(const mbedtls_ecjpake_context * ctx);
 
 /**
  * \brief           Generate and write the first round message
@@ -193,10 +188,8 @@ int mbedtls_ecjpake_check( const mbedtls_ecjpake_context *ctx );
  * \return          0 if successful,
  *                  a negative error code otherwise
  */
-int mbedtls_ecjpake_write_round_one( mbedtls_ecjpake_context *ctx,
-                            unsigned char *buf, size_t len, size_t *olen,
-                            int (*f_rng)(void *, unsigned char *, size_t),
-                            void *p_rng );
+int mbedtls_ecjpake_write_round_one(mbedtls_ecjpake_context * ctx, unsigned char * buf, size_t len, size_t * olen,
+                                    int (*f_rng)(void *, unsigned char *, size_t), void * p_rng);
 
 /**
  * \brief           Read and process the first round message
@@ -210,9 +203,7 @@ int mbedtls_ecjpake_write_round_one( mbedtls_ecjpake_context *ctx,
  * \return          0 if successful,
  *                  a negative error code otherwise
  */
-int mbedtls_ecjpake_read_round_one( mbedtls_ecjpake_context *ctx,
-                                    const unsigned char *buf,
-                                    size_t len );
+int mbedtls_ecjpake_read_round_one(mbedtls_ecjpake_context * ctx, const unsigned char * buf, size_t len);
 
 /**
  * \brief           Generate and write the second round message
@@ -228,10 +219,8 @@ int mbedtls_ecjpake_read_round_one( mbedtls_ecjpake_context *ctx,
  * \return          0 if successful,
  *                  a negative error code otherwise
  */
-int mbedtls_ecjpake_write_round_two( mbedtls_ecjpake_context *ctx,
-                            unsigned char *buf, size_t len, size_t *olen,
-                            int (*f_rng)(void *, unsigned char *, size_t),
-                            void *p_rng );
+int mbedtls_ecjpake_write_round_two(mbedtls_ecjpake_context * ctx, unsigned char * buf, size_t len, size_t * olen,
+                                    int (*f_rng)(void *, unsigned char *, size_t), void * p_rng);
 
 /**
  * \brief           Read and process the second round message
@@ -244,9 +233,7 @@ int mbedtls_ecjpake_write_round_two( mbedtls_ecjpake_context *ctx,
  * \return          0 if successful,
  *                  a negative error code otherwise
  */
-int mbedtls_ecjpake_read_round_two( mbedtls_ecjpake_context *ctx,
-                                    const unsigned char *buf,
-                                    size_t len );
+int mbedtls_ecjpake_read_round_two(mbedtls_ecjpake_context * ctx, const unsigned char * buf, size_t len);
 
 /**
  * \brief           Derive the shared secret
@@ -262,18 +249,15 @@ int mbedtls_ecjpake_read_round_two( mbedtls_ecjpake_context *ctx,
  * \return          0 if successful,
  *                  a negative error code otherwise
  */
-int mbedtls_ecjpake_derive_secret( mbedtls_ecjpake_context *ctx,
-                            unsigned char *buf, size_t len, size_t *olen,
-                            int (*f_rng)(void *, unsigned char *, size_t),
-                            void *p_rng );
+int mbedtls_ecjpake_derive_secret(mbedtls_ecjpake_context * ctx, unsigned char * buf, size_t len, size_t * olen,
+                                  int (*f_rng)(void *, unsigned char *, size_t), void * p_rng);
 
 /**
  * \brief           Free a context's content
  *
  * \param ctx       context to free
  */
-void mbedtls_ecjpake_free( mbedtls_ecjpake_context *ctx );
-
+void mbedtls_ecjpake_free(mbedtls_ecjpake_context * ctx);
 
 #ifdef __cplusplus
 }

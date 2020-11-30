@@ -52,5 +52,4 @@
 // Use the TI-supplied default platform configuration for remainder
 #include "openthread-core-cc13x2_26x2-config.h"
 
-
 #endif // OPENTHREAD_PLATFORM_CONFIG_H

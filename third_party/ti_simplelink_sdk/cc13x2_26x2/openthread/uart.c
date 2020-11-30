@@ -40,7 +40,6 @@
 
  *****************************************************************************/
 
-
 #include <openthread/config.h>
 
 #include <stddef.h>
@@ -50,8 +49,8 @@
 #include <ti/drivers/UART.h>
 #include <ti/drivers/uart/UARTCC26XX.h>
 
-#include "ti_drivers_config.h"
 #include "system.h"
+#include "ti_drivers_config.h"
 
 /**
  * Configure the UART core for 115200 baud 8-N-1, no HW flow control.
@@ -63,8 +62,8 @@
 /**
  * Event identifiers passed back to the stack task callback.
  */
-#define PLATFORM_UART_EVENT_TX_DONE  (1U << 0)
-#define PLATFORM_UART_EVENT_RX_DONE  (1U << 1)
+#define PLATFORM_UART_EVENT_TX_DONE (1U << 0)
+#define PLATFORM_UART_EVENT_RX_DONE (1U << 1)
 
 /**
  * Size of the statically allocated buffer to pass data from the callback to
@@ -85,7 +84,7 @@ static size_t PlatformUart_receiveLen;
 /**
  * The buffer to be sent.
  */
-static uint8_t const *PlatformUart_sendBuffer = NULL;
+static uint8_t const * PlatformUart_sendBuffer = NULL;
 
 /**
  * Uart driver handle.
@@ -101,10 +100,10 @@ static uintptr_t PlatformUart_arg;
  * This is triggered when the buffer is full, or when the UART hardware times
  * out.
  */
-static void uartReadCallback(UART_Handle aHandle, void *aBuf, size_t aLen)
+static void uartReadCallback(UART_Handle aHandle, void * aBuf, size_t aLen)
 {
-    (void)aHandle;
-    (void)aBuf;
+    (void) aHandle;
+    (void) aBuf;
     PlatformUart_receiveLen = aLen;
     PlatformUart_arg |= PLATFORM_UART_EVENT_RX_DONE;
     platformUartSignal();
@@ -113,11 +112,11 @@ static void uartReadCallback(UART_Handle aHandle, void *aBuf, size_t aLen)
 /**
  * Callback for when the UART driver finishes writing a buffer.
  */
-static void uartWriteCallback(UART_Handle aHandle, void *aBuf, size_t aLen)
+static void uartWriteCallback(UART_Handle aHandle, void * aBuf, size_t aLen)
 {
-    (void)aHandle;
-    (void)aBuf;
-    (void)aLen;
+    (void) aHandle;
+    (void) aBuf;
+    (void) aLen;
     PlatformUart_sendBuffer = NULL;
     PlatformUart_arg |= PLATFORM_UART_EVENT_TX_DONE;
     platformUartSignal();
@@ -132,27 +131,25 @@ otError otPlatUartEnable(void)
 
     UART_Params_init(&params);
 
-    params.readMode         = UART_MODE_CALLBACK;
-    params.writeMode        = UART_MODE_CALLBACK;
-    params.readCallback     = uartReadCallback;
-    params.writeCallback    = uartWriteCallback;
-    params.readDataMode     = UART_DATA_BINARY;
-    params.writeDataMode    = UART_DATA_BINARY;
-    params.readEcho         = UART_ECHO_OFF;
-    params.baudRate         = 115200;
-    params.dataLength       = UART_LEN_8;
-    params.stopBits         = UART_STOP_ONE;
-    params.parityType       = UART_PAR_NONE;
+    params.readMode      = UART_MODE_CALLBACK;
+    params.writeMode     = UART_MODE_CALLBACK;
+    params.readCallback  = uartReadCallback;
+    params.writeCallback = uartWriteCallback;
+    params.readDataMode  = UART_DATA_BINARY;
+    params.writeDataMode = UART_DATA_BINARY;
+    params.readEcho      = UART_ECHO_OFF;
+    params.baudRate      = 115200;
+    params.dataLength    = UART_LEN_8;
+    params.stopBits      = UART_STOP_ONE;
+    params.parityType    = UART_PAR_NONE;
 
     PlatformUart_uartHandle = UART_open(CONFIG_DISPLAY_UART, &params);
 
     /* allow the uart driver to return before the read buffer is full */
-    UART_control(PlatformUart_uartHandle, UARTCC26XX_CMD_RETURN_PARTIAL_ENABLE,
-                 NULL);
+    UART_control(PlatformUart_uartHandle, UARTCC26XX_CMD_RETURN_PARTIAL_ENABLE, NULL);
 
     /* begin reading from the uart */
-    UART_read(PlatformUart_uartHandle, PlatformUart_receiveBuffer,
-              sizeof(PlatformUart_receiveBuffer));
+    UART_read(PlatformUart_uartHandle, PlatformUart_receiveBuffer, sizeof(PlatformUart_receiveBuffer));
 
     return OT_ERROR_NONE;
 }
@@ -170,7 +167,7 @@ otError otPlatUartDisable(void)
 /**
  * Function documented in platform/uart.h
  */
-otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
+otError otPlatUartSend(const uint8_t * aBuf, uint16_t aBufLength)
 {
     otError error = OT_ERROR_NONE;
     if (PlatformUart_sendBuffer == NULL)
@@ -185,7 +182,6 @@ otError otPlatUartSend(const uint8_t *aBuf, uint16_t aBufLength)
 
     return error;
 }
-
 
 /**
  * Function documented in system.h
@@ -204,8 +200,7 @@ void platformUartProcess()
         PlatformUart_arg &= ~PLATFORM_UART_EVENT_RX_DONE;
         otPlatUartReceived(PlatformUart_receiveBuffer, PlatformUart_receiveLen);
         PlatformUart_receiveLen = 0;
-        UART_read(PlatformUart_uartHandle, PlatformUart_receiveBuffer,
-                  sizeof(PlatformUart_receiveBuffer));
+        UART_read(PlatformUart_uartHandle, PlatformUart_receiveBuffer, sizeof(PlatformUart_receiveBuffer));
     }
 }
 

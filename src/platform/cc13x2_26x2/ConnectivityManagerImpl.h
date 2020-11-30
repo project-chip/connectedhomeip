@@ -21,7 +21,6 @@
  *          Instruments CC1352 platform.
  */
 
-
 #pragma once
 
 #include <platform/ConnectivityManager.h>

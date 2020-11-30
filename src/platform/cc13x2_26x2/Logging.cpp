@@ -39,7 +39,7 @@ using namespace ::chip::DeviceLayer::Internal;
 
 #define DEVICE_LAYER_LOG_BUFFER_SIZE (256)
 UART_Handle sDebugUartHandle;
-char        sDebugUartBuffer[DEVICE_LAYER_LOG_BUFFER_SIZE];
+char sDebugUartBuffer[DEVICE_LAYER_LOG_BUFFER_SIZE];
 
 extern "C" int cc13x2_26x2LogInit(void)
 {
@@ -61,11 +61,11 @@ extern "C" void cc13x2_26x2VLog(const char * msg, va_list v)
 {
     int ret;
 
-    ret = vsnprintf (sDebugUartBuffer, sizeof(sDebugUartBuffer), msg, v);
+    ret = vsnprintf(sDebugUartBuffer, sizeof(sDebugUartBuffer), msg, v);
     if (0 < ret)
     {
         // PuTTY likes \r\n
-        size_t len = (ret + 2U) < sizeof(sDebugUartBuffer) ? (ret + 2) : sizeof(sDebugUartBuffer);
+        size_t len                = (ret + 2U) < sizeof(sDebugUartBuffer) ? (ret + 2) : sizeof(sDebugUartBuffer);
         sDebugUartBuffer[len - 2] = '\r';
         sDebugUartBuffer[len - 1] = '\n';
         sDebugUartBuffer[len]     = '\0';
@@ -114,7 +114,6 @@ void Log(uint8_t module, uint8_t category, const char * msg, ...)
 
 } // namespace Logging
 } // namespace chip
-
 
 /**
  * LwIP log output function.

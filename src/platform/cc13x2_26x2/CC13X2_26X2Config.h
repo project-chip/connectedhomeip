@@ -40,8 +40,8 @@ public:
     // TODO: Define a proper system ID in upstream driver
     static constexpr uint16_t kNvinf_sysid_chip = (13);
 
-    static const uint16_t kCC13X2_26X2ChipConfig_Sysid = kNvinf_sysid_chip;
-    static const uint16_t kCC13X2_26X2ChipFactory_Sysid = kNvinf_sysid_chip;
+    static const uint16_t kCC13X2_26X2ChipConfig_Sysid   = kNvinf_sysid_chip;
+    static const uint16_t kCC13X2_26X2ChipFactory_Sysid  = kNvinf_sysid_chip;
     static const uint16_t kCC13X2_26X2ChipCounters_Sysid = kNvinf_sysid_chip;
 
     // Key definitions for well-known keys.
@@ -98,9 +98,7 @@ struct CC13X2_26X2Config::Key
 
 inline bool CC13X2_26X2Config::Key::operator==(const Key & other) const
 {
-    return (nvID.systemID == other.nvID.systemID
-            && nvID.itemID   == other.nvID.itemID
-            && nvID.subID    == other.nvID.subID);
+    return (nvID.systemID == other.nvID.systemID && nvID.itemID == other.nvID.itemID && nvID.subID == other.nvID.subID);
 }
 
 } // namespace Internal

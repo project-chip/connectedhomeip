@@ -17,8 +17,8 @@
  *    limitations under the License.
  */
 
-#include "AppConfig.h"
 #include "AppTask.h"
+#include "AppConfig.h"
 #include "AppEvent.h"
 #include "Server.h"
 
@@ -28,8 +28,8 @@
 
 #include "DataModelHandler.h"
 
-#include <ti/drivers/apps/LED.h>
 #include <ti/drivers/apps/Button.h>
+#include <ti/drivers/apps/LED.h>
 
 /* syscfg */
 #include <ti_drivers_config.h>
@@ -58,16 +58,17 @@ int AppTask::StartAppTask()
     if (sAppEventQueue == NULL)
     {
         PLAT_LOG("Failed to allocate app event queue");
-        while (1) ;
+        while (1)
+            ;
     }
 
     // Start App task.
-    if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE /
-                sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle)
-            != pdPASS)
+    if (xTaskCreate(AppTaskMain, "APP", APP_TASK_STACK_SIZE / sizeof(StackType_t), NULL, APP_TASK_PRIORITY, &sAppTaskHandle) !=
+        pdPASS)
     {
         PLAT_LOG("Failed to create app task");
-        while (1) ;
+        while (1)
+            ;
     }
     return ret;
 }
@@ -85,46 +86,52 @@ int AppTask::Init()
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("PlatformMgr().InitChipStack() failed");
-        while(1);
+        while (1)
+            ;
     }
 
     ret = ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ThreadStackMgr().InitThreadStack() failed");
-        while(1);
+        while (1)
+            ;
     }
 
     ret = ConnectivityMgr().SetThreadDeviceType(ConnectivityManager::kThreadDeviceType_SleepyEndDevice);
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadDeviceType() failed");
-        while(1);
+        while (1)
+            ;
     }
 
     pollingConfig.Clear();
-    pollingConfig.ActivePollingIntervalMS = 5000; // ms
+    pollingConfig.ActivePollingIntervalMS   = 5000; // ms
     pollingConfig.InactivePollingIntervalMS = 5000; // ms
 
     ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ConnectivityMgr().SetThreadPollingConfig() failed");
-        while(1);
+        while (1)
+            ;
     }
 
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("PlatformMgr().StartEventLoopTask() failed");
-        while(1);
+        while (1)
+            ;
     }
 
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {
         PLAT_LOG("ThreadStackMgr().StartThreadTask() failed");
-        while(1);
+        while (1)
+            ;
     }
 
     // Init ZCL Data Model and start server
@@ -148,21 +155,20 @@ int AppTask::Init()
     Button_init();
 
     Button_Params_init(&buttionParams);
-    buttionParams.buttonEventMask = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttionParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
     buttionParams.longPressDuration = 1000U; // ms
-    sAppLeftHandle = Button_open(CONFIG_BTN_LEFT, ButtonLeftEventHandler, &buttionParams);
+    sAppLeftHandle                  = Button_open(CONFIG_BTN_LEFT, ButtonLeftEventHandler, &buttionParams);
 
     Button_Params_init(&buttionParams);
-    buttionParams.buttonEventMask = Button_EV_CLICKED | Button_EV_LONGCLICKED;
+    buttionParams.buttonEventMask   = Button_EV_CLICKED | Button_EV_LONGCLICKED;
     buttionParams.longPressDuration = 1000U; // ms
-    sAppRightHandle = Button_open(CONFIG_BTN_RIGHT, ButtonRightEventHandler, &buttionParams);
+    sAppRightHandle                 = Button_open(CONFIG_BTN_RIGHT, ButtonRightEventHandler, &buttionParams);
 
     // Initialize BoltLock module
     PLAT_LOG("Initialize BoltLock");
     BoltLockMgr().Init();
 
     BoltLockMgr().SetCallbacks(ActionInitiated, ActionCompleted);
-
 
     return 0;
 }
@@ -183,9 +189,9 @@ void AppTask::AppTaskMain(void * pvParameter)
     }
 }
 
-void AppTask::PostEvent(const AppEvent *aEvent)
+void AppTask::PostEvent(const AppEvent * aEvent)
 {
-    if (xQueueSend(sAppEventQueue, aEvent, 0) != pdPASS )
+    if (xQueueSend(sAppEventQueue, aEvent, 0) != pdPASS)
     {
         /* Failed to post the message */
     }
@@ -205,7 +211,7 @@ void AppTask::ButtonLeftEventHandler(Button_Handle handle, Button_EventMask even
         event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
     }
     // button callbacks are in ISR context
-    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS )
+    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
     {
         /* Failed to post the message */
     }
@@ -225,7 +231,7 @@ void AppTask::ButtonRightEventHandler(Button_Handle handle, Button_EventMask eve
         event.ButtonEvent.Type = AppEvent::kAppEventButtonType_LongClicked;
     }
     // button callbacks are in ISR context
-    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS )
+    if (xQueueSendFromISR(sAppEventQueue, &event, NULL) != pdPASS)
     {
         /* Failed to post the message */
     }
@@ -279,39 +285,39 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 {
     switch (aEvent->Type)
     {
-        case AppEvent::kEventType_ButtonLeft:
-            if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
-            {
-                BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
-            }
-            else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
-            {
-                // TODO: factory reset device
-                BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
-            }
-            break;
+    case AppEvent::kEventType_ButtonLeft:
+        if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
+        {
+            BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+        }
+        else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
+        {
+            // TODO: factory reset device
+            BoltLockMgr().InitiateAction(0, BoltLockManager::UNLOCK_ACTION);
+        }
+        break;
 
-        case AppEvent::kEventType_ButtonRight:
-            if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
-            {
-                BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
-            }
-            else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
-            {
-                // TODO: factory reset device
-                BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
-            }
-            break;
+    case AppEvent::kEventType_ButtonRight:
+        if (AppEvent::kAppEventButtonType_Clicked == aEvent->ButtonEvent.Type)
+        {
+            BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+        }
+        else if (AppEvent::kAppEventButtonType_LongClicked == aEvent->ButtonEvent.Type)
+        {
+            // TODO: factory reset device
+            BoltLockMgr().InitiateAction(0, BoltLockManager::LOCK_ACTION);
+        }
+        break;
 
-        case AppEvent::kEventType_AppEvent:
-            if (NULL != aEvent->Handler)
-            {
-                aEvent->Handler(aEvent);
-            }
-            break;
+    case AppEvent::kEventType_AppEvent:
+        if (NULL != aEvent->Handler)
+        {
+            aEvent->Handler(aEvent);
+        }
+        break;
 
-        case AppEvent::kEventType_None:
-        default:
-            break;
+    case AppEvent::kEventType_None:
+    default:
+        break;
     }
 }

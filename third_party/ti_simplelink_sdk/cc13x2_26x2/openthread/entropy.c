@@ -40,7 +40,6 @@
 
  *****************************************************************************/
 
-
 /**
  * @file
  *   This file implements an entropy source based on TRNG.
@@ -50,8 +49,8 @@
 #include <openthread/config.h>
 
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib/prcm.h)
-#include DeviceFamily_constructPath(driverlib/trng.h)
+#include DeviceFamily_constructPath(driverlib / prcm.h)
+#include DeviceFamily_constructPath(driverlib / trng.h)
 
 #include <openthread/platform/entropy.h>
 #include <ti/drivers/TRNG.h>
@@ -71,20 +70,20 @@ TRNG_Handle TRNG_handle;
  *
  * @return returns 0 if no error occurred, -1 if error.
  */
-static int getRandom(uint8_t *aOutput, size_t aLen)
+static int getRandom(uint8_t * aOutput, size_t aLen)
 {
     int_fast16_t rtn;
     CryptoKey entropyKey;
 
     /*
-      * prepare the data buffer
-    */
+     * prepare the data buffer
+     */
     CryptoKeyPlaintext_initBlankKey(&entropyKey, aOutput, aLen);
 
     /* get entropy */
     rtn = TRNG_generateEntropy(TRNG_handle, &entropyKey);
     if (rtn != TRNG_STATUS_SUCCESS)
-    	return OT_ERROR_FAILED;
+        return OT_ERROR_FAILED;
 
     return OT_ERROR_NONE;
 }
@@ -103,7 +102,7 @@ void platformRandomInit(void)
     TRNG_Params_init(&TRNGParams);
     /* use the polling mode */
     TRNGParams.returnBehavior = TRNG_RETURN_BEHAVIOR_POLLING;
-    TRNG_handle = TRNG_open(0, &TRNGParams);
+    TRNG_handle               = TRNG_open(0, &TRNGParams);
 
     if (NULL == TRNG_handle)
     {
@@ -123,13 +122,12 @@ void platformRandomInit(void)
 void platformRandomProcess(void)
 {
     /* place holder */
-
 }
 
 /**
  * Function documented in platform/entropy.h
  */
-otError otPlatEntropyGet(uint8_t *aOutput, uint16_t aOutputLength)
+otError otPlatEntropyGet(uint8_t * aOutput, uint16_t aOutputLength)
 {
     otError error = OT_ERROR_NONE;
 

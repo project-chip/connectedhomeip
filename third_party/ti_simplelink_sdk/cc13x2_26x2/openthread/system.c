@@ -40,7 +40,6 @@
 
  *****************************************************************************/
 
-
 /**
  * @file
  * @brief
@@ -52,13 +51,13 @@
 
 #include <ti/devices/DeviceFamily.h>
 #include <ti/drivers/AESECB.h>
-#include <ti/drivers/SHA2.h>
 #include <ti/drivers/ECJPAKE.h>
+#include <ti/drivers/SHA2.h>
 
 /**
  * Function documented in system.h
  */
-void otSysInit(int argc, char *argv[])
+void otSysInit(int argc, char * argv[])
 {
     OT_UNUSED_VARIABLE(argc);
     OT_UNUSED_VARIABLE(argv);
@@ -78,7 +77,7 @@ void otSysInit(int argc, char *argv[])
 /**
  * Function documented in platform-cc1352.h
  */
-void otSysProcessDrivers(otInstance *aInstance)
+void otSysProcessDrivers(otInstance * aInstance)
 {
     // should sleep and wait for interrupts here
 

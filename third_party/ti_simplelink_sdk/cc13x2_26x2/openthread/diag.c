@@ -44,7 +44,6 @@
 
  *****************************************************************************/
 
-
 #include <openthread/config.h>
 
 #include <stdbool.h>
@@ -72,12 +71,12 @@
 /**
  * Default interframe spacing used for transmission command.
  */
-#define PLAT_DIAG_TX_INTERFRAME   100 //ms
+#define PLAT_DIAG_TX_INTERFRAME 100 // ms
 
 /**
  * Default packet size used for transmission command.
  */
-#define PLAT_DIAG_TX_PACKETSIZE   30
+#define PLAT_DIAG_TX_PACKETSIZE 30
 
 /**
  * Diagnostics mode variables.
@@ -112,9 +111,9 @@ static uint16_t PlatDiag_rxReceivedCount;
  * @retval OT_ERROR_NONE    The string was parsed correctly.
  * @retval OT_ERROR_PARSE   The string was not formatted correctly.
  */
-otError PlatDiag_parseLong(char *aArgVector, long *aValue)
+otError PlatDiag_parseLong(char * aArgVector, long * aValue)
 {
-    char *endptr;
+    char * endptr;
     *aValue = strtol(aArgVector, &endptr, 0);
     return (*endptr == '\0') ? OT_ERROR_NONE : OT_ERROR_PARSE;
 }
@@ -133,9 +132,7 @@ unsigned int PlatDiag_calculatePER(void)
 
     if (PlatDiag_rxFrameCount != 0)
     {
-        packetErrorRate = (((long)PlatDiag_rxFrameCount -
-                    (long)PlatDiag_rxReceivedCount) * 100 /
-                (long)PlatDiag_rxFrameCount);
+        packetErrorRate = (((long) PlatDiag_rxFrameCount - (long) PlatDiag_rxReceivedCount) * 100 / (long) PlatDiag_rxFrameCount);
     }
     else
     {
@@ -143,10 +140,8 @@ unsigned int PlatDiag_calculatePER(void)
             packetErrorRate = 100;
         else
         {
-            packetErrorRate = (((long)PlatDiag_rxNokCount +
-                        (long)PlatDiag_rxLostFrames) * 100 /
-                     ((long)PlatDiag_rxReceivedCount + (long)PlatDiag_rxNokCount
-                     + (long)PlatDiag_rxLostFrames));
+            packetErrorRate = (((long) PlatDiag_rxNokCount + (long) PlatDiag_rxLostFrames) * 100 /
+                               ((long) PlatDiag_rxReceivedCount + (long) PlatDiag_rxNokCount + (long) PlatDiag_rxLostFrames));
         }
     }
 
@@ -164,8 +159,7 @@ unsigned int PlatDiag_calculatePER(void)
  *
  * @return Error value from parsing or executing the command.
  */
-otError PlatDiag_processReceive(otInstance *aInstance, int argc, char *argv[],
-                                char *aOutput, size_t aOutputMaxLen)
+otError PlatDiag_processReceive(otInstance * aInstance, int argc, char * argv[], char * aOutput, size_t aOutputMaxLen)
 {
     otError retval = OT_ERROR_INVALID_ARGS;
 
@@ -175,9 +169,7 @@ otError PlatDiag_processReceive(otInstance *aInstance, int argc, char *argv[],
         {
             long expectedCount;
 
-            otEXPECT_ACTION(true == PlatDiag_diagEnabled
-                                && false == PlatDiag_rxEnabled
-                                && false == PlatDiag_txEnabled,
+            otEXPECT_ACTION(true == PlatDiag_diagEnabled && false == PlatDiag_rxEnabled && false == PlatDiag_txEnabled,
                             retval = OT_ERROR_INVALID_STATE);
 
             if (argc >= 2)
@@ -200,7 +192,8 @@ otError PlatDiag_processReceive(otInstance *aInstance, int argc, char *argv[],
             retval = OT_ERROR_NONE;
             snprintf(aOutput, aOutputMaxLen,
                      "packet reception is started\r\n"
-                     "status 0x%02x\r\n", retval);
+                     "status 0x%02x\r\n",
+                     retval);
         }
         else if (strcmp(argv[0], "stop") == 0)
         {
@@ -209,7 +202,7 @@ otError PlatDiag_processReceive(otInstance *aInstance, int argc, char *argv[],
             otEXPECT(true == PlatDiag_diagEnabled);
 
             packetErrorRate = PlatDiag_calculatePER();
-            retval = OT_ERROR_NONE;
+            retval          = OT_ERROR_NONE;
 
             PlatDiag_rxEnabled = false;
             snprintf(aOutput, aOutputMaxLen,
@@ -220,8 +213,8 @@ otError PlatDiag_processReceive(otInstance *aInstance, int argc, char *argv[],
                      "lost: 0x%04x\r\n"
                      "Packet Error Rate: %d%%\r\n"
                      "status 0x%02x\r\n",
-                     PlatDiag_rxFrameCount,PlatDiag_rxReceivedCount, PlatDiag_rxNokCount,
-                     PlatDiag_rxLostFrames, packetErrorRate, retval);
+                     PlatDiag_rxFrameCount, PlatDiag_rxReceivedCount, PlatDiag_rxNokCount, PlatDiag_rxLostFrames, packetErrorRate,
+                     retval);
         }
     }
 
@@ -240,8 +233,7 @@ exit:
  *
  * @return Error value from parsing or executing the command.
  */
-otError PlatDiag_processTransmit(otInstance *aInstance, int argc, char *argv[],
-                                 char *aOutput, size_t aOutputMaxLen)
+otError PlatDiag_processTransmit(otInstance * aInstance, int argc, char * argv[], char * aOutput, size_t aOutputMaxLen)
 {
     otError retval = OT_ERROR_INVALID_ARGS;
 
@@ -253,9 +245,7 @@ otError PlatDiag_processTransmit(otInstance *aInstance, int argc, char *argv[],
             long interframeSpace;
             long transmitCount;
 
-            otEXPECT_ACTION(true == PlatDiag_diagEnabled
-                                && false == PlatDiag_txEnabled
-                                && false == PlatDiag_rxEnabled,
+            otEXPECT_ACTION(true == PlatDiag_diagEnabled && false == PlatDiag_txEnabled && false == PlatDiag_rxEnabled,
                             retval = OT_ERROR_INVALID_STATE);
 
             if (argc >= 2)
@@ -294,18 +284,17 @@ otError PlatDiag_processTransmit(otInstance *aInstance, int argc, char *argv[],
             PlatDiag_txFrameCount = transmitCount;
             PlatDiag_txSentCount  = 0;
 
-            otPlatAlarmMilliStartAt(aInstance, otPlatAlarmMilliGetNow(),
-                    PlatDiag_txPeriod);
+            otPlatAlarmMilliStartAt(aInstance, otPlatAlarmMilliGetNow(), PlatDiag_txPeriod);
 
             retval = OT_ERROR_NONE;
             snprintf(aOutput, aOutputMaxLen,
                      "packet transmission is started\r\n"
-                     "status 0x%02x\r\n", retval);
+                     "status 0x%02x\r\n",
+                     retval);
         }
         else if (strcmp(argv[0], "stop") == 0)
         {
-            otEXPECT_ACTION(true == PlatDiag_diagEnabled && true ==
-                    PlatDiag_txEnabled, retval = OT_ERROR_INVALID_STATE);
+            otEXPECT_ACTION(true == PlatDiag_diagEnabled && true == PlatDiag_txEnabled, retval = OT_ERROR_INVALID_STATE);
 
             PlatDiag_txEnabled = false;
             otPlatAlarmMilliStop(aInstance);
@@ -334,8 +323,7 @@ exit:
  *
  * @return Error value from parsing or executing the command.
  */
-otError PlatDiag_processTone(otInstance *aInstance, int argc, char *argv[],
-                             char *aOutput, size_t aOutputMaxLen)
+otError PlatDiag_processTone(otInstance * aInstance, int argc, char * argv[], char * aOutput, size_t aOutputMaxLen)
 {
     otError retval = OT_ERROR_INVALID_ARGS;
 
@@ -353,8 +341,7 @@ otError PlatDiag_processTone(otInstance *aInstance, int argc, char *argv[],
             retval = otPlatDiagRadioToneStart(aInstance, modulated);
             otEXPECT(OT_ERROR_NONE == retval);
 
-            snprintf(aOutput, aOutputMaxLen, "continuous %s tone started\r\n",
-                     modulated ? "modulated" : "unmodulated");
+            snprintf(aOutput, aOutputMaxLen, "continuous %s tone started\r\n", modulated ? "modulated" : "unmodulated");
         }
         else if (strcmp(argv[0], "stop") == 0)
         {
@@ -380,8 +367,7 @@ exit:
  *
  * @return Error value from parsing or executing the command.
  */
-otError PlatDiag_processShield(otInstance *aInstance, int argc, char *argv[],
-                               char *aOutput, size_t aOutputMaxLen)
+otError PlatDiag_processShield(otInstance * aInstance, int argc, char * argv[], char * aOutput, size_t aOutputMaxLen)
 {
     otError retval = OT_ERROR_INVALID_ARGS;
     if (argc == 2)
@@ -414,8 +400,7 @@ exit:
 /**
  * Documented in <openthread/platform/diag.h>
  */
-otError otPlatDiagProcess(otInstance *aInstance, uint8_t argc, char *argv[],
-                       char *aOutput, size_t aOutputMaxLen)
+otError otPlatDiagProcess(otInstance * aInstance, uint8_t argc, char * argv[], char * aOutput, size_t aOutputMaxLen)
 {
     otError retval = OT_ERROR_NONE;
 
@@ -423,32 +408,23 @@ otError otPlatDiagProcess(otInstance *aInstance, uint8_t argc, char *argv[],
     {
         if (strcmp(argv[0], "tone") == 0)
         {
-            retval = PlatDiag_processTone(aInstance, argc - 1,
-                                 (argc > 1) ? &argv[1] : NULL, aOutput,
-                                 aOutputMaxLen);
+            retval = PlatDiag_processTone(aInstance, argc - 1, (argc > 1) ? &argv[1] : NULL, aOutput, aOutputMaxLen);
         }
         else if (strcmp(argv[0], "receive") == 0)
         {
-            retval = PlatDiag_processReceive(aInstance, argc - 1,
-                                 (argc > 1) ? &argv[1] : NULL, aOutput,
-                                 aOutputMaxLen);
+            retval = PlatDiag_processReceive(aInstance, argc - 1, (argc > 1) ? &argv[1] : NULL, aOutput, aOutputMaxLen);
         }
         else if (strcmp(argv[0], "transmit") == 0)
         {
-            retval = PlatDiag_processTransmit(aInstance, argc - 1,
-                                 (argc > 1) ? &argv[1] : NULL, aOutput,
-                                 aOutputMaxLen);
+            retval = PlatDiag_processTransmit(aInstance, argc - 1, (argc > 1) ? &argv[1] : NULL, aOutput, aOutputMaxLen);
         }
         else if (strcmp(argv[0], "shield") == 0)
         {
-            retval = PlatDiag_processShield(aInstance, argc - 1,
-                                 (argc > 1) ? &argv[1] : NULL, aOutput,
-                                 aOutputMaxLen);
+            retval = PlatDiag_processShield(aInstance, argc - 1, (argc > 1) ? &argv[1] : NULL, aOutput, aOutputMaxLen);
         }
         else
         {
-            snprintf(aOutput, aOutputMaxLen,
-                     "diag feature '%s' is not supported\r\n", argv[0]);
+            snprintf(aOutput, aOutputMaxLen, "diag feature '%s' is not supported\r\n", argv[0]);
         }
     }
 
@@ -495,8 +471,7 @@ void otPlatDiagTxPowerSet(int8_t aTxPower)
 /**
  * Documented in <openthread/platform/diag.h>
  */
-void otPlatDiagRadioReceived(otInstance *aInstance, otRadioFrame *aFrame,
-                             otError aError)
+void otPlatDiagRadioReceived(otInstance * aInstance, otRadioFrame * aFrame, otError aError)
 {
     (void) aInstance;
 
@@ -504,11 +479,9 @@ void otPlatDiagRadioReceived(otInstance *aInstance, otRadioFrame *aFrame,
     {
         if (OT_ERROR_NONE == aError)
         {
-            uint16_t seqNo = (aFrame->mPsdu[0] << 8 & 0xFF00)
-                             | (aFrame->mPsdu[1] & 0x00FF);
+            uint16_t seqNo = (aFrame->mPsdu[0] << 8 & 0xFF00) | (aFrame->mPsdu[1] & 0x00FF);
 
-            if (PlatDiag_rxFrameCount != 0
-                    && PlatDiag_rxReceivedCount >= PlatDiag_rxFrameCount)
+            if (PlatDiag_rxFrameCount != 0 && PlatDiag_rxReceivedCount >= PlatDiag_rxFrameCount)
             {
                 /* Recieved enough frames, stop */
                 PlatDiag_rxEnabled = false;
@@ -521,8 +494,7 @@ void otPlatDiagRadioReceived(otInstance *aInstance, otRadioFrame *aFrame,
             }
             else
             {
-                uint16_t seqNoWindow = (0 == PlatDiag_rxFrameCount ?
-                        PLAT_DIAG_RX_SEQNO_WINDOW : PlatDiag_rxFrameCount);
+                uint16_t seqNoWindow = (0 == PlatDiag_rxFrameCount ? PLAT_DIAG_RX_SEQNO_WINDOW : PlatDiag_rxFrameCount);
                 /* Both are unsigned, we are looking for positive difference
                  * only.
                  */
@@ -553,15 +525,14 @@ void otPlatDiagRadioReceived(otInstance *aInstance, otRadioFrame *aFrame,
 /**
  * Documented in <openthread/platform/diag.h>
  */
-void otPlatDiagAlarmCallback(otInstance *aInstance)
+void otPlatDiagAlarmCallback(otInstance * aInstance)
 {
     if (PlatDiag_txEnabled)
     {
-        if (PlatDiag_txFrameCount == 0
-                || PlatDiag_txSentCount < PlatDiag_txFrameCount)
+        if (PlatDiag_txFrameCount == 0 || PlatDiag_txSentCount < PlatDiag_txFrameCount)
         {
-            unsigned int  i;
-            otRadioFrame *packet = otPlatRadioGetTransmitBuffer(aInstance);
+            unsigned int i;
+            otRadioFrame * packet = otPlatRadioGetTransmitBuffer(aInstance);
 
             packet->mLength = PlatDiag_txFrameSize;
 
@@ -575,8 +546,7 @@ void otPlatDiagAlarmCallback(otInstance *aInstance)
 
             otPlatRadioTransmit(aInstance, packet);
             PlatDiag_txSentCount++;
-            otPlatAlarmMilliStartAt(aInstance, otPlatAlarmMilliGetNow(),
-                                    PlatDiag_txPeriod);
+            otPlatAlarmMilliStartAt(aInstance, otPlatAlarmMilliGetNow(), PlatDiag_txPeriod);
         }
         else
         {
@@ -588,7 +558,7 @@ void otPlatDiagAlarmCallback(otInstance *aInstance)
 /**
  * Documented in <openthread/platform/diag.h>
  */
-bool otDiagIsEnabled(otInstance *aInstance)
+bool otDiagIsEnabled(otInstance * aInstance)
 {
 
     return false;

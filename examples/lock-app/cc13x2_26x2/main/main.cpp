@@ -36,7 +36,6 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 
-
 // ================================================================================
 // FreeRTOS Callbacks
 // ================================================================================
@@ -47,7 +46,6 @@ extern "C" void vApplicationStackOverflowHook(void)
         ;
     }
 }
-
 
 // ================================================================================
 // Main Code
@@ -62,12 +60,14 @@ int main(void)
     if (ret != CHIP_NO_ERROR)
     {
         // can't log until the kernel is started
-        //PLAT_LOG("GetAppTask().StartAppTask() failed");
-        while(1);
+        // PLAT_LOG("GetAppTask().StartAppTask() failed");
+        while (1)
+            ;
     }
 
     vTaskStartScheduler();
 
     // Should never get here.
-    while(1);
+    while (1)
+        ;
 }

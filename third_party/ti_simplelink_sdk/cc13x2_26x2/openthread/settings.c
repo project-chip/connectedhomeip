@@ -73,9 +73,9 @@
  * unreliable after a write operation.
  */
 
-#include <stdlib.h>
-#include <stddef.h>
 #include <assert.h>
+#include <stddef.h>
+#include <stdlib.h>
 
 #include <openthread/config.h>
 
@@ -85,13 +85,13 @@
 #include "nv/nvocmp.h"
 
 /* CONSTANTS AND MACROS */
-#define SUBIDMAX    ((2 << 10) - 1)
+#define SUBIDMAX ((2 << 10) - 1)
 
 /* Static local variables */
 static NVINTF_nvFuncts_t sNvoctpFps = { 0 };
 
 /* settings API */
-void otPlatSettingsInit(otInstance *aInstance)
+void otPlatSettingsInit(otInstance * aInstance)
 {
     /* Load NVOCMP function pointers, extended API */
     NVOCMP_loadApiPtrsExt(&sNvoctpFps);
@@ -100,23 +100,22 @@ void otPlatSettingsInit(otInstance *aInstance)
     sNvoctpFps.initNV(NULL);
 }
 
-otError otPlatSettingsBeginChange(otInstance *aInstance)
+otError otPlatSettingsBeginChange(otInstance * aInstance)
 {
-    return(OT_ERROR_NONE);
+    return (OT_ERROR_NONE);
 }
 
-otError otPlatSettingsCommitChange(otInstance *aInstance)
+otError otPlatSettingsCommitChange(otInstance * aInstance)
 {
-    return(OT_ERROR_NONE);
+    return (OT_ERROR_NONE);
 }
 
-otError otPlatSettingsAbandonChange(otInstance *aInstance)
+otError otPlatSettingsAbandonChange(otInstance * aInstance)
 {
-    return(OT_ERROR_NONE);
+    return (OT_ERROR_NONE);
 }
 
-otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex,
-                          uint8_t *aValue, uint16_t *aValueLength)
+otError otPlatSettingsGet(otInstance * aInstance, uint16_t aKey, int aIndex, uint8_t * aValue, uint16_t * aValueLength)
 {
     NVINTF_itemID_t nvID;
     uint8_t status = NVINTF_SUCCESS;
@@ -125,14 +124,14 @@ otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex,
     uint32_t itemLen;
 
     /* doNext search for nth item */
-    NVINTF_nvProxy_t nvProxy = {0};
-    nvProxy.sysid  = NVINTF_SYSID_TIOP;
-    nvProxy.itemid = aKey;
-    nvProxy.flag   = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DOFIND;
+    NVINTF_nvProxy_t nvProxy = { 0 };
+    nvProxy.sysid            = NVINTF_SYSID_TIOP;
+    nvProxy.itemid           = aKey;
+    nvProxy.flag             = NVINTF_DOSTART | NVINTF_DOITMID | NVINTF_DOFIND;
 
     /* Lock and call doNext to find nth item of "aKey" */
     intptr_t key = sNvoctpFps.lockNV();
-    while(!status && (count <= aIndex))
+    while (!status && (count <= aIndex))
     {
         status = sNvoctpFps.doNext(&nvProxy);
         count++;
@@ -142,7 +141,7 @@ otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex,
     /* If we didn't find the nth item, return */
     if (NVINTF_NOTFOUND == status)
     {
-        return(OT_ERROR_NOT_FOUND);
+        return (OT_ERROR_NOT_FOUND);
     }
 
     /* Make item ID */
@@ -172,15 +171,15 @@ otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex,
         {
             /* Item length requested */
             *aValueLength = itemLen;
-            error = OT_ERROR_NONE;
+            error         = OT_ERROR_NONE;
         }
     }
     else if (NULL != aValueLength)
     {
         /* Read operation requested */
         // fix typing here
-        //status = sNvoctpFps.readItem(nvID, NULL, (uint16_t)itemLen, aValue);
-        status = sNvoctpFps.readItem(nvID, 0U, (uint16_t)itemLen, aValue);
+        // status = sNvoctpFps.readItem(nvID, NULL, (uint16_t)itemLen, aValue);
+        status = sNvoctpFps.readItem(nvID, 0U, (uint16_t) itemLen, aValue);
         /* Replace parameter with actual size of item */
         *aValueLength = itemLen;
         if (status)
@@ -197,18 +196,17 @@ otError otPlatSettingsGet(otInstance *aInstance, uint16_t aKey, int aIndex,
         error = OT_ERROR_NOT_FOUND;
     }
 
-    return(error);
+    return (error);
 }
 
-otError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey,
-                          const uint8_t *aValue, uint16_t aValueLength)
+otError otPlatSettingsSet(otInstance * aInstance, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
 {
     /* Function deletes all items with specific itemID and writes one
      *  item with that item ID */
     NVINTF_itemID_t nvID;
-    NVINTF_nvProxy_t nvProxy = {0};
-    uint8_t status = NVINTF_SUCCESS;
-    otError error  = OT_ERROR_NONE;
+    NVINTF_nvProxy_t nvProxy = { 0 };
+    uint8_t status           = NVINTF_SUCCESS;
+    otError error            = OT_ERROR_NONE;
 
     /* Setup doNext call */
     nvProxy.sysid  = NVINTF_SYSID_TIOP;
@@ -217,7 +215,7 @@ otError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey,
 
     /* Lock and call doNext to delete all items with itemID of "aKey" */
     intptr_t key = sNvoctpFps.lockNV();
-    while(!status)
+    while (!status)
     {
         status = sNvoctpFps.doNext(&nvProxy);
     }
@@ -229,16 +227,15 @@ otError otPlatSettingsSet(otInstance *aInstance, uint16_t aKey,
     nvID.subID    = 0;
 
     /* Write item */
-    status = sNvoctpFps.writeItem(nvID, aValueLength, (void *)aValue);
+    status = sNvoctpFps.writeItem(nvID, aValueLength, (void *) aValue);
 
-    return(error);
+    return (error);
 }
 
-otError otPlatSettingsAdd(otInstance *aInstance, uint16_t aKey,
-                          const uint8_t *aValue, uint16_t aValueLength)
+otError otPlatSettingsAdd(otInstance * aInstance, uint16_t aKey, const uint8_t * aValue, uint16_t aValueLength)
 {
     NVINTF_itemID_t nvID;
-    NVINTF_nvProxy_t nvProxy = {0};
+    NVINTF_nvProxy_t nvProxy = { 0 };
     uint8_t status           = NVINTF_SUCCESS;
     otError error            = OT_ERROR_FAILED;
     uint32_t itemLen         = 1;
@@ -254,11 +251,11 @@ otError otPlatSettingsAdd(otInstance *aInstance, uint16_t aKey,
     /* Lock and call doNext to iterate through all items of itemID "aKey" */
     /* Store min/max of sub id's found */
     intptr_t key = sNvoctpFps.lockNV();
-    while(!status)
+    while (!status)
     {
-        status    = sNvoctpFps.doNext(&nvProxy);
-        maxSubId  = (nvProxy.subid > maxSubId ? nvProxy.subid : maxSubId);
-        minSubId  = (nvProxy.subid < minSubId ? nvProxy.subid : minSubId);
+        status   = sNvoctpFps.doNext(&nvProxy);
+        maxSubId = (nvProxy.subid > maxSubId ? nvProxy.subid : maxSubId);
+        minSubId = (nvProxy.subid < minSubId ? nvProxy.subid : minSubId);
     }
     sNvoctpFps.unlockNV(key);
 
@@ -269,7 +266,7 @@ otError otPlatSettingsAdd(otInstance *aInstance, uint16_t aKey,
     /* Look for an unused subid */
     uint16_t count = 0;
     bool looking   = true;
-    while(looking && (count < SUBIDMAX))
+    while (looking && (count < SUBIDMAX))
     {
         if (maxSubId < SUBIDMAX)
         {
@@ -303,17 +300,17 @@ otError otPlatSettingsAdd(otInstance *aInstance, uint16_t aKey,
     /* Write item */
     if (!itemLen)
     {
-        status = sNvoctpFps.writeItem(nvID, aValueLength, (void *)aValue);
-        error = (status == NVINTF_SUCCESS ? OT_ERROR_NONE : OT_ERROR_FAILED);
+        status = sNvoctpFps.writeItem(nvID, aValueLength, (void *) aValue);
+        error  = (status == NVINTF_SUCCESS ? OT_ERROR_NONE : OT_ERROR_FAILED);
     }
 
-    return(error);
+    return (error);
 }
 
-otError otPlatSettingsDelete(otInstance *aInstance, uint16_t aKey, int aIndex)
+otError otPlatSettingsDelete(otInstance * aInstance, uint16_t aKey, int aIndex)
 {
     NVINTF_itemID_t nvID;
-    NVINTF_nvProxy_t nvProxy = {0};
+    NVINTF_nvProxy_t nvProxy = { 0 };
     uint8_t status           = NVINTF_SUCCESS;
     otError error            = OT_ERROR_NONE;
 
@@ -326,9 +323,9 @@ otError otPlatSettingsDelete(otInstance *aInstance, uint16_t aKey, int aIndex)
 
         /* Call doNext to delete all items of itemID "aKey". */
         intptr_t key = sNvoctpFps.lockNV();
-        while(!status)
+        while (!status)
         {
-           status = sNvoctpFps.doNext(&nvProxy);
+            status = sNvoctpFps.doNext(&nvProxy);
         }
         sNvoctpFps.unlockNV(key);
     }
@@ -342,10 +339,10 @@ otError otPlatSettingsDelete(otInstance *aInstance, uint16_t aKey, int aIndex)
         /* Call doNext to find nth matching item, where n = (aIndex - 1) */
         int itemCount = 0;
         intptr_t key  = sNvoctpFps.lockNV();
-        while(!status && (itemCount <= aIndex))
+        while (!status && (itemCount <= aIndex))
         {
-           status = sNvoctpFps.doNext(&nvProxy);
-           itemCount++;
+            status = sNvoctpFps.doNext(&nvProxy);
+            itemCount++;
         }
         sNvoctpFps.unlockNV(key);
 
@@ -355,18 +352,18 @@ otError otPlatSettingsDelete(otInstance *aInstance, uint16_t aKey, int aIndex)
             nvID.systemID = NVINTF_SYSID_TIOP;
             nvID.itemID   = aKey;
             nvID.subID    = nvProxy.subid;
-            status = sNvoctpFps.deleteItem(nvID);
+            status        = sNvoctpFps.deleteItem(nvID);
         }
 
         error = (status == NVINTF_SUCCESS ? error : OT_ERROR_NOT_FOUND);
     }
 
-    return(error);
+    return (error);
 }
 
-void otPlatSettingsWipe(otInstance *aInstance)
+void otPlatSettingsWipe(otInstance * aInstance)
 {
-    NVINTF_nvProxy_t nvProxy = {0};
+    NVINTF_nvProxy_t nvProxy = { 0 };
     uint8_t status           = NVINTF_SUCCESS;
 
     /* Setup doNext call */
@@ -375,7 +372,7 @@ void otPlatSettingsWipe(otInstance *aInstance)
 
     /* Lock and wipe all items with sysid TIOP */
     intptr_t key = sNvoctpFps.lockNV();
-    while(!status)
+    while (!status)
     {
         status = sNvoctpFps.doNext(&nvProxy);
     }

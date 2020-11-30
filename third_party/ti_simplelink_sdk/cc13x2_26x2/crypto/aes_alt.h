@@ -55,8 +55,8 @@
 
 #if defined(MBEDTLS_AES_ALT)
 
-#include <ti/drivers/cryptoutils/cryptokey/CryptoKey.h>
 #include <ti/drivers/AESECB.h>
+#include <ti/drivers/cryptoutils/cryptokey/CryptoKey.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -69,8 +69,8 @@ extern "C" {
  */
 typedef struct
 {
-    CryptoKey cryptoKey;                        /*!<  input to the crypto driver   */
-    uint32_t  keyMaterial[16];                  /*!<  storage for the key   */
+    CryptoKey cryptoKey;      /*!<  input to the crypto driver   */
+    uint32_t keyMaterial[16]; /*!<  storage for the key   */
 } mbedtls_aes_context;
 
 /**
@@ -78,14 +78,14 @@ typedef struct
  *
  * @param [in,out] ctx AES context to be initialized
  */
-void mbedtls_aes_init( mbedtls_aes_context *ctx );
+void mbedtls_aes_init(mbedtls_aes_context * ctx);
 
 /**
  * @brief          Clear AES context
  *
  * \param ctx      AES context to be cleared
  */
-void mbedtls_aes_free( mbedtls_aes_context *ctx );
+void mbedtls_aes_free(mbedtls_aes_context * ctx);
 
 /**
  * \brief          AES key schedule (encryption)
@@ -96,8 +96,7 @@ void mbedtls_aes_free( mbedtls_aes_context *ctx );
  *
  * \return         0 if successful, or MBEDTLS_ERR_AES_INVALID_KEY_LENGTH
  */
-int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
-                    unsigned int keybits );
+int mbedtls_aes_setkey_enc(mbedtls_aes_context * ctx, const unsigned char * key, unsigned int keybits);
 
 /**
  * \brief          AES key schedule (decryption)
@@ -108,8 +107,7 @@ int mbedtls_aes_setkey_enc( mbedtls_aes_context *ctx, const unsigned char *key,
  *
  * \return         0 if successful, or MBEDTLS_ERR_AES_INVALID_KEY_LENGTH
  */
-int mbedtls_aes_setkey_dec( mbedtls_aes_context *ctx, const unsigned char *key,
-                    unsigned int keybits );
+int mbedtls_aes_setkey_dec(mbedtls_aes_context * ctx, const unsigned char * key, unsigned int keybits);
 
 /**
  * \brief          AES-ECB block encryption/decryption
@@ -121,10 +119,7 @@ int mbedtls_aes_setkey_dec( mbedtls_aes_context *ctx, const unsigned char *key,
  *
  * \return         0 if successful
  */
-int mbedtls_aes_crypt_ecb( mbedtls_aes_context *ctx,
-                    int mode,
-                    const unsigned char input[16],
-                    unsigned char output[16] );
+int mbedtls_aes_crypt_ecb(mbedtls_aes_context * ctx, int mode, const unsigned char input[16], unsigned char output[16]);
 
 #ifdef __cplusplus
 }
