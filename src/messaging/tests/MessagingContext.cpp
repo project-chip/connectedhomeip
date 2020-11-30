@@ -31,7 +31,7 @@ CHIP_ERROR MessagingContext::Init(nlTestSuite * suite, TransportMgrBase * transp
     err = mSecureSessionMgr.Init(GetSourceNodeId(), &GetSystemLayer(), transport);
     SuccessOrExit(err);
 
-    err = mExchangeManager.Init(&mSecureSessionMgr);
+    err = mExchangeManager.Init(GetSourceNodeId(), transport, &mSecureSessionMgr);
     SuccessOrExit(err);
 
     err = mSecureSessionMgr.NewPairing(mPeer, GetDestinationNodeId(), &mPairingLocalToPeer);
