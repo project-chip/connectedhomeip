@@ -40,7 +40,7 @@
 
 #include <inet/InetLayer.h>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <system/SystemClock.h>
 #include <system/SystemTimer.h>

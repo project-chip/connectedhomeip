@@ -24,7 +24,7 @@
 
 #include <app/MessageDef.h>
 #include <core/CHIPTLVDebug.hpp>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 
 #include <nlunit-test.h>
