@@ -184,6 +184,7 @@ function asReadType(type)
  * type label for CHIP type conversion. CHIP specific XML should have the
  * correct type directly embedded inside.
  *
+ * @param {*} label : The xml label of the type.
  * @param {*} type : The xml type to be converted
  */
 function asChipUnderlyingType(label, type) {
@@ -192,16 +193,16 @@ function asChipUnderlyingType(label, type) {
     return 'chip::EndpointId'
   } else if (zclHelper.isStrEqual(label, "endpointId")) {
     return 'chip::EndpointId'
-  } else if (zclHelper.isStrEqual(label, "CLUSTER_ID")) {
+  } else if (zclHelper.isStrEqual(type, "CLUSTER_ID")) {
     return 'chip::ClusterId'
-  } else if (zclHelper.isStrEqual(label, "ATTRIBUTE_ID")){
+  } else if (zclHelper.isStrEqual(type, "ATTRIBUTE_ID")){
     return 'chip::AttributeId'
   } else if (zclHelper.isStrEqual(label, "groupId")) {
     return 'chip::GroupId'
   } else if (zclHelper.isStrEqual(label, "commandId")) {
     return 'chip::CommandId'
   } else {
-    // Might want to use asZclUnderlyingType instead. TBD
+    // Might want to use asUnderlyingZclType instead. TBD
     return cHelper.asUnderlyingType.call(this, type)
   }
 }
