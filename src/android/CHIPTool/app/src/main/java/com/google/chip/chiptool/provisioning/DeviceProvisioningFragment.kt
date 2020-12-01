@@ -30,9 +30,7 @@ import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.bluetooth.BluetoothManager
-import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
-import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -117,7 +115,7 @@ class DeviceProvisioningFragment : Fragment() {
 
     override fun onNetworkCredentialsRequested() {
       childFragmentManager.beginTransaction()
-          .add(R.id.fragment_container, EnterWifiNetworkFragment.newInstance())
+          .add(R.id.fragment_container, EnterNetworkFragment.newInstance())
           .commit()
     }
 

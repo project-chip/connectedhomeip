@@ -63,8 +63,21 @@
     <string name="attestation_test_btn_text">Attestation Test</string>
     <string name="attestation_fetching_status">Fetching…</string>
     <string name="attestation_app_not_found">No attestation app found</string>
+
     <string name="enter_wifi_credentials_title">Enter your Wi-Fi network and password below that you want to put your CHIP device on.</string>
     <string name="enter_wifi_ssid_hint">Enter Wi-Fi SSID</string>
     <string name="enter_wifi_password_hint">Enter Wi-Fi password</string>
     <string name="enter_wifi_save_network_btn">Save network</string>
+
+    <string name="enter_thread_credentials_title">Enter credentials of the Thread network that you want to put your CHIP device on.</string>
+    <string name="enter_thread_channel_hint">Channel:</string>
+    <string name="enter_thread_panid_hint">PAN ID:</string>
+    <string name="enter_thread_xpanid_hint">Extended PAN ID:</string>
+    <string name="enter_thread_master_key_hint">Master Key:</string>
+    <string name="enter_thread_channel_text">15</string>
+    <string name="enter_thread_panid_text">1234</string>
+    <string name="enter_thread_xpanid_text">11:11:11:11:22:22:22:22</string>
+    <string name="enter_thread_master_key_text">00:11:22:33:44:55:66:77:88:99:AA:BB:CC:DD:EE:FF</string>
+    <string name="enter_thread_save_network_btn">Save network</string>
+
 </resources>
