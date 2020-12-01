@@ -49,6 +49,7 @@
  *  16 bit: | Exchange ID                                                          |
  *  16 bit: | Optional Vendor ID                                                   |
  *  16 bit: | Protocol ID                                                          |
+ *  32 bit: | Acknowledged Message Counter (if A flag in the Header is set)        |
  * -------- Encrypted Application Data Start ---------------------------------------
  *  <var>:  | Encrypted Data                                                       |
  * -------- Encrypted Application Data End -----------------------------------------
@@ -72,6 +73,9 @@ constexpr size_t kNodeIdSizeBytes = 8;
 
 /// size of a serialized vendor id inside a header
 constexpr size_t kVendorIdSizeBytes = 2;
+
+/// size of a serialized ack id inside a header
+constexpr size_t kAckIdSizeBytes = 4;
 
 /// Mask to extract just the version part from a 16bit header prefix.
 constexpr uint16_t kVersionMask = 0xF000;
@@ -113,7 +117,13 @@ uint16_t PayloadHeader::EncodeSizeBytes() const
         size += kVendorIdSizeBytes;
     }
 
-    static_assert(kEncryptedHeaderSizeBytes + kVendorIdSizeBytes <= UINT16_MAX, "Header size does not fit in uint16_t");
+    if (mAckId.HasValue())
+    {
+        size += kAckIdSizeBytes;
+    }
+
+    static_assert(kEncryptedHeaderSizeBytes + kVendorIdSizeBytes + kAckIdSizeBytes <= UINT16_MAX,
+                  "Header size does not fit in uint16_t");
     return static_cast<uint16_t>(size);
 }
 
@@ -190,7 +200,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data, uint16_t size, uint16_t * decode_len)
+CHIP_ERROR PayloadHeader::Decode(const uint8_t * const data, uint16_t size, uint16_t * decode_len)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     LittleEndian::Reader reader(data, size);
@@ -200,7 +210,9 @@ CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data
     err = reader.Read8(&header).Read8(&mMessageType).Read16(&mExchangeID).StatusCode();
     SuccessOrExit(err);
 
-    if (flags.Has(Header::FlagValues::kVendorIdPresent))
+    mExchangeFlags.SetRaw(header);
+
+    if (mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_VendorIdPresent))
     {
         uint16_t vendor_id;
         err = reader.Read16(&vendor_id).StatusCode();
@@ -212,10 +224,20 @@ CHIP_ERROR PayloadHeader::Decode(Header::Flags flags, const uint8_t * const data
         mVendorId.ClearValue();
     }
 
-    mExchangeFlags.SetRaw(header);
-
     err = reader.Read16(&mProtocolID).StatusCode();
     SuccessOrExit(err);
+
+    if (mExchangeFlags.Has(Header::ExFlagValues::kExchangeFlag_AckMsg))
+    {
+        uint32_t ack_id;
+        err = reader.Read32(&ack_id).StatusCode();
+        SuccessOrExit(err);
+        mAckId.SetValue(ack_id);
+    }
+    else
+    {
+        mAckId.ClearValue();
+    }
 
     octets_read = reader.OctetsRead();
     VerifyOrExit(octets_read == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
@@ -226,7 +248,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size, Header::Flags payloadFlags) const
+CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode_size) const
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
     uint8_t * p     = data;
@@ -235,12 +257,8 @@ CHIP_ERROR PacketHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encode
     VerifyOrExit(size >= EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     {
-        // Payload flags are restricted.
-        VerifyOrExit(payloadFlags.HasOnly(Header::FlagValues::kVendorIdPresent), err = CHIP_ERROR_INVALID_ARGUMENT);
-
         Header::Flags encodeFlags = mFlags;
-        encodeFlags.Set(payloadFlags)
-            .Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
+        encodeFlags.Set(Header::FlagValues::kSourceNodeIdPresent, mSourceNodeId.HasValue())
             .Set(Header::FlagValues::kDestinationNodeIdPresent, mDestinationNodeId.HasValue());
 
         header = header | encodeFlags.Raw();
@@ -286,6 +304,10 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
         LittleEndian::Write16(p, mVendorId.Value());
     }
     LittleEndian::Write16(p, mProtocolID);
+    if (mAckId.HasValue())
+    {
+        LittleEndian::Write32(p, mAckId.Value());
+    }
 
     // Written data size provided to caller on success
     VerifyOrExit(p - data == EncodeSizeBytes(), err = CHIP_ERROR_INTERNAL);
@@ -293,11 +315,6 @@ CHIP_ERROR PayloadHeader::Encode(uint8_t * data, uint16_t size, uint16_t * encod
 
 exit:
     return err;
-}
-
-Header::Flags PayloadHeader::GetEncodePacketFlags() const
-{
-    return Header::Flags().Set(Header::FlagValues::kVendorIdPresent, mVendorId.HasValue());
 }
 
 CHIP_ERROR MessageAuthenticationCode::Decode(const PacketHeader & packetHeader, const uint8_t * const data, uint16_t size,

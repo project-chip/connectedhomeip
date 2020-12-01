@@ -288,7 +288,8 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong handle, j
         RendezvousParameters params = RendezvousParameters()
                                           .SetSetupPINCode(pinCode)
                                           .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
-                                          .SetBleLayer(&sBleLayer);
+                                          .SetBleLayer(&sBleLayer)
+                                          .SetPeerAddress(Transport::PeerAddress::BLE());
         err = wrapper->Controller()->ConnectDevice(kRemoteDeviceId, params, (void *) "ConnectDevice", HandleKeyExchange,
                                                    HandleEchoResponse, HandleError);
     }
@@ -361,7 +362,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
         {
             memcpy(buffer->Start(), messageStr, messageLen);
             buffer->SetDataLength(messageLen);
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", std::move(buffer));
         }
     }
 
@@ -425,7 +426,7 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
             buffer->SetDataLength(dataLength);
 
             // Hardcode endpoint to 1 for now
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", std::move(buffer));
         }
     }
 

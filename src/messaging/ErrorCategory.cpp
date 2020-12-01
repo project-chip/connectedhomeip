@@ -29,7 +29,7 @@
 #include <system/SystemError.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 bool IsIgnoredMulticastSendError(CHIP_ERROR err)
 {
@@ -81,5 +81,5 @@ bool IsSendErrorNonCritical(CHIP_ERROR err)
             err == INET_ERROR_MESSAGE_TOO_LONG || err == INET_ERROR_NO_MEMORY || CHIP_CONFIG_IsPlatformErrorNonCritical(err));
 }
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip

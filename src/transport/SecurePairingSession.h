@@ -48,13 +48,12 @@ public:
      *   Called when pairing session generates a new message that should be sent to peer.
      *
      * @param header the message header for the sent message
-     * @param payloadFlags payload encoding flags
      * @param peerAddress the destination of the message
      * @param msgBuf the raw data for the message being sent
      * @return CHIP_ERROR Error thrown when sending the message
      */
-    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
-                                          const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf)
+    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                          System::PacketBuffer * msgBuf)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -213,9 +212,9 @@ private:
     CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
                     uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
-    CHIP_ERROR HandleCompute_pA(const PacketHeader & header, System::PacketBuffer * msg);
-    CHIP_ERROR HandleCompute_pB_cB(const PacketHeader & header, System::PacketBuffer * msg);
-    CHIP_ERROR HandleCompute_cA(const PacketHeader & header, System::PacketBuffer * msg);
+    CHIP_ERROR HandleCompute_pA(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleCompute_pB_cB(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleCompute_cA(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
     CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgBuf);
 

@@ -171,8 +171,7 @@ Inet::TCPEndPoint * TCPBase::FindActiveConnection(const PeerAddress & address)
     return nullptr;
 }
 
-CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
-                                System::PacketBuffer * msgBuf)
+CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
 {
     System::PacketBufferHandle autofree;
     autofree.Adopt(msgBuf);
@@ -200,7 +199,7 @@ CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, Header::Flags paylo
     LittleEndian::Write16(output, static_cast<uint16_t>(msgBuf->DataLength() - kPacketSizeBytes));
 
     uint16_t actualEncodedHeaderSize;
-    ReturnErrorOnFailure(header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags));
+    ReturnErrorOnFailure(header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize));
 
     // header encoding has to match space that we allocated
     VerifyOrReturnError(prefixSize == actualEncodedHeaderSize + kPacketSizeBytes, CHIP_ERROR_INTERNAL);
@@ -342,7 +341,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
         // when a buffer is empty, it can be released back to the app
         if (buffer->DataLength() == 0)
         {
-            buffer.Adopt(buffer->DetachTail());
+            buffer.FreeHead();
             continue;
         }
 
@@ -397,7 +396,7 @@ exit:
     if (!buffer.IsNull())
     {
         // Incomplete processing will be retried
-        endPoint->PutBackReceivedData(buffer.Release_ForNow());
+        endPoint->PutBackReceivedData(std::move(buffer));
     }
 
     return err;

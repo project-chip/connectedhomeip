@@ -45,6 +45,7 @@ using namespace chip::Inet;
 using namespace chip::System;
 
 namespace chip {
+namespace Messaging {
 
 static void DefaultOnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
                                      PacketBufferHandle payload)
@@ -68,8 +69,8 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
     mFlags.Set(ExFlagValues::kFlagResponseExpected, inResponseExpected);
 }
 
-CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
-                                        void * msgCtxt)
+CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
+                                        const SendFlags & sendFlags, void * msgCtxt)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PayloadHeader payloadHeader;
@@ -92,7 +93,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     payloadHeader.SetMessageType(msgType);
 
     // If a response message is expected...
-    if ((sendFlags & kSendFlag_ExpectResponse) != 0)
+    if (sendFlags.Has(SendMessageFlags::kSendFlag_ExpectResponse))
     {
         // Only one 'response expected' message can be outstanding at a time.
         VerifyOrExit(!IsResponseExpected(), err = CHIP_ERROR_INCORRECT_STATE);
@@ -109,8 +110,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
 
     payloadHeader.SetInitiator(IsInitiator());
 
-    err    = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, msgBuf);
-    msgBuf = nullptr;
+    err = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, std::move(msgBuf));
     SuccessOrExit(err);
 
 exit:
@@ -119,9 +119,12 @@ exit:
         CancelResponseTimer();
         SetResponseExpected(false);
     }
-    if (msgBuf != nullptr && (sendFlags & kSendFlag_RetainBuffer) == 0)
+
+    if (sendFlags.Has(SendMessageFlags::kSendFlag_RetainBuffer))
     {
-        PacketBuffer::Free(msgBuf);
+        // Nothing currently calls us with this flag. Ensure it stays that way until kSendFlag_RetainBuffer is removed
+        // in favour of callers Retain()ing buffers.
+        err = CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
     // Release the reference to the exchange context acquired above. Under normal circumstances
@@ -332,4 +335,5 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     return err;
 }
 
+} // namespace Messaging
 } // namespace chip
