@@ -194,18 +194,18 @@ To use the Docker container for setup, complete the following steps:
 
     In this command:
 
-    - _~/nrfconnect_ can be replaced with an absolute path to the nRF Connect
-      SDK source directory.
-    - _~/connectedhomeip_ must be replaced with an absolute path to the CHIP
-      source directory.
-    - _-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:_ rmw"\*
-      parameters can be omitted if you are not planning to flash the example
-      onto hardware. These parameters give the container access to USB devices
-      connected to your computer such as the nRF52840 DK.
-    - _--rm_ can be omitted if you do not want the container to be auto-removed
-      when you exit the container shell session.
-    - _-e RUNAS=\$(id -u)_ is needed to start the container session as the
-      current user instead of root.
+    -   _~/nrfconnect_ can be replaced with an absolute path to the nRF Connect
+        SDK source directory.
+    -   _~/connectedhomeip_ must be replaced with an absolute path to the CHIP
+        source directory.
+    -   _-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:_ rmw"\*
+        parameters can be omitted if you are not planning to flash the example
+        onto hardware. These parameters give the container access to USB devices
+        connected to your computer such as the nRF52840 DK.
+    -   _--rm_ can be omitted if you do not want the container to be
+        auto-removed when you exit the container shell session.
+    -   _-e RUNAS=\$(id -u)_ is needed to start the container session as the
+        current user instead of root.
 
 4.  Check out or update the nRF Connect SDK to the recommended `v1.4.0` version
     by running the following command in the Docker container:
@@ -223,8 +223,8 @@ To use the native shell for setup, complete the following steps:
 
 1.  Download and install the following additional software:
 
-    - [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools)
-    - [GN meta-build system](https://gn.googlesource.com/gn/)
+    -   [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools)
+    -   [GN meta-build system](https://gn.googlesource.com/gn/)
 
 2.  Depending on whether you have the nRF Connect SDK installed:
 
