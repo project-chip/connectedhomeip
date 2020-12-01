@@ -68,7 +68,8 @@ public:
 
 private:
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
-    size_t IndexOf(void * element) {
+    size_t IndexOf(void * element)
+    {
         std::ptrdiff_t diff = static_cast<uint8_t *>(element) - static_cast<uint8_t *>(mElements);
         assert(diff > 0);
         assert(static_cast<size_t>(diff) % mElementSize == 0);
