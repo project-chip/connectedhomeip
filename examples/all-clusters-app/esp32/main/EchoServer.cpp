@@ -159,7 +159,7 @@ public:
             ESP_LOGI(TAG, "Client sent: %s", logmsg);
 
             // Attempt to echo back
-            err = mgr->SendMessage(header.GetSourceNodeId().Value(), buffer.Release_ForNow());
+            err = mgr->SendMessage(header.GetSourceNodeId().Value(), std::move(buffer));
             if (err != CHIP_NO_ERROR)
             {
                 ESP_LOGE(TAG, "Unable to echo back to client: %s", ErrorStr(err));

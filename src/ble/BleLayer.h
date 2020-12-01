@@ -156,7 +156,7 @@ public:
     /// Must be able to reserve 20 byte data length in msgBuf.
     BLE_ERROR Encode(const System::PacketBufferHandle & msgBuf) const;
 
-    static BLE_ERROR Decode(const PacketBuffer & msgBuf, BleTransportCapabilitiesRequestMessage & msg);
+    static BLE_ERROR Decode(const System::PacketBufferHandle & msgBuf, BleTransportCapabilitiesRequestMessage & msg);
 };
 
 class BleTransportCapabilitiesResponseMessage
@@ -190,7 +190,7 @@ public:
     /// Must be able to reserve 20 byte data length in msgBuf.
     BLE_ERROR Encode(const System::PacketBufferHandle & msgBuf) const;
 
-    static BLE_ERROR Decode(const PacketBuffer & msgBuf, BleTransportCapabilitiesResponseMessage & msg);
+    static BLE_ERROR Decode(const System::PacketBufferHandle & msgBuf, BleTransportCapabilitiesResponseMessage & msg);
 };
 
 /**
@@ -345,7 +345,6 @@ private:
     chip::System::Layer * mSystemLayer;
 
     // Private functions:
-    void HandleDataReceived(BLE_CONNECTION_OBJECT connObj, PacketBuffer * pBuf);
     void HandleAckReceived(BLE_CONNECTION_OBJECT connObj);
     void DriveSending();
     BLE_ERROR HandleBleTransportConnectionInitiated(BLE_CONNECTION_OBJECT connObj, System::PacketBufferHandle pBuf);

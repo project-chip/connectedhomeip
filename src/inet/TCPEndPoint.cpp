@@ -704,7 +704,7 @@ INET_ERROR TCPEndPoint::Send(PacketBuffer * data, bool push)
     if (mSendQueue == nullptr)
         mSendQueue = data;
     else
-        mSendQueue->AddToEnd(data);
+        mSendQueue->AddToEnd_ForNow(data);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -1019,12 +1019,12 @@ INET_ERROR TCPEndPoint::AckReceive(uint16_t len)
     return res;
 }
 
-INET_ERROR TCPEndPoint::PutBackReceivedData(PacketBuffer * data)
+INET_ERROR TCPEndPoint::PutBackReceivedData(System::PacketBufferHandle data)
 {
     if (!IsConnected())
         return INET_ERROR_INCORRECT_STATE;
 
-    mRcvQueue = data;
+    mRcvQueue = std::move(data);
 
     return INET_NO_ERROR;
 }
@@ -1038,7 +1038,7 @@ uint32_t TCPEndPoint::PendingSendLength()
 
 uint32_t TCPEndPoint::PendingReceiveLength()
 {
-    if (mRcvQueue != nullptr)
+    if (!mRcvQueue.IsNull())
         return mRcvQueue->TotalLength();
     return 0;
 }
@@ -1067,7 +1067,6 @@ INET_ERROR TCPEndPoint::Shutdown()
 INET_ERROR TCPEndPoint::Close()
 {
     // Clear the receive queue.
-    PacketBuffer::Free(mRcvQueue);
     mRcvQueue = nullptr;
 
     // Suppress closing callbacks, since the application explicitly called Close().
@@ -1326,7 +1325,7 @@ INET_ERROR TCPEndPoint::DriveSending()
         if (lenSent < bufLen)
             mSendQueue->ConsumeHead(lenSent);
         else
-            mSendQueue = PacketBuffer::FreeHead(mSendQueue);
+            mSendQueue = PacketBuffer::FreeHead_ForNow(mSendQueue);
 
         if (OnDataSent != nullptr)
             OnDataSent(this, lenSent);
@@ -1392,18 +1391,14 @@ void TCPEndPoint::DriveReceiving()
 {
     // If there's data in the receive queue and the app is ready to receive it then call the app's callback
     // with the entire receive queue.
-    if (mRcvQueue != nullptr && ReceiveEnabled && OnDataReceived != nullptr)
+    if (!mRcvQueue.IsNull() && ReceiveEnabled && OnDataReceived != nullptr)
     {
-        PacketBuffer * rcvQueue = mRcvQueue;
-        mRcvQueue               = nullptr;
-        System::PacketBufferHandle rcvQueue_ForNow;
-        rcvQueue_ForNow.Adopt(rcvQueue);
-        OnDataReceived(this, std::move(rcvQueue_ForNow));
+        OnDataReceived(this, std::move(mRcvQueue));
     }
 
     // If the connection is closing, and the receive queue is now empty, call DoClose() to complete
     // the process of closing the connection.
-    if (State == kState_Closing && mRcvQueue == nullptr)
+    if (State == kState_Closing && mRcvQueue.IsNull())
         DoClose(INET_NO_ERROR, false);
 }
 
@@ -1441,7 +1436,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
     // AND there is data waiting to be processed on either the send or receive queues
     // ... THEN enter the Closing state, allowing the queued data to drain,
     // ... OTHERWISE go straight to the Closed state.
-    if (IsConnected() && err == INET_NO_ERROR && (mSendQueue != nullptr || mRcvQueue != nullptr))
+    if (IsConnected() && err == INET_NO_ERROR && (mSendQueue != nullptr || !mRcvQueue.IsNull()))
         State = kState_Closing;
     else
         State = kState_Closed;
@@ -1570,8 +1565,7 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
         // Clear clear the send and receive queues.
         PacketBuffer::Free(mSendQueue);
         mSendQueue = nullptr;
-        PacketBuffer::Free(mRcvQueue);
-        mRcvQueue = nullptr;
+        mRcvQueue  = nullptr;
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         mUnackedLength = 0;
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -1969,7 +1963,7 @@ void TCPEndPoint::HandleDataSent(uint16_t lenSent)
     }
 }
 
-void TCPEndPoint::HandleDataReceived(PacketBuffer * buf)
+void TCPEndPoint::HandleDataReceived(System::PacketBufferHandle buf)
 {
     // Only receive new data while in the Connected or SendShutdown states.
     if (State == kState_Connected || State == kState_SendShutdown)
@@ -1979,13 +1973,15 @@ void TCPEndPoint::HandleDataReceived(PacketBuffer * buf)
 
         // If we received a data buffer, queue it on the receive queue.  If there's already data in
         // the queue, compact the data into the head buffer.
-        if (buf != NULL)
+        if (!buf.IsNull())
         {
-            if (mRcvQueue == NULL)
-                mRcvQueue = buf;
+            if (mRcvQueue.IsNull())
+            {
+                mRcvQueue = std::move(buf);
+            }
             else
             {
-                mRcvQueue->AddToEnd(buf);
+                mRcvQueue->AddToEnd(std::move(buf));
                 mRcvQueue->CompactHead();
             }
         }
@@ -2012,8 +2008,6 @@ void TCPEndPoint::HandleDataReceived(PacketBuffer * buf)
         // Drive the received data into the app.
         DriveReceiving();
     }
-    else
-        PacketBuffer::Free(buf);
 }
 
 void TCPEndPoint::HandleIncomingConnection(TCPEndPoint * conEP)
@@ -2418,11 +2412,11 @@ void TCPEndPoint::ReceiveData()
     PacketBuffer * rcvBuf;
     bool isNewBuf = true;
 
-    if (mRcvQueue == nullptr)
+    if (mRcvQueue.IsNull())
         rcvBuf = PacketBuffer::New(0).Release_ForNow();
     else
     {
-        rcvBuf = mRcvQueue;
+        rcvBuf = mRcvQueue.Get_ForNow();
         for (PacketBuffer * nextBuf = rcvBuf->Next(); nextBuf != nullptr; rcvBuf = nextBuf, nextBuf = nextBuf->Next())
             ;
 
@@ -2535,10 +2529,10 @@ void TCPEndPoint::ReceiveData()
             size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
             VerifyOrDie(CanCastTo<uint16_t>(newDataLength));
             rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength));
-            if (mRcvQueue == nullptr)
-                mRcvQueue = rcvBuf;
+            if (mRcvQueue.IsNull())
+                mRcvQueue.Adopt(rcvBuf);
             else
-                mRcvQueue->AddToEnd(rcvBuf);
+                mRcvQueue->AddToEnd_ForNow(rcvBuf);
         }
 
         else
@@ -2546,7 +2540,7 @@ void TCPEndPoint::ReceiveData()
             VerifyOrDie(rcvLen > 0);
             size_t newDataLength = rcvBuf->DataLength() + static_cast<size_t>(rcvLen);
             VerifyOrDie(CanCastTo<uint16_t>(newDataLength));
-            rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength), mRcvQueue);
+            rcvBuf->SetDataLength(static_cast<uint16_t>(newDataLength), mRcvQueue.Get_ForNow());
         }
     }
 

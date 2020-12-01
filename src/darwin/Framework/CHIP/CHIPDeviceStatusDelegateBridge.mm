@@ -36,22 +36,20 @@ void CHIPDeviceStatusDelegateBridge::setDelegate(id<CHIPDeviceStatusDelegate> de
     }
 }
 
-void CHIPDeviceStatusDelegateBridge::OnMessage(chip::System::PacketBuffer * message)
+void CHIPDeviceStatusDelegateBridge::OnMessage(chip::System::PacketBufferHandle message)
 {
     NSLog(@"DeviceStatusDelegate received message from the device");
 
     size_t data_len = message->DataLength();
     // convert to NSData
     NSMutableData * dataBuffer = [[NSMutableData alloc] initWithBytes:message->Start() length:data_len];
-    message = message->Next();
+    message.FreeHead();
 
-    while (message != NULL) {
+    while (!message.IsNull()) {
         data_len = message->DataLength();
         [dataBuffer appendBytes:message->Start() length:data_len];
-        message = message->Next();
+        message.FreeHead();
     }
-
-    chip::System::PacketBuffer::Free(message);
 
     id<CHIPDeviceStatusDelegate> strongDelegate = mDelegate;
     if (strongDelegate && mQueue) {

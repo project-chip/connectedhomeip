@@ -85,22 +85,20 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf)
+CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf)
 {
     PayloadHeader payloadHeader;
 
-    return SendMessage(payloadHeader, peerNodeId, msgBuf);
+    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf));
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgIn)
+CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf)
 {
-    System::PacketBufferHandle msgBuf;
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
 
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
-    msgBuf.Adopt(msgIn);
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(msgBuf->Next() == nullptr, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrExit(msgBuf->TotalLength() < kMax_SecureSDU_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);

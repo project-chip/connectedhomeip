@@ -226,13 +226,14 @@ exit:
     return err;
 }
 
-BLE_ERROR BleTransportCapabilitiesRequestMessage::Decode(const PacketBuffer & msgBuf, BleTransportCapabilitiesRequestMessage & msg)
+BLE_ERROR BleTransportCapabilitiesRequestMessage::Decode(const PacketBufferHandle & msgBuf,
+                                                         BleTransportCapabilitiesRequestMessage & msg)
 {
-    const uint8_t * p = msgBuf.Start();
+    const uint8_t * p = msgBuf->Start();
     BLE_ERROR err     = BLE_NO_ERROR;
 
     // Verify we can read the fixed-length request without running into the end of the buffer.
-    VerifyOrExit(msgBuf.DataLength() >= CAPABILITIES_REQUEST_LEN, err = BLE_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(msgBuf->DataLength() >= CAPABILITIES_REQUEST_LEN, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 
     VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
     VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
@@ -272,14 +273,14 @@ exit:
     return err;
 }
 
-BLE_ERROR BleTransportCapabilitiesResponseMessage::Decode(const PacketBuffer & msgBuf,
+BLE_ERROR BleTransportCapabilitiesResponseMessage::Decode(const PacketBufferHandle & msgBuf,
                                                           BleTransportCapabilitiesResponseMessage & msg)
 {
-    const uint8_t * p = msgBuf.Start();
+    const uint8_t * p = msgBuf->Start();
     BLE_ERROR err     = BLE_NO_ERROR;
 
     // Verify we can read the fixed-length response without running into the end of the buffer.
-    VerifyOrExit(msgBuf.DataLength() >= CAPABILITIES_RESPONSE_LEN, err = BLE_ERROR_MESSAGE_INCOMPLETE);
+    VerifyOrExit(msgBuf->DataLength() >= CAPABILITIES_RESPONSE_LEN, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 
     VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_1 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
     VerifyOrExit(CAPABILITIES_MSG_CHECK_BYTE_2 == chip::Encoding::Read8(p), err = BLE_ERROR_INVALID_MESSAGE);
