@@ -20,7 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libASN1Tests"
 
-  sources = [ "TestASN1.cpp" ]
+  test_sources = [ "TestASN1.cpp" ]
 
   public_deps = [
     "${chip_root}/src/lib/asn1",
@@ -28,6 +28,4 @@ chip_test_suite("tests") {
     "${chip_root}/src/platform",
     "${nlunit_test_root}:nlunit-test",
   ]
-
-  tests = [ "TestASN1" ]
 }
