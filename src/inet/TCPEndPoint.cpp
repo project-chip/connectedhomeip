@@ -708,12 +708,6 @@ INET_ERROR TCPEndPoint::Send(PacketBuffer * data, bool push)
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    if (mUnsentQueue == NULL)
-    {
-        mUnsentQueue  = data;
-        mUnsentOffset = 0;
-    }
-
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
     if (!mUserTimeoutTimerRunning)
     {
@@ -1175,6 +1169,10 @@ void TCPEndPoint::Init(InetLayer * inetLayer)
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #endif // INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    mUnackedLength = 0;
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
 INET_ERROR TCPEndPoint::DriveSending()
@@ -1195,50 +1193,62 @@ INET_ERROR TCPEndPoint::DriveSending()
         uint16_t sendWindowSize = tcp_sndbuf(mTCP);
 
         // If there's data to be sent and the send window is open...
-        bool canSend = (mUnsentQueue != NULL && sendWindowSize > 0);
+        bool canSend = (RemainingToSend() > 0 && sendWindowSize > 0);
         if (canSend)
         {
+            // Find first packet buffer with remaining data to send by skipping
+            // all sent but un-acked data.
+            TCPEndPoint::BufferOffset startOfUnsent             = FindStartOfUnsent();
+            const chip::System::PacketBuffer * currentUnsentBuf = startOfUnsent.buffer;
+            uint16_t unsentOffset                               = startOfUnsent.offset;
+
             // While there's data to be sent and a window to send it in...
             do
             {
-                uint16_t bufDataLen = mUnsentQueue->DataLength();
+                VerifyOrDie(currentUnsentBuf != NULL);
+
+                uint16_t bufDataLen = currentUnsentBuf->DataLength();
 
                 // Get a pointer to the start of unsent data within the first buffer on the unsent queue.
-                uint8_t * sendData = mUnsentQueue->Start() + mUnsentOffset;
+                const uint8_t * sendData = currentUnsentBuf->Start() + unsentOffset;
 
                 // Determine the amount of data to send from the current buffer.
-                VerifyOrDie(bufDataLen >= mUnsentOffset);
-                uint16_t sendLen = static_cast<uint16_t>(bufDataLen - mUnsentOffset);
+                uint16_t sendLen = static_cast<uint16_t>(bufDataLen - unsentOffset);
                 if (sendLen > sendWindowSize)
                     sendLen = sendWindowSize;
 
-                // Adjust the unsent data offset by the length of data to be written. If the entire buffer
-                // has been sent advance to the next one.
-                //
-                // This cast is safe, because mUnsentOffset + sendLen <=
-                // bufDataLen, which fits in uint16_t.
-                mUnsentOffset = static_cast<uint16_t>(mUnsentOffset + sendLen);
-                if (mUnsentOffset == bufDataLen)
-                {
-                    mUnsentQueue  = mUnsentQueue->Next();
-                    mUnsentOffset = 0;
-                }
-
-                // Adjust the remaining window size.
-                //
-                // This cast is safe because sendLen <= sendWindowSize here.
-                sendWindowSize = static_cast<uint16_t>(sendWindowSize - sendLen);
-
-                // Determine if there's more data to be sent after this buffer.
-                canSend = (mUnsentQueue != NULL && sendWindowSize > 0);
-
                 // Call LwIP to queue the data to be sent, telling it if there's more data to come.
+                // Data is queued in-place as a reference within the source packet buffer. It is
+                // critical that the underlying packet buffer not be freed until the data
+                // is acknowledged, otherwise retransmissions could use an invalid
+                // backing. Using TCP_WRITE_FLAG_COPY would eliminate this requirement, but overall
+                // requires many more memory allocations which may be problematic when very
+                // memory-constrained or when using pool-based allocations.
                 lwipErr = tcp_write(mTCP, sendData, sendLen, (canSend) ? TCP_WRITE_FLAG_MORE : 0);
                 if (lwipErr != ERR_OK)
                 {
                     err = chip::System::MapErrorLwIP(lwipErr);
                     break;
                 }
+                // Start accounting for the data sent as yet-to-be-acked.
+                // This cast is safe, because mUnackedLength + sendLen <= bufDataLen, which fits in uint16_t.
+                mUnackedLength = static_cast<uint16_t>(mUnackedLength + sendLen);
+
+                // Adjust the unsent data offset by the length of data that was written.
+                // If the entire buffer has been sent advance to the next one.
+                // This cast is safe, because unsentOffset + sendLen <= bufDataLen, which fits in uint16_t.
+                unsentOffset = static_cast<uint16_t>(unsentOffset + sendLen);
+                if (unsentOffset == bufDataLen)
+                {
+                    currentUnsentBuf = currentUnsentBuf->Next();
+                    unsentOffset     = 0;
+                }
+
+                // Adjust the remaining window size.
+                sendWindowSize = static_cast<uint16_t>(sendWindowSize - sendLen);
+
+                // Determine if there's more data to be sent after this buffer.
+                canSend = (RemainingToSend() > 0 && sendWindowSize > 0);
             } while (canSend);
 
             // Call LwIP to send the queued data.
@@ -1256,7 +1266,7 @@ INET_ERROR TCPEndPoint::DriveSending()
         if (err == INET_NO_ERROR)
         {
             // If in the SendShutdown state and the unsent queue is now empty, shutdown the PCB for sending.
-            if (State == kState_SendShutdown && mUnsentQueue == NULL)
+            if (State == kState_SendShutdown && (RemainingToSend() == 0))
             {
                 lwipErr = tcp_shutdown(mTCP, 0, 1);
                 if (lwipErr != ERR_OK)
@@ -1562,6 +1572,9 @@ INET_ERROR TCPEndPoint::DoClose(INET_ERROR err, bool suppressCallback)
         mSendQueue = nullptr;
         PacketBuffer::Free(mRcvQueue);
         mRcvQueue = nullptr;
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        mUnackedLength = 0;
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
         // Call the appropriate app callback if allowed.
         if (!suppressCallback)
@@ -1741,6 +1754,67 @@ void TCPEndPoint::RestartTCPUserTimeoutTimer()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
+uint16_t TCPEndPoint::RemainingToSend()
+{
+    if (mSendQueue == NULL)
+    {
+        return 0;
+    }
+    else
+    {
+        // We can never have reported more unacked data than there is pending
+        // in the send queue! This would indicate a critical accounting bug.
+        VerifyOrDie(mUnackedLength <= mSendQueue->TotalLength());
+
+        return static_cast<uint16_t>(mSendQueue->TotalLength() - mUnackedLength);
+    }
+}
+
+TCPEndPoint::BufferOffset TCPEndPoint::FindStartOfUnsent()
+{
+    // Find first packet buffer with remaining data to send by skipping
+    // all sent but un-acked data. This is necessary because of the Consume()
+    // call in HandleDataSent(), which potentially releases backing memory for
+    // fully-sent packet buffers, causing an invalidation of all possible
+    // offsets one might have cached. The TCP acnowledgements may come back
+    // with a variety of sizes depending on prior activity, and size of the
+    // send window. The only way to ensure we get the correct offsets into
+    // unsent data while retaining the buffers that have un-acked data is to
+    // traverse all sent-but-unacked data in the chain to reach the beginning
+    // of ready-to-send data.
+    chip::System::PacketBuffer * currentUnsentBuf = mSendQueue;
+    uint16_t unsentOffset                         = 0;
+    uint16_t leftToSkip                           = mUnackedLength;
+
+    VerifyOrDie(leftToSkip < mSendQueue->TotalLength());
+
+    while (leftToSkip > 0)
+    {
+        VerifyOrDie(currentUnsentBuf != NULL);
+        uint16_t bufDataLen = currentUnsentBuf->DataLength();
+        if (leftToSkip >= bufDataLen)
+        {
+            // We have more to skip than current packet buffer size.
+            // Follow the chain to continue.
+            currentUnsentBuf = currentUnsentBuf->Next();
+            leftToSkip       = static_cast<uint16_t>(leftToSkip - bufDataLen);
+        }
+        else
+        {
+            // Done skipping all data, currentUnsentBuf is first packet buffer
+            // containing unsent data.
+            unsentOffset = leftToSkip;
+            leftToSkip   = 0;
+        }
+    }
+
+    TCPEndPoint::BufferOffset startOfUnsent;
+    startOfUnsent.buffer = currentUnsentBuf;
+    startOfUnsent.offset = unsentOffset;
+
+    return startOfUnsent;
+}
+
 INET_ERROR TCPEndPoint::GetPCB(IPAddressType addrType)
 {
     // IMMPORTANT: This method MUST be called with the LwIP stack LOCKED!
@@ -1832,8 +1906,24 @@ void TCPEndPoint::HandleDataSent(uint16_t lenSent)
 {
     if (IsConnected())
     {
+        // Ensure we do not have internal inconsistency in the lwIP, which
+        // could cause invalid pointer accesses.
+        if (lenSent > mUnackedLength)
+        {
+            ChipLogError(Inet, "Got more ACKed bytes (%d) than were pending (%d)", (int) lenSent, (int) mUnackedLength);
+            DoClose(INET_ERROR_UNEXPECTED_EVENT, false);
+            return;
+        }
+        else if (mSendQueue == NULL)
+        {
+            ChipLogError(Inet, "Got ACK for %d bytes but data backing gone", (int) lenSent);
+            DoClose(INET_ERROR_UNEXPECTED_EVENT, false);
+            return;
+        }
+
         // Consume data off the head of the send queue equal to the amount of data being acknowledged.
-        mSendQueue = mSendQueue->Consume(lenSent);
+        mSendQueue     = mSendQueue->Consume(lenSent);
+        mUnackedLength = static_cast<uint16_t>(mUnackedLength - lenSent);
 
 #if INET_CONFIG_OVERRIDE_SYSTEM_TCP_USER_TIMEOUT
         // Only change the UserTimeout timer if lenSent > 0,
@@ -1841,7 +1931,7 @@ void TCPEndPoint::HandleDataSent(uint16_t lenSent)
         // across.
         if (lenSent > 0)
         {
-            if (mSendQueue == NULL)
+            if (RemainingToSend() == 0)
             {
                 // If the output queue has been flushed then stop the timer.
 
@@ -1869,12 +1959,12 @@ void TCPEndPoint::HandleDataSent(uint16_t lenSent)
         if (OnDataSent != NULL)
             OnDataSent(this, lenSent);
 
-        // If unsent data exists, attempt to sent it now...
-        if (mUnsentQueue != NULL)
+        // If unsent data exists, attempt to send it now...
+        if (RemainingToSend() > 0)
             DriveSending();
 
         // If in the closing state and the send queue is now empty, attempt to transition to closed.
-        if (State == kState_Closing && mSendQueue == NULL)
+        if ((State == kState_Closing) && (RemainingToSend() == 0))
             DoClose(INET_NO_ERROR, false);
     }
 }

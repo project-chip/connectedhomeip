@@ -67,8 +67,7 @@ public:
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
      */
-    virtual CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
-                                   System::PacketBuffer * msgBuf) = 0;
+    virtual CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) = 0;
 
     /**
      * Determine if this transport can SendMessage to the specified peer address.

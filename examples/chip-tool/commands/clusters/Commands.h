@@ -20,8 +20,8 @@
 
 #pragma once
 
-#include "../common/ModelCommand.h"
-#include "../common/ModelCommandResponse.h"
+#include "ModelCommand.h"
+#include "ModelCommandResponse.h"
 
 #include <limits>
 

@@ -18,18 +18,12 @@
 
 #pragma once
 
-#include "../common/EchoCommand.h"
+#include "EchoCommand.h"
 
 class Echo : public EchoCommand
 {
 public:
-    Echo() : EchoCommand("ip", NetworkType::UDP) { NetworkCommand::AddArguments(); }
-};
-
-class EchoBle : public EchoCommand
-{
-public:
-    EchoBle() : EchoCommand("ble", NetworkType::BLE) { NetworkCommand::AddArguments(); }
+    Echo() : EchoCommand("ip") {}
 };
 
 void registerCommandsEcho(Commands & commands)
@@ -38,7 +32,6 @@ void registerCommandsEcho(Commands & commands)
 
     commands_list clusterCommands = {
         make_unique<Echo>(),
-        make_unique<EchoBle>(),
     };
 
     commands.Register(clusterName, clusterCommands);

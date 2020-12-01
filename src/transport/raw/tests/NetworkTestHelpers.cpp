@@ -17,7 +17,7 @@
 
 #include "NetworkTestHelpers.h"
 
-#include "TestInetCommon.h"
+#include <inet/tests/TestInetCommon.h>
 
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>

@@ -25,7 +25,7 @@
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <transport/raw/TCP.h>
 
 #include <nlbyteorder.h>
@@ -123,7 +123,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
     // Should be able to send a message to itself by just calling send.
-    err = tcp.SendMessage(header, Header::Flags(), Transport::PeerAddress::TCP(addr), buffer.Release_ForNow());
+    err = tcp.SendMessage(header, Transport::PeerAddress::TCP(addr), buffer.Release_ForNow());
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO(#2698): the underlying system does not support IPV6. This early return

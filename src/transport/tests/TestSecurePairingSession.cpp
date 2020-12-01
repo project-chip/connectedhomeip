@@ -21,8 +21,6 @@
  *      This file implements unit tests for the SecurePairingSession implementation.
  */
 
-#include "TestTransportLayer.h"
-
 #include <errno.h>
 #include <nlunit-test.h>
 
@@ -31,7 +29,7 @@
 #include <stdarg.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <transport/SecurePairingSession.h>
 
 using namespace chip;
@@ -39,8 +37,8 @@ using namespace chip;
 class TestSecurePairingDelegate : public SecurePairingSessionDelegate
 {
 public:
-    CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
-                                  const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                  System::PacketBuffer * msgBuf) override
     {
         mNumMessageSend++;
         System::PacketBufferHandle msg_ForNow;
@@ -173,8 +171,7 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite,
                        testPairingSession1->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session1) == CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(inSuite,
-                       session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, Header::Flags(), mac) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, mac) == CHIP_NO_ERROR);
     }
 
     {
@@ -183,8 +180,7 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
                        testPairingSession2->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session2) == CHIP_NO_ERROR);
 
         uint8_t decrypted[64];
-        NL_TEST_ASSERT(inSuite,
-                       session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, Header::Flags(), mac) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, mac) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, memcmp(plain_text, decrypted, sizeof(plain_text)) == 0);
     }
 

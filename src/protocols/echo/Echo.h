@@ -28,6 +28,7 @@
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
@@ -44,7 +45,7 @@ enum
 
 typedef void (*EchoFunct)(NodeId nodeId, System::PacketBufferHandle payload);
 
-class DLL_EXPORT EchoClient : public ExchangeDelegate
+class DLL_EXPORT EchoClient : public Messaging::ExchangeDelegate
 {
 public:
     /**
@@ -60,7 +61,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(ExchangeManager * exchangeMgr);
+    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr);
 
     /**
      *  Shutdown the EchoClient. This terminates this instance
@@ -90,17 +91,17 @@ public:
     CHIP_ERROR SendEchoRequest(NodeId nodeId, System::PacketBufferHandle payload);
 
 private:
-    ExchangeManager * mExchangeMgr   = nullptr;
-    ExchangeContext * mExchangeCtx   = nullptr;
-    EchoFunct OnEchoResponseReceived = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+    Messaging::ExchangeContext * mExchangeCtx = nullptr;
+    EchoFunct OnEchoResponseReceived          = nullptr;
 
     CHIP_ERROR SendEchoRequest(System::PacketBufferHandle payload);
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
                            System::PacketBufferHandle payload) override;
-    void OnResponseTimeout(ExchangeContext * ec) override;
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override;
 };
 
-class DLL_EXPORT EchoServer : public ExchangeDelegate
+class DLL_EXPORT EchoServer : public Messaging::ExchangeDelegate
 {
 public:
     /**
@@ -116,7 +117,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(ExchangeManager * exchangeMgr);
+    CHIP_ERROR Init(Messaging::ExchangeManager * exchangeMgr);
 
     /**
      *  Shutdown the EchoServer. This terminates this instance
@@ -134,12 +135,12 @@ public:
     void SetEchoRequestReceived(EchoFunct callback) { OnEchoRequestReceived = callback; }
 
 private:
-    ExchangeManager * mExchangeMgr  = nullptr;
-    EchoFunct OnEchoRequestReceived = nullptr;
+    Messaging::ExchangeManager * mExchangeMgr = nullptr;
+    EchoFunct OnEchoRequestReceived           = nullptr;
 
-    void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
+    void OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
                            System::PacketBufferHandle payload) override;
-    void OnResponseTimeout(ExchangeContext * ec) override {}
+    void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
 } // namespace Protocols
