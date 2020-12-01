@@ -1205,10 +1205,11 @@ int TestTeardown(void * inContext)
 } // namespace
 
 int TestSystemPacketBuffer(void)
-{
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    tcpip_init(NULL, NULL);
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+{ /*
+ #if CHIP_SYSTEM_CONFIG_USE_LWIP
+     tcpip_init(NULL, NULL);
+ #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+ */
 
     // clang-format off
     nlTestSuite theSuite =
