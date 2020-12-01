@@ -20,11 +20,10 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libCoreTests"
 
-  sources = [
+  test_sources = [
     "TestCHIPCallback.cpp",
     "TestCHIPErrorStr.cpp",
     "TestCHIPTLV.cpp",
-    "TestCore.h",
     "TestReferenceCounted.cpp",
   ]
 
@@ -33,12 +32,5 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/lib/core",
     "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestCHIPErrorStr",
-    "TestReferenceCounted",
-    "TestCHIPTLV",
-    "TestCHIPCallback",
   ]
 }
