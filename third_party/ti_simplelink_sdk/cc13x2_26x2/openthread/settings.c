@@ -81,8 +81,8 @@
 
 #include <openthread/platform/settings.h>
 
-#include "nv/nvintf.h"
-#include "nv/nvocmp.h"
+#include <ti/common/nv/nvintf.h>
+#include <ti/common/nv/nvocmp.h>
 
 /* CONSTANTS AND MACROS */
 #define SUBIDMAX ((2 << 10) - 1)

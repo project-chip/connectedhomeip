@@ -37,7 +37,7 @@ ti_simplelink_sdk("sdk") {
     "${project_dir}/main/include/FreeRTOSConfig.h",
   ]
 
-  defines = [ "NVOCMP_FREERTOS_MUTEX=1" ]
+  defines = []
   if (is_debug) {
     defines += [ "BUILD_RELEASE=0" ]
   } else {
@@ -101,8 +101,6 @@ ti_simplelink_executable("lock_app") {
     "${project_dir}/main/ZclCallbacks.cpp",
     "${project_dir}/main/main.cpp",
 
-    #"${project_dir}/main/CXXExceptionStubs.cpp",
-
     # platform drivers here because they need sysconfig headers
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/radio.h",
     "${chip_root}/src/platform/cc13x2_26x2/Logging.cpp",
@@ -113,8 +111,6 @@ ti_simplelink_executable("lock_app") {
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/ecjpake_alt.h",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/sha256_alt.c",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto/sha256_alt.h",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/nv/crc.c",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/nv/nvocmp.c",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/alarm.c",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/diag.c",
     "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/openthread/entropy.c",

@@ -127,9 +127,6 @@ template("ti_simplelink_sdk") {
       "${freertos_root}/FreeRTOS/Source/include",
       "${freertos_root}/FreeRTOS/Source/portable/GCC/ARM_CM4F",
 
-      # TI-POSIX port temporarily disabled
-      #"${ti_simplelink_sdk_root}/source/ti/posix/gcc",
-
       "${ti_simplelink_sdk_root}/source",
       "${ti_simplelink_sdk_root}/source/third_party/CMSIS/Include",
 
@@ -155,7 +152,21 @@ template("ti_simplelink_sdk") {
     }
   }
 
+  config("${sdk_target_name}_posix_config") {
+    include_dirs = [ "${ti_simplelink_sdk_root}/source/ti/posix/gcc" ]
+    cflags = [
+      "-std=c99",
+      "-Wno-maybe-uninitialized",
+    ]
+  }
+
   source_set(sdk_target_name) {
+    defines = []
+    include_dirs = []
+
+    # POSIX-like porting layer is incompatable with the gnu definitions from -std=gnu11
+    configs -= [ "//build/config/compiler:std_default" ]
+    configs += [ ":${sdk_target_name}_posix_config" ]
     sources = [
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/AppHooks_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/ClockPCC26X2_freertos.c",
@@ -170,20 +181,18 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/SystemP_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/TimerPCC26XX_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/startup/startup_cc13x2_cc26x2_gcc.c",
-
-      # TI-POSIX port temporarily disabled
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/clock.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/memory.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/mqueue.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_barrier.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_cond.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_mutex.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_rwlock.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/sched.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/semaphore.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/sleep.c",
-      #"${ti_simplelink_sdk_root}/source/ti/posix/freertos/timer.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/clock.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/memory.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/mqueue.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_barrier.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_cond.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_mutex.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_rwlock.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/sched.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/semaphore.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/sleep.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/timer.c",
 
       "${freertos_root}/FreeRTOS/Source/croutine.c",
       "${freertos_root}/FreeRTOS/Source/event_groups.c",
@@ -195,6 +204,15 @@ template("ti_simplelink_sdk") {
       "${freertos_root}/FreeRTOS/Source/tasks.c",
       "${freertos_root}/FreeRTOS/Source/timers.c",
     ]
+
+    if (ti_simplelink_device_family == "cc13x2_26x2") {
+      defines += [ "NVOCMP_POSIX_MUTEX" ]
+      include_dirs += [ "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2_cc26x2" ]
+      sources += [
+        "${ti_simplelink_sdk_root}/source/ti/common/nv/crc.c",
+        "${ti_simplelink_sdk_root}/source/ti/common/nv/nvocmp.c",
+      ]
+    }
 
     if (defined(invoker.sources)) {
       sources += invoker.sources

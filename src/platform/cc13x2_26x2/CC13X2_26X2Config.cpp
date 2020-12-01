@@ -31,8 +31,8 @@
 #include <platform/cc13x2_26x2/CC13X2_26X2Config.h>
 #include <support/CodeUtils.h>
 
-#include <nv/nvintf.h>
-#include <nv/nvocmp.h>
+#include <ti/common/nv/nvintf.h>
+#include <ti/common/nv/nvocmp.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -168,7 +168,7 @@ CHIP_ERROR CC13X2_26X2Config::WriteConfigValueBin(Key key, const uint8_t * data,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(sNvoctpFps.writeItem(key.nvID, (uint16_t) dataLen, data) == NVINTF_SUCCESS,
+    VerifyOrExit(sNvoctpFps.writeItem(key.nvID, (uint16_t) dataLen, (void *)data) == NVINTF_SUCCESS,
                  err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 exit:
     return err;

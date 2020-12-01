@@ -26,7 +26,7 @@
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <nv/nvintf.h>
+#include <ti/common/nv/nvintf.h>
 
 namespace chip {
 namespace DeviceLayer {
