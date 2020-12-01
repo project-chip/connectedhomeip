@@ -196,13 +196,39 @@ void TestEndianessSwitch(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, bb.expect("hiihhi", 6, 0));
 }
 
+void TestEndianessSwitchFit(nlTestSuite * inSuite, void * inContext)
+{
+    BWTest<BigEndian::BufferWriter> bb(6);
+    bb.Put16(0x1234);
+    bb.Put32(0x12345678);
+
+    NL_TEST_ASSERT(inSuite, bb.Fit());
+
+    bb.Put32(0x1);
+
+    NL_TEST_ASSERT(inSuite, !bb.Fit());
+
+    LittleEndian::BufferWriter leWriter = LittleEndian::BufferWriter::StartingFrom(bb);
+    NL_TEST_ASSERT(inSuite, !leWriter.Fit());
+    NL_TEST_ASSERT(inSuite, leWriter.Size() == 0); // was never able to fit anything to begin with
+    NL_TEST_ASSERT(inSuite, leWriter.Needed() == (bb.Needed() - bb.Size()));
+
+    leWriter.Put16(0x4321);
+    NL_TEST_ASSERT(inSuite, !leWriter.Fit());
+
+    BigEndian::BufferWriter beWriter = BigEndian::BufferWriter::StartingFrom(leWriter);
+    NL_TEST_ASSERT(inSuite, !beWriter.Fit());
+    NL_TEST_ASSERT(inSuite, beWriter.Size() == 0); // was never able to fit anything to begin with
+}
+
 const nlTest sTests[] = {
-    NL_TEST_DEF("TestStringWrite", TestStringWrite),         //
-    NL_TEST_DEF("TestBufferWrite", TestBufferWrite),         //
-    NL_TEST_DEF("TestPutLittleEndian", TestPutLittleEndian), //
-    NL_TEST_DEF("TestPutBigEndian", TestPutBigEndian),       //
-    NL_TEST_DEF("TestEndianessSwitch", TestEndianessSwitch), //
-    NL_TEST_SENTINEL()                                       //
+    NL_TEST_DEF("TestStringWrite", TestStringWrite),               //
+    NL_TEST_DEF("TestBufferWrite", TestBufferWrite),               //
+    NL_TEST_DEF("TestPutLittleEndian", TestPutLittleEndian),       //
+    NL_TEST_DEF("TestPutBigEndian", TestPutBigEndian),             //
+    NL_TEST_DEF("TestEndianessSwitch", TestEndianessSwitch),       //
+    NL_TEST_DEF("TestEndianessSwitchFit", TestEndianessSwitchFit), //
+    NL_TEST_SENTINEL()                                             //
 };
 
 } // namespace

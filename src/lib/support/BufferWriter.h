@@ -90,9 +90,9 @@ public:
     }
 
     /// Returns whether the input fit in the buffer, outputs what was actually written
-    bool Fit(size_t & actually_written) const
+    bool Fit(size_t & actuallyWritten) const
     {
-        actually_written = mSize >= mNeeded ? mNeeded : mSize;
+        actuallyWritten = mSize >= mNeeded ? mNeeded : mSize;
         return mSize >= mNeeded;
     }
 
@@ -102,7 +102,7 @@ public:
     uint8_t * Buffer() { return mBuf; }
     const uint8_t * Buffer() const { return mBuf; }
 
-private:
+protected:
     friend Derived;
 
     uint8_t * mBuf;
@@ -110,6 +110,7 @@ private:
     size_t mNeeded;
 
     BufferWriterBase(uint8_t * buf, size_t len) : mBuf(buf), mSize(len), mNeeded(0) {}
+    BufferWriterBase(uint8_t * buf, size_t len, size_t needed) : mBuf(buf), mSize(len), mNeeded(needed) {}
     BufferWriterBase(const BufferWriterBase & other) = default;
     BufferWriterBase & operator=(const BufferWriterBase & other) = default;
 };
@@ -134,16 +135,20 @@ public:
         return *this;
     }
 
-    // allows treating of a buffer stream to a different endianess
+    /// Allows treating of a buffer stream to a different endianess.
+    /// If input buffer does not fit, return value will not fit either.
     template <typename T>
     static BufferWriter StartingFrom(BufferWriterBase<T> & other)
     {
         if (!other.Fit())
         {
-            return BufferWriter(nullptr, 0);
+            return BufferWriter(other.Buffer() + other.Size(), 0, other.Needed() - other.Size());
         }
         return BufferWriter(other.Buffer() + other.Needed(), other.Size() - other.Needed());
     }
+
+private:
+    BufferWriter(uint8_t * buf, size_t len, size_t needed) : BufferWriterBase<BufferWriter>(buf, len, needed) {}
 };
 
 } // namespace LittleEndian
@@ -167,16 +172,20 @@ public:
         return *this;
     }
 
-    // allows treating of a buffer stream to a different endianess
+    /// Allows treating of a buffer stream to a different endianess.
+    /// If input buffer does not fit, return value will not fit either.
     template <typename T>
     static BufferWriter StartingFrom(BufferWriterBase<T> & other)
     {
         if (!other.Fit())
         {
-            return BufferWriter(nullptr, 0);
+            return BufferWriter(other.Buffer() + other.Size(), 0, other.Needed() - other.Size());
         }
         return BufferWriter(other.Buffer() + other.Needed(), other.Size() - other.Needed());
     }
+
+private:
+    BufferWriter(uint8_t * buf, size_t len, size_t needed) : BufferWriterBase<BufferWriter>(buf, len, needed) {}
 };
 
 } // namespace BigEndian
