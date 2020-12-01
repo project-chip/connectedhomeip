@@ -159,13 +159,18 @@ Requires API's in a crc.h to implement CRC functionality.
 #include "crc.h"
 #include "nvocmp.h"
 
+// clang-format off
+// `/` is a path delimiter, not the division operation
+
 #ifndef NV_LINUX
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib / vims.h)
+#include DeviceFamily_constructPath(driverlib/vims.h)
 #ifdef NVOCMP_MIN_VDD_FLASH_MV
-#include DeviceFamily_constructPath(driverlib / aon_batmon.h)
+#include DeviceFamily_constructPath(driverlib/aon_batmon.h)
 #endif /* NVOCMP_MIN_VDD_FLASH_MV */
 #endif /* NV_LINUX */
+
+// clang-format on
 
 #ifdef NV_LINUX
 #include "nv_linux.h"

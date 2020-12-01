@@ -48,9 +48,14 @@
 
 #include <openthread/config.h>
 
+// clang-format off
+// `/` is a path delimiter, not the division operation
+
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib / prcm.h)
-#include DeviceFamily_constructPath(driverlib / trng.h)
+#include DeviceFamily_constructPath(driverlib/prcm.h)
+#include DeviceFamily_constructPath(driverlib/trng.h)
+
+// clang-format on
 
 #include <openthread/platform/entropy.h>
 #include <ti/drivers/TRNG.h>

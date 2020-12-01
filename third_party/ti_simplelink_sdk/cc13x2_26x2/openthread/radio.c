@@ -57,15 +57,20 @@
 #include <openthread/platform/radio.h>
 #include <utils/code_utils.h>
 
+// clang-format off
+// `/` is a path delimiter, not the division operation
+
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib / aon_rtc.h)
-#include DeviceFamily_constructPath(driverlib / rf_data_entry.h)
-#include DeviceFamily_constructPath(driverlib / rf_common_cmd.h)
-#include DeviceFamily_constructPath(driverlib / rf_mailbox.h)
-#include DeviceFamily_constructPath(driverlib / rf_ieee_cmd.h)
-#include DeviceFamily_constructPath(driverlib / rf_ieee_mailbox.h)
-#include DeviceFamily_constructPath(inc / hw_ccfg.h)
-#include DeviceFamily_constructPath(inc / hw_fcfg1.h)
+#include DeviceFamily_constructPath(driverlib/aon_rtc.h)
+#include DeviceFamily_constructPath(driverlib/rf_data_entry.h)
+#include DeviceFamily_constructPath(driverlib/rf_common_cmd.h)
+#include DeviceFamily_constructPath(driverlib/rf_mailbox.h)
+#include DeviceFamily_constructPath(driverlib/rf_ieee_cmd.h)
+#include DeviceFamily_constructPath(driverlib/rf_ieee_mailbox.h)
+#include DeviceFamily_constructPath(inc/hw_ccfg.h)
+#include DeviceFamily_constructPath(inc/hw_fcfg1.h)
+
+// clang-format on
 
 #include <ti/drivers/rf/RF.h>
 

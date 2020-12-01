@@ -48,8 +48,13 @@
 #ifndef PLATFORM_RADIO_H_
 #define PLATFORM_RADIO_H_
 
+// clang-format off
+// `/` is a path delimiter, not the division operation
+
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib / rf_ieee_cmd.h)
+#include DeviceFamily_constructPath(driverlib/rf_ieee_cmd.h)
+
+// clang-format on
 
 #include <ti/drivers/rf/RF.h>
 

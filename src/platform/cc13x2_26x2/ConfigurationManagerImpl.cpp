@@ -37,10 +37,15 @@
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wconversion"
-
 // BSP header cannot handle conversions
+
+// clang-format off
+// `/` is a path delimiter, not the division operation
+
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib / sys_ctrl.h)
+#include DeviceFamily_constructPath(driverlib/sys_ctrl.h)
+
+// clang-format on
 
 #pragma GCC diagnostic pop
 

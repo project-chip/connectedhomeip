@@ -43,9 +43,14 @@
 #include <openthread/config.h>
 
 #include <openthread/platform/misc.h>
+ 
+// clang-format off
+// `/` is a path delimiter, not the division operation
 
 #include <ti/devices/DeviceFamily.h>
-#include DeviceFamily_constructPath(driverlib / sys_ctrl.h)
+#include DeviceFamily_constructPath(driverlib/sys_ctrl.h)
+
+// clang-format on
 
 /**
  * Function documented in platform/misc.h

@@ -51,8 +51,10 @@
 #endif
 
 #if defined(MBEDTLS_ECJPAKE_ALT)
-#include "ecjpake_alt.h"
+
 #include "mbedtls/ecjpake.h"
+
+#include "ecjpake_alt.h"
 #include <string.h>
 #include <ti/drivers/cryptoutils/cryptokey/CryptoKeyPlaintext.h>
 #include <ti/drivers/cryptoutils/ecc/ECCParams.h>
