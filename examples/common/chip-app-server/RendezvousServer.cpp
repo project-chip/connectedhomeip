@@ -18,7 +18,6 @@
 #include "RendezvousServer.h"
 
 #include "SessionManager.h"
-
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
@@ -63,8 +62,15 @@ void RendezvousServer::OnRendezvousMessageReceived(const PacketHeader & packetHe
 void RendezvousServer::OnRendezvousComplete()
 {
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
-    SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, mRendezvousSession.GetRemoteNodeId().Value(),
-                                &mRendezvousSession.GetPairingSession());
+    if (mRendezvousSession.GetLocalNodeId().HasValue() && mRendezvousSession.GetRemoteNodeId().HasValue())
+    {
+        SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, mRendezvousSession.GetRemoteNodeId().Value(),
+                                    &mRendezvousSession.GetPairingSession());
+    }
+    else
+    {
+        ChipLogError(AppServer, "Commissioner did not assign a node ID to the device!!!");
+    }
 }
 
 void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
@@ -75,12 +81,37 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
         ChipLogProgress(AppServer, "Device completed SPAKE2+ handshake");
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnRendezvousStarted();
+        }
         break;
+
+    case RendezvousSessionDelegate::SecurePairingFailed:
+        ChipLogProgress(AppServer, "Failed in SPAKE2+ handshake");
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnRendezvousStopped();
+        }
+        break;
+
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
         ChipLogProgress(AppServer, "Device was assigned network credentials");
         chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice();
-
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnRendezvousStopped();
+        }
         break;
+
+    case RendezvousSessionDelegate::NetworkProvisioningFailed:
+        ChipLogProgress(AppServer, "Failed in network provisioning");
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnRendezvousStopped();
+        }
+        break;
+
     default:
         break;
     };
@@ -88,5 +119,4 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
 exit:
     return;
 }
-
 } // namespace chip

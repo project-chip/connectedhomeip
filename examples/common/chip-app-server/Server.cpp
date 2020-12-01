@@ -27,13 +27,13 @@
 #include <inet/InetLayer.h>
 #include <lib/mdns/DiscoveryManager.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
 #include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
-#include <transport/raw/UDP.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -41,6 +41,21 @@ using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
 
 namespace {
+
+bool isRendezvousBypassed()
+{
+    RendezvousInformationFlags rendezvousMode = RendezvousInformationFlags::kBLE;
+
+#ifdef CONFIG_RENDEZVOUS_MODE
+    rendezvousMode = static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE);
+#endif
+
+#ifdef CHIP_BYPASS_RENDEZVOUS
+    rendezvousMode = RendezvousInformationFlags::kNone;
+#endif
+
+    return rendezvousMode == RendezvousInformationFlags::kNone;
+}
 
 class ServerCallback : public SecureSessionMgrDelegate
 {
@@ -67,10 +82,24 @@ public:
     exit:;
     }
 
+    void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * mgr) override
+    {
+        ChipLogProgress(AppServer, "Packet received error: %s", ErrorStr(error));
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnReceiveError();
+        }
+    }
+
     void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
     {
         ChipLogProgress(AppServer, "Received a new connection.");
     }
+
+    void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; }
+
+private:
+    AppDelegate * mDelegate = nullptr;
 };
 
 DemoTransportMgr gTransports;
@@ -88,15 +117,22 @@ SecureSessionMgr & chip::SessionManager()
 
 // The function will initialize datamodel handler and then start the server
 // The server assumes the platform's networking has been setup already
-void InitServer()
+void InitServer(AppDelegate * delegate)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
 
     InitDataModelHandler();
+    gCallbacks.SetDelegate(delegate);
+    gRendezvousServer.SetDelegate(delegate);
 
     // Init transport before operations with secure session mgr.
+#if INET_CONFIG_ENABLE_IPV4
+    err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6),
+                           UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv4));
+#else
     err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
+#endif
     SuccessOrExit(err);
 
     err = gSessions.Init(chip::kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransports);
@@ -104,7 +140,13 @@ void InitServer()
 
     // This flag is used to bypass BLE in the cirque test
     // Only in the cirque test this is enabled with --args='bypass_rendezvous=true'
-#ifndef CHIP_BYPASS_RENDEZVOUS
+    if (isRendezvousBypassed())
+    {
+        ChipLogProgress(AppServer, "Rendezvous and Secure Pairing skipped. Using test secret.");
+        err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
+        SuccessOrExit(err);
+    }
+    else
     {
         RendezvousParameters params;
         uint32_t pinCode;
@@ -116,13 +158,13 @@ void InitServer()
             .SetPeerAddress(Transport::PeerAddress::BLE());
         SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
     }
-#endif
 
     err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
 
     gSessions.SetDelegate(&gCallbacks);
-    chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice(chip::Inet::kIPAddressType_IPv6);
+    chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice(kIPAddressType_IPv6);
+
 exit:
     if (err != CHIP_NO_ERROR)
     {
