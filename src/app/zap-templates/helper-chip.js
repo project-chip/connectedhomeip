@@ -195,7 +195,7 @@ function asChipUnderlyingType(label, type) {
     return 'chip::EndpointId'
   } else if (zclHelper.isStrEqual(type, "CLUSTER_ID")) {
     return 'chip::ClusterId'
-  } else if (zclHelper.isStrEqual(type, "ATTRIBUTE_ID")){
+  } else if (zclHelper.isStrEqual(type, "ATTRIBUTE_ID")) {
     return 'chip::AttributeId'
   } else if (zclHelper.isStrEqual(label, "groupId")) {
     return 'chip::GroupId'
