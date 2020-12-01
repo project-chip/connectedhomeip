@@ -44,7 +44,12 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */, Transport::UDP /* IPv4 */>;
+using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                        ,
+                                        Transport::UDP /* IPv4 */
+#endif
+                                        >;
 
 class DLL_EXPORT Device
 {
