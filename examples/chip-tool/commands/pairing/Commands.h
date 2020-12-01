@@ -18,20 +18,41 @@
 
 #pragma once
 
-#include "EchoCommand.h"
+#include "PairingCommand.h"
 
-class Echo : public EchoCommand
+class Unpair : public PairingCommand
 {
 public:
-    Echo() : EchoCommand("ip") {}
+    Unpair() : PairingCommand("unpair", PairingMode::None) {}
 };
 
-void registerCommandsEcho(Commands & commands)
+class PairBypass : public PairingCommand
 {
-    const char * clusterName = "Echo";
+public:
+    PairBypass() : PairingCommand("bypass", PairingMode::Bypass) {}
+};
+
+class PairBle : public PairingCommand
+{
+public:
+    PairBle() : PairingCommand("ble", PairingMode::Ble) {}
+};
+
+class PairSoftAP : public PairingCommand
+{
+public:
+    PairSoftAP() : PairingCommand("softap", PairingMode::SoftAP) {}
+};
+
+void registerCommandsPairing(Commands & commands)
+{
+    const char * clusterName = "Pairing";
 
     commands_list clusterCommands = {
-        make_unique<Echo>(),
+        make_unique<Unpair>(),
+        make_unique<PairBypass>(),
+        make_unique<PairBle>(),
+        make_unique<PairSoftAP>(),
     };
 
     commands.Register(clusterName, clusterCommands);
