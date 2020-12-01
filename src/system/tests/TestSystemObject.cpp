@@ -41,7 +41,7 @@
 
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

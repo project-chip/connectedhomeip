@@ -31,7 +31,7 @@
 
 #include <stdarg.h>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 using namespace chip;
 using namespace Crypto;
