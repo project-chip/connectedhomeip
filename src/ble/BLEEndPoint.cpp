@@ -520,10 +520,10 @@ void BLEEndPoint::Free()
 void BLEEndPoint::FreeBtpEngine()
 {
     // Free transmit disassembly buffer
-    (void) mBtpEngine.TakeTxPacket();
+    mBtpEngine.ClearTxPacket();
 
     // Free receive reassembly buffer
-    (void) mBtpEngine.TakeRxPacket();
+    mBtpEngine.ClearRxPacket();
 }
 
 BLE_ERROR BLEEndPoint::Init(BleLayer * bleLayer, BLE_CONNECTION_OBJECT connObj, BleRole role, bool autoClose)
@@ -721,7 +721,7 @@ BLE_ERROR BLEEndPoint::SendNextMessage()
     QueueTxLock();
 #if CHIP_ENABLE_CHIPOBLE_TEST
     // Return if tx queue is empty
-    // Note: DetachTail() does not check an empty queue
+    // Note: PopHead() does not check an empty queue
     if (mSendQueue.IsNull())
     {
         QueueTxUnlock();
@@ -729,7 +729,7 @@ BLE_ERROR BLEEndPoint::SendNextMessage()
     }
 #endif
 
-    PacketBufferHandle data = mSendQueue.DetachTail();
+    PacketBufferHandle data = mSendQueue.PopHead();
     QueueTxUnlock();
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
@@ -904,8 +904,8 @@ BLE_ERROR BLEEndPoint::HandleFragmentConfirmationReceived()
     // This check covers the case where the local receive window has shrunk between transmission and confirmation of
     // the stand-alone ack, and also the case where a window size < the immediate ack threshold was detected in
     // Receive(), but the stand-alone ack was deferred due to a pending outbound message fragment.
-    if (mLocalReceiveWindowSize <= BLE_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD &&
-        !(!mSendQueue.IsNull() || mBtpEngine.TxState() == BtpEngine::kState_InProgress))
+    if (mLocalReceiveWindowSize <= BLE_CONFIG_IMMEDIATE_ACK_WINDOW_THRESHOLD && mSendQueue.IsNull() &&
+        mBtpEngine.TxState() != BtpEngine::kState_InProgress)
     {
         err = DriveStandAloneAck(); // Encode stand-alone ack and drive sending.
         SuccessOrExit(err);
@@ -1057,6 +1057,7 @@ BLE_ERROR BLEEndPoint::DriveSending()
 #if CHIP_ENABLE_CHIPOBLE_TEST
         mBtpEngineTest.DoTxTiming(sentBuf, BTP_TX_DONE);
 #endif // CHIP_ENABLE_CHIPOBLE_TEST
+        mBtpEngine.ClearTxPacket();
 
         if (!mSendQueue.IsNull())
         {
@@ -1420,6 +1421,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
     {
         // Take ownership of message PacketBuffer
         System::PacketBufferHandle full_packet = mBtpEngine.TakeRxPacket();
+        mBtpEngine.ClearRxPacket();
 
         ChipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
 

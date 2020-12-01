@@ -109,11 +109,6 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
 
     payloadHeader.SetInitiator(IsInitiator());
 
-    // TODO: caller should just Retain the PacketBufferHandle.
-    if (sendFlags & kSendFlag_RetainBuffer)
-    {
-        msgBuf->AddRef();
-    }
     err = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, std::move(msgBuf));
     SuccessOrExit(err);
 

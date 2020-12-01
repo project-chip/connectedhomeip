@@ -94,7 +94,7 @@ bool AndroidBlePlatformDelegate::SendWriteRequest(BLE_CONNECTION_OBJECT connObj,
                                 pBuf->Start(), pBuf->DataLength());
     }
 
-    // Going out of scope release delegate's reference to pBuf. pBuf will be freed when both
+    // Going out of scope releases delegate's reference to pBuf. pBuf will be freed when both
     // platform delegate and Chip stack free their references to it.
     // We release pBuf's reference here since its payload bytes were copied
     // onto the Java heap by SendWriteRequestCb.

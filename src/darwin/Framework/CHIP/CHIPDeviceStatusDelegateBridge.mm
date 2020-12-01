@@ -43,12 +43,12 @@ void CHIPDeviceStatusDelegateBridge::OnMessage(chip::System::PacketBufferHandle 
     size_t data_len = message->DataLength();
     // convert to NSData
     NSMutableData * dataBuffer = [[NSMutableData alloc] initWithBytes:message->Start() length:data_len];
-    (void) message.DetachTail();
+    message.FreeHead();
 
     while (!message.IsNull()) {
         data_len = message->DataLength();
         [dataBuffer appendBytes:message->Start() length:data_len];
-        (void) message.DetachTail();
+        message.FreeHead();
     }
 
     id<CHIPDeviceStatusDelegate> strongDelegate = mDelegate;

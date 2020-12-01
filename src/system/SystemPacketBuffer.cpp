@@ -712,7 +712,7 @@ PacketBuffer * PacketBuffer::BuildFreeList()
 
 #endif //  !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
-PacketBufferHandle PacketBufferHandle::DetachTail()
+PacketBufferHandle PacketBufferHandle::PopHead()
 {
     PacketBuffer * head = mBuffer;
 

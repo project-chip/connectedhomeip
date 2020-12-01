@@ -408,6 +408,15 @@ exit:
     return err;
 }
 
+void BtpEngine::ClearRxPacket()
+{
+    if (mRxState == kState_Complete)
+    {
+        mRxState = kState_Idle;
+    }
+    mRxBuf = nullptr;
+}
+
 // Calling convention:
 //   May only be called if data arg is commited for immediate, synchronous subsequent transmission.
 //   Returns false on error. Caller must free data arg on error.
@@ -550,6 +559,15 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
     }
 
     return true;
+}
+
+void BtpEngine::ClearTxPacket()
+{
+    if (mTxState == kState_Complete)
+    {
+        mTxState = kState_Idle;
+    }
+    mTxBuf = nullptr;
 }
 
 void BtpEngine::LogState() const

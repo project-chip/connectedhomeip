@@ -139,8 +139,10 @@ public:
     bool HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack);
     BLE_ERROR EncodeStandAloneAck(const PacketBufferHandle & data);
 
+    void ClearRxPacket();
     PacketBufferHandle TakeRxPacket() { return std::move(mRxBuf); }
     PacketBufferHandle BorrowRxPacket() { return mRxBuf.Retain(); }
+    void ClearTxPacket();
     PacketBufferHandle TakeTxPacket() { return std::move(mTxBuf); }
     PacketBufferHandle BorrowTxPacket() { return mTxBuf.Retain(); }
 

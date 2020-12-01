@@ -325,9 +325,9 @@ public:
      *  Detach and return the head of a buffer chain while updating this handle to point to the remaining buffers.
      *  The current buffer must be the head of the chain.
      *
-     *  @return the detached bufferly formerly at the head of the buffer chain.
+     *  @return the detached buffer formerly at the head of the buffer chain.
      */
-    PacketBufferHandle DetachTail();
+    PacketBufferHandle PopHead();
 
     /**
      * Free the first buffer in a chain.

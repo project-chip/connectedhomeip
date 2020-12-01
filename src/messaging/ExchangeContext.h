@@ -56,7 +56,6 @@ public:
     enum
     {
         kSendFlag_ExpectResponse = 0x0001, // Used to indicate that a response is expected within a specified timeout.
-        kSendFlag_RetainBuffer   = 0x0002, // Used to indicate that the message buffer should not be freed after sending.
     };
 
     /**

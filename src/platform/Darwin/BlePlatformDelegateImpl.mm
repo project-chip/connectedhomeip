@@ -123,7 +123,7 @@ namespace DeviceLayer {
             if (NULL != charId) {
                 characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
             }
-            if (NULL != pBuf) {
+            if (!pBuf.IsNull()) {
                 data = [NSData dataWithBytes:pBuf->Start() length:pBuf->DataLength()];
             }
 
