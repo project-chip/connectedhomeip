@@ -44,7 +44,7 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-using DeviceTransportMgr = TransportMgr<Transport::UDP>;
+using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */, Transport::UDP /* IPv4 */>;
 
 class DLL_EXPORT Device
 {
@@ -242,8 +242,10 @@ private:
      *   This function loads the secure session object from the serialized operational
      *   credentials corresponding to the device. This is typically done when the device
      *   does not have an active secure channel.
+     *
+     * @param[in] resetNeeded   Does the underlying network socket require a reset
      */
-    CHIP_ERROR LoadSecureSessionParameters();
+    CHIP_ERROR LoadSecureSessionParameters(bool resetNeeded);
 };
 
 /**

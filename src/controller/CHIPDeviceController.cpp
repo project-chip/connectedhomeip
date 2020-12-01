@@ -126,7 +126,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
     mSessionManager = chip::Platform::New<SecureSessionMgr>();
 
-    err = mTransportMgr->Init(Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6));
+    err = mTransportMgr->Init(Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6),
+                              Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
     err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr);

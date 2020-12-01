@@ -59,7 +59,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
     // If there is no secure connection to the device, try establishing it
     if (mState != ConnectionState::SecureConnected)
     {
-        err = LoadSecureSessionParameters();
+        err = LoadSecureSessionParameters(false);
         SuccessOrExit(err);
     }
     else
@@ -79,7 +79,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
     {
         mState = ConnectionState::NotConnected;
 
-        err = LoadSecureSessionParameters();
+        err = LoadSecureSessionParameters(true);
         SuccessOrExit(err);
 
         err = mSessionManager->SendMessage(mDeviceId, std::move(resend));
@@ -202,7 +202,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
     }
 }
 
-CHIP_ERROR Device::LoadSecureSessionParameters()
+CHIP_ERROR Device::LoadSecureSessionParameters(bool resetNeeded)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     SecurePairingSession pairingSession;
@@ -215,8 +215,12 @@ CHIP_ERROR Device::LoadSecureSessionParameters()
     err = pairingSession.FromSerializable(mPairing);
     SuccessOrExit(err);
 
-    err = mTransportMgr->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
-    SuccessOrExit(err);
+    if (resetNeeded)
+    {
+        err = mTransportMgr->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6),
+                                            Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4));
+        SuccessOrExit(err);
+    }
 
     err = mSessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)), mDeviceId,
