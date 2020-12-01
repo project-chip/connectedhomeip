@@ -18,10 +18,7 @@
 
 #pragma once
 
-#include "NetworkCommand.h"
-
-#include <condition_variable>
-#include <mutex>
+#include "../common/NetworkCommand.h"
 
 #include <app/chip-zcl-zpro-codec.h>
 #include <core/CHIPEncoding.h>
@@ -35,38 +32,20 @@ class ModelCommand : public NetworkCommand
 {
 public:
     ModelCommand(const char * commandName, uint16_t clusterId, uint8_t commandId) :
-        NetworkCommand(commandName, NetworkType::UDP), mClusterId(clusterId), mCommandId(commandId)
+        NetworkCommand(commandName), mClusterId(clusterId), mCommandId(commandId)
     {}
 
-    void AddArguments()
-    {
-        NetworkCommand::AddArguments();
-        AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId);
-    }
+    void AddArguments() { AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId); }
 
-    /////////// Command Interface /////////
-    CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) override;
+    /////////// NetworkCommand Interface /////////
+    uint16_t Encode(PacketBufferHandle & buffer, uint16_t bufferSize) override;
+    bool Decode(PacketBufferHandle & buffer) const override;
 
-    /////////// IPCommand Interface /////////
-    void OnConnect(ChipDeviceController * dc) override;
-    void OnError(ChipDeviceController * dc, CHIP_ERROR err) override;
-    void OnMessage(ChipDeviceController * dc, chip::System::PacketBufferHandle buffer) override;
-
-    virtual uint16_t EncodeCommand(const chip::System::PacketBufferHandle & buffer, uint16_t bufferSize, uint8_t endPointId) = 0;
+    virtual uint16_t EncodeCommand(const PacketBufferHandle & buffer, uint16_t bufferSize, uint8_t endPointId) = 0;
     virtual bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
     virtual bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
 
 private:
-    bool SendCommand(ChipDeviceController * dc);
-    bool ReceiveCommandResponse(ChipDeviceController * dc, chip::System::PacketBufferHandle buffer) const;
-
-    void UpdateWaitForResponse(bool value);
-    void WaitForResponse(void);
-    void PrintBuffer(const chip::System::PacketBufferHandle & buffer) const;
-
-    std::condition_variable cvWaitingForResponse;
-    std::mutex cvWaitingForResponseMutex;
-    bool mWaitingForResponse{ false };
     const uint16_t mClusterId;
     const uint8_t mCommandId;
     uint8_t mEndPointId;

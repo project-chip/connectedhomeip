@@ -18,53 +18,29 @@
 
 #pragma once
 
+#include "../../config/PersistentStorage.h"
 #include "Command.h"
 
-enum NetworkType
-{
-    UDP,
-    BLE,
-    ALL
-};
-
-class NetworkCommand : public Command
+class NetworkCommand : public Command, public chip::Controller::DeviceStatusDelegate
 {
 public:
-    NetworkCommand(const char * commandName, NetworkType type) :
-        Command(commandName), mNetworkType(type), mRemoteAddr{ IPAddress::Any, INET_NULL_INTERFACEID }
-    {}
+    NetworkCommand(const char * commandName) : Command(commandName) {}
 
-    void AddArguments()
-    {
-        if (mNetworkType == NetworkType::UDP || mNetworkType == NetworkType::ALL)
-        {
-            AddArgument("device-remote-ip", &mRemoteAddr);
-            AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
-        }
+    virtual uint16_t Encode(PacketBufferHandle & buffer, uint16_t bufferSize) = 0;
+    virtual bool Decode(PacketBufferHandle & buffer) const                    = 0;
 
-        if (mNetworkType == NetworkType::BLE || mNetworkType == NetworkType::ALL)
-        {
-            AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
-            AddArgument("discriminator", 0, 4096, &mDiscriminator);
-        }
-    }
+    /////////// Command Interface /////////
+    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
-    const char * GetNetworkName(void) const { return mName; }
-
-    virtual void OnConnect(ChipDeviceController * dc)                                          = 0;
-    virtual void OnError(ChipDeviceController * dc, CHIP_ERROR err)                            = 0;
-    virtual void OnMessage(ChipDeviceController * dc, chip::System::PacketBufferHandle buffer) = 0;
-
-    CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) override;
+    /////////// DeviceStatusDelegate Interface /////////
+    void OnMessage(PacketBufferHandle buffer) override;
+    void OnStatusChange(void) override;
 
 private:
-    const NetworkType mNetworkType;
-    CHIP_ERROR ConnectBLE(ChipDeviceController * dc, NodeId remoteId);
-    CHIP_ERROR ConnectUDP(ChipDeviceController * dc, NodeId remoteId);
+    CHIP_ERROR RunInternal(NodeId remoteId);
+    CHIP_ERROR RunCommandInternal(ChipDevice * device);
 
-    char mName[46];
-    Command::AddressWithInterface mRemoteAddr;
-    uint16_t mRemotePort;
-    uint16_t mDiscriminator;
-    uint32_t mSetupPINCode;
+    void PrintBuffer(PacketBufferHandle & buffer) const;
+
+    ChipDeviceCommissioner mCommissioner;
 };

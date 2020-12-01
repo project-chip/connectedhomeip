@@ -24,14 +24,13 @@
  *      decode interfaces.
  *
  */
-
-#include "TestASN1.h"
-
 #include <nlunit-test.h>
 
 #include <stdint.h>
 #include <stdio.h>
 #include <string.h>
+
+#include <support/UnitTestRegistration.h>
 
 #include <asn1/ASN1.h>
 #include <asn1/ASN1Macros.h>
@@ -395,3 +394,5 @@ int TestASN1(void)
     nlTestRunner(&theSuite, nullptr);
     return (nlTestRunnerStats(&theSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestASN1);

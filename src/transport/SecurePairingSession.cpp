@@ -210,8 +210,8 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err = mDelegate->SendPairingMessage(PacketHeader().SetSourceNodeId(mLocalNodeId).SetEncryptionKeyID(mLocalKeyId),
-                                        payloadHeader.GetEncodePacketFlags(), mPeerAddress, msgBuf.Release_ForNow());
+    err = mDelegate->SendPairingMessage(PacketHeader().SetSourceNodeId(mLocalNodeId).SetEncryptionKeyID(mLocalKeyId), mPeerAddress,
+                                        msgBuf.Release_ForNow());
     SuccessOrExit(err);
 
 exit:
@@ -437,7 +437,7 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
 
     VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = payloadHeader.Decode(packetHeader.GetFlags(), msg->Start(), msg->DataLength(), &headerSize);
+    err = payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
     SuccessOrExit(err);
 
     msg->ConsumeHead(headerSize);

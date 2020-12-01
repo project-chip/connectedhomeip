@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 #include <mdns/minimal/records/IP.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

@@ -28,8 +28,6 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TestInetLayer.h"
-
 #include <errno.h>
 #include <inttypes.h>
 #include <stdint.h>
@@ -42,7 +40,7 @@
 
 #include <support/CHIPArgParser.hpp>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <system/SystemError.h>
 #include <system/SystemTimer.h>
