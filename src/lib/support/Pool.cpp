@@ -19,7 +19,10 @@
 
 namespace chip {
 
-StaticAllocatorBitmap::StaticAllocatorBitmap(void * storage, std::atomic<tBitChunkType> * usage, size_t capacity, size_t elementSize) : StaticAllocatorBase(capacity), mElements(storage), mElementSize(elementSize), mUsage(usage)
+StaticAllocatorBitmap::StaticAllocatorBitmap(void * storage, std::atomic<tBitChunkType> * usage, size_t capacity,
+                                             size_t elementSize) :
+    StaticAllocatorBase(capacity),
+    mElements(storage), mElementSize(elementSize), mUsage(usage)
 {
     for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
     {
@@ -54,7 +57,7 @@ void * StaticAllocatorBitmap::Allocate(void)
 
 void StaticAllocatorBitmap::Deallocate(void * element)
 {
-    size_t index = IndexOf(element);
+    size_t index  = IndexOf(element);
     size_t word   = index / kBitChunkSize;
     size_t offset = index - (word * kBitChunkSize);
 

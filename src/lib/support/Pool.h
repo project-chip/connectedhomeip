@@ -71,7 +71,7 @@ private:
     size_t IndexOf(void * element) { return (static_cast<uint8_t *>(element) - static_cast<uint8_t *>(mElements)) / mElementSize; }
 
 private:
-    void *       mElements;
+    void * mElements;
     const size_t mElementSize;
     std::atomic<tBitChunkType> * mUsage;
 };
