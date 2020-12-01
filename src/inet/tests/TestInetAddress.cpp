@@ -24,8 +24,6 @@
  *
  */
 
-#include "TestInetLayer.h"
-
 #include <inet/IPAddress.h>
 
 #include <string.h>
