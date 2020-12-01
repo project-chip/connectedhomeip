@@ -610,7 +610,7 @@ static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle aB
 
     if (aEndPoint->State != TCPEndPoint::kState_Connected)
     {
-        lStatus = aEndPoint->PutBackReceivedData(aBuffer.Release_ForNow());
+        lStatus = aEndPoint->PutBackReceivedData(std::move(aBuffer));
         INET_FAIL_ERROR(lStatus, "TCPEndPoint::PutBackReceivedData failed");
         goto exit;
     }

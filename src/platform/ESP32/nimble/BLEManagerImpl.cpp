@@ -325,7 +325,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBuffer * data)
+                                    PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     struct os_mbuf * om;
@@ -353,21 +353,20 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-        PacketBuffer::Free(data);
         return false;
     }
     return true;
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBuffer * pBuf)
+                                      PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
     return false;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBuffer * pBuf)
+                                     PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
     return false;

@@ -279,7 +279,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -341,7 +341,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -400,7 +400,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_cA(const PacketHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_cA(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     const uint8_t * hash = msg->Start();
@@ -450,15 +450,15 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
     switch (static_cast<Spake2pMsgType>(payloadHeader.GetMessageType()))
     {
     case Spake2pMsgType::kSpake2pCompute_pA:
-        err = HandleCompute_pA(packetHeader, msg.Get_ForNow());
+        err = HandleCompute_pA(packetHeader, msg);
         break;
 
     case Spake2pMsgType::kSpake2pCompute_pB_cB:
-        err = HandleCompute_pB_cB(packetHeader, msg.Get_ForNow());
+        err = HandleCompute_pB_cB(packetHeader, msg);
         break;
 
     case Spake2pMsgType::kSpake2pCompute_cA:
-        err = HandleCompute_cA(packetHeader, msg.Get_ForNow());
+        err = HandleCompute_cA(packetHeader, msg);
         break;
 
     default:

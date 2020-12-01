@@ -78,7 +78,7 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     response->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 
     // Send an Echo Response back to the sender.
-    ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, response.Release_ForNow(),
+    ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, std::move(response),
                     Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
 
     // Discard the exchange context.
