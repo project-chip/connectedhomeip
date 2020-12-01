@@ -4,18 +4,21 @@ The following examples for the development kits from Nordic Semiconductor
 include a command-line interface that allows access to application logs and
 [Zephyr shell](https://docs.zephyrproject.org/1.13.0/subsystems/shell.html):
 
-- [CHIP nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md)
-- [CHIP nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
+-   [CHIP nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md)
+-   [CHIP nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md)
 
-The [CHIP nRF Connect Pigweed Example Application](../../examples/pigweed-app/nrfconnect/README.md) does not support CLI.
+The
+[CHIP nRF Connect Pigweed Example Application](../../examples/pigweed-app/nrfconnect/README.md)
+does not support CLI.
 
 ## Accessing the CLI console
 
-To access the CLI console, use a serial terminal emulator of your choice, like Minicom or GNU Screen.
-Use the baud rate set to `115200`.
+To access the CLI console, use a serial terminal emulator of your choice, like
+Minicom or GNU Screen. Use the baud rate set to `115200`.
 
 For example, to start using the CLI console with Minicom, run the following
-command with _/dev/ttyACM0_ replaced with the device node name of your development kit:
+command with _/dev/ttyACM0_ replaced with the device node name of your
+development kit:
 
     $ minicom -D /dev/ttyACM0 -b 115200
 
@@ -33,8 +36,8 @@ I: Init CHIP stack
 ...
 ```
 
-This means that the console is working correctly and you can start using
-shell commands. For example, issuing the `kernel threads` command will print
+This means that the console is working correctly and you can start using shell
+commands. For example, issuing the `kernel threads` command will print
 information about all running threads:
 
 ```shell
@@ -58,7 +61,8 @@ Threads:
 To list all available commands, use the Tab key, which is normally used for the
 command completion feature.
 
-Pressing the Tab key in an empty command line prints the list of available commands:
+Pressing the Tab key in an empty command line prints the list of available
+commands:
 
 ```shell
 uart:~$
@@ -67,8 +71,8 @@ uart:~$
   ot                 resize             shell
 ```
 
-Pressing the Tab key with a command entered in the command line cycles through available options
-for the given command.
+Pressing the Tab key with a command entered in the command line cycles through
+available options for the given command.
 
 ## Using OpenThread commands
 
