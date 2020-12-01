@@ -34,9 +34,16 @@ static_library("helpers") {
     "TestInetCommonOptions.cpp",
     "TestInetCommonOptions.h",
     "TestInetLayer.cpp",
-    "TestInetLayer.h",
     "TestInetLayerCommon.cpp",
   ]
+
+  if (lwip_platform == "standalone") {
+    sources += [
+      "TapAddrAutoconf.cpp",
+      "TapAddrAutoconf.h",
+    ]
+  }
+
 
   cflags = [ "-Wconversion" ]
 
@@ -50,18 +57,6 @@ static_library("helpers") {
 chip_test_suite("tests") {
   output_name = "libInetLayerTests"
 
-  sources = [
-    "TestInetAddress.cpp",
-    "TestInetErrorStr.cpp",
-  ]
-
-  if (lwip_platform == "standalone") {
-    sources += [
-      "TapAddrAutoconf.cpp",
-      "TapAddrAutoconf.h",
-    ]
-  }
-
   public_configs = [ ":tests_config" ]
 
   public_deps = [
@@ -71,25 +66,24 @@ chip_test_suite("tests") {
     "${nlunit_test_root}:nlunit-test",
   ]
 
-  tests = [
-    "TestInetAddress",
-    "TestInetErrorStr",
+  test_sources = [
+    "TestInetAddress.cpp",
+    "TestInetErrorStr.cpp",
   ]
+  sources = []
 
   if (current_os != "zephyr") {
-    sources += [ "TestInetEndPoint.cpp" ]
-    tests += [ "TestInetEndPoint" ]
+    test_sources += [ "TestInetEndPoint.cpp" ]
   }
 
   # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
   # x64.
   if (current_os != "mac" && current_os != "zephyr" &&
       chip_device_platform != "esp32" && current_cpu == "x64") {
-    sources += [
-      "TestInetLayerDNS.cpp",
-      "TestLwIPDNS.cpp",
-    ]
-    tests += [ "TestInetLayerDNS" ]
+    test_sources += [ "TestInetLayerDNS.cpp" ]
+
+    # TODO: This test does not seem executed
+    sources += [ "TestLwIPDNS.cpp" ]
   }
 }
 

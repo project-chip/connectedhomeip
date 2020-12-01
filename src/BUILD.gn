@@ -54,6 +54,10 @@ if (chip_build_tests) {
       "${chip_root}/src/transport/tests",
     ]
 
+    if (chip_device_platform != "none") {
+      deps += [ "${chip_root}/src/lib/mdns/minimal/tests" ]
+    }
+
     if (chip_device_platform != "esp32") {
       deps += [ "${chip_root}/src/platform/tests" ]
     }

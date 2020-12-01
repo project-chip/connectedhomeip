@@ -209,35 +209,40 @@ CHIP_ERROR GenericThreadStackManagerImpl_OpenThread<ImplClass>::_SetThreadProvis
 
     // Form a Thread operational dataset from the given network parameters.
     memset(&newDataset, 0, sizeof(newDataset));
-    newDataset.mComponents.mIsActiveTimestampPresent  = true;
-    newDataset.mComponents.mIsPendingTimestampPresent = true;
+
     if (netInfo.ThreadNetworkName[0] != 0)
     {
         strncpy((char *) newDataset.mNetworkName.m8, netInfo.ThreadNetworkName, sizeof(newDataset.mNetworkName.m8));
         newDataset.mComponents.mIsNetworkNamePresent = true;
     }
+
     if (netInfo.FieldPresent.ThreadExtendedPANId)
     {
         memcpy(newDataset.mExtendedPanId.m8, netInfo.ThreadExtendedPANId, sizeof(newDataset.mExtendedPanId.m8));
         newDataset.mComponents.mIsExtendedPanIdPresent = true;
     }
+
     if (netInfo.FieldPresent.ThreadMeshPrefix)
     {
         memcpy(newDataset.mMeshLocalPrefix.m8, netInfo.ThreadMeshPrefix, sizeof(newDataset.mMeshLocalPrefix.m8));
         newDataset.mComponents.mIsMeshLocalPrefixPresent = true;
     }
+
     memcpy(newDataset.mMasterKey.m8, netInfo.ThreadMasterKey, sizeof(newDataset.mMasterKey.m8));
     newDataset.mComponents.mIsMasterKeyPresent = true;
+
     if (netInfo.FieldPresent.ThreadPSKc)
     {
         memcpy(newDataset.mPskc.m8, netInfo.ThreadPSKc, sizeof(newDataset.mPskc.m8));
         newDataset.mComponents.mIsPskcPresent = true;
     }
+
     if (netInfo.ThreadPANId != kThreadPANId_NotSpecified)
     {
         newDataset.mPanId                      = netInfo.ThreadPANId;
         newDataset.mComponents.mIsPanIdPresent = true;
     }
+
     if (netInfo.ThreadChannel != kThreadChannel_NotSpecified)
     {
         newDataset.mChannel                      = netInfo.ThreadChannel;

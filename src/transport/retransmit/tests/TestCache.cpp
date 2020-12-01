@@ -17,7 +17,7 @@
 
 #include "TestRetransmit.h"
 
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <transport/retransmit/Cache.h>
 
 #include <bitset>

@@ -25,7 +25,7 @@
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <transport/raw/UDP.h>
 
 #include <nlbyteorder.h>

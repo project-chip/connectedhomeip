@@ -12,25 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("//build_overrides/nlunit_test.gni")
+config("qrcode-common_config") {
+  include_dirs = [ "repo/c" ]
 
-import("${chip_root}/build/chip/chip_test_suite.gni")
+  cflags = [ "-Wno-type-limits" ]
+}
 
-chip_test_suite("tests") {
-  output_name = "libCoreTests"
+static_library("QRCode") {
+  output_name = "libqrcode-common"
 
-  test_sources = [
-    "TestCHIPCallback.cpp",
-    "TestCHIPErrorStr.cpp",
-    "TestCHIPTLV.cpp",
-    "TestReferenceCounted.cpp",
-  ]
+  output_dir = "${root_out_dir}/lib"
 
-  cflags = [ "-Wconversion" ]
+  sources = [ "repo/c/qrcodegen.c" ]
 
-  public_deps = [
-    "${chip_root}/src/lib/core",
-    "${nlunit_test_root}:nlunit-test",
-  ]
+  public_configs = [ ":qrcode-common_config" ]
 }
