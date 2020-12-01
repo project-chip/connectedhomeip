@@ -43,7 +43,7 @@
 #include <openthread/config.h>
 
 #include <openthread/platform/misc.h>
- 
+
 // clang-format off
 // `/` is a path delimiter, not the division operation
 
