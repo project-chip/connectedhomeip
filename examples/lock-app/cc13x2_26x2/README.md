@@ -88,7 +88,7 @@ section will need to be done when migrating to new versions of the SDK.
 
     ```
     $ cd ~/connectedhomeip
-    h
+    $ source ./script/bootstrap.sh
 
     ```
 
@@ -101,7 +101,7 @@ Ninja to build the executable.
 
     ```
     $ cd ~/connectedhomeip
-    h
+    $ source ./script/activate.sh
 
     ```
 
