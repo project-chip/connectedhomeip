@@ -20,7 +20,7 @@
 
 #include <mdns/minimal/Parser.h>
 #include <mdns/minimal/RecordData.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
