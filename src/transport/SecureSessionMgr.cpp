@@ -135,7 +135,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
             .SetPayloadLength(static_cast<uint16_t>(payloadLength));
         packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
 
-        ChipLogProgress(Inet, "Sending msg from %llu to %llu\n", mLocalNodeId, peerNodeId);
+        ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, peerNodeId);
 
         VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
@@ -146,7 +146,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         err = payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize);
         SuccessOrExit(err);
 
-        err = state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
+        err = state->GetSecureSession().Encrypt(data, totalLen, data, packetHeader, mac);
         SuccessOrExit(err);
 
         err = mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen);
@@ -157,8 +157,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
 
         ChipLogDetail(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
-        err = mTransportMgr->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), state->GetPeerAddress(),
-                                         msgBuf.Release_ForNow());
+        err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), msgBuf.Release_ForNow());
     }
     SuccessOrExit(err);
     state->IncrementSendMessageIndex();
@@ -306,13 +305,13 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         PayloadHeader payloadHeader;
         MessageAuthenticationCode mac;
 
-        uint8_t * data            = msg->Start();
-        uint8_t * plainText       = nullptr;
-        uint16_t len              = msg->TotalLength();
-        const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
-        uint16_t decodedSize      = 0;
-        uint16_t taglen           = 0;
-        uint16_t payloadlen       = 0;
+        uint8_t * data       = msg->Start();
+        uint8_t * plainText  = nullptr;
+        uint16_t len         = msg->TotalLength();
+        uint16_t headerSize  = 0;
+        uint16_t decodedSize = 0;
+        uint16_t taglen      = 0;
+        uint16_t payloadlen  = 0;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         /* This is a workaround for the case where PacketBuffer payload is not
@@ -333,10 +332,11 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         len = static_cast<uint16_t>(len - taglen);
         msg->SetDataLength(len, nullptr);
 
-        err = state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, payloadHeader.GetEncodePacketFlags(), mac);
+        err = state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, mac);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decrypt msg: err %d", err));
 
-        err = payloadHeader.Decode(packetHeader.GetFlags(), plainText, len, &decodedSize);
+        err        = payloadHeader.Decode(plainText, len, &decodedSize);
+        headerSize = payloadHeader.EncodeSizeBytes();
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode encrypted header: err %d", err));
         VerifyOrExit(headerSize == decodedSize, ChipLogError(Inet, "Secure transport decode encrypted header length mismatched"));
 
