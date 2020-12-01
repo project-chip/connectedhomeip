@@ -91,8 +91,8 @@ RendezvousSession::~RendezvousSession()
     mDelegate = nullptr;
 }
 
-CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
-                                                 const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgIn)
+CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                                 System::PacketBuffer * msgIn)
 {
     if (mCurrentState != State::kSecurePairing)
     {
@@ -102,11 +102,11 @@ CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, He
 
     if (peerAddress.GetTransportType() == Transport::Type::kBle)
     {
-        return mTransport->SendMessage(header, payloadFlags, peerAddress, msgIn);
+        return mTransport->SendMessage(header, peerAddress, msgIn);
     }
     else if (mTransportMgr != nullptr)
     {
-        return mTransportMgr->SendMessage(header, payloadFlags, peerAddress, msgIn);
+        return mTransportMgr->SendMessage(header, peerAddress, msgIn);
     }
     else
     {
@@ -150,7 +150,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
     uint16_t totalLen                = msgBuf->TotalLength();
 
     ReturnErrorOnFailure(payloadHeader.Encode(data, totalLen, &actualEncodedHeaderSize));
-    ReturnErrorOnFailure(mSecureSession.Encrypt(data, totalLen, data, packetHeader, payloadHeader.GetEncodePacketFlags(), mac));
+    ReturnErrorOnFailure(mSecureSession.Encrypt(data, totalLen, data, packetHeader, mac));
 
     uint16_t taglen = 0;
     ReturnErrorOnFailure(mac.Encode(packetHeader, &data[totalLen], kMaxTagLen, &taglen));
@@ -159,8 +159,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
 
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    ReturnErrorOnFailure(mTransport->SendMessage(packetHeader, payloadHeader.GetEncodePacketFlags(), Transport::PeerAddress::BLE(),
-                                                 msgBuf.Release_ForNow()));
+    ReturnErrorOnFailure(mTransport->SendMessage(packetHeader, Transport::PeerAddress::BLE(), msgBuf.Release_ForNow()));
 
     mSecureMessageIndex++;
 
@@ -378,7 +377,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     len = static_cast<uint16_t>(len - taglen);
     msgBuf->SetDataLength(len);
 
-    ReturnErrorOnFailure(mSecureSession.Decrypt(data, len, plainText, packetHeader, payloadHeader.GetEncodePacketFlags(), mac));
+    ReturnErrorOnFailure(mSecureSession.Decrypt(data, len, plainText, packetHeader, mac));
 
     // Use the node IDs from the packet header only after it's successfully decrypted
     if (packetHeader.GetDestinationNodeId().HasValue() && !mParams.HasLocalNodeId())
@@ -394,7 +393,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     }
 
     uint16_t decodedSize = 0;
-    ReturnErrorOnFailure(payloadHeader.Decode(packetHeader.GetFlags(), plainText, len, &decodedSize));
+    ReturnErrorOnFailure(payloadHeader.Decode(plainText, len, &decodedSize));
 
     ReturnErrorCodeIf(headerSize != decodedSize, CHIP_ERROR_INCORRECT_STATE);
 

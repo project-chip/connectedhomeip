@@ -18,21 +18,22 @@
 
 #pragma once
 
-#include "EchoCommand.h"
+#include <controller/CHIPDeviceController.h>
+#include <inipp/inipp.h>
 
-class Echo : public EchoCommand
+class PersistentStorage : public chip::Controller::PersistentStorageDelegate
 {
 public:
-    Echo() : EchoCommand("ip") {}
+    CHIP_ERROR Init();
+
+    /////////// PersistentStorageDelegate Interface /////////
+    void SetDelegate(chip::Controller::PersistentStorageResultDelegate * delegate) override;
+    void GetKeyValue(const char * key) override;
+    CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) override;
+    void SetKeyValue(const char * key, const char * value) override;
+    void DeleteKeyValue(const char * key) override;
+
+private:
+    CHIP_ERROR CommitConfig();
+    inipp::Ini<char> mConfig;
 };
-
-void registerCommandsEcho(Commands & commands)
-{
-    const char * clusterName = "Echo";
-
-    commands_list clusterCommands = {
-        make_unique<Echo>(),
-    };
-
-    commands.Register(clusterName, clusterCommands);
-}

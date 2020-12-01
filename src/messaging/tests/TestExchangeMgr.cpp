@@ -26,6 +26,7 @@
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
@@ -42,6 +43,7 @@ namespace {
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
+using namespace chip::Messaging;
 
 using TestContext = chip::Test::IOContext;
 
@@ -56,8 +58,7 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
-                           System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
     {
         System::PacketBufferHandle msg_ForNow;
         msg_ForNow.Adopt(msgBuf);
@@ -246,11 +247,11 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
 
     // send a malicious packet
-    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New());
+    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     // send a good packet
-    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New());
+    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 }
 

@@ -28,7 +28,7 @@
 namespace chip {
 namespace Protocols {
 
-CHIP_ERROR EchoClient::Init(ExchangeManager * exchangeMgr)
+CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr)
 {
     // Error if already initialized.
     if (mExchangeMgr != nullptr)
@@ -75,7 +75,8 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Send an Echo Request message.  Discard the exchange context if the send fails.
-    err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(payload));
+    err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(payload),
+                                    Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -86,8 +87,8 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
     return err;
 }
 
-void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                   System::PacketBufferHandle payload)
+void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
+                                   uint8_t msgType, System::PacketBufferHandle payload)
 {
     // Assert that the exchange context matches the client's current context.
     // This should never fail because even if SendEchoRequest is called
@@ -118,7 +119,7 @@ void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     }
 }
 
-void EchoClient::OnResponseTimeout(ExchangeContext * ec)
+void EchoClient::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
     ChipLogProgress(Echo, "Time out! failed to receive echo response from Node: %llu", ec->GetPeerNodeId());
 }

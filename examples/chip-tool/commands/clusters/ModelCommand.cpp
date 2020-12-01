@@ -18,15 +18,7 @@
 
 #include "ModelCommand.h"
 
-#include <atomic>
-#include <chrono>
-#include <sstream>
-#include <string>
-
 using namespace ::chip;
-using namespace ::chip::DeviceController;
-
-constexpr std::chrono::seconds kWaitingForResponseTimeout(10);
 
 namespace {
 constexpr uint8_t kZCLGlobalCmdFrameControlHeader  = 8;
@@ -44,76 +36,15 @@ bool isGlobalCommand(uint8_t frameControl)
 }
 } // namespace
 
-void ModelCommand::OnConnect(ChipDeviceController * dc)
+uint16_t ModelCommand::Encode(PacketBufferHandle & buffer, uint16_t bufferSize)
 {
-    if (SendCommand(dc))
-    {
-        UpdateWaitForResponse(true);
-        WaitForResponse();
-    }
-}
-
-void ModelCommand::OnError(ChipDeviceController * dc, CHIP_ERROR err)
-{
-    UpdateWaitForResponse(false);
-}
-
-void ModelCommand::OnMessage(ChipDeviceController * dc, PacketBufferHandle buffer)
-{
-    SetCommandExitStatus(ReceiveCommandResponse(dc, std::move(buffer)));
-    UpdateWaitForResponse(false);
-}
-
-CHIP_ERROR ModelCommand::Run(ChipDeviceController * dc, NodeId remoteId)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    err = NetworkCommand::Run(dc, remoteId);
-    SuccessOrExit(err);
-
-    err = dc->ServiceEventSignal();
-    SuccessOrExit(err);
-
-    VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);
-
-exit:
-    return err;
-}
-
-bool ModelCommand::SendCommand(ChipDeviceController * dc)
-{
-    // Make sure our buffer is big enough, but this will need a better setup!
-    static const uint16_t bufferSize = 1024;
-    PacketBufferHandle buffer        = PacketBuffer::NewWithAvailableSize(bufferSize);
-
-    if (buffer.IsNull())
-    {
-        ChipLogError(chipTool, "Failed to allocate memory for packet data.");
-        return false;
-    }
-
     ChipLogProgress(chipTool, "Endpoint id: '0x%02x', Cluster id: '0x%04x', Command id: '0x%02x'", mEndPointId, mClusterId,
                     mCommandId);
 
-    uint16_t dataLength = EncodeCommand(buffer, bufferSize, mEndPointId);
-    if (dataLength == 0)
-    {
-        ChipLogError(chipTool, "Error while encoding data for command: %s", GetName());
-        return false;
-    }
-
-    buffer->SetDataLength(dataLength);
-    ChipLogDetail(chipTool, "Encoded data of length %d", dataLength);
-
-#ifdef DEBUG
-    PrintBuffer(buffer);
-#endif
-
-    dc->SendMessage(NULL, std::move(buffer));
-    return true;
+    return EncodeCommand(buffer, bufferSize, mEndPointId);
 }
 
-bool ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBufferHandle buffer) const
+bool ModelCommand::Decode(PacketBufferHandle & buffer) const
 {
     EmberApsFrame frame;
     uint8_t * message;
@@ -149,35 +80,4 @@ bool ModelCommand::ReceiveCommandResponse(ChipDeviceController * dc, PacketBuffe
 
 exit:
     return success;
-}
-
-void ModelCommand::UpdateWaitForResponse(bool value)
-{
-    {
-        std::lock_guard<std::mutex> lk(cvWaitingForResponseMutex);
-        mWaitingForResponse = value;
-    }
-    cvWaitingForResponse.notify_all();
-}
-
-void ModelCommand::WaitForResponse()
-{
-    std::unique_lock<std::mutex> lk(cvWaitingForResponseMutex);
-    auto waitingUntil = std::chrono::system_clock::now() + kWaitingForResponseTimeout;
-    if (!cvWaitingForResponse.wait_until(lk, waitingUntil, [this]() { return !this->mWaitingForResponse; }))
-    {
-        ChipLogError(chipTool, "No response from device");
-    }
-}
-
-void ModelCommand::PrintBuffer(const PacketBufferHandle & buffer) const
-{
-    const size_t data_len = buffer->DataLength();
-
-    fprintf(stderr, "SENDING: %zu ", data_len);
-    for (size_t i = 0; i < data_len; ++i)
-    {
-        fprintf(stderr, "%d ", buffer->Start()[i]);
-    }
-    fprintf(stderr, "\n");
 }

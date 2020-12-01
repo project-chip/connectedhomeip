@@ -134,8 +134,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
-                            System::PacketBuffer * msgIn)
+CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgIn)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     const uint16_t headerSize = header.EncodeSizeBytes();
@@ -150,7 +149,7 @@ CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFl
 
     msgBuf->SetStart(msgBuf->Start() - headerSize);
 
-    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags);
+    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
     SuccessOrExit(err);
 
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);

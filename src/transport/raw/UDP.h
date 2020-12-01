@@ -110,7 +110,7 @@ public:
      */
     void Close() override;
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
+    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override

@@ -28,7 +28,7 @@
 namespace chip {
 namespace Protocols {
 
-CHIP_ERROR EchoServer::Init(ExchangeManager * exchangeMgr)
+CHIP_ERROR EchoServer::Init(Messaging::ExchangeManager * exchangeMgr)
 {
     // Error if already initialized.
     if (mExchangeMgr != nullptr)
@@ -52,8 +52,8 @@ void EchoServer::Shutdown()
     }
 }
 
-void EchoServer::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                   System::PacketBufferHandle payload)
+void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
+                                   uint8_t msgType, System::PacketBufferHandle payload)
 {
     System::PacketBufferHandle response;
 
@@ -78,7 +78,8 @@ void EchoServer::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     response->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 
     // Send an Echo Response back to the sender.
-    ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, std::move(response));
+    ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, std::move(response),
+                    Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
 
     // Discard the exchange context.
     ec->Close();

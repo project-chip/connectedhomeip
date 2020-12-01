@@ -25,12 +25,14 @@
 
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/ExchangeDelegate.h>
+#include <messaging/Flags.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
+namespace Messaging {
 
 class ExchangeManager;
 class ExchangeContext;
@@ -53,11 +55,6 @@ class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, Exch
     friend class ExchangeContextDeletor;
 
 public:
-    enum
-    {
-        kSendFlag_ExpectResponse = 0x0001, // Used to indicate that a response is expected within a specified timeout.
-    };
-
     /**
      *  Determine whether the context is the initiator of the exchange.
      *
@@ -107,7 +104,7 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload, uint16_t sendFlags = 0,
+    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload, const SendFlags & sendFlags,
                            void * msgCtxt = nullptr);
 
     /**
@@ -191,4 +188,5 @@ inline void ExchangeContextDeletor::Release(ExchangeContext * obj)
     obj->Free();
 }
 
+} // namespace Messaging
 } // namespace chip

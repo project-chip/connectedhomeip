@@ -201,7 +201,7 @@ static PacketBufferHandle MakeICMPDataBuffer(uint16_t aDesiredUserLength, uint16
     // To ensure there is enough room for the user data and the ICMP
     // header, include both the user data size and the ICMP header length.
 
-    lBuffer = MakeDataBuffer(aDesiredUserLength + aHeaderLength, aPatternStartOffset);
+    lBuffer = MakeDataBuffer(static_cast<uint16_t>(aDesiredUserLength + aHeaderLength), aPatternStartOffset);
 
     if (!lBuffer.IsNull())
     {
@@ -210,7 +210,7 @@ static PacketBufferHandle MakeICMPDataBuffer(uint16_t aDesiredUserLength, uint16
         lHeader->mType           = aType;
         lHeader->mCode           = 0;
         lHeader->mChecksum       = 0;
-        lHeader->mID             = rand() & UINT16_MAX;
+        lHeader->mID             = static_cast<uint16_t>(rand() & UINT16_MAX);
         lHeader->mSequenceNumber = nlByteOrderSwap16HostToBig(lSequenceNumber++);
     }
 
@@ -268,8 +268,8 @@ static bool HandleDataReceived(const PacketBufferHandle & aBuffer, TransferStats
             VerifyOrExit(lStatus == true, );
         }
 
-        lTotalDataLength += lBuffer->DataLength();
-        aFirstValue += lBuffer->DataLength();
+        lTotalDataLength = static_cast<uint16_t>(lTotalDataLength + lBuffer->DataLength());
+        aFirstValue      = static_cast<uint8_t>(aFirstValue + lBuffer->DataLength());
     }
 
     // If we are accumulating stats by packet rather than by size,

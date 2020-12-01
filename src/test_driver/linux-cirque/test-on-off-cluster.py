@@ -77,14 +77,20 @@ class TestOnOffCluster(CHIPVirtualHome):
         for device_id in server_ids:
             server_ip_address.add(self.get_device_thread_ip(device_id))
 
-        command = "chip-tool onoff {} {} {} 1"
+        command = "chip-tool onoff {} 1"
 
         for ip in server_ip_address:
-            ret = self.execute_device_cmd(tool_device_id, command.format("on", ip, CHIP_PORT))
+            ret = self.execute_device_cmd(tool_device_id, "chip-tool pairing bypass {} {}".format(ip, CHIP_PORT))
+            self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format("pairing bypass", ret['output']))
+
+            ret = self.execute_device_cmd(tool_device_id, command.format("on"))
             self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format("on", ret['output']))
 
-            ret = self.execute_device_cmd(tool_device_id, command.format("off", ip, CHIP_PORT))
+            ret = self.execute_device_cmd(tool_device_id, command.format("off"))
             self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format("off", ret['output']))
+
+            ret = self.execute_device_cmd(tool_device_id, "chip-tool pairing unpair")
+            self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format("pairing unpair", ret['output']))
 
         time.sleep(1)
 
