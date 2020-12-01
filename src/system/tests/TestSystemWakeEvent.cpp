@@ -24,11 +24,8 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-// config
-#include <system/SystemConfig.h>
 
-// module header
-#include "TestSystemLayer.h"
+#include <system/SystemConfig.h>
 
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>
