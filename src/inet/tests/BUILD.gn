@@ -44,7 +44,6 @@ static_library("helpers") {
     ]
   }
 
-
   cflags = [ "-Wconversion" ]
 
   public_deps = [
