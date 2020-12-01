@@ -101,7 +101,7 @@ void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     {
         ec->Close();
         mExchangeCtx = nullptr;
-        ExitNow();
+        return;
     }
 
     // Remove the EC from the app state now. OnEchoResponseReceived can call
@@ -116,8 +116,6 @@ void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & pa
     {
         OnEchoResponseReceived(packetHeader.GetSourceNodeId().ValueOr(0), std::move(payload));
     }
-
-exit:;
 }
 
 void EchoClient::OnResponseTimeout(ExchangeContext * ec)

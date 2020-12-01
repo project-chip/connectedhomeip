@@ -23,8 +23,6 @@
  *
  */
 
-#include "TestCore.h"
-
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
@@ -39,7 +37,7 @@
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/ScopedBuffer.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <string.h>
 
