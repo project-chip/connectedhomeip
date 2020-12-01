@@ -26,6 +26,7 @@
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
+#include <messaging/Flags.h>
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
@@ -42,6 +43,7 @@ namespace {
 using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
+using namespace chip::Messaging;
 
 using TestContext = chip::Test::IOContext;
 
@@ -245,11 +247,13 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
 
     // send a malicious packet
-    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New().Release_ForNow());
+    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New().Release_ForNow(),
+                     SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     // send a good packet
-    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New().Release_ForNow());
+    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New().Release_ForNow(),
+                     SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 }
 

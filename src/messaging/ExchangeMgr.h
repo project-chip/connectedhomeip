@@ -31,6 +31,7 @@
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
+namespace Messaging {
 
 class ExchangeContext;
 class ExchangeDelegate;
@@ -206,4 +207,5 @@ private:
     void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override;
 };
 
+} // namespace Messaging
 } // namespace chip
