@@ -39,7 +39,7 @@
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>
 #include <support/ScopedBuffer.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <stdarg.h>
 #include <stdint.h>
