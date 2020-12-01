@@ -15,10 +15,10 @@
  *    limitations under the License.
  */
 
+#include "AppDelegate.h"
 #include "BluetoothWidget.h"
 #include "Button.h"
 #include "CHIPDeviceManager.h"
-#include "DataModelHandler.h"
 #include "DeviceCallbacks.h"
 #include "Display.h"
 #include "Globals.h"
@@ -26,8 +26,8 @@
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
 #include "QRCodeUtil.h"
-#include "RendezvousDeviceDelegate.h"
 #include "ScreenManager.h"
+#include "Server.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -45,13 +45,11 @@
 #include <string>
 #include <vector>
 
-#include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
-#include <transport/SecureSessionMgr.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
@@ -83,12 +81,9 @@ using namespace ::chip::DeviceLayer;
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-extern void PairingComplete(NodeId assignedNodeId, NodeId peerNodeId, SecurePairingSession * pairing);
-
 const char * TAG = "all-clusters-app";
 
 static DeviceCallbacks EchoCallbacks;
-RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
 
 namespace {
 
@@ -342,11 +337,6 @@ bool isRendezvousBLE()
     return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
 }
 
-bool isRendezvousBypassed()
-{
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kNone;
-}
-
 std::string createSetupPayload()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -431,7 +421,13 @@ std::string createSetupPayload()
     return result;
 };
 
-static SecurePairingUsingTestSecret gTestPairing;
+class AppCallbacks : public AppDelegate
+{
+public:
+void OnReceiveError() override { statusLED1.BlinkOnError(); }
+void OnRendezvousStarted() override { bluetoothLED.Set(true); }
+void OnRendezvousStopped() override { bluetoothLED.Set(false); }
+};
 
 } // namespace
 
@@ -484,18 +480,9 @@ extern "C" void app_main()
     bluetoothLED.Init();
     wifiLED.Init();
 
-    // Start the Echo Server
-    InitDataModelHandler();
-
-    if (isRendezvousBLE())
-    {
-        rendezvousDelegate = chip::Platform::New<RendezvousDeviceDelegate>();
-    }
-    else if (isRendezvousBypassed())
-    {
-        ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
-        PairingComplete(chip::kTestDeviceNodeId, chip::kTestControllerNodeId, &gTestPairing);
-    }
+    // Init ZCL Data Model and CHIP App Server
+    AppCallbacks callbacks;
+    InitServer(&callbacks);
 
     std::string qrCodeText = createSetupPayload();
     ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
