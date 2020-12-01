@@ -669,10 +669,10 @@ void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix)
 
 static void RebootCallbackFn()
 {
-    int i;
-    int j = 0;
+    size_t i;
+    size_t j = 0;
     chip::Platform::ScopedMemoryBuffer<char *> lArgv;
-    if (!lArgv.Alloc(sRestartCallbackCtx.mArgc + 2))
+    if (!lArgv.Alloc(static_cast<size_t>(sRestartCallbackCtx.mArgc + 2)))
     {
         printf("** failed to allocate memory **\n");
         ExitNow();
@@ -697,9 +697,9 @@ static void RebootCallbackFn()
 
     lArgv[j] = nullptr;
 
-    for (i = 0; lArgv[i] != nullptr; i++)
+    for (size_t idx = 0; lArgv[idx] != nullptr; idx++)
     {
-        printf("argv[%d]: %s\n", i, lArgv[i]);
+        printf("argv[%d]: %s\n", static_cast<int>(idx), lArgv[idx]);
     }
 
     // Need to close any open file descriptor above stdin/out/err.
@@ -707,9 +707,9 @@ static void RebootCallbackFn()
     // Given that CHIP's test apps don't open a large number of files,
     // FD_SETSIZE should be a reasonable upper bound (see the documentation
     // of select).
-    for (i = 3; i < FD_SETSIZE; i++)
+    for (int fd = 3; fd < FD_SETSIZE; fd++)
     {
-        close(i);
+        close(fd);
     }
 
     printf("********** Restarting *********\n");
