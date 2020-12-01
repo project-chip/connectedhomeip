@@ -19,7 +19,7 @@
 #include "TestSupport.h"
 
 #include <support/ScopedBuffer.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

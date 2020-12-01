@@ -22,6 +22,7 @@
 
 set -e
 set -o pipefail
+set -x
 
 here=$(cd "$(dirname "$0")" && pwd)
 chip_dir="$here"/../..
@@ -41,16 +42,16 @@ if [ $? -ne 0 ]; then
 fi
 
 really_run_suite() {
-    idf scripts/tools/qemu_run_test.sh src/test_driver/esp32/build/chip "$1"
+    idf scripts/tools/qemu_run_test.sh src/test_driver/esp32/build/chip "$1" "$2"
 }
 
 run_suite() {
     if [[ -d "${log_dir}" ]]; then
         suite=${1%.a}
         suite=${suite#lib}
-        really_run_suite "$1" |& tee "$log_dir/$suite.log"
+        really_run_suite "$1" "$2" |& tee "$log_dir/$suite.log"
     else
-        really_run_suite "$1"
+        really_run_suite "$1" "$2"
     fi
 }
 
@@ -58,14 +59,27 @@ run_suite() {
 # The specific qualifiers will be removed, once all CHIP unit tests are
 # updated to run on QEMU.
 SUITES=(
-    libInetLayerTests.a
-    libSystemLayerTests.a
-    libTransportLayerTests.a
 )
 
-for suite in "${SUITES[@]}"; do
-    run_suite "$suite"
-done
+run_suite libAppTests.a
+run_suite libASN1Tests.a
+run_suite libBleLayerTests.a
+run_suite libCoreTests.a
+run_suite libInetLayerTests.a
+run_suite libRetransmitTests.a
+run_suite libSystemLayerTests.a
+
+# TODO: Transport layer tests do not link:
+#    - getpid undefined
+#    - ArgParser for IPAddresses are not linked in
+#    - std::__throw_bad_alloc() linker errors
+# run_suite libRawTransportTests.a "-lNetworkTestHelpers -lInetTestHelpers"
+
+# TODO: Transport layer tests do not link:
+#    - getpid undefined
+#    - ArgParser for IPAddresses are not linked in
+#    - std::__throw_bad_alloc() linker errors
+# run_suite libTransportLayerTests.a "-lNetworkTestHelpers -lInetTestHelpers"
 
 # TODO - Fix crypto tests.
-run_suite libChipCryptoTests.a || true
+# run_suite libChipCryptoTests.a || true

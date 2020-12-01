@@ -467,7 +467,6 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mStorageDelegate != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
 
 #if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
     if (!params.HasBleLayer())
