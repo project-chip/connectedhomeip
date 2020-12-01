@@ -32,14 +32,14 @@ buildconfig_header("chip_buildconfig") {
   chip_logging_style_stdio = chip_logging_style == "stdio"
   chip_logging_style_stdio_weak = chip_logging_style == "stdio_weak"
   chip_logging_style_stdio_with_timestamps =
-      chip_logging_style == "stdio_with_timestamps"
+  chip_logging_style == "stdio_with_timestamps"
 
   chip_config_memory_management_malloc =
-      chip_config_memory_management == "malloc"
+  chip_config_memory_management == "malloc"
   chip_config_memory_management_simple =
-      chip_config_memory_management == "simple"
+  chip_config_memory_management == "simple"
   chip_config_memory_management_platform =
-      chip_config_memory_management == "platform"
+  chip_config_memory_management == "platform"
 
   # TODO - Move CHIP_PROJECT_CONFIG_INCLUDE, CHIP_PLATFORM_CONFIG_INCLUDE here.
   # Currently those are also used from src/system.
@@ -94,7 +94,6 @@ static_library("core") {
   output_name = "libChipCore"
 
   sources = [
-    "CHIPCallbackManager.h",
     "CHIPCallback.h",
     "CHIPCircularTLVBuffer.cpp",
     "CHIPCircularTLVBuffer.h",
