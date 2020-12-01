@@ -59,16 +59,7 @@ if (chip_build_tests) {
     }
 
     if (chip_device_platform != "esp32") {
-<<<<<<< HEAD
-      deps += [
-        "${chip_root}/src/lib/core/tests",
-        "${chip_root}/src/lib/support/tests",
-        "${chip_root}/src/platform/tests",
-        "${chip_root}/src/setup_payload/tests",
-      ]
-=======
       deps += [ "${chip_root}/src/platform/tests" ]
->>>>>>> master
     }
 
     if (chip_config_network_layer_ble) {
