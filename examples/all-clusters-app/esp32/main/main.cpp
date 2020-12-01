@@ -424,9 +424,9 @@ std::string createSetupPayload()
 class AppCallbacks : public AppDelegate
 {
 public:
-void OnReceiveError() override { statusLED1.BlinkOnError(); }
-void OnRendezvousStarted() override { bluetoothLED.Set(true); }
-void OnRendezvousStopped() override { bluetoothLED.Set(false); }
+    void OnReceiveError() override { statusLED1.BlinkOnError(); }
+    void OnRendezvousStarted() override { bluetoothLED.Set(true); }
+    void OnRendezvousStopped() override { bluetoothLED.Set(false); }
 };
 
 } // namespace

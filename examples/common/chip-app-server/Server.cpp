@@ -54,7 +54,8 @@ bool isRendezvousBypassed()
     rendezvousMode = RendezvousInformationFlags::kNone;
 #endif
 
-    return rendezvousMode == RendezvousInformationFlags::kNone;;
+    return rendezvousMode == RendezvousInformationFlags::kNone;
+    ;
 }
 
 class ServerCallback : public SecureSessionMgrDelegate
