@@ -20,8 +20,8 @@ template("chip_build") {
   _build_name = target_name
   _toolchain = invoker.toolchain
 
-  group("all_${_build_name}") {
-    deps = [ ":all(${_toolchain})" ]
+  group("${_build_name}") {
+    deps = [ ":default(${_toolchain})" ]
   }
 
   group("check_${_build_name}") {

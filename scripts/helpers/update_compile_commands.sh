@@ -23,19 +23,19 @@ CHIP_ROOT="$(dirname "$0")/../.."
 
 source "$CHIP_ROOT/scripts/activate.sh"
 
-gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=all_host_gcc
+gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=host_gcc
 mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.gcc.json"
 
-gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=all_host_clang
+gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=host_clang
 mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.clang.json"
 
-gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=all_host_gcc_mbedtls
+gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=host_gcc_mbedtls
 mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.mbedtls.json"
 
-gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=all_android_x64
+gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=android_x64
 mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.android_x64.json"
 
-gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=all_android_arm64
+gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=android_arm64
 mv "$CHIP_ROOT/out/debug/compile_commands.json" "$CHIP_ROOT/out/debug/compile_commands.android_arm64.json"
 
 gn --root="$CHIP_ROOT" gen "$CHIP_ROOT/out/debug" --export-compile-commands=efr32_lock_app

@@ -34,10 +34,6 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
   # This is a real toolchain. Build CHIP.
   group("default") {
-    deps = [ ":all" ]
-  }
-
-  group("all") {
     deps = [
       "${chip_root}/src/app",
       "${chip_root}/src/ble",
@@ -249,20 +245,20 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   group("default") {
     deps = []
     if (enable_host_clang_build) {
-      deps += [ ":all_host_clang" ]
+      deps += [ ":host_clang" ]
     }
     if (enable_host_gcc_build) {
-      deps += [ ":all_host_gcc" ]
+      deps += [ ":host_gcc" ]
     }
     if (enable_host_gcc_mbedtls_build) {
-      deps += [ ":all_host_gcc_mbedtls" ]
+      deps += [ ":host_gcc_mbedtls" ]
     }
     if (enable_android_builds) {
       deps += [
-        ":all_android_arm",
-        ":all_android_arm64",
-        ":all_android_x64",
-        ":all_android_x86",
+        ":android_arm",
+        ":android_arm64",
+        ":android_x64",
+        ":android_x86",
       ]
     }
     if (enable_standalone_chip_tool_build) {
