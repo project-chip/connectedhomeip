@@ -112,6 +112,9 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     mOnComplete.Response = onMessageReceived;
     mOnError             = onError;
 
+    // TODO: Should call mOnNewConnected when rendezvous completed
+    mOnNewConnection(this, nullptr, mAppReqState);
+
 exit:
     return err;
 }

@@ -483,6 +483,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
+    mIsIPRendezvous    = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
     err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr);
@@ -493,6 +494,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
         // IP Rendezvous
+        device->SetAddress(params.GetPeerAddress().GetIPAddress());
         mRendezvousSession->OnRendezvousConnectionOpened();
     }
 
@@ -679,7 +681,7 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
         ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
         mRendezvousSession->GetPairingSession().ToSerializable(device->GetPairing());
 
-        if (mPairingDelegate != nullptr)
+        if (!mIsIPRendezvous && mPairingDelegate != nullptr)
         {
             mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
         }

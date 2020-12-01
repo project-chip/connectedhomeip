@@ -297,6 +297,10 @@ private:
        If no device is currently being paired, this value will be kNumMaxPairedDevices.  */
     uint16_t mDeviceBeingPaired;
 
+    /* This is a temporary flag, when using IP rendezvous, we need to disable network provisioning.
+       In the future, network provisioning will no longer be a part of rendezvous procedure. */
+    bool mIsIPRendezvous;
+
     /* This field is true when device pairing information changes, e.g. a new device is paired, or
        the pairing for a device is removed. The DeviceCommissioner uses this to decide when to
        persist the device list */
