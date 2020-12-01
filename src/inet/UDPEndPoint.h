@@ -57,10 +57,10 @@ public:
     InterfaceId GetBoundInterface();
     uint16_t GetBoundPort();
     INET_ERROR Listen();
-    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
-    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg,
+    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle msg,
                       uint16_t sendFlags = 0);
-    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
     void Close();
     void Free();
 

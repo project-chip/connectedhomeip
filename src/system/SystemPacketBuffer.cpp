@@ -236,8 +236,9 @@ uint16_t PacketBuffer::ReservedSize() const
  *
  * @param[in] aPacket - the packet buffer to be added to the end of the current chain.
  */
-void PacketBuffer::AddToEnd_ForNow(PacketBuffer * aPacket)
+void PacketBuffer::AddToEnd(PacketBufferHandle aPacketHandle)
 {
+    PacketBuffer * aPacket = aPacketHandle.Release_ForNow();
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_cat(this, aPacket);
 #else  // !CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -255,27 +256,6 @@ void PacketBuffer::AddToEnd_ForNow(PacketBuffer * aPacket)
         lCursor = static_cast<PacketBuffer *>(lCursor->next);
     }
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
-}
-
-void PacketBuffer::AddToEnd(PacketBufferHandle aPacket)
-{
-    AddToEnd_ForNow(aPacket.Release_ForNow());
-}
-
-/**
- *  Detach the current buffer from its chain and return a pointer to the remaining buffers.  The current buffer must be the head of
- *  the chain.
- *
- *  @return the tail of the current buffer chain or NULL if the current buffer is the only buffer in the chain.
- */
-PacketBuffer * PacketBuffer::DetachTail_ForNow()
-{
-    PacketBuffer & lReturn = *static_cast<PacketBuffer *>(this->next);
-
-    this->next    = nullptr;
-    this->tot_len = this->len;
-
-    return &lReturn;
 }
 
 /**
@@ -348,7 +328,7 @@ void PacketBuffer::ConsumeHead(uint16_t aConsumeLength)
  *
  *  @return the first buffer from the current chain that contains any remaining data.  If no data remains, a NULL is returned.
  */
-PacketBuffer * PacketBuffer::Consume(uint16_t aConsumeLength)
+PacketBuffer * PacketBuffer::Consume_ForNow(uint16_t aConsumeLength)
 {
     PacketBuffer * lPacket = this;
 
@@ -668,6 +648,7 @@ PacketBuffer * PacketBuffer::FreeHead(PacketBuffer * aPacket)
     return lNextPacket;
 }
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
 /**
  * Copy the given buffer to a right-sized buffer if applicable.
  * This function is a no-op for sockets.
@@ -678,18 +659,16 @@ PacketBuffer * PacketBuffer::FreeHead(PacketBuffer * aPacket)
  */
 PacketBuffer * PacketBuffer::RightSize(PacketBuffer * aPacket)
 {
-    PacketBuffer * lNewPacket = aPacket;
-#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
-    lNewPacket = static_cast<PacketBuffer *>(pbuf_rightsize((struct pbuf *) aPacket, -1));
+    PacketBuffer * lNewPacket = static_cast<PacketBuffer *>(pbuf_rightsize((struct pbuf *) aPacket, -1));
     if (lNewPacket != aPacket)
     {
         SYSTEM_STATS_UPDATE_LWIP_PBUF_COUNTS();
 
         ChipLogProgress(chipSystemLayer, "PacketBuffer: RightSize Copied");
     }
-#endif
     return lNewPacket;
 }
+#endif
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
@@ -722,7 +701,6 @@ PacketBufferHandle PacketBufferHandle::PopHead()
     head->next    = nullptr;
     head->tot_len = head->len;
 
-    // The returned handle takes ownership from this.
     return PacketBufferHandle(head);
 }
 

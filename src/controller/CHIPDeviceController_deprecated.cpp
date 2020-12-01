@@ -68,7 +68,6 @@ ChipDeviceController::ChipDeviceController()
 {
     mState                  = kState_NotInitialized;
     AppState                = nullptr;
-    mCurReqMsg              = nullptr;
     mOnError                = nullptr;
     mOnNewConnection        = nullptr;
     mListenPort             = CHIP_PORT;

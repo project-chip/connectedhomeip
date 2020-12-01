@@ -317,7 +317,7 @@ void CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
                 if (theFirstContext == theSecondContext)
                 {
                     // headOfChain (the second arg) is NULL
-                    buffer_2->SetDataLength(length, nullptr);
+                    buffer_2->SetDataLength(length);
 
                     if (length > (theSecondContext->end_buffer - theSecondContext->payload_ptr))
                     {
@@ -338,7 +338,10 @@ void CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
                 else
                 {
                     // headOfChain (the second arg) is buffer_1
-                    buffer_2->SetDataLength(length, buffer_1);
+                    PacketBufferHandle buffer;
+                    buffer.Adopt(buffer_1);
+                    buffer->AddRef();
+                    buffer_2->SetDataLength(length, buffer);
 
                     if (length > (theSecondContext->end_buffer - theSecondContext->payload_ptr))
                     {
@@ -493,7 +496,7 @@ void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
                 buffer_2 = PrepareTestBuffer(theSecondContext);
                 buffer_3 = PrepareTestBuffer(theThirdContext);
 
-                buffer_1->AddToEnd_ForNow(buffer_2);
+                buffer_1->AddToEnd(PacketBufferHandle::Create(buffer_2));
 
                 NL_TEST_ASSERT(inSuite, theFirstContext->buf->tot_len == (theFirstContext->init_len + theSecondContext->init_len));
                 NL_TEST_ASSERT(inSuite, theFirstContext->buf->next == theSecondContext->buf);
@@ -501,7 +504,7 @@ void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
 
                 NL_TEST_ASSERT(inSuite, theThirdContext->buf->next == nullptr);
 
-                buffer_1->AddToEnd_ForNow(buffer_3);
+                buffer_1->AddToEnd(PacketBufferHandle::Create(buffer_3));
 
                 NL_TEST_ASSERT(inSuite,
                                theFirstContext->buf->tot_len ==
@@ -540,9 +543,10 @@ void CheckDetachTail(nlTestSuite * inSuite, void * inContext)
 
         for (size_t jth = 0; jth < kTestElements; jth++)
         {
-            PacketBuffer * buffer_1 = PrepareTestBuffer(theFirstContext);
-            PacketBuffer * buffer_2 = PrepareTestBuffer(theSecondContext);
-            PacketBuffer * returned = nullptr;
+            PacketBuffer * buffer_1          = PrepareTestBuffer(theFirstContext);
+            PacketBuffer * buffer_2          = PrepareTestBuffer(theSecondContext);
+            PacketBuffer * returned          = nullptr;
+            PacketBufferHandle buffer_handle = PacketBufferHandle::Create(buffer_1);
 
             if (theFirstContext != theSecondContext)
             {
@@ -550,7 +554,8 @@ void CheckDetachTail(nlTestSuite * inSuite, void * inContext)
                 theFirstContext->buf->tot_len = static_cast<uint16_t>(theFirstContext->buf->tot_len + theSecondContext->init_len);
             }
 
-            returned = buffer_1->DetachTail_ForNow();
+            PacketBufferHandle popped = buffer_handle.PopHead();
+            returned                  = buffer_handle.Release_ForNow();
 
             NL_TEST_ASSERT(inSuite, theFirstContext->buf->next == nullptr);
             NL_TEST_ASSERT(inSuite, theFirstContext->buf->tot_len == theFirstContext->init_len);
@@ -599,7 +604,10 @@ void CheckCompactHead(nlTestSuite * inSuite, void * inContext)
                     uint16_t len1           = 0;
                     uint16_t len2           = 0;
 
-                    buffer_1->SetDataLength(firstLength, buffer_1);
+                    PacketBufferHandle buffer;
+                    buffer.Adopt(buffer_1);
+                    buffer->AddRef();
+                    buffer_1->SetDataLength(firstLength, buffer);
                     len1 = buffer_1->DataLength();
 
                     if (theFirstContext != theSecondContext)
@@ -607,7 +615,7 @@ void CheckCompactHead(nlTestSuite * inSuite, void * inContext)
                         theFirstContext->buf->next = theSecondContext->buf;
 
                         // Add various lengths to the second buffer
-                        buffer_2->SetDataLength(secondLength, buffer_1);
+                        buffer_2->SetDataLength(secondLength, buffer);
                         len2 = buffer_2->DataLength();
                     }
 
@@ -745,13 +753,16 @@ void CheckConsume(nlTestSuite * inSuite, void * inContext)
                         theFirstContext->buf->next = theSecondContext->buf;
 
                         // Add various lengths to buffers
-                        buffer_1->SetDataLength(firstLength, buffer_1);
-                        buffer_2->SetDataLength(secondLength, buffer_1);
+                        PacketBufferHandle buffer;
+                        buffer.Adopt(buffer_1);
+                        buffer->AddRef();
+                        buffer_1->SetDataLength(firstLength, buffer);
+                        buffer_2->SetDataLength(secondLength, buffer);
 
                         buf_1_len = theFirstContext->buf->len;
                         buf_2_len = theSecondContext->buf->len;
 
-                        returned = buffer_1->Consume(consumeLength);
+                        returned = buffer_1->Consume_ForNow(consumeLength);
 
                         if (consumeLength == 0)
                         {

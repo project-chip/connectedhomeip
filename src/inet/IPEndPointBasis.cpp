@@ -674,6 +674,20 @@ IPPacketInfo * IPEndPointBasis::GetPacketInfo(const System::PacketBufferHandle &
 done:
     return (lPacketInfo);
 }
+
+System::Error IPEndPointBasis::PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget,
+                                                     System::EventType aEventType, System::PacketBufferHandle aBuffer)
+{
+    System::PacketBuffer * buf = aBuffer.Release_ForNow();
+    System::Error error        = aLayer.PostEvent(aTarget, aEventType, (uintptr_t) buf);
+    if (error != INET_NO_ERROR)
+    {
+        // If PostEvent() failed, it has not taken ownership of the buffer, so we need to free it ourselves.
+        System::PacketBuffer::Free(buf);
+    }
+    return error;
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -793,7 +807,7 @@ INET_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
     return (lRetval);
 }
 
-INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags)
+INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle aBuffer, uint16_t aSendFlags)
 {
     INET_ERROR res = INET_NO_ERROR;
     PeerSockAddr peerSockAddr;
@@ -1233,7 +1247,7 @@ exit:
     return res;
 }
 
-INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags)
+INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle aBuffer, uint16_t aSendFlags)
 {
     __block INET_ERROR res = INET_NO_ERROR;
     dispatch_data_t content;

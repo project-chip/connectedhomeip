@@ -187,7 +187,7 @@ public:
      *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
      */
     typedef void (*MessageReceiveFunct)(ExchangeContext * ec, const Inet::IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                        uint32_t profileId, uint8_t msgType, System::PacketBuffer * payload);
+                                        uint32_t profileId, uint8_t msgType, System::PacketBufferHandle payload);
     MessageReceiveFunct OnMessageReceived;
 
     /**
@@ -487,7 +487,7 @@ private:
 
     void HandleConnectionReceived(ChipConnection * con);
     void HandleConnectionClosed(ChipConnection * con, CHIP_ERROR conErr);
-    void DispatchMessage(ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
+    void DispatchMessage(ChipMessageInfo * msgInfo, System::PacketBufferHandle msgBuf);
     CHIP_ERROR RegisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con, bool allowDups,
                            ExchangeContext::MessageReceiveFunct handler, void * appState);
     CHIP_ERROR UnregisterUMH(uint32_t profileId, int16_t msgType, ChipConnection * con);
@@ -496,7 +496,8 @@ private:
     static void HandleMessageReceived(ChipMessageLayer * msgLayer, ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
     static void HandleMessageReceived(ChipConnection * con, ChipMessageInfo * msgInfo, System::PacketBuffer * msgBuf);
     static CHIP_ERROR PrependHeader(ChipExchangeHeader * exchangeHeader, System::PacketBuffer * buf);
-    static CHIP_ERROR DecodeHeader(ChipExchangeHeader * exchangeHeader, ChipMessageInfo * msgInfo, System::PacketBuffer * buf);
+    static CHIP_ERROR DecodeHeader(ChipExchangeHeader * exchangeHeader, ChipMessageInfo * msgInfo,
+                                   const System::PacketBufferHandle & buf);
 
     void InitBindingPool();
     Binding * AllocBinding();

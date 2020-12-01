@@ -59,9 +59,9 @@ class TransportMgrBase
 public:
     CHIP_ERROR Init(Transport::Base * transport);
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
+    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
     {
-        return mTransport->SendMessage(header, address, msgBuf);
+        return mTransport->SendMessage(header, address, std::move(msgBuf));
     }
 
     void Disconnect(const Transport::PeerAddress & address) { mTransport->Disconnect(address); }

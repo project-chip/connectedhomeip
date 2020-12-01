@@ -1057,7 +1057,6 @@ BLE_ERROR BLEEndPoint::DriveSending()
 #if CHIP_ENABLE_CHIPOBLE_TEST
         mBtpEngineTest.DoTxTiming(sentBuf, BTP_TX_DONE);
 #endif // CHIP_ENABLE_CHIPOBLE_TEST
-        mBtpEngine.ClearTxPacket();
 
         if (!mSendQueue.IsNull())
         {
@@ -1421,7 +1420,6 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
     {
         // Take ownership of message PacketBuffer
         System::PacketBufferHandle full_packet = mBtpEngine.TakeRxPacket();
-        mBtpEngine.ClearRxPacket();
 
         ChipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
 

@@ -213,7 +213,7 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
     QuerySplitter query;
     query.Split(gOptions.query);
 
-    mdns::Minimal::QueryBuilder builder(buffer.Get_ForNow());
+    mdns::Minimal::QueryBuilder builder(buffer.Retain());
 
     builder.Header().SetMessageId(kTestMessageId);
     builder.AddQuery(query.MdnsQuery()
@@ -227,7 +227,7 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
         return;
     }
 
-    if (server->BroadcastSend(buffer.Release_ForNow(), gOptions.querySendPort) != CHIP_NO_ERROR)
+    if (server->BroadcastSend(std::move(buffer), gOptions.querySendPort) != CHIP_NO_ERROR)
     {
         printf("Error sending\n");
         return;

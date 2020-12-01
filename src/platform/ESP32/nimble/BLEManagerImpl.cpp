@@ -241,13 +241,10 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
         break;
 
-    case DeviceEventType::kCHIPoBLEWriteReceived: {
-        System::PacketBufferHandle data_ForNow;
-        data_ForNow.Adopt(event->CHIPoBLEWriteReceived.Data);
+    case DeviceEventType::kCHIPoBLEWriteReceived:
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
-                            std::move(data_ForNow));
-    }
-    break;
+                            PacketBufferHandle::Create(event->CHIPoBLEWriteReceived.Data));
+        break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);

@@ -81,9 +81,9 @@ template <typename... TransportTypes>
 class Tuple : public Base
 {
 public:
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        return SendMessageImpl<0>(header, address, msgBuf);
+        return SendMessageImpl<0>(header, address, std::move(msgBuf));
     }
 
     bool CanSendToPeer(const PeerAddress & address) override { return CanSendToPeerImpl<0>(address); }
@@ -163,23 +163,22 @@ private:
      * @param msgBuf the data to send.
      */
     template <size_t N, typename std::enable_if<(N < sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const PacketHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf)
+    CHIP_ERROR SendMessageImpl(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf)
     {
         Base * base = &std::get<N>(mTransports);
         if (base->CanSendToPeer(address))
         {
-            return base->SendMessage(header, address, msgBuf);
+            return base->SendMessage(header, address, std::move(msgBuf));
         }
-        return SendMessageImpl<N + 1>(header, address, msgBuf);
+        return SendMessageImpl<N + 1>(header, address, std::move(msgBuf));
     }
 
     /**
      * SendMessageImpl when N is out of range. Always returns an error code.
      */
     template <size_t N, typename std::enable_if<(N >= sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR SendMessageImpl(const PacketHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf)
+    CHIP_ERROR SendMessageImpl(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf)
     {
-        System::PacketBuffer::Free(msgBuf);
         return CHIP_ERROR_NO_MESSAGE_HANDLER;
     }
 

@@ -204,7 +204,6 @@ private:
 
     ErrorHandler mOnError;
     NewConnectionHandler mOnNewConnection;
-    System::PacketBuffer * mCurReqMsg;
 
     NodeId mLocalDeviceId;
     NodeId mRemoteDeviceId;

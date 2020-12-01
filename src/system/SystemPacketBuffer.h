@@ -75,7 +75,7 @@ struct pbuf
  *      for protocol headers at each layer of a configurable communication stack.  For details, see `PacketBuffer::New()` as well
  *      as LwIP documentation.
  *
- *      FIXME: CHIP is in the middle of a transition to use PacketBufferHandle to manage PacketBuffer ownership, so the following
+ *      FIXME: CHIP has largely converted to use PacketBufferHandle to manage PacketBuffer ownership, so the following
  *      paragraph is neither entirely correct nor entirely wrong.
  *
  *        PacketBuffer objects are reference-counted, and the prevailing usage mode within chip is "fire-and-forget".  As the packet
@@ -83,7 +83,7 @@ struct pbuf
  *        between layers implies ownership transfer, and the callee is responsible for freeing the buffer.  On failure of a
  *        cross-layer call, the responsibilty for freeing the buffer rests with the caller.
  *
- *      The end goal is:
+ *      New code should use PacketBufferHandle and avoid storing PacketBuffer pointers otherwise. The end goal is:
  *
  *        PacketBuffer objects are reference-counted, and held through `PacketBufferHandle`s. When a PacketBufferHandle goes out
  *        of scope, its reference is released. To transfer ownership, a function takes a PacketBufferHandle by value. To borrow
@@ -110,7 +110,8 @@ public:
     void SetStart(uint8_t * aNewStart);
 
     uint16_t DataLength() const;
-    void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead = nullptr);
+    void SetDataLength(uint16_t aNewLen) { SetDataLength(aNewLen, nullptr); }
+    void SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead);
 
     uint16_t TotalLength() const;
 
@@ -121,14 +122,9 @@ public:
 
     PacketBuffer * Next() const;
 
-    // The raw PacketBuffer version of AddToEnd() will be removed when conversion to PacketBufferHandle is complete.
-    void AddToEnd_ForNow(PacketBuffer * aPacket);
     // The PacketBufferHandle's ownership is transferred to the `next` link at the end of the current chain.
     void AddToEnd(PacketBufferHandle aPacket);
-    // The raw PacketBuffer version of DetachTail() will be removed when conversion to PacketBufferHandle is complete.
-    PacketBuffer * DetachTail_ForNow();
     void CompactHead();
-    PacketBuffer * Consume(uint16_t aConsumeLength);
     void ConsumeHead(uint16_t aConsumeLength);
     bool EnsureReservedSize(uint16_t aReservedSize);
     bool AlignPayload(uint16_t aAlignBytes);
@@ -141,11 +137,10 @@ public:
     static PacketBufferHandle New();
     static PacketBufferHandle New(uint16_t aReservedSize);
 
-    static PacketBuffer * RightSize(PacketBuffer * aPacket);
-
     static void Free(PacketBuffer * aPacket);
     // To be removed when conversion to PacketBufferHandle is complete:
     static PacketBuffer * FreeHead_ForNow(PacketBuffer * aPacket) { return FreeHead(aPacket); }
+    PacketBuffer * Consume_ForNow(uint16_t aConsumeLength);
 
 private:
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
@@ -154,8 +149,13 @@ private:
     static PacketBuffer * BuildFreeList();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+    static PacketBuffer * RightSize(PacketBuffer * aPacket);
+#endif
+
     static PacketBuffer * FreeHead(PacketBuffer * aPacket);
     void Clear();
+    void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead);
     friend class PacketBufferHandle;
 };
 
@@ -303,6 +303,9 @@ public:
         mBuffer = buffer;
     }
 
+    // The caller's ownership is transferred to the newly created PacketBufferHandle.
+    static PacketBufferHandle Create(PacketBuffer * buffer) { return PacketBufferHandle(buffer); }
+
     // The PacketBufferHandle's ownership is transferred to the caller.
     // This is intended to be used only to call functions that have not yet been converted; a permanent version may be created
     // if/when the need is clear. Most uses will be converted to take a `PacketBufferHandle` by value.
@@ -319,15 +322,22 @@ public:
     // `const PacketBufferHandle &`.
     PacketBuffer * Get_ForNow() const { return mBuffer; }
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    struct pbuf * GetLwIPpbuf() { return static_cast<struct pbuf *>(mBuffer); }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
     bool IsNull() const { return mBuffer == nullptr; }
 
     /**
      *  Detach and return the head of a buffer chain while updating this handle to point to the remaining buffers.
      *  The current buffer must be the head of the chain.
      *
+     *  This PacketBufferHandle now holds the ownership formerly held by the head of the chain.
+     *  The returned PacketBufferHandle holds the ownership formerly held by this.
+     *
      *  @return the detached buffer formerly at the head of the buffer chain.
      */
-    PacketBufferHandle PopHead();
+    CHECK_RETURN_VALUE PacketBufferHandle PopHead();
 
     /**
      * Free the first buffer in a chain.
@@ -341,6 +351,52 @@ public:
         mBuffer = PacketBuffer::FreeHead(mBuffer);
     }
 
+    /**
+     * Advance this PacketBufferHandle to the next buffer in a chain.
+     *
+     *  @note This differs from `FreeHead()` in that it does not touch any part of the currently referenced packet buffer
+     *  other than its reference count.
+     */
+    void Advance() { Adopt(mBuffer->Next()); }
+
+    /**
+     * Advance this PacketBufferHandle to the last buffer in a chain.
+     */
+    void AdvanceToEnd()
+    {
+        PacketBuffer * buffer = mBuffer;
+        while (buffer->next != nullptr)
+            buffer = buffer->Next();
+        if (buffer != mBuffer)
+            Adopt(buffer);
+    }
+
+    /**
+     * Consume data in a chain of buffers.
+     *
+     *  Consume data in a chain of buffers starting with the current buffer and proceeding through the remaining buffers in the
+     *  chain. Each buffer that is completely consumed is freed and the function returns the first buffer (if any) containing the
+     *  remaining data. The current buffer must be the head of the buffer chain.
+     *
+     *  @param[in] aConsumeLength - number of bytes to consume from the current chain.
+     */
+    void Consume(uint16_t aConsumeLength)
+    {
+        // `PacketBuffer::Consume()` frees buffers; this takes ownership of the new head.
+        mBuffer = mBuffer->Consume_ForNow(aConsumeLength);
+    }
+
+    /**
+     * Copy the given buffer to a right-sized buffer if applicable.
+     * This function is a no-op for sockets.
+     */
+    void RightSize()
+    {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+        mBuffer = PacketBuffer::RightSize(mBuffer);
+#endif
+    }
+
 private:
     PacketBufferHandle(const PacketBufferHandle &) = delete;
     PacketBufferHandle & operator=(const PacketBufferHandle &) = delete;
@@ -351,6 +407,11 @@ private:
     PacketBuffer * mBuffer;
     friend class PacketBuffer;
 };
+
+inline void PacketBuffer::SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead)
+{
+    SetDataLength(aNewLen, aChainHead.Get_ForNow());
+}
 
 } // namespace System
 } // namespace chip

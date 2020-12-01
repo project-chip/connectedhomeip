@@ -764,7 +764,7 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        lStatus = sRawIPEndPoint->SendTo(aAddress, lBuffer.Release_ForNow());
+        lStatus = sRawIPEndPoint->SendTo(aAddress, std::move(lBuffer));
         SuccessOrExit(lStatus);
     }
     else
@@ -779,7 +779,7 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
             lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
             VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
 
-            lStatus = sUDPIPEndPoint->SendTo(aAddress, kUDPPort, lBuffer.Release_ForNow());
+            lStatus = sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer));
             SuccessOrExit(lStatus);
         }
     }

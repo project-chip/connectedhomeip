@@ -408,13 +408,13 @@ exit:
     return err;
 }
 
-void BtpEngine::ClearRxPacket()
+PacketBufferHandle BtpEngine::TakeRxPacket()
 {
     if (mRxState == kState_Complete)
     {
         mRxState = kState_Idle;
     }
-    mRxBuf = nullptr;
+    return std::move(mRxBuf);
 }
 
 // Calling convention:
@@ -561,13 +561,13 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
     return true;
 }
 
-void BtpEngine::ClearTxPacket()
+PacketBufferHandle BtpEngine::TakeTxPacket()
 {
     if (mTxState == kState_Complete)
     {
         mTxState = kState_Idle;
     }
-    mTxBuf = nullptr;
+    return std::move(mTxBuf);
 }
 
 void BtpEngine::LogState() const

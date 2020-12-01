@@ -92,42 +92,37 @@ RendezvousSession::~RendezvousSession()
 }
 
 CHIP_ERROR RendezvousSession::SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                                 System::PacketBuffer * msgIn)
+                                                 System::PacketBufferHandle msgIn)
 {
     if (mCurrentState != State::kSecurePairing)
     {
-        PacketBuffer::Free(msgIn);
         return CHIP_ERROR_INCORRECT_STATE;
     }
 
     if (peerAddress.GetTransportType() == Transport::Type::kBle)
     {
-        return mTransport->SendMessage(header, peerAddress, msgIn);
+        return mTransport->SendMessage(header, peerAddress, std::move(msgIn));
     }
     else if (mTransportMgr != nullptr)
     {
-        return mTransportMgr->SendMessage(header, peerAddress, msgIn);
+        return mTransportMgr->SendMessage(header, peerAddress, std::move(msgIn));
     }
     else
     {
-        PacketBuffer::Free(msgIn);
         ChipLogError(Ble, "SendPairingMessage dropped since no transport mgr for IP rendezvous");
         return CHIP_ERROR_INVALID_ADDRESS;
     }
 }
 
-CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgIn)
+CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType,
+                                                System::PacketBufferHandle msgBuf)
 {
-    System::PacketBufferHandle msgBuf;
-
-    msgBuf.Adopt(msgIn);
-
     PayloadHeader payloadHeader;
     payloadHeader.SetProtocolID(static_cast<uint16_t>(protocol)).SetMessageType(msgType);
 
     const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
 
-    VerifyOrReturnError(msgIn != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrReturnError(msgBuf->Next() == nullptr, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(msgBuf->TotalLength() < kMax_SecureSDU_Length, CHIP_ERROR_INVALID_MESSAGE_LENGTH);
     VerifyOrReturnError(CanCastTo<uint16_t>(headerSize + msgBuf->TotalLength()), CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -159,7 +154,7 @@ CHIP_ERROR RendezvousSession::SendSecureMessage(Protocols::CHIPProtocolId protoc
 
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    ReturnErrorOnFailure(mTransport->SendMessage(packetHeader, Transport::PeerAddress::BLE(), msgBuf.Release_ForNow()));
+    ReturnErrorOnFailure(mTransport->SendMessage(packetHeader, Transport::PeerAddress::BLE(), std::move(msgBuf)));
 
     mSecureMessageIndex++;
 

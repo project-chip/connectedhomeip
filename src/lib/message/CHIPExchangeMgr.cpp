@@ -614,15 +614,13 @@ void ChipExchangeManager::RMPProcessDDMessage(uint32_t PauseTimeMillis, uint64_t
 }
 
 static void DefaultOnMessageReceived(ExchangeContext * ec, const IPPacketInfo * pktInfo, const ChipMessageInfo * msgInfo,
-                                     uint32_t profileId, uint8_t msgType, PacketBuffer * payload)
+                                     uint32_t profileId, uint8_t msgType, PacketBufferHandle payload)
 {
     ChipLogError(ExchangeManager, "Dropping unexpected message %08" PRIX32 ":%d %04" PRIX16 " MsgId:%08" PRIX32, profileId, msgType,
                  ec->ExchangeId, msgInfo->MessageId);
-
-    PacketBuffer::Free(payload);
 }
 
-void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf)
+void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBufferHandle msgBuf)
 {
     ChipExchangeHeader exchangeHeader;
     UnsolicitedMessageHandler * umh         = nullptr;
@@ -671,8 +669,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
     // If received message is a MsgCounterSyncResp process it first.
     if (isMsgCounterSyncResp)
     {
-        MessageLayer->SecurityMgr->HandleMsgCounterSyncRespMsg(msgInfo, msgBuf);
-        msgBuf = nullptr;
+        MessageLayer->SecurityMgr->HandleMsgCounterSyncRespMsg(msgInfo, std::move(msgBuf));
     }
 
     // If message counter synchronization was requested.
@@ -729,9 +726,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
             }
 
             // Matched ExchangeContext; send to message handler.
-            ec->HandleMessage(msgInfo, &exchangeHeader, msgBuf);
-
-            msgBuf = nullptr;
+            ec->HandleMessage(msgInfo, &exchangeHeader, std::move(msgBuf));
 
             ExitNow(err = CHIP_NO_ERROR);
         }
@@ -870,8 +865,7 @@ void ChipExchangeManager::DispatchMessage(ChipMessageInfo * msgInfo, PacketBuffe
         // Arrange to automatically release the encryption key when the exchange is freed.
         ec->SetAutoReleaseKey(true);
 
-        ec->HandleMessage(msgInfo, &exchangeHeader, msgBuf, umhandler);
-        msgBuf = nullptr;
+        ec->HandleMessage(msgInfo, &exchangeHeader, std::move(msgBuf), umhandler);
 
         // Close exchange if it was created only to send ack for a duplicate message.
         if (sendAckAndCloseExchange)
@@ -882,11 +876,6 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(ExchangeManager, "DispatchMessage failed, err = %d", err);
-    }
-
-    if (msgBuf != nullptr)
-    {
-        PacketBuffer::Free(msgBuf);
     }
 }
 
@@ -1010,7 +999,8 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipExchangeManager::DecodeHeader(ChipExchangeHeader * exchangeHeader, ChipMessageInfo * msgInfo, PacketBuffer * buf)
+CHIP_ERROR ChipExchangeManager::DecodeHeader(ChipExchangeHeader * exchangeHeader, ChipMessageInfo * msgInfo,
+                                             const PacketBufferHandle & buf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 

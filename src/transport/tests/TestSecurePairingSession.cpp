@@ -38,12 +38,10 @@ class TestSecurePairingDelegate : public SecurePairingSessionDelegate
 {
 public:
     CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                  System::PacketBuffer * msgBuf) override
+                                  System::PacketBufferHandle msgBuf) override
     {
         mNumMessageSend++;
-        System::PacketBufferHandle msg_ForNow;
-        msg_ForNow.Adopt(msgBuf);
-        return (peer != nullptr) ? peer->HandlePeerMessage(header, peerAddress, std::move(msg_ForNow)) : mMessageSendError;
+        return (peer != nullptr) ? peer->HandlePeerMessage(header, peerAddress, std::move(msgBuf)) : mMessageSendError;
     }
 
     void OnPairingError(CHIP_ERROR error) override { mNumPairingErrors++; }

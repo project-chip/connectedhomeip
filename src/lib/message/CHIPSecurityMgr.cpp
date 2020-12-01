@@ -571,7 +571,7 @@ exit:
  * @retval None.
  *
  */
-void ChipSecurityManager::HandleMsgCounterSyncRespMsg(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf)
+void ChipSecurityManager::HandleMsgCounterSyncRespMsg(ChipMessageInfo * msgInfo, PacketBufferHandle msgBuf)
 {
     // Verify correct message size and that the message was encrypted with application group key.
     VerifyOrExit(msgBuf->DataLength() == kChipMsgCounterSyncRespMsgSize && ChipKeyId::IsAppGroupKey(msgInfo->KeyId), /* no-op */);
@@ -579,8 +579,7 @@ void ChipSecurityManager::HandleMsgCounterSyncRespMsg(ChipMessageInfo * msgInfo,
     // Initialize/synchronize peer's message counter.
     FabricState->OnMsgCounterSyncRespRcvd(msgInfo->SourceNodeId, msgInfo->MessageId, LittleEndian::Get32(msgBuf->Start()));
 
-exit:
-    PacketBuffer::Free(msgBuf);
+exit:;
 }
 
 #endif // CHIP_CONFIG_USE_APP_GROUP_KEYS_FOR_MSG_ENC

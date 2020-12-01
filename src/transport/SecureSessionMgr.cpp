@@ -151,11 +151,11 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         SuccessOrExit(err);
 
         VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INTERNAL);
-        msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen), nullptr);
+        msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
         ChipLogDetail(Inet, "Secure transport transmitting msg %u after encryption", state->GetSendMessageIndex());
 
-        err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), msgBuf.Release_ForNow());
+        err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), std::move(msgBuf));
     }
     SuccessOrExit(err);
     state->IncrementSendMessageIndex();
@@ -328,7 +328,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         err = mac.Decode(packetHeader, &data[payloadlen], static_cast<uint16_t>(len - payloadlen), &taglen);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decode MAC Tag: err %d", err));
         len = static_cast<uint16_t>(len - taglen);
-        msg->SetDataLength(len, nullptr);
+        msg->SetDataLength(len);
 
         err = state->GetSecureSession().Decrypt(data, len, plainText, packetHeader, mac);
         VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Inet, "Secure transport failed to decrypt msg: err %d", err));

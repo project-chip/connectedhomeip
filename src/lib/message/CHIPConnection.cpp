@@ -498,7 +498,7 @@ void ChipConnection::GetPeerDescription(char * buf, size_t bufSize) const
  *  @retval    other Inet layer errors related to the specific endpoint send operations.
  *
  */
-CHIP_ERROR ChipConnection::SendMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf)
+CHIP_ERROR ChipConnection::SendMessage(ChipMessageInfo * msgInfo, PacketBufferHandle msgBuf)
 {
     CHIP_ERROR res = CHIP_NO_ERROR;
 
@@ -548,27 +548,20 @@ CHIP_ERROR ChipConnection::SendMessage(ChipMessageInfo * msgInfo, PacketBuffer *
     }
 
     // Copy msg to a right-sized buffer if applicable
-    msgBuf = PacketBuffer::RightSize(msgBuf);
+    msgBuf.RightSize();
 
 #if CONFIG_NETWORK_LAYER_BLE
     if (mBleEndPoint != nullptr)
     {
-        res = mBleEndPoint->Send(msgBuf);
+        res = mBleEndPoint->Send(std::move(msgBuf));
     }
     else
 #endif
     {
-        res = mTcpEndPoint->Send(msgBuf, true);
+        res = mTcpEndPoint->Send(std::move(msgBuf), true);
     }
-    msgBuf = nullptr;
 
 exit:
-    if (msgBuf != nullptr)
-    {
-        PacketBuffer::Free(msgBuf);
-        msgBuf = nullptr;
-    }
-
     return res;
 }
 
@@ -1219,20 +1212,20 @@ void ChipConnection::HandleConnectComplete(TCPEndPoint * endPoint, INET_ERROR co
     }
 }
 
-void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * data)
+void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBufferHandle data)
 {
     CHIP_ERROR err;
     ChipConnection * con        = static_cast<ChipConnection *>(endPoint->AppState);
     ChipMessageLayer * msgLayer = con->MessageLayer;
 
     // While in a state that allows receiving, process the received data...
-    while (data != nullptr && con->StateAllowsReceive() && con->ReceiveEnabled && (con->OnMessageReceived != nullptr))
+    while (!data.IsNull() && con->StateAllowsReceive() && con->ReceiveEnabled && (con->OnMessageReceived != nullptr))
     {
         IPPacketInfo packetInfo;
         ChipMessageInfo msgInfo;
         uint8_t * payload;
         uint16_t payloadLen;
-        PacketBuffer * payloadBuf = nullptr;
+        PacketBufferHandle payloadBuf;
         uint32_t frameLen;
 
         packetInfo.Clear();
@@ -1277,8 +1270,8 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
 
             // Prepend the new buffer to the receive queue and copy the received message data into
             // the new buffer, discarding the original buffer(s).
-            newBuf->AddToEnd(data);
-            data = newBuf.Release();
+            newBuf->AddToEnd(std::move(data));
+            data = std::move(newBuf);
             data->CompactHead();
 
             // Try again to decode the message.
@@ -1325,8 +1318,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
             if (data->DataLength() == 0)
             {
                 // Detach the buffer from the data queue.
-                payloadBuf = data;
-                data       = data->DetachTail();
+                payloadBuf = data.DetachTail();
 
                 // Adjust the buffer to point at the payload of the message.
                 payloadBuf->SetStart(payload);
@@ -1338,7 +1330,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
             else
             {
                 payloadBuf = PacketBuffer::New(0);
-                if (payloadBuf != nullptr)
+                if (!payloadBuf.IsNull())
                 {
                     memcpy(payloadBuf->Start(), payload, payloadLen);
                     payloadBuf->SetDataLength(payloadLen);
@@ -1356,11 +1348,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
             // Send key error response to the peer if required.
             if (msgLayer->SecurityMgr->IsKeyError(err))
             {
-                if (data != nullptr)
-                {
-                    PacketBuffer::Free(data);
-                    data = nullptr;
-                }
+                data = nullptr;
 
                 msgLayer->SecurityMgr->SendKeyErrorMsg(&msgInfo, nullptr, con, err);
             }
@@ -1373,7 +1361,7 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
         // NOTE that when this function returns, the state of the connection may have changed.
         if (con->OnMessageReceived)
         {
-            con->OnMessageReceived(con, &msgInfo, payloadBuf);
+            con->OnMessageReceived(con, &msgInfo, std::move(payloadBuf));
         }
         else
         {
@@ -1387,20 +1375,17 @@ void ChipConnection::HandleDataReceived(TCPEndPoint * endPoint, PacketBuffer * d
     // TCP connection is closed (which means we're never going to receive any more data), fail with
     // a MESSAGE_INCOMPLETE error.  If the ChipConnection is closed (e.g. the app called close)
     // then simply discard the received data.
-    if (data != nullptr)
+    if (!data.IsNull())
     {
         if (con->StateAllowsReceive())
         {
             if (endPoint->State == TCPEndPoint::kState_Connected || endPoint->State == TCPEndPoint::kState_SendShutdown)
             {
-                endPoint->PutBackReceivedData(data);
-                data = nullptr;
+                endPoint->PutBackReceivedData(std::move(data));
             }
             else
                 con->DoClose(CHIP_ERROR_MESSAGE_INCOMPLETE, 0);
         }
-        if (data != nullptr)
-            PacketBuffer::Free(data);
     }
 }
 
@@ -1632,7 +1617,7 @@ exit:
     }
 }
 
-void ChipConnection::HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuffer * data)
+void ChipConnection::HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBufferHandle data)
 {
     ChipConnection * con        = static_cast<ChipConnection *>(endPoint->mAppState);
     ChipMessageLayer * msgLayer = con->MessageLayer;
@@ -1643,7 +1628,6 @@ void ChipConnection::HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuff
     ChipMessageInfo msgInfo;
     uint8_t * payload;
     uint16_t payloadLen;
-    PacketBuffer * payloadBuf;
     uint32_t frameLen;
     CHIP_ERROR err;
 
@@ -1665,25 +1649,18 @@ void ChipConnection::HandleBleMessageReceived(BLEEndPoint * endPoint, PacketBuff
     // Verify that the received buffer contained exactly one CHIP message.
     VerifyOrExit(data->DataLength() == 0, err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
 
-    // Assign received data to payload buffer.
-    payloadBuf = data;
-    data       = nullptr;
-
     // Adjust the buffer to point at the payload of the message.
-    payloadBuf->SetStart(payload);
-    payloadBuf->SetDataLength(payloadLen);
+    data->SetStart(payload);
+    data->SetDataLength(payloadLen);
 
     // Pass the message header and payload to the application.
     // NOTE that when this function returns, the state of the connection may have changed.
-    con->OnMessageReceived(con, &msgInfo, payloadBuf);
+    con->OnMessageReceived(con, &msgInfo, std::move(data));
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(MessageLayer, "HandleBleMessageReceived failed, err = %d", err);
-
-        if (data != nullptr)
-            PacketBuffer::Free(data);
 
         // Send key error response to the peer if required.
         if (msgLayer->SecurityMgr->IsKeyError(err))

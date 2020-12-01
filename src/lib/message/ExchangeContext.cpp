@@ -376,7 +376,7 @@ void ExchangeContext::SetUseEphemeralUDPPort(bool val)
  *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
  *                                                       network layer.
  */
-CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, PacketBuffer * msgBuf, uint16_t sendFlags,
+CHIP_ERROR ExchangeContext::SendMessage(uint32_t profileId, uint8_t msgType, PacketBufferHandle msgBuf, uint16_t sendFlags,
                                         void * msgCtxt)
 {
     // Setup the message info structure.
@@ -1344,9 +1344,10 @@ CHIP_ERROR ExchangeContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
 /**
  * @overload
  */
-CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader, PacketBuffer * msgBuf)
+CHIP_ERROR ExchangeContext::HandleMessage(ChipMessageInfo * msgInfo, const ChipExchangeHeader * exchHeader,
+                                          PacketBufferHandle msgBuf)
 {
-    return HandleMessage(msgInfo, exchHeader, msgBuf, nullptr);
+    return HandleMessage(msgInfo, exchHeader, std::move(msgBuf), nullptr);
 }
 
 /**

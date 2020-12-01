@@ -264,7 +264,7 @@ public:
 
     void GetPeerDescription(char * buf, size_t bufSize) const;
 
-    CHIP_ERROR SendMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(ChipMessageInfo * msgInfo, System::PacketBufferHandle msgBuf);
 
     // TODO COM-311: implement EnableReceived/DisableReceive for BLE ChipConnections.
     void EnableReceive();
@@ -323,7 +323,7 @@ public:
      *  @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
      *
      */
-    typedef void (*MessageReceiveFunct)(ChipConnection * con, ChipMessageInfo * msgInfo, PacketBuffer * msgBuf);
+    typedef void (*MessageReceiveFunct)(ChipConnection * con, ChipMessageInfo * msgInfo, System::PacketBufferHandle msgBuf);
     MessageReceiveFunct OnMessageReceived;
 
     /**
@@ -380,7 +380,7 @@ private:
 
     static void HandleResolveComplete(void * appState, INET_ERROR err, uint8_t addrCount, Inet::IPAddress * addrArray);
     static void HandleConnectComplete(Inet::TCPEndPoint * endPoint, INET_ERROR conRes);
-    static void HandleDataReceived(Inet::TCPEndPoint * endPoint, PacketBuffer * data);
+    static void HandleDataReceived(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle data);
     static void HandleTcpConnectionClosed(Inet::TCPEndPoint * endPoint, INET_ERROR err);
     static void HandleSecureSessionEstablished(ChipSecurityManager * sm, ChipConnection * con, void * reqState,
                                                uint16_t sessionKeyId, uint64_t peerNodeId, uint8_t encType);
@@ -398,7 +398,7 @@ private:
     void MakeConnectedBle(Ble::BLEEndPoint * endPoint);
 
     static void HandleBleConnectComplete(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
-    static void HandleBleMessageReceived(Ble::BLEEndPoint * endPoint, System::PacketBuffer * data);
+    static void HandleBleMessageReceived(Ble::BLEEndPoint * endPoint, System::PacketBufferHandle data);
     static void HandleBleConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
 #endif
 };
@@ -526,7 +526,7 @@ public:
      *  @param[in]     payload        Pointer to PacketBuffer message containing packet received.
      *
      */
-    typedef void (*MessageReceiveFunct)(ChipMessageLayer * msgLayer, ChipMessageInfo * msgInfo, PacketBuffer * payload);
+    typedef void (*MessageReceiveFunct)(ChipMessageLayer * msgLayer, ChipMessageInfo * msgInfo, System::PacketBufferHandle payload);
     MessageReceiveFunct OnMessageReceived;
 
     /**
@@ -585,12 +585,12 @@ public:
     typedef void (*AcceptErrorFunct)(ChipMessageLayer * msgLayer, CHIP_ERROR err);
     AcceptErrorFunct OnAcceptError;
 
-    CHIP_ERROR DecodeHeader(PacketBuffer * msgBuf, ChipMessageInfo * msgInfo, uint8_t ** payloadStart);
-    CHIP_ERROR ReEncodeMessage(PacketBuffer * buf);
-    CHIP_ERROR EncodeMessage(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf, ChipConnection * con, uint16_t maxLen,
-                             uint16_t reserve = 0);
+    CHIP_ERROR DecodeHeader(const System::PacketBufferHandle & msgBuf, ChipMessageInfo * msgInfo, uint8_t ** payloadStart);
+    CHIP_ERROR ReEncodeMessage(const System::PacketBufferHandle & buf);
+    CHIP_ERROR EncodeMessage(ChipMessageInfo * msgInfo, const System::PacketBufferHandle & msgBuf, ChipConnection * con,
+                             uint16_t maxLen, uint16_t reserve = 0);
     CHIP_ERROR EncodeMessage(const Inet::IPAddress & destAddr, uint16_t destPort, Inet::InterfaceId sendIntId,
-                             ChipMessageInfo * msgInfo, PacketBuffer * payload);
+                             ChipMessageInfo * msgInfo, const System::PacketBufferHandle & payload);
 
     CHIP_ERROR RefreshEndpoints();
     CHIP_ERROR CloseEndpoints();
@@ -622,7 +622,7 @@ public:
     void SetSignalMessageLayerActivityChanged(MessageLayerActivityChangeHandlerFunct messageLayerActivityChangeHandler);
     bool IsMessageLayerActive();
 
-    static uint32_t GetMaxChipPayloadSize(const PacketBufferHandle & msgBuf, bool isUDP, uint32_t udpMTU);
+    static uint32_t GetMaxChipPayloadSize(const System::PacketBufferHandle & msgBuf, bool isUDP, uint32_t udpMTU);
 
     static void GetPeerDescription(char * buf, size_t bufSize, uint64_t nodeId, const Inet::IPAddress * addr, uint16_t port,
                                    Inet::InterfaceId interfaceId, const ChipConnection * con);
@@ -688,10 +688,11 @@ private:
                            PacketBuffer * payload, uint32_t msgFlags);
     CHIP_ERROR SelectOutboundUDPEndPoint(const Inet::IPAddress & destAddr, uint32_t msgFlags, Inet::UDPEndPoint *& ep);
     CHIP_ERROR SelectDestNodeIdAndAddress(uint64_t & destNodeId, Inet::IPAddress & destAddr);
-    CHIP_ERROR DecodeMessage(PacketBuffer * msgBuf, uint64_t sourceNodeId, ChipConnection * con, ChipMessageInfo * msgInfo,
-                             uint8_t ** rPayload, uint16_t * rPayloadLen);
-    CHIP_ERROR EncodeMessageWithLength(ChipMessageInfo * msgInfo, PacketBuffer * msgBuf, ChipConnection * con, uint16_t maxLen);
-    CHIP_ERROR DecodeMessageWithLength(PacketBuffer * msgBuf, uint64_t sourceNodeId, ChipConnection * con,
+    CHIP_ERROR DecodeMessage(const System::PacketBufferHandle & msgBuf, uint64_t sourceNodeId, ChipConnection * con,
+                             ChipMessageInfo * msgInfo, uint8_t ** rPayload, uint16_t * rPayloadLen);
+    CHIP_ERROR EncodeMessageWithLength(ChipMessageInfo * msgInfo, const System::PacketBufferHandle & msgBuf, ChipConnection * con,
+                                       uint16_t maxLen);
+    CHIP_ERROR DecodeMessageWithLength(const System::PacketBufferHandle & msgBuf, uint64_t sourceNodeId, ChipConnection * con,
                                        ChipMessageInfo * msgInfo, uint8_t ** rPayload, uint16_t * rPayloadLen,
                                        uint32_t * rFrameLen);
     void GetIncomingTCPConCount(const Inet::IPAddress & peerAddr, uint16_t & count, uint16_t & countFromIP);
