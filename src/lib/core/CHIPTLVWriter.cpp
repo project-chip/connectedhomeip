@@ -1854,8 +1854,8 @@ CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHand
         System::PacketBufferHandle newBufHandle = PacketBuffer::New(0);
         if (!newBufHandle.IsNull())
         {
+            newBuf = newBufHandle.Get_ForNow();
             buf->AddToEnd(std::move(newBufHandle));
-            newBuf = newBufHandle.Release_ForNow();
         }
     }
 

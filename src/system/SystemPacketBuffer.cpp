@@ -234,7 +234,7 @@ uint16_t PacketBuffer::ReservedSize() const
  *  @note The current packet buffer must be the head of the buffer chain for the lengths to be adjusted properly. The caller MUST
  *  NOT reference the given packet buffer afterwards.
  *
- * @param[in] aPacket - the packet buffer to be added to the end of the current chain.
+ * @param[in] aPacketHandle - the packet buffer to be added to the end of the current chain.
  */
 void PacketBuffer::AddToEnd(PacketBufferHandle aPacketHandle)
 {
