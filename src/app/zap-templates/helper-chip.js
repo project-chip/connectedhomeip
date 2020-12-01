@@ -21,6 +21,25 @@
  * @module Templating API: toplevel utility helpers
  */
 
+// Import Zcl helper from zap core
+const helperZcl = require('../../../third_party/zap/repo/src-electron/generator/helper-zcl.js')
+
+/**
+ * Dummy helper that add a string to the templates showing
+ * if the strings matches. Use to demonstrate the use
+ * of ZAP helper within the chip-helper environment
+ *
+ * @param {*} str1 : First string to compare
+ * @param {*} str2 : Second string to comapre
+ */
+function example_helper(str1, str2) {
+  if (helperZcl.isStrEqual(str1, str2)) {
+    return 'The two strings are identical'
+  } else {
+    return 'The two strings are different'
+  }
+}
+
 /**
  * Produces the top-of-the-file header for a C file.
  *
@@ -46,38 +65,10 @@ function chip_header() {
   */`;
 }
 
-function isClient(side) { return 0 == side.localeCompare("client"); }
-
-function isServer(side) { return 0 == side.localeCompare("server"); }
-
-function isStrEqual(str1, str2) { return 0 == str1.localeCompare(str2); }
-
-function isLastElement(index, count) { return index == count - 1; }
-
-function isEnabled(enable) { return 1 == enable; }
-
-function isCommandAvailable(clusterSide, incoming, outgoing, source, name) {
-  if (0 == clusterSide.localeCompare(source)) {
-    return false;
-  }
-
-  if (isClient(clusterSide) && outgoing) {
-    return true;
-  } else if (isServer(clusterSide) && incoming) {
-    return true;
-  }
-  return false;
-}
-
 // WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 //
 // Note: these exports are public API. Templates that might have been created in the past and are
 // available in the wild might depend on these names.
 // If you rename the functions, you need to still maintain old exports list.
 exports.chip_header = chip_header;
-exports.isClient = isClient;
-exports.isServer = isServer;
-exports.isStrEqual = isStrEqual;
-exports.isLastElement = isLastElement;
-exports.isEnabled = isEnabled;
-exports.isCommandAvailable = isCommandAvailable;
+exports.example_helper = example_helper;
