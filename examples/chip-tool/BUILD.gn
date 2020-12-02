@@ -25,9 +25,9 @@ executable("chip-tool") {
     "commands/common/Commands.cpp",
     "commands/common/Logging.cpp",
     "commands/common/NetworkCommand.cpp",
-    "commands/payload/ParseCommand.cpp",
     "commands/echo/EchoCommand.cpp",
     "commands/pairing/PairingCommand.cpp",
+    "commands/payload/ParseCommand.cpp",
     "config/PersistentStorage.cpp",
     "main.cpp",
   ]
