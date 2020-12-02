@@ -138,7 +138,7 @@ public:
 
     Error NewTimer(Timer *& aTimerPtr);
 
-    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback);
+    void StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> & aCallback);
     void DispatchTimerCallbacks(uint64_t kCurrentEpoch);
 
     typedef void (*TimerCompleteFunct)(Layer * aLayer, void * aAppState, Error aError);
@@ -146,6 +146,7 @@ public:
     void CancelTimer(TimerCompleteFunct aOnComplete, void * aAppState);
 
     Error ScheduleWork(TimerCompleteFunct aComplete, void * aAppState);
+    void ScheduleWork(chip::Callback::Callback<> & aCallback);
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS || CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
     void PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet, fd_set * aExceptionSet, struct timeval & aSleepTime);
@@ -179,6 +180,7 @@ private:
     void * mContext;
     void * mPlatformData;
     chip::Callback::CallbackDeque mTimerCallbacks;
+    chip::Callback::CallbackDeque mScheduleWorkCallbacks;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     static LwIPEventHandlerDelegate sSystemEventHandlerDelegate;

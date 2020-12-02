@@ -217,15 +217,14 @@ Error Layer::NewTimer(Timer *& aTimerPtr)
     return CHIP_SYSTEM_NO_ERROR;
 }
 
-static bool TimerReady(const Timer::Epoch epoch, const Cancelable * timer)
+static bool TimerReady(const Timer::Epoch epoch, const Cancelable & timer)
 {
-    return !Timer::IsEarlierEpoch(epoch, timer->mInfoScalar);
+    return !Timer::IsEarlierEpoch(epoch, timer.mInfo.scalar);
 }
 
-static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
+static int TimerCompare(const Cancelable & a, const Cancelable & b)
 {
-    (void) p;
-    return (a->mInfoScalar > b->mInfoScalar) ? 1 : (a->mInfoScalar < b->mInfoScalar) ? -1 : 0;
+    return (a.mInfo.scalar > b.mInfo.scalar) ? 1 : (a.mInfo.scalar < b.mInfo.scalar) ? -1 : 0;
 }
 
 /**
@@ -244,13 +243,13 @@ static int TimerCompare(void * p, const Cancelable * a, const Cancelable * b)
  *   @return Other Value indicating timer failed to start.
  *
  */
-void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> * aCallback)
+void Layer::StartTimer(uint32_t aMilliseconds, chip::Callback::Callback<> & aCallback)
 {
-    Cancelable * ca = aCallback->Cancel();
+    Cancelable * ca = aCallback.Cancel();
 
-    ca->mInfoScalar = Timer::GetCurrentEpoch() + aMilliseconds;
+    ca->mInfo.scalar = Timer::GetCurrentEpoch() + aMilliseconds;
 
-    mTimerCallbacks.InsertBy(ca, TimerCompare, nullptr);
+    mTimerCallbacks.InsertBy(*ca, TimerCompare);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     if (mTimerCallbacks.First() == ca)
@@ -381,6 +380,12 @@ Error Layer::ScheduleWork(TimerCompleteFunct aComplete, void * aAppState)
 
 exit:
     return lReturn;
+}
+
+void Layer::ScheduleWork(chip::Callback::Callback<> & aCallback)
+{
+    // this ensures that overdue timers fire before any scheduled work
+    StartTimer(0, aCallback);
 }
 
 /**
@@ -565,14 +570,14 @@ Error Layer::SetClock_RealTime(uint64_t newCurTime)
 void Layer::DispatchTimerCallbacks(const uint64_t kCurrentEpoch)
 {
     // dispatch TimerCallbacks
-    Cancelable ready;
+    CallbackDeque ready;
 
-    mTimerCallbacks.DequeueBy(TimerReady, kCurrentEpoch, ready);
+    mTimerCallbacks.DequeueBy([&](Cancelable & ca) -> bool { return TimerReady(kCurrentEpoch, ca); }, ready);
 
     while (ready.mNext != &ready)
     {
-        // one-shot
-        chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromCancelable(ready.mNext);
+        // one-shot semantics
+        chip::Callback::Callback<> * cb = chip::Callback::Callback<>::FromCancelable(*ready.mNext);
         cb->Cancel();
         cb->mCall(cb->mContext);
     }
@@ -626,9 +631,9 @@ void Layer::PrepareSelect(int & aSetSize, fd_set * aReadSet, fd_set * aWriteSet,
     if (lAwakenEpoch != kCurrentEpoch)
     {
         Cancelable * ca = mTimerCallbacks.First();
-        if (ca != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, ca->mInfoScalar))
+        if (ca != nullptr && !Timer::IsEarlierEpoch(kCurrentEpoch, ca->mInfo.scalar))
         {
-            lAwakenEpoch = ca->mInfoScalar;
+            lAwakenEpoch = ca->mInfo.scalar;
         }
     }
 
@@ -985,8 +990,8 @@ namespace Layer {
 #if !CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS
 
 /**
- * This is a platform-specific CHIP System Layer pre-initialization hook. This may be overridden by assserting the preprocessor
- * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
+ * This is a platform-specific CHIP System Layer pre-initialization hook. This may be overridden by assserting the
+ * preprocessor definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
  *
  *  @param[in,out] aLayer    A reference to the CHIP System Layer instance being initialized.
  *
@@ -1011,8 +1016,8 @@ DLL_EXPORT Error WillInit(Layer & aLayer, void * aContext)
  *
  *  @param[in,out] aContext  Platform-specific context data passed to the layer initialization method, \::Shutdown.
  *
- *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
- *      non-successful status will abort shutdown.
+ *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure.
+ * Returning non-successful status will abort shutdown.
  */
 DLL_EXPORT Error WillShutdown(Layer & aLayer, void * aContext)
 {
@@ -1023,8 +1028,8 @@ DLL_EXPORT Error WillShutdown(Layer & aLayer, void * aContext)
 }
 
 /**
- * This is a platform-specific CHIP System Layer post-initialization hook. This may be overridden by assserting the preprocessor
- * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
+ * This is a platform-specific CHIP System Layer post-initialization hook. This may be overridden by assserting the
+ * preprocessor definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_XTOR_FUNCTIONS.
  *
  *  @param[in,out] aLayer    A reference to the CHIP System Layer instance being initialized.
  *
@@ -1049,8 +1054,8 @@ DLL_EXPORT void DidInit(Layer & aLayer, void * aContext, Error aStatus)
  *
  *  @param[in]     aStatus   The overall status being returned via the CHIP System Layer \::Shutdown method.
  *
- *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure. Returning
- *      non-successful status will abort shutdown.
+ *  @return #CHIP_SYSTEM_NO_ERROR on success; otherwise, a specific error indicating the reason for shutdown failure.
+ * Returning non-successful status will abort shutdown.
  */
 DLL_EXPORT void DidShutdown(Layer & aLayer, void * aContext, Error aStatus)
 {
@@ -1070,8 +1075,8 @@ using chip::System::LwIPEvent;
  *  This is a platform-specific event / message post hook. This may be overridden by assserting the preprocessor definition,
  *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
  *
- *  This posts an event / message of the specified type with the provided argument to this instance's platform-specific event /
- *  message queue.
+ *  This posts an event / message of the specified type with the provided argument to this instance's platform-specific
+ * event / message queue.
  *
  *  @note
  *    This is an implementation for LwIP.
@@ -1113,8 +1118,8 @@ exit:
 }
 
 /**
- *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor definition,
- *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
+ *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor
+ * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
  *
  *  This effects an event loop, waiting on a queue that services this instance, pulling events off of that queue, and then
  *  dispatching them for handling.
@@ -1162,11 +1167,11 @@ exit:
 }
 
 /**
- *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor definition,
- *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
+ *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor
+ * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
  *
- *  This dispatches the specified event for handling, unmarshalling the type and arguments from the event for hand off to CHIP
- *  System Layer::HandleEvent for the actual dispatch.
+ *  This dispatches the specified event for handling, unmarshalling the type and arguments from the event for hand off to
+ * CHIP System Layer::HandleEvent for the actual dispatch.
  *
  *  @note
  *    This is an implementation for LwIP.
@@ -1199,8 +1204,8 @@ exit:
 }
 
 /**
- *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor definition,
- *  #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
+ *  This is a platform-specific event / message dispatch hook. This may be overridden by assserting the preprocessor
+ * definition, #CHIP_SYSTEM_CONFIG_PLATFORM_PROVIDES_EVENT_FUNCTIONS.
  *
  *  @note
  *    This is an implementation for LwIP.

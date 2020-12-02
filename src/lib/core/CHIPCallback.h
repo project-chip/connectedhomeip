@@ -39,7 +39,7 @@ namespace Callback {
  */
 class Cancelable
 {
-    typedef void (*CancelFn)(Cancelable *);
+    typedef void (*CancelFn)(Cancelable &);
 
 public:
     /**
@@ -50,8 +50,11 @@ public:
     Cancelable * mNext;
     Cancelable * mPrev;
 
-    void * mInfoPtr;
-    uint64_t mInfoScalar;
+    union
+    {
+        void * ptr;
+        uint64_t scalar;
+    } mInfo;
 
     /**
      * @brief when non-null, indicates the Callback is registered with
@@ -60,11 +63,7 @@ public:
      */
     CancelFn mCancel;
 
-    Cancelable()
-    {
-        mNext = mPrev = this;
-        mCancel       = nullptr;
-    }
+    Cancelable() { mCancel = nullptr; }
 
     /**
      * @brief run whatever function the callee/registrar has specified in order
@@ -77,10 +76,11 @@ public:
         {
             CancelFn cancel = mCancel;
             mCancel         = nullptr;
-            cancel(this);
+            cancel(*this);
         }
         return this;
     }
+
     ~Cancelable() { Cancel(); }
 
     Cancelable(const Cancelable &) = delete;
@@ -161,42 +161,49 @@ public:
      * TODO: type-safety? It'd be nice if Cancelables that aren't Callbacks returned null
      *    here.  https://github.com/project-chip/connectedhomeip/issues/1350
      */
-    static Callback * FromCancelable(Cancelable * ca) { return static_cast<Callback *>(ca); }
+    static Callback * FromCancelable(Cancelable & ca) { return static_cast<Callback *>(&ca); }
 };
 
 /**
  * @brief core of a simple doubly-linked list Callback keeper-tracker-of
+ *  with automatic cancellation for queuing and an outer function if
+ *  necessary
  *
  */
 class CallbackDeque : public Cancelable
 {
 public:
+    CallbackDeque() : CallbackDeque(_Dequeue) {}
+
+    CallbackDeque(void (*cancel)(Cancelable &))
+    {
+        mNext = mPrev = this;
+        mCancel       = cancel;
+    }
+
     /**
-     * @brief appends with overridden cancel function, in case the
-     *   list change requires some other state update.
+     * @brief appends *and* installs a cancel function in order to automatically dequeue
      */
-    void Enqueue(Cancelable * ca, void (*cancel)(Cancelable *))
+    void Enqueue(Cancelable & ca)
     {
         // add to a doubly-linked list, set cancel function
-        InsertBefore(ca, this, cancel);
+        InsertBefore(ca);
     }
-    /**
-     * @brief appends
-     */
-    void Enqueue(Cancelable * ca) { Enqueue(ca, Dequeue); }
 
     /**
      * @brief dequeue, but don't cancel, all cas that match the by()
      */
-    void DequeueBy(bool (*by)(uint64_t, const Cancelable *), uint64_t p, Cancelable & dequeued)
+    template <typename Functor>
+    void DequeueBy(Functor by, CallbackDeque & dequeued)
     {
+        dequeued.mCancel = mCancel;
         for (Cancelable * ca = mNext; ca != this;)
         {
             Cancelable * next = ca->mNext;
-            if (by(p, ca))
+            if (by(*ca))
             {
-                _Dequeue(ca);
-                _InsertBefore(ca, &dequeued);
+                _Dequeue(*ca);
+                _InsertBefore(*ca, dequeued);
             }
             ca = next;
         }
@@ -206,35 +213,32 @@ public:
      * @brief insert the node in a queue in order, sorted by "sortby(a, b)"
      *   sortby(a, b) should return 1 if a > b, -1 if a < b and 0 if a == b
      */
-    void InsertBy(Cancelable * ca, int (*sortby)(void *, const Cancelable *, const Cancelable *), void * p,
-                  void (*cancel)(Cancelable *))
+    template <typename Functor>
+    void InsertBy(Cancelable & ca, Functor sortby)
     {
+        ca.Cancel(); // make sure we're not corrupting another list somewhere
+        ca.mCancel = mCancel;
+
         Cancelable * where; // node before which we need to insert
         for (where = mNext; where != this; where = where->mNext)
         {
-            if (sortby(p, ca, where) <= 0)
+            if (sortby(ca, *where) <= 0)
             {
                 break;
             }
         }
-        InsertBefore(ca, where, cancel);
-    }
-
-    void InsertBy(Cancelable * ca, int (*sortby)(void *, const Cancelable *, const Cancelable *), void * p)
-    {
-        InsertBy(ca, sortby, p, Dequeue);
+        _InsertBefore(ca, *where);
     }
 
     /**
      * @brief insert the node in a the list at a specific point
      */
-    void InsertBefore(Cancelable * ca, Cancelable * where, void (*cancel)(Cancelable *))
+    void InsertBefore(Cancelable & ca)
     {
-        ca->Cancel(); // make doubly-sure we're not corrupting another list somewhere
-        ca->mCancel = cancel;
-        _InsertBefore(ca, where);
+        ca.Cancel(); // make sure we're not corrupting another list somewhere
+        ca.mCancel = mCancel;
+        _InsertBefore(ca, *this);
     }
-    void InsertBefore(Cancelable * ca, Cancelable * where) { InsertBefore(ca, where, Dequeue); }
 
     /**
      * @brief returns first item unless list is empty, otherwise returns NULL
@@ -245,8 +249,10 @@ public:
      * @brief Dequeue all, return in a stub. does not cancel the cas, as the list
      *   members are still in use
      */
-    void DequeueAll(Cancelable & ready)
+    void DequeueAll(CallbackDeque & ready)
     {
+        // copy the cancel function into the head of the list
+        ready.mCancel = mCancel;
         if (mNext != this)
         {
             ready.mNext        = mNext;
@@ -259,33 +265,24 @@ public:
     }
 
     /**
-     * @brief dequeue but don't cancel, useful if
-     *     immediately putting on another list
-     */
-    static void Dequeue(Cancelable * ca)
-    {
-        _Dequeue(ca);
-        ca->mCancel = nullptr;
-    }
-
-    /**
      * @brief empty?
      */
     bool IsEmpty() { return mNext == this; }
 
 private:
-    static void _Dequeue(Cancelable * ca)
+    // raw list management
+    static void _Dequeue(Cancelable & ca)
     {
-        ca->mNext->mPrev = ca->mPrev;
-        ca->mPrev->mNext = ca->mNext;
-        ca->mNext = ca->mPrev = ca;
+        ca.mNext->mPrev = ca.mPrev;
+        ca.mPrev->mNext = ca.mNext;
+        ca.mNext = ca.mPrev = &ca;
     }
-    void _InsertBefore(Cancelable * ca, Cancelable * where)
+    static void _InsertBefore(Cancelable & ca, Cancelable & where)
     {
-        ca->mPrev           = where->mPrev;
-        where->mPrev->mNext = ca;
-        where->mPrev        = ca;
-        ca->mNext           = where;
+        ca.mPrev           = where.mPrev;
+        where.mPrev->mNext = &ca;
+        where.mPrev        = &ca;
+        ca.mNext           = &where;
     }
 };
 

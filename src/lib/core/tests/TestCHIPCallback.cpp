@@ -41,16 +41,17 @@ public:
     /**
      * @brief run this callback next Dispatch
      */
-    void Resume(Callback<> * cb)
+    void Resume(Callback<> & cb)
     {
         // always first thing: cancel to take ownership of
         //  cb members
-        Enqueue(cb->Cancel());
+        Cancelable * ca = cb.Cancel();
+        Enqueue(*ca);
     }
 
     void Dispatch()
     {
-        Cancelable ready;
+        Resumer ready;
 
         DequeueAll(ready);
 
@@ -79,7 +80,7 @@ struct Resume
 
 static void resume(struct Resume * me)
 {
-    me->resumer->Resume(me->cb);
+    me->resumer->Resume(*me->cb);
 }
 
 static void canceler(Cancelable * ca)
@@ -95,40 +96,40 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
     Resumer resumer;
 
     // Resume() works
-    resumer.Resume(&cb);
+    resumer.Resume(cb);
     resumer.Dispatch();
-    resumer.Resume(&cb);
+    resumer.Resume(cb);
     resumer.Dispatch();
     NL_TEST_ASSERT(inSuite, n == 3);
 
     n = 1;
     // test cb->Cancel() cancels
-    resumer.Resume(&cb);
+    resumer.Resume(cb);
     cb.Cancel();
     resumer.Dispatch();
     NL_TEST_ASSERT(inSuite, n == 1);
 
     n = 1;
     // Cancel cb before Dispatch() gets around to us (tests FIFO *and* cancel() from readylist)
-    resumer.Resume(&cancelcb);
-    resumer.Resume(&cb);
+    resumer.Resume(cancelcb);
+    resumer.Resume(cb);
     resumer.Dispatch();
     NL_TEST_ASSERT(inSuite, n == 1);
 
     n = 1;
     // 2nd Resume() cancels first registration
-    resumer.Resume(&cb);
-    resumer.Resume(&cb); // cancels previous registration
-    resumer.Dispatch();  // runs the list
-    resumer.Dispatch();  // runs an empty list
+    resumer.Resume(cb);
+    resumer.Resume(cb); // cancels previous registration
+    resumer.Dispatch(); // runs the list
+    resumer.Dispatch(); // runs an empty list
     NL_TEST_ASSERT(inSuite, n == 2);
 
     n = 1;
     // Resume() during Dispatch() runs only once, but enqueues for next dispatch
     struct Resume res = { .cb = &cb, .resumer = &resumer };
     Callback<> resumecb(reinterpret_cast<CallFn>(resume), &res);
-    resumer.Resume(&cb);
-    resumer.Resume(&resumecb);
+    resumer.Resume(cb);
+    resumer.Resume(resumecb);
     resumer.Dispatch();
     NL_TEST_ASSERT(inSuite, n == 2);
     resumer.Dispatch();
@@ -138,11 +139,11 @@ static void ResumerTest(nlTestSuite * inSuite, void * inContext)
 
     n = 1;
     // cancel on destruct
-    resumer.Resume(pcb);
+    resumer.Resume(*pcb);
     resumer.Dispatch();
     NL_TEST_ASSERT(inSuite, n == 2);
 
-    resumer.Resume(pcb);
+    resumer.Resume(*pcb);
     chip::Platform::Delete(pcb);
     resumer.Dispatch();
     NL_TEST_ASSERT(inSuite, n == 2);
@@ -172,17 +173,13 @@ public:
     }
 
     /**
-     * @brief example
-     */
-    static void Cancel(Cancelable * cb)
-    {
-        Dequeue(cb); // take off ready list
-    }
-
-    /**
      * @brief illustrate a case where this needs notification of cancellation
      */
-    void Register(Callback<NotifyFn> * cb) { Enqueue(cb->Cancel(), Cancel); }
+    void Register(Callback<NotifyFn> * cb)
+    {
+        Cancelable * ca = cb->Cancel();
+        Enqueue(*ca);
+    }
 };
 
 static void increment_by(int * n, int by)

@@ -41,7 +41,8 @@
  *******************************************************************************
  ******************************************************************************/
 
-// this file contains all the common includes for clusters in the zcl-util
+// this file contains all the common includes for clusters in the zcl-util, is
+// similar to a config header
 #include "common.h"
 
 #include "attribute-storage.h"
@@ -50,6 +51,8 @@
 #include "af-main.h"
 
 #include "gen/enums.h"
+
+#include <platform/CHIPDeviceLayer.h>
 
 #ifdef EMBER_AF_PLUGIN_REPORTING
 #include <app/reporting/reporting.h>
@@ -462,8 +465,42 @@ kickout:
     return status;
 }
 
+// this list (like all globals accessed by this file) should be moved to an instance variable
+static chip::Callback::CallbackDeque sOnPostAttributeChangedCallbacks;
+
+void emberAfOnPostAttributeChanged(chip::Callback::Callback<> & cb, emberAfOnAttributeChangedFilter & filter)
+{
+    // two steps to taking control of the Cancelable memory
+    // 1. cancel the callback
+    chip::Callback::Cancelable * ca = cb.Cancel();
+
+    // 2. install a cancel function and use the memory.
+    //    in this case we're recording what the caller
+    //    is interested in in mInfo.ptr
+    sOnPostAttributeChangedCallbacks.Enqueue(*ca);
+    ca->mInfo.ptr = &filter;
+}
+
 //------------------------------------------------------------------------------
 // Internal Functions
+
+static void dispatchOnPostAttributeChanged(emberAfOnAttributeChangedFilter & filter)
+{
+    chip::Callback::CallbackDeque matched;
+
+    // find all the matches by checking the filter
+    sOnPostAttributeChangedCallbacks.DequeueBy(
+        [&](chip::Callback::Cancelable & item) -> bool {
+            return static_cast<emberAfOnAttributeChangedFilter *>(item.mInfo.ptr)->matches(filter);
+        },
+        matched);
+
+    // run all the matches
+    while (!matched.IsEmpty())
+    {
+        chip::DeviceLayer::SystemLayer.ScheduleWork(*chip::Callback::Callback<>::FromCancelable(*matched.First()));
+    }
+}
 
 // writes an attribute (identified by clusterID and attrID to the given value.
 // this returns:
@@ -611,6 +648,15 @@ EmberAfStatus emAfWriteAttribute(EndpointId endpoint, ClusterId cluster, Attribu
         // of cluster.
         emberAfPostAttributeChangeCallback(endpoint, cluster, attributeID, mask, manufacturerCode, dataType,
                                            emberAfAttributeSize(metadata), data);
+
+        // run all the registered OnPostAttributeChanged callbacks that apply
+        emberAfOnAttributeChangedFilter filter = {
+            .mEndpointId  = endpoint,
+            .mClusterId   = cluster,
+            .mAttributeId = attributeID,
+            .mMask        = mask,
+        };
+        dispatchOnPostAttributeChanged(filter);
 
         // Post-write attribute callback specific
         // to the cluster that the attribute lives in.

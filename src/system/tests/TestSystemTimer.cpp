@@ -115,7 +115,7 @@ public:
             return;
         }
 
-        mLayer->StartTimer(0, &mGreedyTimer);
+        mLayer->StartTimer(0, mGreedyTimer);
         mNumTimersHandled++;
     }
     static void GreedyTimer(void * p)
@@ -164,7 +164,7 @@ static void CheckOverflow(nlTestSuite * inSuite, void * aContext)
 
     lSys.StartTimer(timeout_overflow_0ms, HandleTimerFailed, aContext);
     chip::Callback::Callback<> cb(TimerFailed, aContext);
-    lSys.StartTimer(timeout_overflow_1ms, &cb);
+    lSys.StartTimer(timeout_overflow_1ms, cb);
     lSys.StartTimer(timeout_10ms, HandleTimer10Success, aContext);
 
     while (!sOverflowTestDone)
@@ -202,7 +202,7 @@ static void CheckStarvation(nlTestSuite * inSuite, void * aContext)
     struct timeval sleepTime;
 
     lSys.StartTimer(0, HandleGreedyTimer, aContext);
-    lSys.StartTimer(0, &lContext.mGreedyTimer);
+    lSys.StartTimer(0, lContext.mGreedyTimer);
 
     sleepTime.tv_sec  = 0;
     sleepTime.tv_usec = 1000; // 1 ms tick

@@ -43,7 +43,6 @@ using namespace ::chip::DeviceLayer;
  */
 CHIP_ERROR CHIPDeviceManager::Init()
 {
-    mCallbackManager = CallbackManager();
     return CHIP_NO_ERROR;
 }
 

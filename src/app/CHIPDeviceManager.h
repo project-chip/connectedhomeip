@@ -26,7 +26,6 @@
 
 #pragma once
 
-#include <core/CHIPCallbackManager.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPError.h>
 
@@ -54,8 +53,6 @@ public:
         static CHIPDeviceManager instance;
         return instance;
     }
-
-    chip::CallbackManager mCallbackManager;
 
     /**
      * @brief

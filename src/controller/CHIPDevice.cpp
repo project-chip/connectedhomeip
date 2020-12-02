@@ -174,7 +174,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
         Cancelable * ca = mResponses.mNext;
         while (ca != &mResponses)
         {
-            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
+            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(*ca);
             // Let's advance to the next cancelable, as the current one will get removed
             // from the list (and once removed, its next will point to itself)
             ca = ca->mNext;
@@ -189,7 +189,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
         ca = mReports.mNext;
         while (ca != &mReports)
         {
-            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(ca);
+            Callback::Callback<> * cb = Callback::Callback<>::FromCancelable(*ca);
             // Let's advance to the next cancelable, as the current one might get removed
             // from the list in the callback (and if removed, its next will point to itself)
             ca = ca->mNext;
@@ -246,11 +246,12 @@ void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback
     CallbackInfo info                 = { endpoint, cluster };
     Callback::Cancelable * cancelable = onResponse->Cancel();
 
-    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfo.scalar),
+                          "Size of CallbackInfo should be <= size of mInfoScalar");
 
-    cancelable->mInfoScalar = 0;
-    memmove(&cancelable->mInfoScalar, &info, sizeof(info));
-    mResponses.Enqueue(cancelable);
+    cancelable->mInfo.scalar = 0;
+    memmove(&cancelable->mInfo.scalar, &info, sizeof(info));
+    mResponses.Enqueue(*cancelable);
 }
 
 void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport)
@@ -258,11 +259,12 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::
     CallbackInfo info                 = { endpoint, cluster };
     Callback::Cancelable * cancelable = onReport->Cancel();
 
-    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfo.scalar),
+                          "Size of CallbackInfo should be <= size of mInfoScalar");
 
-    cancelable->mInfoScalar = 0;
-    memmove(&cancelable->mInfoScalar, &info, sizeof(info));
-    mReports.Enqueue(cancelable);
+    cancelable->mInfo.scalar = 0;
+    memmove(&cancelable->mInfo.scalar, &info, sizeof(info));
+    mReports.Enqueue(*cancelable);
 }
 
 } // namespace Controller
