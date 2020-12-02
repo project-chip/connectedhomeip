@@ -1,14 +1,23 @@
 # Commissioning nRF Connect Accessory using Android CHIPTool
 
 This article describes how to use [CHIPTool](../../src/android/CHIPTool/README.md) for Android smartphones to commission a Nordic Semiconductor nRF52840 DK running
-[nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md) onto a CHIP-enabled Thread network. The instructions are also valid for [nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md).
+[nRF Connect Lock Example Application](../../examples/lock-app/nrfconnect/README.md) onto a CHIP-enabled Thread network.
+The instructions are also valid for [nRF Connect Lighting Example Application](../../examples/lighting-app/nrfconnect/README.md).
 
-The essence of the commissioning process is composed of the following pieces:
-1. CHIPTool discovers a CHIP accessory device over Bluetooth LE.
-2. CHIPTool establishes a secure channel to the device over Bluetooth LE, sends CHIP operational credentials and Thread provisioning data.
-3. The accessory device joins a CHIP-enabled Thread network.
+The commissioning process is composed of the following main stages:
 
-Bluetooth LE is only used during the commissioning phase and afterwards IP connectivity between the smartphone and the accessory device is needed to send operational messages. Since a typical smartphone doesn't have a Thread radio built-in, extra effort is needed to prepare full-fledged test environment. The article describes how to build a Thread border router using a PC with a spare Wi-Fi card and an [OpenThread Radio Co-Processor](https://openthread.io/platforms/co-processor) device. The below diagram shows connectivity between network components necessary to allow communication between devices running CHIPTool and Lock applications:
+- CHIPTool discovers a CHIP accessory device over Bluetooth LE.
+- CHIPTool establishes a secure channel to the device over Bluetooth LE, and sends CHIP operational credentials and Thread provisioning data.
+- The accessory device joins a CHIP-enabled Thread network.
+
+Bluetooth LE is only used during the commissioning phase.
+Afterwards, only the IP connectivity between the smartphone and the accessory device is needed to send operational messages.
+Since a typical smartphone does not have a Thread radio built-in, extra effort is needed to prepare a fully-fledged testing environment.
+This page describes how to build a Thread Border Router using a PC with a spare Wi-Fi card
+and an [OpenThread Radio Co-Processor](https://openthread.io/platforms/co-processor) device.
+
+The following diagram shows the connectivity between network components required to allow
+communication between devices running the CHIPTool and Lock applications:
 
 ```
                +--------------------+
@@ -21,7 +30,7 @@ Bluetooth LE is only used during the commissioning phase and afterwards IP conne
      |                                |      PC       |------------| Internet |
      |                                +---------------+            +----------+
      |                                        |
- BLE |                                        | USB
+     | Bluetooth LE                           | USB
      |                                        |
      |                                +---------------+
      |                                |  nRF52840 DK  |
@@ -34,24 +43,34 @@ Bluetooth LE is only used during the commissioning phase and afterwards IP conne
                +--------------------+
 ```
 
-Prerequisites:
-- 2x nRF52840 DK (PCA10056)<br><br>
-  > :information_source: One nRF52840 DK is needed to run [OpenThread Radio Co-Processor](https://openthread.io/platforms/co-processor) firmware and can be replaced with another compatible device like nRF52840 Dongle.
-- 1x smartphone with Android 8+
-- 1x PC with Ubuntu 20.04 and Docker installed, with a spare Wi-Fi card.<br><br>
-  > :information_source: While the article uses Ubuntu 20.04 as a reference, all the presented steps should be achievable using other popular operating systems.
+## Requirements
+
+You need the following hardware and software to build a Thread Border Router:
+
+- Two nRF52840 DK (PCA10056)
+
+  - One nRF52840 DK is needed to run [OpenThread Radio Co-Processor](https://openthread.io/platforms/co-processor) firmware and can be replaced with another compatible device like nRF52840 Dongle.
+
+- Smartphone compatible with Android 8.0 or later
+- PC with the following characteristics:
+
+  - Software: Ubuntu 20.04 and Docker installed
+  - Hardware: A spare Wi-Fi card
+
+While this page references Ubuntu 20.04, all the procedures can be completed using other popular operating systems.
 
 ## Building and flashing OpenThread RCP firmware
 
-OpenThread RCP firmware is required to allow a PC to communicate with Thread devices. Complete the following steps to build and flash the RCP firmware onto a nRF52840 DK:
+OpenThread RCP firmware is required to allow the PC to communicate with Thread devices.
+Run the commands mentioned in the following steps to build and flash the RCP firmware onto an nRF52840 DK:
 
 1. Download and install the
 [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools).
-2. Clone OpenThread repository into the current directory:
+2. Clone the OpenThread repository into the current directory:
 
         $ git clone https://github.com/openthread/openthread.git
-        
-3. Enter _openthread_ directory:
+
+3. Enter the _openthread_ directory:
 
         $ cd openthread
 
@@ -59,7 +78,7 @@ OpenThread RCP firmware is required to allow a PC to communicate with Thread dev
 
         $ ./script/bootstrap
 
-5. Set up build environment:
+5. Set up the build environment:
 
         $ ./bootstrap
 
@@ -67,7 +86,8 @@ OpenThread RCP firmware is required to allow a PC to communicate with Thread dev
 
         $ make -f examples/Makefile-nrf52840
 
-7. Convert the resulting RCP image to HEX format:
+   This creates an RCP image in the `bin/ot-rcp` directory.
+7. Convert the RCP image to HEX format:
 
         $ arm-none-eabi-objcopy -O ihex output/nrf52840/bin/ot-rcp output/nrf52840/bin/ot-rcp.hex
 
@@ -75,69 +95,78 @@ OpenThread RCP firmware is required to allow a PC to communicate with Thread dev
 
         $ nrfjprog --chiperase --program output/nrf52840/bin/ot-rcp.hex --reset
 
-9. Disable Mass Storage feature on the device so that it doesn't [interfere](https://github.com/openthread/openthread/blob/master/examples/platforms/nrf528xx/nrf52840/README.md#mass-storage-device-known-issue) with core RCP functionalities. The setting will remain valid even if you flash another firmware onto the device.
+9. Disable the Mass Storage feature on the device,
+   so that it [does not interfere](https://github.com/openthread/openthread/blob/master/examples/platforms/nrf528xx/nrf52840/README.md#mass-storage-device-known-issue)
+   with core RCP functionalities.
 
         $ JLinkExe
         J-Link>MSDDisable
         Probe configured successfully.
         J-Link>exit
 
+    The setting remains valid even if you flash another firmware onto the device.
 10. Power-cycle the device to apply the changes.
 
-## Configuring PC as a Thread border router
+## Configuring PC as Thread Border Router
 
-To make your PC work as a Thread border router, you need to complete the following tasks which can be further broken down into smaller steps:
+To make your PC work as a Thread Border Router, you need to complete the following tasks:
 
-1. Form a Thread network using the OpenThread RCP device and configure IPv6 packet routing to the network.
-2. Configure a Wi-Fi hotspot using a spare Wi-Fi card on your PC.
+- Form a Thread network using the OpenThread RCP device and configure IPv6 packet routing to the network.
+- Configure a Wi-Fi hotspot using a spare Wi-Fi card on your PC.
 
-### Forming a Thread network
+### Forming Thread network
 
-To form a Thread network, perform the following steps:
+To form a Thread network, complete the following steps:
 
-1. Create an IPv6 network for an OTBR Docker container:
+1. Create an IPv6 network for the OpenThread Border Router (OTBR) container in Docker:
 
         $ docker network create --ipv6 --subnet 2001:db8:1::/64 -o com.docker.network.bridge.name=otbr0 otbr
 
-2. Start an OTBR Docker container using the command below with _rcp-dk_ in the last line replaced with the device node name of the nRF52840 DK running the RCP firmware, e.g. _/dev/ttyACM0_:
+2. Start the OTBR container using the command below with *rcp-dk* in the last line replaced with the device node name of the nRF52840 DK that is running the RCP firmware (for example, */dev/ttyACM0*):
 
         $ docker run -it --rm --privileged --network otbr -p 8080:80 \
                 --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1" \
                 --volume rcp-dk:/dev/ttyACM0 openthread/otbr --radio-url spinel+hdlc+uart:///dev/ttyACM0
 
-3. Open `http://localhost:8080/` address in a web browser.
-4. Click __Form__ button on the left menu.
-5. Notice that On-Mesh Prefix is `fd11:22::`. It will be used later to configure IPv6 packet routing.
-6. Click __Form__ button at the bottom to form a new Thread network using the default settings.
-7. Check the output from `docker network inspect otbr | grep IPv6Addres` to learn which IPv6 address was assigned to the OTBR Docker container. Most likely, it will be `2001:db8:1::2`.
-8. Run the following command, with `2001:db8:1::2` replaced with the actual address obtained in the previous step, to ensure that packets targeting Thread network nodes are routed via the OTBR Docker container:
+3. Open the `http://localhost:8080/` address in a web browser.
+4. Click **Form** on the left menu.
+   The network forming creator window appears.
+5. Make sure that the On-Mesh Prefix is set to `fd11:22::`.
+   This value is used later to configure the IPv6 packet routing.
+6. Click the **Form** button at the bottom of the window to form a new Thread network using the default settings.
+7. Run the following command to learn which IPv6 address was assigned to the OTBR container in Docker.
+
+        $ docker network inspect otbr | grep IPv6Address
+
+   After checking the output, the address will most likely be `2001:db8:1::2`.
+8. To ensure that packets targeting Thread network nodes are routed through the OTBR container in Docker, run the following command, with *2001:db8:1::2* replaced with the actual address obtained in the previous step:
 
         $ sudo ip -6 route add fd11:22::/64 dev otbr0 via 2001:db8:1::2
 
-### Configuring a Wi-Fi hotspot
+### Configuring Wi-Fi hotspot
 
-To configure a Wi-Fi hotspot using a spare Wi-Fi card on your PC, perform the following steps:
+To configure a Wi-Fi hotspot using a spare Wi-Fi card on your PC, complete the following steps:
 
-1. Open Ubuntu settings widget, by running the command:
+1. Open the Ubuntu settings widget by running the following command:
 
         $ gnome-control-center
 
-2. Navigate to Wi-Fi settings.
-3. Click the 3-dot icon at the title bar and select __Turn On Wi-Fi Hotspot...__ option.
-4. Enter your network name and password and click __Turn On__.
+2. Go to the Wi-Fi settings.
+3. Click the three-dot icon at the title bar and select the **Turn On Wi-Fi Hotspot...** option.
+4. Enter your network name and password and click **Turn On**.
 5. Run the following command to assign a well-known IPv6 address to the hotspot interface:
 
         $ nmcli connection modify Hotspot ipv6.addresses 2001:db8:2::1/64
 
-6. Install Routing Advertisement Daemon to enable IPv6 auto-configuration of devices connecting to the hotspot:
+6. Run the following command to install Routing Advertisement Daemon (radvd), which enables the IPv6 auto-configuration of devices that connect to the hotspot:
 
         $ sudo apt install radvd
 
-7. To learn the hotspot interface name:
+7. Learn the hotspot interface name by running the following command:
 
-        $ nmcli connection show Hotspot | grep interface-name  
+        $ nmcli connection show Hotspot | grep interface-name
 
-8. Put the following content with _wlo1_ replaced with the hotspot interface name in `/etc/radvd.conf`:
+8. Add the following code into `/etc/radvd.conf`, with *wlo1* replaced with the hotspot interface name obtained in the previous step:
 
         interface wlo1
         {
@@ -146,63 +175,83 @@ To configure a Wi-Fi hotspot using a spare Wi-Fi card on your PC, perform the fo
           AdvSendAdvert on;
           AdvManagedFlag on;
           prefix 2001:db8:2::/64
-          { 
-             AdvValidLifetime 14300; 
-             AdvPreferredLifetime 14200; 
+          {
+             AdvValidLifetime 14300;
+             AdvPreferredLifetime 14200;
           };
         };
 
-9. Start `radvd` service:
+9. Start the radvd service by running the following command:
 
         $ systemctl start radvd
 
-10. To automatically start `radvd` service on every reboot:
+To automatically start the radvd service on every reboot, run the following command:
 
-        $ systemctl enable radvd
+    $ systemctl enable radvd
 
 ## Building and flashing nRF Connect Lock Example Application
 
-Read [nRF Connect Lock Example Application README](../../examples/lock-app/nrfconnect/README.md) to learn how to build and flash the lock firmware onto a nRF52840 DK.
+See [nRF Connect Lock Example Application README](../../examples/lock-app/nrfconnect/README.md)
+to learn how to build and flash the example onto an nRF52840 DK.
 
 ## Building and installing Android CHIPTool
 
-1. Read [Android CHIPTool README](../../src/android/CHIPTool/README.md) to learn how to build the application for your smartphone.
-2. Install `android-tools-adb` package:
+To build the CHIPTool application for your smartphone, read [Android CHIPTool README](../../src/android/CHIPTool/README.md).
+
+After building, install the application by completing the following steps:
+
+1. Install the Android Debug Bridge (adb) package by running the following command:
 
         $ sudo apt install android-tools-adb
 
-3. Enable **USB debugging** on the smartphone by following the [article](https://developer.android.com/studio/debug/dev-options). If **Install via USB** option is present on your Android version, turn it on, too.
-4. Plug the smartphone into a USB port on your PC.
-5. Run the following command with _chip-dir_ replaced with CHIP source directory to install the application:
+2. Enable **USB debugging** on the smartphone.
+   See the [Configure on-device developer options](https://developer.android.com/studio/debug/dev-options) guide on the Android Studio hub for detailed information.
+3. If the **Install via USB** option is supported for your Android version, turn it on.
+4. Plug the smartphone into an USB port on your PC.
+5. Run the following command to install the application, with *chip-dir* replaced with the path to the CHIP source directory:
 
         $ adb install -r chip-dir/src/android/CHIPTool/app/build/outputs/apk/debug/app-debug.apk
 
-6. Navigate to Android Settings and grant __Camera__ and __Location__ permissions to CHIPTool.
+6. Navigate to settings on your smartphone and grant **Camera** and **Location** permissions to CHIPTool.
 
-## Commissioning
+CHIPTool is now ready to be used for commissioning.
 
-To prepare the accessory device for commissioning:
+## Preparing accessory device
 
-1. Attach to the device [CLI](nrfconnect_examples_cli.md) to get access to application logs.
-2. Hold **Button 1** for more than 6s to trigger factory reset of the device.
-3. Find a message similar to the one below in application logs:
+To prepare the accessory device for commissioning, complete the following steps:
+
+1. Use a terminal emulator to connect to the UART console of the accessory device.
+   For details, see the [Using CLI in nRF Connect SDK examples](nrfconnect_examples_cli.md) guide.
+   This will grant you access to the application logs.
+2. Hold **Button 1** on the accessory device for more than 6 s to trigger the factory reset of the device.
+3. Find a message similar to the following one in the application logs:
 
         I: 666[SVR] Copy/paste the below URL in a browser to see the QR Code:
                 https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3AI34DV%2A-00%200C9SS0
-4. Open the URL in a web browser to have onboarding QR code generated.
+
+4. Open the URL in a web browser to have the commissioning QR code generated.
 5. Push **Button 4** on the device to start Bluetooth LE advertising.
 
-To commission the accessory device onto the Thread network created in [Forming a Thread network](#Forming-a-Thread-network) section:
+## Commissioning accessory device
+
+To commission the accessory device onto the Thread network created in the [Forming Thread network](#Forming-a-Thread-network) section, complete the following steps:
 
 1. Enable **Bluetooth** and **Location** services on your smartphone.
-2. Connect the smartphone to the Wi-Fi Hotspot created in [Configuring a Wi-Fi hotspot](#Configuring-a-Wi-Fi-hotspot) section.
-3. Open CHIPTool application.
-4. Tap **SCAN QR CODE** button and scan the onboarding QR code.
-5. Tap **Rendezvous over BLE** button to initiate the commissioning procedure. You should see a few pop-up messages appearing as the commissioning progresses. A message "Secure channel established. Provisioning" indicates that a secure channel has been established successfully and Thread provisioning data has been sent to the accessory device.
+2. Connect the smartphone to the Wi-Fi Hotspot created in the [Configuring Wi-Fi hotspot](#Configuring-a-Wi-Fi-hotspot) section.
+3. Open the CHIPTool application on your smartphone.
+4. Tap the **SCAN QR CODE** button and scan the commissioning QR code.
+5. Tap the **Rendezvous over BLE** button to initiate the commissioning procedure.
+
+You will see a few pop-up messages appear as the commissioning progresses.
+The message "Secure channel established. Provisioning" indicates that a secure channel
+has been established successfully and Thread provisioning data has been sent to the accessory device.
 
 ## Sending CHIP commands
 
+Once the device is commissioned, check the connection with the following commands:
+
 1. Go back to the main application screen.
-2. Tap **LIGHT ON/OFF CLUSTER** button.
-3. Verify that the textbox on the next screen is filled in with IPv6 address of the accessory device.
-4. Tap **ON** or **OFF** button to lock or unlock the door. Observe that the second LED on the device gets turned on and off as state of the lock changes.
+2. Tap the **LIGHT ON/OFF CLUSTER** button.
+3. Verify that the text box on the next screen contains the IPv6 address of the accessory device.
+4. Tap either the **ON** or the **OFF** button to lock or unlock the door, respectively.
+   The **LED 2** on the device turns on or off based on the changes of the lock state.

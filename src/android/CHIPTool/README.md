@@ -1,8 +1,8 @@
 # Android CHIPTool
 
-This directory contains an Android Studio project for CHIPTool, an Android application for commissioning and controlling CHIP accessories.
+This directory contains the Android Studio project for CHIPTool, an Android application for commissioning and controlling CHIP accessories.
 
-CHIPTool features: 
+CHIPTool offers the following features:
 - Scan a CHIP QR code and display payload information to the user
 - Read the NFC tag containing CHIP onboarding information
 - Commission a CHIP device
@@ -12,14 +12,16 @@ CHIPTool features:
 > :warning: Connection to the CHIP device's soft AP will be a manual step until
 > pairing is implemented.
 
-## Steps to build Android CHIPTool
+## Requirements for building
 
-Pre-conditions: Have Android SDK 21 & NDK downloaded to your machine. Set the
-\$ANDROID_HOME environment variable to where the SDK is downloaded and the
-\$ANDROID_NDK_HOME environment variable to point to the NDK package is
+You need Android SDK 21 & NDK downloaded to your machine. Set the
+`\$ANDROID_HOME` environment variable to where the SDK is downloaded and the
+`\$ANDROID_NDK_HOME` environment variable to point to where the NDK package is
 downloaded.
 
-ABIs and corresponding values for `TARGET_CPU`
+## ABIs and TARGET_CPU
+
+`TARGET_CPU` can have the following ABIs, with the respective value:
 
 | ABI         | TARGET_CPU |
 | ----------- | ---------- |
@@ -28,24 +30,31 @@ ABIs and corresponding values for `TARGET_CPU`
 | x86         | x86        |
 | x86_64      | x64        |
 
-1. Checkout the CHIP repo
+## Building CHIPTool
 
-2. On the command line, `cd` into the top CHIP directory and run:
+Complete the following steps to build CHIPTool:
+
+1. Check out the CHIP repository.
+
+2. In the command line, run the following command from the top CHIP directory:
 
     ```shell
     sudo apt-get install -y swig # "brew install swig" for macOS.
     TARGET_CPU=arm64 ./scripts/examples/android_app.sh
     ```
 
-    See table above for other values of `TARGET_CPU`.
+    See the table above for other values of `TARGET_CPU`.
 
-3. Open the project in Android Studio and run **Sync Project with Gradle Files**
+3. Open the project in Android Studio and run **Sync Project with Gradle Files**.
 
-4. Click **Make Project** to build an Android package. Alternatively, on the command line, run:
+4. Use one of the following options to build an Android package:
 
-    ```shell
-    cd src/android/CHIPTool
-    ./gradlew build
-    ```
+   - Click **Make Project** in Android Studio.
+   - Run the following command in the command line:
 
-    The debug Android package will generated at _./app/build/outputs/apk/debug/app-debug.apk_
+     ```shell
+     cd src/android/CHIPTool
+     ./gradlew build
+     ```
+
+The debug Android package `app-debug.apk` will be generated at `./app/build/outputs/apk/debug/`.
