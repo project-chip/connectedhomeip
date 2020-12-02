@@ -887,7 +887,7 @@ void emberAfMarkBuffersCallback(void)
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
+bool emberAfMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
                                 uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
     return false;
