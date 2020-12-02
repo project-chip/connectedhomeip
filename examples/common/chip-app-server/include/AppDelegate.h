@@ -15,20 +15,18 @@
  *    limitations under the License.
  */
 
+/**
+ * @file
+ *   This file defines the API for application specific callbacks.
+ */
+
 #pragma once
 
-#include <platform/CHIPDeviceLayer.h>
-#include <transport/RendezvousSession.h>
-
-class RendezvousDeviceDelegate : public chip::RendezvousSessionDelegate
+class AppDelegate
 {
 public:
-    RendezvousDeviceDelegate();
-
-    //////////// RendezvousSession callback Implementation ///////////////
-    void OnRendezvousComplete() override;
-    void OnRendezvousStatusUpdate(RendezvousSessionDelegate::Status status, CHIP_ERROR err) override;
-
-private:
-    chip::RendezvousSession * mRendezvousSession;
+    virtual ~AppDelegate() {}
+    virtual void OnReceiveError(){};
+    virtual void OnRendezvousStarted(){};
+    virtual void OnRendezvousStopped(){};
 };
