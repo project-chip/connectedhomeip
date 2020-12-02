@@ -151,6 +151,25 @@ class BLEManagerImpl final : public BLEManager,
         uint16_t Allocated : 1;
         uint16_t Subscribed : 1;
         uint16_t Unused : 4;
+
+        void Set(uint16_t conId)
+        {
+            PendingIndBuf = nullptr;
+            ConId         = conId;
+            MTU           = 0;
+            Allocated     = 1;
+            Subscribed    = 0;
+            Unused        = 0;
+        }
+        void Reset()
+        {
+            PendingIndBuf = nullptr;
+            ConId         = BLE_CONNECTION_UNINITIALIZED;
+            MTU           = 0;
+            Allocated     = 0;
+            Subscribed    = 0;
+            Unused        = 0;
+        }
     };
 
     CHIPoBLEConState mCons[kMaxConnections];
