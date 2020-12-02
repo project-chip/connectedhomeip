@@ -38,8 +38,7 @@ __all__ = ["ChipDeviceController"]
 
 
 _CompleteFunct = CFUNCTYPE(None, c_void_p, c_void_p)
-_ErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p,
-                        c_ulong, POINTER(DeviceStatusStruct))
+_ErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p, c_ulong, POINTER(DeviceStatusStruct))
 _GetBleEventFunct = CFUNCTYPE(c_void_p)
 _WriteBleCharacteristicFunct = CFUNCTYPE(
     c_bool, c_void_p, c_void_p, c_void_p, c_void_p, c_uint16
@@ -56,14 +55,11 @@ _CloseBleFunct = CFUNCTYPE(c_bool, c_void_p)
 # typedef void (*OnMessageFunct)(Chip::DeviceController::ChipDeviceController * dc, void * appReqState, PacketBuffer * buffer);
 
 _OnConnectFunct = CFUNCTYPE(None, c_void_p, c_void_p, c_void_p)
-_OnRendezvousErrorFunct = CFUNCTYPE(
-    None, c_void_p, c_void_p, c_uint32, c_void_p)
+_OnRendezvousErrorFunct = CFUNCTYPE(None, c_void_p, c_void_p, c_uint32, c_void_p)
 _OnMessageFunct = CFUNCTYPE(None, c_void_p, c_void_p, c_void_p)
 
 # This is a fix for WEAV-429. Jay Logue recommends revisiting this at a later
 # date to allow for truely multiple instances so this is temporary.
-
-
 def _singleton(cls):
     instance = [None]
 
@@ -82,7 +78,6 @@ class DCState(enum.IntEnum):
     RENDEZVOUS_ONGOING = 3
     RENDEZVOUS_CONNECTED = 4
 
-
 @_singleton
 class ChipDeviceController(object):
     def __init__(self, startNetworkThread=True):
@@ -96,19 +91,16 @@ class ChipDeviceController(object):
         self._InitLib()
 
         devCtrl = c_void_p(None)
-        res = self._dmLib.nl_Chip_DeviceController_NewDeviceController(
-            pointer(devCtrl))
+        res = self._dmLib.nl_Chip_DeviceController_NewDeviceController(pointer(devCtrl))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
         pairingDelegate = c_void_p(None)
-        res = self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate(
-            pointer(pairingDelegate))
+        res = self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate(pointer(pairingDelegate))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
-        res = self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate(
-            devCtrl, pairingDelegate)
+        res = self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate(devCtrl, pairingDelegate)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
@@ -139,8 +131,7 @@ class ChipDeviceController(object):
             elif self.state == DCState.RENDEZVOUS_CONNECTED:
                 print("Disconnected from device")
 
-        self.cbHandleRendezvousError = _OnRendezvousErrorFunct(
-            HandleRendezvousError)
+        self.cbHandleRendezvousError = _OnRendezvousErrorFunct(HandleRendezvousError)
 
         if startNetworkThread:
             self.StartNetworkThread()
@@ -148,8 +139,7 @@ class ChipDeviceController(object):
 
     def __del__(self):
         if self.devCtrl != None:
-            self._dmLib.nl_Chip_DeviceController_DeleteDeviceManager(
-                self.devCtrl)
+            self._dmLib.nl_Chip_DeviceController_DeleteDeviceManager(self.devCtrl)
             self.devCtrl = None
 
     def DriveBleIO(self):
@@ -161,13 +151,11 @@ class ChipDeviceController(object):
     def SetBleEventCB(self, bleEventCB):
         if self.devCtrl != None:
             self.cbHandleBleEvent = _GetBleEventFunct(bleEventCB)
-            self._dmLib.nl_Chip_DeviceController_SetBleEventCB(
-                self.cbHandleBleEvent)
+            self._dmLib.nl_Chip_DeviceController_SetBleEventCB(self.cbHandleBleEvent)
 
     def SetBleWriteCharCB(self, bleWriteCharCB):
         if self.devCtrl != None:
-            self.cbHandleBleWriteChar = _WriteBleCharacteristicFunct(
-                bleWriteCharCB)
+            self.cbHandleBleWriteChar = _WriteBleCharacteristicFunct(bleWriteCharCB)
             self._dmLib.nl_Chip_DeviceController_SetBleWriteCharacteristic(
                 self.cbHandleBleWriteChar
             )
@@ -184,8 +172,7 @@ class ChipDeviceController(object):
     def SetBleCloseCB(self, bleCloseCB):
         if self.devCtrl != None:
             self.cbHandleBleClose = _CloseBleFunct(bleCloseCB)
-            self._dmLib.nl_Chip_DeviceController_SetBleClose(
-                self.cbHandleBleClose)
+            self._dmLib.nl_Chip_DeviceController_SetBleClose(self.cbHandleBleClose)
 
     def StartNetworkThread(self):
         if self.networkThread != None:
@@ -198,16 +185,14 @@ class ChipDeviceController(object):
                 self._ChipStack.networkLock.release()
                 time.sleep(0.005)
 
-        self.networkThread = Thread(
-            target=RunNetworkThread, name="ChipNetworkThread")
+        self.networkThread = Thread(target=RunNetworkThread, name="ChipNetworkThread")
         self.networkThread.daemon = True
         self.networkThreadRunable = True
         self.networkThread.start()
 
     def IsConnected(self):
         return self._ChipStack.Call(
-            lambda: self._dmLib.nl_Chip_DeviceController_IsConnected(
-                self.devCtrl)
+            lambda: self._dmLib.nl_Chip_DeviceController_IsConnected(self.devCtrl)
         )
 
     def ConnectBle(self, bleConnection):
@@ -270,8 +255,7 @@ class ChipDeviceController(object):
         self._ChipStack.blockingCB = blockingCB
 
     def SetWifiCredential(self, ssid, password):
-        ret = self._dmLib.nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(
-            self.pairingDelegate, ssid.encode("utf-8"), password.encode("utf-8"))
+        ret = self._dmLib.nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(self.pairingDelegate, ssid.encode("utf-8"), password.encode("utf-8"))
         if ret != 0:
             raise self._ChipStack.ErrorToException(res)
 
@@ -320,12 +304,10 @@ class ChipDeviceController(object):
                 c_uint32
             )
 
-            self._dmLib.nl_Chip_DeviceController_SetBleClose.argtypes = [
-                _CloseBleFunct]
+            self._dmLib.nl_Chip_DeviceController_SetBleClose.argtypes = [_CloseBleFunct]
             self._dmLib.nl_Chip_DeviceController_SetBleClose.restype = c_uint32
 
-            self._dmLib.nl_Chip_DeviceController_IsConnected.argtypes = [
-                c_void_p]
+            self._dmLib.nl_Chip_DeviceController_IsConnected.argtypes = [c_void_p]
             self._dmLib.nl_Chip_DeviceController_IsConnected.restype = c_bool
 
             self._dmLib.nl_Chip_DeviceController_ValidateBTP.argtypes = [
@@ -339,8 +321,7 @@ class ChipDeviceController(object):
             self._dmLib.nl_Chip_DeviceController_GetLogFilter.argtypes = []
             self._dmLib.nl_Chip_DeviceController_GetLogFilter.restype = c_uint8
 
-            self._dmLib.nl_Chip_DeviceController_SetLogFilter.argtypes = [
-                c_uint8]
+            self._dmLib.nl_Chip_DeviceController_SetLogFilter.argtypes = [c_uint8]
             self._dmLib.nl_Chip_DeviceController_SetLogFilter.restype = None
 
             self._dmLib.nl_Chip_DeviceController_Connect.argtypes = [
@@ -351,14 +332,11 @@ class ChipDeviceController(object):
                 c_void_p, c_char_p, c_uint32, _OnConnectFunct, _OnMessageFunct, _OnRendezvousErrorFunct]
             self._dmLib.nl_Chip_DeviceController_ConnectIP.restype = c_uint32
 
-            self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate.argtypes = [
-                POINTER(c_void_p)]
+            self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate.argtypes = [POINTER(c_void_p)]
             self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate.restype = c_uint32
 
-            self._dmLib.nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential.argtypes = [
-                c_void_p, c_char_p, c_char_p]
+            self._dmLib.nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential.argtypes = [c_void_p, c_char_p, c_char_p]
             self._dmLib.nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential.restype = c_uint32
 
-            self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate.argtypes = [
-                c_void_p, c_void_p]
+            self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate.argtypes = [c_void_p, c_void_p]
             self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate.restype = c_uint32
