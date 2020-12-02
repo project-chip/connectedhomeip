@@ -64,44 +64,44 @@ namespace {
 
 using namespace chip;
 
-void TestFreeNull(nlTestSuite * inSuite, void * inContext)
+void TestReleaseNull(nlTestSuite * inSuite, void * inContext)
 {
     constexpr const size_t size = 10;
     BitMapObjectPool<uint32_t, size> pool;
-    pool.Delete(nullptr);
+    pool.ReleaseObject(nullptr);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == 0);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == 0);
 }
 
-void TestNewFree(nlTestSuite * inSuite, void * inContext)
+void TestCreateReleaseObject(nlTestSuite * inSuite, void * inContext)
 {
     constexpr const size_t size = 100;
     BitMapObjectPool<uint32_t, size> pool;
     uint32_t * obj[size];
     for (size_t i = 0; i < pool.Size(); ++i)
     {
-        obj[i] = pool.New();
+        obj[i] = pool.CreateObject();
         NL_TEST_ASSERT(inSuite, obj[i] != nullptr);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == i + 1);
         NL_TEST_ASSERT(inSuite, pool.Allocated() == i + 1);
     }
 
-    uint32_t * fail = pool.New();
+    uint32_t * fail = pool.CreateObject();
     NL_TEST_ASSERT(inSuite, fail == nullptr);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == size);
     NL_TEST_ASSERT(inSuite, pool.Exhausted());
 
-    pool.Delete(obj[55]);
+    pool.ReleaseObject(obj[55]);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size - 1);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == size - 1);
     NL_TEST_ASSERT(inSuite, !pool.Exhausted());
-    NL_TEST_ASSERT(inSuite, obj[55] == pool.New());
+    NL_TEST_ASSERT(inSuite, obj[55] == pool.CreateObject());
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == size);
     NL_TEST_ASSERT(inSuite, pool.Exhausted());
 
-    fail = pool.New();
+    fail = pool.CreateObject();
     NL_TEST_ASSERT(inSuite, fail == nullptr);
     NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size);
     NL_TEST_ASSERT(inSuite, pool.Allocated() == size);
@@ -109,13 +109,13 @@ void TestNewFree(nlTestSuite * inSuite, void * inContext)
 
     for (size_t i = 0; i < pool.Size(); ++i)
     {
-        pool.Delete(obj[i]);
+        pool.ReleaseObject(obj[i]);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size - i - 1);
         NL_TEST_ASSERT(inSuite, pool.Allocated() == size - i - 1);
     }
 }
 
-void TestNewFreeStruct(nlTestSuite * inSuite, void * inContext)
+void TestCreateReleaseStruct(nlTestSuite * inSuite, void * inContext)
 {
     struct S
     {
@@ -131,14 +131,14 @@ void TestNewFreeStruct(nlTestSuite * inSuite, void * inContext)
     S * objs2[size];
     for (size_t i = 0; i < pool.Size(); ++i)
     {
-        objs2[i] = pool.New(objs1);
+        objs2[i] = pool.CreateObject(objs1);
         NL_TEST_ASSERT(inSuite, objs2[i] != nullptr);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == i + 1);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == objs1.size());
     }
     for (size_t i = 0; i < pool.Size(); ++i)
     {
-        pool.Delete(objs2[i]);
+        pool.ReleaseObject(objs2[i]);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == size - i - 1);
         NL_TEST_ASSERT(inSuite, GetNumObjectsInUse(pool) == objs1.size());
     }
@@ -160,8 +160,8 @@ int Teardown(void * inContext)
 /**
  *   Test Suite. It lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF_FN(TestFreeNull), NL_TEST_DEF_FN(TestNewFree), NL_TEST_DEF_FN(TestNewFreeStruct),
-                                 NL_TEST_SENTINEL() };
+static const nlTest sTests[] = { NL_TEST_DEF_FN(TestReleaseNull), NL_TEST_DEF_FN(TestCreateReleaseObject),
+                                 NL_TEST_DEF_FN(TestCreateReleaseStruct), NL_TEST_SENTINEL() };
 
 extern "C" int TestPool()
 {

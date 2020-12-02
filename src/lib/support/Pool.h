@@ -1,5 +1,6 @@
 /*
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2013 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -36,9 +37,9 @@ class StaticAllocatorBase
 public:
     StaticAllocatorBase(size_t capacity) : mAllocated(0), mCapacity(capacity) {}
 
-    size_t Capacity(void) const { return mCapacity; }
-    size_t Allocated(void) const { return mAllocated; }
-    bool Exhausted(void) const { return mAllocated == mCapacity; }
+    size_t Capacity() const { return mCapacity; }
+    size_t Allocated() const { return mAllocated; }
+    bool Exhausted() const { return mAllocated == mCapacity; }
 
 protected:
     size_t mAllocated;
@@ -59,7 +60,7 @@ protected:
 
 public:
     StaticAllocatorBitmap(void * storage, std::atomic<tBitChunkType> * usage, size_t capacity, size_t elementSize);
-    void * Allocate(void);
+    void * Allocate();
     void Deallocate(void * element);
 
     // Test-only function declaration
@@ -68,9 +69,10 @@ public:
 
 private:
     void * At(size_t index) { return static_cast<uint8_t *>(mElements) + mElementSize * index; }
-    size_t IndexOf(void * element) {
+    size_t IndexOf(void * element)
+    {
         std::ptrdiff_t diff = static_cast<uint8_t *>(element) - static_cast<uint8_t *>(mElements);
-        assert(diff > 0);
+        assert(diff >= 0);
         assert(static_cast<size_t>(diff) % mElementSize == 0);
         auto index = static_cast<size_t>(diff) / mElementSize;
         assert(index < Capacity());
@@ -99,7 +101,7 @@ public:
     static size_t Size() { return N; }
 
     template <typename... Args>
-    T * New(Args &&... args)
+    T * CreateObject(Args &&... args)
     {
         T * element = reinterpret_cast<T *>(Allocate());
         if (element != nullptr)
@@ -108,7 +110,7 @@ public:
             return nullptr;
     }
 
-    void Delete(T * element)
+    void ReleaseObject(T * element)
     {
         if (element == nullptr)
             return;

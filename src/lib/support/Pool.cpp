@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2013 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -30,7 +32,7 @@ StaticAllocatorBitmap::StaticAllocatorBitmap(void * storage, std::atomic<tBitChu
     }
 }
 
-void * StaticAllocatorBitmap::Allocate(void)
+void * StaticAllocatorBitmap::Allocate()
 {
     for (size_t word = 0; word * kBitChunkSize < Capacity(); ++word)
     {
