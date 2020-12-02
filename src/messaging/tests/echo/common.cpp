@@ -28,7 +28,7 @@
 #include <support/ErrorStr.h>
 
 // The ExchangeManager global object.
-ExchangeManager gExchangeManager;
+Messaging::ExchangeManager gExchangeManager;
 
 void InitializeChip(void)
 {

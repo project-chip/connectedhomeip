@@ -77,49 +77,31 @@ bool EchoIntervalExpired(void)
     return (Now() >= gLastEchoTime + gEchoInterval);
 }
 
-System::PacketBuffer * FormulateEchoRequestBuffer()
+CHIP_ERROR SendEchoRequest(void)
 {
-    System::PacketBufferHandle buffer = System::PacketBuffer::New();
+    CHIP_ERROR err                        = CHIP_NO_ERROR;
+    System::PacketBufferHandle payloadBuf = System::PacketBuffer::New();
 
-    if (buffer.IsNull())
+    if (payloadBuf.IsNull())
     {
         printf("Unable to allocate PacketBuffer\n");
-        return nullptr;
+        return CHIP_ERROR_NO_MEMORY;
     }
     else
     {
         // Add some application payload data in the buffer.
-        char * p    = reinterpret_cast<char *>(buffer->Start());
+        char * p    = reinterpret_cast<char *>(payloadBuf->Start());
         int32_t len = snprintf(p, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, "Echo Message %" PRIu64 "\n", gEchoCount);
 
         // Set the datalength in the buffer appropriately.
-        buffer->SetDataLength((uint16_t) len);
-
-        return buffer.Release_ForNow();
+        payloadBuf->SetDataLength((uint16_t) len);
     }
-}
-
-CHIP_ERROR SendEchoRequest(void)
-{
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
-    System::PacketBuffer * payloadBuf = NULL;
 
     gLastEchoTime = Now();
 
-    payloadBuf = FormulateEchoRequestBuffer();
-    if (payloadBuf == NULL)
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
-
     printf("\nSend echo request message to Node: %lu\n", kServerDeviceId);
 
-    err = gEchoClient.SendEchoRequest(kServerDeviceId, payloadBuf);
-
-    // Set the local buffer to NULL after passing it down to
-    // the lower layers who are now responsible for freeing
-    // the buffer.
-    payloadBuf = NULL;
+    err = gEchoClient.SendEchoRequest(kServerDeviceId, std::move(payloadBuf));
 
     if (err == CHIP_NO_ERROR)
     {
@@ -161,7 +143,7 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(NodeId nodeId, System::PacketBuffer * payload)
+void HandleEchoResponseReceived(NodeId nodeId, System::PacketBufferHandle payload)
 {
     uint32_t respTime    = Now();
     uint32_t transitTime = respTime - gLastEchoTime;
