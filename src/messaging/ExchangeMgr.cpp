@@ -67,6 +67,8 @@ ExchangeManager::ExchangeManager()
 
 CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 {
+    ExchangeContext * ec = mContextPool;
+
     if (mState != State::kState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
 
@@ -74,7 +76,9 @@ CHIP_ERROR ExchangeManager::Init(SecureSessionMgr * sessionMgr)
 
     mNextExchangeId = GetRandU16();
 
-    memset((void *) mContextPool, 0, sizeof(mContextPool));
+    for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
+        ec = nullptr;
+
     mContextsInUse = 0;
 
     memset(UMHandlerPool, 0, sizeof(UMHandlerPool));
@@ -174,24 +178,16 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
     ExchangeContext * ec                    = nullptr;
-    uint16_t protocolId                     = 0;
-    uint8_t messageType                     = 0;
+    const uint16_t protocolId               = payloadHeader.GetProtocolID();
+    const uint8_t messageType               = payloadHeader.GetMessageType();
     bool sendAckAndCloseExchange            = false;
-
-    protocolId  = payloadHeader.GetProtocolID();
-    messageType = payloadHeader.GetMessageType();
 
     // Received Delayed Delivery Message: Extend time for pending retrans objects
     if (protocolId == Protocols::kProtocol_Protocol_Common && messageType == Protocols::Common::kMsgType_RMP_Delayed_Delivery)
     {
-        const uint8_t * p        = nullptr;
-        uint32_t PauseTimeMillis = 0;
-        uint64_t DelayedNodeId   = 0;
-
-        p = msgBuf->Start();
-
-        PauseTimeMillis = LittleEndian::Read32(p);
-        DelayedNodeId   = LittleEndian::Read64(p);
+        const uint8_t * p              = msgBuf->Start();
+        const uint32_t PauseTimeMillis = LittleEndian::Read32(p);
+        const uint64_t DelayedNodeId   = LittleEndian::Read64(p);
 
         mReliableMessageMgr.ProcessDelayedDeliveryMessage(PauseTimeMillis, DelayedNodeId);
 
@@ -247,12 +243,9 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     }
     // Discard the message if it isn't marked as being sent by an initiator and the message does not needs to send
     // ack to the peer.
-    else
+    else if (!payloadHeader.IsAckMsg())
     {
-        if (!payloadHeader.IsAckMsg())
-        {
-            ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
-        }
+        ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
     }
 
     // Create new exchange to send ack for a duplicate message and then close this exchange.

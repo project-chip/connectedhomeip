@@ -198,7 +198,7 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
 
 uint64_t ReliableMessageContext::GetPeerNodeId()
 {
-    return (mExchange ? mExchange->GetPeerNodeId() : 0);
+    return (mExchange ? mExchange->GetPeerNodeId() : kUndefinedNodeId);
 }
 
 /**

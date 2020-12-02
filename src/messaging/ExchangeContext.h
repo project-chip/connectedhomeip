@@ -187,10 +187,7 @@ public:
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    ReliableMessageContext * GetReliableMessageContext() const
-    {
-        return const_cast<ReliableMessageContext *>(&mReliableMessageContext);
-    };
+    ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
 
     uint64_t GetPeerNodeId() const { return mPeerNodeId; }
 

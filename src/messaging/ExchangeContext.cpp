@@ -149,15 +149,13 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
         err = mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(&mReliableMessageContext, payloadHeader, mPeerNodeId,
                                                                        msgBuf.Release_ForNow(), &entry);
         SuccessOrExit(err);
-        msgBuf = nullptr;
 
         err = mExchangeMgr->GetReliableMessageMgr()->SendFromRetransTable(entry, false);
         SuccessOrExit(err);
     }
     else
     {
-        err    = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, std::move(msgBuf));
-        msgBuf = nullptr;
+        err = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, std::move(msgBuf));
         SuccessOrExit(err);
     }
 
@@ -197,10 +195,10 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     }
     mDelegate = nullptr;
 
-    // Flush any pending RMP acks
+    // Flush any pending CRMP acks
     mReliableMessageContext.FlushAcks();
 
-    // Clear the RMP retransmission table
+    // Clear the CRMP retransmission table
     if (clearRetransTable)
     {
         mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(&mReliableMessageContext);
