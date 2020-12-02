@@ -155,7 +155,7 @@ public:
      * @param[in] peerDevice    Device ID of the peer device
      * @return CHIP_ERROR   The return status
      */
-    CHIP_ERROR SendMessage(void * appReqState, System::PacketBuffer * buffer, NodeId peerDevice = kUndefinedNodeId);
+    CHIP_ERROR SendMessage(void * appReqState, System::PacketBufferHandle buffer, NodeId peerDevice = kUndefinedNodeId);
 
     // ----- IO -----
     /**

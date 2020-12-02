@@ -29,6 +29,8 @@ chip_test_suite("tests") {
     "TestQRCodeTLV.h",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/setup_payload",
     "${nlunit_test_root}:nlunit-test",

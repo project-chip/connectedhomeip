@@ -78,9 +78,9 @@ inline string toBinaryRepresentation(string base41Result)
 
     // Convert it to binary
     string binaryResult;
-    for (int i = buffer.size() - 1; i >= 0; i--)
+    for (size_t i = buffer.size(); i > 0; i--)
     {
-        binaryResult += bitset<8>(buffer[i]).to_string();
+        binaryResult += bitset<8>(buffer[i - 1]).to_string();
     }
 
     // Insert spaces after each block

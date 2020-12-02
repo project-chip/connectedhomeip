@@ -212,7 +212,7 @@ expensive to build everything for every edit. To save time, you can name the
 configuration to build:
 
 ```
-ninja -C out/unified all_host_gcc
+ninja -C out/unified host_gcc
 ninja -C out/unified check_host_gcc
 ```
 

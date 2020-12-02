@@ -81,7 +81,7 @@ CHIP_ERROR NetworkCommand::RunCommandInternal(ChipDevice * device)
     PrintBuffer(buffer);
 #endif
 
-    err = device->SendMessage(buffer.Release_ForNow());
+    err = device->SendMessage(std::move(buffer));
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
 
 exit:

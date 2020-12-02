@@ -87,7 +87,7 @@ public:
     CHIP_ERROR SendNetworkCredentials(const char * ssid, const char * passwd);
     CHIP_ERROR SendThreadCredentials(const DeviceLayer::Internal::DeviceNetworkInfo & threadData);
 
-    CHIP_ERROR HandleNetworkProvisioningMessage(uint8_t msgType, System::PacketBuffer * msgBuf);
+    CHIP_ERROR HandleNetworkProvisioningMessage(uint8_t msgType, const System::PacketBufferHandle & msgBuf);
 
     /**
      * @brief
@@ -116,7 +116,7 @@ private:
     CHIP_ERROR EncodeString(const char * str, BufBound & bbuf);
     CHIP_ERROR DecodeString(const uint8_t * input, size_t input_len, BufBound & bbuf, size_t & consumed);
 
-    CHIP_ERROR DecodeThreadAssociationRequest(System::PacketBuffer * msgBuf);
+    CHIP_ERROR DecodeThreadAssociationRequest(const System::PacketBufferHandle & msgBuf);
 
 #if CONFIG_DEVICE_LAYER
     static void ConnectivityHandler(const DeviceLayer::ChipDeviceEvent * event, intptr_t arg);

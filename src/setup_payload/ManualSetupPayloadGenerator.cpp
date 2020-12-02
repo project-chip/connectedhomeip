@@ -24,6 +24,7 @@
 #include "ManualSetupPayloadGenerator.h"
 
 #include <inttypes.h>
+#include <limits>
 
 #include <support/logging/CHIPLogging.h>
 #include <support/verhoeff/Verhoeff.h>
@@ -32,11 +33,15 @@ using namespace chip;
 
 static uint32_t shortPayloadRepresentation(const SetupPayload & payload)
 {
-    int offset      = 1;
-    uint32_t result = payload.requiresCustomFlow ? 1 : 0;
-    result |= (payload.discriminator & kManualSetupDiscriminatorFieldBitMask) << offset;
-    offset += kManualSetupDiscriminatorFieldLengthInBits;
-    result |= payload.setUpPINCode << offset;
+    constexpr int discriminatorOffset = kCustomFlowRequiredFieldLengthInBits;
+    constexpr int pinCodeOffset       = discriminatorOffset + kManualSetupDiscriminatorFieldLengthInBits;
+    uint32_t result                   = payload.requiresCustomFlow ? 1 : 0;
+
+    static_assert(kManualSetupDiscriminatorFieldBitMask <= UINT32_MAX >> discriminatorOffset, "Discriminator won't fit");
+    result |= static_cast<uint32_t>((payload.discriminator & kManualSetupDiscriminatorFieldBitMask) << discriminatorOffset);
+
+    static_assert(pinCodeOffset + kSetupPINCodeFieldLengthInBits <= std::numeric_limits<uint32_t>::digits, "PIN code won't fit");
+    result |= static_cast<uint32_t>(payload.setUpPINCode << pinCodeOffset);
     return result;
 }
 
