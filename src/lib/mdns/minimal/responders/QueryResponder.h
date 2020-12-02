@@ -189,9 +189,9 @@ public:
     /// Return valid QueryResponderSettings on add success.
     QueryResponderSettings AddResponder(Responder * responder);
 
-    /// Implementation of the responder delegate
+    /// Implementation of the responder delegate.
     ///
-    /// adds responses for all known _dns-sd services
+    /// Adds responses for all known _dns-sd services.
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
 
     QueryResponderIterator begin() { return QueryResponderIterator(false, mResponderInfos, mResponderInfoSize); }
