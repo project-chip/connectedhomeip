@@ -47,6 +47,8 @@
 #define THREAD_ACTIVE_POLLING_INTERVAL_MS 100
 #define THREAD_INACTIVE_POLLING_INTERVAL_MS 1000
 
-#define K32W_LOG(...) k32wLog(__VA_ARGS__);
-
-void k32wLog(const char * aFormat, ...);
+#if K32W_LOG_ENABLED
+ #define K32W_LOG(...) otPlatLog(OT_LOG_LEVEL_NONE, OT_LOG_REGION_API, ##__VA_ARGS__);
+#else
+ #define K32W_LOG(...)
+#endif

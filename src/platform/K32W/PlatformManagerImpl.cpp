@@ -25,15 +25,31 @@
 /* this file behaves like a config.h, comes first */
 #include <platform/internal/CHIPDeviceLayerInternal.h>
 
+#include <crypto/CHIPCryptoPAL.h>
 #include <platform/PlatformManager.h>
 #include <platform/internal/GenericPlatformManagerImpl_FreeRTOS.cpp>
 
 #include <lwip/tcpip.h>
 
+#include <openthread/platform/entropy.h>
+
 namespace chip {
 namespace DeviceLayer {
 
 PlatformManagerImpl PlatformManagerImpl::sInstance;
+
+static int app_entropy_source(void * data, unsigned char * output, size_t len, size_t * olen)
+{
+    otError otErr = otPlatEntropyGet(output, (uint16_t) len);
+
+    if (otErr != OT_ERROR_NONE)
+    {
+        return -1;
+	}
+
+    *olen = len;
+    return 0;
+}
 
 CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
 {
@@ -49,6 +65,9 @@ CHIP_ERROR PlatformManagerImpl::_InitChipStack(void)
     // Call _InitChipStack() on the generic implementation base class
     // to finish the initialization process.
     err = Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>::_InitChipStack();
+    SuccessOrExit(err);
+
+    err = chip::Crypto::add_entropy_source(app_entropy_source, NULL, 16);
     SuccessOrExit(err);
 
 exit:

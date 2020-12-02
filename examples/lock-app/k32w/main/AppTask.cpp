@@ -16,17 +16,22 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
 #include "AppTask.h"
 #include "AppEvent.h"
-#include "LEDWidget.h"
 #include "Server.h"
 #include "support/ErrorStr.h"
 
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include "QRCodeUtil.h"
+
+#include "attribute-storage.h"
+#include "gen/attribute-id.h"
+#include "gen/attribute-type.h"
+#include "gen/cluster-id.h"
 
 #include "Keyboard.h"
+#include "LEDWidget.h"
 #include "LED.h"
 #include "TimersManager.h"
 #include "app_config.h"
@@ -79,6 +84,9 @@ int AppTask::Init()
 
     // Init ZCL Data Model and start server
     InitServer();
+
+    // QR code will be used with CHIP Tool
+    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
 
     TMR_Init();
 
@@ -337,14 +345,6 @@ void AppTask::ResetActionEventHandler(AppEvent * aEvent)
             return;
         }
 
-        /*
-        if (SoftwareUpdateMgr().IsInProgress())
-        {
-            K32W_LOG("Canceling In Progress Software Update");
-            SoftwareUpdateMgr().Abort();
-            K32W_LOG("OTA processs was cancelled!");
-        }
-        */
         K32W_LOG("Factory Reset Triggered. Push the RESET button within %u ms to cancel!", resetTimeout);
         sAppTask.mFunction = kFunction_FactoryReset;
 
@@ -563,5 +563,18 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
     else
     {
         K32W_LOG("Event received with no handler. Dropping event.");
+    }
+}
+
+void AppTask::UpdateClusterState(void)
+{
+    uint8_t newValue = !BoltLockMgr().IsUnlocked();
+
+    // write the new on/off value
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER,
+                                                 (uint8_t *) &newValue, ZCL_BOOLEAN_ATTRIBUTE_TYPE);
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        ChipLogError(NotSpecified, "ERR: updating on/off %x", status);
     }
 }

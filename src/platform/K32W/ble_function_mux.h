@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
- *    Copyright (c) 2020 Google LLC.
+ *    Copyright (c) 2020 Nest Labs, Inc.
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,18 +19,15 @@
 
 /**
  *    @file
- *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on K32W platforms using the NXP SDK.
- *
+ *          Provides an implementation for BLE Host NVM functions
  */
 
-#pragma once
+#ifndef BLE_FUNCTION_MUX_H
+#define BLE_FUNCTION_MUX_H
 
-// ==================== Platform Adaptations ====================
+typedef enum{
+    kBleFuncMux_AppMode_None,
+    kBleFuncMux_AppMode_Ota
+} ble_func_mux_app_mode_t;
 
-#define BLE_CONNECTION_OBJECT uint8_t
-#define BLE_CONNECTION_UNINITIALIZED ((uint8_t) 0xFF)
-
-// ========== Platform-specific Configuration Overrides =========
-
-/* none so far */
+#endif

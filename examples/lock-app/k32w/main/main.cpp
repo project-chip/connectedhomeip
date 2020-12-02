@@ -31,31 +31,28 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <platform/ThreadStackManager.h>
 #include <support/logging/CHIPLogging.h>
+#include <support/CHIPMem.h>
 
-#include "FreeRtosMbedtlsMutex.h"
+#include "FreeRtosMbedtlsUtils.h"
 #include "app_config.h"
+
+#include "radio.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::DeviceLayer;
 using namespace ::chip::Logging;
 
-extern "C" void * pvPortCalloc(size_t num, size_t size);
+extern "C" void * pvPortCallocRtos(size_t num, size_t size);
 
 #include <AppTask.h>
-
-void k32wLog(const char * aFormat, ...)
-{
-    va_list args;
-
-    va_start(args, aFormat);
-    otPlatLog(OT_LOG_LEVEL_NONE, OT_LOG_REGION_API, aFormat, args);
-    va_end(args);
-}
 
 typedef void (*InitFunc)(void);
 extern InitFunc __init_array_start;
 extern InitFunc __init_array_end;
+
+/* needed for FreeRtos Heap 4 */
+uint8_t __attribute__((section (".heap"))) ucHeap[0xF000];
 
 extern "C" void main_task(void const * argument)
 {
@@ -76,27 +73,30 @@ extern "C" void main_task(void const * argument)
      * during the initialization of the Thread stack */
     otPlatUartEnable();
 
-    k32wLog("Welcome to NXP ELock Demo App");
+    K32W_LOG("Welcome to NXP ELock Demo App");
 
     /* Using OT Heap is deprecated so use instead the FreeRTOS
      * allocation system - which is also thread-safe */
-    otHeapSetCAllocFree(pvPortCalloc, vPortFree);
+    otHeapSetCAllocFree(pvPortCallocRtos, vPortFree);
 
     /* Mbedtls Threading support is needed because both
      * Thread and Weave tasks are using it */
     freertos_mbedtls_mutex_init();
 
+    // Init Chip memory management before the stack
+    chip::Platform::MemoryInit();
+
     ret = PlatformMgr().InitChipStack();
     if (ret != CHIP_NO_ERROR)
     {
-        k32wLog("Error during PlatformMgr().InitWeaveStack()");
+        K32W_LOG("Error during PlatformMgr().InitWeaveStack()");
         goto exit;
     }
 
     ret = ThreadStackMgr().InitThreadStack();
     if (ret != CHIP_NO_ERROR)
     {
-        k32wLog("Error during ThreadStackMgr().InitThreadStack()");
+        K32W_LOG("Error during ThreadStackMgr().InitThreadStack()");
         goto exit;
     }
 
@@ -116,7 +116,7 @@ extern "C" void main_task(void const * argument)
         ret = ConnectivityMgr().SetThreadPollingConfig(pollingConfig);
         if (ret != CHIP_NO_ERROR)
         {
-            k32wLog("Error during ConnectivityMgr().SetThreadPollingConfig(pollingConfig)");
+            K32W_LOG("Error during ConnectivityMgr().SetThreadPollingConfig(pollingConfig)");
             goto exit;
         }
     }
@@ -124,7 +124,7 @@ extern "C" void main_task(void const * argument)
     ret = PlatformMgr().StartEventLoopTask();
     if (ret != CHIP_NO_ERROR)
     {
-        k32wLog("Error during PlatformMgr().StartEventLoopTask();");
+        K32W_LOG("Error during PlatformMgr().StartEventLoopTask();");
         goto exit;
     }
 
@@ -132,14 +132,14 @@ extern "C" void main_task(void const * argument)
     ret = ThreadStackMgrImpl().StartThreadTask();
     if (ret != CHIP_NO_ERROR)
     {
-        k32wLog("Error during ThreadStackMgrImpl().StartThreadTask()");
+        K32W_LOG("Error during ThreadStackMgrImpl().StartThreadTask()");
         goto exit;
     }
 
     ret = GetAppTask().StartAppTask();
     if (ret != CHIP_NO_ERROR)
     {
-        k32wLog("Error during GetAppTask().StartAppTask()");
+        K32W_LOG("Error during GetAppTask().StartAppTask()");
         goto exit;
     }
 

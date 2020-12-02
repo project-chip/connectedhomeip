@@ -27,6 +27,25 @@
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
+#include "Messaging.h"
+
+#include "fsl_os_abstraction.h"
+
+
+#include "gatt_server_interface.h"
+#include "ble_general.h"
+#include "gatt_db_dynamic.h"
+#include "gap_interface.h"
+#include "controller_interface.h"
+#include "ble_controller_task_config.h"
+#include "ble_host_task_config.h"
+#include "ble_host_tasks.h"
+#include "ble_conn_manager.h"
+
+#include "FreeRTOS.h"
+#include "timers.h"
+#include "event_groups.h"
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -36,20 +55,11 @@ using namespace chip::Ble;
 /**
  * Concrete implementation of the NetworkProvisioningServer singleton object for the K32W platforms.
  */
-class BLEManagerImpl final : public BLEManager,
-                             private ::nl::Ble::BleLayer,
-                             private BlePlatformDelegate,
-                             private BleApplicationDelegate
+class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
     friend BLEManager;
-
-public:
-    // ===== Platform-specific members available for use by the application.
-
-    uint8_t GetAdvertisingHandle(void);
-    void SetAdvertisingHandle(uint8_t handle);
 
 private:
     // ===== Members that implement the BLEManager internal interface.
@@ -100,12 +110,12 @@ private:
 
     enum
     {
-        kFlag_AdvertisingEnabled     = 0x0001,
-        kFlag_FastAdvertisingEnabled = 0x0002,
-        kFlag_Advertising            = 0x0004,
-        kFlag_RestartAdvertising     = 0x0008,
-        kFlag_EFRBLEStackInitialized = 0x0010,
-        kFlag_DeviceNameSet          = 0x0020,
+        kFlag_AdvertisingEnabled      = 0x0001,
+        kFlag_FastAdvertisingEnabled  = 0x0002,
+        kFlag_Advertising             = 0x0004,
+        kFlag_RestartAdvertising      = 0x0008,
+        kFlag_K32WBLEStackInitialized = 0x0010,
+        kFlag_DeviceNameSet           = 0x0020,
     };
 
     enum
@@ -114,18 +124,91 @@ private:
         kMaxDeviceNameLength = 16,
         kUnusedIndex         = 0xFF,
     };
-    WoBLEServiceMode mServiceMode;
-    uint16_t mFlags;
+
+    typedef enum
+    {
+        BLE_KW_MSG_ERROR = 0x01,
+        BLE_KW_MSG_CONNECTED,
+        BLE_KW_MSG_DISCONNECTED,
+        BLE_KW_MSG_MTU_CHANGED,
+        BLE_KW_MSG_ATT_WRITTEN,
+        BLE_KW_MSG_ATT_LONG_WRITTEN,
+        BLE_KW_MSG_ATT_READ,
+        BLE_KW_MSG_ATT_CCCD_WRITTEN,
+        BLE_KW_MSG_FORCE_DISCONNECT,
+    } blekw_msg_type_t;
+
+    typedef struct hk_ble_kw_msg_s
+    {
+        blekw_msg_type_t            type;
+        uint16_t                    length;
+        union
+        {
+            uint8_t                 u8;
+            uint16_t                u16;
+            uint32_t                u32;
+            uint8_t                 data[1];
+            char*                   str;
+        }data;
+    } blekw_msg_t;
+
+    typedef enum ble_err_t
+    {
+        BLE_OK = 0,
+		BLE_INTERNAL_GATT_ERROR,
+		BLE_E_SET_ADV_PARAMS,
+		BLE_E_ADV_PARAMS_FAILED,
+		BLE_E_SET_ADV_DATA,
+		BLE_E_ADV_CHANGED,
+		BLE_E_ADV_FAILED,
+		BLE_E_ADV_SETUP_FAILED,
+		BLE_E_START_ADV,
+		BLE_E_STOP,
+		BLE_E_FAIL,
+		BLE_E_START_ADV_FAILED,
+        BLE_INTERNAL_ERROR,
+    } ble_err_t;
+
+    typedef struct ble_att_written_data_s
+    {
+        uint8_t     device_id;
+        uint16_t    handle;
+        uint16_t    length;
+        uint8_t     data[1];
+    } blekw_att_written_data_t;
+
+    typedef struct hk_ble_att_read_data_s
+    {
+        uint8_t     device_id;
+        uint16_t    handle;
+    } blekw_att_read_data_t;
+
+    struct CHIPoBLEConState
+    {
+        uint16_t mtu : 10;
+        uint16_t allocated : 1;
+        uint16_t subscribed : 1;
+        uint16_t unused : 4;
+        uint8_t connectionHandle;
+        uint8_t bondingHandle;
+    };
+    CHIPoBLEConState mBleConnections[kMaxConnections];
+
+    CHIPoBLEServiceMode mServiceMode;
     uint16_t mNumGAPCons;
-    uint16_t mSubscribedConIds[kMaxConnections];
     uint8_t mAdvHandle;
+    char mDeviceName[kMaxDeviceNameLength + 1];
 
     void DriveBLEState(void);
     CHIP_ERROR ConfigureAdvertising(void);
-    CHIP_ERROR EncodeAdvertisingData(ble_gap_adv_data_t & gapAdvData);
     CHIP_ERROR StartAdvertising(void);
     CHIP_ERROR StopAdvertising(void);
     void HandleSoftDeviceBLEEvent(const ChipDeviceEvent * event);
+    void HandleConnectEvent(blekw_msg_t* msg);
+    void HandleConnectionCloseEvent(blekw_msg_t* msg);
+    void HandleWriteEvent(blekw_msg_t* msg);
+    void HandleRXCharWrite(blekw_msg_t* msg);
+    void HandleTXCharCCCDWrite(blekw_msg_t* msg);
     CHIP_ERROR HandleGAPConnect(const ChipDeviceEvent * event);
     CHIP_ERROR HandleGAPDisconnect(const ChipDeviceEvent * event);
     CHIP_ERROR HandleRXCharWrite(const ChipDeviceEvent * event);
@@ -134,9 +217,38 @@ private:
     CHIP_ERROR SetSubscribed(uint16_t conId);
     bool UnsetSubscribed(uint16_t conId);
     bool IsSubscribed(uint16_t conId);
+    CHIP_ERROR ConfigureAdvertisingData(void);
+    BLEManagerImpl::ble_err_t blekw_send_event(int8_t connection_handle, uint16_t handle,
+                                               uint8_t* data, uint32_t len);
+    bool RemoveConnection(uint8_t connectionHandle);
+    void AddConnection(uint8_t connectionHandle);
+    BLEManagerImpl::CHIPoBLEConState *GetConnectionState(uint8_t connectionHandle, bool allocate);
 
     static void DriveBLEState(intptr_t arg);
-    static void SoftDeviceBLEEventCallback(void * context);
+
+    static void BLE_SignalFromISRCallback(void);
+    static void blekw_connection_timeout_cb(TimerHandle_t timer);
+    static CHIP_ERROR blekw_msg_add_u8(blekw_msg_type_t type, uint8_t data);
+    static void blekw_new_data_received_notification(uint32_t mask);
+    static CHIP_ERROR blekw_controller_init(void);
+    static CHIP_ERROR blekw_host_init(void);
+    static void Host_Task(osaTaskParam_t argument);
+    static void blekw_generic_cb(gapGenericEvent_t* pGenericEvent);
+    static void blekw_gatt_server_cb(deviceId_t deviceId, gattServerEvent_t*  pServerEvent);
+    static CHIP_ERROR blekw_msg_add_u16(blekw_msg_type_t type, uint16_t data);
+    static CHIP_ERROR blekw_msg_add_att_written(blekw_msg_type_t type,
+           uint8_t device_id, uint16_t handle, uint8_t* data, uint16_t length);
+    static CHIP_ERROR blekw_msg_add_att_read(blekw_msg_type_t type,
+           uint8_t device_id, uint16_t handle);
+    static BLEManagerImpl::ble_err_t blekw_start_advertising(gapAdvertisingParameters_t* adv_params,
+           gapAdvertisingData_t* adv, gapScanResponseData_t* scnrsp);
+    static BLEManagerImpl::ble_err_t blekw_stop_advertising(void);
+    static void blekw_gap_advertising_cb(gapAdvertisingEvent_t* pAdvertisingEvent);
+    static void blekw_gap_connection_cb(deviceId_t deviceId, gapConnectionEvent_t* pConnectionEvent);
+    static void blekw_start_connection_timeout(void);
+    static void blekw_stop_connection_timeout(void);
+
+    static void bleAppTask(void * p_arg);
 };
 
 /**
@@ -161,7 +273,7 @@ inline BLEManagerImpl & BLEMgrImpl(void)
     return BLEManagerImpl::sInstance;
 }
 
-inline ::nl::Ble::BleLayer * BLEManagerImpl::_GetBleLayer()
+inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
 }
@@ -169,16 +281,6 @@ inline ::nl::Ble::BleLayer * BLEManagerImpl::_GetBleLayer()
 inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
 {
     return mServiceMode;
-}
-
-inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
-{
-    return GetFlag(mFlags, kFlag_AdvertisingEnabled);
-}
-
-inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
-{
-    return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
 }
 
 } // namespace Internal

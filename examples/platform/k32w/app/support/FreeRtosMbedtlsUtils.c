@@ -17,12 +17,15 @@
  *
  */
 
-#include "FreeRtosMbedtlsMutex.h"
+#include "FreeRtosMbedtlsUtils.h"
 
 #include "FreeRTOS.h"
 #include "semphr.h"
 
 #include <assert.h>
+
+#include <stdio.h>
+#include <string.h>
 
 static inline void mutex_init(mbedtls_threading_mutex_t * p_mutex)
 {
@@ -60,4 +63,18 @@ void freertos_mbedtls_mutex_init(void)
 void freertos_mbedtls_mutex_free(void)
 {
     mbedtls_threading_free_alt();
+}
+
+void *pvPortCallocRtos(size_t num, size_t size)
+{
+	size_t totalAllocSize = (size_t)(num * size);
+
+    void *p = pvPortMalloc(totalAllocSize);
+
+    if (p)
+    {
+        memset(p, 0, totalAllocSize);
+    }
+
+    return p;
 }
