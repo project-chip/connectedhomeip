@@ -545,9 +545,9 @@ void CheckDetachTail(nlTestSuite * inSuite, void * inContext)
 
         for (size_t jth = 0; jth < kTestElements; jth++)
         {
-            PacketBuffer * buffer_1          = PrepareTestBuffer(theFirstContext);
-            PacketBuffer * buffer_2          = PrepareTestBuffer(theSecondContext);
-            PacketBuffer * returned          = nullptr;
+            PacketBuffer * buffer_1 = PrepareTestBuffer(theFirstContext);
+            PacketBuffer * buffer_2 = PrepareTestBuffer(theSecondContext);
+            PacketBuffer * returned = nullptr;
             buffer_1->AddRef(); // The test still holds ownership via buffer_1.
             PacketBufferHandle buffer_handle = PacketBufferHandle::Create(buffer_1);
 
