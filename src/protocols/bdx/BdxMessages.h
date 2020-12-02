@@ -71,7 +71,7 @@ struct TransferInit
      *  Parse data from an PacketBuffer into a struct instance.
      *
      *  Note that this struct will store pointers that point into the passed PacketBuffer,
-     *  so it is essential that the PacketBuffer is not modified or freed until after this
+     *  so it is essential that the PacketBuffer is not modified until after this
      *  struct is no longer needed.
      *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data.
@@ -79,7 +79,7 @@ struct TransferInit
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(const System::PacketBuffer & aBuffer);
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer);
 
     /**
      * @brief
@@ -103,16 +103,15 @@ struct TransferInit
     uint64_t MaxLength    = 0; ///< Proposed max length of data in transfer, 0 for indefinite
 
     // File designator (required)
-    // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
-    // It is up to the caller to ensure that the memory pointed to here has not been freed.
     const uint8_t * FileDesignator = nullptr;
     uint16_t FileDesLength         = 0; ///< Length of file designator string (not including null-terminator)
 
     // Additional metadata (optional, TLV format)
-    // WARNING: there is no guarantee at any point that this pointer will point to valid memory.
-    // It is up to the caller to ensure that the memory pointed to here has not been freed.
     const uint8_t * Metadata = nullptr;
     uint16_t MetadataLength  = 0;
+
+    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    System::PacketBufferHandle Buffer;
 };
 
 using SendInit    = TransferInit;
@@ -141,7 +140,7 @@ struct SendAccept
      *  Parse data from an PacketBuffer into a struct instance
      *
      *  Note that this struct will store pointers that point into the passed PacketBuffer,
-     *  so it is essential that the PacketBuffer is not modified or freed until after this
+     *  so it is essential that the PacketBuffer is not modified until after this
      *  struct is no longer needed.
      *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data
@@ -149,7 +148,7 @@ struct SendAccept
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(const System::PacketBuffer & aBuffer);
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer);
 
     /**
      * @brief
@@ -174,6 +173,9 @@ struct SendAccept
     // It is up to the caller to ensure that the memory pointed to here has not been freed.
     uint8_t * Metadata      = nullptr;
     uint16_t MetadataLength = 0;
+
+    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    System::PacketBufferHandle Buffer;
 };
 
 /**
@@ -199,7 +201,7 @@ struct ReceiveAccept
      *  Parse data from an PacketBuffer into a struct instance
      *
      *  Note that this struct will store pointers that point into the passed PacketBuffer,
-     *  so it is essential that the PacketBuffer is not modified or freed until after this
+     *  so it is essential that the PacketBuffer is not modified until after this
      *  struct is no longer needed.
      *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data
@@ -207,7 +209,7 @@ struct ReceiveAccept
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(const System::PacketBuffer & aBuffer);
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer);
 
     /**
      * @brief
@@ -235,6 +237,9 @@ struct ReceiveAccept
     // It is up to the caller to ensure that the memory pointed to here has not been freed.
     uint8_t * Metadata      = nullptr;
     uint16_t MetadataLength = 0;
+
+    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    System::PacketBufferHandle Buffer;
 };
 
 /**
@@ -265,7 +270,7 @@ struct CounterMessage
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(const System::PacketBuffer & aBuffer);
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer);
 
     /**
      * @brief
@@ -280,6 +285,9 @@ struct CounterMessage
     bool operator==(const CounterMessage &) const;
 
     uint32_t BlockCounter = 0;
+
+    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    System::PacketBufferHandle Buffer;
 };
 
 using BlockQuery  = CounterMessage;
@@ -309,7 +317,7 @@ struct DataBlock
      *  Parse data from an PacketBuffer into a struct instance
      *
      *  Note that this struct will store pointers that point into the passed PacketBuffer,
-     *  so it is essential that the PacketBuffer is not modified or freed until after this
+     *  so it is essential that the PacketBuffer is not modified until after this
      *  struct is no longer needed.
      *
      * @param[in] aBuffer Pointer to a PacketBuffer containing the data
@@ -317,7 +325,7 @@ struct DataBlock
      * @return CHIP_ERROR Any error that occurs when trying to read the message
      */
     CHECK_RETURN_VALUE
-    CHIP_ERROR Parse(const System::PacketBuffer & aBuffer);
+    CHIP_ERROR Parse(System::PacketBufferHandle aBuffer);
 
     /**
      * @brief
@@ -337,6 +345,9 @@ struct DataBlock
     // It is up to the caller to ensure that the memory pointed to here has not been freed.
     uint8_t * Data      = nullptr;
     uint16_t DataLength = 0;
+
+    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    System::PacketBufferHandle Buffer;
 };
 
 using Block    = DataBlock;
