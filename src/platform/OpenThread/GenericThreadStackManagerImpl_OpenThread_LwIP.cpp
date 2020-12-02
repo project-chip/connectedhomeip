@@ -178,17 +178,7 @@ void GenericThreadStackManagerImpl_OpenThread_LwIP<ImplClass>::UpdateThreadInter
                 //   - link-local addresses.
                 //   - mesh-local addresses that are NOT RLOC addresses.
                 //   - global unicast addresses.
-                //
-                // This logic purposefully leaves out CHIP fabric ULAs, as well as other non-fabric ULAs that the
-                // Thread stack assigns due to Thread SLAAC.
-                //
-                // Assignments of CHIP fabric ULAs to the netif address table are handled separately by the WARM module.
-                //
-                // Non-fabric ULAs are ignored entirely as they are presumed to not be of interest to CHIP-enabled
-                // devices, and would otherwise consume slots in the LwIP address table, potentially leading to
-                // starvation.
-                if (otAddr->mValid && !otAddr->mRloc &&
-                    (!addr.IsIPv6ULA() || IsOpenThreadMeshLocalAddress(Impl()->OTInstance(), addr)))
+                if (otAddr->mValid && !otAddr->mRloc)
                 {
                     ip_addr_t lwipAddr = addr.ToLwIPAddr();
                     s8_t addrIdx;
