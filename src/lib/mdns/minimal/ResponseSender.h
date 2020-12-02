@@ -29,6 +29,10 @@
 namespace mdns {
 namespace Minimal {
 
+/// Sends responses to mDNS queries.
+///
+/// Handles processing the query via a QueryResponderBase and then sending back the reply
+/// using appropriate paths (unicast or multicast) via the given Server.
 class ResponseSender : public ResponderDelegate
 {
 public:

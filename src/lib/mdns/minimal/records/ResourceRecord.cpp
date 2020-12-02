@@ -33,7 +33,7 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, chip::BufBound
         return false;
     }
 
-    mQName.Put(out);
+    mQName.Output(out);
 
     out                                             //
         .PutBE16(static_cast<uint16_t>(GetType()))  //

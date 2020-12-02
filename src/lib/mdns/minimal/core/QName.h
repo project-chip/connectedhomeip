@@ -39,7 +39,7 @@ using QNamePart = const char *;
 /// A list of QNames that is simple to pass around
 ///
 /// As the struct may be copied, the lifetime of 'names' has to extend beyond
-/// the objects that use this struyct.
+/// the objects that use this struct.
 struct FullQName
 {
     const QNamePart * names;
@@ -53,7 +53,7 @@ struct FullQName
     FullQName(const QNamePart (&data)[N]) : names(data), nameCount(N)
     {}
 
-    void Put(chip::BufBound & out) const
+    void Output(chip::BufBound & out) const
     {
         for (uint16_t i = 0; i < nameCount; i++)
         {
@@ -66,20 +66,6 @@ struct FullQName
 
     bool operator==(const FullQName & other) const;
     bool operator!=(const FullQName & other) const { return !(*this == other); }
-
-    // Get a new FullQName without the first element in the qname
-    FullQName SkipHead() const
-    {
-        if (nameCount == 0)
-        {
-            return *this;
-        }
-
-        FullQName tail;
-        tail.names     = names + 1;
-        tail.nameCount = nameCount - 1;
-        return tail;
-    }
 };
 
 /// A serialized QNAME is comprised of

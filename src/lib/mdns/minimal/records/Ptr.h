@@ -32,7 +32,7 @@ public:
 protected:
     bool WriteData(chip::BufBound & out) const override
     {
-        mPtrName.Put(out);
+        mPtrName.Output(out);
         return out.Fit();
     }
 

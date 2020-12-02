@@ -43,7 +43,7 @@ protected:
         out.PutBE16(mPriority);
         out.PutBE16(mWeight);
         out.PutBE16(mPort);
-        mServerName.Put(out);
+        mServerName.Output(out);
 
         return out.Fit();
     }

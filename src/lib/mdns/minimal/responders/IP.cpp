@@ -35,8 +35,7 @@ void IPv4Responder::AddAllResponses(const chip::Inet::IPPacketInfo * source, Res
         {
             continue;
         }
-        IPResourceRecord record(GetQName(), addr);
-        delegate->AddResponse(record);
+        delegate->AddResponse(IPResourceRecord(GetQName(), addr));
     }
 }
 

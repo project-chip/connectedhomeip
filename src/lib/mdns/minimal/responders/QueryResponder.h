@@ -197,8 +197,7 @@ public:
     QueryResponderIterator begin() { return QueryResponderIterator(false, mResponderInfos, mResponderInfoSize); }
     QueryResponderIterator end() { return QueryResponderIterator(); }
 
-    // Keeping track of 'additional data to report'
-
+    /// Clear any items marked as 'additional'.
     void ResetAdditionals();
 
     /// Marks queries matching this qname as 'to be additionally reported'

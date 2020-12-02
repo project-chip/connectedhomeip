@@ -64,7 +64,7 @@ public:
             return false;
         }
 
-        mQName.Put(out);
+        mQName.Output(out);
 
         out.PutBE16(static_cast<uint16_t>(mType));
         out.PutBE16(static_cast<uint16_t>(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0)));

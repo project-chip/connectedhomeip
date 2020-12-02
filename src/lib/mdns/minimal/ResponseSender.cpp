@@ -153,7 +153,7 @@ void ResponseSender::AddResponse(const ResourceRecord & record)
 
     mResponseBuilder.AddRecord(mCurrentResourceType, record);
 
-    // respons build AddRecord will only fail if insufficient space is available (or at least this is
+    // ResponseBuilder AddRecord will only fail if insufficient space is available (or at least this is
     // the assumption here). It also guarantees that existing data and header are unchanged on
     // failure, hence we can flush and try again. This allows for split replies.
     if (!mResponseBuilder.Ok())
