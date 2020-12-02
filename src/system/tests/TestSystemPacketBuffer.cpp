@@ -340,7 +340,7 @@ void CheckSetDataLength(nlTestSuite * inSuite, void * inContext)
                     // headOfChain (the second arg) is buffer_1
                     PacketBufferHandle buffer;
                     buffer.Adopt(buffer_1);
-                    buffer->AddRef();
+                    buffer_1->AddRef(); // The test still holds ownership via buffer_1.
                     buffer_2->SetDataLength(length, buffer);
 
                     if (length > (theSecondContext->end_buffer - theSecondContext->payload_ptr))
@@ -496,6 +496,7 @@ void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
                 buffer_2 = PrepareTestBuffer(theSecondContext);
                 buffer_3 = PrepareTestBuffer(theThirdContext);
 
+                buffer_2->AddRef(); // The test still holds ownership via buffer_2, despite the @note on AddToEnd().
                 buffer_1->AddToEnd(PacketBufferHandle::Create(buffer_2));
 
                 NL_TEST_ASSERT(inSuite, theFirstContext->buf->tot_len == (theFirstContext->init_len + theSecondContext->init_len));
@@ -504,6 +505,7 @@ void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
 
                 NL_TEST_ASSERT(inSuite, theThirdContext->buf->next == nullptr);
 
+                buffer_3->AddRef(); // The test still holds ownership via buffer_3, despite the @note on AddToEnd().
                 buffer_1->AddToEnd(PacketBufferHandle::Create(buffer_3));
 
                 NL_TEST_ASSERT(inSuite,
@@ -546,6 +548,7 @@ void CheckDetachTail(nlTestSuite * inSuite, void * inContext)
             PacketBuffer * buffer_1          = PrepareTestBuffer(theFirstContext);
             PacketBuffer * buffer_2          = PrepareTestBuffer(theSecondContext);
             PacketBuffer * returned          = nullptr;
+            buffer_1->AddRef(); // The test still holds ownership via buffer_1.
             PacketBufferHandle buffer_handle = PacketBufferHandle::Create(buffer_1);
 
             if (theFirstContext != theSecondContext)
@@ -606,7 +609,7 @@ void CheckCompactHead(nlTestSuite * inSuite, void * inContext)
 
                     PacketBufferHandle buffer;
                     buffer.Adopt(buffer_1);
-                    buffer->AddRef();
+                    buffer_1->AddRef(); // The test still holds ownership via buffer_1.
                     buffer_1->SetDataLength(firstLength, buffer);
                     len1 = buffer_1->DataLength();
 
@@ -755,7 +758,7 @@ void CheckConsume(nlTestSuite * inSuite, void * inContext)
                         // Add various lengths to buffers
                         PacketBufferHandle buffer;
                         buffer.Adopt(buffer_1);
-                        buffer->AddRef();
+                        buffer_1->AddRef(); // The test still holds ownership via buffer_1.
                         buffer_1->SetDataLength(firstLength, buffer);
                         buffer_2->SetDataLength(secondLength, buffer);
 
