@@ -732,8 +732,8 @@ void emberAfMarkBuffersCallback(void);
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
-                                uint16_t msgLen, uint8_t * message, EmberStatus status);
+bool emberAfMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                EmberStatus status);
 /** @brief Ncp Init
  *
  * This function is called when the network coprocessor is being initialized,
@@ -1324,8 +1324,8 @@ void emberAfBasicClusterClientManufacturerSpecificAttributeChangedCallback(chip:
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBasicClusterClientMessageSentCallback(DataModelContext & context,
-                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBasicClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                  uint8_t * message, EmberStatus status);
 /** @brief Basic Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -1416,8 +1416,8 @@ void emberAfBasicClusterServerManufacturerSpecificAttributeChangedCallback(chip:
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBasicClusterServerMessageSentCallback(DataModelContext & context,
-                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfBasicClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                  uint8_t * message, EmberStatus status);
 /** @brief Basic Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -1494,9 +1494,8 @@ void emberAfPowerConfigClusterClientManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPowerConfigClusterClientMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfPowerConfigClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Power Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -1567,9 +1566,8 @@ void emberAfPowerConfigClusterServerManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPowerConfigClusterServerMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfPowerConfigClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Power Configuration Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -1646,9 +1644,8 @@ void emberAfDeviceTempClusterClientManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDeviceTempClusterClientMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfDeviceTempClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief Device Temperature Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -1719,9 +1716,8 @@ void emberAfDeviceTempClusterServerManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDeviceTempClusterServerMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfDeviceTempClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief Device Temperature Configuration Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -1798,9 +1794,8 @@ void emberAfIdentifyClusterClientManufacturerSpecificAttributeChangedCallback(ch
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIdentifyClusterClientMessageSentCallback(DataModelContext & context,
-                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                     EmberStatus status);
+void emberAfIdentifyClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                     uint8_t * message, EmberStatus status);
 /** @brief Identify Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -1898,9 +1893,8 @@ void emberAfIdentifyClusterServerManufacturerSpecificAttributeChangedCallback(ch
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIdentifyClusterServerMessageSentCallback(DataModelContext & context,
-                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                     EmberStatus status);
+void emberAfIdentifyClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                     uint8_t * message, EmberStatus status);
 /** @brief Identify Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -2024,9 +2018,8 @@ void emberAfGroupsClusterClientManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfGroupsClusterClientMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfGroupsClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief Groups Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -2134,9 +2127,8 @@ void emberAfGroupsClusterServerManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfGroupsClusterServerMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfGroupsClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief Groups Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -2257,9 +2249,8 @@ void emberAfScenesClusterClientManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfScenesClusterClientMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfScenesClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief Scenes Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -2453,9 +2444,8 @@ void emberAfScenesClusterServerManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfScenesClusterServerMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfScenesClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief Scenes Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -2567,8 +2557,8 @@ void emberAfOnOffClusterClientManufacturerSpecificAttributeChangedCallback(chip:
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfOnOffClusterClientMessageSentCallback(DataModelContext & context,
-                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfOnOffClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                  uint8_t * message, EmberStatus status);
 /** @brief On/off Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -2702,8 +2692,8 @@ void emberAfOnOffClusterServerManufacturerSpecificAttributeChangedCallback(chip:
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfOnOffClusterServerMessageSentCallback(DataModelContext & context,
-                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfOnOffClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                  uint8_t * message, EmberStatus status);
 /** @brief On/off Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -2785,9 +2775,8 @@ void emberAfOnOffSwitchConfigClusterClientManufacturerSpecificAttributeChangedCa
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfOnOffSwitchConfigClusterClientMessageSentCallback(DataModelContext & context,
-                                                              EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                              EmberStatus status);
+void emberAfOnOffSwitchConfigClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                              uint8_t * message, EmberStatus status);
 /** @brief On/off Switch Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -2859,9 +2848,8 @@ void emberAfOnOffSwitchConfigClusterServerManufacturerSpecificAttributeChangedCa
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfOnOffSwitchConfigClusterServerMessageSentCallback(DataModelContext & context,
-                                                              EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                              EmberStatus status);
+void emberAfOnOffSwitchConfigClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                              uint8_t * message, EmberStatus status);
 /** @brief On/off Switch Configuration Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -2939,9 +2927,8 @@ void emberAfLevelControlClusterClientManufacturerSpecificAttributeChangedCallbac
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfLevelControlClusterClientMessageSentCallback(DataModelContext & context,
-                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                         EmberStatus status);
+void emberAfLevelControlClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                         uint8_t * message, EmberStatus status);
 /** @brief Level Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -3049,9 +3036,8 @@ void emberAfLevelControlClusterServerManufacturerSpecificAttributeChangedCallbac
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfLevelControlClusterServerMessageSentCallback(DataModelContext & context,
-                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                         EmberStatus status);
+void emberAfLevelControlClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                         uint8_t * message, EmberStatus status);
 /** @brief Level Control Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -3169,8 +3155,8 @@ void emberAfAlarmClusterClientManufacturerSpecificAttributeChangedCallback(chip:
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfAlarmClusterClientMessageSentCallback(DataModelContext & context,
-                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfAlarmClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                  uint8_t * message, EmberStatus status);
 /** @brief Alarms Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -3275,8 +3261,8 @@ void emberAfAlarmClusterServerManufacturerSpecificAttributeChangedCallback(chip:
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfAlarmClusterServerMessageSentCallback(DataModelContext & context,
-                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfAlarmClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                  uint8_t * message, EmberStatus status);
 /** @brief Alarms Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -3351,8 +3337,8 @@ void emberAfTimeClusterClientManufacturerSpecificAttributeChangedCallback(chip::
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfTimeClusterClientMessageSentCallback(DataModelContext & context,
-                                                 EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfTimeClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                 uint8_t * message, EmberStatus status);
 /** @brief Time Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -3421,8 +3407,8 @@ void emberAfTimeClusterServerManufacturerSpecificAttributeChangedCallback(chip::
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfTimeClusterServerMessageSentCallback(DataModelContext & context,
-                                                 EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfTimeClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                 uint8_t * message, EmberStatus status);
 /** @brief Time Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -3510,9 +3496,8 @@ void emberAfRssiLocationClusterClientManufacturerSpecificAttributeChangedCallbac
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfRssiLocationClusterClientMessageSentCallback(DataModelContext & context,
-                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                         EmberStatus status);
+void emberAfRssiLocationClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                         uint8_t * message, EmberStatus status);
 /** @brief RSSI Location Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -3717,9 +3702,8 @@ void emberAfRssiLocationClusterServerManufacturerSpecificAttributeChangedCallbac
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfRssiLocationClusterServerMessageSentCallback(DataModelContext & context,
-                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                         EmberStatus status);
+void emberAfRssiLocationClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                         uint8_t * message, EmberStatus status);
 /** @brief RSSI Location Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -3820,9 +3804,8 @@ void emberAfBinaryInputBasicClusterClientManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBinaryInputBasicClusterClientMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfBinaryInputBasicClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Binary Input (Basic) Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -3894,9 +3877,8 @@ void emberAfBinaryInputBasicClusterServerManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBinaryInputBasicClusterServerMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfBinaryInputBasicClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Binary Input (Basic) Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -3974,9 +3956,8 @@ void emberAfCommissioningClusterClientManufacturerSpecificAttributeChangedCallba
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfCommissioningClusterClientMessageSentCallback(DataModelContext & context,
-                                                          EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                          EmberStatus status);
+void emberAfCommissioningClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                          uint8_t * message, EmberStatus status);
 /** @brief Commissioning Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -4108,9 +4089,8 @@ void emberAfCommissioningClusterServerManufacturerSpecificAttributeChangedCallba
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfCommissioningClusterServerMessageSentCallback(DataModelContext & context,
-                                                          EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                          EmberStatus status);
+void emberAfCommissioningClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                          uint8_t * message, EmberStatus status);
 /** @brief Commissioning Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -4187,9 +4167,8 @@ void emberAfPartitionClusterClientManufacturerSpecificAttributeChangedCallback(c
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPartitionClusterClientMessageSentCallback(DataModelContext & context,
-                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                      EmberStatus status);
+void emberAfPartitionClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                      uint8_t * message, EmberStatus status);
 /** @brief Partition Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -4284,9 +4263,8 @@ void emberAfPartitionClusterServerManufacturerSpecificAttributeChangedCallback(c
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPartitionClusterServerMessageSentCallback(DataModelContext & context,
-                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                      EmberStatus status);
+void emberAfPartitionClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                      uint8_t * message, EmberStatus status);
 /** @brief Partition Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -4379,9 +4357,8 @@ void emberAfOtaBootloadClusterClientManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfOtaBootloadClusterClientMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfOtaBootloadClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Over the Air Bootloading Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -4452,9 +4429,8 @@ void emberAfOtaBootloadClusterServerManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfOtaBootloadClusterServerMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfOtaBootloadClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Over the Air Bootloading Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -4531,9 +4507,8 @@ void emberAfPowerProfileClusterClientManufacturerSpecificAttributeChangedCallbac
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPowerProfileClusterClientMessageSentCallback(DataModelContext & context,
-                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                         EmberStatus status);
+void emberAfPowerProfileClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                         uint8_t * message, EmberStatus status);
 /** @brief Power Profile Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -4791,9 +4766,8 @@ void emberAfPowerProfileClusterServerManufacturerSpecificAttributeChangedCallbac
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPowerProfileClusterServerMessageSentCallback(DataModelContext & context,
-                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                         EmberStatus status);
+void emberAfPowerProfileClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                         uint8_t * message, EmberStatus status);
 /** @brief Power Profile Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -4870,9 +4844,8 @@ void emberAfApplianceControlClusterClientManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfApplianceControlClusterClientMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfApplianceControlClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Appliance Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -4970,9 +4943,8 @@ void emberAfApplianceControlClusterServerManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfApplianceControlClusterServerMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfApplianceControlClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Appliance Control Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -5100,9 +5072,8 @@ void emberAfPollControlClusterClientManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPollControlClusterClientMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfPollControlClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Poll Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -5179,9 +5150,8 @@ void emberAfPollControlClusterServerManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPollControlClusterServerMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfPollControlClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Poll Control Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -5272,9 +5242,8 @@ void emberAfGreenPowerClusterClientManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfGreenPowerClusterClientMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfGreenPowerClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief Green Power Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -5600,9 +5569,8 @@ void emberAfGreenPowerClusterServerManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfGreenPowerClusterServerMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfGreenPowerClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief Green Power Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -5679,9 +5647,8 @@ void emberAfKeepaliveClusterClientManufacturerSpecificAttributeChangedCallback(c
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfKeepaliveClusterClientMessageSentCallback(DataModelContext & context,
-                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                      EmberStatus status);
+void emberAfKeepaliveClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                      uint8_t * message, EmberStatus status);
 /** @brief Keep-Alive Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -5752,9 +5719,8 @@ void emberAfKeepaliveClusterServerManufacturerSpecificAttributeChangedCallback(c
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfKeepaliveClusterServerMessageSentCallback(DataModelContext & context,
-                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                      EmberStatus status);
+void emberAfKeepaliveClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                      uint8_t * message, EmberStatus status);
 /** @brief Keep-Alive Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -5831,9 +5797,8 @@ void emberAfShadeConfigClusterClientManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfShadeConfigClusterClientMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfShadeConfigClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Shade Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -5904,9 +5869,8 @@ void emberAfShadeConfigClusterServerManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfShadeConfigClusterServerMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfShadeConfigClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Shade Configuration Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -6081,9 +6045,8 @@ void emberAfDoorLockClusterClientManufacturerSpecificAttributeChangedCallback(ch
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDoorLockClusterClientMessageSentCallback(DataModelContext & context,
-                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                     EmberStatus status);
+void emberAfDoorLockClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                     uint8_t * message, EmberStatus status);
 /** @brief Door Lock Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -6345,9 +6308,8 @@ void emberAfDoorLockClusterServerManufacturerSpecificAttributeChangedCallback(ch
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDoorLockClusterServerMessageSentCallback(DataModelContext & context,
-                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                     EmberStatus status);
+void emberAfDoorLockClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                     uint8_t * message, EmberStatus status);
 /** @brief Door Lock Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -6588,9 +6550,8 @@ void emberAfWindowCoveringClusterClientManufacturerSpecificAttributeChangedCallb
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfWindowCoveringClusterClientMessageSentCallback(DataModelContext & context,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfWindowCoveringClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                           uint8_t * message, EmberStatus status);
 /** @brief Window Covering Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -6662,9 +6623,8 @@ void emberAfWindowCoveringClusterServerManufacturerSpecificAttributeChangedCallb
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfWindowCoveringClusterServerMessageSentCallback(DataModelContext & context,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfWindowCoveringClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                           uint8_t * message, EmberStatus status);
 /** @brief Window Covering Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -6801,9 +6761,8 @@ void emberAfBarrierControlClusterClientManufacturerSpecificAttributeChangedCallb
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBarrierControlClusterClientMessageSentCallback(DataModelContext & context,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfBarrierControlClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                           uint8_t * message, EmberStatus status);
 /** @brief Barrier Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -6875,9 +6834,8 @@ void emberAfBarrierControlClusterServerManufacturerSpecificAttributeChangedCallb
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBarrierControlClusterServerMessageSentCallback(DataModelContext & context,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfBarrierControlClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                           uint8_t * message, EmberStatus status);
 /** @brief Barrier Control Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -6955,9 +6913,8 @@ void emberAfPumpConfigControlClusterClientManufacturerSpecificAttributeChangedCa
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPumpConfigControlClusterClientMessageSentCallback(DataModelContext & context,
-                                                              EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                              EmberStatus status);
+void emberAfPumpConfigControlClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                              uint8_t * message, EmberStatus status);
 /** @brief Pump Configuration and Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -7029,9 +6986,8 @@ void emberAfPumpConfigControlClusterServerManufacturerSpecificAttributeChangedCa
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPumpConfigControlClusterServerMessageSentCallback(DataModelContext & context,
-                                                              EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                              EmberStatus status);
+void emberAfPumpConfigControlClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                              uint8_t * message, EmberStatus status);
 /** @brief Pump Configuration and Control Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -7115,9 +7071,8 @@ void emberAfThermostatClusterClientManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfThermostatClusterClientMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfThermostatClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief Thermostat Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -7226,9 +7181,8 @@ void emberAfThermostatClusterServerManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfThermostatClusterServerMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfThermostatClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief Thermostat Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -7324,9 +7278,8 @@ void emberAfFanControlClusterClientManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfFanControlClusterClientMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfFanControlClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief Fan Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -7397,9 +7350,8 @@ void emberAfFanControlClusterServerManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfFanControlClusterServerMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfFanControlClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief Fan Control Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -7476,9 +7428,8 @@ void emberAfDehumidControlClusterClientManufacturerSpecificAttributeChangedCallb
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDehumidControlClusterClientMessageSentCallback(DataModelContext & context,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfDehumidControlClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                           uint8_t * message, EmberStatus status);
 /** @brief Dehumidification Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -7550,9 +7501,8 @@ void emberAfDehumidControlClusterServerManufacturerSpecificAttributeChangedCallb
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDehumidControlClusterServerMessageSentCallback(DataModelContext & context,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfDehumidControlClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                           uint8_t * message, EmberStatus status);
 /** @brief Dehumidification Control Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -7630,9 +7580,8 @@ void emberAfThermostatUiConfigClusterClientManufacturerSpecificAttributeChangedC
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfThermostatUiConfigClusterClientMessageSentCallback(DataModelContext & context,
-                                                               EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                               EmberStatus status);
+void emberAfThermostatUiConfigClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                               uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Thermostat User Interface Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -7704,9 +7653,8 @@ void emberAfThermostatUiConfigClusterServerManufacturerSpecificAttributeChangedC
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfThermostatUiConfigClusterServerMessageSentCallback(DataModelContext & context,
-                                                               EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                               EmberStatus status);
+void emberAfThermostatUiConfigClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                               uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Thermostat User Interface Configuration Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -7784,9 +7732,8 @@ void emberAfColorControlClusterClientManufacturerSpecificAttributeChangedCallbac
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfColorControlClusterClientMessageSentCallback(DataModelContext & context,
-                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                         EmberStatus status);
+void emberAfColorControlClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                         uint8_t * message, EmberStatus status);
 /** @brief Color Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -8007,9 +7954,8 @@ void emberAfColorControlClusterServerManufacturerSpecificAttributeChangedCallbac
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfColorControlClusterServerMessageSentCallback(DataModelContext & context,
-                                                         EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                         EmberStatus status);
+void emberAfColorControlClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                         uint8_t * message, EmberStatus status);
 /** @brief Color Control Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -8145,9 +8091,8 @@ void emberAfBallastConfigurationClusterClientManufacturerSpecificAttributeChange
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBallastConfigurationClusterClientMessageSentCallback(DataModelContext & context,
-                                                                 EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                 EmberStatus status);
+void emberAfBallastConfigurationClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Ballast Configuration Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -8219,9 +8164,8 @@ void emberAfBallastConfigurationClusterServerManufacturerSpecificAttributeChange
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBallastConfigurationClusterServerMessageSentCallback(DataModelContext & context,
-                                                                 EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                 EmberStatus status);
+void emberAfBallastConfigurationClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Ballast Configuration Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -8299,9 +8243,8 @@ void emberAfIllumMeasurementClusterClientManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIllumMeasurementClusterClientMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfIllumMeasurementClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Illuminance Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -8373,9 +8316,8 @@ void emberAfIllumMeasurementClusterServerManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIllumMeasurementClusterServerMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfIllumMeasurementClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Illuminance Measurement Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -8453,9 +8395,8 @@ void emberAfIllumLevelSensingClusterClientManufacturerSpecificAttributeChangedCa
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIllumLevelSensingClusterClientMessageSentCallback(DataModelContext & context,
-                                                              EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                              EmberStatus status);
+void emberAfIllumLevelSensingClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                              uint8_t * message, EmberStatus status);
 /** @brief Illuminance Level Sensing Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -8527,9 +8468,8 @@ void emberAfIllumLevelSensingClusterServerManufacturerSpecificAttributeChangedCa
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIllumLevelSensingClusterServerMessageSentCallback(DataModelContext & context,
-                                                              EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                              EmberStatus status);
+void emberAfIllumLevelSensingClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                              uint8_t * message, EmberStatus status);
 /** @brief Illuminance Level Sensing Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -8607,9 +8547,8 @@ void emberAfTempMeasurementClusterClientManufacturerSpecificAttributeChangedCall
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfTempMeasurementClusterClientMessageSentCallback(DataModelContext & context,
-                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                            EmberStatus status);
+void emberAfTempMeasurementClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                            uint8_t * message, EmberStatus status);
 /** @brief Temperature Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -8681,9 +8620,8 @@ void emberAfTempMeasurementClusterServerManufacturerSpecificAttributeChangedCall
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfTempMeasurementClusterServerMessageSentCallback(DataModelContext & context,
-                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                            EmberStatus status);
+void emberAfTempMeasurementClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                            uint8_t * message, EmberStatus status);
 /** @brief Temperature Measurement Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -8761,9 +8699,8 @@ void emberAfPressureMeasurementClusterClientManufacturerSpecificAttributeChanged
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPressureMeasurementClusterClientMessageSentCallback(DataModelContext & context,
-                                                                EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                EmberStatus status);
+void emberAfPressureMeasurementClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Pressure Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -8835,9 +8772,8 @@ void emberAfPressureMeasurementClusterServerManufacturerSpecificAttributeChanged
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPressureMeasurementClusterServerMessageSentCallback(DataModelContext & context,
-                                                                EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                EmberStatus status);
+void emberAfPressureMeasurementClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Pressure Measurement Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -8915,9 +8851,8 @@ void emberAfFlowMeasurementClusterClientManufacturerSpecificAttributeChangedCall
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfFlowMeasurementClusterClientMessageSentCallback(DataModelContext & context,
-                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                            EmberStatus status);
+void emberAfFlowMeasurementClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                            uint8_t * message, EmberStatus status);
 /** @brief Flow Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -8989,9 +8924,8 @@ void emberAfFlowMeasurementClusterServerManufacturerSpecificAttributeChangedCall
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfFlowMeasurementClusterServerMessageSentCallback(DataModelContext & context,
-                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                            EmberStatus status);
+void emberAfFlowMeasurementClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                            uint8_t * message, EmberStatus status);
 /** @brief Flow Measurement Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -9070,9 +9004,8 @@ void emberAfRelativeHumidityMeasurementClusterClientManufacturerSpecificAttribut
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfRelativeHumidityMeasurementClusterClientMessageSentCallback(DataModelContext & context,
-                                                                        EmberApsFrame * apsFrame, uint16_t msgLen,
-                                                                        uint8_t * message, EmberStatus status);
+void emberAfRelativeHumidityMeasurementClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                        uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Relative Humidity Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -9145,9 +9078,8 @@ void emberAfRelativeHumidityMeasurementClusterServerManufacturerSpecificAttribut
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfRelativeHumidityMeasurementClusterServerMessageSentCallback(DataModelContext & context,
-                                                                        EmberApsFrame * apsFrame, uint16_t msgLen,
-                                                                        uint8_t * message, EmberStatus status);
+void emberAfRelativeHumidityMeasurementClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                        uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Relative Humidity Measurement Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -9225,9 +9157,8 @@ void emberAfOccupancySensingClusterClientManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfOccupancySensingClusterClientMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfOccupancySensingClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Occupancy Sensing Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -9299,9 +9230,8 @@ void emberAfOccupancySensingClusterServerManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfOccupancySensingClusterServerMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfOccupancySensingClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Occupancy Sensing Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -12738,9 +12668,8 @@ void emberAfLeadConcentrationMeasurementClusterClientManufacturerSpecificAttribu
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfLeadConcentrationMeasurementClusterClientMessageSentCallback(DataModelContext & context,
-                                                                         EmberApsFrame * apsFrame, uint16_t msgLen,
-                                                                         uint8_t * message, EmberStatus status);
+void emberAfLeadConcentrationMeasurementClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                         uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Lead Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -12813,9 +12742,8 @@ void emberAfLeadConcentrationMeasurementClusterServerManufacturerSpecificAttribu
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfLeadConcentrationMeasurementClusterServerMessageSentCallback(DataModelContext & context,
-                                                                         EmberApsFrame * apsFrame, uint16_t msgLen,
-                                                                         uint8_t * message, EmberStatus status);
+void emberAfLeadConcentrationMeasurementClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                         uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Lead Concentration Measurement Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -13659,9 +13587,9 @@ void emberAfChloroformConcentrationMeasurementClusterClientManufacturerSpecificA
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfChloroformConcentrationMeasurementClusterClientMessageSentCallback(DataModelContext & context,
-                                                                               EmberApsFrame * apsFrame, uint16_t msgLen,
-                                                                               uint8_t * message, EmberStatus status);
+void emberAfChloroformConcentrationMeasurementClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                               uint16_t msgLen, uint8_t * message,
+                                                                               EmberStatus status);
 /** @brief Chloroform Concentration Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -13733,9 +13661,9 @@ void emberAfChloroformConcentrationMeasurementClusterServerManufacturerSpecificA
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfChloroformConcentrationMeasurementClusterServerMessageSentCallback(DataModelContext & context,
-                                                                               EmberApsFrame * apsFrame, uint16_t msgLen,
-                                                                               uint8_t * message, EmberStatus status);
+void emberAfChloroformConcentrationMeasurementClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                               uint16_t msgLen, uint8_t * message,
+                                                                               EmberStatus status);
 /** @brief Chloroform Concentration Measurement Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -13966,9 +13894,8 @@ void emberAfIasZoneClusterClientManufacturerSpecificAttributeChangedCallback(chi
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIasZoneClusterClientMessageSentCallback(DataModelContext & context,
-                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                    EmberStatus status);
+void emberAfIasZoneClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                    uint8_t * message, EmberStatus status);
 /** @brief IAS Zone Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -14064,9 +13991,8 @@ void emberAfIasZoneClusterServerManufacturerSpecificAttributeChangedCallback(chi
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIasZoneClusterServerMessageSentCallback(DataModelContext & context,
-                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                    EmberStatus status);
+void emberAfIasZoneClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                    uint8_t * message, EmberStatus status);
 /** @brief IAS Zone Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -14202,9 +14128,8 @@ void emberAfIasAceClusterClientManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIasAceClusterClientMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfIasAceClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief IAS ACE Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -14397,9 +14322,8 @@ void emberAfIasAceClusterServerManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIasAceClusterServerMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfIasAceClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief IAS ACE Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -14493,8 +14417,8 @@ void emberAfIasWdClusterClientManufacturerSpecificAttributeChangedCallback(chip:
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIasWdClusterClientMessageSentCallback(DataModelContext & context,
-                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfIasWdClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                  uint8_t * message, EmberStatus status);
 /** @brief IAS WD Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -14563,8 +14487,8 @@ void emberAfIasWdClusterServerManufacturerSpecificAttributeChangedCallback(chip:
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIasWdClusterServerMessageSentCallback(DataModelContext & context,
-                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfIasWdClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                  uint8_t * message, EmberStatus status);
 /** @brief IAS WD Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -14666,9 +14590,8 @@ void emberAfGenericTunnelClusterClientManufacturerSpecificAttributeChangedCallba
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfGenericTunnelClusterClientMessageSentCallback(DataModelContext & context,
-                                                          EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                          EmberStatus status);
+void emberAfGenericTunnelClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                          uint8_t * message, EmberStatus status);
 /** @brief Generic Tunnel Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -14754,9 +14677,8 @@ void emberAfGenericTunnelClusterServerManufacturerSpecificAttributeChangedCallba
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfGenericTunnelClusterServerMessageSentCallback(DataModelContext & context,
-                                                          EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                          EmberStatus status);
+void emberAfGenericTunnelClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                          uint8_t * message, EmberStatus status);
 /** @brief Generic Tunnel Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -14833,9 +14755,8 @@ void emberAfBacnetProtocolTunnelClusterClientManufacturerSpecificAttributeChange
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBacnetProtocolTunnelClusterClientMessageSentCallback(DataModelContext & context,
-                                                                 EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                 EmberStatus status);
+void emberAfBacnetProtocolTunnelClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief BACnet Protocol Tunnel Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -14907,9 +14828,8 @@ void emberAfBacnetProtocolTunnelClusterServerManufacturerSpecificAttributeChange
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBacnetProtocolTunnelClusterServerMessageSentCallback(DataModelContext & context,
-                                                                 EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                 EmberStatus status);
+void emberAfBacnetProtocolTunnelClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                 uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief BACnet Protocol Tunnel Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -14994,9 +14914,8 @@ void emberAf11073ProtocolTunnelClusterClientManufacturerSpecificAttributeChanged
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAf11073ProtocolTunnelClusterClientMessageSentCallback(DataModelContext & context,
-                                                                EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                EmberStatus status);
+void emberAf11073ProtocolTunnelClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief 11073 Protocol Tunnel Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -15093,9 +15012,8 @@ void emberAf11073ProtocolTunnelClusterServerManufacturerSpecificAttributeChanged
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAf11073ProtocolTunnelClusterServerMessageSentCallback(DataModelContext & context,
-                                                                EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                EmberStatus status);
+void emberAf11073ProtocolTunnelClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief 11073 Protocol Tunnel Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -15180,9 +15098,8 @@ void emberAfIso7816ProtocolTunnelClusterClientManufacturerSpecificAttributeChang
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIso7816ProtocolTunnelClusterClientMessageSentCallback(DataModelContext & context,
-                                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                  EmberStatus status);
+void emberAfIso7816ProtocolTunnelClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief ISO 7816 Protocol Tunnel Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -15266,9 +15183,8 @@ void emberAfIso7816ProtocolTunnelClusterServerManufacturerSpecificAttributeChang
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfIso7816ProtocolTunnelClusterServerMessageSentCallback(DataModelContext & context,
-                                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                  EmberStatus status);
+void emberAfIso7816ProtocolTunnelClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief ISO 7816 Protocol Tunnel Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -15360,8 +15276,8 @@ void emberAfPriceClusterClientManufacturerSpecificAttributeChangedCallback(chip:
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPriceClusterClientMessageSentCallback(DataModelContext & context,
-                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfPriceClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                  uint8_t * message, EmberStatus status);
 /** @brief Price Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -15822,8 +15738,8 @@ void emberAfPriceClusterServerManufacturerSpecificAttributeChangedCallback(chip:
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPriceClusterServerMessageSentCallback(DataModelContext & context,
-                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAfPriceClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                  uint8_t * message, EmberStatus status);
 /** @brief Price Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -15921,9 +15837,8 @@ void emberAfDemandResponseLoadControlClusterClientManufacturerSpecificAttributeC
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDemandResponseLoadControlClusterClientMessageSentCallback(DataModelContext & context,
-                                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                      EmberStatus status);
+void emberAfDemandResponseLoadControlClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                      uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Demand Response and Load Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -16052,9 +15967,8 @@ void emberAfDemandResponseLoadControlClusterServerManufacturerSpecificAttributeC
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDemandResponseLoadControlClusterServerMessageSentCallback(DataModelContext & context,
-                                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                      EmberStatus status);
+void emberAfDemandResponseLoadControlClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                      uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Demand Response and Load Control Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -16146,9 +16060,8 @@ void emberAfSimpleMeteringClusterClientManufacturerSpecificAttributeChangedCallb
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfSimpleMeteringClusterClientMessageSentCallback(DataModelContext & context,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfSimpleMeteringClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                           uint8_t * message, EmberStatus status);
 /** @brief Simple Metering Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -16424,9 +16337,8 @@ void emberAfSimpleMeteringClusterServerManufacturerSpecificAttributeChangedCallb
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfSimpleMeteringClusterServerMessageSentCallback(DataModelContext & context,
-                                                           EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                           EmberStatus status);
+void emberAfSimpleMeteringClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                           uint8_t * message, EmberStatus status);
 /** @brief Simple Metering Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -16594,9 +16506,8 @@ void emberAfMessagingClusterClientManufacturerSpecificAttributeChangedCallback(c
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfMessagingClusterClientMessageSentCallback(DataModelContext & context,
-                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                      EmberStatus status);
+void emberAfMessagingClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                      uint8_t * message, EmberStatus status);
 /** @brief Messaging Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -16719,9 +16630,8 @@ void emberAfMessagingClusterServerManufacturerSpecificAttributeChangedCallback(c
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfMessagingClusterServerMessageSentCallback(DataModelContext & context,
-                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                      EmberStatus status);
+void emberAfMessagingClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                      uint8_t * message, EmberStatus status);
 /** @brief Messaging Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -16814,9 +16724,8 @@ void emberAfTunnelingClusterClientManufacturerSpecificAttributeChangedCallback(c
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfTunnelingClusterClientMessageSentCallback(DataModelContext & context,
-                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                      EmberStatus status);
+void emberAfTunnelingClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                      uint8_t * message, EmberStatus status);
 /** @brief Tunneling Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -16938,9 +16847,8 @@ void emberAfTunnelingClusterServerManufacturerSpecificAttributeChangedCallback(c
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfTunnelingClusterServerMessageSentCallback(DataModelContext & context,
-                                                      EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                      EmberStatus status);
+void emberAfTunnelingClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                      uint8_t * message, EmberStatus status);
 /** @brief Tunneling Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -17108,9 +17016,8 @@ void emberAfPrepaymentClusterClientManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPrepaymentClusterClientMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfPrepaymentClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief Prepayment Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -17293,9 +17200,8 @@ void emberAfPrepaymentClusterServerManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPrepaymentClusterServerMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfPrepaymentClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief Prepayment Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -17403,9 +17309,8 @@ void emberAfEnergyManagementClusterClientManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfEnergyManagementClusterClientMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfEnergyManagementClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Energy Management Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -17508,9 +17413,8 @@ void emberAfEnergyManagementClusterServerManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfEnergyManagementClusterServerMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfEnergyManagementClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Energy Management Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -17597,9 +17501,8 @@ void emberAfCalendarClusterClientManufacturerSpecificAttributeChangedCallback(ch
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfCalendarClusterClientMessageSentCallback(DataModelContext & context,
-                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                     EmberStatus status);
+void emberAfCalendarClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                     uint8_t * message, EmberStatus status);
 /** @brief Calendar Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -17818,9 +17721,8 @@ void emberAfCalendarClusterServerManufacturerSpecificAttributeChangedCallback(ch
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfCalendarClusterServerMessageSentCallback(DataModelContext & context,
-                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                     EmberStatus status);
+void emberAfCalendarClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                     uint8_t * message, EmberStatus status);
 /** @brief Calendar Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -17897,9 +17799,8 @@ void emberAfDeviceManagementClusterClientManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDeviceManagementClusterClientMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfDeviceManagementClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Device Management Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -18063,9 +17964,8 @@ void emberAfDeviceManagementClusterServerManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDeviceManagementClusterServerMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfDeviceManagementClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Device Management Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -18191,9 +18091,8 @@ void emberAfEventsClusterClientManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfEventsClusterClientMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfEventsClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief Events Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -18300,9 +18199,8 @@ void emberAfEventsClusterServerManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfEventsClusterServerMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfEventsClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief Events Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -18379,9 +18277,8 @@ void emberAfMduPairingClusterClientManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfMduPairingClusterClientMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfMduPairingClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief MDU Pairing Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -18472,9 +18369,8 @@ void emberAfMduPairingClusterServerManufacturerSpecificAttributeChangedCallback(
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfMduPairingClusterServerMessageSentCallback(DataModelContext & context,
-                                                       EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                       EmberStatus status);
+void emberAfMduPairingClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                       uint8_t * message, EmberStatus status);
 /** @brief MDU Pairing Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -18550,9 +18446,8 @@ void emberAfSubGhzClusterClientManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfSubGhzClusterClientMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfSubGhzClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief Sub-GHz Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -18628,9 +18523,8 @@ void emberAfSubGhzClusterServerManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfSubGhzClusterServerMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfSubGhzClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief Sub-GHz Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -18725,9 +18619,8 @@ void emberAfKeyEstablishmentClusterClientManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfKeyEstablishmentClusterClientMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfKeyEstablishmentClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Key Establishment Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -18851,9 +18744,8 @@ void emberAfKeyEstablishmentClusterServerManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfKeyEstablishmentClusterServerMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfKeyEstablishmentClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Key Establishment Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -18952,9 +18844,8 @@ void emberAfInformationClusterClientManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfInformationClusterClientMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfInformationClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Information Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -19132,9 +19023,8 @@ void emberAfInformationClusterServerManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfInformationClusterServerMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfInformationClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Information Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -19233,9 +19123,8 @@ void emberAfDataSharingClusterClientManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDataSharingClusterClientMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfDataSharingClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Data Sharing Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -19356,9 +19245,8 @@ void emberAfDataSharingClusterServerManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDataSharingClusterServerMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfDataSharingClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Data Sharing Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -19457,9 +19345,8 @@ void emberAfGamingClusterClientManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfGamingClusterClientMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfGamingClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief Gaming Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -19594,9 +19481,8 @@ void emberAfGamingClusterServerManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfGamingClusterServerMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfGamingClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief Gaming Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -19685,9 +19571,8 @@ void emberAfDataRateControlClusterClientManufacturerSpecificAttributeChangedCall
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDataRateControlClusterClientMessageSentCallback(DataModelContext & context,
-                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                            EmberStatus status);
+void emberAfDataRateControlClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                            uint8_t * message, EmberStatus status);
 /** @brief Data Rate Control Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -19796,9 +19681,8 @@ void emberAfDataRateControlClusterServerManufacturerSpecificAttributeChangedCall
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDataRateControlClusterServerMessageSentCallback(DataModelContext & context,
-                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                            EmberStatus status);
+void emberAfDataRateControlClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                            uint8_t * message, EmberStatus status);
 /** @brief Data Rate Control Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -19876,9 +19760,8 @@ void emberAfVoiceOverZigbeeClusterClientManufacturerSpecificAttributeChangedCall
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterClientMessageSentCallback(DataModelContext & context,
-                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                            EmberStatus status);
+void emberAfVoiceOverZigbeeClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                            uint8_t * message, EmberStatus status);
 /** @brief Voice over ZigBee Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -19985,9 +19868,8 @@ void emberAfVoiceOverZigbeeClusterServerManufacturerSpecificAttributeChangedCall
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfVoiceOverZigbeeClusterServerMessageSentCallback(DataModelContext & context,
-                                                            EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                            EmberStatus status);
+void emberAfVoiceOverZigbeeClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                            uint8_t * message, EmberStatus status);
 /** @brief Voice over ZigBee Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -20098,9 +19980,8 @@ void emberAfChattingClusterClientManufacturerSpecificAttributeChangedCallback(ch
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfChattingClusterClientMessageSentCallback(DataModelContext & context,
-                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                     EmberStatus status);
+void emberAfChattingClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                     uint8_t * message, EmberStatus status);
 /** @brief Chatting Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -20230,9 +20111,8 @@ void emberAfChattingClusterServerManufacturerSpecificAttributeChangedCallback(ch
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfChattingClusterServerMessageSentCallback(DataModelContext & context,
-                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                     EmberStatus status);
+void emberAfChattingClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                     uint8_t * message, EmberStatus status);
 /** @brief Chatting Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -20411,9 +20291,8 @@ void emberAfPaymentClusterClientManufacturerSpecificAttributeChangedCallback(chi
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPaymentClusterClientMessageSentCallback(DataModelContext & context,
-                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                    EmberStatus status);
+void emberAfPaymentClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                    uint8_t * message, EmberStatus status);
 /** @brief Payment Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -20504,9 +20383,8 @@ void emberAfPaymentClusterServerManufacturerSpecificAttributeChangedCallback(chi
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfPaymentClusterServerMessageSentCallback(DataModelContext & context,
-                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                    EmberStatus status);
+void emberAfPaymentClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                    uint8_t * message, EmberStatus status);
 /** @brief Payment Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -20607,9 +20485,8 @@ void emberAfBillingClusterClientManufacturerSpecificAttributeChangedCallback(chi
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBillingClusterClientMessageSentCallback(DataModelContext & context,
-                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                    EmberStatus status);
+void emberAfBillingClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                    uint8_t * message, EmberStatus status);
 /** @brief Billing Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -20691,9 +20568,8 @@ void emberAfBillingClusterServerManufacturerSpecificAttributeChangedCallback(chi
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfBillingClusterServerMessageSentCallback(DataModelContext & context,
-                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                    EmberStatus status);
+void emberAfBillingClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                    uint8_t * message, EmberStatus status);
 /** @brief Billing Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -20815,9 +20691,8 @@ void emberAfApplianceIdentificationClusterClientManufacturerSpecificAttributeCha
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfApplianceIdentificationClusterClientMessageSentCallback(DataModelContext & context,
-                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                    EmberStatus status);
+void emberAfApplianceIdentificationClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                    uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Appliance Identification Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -20889,9 +20764,8 @@ void emberAfApplianceIdentificationClusterServerManufacturerSpecificAttributeCha
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfApplianceIdentificationClusterServerMessageSentCallback(DataModelContext & context,
-                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                    EmberStatus status);
+void emberAfApplianceIdentificationClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                    uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Appliance Identification Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -20969,9 +20843,8 @@ void emberAfMeterIdentificationClusterClientManufacturerSpecificAttributeChanged
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfMeterIdentificationClusterClientMessageSentCallback(DataModelContext & context,
-                                                                EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                EmberStatus status);
+void emberAfMeterIdentificationClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Meter Identification Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -21043,9 +20916,8 @@ void emberAfMeterIdentificationClusterServerManufacturerSpecificAttributeChanged
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfMeterIdentificationClusterServerMessageSentCallback(DataModelContext & context,
-                                                                EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                EmberStatus status);
+void emberAfMeterIdentificationClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Meter Identification Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -21131,9 +21003,8 @@ void emberAfApplianceEventsAndAlertClusterClientManufacturerSpecificAttributeCha
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfApplianceEventsAndAlertClusterClientMessageSentCallback(DataModelContext & context,
-                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                    EmberStatus status);
+void emberAfApplianceEventsAndAlertClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                    uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Appliance Events and Alert Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -21227,9 +21098,8 @@ void emberAfApplianceEventsAndAlertClusterServerManufacturerSpecificAttributeCha
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfApplianceEventsAndAlertClusterServerMessageSentCallback(DataModelContext & context,
-                                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                    EmberStatus status);
+void emberAfApplianceEventsAndAlertClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                    uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Appliance Events and Alert Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -21307,9 +21177,8 @@ void emberAfApplianceStatisticsClusterClientManufacturerSpecificAttributeChanged
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfApplianceStatisticsClusterClientMessageSentCallback(DataModelContext & context,
-                                                                EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                EmberStatus status);
+void emberAfApplianceStatisticsClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Appliance Statistics Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -21424,9 +21293,8 @@ void emberAfApplianceStatisticsClusterServerManufacturerSpecificAttributeChanged
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfApplianceStatisticsClusterServerMessageSentCallback(DataModelContext & context,
-                                                                EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                EmberStatus status);
+void emberAfApplianceStatisticsClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Appliance Statistics Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -21512,9 +21380,8 @@ void emberAfElectricalMeasurementClusterClientManufacturerSpecificAttributeChang
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfElectricalMeasurementClusterClientMessageSentCallback(DataModelContext & context,
-                                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                  EmberStatus status);
+void emberAfElectricalMeasurementClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Electrical Measurement Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -21630,9 +21497,8 @@ void emberAfElectricalMeasurementClusterServerManufacturerSpecificAttributeChang
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfElectricalMeasurementClusterServerMessageSentCallback(DataModelContext & context,
-                                                                  EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                                  EmberStatus status);
+void emberAfElectricalMeasurementClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                                  uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Electrical Measurement Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -21710,9 +21576,8 @@ void emberAfDiagnosticsClusterClientManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDiagnosticsClusterClientMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfDiagnosticsClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Diagnostics Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -21783,9 +21648,8 @@ void emberAfDiagnosticsClusterServerManufacturerSpecificAttributeChangedCallback
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfDiagnosticsClusterServerMessageSentCallback(DataModelContext & context,
-                                                        EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                        EmberStatus status);
+void emberAfDiagnosticsClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                        uint8_t * message, EmberStatus status);
 /** @brief Diagnostics Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -21862,9 +21726,8 @@ void emberAfZllCommissioningClusterClientManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfZllCommissioningClusterClientMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfZllCommissioningClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief ZLL Commissioning Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -22173,9 +22036,8 @@ void emberAfZllCommissioningClusterServerManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfZllCommissioningClusterServerMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfZllCommissioningClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief ZLL Commissioning Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -22253,9 +22115,8 @@ void emberAfSampleMfgSpecificClusterClientManufacturerSpecificAttributeChangedCa
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfSampleMfgSpecificClusterClientMessageSentCallback(DataModelContext & context,
-                                                              EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                              EmberStatus status);
+void emberAfSampleMfgSpecificClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                              uint8_t * message, EmberStatus status);
 /** @brief Sample Mfg Specific Cluster Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -22334,9 +22195,8 @@ void emberAfSampleMfgSpecificClusterServerManufacturerSpecificAttributeChangedCa
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfSampleMfgSpecificClusterServerMessageSentCallback(DataModelContext & context,
-                                                              EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                              EmberStatus status);
+void emberAfSampleMfgSpecificClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                              uint8_t * message, EmberStatus status);
 /** @brief Sample Mfg Specific Cluster Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -22414,9 +22274,8 @@ void emberAfSampleMfgSpecificCluster2ClientManufacturerSpecificAttributeChangedC
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfSampleMfgSpecificCluster2ClientMessageSentCallback(DataModelContext & context,
-                                                               EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                               EmberStatus status);
+void emberAfSampleMfgSpecificCluster2ClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                               uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -22495,9 +22354,8 @@ void emberAfSampleMfgSpecificCluster2ServerManufacturerSpecificAttributeChangedC
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfSampleMfgSpecificCluster2ServerMessageSentCallback(DataModelContext & context,
-                                                               EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                               EmberStatus status);
+void emberAfSampleMfgSpecificCluster2ServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame,
+                                                               uint16_t msgLen, uint8_t * message, EmberStatus status);
 /** @brief Sample Mfg Specific Cluster 2 Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -22575,9 +22433,8 @@ void emberAfOtaConfigurationClusterClientManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfOtaConfigurationClusterClientMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfOtaConfigurationClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Configuration Cluster Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -22670,9 +22527,8 @@ void emberAfOtaConfigurationClusterServerManufacturerSpecificAttributeChangedCal
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfOtaConfigurationClusterServerMessageSentCallback(DataModelContext & context,
-                                                             EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                             EmberStatus status);
+void emberAfOtaConfigurationClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                             uint8_t * message, EmberStatus status);
 /** @brief Configuration Cluster Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -22764,9 +22620,8 @@ void emberAfMfglibClusterClientManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfMfglibClusterClientMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfMfglibClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief MFGLIB Cluster Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -22845,9 +22700,8 @@ void emberAfMfglibClusterServerManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfMfglibClusterServerMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfMfglibClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief MFGLIB Cluster Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed
@@ -22976,9 +22830,8 @@ void emberAfSlWwahClusterClientManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfSlWwahClusterClientMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfSlWwahClusterClientMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief SL Works With All Hubs Cluster Client Pre Attribute Changed
  *
  * Client Pre Attribute Changed
@@ -23256,9 +23109,8 @@ void emberAfSlWwahClusterServerManufacturerSpecificAttributeChangedCallback(chip
  * @param message The message that was sent  Ver.: always
  * @param status The status of the sent message  Ver.: always
  */
-void emberAfSlWwahClusterServerMessageSentCallback(DataModelContext & context,
-                                                   EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                   EmberStatus status);
+void emberAfSlWwahClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                   uint8_t * message, EmberStatus status);
 /** @brief SL Works With All Hubs Cluster Server Pre Attribute Changed
  *
  * Server Pre Attribute Changed

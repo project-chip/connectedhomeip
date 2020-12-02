@@ -32,7 +32,8 @@
 
 using namespace chip;
 
-EmberStatus chipSendUnicast(Messaging::ExchangeContext & exchangeContext, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
+EmberStatus chipSendUnicast(Messaging::ExchangeContext & exchangeContext, EmberApsFrame * apsFrame, uint16_t messageLength,
+                            uint8_t * message)
 {
     uint16_t frameSize           = encodeApsFrame(nullptr, 0, apsFrame);
     uint32_t dataLengthUnchecked = uint32_t(frameSize) + uint32_t(messageLength);
@@ -67,7 +68,8 @@ EmberStatus chipSendUnicast(Messaging::ExchangeContext & exchangeContext, EmberA
     memcpy(buffer->Start() + frameSize, message, messageLength);
     buffer->SetDataLength(dataLength);
 
-    CHIP_ERROR err = exchangeContext.SendMessage(Protocols::kProtocol_InteractionModel, 0, std::move(buffer), Messaging::SendFlags(), 0);
+    CHIP_ERROR err =
+        exchangeContext.SendMessage(Protocols::kProtocol_InteractionModel, 0, std::move(buffer), Messaging::SendFlags(), 0);
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?

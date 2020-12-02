@@ -276,7 +276,8 @@ void emberAfPluginReportingTickEventHandler(void)
                 if (status == (EmberAfStatus) EMBER_SUCCESS && bindingEntry->local == entry.endpoint &&
                     bindingEntry->clusterId == entry.clusterId)
                 {
-                    currentPayloadMaxLength = 255; /* TODO: How to calculate max available payload size */;
+                    currentPayloadMaxLength = 255; /* TODO: How to calculate max available payload size */
+                    ;
                     if (currentPayloadMaxLength < smallestPayloadMaxLength)
                     {
                         smallestPayloadMaxLength = currentPayloadMaxLength;

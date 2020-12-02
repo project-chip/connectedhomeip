@@ -431,7 +431,7 @@ EmberStatus emberAfSendUnicastToBindingsWithCallback(EmberApsFrame * apsFrame, u
                 continue;
 
             Messaging::ExchangeContext * exchange = gExchangeManager->NewExchange(binding->channelHandle);
-            status = send(*exchange, apsFrame, messageLength, message,
+            status                                = send(*exchange, apsFrame, messageLength, message,
                           false, // broadcast?
                           0,     // alias
                           0,     // sequence
@@ -568,8 +568,8 @@ void emAfFragmentationMessageSentHandler(DataModelContext & context, EmberApsFra
 }
 #endif // EMBER_AF_PLUGIN_FRAGMENTATION
 
-EmberStatus emAfSend(chip::Messaging::ExchangeContext & exchangeContext, EmberApsFrame * apsFrame, uint8_t messageLength, uint8_t * message,
-                     uint8_t * messageTag, EmberNodeId alias, uint8_t sequence)
+EmberStatus emAfSend(chip::Messaging::ExchangeContext & exchangeContext, EmberApsFrame * apsFrame, uint8_t messageLength,
+                     uint8_t * message, uint8_t * messageTag, EmberNodeId alias, uint8_t sequence)
 {
     return chipSendUnicast(exchangeContext, apsFrame, messageLength, message);
 }

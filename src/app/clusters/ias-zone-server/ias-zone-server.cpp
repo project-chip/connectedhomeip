@@ -239,7 +239,8 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId 
             // If the binding table entry created based on the response already exists
             // do nothing.
             if ((bindingEntry->local == endpoint) && (bindingEntry->clusterId == ZCL_IAS_ZONE_CLUSTER_ID) &&
-                (bindingEntry->remote == emberAfCurrentCommand()->apsFrame->sourceEndpoint) && (bindingEntry->type == EMBER_UNICAST_BINDING))
+                (bindingEntry->remote == emberAfCurrentCommand()->apsFrame->sourceEndpoint) &&
+                (bindingEntry->type == EMBER_UNICAST_BINDING))
             {
                 break;
             }
@@ -758,9 +759,8 @@ void emberAfPluginIasZoneServerPrintQueueConfig(void)
 // destination when the destination is the only router the node is joined to.
 // In that case, the command will never have been sent, as the device will have
 // had no router by which to send the command.
-void emberAfIasZoneClusterServerMessageSentCallback(DataModelContext & context,
-                                                    EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
-                                                    EmberStatus status)
+void emberAfIasZoneClusterServerMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen,
+                                                    uint8_t * message, EmberStatus status)
 {
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
     uint8_t frameControl;
