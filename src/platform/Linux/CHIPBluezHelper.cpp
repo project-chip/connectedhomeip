@@ -1261,6 +1261,44 @@ void BluezObjectsCleanup(BluezEndpoint * apEndpoint)
     EndpointCleanup(apEndpoint);
 }
 
+static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * characteristic)
+{
+    // Construct the TLV for the additional data
+    GVariant * cValue = nullptr;
+    unsigned long err = 0;
+    TLVWriter writer;
+    chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
+    chip::System::PacketBuffer * buffer = bufferHandle.Get_ForNow();
+    char testRotatingDeviceId[] = "1122334455667788";
+
+    writer.Init(buffer);
+    TLVType containerType;
+    err = writer.StartContainer(AnonymousTag, kTLVType_Structure, containerType);
+    SuccessOrExit(err);
+
+    // Adding the rotating device id to the TLV data
+    err = writer.PutString(CommonTag(0), testRotatingDeviceId);
+    SuccessOrExit(err);
+
+    err = writer.EndContainer(containerType);
+    SuccessOrExit(err);
+
+    writer.Finalize();
+
+    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), buffer->Start(), buffer->DataLength(), TRUE, NULL, NULL);
+    bluez_gatt_characteristic1_set_value(characteristic, cValue);
+
+    ChipLogDetail(DeviceLayer, "Set Characteristics value to %s", g_variant_get_string(cValue, NULL));
+    return;
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data", __func__);
+    }
+    return;
+}
+
 static void BluezPeripheralObjectsSetup(gpointer apClosure)
 {
 
@@ -1307,6 +1345,8 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
     g_signal_connect(endpoint->mpC3, "handle-start-notify", G_CALLBACK(BluezCharacteristicStartNotify), apClosure);
     g_signal_connect(endpoint->mpC3, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), apClosure);
     g_signal_connect(endpoint->mpC3, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), apClosure);
+    // update the characteristic value
+    UpdateAdditionalDataCharacteristic(endpoint->mpC3);
 
     ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC1));
     ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC2));
