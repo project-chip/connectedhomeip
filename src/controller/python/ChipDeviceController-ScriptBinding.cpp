@@ -52,6 +52,7 @@
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
 
+using namespace chip;
 using namespace chip::Ble;
 using namespace chip::DeviceController;
 
@@ -536,9 +537,12 @@ CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceCo
                                             uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
                                             OnErrorFunct onError)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::RendezvousParameters params =
-        chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetConnectionObject(connObj).SetBleLayer(&sBle);
+    CHIP_ERROR err                    = CHIP_NO_ERROR;
+    chip::RendezvousParameters params = chip::RendezvousParameters()
+                                            .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
+                                            .SetSetupPINCode(setupPINCode)
+                                            .SetConnectionObject(connObj)
+                                            .SetBleLayer(&sBle);
     err = devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
     SuccessOrExit(err);
 

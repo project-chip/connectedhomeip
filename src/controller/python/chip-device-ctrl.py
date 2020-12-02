@@ -384,7 +384,7 @@ class DeviceMgrCmd(Cmd):
             if args[0] == "-ip" and len(args) == 3:
                 self.devCtrl.ConnectIP(args[1].encode("utf-8"), int(args[2]))
             elif args[0] == "-ble" and len(args) == 2:
-                self.devCtrl.Connect(FAKE_CONN_OBJ_VALUE, int(args[0]))
+                self.devCtrl.Connect(FAKE_CONN_OBJ_VALUE, int(args[1]))
             else:
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
