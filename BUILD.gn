@@ -69,7 +69,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       deps += [
         "${chip_root}/examples/shell/standalone:chip-shell",
         "${chip_root}/src/messaging/tests/echo:chip-echo-requester",
-        "${chip_root}/src/messaging/tests/echo:chip-echo-responder",            
+        "${chip_root}/src/messaging/tests/echo:chip-echo-responder",
         "${chip_root}/src/qrcodetool",
         "${chip_root}/src/setup_payload",
       ]
