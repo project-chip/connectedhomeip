@@ -42,7 +42,7 @@ using namespace chip;
 constexpr chip::NodeId kClientDeviceId = 12344321;
 constexpr chip::NodeId kServerDeviceId = 12344322;
 
-extern ExchangeManager gExchangeManager;
+extern Messaging::ExchangeManager gExchangeManager;
 
 void InitializeChip(void);
 void ShutdownChip(void);

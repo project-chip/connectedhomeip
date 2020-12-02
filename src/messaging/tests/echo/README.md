@@ -22,9 +22,8 @@ transport (TCP, UDP, or CRMP).
 ## Building
 
 ```
-cd echo
-git submodule update --init
-source third_party/connectedhomeip/scripts/activate.sh
+source scripts/activate.sh
+cd src/messaging/tests/echo
 gn gen out/debug
 ninja -C out/debug
 ```

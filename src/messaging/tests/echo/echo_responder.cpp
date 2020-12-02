@@ -41,7 +41,7 @@ SecureSessionMgr gSessionManager;
 SecurePairingUsingTestSecret gTestPairing;
 
 // Callback handler when a CHIP EchoRequest is received.
-void HandleEchoRequestReceived(NodeId nodeId, System::PacketBuffer * payload)
+void HandleEchoRequestReceived(NodeId nodeId, System::PacketBufferHandle payload)
 {
     printf("Echo Request from node %lu, len=%u ... sending response.\n", nodeId, payload->DataLength());
 }
