@@ -22,23 +22,17 @@
 
 #include "chip-message-send.h"
 
+#include <app/util/common.h>
 #include <assert.h>
 #include <inet/InetLayer.h> // PacketBuffer and the like
+#include <messaging/ExchangeContext.h>
+#include <protocols/Protocols.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/SecureSessionMgr.h> // For SecureSessionMgr
 
 using namespace chip;
 
-// TODO: This is not ideal, but we're still sorting out how secure session
-// managers end up working and whether they're singletons.  In the long term,
-// there will be some sane API that lets us send a message to a given node id.
-//
-// https://github.com/project-chip/connectedhomeip/issues/2566 tracks that API.
-namespace chip {
-extern SecureSessionMgr & SessionManager();
-}
-
-EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
+EmberStatus chipSendUnicast(Messaging::ExchangeContext & exchangeContext, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
     uint16_t frameSize           = encodeApsFrame(nullptr, 0, apsFrame);
     uint32_t dataLengthUnchecked = uint32_t(frameSize) + uint32_t(messageLength);
@@ -73,7 +67,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     memcpy(buffer->Start() + frameSize, message, messageLength);
     buffer->SetDataLength(dataLength);
 
-    CHIP_ERROR err = SessionManager().SendMessage(destination, std::move(buffer));
+    CHIP_ERROR err = exchangeContext.SendMessage(Protocols::kProtocol_InteractionModel, 0, std::move(buffer), Messaging::SendFlags(), 0);
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?

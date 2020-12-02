@@ -275,8 +275,7 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
-                                uint16_t msgLen, uint8_t * message, EmberStatus status)
+bool emberAfMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status)
 {
     return false;
 }
@@ -501,18 +500,6 @@ uint32_t emberAfGetCurrentTimeCallback()
 bool emberAfGetEndpointInfoCallback(EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo)
 {
     return false;
-}
-
-/** @brief Get Source Route Overhead
- *
- * This function is called by the framework to determine the overhead required
- * in the network frame for source routing to a particular destination.
- *
- * @param destination The node id of the destination  Ver.: always
- */
-uint8_t emberAfGetSourceRouteOverheadCallback(EmberNodeId destination)
-{
-    return 0;
 }
 
 /** @brief Registration Abort

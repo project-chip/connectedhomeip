@@ -52,6 +52,7 @@ source_set("all-clusters-common") {
     "${chip_root}/src/app/util/binding-table.cpp",
     "${chip_root}/src/app/util/chip-message-send.cpp",
     "${chip_root}/src/app/util/client-api.cpp",
+    "${chip_root}/src/app/util/context.cpp",
     "${chip_root}/src/app/util/ember-print.cpp",
     "${chip_root}/src/app/util/message.cpp",
     "${chip_root}/src/app/util/process-cluster-message.cpp",

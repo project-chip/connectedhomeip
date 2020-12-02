@@ -54,6 +54,8 @@
 #include <app/util/af-event.h>
 #include <app/util/af.h>
 #include <app/util/binding-table.h>
+#include <app/util/common.h>
+#include <messaging/ExchangeMgr.h>
 #include <system/SystemLayer.h>
 
 using namespace chip;
@@ -208,8 +210,6 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId 
 {
     uint8_t i;
     bool zeroAddress;
-    EmberBindingTableEntry bindingEntry;
-    EmberBindingTableEntry currentBind;
     NodeId destNodeId;
     uint8_t ieeeAddress[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
@@ -224,32 +224,22 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId 
 
     // Create the binding table entry
 
-    // This code assumes that the endpoint and device that is setting the CIE
-    // address is the CIE device itself, and as such the remote endpoint to bind
-    // to is the endpoint that generated the attribute change.  This
-    // assumption is made based on analysis of the behavior of CIE devices
-    // currently existing in the field.
-    bindingEntry.type      = EMBER_UNICAST_BINDING;
-    bindingEntry.local     = endpoint;
-    bindingEntry.clusterId = ZCL_IAS_ZONE_CLUSTER_ID;
-    bindingEntry.remote    = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
-    bindingEntry.nodeId    = destNodeId;
-
     // Cycle through the binding table until we find a valid entry that is not
     // being used, then use the created entry to make the bind.
     for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
-        if (emberGetBinding(i, &currentBind) != EMBER_SUCCESS)
+        EmberBindingTableEntry * bindingEntry;
+        if (emberGetBinding(i, &bindingEntry) != EMBER_SUCCESS)
         {
             // break out of the loop to ensure that an error message still prints
             break;
         }
-        if (currentBind.type != EMBER_UNUSED_BINDING)
+        if (bindingEntry->type != EMBER_UNUSED_BINDING)
         {
             // If the binding table entry created based on the response already exists
             // do nothing.
-            if ((currentBind.local == bindingEntry.local) && (currentBind.clusterId == bindingEntry.clusterId) &&
-                (currentBind.remote == bindingEntry.remote) && (currentBind.type == bindingEntry.type))
+            if ((bindingEntry->local == endpoint) && (bindingEntry->clusterId == ZCL_IAS_ZONE_CLUSTER_ID) &&
+                (bindingEntry->remote == emberAfCurrentCommand()->apsFrame->sourceEndpoint) && (bindingEntry->type == EMBER_UNICAST_BINDING))
             {
                 break;
             }
@@ -258,7 +248,21 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId 
         }
         else
         {
-            emberSetBinding(i, &bindingEntry);
+            // This code assumes that the endpoint and device that is setting the CIE
+            // address is the CIE device itself, and as such the remote endpoint to bind
+            // to is the endpoint that generated the attribute change.  This
+            // assumption is made based on analysis of the behavior of CIE devices
+            // currently existing in the field.
+            bindingEntry->type      = EMBER_UNICAST_BINDING;
+            bindingEntry->local     = endpoint;
+            bindingEntry->clusterId = ZCL_IAS_ZONE_CLUSTER_ID;
+            bindingEntry->remote    = emberAfCurrentCommand()->apsFrame->sourceEndpoint;
+            bindingEntry->nodeId    = destNodeId;
+
+            // Initialize the channel
+            Messaging::ChannelBuilder channelBuilder;
+            channelBuilder.SetPeerNodeId(destNodeId);
+            bindingEntry->channelHandle = gExchangeManager->EstablishChannel(channelBuilder, nullptr);
             break;
         }
     }
@@ -754,7 +758,7 @@ void emberAfPluginIasZoneServerPrintQueueConfig(void)
 // destination when the destination is the only router the node is joined to.
 // In that case, the command will never have been sent, as the device will have
 // had no router by which to send the command.
-void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
+void emberAfIasZoneClusterServerMessageSentCallback(DataModelContext & context,
                                                     EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
                                                     EmberStatus status)
 {

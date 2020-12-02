@@ -121,10 +121,10 @@ bool emAfProcessZdo(EmberNodeId sender, EmberApsFrame * apsFrame, uint8_t * mess
 
 void emAfIncomingMessageHandler(EmberIncomingMessageType type, EmberApsFrame * apsFrame, uint8_t lastHopLqi, int8_t lastHopRssi,
                                 uint16_t messageLength, uint8_t * messageContents);
-EmberStatus emAfSend(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint8_t messageLength,
-                     uint8_t * message, uint8_t * messageTag, EmberNodeId alias, uint8_t sequence);
-void emAfMessageSentHandler(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
-                            EmberStatus status, uint16_t messageLength, uint8_t * messageContents, uint8_t messageTag);
+EmberStatus emAfSend(chip::Messaging::ExchangeContext & exchangeContext, EmberApsFrame * apsFrame, uint8_t messageLength, uint8_t * message,
+                     uint8_t * messageTag, EmberNodeId alias, uint8_t sequence);
+void emAfMessageSentHandler(DataModelContext & context, EmberApsFrame * apsFrame, EmberStatus status, uint16_t messageLength,
+                            uint8_t * messageContents, uint8_t messageTag);
 
 void emAfStackStatusHandler(EmberStatus status);
 void emAfNetworkInit(void);

@@ -315,7 +315,7 @@ EmberStatus emberAfSendCommandMulticastToBindings(void)
     return emberAfSendMulticastToBindings(emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer);
 }
 
-// EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination,
+// EmberStatus emberAfSendCommandUnicastWithCallback(DataModelContext & context,
 //                                                   EmberAfMessageSentFunction callback)
 // {
 //     return emberAfSendUnicastWithCallback(type, indexOrDestination, emAfCommandApsFrame, *emAfResponseLengthPtr, emAfZclBuffer,

@@ -64,8 +64,8 @@ static void removeConfigurationAndScheduleTick(uint8_t index);
 static EmberAfStatus configureReceivedAttribute(const EmberAfClusterCommand * cmd, AttributeId attributeId, uint8_t mask,
                                                 uint16_t timeout);
 static void putReportableChangeInResp(const EmberAfPluginReportingEntry * entry, EmberAfAttributeType dataType);
-static void retrySendReport(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                            uint8_t * message, EmberStatus status);
+static void retrySendReport(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                            EmberStatus status);
 static uint32_t computeStringHash(uint8_t * data, uint8_t length);
 
 EmberEventControl emberAfPluginReportingTickEventControl;
@@ -90,13 +90,13 @@ EmberAfStatus emberAfPluginReportingConfiguredCallback(const EmberAfPluginReport
     return EMBER_ZCL_STATUS_SUCCESS;
 }
 
-static void retrySendReport(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint16_t msgLen,
-                            uint8_t * message, EmberStatus status)
+static void retrySendReport(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                            EmberStatus status)
 {
     // Retry once, and do so by unicasting without a pointer to this callback
     if (status != EMBER_SUCCESS)
     {
-        emberAfSendUnicast(type, indexOrDestination, apsFrame, msgLen, message);
+        emberAfSendUnicast(context, apsFrame, msgLen, message);
     }
 }
 
@@ -184,7 +184,7 @@ void emberAfPluginReportingTickEventHandler(void)
     uint8_t i;
     uint16_t dataSize;
     bool clientToServer = false;
-    EmberBindingTableEntry bindingEntry;
+    EmberBindingTableEntry * bindingEntry;
     // reportSize needs to be able to fit a sum of dataSize and some other stuff
     // without overflowing.
     uint32_t reportSize;
@@ -273,11 +273,10 @@ void emberAfPluginReportingTickEventHandler(void)
             for (index = 0; index < EMBER_BINDING_TABLE_SIZE; index++)
             {
                 status = (EmberAfStatus) emberGetBinding(index, &bindingEntry);
-                if (status == (EmberAfStatus) EMBER_SUCCESS && bindingEntry.local == entry.endpoint &&
-                    bindingEntry.clusterId == entry.clusterId)
+                if (status == (EmberAfStatus) EMBER_SUCCESS && bindingEntry->local == entry.endpoint &&
+                    bindingEntry->clusterId == entry.clusterId)
                 {
-                    currentPayloadMaxLength =
-                        emberAfMaximumApsPayloadLength(bindingEntry.type, bindingEntry.networkIndex, apsFrame);
+                    currentPayloadMaxLength = 255; /* TODO: How to calculate max available payload size */;
                     if (currentPayloadMaxLength < smallestPayloadMaxLength)
                     {
                         smallestPayloadMaxLength = currentPayloadMaxLength;

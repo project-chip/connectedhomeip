@@ -130,8 +130,12 @@ public:
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
     uint64_t GetPeerNodeId() const { return mPeerNodeId; }
+    uint64_t GetGroupId() const { return 0; /* TODO: group not implemented yet */ }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
+
+    size_t GetMTU() { return 1280; /* TODO: calculate MTU */ }
+    bool IsUnicast() { return true; /* multi/group cast not implemented yet */ }
 
     /*
      * In order to use reference counting (see refCount below) we use a hold/free paradigm where users of the exchange

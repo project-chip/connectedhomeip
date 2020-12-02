@@ -85,6 +85,7 @@
 //#include "app/framework/util/print.h"
 //#include "app/framework/util/time-util.h"
 #include "client-api.h"
+#include "context.h"
 #include "debug-printing.h"
 #include "ember-print.h"
 
@@ -1284,14 +1285,13 @@ EmberStatus emberAfSendBroadcastWithAliasWithCallback(EmberNodeId destination, E
 /**
  * @brief Sends unicast.
  */
-EmberStatus emberAfSendUnicast(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
-                               uint16_t messageLength, uint8_t * message);
+EmberStatus emberAfSendUnicast(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
 
 /**
  * @brief Sends unicast with attached message sent callback.
  */
-EmberStatus emberAfSendUnicastWithCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
-                                           uint16_t messageLength, uint8_t * message, EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendUnicastWithCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t messageLength,
+                                           uint8_t * message, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Unicasts the message to each remote node in the binding table that
@@ -1377,13 +1377,12 @@ EmberStatus emberAfSendCommandMulticastToBindings(void);
  * using the emberAfFill... macros from the client command API.
  * It will be sent as unicast.
  */
-EmberStatus emberAfSendCommandUnicast(EmberOutgoingMessageType type, uint16_t indexOrDestination);
+EmberStatus emberAfSendCommandUnicast(DataModelContext & context);
 
 /**
  * @brief emberAfSendCommandUnicast with attached message sent callback.
  */
-EmberStatus emberAfSendCommandUnicastWithCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination,
-                                                  EmberAfMessageSentFunction callback);
+EmberStatus emberAfSendCommandUnicastWithCallback(DataModelContext & context, EmberAfMessageSentFunction callback);
 
 /**
  * @brief Sends the command prepared with emberAfFill.... macro.
@@ -1460,24 +1459,6 @@ EmberStatus emberAfSendImmediateDefaultResponse(EmberAfStatus status);
  * @brief emberAfSendImmediateDefaultResponse with attached message sent callback.
  */
 EmberStatus emberAfSendImmediateDefaultResponseWithCallback(EmberAfStatus status, EmberAfMessageSentFunction callback);
-
-/**
- * @brief Returns the maximum size of the payload that the Application
- * Support sub-layer will accept for the given message type, destination, and
- * APS frame.
- *
- * The size depends on multiple factors, including the security level in use
- * and additional information added to the message to support the various
- * options.
- *
- * @param type The outgoing message type.
- * @param indexOrDestination Depending on the message type, this is either the
- *  EmberNodeId of the destination, an index into the address table, an index
- *  into the binding table, the multicast identifier, or a broadcast address.
- * @param apsFrame The APS frame for the message.
- * @return The maximum APS payload length for the given message.
- */
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame);
 
 /**
  * @brief Access to client API APS frame.

@@ -45,6 +45,7 @@
 #include "af.h"
 #include "attribute-storage.h"
 #include "attribute-table.h"
+#include "context.h"
 #include "time-util.h"
 #include "util.h"
 
@@ -52,4 +53,5 @@
 extern EmberApsFrame emberAfResponseApsFrame;
 extern uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 extern uint16_t appResponseLength;
-extern chip::NodeId emberAfResponseDestination;
+extern DataModelContext dmContext;
+extern chip::Messaging::ExchangeManager * gExchangeManager;

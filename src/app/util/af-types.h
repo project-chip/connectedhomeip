@@ -52,12 +52,15 @@
 #include <stdint.h>  // For various uint*_t types
 
 #include "basic-types.h"
+#include "context.h"
 #include "gen/enums.h"
 #include "types_stub.h" // For various types.
 
 #ifdef EZSP_HOST
 #include "app/util/ezsp/ezsp-enum.h"
 #endif
+
+#include "messaging/ExchangeContext.h"
 
 /**
  * @brief Type for referring to ZCL attribute type
@@ -1244,8 +1247,8 @@ typedef void (*EmberAfDefaultResponseFunction)(chip::EndpointId endpoint, chip::
  *
  * This function is called when a message is sent.
  */
-typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame,
-                                           uint16_t msgLen, uint8_t * message, EmberStatus status);
+typedef void (*EmberAfMessageSentFunction)(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message,
+                                           EmberStatus status);
 
 /**
  * @brief The EmberAfMessageStruct is a struct wrapper that
@@ -1254,13 +1257,11 @@ typedef void (*EmberAfMessageSentFunction)(EmberOutgoingMessageType type, uint64
  */
 typedef struct
 {
+    chip::Messaging::ExchangeContext & exchangeContext;
     EmberAfMessageSentFunction callback;
     EmberApsFrame * apsFrame;
     uint8_t * message;
-    uint64_t indexOrDestination;
     uint16_t messageLength;
-    EmberOutgoingMessageType type;
-    bool broadcast;
 } EmberAfMessageStruct;
 
 /**

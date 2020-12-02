@@ -139,7 +139,7 @@ uint16_t emberAfGetMfgCodeFromCurrentCommand(void);
 // EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH is defined in config.h
 #define EMBER_AF_RESPONSE_BUFFER_LEN EMBER_AF_MAXIMUM_SEND_PAYLOAD_LENGTH
 
-void emberAfInit(void);
+void emberAfInit(chip::Messaging::ExchangeManager & exchangeManager);
 void emberAfTick(void);
 uint16_t emberAfFindClusterNameIndex(chip::ClusterId cluster);
 uint16_t emberAfFindClusterNameIndexWithMfgCode(chip::ClusterId cluster, uint16_t mfgCode);

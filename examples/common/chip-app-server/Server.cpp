@@ -26,6 +26,8 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <lib/mdns/DiscoveryManager.h>
+#include <messaging/ExchangeDelegate.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
@@ -42,40 +44,9 @@ using namespace ::chip::DeviceLayer;
 
 namespace {
 
-class ServerCallback : public SecureSessionMgrDelegate
-{
-public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBufferHandle buffer,
-                           SecureSessionMgr * mgr) override
-    {
-        const size_t data_len = buffer->DataLength();
-        char src_addr[PeerAddress::kMaxToStringSize];
-
-        // as soon as a client connects, assume it is connected
-        VerifyOrExit(!buffer.IsNull(), ChipLogProgress(AppServer, "Received data but couldn't process it..."));
-        VerifyOrExit(header.GetSourceNodeId().HasValue(), ChipLogProgress(AppServer, "Unknown source for received message"));
-
-        VerifyOrExit(state->GetPeerNodeId() != kUndefinedNodeId, ChipLogProgress(AppServer, "Unknown source for received message"));
-
-        state->GetPeerAddress().ToString(src_addr, sizeof(src_addr));
-
-        ChipLogProgress(AppServer, "Packet received from %s: %zu bytes", src_addr, static_cast<size_t>(data_len));
-
-        HandleDataModelMessage(header, std::move(buffer), mgr);
-
-    exit:;
-    }
-
-    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
-    {
-        ChipLogProgress(AppServer, "Received a new connection.");
-    }
-};
-
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
-ServerCallback gCallbacks;
+Messaging::ExchangeManager gExchangeManager;
 SecurePairingUsingTestSecret gTestPairing;
 RendezvousServer gRendezvousServer;
 
@@ -92,8 +63,6 @@ void InitServer()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
-
-    InitDataModelHandler();
 
     // Init transport before operations with secure session mgr.
     err = gTransports.Init(UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(kIPAddressType_IPv6));
@@ -121,7 +90,9 @@ void InitServer()
     err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
 
-    gSessions.SetDelegate(&gCallbacks);
+    gExchangeManager.Init(&gSessions);
+    gSessions.SetDelegate(&gExchangeManager);
+    InitDataModelHandler(gExchangeManager);
     chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice(chip::Inet::kIPAddressType_IPv6);
 exit:
     if (err != CHIP_NO_ERROR)

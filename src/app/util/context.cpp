@@ -1,4 +1,4 @@
-/*
+/**
  *
  *    Copyright (c) 2020 Project CHIP Authors
  *
@@ -15,35 +15,23 @@
  *    limitations under the License.
  */
 
-/**
- * @file
- *   This file implements the handler for data model messages.
- */
+#include "context.h"
 
-#include <lib/support/logging/CHIPLogging.h>
-#include <support/logging/CHIPLogging.h>
-#include <system/SystemPacketBuffer.h>
+#include "common.h"
 
-#include "DataModelHandler.h"
+DataModelHandler gDataModelHandler;
 
-#include <app/chip-zcl-zpro-codec.h>
-#include <app/util/af-types.h>
-#include <app/util/attribute-storage.h>
-#include <app/util/util.h>
-
-using namespace ::chip;
-
-/**
- * Handle a message that should be processed via our data model processing
- * codepath. This function will free the packet buffer.
- *
- * @param [in] buffer The buffer holding the message.  This function guarantees
- *                    that it will free the buffer before returning.
- */
-void HandleDataModelMessage(const PacketHeader & header, System::PacketBufferHandle buffer, SecureSessionMgr * mgr)
+chip::Messaging::ExchangeDelegate * GetDataModelHandler()
 {
+    return &gDataModelHandler;
+}
+
+void DataModelHandler::OnMessageReceived(chip::Messaging::ExchangeContext * ec, const chip::PacketHeader & packetHeader, uint32_t protocolId,
+                                         uint8_t msgType, chip::System::PacketBufferHandle payload)
+{
+    auto contextLock = dmContext.Scoped(ec);
     EmberApsFrame frame;
-    bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
+    bool ok = extractApsFrame(payload->Start(), payload->DataLength(), &frame) > 0;
     if (ok)
     {
         ChipLogProgress(Zcl, "APS frame processing success!");
@@ -55,11 +43,11 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBufferHan
     }
 
     uint8_t * message;
-    uint16_t messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
+    uint16_t messageLen = extractMessage(payload->Start(), payload->DataLength(), &message);
     ok                  = emberAfProcessMessage(&frame,
                                0, // type
                                message, messageLen,
-                               header.GetSourceNodeId().Value(), // source identifier
+                               packetHeader.GetSourceNodeId().Value(), // source identifier
                                NULL);
 
     if (ok)
@@ -69,11 +57,9 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBufferHan
     else
     {
         ChipLogProgress(Zcl, "Data model processing failure!");
+        return;
     }
 }
 
-void InitDataModelHandler(chip::Messaging::ExchangeManager & exchangeManager)
-{
-    emberAfEndpointConfigure();
-    emberAfInit(exchangeManager);
-}
+void DataModelHandler::OnResponseTimeout(chip::Messaging::ExchangeContext * ec) {}
+void DataModelHandler::OnExchangeClosing(chip::Messaging::ExchangeContext * ec) {}

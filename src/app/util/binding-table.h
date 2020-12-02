@@ -26,8 +26,6 @@
 // Should this be configurable by the app somehow?
 #define BINDING_TABLE_SIZE 10
 
-EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result);
-
-EmberStatus emberSetBinding(uint8_t index, EmberBindingTableEntry * result);
+EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry ** result);
 
 EmberStatus emberDeleteBinding(uint8_t index);

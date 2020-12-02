@@ -99,25 +99,14 @@ static EmberAfStatus addEntryToGroupTable(EndpointId endpoint, GroupId groupId, 
     // Look for an empty binding slot.
     for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
-        EmberBindingTableEntry binding;
-        if (emberGetBinding(i, &binding) == EMBER_SUCCESS && binding.type == EMBER_UNUSED_BINDING)
+        EmberBindingTableEntry * binding;
+        if (emberGetBinding(i, &binding) == EMBER_SUCCESS && binding->type == EMBER_UNUSED_BINDING)
         {
-            EmberStatus status;
-            binding.type    = EMBER_MULTICAST_BINDING;
-            binding.groupId = groupId;
-            binding.local   = endpoint;
-
-            status = emberSetBinding(i, &binding);
-            if (status == EMBER_SUCCESS)
-            {
-                // Set the group name, if supported
-                emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
-                return EMBER_ZCL_STATUS_SUCCESS;
-            }
-            else
-            {
-                emberAfGroupsClusterPrintln("ERR: Failed to create binding (0x%x)", status);
-            }
+            binding->type    = EMBER_MULTICAST_BINDING;
+            binding->groupId = groupId;
+            binding->local   = endpoint;
+            // TODO: binding->channelHandle = {Create group channel}
+            emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
         }
     }
     emberAfGroupsClusterPrintln("ERR: Binding table is full");
@@ -224,12 +213,12 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
     {
         for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
         {
-            EmberBindingTableEntry entry;
+            EmberBindingTableEntry * entry;
             status = emberGetBinding(i, &entry);
-            if ((status == EMBER_SUCCESS) && (entry.type == EMBER_MULTICAST_BINDING) && (entry.local == emberAfCurrentEndpoint()))
+            if ((status == EMBER_SUCCESS) && (entry->type == EMBER_MULTICAST_BINDING) && (entry->local == emberAfCurrentEndpoint()))
             {
-                list[listLen]     = LOW_BYTE(entry.groupId);
-                list[listLen + 1] = HIGH_BYTE(entry.groupId);
+                list[listLen]     = LOW_BYTE(entry->groupId);
+                list[listLen + 1] = HIGH_BYTE(entry->groupId);
                 listLen           = static_cast<uint8_t>(listLen + 2);
                 count++;
             }
@@ -242,11 +231,11 @@ bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t 
             GroupId groupId = emberAfGetInt16u(groupList + (i << 1), 0, 2);
             for (j = 0; j < EMBER_BINDING_TABLE_SIZE; j++)
             {
-                EmberBindingTableEntry entry;
+                EmberBindingTableEntry * entry;
                 status = emberGetBinding(j, &entry);
-                if ((status == EMBER_SUCCESS) && (entry.type == EMBER_MULTICAST_BINDING))
+                if ((status == EMBER_SUCCESS) && (entry->type == EMBER_MULTICAST_BINDING))
                 {
-                    if (entry.local == emberAfCurrentEndpoint() && entry.groupId == groupId)
+                    if (entry->local == emberAfCurrentEndpoint() && entry->groupId == groupId)
                     {
                         list[listLen]     = LOW_BYTE(groupId);
                         list[listLen + 1] = HIGH_BYTE(groupId);
@@ -324,10 +313,10 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
 
     for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
-        EmberBindingTableEntry binding;
+        EmberBindingTableEntry * binding;
         if (emberGetBinding(i, &binding) == EMBER_SUCCESS)
         {
-            if (binding.type == EMBER_MULTICAST_BINDING && endpoint == binding.local)
+            if (binding->type == EMBER_MULTICAST_BINDING && endpoint == binding->local)
             {
                 EmberStatus status = emberDeleteBinding(i);
                 if (status != EMBER_SUCCESS)
@@ -338,7 +327,7 @@ bool emberAfGroupsClusterRemoveAllGroupsCallback(void)
                 else
                 {
                     uint8_t groupName[ZCL_GROUPS_CLUSTER_MAXIMUM_NAME_LENGTH + 1] = { 0 };
-                    GroupId groupId                                               = binding.groupId;
+                    GroupId groupId                                               = binding->groupId;
                     emberAfPluginGroupsServerSetGroupNameCallback(endpoint, groupId, groupName);
                     success = true && success;
 
@@ -398,9 +387,9 @@ void emberAfGroupsClusterClearGroupTableCallback(EndpointId endpoint)
     uint8_t i, networkIndex = 0 /* emberGetCurrentNetwork() */;
     for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
-        EmberBindingTableEntry binding;
-        if (emberGetBinding(i, &binding) == EMBER_SUCCESS && binding.type == EMBER_MULTICAST_BINDING &&
-            (endpoint == binding.local || (endpoint == EMBER_BROADCAST_ENDPOINT && networkIndex == binding.networkIndex)))
+        EmberBindingTableEntry * binding;
+        if (emberGetBinding(i, &binding) == EMBER_SUCCESS && binding->type == EMBER_MULTICAST_BINDING &&
+            (endpoint == binding->local || (endpoint == EMBER_BROADCAST_ENDPOINT && networkIndex == binding->networkIndex)))
         {
             EmberStatus status = emberDeleteBinding(i);
             if (status != EMBER_SUCCESS)
@@ -417,10 +406,10 @@ static bool isGroupPresent(EndpointId endpoint, GroupId groupId)
 
     for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
-        EmberBindingTableEntry binding;
+        EmberBindingTableEntry * binding;
         if (emberGetBinding(i, &binding) == EMBER_SUCCESS)
         {
-            if (bindingGroupMatch(endpoint, groupId, &binding))
+            if (bindingGroupMatch(endpoint, groupId, binding))
             {
                 return true;
             }
@@ -442,9 +431,9 @@ static uint8_t findGroupIndex(EndpointId endpoint, GroupId groupId)
 
     for (i = 0; i < EMBER_BINDING_TABLE_SIZE; i++)
     {
-        EmberBindingTableEntry entry;
+        EmberBindingTableEntry * entry;
         status = emberGetBinding(i, &entry);
-        if ((status == EMBER_SUCCESS) && bindingGroupMatch(endpoint, groupId, &entry))
+        if ((status == EMBER_SUCCESS) && bindingGroupMatch(endpoint, groupId, entry))
         {
             return i;
         }

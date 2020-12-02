@@ -18,12 +18,12 @@
 /**
  * @file
  *   This file declares a function that can be called to send a unicast message
- *   (in the form of a buffer and length) to a given response destination node
- *   id.
+ *   (in the form of a buffer and length) to a given exchange.
  */
 
 #pragma once
 
+#include "messaging/ExchangeContext.h"
 #include "types_stub.h" // For EmberApsFrame, EmberStatus, node ids.
 
 /**
@@ -32,10 +32,10 @@
  *    by serializing the given APS frame followed by the actual message
  *    buffer passed in.
  *
- * @param[in] destination The destination node id to send the message to.
  * @param[in] apsFrame The APS frame to use for the message.
  * @param[in] messageLength The length of the message to send after the APS
  *                          frame.
  * @param[in] message The message to send after the APS frame.
  */
-EmberStatus chipSendUnicast(chip::NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message);
+EmberStatus chipSendUnicast(chip::Messaging::ExchangeContext & exchangeContext, EmberApsFrame * apsFrame, uint16_t messageLength,
+                            uint8_t * message);

@@ -78,7 +78,7 @@ void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}Manufac
  * @param message            The message that was sent
  * @param status             The status of the sent message
  */
-void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}MessageSentCallback(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
+void emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}MessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief {{name}} Cluster {{asCamelCased side false}} Pre Attribute Changed
  *
@@ -351,8 +351,7 @@ bool emberAfPreMessageSendCallback(EmberAfMessageStruct * messageStruct, EmberSt
  * @param message   Ver.: always
  * @param status   Ver.: always
  */
-bool emberAfMessageSentCallback(EmberOutgoingMessageType type, uint16_t indexOrDestination, EmberApsFrame * apsFrame,
-                                uint16_t msgLen, uint8_t * message, EmberStatus status);
+bool emberAfMessageSentCallback(DataModelContext & context, EmberApsFrame * apsFrame, uint16_t msgLen, uint8_t * message, EmberStatus status);
 
 /** @brief Pre Attribute Change
  *
@@ -551,15 +550,6 @@ uint32_t emberAfGetCurrentTimeCallback();
  * with information about the endpoint.  Ver.: always
  */
 bool emberAfGetEndpointInfoCallback(chip::EndpointId endpoint, uint8_t * returnNetworkIndex, EmberAfEndpointInfoStruct * returnEndpointInfo);
-
-/** @brief Get Source Route Overhead
- *
- * This function is called by the framework to determine the overhead required
- * in the network frame for source routing to a particular destination.
- *
- * @param destination The node id of the destination  Ver.: always
- */
-uint8_t emberAfGetSourceRouteOverheadCallback(EmberNodeId destination);
 
 /** @brief Registration Abort
  *

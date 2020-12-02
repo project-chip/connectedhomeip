@@ -22,6 +22,7 @@
 
 #pragma once
 
+#include <messaging/ExchangeMgr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/MessageHeader.h>
@@ -35,4 +36,4 @@
  */
 void HandleDataModelMessage(const chip::PacketHeader & header, chip::System::PacketBufferHandle buffer,
                             chip::SecureSessionMgr * mgr);
-void InitDataModelHandler();
+void InitDataModelHandler(chip::Messaging::ExchangeManager & exchangeManager);

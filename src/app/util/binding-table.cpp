@@ -24,25 +24,14 @@
 
 static EmberBindingTableEntry bindingTable[EMBER_BINDING_TABLE_SIZE];
 
-EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result)
+EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry ** result)
 {
     if (index >= EMBER_BINDING_TABLE_SIZE)
     {
         return EMBER_BAD_ARGUMENT;
     }
 
-    *result = bindingTable[index];
-    return EMBER_SUCCESS;
-}
-
-EmberStatus emberSetBinding(uint8_t index, EmberBindingTableEntry * result)
-{
-    if (index >= EMBER_BINDING_TABLE_SIZE)
-    {
-        return EMBER_BAD_ARGUMENT;
-    }
-
-    bindingTable[index] = *result;
+    *result = &bindingTable[index];
     return EMBER_SUCCESS;
 }
 

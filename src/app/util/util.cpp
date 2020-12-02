@@ -56,6 +56,10 @@
 #include <app/reporting/reporting.h>
 #endif // EMBER_AF_PLUGIN_REPORTING
 
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
+#include <protocols/Protocols.h>
+
 using namespace chip;
 
 // TODO: Need to figure out what needs to happen wrt HAL tokens here, but for
@@ -232,8 +236,7 @@ static void prepareForResponse(const EmberAfClusterCommand * cmd)
 
     if (cmd->interPanHeader == NULL)
     {
-        emberAfResponseDestination = cmd->source;
-        emberAfResponseType        = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_INTERPAN);
+        emberAfResponseType = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_INTERPAN);
     }
     else
     {
@@ -247,12 +250,15 @@ static void prepareForResponse(const EmberAfClusterCommand * cmd)
 // ****************************************
 // Initialize Clusters
 // ****************************************
-void emberAfInit(void)
+void emberAfInit(chip::Messaging::ExchangeManager & exchangeManager)
 {
     uint8_t i;
 #ifdef EMBER_AF_ENABLE_STATISTICS
     afNumPktsSent = 0;
 #endif
+
+    gExchangeManager = &exchangeManager;
+    gExchangeManager->RegisterUnsolicitedMessageHandler(Protocols::kProtocol_InteractionModel, 0, GetDataModelHandler());
 
     for (i = 0; i < EMBER_SUPPORTED_NETWORKS; i++)
     {
@@ -657,12 +663,6 @@ void emAfApplyDisableDefaultResponse(uint8_t * frame_control)
     }
 }
 
-static bool isBroadcastDestination(NodeId responseDestination)
-{
-    // FIXME: Will need to actually figure out how to test for this!
-    return false;
-}
-
 EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
 {
     EmberStatus status;
@@ -706,24 +706,15 @@ EmberStatus emberAfSendResponseWithCallback(EmberAfMessageSentFunction callback)
         status              = emberAfInterpanSendMessageCallback(&interpanResponseHeader, appResponseLength, appResponseData);
         emberAfResponseType = static_cast<uint8_t>(emberAfResponseType & ~ZCL_UTIL_RESP_INTERPAN);
     }
-    else if (!isBroadcastDestination(emberAfResponseDestination))
+    else if (dmContext.GetExchangeContext().IsUnicast())
     {
         label  = 'U';
-        status = emberAfSendUnicastWithCallback(EMBER_OUTGOING_DIRECT, emberAfResponseDestination, &emberAfResponseApsFrame,
-                                                appResponseLength, appResponseData, callback);
+        status = emberAfSendUnicastWithCallback(dmContext, &emberAfResponseApsFrame, appResponseLength, appResponseData, callback);
     }
     else
     {
-        label = 'B';
-#if 0
-    status = emberAfSendBroadcastWithCallback(emberAfResponseDestination,
-                                              &emberAfResponseApsFrame,
-                                              appResponseLength,
-                                              appResponseData,
-                                              callback);
-#else
-        status = EMBER_SUCCESS;
-#endif
+        label  = 'B';
+        status = emberAfSendUnicastWithCallback(dmContext, &emberAfResponseApsFrame, appResponseLength, appResponseData, callback);
     }
     UNUSED_VAR(label);
     emberAfDebugPrintln("T%4x:TX (%p) %ccast 0x%x%p", 0, "resp", label, status, "");
@@ -809,52 +800,6 @@ EmberStatus emberAfSendDefaultResponseWithCallback(const EmberAfClusterCommand *
 EmberStatus emberAfSendDefaultResponse(const EmberAfClusterCommand * cmd, EmberAfStatus status)
 {
     return emberAfSendDefaultResponseWithCallback(cmd, status, NULL);
-}
-
-uint8_t emberAfMaximumApsPayloadLength(EmberOutgoingMessageType type, uint64_t indexOrDestination, EmberApsFrame * apsFrame)
-{
-    NodeId destination = EMBER_UNKNOWN_NODE_ID;
-    uint8_t max        = EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH;
-
-    if ((apsFrame->options & EMBER_APS_OPTION_SOURCE_EUI64) != 0U)
-    {
-        max = static_cast<uint8_t>(max - EUI64_SIZE);
-    }
-    if ((apsFrame->options & EMBER_APS_OPTION_DESTINATION_EUI64) != 0U)
-    {
-        max = static_cast<uint8_t>(max - EUI64_SIZE);
-    }
-    if ((apsFrame->options & EMBER_APS_OPTION_FRAGMENT) != 0U)
-    {
-        max = static_cast<uint8_t>(max - EMBER_AF_APS_FRAGMENTATION_OVERHEAD);
-    }
-
-    switch (type)
-    {
-    case EMBER_OUTGOING_DIRECT:
-        destination = indexOrDestination;
-        break;
-    case EMBER_OUTGOING_VIA_ADDRESS_TABLE:
-        // destination = emberGetAddressTableRemoteNodeId(indexOrDestination);
-        break;
-    case EMBER_OUTGOING_VIA_BINDING:
-        // destination = emberGetBindingRemoteNodeId(indexOrDestination);
-        break;
-    case EMBER_OUTGOING_MULTICAST:
-        // APS multicast messages include the two-byte group id and exclude the
-        // one-byte destination endpoint, for a net loss of an extra byte.
-        max--;
-        break;
-    case EMBER_OUTGOING_BROADCAST:
-        break;
-    default:
-        // MISRA requires default case.
-        break;
-    }
-
-    max = static_cast<uint8_t>(max - emberAfGetSourceRouteOverheadCallback(destination));
-
-    return max;
 }
 
 void emberAfCopyInt16u(uint8_t * data, uint16_t index, uint16_t x)

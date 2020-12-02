@@ -41,6 +41,7 @@
 
 #include "af.h"
 #include "config.h"
+#include "context.h"
 #include "util.h"
 
 using namespace chip;
@@ -55,9 +56,10 @@ using namespace chip;
 // receives multiple ZCL messages, the stack will queue these and hand
 // these to the application via emberIncomingMsgHandler one at a time.
 EmberApsFrame emberAfResponseApsFrame;
-NodeId emberAfResponseDestination;
+DataModelContext dmContext;
 uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 uint16_t appResponseLength;
+chip::Messaging::ExchangeManager * gExchangeManager;
 
 // Used for empty string
 static uint16_t zeroLenByte     = 0;
@@ -72,7 +74,6 @@ void emberAfClearResponseData(void)
     emberAfResponseType = ZCL_UTIL_RESP_NORMAL;
     // To prevent accidentally sending to someone else,
     // set the destination to ourselves.
-    emberAfResponseDestination = 0 /* emberAfGetNodeId() */;
     memset(appResponseData, 0, EMBER_AF_RESPONSE_BUFFER_LEN);
     appResponseLength = 0;
     memset(&emberAfResponseApsFrame, 0, sizeof(EmberApsFrame));
