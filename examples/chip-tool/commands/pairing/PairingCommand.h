@@ -44,6 +44,8 @@ public:
             AddArgument("device-remote-port", 0, UINT16_MAX, &mRemotePort);
             break;
         case PairingMode::Ble:
+            AddArgument("ssid", &mSSID);
+            AddArgument("password", &mPassword);
             AddArgument("setup-pin-code", 0, 134217727, &mSetupPINCode);
             AddArgument("discriminator", 0, 4096, &mDiscriminator);
             break;
