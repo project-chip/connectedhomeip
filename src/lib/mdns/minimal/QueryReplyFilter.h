@@ -24,6 +24,7 @@
 namespace mdns {
 namespace Minimal {
 
+/// A reply filter implementation based on a received/parsed query.
 class QueryReplyFilter : public ReplyFilter
 {
 public:
@@ -46,6 +47,11 @@ public:
         return mIgnoreNameMatch || (mQueryData.GetName() == qname);
     }
 
+    /// Ignore qname matches during Accept calls (if set to true, only qtype and qclass are matched).
+    ///
+    /// Ignoring qname is useful when sending related data replies: cliens often query for PTR
+    /// records however to avoid chattyness, servers generally send all of PTR, SRV (pointed to by PTR)
+    /// and A/AAAA (pointed to by SRV).
     QueryReplyFilter & SetIgnoreNameMatch(bool ignore)
     {
         mIgnoreNameMatch = ignore;

@@ -24,7 +24,7 @@
 #define RETURN_IF_ERROR(err)                                                                                                       \
     do                                                                                                                             \
     {                                                                                                                              \
-        if (err)                                                                                                                   \
+        if (err != CHIP_NO_ERROR)                                                                                                  \
         {                                                                                                                          \
             return;                                                                                                                \
         }                                                                                                                          \

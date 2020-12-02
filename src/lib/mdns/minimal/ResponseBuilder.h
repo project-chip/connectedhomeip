@@ -25,6 +25,7 @@
 namespace mdns {
 namespace Minimal {
 
+/// Writes a MDNS reply into a given packet buffer.
 class ResponseBuilder
 {
 public:
