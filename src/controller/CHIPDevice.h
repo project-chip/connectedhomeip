@@ -209,6 +209,11 @@ private:
         ClusterId cluster;
     };
 
+    enum class ResetTransport
+    {
+        kYes,
+        kNo,
+    };
     /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
 
@@ -250,7 +255,7 @@ private:
      *
      * @param[in] resetNeeded   Does the underlying network socket require a reset
      */
-    CHIP_ERROR LoadSecureSessionParameters(bool resetNeeded);
+    CHIP_ERROR LoadSecureSessionParameters(ResetTransport resetNeeded);
 };
 
 /**

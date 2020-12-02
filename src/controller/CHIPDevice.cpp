@@ -59,7 +59,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
     // If there is no secure connection to the device, try establishing it
     if (mState != ConnectionState::SecureConnected)
     {
-        err = LoadSecureSessionParameters(false);
+        err = LoadSecureSessionParameters(ResetTransport::kNo);
         SuccessOrExit(err);
     }
     else
@@ -79,7 +79,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
     {
         mState = ConnectionState::NotConnected;
 
-        err = LoadSecureSessionParameters(true);
+        err = LoadSecureSessionParameters(ResetTransport::kYes);
         SuccessOrExit(err);
 
         err = mSessionManager->SendMessage(mDeviceId, std::move(resend));
@@ -202,7 +202,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
     }
 }
 
-CHIP_ERROR Device::LoadSecureSessionParameters(bool resetNeeded)
+CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     SecurePairingSession pairingSession;
@@ -215,7 +215,7 @@ CHIP_ERROR Device::LoadSecureSessionParameters(bool resetNeeded)
     err = pairingSession.FromSerializable(mPairing);
     SuccessOrExit(err);
 
-    if (resetNeeded)
+    if (resetNeeded == ResetTransport::kYes)
     {
         err = mTransportMgr->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6)
 #if INET_CONFIG_ENABLE_IPV4
