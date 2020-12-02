@@ -127,8 +127,7 @@ public:
      */
     CHIP_ERROR Init(TcpListenParameters & params);
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
-                           System::PacketBuffer * msgBuf) override;
+    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override;
 
     void Disconnect(const PeerAddress & address) override;
 
@@ -178,7 +177,8 @@ private:
      * Ownership of buffer is taken over and will be freed (or re-enqueued to the endPoint receive queue)
      * as needed during processing.
      */
-    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress, System::PacketBuffer * buffer);
+    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+                                     System::PacketBufferHandle buffer);
 
     /**
      * Process a single message of the specified size from a buffer.
@@ -186,15 +186,13 @@ private:
      * @param peerAddress the peer the data is coming from
      * @param buffer the buffer containing the message
      * @param messageSize how much of the head contains the actual message
-     *
-     * Does *not* free buffer.
      */
-    CHIP_ERROR ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBuffer * buffer,
+    CHIP_ERROR ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, const System::PacketBufferHandle & buffer,
                                                   uint16_t messageSize);
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
     // @see TCPEndpoint::OnDataReceivedFunct
-    static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer);
+    static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer);
 
     // Callback handler for TCPEndPoint. Called when a connection has been completed.
     // @see TCPEndpoint::OnConnectCompleteFunct

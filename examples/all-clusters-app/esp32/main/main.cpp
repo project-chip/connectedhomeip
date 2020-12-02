@@ -15,18 +15,19 @@
  *    limitations under the License.
  */
 
+#include "AppDelegate.h"
 #include "BluetoothWidget.h"
 #include "Button.h"
 #include "CHIPDeviceManager.h"
-#include "DataModelHandler.h"
 #include "DeviceCallbacks.h"
 #include "Display.h"
 #include "Globals.h"
 #include "LEDWidget.h"
 #include "ListScreen.h"
 #include "QRCodeScreen.h"
-#include "RendezvousDeviceDelegate.h"
+#include "QRCodeUtil.h"
 #include "ScreenManager.h"
+#include "Server.h"
 #include "WiFiWidget.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
@@ -44,19 +45,15 @@
 #include <string>
 #include <vector>
 
-#include <crypto/CHIPCryptoPAL.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/ManualSetupPayloadGenerator.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/CHIPMem.h>
 #include <support/ErrorStr.h>
-#include <transport/SecureSessionMgr.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
-
-extern void startServer();
 
 #define QRCODE_BASE_URL "https://dhrishi.github.io/connectedhomeip/qrcode.html"
 
@@ -84,12 +81,9 @@ extern void startServer();
 // Used to indicate that an IP address has been added to the QRCode
 #define EXAMPLE_VENDOR_TAG_IP 1
 
-extern void PairingComplete(SecurePairingSession * pairing);
-
 const char * TAG = "all-clusters-app";
 
 static DeviceCallbacks EchoCallbacks;
-RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
 
 namespace {
 
@@ -343,11 +337,6 @@ bool isRendezvousBLE()
     return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
 }
 
-bool isRendezvousBypassed()
-{
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kNone;
-}
-
 std::string createSetupPayload()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -432,49 +421,13 @@ std::string createSetupPayload()
     return result;
 };
 
-bool inRfc3986UnreservedChar(const char c)
+class AppCallbacks : public AppDelegate
 {
-    static const char unreserved[] = { '-', '.', '_', '~' };
-    return isalpha(c) || isdigit(c) || (strchr(unreserved, c) != NULL);
-}
-
-esp_err_t urlEncode(const char * src, size_t len, char * dest, size_t max_size)
-{
-    const char upper_xdigits[] = "0123456789ABCDEF";
-    size_t i = 0, j = 0;
-    for (i = 0; i < len; ++i)
-    {
-        unsigned char c = src[i];
-        if (inRfc3986UnreservedChar(c))
-        {
-            if ((j + 1) < max_size)
-            {
-                dest[j++] = c;
-            }
-            else
-            {
-                return ESP_FAIL;
-            }
-        }
-        else
-        {
-            if ((j + 3) < max_size)
-            {
-                dest[j++] = '%';
-                dest[j++] = upper_xdigits[c >> 4];
-                dest[j++] = upper_xdigits[(c & 0x0f)];
-            }
-            else
-            {
-                return ESP_FAIL;
-            }
-        }
-    }
-    dest[j] = '\0';
-    return ESP_OK;
-}
-
-static SecurePairingUsingTestSecret gTestPairing;
+public:
+    void OnReceiveError() override { statusLED1.BlinkOnError(); }
+    void OnRendezvousStarted() override { bluetoothLED.Set(true); }
+    void OnRendezvousStopped() override { bluetoothLED.Set(false); }
+};
 
 } // namespace
 
@@ -527,29 +480,19 @@ extern "C" void app_main()
     bluetoothLED.Init();
     wifiLED.Init();
 
-    // Start the Echo Server
-    InitDataModelHandler();
-    startServer();
-
-    if (isRendezvousBLE())
-    {
-        rendezvousDelegate = chip::Platform::New<RendezvousDeviceDelegate>();
-    }
-    else if (isRendezvousBypassed())
-    {
-        ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
-        PairingComplete(&gTestPairing);
-    }
+    // Init ZCL Data Model and CHIP App Server
+    AppCallbacks callbacks;
+    InitServer(&callbacks);
 
     std::string qrCodeText = createSetupPayload();
     ESP_LOGI(TAG, "QR CODE Text: '%s'", qrCodeText.c_str());
 
     {
         std::vector<char> qrCode(3 * qrCodeText.size() + 1);
-        err = urlEncode(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
-        if (err == ESP_OK)
+        err = EncodeQRCodeToUrl(qrCodeText.c_str(), qrCodeText.size(), qrCode.data(), qrCode.max_size());
+        if (err == CHIP_NO_ERROR)
         {
-            ESP_LOGI(TAG, "Copy paste the below URL in a browser to see the QR CODE:\n\t%s?data=%s", QRCODE_BASE_URL,
+            ESP_LOGI(TAG, "Copy/paste the below URL in a browser to see the QR CODE:\n\t%s?data=%s", QRCODE_BASE_URL,
                      qrCode.data());
         }
     }

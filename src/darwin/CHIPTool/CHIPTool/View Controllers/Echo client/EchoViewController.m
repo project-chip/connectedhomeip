@@ -31,6 +31,7 @@
 @property (nonatomic, strong) UIStackView * stackView;
 
 @property (readwrite) CHIPDeviceController * chipController;
+@property (readwrite) CHIPDevice * chipDevice;
 
 @property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
 
@@ -56,6 +57,14 @@
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
     [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
+
+    uint64_t deviceID = CHIPGetNextAvailableDeviceID();
+    if (deviceID > 1) {
+        // Let's use the last device that was paired
+        deviceID--;
+        NSError * error;
+        self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
+    }
 }
 
 - (void)dismissKeyboard
@@ -126,9 +135,9 @@
     }
 
     // send message
-    if ([self.chipController isConnected]) {
+    if ([self.chipDevice isActive]) {
         NSError * error;
-        BOOL didSend = [self.chipController sendMessage:[msg dataUsingEncoding:NSUTF8StringEncoding] error:&error];
+        BOOL didSend = [self.chipDevice sendMessage:[msg dataUsingEncoding:NSUTF8StringEncoding] error:&error];
         if (!didSend) {
             NSString * errorString = [@"Error: " stringByAppendingString:error.localizedDescription];
             [self updateResult:errorString];
@@ -160,8 +169,8 @@
 - (void)deviceControllerOnMessage:(nonnull NSData *)message
 {
     NSString * stringMessage;
-    if ([CHIPDeviceController isDataModelCommand:message] == YES) {
-        stringMessage = [CHIPDeviceController commandToString:message];
+    if ([CHIPDevice isDataModelCommand:message] == YES) {
+        stringMessage = [CHIPDevice commandToString:message];
     } else {
         stringMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
     }

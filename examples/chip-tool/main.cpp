@@ -21,12 +21,9 @@
 #include "commands/clusters/Commands.h"
 #include "commands/echo/Commands.h"
 #include "commands/payload/Commands.h"
+#include "commands/pairing/Commands.h"
 
-// NOTE: Remote device ID is in sync with the echo server device id
-//       At some point, we may want to add an option to connect to a device without
-//       knowing its id, because the ID can be learned on the first response that is received.
-constexpr chip::NodeId kLocalDeviceId  = 112233;
-constexpr chip::NodeId kRemoteDeviceId = 12344321;
+#include <transport/SecurePairingSession.h>
 
 // ================================================================================
 // Main Code
@@ -36,8 +33,8 @@ int main(int argc, char * argv[])
     Commands commands;
     registerCommandsEcho(commands);
     registerCommandsPayload(commands);
-
+    registerCommandsPairing(commands);
     registerClusters(commands);
 
-    return commands.Run(kLocalDeviceId, kRemoteDeviceId, argc, argv);
+    return commands.Run(chip::kTestControllerNodeId, chip::kTestDeviceNodeId, argc, argv);
 }

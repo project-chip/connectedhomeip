@@ -29,9 +29,9 @@
 @property (nonatomic, strong) UILabel * resultLabel;
 
 @property (readwrite) CHIPDeviceController * chipController;
+@property (readwrite) CHIPDevice * chipDevice;
 
 @property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
-
 @end
 
 @implementation OnOffViewController
@@ -50,7 +50,15 @@
     self.chipController = [CHIPDeviceController sharedController];
     [self.chipController setDelegate:self queue:callbackQueue];
     [self.chipController setPersistentStorageDelegate:_persistentStorage queue:callbackQueue];
-    self.onOff = [[CHIPOnOff alloc] initWithDeviceController:self.chipController];
+
+    uint64_t deviceID = CHIPGetNextAvailableDeviceID();
+    if (deviceID > 1) {
+        // Let's use the last device that was paired
+        deviceID--;
+        NSError * error;
+        self.chipDevice = [self.chipController getPairedDevice:deviceID error:&error];
+        self.onOff = [[CHIPOnOff alloc] initWithDevice:self.chipDevice endpoint:1 queue:callbackQueue];
+    }
 }
 
 // MARK: UI Setup
@@ -132,17 +140,26 @@
 
 - (IBAction)onButtonTapped:(id)sender
 {
-    [self.onOff lightOn];
+    CHIPDeviceCallback completionHandler = ^(NSError * error) {
+        NSLog(@"Status: On command completed with error %@", [error description]);
+    };
+    [self.onOff lightOn:completionHandler];
 }
 
 - (IBAction)offButtonTapped:(id)sender
 {
-    [self.onOff lightOff];
+    CHIPDeviceCallback completionHandler = ^(NSError * error) {
+        NSLog(@"Status: Off command completed with error %@", [error description]);
+    };
+    [self.onOff lightOff:completionHandler];
 }
 
 - (IBAction)toggleButtonTapped:(id)sender
 {
-    [self.onOff toggleLight];
+    CHIPDeviceCallback completionHandler = ^(NSError * error) {
+        NSLog(@"Status: Toggle command completed with error %@", [error description]);
+    };
+    [self.onOff toggleLight:completionHandler];
 }
 
 // MARK: CHIPDeviceControllerDelegate
@@ -165,8 +182,8 @@
 - (void)deviceControllerOnMessage:(nonnull NSData *)message
 {
     NSString * stringMessage;
-    if ([CHIPDeviceController isDataModelCommand:message] == YES) {
-        stringMessage = [CHIPDeviceController commandToString:message];
+    if ([CHIPDevice isDataModelCommand:message] == YES) {
+        stringMessage = [CHIPDevice commandToString:message];
     } else {
         stringMessage = [[NSString alloc] initWithData:message encoding:NSUTF8StringEncoding];
     }
@@ -175,5 +192,4 @@
         [self updateResult:resultMessage];
     });
 }
-
 @end

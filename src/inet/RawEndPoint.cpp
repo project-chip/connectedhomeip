@@ -69,6 +69,7 @@
 #endif
 
 #include <string.h>
+#include <utility>
 
 namespace chip {
 namespace Inet {
@@ -831,9 +832,9 @@ InterfaceId RawEndPoint::GetBoundInterface()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-void RawEndPoint::HandleDataReceived(PacketBuffer * msg)
+void RawEndPoint::HandleDataReceived(System::PacketBufferHandle msg)
 {
-    IPEndPointBasis::HandleDataReceived(msg);
+    IPEndPointBasis::HandleDataReceived(std::move(msg));
 }
 
 INET_ERROR RawEndPoint::GetPCB(IPAddressType addrType)
@@ -947,6 +948,7 @@ exit:
  * This fn() may be executed concurrently with SetICMPFilter()
  * - this fn() runs in the LwIP thread (and the lock has already been taken)
  * - SetICMPFilter() runs in the Inet thread.
+ * Returns non-zero if and only if ownership of the pbuf has been taken.
  */
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct pbuf * p, const ip_addr_t * addr)
@@ -985,7 +987,9 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
 
     if (enqueue)
     {
-        pktInfo = GetPacketInfo(buf);
+        System::PacketBufferHandle bufHandle;
+        bufHandle.Adopt(buf);
+        pktInfo = GetPacketInfo(bufHandle);
 
         if (pktInfo != NULL)
         {
@@ -1012,8 +1016,12 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
             pktInfo->DestPort  = 0;
         }
 
+        buf = bufHandle.Release_ForNow();
         if (lSystemLayer.PostEvent(*ep, kInetEvent_RawDataReceived, (uintptr_t) buf) != INET_NO_ERROR)
+        {
+            // If PostEvent() failed, it has not taken ownership of the buffer, so we need to free it ourselves.
             PacketBuffer::Free(buf);
+        }
     }
 
     return enqueue;

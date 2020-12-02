@@ -13,6 +13,8 @@ An example application showing the use
         -   [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
     -   [Configuring the example](#configuring-the-example)
     -   [Flashing and debugging](#flashing-and-debugging)
+        -   [Flashing nRF52840 DK](#nrf52840dk_flashing)
+        -   [Flashing nRF52840 Dongle](#nrf52840dongle_flashing)
     -   [Currently implemented features](#currently-implemented-features)
 
 <hr>
@@ -64,7 +66,7 @@ container:
 > -   `-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule 'c 189:* rmw`
 >     parameters can be omitted if you're not planning to flash the example onto
 >     hardware. The parameters give the container access to USB devices
->     connected to your computer such as the nRF52840 DK.
+>     connected to your computer such as the nRF52840 DK or nRF52840 Dongle.
 > -   `--rm` flag can be omitted if you don't want the container to be
 >     auto-removed when you exit the container shell session.
 > -   `-e RUNAS=$(id -u)` is needed to start the container session as the
@@ -90,7 +92,13 @@ Now you may build the example by running the commands below in the Docker
 container:
 
         $ cd /var/chip/examples/pigweed-app/nrfconnect
-        $ west build -b nrf52840dk_nrf52840
+        $ west build -b <board_name>
+
+> **Note**:
+>
+> -   `<board_name>` has to be replaced with a board name which might be
+>     nrf52840dk_nrf52840 for development kit board or nrf52840dongle_nrf52840
+>     for dongle board.
 
 If the build succeeds, the binary will be available under
 `/var/chip/examples/pigweed-app/nrfconnect/build/zephyr/zephyr.hex`. Note that
@@ -138,10 +146,16 @@ The following commands will build the `pigweed-app` example:
         $ cd ~/connectedhomeip/examples/pigweed-app/nrfconnect
 
         # If this is a first time build or if `build` directory was deleted
-        $ west build -b nrf52840dk_nrf52840
+        $ west build -b <board_name>
 
         # Any subsequent build
         $ west build
+
+> **Note**:
+>
+> -   `<board_name>` has to be replaced with a board name which might be
+>     nrf52840dk_nrf52840 for development kit board or nrf52840dongle_nrf52840
+>     for dongle board.
 
 After a successful build, the binary will be available under
 `<example-dir>/build/zephyr/zephyr.hex`
@@ -183,7 +197,7 @@ To open the configuration menu, do the following:
 
         $ cd <example-dir>
         # First time build
-        $ west build -b nrf52840dk_nrf52840 -t menuconfig
+        $ west build -b <board_name> -t menuconfig
 
         # Any subsequent build
         $ west build -t menuconfig
@@ -191,6 +205,12 @@ To open the configuration menu, do the following:
         # Running menuconfig with ninja
         $ cd <example-dir>/build
         $ ninja menuconfig
+
+> **Note**:
+>
+> -   `<board_name>` has to be replaced with a board name which might be
+>     nrf52840dk_nrf52840 for development kit board or nrf52840dongle_nrf52840
+>     for dongle board.
 
 Changes done with `menuconfig` will be lost, if the `build` directory is
 deleted. To make them persistent, save the configuration options in `prj.conf`
@@ -202,7 +222,13 @@ file.
 
 The example application is designed to run on the
 [Nordic nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)
-development kit.
+development kit board or
+[Nordic nRF52840 Dongle](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF52840-Dongle)
+board.
+
+<a name="nrf52840dk_flashing"></a>
+
+### Flashing nRF52840 DK
 
 To flash the application to the device, use the `west` tool:
 
@@ -216,6 +242,14 @@ To debug the application on target:
 
         $ cd <example-dir>
         $ west debug
+
+<a name="nrf52840dongle_flashing"></a>
+
+### Flashing nRF52840 Dongle
+
+Visit
+[Programming and Flashing nRF52840 Dongle](https://docs.zephyrproject.org/latest/boards/arm/nrf52840dongle_nrf52840/doc/index.html#programming-and-debugging)
+to read detailed information on this and other board related topics.
 
 <a name="currently-implemented-features"></a>
 

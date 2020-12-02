@@ -37,17 +37,12 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef SILABS_AF_EVENT_H
-#define SILABS_AF_EVENT_H
+#pragma once
 
 #include "af.h"
 
 #define MAX_TIMER_UNITS_HOST 0x7fff
 #define MAX_TIMER_MILLISECONDS_HOST (MAX_TIMER_UNITS_HOST * MILLISECOND_TICKS_PER_MINUTE)
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 /** @brief Complete events with a control and a handler procedure.
  *
@@ -81,9 +76,3 @@ bool emberEventControlGetActive(EmberEventControl * control);
 /** @brief Sets this ::EmberEventControl to run as soon as possible.
  */
 void emberEventControlSetActive(EmberEventControl * control);
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif // SILABS_AF_EVENT_H

@@ -67,8 +67,7 @@
  *
  ******************************************************************************/
 
-#ifndef __EMBER_AF_CONFIG_H__
-#define __EMBER_AF_CONFIG_H__
+#pragma once
 
 // include generated configuration information from AppBuilder.
 // ZA_GENERATED_HEADER is defined in the project file
@@ -98,10 +97,6 @@
 #define ZA_END_DEVICE 3
 #define ZA_SLEEPY_END_DEVICE 4
 
-#define CBA_PROFILE_ID (0x0105)
-#define HA_PROFILE_ID (0x0104)
-#define SE_PROFILE_ID (0x0109)
-
 // A subtle distniction:
 //   EMBER_AF_MANUFACTURER_CODE is the MFG code set by AppBuilder
 //     for use in the App Framework (AF).  If not set by AppBuilder we default
@@ -127,11 +122,7 @@
 // the max source route overhead and broadcast radius
 // if we havent defined MAX_HOPS then define based on profile ID
 #ifndef ZA_MAX_HOPS
-#ifdef EMBER_AF_HAS_SECURITY_PROFILE_SE
-#define ZA_MAX_HOPS 6
-#else
 #define ZA_MAX_HOPS 12
-#endif
 #endif
 
 #ifndef EMBER_AF_SOURCE_ROUTING_RESERVED_PAYLOAD_LENGTH
@@ -141,11 +132,7 @@
 // The maximum APS payload, not including any APS options.  This value is also
 // available from emberMaximumApsPayloadLength() or ezspMaximumPayloadLength().
 // See http://portal.ember.com/faq/payload for more information.
-#ifdef EMBER_AF_HAS_SECURITY_PROFILE_NONE
-#define EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH 100 - EMBER_AF_SOURCE_ROUTING_RESERVED_PAYLOAD_LENGTH
-#else
 #define EMBER_AF_MAXIMUM_APS_PAYLOAD_LENGTH 82 - EMBER_AF_SOURCE_ROUTING_RESERVED_PAYLOAD_LENGTH
-#endif
 
 // Max PHY size = 128
 //   -1 byte for PHY length
@@ -189,18 +176,8 @@
 // Defines needed for enabling security
 //
 
-// Unless we are not using security, our stack profile is 2 (ZigBee Pro).  The
-// stack will set up other configuration values based on profile.
-#ifndef EMBER_AF_HAS_SECURITY_PROFILE_NONE
+// Our stack profile is 2 (ZigBee Pro).
 #define EMBER_STACK_PROFILE 2
-#else
-#ifndef EMBER_STACK_PROFILE
-#define EMBER_STACK_PROFILE 0
-#endif
-#ifndef EMBER_SECURITY_LEVEL
-#define EMBER_SECURITY_LEVEL 0
-#endif
-#endif
 
 // *******************************************************************
 // Application Handlers
@@ -288,12 +265,6 @@
 #error "Custom options cannot be used with the standard network init"
 #endif
 #else
-#ifdef EMBER_AF_HAS_SECURITY_PROFILE_Z3 // Z3 Compliant end devices must send a rejoin request on reboot
-#define Z3_NETWORK_INIT_BEHAVIOR EMBER_NETWORK_INIT_END_DEVICE_REJOIN_ON_REBOOT
-#else // EMBER_AF_HAS_SECURITY_PROFILE_Z3
-#define Z3_NETWORK_INIT_BEHAVIOR EMBER_NETWORK_INIT_NO_OPTIONS
-#endif // EMBER_AF_HAS_SECURITY_PROFILE_Z3
-
 // We always want to store our parent info in a token. This prevents doing an
 // orphan scan upon reboot, which can suffer from the multiple-parent-
 // responses issue
@@ -304,5 +275,3 @@
  * @brief CHIP uses millisecond ticks
  */
 #define MILLISECOND_TICKS_PER_SECOND 1000
-
-#endif // __EMBER_AF_CONFIG_H__

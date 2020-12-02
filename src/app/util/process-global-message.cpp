@@ -44,6 +44,10 @@
 
 #include <app/clusters/ias-zone-client/ias-zone-client.h>
 
+#ifdef EMBER_AF_PLUGIN_REPORTING
+#include <app/reporting/reporting.h>
+#endif // EMBER_AF_PLUGIN_REPORTING
+
 //#include "../plugin/key-establishment/key-establishment.h"
 //#include "../plugin/smart-energy-registration/smart-energy-registration.h"
 //#include "../plugin/trust-center-keepalive/trust-center-keepalive.h"
@@ -100,16 +104,16 @@ static void printDiscoverCommandsResponse(bool generated, ClusterId clusterId, b
 
 bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
 {
-    uint16_t attrId;
+    AttributeId attrId;
     uint8_t frameControl;
     // This is a little clumsy but easier to read and port
     // from earlier implementation.
-    EmberAfClusterId clusterId = cmd->apsFrame->clusterId;
-    uint8_t zclCmd             = cmd->commandId;
-    uint8_t * message          = cmd->buffer;
-    uint16_t msgLen            = cmd->bufLen;
-    uint16_t msgIndex          = cmd->payloadStartIndex;
-    uint8_t clientServerMask   = (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT);
+    ClusterId clusterId      = cmd->apsFrame->clusterId;
+    CommandId zclCmd         = cmd->commandId;
+    uint8_t * message        = cmd->buffer;
+    uint16_t msgLen          = cmd->bufLen;
+    uint16_t msgIndex        = cmd->payloadStartIndex;
+    uint8_t clientServerMask = (cmd->direction == ZCL_DIRECTION_CLIENT_TO_SERVER ? CLUSTER_MASK_SERVER : CLUSTER_MASK_CLIENT);
 
     // If we are disabled then we can only respond to read or write commands
     // or identify cluster (see device enabled attr of basic cluster)
@@ -181,8 +185,8 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
             {
                 static const struct
                 {
-                    EmberAfClusterId clusterId;
-                    uint16_t attrId;
+                    ClusterId clusterId;
+                    AttributeId attrId;
                 } noDefaultResponseSet[] = {
                     { ZCL_PRICE_CLUSTER_ID, ZCL_THRESHOLD_MULTIPLIER_ATTRIBUTE_ID },
                     { ZCL_PRICE_CLUSTER_ID, ZCL_THRESHOLD_DIVISOR_ATTRIBUTE_ID },
@@ -429,7 +433,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
     // the format of the response is: [done:1] ([attrID:2] [type:1]) * N
     case ZCL_DISCOVER_ATTRIBUTES_COMMAND_ID:
     case ZCL_DISCOVER_ATTRIBUTES_EXTENDED_COMMAND_ID: {
-        EmberAfAttributeId startingAttributeId;
+        AttributeId startingAttributeId;
         uint8_t numberAttributes;
         uint8_t * complete;
 
@@ -475,6 +479,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         return true;
     }
 
+#ifdef EMBER_AF_PLUGIN_REPORTING
     case ZCL_CONFIGURE_REPORTING_COMMAND_ID:
         if (emberAfConfigureReportingCommandCallback(cmd))
         {
@@ -488,6 +493,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
             return true;
         }
         break;
+#endif // EMBER_AF_PLUGIN_REPORTING
 
     // ([attribute id:2] [status:1] [type:0/1] [value:0/V])+
     case ZCL_READ_ATTRIBUTES_RESPONSE_COMMAND_ID:
@@ -573,6 +579,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         }
         return true;
 
+#ifdef EMBER_AF_PLUGIN_REPORTING
     // ([status:1] [direction:1] [attribute id:2])+
     case ZCL_CONFIGURE_REPORTING_RESPONSE_COMMAND_ID:
         if (!emberAfConfigureReportingResponseCallback(clusterId, message + msgIndex, static_cast<uint16_t>(msgLen - msgIndex)))
@@ -591,6 +598,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
             emberAfSendDefaultResponse(cmd, EMBER_ZCL_STATUS_SUCCESS);
         }
         return true;
+#endif // EMBER_AF_PLUGIN_REPORTING
 
     // ([attribute id:2] [type:1] [data:V])+
     case ZCL_REPORT_ATTRIBUTES_COMMAND_ID:
@@ -603,7 +611,7 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
     // [command id:1] [status:1]
     case ZCL_DEFAULT_RESPONSE_COMMAND_ID: {
         EmberAfStatus status;
-        uint8_t commandId;
+        CommandId commandId;
         commandId = emberAfGetInt8u(message, msgIndex, msgLen);
         msgIndex++;
         status = (EmberAfStatus) emberAfGetInt8u(message, msgIndex, msgLen);

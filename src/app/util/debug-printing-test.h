@@ -37,8 +37,8 @@
 
 // This is the test header, that enables all printing
 // Enclosing macro to prevent multiple inclusion
-#ifndef SILABS_EMBER_AF_PRINTING_TEST
-#define SILABS_EMBER_AF_PRINTING_TEST
+
+#pragma once
 
 #define EMBER_AF_PRINT_ENABLE
 #define EMBER_AF_PRINT_BASIC_CLUSTER 0x0001
@@ -204,5 +204,3 @@
     {                                                                                                                              \
         0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF                             \
     }
-
-#endif // SILABS_EMBER_AF_PRINTING_TEST

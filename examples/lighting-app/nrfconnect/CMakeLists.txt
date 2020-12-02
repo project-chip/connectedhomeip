@@ -20,7 +20,8 @@ get_filename_component(CHIP_APP_SERVER ${CHIP_ROOT}/examples/common/chip-app-ser
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighting-common REALPATH)
 
-list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/overlay-sample-defaults.conf)
+set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/sample-defaults.conf prj.conf)
+set(CHIP_OPENTHREAD_CONFIG ${NRFCONNECT_COMMON}/project_include/OpenThreadConfig.h)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
 include(nrfconnect-app)
@@ -32,8 +33,8 @@ target_sources(app PRIVATE
                main/LightingManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${LIGHTING_COMMON}/gen/call-command-handler.c
-               ${LIGHTING_COMMON}/gen/callback-stub.c
+               ${LIGHTING_COMMON}/gen/call-command-handler.cpp
+               ${LIGHTING_COMMON}/gen/callback-stub.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
@@ -57,4 +58,6 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp)
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp
+               ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
+               )

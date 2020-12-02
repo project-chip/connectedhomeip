@@ -21,8 +21,6 @@
  *      This file implements unit tests for the SecurePairingSession implementation.
  */
 
-#include "TestTransportLayer.h"
-
 #include <errno.h>
 #include <nlunit-test.h>
 
@@ -31,7 +29,7 @@
 #include <stdarg.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <transport/SecurePairingSession.h>
 
 using namespace chip;
@@ -39,10 +37,13 @@ using namespace chip;
 class TestSecurePairingDelegate : public SecurePairingSessionDelegate
 {
 public:
-    CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags, System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                  System::PacketBuffer * msgBuf) override
     {
         mNumMessageSend++;
-        return (peer != nullptr) ? peer->HandlePeerMessage(header, msgBuf) : mMessageSendError;
+        System::PacketBufferHandle msg_ForNow;
+        msg_ForNow.Adopt(msgBuf);
+        return (peer != nullptr) ? peer->HandlePeerMessage(header, peerAddress, std::move(msg_ForNow)) : mMessageSendError;
     }
 
     void OnPairingError(CHIP_ERROR error) override { mNumPairingErrors++; }
@@ -81,12 +82,14 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     SecurePairingSession pairing;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(1234, 500, nullptr, 0, Optional<NodeId>::Value(1), 0, &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
+                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 500, nullptr, 0, Optional<NodeId>::Value(1), 0,
+                                &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0, nullptr) ==
-                       CHIP_ERROR_INVALID_ARGUMENT);
+                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 500, (const uint8_t *) "salt", 4,
+                                Optional<NodeId>::Value(1), 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0, &delegate) == CHIP_NO_ERROR);
+                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 500, (const uint8_t *) "salt", 4,
+                                Optional<NodeId>::Value(1), 0, &delegate) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegate.mNumMessageSend == 1);
 
@@ -95,8 +98,8 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     SecurePairingSession pairing1;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.Pair(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0, &delegate) ==
-                       CHIP_ERROR_BAD_REQUEST);
+                   pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 500, (const uint8_t *) "salt", 4,
+                                 Optional<NodeId>::Value(1), 0, &delegate) == CHIP_ERROR_BAD_REQUEST);
 }
 
 void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SecurePairingSession & pairingCommissioner,
@@ -113,8 +116,8 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
                    pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0,
                                                    &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.Pair(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(2), 0,
-                                            &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 500, (const uint8_t *) "salt", 4,
+                                            Optional<NodeId>::Value(2), 0, &delegateCommissioner) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 1);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
@@ -168,8 +171,7 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite,
                        testPairingSession1->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session1) == CHIP_NO_ERROR);
 
-        NL_TEST_ASSERT(inSuite,
-                       session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, Header::Flags(), mac) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, session1.Encrypt(plain_text, sizeof(plain_text), encrypted, header, mac) == CHIP_NO_ERROR);
     }
 
     {
@@ -178,8 +180,7 @@ void SecurePairingSerializeTest(nlTestSuite * inSuite, void * inContext)
                        testPairingSession2->DeriveSecureSession(Uint8::from_const_char("abc"), 3, session2) == CHIP_NO_ERROR);
 
         uint8_t decrypted[64];
-        NL_TEST_ASSERT(inSuite,
-                       session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, Header::Flags(), mac) == CHIP_NO_ERROR);
+        NL_TEST_ASSERT(inSuite, session2.Decrypt(encrypted, sizeof(plain_text), decrypted, header, mac) == CHIP_NO_ERROR);
         NL_TEST_ASSERT(inSuite, memcmp(plain_text, decrypted, sizeof(plain_text)) == 0);
     }
 

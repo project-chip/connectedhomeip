@@ -30,16 +30,15 @@
 #include "WiFiWidget.h"
 #include "esp_heap_caps.h"
 #include "esp_log.h"
+#include "gen/attribute-id.h"
+#include "gen/cluster-id.h"
+#include <app/util/basic-types.h>
 #include <lib/mdns/DiscoveryManager.h>
 #include <support/CodeUtils.h>
 
-extern "C" {
-#include "gen/attribute-id.h"
-#include "gen/cluster-id.h"
-} // extern "C"
+static const char * TAG = "app-devicecallbacks";
 
-static const char * TAG = "echo-devicecallbacks";
-
+using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::System;
 using namespace ::chip::DeviceLayer;
@@ -63,9 +62,8 @@ void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_
     ESP_LOGI(TAG, "Current free heap: %d\n", heap_caps_get_free_size(MALLOC_CAP_8BIT));
 }
 
-void DeviceCallbacks::PostAttributeChangeCallback(uint8_t endpointId, EmberAfClusterId clusterId, EmberAfAttributeId attributeId,
-                                                  uint8_t mask, uint16_t manufacturerCode, uint8_t type, uint8_t size,
-                                                  uint8_t * value)
+void DeviceCallbacks::PostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                                  uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     ESP_LOGI(TAG, "PostAttributeChangeCallback - Cluster ID: '0x%04x', EndPoint ID: '0x%02x', Attribute ID: '0x%04x'", clusterId,
              endpointId, attributeId);
@@ -120,7 +118,7 @@ void DeviceCallbacks::OnSessionEstablished(const ChipDeviceEvent * event)
     }
 }
 
-void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value)
+void DeviceCallbacks::OnOnOffPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == ZCL_ON_OFF_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1 || endpointId == 2, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
@@ -136,23 +134,22 @@ void IdentifyTimerHandler(Layer * systemLayer, void * appState, Error error)
 {
     statusLED1.Animate();
 
-    // Decrement the timer count.
-    identifyTimerCount--;
-
     if (identifyTimerCount)
     {
         SystemLayer.StartTimer(kIdentifyTimerDelayMS, IdentifyTimerHandler, appState);
+        // Decrement the timer count.
+        identifyTimerCount--;
     }
 }
 
-void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(uint8_t endpointId, uint16_t attributeId, uint8_t * value)
+void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointId, AttributeId attributeId, uint8_t * value)
 {
     VerifyOrExit(attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID, ESP_LOGI(TAG, "Unhandled Attribute ID: '0x%04x", attributeId));
     VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
 
     statusLED1.Blink(kIdentifyTimerDelayMS * 2);
 
-    // timerCount represents the number of callback execution before the we stopped the timer.
+    // timerCount represents the number of callback executions before we stop the timer.
     // value is expressed in seconds and the timer is fired every 250ms, so just multiply value by 4.
     // Also, we want timerCount to be odd number, so the ligth state ends in the same state it starts.
     identifyTimerCount = (*value) * 4;
@@ -162,23 +159,4 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(uint8_t endpointId, 
 
 exit:
     return;
-}
-
-void DeviceCallbacks::PluginBasicResetToFactoryDefaultsCallback(uint8_t endpointId)
-{
-    ESP_LOGI(TAG, "PluginBasicResetToFactoryDefaultsCallback - EndPoint ID: '0x%02x'", endpointId);
-
-    VerifyOrExit(endpointId == 1, ESP_LOGE(TAG, "Unexpected EndPoint ID: `0x%02x'", endpointId));
-
-    ConfigurationMgr().InitiateFactoryReset();
-
-exit:
-    return;
-}
-
-bool DeviceCallbacks::PluginDoorLockActivateDoorLockCallback(bool activate)
-{
-    ESP_LOGI(TAG, "PluginDoorLockActivateDoorLockCallback: '0x%02x'", activate);
-    // Simulate that locking/unlocking the door is always succesful.
-    return true;
 }

@@ -1851,9 +1851,9 @@ CHIP_ERROR TLVWriter::GetNewPacketBuffer(TLVWriter & writer, uintptr_t & bufHand
     PacketBuffer * newBuf = buf->Next();
     if (newBuf == nullptr)
     {
-        newBuf = PacketBuffer::New(0);
+        newBuf = PacketBuffer::New(0).Release_ForNow();
         if (newBuf != nullptr)
-            buf->AddToEnd(newBuf);
+            buf->AddToEnd_ForNow(newBuf);
     }
 
     if (newBuf != nullptr)

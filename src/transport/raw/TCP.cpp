@@ -27,6 +27,7 @@
 
 #include <core/CHIPEncoding.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -46,7 +47,7 @@ constexpr int kListenBacklogSize = 2;
 /**
  *  Determine if the given buffer contains a complete message
  */
-bool ContainsCompleteMessage(System::PacketBuffer * buffer, uint8_t ** start, uint16_t * size)
+bool ContainsCompleteMessage(const System::PacketBufferHandle & buffer, uint8_t ** start, uint16_t * size)
 {
     bool completeMessage = false;
 
@@ -146,9 +147,10 @@ exit:
 
 Inet::TCPEndPoint * TCPBase::FindActiveConnection(const PeerAddress & address)
 {
-    Inet::TCPEndPoint * endPoint = nullptr;
-
-    VerifyOrExit(address.GetTransportType() == Type::kTcp, endPoint = nullptr);
+    if (address.GetTransportType() != Type::kTcp)
+    {
+        return nullptr;
+    }
 
     for (size_t i = 0; i < mActiveConnectionsSize; i++)
     {
@@ -162,75 +164,58 @@ Inet::TCPEndPoint * TCPBase::FindActiveConnection(const PeerAddress & address)
 
         if ((addr == address.GetIPAddress()) && (port == address.GetPort()))
         {
-            ExitNow(endPoint = mActiveConnections[i]);
+            return mActiveConnections[i];
         }
     }
 
-exit:
-    return endPoint;
+    return nullptr;
 }
 
-CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
-                                System::PacketBuffer * msgBuf)
+CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
 {
+    System::PacketBufferHandle autofree;
+    autofree.Adopt(msgBuf);
+
     // Sent buffer data format is:
     //    - packet size as a uint16_t (inludes size of header and actual data)
     //    - header
     //    - actual data
-    CHIP_ERROR err               = CHIP_NO_ERROR;
-    const size_t prefixSize      = header.EncodeSizeBytes() + kPacketSizeBytes;
-    Inet::TCPEndPoint * endPoint = nullptr;
-    uint16_t actualEncodedHeaderSize;
+    const size_t prefixSize = header.EncodeSizeBytes() + kPacketSizeBytes;
 
-    VerifyOrExit(address.GetTransportType() == Type::kTcp, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(prefixSize + msgBuf->DataLength() <= std::numeric_limits<uint16_t>::max(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(address.GetTransportType() == Type::kTcp, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(prefixSize + msgBuf->DataLength() <= std::numeric_limits<uint16_t>::max(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // The check above about prefixSize + msgBuf->DataLength() means prefixSize
     // definitely fits in uint16_t.
-    VerifyOrExit(msgBuf->EnsureReservedSize(static_cast<uint16_t>(prefixSize)), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(msgBuf->EnsureReservedSize(static_cast<uint16_t>(prefixSize)), CHIP_ERROR_NO_MEMORY);
 
-    {
-        msgBuf->SetStart(msgBuf->Start() - prefixSize);
+    msgBuf->SetStart(msgBuf->Start() - prefixSize);
 
-        uint8_t * output = msgBuf->Start();
+    // Length is actual data, without considering the length bytes themselves
+    VerifyOrReturnError(msgBuf->DataLength() >= kPacketSizeBytes, CHIP_ERROR_INTERNAL);
 
-        // Length is actual data, without considering the length bytes themselves
-        VerifyOrExit(msgBuf->DataLength() >= kPacketSizeBytes, err = CHIP_ERROR_INTERNAL);
+    uint8_t * output = msgBuf->Start();
+    LittleEndian::Write16(output, static_cast<uint16_t>(msgBuf->DataLength() - kPacketSizeBytes));
 
-        LittleEndian::Write16(output, static_cast<uint16_t>(msgBuf->DataLength() - kPacketSizeBytes));
+    uint16_t actualEncodedHeaderSize;
+    ReturnErrorOnFailure(header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize));
 
-        err = header.Encode(output, msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags);
-        SuccessOrExit(err);
-
-        // header encoding has to match space that we allocated
-        VerifyOrExit(prefixSize == actualEncodedHeaderSize + kPacketSizeBytes, err = CHIP_ERROR_INTERNAL);
-    }
+    // header encoding has to match space that we allocated
+    VerifyOrReturnError(prefixSize == actualEncodedHeaderSize + kPacketSizeBytes, CHIP_ERROR_INTERNAL);
 
     // Reuse existing connection if one exists, otherwise a new one
     // will be established
-
-    endPoint = FindActiveConnection(address);
+    Inet::TCPEndPoint * endPoint = FindActiveConnection(address);
 
     if (endPoint != nullptr)
     {
-        err = endPoint->Send(msgBuf);
+        return endPoint->Send(autofree.Release_ForNow());
     }
     else
     {
-        err = SendAfterConnect(address, msgBuf);
+        return SendAfterConnect(address, autofree.Release_ForNow());
     }
-    msgBuf = nullptr;
-    SuccessOrExit(err);
-
-exit:
-    if (msgBuf != nullptr)
-    {
-        System::PacketBuffer::Free(msgBuf);
-        msgBuf = nullptr;
-    }
-
-    return err;
 }
 
 CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuffer * msg)
@@ -318,7 +303,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBuffer * buffer,
+CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, const System::PacketBufferHandle & buffer,
                                                        uint16_t messageSize)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
@@ -337,9 +322,7 @@ CHIP_ERROR TCPBase::ProcessSingleMessageFromBufferHead(const PeerAddress & peerA
 
     // message receive handler will attempt to free the buffer, however as the buffer may
     // contain additional data, we retain it to prevent actual free
-    buffer->AddRef();
-
-    HandleMessageReceived(header, peerAddress, buffer);
+    HandleMessageReceived(header, peerAddress, buffer.Retain());
 
 exit:
     buffer->SetStart(oldStart);
@@ -349,18 +332,16 @@ exit:
 }
 
 CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
-                                          System::PacketBuffer * buffer)
+                                          System::PacketBufferHandle buffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    while (buffer != nullptr)
+    while (!buffer.IsNull())
     {
         // when a buffer is empty, it can be released back to the app
         if (buffer->DataLength() == 0)
         {
-            System::PacketBuffer * old = buffer;
-            buffer                     = old->DetachTail();
-            System::PacketBuffer::Free(old);
+            buffer.FreeHead();
             continue;
         }
 
@@ -412,16 +393,16 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
     }
 
 exit:
-    if (buffer != nullptr)
+    if (!buffer.IsNull())
     {
         // Incomplete processing will be retried
-        endPoint->PutBackReceivedData(buffer);
+        endPoint->PutBackReceivedData(std::move(buffer));
     }
 
     return err;
 }
 
-void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer)
+void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer)
 {
     Inet::IPAddress ipAddress;
     uint16_t port;
@@ -430,7 +411,7 @@ void TCPBase::OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * 
     PeerAddress peerAddress = PeerAddress::TCP(ipAddress, port);
 
     TCPBase * tcp  = reinterpret_cast<TCPBase *>(endPoint->AppState);
-    CHIP_ERROR err = tcp->ProcessReceivedBuffer(endPoint, peerAddress, buffer);
+    CHIP_ERROR err = tcp->ProcessReceivedBuffer(endPoint, peerAddress, std::move(buffer));
 
     if (err != CHIP_NO_ERROR)
     {

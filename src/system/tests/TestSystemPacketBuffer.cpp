@@ -27,15 +27,13 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TestSystemLayer.h"
-
 #include <errno.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <system/SystemPacketBuffer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -54,6 +52,7 @@
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 using ::chip::System::PacketBuffer;
+using ::chip::System::PacketBufferHandle;
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP
 using ::chip::System::pbuf;
@@ -126,7 +125,7 @@ void BufferAlloc(struct TestContext * theContext)
 
     if (theContext->buf == nullptr)
     {
-        theContext->buf = TO_LWIP_PBUF(PacketBuffer::New(0));
+        theContext->buf = TO_LWIP_PBUF(PacketBuffer::New(0).Release_ForNow());
     }
 
     if (theContext->buf == nullptr)
@@ -494,7 +493,7 @@ void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
                 buffer_2 = PrepareTestBuffer(theSecondContext);
                 buffer_3 = PrepareTestBuffer(theThirdContext);
 
-                buffer_1->AddToEnd(buffer_2);
+                buffer_1->AddToEnd_ForNow(buffer_2);
 
                 NL_TEST_ASSERT(inSuite, theFirstContext->buf->tot_len == (theFirstContext->init_len + theSecondContext->init_len));
                 NL_TEST_ASSERT(inSuite, theFirstContext->buf->next == theSecondContext->buf);
@@ -502,7 +501,7 @@ void CheckAddToEnd(nlTestSuite * inSuite, void * inContext)
 
                 NL_TEST_ASSERT(inSuite, theThirdContext->buf->next == nullptr);
 
-                buffer_1->AddToEnd(buffer_3);
+                buffer_1->AddToEnd_ForNow(buffer_3);
 
                 NL_TEST_ASSERT(inSuite,
                                theFirstContext->buf->tot_len ==
@@ -551,7 +550,7 @@ void CheckDetachTail(nlTestSuite * inSuite, void * inContext)
                 theFirstContext->buf->tot_len = static_cast<uint16_t>(theFirstContext->buf->tot_len + theSecondContext->init_len);
             }
 
-            returned = buffer_1->DetachTail();
+            returned = buffer_1->DetachTail_ForNow();
 
             NL_TEST_ASSERT(inSuite, theFirstContext->buf->next == nullptr);
             NL_TEST_ASSERT(inSuite, theFirstContext->buf->tot_len == theFirstContext->init_len);
@@ -952,7 +951,7 @@ void CheckAddRef(nlTestSuite * inSuite, void * inContext)
 void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
 {
     struct TestContext * theContext = static_cast<struct TestContext *>(inContext);
-    PacketBuffer * buffer;
+    PacketBufferHandle buffer;
 
     for (size_t ith = 0; ith < kTestElements; ith++)
     {
@@ -962,17 +961,17 @@ void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
 
         if (theContext->reserved_size > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX)
         {
-            NL_TEST_ASSERT(inSuite, buffer == nullptr);
+            NL_TEST_ASSERT(inSuite, buffer.IsNull());
             theContext++;
             continue;
         }
 
         NL_TEST_ASSERT(inSuite, theContext->reserved_size <= buffer->AllocSize());
-        NL_TEST_ASSERT(inSuite, buffer != nullptr);
+        NL_TEST_ASSERT(inSuite, !buffer.IsNull());
 
-        if (buffer != nullptr)
+        if (!buffer.IsNull())
         {
-            pb = TO_LWIP_PBUF(buffer);
+            pb = TO_LWIP_PBUF(buffer.Get_ForNow());
 
             NL_TEST_ASSERT(inSuite, pb->len == 0);
             NL_TEST_ASSERT(inSuite, pb->tot_len == 0);
@@ -980,16 +979,24 @@ void CheckNewWithAvailableSizeAndFree(nlTestSuite * inSuite, void * inContext)
             NL_TEST_ASSERT(inSuite, pb->ref == 1);
         }
 
-        PacketBuffer::Free(buffer);
-
         theContext++;
     }
 
     // Use the rest of the buffer space
-    do
+    for (;;)
     {
         buffer = PacketBuffer::NewWithAvailableSize(0, 0);
-    } while (buffer != nullptr);
+        if (buffer.IsNull())
+        {
+            break;
+        }
+        // Leak the buffer on purpose, to use up all the buffer space.
+        // (Compilers other than GCC recognize the `(void)` idiom, which is mandated in C++20.)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+        (void) buffer.Release_ForNow();
+#pragma GCC diagnostic pop
+    }
 }
 
 /**
@@ -1104,7 +1111,7 @@ void CheckFreeHead(nlTestSuite * inSuite, void * inContext)
 
             theFirstContext->buf->next = theSecondContext->buf;
 
-            returned = PacketBuffer::FreeHead(buffer_1);
+            returned = PacketBuffer::FreeHead_ForNow(buffer_1);
 
             NL_TEST_ASSERT(inSuite, returned == buffer_2);
 
@@ -1198,7 +1205,12 @@ int TestTeardown(void * inContext)
 } // namespace
 
 int TestSystemPacketBuffer(void)
-{
+{ /*
+ #if CHIP_SYSTEM_CONFIG_USE_LWIP
+     tcpip_init(NULL, NULL);
+ #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+ */
+
     // clang-format off
     nlTestSuite theSuite =
 	{

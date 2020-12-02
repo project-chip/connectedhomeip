@@ -27,6 +27,7 @@ source_set("all-clusters-common") {
     "${chip_root}/src/app/clusters/barrier-control-server/barrier-control-server.cpp",
     "${chip_root}/src/app/clusters/basic/basic.cpp",
     "${chip_root}/src/app/clusters/color-control-server/color-control-server.cpp",
+    "${chip_root}/src/app/clusters/door-lock-client/door-lock-client.cpp",
     "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-core.cpp",
     "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-logging.cpp",
     "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-schedule.cpp",
@@ -34,6 +35,7 @@ source_set("all-clusters-common") {
     "${chip_root}/src/app/clusters/groups-client/groups-client.cpp",
     "${chip_root}/src/app/clusters/groups-server/groups-server.cpp",
     "${chip_root}/src/app/clusters/ias-zone-server/ias-zone-server.cpp",
+    "${chip_root}/src/app/clusters/identify-client/identify-client.cpp",
     "${chip_root}/src/app/clusters/identify/identify.cpp",
     "${chip_root}/src/app/clusters/level-control/level-control.cpp",
     "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
@@ -55,9 +57,8 @@ source_set("all-clusters-common") {
     "${chip_root}/src/app/util/process-cluster-message.cpp",
     "${chip_root}/src/app/util/process-global-message.cpp",
     "${chip_root}/src/app/util/util.cpp",
-    "gen/call-command-handler.c",
-    "gen/callback-stub.c",
-    "gen/clusters-callback-stubs.c",
+    "gen/call-command-handler.cpp",
+    "gen/callback-stub.cpp",
   ]
 
   deps = [

@@ -19,7 +19,7 @@
 #include "TestSupport.h"
 
 #include <support/ScopedBuffer.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -160,4 +160,4 @@ int TestScopedBuffer(void)
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestBufBound)
+CHIP_REGISTER_TEST_SUITE(TestScopedBuffer)

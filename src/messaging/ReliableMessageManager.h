@@ -35,7 +35,7 @@
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 enum class SendMessageFlags : uint16_t;
 class ReliableMessageContext;
@@ -122,5 +122,5 @@ private:
     RetransTableEntry RetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
 };
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip

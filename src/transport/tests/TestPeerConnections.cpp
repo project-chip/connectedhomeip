@@ -22,11 +22,9 @@
  *      the PeerConnections class within the transport layer
  *
  */
-#include "TestTransportLayer.h"
-
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <transport/PeerConnections.h>
 
 #include <nlunit-test.h>
@@ -201,21 +199,12 @@ struct ExpiredCallInfo
     PeerAddress lastCallPeerAddress = PeerAddress::Uninitialized();
 };
 
-void OnConnectionExpired(const PeerConnectionState & state, ExpiredCallInfo * info)
-{
-    info->callCount++;
-    info->lastCallNodeId      = state.GetPeerNodeId();
-    info->lastCallPeerAddress = state.GetPeerAddress();
-}
-
 void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
 {
     CHIP_ERROR err;
     ExpiredCallInfo callInfo;
     PeerConnectionState * statePtr;
     PeerConnections<2, Time::Source::kTest> connections;
-
-    connections.SetConnectionExpiredHandler(OnConnectionExpired, &callInfo);
 
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(100);
 
@@ -233,7 +222,11 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err != CHIP_NO_ERROR);
 
     // at time 300, this expires ip addr 1
-    connections.ExpireInactiveConnections(150);
+    connections.ExpireInactiveConnections(150, [&callInfo](const PeerConnectionState & state) {
+        callInfo.callCount++;
+        callInfo.lastCallNodeId      = state.GetPeerNodeId();
+        callInfo.lastCallPeerAddress = state.GetPeerAddress();
+    });
     NL_TEST_ASSERT(inSuite, callInfo.callCount == 1);
     NL_TEST_ASSERT(inSuite, callInfo.lastCallNodeId == kUndefinedNodeId);
     NL_TEST_ASSERT(inSuite, callInfo.lastCallPeerAddress == kPeer1Addr);
@@ -257,7 +250,11 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
 
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(500);
     callInfo.callCount = 0;
-    connections.ExpireInactiveConnections(150);
+    connections.ExpireInactiveConnections(150, [&callInfo](const PeerConnectionState & state) {
+        callInfo.callCount++;
+        callInfo.lastCallNodeId      = state.GetPeerNodeId();
+        callInfo.lastCallPeerAddress = state.GetPeerAddress();
+    });
 
     // peer 2 stays active
     NL_TEST_ASSERT(inSuite, callInfo.callCount == 1);
@@ -276,7 +273,11 @@ void TestExpireConnections(nlTestSuite * inSuite, void * inContext)
     // peer 1 and 2 are active
     connections.GetTimeSource().SetCurrentMonotonicTimeMs(1000);
     callInfo.callCount = 0;
-    connections.ExpireInactiveConnections(100);
+    connections.ExpireInactiveConnections(100, [&callInfo](const PeerConnectionState & state) {
+        callInfo.callCount++;
+        callInfo.lastCallNodeId      = state.GetPeerNodeId();
+        callInfo.lastCallPeerAddress = state.GetPeerAddress();
+    });
     NL_TEST_ASSERT(inSuite, callInfo.callCount == 2); // everything expired
     NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer1Addr, nullptr));
     NL_TEST_ASSERT(inSuite, !connections.FindPeerConnectionState(kPeer2Addr, nullptr));

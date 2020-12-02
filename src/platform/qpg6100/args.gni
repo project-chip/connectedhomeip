@@ -19,6 +19,7 @@ import("//build_overrides/qpg6100_sdk.gni")
 arm_platform_config = "${qpg6100_sdk_build_root}/qpg6100_arm.gni"
 
 mbedtls_target = "${qpg6100_sdk_build_root}:qpg6100_sdk"
+openthread_external_mbedtls = mbedtls_target
 
 chip_device_platform = "qpg6100"
 

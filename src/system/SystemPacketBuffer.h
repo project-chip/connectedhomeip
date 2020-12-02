@@ -29,6 +29,7 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
+#include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <system/SystemAlignSize.h>
 #include <system/SystemError.h>
@@ -43,6 +44,8 @@
 
 namespace chip {
 namespace System {
+
+class PacketBufferHandle;
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP
 struct pbuf
@@ -72,10 +75,19 @@ struct pbuf
  *      for protocol headers at each layer of a configurable communication stack.  For details, see `PacketBuffer::New()` as well
  *      as LwIP documentation.
  *
- *      PacketBuffer objects are reference-counted, and the prevailing usage mode within chip is "fire-and-forget".  As the packet
- *      (and its underlying PacketBuffer object) is dispatched through various protocol layers, the successful upcall or downcall
- *      between layers implies ownership transfer, and the callee is responsible for freeing the buffer.  On failure of a
- *      cross-layer call, the responsibilty for freeing the buffer rests with the caller.
+ *      FIXME: CHIP is in the middle of a transition to use PacketBufferHandle to manage PacketBuffer ownership, so the following
+ *      paragraph is neither entirely correct nor entirely wrong.
+ *
+ *        PacketBuffer objects are reference-counted, and the prevailing usage mode within chip is "fire-and-forget".  As the packet
+ *        (and its underlying PacketBuffer object) is dispatched through various protocol layers, the successful upcall or downcall
+ *        between layers implies ownership transfer, and the callee is responsible for freeing the buffer.  On failure of a
+ *        cross-layer call, the responsibilty for freeing the buffer rests with the caller.
+ *
+ *      The end goal is:
+ *
+ *        PacketBuffer objects are reference-counted, and held through `PacketBufferHandle`s. When a PacketBufferHandle goes out
+ *        of scope, its reference is released. To transfer ownership, a function takes a PacketBufferHandle by value. To borrow
+ *        ownership, a function takes a `const PacketBufferHandle &`.
  *
  *      New objects of PacketBuffer class are initialized at the beginning of an allocation of memory obtained from the underlying
  *      environment, e.g. from LwIP pbuf target pools, from the standard C library heap, from an internal buffer pool. In the
@@ -109,8 +121,12 @@ public:
 
     PacketBuffer * Next() const;
 
-    void AddToEnd(PacketBuffer * aPacket);
-    PacketBuffer * DetachTail();
+    // The raw PacketBuffer version of AddToEnd() will be removed when conversion to PacketBufferHandle is complete.
+    void AddToEnd_ForNow(PacketBuffer * aPacket);
+    // The PacketBufferHandle's ownership is transferred to the `next` link at the end of the current chain.
+    void AddToEnd(PacketBufferHandle aPacket);
+    // The raw PacketBuffer version of DetachTail() will be removed when conversion to PacketBufferHandle is complete.
+    PacketBuffer * DetachTail_ForNow();
     void CompactHead();
     PacketBuffer * Consume(uint16_t aConsumeLength);
     void ConsumeHead(uint16_t aConsumeLength);
@@ -119,16 +135,17 @@ public:
 
     void AddRef();
 
-    static PacketBuffer * NewWithAvailableSize(uint16_t aAvailableSize);
-    static PacketBuffer * NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize);
+    static PacketBufferHandle NewWithAvailableSize(uint16_t aAvailableSize);
+    static PacketBufferHandle NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize);
 
-    static PacketBuffer * New();
-    static PacketBuffer * New(uint16_t aReservedSize);
+    static PacketBufferHandle New();
+    static PacketBufferHandle New(uint16_t aReservedSize);
 
     static PacketBuffer * RightSize(PacketBuffer * aPacket);
 
     static void Free(PacketBuffer * aPacket);
-    static PacketBuffer * FreeHead(PacketBuffer * aPacket);
+    // To be removed when conversion to PacketBufferHandle is complete:
+    static PacketBuffer * FreeHead_ForNow(PacketBuffer * aPacket) { return FreeHead(aPacket); }
 
 private:
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
@@ -137,7 +154,9 @@ private:
     static PacketBuffer * BuildFreeList();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
+    static PacketBuffer * FreeHead(PacketBuffer * aPacket);
     void Clear();
+    friend class PacketBufferHandle;
 };
 
 } // namespace System
@@ -227,6 +246,111 @@ inline uint16_t PacketBuffer::AllocSize() const
 #endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
+
+} // namespace System
+} // namespace chip
+
+namespace chip {
+namespace System {
+
+/// Tracks ownership of a System::PacketBuffer.
+class DLL_EXPORT PacketBufferHandle
+{
+public:
+    PacketBufferHandle() : mBuffer(nullptr) {}
+    PacketBufferHandle(decltype(nullptr)) : mBuffer(nullptr) {}
+
+    PacketBufferHandle(PacketBufferHandle && aOther)
+    {
+        mBuffer        = aOther.mBuffer;
+        aOther.mBuffer = nullptr;
+    }
+
+    ~PacketBufferHandle() { Adopt(nullptr); }
+
+    PacketBufferHandle & operator=(PacketBufferHandle && aOther)
+    {
+        if (mBuffer != nullptr)
+        {
+            PacketBuffer::Free(mBuffer);
+        }
+        mBuffer        = aOther.mBuffer;
+        aOther.mBuffer = nullptr;
+        return *this;
+    }
+    PacketBufferHandle & operator=(decltype(nullptr))
+    {
+        Adopt(nullptr);
+        return *this;
+    }
+
+    PacketBufferHandle Retain() const
+    {
+        mBuffer->AddRef();
+        return PacketBufferHandle(mBuffer);
+    }
+
+    PacketBuffer * operator->() const { return mBuffer; }
+    PacketBuffer & operator*() const { return *mBuffer; }
+
+    // The caller's ownership is transferred to this.
+    void Adopt(PacketBuffer * buffer)
+    {
+        if (mBuffer != nullptr)
+        {
+            PacketBuffer::Free(mBuffer);
+        }
+        mBuffer = buffer;
+    }
+
+    // The PacketBufferHandle's ownership is transferred to the caller.
+    // This is intended to be used only to call functions that have not yet been converted; a permanent version may be created
+    // if/when the need is clear. Most uses will be converted to take a `PacketBufferHandle` by value.
+    CHECK_RETURN_VALUE PacketBuffer * Release_ForNow()
+    {
+        PacketBuffer * buffer = mBuffer;
+        mBuffer               = nullptr;
+        return buffer;
+    }
+
+    // The caller has access but no ownership.
+    // This is intended to be used only to call functions that have not yet been converted to take a PacketBufferHandle;
+    // a permanent version may be created if/when the need is clear. Most uses will be converted to take a
+    // `const PacketBufferHandle &`.
+    PacketBuffer * Get_ForNow() const { return mBuffer; }
+
+    bool IsNull() const { return mBuffer == nullptr; }
+
+    /**
+     *  Detach and return the head of a buffer chain while updating this handle to point to the remaining buffers.
+     *  The current buffer must be the head of the chain.
+     *
+     *  @return the detached buffer formerly at the head of the buffer chain.
+     */
+    PacketBufferHandle PopHead();
+
+    /**
+     * Free the first buffer in a chain.
+     *
+     *  @note When the buffer chain is referenced by multiple callers, `FreeHead()` will detach the head, but will not forcibly
+     *  deallocate the head buffer.
+     */
+    void FreeHead()
+    {
+        // `PacketBuffer::FreeHead()` frees the current head; this takes ownership from the `next` link.
+        mBuffer = PacketBuffer::FreeHead(mBuffer);
+    }
+
+private:
+    PacketBufferHandle(const PacketBufferHandle &) = delete;
+    PacketBufferHandle & operator=(const PacketBufferHandle &) = delete;
+
+    // The caller's ownership is transferred to this.
+    explicit PacketBufferHandle(PacketBuffer * buffer) : mBuffer(buffer) {}
+
+    PacketBuffer * mBuffer;
+    friend class PacketBuffer;
+};
 
 } // namespace System
 } // namespace chip

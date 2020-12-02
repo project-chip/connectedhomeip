@@ -24,6 +24,7 @@
 #include <transport/raw/UDP.h>
 
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -34,20 +35,17 @@ namespace Transport {
 
 UDP::~UDP()
 {
-    if (mUDPEndPoint)
-    {
-        // Udp endpoint is only non null if udp endpoint is initialized and listening
-        mUDPEndPoint->Close();
-        mUDPEndPoint->Free();
-        mUDPEndPoint = nullptr;
-    }
+    Close();
 }
 
 CHIP_ERROR UDP::Init(UdpListenParameters & params)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(mState == State::kNotReady, err = CHIP_ERROR_INCORRECT_STATE);
+    if (mState != State::kNotReady)
+    {
+        Close();
+    }
 
     err = params.GetInetLayer()->NewUDPEndPoint(&mUDPEndPoint);
     SuccessOrExit(err);
@@ -78,16 +76,28 @@ exit:
     return err;
 }
 
-CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
-                            System::PacketBuffer * msgBuf)
+void UDP::Close()
 {
-    const uint16_t headerSize = header.EncodeSizeBytes();
-    uint16_t actualEncodedHeaderSize;
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    if (mUDPEndPoint)
+    {
+        // Udp endpoint is only non null if udp endpoint is initialized and listening
+        mUDPEndPoint->Close();
+        mUDPEndPoint->Free();
+        mUDPEndPoint = nullptr;
+    }
+    mState = State::kNotReady;
+}
 
-    VerifyOrExit(address.GetTransportType() == Type::kUdp, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(mUDPEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
+CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgIn)
+{
+    System::PacketBufferHandle msgBuf;
+    msgBuf.Adopt(msgIn);
+
+    const uint16_t headerSize = header.EncodeSizeBytes();
+
+    VerifyOrReturnError(address.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mState == State::kInitialized, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(mUDPEndPoint != nullptr, CHIP_ERROR_INCORRECT_STATE);
 
     Inet::IPPacketInfo addrInfo;
     addrInfo.Clear();
@@ -96,30 +106,19 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFl
     addrInfo.DestPort    = address.GetPort();
     addrInfo.Interface   = address.GetInterface();
 
-    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrReturnError(msgBuf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetStart(msgBuf->Start() - headerSize);
-    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags);
-    SuccessOrExit(err);
 
-    // This is unexpected and means header changed while encoding
-    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
+    uint16_t actualEncodedHeaderSize;
+    ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize));
 
-    err    = mUDPEndPoint->SendMsg(&addrInfo, msgBuf);
-    msgBuf = nullptr;
-    SuccessOrExit(err);
+    VerifyOrReturnError(headerSize == actualEncodedHeaderSize, CHIP_ERROR_INTERNAL);
 
-exit:
-    if (msgBuf != nullptr)
-    {
-        System::PacketBuffer::Free(msgBuf);
-        msgBuf = nullptr;
-    }
-
-    return err;
+    return mUDPEndPoint->SendMsg(&addrInfo, msgBuf.Release_ForNow());
 }
 
-void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const Inet::IPPacketInfo * pktInfo)
+void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle buffer, const Inet::IPPacketInfo * pktInfo)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
@@ -131,7 +130,7 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * 
     SuccessOrExit(err);
 
     buffer->ConsumeHead(headerSize);
-    udp->HandleMessageReceived(header, peerAddress, buffer);
+    udp->HandleMessageReceived(header, peerAddress, std::move(buffer));
 
 exit:
     if (err != CHIP_NO_ERROR)

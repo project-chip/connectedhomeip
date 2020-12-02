@@ -210,7 +210,7 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId 
     bool zeroAddress;
     EmberBindingTableEntry bindingEntry;
     EmberBindingTableEntry currentBind;
-    ChipNodeId destNodeId;
+    NodeId destNodeId;
     uint8_t ieeeAddress[] = { 0, 0, 0, 0, 0, 0, 0, 0 };
 
     // If this is not a CIE Address write, the CIE address has already been
@@ -220,7 +220,7 @@ EmberAfStatus emberAfIasZoneClusterServerPreAttributeChangedCallback(EndpointId 
         return EMBER_ZCL_STATUS_SUCCESS;
     }
 
-    memcpy(&destNodeId, value, sizeof(ChipNodeId));
+    memcpy(&destNodeId, value, sizeof(NodeId));
 
     // Create the binding table entry
 
@@ -400,7 +400,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
     IasZoneStatusQueueEntry newBufferEntry;
     newBufferEntry.endpoint    = endpoint;
     newBufferEntry.status      = newStatus;
-    newBufferEntry.eventTimeMs = chip::System::Layer::GetClock_MonotonicMS();
+    newBufferEntry.eventTimeMs = System::Layer::GetClock_MonotonicMS();
 #endif
     EmberStatus sendStatus;
 
@@ -477,7 +477,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(EndpointId endpoint, uint
     return sendStatus;
 }
 
-extern "C" void emberAfPluginIasZoneServerManageQueueEventHandler(void)
+void emberAfPluginIasZoneServerManageQueueEventHandler(void)
 {
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
     IasZoneStatusQueueEntry * bufferStart;
@@ -760,7 +760,7 @@ void emberAfIasZoneClusterServerMessageSentCallback(EmberOutgoingMessageType typ
 {
 #if defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER_ENABLE_QUEUE)
     uint8_t frameControl;
-    uint8_t commandId;
+    CommandId commandId;
 
     IasZoneStatusQueueEntry dummyEntry;
 
@@ -899,7 +899,7 @@ static int16_t popFromBuffer(IasZoneStatusQueue * ring, IasZoneStatusQueueEntry 
 
 uint16_t computeElapsedTimeQs(IasZoneStatusQueueEntry * entry)
 {
-    uint32_t currentTimeMs = chip::System::Layer::GetClock_MonotonicMS();
+    uint32_t currentTimeMs = System::Layer::GetClock_MonotonicMS();
     int64_t deltaTimeMs    = currentTimeMs - entry->eventTimeMs;
 
     if (deltaTimeMs < 0)

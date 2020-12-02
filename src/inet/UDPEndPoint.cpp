@@ -64,6 +64,7 @@
 #include "arpa-inet-compatibility.h"
 
 #include <string.h>
+#include <utility>
 
 // SOCK_CLOEXEC not defined on all platforms, e.g. iOS/macOS:
 #ifdef SOCK_CLOEXEC
@@ -778,9 +779,9 @@ uint16_t UDPEndPoint::GetBoundPort()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-void UDPEndPoint::HandleDataReceived(PacketBuffer * msg)
+void UDPEndPoint::HandleDataReceived(System::PacketBufferHandle msg)
 {
-    IPEndPointBasis::HandleDataReceived(msg);
+    IPEndPointBasis::HandleDataReceived(std::move(msg));
 }
 
 INET_ERROR UDPEndPoint::GetPCB(IPAddressType addrType)
@@ -874,7 +875,9 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
     chip::System::Layer & lSystemLayer = ep->SystemLayer();
     IPPacketInfo * pktInfo             = NULL;
 
-    pktInfo = GetPacketInfo(buf);
+    System::PacketBufferHandle buf_ForNow;
+    buf_ForNow.Adopt(buf);
+    pktInfo = GetPacketInfo(buf_ForNow);
     if (pktInfo != NULL)
     {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
@@ -900,8 +903,12 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
         pktInfo->DestPort  = pcb->local_port;
     }
 
+    buf = buf_ForNow.Release_ForNow();
     if (lSystemLayer.PostEvent(*ep, kInetEvent_UDPDataReceived, (uintptr_t) buf) != INET_NO_ERROR)
+    {
+        // If PostEvent() failed, it has not taken ownership of the buffer, so we need to free it ourselves.
         PacketBuffer::Free(buf);
+    }
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

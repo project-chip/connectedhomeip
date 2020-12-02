@@ -19,6 +19,13 @@ template("mbedtls_target") {
 
   _mbedtls_root = "${mbedtls_root}/repo"
 
+  config("${mbedtls_target_name}_warnings") {
+    cflags = [
+      "-Wno-maybe-uninitialized",
+      "-Wno-string-concatenation",
+    ]
+  }
+
   config("${mbedtls_target_name}_config") {
     include_dirs = [ "${_mbedtls_root}/include" ]
   }
@@ -105,6 +112,13 @@ template("mbedtls_target") {
     if (current_os != "freertos") {
       sources += [ "${_mbedtls_root}/library/timing.c" ]
     }
+
+    if (!defined(configs)) {
+      configs = []
+    }
+
+    # Relax warnings for third_party code.
+    configs += [ ":${mbedtls_target_name}_warnings" ]
 
     if (!defined(public_configs)) {
       public_configs = []

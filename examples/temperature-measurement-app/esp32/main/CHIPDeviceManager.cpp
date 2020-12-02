@@ -25,10 +25,13 @@
 #include <stdlib.h>
 
 #include "CHIPDeviceManager.h"
+#include <app/util/basic-types.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+
+using namespace ::chip;
 
 namespace chip {
 
@@ -92,18 +95,16 @@ CHIP_ERROR CHIPDeviceManager::Init(CHIPDeviceManagerCallbacks * cb)
 exit:
     return err;
 }
-
-extern "C" {
-void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
-                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
-{
-    CHIPDeviceManagerCallbacks * cb = CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
-    if (cb != nullptr)
-    {
-        cb->PostAttributeChangeCallback(endpoint, clusterId, attributeId, mask, manufacturerCode, type, size, value);
-    }
-}
-} // extern "C"
-
 } // namespace DeviceManager
 } // namespace chip
+
+void emberAfPostAttributeChangeCallback(EndpointId endpointId, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
+                                        uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
+{
+    chip::DeviceManager::CHIPDeviceManagerCallbacks * cb =
+        chip::DeviceManager::CHIPDeviceManager::GetInstance().GetCHIPDeviceManagerCallbacks();
+    if (cb != nullptr)
+    {
+        cb->PostAttributeChangeCallback(endpointId, clusterId, attributeId, mask, manufacturerCode, type, size, value);
+    }
+}

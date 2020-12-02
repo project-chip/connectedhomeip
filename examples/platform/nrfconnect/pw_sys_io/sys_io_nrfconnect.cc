@@ -22,9 +22,20 @@
 #include <cassert>
 #include <zephyr.h>
 
+#ifdef CONFIG_USB
+#include <usb/usb_device.h>
+#endif
+
 extern "C" void pw_sys_io_Init()
 {
-    int err = console_init();
+    int err;
+
+#ifdef CONFIG_USB
+    err = usb_enable(nullptr);
+    assert(err == 0);
+#endif
+
+    err = console_init();
     assert(err == 0);
 }
 
@@ -37,6 +48,7 @@ Status ReadByte(std::byte * dest)
 
     const int c = console_getchar();
     *dest       = static_cast<std::byte>(c);
+
     return c < 0 ? Status::FAILED_PRECONDITION : Status::OK;
 }
 

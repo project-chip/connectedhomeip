@@ -236,7 +236,7 @@ uint16_t PacketBuffer::ReservedSize() const
  *
  * @param[in] aPacket - the packet buffer to be added to the end of the current chain.
  */
-void PacketBuffer::AddToEnd(PacketBuffer * aPacket)
+void PacketBuffer::AddToEnd_ForNow(PacketBuffer * aPacket)
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     pbuf_cat(this, aPacket);
@@ -257,13 +257,18 @@ void PacketBuffer::AddToEnd(PacketBuffer * aPacket)
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
+void PacketBuffer::AddToEnd(PacketBufferHandle aPacket)
+{
+    AddToEnd_ForNow(aPacket.Release_ForNow());
+}
+
 /**
  *  Detach the current buffer from its chain and return a pointer to the remaining buffers.  The current buffer must be the head of
  *  the chain.
  *
  *  @return the tail of the current buffer chain or NULL if the current buffer is the only buffer in the chain.
  */
-PacketBuffer * PacketBuffer::DetachTail()
+PacketBuffer * PacketBuffer::DetachTail_ForNow()
 {
     PacketBuffer & lReturn = *static_cast<PacketBuffer *>(this->next);
 
@@ -456,7 +461,7 @@ void PacketBuffer::AddRef()
  *
  *  @return     On success, a pointer to the PacketBuffer in the allocated block. On fail, \c NULL.
  */
-PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize)
+PacketBufferHandle PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize)
 {
     // Adding three 16-bit-int sized numbers together will never overflow
     // assuming int is at least 32 bits.
@@ -469,12 +474,12 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, uint16
     const size_t lBlockSize = CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + lAllocSize;
     PacketBuffer * lPacket;
 
-    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return nullptr);
+    CHIP_SYSTEM_FAULT_INJECT(FaultInjection::kFault_PacketBufferNew, return PacketBufferHandle());
 
     if (lAllocSize > CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX || lBlockSize > UINT16_MAX)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: allocation too large.");
-        return nullptr;
+        return PacketBufferHandle();
     }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -510,7 +515,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, uint16
     if (lPacket == nullptr)
     {
         ChipLogError(chipSystemLayer, "PacketBuffer: pool EMPTY.");
-        return nullptr;
+        return PacketBufferHandle();
     }
 
     lPacket->payload = reinterpret_cast<uint8_t *>(lPacket) + CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE + aReservedSize;
@@ -521,7 +526,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, uint16
     lPacket->alloc_size = static_cast<uint16_t>(lAllocSize);
 #endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC == 0
 
-    return lPacket;
+    return PacketBufferHandle(lPacket);
 }
 
 /**
@@ -534,7 +539,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aReservedSize, uint16
  *
  *  @return     On success, a pointer to the PacketBuffer in the allocated block. On fail, \c NULL. *
  */
-PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aAvailableSize)
+PacketBufferHandle PacketBuffer::NewWithAvailableSize(uint16_t aAvailableSize)
 {
     return PacketBuffer::NewWithAvailableSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, aAvailableSize);
 }
@@ -555,7 +560,7 @@ PacketBuffer * PacketBuffer::NewWithAvailableSize(uint16_t aAvailableSize)
  *
  *  @return On success, a pointer to the PacketBuffer, on failure \c NULL.
  */
-PacketBuffer * PacketBuffer::New(uint16_t aReservedSize)
+PacketBufferHandle PacketBuffer::New(uint16_t aReservedSize)
 {
     static_assert(CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX <= UINT16_MAX, "Our available size won't fit in uint16_t");
     const uint16_t lAvailableSize = aReservedSize < CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
@@ -572,7 +577,7 @@ PacketBuffer * PacketBuffer::New(uint16_t aReservedSize)
  * The reserved size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) is large enough to hold transport layer headers as well as headers
  * required by \c chipMessageLayer and \c chipExchangeLayer.
  */
-PacketBuffer * PacketBuffer::New()
+PacketBufferHandle PacketBuffer::New()
 {
     return PacketBuffer::New(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 }
@@ -706,6 +711,20 @@ PacketBuffer * PacketBuffer::BuildFreeList()
 }
 
 #endif //  !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
+
+PacketBufferHandle PacketBufferHandle::PopHead()
+{
+    PacketBuffer * head = mBuffer;
+
+    // This takes ownership from the `next` link.
+    mBuffer = static_cast<PacketBuffer *>(mBuffer->next);
+
+    head->next    = nullptr;
+    head->tot_len = head->len;
+
+    // The returned handle takes ownership from this.
+    return PacketBufferHandle(head);
+}
 
 } // namespace System
 } // namespace chip

@@ -77,17 +77,15 @@ bool AndroidBlePlatformDelegate::CloseConnection(BLE_CONNECTION_OBJECT connObj)
 }
 
 bool AndroidBlePlatformDelegate::SendIndication(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId,
-                                                const ChipBleUUID * charId, PacketBuffer * pBuf)
+                                                const ChipBleUUID * charId, PacketBufferHandle pBuf)
 {
-    // Release delegate's reference to pBuf. pBuf will be freed when both
+    // Going out of scope releases delegate's reference to pBuf. pBuf will be freed when both
     // platform delegate and Chip stack free their references to it.
-    PacketBuffer::Free(pBuf);
-
     return false;
 }
 
 bool AndroidBlePlatformDelegate::SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId,
-                                                  const ChipBleUUID * charId, PacketBuffer * pBuf)
+                                                  const ChipBleUUID * charId, PacketBufferHandle pBuf)
 {
     bool rc = true;
     if (SendWriteRequestCb)
@@ -96,17 +94,15 @@ bool AndroidBlePlatformDelegate::SendWriteRequest(BLE_CONNECTION_OBJECT connObj,
                                 pBuf->Start(), pBuf->DataLength());
     }
 
-    // Release delegate's reference to pBuf. pBuf will be freed when both
+    // Going out of scope releases delegate's reference to pBuf. pBuf will be freed when both
     // platform delegate and Chip stack free their references to it.
     // We release pBuf's reference here since its payload bytes were copied
     // onto the Java heap by SendWriteRequestCb.
-    PacketBuffer::Free(pBuf);
-
     return rc;
 }
 
 bool AndroidBlePlatformDelegate::SendReadRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId,
-                                                 const ChipBleUUID * charId, PacketBuffer * pBuf)
+                                                 const ChipBleUUID * charId, PacketBufferHandle pBuf)
 {
     return true;
 }

@@ -90,7 +90,7 @@ public:
      *  member to process message text reception events on \c endPoint where
      *  \c msg is the message text received from the sender at \c senderAddr.
      */
-    typedef void (*OnMessageReceivedFunct)(IPEndPointBasis * endPoint, chip::System::PacketBuffer * msg,
+    typedef void (*OnMessageReceivedFunct)(IPEndPointBasis * endPoint, chip::System::PacketBufferHandle msg,
                                            const IPPacketInfo * pktInfo);
 
     /** The endpoint's message reception event handling function delegate. */
@@ -124,9 +124,9 @@ public:
     static struct netif * FindNetifFromInterfaceId(InterfaceId aInterfaceId);
 
 protected:
-    void HandleDataReceived(chip::System::PacketBuffer * aBuffer);
+    void HandleDataReceived(chip::System::PacketBufferHandle aBuffer);
 
-    static IPPacketInfo * GetPacketInfo(chip::System::PacketBuffer * aBuffer);
+    static IPPacketInfo * GetPacketInfo(const chip::System::PacketBufferHandle & aBuffer);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS

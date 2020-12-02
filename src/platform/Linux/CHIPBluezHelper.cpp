@@ -1445,7 +1445,7 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
-bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBuffer * apBuf)
+bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf)
 {
     ConnectionDataBundle * closure;
     const char * msg = nullptr;
@@ -1453,7 +1453,7 @@ bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBuffe
     uint8_t * buffer = nullptr;
     size_t len       = 0;
 
-    VerifyOrExit(apBuf != nullptr, ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
+    VerifyOrExit(!apBuf.IsNull(), ChipLogError(DeviceLayer, "apBuf is NULL in %s", __func__));
     buffer = apBuf->Start();
     len    = apBuf->DataLength();
 
@@ -1468,11 +1468,6 @@ exit:
     if (nullptr != msg)
     {
         ChipLogError(Ble, msg);
-    }
-
-    if (nullptr != apBuf)
-    {
-        chip::System::PacketBuffer::Free(apBuf);
     }
 
     return success;

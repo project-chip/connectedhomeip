@@ -30,6 +30,7 @@
 #include "IPEndPointBasis.h"
 
 #include <string.h>
+#include <utility>
 
 #include <inet/EndPointBasis.h>
 #include <inet/InetInterface.h>
@@ -608,7 +609,7 @@ void IPEndPointBasis::Init(InetLayer * aInetLayer)
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-void IPEndPointBasis::HandleDataReceived(PacketBuffer * aBuffer)
+void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle aBuffer)
 {
     if ((mState == kState_Listening) && (OnMessageReceived != NULL))
     {
@@ -618,18 +619,13 @@ void IPEndPointBasis::HandleDataReceived(PacketBuffer * aBuffer)
         {
             const IPPacketInfo pktInfoCopy = *pktInfo; // copy the address info so that the app can free the
                                                        // PacketBuffer without affecting access to address info.
-            OnMessageReceived(this, aBuffer, &pktInfoCopy);
+            OnMessageReceived(this, std::move(aBuffer), &pktInfoCopy);
         }
         else
         {
             if (OnReceiveError != NULL)
                 OnReceiveError(this, INET_ERROR_INBOUND_MESSAGE_TOO_BIG, NULL);
-            PacketBuffer::Free(aBuffer);
         }
-    }
-    else
-    {
-        PacketBuffer::Free(aBuffer);
     }
 }
 
@@ -659,7 +655,7 @@ void IPEndPointBasis::HandleDataReceived(PacketBuffer * aBuffer)
  *     packets that arrive without an Ethernet header.
  *
  */
-IPPacketInfo * IPEndPointBasis::GetPacketInfo(PacketBuffer * aBuffer)
+IPPacketInfo * IPEndPointBasis::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
 {
     uintptr_t lStart;
     uintptr_t lPacketInfoStart;
@@ -1055,14 +1051,14 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 {
     INET_ERROR lStatus = INET_NO_ERROR;
     IPPacketInfo lPacketInfo;
-    PacketBuffer * lBuffer;
+    System::PacketBufferHandle lBuffer;
 
     lPacketInfo.Clear();
     lPacketInfo.DestPort = aPort;
 
     lBuffer = PacketBuffer::New(0);
 
-    if (lBuffer != nullptr)
+    if (!lBuffer.IsNull())
     {
         struct iovec msgIOV;
         PeerSockAddr lPeerSockAddr;
@@ -1160,10 +1156,11 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
     }
 
     if (lStatus == INET_NO_ERROR)
-        OnMessageReceived(this, lBuffer, &lPacketInfo);
+    {
+        OnMessageReceived(this, std::move(lBuffer), &lPacketInfo);
+    }
     else
     {
-        PacketBuffer::Free(lBuffer);
         if (OnReceiveError != nullptr && lStatus != chip::System::MapErrorPOSIX(EAGAIN))
             OnReceiveError(this, lStatus, nullptr);
     }
@@ -1307,8 +1304,8 @@ void IPEndPointBasis::HandleDataReceived(const nw_connection_t & aConnection)
 
             if (content != NULL && OnMessageReceived != NULL)
             {
-                size_t count                        = dispatch_data_get_size(content);
-                System::PacketBuffer * packetBuffer = PacketBuffer::NewWithAvailableSize(count);
+                size_t count                              = dispatch_data_get_size(content);
+                System::PacketBufferHandle * packetBuffer = System::PacketBuffer::NewWithAvailableSize(count);
                 dispatch_data_apply(content, ^(dispatch_data_t data, size_t offset, const void * buffer, size_t size) {
                     memmove(packetBuffer->Start() + offset, buffer, size);
                     return true;

@@ -32,8 +32,9 @@ const char * SerializableU64SetBase::SerializeBase64(char * buf, uint16_t & bufl
     // Swap to little endian order if needed.
     SwapByteOrderIfNeeded();
 
-    buflen = Base64Encode(reinterpret_cast<const uint8_t *>(mData), static_cast<uint16_t>(len), buf);
-    out    = buf;
+    buflen      = Base64Encode(reinterpret_cast<const uint8_t *>(mData), static_cast<uint16_t>(len), buf);
+    buf[buflen] = '\0';
+    out         = buf;
 
     // Swap back to the original order
     SwapByteOrderIfNeeded();

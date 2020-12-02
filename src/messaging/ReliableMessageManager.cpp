@@ -34,7 +34,7 @@
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 ReliableMessageManager::RetransTableEntry::RetransTableEntry() :
     rc(nullptr), msgBuf(nullptr), msgId(0), msgSendFlags(0), nextRetransTimeTick(0), sendCount(0)
@@ -419,7 +419,7 @@ CHIP_ERROR ReliableMessageManager::SendFromRetransTable(RetransTableEntry * entr
 
         // Send the message through
         uint16_t msgSendFlags = entry->msgSendFlags;
-        SetFlag(msgSendFlags, MessageFlagValues::kChipMessageFlag_RetainBuffer);
+        SetFlag(msgSendFlags, MessageFlagValues::kMessageFlag_RetainBuffer);
         err = SendMessage(rc, entry->msgBuf, msgSendFlags);
 
         // Reset the msgBuf start pointer and data length after sending
@@ -642,5 +642,5 @@ int ReliableMessageManager::TestGetCountRetransTable()
     return count;
 }
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip

@@ -123,7 +123,7 @@ DLL_EXPORT __CHIP_LOGGING_LINK_ATTRIBUTE void LogV(uint8_t module, uint8_t categ
             return;
         }
 
-        if (prefixLen >= sizeof(formattedMsg))
+        if (static_cast<size_t>(prefixLen) >= sizeof(formattedMsg))
         {
             prefixLen = sizeof(formattedMsg) - 1;
         }

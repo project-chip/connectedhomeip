@@ -20,7 +20,7 @@
  *      This file defines the platform API to publish and subscribe mDNS
  *      services.
  *
- *      You can find the implementation in src/platform/<PLATFORM>/MdnsImpl.cpp.
+ *      You can find the implementation in src/platform/\<PLATFORM\>/MdnsImpl.cpp.
  */
 
 #pragma once
@@ -87,7 +87,7 @@ using MdnsResolveCallback = void (*)(void * context, MdnsService * result, CHIP_
  *
  * @param[in] context       The context passed to ChipMdnsBrowse or ChipMdnsResolve.
  * @param[in] services      The service list, can be nullptr.
- * @param[in] serciesSize   The size of the service list.
+ * @param[in] servicesSize  The size of the service list.
  * @param[in] error         The error code.
  *
  */
@@ -144,11 +144,12 @@ CHIP_ERROR ChipMdnsStopPublish();
 /**
  * This function browses the services published by mdns
  *
- * @param[in] type       The service type.
- * @param[in] protocol   The service protocol.
- * @param[in] interface  The interface to send queries.
- * @param[in] callback   The callback for found services.
- * @param[in] context    The user context.
+ * @param[in] type        The service type.
+ * @param[in] protocol    The service protocol.
+ * @param[in] addressType The protocol version of the IP address.
+ * @param[in] interface   The interface to send queries.
+ * @param[in] callback    The callback for found services.
+ * @param[in] context     The user context.
  *
  * @retval CHIP_NO_ERROR                The browse succeeds.
  * @retval CHIP_ERROR_INVALID_ARGUMENT  The type or callback is nullptr.
@@ -162,6 +163,7 @@ CHIP_ERROR ChipMdnsBrowse(const char * type, MdnsServiceProtocol protocol, chip:
  * This function resolves the services published by mdns
  *
  * @param[in] browseResult  The service entry returned by @ref ChipMdnsBrowse
+ * @param[in] interface     The interface to send queries.
  * @param[in] callback      The callback for found services.
  * @param[in] context       The user context.
  *

@@ -80,13 +80,12 @@ public:
      * @param input_length Length of the input data
      * @param output Output buffer for encrypted data
      * @param header message header structure. Encryption type will be set on the header.
-     * @param payloadFlags extra flags for packet header encryption
      * @param mac - output the resulting mac
      *
      * @return CHIP_ERROR The result of encryption
      */
     CHIP_ERROR Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                       Header::Flags payloadFlags, MessageAuthenticationCode & mac);
+                       MessageAuthenticationCode & mac);
 
     /**
      * @brief
@@ -96,12 +95,11 @@ public:
      * @param input_length Length of the input data
      * @param output Output buffer for decrypted data
      * @param header message header structure
-     * @param payloadFlags extra flags for packet header decryption
      * @return CHIP_ERROR The result of decryption
      * @param mac Input mac
      */
     CHIP_ERROR Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                       Header::Flags payloadFlags, const MessageAuthenticationCode & mac);
+                       const MessageAuthenticationCode & mac);
 
     /**
      * @brief
@@ -128,8 +126,7 @@ private:
     // Use unencrypted header as additional authenticated data (AAD) during encryption and decryption.
     // The encryption operations includes AAD when message authentication tag is generated. This tag
     // is used at the time of decryption to integrity check the received data.
-    static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, Header::Flags payloadEncodeFlags, uint8_t * aad,
-                                            uint16_t & len);
+    static CHIP_ERROR GetAdditionalAuthData(const PacketHeader & header, uint8_t * aad, uint16_t & len);
 };
 
 } // namespace chip

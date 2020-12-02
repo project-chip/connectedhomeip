@@ -241,10 +241,13 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
         break;
 
-    case DeviceEventType::kCHIPoBLEWriteReceived:
+    case DeviceEventType::kCHIPoBLEWriteReceived: {
+        System::PacketBufferHandle data_ForNow;
+        data_ForNow.Adopt(event->CHIPoBLEWriteReceived.Data);
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
-                            event->CHIPoBLEWriteReceived.Data);
-        break;
+                            std::move(data_ForNow));
+    }
+    break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_TX);
@@ -322,7 +325,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBuffer * data)
+                                    PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     struct os_mbuf * om;
@@ -350,21 +353,20 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-        PacketBuffer::Free(data);
         return false;
     }
     return true;
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBuffer * pBuf)
+                                      PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
     return false;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBuffer * pBuf)
+                                     PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
     return false;
@@ -657,15 +659,14 @@ exit:
 
 void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    PacketBuffer * buf = NULL;
-    uint16_t data_len  = 0;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    uint16_t data_len = 0;
 
     ESP_LOGI(TAG, "Write request received for CHIPoBLE RX characteristic con %u %u", param->conn_handle, param->attr_handle);
 
     // Copy the data to a PacketBuffer.
-    buf = PacketBuffer::New(0);
-    VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    PacketBufferHandle buf = PacketBuffer::New(0);
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     data_len = OS_MBUF_PKTLEN(param->ctxt->om);
     VerifyOrExit(buf->AvailableDataLength() >= data_len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     ble_hs_mbuf_to_flat(param->ctxt->om, buf->Start(), data_len, NULL);
@@ -676,19 +677,14 @@ void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = param->conn_handle;
-        event.CHIPoBLEWriteReceived.Data  = buf;
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
-        buf = NULL;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
-    }
-    if (buf != NULL)
-    {
-        PacketBuffer::Free(buf);
     }
 }
 

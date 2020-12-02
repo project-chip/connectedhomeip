@@ -39,42 +39,31 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef ZCL_UTIL_ATTRIBUTE_TABLE_H
-#define ZCL_UTIL_ATTRIBUTE_TABLE_H
+#pragma once
 
 #include "af.h"
 
 #define ZCL_NULL_ATTRIBUTE_TABLE_INDEX 0xFFFF
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 // Remote devices writing attributes of local device
-EmberAfStatus emberAfWriteAttributeExternal(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID,
+EmberAfStatus emberAfWriteAttributeExternal(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID,
                                             uint8_t mask, uint16_t manufacturerCode, uint8_t * dataPtr,
                                             EmberAfAttributeType dataType);
 
-void emberAfRetrieveAttributeAndCraftResponse(CHIPEndpointId endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attrId,
+void emberAfRetrieveAttributeAndCraftResponse(chip::EndpointId endpoint, chip::ClusterId clusterId, chip::AttributeId attrId,
                                               uint8_t mask, uint16_t manufacturerCode, uint16_t readLength);
-EmberAfStatus emberAfAppendAttributeReportFields(CHIPEndpointId endpoint, EmberAfClusterId clusterId,
-                                                 EmberAfAttributeId attributeId, uint8_t mask, uint8_t * buffer, uint8_t bufLen,
+EmberAfStatus emberAfAppendAttributeReportFields(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                 chip::AttributeId attributeId, uint8_t mask, uint8_t * buffer, uint8_t bufLen,
                                                  uint8_t * bufIndex);
 void emberAfPrintAttributeTable(void);
 
-bool emberAfReadSequentialAttributesAddToResponse(CHIPEndpointId endpoint, EmberAfClusterId clusterId,
-                                                  EmberAfAttributeId startAttributeId, uint8_t mask, uint16_t manufacturerCode,
+bool emberAfReadSequentialAttributesAddToResponse(chip::EndpointId endpoint, chip::ClusterId clusterId,
+                                                  chip::AttributeId startAttributeId, uint8_t mask, uint16_t manufacturerCode,
                                                   uint8_t maxAttributeIds, bool includeAccessControl);
 
-EmberAfStatus emAfWriteAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+EmberAfStatus emAfWriteAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
                                  uint16_t manufacturerCode, uint8_t * data, EmberAfAttributeType dataType,
                                  bool overrideReadOnlyAndDataType, bool justTest);
 
-EmberAfStatus emAfReadAttribute(CHIPEndpointId endpoint, EmberAfClusterId cluster, EmberAfAttributeId attributeID, uint8_t mask,
+EmberAfStatus emAfReadAttribute(chip::EndpointId endpoint, chip::ClusterId cluster, chip::AttributeId attributeID, uint8_t mask,
                                 uint16_t manufacturerCode, uint8_t * dataPtr, uint16_t readLength, EmberAfAttributeType * dataType);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
-
-#endif // ZCL_UTIL_ATTRIBUTE_TABLE_H

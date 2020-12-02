@@ -21,6 +21,8 @@
 
 #import "CHIPDeviceController.h"
 #import "CHIPDevicePairingDelegateBridge.h"
+#import "CHIPDeviceStatusDelegateBridge.h"
+#import "CHIPDevice_Internal.h"
 #import "CHIPError.h"
 #import "CHIPLogging.h"
 #import "CHIPPersistentStorageDelegateBridge.h"
@@ -32,11 +34,7 @@
 
 static const char * const CHIP_SELECT_QUEUE = "com.zigbee.chip.select";
 
-// NOTE: Remote device ID is in sync with the echo server device id
-//       At some point, we may want to add an option to connect to a device without
-//       knowing its id, because the ID can be learned on the first response that is received.
-constexpr chip::NodeId kLocalDeviceId = 112233;
-constexpr chip::NodeId kRemoteDeviceId = 12344321;
+constexpr chip::NodeId kLocalDeviceId = chip::kTestControllerNodeId;
 
 @implementation AddressInfo
 - (instancetype)initWithIP:(NSString *)ip
@@ -65,8 +63,9 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
  * The delegate queue where delegate callbacks will run
  */
 @property (readonly, nonatomic) dispatch_queue_t delegateQueue;
-@property (readonly) chip::DeviceController::ChipDeviceController * cppController;
+@property (readonly) chip::Controller::DeviceCommissioner * cppController;
 @property (readonly) CHIPDevicePairingDelegateBridge * pairingDelegateBridge;
+@property (readonly) CHIPDeviceStatusDelegateBridge * deviceStatusDelegateBridge;
 @property (readonly) CHIPPersistentStorageDelegateBridge * persistentStorageDelegateBridge;
 
 @end
@@ -95,7 +94,20 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
             return nil;
         }
 
-        _cppController = new chip::DeviceController::ChipDeviceController();
+        if (CHIP_NO_ERROR != chip::Platform::MemoryInit()) {
+            CHIP_LOG_ERROR("Error: Failed in memory init");
+            return nil;
+        }
+
+        _deviceStatusDelegateBridge = new CHIPDeviceStatusDelegateBridge();
+        if (!_deviceStatusDelegateBridge) {
+            CHIP_LOG_ERROR("Error: couldn't create device status delegate bridge");
+            return nil;
+        }
+        dispatch_queue_t callbackQueue = dispatch_queue_create("com.zigbee.chip.controller.callback", DISPATCH_QUEUE_SERIAL);
+        _deviceStatusDelegateBridge->setDelegate(self, callbackQueue);
+
+        _cppController = new chip::Controller::DeviceCommissioner();
         if (!_cppController) {
             CHIP_LOG_ERROR("Error: couldn't create c++ controller");
             return nil;
@@ -119,7 +131,7 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
             return nil;
         }
 
-        if (CHIP_NO_ERROR != _cppController->Init(kLocalDeviceId, _pairingDelegateBridge, _persistentStorageDelegateBridge)) {
+        if (CHIP_NO_ERROR != _cppController->Init(kLocalDeviceId, _persistentStorageDelegateBridge, _pairingDelegateBridge)) {
             CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
             delete _cppController;
             _cppController = NULL;
@@ -130,338 +142,115 @@ constexpr chip::NodeId kRemoteDeviceId = 12344321;
             return nil;
         }
 
-        if (CHIP_NO_ERROR != chip::Platform::MemoryInit()) {
-            CHIP_LOG_ERROR("Error: couldn't initialize c++ controller");
-            delete _cppController;
-            _cppController = NULL;
-            delete _pairingDelegateBridge;
-            _pairingDelegateBridge = NULL;
-            delete _persistentStorageDelegateBridge;
-            _persistentStorageDelegateBridge = NULL;
-            return nil;
-        }
+        // Start the IO pump
+        dispatch_async(_chipSelectQueue, ^() {
+            self.cppController->ServiceEvents();
+        });
     }
     return self;
 }
 
-static void onConnected(
-    chip::DeviceController::ChipDeviceController * cppController, chip::Transport::PeerConnectionState * state, void * appReqState)
-{
-    CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
-    [controller _dispatchAsyncConnectBlock];
-}
-
-static void onMessageReceived(
-    chip::DeviceController::ChipDeviceController * deviceController, void * appReqState, chip::System::PacketBuffer * buffer)
-{
-    CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
-
-    size_t data_len = buffer->DataLength();
-    // convert to NSData and pass back to the application
-    NSMutableData * dataBuffer = [[NSMutableData alloc] initWithBytes:buffer->Start() length:data_len];
-    buffer = buffer->Next();
-
-    while (buffer != NULL) {
-        data_len = buffer->DataLength();
-        [dataBuffer appendBytes:buffer->Start() length:data_len];
-        buffer = buffer->Next();
-    }
-
-    [controller _dispatchAsyncMessageBlock:dataBuffer];
-
-    // ignore unused variable
-    (void) deviceController;
-    chip::System::PacketBuffer::Free(buffer);
-}
-
-static void onInternalError(chip::DeviceController::ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR error,
-    const chip::Inet::IPPacketInfo * pi)
-{
-    CHIPDeviceController * controller = (__bridge CHIPDeviceController *) appReqState;
-    [controller _dispatchAsyncErrorBlock:[CHIPError errorForCHIPErrorCode:error]];
-}
-
-- (void)_dispatchAsyncErrorBlock:(NSError *)error
+// MARK: CHIPDeviceStatusDelegate
+- (void)onMessageReceived:(NSData *)message
 {
     CHIP_LOG_METHOD_ENTRY();
 
     id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
     if (strongDelegate && [self delegateQueue]) {
         dispatch_async(self.delegateQueue, ^{
-            [strongDelegate deviceControllerOnError:error];
+            [strongDelegate deviceControllerOnMessage:message];
         });
     }
 }
 
-- (void)_dispatchAsyncMessageBlock:(NSData *)data
-{
-    CHIP_LOG_METHOD_ENTRY();
-
-    id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
-    if (strongDelegate && [self delegateQueue]) {
-        dispatch_async(self.delegateQueue, ^{
-            [strongDelegate deviceControllerOnMessage:data];
-        });
-    }
-}
-
-- (void)_dispatchAsyncConnectBlock
-{
-    CHIP_LOG_METHOD_ENTRY();
-
-    id<CHIPDeviceControllerDelegate> strongDelegate = [self delegate];
-    if (strongDelegate && [self delegateQueue]) {
-        dispatch_async(self.delegateQueue, ^{
-            [strongDelegate deviceControllerOnConnected];
-        });
-    }
-}
-
-- (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error
-{
-    // Start the IO pump
-    dispatch_async(_chipSelectQueue, ^() {
-        self.cppController->ServiceEvents();
-    });
-    return YES;
-}
-
-- (BOOL)connect:(uint16_t)discriminator setupPINCode:(uint32_t)setupPINCode error:(NSError * __autoreleasing *)error
+- (BOOL)pairDevice:(uint64_t)deviceID
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     [self.lock lock];
 
     chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetDiscriminator(discriminator);
-    err = self.cppController->ConnectDevice(
-        kRemoteDeviceId, params, (__bridge void *) self, onConnected, onMessageReceived, onInternalError);
+    err = self.cppController->PairDevice(deviceID, params);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, connect failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%d): %@, failed in pairing the device", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
         return NO;
     }
 
-    // Start the IO pump
-    dispatch_async(_chipSelectQueue, ^() {
-        self.cppController->ServiceEvents();
-    });
     return YES;
 }
 
-- (BOOL)connectWithoutSecurePairing:(NSString *)ipAddress error:(NSError * __autoreleasing *)error
+- (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     [self.lock lock];
-    chip::Inet::IPAddress addr;
-    chip::Inet::IPAddress::FromString([ipAddress UTF8String], addr);
-    err = self.cppController->ConnectDeviceWithoutSecurePairing(
-        kRemoteDeviceId, addr, (__bridge void *) self, onConnected, onMessageReceived, onInternalError);
+
+    err = self.cppController->UnpairDevice(deviceID);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, connect failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%d): %@, failed in unpairing the device", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
         return NO;
     }
 
-    // Start the IO pump
-    dispatch_async(_chipSelectQueue, ^() {
-        self.cppController->ServiceEvents();
-    });
     return YES;
 }
 
-- (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error
+- (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     [self.lock lock];
-    size_t messageLen = [message length];
-    const void * messageChars = [message bytes];
-
-    chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(messageLen);
-    if (!buffer) {
-        err = CHIP_ERROR_NO_MEMORY;
-    } else {
-        buffer->SetDataLength(messageLen);
-
-        memcpy(buffer->Start(), messageChars, messageLen);
-        err = self.cppController->SendMessage((__bridge void *) self, buffer, kRemoteDeviceId);
-    }
+    err = self.cppController->StopPairing(deviceID);
     [self.lock unlock];
 
     if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, send failed", err, [CHIPError errorForCHIPErrorCode:err]);
+        CHIP_LOG_ERROR("Error(%d): %@, failed in stopping the pairing process", err, [CHIPError errorForCHIPErrorCode:err]);
         if (error) {
             *error = [CHIPError errorForCHIPErrorCode:err];
         }
         return NO;
     }
+
     return YES;
 }
 
-- (BOOL)sendCHIPCommand:(uint32_t (^)(chip::System::PacketBuffer *, uint16_t))encodeCommandBlock
+- (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::Controller::Device * cppDevice = nil;
+
     [self.lock lock];
-    // FIXME: This needs a better buffersizing setup!
-    static const size_t bufferSize = 1024;
-    chip::System::PacketBuffer * buffer = chip::System::PacketBuffer::NewWithAvailableSize(bufferSize);
-    if (!buffer) {
-        err = CHIP_ERROR_NO_MEMORY;
-    } else {
-        uint32_t dataLength = encodeCommandBlock(buffer, (uint16_t) bufferSize);
-        buffer->SetDataLength(dataLength);
-
-        err = self.cppController->SendMessage((__bridge void *) self, buffer, kRemoteDeviceId);
-    }
+    err = self.cppController->GetDevice(deviceID, &cppDevice);
     [self.lock unlock];
-    if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, send failed", err, [CHIPError errorForCHIPErrorCode:err]);
-        return NO;
-    }
-    return YES;
-}
 
-- (BOOL)sendOnCommand
-{
-    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
-        // Hardcode endpoint to 1 for now
-        return encodeOnOffClusterOnCommand(buffer->Start(), bufferSize, 1);
-    }];
-}
-
-- (BOOL)sendOffCommand
-{
-    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
-        // Hardcode endpoint to 1 for now
-        return encodeOnOffClusterOffCommand(buffer->Start(), bufferSize, 1);
-    }];
-}
-
-- (BOOL)sendToggleCommand
-{
-    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
-        // Hardcode endpoint to 1 for now
-        return encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, 1);
-    }];
-}
-
-- (BOOL)sendIdentifyCommandWithDuration:(NSTimeInterval)duration
-{
-    if (duration > UINT16_MAX) {
-        duration = UINT16_MAX;
+    if (err != CHIP_NO_ERROR || !cppDevice) {
+        CHIP_LOG_ERROR("Error(%d): %@, failed in getting device instance", err, [CHIPError errorForCHIPErrorCode:err]);
+        if (error) {
+            *error = [CHIPError errorForCHIPErrorCode:err];
+        }
+        return nil;
     }
 
-    return [self sendCHIPCommand:^uint32_t(chip::System::PacketBuffer * buffer, uint16_t bufferSize) {
-        // Hardcode endpoint to 1 for now
-        return encodeIdentifyClusterIdentifyCommand(buffer->Start(), bufferSize, 1, duration);
-    }];
+    cppDevice->SetDelegate(_deviceStatusDelegateBridge);
+
+    return [[CHIPDevice alloc] initWithDevice:cppDevice];
 }
 
 - (BOOL)disconnect:(NSError * __autoreleasing *)error
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    [self.lock lock];
-
-    err = self.cppController->DisconnectDevice();
-    [self.lock unlock];
-
-    if (err != CHIP_NO_ERROR) {
-        CHIP_LOG_ERROR("Error(%d): %@, disconnect failed", err, [CHIPError errorForCHIPErrorCode:err]);
-        if (error) {
-            *error = [CHIPError errorForCHIPErrorCode:err];
-        }
-        return NO;
-    }
     return YES;
-}
-
-- (BOOL)isConnected
-{
-    bool isConnected = false;
-
-    [self.lock lock];
-    isConnected = self.cppController->IsConnected();
-    [self.lock unlock];
-
-    return isConnected ? YES : NO;
-}
-
-+ (BOOL)isDataModelCommand:(NSData * _Nonnull)message
-{
-    if (message.length == 0) {
-        return NO;
-    }
-
-    UInt8 * bytes = (UInt8 *) message.bytes;
-    return bytes[0] < 0x04 ? YES : NO;
-}
-
-+ (NSString *)commandToString:(NSData * _Nonnull)response
-{
-    if ([CHIPDeviceController isDataModelCommand:response] == NO) {
-        return @"Response is not a CHIP command";
-    }
-
-    uint8_t * bytes = (uint8_t *) response.bytes;
-
-    EmberApsFrame frame;
-    if (extractApsFrame(bytes, (uint32_t) response.length, &frame) == 0) {
-        return @"Response is not an APS frame";
-    }
-
-    uint8_t * message;
-    uint16_t messageLen = extractMessage(bytes, response.length, &message);
-    if (messageLen != 5) {
-        // Not a Default Response command for sure.
-        return @"Unexpected response length";
-    }
-
-    if (message[0] != 8) {
-        // Unexpected control byte
-        return [NSString stringWithFormat:@"Control byte value '0x%02x' is not expected", message[0]];
-    }
-
-    // message[1] is the sequence counter; just ignore it for now.
-
-    if (message[2] != 0x0b) {
-        // Not a Default Response command id
-        return [NSString stringWithFormat:@"Command id '0x%02x' is not the Default Response command id (0x0b)", message[2]];
-    }
-
-    if (frame.clusterId != 0x06) {
-        // Not On/Off cluster
-        return [NSString stringWithFormat:@"Cluster id '0x%02x' is not the on/off cluster id (0x06)", frame.clusterId];
-    }
-
-    NSString * command;
-    if (message[3] == 0) {
-        command = @"off";
-    } else if (message[3] == 1) {
-        command = @"on";
-    } else if (message[3] == 2) {
-        command = @"toggle";
-    } else {
-        return [NSString stringWithFormat:@"Command '0x%02x' is unknown", message[3]];
-    }
-
-    NSString * status;
-    if (message[4] == 0) {
-        status = @"succeeded";
-    } else {
-        status = @"failed";
-    }
-
-    return [NSString stringWithFormat:@"Sending '%@' command %@", command, status];
 }
 
 - (void)setDelegate:(id<CHIPDeviceControllerDelegate>)delegate queue:(dispatch_queue_t)queue

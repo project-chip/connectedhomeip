@@ -43,6 +43,8 @@
 #include "config.h"
 #include "util.h"
 
+using namespace chip;
+
 //------------------------------------------------------------------------------
 
 // these variables are for storing responses that are created by zcl-utils
@@ -53,7 +55,7 @@
 // receives multiple ZCL messages, the stack will queue these and hand
 // these to the application via emberIncomingMsgHandler one at a time.
 EmberApsFrame emberAfResponseApsFrame;
-ChipNodeId emberAfResponseDestination;
+NodeId emberAfResponseDestination;
 uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 uint16_t appResponseLength;
 

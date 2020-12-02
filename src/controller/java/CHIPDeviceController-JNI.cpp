@@ -28,7 +28,7 @@
 #include "AndroidDeviceControllerWrapper.h"
 
 #include <ble/BleUUID.h>
-#include <controller/CHIPDeviceController.h>
+#include <controller/CHIPDeviceController_deprecated.h>
 #include <jni.h>
 #include <pthread.h>
 #include <support/CHIPMem.h>
@@ -66,8 +66,9 @@ using namespace chip::DeviceController;
 
 #define CDC_JNI_CALLBACK_LOCAL_REF_COUNT 256
 
-static void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState);
-static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+static void HandleKeyExchange(ChipDeviceController * deviceController, const Transport::PeerConnectionState * state,
+                              void * appReqState);
+static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBufferHandle payload);
 static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, const char * operation);
 static void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 static bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
@@ -146,8 +147,8 @@ private:
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
 // knowing its id, because the ID can be learned on the first response that is received.
-chip::NodeId kLocalDeviceId  = 112233;
-chip::NodeId kRemoteDeviceId = 12344321;
+chip::NodeId kLocalDeviceId  = chip::kTestControllerNodeId;
+chip::NodeId kRemoteDeviceId = chip::kTestDeviceNodeId;
 
 jint JNI_OnLoad(JavaVM * jvm, void * reserved)
 {
@@ -287,7 +288,8 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong handle, j
         RendezvousParameters params = RendezvousParameters()
                                           .SetSetupPINCode(pinCode)
                                           .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
-                                          .SetBleLayer(&sBleLayer);
+                                          .SetBleLayer(&sBleLayer)
+                                          .SetPeerAddress(Transport::PeerAddress::BLE());
         err = wrapper->Controller()->ConnectDevice(kRemoteDeviceId, params, (void *) "ConnectDevice", HandleKeyExchange,
                                                    HandleEchoResponse, HandleError);
     }
@@ -351,8 +353,8 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
     {
         ScopedPthreadLock lock(&sStackLock);
 
-        auto * buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
-        if (buffer == nullptr)
+        System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(messageLen);
+        if (buffer.IsNull())
         {
             err = CHIP_ERROR_NO_MEMORY;
         }
@@ -360,7 +362,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
         {
             memcpy(buffer->Start(), messageStr, messageLen);
             buffer->SetDataLength(messageLen);
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer);
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", std::move(buffer));
         }
     }
 
@@ -373,7 +375,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
     }
 }
 
-JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, jobject commandObj)
+JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, jobject commandObj, jint aValue)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -388,10 +390,10 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
         ScopedPthreadLock lock(&sStackLock);
 
         // Make sure our buffer is big enough, but this will need a better setup!
-        static const size_t bufferSize = 1024;
-        auto * buffer                  = System::PacketBuffer::NewWithAvailableSize(bufferSize);
+        static const size_t bufferSize    = 1024;
+        System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(bufferSize);
 
-        if (buffer == nullptr)
+        if (buffer.IsNull())
         {
             err = CHIP_ERROR_NO_MEMORY;
         }
@@ -412,6 +414,10 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
             case 2:
                 dataLength = encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, endpoint);
                 break;
+            case 3:
+                dataLength = encodeLevelClusterMoveToLevelCommand(buffer->Start(), bufferSize, endpoint, (uint8_t)(aValue & 0xff),
+                                                                  0xFFFF, 0, 0);
+                break;
             default:
                 ChipLogError(Controller, "Unknown command: %d", commandID);
                 return;
@@ -420,7 +426,7 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
             buffer->SetDataLength(dataLength);
 
             // Hardcode endpoint to 1 for now
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer);
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", std::move(buffer));
         }
     }
 
@@ -454,7 +460,7 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
 
     chip::Ble::ChipBleUUID svcUUID;
     chip::Ble::ChipBleUUID charUUID;
-    chip::System::PacketBuffer * buffer = nullptr;
+    chip::System::PacketBufferHandle buffer;
 
     VerifyOrExit(JavaBytesToUUID(env, svcId, svcUUID),
                  ChipLogError(Controller, "handleIndicationReceived() called with invalid service ID"));
@@ -462,13 +468,13 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
                  ChipLogError(Controller, "handleIndicationReceived() called with invalid characteristic ID"));
 
     buffer = System::PacketBuffer::NewWithAvailableSize(valueLength);
-    VerifyOrExit(buffer, ChipLogError(Controller, "Failed to allocate packet buffer"));
+    VerifyOrExit(!buffer.IsNull(), ChipLogError(Controller, "Failed to allocate packet buffer"));
 
     memcpy(buffer->Start(), valueBegin, valueLength);
     buffer->SetDataLength(valueLength);
 
     pthread_mutex_lock(&sStackLock);
-    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, buffer);
+    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, std::move(buffer));
     pthread_mutex_unlock(&sStackLock);
 exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
@@ -664,12 +670,12 @@ exit:
     env->ExceptionClear();
 }
 
-void HandleKeyExchange(ChipDeviceController * deviceController, Transport::PeerConnectionState * state, void * appReqState)
+void HandleKeyExchange(ChipDeviceController * deviceController, const Transport::PeerConnectionState * state, void * appReqState)
 {
     HandleSimpleOperationComplete(deviceController, (const char *) appReqState);
 }
 
-void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
+void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBufferHandle payload)
 {
     StackUnlockGuard unlockGuard;
     JNIEnv * env;
@@ -702,7 +708,6 @@ void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqSt
 
 exit:
     env->ExceptionClear();
-    System::PacketBuffer::Free(payload);
 }
 
 void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)

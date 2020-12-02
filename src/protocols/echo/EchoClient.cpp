@@ -28,7 +28,7 @@
 namespace chip {
 namespace Protocols {
 
-CHIP_ERROR EchoClient::Init(ExchangeManager * exchangeMgr)
+CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr)
 {
     // Error if already initialized.
     if (mExchangeMgr != nullptr)
@@ -50,7 +50,7 @@ void EchoClient::Shutdown()
     }
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * payload)
+CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBufferHandle payload)
 {
     // Discard any existing exchange context. Effectively we can only have one Echo exchange with
     // a single node at any one time.
@@ -64,19 +64,19 @@ CHIP_ERROR EchoClient::SendEchoRequest(NodeId nodeId, System::PacketBuffer * pay
     mExchangeCtx = mExchangeMgr->NewContext(nodeId, this);
     if (mExchangeCtx == nullptr)
     {
-        System::PacketBuffer::Free(payload);
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    return SendEchoRequest(payload);
+    return SendEchoRequest(std::move(payload));
 }
 
-CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBuffer * payload)
+CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Send an Echo Request message.  Discard the exchange context if the send fails.
-    err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, payload);
+    err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(payload),
+                                    Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
 
     if (err != CHIP_NO_ERROR)
     {
@@ -87,46 +87,39 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBuffer * payload)
     return err;
 }
 
-void EchoClient::OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                   System::PacketBuffer * payload)
+void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
+                                   uint8_t msgType, System::PacketBufferHandle payload)
 {
-    EchoClient * echoApp = static_cast<EchoClient *>(ec->GetAppState());
-
     // Assert that the exchange context matches the client's current context.
     // This should never fail because even if SendEchoRequest is called
     // back-to-back, the second call will call Close() on the first exchange,
     // which clears the OnMessageReceived callback.
-    VerifyOrDie(echoApp && ec == echoApp->mExchangeCtx);
+    VerifyOrDie(ec == mExchangeCtx);
 
     // Verify that the message is an Echo Response.
     // If not, close the exchange and free the payload.
     if (protocolId != kProtocol_Echo || msgType != kEchoMessageType_EchoResponse)
     {
         ec->Close();
-        echoApp->mExchangeCtx = nullptr;
-        ExitNow();
+        mExchangeCtx = nullptr;
+        return;
     }
 
     // Remove the EC from the app state now. OnEchoResponseReceived can call
     // SendEchoRequest and install a new one. We abort rather than close
     // because we no longer care whether the echo request message has been
     // acknowledged at the transport layer.
-    echoApp->mExchangeCtx->Abort();
-    echoApp->mExchangeCtx = nullptr;
+    mExchangeCtx->Abort();
+    mExchangeCtx = nullptr;
 
     // Call the registered OnEchoResponseReceived handler, if any.
-    if (echoApp->OnEchoResponseReceived != nullptr)
+    if (OnEchoResponseReceived != nullptr)
     {
-        echoApp->OnEchoResponseReceived(packetHeader.GetSourceNodeId().HasValue() ? packetHeader.GetSourceNodeId().Value() : 0,
-                                        payload);
+        OnEchoResponseReceived(packetHeader.GetSourceNodeId().ValueOr(0), std::move(payload));
     }
-
-exit:
-    // Free the payload buffer.
-    System::PacketBuffer::Free(payload);
 }
 
-void EchoClient::OnResponseTimeout(ExchangeContext * ec)
+void EchoClient::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
     ChipLogProgress(Echo, "Time out! failed to receive echo response from Node: %llu", ec->GetPeerNodeId());
 }

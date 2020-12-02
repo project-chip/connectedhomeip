@@ -48,6 +48,7 @@ public:
      * via mDNS. If device meta data has changed, you can call this function again
      * to update the information.
      *
+     * @param[in] addressType The protocol version of the IP address.
      * @param[in] interface   The interface to send mDNS multicast.
      *
      */
