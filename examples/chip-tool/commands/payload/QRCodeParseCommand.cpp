@@ -16,14 +16,14 @@
  *
  */
 
-#include "ParseCommand.h"
+#include "QRCodeParseCommand.h"
 #include <setup_payload/ManualSetupPayloadParser.h>
 #include <setup_payload/QRCodeSetupPayloadParser.h>
 #include <setup_payload/SetupPayload.h>
 
 using namespace ::chip;
 
-CHIP_ERROR ParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+CHIP_ERROR QRCodeParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
     std::string codeString(mCode);
     SetupPayload payload;
@@ -38,7 +38,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ParseCommand::Print(chip::SetupPayload payload)
+CHIP_ERROR QRCodeParseCommand::Print(chip::SetupPayload payload)
 {
     std::string serialNumber;
     std::vector<OptionalQRCodeInfo> optionalVendorData;
@@ -80,7 +80,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR ParseCommand::Parse(std::string codeString, chip::SetupPayload & payload)
+CHIP_ERROR QRCodeParseCommand::Parse(std::string codeString, chip::SetupPayload & payload)
 {
 
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -98,7 +98,7 @@ CHIP_ERROR ParseCommand::Parse(std::string codeString, chip::SetupPayload & payl
     return err;
 }
 
-bool ParseCommand::IsQRCode(std::string codeString)
+bool QRCodeParseCommand::IsQRCode(std::string codeString)
 {
     return codeString.rfind(QRCODE_PREFIX) == 0;
 }

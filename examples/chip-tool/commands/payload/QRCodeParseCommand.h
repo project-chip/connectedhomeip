@@ -21,10 +21,10 @@
 #include "../common/Command.h"
 #include <setup_payload/SetupPayload.h>
 
-class ParseCommand : public Command
+class QRCodeParseCommand : public Command
 {
 public:
-    ParseCommand() : Command("parse") { AddArgument("code", &mCode); }
+    QRCodeParseCommand() : Command("parse") { AddArgument("code", &mCode); }
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
 private:
