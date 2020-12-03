@@ -75,39 +75,37 @@ uint16_t DeviceController_BlePlatformDelegate::GetMTU(BLE_CONNECTION_OBJECT conn
 }
 
 bool DeviceController_BlePlatformDelegate::SendIndication(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId,
-                                                          const chip::Ble::ChipBleUUID * charId, chip::System::PacketBuffer * pBuf)
+                                                          const chip::Ble::ChipBleUUID * charId,
+                                                          chip::System::PacketBufferHandle pBuf)
 {
     // TODO Python queue-based implementation
 
-    // Release delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free their references to
-    // it.
-    chip::System::PacketBuffer::Free(pBuf);
-
+    // Going out of scope releases delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free
+    // their references to it.
     return false;
 }
 
 bool DeviceController_BlePlatformDelegate::SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId,
                                                             const chip::Ble::ChipBleUUID * charId,
-                                                            chip::System::PacketBuffer * pBuf)
+                                                            chip::System::PacketBufferHandle pBuf)
 {
     bool ret = false;
 
-    if (writeCB && svcId && charId && pBuf)
+    if (writeCB && svcId && charId && !pBuf.IsNull())
     {
         ret = writeCB(connObj, static_cast<const void *>(svcId->bytes), static_cast<const void *>(charId->bytes),
                       static_cast<void *>(pBuf->Start()), pBuf->DataLength());
     }
 
-    // Release delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free their references to
-    // it. We release pBuf's reference here since its payload bytes were copied into a new NSData object by ChipBleMgr.py's writeCB,
-    // and in both the error and succees cases this code has no further use for the pBuf PacketBuffer.
-    chip::System::PacketBuffer::Free(pBuf);
-
+    // Going out of scope releases delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free
+    // their references to it. We release pBuf's reference here since its payload bytes were copied into a new NSData object by
+    // ChipBleMgr.py's writeCB, and in both the error and succees cases this code has no further use for the pBuf PacketBuffer.
     return ret;
 }
 
 bool DeviceController_BlePlatformDelegate::SendReadRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId,
-                                                           const chip::Ble::ChipBleUUID * charId, chip::System::PacketBuffer * pBuf)
+                                                           const chip::Ble::ChipBleUUID * charId,
+                                                           chip::System::PacketBufferHandle pBuf)
 {
     // TODO Python queue-based implementation
     return false;

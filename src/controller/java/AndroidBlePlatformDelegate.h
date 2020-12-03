@@ -47,11 +47,11 @@ public:
     bool CloseConnection(BLE_CONNECTION_OBJECT connObj);
     uint16_t GetMTU(BLE_CONNECTION_OBJECT connObj) const;
     bool SendIndication(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId,
-                        chip::System::PacketBuffer * pBuf);
+                        chip::System::PacketBufferHandle pBuf);
     bool SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId,
-                          const chip::Ble::ChipBleUUID * charId, chip::System::PacketBuffer * pBuf);
+                          const chip::Ble::ChipBleUUID * charId, chip::System::PacketBufferHandle pBuf);
     bool SendReadRequest(BLE_CONNECTION_OBJECT connObj, const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId,
-                         chip::System::PacketBuffer * pBuf);
+                         chip::System::PacketBufferHandle pBuf);
     bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext,
                           const chip::Ble::ChipBleUUID * svcId, const chip::Ble::ChipBleUUID * charId);
 

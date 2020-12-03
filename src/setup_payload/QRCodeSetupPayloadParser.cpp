@@ -36,6 +36,7 @@
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
 
 using namespace chip;
@@ -44,7 +45,7 @@ using namespace chip::TLV;
 using namespace chip::TLV::Utilities;
 
 // Populate numberOfBits into dest from buf starting at startIndex
-static CHIP_ERROR readBits(vector<uint8_t> buf, int & index, uint64_t & dest, size_t numberOfBitsToRead)
+static CHIP_ERROR readBits(vector<uint8_t> buf, size_t & index, uint64_t & dest, size_t numberOfBitsToRead)
 {
     dest = 0;
     if (index + numberOfBitsToRead > buf.size() * 8 || numberOfBitsToRead > sizeof(uint64_t) * 8)
@@ -54,7 +55,7 @@ static CHIP_ERROR readBits(vector<uint8_t> buf, int & index, uint64_t & dest, si
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    int currentIndex = index;
+    size_t currentIndex = index;
     for (size_t bitsRead = 0; bitsRead < numberOfBitsToRead; bitsRead++)
     {
         if (buf[currentIndex / 8] & (1 << (currentIndex % 8)))
@@ -258,12 +259,15 @@ exit:
     return err;
 }
 
-CHIP_ERROR QRCodeSetupPayloadParser::parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataStart,
-                                                    uint32_t tlvDataLengthInBytes)
+CHIP_ERROR QRCodeSetupPayloadParser::parseTLVFields(SetupPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    if (!CanCastTo<uint32_t>(tlvDataLengthInBytes))
+    {
+        return CHIP_ERROR_INVALID_ARGUMENT;
+    }
     TLVReader rootReader;
-    rootReader.Init(tlvDataStart, tlvDataLengthInBytes);
+    rootReader.Init(tlvDataStart, static_cast<uint32_t>(tlvDataLengthInBytes));
     rootReader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
     err                          = rootReader.Next();
     SuccessOrExit(err);
@@ -291,11 +295,11 @@ exit:
     return err;
 }
 
-CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, const vector<uint8_t> & buf, int & index)
+CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, const vector<uint8_t> & buf, size_t & index)
 {
     CHIP_ERROR err        = CHIP_NO_ERROR;
     size_t bitsLeftToRead = (buf.size() * 8) - index;
-    size_t tlvBytesLength = ceil(double(bitsLeftToRead) / 8);
+    size_t tlvBytesLength = (bitsLeftToRead + 7) / 8; // ceil(bitsLeftToRead/8)
     chip::Platform::ScopedMemoryBuffer<uint8_t> tlvArray;
 
     SuccessOrExit(tlvBytesLength == 0);
@@ -320,22 +324,22 @@ static string extractPayload(string inString)
 {
     string chipSegment;
     char delimiter = '%';
-    vector<int> delimiterIndices;
-    delimiterIndices.push_back(-1);
+    vector<size_t> startIndices;
+    startIndices.push_back(0);
 
     for (size_t i = 0; i < inString.length(); i++)
     {
         if (inString[i] == delimiter)
         {
-            delimiterIndices.push_back(i);
+            startIndices.push_back(i + 1);
         }
     }
 
     // Find the first string between delimiters that starts with kQRCodePrefix
-    for (size_t i = 0; i < delimiterIndices.size(); i++)
+    for (size_t i = 0; i < startIndices.size(); i++)
     {
-        size_t startIndex = delimiterIndices[i] + 1;
-        size_t endIndex   = (i == delimiterIndices.size() - 1 ? string::npos : delimiterIndices[i + 1]);
+        size_t startIndex = startIndices[i];
+        size_t endIndex   = (i == startIndices.size() - 1 ? string::npos : startIndices[i + 1] - 1);
         size_t length     = (endIndex != string::npos ? endIndex - startIndex : string::npos);
         string segment    = inString.substr(startIndex, length);
 
@@ -358,8 +362,8 @@ static string extractPayload(string inString)
 CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 {
     vector<uint8_t> buf;
-    CHIP_ERROR err      = CHIP_NO_ERROR;
-    int indexToReadFrom = 0;
+    CHIP_ERROR err         = CHIP_NO_ERROR;
+    size_t indexToReadFrom = 0;
     uint64_t dest;
 
     string payload = extractPayload(mBase41Representation);
@@ -370,19 +374,23 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     err = readBits(buf, indexToReadFrom, dest, kVersionFieldLengthInBits);
     SuccessOrExit(err);
-    outPayload.version = dest;
+    static_assert(kVersionFieldLengthInBits <= 8, "Won't fit in uint8_t");
+    outPayload.version = static_cast<uint8_t>(dest);
 
     err = readBits(buf, indexToReadFrom, dest, kVendorIDFieldLengthInBits);
     SuccessOrExit(err);
-    outPayload.vendorID = dest;
+    static_assert(kVendorIDFieldLengthInBits <= 16, "Won't fit in uint16_t");
+    outPayload.vendorID = static_cast<uint16_t>(dest);
 
     err = readBits(buf, indexToReadFrom, dest, kProductIDFieldLengthInBits);
     SuccessOrExit(err);
-    outPayload.productID = dest;
+    static_assert(kProductIDFieldLengthInBits <= 16, "Won't fit in uint16_t");
+    outPayload.productID = static_cast<uint16_t>(dest);
 
     err = readBits(buf, indexToReadFrom, dest, kCustomFlowRequiredFieldLengthInBits);
     SuccessOrExit(err);
-    outPayload.requiresCustomFlow = dest;
+    static_assert(kCustomFlowRequiredFieldLengthInBits <= 8, "Won't fit in uint8_t");
+    outPayload.requiresCustomFlow = static_cast<uint8_t>(dest);
 
     err = readBits(buf, indexToReadFrom, dest, kRendezvousInfoFieldLengthInBits);
     SuccessOrExit(err);
@@ -390,11 +398,13 @@ CHIP_ERROR QRCodeSetupPayloadParser::populatePayload(SetupPayload & outPayload)
 
     err = readBits(buf, indexToReadFrom, dest, kPayloadDiscriminatorFieldLengthInBits);
     SuccessOrExit(err);
-    outPayload.discriminator = dest;
+    static_assert(kPayloadDiscriminatorFieldLengthInBits <= 16, "Won't fit in uint16_t");
+    outPayload.discriminator = static_cast<uint16_t>(dest);
 
     err = readBits(buf, indexToReadFrom, dest, kSetupPINCodeFieldLengthInBits);
     SuccessOrExit(err);
-    outPayload.setUpPINCode = dest;
+    static_assert(kSetupPINCodeFieldLengthInBits <= 32, "Won't fit in uint32_t");
+    outPayload.setUpPINCode = static_cast<uint32_t>(dest);
 
     err = readBits(buf, indexToReadFrom, dest, kPaddingFieldLengthInBits);
     SuccessOrExit(err);

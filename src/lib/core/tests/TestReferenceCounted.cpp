@@ -23,14 +23,12 @@
  *
  */
 
-#include "TestCore.h"
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
 
 #include <lib/core/ReferenceCounted.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

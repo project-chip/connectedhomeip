@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "AppDelegate.h"
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/RendezvousSession.h>
 
@@ -28,6 +29,7 @@ public:
     RendezvousServer();
 
     CHIP_ERROR Init(const RendezvousParameters & params, TransportMgrBase * transportMgr);
+    void SetDelegate(AppDelegate * delegate) { mDelegate = delegate; };
 
     //////////////// RendezvousSessionDelegate Implementation ///////////////////
 
@@ -42,6 +44,7 @@ public:
 
 private:
     RendezvousSession mRendezvousSession;
+    AppDelegate * mDelegate;
 };
 
 } // namespace chip
