@@ -217,10 +217,11 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 
     if (resetNeeded == ResetTransport::kYes)
     {
-        err = mTransportMgr->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6)
+        err = mTransportMgr->ResetTransport(
+            Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(mListenPort)
 #if INET_CONFIG_ENABLE_IPV4
-                                                ,
-                                            Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4)
+                ,
+            Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(mListenPort)
 #endif
         );
         SuccessOrExit(err);

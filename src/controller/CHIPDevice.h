@@ -103,12 +103,14 @@ public:
      * @param[in] transportMgr Transport manager object pointer
      * @param[in] sessionMgr   Secure session manager object pointer
      * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort)
     {
         mTransportMgr   = transportMgr;
         mSessionManager = sessionMgr;
         mInetLayer      = inetLayer;
+        mListenPort     = listenPort;
     }
 
     /**
@@ -125,14 +127,15 @@ public:
      * @param[in] transportMgr Transport manager object pointer
      * @param[in] sessionMgr   Secure session manager object pointer
      * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
      * @param[in] devicePort   Port on which device is listening (typically CHIP_PORT)
      * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, NodeId deviceId,
-              uint16_t devicePort, Inet::InterfaceId interfaceId)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
+              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId)
     {
-        Init(transportMgr, sessionMgr, inetLayer);
+        Init(transportMgr, sessionMgr, inetLayer, mListenPort);
         mDeviceId   = deviceId;
         mDevicePort = devicePort;
         mInterface  = interfaceId;
@@ -256,6 +259,8 @@ private:
      * @param[in] resetNeeded   Does the underlying network socket require a reset
      */
     CHIP_ERROR LoadSecureSessionParameters(ResetTransport resetNeeded);
+
+    uint16_t mListenPort;
 };
 
 /**
