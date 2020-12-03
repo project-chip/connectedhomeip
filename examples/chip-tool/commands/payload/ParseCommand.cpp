@@ -22,9 +22,8 @@
 #include <setup_payload/SetupPayload.h>
 
 using namespace ::chip;
-using namespace ::chip::DeviceController;
 
-CHIP_ERROR ParseCommand::Run(ChipDeviceController * dc, NodeId remoteId)
+CHIP_ERROR ParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
     std::string codeString(mCode);
     SetupPayload payload;

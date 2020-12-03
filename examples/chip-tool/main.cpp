@@ -20,8 +20,8 @@
 
 #include "commands/clusters/Commands.h"
 #include "commands/echo/Commands.h"
-#include "commands/payload/Commands.h"
 #include "commands/pairing/Commands.h"
+#include "commands/payload/Commands.h"
 
 #include <transport/SecurePairingSession.h>
 

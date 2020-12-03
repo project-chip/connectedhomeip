@@ -25,8 +25,7 @@ class ParseCommand : public Command
 {
 public:
     ParseCommand() : Command("parse") { AddArgument("code", &mCode); }
-
-    CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) override;
+    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
 private:
     char * mCode;
