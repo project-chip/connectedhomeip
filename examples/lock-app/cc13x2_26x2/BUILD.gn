@@ -68,21 +68,20 @@ source_set("openthread_platform") {
     "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
   ]
   sources = [
+    "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/alarm.c",
+    "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/alarm_micro.c",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/crypto/aes_alt.c",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/crypto/ecjpake_alt.c",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/crypto/sha256_alt.c",
-
-    "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/alarm.c",
-    "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/alarm_micro.c",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/diag.c",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/entropy.c",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/misc.c",
+    "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/nv/crc.c",
+    "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/nv/nvocmp.c",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/radio.c",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/settings.c",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/system.c",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/uart.c",
-    "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/nv/crc.c",
-    "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/nv/nvocmp.c",
   ]
 }
 
@@ -125,9 +124,9 @@ ti_simplelink_executable("lock_app") {
   output_name = "chip-cc13x2_26x2-lock-example.out"
 
   public_deps = [
+    ":openthread_platform",
     ":sdk",
     ":sysconfig",
-    ":openthread_platform",
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",

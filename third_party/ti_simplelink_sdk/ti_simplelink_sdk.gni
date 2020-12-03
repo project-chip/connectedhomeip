@@ -168,6 +168,15 @@ template("ti_simplelink_sdk") {
     configs -= [ "//build/config/compiler:std_default" ]
     configs += [ ":${sdk_target_name}_posix_config" ]
     sources = [
+      "${freertos_root}/FreeRTOS/Source/croutine.c",
+      "${freertos_root}/FreeRTOS/Source/event_groups.c",
+      "${freertos_root}/FreeRTOS/Source/list.c",
+      "${freertos_root}/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c",
+      "${freertos_root}/FreeRTOS/Source/portable/MemMang/heap_4.c",
+      "${freertos_root}/FreeRTOS/Source/queue.c",
+      "${freertos_root}/FreeRTOS/Source/stream_buffer.c",
+      "${freertos_root}/FreeRTOS/Source/tasks.c",
+      "${freertos_root}/FreeRTOS/Source/timers.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/AppHooks_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/ClockPCC26X2_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/DebugP_freertos.c",
@@ -184,25 +193,15 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/clock.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/memory.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/mqueue.c",
+      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_barrier.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_cond.c",
-      "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_mutex.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/pthread_rwlock.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/sched.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/semaphore.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/sleep.c",
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/timer.c",
-
-      "${freertos_root}/FreeRTOS/Source/croutine.c",
-      "${freertos_root}/FreeRTOS/Source/event_groups.c",
-      "${freertos_root}/FreeRTOS/Source/list.c",
-      "${freertos_root}/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c",
-      "${freertos_root}/FreeRTOS/Source/portable/MemMang/heap_4.c",
-      "${freertos_root}/FreeRTOS/Source/queue.c",
-      "${freertos_root}/FreeRTOS/Source/stream_buffer.c",
-      "${freertos_root}/FreeRTOS/Source/tasks.c",
-      "${freertos_root}/FreeRTOS/Source/timers.c",
     ]
 
     if (defined(invoker.sources)) {
