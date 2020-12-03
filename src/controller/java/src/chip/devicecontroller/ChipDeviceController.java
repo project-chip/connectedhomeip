@@ -196,7 +196,8 @@ public class ChipDeviceController {
 
   private native void sendWiFiCredentials(long deviceControllerPtr, String ssid, String password);
 
-  private native void sendThreadCredentials(long deviceControllerPtr, int channel, int panId, byte[] xpanId, byte[] masterKey);
+  private native void sendThreadCredentials(
+      long deviceControllerPtr, int channel, int panId, byte[] xpanId, byte[] masterKey);
 
   private native boolean disconnectDevice(long deviceControllerPtr);
 
