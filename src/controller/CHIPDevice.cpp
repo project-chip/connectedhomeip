@@ -215,7 +215,8 @@ CHIP_ERROR Device::LoadSecureSessionParameters()
     err = pairingSession.FromSerializable(mPairing);
     SuccessOrExit(err);
 
-    err = mTransportMgr->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
+    err = mTransportMgr->ResetTransport(
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()).SetListenPort(mListenPort));
     SuccessOrExit(err);
 
     err = mSessionManager->NewPairing(

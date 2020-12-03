@@ -146,6 +146,8 @@ public:
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
+    CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
+
     virtual void ReleaseDevice(Device * device);
 
     // ----- IO -----
@@ -192,6 +194,8 @@ protected:
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
     CHIP_ERROR SetPairedDeviceList(const char * pairedDeviceSerializedSet);
+
+    uint16_t mListenPort;
 
 private:
     //////////// SecureSessionMgrDelegate Implementation ///////////////
