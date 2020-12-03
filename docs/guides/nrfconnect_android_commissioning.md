@@ -189,6 +189,8 @@ To automatically start the radvd service on every reboot, run the following comm
 
     $ systemctl enable radvd
 
+> If you use Ubuntu 18.04, a DHCP server is not configured automatically when creating a Wi-Fi hotspot. As a result, devices that connect to the hotspot will not be assigned an IPv4 address and may not work properly. To address the problem, install and configure a DHCP server on the hotspot interface. For example, you may use [isc-dhcp-server](https://help.ubuntu.com/community/isc-dhcp-server).
+
 ## Building and flashing nRF Connect Lock Example Application
 
 See [nRF Connect Lock Example Application README](../../examples/lock-app/nrfconnect/README.md)
@@ -241,10 +243,14 @@ To commission the accessory device onto the Thread network created in the [Formi
 3. Open the CHIPTool application on your smartphone.
 4. Tap the **SCAN QR CODE** button and scan the commissioning QR code.
 5. Tap the **Rendezvous over BLE** button to initiate the commissioning procedure.
+   
+   You will see a few pop-up messages appear as the commissioning progresses. Eventually,
+   a screen for entering network settings shows up.
+6. In the new screen, open the **THREAD** tab.
+7. Tap the **Save Network** button to send a Thread provisioning message to the accessory device.
 
-You will see a few pop-up messages appear as the commissioning progresses.
-The message "Secure channel established. Provisioning" indicates that a secure channel
-has been established successfully and Thread provisioning data has been sent to the accessory device.
+You will see the "Network provisioning completed" message when the accessory device 
+successfully joins the Thread network.
 
 ## Sending CHIP commands
 
