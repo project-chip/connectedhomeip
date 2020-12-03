@@ -79,6 +79,11 @@
             "output": "command-id.h"
         },
         {
+            "path": "endpoint_config.zapt",
+            "name": "ZCL endpoint configuration",
+            "output": "endpoint_config.h"
+        },
+        {
             "path": "enums.zapt",
             "name": "ZCL enums header",
             "output": "enums.h"
