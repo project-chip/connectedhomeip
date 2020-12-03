@@ -14,18 +14,23 @@ into an existing CHIP network and can be controlled by this network.
 
 <hr>
 
--   [Overview](#overview)
-    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
-    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
--   [Requirements](#requirements)
--   [Device UI](#device-ui)
--   [Setting up the environment](#setting-up-the-environment)
-    -   [Using Docker container for setup](#using-docker-container-for-setup)
-    -   [Using native shell for setup](#using-native-shell-for-setup)
--   [Building](#building)
--   [Configuring the example](#configuring-the-example)
--   [Flashing and debugging](#flashing-and-debugging)
--   [Testing the example](#testing-the-example)
+- [CHIP nRF Connect Lighting Example Application](#chip-nrf-connect-lighting-example-application)
+  - [Overview](#overview)
+    - [Bluetooth LE advertising](#bluetooth-le-advertising)
+    - [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
+      - [Thread provisioning](#thread-provisioning)
+  - [Requirements](#requirements)
+  - [Device UI](#device-ui)
+  - [Setting up the environment](#setting-up-the-environment)
+    - [Using Docker container for setup](#using-docker-container-for-setup)
+    - [Using native shell for setup](#using-native-shell-for-setup)
+  - [Building](#building)
+    - [Removing build artifacts](#removing-build-artifacts)
+    - [Building with release configuration](#building-with-release-configuration)
+  - [Configuring the example](#configuring-the-example)
+  - [Building with Pigweed RPCs](#building-with-pigweed-rpcs)
+  - [Flashing and debugging](#flashing-and-debugging)
+  - [Testing the example](#testing-the-example)
 
 <hr>
 
@@ -320,6 +325,18 @@ page.
 <hr>
 
 <a name="flashing"></a>
+
+## Building with Pigweed RPCs
+
+The RPCs in lighting-common/pigweed-lighting.proto can be used to control
+various functionalities of the lighting app from a USB-connected host computer.
+
+        $ cd <example-dir>
+        # First time build
+        $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=rpc.overlay
+
+        # Any subsequent build
+        $ west build -- -DOVERLAY_CONFIG=rpc.overlay
 
 ## Flashing and debugging
 
