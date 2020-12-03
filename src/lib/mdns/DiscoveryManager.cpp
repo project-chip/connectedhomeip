@@ -49,6 +49,27 @@ uint8_t HexToInt(char c)
     return UINT8_MAX;
 }
 
+uint64_t HexStringToUint64(const char * buf, size_t size, char ** end)
+{
+    uint64_t value = 0;
+
+    for (size_t i = 0; i < size; i++)
+    {
+        uint8_t current = HexToInt(buf[i]);
+
+        // This wil also handle buf[i] == '\0'
+        if (current == UINT8_MAX)
+        {
+            *end = const_cast<char *>(&buf[i]);
+            return value;
+        }
+        value = value * 16 + current;
+    }
+
+    *end = const_cast<char *>(&buf[size]);
+    return value;
+}
+
 constexpr uint64_t kUndefinedNodeId = 0;
 
 } // namespace
@@ -254,7 +275,8 @@ CHIP_ERROR DiscoveryManager::RegisterResolveDelegate(ResolveDelegate * delegate)
     }
 }
 
-CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
+CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type,
+                                           Inet::InterfaceId interface)
 {
 #if CHIP_ENABLE_MDNS
     MdnsService service;
@@ -263,7 +285,7 @@ CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, I
     strncpy(service.mType, "_chip", sizeof(service.mType));
     service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
     service.mAddressType = type;
-    return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
+    return ChipMdnsResolve(&service, interface, HandleNodeIdResolve, this);
 #else
     return CHIP_ERROR_NOT_IMPLEMENTED;
 #endif // CHIP_ENABLE_MDNS
@@ -291,44 +313,100 @@ void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result,
     else
     {
         // Parse '%x-%x' from the name
-        uint64_t nodeId       = 0;
-        bool deliminatorFound = false;
+        uint64_t nodeId    = 0;
+        char * deliminator = nullptr;
 
-        for (size_t i = 0; i < sizeof(result->mName) && result->mName[i] != 0; i++)
-        {
-            if (result->mName[i] == '-')
-            {
-                deliminatorFound = true;
-                break;
-            }
-            else
-            {
-                uint8_t val = HexToInt(result->mName[i]);
+        HexStringToUint64(result->mName, sizeof(result->mName), &deliminator);
 
-                if (val == UINT8_MAX)
-                {
-                    break;
-                }
-                else
-                {
-                    nodeId = nodeId * 16 + val;
-                }
-            }
-        }
-
-        if (deliminatorFound)
-        {
-            ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
-            mgr->mResolveDelegate->HandleNodeIdResolve(error, nodeId, *result);
-        }
-        else
+        if (deliminator == nullptr || *deliminator != '-')
         {
             ChipLogProgress(Discovery, "Invalid service entry from node %" PRIX64, nodeId);
             mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, *result);
         }
+        else
+        {
+            ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
+            mgr->mResolveDelegate->HandleNodeIdResolve(error, nodeId, *result);
+        }
     }
 #endif // CHIP_ENABLE_MDNS
 }
+
+#if CHIP_ENABLE_MDNS
+CHIP_ERROR DiscoveryManager::BrowseUnprovisionedDevice(Inet::IPAddressType type, Inet::InterfaceId interface)
+{
+    return ChipMdnsBrowse("_chipc", MdnsServiceProtocol::kMdnsProtocolUdp, type, interface, HandleUnprovisionedDeviceBrowse, this);
+}
+
+void DiscoveryManager::HandleUnprovisionedDeviceBrowse(void * context, MdnsService * services, size_t servicesSize,
+                                                       CHIP_ERROR error)
+{
+    DiscoveryManager * mgr = static_cast<DiscoveryManager *>(context);
+
+    if (mgr->mResolveDelegate)
+    {
+        mgr->mResolveDelegate->HandleUnprovisionedDeviceBrowse(error, services, servicesSize);
+    }
+}
+
+CHIP_ERROR DiscoveryManager::ResolveUnprovisionedDevice(uint64_t name, Inet::IPAddressType type, Inet::InterfaceId interface)
+{
+    MdnsService service;
+
+    snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, name);
+    strncpy(service.mType, "_chipc", sizeof(service.mType));
+    service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolUdp;
+    service.mAddressType = type;
+    return ChipMdnsResolve(&service, interface, HandleDiscriminatorResolve, this);
+}
+
+void DiscoveryManager::HandleDiscriminatorResolve(void * context, MdnsService * result, CHIP_ERROR error)
+{
+    DiscoveryManager * mgr = static_cast<DiscoveryManager *>(context);
+
+    if (mgr->mResolveDelegate == nullptr)
+    {
+        return;
+    }
+    if (error != CHIP_NO_ERROR)
+    {
+        ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
+        mgr->mResolveDelegate->HandleUnprovisionedDeviceResolve(error, 0, MdnsService{});
+    }
+    else if (result == nullptr)
+    {
+        ChipLogError(Discovery, "Node ID resolve not found");
+        mgr->mResolveDelegate->HandleUnprovisionedDeviceResolve(CHIP_ERROR_UNKNOWN_RESOURCE_ID, 0, MdnsService{});
+    }
+    else
+    {
+        uint64_t name = 0;
+        char * end    = nullptr;
+
+        HexStringToUint64(result->mName, sizeof(result->mName), &end);
+
+        if (end == nullptr || *end != '\0')
+        {
+            ChipLogError(Discovery, "Invalid device name");
+            mgr->mResolveDelegate->HandleUnprovisionedDeviceResolve(CHIP_ERROR_UNKNOWN_RESOURCE_ID, 0, MdnsService{});
+        }
+        else
+        {
+            mgr->mResolveDelegate->HandleUnprovisionedDeviceResolve(CHIP_NO_ERROR, name, *result);
+        }
+    }
+}
+#else  // CHIP_ENABLE_MDNS
+CHIP_ERROR DiscoveryManager::BrowseUnprovisionedDevice(Inet::IPAddressType type, Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+
+CHIP_ERROR DiscoveryManager::ResolveUnprovisionedDevice(uint64_t name, Inet::IPAddressType type, Inet::InterfaceId interface)
+{
+    return CHIP_ERROR_NOT_IMPLEMENTED;
+}
+#endif // CHIP_ENABLE_MDNS
 
 } // namespace Mdns
 } // namespace chip
