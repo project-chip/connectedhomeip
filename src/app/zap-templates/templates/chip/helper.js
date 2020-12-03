@@ -344,6 +344,7 @@ function isManufacturerSpecificCommand()
   return !!this.mfgCode;
 }
 
+
 //
 // Module exports
 //

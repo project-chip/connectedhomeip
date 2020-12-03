@@ -70,11 +70,11 @@ uint8_t emberEndpointCount = 0;
 
 // If we have attributes that are more than 2 bytes, then
 // we need this data block for the defaults
-#ifdef GENERATED_DEFAULTS
+#if (defined(GENERATED_DEFAULTS) && GENERATED_DEFAULTS_COUNT)
 const uint8_t generatedDefaults[] = GENERATED_DEFAULTS;
 #endif // GENERATED_DEFAULTS
 
-#ifdef GENERATED_MIN_MAX_DEFAULTS
+#if (defined(GENERATED_MIN_MAX_DEFAULTS) && GENERATED_MIN_MAX_DEFAULT_COUNT)
 const EmberAfAttributeMinMaxValue minMaxDefaults[] = GENERATED_MIN_MAX_DEFAULTS;
 #endif // GENERATED_MIN_MAX_DEFAULTS
 

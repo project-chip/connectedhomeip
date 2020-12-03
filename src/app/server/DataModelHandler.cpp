@@ -30,8 +30,14 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
-#ifdef EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS
-EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS
+#ifdef EMBER_AF_PLUGIN_REPORTING
+void emberAfPluginReportingStackStatusCallback(EmberStatus status);
+#endif
+#ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
+void emberAfPluginTemperatureMeasurementServerStackStatusCallback(EmberStatus status);
+#endif
+#ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
+void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status);
 #endif
 
 using namespace ::chip;
@@ -80,8 +86,18 @@ void InitDataModelHandler()
     emberAfEndpointConfigure();
     emberAfInit();
 
-#ifdef EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS
+#if defined(EMBER_AF_PLUGIN_REPORTING) || defined(EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER) ||                               \
+    defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
     EmberStatus status = EMBER_NETWORK_UP;
-    EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS
+#endif
+
+#ifdef EMBER_AF_PLUGIN_REPORTING
+    emberAfPluginReportingStackStatusCallback(status);
+#endif
+#ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
+    emberAfPluginTemperatureMeasurementServerStackStatusCallback(status);
+#endif
+#ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
+    emberAfPluginIasZoneServerStackStatusCallback(status);
 #endif
 }
