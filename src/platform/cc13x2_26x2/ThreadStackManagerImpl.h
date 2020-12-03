@@ -80,7 +80,8 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
         procQueueCmd_alarmu,
     };
 
-    struct procQueueMsg {
+    struct procQueueMsg
+    {
         enum procQueueCmd cmd;
         uintptr_t arg;
     };
@@ -92,7 +93,7 @@ public:
     CHIP_ERROR InitThreadStack(otInstance * otInst);
     void _OnCHIPoBLEAdvertisingStart(void);
     void _OnCHIPoBLEAdvertisingStop(void);
-    void _SendProcMessage(procQueueMsg &procMsg);
+    void _SendProcMessage(procQueueMsg & procMsg);
     void _ProcMessage(otInstance * aInstance);
 
 private:

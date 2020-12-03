@@ -168,7 +168,7 @@ CHIP_ERROR CC13X2_26X2Config::WriteConfigValueBin(Key key, const uint8_t * data,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(sNvoctpFps.writeItem(key.nvID, (uint16_t) dataLen, (void *)data) == NVINTF_SUCCESS,
+    VerifyOrExit(sNvoctpFps.writeItem(key.nvID, (uint16_t) dataLen, (void *) data) == NVINTF_SUCCESS,
                  err = CHIP_ERROR_PERSISTED_STORAGE_FAILED);
 exit:
     return err;

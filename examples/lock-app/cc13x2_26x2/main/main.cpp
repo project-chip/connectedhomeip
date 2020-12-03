@@ -33,8 +33,8 @@
 #include <ti/drivers/UART.h>
 
 #include <ti/drivers/AESECB.h>
-#include <ti/drivers/SHA2.h>
 #include <ti/drivers/ECJPAKE.h>
+#include <ti/drivers/SHA2.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;

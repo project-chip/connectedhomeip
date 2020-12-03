@@ -71,7 +71,7 @@ CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Create FreeRTOS queue for platform driver messages
-    procQueue = xQueueCreate( 16U, sizeof(ThreadStackManagerImpl::procQueueMsg));
+    procQueue = xQueueCreate(16U, sizeof(ThreadStackManagerImpl::procQueueMsg));
 
     mbedtls_platform_set_calloc_free(ot_calloc, ot_free);
     otHeapSetCAllocFree(ot_calloc, ot_free);
@@ -122,7 +122,7 @@ void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop(void)
 #endif
 }
 
-void ThreadStackManagerImpl::_SendProcMessage(ThreadStackManagerImpl::procQueueMsg &procMsg)
+void ThreadStackManagerImpl::_SendProcMessage(ThreadStackManagerImpl::procQueueMsg & procMsg)
 {
     xQueueSendFromISR(procQueue, &procMsg, NULL);
 
@@ -137,46 +137,39 @@ void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
     {
         switch (procMsg.cmd)
         {
-            case procQueueCmd_alarm:
-            {
-                platformAlarmProcess(aInstance);
-                break;
-            }
+        case procQueueCmd_alarm: {
+            platformAlarmProcess(aInstance);
+            break;
+        }
 
-            case procQueueCmd_radio:
-            {
-                platformRadioProcess(aInstance, procMsg.arg);
-                break;
-            }
+        case procQueueCmd_radio: {
+            platformRadioProcess(aInstance, procMsg.arg);
+            break;
+        }
 
-            case procQueueCmd_tasklets:
-            {
-                otTaskletsProcess(aInstance);
-                break;
-            }
+        case procQueueCmd_tasklets: {
+            otTaskletsProcess(aInstance);
+            break;
+        }
 
-            case procQueueCmd_uart:
-            {
-                platformUartProcess(procMsg.arg);
-                break;
-            }
+        case procQueueCmd_uart: {
+            platformUartProcess(procMsg.arg);
+            break;
+        }
 
-            case procQueueCmd_random:
-            {
-                platformRandomProcess();
-                break;
-            }
+        case procQueueCmd_random: {
+            platformRandomProcess();
+            break;
+        }
 
-            case procQueueCmd_alarmu:
-            {
-                platformAlarmMicroProcess(aInstance);
-                break;
-            }
+        case procQueueCmd_alarmu: {
+            platformAlarmMicroProcess(aInstance);
+            break;
+        }
 
-            default:
-            {
-                break;
-            }
+        default: {
+            break;
+        }
         }
     }
 }
