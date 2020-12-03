@@ -50,6 +50,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -537,17 +538,13 @@ CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceCo
                                             uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
                                             OnErrorFunct onError)
 {
-    CHIP_ERROR err                    = CHIP_NO_ERROR;
-    chip::RendezvousParameters params = chip::RendezvousParameters()
-                                            .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
-                                            .SetSetupPINCode(setupPINCode)
-                                            .SetConnectionObject(connObj)
-                                            .SetBleLayer(&sBle);
-    err = devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return devCtrl->ConnectDevice(kRemoteDeviceId,
+                                  chip::RendezvousParameters()
+                                      .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
+                                      .SetSetupPINCode(setupPINCode)
+                                      .SetConnectionObject(connObj)
+                                      .SetBleLayer(&sBle),
+                                  (void *) devCtrl, onConnect, onMessage, onError);
 }
 
 CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerAddrStr,
@@ -559,17 +556,11 @@ CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDevice
     chip::Transport::PeerAddress addr;
     chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
 
-    VerifyOrExit(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), err = CHIP_ERROR_INVALID_ARGUMENT);
-    addr.SetIPAddress(peerAddr);
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), err = CHIP_ERROR_INVALID_ARGUMENT);
     // TODO: IP rendezvous should use TCP connection.
-    addr.SetTransportType(chip::Transport::Type::kUdp);
-    params.SetPeerAddress(addr);
-    params.SetDiscriminator(0);
-    err = devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
+    params.SetPeerAddress(addr).SetDiscriminator(0);
+    return devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
 }
 
 CHIP_ERROR

@@ -181,6 +181,8 @@ void RendezvousSession::OnPairingComplete()
         return;
     }
 
+    // TODO: This check of BLE transport should be removed in the future, after we have network provisioning cluster and ble becomes
+    // a transport.
     if (mParams.GetPeerAddress().GetTransportType() != Transport::Type::kBle || // For rendezvous initializer
         mPeerAddress.GetTransportType() != Transport::Type::kBle)               // For rendezvous target
     {

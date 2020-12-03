@@ -490,9 +490,10 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 
     device->Init(mTransportMgr, mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
 
+    // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
+    // provisiong cluster is ready.
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
-        // IP Rendezvous
         device->SetAddress(params.GetPeerAddress().GetIPAddress());
         mRendezvousSession->OnRendezvousConnectionOpened();
     }
