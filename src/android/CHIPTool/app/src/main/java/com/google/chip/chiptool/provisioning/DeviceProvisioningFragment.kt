@@ -104,13 +104,26 @@ class DeviceProvisioningFragment : Fragment() {
     }
   }
 
+   private fun closeChildFragments() {
+     childFragmentManager.fragments.forEach {
+       f -> childFragmentManager.beginTransaction().remove(f).commit()
+     }
+   }
+
   inner class ConnectionCallback : GenericChipDeviceListener() {
     override fun onConnectDeviceComplete() {
-      showMessage(R.string.rendezvous_over_ble_success_text)
+      Log.d(TAG, "onConnectDeviceComplete")
     }
 
     override fun onStatusUpdate(status: Int) {
       Log.i(TAG, "Pairing status update: $status");
+
+      when (status) {
+        STATUS_NETWORK_PROVISIONING_SUCCESS -> {
+          showMessage(R.string.rendezvous_over_ble_provisioning_success_text)
+          closeChildFragments()
+        }
+      }
     }
 
     override fun onNetworkCredentialsRequested() {
@@ -139,6 +152,7 @@ class DeviceProvisioningFragment : Fragment() {
   companion object {
     private const val TAG = "DeviceProvisioningFragment"
     private const val ARG_DEVICE_INFO = "device_info"
+    private const val STATUS_NETWORK_PROVISIONING_SUCCESS = 2
 
     fun newInstance(deviceInfo: CHIPDeviceInfo): DeviceProvisioningFragment {
       return DeviceProvisioningFragment().apply {
