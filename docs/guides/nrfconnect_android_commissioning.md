@@ -166,7 +166,7 @@ To configure a Wi-Fi hotspot using a spare Wi-Fi card on your PC, complete the f
 
         $ nmcli connection show Hotspot | grep interface-name
 
-8. Add the following code into `/etc/radvd.conf`, with *wlo1* replaced with the hotspot interface name obtained in the previous step:
+8. Add the following lines into `/etc/radvd.conf`, with *wlo1* replaced with the hotspot interface name obtained in the previous step:
 
         interface wlo1
         {
@@ -189,7 +189,7 @@ To automatically start the radvd service on every reboot, run the following comm
 
     $ systemctl enable radvd
 
-> If you use Ubuntu 18.04, a DHCP server is not configured automatically when creating a Wi-Fi hotspot. As a result, devices that connect to the hotspot will not be assigned an IPv4 address and may not work properly. To address the problem, install and configure a DHCP server on the hotspot interface. For example, you may use [isc-dhcp-server](https://help.ubuntu.com/community/isc-dhcp-server).
+> If you use Ubuntu 18.04, a DHCP server is not configured automatically when creating a Wi-Fi hotspot. As a result, devices that connect to the hotspot will not be assigned an IPv4 address and may not work properly. To address the problem, install and configure a DHCP server on the hotspot interface. For example, you can use [isc-dhcp-server](https://help.ubuntu.com/community/isc-dhcp-server).
 
 ## Building and flashing nRF Connect Lock Example Application
 
@@ -243,9 +243,8 @@ To commission the accessory device onto the Thread network created in the [Formi
 3. Open the CHIPTool application on your smartphone.
 4. Tap the **SCAN QR CODE** button and scan the commissioning QR code.
 5. Tap the **Rendezvous over BLE** button to initiate the commissioning procedure.
-   
    You will see a few pop-up messages appear as the commissioning progresses. Eventually,
-   a screen for entering network settings shows up.
+   the network settings screen appears.
 6. In the new screen, open the **THREAD** tab.
 7. Tap the **Save Network** button to send a Thread provisioning message to the accessory device.
 

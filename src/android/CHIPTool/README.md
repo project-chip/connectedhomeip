@@ -21,7 +21,7 @@ downloaded.
 
 ## ABIs and TARGET_CPU
 
-`TARGET_CPU` can have the following values depending on your smartphone CPU architecture:
+`TARGET_CPU` can have the following values, depending on your smartphone CPU architecture:
 
 | ABI         | TARGET_CPU |
 | ----------- | ---------- |
