@@ -48,6 +48,7 @@
 #define OPENTHREAD_CONFIG_JOINER_ENABLE 1
 #define OPENTHREAD_CONFIG_HEAP_EXTERNAL_ENABLE 1
 #define UART_AS_SERIAL_TRANSPORT 1
+#define OPENTHREAD_CONFIG_PLATFORM_USEC_TIMER_ENABLE 1
 
 // Use the TI-supplied default platform configuration for remainder
 #include "openthread-core-cc13x2_26x2-config.h"

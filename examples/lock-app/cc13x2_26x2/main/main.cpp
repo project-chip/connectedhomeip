@@ -26,11 +26,15 @@
 
 #include <FreeRTOS.h>
 
-/* Driver header files */
+/* Driver Header files */
 #include <ti/drivers/Board.h>
 #include <ti/drivers/GPIO.h>
+#include <ti/drivers/NVS.h>
+#include <ti/drivers/UART.h>
 
-#include <openthread/system.h>
+#include <ti/drivers/AESECB.h>
+#include <ti/drivers/SHA2.h>
+#include <ti/drivers/ECJPAKE.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -55,6 +59,18 @@ int main(void)
     int ret = CHIP_ERROR_MAX;
 
     Board_init();
+
+    GPIO_init();
+
+    NVS_init();
+
+    UART_init();
+
+    ECJPAKE_init();
+
+    AESECB_init();
+
+    SHA2_init();
 
     ret = GetAppTask().StartAppTask();
     if (ret != CHIP_NO_ERROR)

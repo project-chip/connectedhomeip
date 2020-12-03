@@ -32,10 +32,12 @@
 #include <openthread/tasklet.h>
 #include <openthread/thread.h>
 
+#include <queue.h>
+
 extern "C" void platformAlarmSignal();
-extern "C" void platformRadioSignal();
-extern "C" void platformUartSignal();
-extern "C" void otSysEventSignalPending(void);
+extern "C" void platformAlarmMicroSignal();
+extern "C" void platformRadioSignal(uintptr_t arg);
+extern "C" void platformUartSignal(uintptr_t arg);
 
 namespace chip {
 namespace DeviceLayer {
@@ -63,10 +65,25 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
     // Allow glue functions called by OpenThread to call helper methods on this
     // class.
     friend void ::platformAlarmSignal();
-    friend void ::platformRadioSignal();
-    friend void ::platformUartSignal();
+    friend void ::platformAlarmMicroSignal();
+    friend void ::platformRadioSignal(uintptr_t arg);
+    friend void ::platformUartSignal(uintptr_t arg);
     friend void ::otTaskletsSignalPending(otInstance * otInst);
-    friend void ::otSysEventSignalPending(void);
+
+    enum procQueueCmd
+    {
+        procQueueCmd_alarm,
+        procQueueCmd_radio,
+        procQueueCmd_tasklets,
+        procQueueCmd_uart,
+        procQueueCmd_random,
+        procQueueCmd_alarmu,
+    };
+
+    struct procQueueMsg {
+        enum procQueueCmd cmd;
+        uintptr_t arg;
+    };
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.
@@ -75,6 +92,8 @@ public:
     CHIP_ERROR InitThreadStack(otInstance * otInst);
     void _OnCHIPoBLEAdvertisingStart(void);
     void _OnCHIPoBLEAdvertisingStop(void);
+    void _SendProcMessage(procQueueMsg &procMsg);
+    void _ProcMessage(otInstance * aInstance);
 
 private:
     // ===== Methods that implement the ThreadStackManager abstract interface.
@@ -93,6 +112,7 @@ private:
     // ===== Private members for use by this class only.
 
     ThreadStackManagerImpl() = default;
+    QueueHandle_t procQueue;
 };
 
 /**

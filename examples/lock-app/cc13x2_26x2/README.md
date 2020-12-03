@@ -57,6 +57,10 @@ section will need to be done when migrating to new versions of the SDK.
     -   Follow the default installation instructions when executing the
         installer.
 
+    -   The version of OpenThread used in this repository is newer than the one
+        packaged with the TI SDK. Check the following section for a list of
+        changes needed.
+
 -   Download and install [SysConfig][sysconfig]
     ([sysconfig-1.5.0_1397][sysconfig-1.5.0_1397])
 
@@ -91,6 +95,23 @@ section will need to be done when migrating to new versions of the SDK.
     $ source ./script/bootstrap.sh
 
     ```
+
+#### Changes to the TI SDK
+
+The OpenThread library will set the short address assigned to the device as
+soon as it receives the Child ID response. This may happen while the radio
+driver is still in transmit mode. This is easilly fixed by removing state check
+in the else condition in
+`${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/radio.c`
+on linke 1791.
+
+```
+-     else if (sState != platformRadio_phyState_Transmit)
++     else
+      {
+          sReceiveCmd.localShortAddr = aAddress;
+      }
+```
 
 ### Compilation
 

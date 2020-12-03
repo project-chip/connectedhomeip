@@ -32,9 +32,8 @@ config("ti_simplelink_mbedtls_config") {
 
   include_dirs = [
     "${chip_root}/src/platform/cc13x2_26x2",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2",
-    "${chip_root}/third_party/ti_simplelink_sdk/cc13x2_26x2/crypto",
     "${ti_simplelink_sdk_root}/source",
+    "${ti_simplelink_sdk_root}/source/ti/thread/rtos/${ti_simplelink_board}/thread/libmbedcrypto/config",
   ]
 }
 

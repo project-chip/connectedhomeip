@@ -155,7 +155,7 @@ template("ti_simplelink_sdk") {
   config("${sdk_target_name}_posix_config") {
     include_dirs = [ "${ti_simplelink_sdk_root}/source/ti/posix/gcc" ]
     cflags = [
-      "-std=c99",
+      "-std=c11",
       "-Wno-maybe-uninitialized",
     ]
   }
@@ -204,15 +204,6 @@ template("ti_simplelink_sdk") {
       "${freertos_root}/FreeRTOS/Source/tasks.c",
       "${freertos_root}/FreeRTOS/Source/timers.c",
     ]
-
-    if (ti_simplelink_device_family == "cc13x2_26x2") {
-      defines += [ "NVOCMP_POSIX_MUTEX" ]
-      include_dirs += [ "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2_cc26x2" ]
-      sources += [
-        "${ti_simplelink_sdk_root}/source/ti/common/nv/crc.c",
-        "${ti_simplelink_sdk_root}/source/ti/common/nv/nvocmp.c",
-      ]
-    }
 
     if (defined(invoker.sources)) {
       sources += invoker.sources

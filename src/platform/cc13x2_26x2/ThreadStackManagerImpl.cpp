@@ -35,7 +35,8 @@
 #include <platform/OpenThread/OpenThreadUtils.h>
 #include <platform/ThreadStackManager.h>
 
-#include "openthread/system.h"
+// platform folder in the TI SDK example application
+#include <platform/system.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -68,6 +69,9 @@ CHIP_ERROR ThreadStackManagerImpl::_InitThreadStack(void)
 CHIP_ERROR ThreadStackManagerImpl::InitThreadStack(otInstance * otInst)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+
+    // Create FreeRTOS queue for platform driver messages
+    procQueue = xQueueCreate( 16U, sizeof(ThreadStackManagerImpl::procQueueMsg));
 
     mbedtls_platform_set_calloc_free(ot_calloc, ot_free);
     otHeapSetCAllocFree(ot_calloc, ot_free);
@@ -118,6 +122,65 @@ void ThreadStackManagerImpl::_OnCHIPoBLEAdvertisingStop(void)
 #endif
 }
 
+void ThreadStackManagerImpl::_SendProcMessage(ThreadStackManagerImpl::procQueueMsg &procMsg)
+{
+    xQueueSendFromISR(procQueue, &procMsg, NULL);
+
+    // signal processing loop
+    SignalThreadActivityPendingFromISR();
+}
+
+void ThreadStackManagerImpl::_ProcMessage(otInstance * aInstance)
+{
+    procQueueMsg procMsg;
+    while (pdTRUE == xQueueReceive(procQueue, &procMsg, 0U))
+    {
+        switch (procMsg.cmd)
+        {
+            case procQueueCmd_alarm:
+            {
+                platformAlarmProcess(aInstance);
+                break;
+            }
+
+            case procQueueCmd_radio:
+            {
+                platformRadioProcess(aInstance, procMsg.arg);
+                break;
+            }
+
+            case procQueueCmd_tasklets:
+            {
+                otTaskletsProcess(aInstance);
+                break;
+            }
+
+            case procQueueCmd_uart:
+            {
+                platformUartProcess(procMsg.arg);
+                break;
+            }
+
+            case procQueueCmd_random:
+            {
+                platformRandomProcess();
+                break;
+            }
+
+            case procQueueCmd_alarmu:
+            {
+                platformAlarmMicroProcess(aInstance);
+                break;
+            }
+
+            default:
+            {
+                break;
+            }
+        }
+    }
+}
+
 } // namespace DeviceLayer
 } // namespace chip
 
@@ -128,23 +191,41 @@ using namespace ::chip::DeviceLayer;
  */
 extern "C" void platformAlarmSignal()
 {
-    otSysEventSignalPending();
+    ThreadStackManagerImpl::procQueueMsg msg;
+    msg.cmd = ThreadStackManagerImpl::procQueueCmd_alarm;
+    ThreadStackMgrImpl()._SendProcMessage(msg);
+}
+
+/**
+ * Glue function called by alarm processing layer to notify OpenThread the driver needs processing.
+ */
+extern "C" void platformAlarmMicroSignal()
+{
+    ThreadStackManagerImpl::procQueueMsg msg;
+    msg.cmd = ThreadStackManagerImpl::procQueueCmd_alarmu;
+    ThreadStackMgrImpl()._SendProcMessage(msg);
 }
 
 /**
  * Glue function called by radio processing layer to notify OpenThread the driver needs processing.
  */
-extern "C" void platformRadioSignal()
+extern "C" void platformRadioSignal(uintptr_t arg)
 {
-    otSysEventSignalPending();
+    ThreadStackManagerImpl::procQueueMsg msg;
+    msg.cmd = ThreadStackManagerImpl::procQueueCmd_radio;
+    msg.arg = arg;
+    ThreadStackMgrImpl()._SendProcMessage(msg);
 }
 
 /**
  * Glue function called by UART processing layer to notify OpenThread the driver needs processing.
  */
-extern "C" void platformUartSignal()
+extern "C" void platformUartSignal(uintptr_t arg)
 {
-    otSysEventSignalPending();
+    ThreadStackManagerImpl::procQueueMsg msg;
+    msg.cmd = ThreadStackManagerImpl::procQueueCmd_uart;
+    msg.arg = arg;
+    ThreadStackMgrImpl()._SendProcMessage(msg);
 }
 
 /**
@@ -157,14 +238,9 @@ extern "C" void otTaskletsSignalPending(otInstance * p_instance)
 }
 
 /**
- * Glue function called directly by the OpenThread stack when system event processing work
- * is pending.
+ * Process events from the drivers
  */
-extern "C" void otSysEventSignalPending(void)
+extern "C" void otSysProcessDrivers(otInstance * aInstance)
 {
-    ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
-#if 0
-    BaseType_t yieldRequired = ThreadStackMgrImpl().SignalThreadActivityPendingFromISR();
-    portYIELD_FROM_ISR(yieldRequired);
-#endif
+    ThreadStackMgrImpl()._ProcMessage(aInstance);
 }
