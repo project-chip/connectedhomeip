@@ -70,6 +70,7 @@ typedef struct
     bool reportableChange;
 } EmAfPluginReportVolatileData;
 extern EmAfPluginReportVolatileData emAfPluginReportVolatileData[];
+void emberAfPluginReportingInitCallback(void);
 EmberAfStatus emberAfPluginReportingConfigureReportedAttribute(const EmberAfPluginReportingEntry * newEntry);
 void emAfPluginReportingGetEntry(uint8_t index, EmberAfPluginReportingEntry * result);
 void emAfPluginReportingSetEntry(uint8_t index, EmberAfPluginReportingEntry * value);
