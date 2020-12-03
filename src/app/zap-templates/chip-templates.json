@@ -49,6 +49,11 @@
             "output": "callback.h"
         },
         {
+            "path": "client-command-macro.zapt",
+            "name": "ZCL client command",
+            "output": "client-command-macro.h"
+        },
+        {
             "path": "cluster-id.zapt",
             "name": "ZCL cluster-id header",
             "output": "cluster-id.h"
