@@ -15,8 +15,7 @@
  *    limitations under the License.
  */
 
-function atomicType(arg)
-{
+function atomicType(arg) {
   switch (arg.name) {
   case 'attribute_id':
     return 'chip::AttributeId';

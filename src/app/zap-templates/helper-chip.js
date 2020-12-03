@@ -22,10 +22,10 @@
  */
 
 // Import helpers from zap core
-const zapPath      = '../../../third_party/zap/repo/src-electron/';
-const cHelper      = require(zapPath + 'generator/helper-c.js')
-const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
-const zclQuery     = require(zapPath + 'db/query-zcl.js')
+const zapPath = '../../../third_party/zap/repo/src-electron/';
+const cHelper = require(zapPath + 'generator/helper-c.js')
+const zclHelper = require(zapPath + 'generator/helper-zcl.js')
+const zclQuery = require(zapPath + 'db/query-zcl.js')
 const templateUtil = require(zapPath + 'generator/template-util.js')
 
 /**
@@ -33,8 +33,7 @@ const templateUtil = require(zapPath + 'generator/template-util.js')
  *
  * @returns The header content
  */
-function chip_header()
-{
+function chip_header() {
   return `
   /*
   *
@@ -55,32 +54,21 @@ function chip_header()
 }
 
 const stringShortTypes = [ 'CHAR_STRING', 'OCTET_STRING' ];
-const stringLongTypes  = [ 'LONG_CHAR_STRING', 'LONG_OCTET_STRING' ];
+const stringLongTypes = [ 'LONG_CHAR_STRING', 'LONG_OCTET_STRING' ];
 
-function isShortString(type)
-{
-  return stringShortTypes.includes(type);
-}
+function isShortString(type) { return stringShortTypes.includes(type); }
 
-function isLongString(type)
-{
-  return stringLongTypes.includes(type);
-}
+function isLongString(type) { return stringLongTypes.includes(type); }
 
-function isString(type)
-{
-  return isShortString(type) || isLongString(type);
-}
+function isString(type) { return isShortString(type) || isLongString(type); }
 
-function asValueIfNotPresent(type, isArray)
-{
+function asValueIfNotPresent(type, isArray) {
   if (isString(type) || isArray) {
     return 'NULL';
   }
 
-  function resolve(packageId)
-  {
-    const options = { 'hash' : {} };
+  function resolve(packageId) {
+    const options = {'hash' : {}};
     return cHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       switch (zclType) {
       case 'uint8_t':
@@ -100,8 +88,7 @@ function asValueIfNotPresent(type, isArray)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asReadTypeLength(type)
-{
+function asReadTypeLength(type) {
   if (isShortString(type)) {
     return '1u';
   }
@@ -110,22 +97,21 @@ function asReadTypeLength(type)
     return '2u';
   }
 
-  function resolve(packageId)
-  {
+  function resolve(packageId) {
     const db = this.global.db;
 
     const defaultResolver = zclQuery.selectAtomicType(db, packageId, type);
 
     const enumResolver = zclHelper.isEnum(db, type, packageId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectEnumByName(db, type, packageId).then(rec => {
-        return zclQuery.selectAtomicType(db, packageId, rec.type);
-      });
+      return result == 'unknown' ? null
+                                 : zclQuery.selectEnumByName(db, type, packageId)
+                                       .then(rec => { return zclQuery.selectAtomicType(db, packageId, rec.type); });
     });
 
     const bitmapResolver = zclHelper.isBitmap(db, type, packageId).then(result => {
-      return result == 'unknown' ? null : zclQuery.selectBitmapByName(db, packageId, type).then(rec => {
-        return zclQuery.selectAtomicType(db, packageId, rec.type);
-      });
+      return result == 'unknown' ? null
+                                 : zclQuery.selectBitmapByName(db, packageId, type)
+                                       .then(rec => { return zclQuery.selectAtomicType(db, packageId, rec.type); });
     });
 
     const typeResolver = Promise.all([ defaultResolver, enumResolver, bitmapResolver ]);
@@ -136,8 +122,7 @@ function asReadTypeLength(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
-function asReadType(type)
-{
+function asReadType(type) {
   if (isShortString(type)) {
     return 'String';
   }
@@ -146,9 +131,8 @@ function asReadType(type)
     return 'LongString';
   }
 
-  function resolve(packageId)
-  {
-    const options = { 'hash' : {} };
+  function resolve(packageId) {
+    const options = {'hash' : {}};
     return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       switch (zclType) {
       case 'int8_t':
@@ -179,8 +163,8 @@ function asReadType(type)
 // Note: these exports are public API. Templates that might have been created in the past and are
 // available in the wild might depend on these names.
 // If you rename the functions, you need to still maintain old exports list.
-exports.chip_header         = chip_header;
-exports.isString            = isString;
-exports.asReadType          = asReadType;
-exports.asReadTypeLength    = asReadTypeLength;
+exports.chip_header = chip_header;
+exports.isString = isString;
+exports.asReadType = asReadType;
+exports.asReadTypeLength = asReadTypeLength;
 exports.asValueIfNotPresent = asValueIfNotPresent;
