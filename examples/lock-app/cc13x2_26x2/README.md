@@ -98,10 +98,10 @@ section will need to be done when migrating to new versions of the SDK.
 
 #### Changes to the TI SDK
 
-The OpenThread library will set the short address assigned to the device as
-soon as it receives the Child ID response. This may happen while the radio
-driver is still in transmit mode. This is easilly fixed by removing state check
-in the else condition in
+The OpenThread library will set the short address assigned to the device as soon
+as it receives the Child ID response. This may happen while the radio driver is
+still in transmit mode. This is easilly fixed by removing state check in the
+else condition in
 `${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/radio.c`
 on linke 1791.
 
