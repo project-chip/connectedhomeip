@@ -147,8 +147,8 @@ public:
      *  @param[in,out] aChainHead - the head of the buffer chain the current buffer belongs to.  May be nullptr if the current
      *      buffer is the head of the buffer chain.
      */
-    void SetDataLength(uint16_t aNewLen) { SetDataLength(aNewLen, nullptr); }
     void SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead);
+    void SetDataLength(uint16_t aNewLen) { SetDataLength(aNewLen, nullptr); }
     // This version will shortly be made private; do not use in new code.
     void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead);
 
