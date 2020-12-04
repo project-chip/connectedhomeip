@@ -28,7 +28,7 @@ namespace Minimal {
 class ResponseBuilder
 {
 public:
-    ResponseBuilder(chip::System::PacketBuffer * packet) : mPacket(packet), mHeader(mPacket->Start())
+    ResponseBuilder(const chip::System::PacketBufferHandle & packet) : mPacket(packet), mHeader(mPacket->Start())
     {
 
         if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
@@ -72,7 +72,7 @@ public:
     bool Ok() const { return mBuildOk; }
 
 private:
-    chip::System::PacketBuffer * mPacket;
+    const chip::System::PacketBufferHandle & mPacket;
     HeaderRef mHeader;
     bool mBuildOk = true;
 };

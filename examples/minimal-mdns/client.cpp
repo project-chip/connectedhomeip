@@ -213,7 +213,7 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
     QuerySplitter query;
     query.Split(gOptions.query);
 
-    mdns::Minimal::QueryBuilder builder(buffer.Get_ForNow());
+    mdns::Minimal::QueryBuilder builder(buffer.Retain());
 
     builder.Header().SetMessageId(kTestMessageId);
     builder.AddQuery(query.MdnsQuery()
