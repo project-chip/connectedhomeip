@@ -28,6 +28,7 @@
 #include <messaging/ReliableMessageContext.h>
 #include <messaging/ReliableMessageManager.h>
 #include <protocols/Protocols.h>
+#include <protocols/echo/Echo.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -48,12 +49,17 @@ using namespace chip;
 using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::Messaging;
+using namespace chip::Protocols;
 
 using TestContext = chip::Test::IOContext;
 
 TestContext sContext;
 
-constexpr NodeId kSourceNodeId = 123654;
+const char PAYLOAD[]                = "Hello!";
+constexpr NodeId kSourceNodeId      = 123654;
+constexpr NodeId kDestinationNodeId = 111222333;
+
+int gSendMessageCount = 0;
 
 class LoopbackTransport : public Transport::Base
 {
@@ -65,7 +71,8 @@ public:
     {
         System::PacketBufferHandle msg_ForNow;
         msg_ForNow.Adopt(msgBuf);
-        HandleMessageReceived(header, address, std::move(msg_ForNow));
+        gSendMessageCount++;
+
         return CHIP_NO_ERROR;
     }
 
@@ -133,7 +140,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockAppDelegate;
 
-    ExchangeContext * exchange = exchangeMgr.NewContext(kSourceNodeId, &mockAppDelegate);
+    ExchangeContext * exchange = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
@@ -146,7 +153,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 
     rm->AddToRetransTable(rc, header, 1, nullptr, &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-    rm->ClearRetransmitTable(*entry);
+    rm->ClearRetransTable(*entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
 
@@ -171,7 +178,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockAppDelegate;
 
-    ExchangeContext * exchange = exchangeMgr.NewContext(kSourceNodeId, &mockAppDelegate);
+    ExchangeContext * exchange = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
@@ -212,7 +219,7 @@ void CheckRetransExpire(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockAppDelegate;
 
-    ExchangeContext * exchange = exchangeMgr.NewContext(kSourceNodeId, &mockAppDelegate);
+    ExchangeContext * exchange = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
@@ -322,6 +329,80 @@ void CheckDelayDelivery(nlTestSuite * inSuite, void * inContext)
     // send error
 }
 
+void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    uint16_t payload_len = sizeof(PAYLOAD);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    memmove(buffer->Start(), PAYLOAD, payload_len);
+    buffer->SetDataLength(payload_len);
+
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TransportMgr<LoopbackTransport> transportMgr;
+    SecureSessionMgr secureSessionMgr;
+
+    err = transportMgr.Init("LOOPBACK");
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    ExchangeManager exchangeMgr;
+    err = exchangeMgr.Init(&secureSessionMgr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
+    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    MockAppDelegate mockSender;
+
+    ExchangeContext * exchange = exchangeMgr.NewContext(kDestinationNodeId, &mockSender);
+    NL_TEST_ASSERT(inSuite, exchange != nullptr);
+
+    ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
+    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
+    NL_TEST_ASSERT(inSuite, rm != nullptr);
+    NL_TEST_ASSERT(inSuite, rc != nullptr);
+
+    rc->SetConfig({
+        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT_TICK
+        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT_TICK
+        1, // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
+        3, // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
+    });
+
+    gSendMessageCount = 0;
+
+    err = exchange->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(buffer),
+                                Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
+    test_os_sleep_ms(65);
+    ReliableMessageManager::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gSendMessageCount == 2);
+
+    // sleep another 65 ms to trigger second re-transmit
+    test_os_sleep_ms(65);
+    ReliableMessageManager::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, gSendMessageCount == 3);
+}
+
 // Test Suite
 
 /**
@@ -334,6 +415,7 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ReliableMessageManager::CheckFailRetrans", CheckFailRetrans),
     NL_TEST_DEF("Test ReliableMessageManager::CheckRetransExpire", CheckRetransExpire),
     NL_TEST_DEF("Test ReliableMessageManager::CheckDelayDelivery", CheckDelayDelivery),
+    NL_TEST_DEF("Test ReliableMessageManager::CheckResendMessage", CheckResendMessage),
 
     NL_TEST_SENTINEL()
 };

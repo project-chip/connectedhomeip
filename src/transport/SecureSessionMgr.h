@@ -42,6 +42,10 @@
 
 namespace chip {
 
+namespace Messaging {
+class ReliableMessageManager;
+}
+
 class SecureSessionMgr;
 
 /**
@@ -103,17 +107,18 @@ public:
 
 class DLL_EXPORT SecureSessionMgr : public TransportMgrDelegate
 {
+    friend class Messaging::ReliableMessageManager;
+
 public:
+    SecureSessionMgr();
+    ~SecureSessionMgr() override;
+
     /**
      * @brief
      *   Send a message to a currently connected peer
      */
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
     CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf, uint32_t & msgId,
-                           uint32_t & payloadLength, bool isResend);
-    SecureSessionMgr();
-    ~SecureSessionMgr() override;
 
     /**
      * @brief
@@ -180,6 +185,9 @@ private:
 
     SecureSessionMgrDelegate * mCB   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
+
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf, uint32_t & msgId,
+                           uint32_t & payloadLength, bool isResend);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();

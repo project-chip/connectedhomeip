@@ -201,7 +201,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // Clear the CRMP retransmission table
     if (clearRetransTable)
     {
-        mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(&mReliableMessageContext);
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(&mReliableMessageContext);
     }
 
     // Cancel the response timer.
@@ -374,18 +374,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
     if (payloadHeader.IsAckMsg())
     {
-        Optional<uint32_t> ackId = payloadHeader.GetAckId();
-
-        if (ackId.HasValue())
-        {
-            err = mReliableMessageContext.HandleRcvdAck(ackId.Value());
-        }
-        else
-        {
-            err = CHIP_ERROR_DECODE_FAILED;
-            ChipLogError(ExchangeManager, "Failed to retrieve Ack ID");
-            ExitNow(err = CHIP_NO_ERROR);
-        }
+        err = mReliableMessageContext.HandleRcvdAck(payloadHeader.GetAckId().Value());
     }
 
     if (payloadHeader.IsNeedsAck())
