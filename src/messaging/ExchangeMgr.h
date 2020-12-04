@@ -166,7 +166,7 @@ public:
 
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
-    ReliableMessageManager * GetReliableMessageMgr() const { return const_cast<ReliableMessageManager *>(&mReliableMessageMgr); };
+    ReliableMessageManager * GetReliableMessageMgr() { return &mReliableMessageMgr; };
 
     size_t GetContextsInUse() const { return mContextsInUse; }
 
@@ -189,7 +189,7 @@ private:
     SecureSessionMgr * mSessionMgr;
     ReliableMessageManager mReliableMessageMgr;
 
-    ExchangeContext mContextPool[CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS];
+    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];

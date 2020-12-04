@@ -23,6 +23,7 @@
 
 #pragma once
 
+#include <array>
 #include <stdint.h>
 
 #include <messaging/ExchangeContext.h>
@@ -67,10 +68,10 @@ public:
     };
 
 public:
-    ReliableMessageManager();
+    ReliableMessageManager(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageManager();
 
-    void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr, ExchangeContext * contextPool);
+    void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr);
     void Shutdown();
 
     uint64_t GetTickCounterFromTimePeriod(uint64_t period);
@@ -100,8 +101,8 @@ public:
     void TestSetIntervalShift(uint16_t value) { mTimerIntervalShift = value; }
 
 private:
+    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
-    ExchangeContext * mContextPool;
     SecureSessionMgr * mSessionMgr;
     uint64_t mTimeStampBase;                  // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
     System::Timer::Epoch mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
@@ -111,14 +112,9 @@ private:
     template <typename Function>
     void ExecuteForAllContext(Function function)
     {
-        ExchangeContext * ec = mContextPool;
-
-        if (ec != nullptr)
+        for (auto & ec : mContextPool)
         {
-            for (int i = 0; i < CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS; i++, ec++)
-            {
-                function(ec->GetReliableMessageContext());
-            }
+            function(ec.GetReliableMessageContext());
         }
     }
 

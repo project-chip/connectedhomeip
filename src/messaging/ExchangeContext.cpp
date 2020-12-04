@@ -266,7 +266,7 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     mReliableMessageContext.Init(em->GetReliableMessageMgr(), this);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), em->GetContextsInUse(),
+    ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->mContextPool + 1), em->GetContextsInUse(),
                     this);
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
@@ -400,7 +400,11 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         uint32_t PauseTimeMillis = 0;
 
         // Extract PauseTimeMillis from msgBuf
-        p               = msgBuf->Start();
+        p                  = msgBuf->Start();
+        const uint16_t len = msgBuf->DataLength();
+
+        VerifyOrExit(len == 4, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
         PauseTimeMillis = LittleEndian::Read32(p);
         mReliableMessageContext.HandleThrottleFlow(PauseTimeMillis);
 

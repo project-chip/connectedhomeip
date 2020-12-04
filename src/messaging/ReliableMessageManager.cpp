@@ -40,18 +40,17 @@ ReliableMessageManager::RetransTableEntry::RetransTableEntry() :
     rc(nullptr), msgBuf(nullptr), peerNodeId(0), msgId(0), nextRetransTimeTick(0), sendCount(0)
 {}
 
-ReliableMessageManager::ReliableMessageManager() :
-    mSystemLayer(nullptr), mContextPool(nullptr), mCurrentTimerExpiry(0),
+ReliableMessageManager::ReliableMessageManager(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
+    mContextPool(contextPool), mSystemLayer(nullptr), mCurrentTimerExpiry(0),
     mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
 {}
 
 ReliableMessageManager::~ReliableMessageManager() {}
 
-void ReliableMessageManager::Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr, ExchangeContext * contextPool)
+void ReliableMessageManager::Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr)
 {
     mSystemLayer = systemLayer;
     mSessionMgr  = sessionMgr;
-    mContextPool = contextPool;
 
     memset(mRetransTable, 0, sizeof(mRetransTable));
 
@@ -63,14 +62,13 @@ void ReliableMessageManager::Shutdown()
 {
     mSystemLayer = nullptr;
     mSessionMgr  = nullptr;
-    mContextPool = nullptr;
 
     StopTimer();
 
     // Clear the retransmit table
-    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
+    for (RetransTableEntry & rEntry : mRetransTable)
     {
-        ClearRetransTable(mRetransTable[i]);
+        ClearRetransTable(rEntry);
     }
 }
 
