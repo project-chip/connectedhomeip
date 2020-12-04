@@ -2,6 +2,7 @@
     "name": "CHIP templates",
     "version": "chip-v1",
     "helpers": ["helper-chip.js"],
+    "override": "override.js",
     "templates": [
         {
             "path": "af-structs.zapt",
