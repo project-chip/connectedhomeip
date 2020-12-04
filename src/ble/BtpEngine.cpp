@@ -69,7 +69,7 @@ namespace Ble {
 
 static inline void IncSeqNum(SequenceNumber_t & a_seq_num)
 {
-    a_seq_num = 0xff & ((a_seq_num) + 1);
+    a_seq_num = static_cast<SequenceNumber_t>(0xff & ((a_seq_num) + 1));
 }
 
 static inline bool DidReceiveData(uint8_t rx_flags)
@@ -490,12 +490,12 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         }
 
         characteristic[cursor++] = GetAndIncrementNextTxSeqNum();
-        characteristic[cursor++] = mTxLength & 0xff;
-        characteristic[cursor++] = mTxLength >> 8;
+        characteristic[cursor++] = static_cast<uint8_t>(mTxLength & 0xff);
+        characteristic[cursor++] = static_cast<uint8_t>(mTxLength >> 8);
 
         if ((mTxLength + cursor) <= mTxFragmentSize)
         {
-            mTxBuf->SetDataLength(mTxLength + cursor);
+            mTxBuf->SetDataLength(static_cast<uint16_t>(mTxLength + cursor));
             mTxLength = 0;
             SetFlag(characteristic[0], kHeaderFlag_EndMessage, true);
             mTxState = kState_Complete;
@@ -504,7 +504,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         else
         {
             mTxBuf->SetDataLength(mTxFragmentSize);
-            mTxLength -= mTxFragmentSize - cursor;
+            mTxLength = static_cast<uint16_t>((mTxLength + cursor) - mTxFragmentSize);
         }
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send first fragment:");
@@ -546,7 +546,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
 
         if ((mTxLength + cursor) <= mTxFragmentSize)
         {
-            mTxBuf->SetDataLength(mTxLength + cursor);
+            mTxBuf->SetDataLength(static_cast<uint16_t>(mTxLength + cursor));
             mTxLength = 0;
             SetFlag(characteristic[0], kHeaderFlag_EndMessage, true);
             mTxState = kState_Complete;
@@ -555,7 +555,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         else
         {
             mTxBuf->SetDataLength(mTxFragmentSize);
-            mTxLength -= mTxFragmentSize - cursor;
+            mTxLength = static_cast<uint16_t>((mTxLength + cursor) - mTxFragmentSize);
         }
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send additional fragment:");
