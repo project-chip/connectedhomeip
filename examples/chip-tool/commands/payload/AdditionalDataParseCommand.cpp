@@ -16,21 +16,15 @@
  *
  */
 
-#pragma once
+#include "AdditionalDataParseCommand.h"
 
-#include "../common/Command.h"
-#include <setup_payload/SetupPayload.h>
+using namespace ::chip;
 
-class QRCodeParseCommand : public Command
+CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
-public:
-    QRCodeParseCommand() : Command("parse-qr-code") { AddArgument("code", &mCode); }
-    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
-
-private:
-    char * mCode;
-    CHIP_ERROR Parse(std::string codeString, chip::SetupPayload & payload);
-    CHIP_ERROR Print(chip::SetupPayload payload);
-    bool IsQRCode(std::string codeString);
-    const std::string QRCODE_PREFIX = "CH:";
-};
+    std::string payload(mPayload);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err);
+exit:
+    return err;
+}

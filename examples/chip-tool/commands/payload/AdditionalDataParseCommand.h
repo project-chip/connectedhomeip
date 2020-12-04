@@ -19,18 +19,13 @@
 #pragma once
 
 #include "../common/Command.h"
-#include <setup_payload/SetupPayload.h>
 
-class QRCodeParseCommand : public Command
+class AdditionalDataParseCommand : public Command
 {
 public:
-    QRCodeParseCommand() : Command("parse-qr-code") { AddArgument("code", &mCode); }
+    AdditionalDataParseCommand() : Command("parse-additional-data") { AddArgument("payload", &mPayload); }
     CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
 private:
-    char * mCode;
-    CHIP_ERROR Parse(std::string codeString, chip::SetupPayload & payload);
-    CHIP_ERROR Print(chip::SetupPayload payload);
-    bool IsQRCode(std::string codeString);
-    const std::string QRCODE_PREFIX = "CH:";
+    char * mPayload;
 };
