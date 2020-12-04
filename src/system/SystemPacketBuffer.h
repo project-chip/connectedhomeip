@@ -195,7 +195,7 @@ public:
      *
      *  @note Ownership is transferred from the argument to the `next` link at the end of the current chain.
      *
-     *  @param[in] aPacketHandle - the packet buffer to be added to the end of the current chain.
+     *  @param[in] aPacket - the packet buffer to be added to the end of the current chain.
      */
     void AddToEnd(PacketBufferHandle aPacket);
 
