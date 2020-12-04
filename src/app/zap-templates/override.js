@@ -22,6 +22,8 @@ function atomicType(arg)
     return 'chip::AttributeId';
   case 'cluster_id':
     return 'chip::ClusterId';
+  case 'ieee_address':
+    return 'uint64_t';
   default:
     throw 'not overriding';
   }
