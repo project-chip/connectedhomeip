@@ -210,8 +210,8 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     SuccessOrExit(err);
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err = mDelegate->SendPairingMessage(PacketHeader().SetSourceNodeId(mLocalNodeId).SetEncryptionKeyID(mLocalKeyId),
-                                        payloadHeader.GetEncodePacketFlags(), mPeerAddress, msgBuf.Release_ForNow());
+    err = mDelegate->SendPairingMessage(PacketHeader().SetSourceNodeId(mLocalNodeId).SetEncryptionKeyID(mLocalKeyId), mPeerAddress,
+                                        msgBuf.Release_ForNow());
     SuccessOrExit(err);
 
 exit:
@@ -279,7 +279,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -341,7 +341,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -400,7 +400,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::HandleCompute_cA(const PacketHeader & header, System::PacketBuffer * msg)
+CHIP_ERROR SecurePairingSession::HandleCompute_cA(const PacketHeader & header, const System::PacketBufferHandle & msg)
 {
     CHIP_ERROR err       = CHIP_NO_ERROR;
     const uint8_t * hash = msg->Start();
@@ -437,7 +437,7 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
 
     VerifyOrExit(!msg.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = payloadHeader.Decode(packetHeader.GetFlags(), msg->Start(), msg->DataLength(), &headerSize);
+    err = payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
     SuccessOrExit(err);
 
     msg->ConsumeHead(headerSize);
@@ -450,15 +450,15 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
     switch (static_cast<Spake2pMsgType>(payloadHeader.GetMessageType()))
     {
     case Spake2pMsgType::kSpake2pCompute_pA:
-        err = HandleCompute_pA(packetHeader, msg.Get_ForNow());
+        err = HandleCompute_pA(packetHeader, msg);
         break;
 
     case Spake2pMsgType::kSpake2pCompute_pB_cB:
-        err = HandleCompute_pB_cB(packetHeader, msg.Get_ForNow());
+        err = HandleCompute_pB_cB(packetHeader, msg);
         break;
 
     case Spake2pMsgType::kSpake2pCompute_cA:
-        err = HandleCompute_cA(packetHeader, msg.Get_ForNow());
+        err = HandleCompute_cA(packetHeader, msg);
         break;
 
     default:

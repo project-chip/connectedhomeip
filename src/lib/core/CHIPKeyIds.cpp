@@ -97,7 +97,7 @@ uint32_t ChipKeyId::MakeAppKeyId(uint32_t keyType, uint32_t rootKeyId, uint32_t 
                                  bool useCurrentEpochKey)
 {
     return (keyType | (rootKeyId & kMask_RootKeyNumber) | (appGroupMasterKeyId & kMask_GroupLocalNumber) |
-            (useCurrentEpochKey ? kFlag_UseCurrentEpochKey : (epochKeyId & kMask_EpochKeyNumber)));
+            (useCurrentEpochKey ? static_cast<uint32_t>(kFlag_UseCurrentEpochKey) : (epochKeyId & kMask_EpochKeyNumber)));
 }
 
 /**

@@ -1066,9 +1066,12 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
         static_cast<TCPEndPoint &>(aTarget).HandleIncomingConnection(reinterpret_cast<TCPEndPoint *>(aArgument));
         break;
 
-    case kInetEvent_TCPDataReceived:
-        static_cast<TCPEndPoint &>(aTarget).HandleDataReceived(reinterpret_cast<chip::System::PacketBuffer *>(aArgument));
-        break;
+    case kInetEvent_TCPDataReceived: {
+        chip::System::PacketBufferHandle buf;
+        buf.Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument));
+        static_cast<TCPEndPoint &>(aTarget).HandleDataReceived(std::move(buf));
+    }
+    break;
 
     case kInetEvent_TCPDataSent:
         static_cast<TCPEndPoint &>(aTarget).HandleDataSent(static_cast<uint16_t>(aArgument));

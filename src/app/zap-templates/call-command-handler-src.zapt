@@ -100,18 +100,43 @@ EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false
         {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
         case ZCL_{{asDelimitedMacro name}}_COMMAND_ID: {
             {{#if (zcl_command_arguments_count this.id)}}
-            uint32_t argOffset = 0;
+            uint32_t payloadOffset = cmd->payloadStartIndex;
             {{#zcl_command_arguments}}
-            {{asUnderlyingType type}} * {{asSymbol label}} = ({{asUnderlyingType type}} *)(cmd->buffer + argOffset);
-            {{#unless (isLastElement index count)}}
-            argOffset+= sizeof({{asUnderlyingType type}});
-            {{/unless}}
+            {{asUnderlyingZclType type}} {{asSymbol label}};
             {{/zcl_command_arguments}}
 
-            wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}} *{{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
-            {{else}}
-            wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback();
+            {{#zcl_command_arguments}}
+            {{#if presentIf}}
+            if ({{presentIf}})
+            {
             {{/if}}
+                {{#if isArray}}
+                {{asSymbol label}} = cmd->buffer + payloadOffset;
+                {{else}}
+                if (cmd->bufLen < payloadOffset + {{asReadTypeLength type}})
+                {
+                    return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+                }
+                {{asSymbol label}} = emberAfGet{{asReadType type}}(cmd->buffer, payloadOffset, cmd->bufLen);
+                {{#unless (isLastElement index count)}}
+                {{#if (isString type)}}
+                payloadOffset += emberAf{{asReadType type}}Length({{asSymbol label}}) + {{asReadTypeLength type}};
+                {{else}}
+                payloadOffset += {{asReadTypeLength type}};
+                {{/if}}
+                {{/unless}}
+                {{/if}}
+            {{#if presentIf}}
+            }
+            else
+            {
+                {{asSymbol label}} = {{asValueIfNotPresent type}};
+            }
+            {{/if}}
+            {{/zcl_command_arguments}}
+
+            {{/if}}
+            wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}}{{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
             break;
         }
         {{/if}}

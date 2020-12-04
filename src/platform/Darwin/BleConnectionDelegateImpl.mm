@@ -269,7 +269,7 @@ namespace DeviceLayer {
                     std::is_same<decltype(msgBuf->MaxDataLength()), uint16_t>::value, "Unexpected type for max data length");
                 msgBuf->SetDataLength(static_cast<uint16_t>(characteristic.value.length));
 
-                if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, msgBuf.Release_ForNow())) {
+                if (!_mBleLayer->HandleIndicationReceived((__bridge void *) peripheral, &svcId, &charId, std::move(msgBuf))) {
                     // since this error comes from device manager core
                     // we assume it would do the right thing, like closing the connection
                     ChipLogError(Ble, "Failed at handling incoming BLE data");

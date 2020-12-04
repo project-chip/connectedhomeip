@@ -20,6 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 
 static_library("helpers") {
   output_name = "libNetworkTestHelpers"
+  output_dir = "${root_out_dir}/lib"
 
   sources = [
     "NetworkTestHelpers.cpp",
@@ -28,7 +29,7 @@ static_library("helpers") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/inet/tests:tests_common" ]
+  public_deps = [ "${chip_root}/src/inet/tests:helpers" ]
 }
 
 chip_test_suite("tests") {
@@ -45,7 +46,7 @@ chip_test_suite("tests") {
 
   public_deps = [
     ":helpers",
-    "${chip_root}/src/inet/tests:tests_common",
+    "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/transport/raw",

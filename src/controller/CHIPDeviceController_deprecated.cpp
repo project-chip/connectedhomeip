@@ -105,6 +105,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     CHIP_ERROR err = mCommissioner.PairDevice(remoteDeviceId, params, devicePort, interfaceId);
     SuccessOrExit(err);
 
+    mState           = kState_Initialized;
     mRemoteDeviceId  = remoteDeviceId;
     mAppReqState     = appReqState;
     mOnNewConnection = onConnected;
@@ -127,6 +128,7 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
 
     mPairingWithoutSecurity = true;
 
+    mState           = kState_Initialized;
     mRemoteDeviceId  = remoteDeviceId;
     mAppReqState     = appReqState;
     mOnNewConnection = onConnected;
@@ -184,11 +186,11 @@ CHIP_ERROR ChipDeviceController::DisconnectDevice()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * buffer, NodeId peerDevice)
+CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBufferHandle buffer, NodeId peerDevice)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     mAppReqState = appReqState;
 
@@ -214,7 +216,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBuffer * 
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     mDevice->SetDelegate(this);
 
-    err = mDevice->SendMessage(buffer);
+    err = mDevice->SendMessage(std::move(buffer));
 
 exit:
 

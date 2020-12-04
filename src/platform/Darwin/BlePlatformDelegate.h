@@ -21,7 +21,7 @@
 #include <system/SystemPacketBuffer.h>
 
 using ::chip::Ble::ChipBleUUID;
-using ::chip::System::PacketBuffer;
+using ::chip::System::PacketBufferHandle;
 
 namespace chip {
 namespace DeviceLayer {
@@ -35,11 +35,11 @@ public:
     virtual bool CloseConnection(BLE_CONNECTION_OBJECT connObj);
     virtual uint16_t GetMTU(BLE_CONNECTION_OBJECT connObj) const;
     virtual bool SendIndication(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                PacketBuffer * pBuf);
+                                PacketBufferHandle pBuf);
     virtual bool SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                  PacketBuffer * pBuf);
+                                  PacketBufferHandle pBuf);
     virtual bool SendReadRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                 PacketBuffer * pBuf);
+                                 PacketBufferHandle pBuf);
     virtual bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext,
                                   const Ble::ChipBleUUID * svcId, const ChipBleUUID * charId);
 };

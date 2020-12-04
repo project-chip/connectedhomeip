@@ -39,6 +39,7 @@ enum CHIPProtocolId
     //
     // NOTE: Do not attempt to allocate these values yourself.
 
+    kProtocol_Protocol_Common     = (kChipVendor_Common << 16) | 0x0000, // Common Protocol
     kProtocol_SecurityChannel     = (kChipVendor_Common << 16) | 0x0001, // Security Channel Protocol
     kProtocol_Echo                = (kChipVendor_Common << 16) | 0x0002, // Echo Protocol
     kProtocol_BDX                 = (kChipVendor_Common << 16) | 0x0003, // Bulk Data Exchange Protocol

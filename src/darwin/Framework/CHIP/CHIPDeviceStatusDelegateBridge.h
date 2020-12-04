@@ -30,7 +30,7 @@ public:
 
     void setDelegate(id<CHIPDeviceStatusDelegate> delegate, dispatch_queue_t queue);
 
-    void OnMessage(chip::System::PacketBuffer * message) override;
+    void OnMessage(chip::System::PacketBufferHandle message) override;
 
     void OnStatusChange() override;
 

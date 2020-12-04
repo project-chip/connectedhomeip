@@ -44,7 +44,12 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-using DeviceTransportMgr = TransportMgr<Transport::UDP>;
+using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                        ,
+                                        Transport::UDP /* IPv4 */
+#endif
+                                        >;
 
 class DLL_EXPORT Device
 {
@@ -63,19 +68,6 @@ public:
     void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
     // ----- Messaging -----
-    /**
-     * @brief
-     *   Send the provided message to the device
-     *
-     * @param[in] message   The message to be sent. The ownership of the message buffer
-     *                      is handed over to Device object. SendMessage() will
-     *                      decrement the reference count of the message buffer before
-     *                      returning.
-     *
-     * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR SendMessage(System::PacketBuffer * message);
-
     /**
      * @brief
      *   Send the provided message to the device
@@ -217,6 +209,11 @@ private:
         ClusterId cluster;
     };
 
+    enum class ResetTransport
+    {
+        kYes,
+        kNo,
+    };
     /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
 
@@ -255,8 +252,10 @@ private:
      *   This function loads the secure session object from the serialized operational
      *   credentials corresponding to the device. This is typically done when the device
      *   does not have an active secure channel.
+     *
+     * @param[in] resetNeeded   Does the underlying network socket require a reset
      */
-    CHIP_ERROR LoadSecureSessionParameters();
+    CHIP_ERROR LoadSecureSessionParameters(ResetTransport resetNeeded);
 };
 
 /**

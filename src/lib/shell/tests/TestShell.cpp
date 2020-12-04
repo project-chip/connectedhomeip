@@ -19,7 +19,7 @@
 
 #include <shell/shell.h>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <inttypes.h>
 #include <stdarg.h>

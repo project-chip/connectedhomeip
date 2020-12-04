@@ -36,7 +36,7 @@
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 class ChipMessageInfo;
 enum class MessageFlagValues : uint32_t;
@@ -131,5 +131,5 @@ private:
     ReliableMessageDelegate * mDelegate;
 };
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip

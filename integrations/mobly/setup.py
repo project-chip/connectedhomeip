@@ -14,17 +14,12 @@
 
 """chip_mobly"""
 
-import setuptools
+import setuptools # type: ignore
 
 setuptools.setup(
     name='chip_mobly',
     version='0.0.1',
     author='CHIP Authors',
-#    author_email='?',
     description='Integration of Mobly with CHIP devices',
     packages=setuptools.find_packages(),
-#TODO - uncomment this once native python building is solved for
-#       psutil (one of mobly's dependencies which CHIP does
-#       not actually need)
-#     install_requires=['mobly'],
 )

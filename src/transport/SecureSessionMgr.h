@@ -117,13 +117,9 @@ public:
     /**
      * @brief
      *   Send a message to a currently connected peer
-     *
-     * @details
-     *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
-     *   behalf of the caller regardless of the return status.
      */
-    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf);
     SecureSessionMgr();
     ~SecureSessionMgr() override;
 

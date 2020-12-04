@@ -96,8 +96,7 @@ CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_
     return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, const Header::Flags payloadEncodeFlags, uint8_t * aad,
-                                                uint16_t & len)
+CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, uint8_t * aad, uint16_t & len)
 {
     VerifyOrReturnError(len >= header.EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -105,7 +104,7 @@ CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, con
     // integrity protect the whole message
     uint16_t actualEncodedHeaderSize;
 
-    ReturnErrorOnFailure(header.Encode(aad, len, &actualEncodedHeaderSize, payloadEncodeFlags));
+    ReturnErrorOnFailure(header.Encode(aad, len, &actualEncodedHeaderSize));
     VerifyOrReturnError(len >= actualEncodedHeaderSize, CHIP_ERROR_INVALID_ARGUMENT);
 
     len = actualEncodedHeaderSize;
@@ -114,7 +113,7 @@ CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, con
 }
 
 CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                  Header::Flags payloadFlags, MessageAuthenticationCode & mac)
+                                  MessageAuthenticationCode & mac)
 {
 
     constexpr Header::EncryptionType encType = Header::EncryptionType::kAESCCMTagLen16;
@@ -133,7 +132,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
     uint8_t tag[kMaxTagLen];
 
     ReturnErrorOnFailure(GetIV(header, IV, sizeof(IV)));
-    ReturnErrorOnFailure(GetAdditionalAuthData(header, payloadFlags, AAD, aadLen));
+    ReturnErrorOnFailure(GetAdditionalAuthData(header, AAD, aadLen));
     ReturnErrorOnFailure(
         AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output, tag, taglen));
 
@@ -143,7 +142,7 @@ CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, ui
 }
 
 CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                                  Header::Flags payloadFlags, const MessageAuthenticationCode & mac)
+                                  const MessageAuthenticationCode & mac)
 {
     const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(header.GetEncryptionType());
     const uint8_t * tag = mac.GetTag();
@@ -157,7 +156,7 @@ CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, ui
     VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
     ReturnErrorOnFailure(GetIV(header, IV, sizeof(IV)));
-    ReturnErrorOnFailure(GetAdditionalAuthData(header, payloadFlags, AAD, aadLen));
+    ReturnErrorOnFailure(GetAdditionalAuthData(header, AAD, aadLen));
 
     return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey), IV, sizeof(IV), output);
 }

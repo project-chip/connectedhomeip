@@ -38,6 +38,8 @@ static_library("setup_payload") {
     "SetupPayloadHelper.h",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
