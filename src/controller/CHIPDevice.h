@@ -54,7 +54,7 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 class DLL_EXPORT Device
 {
 public:
-    Device() : mActive(false), mState(ConnectionState::NotConnected) {}
+    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
     ~Device() {}
 
     /**
@@ -290,7 +290,8 @@ typedef struct SerializableDevice
     SecurePairingSessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort; /* This field is serealized in LittelEndian byte order */
+    uint16_t mDevicePort;  /* This field is serealized in LittelEndian byte order */
+    uint64_t mInterfaceId; /* This field is serealized in LittelEndian byte order */
 } SerializableDevice;
 
 typedef struct SerializedDevice

@@ -105,6 +105,10 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
+
+    nlSTATIC_ASSERT_PRINT(sizeof(serializable.mInterfaceId) >= sizeof(mInterface), "Size of network interface ID must fit");
+    serializable.mInterfaceId = Encoding::LittleEndian::HostSwap64(mInterface);
+
     nlSTATIC_ASSERT_PRINT(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN,
                           "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
@@ -147,6 +151,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     memmove(&mPairing, &serializable.mOpsCreds, sizeof(mPairing));
     mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+    mInterface  = static_cast<Inet::InterfaceId>(Encoding::LittleEndian::HostSwap64(serializable.mInterfaceId));
 
 exit:
     return error;
