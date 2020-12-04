@@ -28,6 +28,7 @@
 #include <support/CodeUtils.h>
 
 #include <limits>
+#include <utility>
 
 namespace {
 constexpr uint8_t kVersionMask = 0x0F;
@@ -93,14 +94,14 @@ BufBound & TransferInit::WriteToBuffer(BufBound & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR TransferInit::Parse(const System::PacketBuffer & aBuffer)
+CHIP_ERROR TransferInit::Parse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint8_t proposedTransferCtl;
     uint8_t rangeCtl;
     uint32_t tmpUint32Value = 0; // Used for reading non-wide length and offset fields
-    uint8_t * bufStart      = aBuffer.Start();
-    Reader bufReader(bufStart, aBuffer.DataLength());
+    uint8_t * bufStart      = aBuffer->Start();
+    Reader bufReader(bufStart, aBuffer->DataLength());
     BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
 
     SuccessOrExit(bufReader.Read8(&proposedTransferCtl).Read8(&rangeCtl).Read16(&MaxBlockSize).StatusCode());
@@ -139,9 +140,6 @@ CHIP_ERROR TransferInit::Parse(const System::PacketBuffer & aBuffer)
 
     SuccessOrExit(bufReader.Read16(&FileDesLength).StatusCode());
 
-    // WARNING: this struct will store a pointer to the start of the file designator in the PacketBuffer,
-    // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
-    // or there is risk of unsafe memory access.
     VerifyOrExit(bufReader.HasAtLeast(FileDesLength), err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     FileDesignator = &bufStart[bufReader.OctetsRead()];
 
@@ -150,13 +148,13 @@ CHIP_ERROR TransferInit::Parse(const System::PacketBuffer & aBuffer)
     MetadataLength = 0;
     if (bufReader.Remaining() > FileDesLength)
     {
-        // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
-        // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
-        // or there is risk of unsafe memory access.
         uint16_t metadataStartIndex = static_cast<uint16_t>(bufReader.OctetsRead() + FileDesLength);
         Metadata                    = &bufStart[metadataStartIndex];
-        MetadataLength              = static_cast<uint16_t>(aBuffer.DataLength() - metadataStartIndex);
+        MetadataLength              = static_cast<uint16_t>(aBuffer->DataLength() - metadataStartIndex);
     }
+
+    // Retain ownership of the PacketBuffer so that the FileDesignator and Metadata pointers remain valid.
+    Buffer = std::move(aBuffer);
 
 exit:
     if (bufReader.StatusCode() != CHIP_NO_ERROR)
@@ -215,12 +213,12 @@ BufBound & SendAccept::WriteToBuffer(BufBound & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR SendAccept::Parse(const System::PacketBuffer & aBuffer)
+CHIP_ERROR SendAccept::Parse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint8_t transferCtl = 0;
-    uint8_t * bufStart  = aBuffer.Start();
-    Reader bufReader(bufStart, aBuffer.DataLength());
+    uint8_t * bufStart  = aBuffer->Start();
+    Reader bufReader(bufStart, aBuffer->DataLength());
 
     SuccessOrExit(bufReader.Read8(&transferCtl).Read16(&MaxBlockSize).StatusCode());
 
@@ -234,12 +232,12 @@ CHIP_ERROR SendAccept::Parse(const System::PacketBuffer & aBuffer)
     MetadataLength = 0;
     if (bufReader.Remaining() > 0)
     {
-        // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
-        // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
-        // or there is risk of unsafe memory access.
         Metadata       = &bufStart[bufReader.OctetsRead()];
         MetadataLength = bufReader.Remaining();
     }
+
+    // Retain ownership of the PacketBuffer so that the Metadata pointer remains valid.
+    Buffer = std::move(aBuffer);
 
 exit:
     if (bufReader.StatusCode() != CHIP_NO_ERROR)
@@ -322,14 +320,14 @@ BufBound & ReceiveAccept::WriteToBuffer(BufBound & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR ReceiveAccept::Parse(const System::PacketBuffer & aBuffer)
+CHIP_ERROR ReceiveAccept::Parse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     uint8_t transferCtl     = 0;
     uint8_t rangeCtl        = 0;
     uint32_t tmpUint32Value = 0; // Used for reading non-wide length and offset fields
-    uint8_t * bufStart      = aBuffer.Start();
-    Reader bufReader(bufStart, aBuffer.DataLength());
+    uint8_t * bufStart      = aBuffer->Start();
+    Reader bufReader(bufStart, aBuffer->DataLength());
     BitFlags<uint8_t, RangeControlFlags> rangeCtlFlags;
 
     SuccessOrExit(bufReader.Read8(&transferCtl).Read8(&rangeCtl).Read16(&MaxBlockSize).StatusCode());
@@ -374,12 +372,12 @@ CHIP_ERROR ReceiveAccept::Parse(const System::PacketBuffer & aBuffer)
     MetadataLength = 0;
     if (bufReader.Remaining() > 0)
     {
-        // WARNING: this struct will store a pointer to the start of metadata in the PacketBuffer,
-        // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
-        // or there is risk of unsafe memory access.
         Metadata       = &bufStart[bufReader.OctetsRead()];
         MetadataLength = bufReader.Remaining();
     }
+
+    // Retain ownership of the PacketBuffer so that the Metadata pointer remains valid.
+    Buffer = std::move(aBuffer);
 
 exit:
     if (bufReader.StatusCode() != CHIP_NO_ERROR)
@@ -420,10 +418,10 @@ BufBound & CounterMessage::WriteToBuffer(BufBound & aBuffer) const
     return aBuffer.Put32(BlockCounter);
 }
 
-CHIP_ERROR CounterMessage::Parse(const System::PacketBuffer & aBuffer)
+CHIP_ERROR CounterMessage::Parse(System::PacketBufferHandle aBuffer)
 {
-    uint8_t * bufStart = aBuffer.Start();
-    Reader bufReader(bufStart, aBuffer.DataLength());
+    uint8_t * bufStart = aBuffer->Start();
+    Reader bufReader(bufStart, aBuffer->DataLength());
     return bufReader.Read32(&BlockCounter).StatusCode();
 }
 
@@ -450,11 +448,11 @@ BufBound & DataBlock::WriteToBuffer(BufBound & aBuffer) const
     return aBuffer;
 }
 
-CHIP_ERROR DataBlock::Parse(const System::PacketBuffer & aBuffer)
+CHIP_ERROR DataBlock::Parse(System::PacketBufferHandle aBuffer)
 {
     CHIP_ERROR err     = CHIP_NO_ERROR;
-    uint8_t * bufStart = aBuffer.Start();
-    Reader bufReader(bufStart, aBuffer.DataLength());
+    uint8_t * bufStart = aBuffer->Start();
+    Reader bufReader(bufStart, aBuffer->DataLength());
 
     SuccessOrExit(bufReader.Read32(&BlockCounter).StatusCode());
 
@@ -463,12 +461,12 @@ CHIP_ERROR DataBlock::Parse(const System::PacketBuffer & aBuffer)
     DataLength = 0;
     if (bufReader.Remaining() > 0)
     {
-        // WARNING: this struct will store a pointer to the start of data in the PacketBuffer,
-        // but will not make a copy. It is essential that this struct not outlive the PacketBuffer,
-        // or there is risk of unsafe memory access.
         Data       = &bufStart[bufReader.OctetsRead()];
         DataLength = bufReader.Remaining();
     }
+
+    // Retain ownership of the PacketBuffer so that the Data pointer remains valid.
+    Buffer = std::move(aBuffer);
 
 exit:
     if (bufReader.StatusCode() != CHIP_NO_ERROR)
