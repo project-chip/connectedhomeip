@@ -806,7 +806,7 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     VerifyOrExit(mAddrType == aPktInfo->DestAddress.Type(), res = INET_ERROR_BAD_ARGS);
 
     // For now the entire message must fit within a single buffer.
-    VerifyOrExit(aBuffer->Next() == nullptr, res = INET_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrExit(!aBuffer->HasChainedBuffer(), res = INET_ERROR_MESSAGE_TOO_LONG);
 
     memset(&msgHeader, 0, sizeof(msgHeader));
 

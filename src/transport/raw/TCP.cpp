@@ -372,7 +372,7 @@ CHIP_ERROR TCPBase::ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const Pe
         }
 
         // Buffer is incomplete if we reach this point
-        if (buffer->Next() != nullptr)
+        if (buffer->HasChainedBuffer())
         {
             buffer->CompactHead();
             continue;
