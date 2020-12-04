@@ -636,7 +636,7 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         mPairingDelegate->OnPairingComplete(status);
     }
 
-    if (mDeviceBeingPaired != kNumMaxActiveDevices)
+    if (mDeviceBeingPaired != kNumMaxActiveDevices && mStorageDelegate != nullptr)
     {
         // Let's release the device that's being paired.
         // If pairing was successful, its information is

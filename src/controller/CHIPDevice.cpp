@@ -268,9 +268,9 @@ exit:
 
 bool Device::GetIpAddress(Inet::IPAddress & addr) const
 {
-    if (mState == ConnectionState::SecureConnected)
+    if (mState != ConnectionState::NotConnected)
         addr = mDeviceAddr;
-    return mState == ConnectionState::SecureConnected;
+    return mState != ConnectionState::NotConnected;
 }
 
 void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse)
