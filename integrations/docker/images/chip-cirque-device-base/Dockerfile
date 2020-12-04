@@ -11,6 +11,8 @@ RUN mkdir /app
 
 WORKDIR /app
 
+# TODO: Use multi stage build for smaller image size.
+
 RUN apt-get update \
   && apt-get install --no-install-recommends -y sudo git ca-certificates psmisc dhcpcd5 wpasupplicant wireless-tools \
   && ln -fs /usr/share/zoneinfo/UTC /etc/localtime \
@@ -38,7 +40,6 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 ENTRYPOINT service dbus start && \
-           sleep 1 && \
            otbr-agent -I wpan0 spinel+hdlc+uart:///dev/ttyUSB0 || sleep infinity
 
 EXPOSE 80
