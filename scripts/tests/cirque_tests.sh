@@ -69,7 +69,7 @@ function __cirquetest_clean_flask() {
 
 function __cirquetest_build_ot() {
   pushd .
-  cd $REPO_DIR/third_party/openthread/repo
+  cd "$REPO_DIR"/third_party/openthread/repo
   ./bootstrap
   make -f examples/Makefile-simulation
   popd
