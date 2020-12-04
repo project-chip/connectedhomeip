@@ -16,6 +16,9 @@
 #    limitations under the License.
 #
 
+# Run bootstrap to set up e.g. Pigweed correctly
+source "$(dirname "$0")/../../scripts/bootstrap.sh"
+
 cd "$(dirname "$0")/../../examples"
 
 APP="$1"

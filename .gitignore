@@ -11,6 +11,9 @@
 out/
 /src/test_driver/nrfconnect/build/
 
+# Environment directory
+.environment/
+
 # Temporary Directories
 .tmp/
 
