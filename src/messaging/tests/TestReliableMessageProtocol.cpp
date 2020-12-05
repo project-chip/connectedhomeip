@@ -151,7 +151,8 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
     ReliableMessageManager::RetransTableEntry * entry;
     PayloadHeader header;
 
-    rm->AddToRetransTable(rc, header, 1, nullptr, &entry);
+    auto buf = System::PacketBuffer::New();
+    rm->AddToRetransTable(rc, header, 1, std::move(buf), &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     rm->ClearRetransTable(*entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);

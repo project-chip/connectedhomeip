@@ -336,7 +336,7 @@ void ReliableMessageManager::Timeout(System::Layer * aSystemLayer, void * aAppSt
  *
  *  @param[in]    nodeId    A peer Node ID of the CHIP message to be retransmitted.
  *
- *  @param[in]    msgBuf    A pointer to the message buffer holding the CHIP message to be retransmitted.
+ *  @param[in]    msgBuf    The message buffer holding the CHIP message to be retransmitted.
  *
  *  @param[out]   rEntry    A pointer to a pointer of a retransmission table entry added into the table.
  *
@@ -372,8 +372,6 @@ CHIP_ERROR ReliableMessageManager::AddToRetransTable(ReliableMessageContext * rc
             rc->mExchange->Retain();
             added = true;
 
-            // Check if the timer needs to be started and start it.
-            StartTimer();
             break;
         }
     }

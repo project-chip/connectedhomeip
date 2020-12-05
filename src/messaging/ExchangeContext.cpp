@@ -147,7 +147,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
 
         // Add to Table for subsequent sending
         err = mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(&mReliableMessageContext, payloadHeader, mPeerNodeId,
-                                                                       msgBuf.Release_ForNow(), &entry);
+                                                                       std::move(msgBuf), &entry);
         SuccessOrExit(err);
 
         err = mExchangeMgr->GetReliableMessageMgr()->SendFromRetransTable(entry, false);
