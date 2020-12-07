@@ -22,7 +22,7 @@
 #include <mdns/minimal/core/Constants.h>
 #include <mdns/minimal/core/QName.h>
 
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 
 namespace mdns {
 namespace Minimal {
@@ -48,11 +48,11 @@ public:
 
     /// Append the given record to the underlying output.
     /// Updates header item count on success, does NOT update header on failure.
-    bool Append(HeaderRef & hdr, ResourceType asType, chip::BufBound & out) const;
+    bool Append(HeaderRef & hdr, ResourceType asType, chip::Encoding::BigEndian::BufferWriter & out) const;
 
 protected:
     /// Output the data portion of the resource record.
-    virtual bool WriteData(chip::BufBound & out) const = 0;
+    virtual bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const = 0;
 
     ResourceRecord(QType type, FullQName name) : mType(type), mQName(name) {}
 
