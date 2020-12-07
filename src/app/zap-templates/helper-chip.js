@@ -81,7 +81,7 @@ function asValueIfNotPresent(type, isArray)
   function resolve(packageId)
   {
     const options = { 'hash' : {} };
-    return cHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
+    return zclHelper.asUnderlyingZclType.call(this, type, options).then(zclType => {
       switch (zclType) {
       case 'uint8_t':
         return 'UINT8_MAX';

@@ -80,7 +80,7 @@ typedef struct _DebtPayload
 {
     uint32_t collectionTime;
     uint32_t amountCollected;
-    EmberAfRepaymentDebtType debtType;
+    uint8_t debtType;
     uint32_t outstandingDebt;
 } EmberAfDebtPayload;
 
@@ -93,7 +93,7 @@ typedef struct _DeviceInformationRecord
     uint16_t deviceId;
     uint8_t version;
     uint8_t groupIdCount;
-    EmberAfDeviceInformationRecordSort sort;
+    uint8_t sort;
 } EmberAfDeviceInformationRecord;
 
 // Struct for DiscoverAttributesInfoRecord
@@ -128,7 +128,7 @@ typedef struct _EventConfigurationPayload
 // Struct for EventLogPayload
 typedef struct _EventLogPayload
 {
-    EmberAfEventLogId logId;
+    uint8_t logId;
     uint16_t eventId;
     uint32_t eventTime;
     uint8_t * eventData;
@@ -316,7 +316,7 @@ typedef struct _ScheduleEntryFriendlyCreditSwitchTimes
 typedef struct _ScheduleEntryRateSwitchTimes
 {
     uint16_t startTime;
-    EmberAfPriceTier priceTier;
+    uint8_t priceTier;
 } EmberAfScheduleEntryRateSwitchTimes;
 
 // Struct for ScheduledPhase
@@ -347,7 +347,7 @@ typedef struct _Smac
 typedef struct _SnapshotResponsePayload
 {
     uint8_t snapshotScheduleId;
-    EmberAfSnapshotScheduleConfirmation snapshotScheduleConfirmation;
+    uint8_t snapshotScheduleConfirmation;
 } EmberAfSnapshotResponsePayload;
 
 // Struct for SnapshotSchedulePayload
@@ -356,7 +356,7 @@ typedef struct _SnapshotSchedulePayload
     uint8_t snapshotScheduleId;
     uint32_t snapshotStartTime;
     uint32_t snapshotSchedule;
-    EmberAfSnapshotPayloadType snapshotPayloadType;
+    uint8_t snapshotPayloadType;
     uint32_t snapshotCause;
 } EmberAfSnapshotSchedulePayload;
 

@@ -130,7 +130,7 @@ EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false
             }
             else
             {
-                {{asSymbol label}} = {{asValueIfNotPresent type}};
+                {{asSymbol label}} = {{asValueIfNotPresent type isArray}};
             }
             {{/if}}
             {{/zcl_command_arguments}}
