@@ -50,10 +50,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     # GN will run Python in venv, which will break happy test
     if args.ci:
-        if test_environ.get("VIRTUAL_ENV", None) != None:
-            del test_environ["VIRTUAL_ENV"]
-        test_environ["PATH"] = ":".join([s for s in test_environ.get(
-            "PATH", "").split(":") if not os.path.realpath(s).startswith(os.path.realpath(os.path.join(CHIP_PATH, "third_party/pigweed/repo")))])
         test_environ["HAPPY_LOG_DIR"] = "/tmp/happy_test_logs"
     test_environ["TEST_BIN_DIR"] = args.bin_dir
     test_environ["HAPPY_MAIN_CONFIG_FILE"] = os.path.realpath(

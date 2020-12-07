@@ -19,22 +19,29 @@
 
 #include <system/SystemPacketBuffer.h>
 
-#include "DnsHeader.h"
-#include "ResourceRecord.h"
+#include <mdns/minimal/core/DnsHeader.h>
+#include <mdns/minimal/records/ResourceRecord.h>
 
 namespace mdns {
 namespace Minimal {
 
+/// Writes a MDNS reply into a given packet buffer.
 class ResponseBuilder
 {
 public:
-    ResponseBuilder(chip::System::PacketBuffer * packet) : mPacket(packet), mHeader(mPacket->Start())
+    ResponseBuilder() : mHeader(nullptr) {}
+    ResponseBuilder(chip::System::PacketBuffer * packet) : mHeader(nullptr) { Reset(packet); }
+
+    ResponseBuilder & Reset(chip::System::PacketBuffer * packet)
     {
+        mPacket = packet;
+        mHeader = HeaderRef(mPacket->Start());
 
         if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
         {
             mPacket->SetDataLength(HeaderRef::kSizeBytes);
             mHeader.Clear();
+            mBuildOk = true;
         }
         else
         {
@@ -42,6 +49,20 @@ public:
         }
 
         mHeader.SetFlags(mHeader.GetFlags().SetResponse());
+        return *this;
+    }
+
+    ResponseBuilder & Invalidate()
+    {
+        mPacket  = nullptr;
+        mHeader  = HeaderRef(nullptr);
+        mBuildOk = false;
+        return *this;
+    }
+
+    bool HasResponseRecords() const
+    {
+        return (mHeader.GetAnswerCount() != 0) || (mHeader.GetAuthorityCount() != 0) || (mHeader.GetAdditionalCount() != 0);
     }
 
     HeaderRef & Header() { return mHeader; }
@@ -64,7 +85,7 @@ public:
         }
         else
         {
-            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Written()));
+            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Needed()));
         }
         return *this;
     }
@@ -72,9 +93,9 @@ public:
     bool Ok() const { return mBuildOk; }
 
 private:
-    chip::System::PacketBuffer * mPacket;
+    chip::System::PacketBuffer * mPacket = nullptr;
     HeaderRef mHeader;
-    bool mBuildOk = true;
+    bool mBuildOk = false;
 };
 
 } // namespace Minimal

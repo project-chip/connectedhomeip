@@ -77,6 +77,8 @@ if (chip_config_network_layer_ble) {
       "CHIPBleServiceData.h",
     ]
 
+    cflags = [ "-Wconversion" ]
+
     public_deps = [
       ":ble_config_header",
       "${chip_root}/src/inet",

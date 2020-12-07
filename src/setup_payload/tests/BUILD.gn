@@ -20,23 +20,18 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libSetupPayloadTests"
 
-  sources = [
+  test_sources = [
     "TestManualCode.cpp",
-    "TestManualCode.h",
     "TestQRCode.cpp",
-    "TestQRCode.h",
     "TestQRCodeTLV.cpp",
-    "TestQRCodeTLV.h",
   ]
+
+  sources = [ "TestHelpers.h" ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/setup_payload",
     "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestQRCodeTLV",
-    "TestManualCode",
-    "TestQRCode",
   ]
 }

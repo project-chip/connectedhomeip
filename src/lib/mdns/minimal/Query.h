@@ -19,8 +19,8 @@
 
 #include <support/BufferWriter.h>
 
-#include "Constants.h"
-#include "QName.h"
+#include <mdns/minimal/core/Constants.h>
+#include <mdns/minimal/core/QName.h>
 
 namespace mdns {
 namespace Minimal {
@@ -29,7 +29,7 @@ namespace Minimal {
 class Query
 {
 public:
-    Query(const QNamePart * names, uint16_t namesCount) : mQNameCount(namesCount), mQName(names) {}
+    Query(FullQName name) : mQName(name) {}
 
     bool IsAnswerViaUnicast() const { return mAnswerViaUnicast; }
     Query & SetAnswerViaUnicast(bool value)
@@ -63,13 +63,8 @@ public:
         {
             return false;
         }
-        for (uint16_t i = 0; i < mQNameCount; i++)
-        {
 
-            out.Put8(static_cast<uint8_t>(strlen(mQName[i])));
-            out.Put(mQName[i]);
-        }
-        out.Put8(0); // end of qnames
+        mQName.Output(out);
 
         out.Put16(static_cast<uint16_t>(mType));
         out.Put16(static_cast<uint16_t>(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0)));
@@ -83,8 +78,7 @@ public:
     }
 
 private:
-    const uint16_t mQNameCount;
-    const QNamePart * mQName;
+    const FullQName mQName;
     QType mType            = QType::ANY;
     QClass mClass          = QClass::IN;
     bool mAnswerViaUnicast = true;

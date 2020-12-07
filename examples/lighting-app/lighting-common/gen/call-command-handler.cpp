@@ -99,16 +99,29 @@ EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand
             uint8_t optionMask;
             uint8_t optionOverride;
 
-            moveMode = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            rate = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            optionMask = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            optionOverride = (*(uint8_t *) (cmd->buffer + payloadOffset));
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            moveMode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            rate = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionMask = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfLevelControlClusterMoveCallback(moveMode, rate, optionMask, optionOverride);
             break;
@@ -120,16 +133,29 @@ EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand
             uint8_t optionMask;
             uint8_t optionOverride;
 
-            level = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            transitionTime = (*(uint16_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint16_t);
-
-            optionMask = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            optionOverride = (*(uint8_t *) (cmd->buffer + payloadOffset));
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            level = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 2;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionMask = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfLevelControlClusterMoveToLevelCallback(level, transitionTime, optionMask, optionOverride);
             break;
@@ -139,10 +165,17 @@ EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand
             uint8_t level;
             uint16_t transitionTime;
 
-            level = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            transitionTime = (*(uint16_t *) (cmd->buffer + payloadOffset));
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            level = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfLevelControlClusterMoveToLevelWithOnOffCallback(level, transitionTime);
             break;
@@ -152,10 +185,17 @@ EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand
             uint8_t moveMode;
             uint8_t rate;
 
-            moveMode = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            rate = (*(uint8_t *) (cmd->buffer + payloadOffset));
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            moveMode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            rate = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfLevelControlClusterMoveWithOnOffCallback(moveMode, rate);
             break;
@@ -168,19 +208,35 @@ EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand
             uint8_t optionMask;
             uint8_t optionOverride;
 
-            stepMode = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            stepSize = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            transitionTime = (*(uint16_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint16_t);
-
-            optionMask = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            optionOverride = (*(uint8_t *) (cmd->buffer + payloadOffset));
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepMode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepSize = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 2;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionMask = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfLevelControlClusterStepCallback(stepMode, stepSize, transitionTime, optionMask, optionOverride);
             break;
@@ -191,13 +247,23 @@ EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand
             uint8_t stepSize;
             uint16_t transitionTime;
 
-            stepMode = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            stepSize = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            transitionTime = (*(uint16_t *) (cmd->buffer + payloadOffset));
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepMode = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            stepSize = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 2)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            transitionTime = emberAfGetInt16u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfLevelControlClusterStepWithOnOffCallback(stepMode, stepSize, transitionTime);
             break;
@@ -207,10 +273,17 @@ EmberAfStatus emberAfLevelControlClusterServerCommandParse(EmberAfClusterCommand
             uint8_t optionMask;
             uint8_t optionOverride;
 
-            optionMask = (*(uint8_t *) (cmd->buffer + payloadOffset));
-            payloadOffset += sizeof(uint8_t);
-
-            optionOverride = (*(uint8_t *) (cmd->buffer + payloadOffset));
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionMask = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
+            payloadOffset += 1;
+            if (cmd->bufLen < payloadOffset + 1)
+            {
+                return EMBER_ZCL_STATUS_MALFORMED_COMMAND;
+            }
+            optionOverride = emberAfGetInt8u(cmd->buffer, payloadOffset, cmd->bufLen);
 
             wasHandled = emberAfLevelControlClusterStopCallback(optionMask, optionOverride);
             break;
