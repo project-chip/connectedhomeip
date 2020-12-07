@@ -153,7 +153,6 @@ void InitServer(AppDelegate * delegate)
 
         SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
         params.SetSetupPINCode(pinCode)
-            .SetLocalNodeId(chip::kTestDeviceNodeId)
             .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
             .SetPeerAddress(Transport::PeerAddress::BLE());
         SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
