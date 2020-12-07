@@ -78,8 +78,6 @@ jobs:
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
             # https://github.com/project-chip/connectedhomeip/issues/3100
-            # - name: Show tree
-            #   run: find .
             # - name: Remove third_party binaries for CodeQL Analysis
             #   run: find examples -type d -name "third_party" -exec rm -rf {} +
             # - name: Remove nrfxlib binaries for CodeQL Analysis

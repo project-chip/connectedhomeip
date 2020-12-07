@@ -78,8 +78,6 @@ jobs:
                   path: |
                       out/chip_tool_debug/chip-tool
                       out/shell_debug/chip-shell
-            - name: Show tree
-              run: find .
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
             - name: Remove dbus binaries for CodeQL Analysis
