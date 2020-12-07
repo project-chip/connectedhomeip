@@ -100,21 +100,21 @@ public:
      * Return the size of the allocation including the reserved and payload data spaces but not including space
      * allocated for the PacketBuffer structure.
      *
-     *  @note    The allocation size is equal or to greater than \c aAllocSize parameter to the \c Create method).
+     *  @note    The allocation size is equal to or greater than the \c aAllocSize parameter to the \c Create method).
      *
      *  @return     size of the allocation
      */
     uint16_t AllocSize() const;
 
     /**
-     * Get pointer to start of data in buffer.
+     * Get a pointer to the start of data in a buffer.
      *
      *  @return pointer to the start of data.
      */
     uint8_t * Start() const { return static_cast<uint8_t *>(this->payload); }
 
     /**
-     *  Set the start data in buffer, adjusting length and total length accordingly.
+     *  Set the the start of data in a buffer, adjusting length and total length accordingly.
      *
      *  @note The data within the buffer is not moved, only accounting information is changed.  The function is commonly used to
      *      either strip or prepend protocol headers in a zero-copy way.
@@ -128,14 +128,14 @@ public:
     void SetStart(uint8_t * aNewStart);
 
     /**
-     * Get length, in bytes, of data in packet buffer.
+     * Get the length, in bytes, of data in a packet buffer.
      *
      *  @return length, in bytes (current payload length).
      */
     uint16_t DataLength() const { return this->len; }
 
     /**
-     * Set length, in bytes, of data in buffer, adjusting total length accordingly.
+     * Set the length, in bytes, of data in a packet buffer, adjusting total length accordingly.
      *
      *  The function sets the length, in bytes, of the data in the buffer, adjusting the total length appropriately. When the buffer
      *  is not the head of the buffer chain (common case: the caller adds data to the last buffer in the PacketBuffer chain prior to
@@ -144,7 +144,7 @@ public:
      *
      *  @param[in] aNewLen - new length, in bytes, of this buffer.
      *
-     *  @param[in,out] aChainHead - the head of the buffer chain the current buffer belongs to.  May be nullptr if the current
+     *  @param[in,out] aChainHead - the head of the buffer chain the current buffer belongs to.  May be \c nullptr if the current
      *      buffer is the head of the buffer chain.
      */
     void SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead);
@@ -153,7 +153,7 @@ public:
     void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead);
 
     /**
-     * Get total length of packet data in the buffer chain.
+     * Get the total length of packet data in the buffer chain.
      *
      *  @return total length, in octets.
      */
@@ -222,7 +222,7 @@ public:
     /**
      * Ensure the buffer has at least the specified amount of reserved space.
      *
-     *  Ensure the buffer has at least the specified amount of reserved space moving the data in the buffer forward to make room if
+     *  Ensure the buffer has at least the specified amount of reserved space, moving the data in the buffer forward to make room if
      *  necessary.
      *
      *  @param[in] aReservedSize - number of bytes desired for the headers.
