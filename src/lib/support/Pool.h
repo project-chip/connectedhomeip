@@ -103,7 +103,7 @@ public:
     template <typename... Args>
     T * CreateObject(Args &&... args)
     {
-        T * element = reinterpret_cast<T *>(Allocate());
+        T * element = static_cast<T *>(Allocate());
         if (element != nullptr)
             return new (element) T(std::forward<Args>(args)...);
         else
