@@ -25,7 +25,7 @@
 #include <utility>
 
 #include <core/CHIPEncoding.h>
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 
 #include <mdns/minimal/core/BytesRange.h>
 #include <mdns/minimal/core/DnsHeader.h>
@@ -53,7 +53,7 @@ struct FullQName
     FullQName(const QNamePart (&data)[N]) : names(data), nameCount(N)
     {}
 
-    void Output(chip::BufBound & out) const
+    void Output(chip::Encoding::BigEndian::BufferWriter & out) const
     {
         for (uint16_t i = 0; i < nameCount; i++)
         {

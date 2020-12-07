@@ -38,11 +38,11 @@ public:
     void SetWeight(uint16_t value) { mWeight = value; }
 
 protected:
-    bool WriteData(chip::BufBound & out) const override
+    bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override
     {
-        out.PutBE16(mPriority);
-        out.PutBE16(mWeight);
-        out.PutBE16(mPort);
+        out.Put16(mPriority);
+        out.Put16(mWeight);
+        out.Put16(mPort);
         mServerName.Output(out);
 
         return out.Fit();
