@@ -23,11 +23,10 @@
  *
  */
 
-#include "TestSupport.h"
-
 #include <set>
 
 #include <support/Pool.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -163,7 +162,7 @@ int Teardown(void * inContext)
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestReleaseNull), NL_TEST_DEF_FN(TestCreateReleaseObject),
                                  NL_TEST_DEF_FN(TestCreateReleaseStruct), NL_TEST_SENTINEL() };
 
-extern "C" int TestPool()
+int TestPool()
 {
     nlTestSuite theSuite = { "CHIP Pool tests", &sTests[0], Setup, Teardown };
 
@@ -171,3 +170,5 @@ extern "C" int TestPool()
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestPool);
