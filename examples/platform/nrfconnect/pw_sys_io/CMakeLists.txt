@@ -1,4 +1,3 @@
-include(chip-lib)
 include($ENV{PW_ROOT}/pw_build/pigweed.cmake)
 
 pw_add_module_library(pw_sys_io.nrfconnect

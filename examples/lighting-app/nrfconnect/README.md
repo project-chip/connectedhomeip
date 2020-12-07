@@ -294,7 +294,7 @@ following command:
 To build the example with release configuration that disables the diagnostic
 features like logs and command-line interface, run the following command:
 
-    $ west build -b board-name -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/release.conf
+    $ west build -b board-name -- -DOVERLAY_CONFIG=third_party/connectedhomeip/config/nrfconnect/app/release.conf
 
 Remember to replace _board-name_ with the name of the Nordic Semiconductor's
 board you own.
