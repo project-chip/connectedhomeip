@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include "TestSupport.h"
-
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
 #include <support/SerializableIntegerSet.h>

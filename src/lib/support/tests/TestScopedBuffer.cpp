@@ -16,8 +16,6 @@
  *    limitations under the License.
  */
 
-#include "TestSupport.h"
-
 #include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
 
