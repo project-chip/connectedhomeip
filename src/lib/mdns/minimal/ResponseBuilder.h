@@ -30,11 +30,11 @@ class ResponseBuilder
 {
 public:
     ResponseBuilder() : mHeader(nullptr) {}
-    ResponseBuilder(chip::System::PacketBuffer * packet) : mHeader(nullptr) { Reset(packet); }
+    ResponseBuilder(chip::System::PacketBufferHandle && packet) : mHeader(nullptr) { Reset(std::move(packet)); }
 
-    ResponseBuilder & Reset(chip::System::PacketBuffer * packet)
+    ResponseBuilder & Reset(chip::System::PacketBufferHandle && packet)
     {
-        mPacket = packet;
+        mPacket = std::move(packet);
         mHeader = HeaderRef(mPacket->Start());
 
         if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
@@ -52,12 +52,12 @@ public:
         return *this;
     }
 
-    ResponseBuilder & Invalidate()
+    CHECK_RETURN_VALUE
+    chip::System::PacketBufferHandle && ReleasePacket()
     {
-        mPacket  = nullptr;
         mHeader  = HeaderRef(nullptr);
         mBuildOk = false;
-        return *this;
+        return std::move(mPacket);
     }
 
     bool HasResponseRecords() const
@@ -90,10 +90,31 @@ public:
         return *this;
     }
 
+    ResponseBuilder & AddQuery(const QueryData & query)
+    {
+        if (!mBuildOk)
+        {
+            return *this;
+        }
+
+        chip::BufBound out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
+
+        if (!query.Append(mHeader, out))
+        {
+            mBuildOk = false;
+        }
+        else
+        {
+            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Needed()));
+        }
+        return *this;
+    }
+
     bool Ok() const { return mBuildOk; }
+    bool HasPacketBuffer() const { return !mPacket.IsNull(); }
 
 private:
-    chip::System::PacketBuffer * mPacket = nullptr;
+    chip::System::PacketBufferHandle mPacket;
     HeaderRef mHeader;
     bool mBuildOk = false;
 };

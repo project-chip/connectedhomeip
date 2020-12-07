@@ -108,6 +108,18 @@ public:
     bool operator==(const FullQName & other) const;
     bool operator!=(const FullQName & other) const { return !(*this == other); }
 
+    void Put(chip::BufBound & out) const
+    {
+        SerializedQNameIterator copy = *this;
+        while (copy.Next())
+        {
+
+            out.Put8(static_cast<uint8_t>(strlen(copy.Value())));
+            out.Put(copy.Value());
+        }
+        out.Put8(0); // end of qnames
+    }
+
 private:
     static constexpr size_t kMaxValueSize = 63;
     static constexpr uint8_t kPtrMask     = 0xC0;
