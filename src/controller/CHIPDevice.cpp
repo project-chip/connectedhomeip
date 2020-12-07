@@ -30,6 +30,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/tcp.h>
+#include <lwip/tcpip.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
