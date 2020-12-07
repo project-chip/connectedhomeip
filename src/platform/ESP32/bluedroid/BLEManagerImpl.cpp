@@ -96,8 +96,8 @@ enum
 const esp_gatts_attr_db_t CHIPoBLEGATTAttrs[] = {
     // Service Declaration for Chip over BLE Service
     { { ESP_GATT_AUTO_RSP },
-      { ESP_UUID_LEN_16, (uint8_t *) UUID_PrimaryService, ESP_GATT_PERM_READ, ESP_UUID_LEN_128, ESP_UUID_LEN_128,
-        (uint8_t *) UUID_CHIPoBLEService } },
+      { ESP_UUID_LEN_16, (uint8_t *) UUID_PrimaryService, ESP_GATT_PERM_READ, ESP_UUID_LEN_16, ESP_UUID_LEN_16,
+        (uint8_t *) ShortUUID_CHIPoBLEService } },
 
     // ----- Chip over BLE RX Characteristic -----
 

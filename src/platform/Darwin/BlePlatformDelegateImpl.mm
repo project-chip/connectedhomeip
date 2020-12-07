@@ -28,7 +28,7 @@
 #include <platform/Darwin/BlePlatformDelegate.h>
 #include <support/logging/CHIPLogging.h>
 
-#import <CoreBluetooth/CoreBluetooth.h>
+#import "UUIDHelper.h"
 
 using namespace ::chip;
 using namespace ::chip::Ble;
@@ -46,7 +46,7 @@ namespace DeviceLayer {
             CBPeripheral * peripheral = (CBPeripheral *) connObj;
 
             if (NULL != svcId) {
-                serviceId = [CBUUID UUIDWithData:[NSData dataWithBytes:svcId->bytes length:16]];
+                serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
             }
 
             if (NULL != charId) {
@@ -77,7 +77,7 @@ namespace DeviceLayer {
             CBPeripheral * peripheral = (CBPeripheral *) connObj;
 
             if (NULL != svcId) {
-                serviceId = [CBUUID UUIDWithData:[NSData dataWithBytes:svcId->bytes length:16]];
+                serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
             }
             if (NULL != charId) {
                 characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
@@ -118,7 +118,7 @@ namespace DeviceLayer {
             CBPeripheral * peripheral = (CBPeripheral *) connObj;
 
             if (NULL != svcId) {
-                serviceId = [CBUUID UUIDWithData:[NSData dataWithBytes:svcId->bytes length:16]];
+                serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
             }
             if (NULL != charId) {
                 characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
