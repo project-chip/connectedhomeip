@@ -19,8 +19,8 @@
 
 #include <cstddef>
 
-#include "Constants.h"
-#include "QName.h"
+#include <mdns/minimal/core/Constants.h>
+#include <mdns/minimal/core/QName.h>
 
 #include <support/BufBound.h>
 
@@ -31,8 +31,11 @@ namespace Minimal {
 class ResourceRecord
 {
 public:
+    static constexpr uint64_t kDefaultTtl = 30;
+
     virtual ~ResourceRecord() {}
 
+    const FullQName & GetName() const { return mQName; }
     QClass GetClass() const { return QClass::IN; }
     QType GetType() const { return mType; }
 
@@ -51,15 +54,12 @@ protected:
     /// Output the data portion of the resource record.
     virtual bool WriteData(chip::BufBound & out) const = 0;
 
-    ResourceRecord(QType type, const QNamePart * names, uint16_t namesCount) : mType(type), mQNameCount(namesCount), mQName(names)
-    {}
+    ResourceRecord(QType type, FullQName name) : mType(type), mQName(name) {}
 
 private:
     const QType mType;
-    uint64_t mTtl = 0;
-
-    const uint16_t mQNameCount;
-    const QNamePart * mQName;
+    uint64_t mTtl = kDefaultTtl;
+    const FullQName mQName;
 };
 
 } // namespace Minimal

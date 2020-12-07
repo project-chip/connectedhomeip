@@ -15,6 +15,7 @@
  *    limitations under the License.
  */
 #include <assert.h>
+#include <strings.h>
 
 #include "QName.h"
 
@@ -132,6 +133,39 @@ const uint8_t * SerializedQNameIterator::FindDataEnd()
 
     // invalid data
     return nullptr;
+}
+
+bool SerializedQNameIterator::operator==(const FullQName & other) const
+{
+    SerializedQNameIterator self = *this; // allow iteration
+    size_t idx                   = 0;
+
+    while ((idx < other.nameCount) && self.Next())
+    {
+        if (strcasecmp(self.Value(), other.names[idx]) != 0)
+        {
+            return false;
+        }
+        idx++;
+    }
+
+    return ((idx == other.nameCount) && !self.Next());
+}
+
+bool FullQName::operator==(const FullQName & other) const
+{
+    if (nameCount != other.nameCount)
+    {
+        return false;
+    }
+    for (size_t i = 0; i < nameCount; i++)
+    {
+        if (strcasecmp(names[i], other.names[i]) != 0)
+        {
+            return false;
+        }
+    }
+    return true;
 }
 
 } // namespace Minimal

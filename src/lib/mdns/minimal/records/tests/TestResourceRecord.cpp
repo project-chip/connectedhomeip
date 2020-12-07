@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include <mdns/minimal/ResourceRecord.h>
+#include <mdns/minimal/records/ResourceRecord.h>
 #include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
@@ -26,13 +26,12 @@ namespace {
 using namespace chip;
 using namespace mdns::Minimal;
 
-constexpr uint16_t kTestQnameCount        = 2;
-const char * kTestQnames[kTestQnameCount] = { "foo", "bar" };
+const QNamePart kNames[] = { "foo", "bar" };
 
 class FakeResourceRecord : public ResourceRecord
 {
 public:
-    FakeResourceRecord(const char * data) : ResourceRecord(QType::ANY, kTestQnames, kTestQnameCount), mData(data) {}
+    FakeResourceRecord(const char * data) : ResourceRecord(QType::ANY, kNames), mData(data) {}
 
 protected:
     bool WriteData(chip::BufBound & out) const override
@@ -63,8 +62,8 @@ void CanWriteSimpleRecord(nlTestSuite * inSuite, void * inContext)
         3,    'f',  'o',  'o',  // QNAME part: foo
         3,    'b',  'a',  'r',  // QNAME part: bar
         0,                      // QNAME ends
-        0,    1,                // QClass IN
         0,    255,              // QType ANY (totally fake)
+        0,    1,                // QClass IN
         0x11, 0x22, 0x33, 0x44, // TTL
         0,    8,                // data size
         's',  'o',  'm',  'e',  'd', 'a', 't', 'a',
@@ -99,24 +98,24 @@ void CanWriteMultipleRecords(nlTestSuite * inSuite, void * inContext)
         3,    'f',  'o',  'o',                      // QNAME part: foo
         3,    'b',  'a',  'r',                      // QNAME part: bar
         0,                                          // QNAME ends
-        0,    1,                                    // QClass IN
         0,    255,                                  // QType ANY (totally fake)
+        0,    1,                                    // QClass IN
         0x11, 0x22, 0x33, 0x44,                     // TTL
         0,    8,                                    // data size
         's',  'o',  'm',  'e',  'd', 'a', 't', 'a', //
         3,    'f',  'o',  'o',                      // QNAME part: foo
         3,    'b',  'a',  'r',                      // QNAME part: bar
         0,                                          // QNAME ends
-        0,    1,                                    // QClass IN
         0,    255,                                  // QType ANY (totally fake)
+        0,    1,                                    // QClass IN
         0,    0,    0,    0,                        // TTL
         0,    8,                                    // data size
         'm',  'o',  'r',  'e',  'd', 'a', 't', 'a', //
         3,    'f',  'o',  'o',                      // QNAME part: foo
         3,    'b',  'a',  'r',                      // QNAME part: bar
         0,                                          // QNAME ends
-        0,    1,                                    // QClass IN
         0,    255,                                  // QType ANY (totally fake)
+        0,    1,                                    // QClass IN
         0,    0,    0,    0xFF,                     // TTL
         0,    3,                                    // data size
         'x',  'y',  'z',
@@ -175,9 +174,9 @@ void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
         3,   'f', 'o', 'o', // QNAME part: foo
         3,   'b', 'a', 'r', // QNAME part: bar
         0,                  // QNAME ends
-        0,   1,             // QClass IN
         0,   255,           // QType ANY (totally fake)
-        0,   0,   0,   0,   // TTL
+        0,   1,             // QClass IN
+        0,   0,   0,   30,  // TTL
         0,   8,             // data size
         's', 'o', 'm', 'e', 'd', 'a', 't', 'a',
     };

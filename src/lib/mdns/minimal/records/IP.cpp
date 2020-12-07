@@ -15,29 +15,27 @@
  *    limitations under the License.
  */
 
-#pragma once
-
-#include <inet/IPAddress.h>
-
-#include "ResourceRecord.h"
+#include "IP.h"
 
 namespace mdns {
 namespace Minimal {
 
-class IPResourceRecord : public ResourceRecord
+bool IPResourceRecord::WriteData(chip::BufBound & out) const
 {
-public:
-    IPResourceRecord(const QNamePart * names, uint16_t namesCount, const chip::Inet::IPAddress & ip) :
-        ResourceRecord(ip.IsIPv6() ? QType::AAAA : QType::A, names, namesCount), mIPAddress(ip)
-    {}
+    // IP address is already stored in network byte order. We cannot use
+    // PutBE/PutLE
 
-protected:
-    bool WriteData(chip::BufBound & out) const override;
+    if (mIPAddress.IsIPv6())
+    {
+        out.Put(mIPAddress.Addr, 16);
+    }
+    else
+    {
+        out.Put(mIPAddress.Addr + 3, 4);
+    }
 
-private:
-    const chip::Inet::IPAddress mIPAddress;
-};
+    return out.Fit();
+}
 
 } // namespace Minimal
-
 } // namespace mdns

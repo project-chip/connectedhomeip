@@ -17,9 +17,9 @@
 
 #pragma once
 
-#include "Constants.h"
-#include "DnsHeader.h"
-#include "QName.h"
+#include <mdns/minimal/core/Constants.h>
+#include <mdns/minimal/core/DnsHeader.h>
+#include <mdns/minimal/core/QName.h>
 
 namespace mdns {
 namespace Minimal {
@@ -37,7 +37,7 @@ public:
 
     QType GetType() const { return mType; }
     QClass GetClass() const { return mClass; }
-    bool GetUnicastAnswer() const { return mAnswerViaUnicast; }
+    bool RequestedUnicastAnswer() const { return mAnswerViaUnicast; }
 
     SerializedQNameIterator GetName() const { return mNameIterator; }
 

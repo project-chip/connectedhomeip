@@ -130,6 +130,7 @@ class HeaderRef : public ConstHeaderRef
 {
 public:
     HeaderRef(uint8_t * buffer) : ConstHeaderRef(buffer) {}
+    HeaderRef & operator=(const HeaderRef & other) = default;
 
     HeaderRef & Clear()
     {

@@ -18,11 +18,12 @@ import("//build_overrides/nlunit_test.gni")
 import("${chip_root}/build/chip/chip_test_suite.gni")
 
 chip_test_suite("tests") {
-  output_name = "libMinimalMdnstests"
+  output_name = "LibMinimalMdnsRespondersTests"
 
   test_sources = [
-    "TestQueryReplyFilter.cpp",
-    "TestRecordData.cpp",
+    "TestIPResponder.cpp",
+    "TestPtrResponder.cpp",
+    "TestQueryResponder.cpp",
   ]
 
   cflags = [ "-Wconversion" ]
@@ -30,6 +31,7 @@ chip_test_suite("tests") {
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/mdns/minimal",
+    "${chip_root}/src/lib/mdns/minimal/responders",
     "${nlunit_test_root}:nlunit-test",
   ]
 }
