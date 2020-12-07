@@ -45,7 +45,10 @@ public:
     {
         size_t available = Available();
 
-        memmove(mBuf + mNeeded, buf, available < len ? available : len);
+        if (available > 0)
+        {
+            memmove(mBuf + mNeeded, buf, available < len ? available : len);
+        }
 
         mNeeded += len;
 
