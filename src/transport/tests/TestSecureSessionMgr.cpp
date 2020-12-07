@@ -21,10 +21,9 @@
  *      This file implements unit tests for the SecureSessionMgr implementation.
  */
 
-#include "TestTransportLayer.h"
-
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -54,8 +53,7 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
-                           System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
     {
         System::PacketBufferHandle msg_ForNow;
         msg_ForNow.Adopt(msgBuf);
@@ -152,7 +150,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     // Should be able to send a message to itself by just calling send.
     callback.ReceiveHandlerCallCount = 0;
 
-    err = secureSessionMgr.SendMessage(kDestinationNodeId, buffer.Release_ForNow());
+    err = secureSessionMgr.SendMessage(kDestinationNodeId, std::move(buffer));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 0; });
@@ -218,3 +216,5 @@ int TestSecureSessionMgr()
 
     return (nlTestRunnerStats(&sSuite));
 }
+
+CHIP_REGISTER_TEST_SUITE(TestSecureSessionMgr);

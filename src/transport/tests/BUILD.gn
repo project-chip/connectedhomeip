@@ -21,30 +21,22 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libTransportLayerTests"
 
-  sources = [
+  test_sources = [
     "TestPeerConnections.cpp",
     "TestSecurePairingSession.cpp",
     "TestSecureSession.cpp",
     "TestSecureSessionMgr.cpp",
-    "TestTransportLayer.h",
   ]
 
   cflags = [ "-Wconversion" ]
 
   public_deps = [
-    "${chip_root}/src/inet/tests:tests_common",
+    "${chip_root}/src/inet/tests:helpers",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/transport",
     "${chip_root}/src/transport/raw/tests:helpers",
     "${nlio_root}:nlio",
     "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestPeerConnections",
-    "TestSecurePairingSession",
-    "TestSecureSession",
-    "TestSecureSessionMgr",
   ]
 }

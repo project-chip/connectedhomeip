@@ -38,7 +38,6 @@
 namespace chip {
 namespace Ble {
 
-using ::chip::System::PacketBuffer;
 using ::chip::System::PacketBufferHandle;
 
 enum
@@ -97,7 +96,7 @@ public:
 #endif
 
     // Public functions:
-    BLE_ERROR Send(PacketBuffer * data);
+    BLE_ERROR Send(PacketBufferHandle data);
     BLE_ERROR Receive(PacketBufferHandle data);
     BLE_ERROR StartConnect();
 
@@ -139,11 +138,11 @@ private:
     //
     // Re-used during connection setup to cache capabilities request and response payloads; payloads are freed when
     // connection is established.
-    PacketBuffer * mSendQueue;
+    PacketBufferHandle mSendQueue;
 
     // Pending stand-alone BTP acknolwedgement. Pre-empts regular send queue or fragmented message transmission in
     // progress.
-    PacketBuffer * mAckToSend;
+    PacketBufferHandle mAckToSend;
 
     BtpEngine mBtpEngine;
     BleRole mRole;
@@ -167,13 +166,13 @@ private:
     // Transmit path:
     BLE_ERROR DriveSending();
     BLE_ERROR DriveStandAloneAck();
-    bool PrepareNextFragment(PacketBuffer * data, bool & sentAck);
+    bool PrepareNextFragment(PacketBufferHandle data, bool & sentAck);
     BLE_ERROR SendNextMessage();
     BLE_ERROR ContinueMessageSend();
     BLE_ERROR DoSendStandAloneAck();
-    BLE_ERROR SendCharacteristic(PacketBuffer * buf);
-    bool SendIndication(PacketBuffer * buf);
-    bool SendWrite(PacketBuffer * buf);
+    BLE_ERROR SendCharacteristic(PacketBufferHandle buf);
+    bool SendIndication(PacketBufferHandle buf);
+    bool SendWrite(PacketBufferHandle buf);
 
     // Receive path:
     BLE_ERROR HandleConnectComplete();
@@ -224,7 +223,7 @@ private:
     inline void QueueTxLock() {}
     inline void QueueTxUnlock() {}
 #endif
-    void QueueTx(PacketBuffer * data, PacketType_t type);
+    void QueueTx(PacketBufferHandle data, PacketType_t type);
 };
 
 } /* namespace Ble */

@@ -29,7 +29,6 @@ import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.commissioner.CommissionerActivity
 import com.google.chip.chiptool.echoclient.EchoClientFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
-import com.google.chip.chiptool.provisioning.EnterWifiNetworkFragment
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo

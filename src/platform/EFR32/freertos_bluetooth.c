@@ -34,9 +34,9 @@ void BluetoothUpdate();
 volatile struct gecko_cmd_packet * bluetooth_evt;
 SemaphoreHandle_t BluetoothMutex = NULL;
 
-volatile static uint32_t command_header;
-volatile static void * command_data;
-volatile static gecko_cmd_handler command_handler_func = NULL;
+static volatile uint32_t command_header;
+static volatile void * command_data;
+static volatile gecko_cmd_handler command_handler_func = NULL;
 
 // Bluetooth task
 #ifndef BLUETOOTH_STACK_SIZE

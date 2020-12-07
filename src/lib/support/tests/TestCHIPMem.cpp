@@ -32,7 +32,7 @@
 #include <nlunit-test.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 using namespace chip;
 using namespace chip::Logging;

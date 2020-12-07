@@ -44,8 +44,7 @@ int TestCHIPoBLEStackManager()
 
     chip::DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(1, false);
 
-    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(
-        chip::DeviceLayer::ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
+    chip::DeviceLayer::ConnectivityMgr().SetBLEAdvertisingEnabled(true);
 
     ChipLogProgress(DeviceLayer, "Start Chip Over Ble stack Done");
 

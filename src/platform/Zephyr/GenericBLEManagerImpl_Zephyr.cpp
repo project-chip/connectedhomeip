@@ -609,7 +609,7 @@ bool GenericBLEManagerImpl_Zephyr<ImplClass>::UnsubscribeCharacteristic(BLE_CONN
 
 template <class ImplClass>
 bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                             const ChipBleUUID * charId, PacketBuffer * pBuf)
+                                                             const ChipBleUUID * charId, PacketBufferHandle pBuf)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
     uint8_t index                    = bt_conn_index(conId);
@@ -634,14 +634,12 @@ exit:
         ChipLogError(DeviceLayer, "GenericBLEManagerImpl_Zephyr<ImplClass>::SendIndication() failed: %s", ErrorStr(err));
     }
 
-    PacketBuffer::Free(pBuf);
-
     return err == CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
 bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                               const ChipBleUUID * charId, PacketBuffer * pBuf)
+                                                               const ChipBleUUID * charId, PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return true;
@@ -649,7 +647,7 @@ bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendWriteRequest(BLE_CONNECTION_OB
 
 template <class ImplClass>
 bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                              const ChipBleUUID * charId, PacketBuffer * pBuf)
+                                                              const ChipBleUUID * charId, PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return true;

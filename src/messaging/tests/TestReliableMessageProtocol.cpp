@@ -40,7 +40,7 @@ namespace {
 
 using namespace chip;
 using namespace chip::Inet;
-using namespace chip::messaging;
+using namespace chip::Messaging;
 
 using TestContext = chip::Test::IOContext;
 
@@ -243,7 +243,7 @@ int Finalize(void * aContext)
 } // namespace
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 // Stub implementation
 CHIP_ERROR ReliableMessageManager::SendMessage(ReliableMessageContext * context, System::PacketBuffer * msgBuf, uint16_t sendFlags)
@@ -257,7 +257,7 @@ CHIP_ERROR ReliableMessageManager::SendMessage(ReliableMessageContext * context,
 }
 void ReliableMessageManager::FreeContext(ReliableMessageContext *) {}
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip
 
 /**

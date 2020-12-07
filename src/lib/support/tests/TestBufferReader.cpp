@@ -23,7 +23,7 @@
  */
 
 #include <support/BufferReader.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <type_traits>
 
 #include <nlunit-test.h>

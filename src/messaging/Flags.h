@@ -24,9 +24,10 @@
 #pragma once
 
 #include <stdint.h>
+#include <support/BitFlags.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 /**
  *  @brief
@@ -37,29 +38,32 @@ namespace messaging {
 enum class MessageFlagValues : uint32_t
 {
     /**< Indicates that the existing source node identifier must be reused. */
-    kChipMessageFlag_ReuseSourceId = 0x00000020,
+    kMessageFlag_ReuseSourceId = 0x00000020,
     /**< Indicates that the sending of the message needs to be delayed. */
-    kChipMessageFlag_DelaySend = 0x00000040,
+    kMessageFlag_DelaySend = 0x00000040,
     /**< Indicates that the message buffer should not be freed after sending. */
-    kChipMessageFlag_RetainBuffer = 0x00000080,
+    kMessageFlag_RetainBuffer = 0x00000080,
     /**< Indicates that the CHIP message is already encoded. */
-    kChipMessageFlag_MessageEncoded = 0x00001000,
+    kMessageFlag_MessageEncoded = 0x00001000,
     /**< Indicates that default IPv6 source address selection should be used when sending IPv6 multicast messages. */
-    kChipMessageFlag_DefaultMulticastSourceAddress = 0x00002000,
+    kMessageFlag_DefaultMulticastSourceAddress = 0x00002000,
     /**< Indicates that the sender of the  message requested an acknowledgment. */
-    kChipMessageFlag_PeerRequestedAck = 0x00004000,
+    kMessageFlag_PeerRequestedAck = 0x00004000,
     /**< Indicates that the message is a duplicate of a previously received message. */
-    kChipMessageFlag_DuplicateMessage = 0x00008000,
+    kMessageFlag_DuplicateMessage = 0x00008000,
     /**< Indicates that the peer's group key message counter is not synchronized. */
-    kChipMessageFlag_PeerGroupMsgIdNotSynchronized = 0x00010000,
+    kMessageFlag_PeerGroupMsgIdNotSynchronized = 0x00010000,
     /**< Indicates that the source of the message is the initiator of the CHIP exchange. */
-    kChipMessageFlag_FromInitiator = 0x00020000,
+    kMessageFlag_FromInitiator = 0x00020000,
     /**< Indicates that message is being sent/received via the local ephemeral UDP port. */
-    kChipMessageFlag_ViaEphemeralUDPPort = 0x00040000,
+    kMessageFlag_ViaEphemeralUDPPort = 0x00040000,
 };
+
+using MessageFlags = BitFlags<uint32_t, MessageFlagValues>;
 
 enum class SendMessageFlags : uint16_t
 {
+    kSendFlag_None = 0x0000,
     /**< Used to indicate that automatic retransmission is enabled. */
     kSendFlag_AutoRetrans = 0x0001,
     /**< Used to indicate that a response is expected within a specified timeout. */
@@ -82,5 +86,7 @@ enum class SendMessageFlags : uint16_t
     kSendFlag_NoAutoRequestAck = 0x0800,
 };
 
-} // namespace messaging
+using SendFlags = BitFlags<uint16_t, SendMessageFlags>;
+
+} // namespace Messaging
 } // namespace chip

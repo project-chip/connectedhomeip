@@ -2,6 +2,7 @@
     "name": "CHIP templates",
     "version": "chip-v1",
     "helpers": ["helper-chip.js"],
+    "override": "override.js",
     "templates": [
         {
             "path": "af-structs.zapt",
@@ -47,6 +48,11 @@
             "path": "callback.zapt",
             "name": "ZCL callback header",
             "output": "callback.h"
+        },
+        {
+            "path": "client-command-macro.zapt",
+            "name": "ZCL client command",
+            "output": "client-command-macro.h"
         },
         {
             "path": "cluster-id.zapt",

@@ -1,268 +1,325 @@
-# CHIP nRF Connect nRF52840 Pigweed Example Application
+# CHIP nRF Connect Pigweed Example Application
 
-An example application showing the use
-[CHIP](https://github.com/project-chip/connectedhomeip) on the Nordic nRF52840.
+The nRF Connect Pigweed Example demonstrates the usage of Pigweed module
+functionalities in an application.
+
+The example is based on [CHIP](https://github.com/project-chip/connectedhomeip),
+the [Pigweed](https://pigweed.googlesource.com/pigweed/pigweed) module, which is
+a collection of libraries that provide different functionalities for embedded
+systems, and the nRF Connect platform.
+
+You can use this example as a training ground for making experiments, testing
+Pigweed module features and checking what actions are necessary to fully
+integrate Pigweed in a CHIP project.
+
+Pigweed functionalities are being gradually integrated into CHIP. Currently, the
+following features are available:
+
+-   **Echo RPC** - Creates a Remote Procedure Call server and allows sending
+    commands through the serial port to the device, which makes echo and sends
+    the received commands back.
 
 <hr>
 
--   [CHIP nRF52840 Pigweed Example Application](#chip-nrf52840-pigweed-example-application)
-    -   [Introduction](#introduction)
-    -   [Building](#building)
-        -   [Using Docker container](#using-docker-container)
-        -   [Using Native shell](#using-native-shell)
-        -   [Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
-    -   [Configuring the example](#configuring-the-example)
-    -   [Flashing and debugging](#flashing-and-debugging)
-        -   [Flashing nRF52840 DK](#nrf52840dk_flashing)
-        -   [Flashing nRF52840 Dongle](#nrf52840dongle_flashing)
-    -   [Currently implemented features](#currently-implemented-features)
+-   [Overview](#overview)
+-   [Requirements](#requirements)
+-   [Device UI](#device-ui)
+-   [Setting up the environment](#setting-up-the-environment)
+    -   [Using Docker container for setup](#using-docker-container-for-setup)
+    -   [Using native shell for setup](#using-native-shell-for-setup)
+-   [Building](#building)
+-   [Configuring the example](#configuring-the-example)
+-   [Flashing and debugging](#flashing-and-debugging)
+    -   [Flashing on the nRF52840 DK](#nrf52840dk_flashing)
+    -   [Flashing on the nRF52840 Dongle](#nrf52840dongle_flashing)
+-   [Testing the example](#testing-the-example)
 
 <hr>
 
-<a name="intro"></a>
+<a name="overview"></a>
 
-## Introduction
+## Overview
 
-![nrf52840 DK](../../platform/nrf528xx/doc/images/nrf52840-dk.jpg)
+This example is running on the nRF Connect platform, which is based on the
+[nRF Connect SDK](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/index.html)
+and [Zephyr RTOS](https://zephyrproject.org/). Visit CHIP's
+[nRF Connect platform overview](../../../docs/guides/nrfconnect_platform_overview.md)
+to read more about the platform structure and dependencies.
 
-The nRF52840 Pigweed example app exercises functionalities in
-third_party/pigweed, to see what is needed for integrating Pigweed to CHIP, as
-well as a precursor to CHIP functionalities like on-device testing.
+Pigweed libraries are built and organized in a way that enables faster and more
+reliable development. In the CHIP project, the Pigweed module is planned to be
+used to create system infrastructures, for example for performing on-device
+tests, but considering its general functionalities, it can be useful also in
+other cases.
 
-The example makes use of the CMake build system to generate the ninja build
-script. The build system takes care of invoking the CHIP library build with all
-necessary flags exported from the Zephyr environment.
+<hr>
+
+<a name="requirements"></a>
+
+## Requirements
+
+The application requires the nRF Connect SDK v1.4.0 to work correctly.
+
+The example supports building and running on the following devices:
+
+| Board name                                                                                        | Board platform build name |
+| ------------------------------------------------------------------------------------------------- | ------------------------- |
+| [nRF52840 Dongle](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF52840-Dongle) | `nrf52840dongle_nrf52840` |
+| [nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)         | `nrf52840dk_nrf52840`     |
+
+<hr>
+
+<a name="device-ui"></a>
+
+## Device UI
+
+This section lists the User Interface elements that you can use to control and
+monitor the state of the device.
+
+**LED 1** shows the overall state of the device. The following states are
+possible:
+
+-   _Solid On_ &mdash; The application was flashed and ran successfully.
+
+**Serial port** can be used to communicate with the device by sending commands
+and receiving responses.
+
+> **Important**:
+>
+> Please note that supported hardware platforms are using different transport
+> interfaces to perform serial communication, which leads to differences in
+> configuration. By default, these interfaces are used:
+>
+> -   `nrf52840dk_nrf52840` - UART interface routed to the SEGGER J-Link USB
+>     port.
+> -   `nrf52840dongle_nrf52840` - USB interface routed to the USB port.
+
+<hr>
+
+## Setting up the environment
+
+Before building the example, check out the CHIP repository and sync submodules
+using the following command:
+
+        $ git submodule update --init
+
+The example requires the nRF Connect SDK v1.4.0. You can either install it along
+with the related tools directly on your system or use a Docker image that has
+the tools pre-installed.
+
+If you are a macOS user, you won't be able to use the Docker container to flash
+the application onto a Nordic board due to
+[certain limitations of Docker for macOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container).
+Use the [native shell](#using-native-shell) for building instead.
+
+### Using Docker container for setup
+
+To use the Docker container for setup, complete the following steps:
+
+1.  If you do not have the nRF Connect SDK installed yet, create a directory for
+    it by running the following command:
+
+        $ mkdir ~/nrfconnect
+
+2.  Download the latest version of the nRF Connect SDK Docker image by running
+    the following command:
+
+        $ docker pull nordicsemi/nrfconnect-chip
+
+3.  Start Docker with the downloaded image by running the following command,
+    customized to your needs as described below:
+
+         $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
+             -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
+
+    In this command:
+
+    -   _~/nrfconnect_ can be replaced with an absolute path to the nRF Connect
+        SDK source directory.
+    -   _~/connectedhomeip_ must be replaced with an absolute path to the CHIP
+        source directory.
+    -   _-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:_ rmw"\*
+        parameters can be omitted if you are not planning to flash the example
+        onto hardware. These parameters give the container access to USB devices
+        connected to your computer such as the nRF52840 DK.
+    -   _--rm_ can be omitted if you do not want the container to be
+        auto-removed when you exit the container shell session.
+    -   _-e RUNAS=\$(id -u)_ is needed to start the container session as the
+        current user instead of root.
+
+4.  Check out or update the nRF Connect SDK to the recommended `v1.4.0` version
+    by running the following command in the Docker container:
+
+         $ setup --ncs v1.4.0
+         /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [v1.4.0]? [Y/N] y
+         ...
+         /var/chip repository is initialized, skipping...
+
+Now you can proceed with the [Building](#building) instruction.
+
+### Using native shell for setup
+
+To use the native shell for setup, complete the following steps:
+
+1.  Download and install the following additional software:
+
+    -   [nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools)
+    -   [GN meta-build system](https://gn.googlesource.com/gn/)
+
+2.  Depending on whether you have the nRF Connect SDK installed:
+
+    -   Follow the
+        [guide](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_assistant.html#)
+        in the nRF Connect SDK documentation to install the nRF Connect SDK
+        v1.4.0. Since command-line tools will be used for building the example,
+        installing SEGGER Embedded Studio is not required.
+
+    -   If you have an older version of the SDK installed, use the following
+        commands to update it to the recommended version. Replace
+        _nrfconnect-dir_ with the path to your nRF Connect SDK installation
+        directory.
+
+               $ cd nrfconnect-dir/nrf
+               $ git fetch origin
+               $ git checkout v1.4.0
+               $ west update
+
+3.  Initialize environment variables referred to by the CHIP and the nRF Connect
+    SDK build scripts. Replace _nrfconnect-dir_ with the path to your nRF
+    Connect SDK installation directory, and _toolchain-dir_ with the path to GNU
+    Arm Embedded Toolchain.
+
+         $ source nrfconnect-dir/zephyr/zephyr-env.sh
+         $ export ZEPHYR_TOOLCHAIN_VARIANT=gnuarmemb
+         $ export GNUARMEMB_TOOLCHAIN_PATH=toolchain-dir
+
+Now you can proceed with the [Building](#building) instruction.
+
+<hr>
 
 <a name="building"></a>
 
 ## Building
 
-### Using Docker container
+Complete the following steps, regardless of the method used for setting up the
+environment:
 
-> **Important**:
->
-> Due to
-> [certain limitations of Docker for MacOS](https://docs.docker.com/docker-for-mac/faqs/#can-i-pass-through-a-usb-device-to-a-container)
-> it is impossible to use the Docker container to communicate with a USB device
-> such as nRF 52840 DK. Therefore, MacOS users are advised to follow the
-> [Using Native shell](#using-native-shell) instruction.
+1.  Run the `activate.sh` script, regardless of the building strategy. The
+    script is required for building the Pigweed library. Use the following
+    command:
 
-The easiest way to get started with the example is to use nRF Connect SDK Docker
-image for CHIP applications. Run the following commands to start a Docker
-container:
+            $ source scripts/activate.sh
 
-        $ mkdir ~/nrfconnect
-        $ mkdir ~/connectedhomeip
-        $ docker pull nordicsemi/nrfconnect-chip
-        $ docker run --rm -it -e RUNAS=$(id -u) -v ~/nrfconnect:/var/ncs -v ~/connectedhomeip:/var/chip \
-            -v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule "c 189:* rmw" nordicsemi/nrfconnect-chip
+2.  Navigate to the example's directory:
 
-> **Note**:
->
-> -   `~/nrfconnect` can be replaced with an absolute path to nRF Connect SDK
->     source directory in case you have it already installed.
-> -   Likewise, `~/connectedhomeip` can be replaced with an absolute path to
->     CHIP source directory.
-> -   `-v /dev/bus/usb:/dev/bus/usb --device-cgroup-rule 'c 189:* rmw`
->     parameters can be omitted if you're not planning to flash the example onto
->     hardware. The parameters give the container access to USB devices
->     connected to your computer such as the nRF52840 DK or nRF52840 Dongle.
-> -   `--rm` flag can be omitted if you don't want the container to be
->     auto-removed when you exit the container shell session.
-> -   `-e RUNAS=$(id -u)` is needed to start the container session as the
->     current user instead of root.
+        $ cd examples/pigweed-app/nrfconnect
 
-If you use the container for the first time and you don't have nRF Connect SDK
-and CHIP sources downloaded yet, run `setup` command in the container to pull
-the sources into directories mounted as `/var/ncs` and `/var/chip`,
-respectively:
+3.  Run the following command to build the example, with _board-name_ replaced
+    with the name of the Nordic Semiconductor's board you own, for example
+    `nrf52840dk_nrf52840`:
 
-        $ setup --ncs v1.4.0
-        /var/ncs repository is empty. Do you wish to check out nRF Connect SDK sources [v1.4.0]? [Y/N] y
-        ...
-        /var/chip repository is empty. Do you wish to check out Project CHIP sources [master]? [Y/N] y
-        ...
+         $ west build -b board-name
 
-It is important to remember about running activate.sh script, as it is necessary
-to build Pigweed library and it can be done, by typing following command:
+    You only need to specify the board name on the first build. See
+    [Requirements](#requirements) for the names of compatible boards.
 
-        $ source scripts/activate.sh
+The output `zephyr.hex` file will be available in the `build/zephyr/` directory.
 
-Now you may build the example by running the commands below in the Docker
-container:
+### Removing build artifacts
 
-        $ cd /var/chip/examples/pigweed-app/nrfconnect
-        $ west build -b <board_name>
+If you're planning to build the example for a different board or make changes to
+the configuration, remove all build artifacts before building. To do so, use the
+following command:
 
-> **Note**:
->
-> -   `<board_name>` has to be replaced with a board name which might be
->     nrf52840dk_nrf52840 for development kit board or nrf52840dongle_nrf52840
->     for dongle board.
+    $ rm -r build
 
-If the build succeeds, the binary will be available under
-`/var/chip/examples/pigweed-app/nrfconnect/build/zephyr/zephyr.hex`. Note that
-other operations described in this document like flashing or debugging can also
-be done in the container.
-
-### Using native shell
-
-Before building the example,
-[download the nRF Connect SDK and install all requirements](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html).
-Please read the
-[Supported nRF Connect SDK versions](#supported-nrf-connect-sdk-versions)
-section to learn which version to use to avoid unexpected compatibility issues.
-
-If you don't want to use SEGGER Embedded Studio, you may skip the part about
-installing and configuring it.
-
-Download and install the
-[nRF Command Line Tools](https://www.nordicsemi.com/Software-and-Tools/Development-Tools/nRF-Command-Line-Tools).
-
-Download and install [GN meta-build system](https://gn.googlesource.com/gn/).
-
-Make sure that you source the following file:
-
-        $ source <ncs-dir>/zephyr/zephyr-env.sh
-
-> **Note:**
->
-> Ensure that `$ZEPHYR_BASE`, `$GNUARMEMB_TOOLCHAIN_PATH`, and
-> `$ZEPHYR_TOOLCHAIN_VARIANT` environment variables are set in your current
-> terminal before building. `$GNUARMEMB_TOOLCHAIN_PATH` and
-> `$ZEPHYR_TOOLCHAIN_VARIANT` must be set manually.
-
-Make sure that you run activate.sh script, as it is necessary to build Pigweed
-library and it can be done, by typing following command:
-
-        $ source scripts/activate.sh
-
-After your environment is set up, you are ready to build the example. The
-recommended tool for building and flashing the device is
-[west](https://docs.zephyrproject.org/latest/guides/west/).
-
-The following commands will build the `pigweed-app` example:
-
-        $ cd ~/connectedhomeip/examples/pigweed-app/nrfconnect
-
-        # If this is a first time build or if `build` directory was deleted
-        $ west build -b <board_name>
-
-        # Any subsequent build
-        $ west build
-
-> **Note**:
->
-> -   `<board_name>` has to be replaced with a board name which might be
->     nrf52840dk_nrf52840 for development kit board or nrf52840dongle_nrf52840
->     for dongle board.
-
-After a successful build, the binary will be available under
-`<example-dir>/build/zephyr/zephyr.hex`
-
-### Supported nRF Connect SDK versions
-
-It is recommended to use the nRF Connect version which is being verified as a
-part of CHIP Continuous Integration testing, which happens to be `v1.4.0` at the
-moment. You may verify that the revision is used in
-[chip-build-nrf-platform](https://github.com/project-chip/connectedhomeip/blob/master/integrations/docker/images/chip-build-nrf-platform/Dockerfile)
-Docker image in case of doubt.
-
-Please refer to
-[this section](https://developer.nordicsemi.com/nRF_Connect_SDK/doc/latest/nrf/gs_installing.html#updating-the-repositories)
-in the user guide to learn how to update nRF Connect SDK repository. For example
-to checkout given `v1.4.0` revision the following commands should be called:
-
-        # Phrase <nrfconnect-dir> should be replaced with an absolute path to nRF Connect SDK source directory.
-        $ cd <nrfconnect-dir>/nrf
-
-        $ git fetch origin
-        $ git checkout v1.4.0
-        $ west update
-
-Alternatively, if you use the docker container, you may execute the following
-command instead:
-
-        $ setup --ncs v1.4.0
+<hr>
 
 <a name="configuring"></a>
 
 ## Configuring the example
 
-The Zephyr ecosystem is higly configurable and allows the user to modify many
-aspects of the application. The configuration system is based on `Kconfig` and
-the settings can be modified using the `menuconfig` utility.
+The Zephyr ecosystem is highly configurable and allows you to modify many
+aspects of the application. The configuration system is based on Kconfig files
+and the settings can be modified using the menuconfig utility.
 
-To open the configuration menu, do the following:
+To open the menuconfig utility, complete the following steps:
 
-        $ cd <example-dir>
-        # First time build
-        $ west build -b <board_name> -t menuconfig
+1.  Go to the example directory by running the following command, with the
+    _example-dir_ directory name updated for your configuration:
 
-        # Any subsequent build
-        $ west build -t menuconfig
+         $ cd example-dir
 
-        # Running menuconfig with ninja
-        $ cd <example-dir>/build
-        $ ninja menuconfig
+2.  Choose one of the following options:
 
-> **Note**:
->
-> -   `<board_name>` has to be replaced with a board name which might be
->     nrf52840dk_nrf52840 for development kit board or nrf52840dongle_nrf52840
->     for dongle board.
+    -   If you are running the build for the first time, run the following
+        command:
 
-Changes done with `menuconfig` will be lost, if the `build` directory is
-deleted. To make them persistent, save the configuration options in `prj.conf`
-file.
+               $ west build -b nrf52840dk_nrf52840 -t menuconfig
+
+    -   If you are running a subsequent build, run the following command:
+
+               $ west build -t menuconfig
+
+    -   If you are running menuconfig with ninja, run the following commands:
+
+               $ cd example-dir/build
+               $ ninja menuconfig
+
+Changes done with menuconfig will be lost if the `build` directory is deleted.
+To make them persistent, save the configuration options in the `prj.conf` file.
+
+For more information, see the
+[Configuring nRF Connect SDK examples](../../../docs/guides/nrfconnect_examples_configuration.md)
+page.
+
+<hr>
 
 <a name="flashing"></a>
 
 ## Flashing and debugging
 
-The example application is designed to run on the
-[Nordic nRF52840 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52840-DK)
-development kit board or
-[Nordic nRF52840 Dongle](https://www.nordicsemi.com/Software-and-tools/Development-Kits/nRF52840-Dongle)
-board.
+The flashing and debugging procedure is different for the nRF52840 DK and the
+nRF52840 Dongle.
 
 <a name="nrf52840dk_flashing"></a>
 
-### Flashing nRF52840 DK
+### Flashing on the nRF52840 DK
 
-To flash the application to the device, use the `west` tool:
+To flash the application to the device, use the west tool and run the following
+commands, with the _example-dir_ directory name updated for your configuration:
 
-        $ cd <example-dir>
+        $ cd example-dir
         $ west flash
 
-If you have multiple nRF52840 DK boards connected, `west` will prompt you to
-pick the correct one.
+If you have multiple nRF52840 DK boards connected, west will prompt you to pick
+the correct one.
 
-To debug the application on target:
+To debug the application on target, run the following commands:
 
-        $ cd <example-dir>
+        $ cd example-dir
         $ west debug
 
 <a name="nrf52840dongle_flashing"></a>
 
-### Flashing nRF52840 Dongle
+### Flashing on the nRF52840 Dongle
 
 Visit
 [Programming and Flashing nRF52840 Dongle](https://docs.zephyrproject.org/latest/boards/arm/nrf52840dongle_nrf52840/doc/index.html#programming-and-debugging)
-to read detailed information on this and other board related topics.
+to read more about flashing on the nRF52840 Dongle.
+
+<hr>
 
 <a name="currently-implemented-features"></a>
 
-## Currently implemented features
+## Testing the example
 
-### Echo RPC:
+Run the following command to start an interactive Python shell, where the Echo
+RPC commands can be invoked:
 
-```
-python -m pw_hdlc_lite.rpc_console --device /dev/ttyACM0 -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
-```
+        python -m pw_hdlc_lite.rpc_console --device /dev/ttyACM0 -b 115200 $CHIP_ROOT/third_party/pigweed/repo/pw_rpc/pw_rpc_protos/echo.proto -o /tmp/pw_rpc.out
 
-will start an interactive python shell where Echo RPC can be invoked as
+To send an Echo RPC message, type the following command, where the actual
+message is the text in quotation marks after the `msg=` phrase:
 
-```
-rpcs.pw.rpc.EchoService.Echo(msg="hi")
-```
+        rpcs.pw.rpc.EchoService.Echo(msg="hi")

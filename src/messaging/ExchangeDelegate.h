@@ -27,6 +27,7 @@
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
+namespace Messaging {
 
 class ExchangeContext;
 
@@ -74,4 +75,5 @@ public:
     virtual void OnExchangeClosing(ExchangeContext * ec) {}
 };
 
+} // namespace Messaging
 } // namespace chip

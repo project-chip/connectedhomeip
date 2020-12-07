@@ -22,11 +22,12 @@
  *
  */
 
-#include "TestQRCode.h"
 #include "TestHelpers.h"
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
+
+#include <support/UnitTestRegistration.h>
 
 using namespace chip;
 using namespace std;
@@ -354,3 +355,5 @@ int TestQuickResponseCode()
 
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestQuickResponseCode);
