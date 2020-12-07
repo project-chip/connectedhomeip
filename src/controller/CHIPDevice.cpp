@@ -109,6 +109,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     serializable.mInterfaceId = 0;
 #else
     nlSTATIC_ASSERT_PRINT(sizeof(serializable.mInterfaceId) >= sizeof(mInterface), "Size of network interface ID must fit");
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/3762
     serializable.mInterfaceId = Encoding::LittleEndian::HostSwap64(mInterface);
 #endif
     nlSTATIC_ASSERT_PRINT(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN,
