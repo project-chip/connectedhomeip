@@ -33,18 +33,11 @@ bool ResourceRecord::Append(HeaderRef & hdr, ResourceType asType, chip::BufBound
         return false;
     }
 
-    // Write all QName parts
-    for (uint16_t i = 0; i < mQNameCount; i++)
-    {
-
-        out.Put8(strlen(mQName[i]));
-        out.Put(mQName[i]);
-    }
-    out.Put8(0); // end of qnames
+    mQName.Output(out);
 
     out                                             //
-        .PutBE16(static_cast<uint16_t>(GetClass())) //
         .PutBE16(static_cast<uint16_t>(GetType()))  //
+        .PutBE16(static_cast<uint16_t>(GetClass())) //
         .PutBE32(static_cast<uint32_t>(GetTtl()))   //
         ;
 
