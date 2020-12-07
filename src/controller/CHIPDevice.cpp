@@ -105,9 +105,10 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
-    VerifyOrExit(CHIP_NO_ERROR ==
-                     Inet::GetInterfaceName(mInterface, serializable.mInterfaceName, sizeof(serializable.mInterfaceName)),
-                 error = CHIP_ERROR_INTERNAL);
+    VerifyOrExit(
+        CHIP_NO_ERROR ==
+            Inet::GetInterfaceName(mInterface, Uint8::to_char(serializable.mInterfaceName), sizeof(serializable.mInterfaceName)),
+        error = CHIP_ERROR_INTERNAL);
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
@@ -158,7 +159,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         LOCK_TCPIP_CORE();
 #endif
-        INET_ERROR inetErr = Inet::InterfaceNameToId(serializable.mInterfaceName, mInterface);
+        INET_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), mInterface);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
         UNLOCK_TCPIP_CORE();
 #endif
