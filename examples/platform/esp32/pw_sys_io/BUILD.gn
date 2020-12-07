@@ -1,4 +1,4 @@
-# Copyright (c) 2020 Project CHIP Authors
+# Copyright (c) 2021 Project CHIP Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,25 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Options from standalone-chip.mk that differ from configure defaults. These
-# options are used from examples/.
+import("//build_overrides/pigweed.gni")
 
-import("//build_overrides/chip.gni")
-
-import("${chip_root}/build/chip/tests.gni")
-
-declare_args() {
-  chip_build_pw_rpc_lib = false
+import("$dir_pw_build/target_types.gni")
+config("default_config") {
+  include_dirs = [ "public" ]
 }
 
-group("esp32") {
-  deps = [ "${chip_root}/src/lib" ]
-
-  if (chip_build_pw_rpc_lib) {
-    deps += [ "//lib/pw_rpc" ]
-  }
-
-  if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
-  }
+pw_source_set("pw_sys_io_esp32") {
+  public_configs = [ ":default_config" ]
+  deps = [
+    "$dir_pw_sys_io:default_putget_bytes",
+    "$dir_pw_sys_io:facade",
+  ]
+  sources = [ "sys_io_esp32.cc" ]
 }
