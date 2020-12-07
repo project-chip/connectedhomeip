@@ -115,7 +115,9 @@ public:
 
     /**
      * @brief
-     *   Send a message to a currently connected peer
+     *   Send a message to a currently connected peer, msgBuf->Start() points to the packet being transmitted and
+     *   msgBuf->DataLength() is its length in octets. Those values are stored before sending the packet and need
+     *   to be rewinded back after sending the packet so that msgBuf can be re-used for re-transmission.
      */
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
     CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf);

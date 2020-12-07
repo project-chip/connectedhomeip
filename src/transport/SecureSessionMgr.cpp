@@ -120,6 +120,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         uint8_t * p    = nullptr;
         uint16_t len   = 0;
         PacketHeader packetHeader;
+        System::PacketBufferHandle retainedBuf;
         MessageAuthenticationCode mac;
 
         const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
