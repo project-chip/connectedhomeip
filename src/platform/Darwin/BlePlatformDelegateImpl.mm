@@ -32,7 +32,7 @@
 
 using namespace ::chip;
 using namespace ::chip::Ble;
-using ::chip::System::PacketBuffer;
+using ::chip::System::PacketBufferHandle;
 
 namespace chip {
 namespace DeviceLayer {
