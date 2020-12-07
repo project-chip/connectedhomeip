@@ -213,23 +213,23 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
     QuerySplitter query;
     query.Split(gOptions.query);
 
+    mdns::Minimal::QueryBuilder builder(std::move(buffer));
+
+    builder.Header().SetMessageId(kTestMessageId);
+    builder.AddQuery(query
+                         .MdnsQuery()                                  //
+                         .SetClass(mdns::Minimal::QClass::IN)          //
+                         .SetType(gOptions.type)                       //
+                         .SetAnswerViaUnicast(gOptions.unicastAnswers) //
+    );
+
+    if (!builder.Ok())
     {
-        mdns::Minimal::QueryBuilder builder(buffer);
-
-        builder.Header().SetMessageId(kTestMessageId);
-        builder.AddQuery(query.MdnsQuery()
-                             .SetClass(mdns::Minimal::QClass::IN)
-                             .SetType(mdns::Minimal::QType::ANY)
-                             .SetAnswerViaUnicast(gOptions.unicastAnswers));
-
-        if (!builder.Ok())
-        {
-            printf("Failed to build the question");
-            return;
-        }
+        printf("Failed to build the question");
+        return;
     }
 
-    if (server->BroadcastSend(buffer.Release_ForNow(), gOptions.querySendPort) != CHIP_NO_ERROR)
+    if (server->BroadcastSend(builder.ReleasePacket(), gOptions.querySendPort) != CHIP_NO_ERROR)
     {
         printf("Error sending\n");
         return;
