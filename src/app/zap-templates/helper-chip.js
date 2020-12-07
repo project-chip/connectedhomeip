@@ -178,13 +178,44 @@ function asReadType(type)
   return templateUtil.templatePromise(this.global, promise)
 }
 
+/**
+ * Returns CHIP specific type for ZCL framework
+ * This function is flawed since it relies on the
+ * type label for CHIP type conversion. CHIP specific XML should have the
+ * correct type directly embedded inside.
+ *
+ * @param {*} label : The xml label of the type.
+ * @param {*} type : The xml type to be converted
+ */
+function asChipUnderlyingType(label, type)
+{
+
+  if (zclHelper.isStrEqual(label, "endpoint")) {
+    return 'chip::EndpointId'
+  } else if (zclHelper.isStrEqual(label, "endpointId")) {
+    return 'chip::EndpointId'
+  } else if (zclHelper.isStrEqual(type, "CLUSTER_ID")) {
+    return 'chip::ClusterId'
+  } else if (zclHelper.isStrEqual(type, "ATTRIBUTE_ID")) {
+    return 'chip::AttributeId'
+  } else if (zclHelper.isStrEqual(label, "groupId")) {
+    return 'chip::GroupId'
+  } else if (zclHelper.isStrEqual(label, "commandId")) {
+    return 'chip::CommandId'
+  } else {
+    // Might want to use asUnderlyingZclType instead. TBD
+    return cHelper.asUnderlyingType.call(this, type)
+  }
+}
+
 // WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 //
 // Note: these exports are public API. Templates that might have been created in the past and are
 // available in the wild might depend on these names.
 // If you rename the functions, you need to still maintain old exports list.
-exports.chip_header         = chip_header;
-exports.isString            = isString;
-exports.asReadType          = asReadType;
-exports.asReadTypeLength    = asReadTypeLength;
-exports.asValueIfNotPresent = asValueIfNotPresent;
+exports.chip_header          = chip_header;
+exports.isString             = isString;
+exports.asReadType           = asReadType;
+exports.asReadTypeLength     = asReadTypeLength;
+exports.asValueIfNotPresent  = asValueIfNotPresent;
+exports.asChipUnderlyingType = asChipUnderlyingType;
