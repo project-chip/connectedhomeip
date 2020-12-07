@@ -28,7 +28,7 @@ namespace Minimal {
 class QueryBuilder
 {
 public:
-    QueryBuilder(chip::System::PacketBufferHandle packet) : mPacket(std::move(packet)), mHeader(mPacket->Start())
+    QueryBuilder(const chip::System::PacketBufferHandle & packet) : mPacket(packet), mHeader(mPacket->Start())
     {
 
         if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
@@ -69,7 +69,7 @@ public:
     bool Ok() const { return mQueryBuidOk; }
 
 private:
-    chip::System::PacketBufferHandle mPacket;
+    const chip::System::PacketBufferHandle & mPacket;
     HeaderRef mHeader;
     bool mQueryBuidOk = true;
 };
