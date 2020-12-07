@@ -106,6 +106,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/4106
     serializable.mInterfaceId = 0;
 #else
     static_assert(sizeof(serializable.mInterfaceId) >= sizeof(mInterface), "Size of network interface ID must fit");
@@ -157,6 +158,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     // We cannot deserialize interface ID for CHIP builds with LWIP stack.
     // Inteface ID for LWIP stack points to a `netif` structure, instead of an interface ID.
+    // TODO: https://github.com/project-chip/connectedhomeip/issues/4106
     mInterface = INET_NULL_INTERFACEID;
 #else
     mInterface                = static_cast<Inet::InterfaceId>(Encoding::LittleEndian::HostSwap64(serializable.mInterfaceId));
