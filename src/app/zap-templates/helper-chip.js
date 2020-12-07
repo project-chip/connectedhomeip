@@ -187,7 +187,8 @@ function asReadType(type)
  * @param {*} label : The xml label of the type.
  * @param {*} type : The xml type to be converted
  */
-function asChipUnderlyingType(label, type) {
+function asChipUnderlyingType(label, type)
+{
 
   if (zclHelper.isStrEqual(label, "endpoint")) {
     return 'chip::EndpointId'
@@ -212,9 +213,9 @@ function asChipUnderlyingType(label, type) {
 // Note: these exports are public API. Templates that might have been created in the past and are
 // available in the wild might depend on these names.
 // If you rename the functions, you need to still maintain old exports list.
-exports.chip_header         = chip_header;
-exports.isString            = isString;
-exports.asReadType          = asReadType;
-exports.asReadTypeLength    = asReadTypeLength;
-exports.asValueIfNotPresent = asValueIfNotPresent;
+exports.chip_header          = chip_header;
+exports.isString             = isString;
+exports.asReadType           = asReadType;
+exports.asReadTypeLength     = asReadTypeLength;
+exports.asValueIfNotPresent  = asValueIfNotPresent;
 exports.asChipUnderlyingType = asChipUnderlyingType;
