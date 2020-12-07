@@ -97,8 +97,8 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     uint16_t serializedLen = 0;
     SerializableDevice serializable;
 
-    nlSTATIC_ASSERT_PRINT(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner),
-                          "Size of serializable should be <= size of output");
+    static_assert(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner),
+                  "Size of serializable should be <= size of output");
 
     CHIP_ZERO_AT(serializable);
 
@@ -108,12 +108,11 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     serializable.mInterfaceId = 0;
 #else
-    nlSTATIC_ASSERT_PRINT(sizeof(serializable.mInterfaceId) >= sizeof(mInterface), "Size of network interface ID must fit");
+    static_assert(sizeof(serializable.mInterfaceId) >= sizeof(mInterface), "Size of network interface ID must fit");
     // TODO: https://github.com/project-chip/connectedhomeip/issues/3762
     serializable.mInterfaceId = Encoding::LittleEndian::HostSwap64(mInterface);
 #endif
-    nlSTATIC_ASSERT_PRINT(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN,
-                          "Size of device address must fit within INET6_ADDRSTRLEN");
+    static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
@@ -269,7 +268,7 @@ void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback
     CallbackInfo info                 = { endpoint, cluster };
     Callback::Cancelable * cancelable = onResponse->Cancel();
 
-    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+    static_assert(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
 
     cancelable->mInfoScalar = 0;
     memmove(&cancelable->mInfoScalar, &info, sizeof(info));
@@ -281,7 +280,7 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::
     CallbackInfo info                 = { endpoint, cluster };
     Callback::Cancelable * cancelable = onReport->Cancel();
 
-    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+    static_assert(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
 
     cancelable->mInfoScalar = 0;
     memmove(&cancelable->mInfoScalar, &info, sizeof(info));
