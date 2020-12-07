@@ -23,7 +23,7 @@
 + (CBUUID *)GetShortestServiceUUID:(const chip::Ble::ChipBleUUID *)svcId
 {
     // shorten the 16-byte UUID reported by BLE Layer to shortest possible, 2 or 4 bytes
-    // this is the BLE Service UUID Base. If a 16-byte service UUID partially matches with this 12 bytes,
+    // this is the BLE Service UUID Base. If a 16-byte service UUID partially matches with these 12 bytes,
     // it can be shortened to 2 or 4 bytes.
     static const uint8_t bleBaseUUID[12] = { 0x00, 0x00, 0x10, 0x00, 0x80, 0x00, 0x00, 0x80, 0x5F, 0x9B, 0x34, 0xFB };
     if (0 == memcmp(svcId->bytes + 4, bleBaseUUID, sizeof(bleBaseUUID))) {
