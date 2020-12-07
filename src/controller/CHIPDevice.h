@@ -290,8 +290,8 @@ typedef struct SerializableDevice
     SecurePairingSessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort;  /* This field is serealized in LittelEndian byte order */
-    uint64_t mInterfaceId; /* This field is serealized in LittelEndian byte order */
+    uint16_t mDevicePort; /* This field is serealized in LittelEndian byte order */
+    uint8_t mInterfaceName[IFNAMSIZ];
 } SerializableDevice;
 
 typedef struct SerializedDevice

@@ -105,14 +105,9 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/4106
-    serializable.mInterfaceId = 0;
-#else
-    static_assert(sizeof(serializable.mInterfaceId) >= sizeof(mInterface), "Size of network interface ID must fit");
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/3762
-    serializable.mInterfaceId = Encoding::LittleEndian::HostSwap64(mInterface);
-#endif
+    VerifyOrExit(CHIP_NO_ERROR ==
+                     Inet::GetInterfaceName(mInterface, serializable.mInterfaceName, sizeof(serializable.mInterfaceName)),
+                 error = CHIP_ERROR_INTERNAL);
     static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
@@ -155,14 +150,20 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    // We cannot deserialize interface ID for CHIP builds with LWIP stack.
-    // Inteface ID for LWIP stack points to a `netif` structure, instead of an interface ID.
-    // TODO: https://github.com/project-chip/connectedhomeip/issues/4106
+    // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
+    // LwIP stack.
     mInterface = INET_NULL_INTERFACEID;
-#else
-    mInterface                = static_cast<Inet::InterfaceId>(Encoding::LittleEndian::HostSwap64(serializable.mInterfaceId));
+    if (serializable.mInterfaceName[0] != '\0')
+    {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        LOCK_TCPIP_CORE();
 #endif
+        INET_ERROR inetErr = Inet::InterfaceNameToId(serializable.mInterfaceName, mInterface);
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        UNLOCK_TCPIP_CORE();
+#endif
+        VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
+    }
 
 exit:
     return error;
