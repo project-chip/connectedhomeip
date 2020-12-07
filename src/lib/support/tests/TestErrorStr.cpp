@@ -22,7 +22,7 @@
 #include <core/CHIPCore.h>
 
 #include <support/ErrorStr.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 using namespace chip;
 

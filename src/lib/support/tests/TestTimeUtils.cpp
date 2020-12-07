@@ -29,8 +29,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include <support/TestUtils.h>
 #include <support/TimeUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;

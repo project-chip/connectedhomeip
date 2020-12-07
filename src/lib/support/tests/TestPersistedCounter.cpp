@@ -38,7 +38,7 @@
 #include <platform/PersistedStorage.h>
 #include <support/CHIPMem.h>
 #include <support/PersistedCounter.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include "TestPersistedStorageImplementation.h"
 

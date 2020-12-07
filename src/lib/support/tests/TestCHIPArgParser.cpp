@@ -27,7 +27,7 @@
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
 #include <support/ScopedBuffer.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
