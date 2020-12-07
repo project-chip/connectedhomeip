@@ -100,7 +100,7 @@ public:
      * Return the size of the allocation including the reserved and payload data spaces but not including space
      * allocated for the PacketBuffer structure.
      *
-     *  @note    The allocation size is equal or greater than \c aAllocSize paramater to \c Create method).
+     *  @note    The allocation size is equal or to greater than \c aAllocSize parameter to the \c Create method).
      *
      *  @return     size of the allocation
      */
