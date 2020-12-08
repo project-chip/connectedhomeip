@@ -65,8 +65,6 @@ jobs:
                   path: |
                       out/lock_app_debug/chip-qpg6100-lock-example.out
                       out/shell_app/shell-qpg6100.out
-            - name: Show tree
-              run: find .
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
             - name: Perform CodeQL Analysis
