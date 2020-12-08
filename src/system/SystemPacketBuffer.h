@@ -586,15 +586,15 @@ public:
         return buffer;
     }
 
-    void Advance()
-    {
-        PacketBuffer * next = mBuffer->Next_ForNow();
-        if (next != nullptr)
-        {
-            next->AddRef();
-        }
-        Adopt(next);
-    }
+    /**
+     * Advance this PacketBufferHandle to the next buffer in a chain.
+     *
+     *  @note This differs from `FreeHead()` in that it does not touch any content in the currently referenced packet buffer;
+     *      it only changes which buffer this handle owns. (Note that this could result in the previous buffer being freed,
+     *      if there is no other.) `Advance()` is designed to be used with an addition handle to traverse a buffer chain,
+     *      whereas `FreeHead()` modifies a chain.
+     */
+    void Advance() { *this = Hold(mBuffer->Next_ForNow()); }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     /**
@@ -649,7 +649,7 @@ inline PacketBufferHandle PacketBuffer::Next()
 inline PacketBufferHandle PacketBuffer::Last()
 {
     PacketBuffer * p = this;
-    while (p->next != nullptr)
+    while (p->Next_ForNow() != nullptr)
         p = p->Next_ForNow();
     return PacketBufferHandle::Hold(p);
 }
