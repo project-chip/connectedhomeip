@@ -547,6 +547,27 @@ function isReportableAttribute(options)
   return this.reportable.included == 1;
 }
 
+/**
+ * Check if the cluster (name) has any enabled manufacturer commands. This works only inside
+ * cluster block helpers.
+ *
+ * @param {*} name : Cluster name
+ * @param {*} side : Cluster side
+ * @param {*} options
+ * @returns True if cluster has enabled commands otherwise false
+ */
+function user_cluster_has_enabled_manufacturer_command(name, side, options)
+{
+  return queryImpexp.exportendPointTypeIds(this.global.db, this.global.sessionId)
+      .then((endpointTypes) => zclQuery.exportClustersAndEndpointDetailsFromEndpointTypes(this.global.db, endpointTypes))
+      .then((endpointsAndClusters) => zclQuery.exportCommandDetailsFromAllEndpointTypesAndClusters(
+                this.global.db, endpointsAndClusters))
+      .then((endpointCommands) => {
+        return !!endpointCommands.find(cmd => cmd.mfgCode && zclHelper.isStrEqual(name, cmd.clusterName)
+                && zclHelper.isCommandAvailable(side, cmd.incoming, cmd.outgoing, cmd.commandSource, cmd.name));
+      })
+}
+
 // WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 //
 // Note: these exports are public API. Templates that might have been created in the past and are
@@ -561,13 +582,14 @@ exports.asReadTypeLength     = asReadTypeLength;
 exports.asValueIfNotPresent  = asValueIfNotPresent;
 exports.asChipUnderlyingType = asChipUnderlyingType;
 
-exports.chip_server_clusters                    = chip_server_clusters;
-exports.chip_server_cluster_commands            = chip_server_cluster_commands;
-exports.chip_server_cluster_command_arguments   = chip_server_cluster_command_arguments
-exports.isSignedType                            = isSignedType;
-exports.isDiscreteType                          = isDiscreteType;
-exports.chip_server_cluster_attributes          = chip_server_cluster_attributes;
-exports.isWritableAttribute                     = isWritableAttribute;
-exports.isReportableAttribute                   = isReportableAttribute;
-exports.chip_server_writable_attributes_types   = chip_server_writable_attributes_types;
-exports.chip_server_reportable_attributes_types = chip_server_reportable_attributes_types;
+exports.chip_server_clusters                          = chip_server_clusters;
+exports.chip_server_cluster_commands                  = chip_server_cluster_commands;
+exports.chip_server_cluster_command_arguments         = chip_server_cluster_command_arguments
+exports.isSignedType                                  = isSignedType;
+exports.isDiscreteType                                = isDiscreteType;
+exports.chip_server_cluster_attributes                = chip_server_cluster_attributes;
+exports.isWritableAttribute                           = isWritableAttribute;
+exports.isReportableAttribute                         = isReportableAttribute;
+exports.chip_server_writable_attributes_types         = chip_server_writable_attributes_types;
+exports.chip_server_reportable_attributes_types       = chip_server_reportable_attributes_types;
+exports.user_cluster_has_enabled_manufacturer_command = user_cluster_has_enabled_manufacturer_command;

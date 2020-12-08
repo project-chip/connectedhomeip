@@ -1537,6 +1537,12 @@ bool emberAfBarrierControlClusterBarrierControlGoToPercentCallback(uint8_t perce
 bool emberAfBarrierControlClusterBarrierControlStopCallback();
 
 /**
+ * @brief Basic Cluster MfgSpecificPing Command callback
+ */
+
+bool emberAfBasicClusterMfgSpecificPingCallback();
+
+/**
  * @brief Basic Cluster ResetToFactoryDefaults Command callback
  */
 
