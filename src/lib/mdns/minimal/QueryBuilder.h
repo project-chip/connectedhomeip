@@ -51,7 +51,7 @@ public:
     CHECK_RETURN_VALUE
     chip::System::PacketBufferHandle && ReleasePacket()
     {
-        mHeader  = HeaderRef(nullptr);
+        mHeader       = HeaderRef(nullptr);
         mQueryBuildOk = false;
         return std::move(mPacket);
     }
