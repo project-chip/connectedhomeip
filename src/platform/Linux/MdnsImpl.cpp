@@ -114,19 +114,19 @@ std::string GetFullType(const char * type, MdnsServiceProtocol protocol)
 
 MdnsServiceProtocol TruncateProtocolInType(char * type)
 {
-    char * delimiter           = strrchr(type, '.');
+    char * delimiter             = strrchr(type, '.');
     MdnsServiceProtocol protocol = MdnsServiceProtocol::kMdnsProtocolUnknown;
 
     if (delimiter != NULL)
     {
         if (strcmp("._tcp", delimiter) == 0)
         {
-            protocol     = MdnsServiceProtocol::kMdnsProtocolTcp;
+            protocol   = MdnsServiceProtocol::kMdnsProtocolTcp;
             *delimiter = 0;
         }
         else if (strcmp("._udp", delimiter) == 0)
         {
-            protocol     = MdnsServiceProtocol::kMdnsProtocolUdp;
+            protocol   = MdnsServiceProtocol::kMdnsProtocolUdp;
             *delimiter = 0;
         }
     }
