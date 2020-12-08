@@ -23,7 +23,6 @@ static_library("minimal") {
     "QueryReplyFilter.h",
     "RecordData.cpp",
     "RecordData.h",
-    "ReplyFilter.h",
     "ResponseBuilder.h",
     "ResponseSender.cpp",
     "ResponseSender.h",

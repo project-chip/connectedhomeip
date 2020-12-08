@@ -127,7 +127,7 @@ CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator 
     return autoShutdown.ReturnSuccess();
 }
 
-CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBuffer * data, const chip::Inet::IPAddress & addr, uint16_t port,
+CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                                   chip::Inet::InterfaceId interface)
 {
     for (size_t i = 0; i < mEndpointCount; i++)
@@ -150,14 +150,13 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBuffer * data, const chip:
             continue;
         }
 
-        return info->udp->SendTo(addr, port, data);
+        return info->udp->SendTo(addr, port, data.Release_ForNow());
     }
 
-    chip::System::PacketBuffer::Free(data);
     return CHIP_ERROR_NOT_CONNECTED;
 }
 
-CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t port, chip::Inet::InterfaceId interface)
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface)
 {
     for (size_t i = 0; i < mEndpointCount; i++)
     {
@@ -174,34 +173,29 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
         }
 
         // data may be sent over multiple packets. Keep the one ref active all the time
-        data->AddRef();
+        chip::System::PacketBufferHandle extraCopy = data.Retain();
 
         CHIP_ERROR err;
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), data);
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), extraCopy.Release_ForNow());
         }
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), data);
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), extraCopy.Release_ForNow());
         }
         else
         {
-            // remove extra ref and then also clear it
-            chip::System::PacketBuffer::Free(data);
-            chip::System::PacketBuffer::Free(data);
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
         if (err != CHIP_NO_ERROR)
         {
-            chip::System::PacketBuffer::Free(data);
             return err;
         }
     }
 
-    chip::System::PacketBuffer::Free(data);
     return CHIP_NO_ERROR;
 }
 
