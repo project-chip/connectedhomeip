@@ -181,7 +181,7 @@ private:
             return true; // not a usable interface
         }
         char name[64];
-        if (!mIterator.GetInterfaceName(name, sizeof(name)) == CHIP_NO_ERROR)
+        if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Interface iterator failed to get interface name.");
             return true;
