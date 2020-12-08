@@ -25,6 +25,7 @@
 #include <utility>
 
 #include <core/CHIPEncoding.h>
+#include <support/BufBound.h>
 #include <support/BufferWriter.h>
 
 #include <mdns/minimal/core/BytesRange.h>
