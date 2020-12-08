@@ -33,6 +33,83 @@ namespace chip {
 namespace Mdns {
 namespace {
 
+template <size_t kSize>
+class StringBuilder
+{
+public:
+    const char * c_str() const { return mBuffer; }
+
+    StringBuilder & Append(const char * s)
+    {
+        size_t available = kSize - mUsed;
+        size_t len       = strlen(s);
+
+        if (len > available)
+        {
+            len = available - 1;
+        }
+        memcpy(mBuffer + mUsed, s, len);
+        mUsed += len;
+        mBuffer[mUsed] = 0;
+
+        return *this;
+    }
+
+private:
+    char mBuffer[kSize] = { 0 };
+    size_t mUsed        = 0;
+};
+
+void LogQuery(const mdns::Minimal::QueryData & data)
+{
+    StringBuilder<128> logString;
+
+    logString.Append("QUERY ");
+    switch (data.GetClass())
+    {
+    case mdns::Minimal::QClass::IN:
+        logString.Append("IN");
+        break;
+    default:
+        logString.Append("???");
+        break;
+    }
+    logString.Append("/");
+    switch (data.GetType())
+    {
+    case mdns::Minimal::QType::ANY:
+        logString.Append("ANY");
+        break;
+    case mdns::Minimal::QType::A:
+        logString.Append("A");
+        break;
+    case mdns::Minimal::QType::AAAA:
+        logString.Append("AAAA");
+        break;
+    case mdns::Minimal::QType::TXT:
+        logString.Append("TXT");
+        break;
+    case mdns::Minimal::QType::SRV:
+        logString.Append("SRV");
+        break;
+    case mdns::Minimal::QType::PTR:
+        logString.Append("PTR");
+        break;
+    default:
+        logString.Append("???");
+        break;
+    }
+    logString.Append(": ");
+
+    mdns::Minimal::SerializedQNameIterator name = data.GetName();
+    while (name.Next())
+    {
+        logString.Append(name.Value()).Append(".");
+    }
+
+    ChipLogDetail(Discovery, "%s", logString.c_str());
+}
+
 class AllInterfaces : public mdns::Minimal::ListenIterator
 {
 public:
@@ -126,8 +203,7 @@ class AdvertiserMinMdns : public ServiceAdvertiser,
 public:
     AdvertiserMinMdns() :
         mResponseSender(&mServer, &mQueryResponder), mPtrResponder(mOperationalServiceQName, mOperationalServerQName),
-        mSrvResponder(mOperationalServiceQName,
-                      mdns::Minimal::SrvResourceRecord(mOperationalServiceQName, mServerQName, CHIP_PORT)),
+        mSrvResponder(mOperationalServerQName, mdns::Minimal::SrvResourceRecord(mOperationalServiceQName, mServerQName, CHIP_PORT)),
         mIPv4Responder(mServerQName), mIPv6Responder(mServerQName)
 
     {
@@ -192,6 +268,8 @@ void AdvertiserMinMdns::OnQuery(const mdns::Minimal::QueryData & data)
         ChipLogError(Discovery, "INTERNAL CONSISTENCY ERROR: missing query source");
         return;
     }
+
+    LogQuery(data);
 
     CHIP_ERROR err = mResponseSender.Respond(mMessageId, data, mCurrentSource);
     if (err != CHIP_NO_ERROR)
