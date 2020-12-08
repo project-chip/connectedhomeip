@@ -18,13 +18,20 @@
 
 #include "AdditionalDataParseCommand.h"
 
+#include <setup_payload/AdditionalDataPayloadParser.h>
+#include <setup_payload/AdditionalDataPayload.h>
+
 using namespace ::chip;
 
 CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
     std::string payload(mPayload);
+    AdditionalDataPayload resultPayload;
     CHIP_ERROR err = CHIP_NO_ERROR;
     SuccessOrExit(err);
+    ChipLogProgress(chipTool, "AdditionalDataParseCommand, payload=%s", payload.c_str());
+
+    err = AdditionalDataPayloadParser(payload).populatePayload(resultPayload);
 exit:
     return err;
 }
