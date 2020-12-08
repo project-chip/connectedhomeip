@@ -28,6 +28,11 @@ static_library("app") {
   output_name = "libCHIPDataModel"
 
   sources = [
+    "Command.cpp",
+    "Command.h",
+    "CommandHandler.cpp",
+    "CommandSender.cpp",
+    "InteractionModelEngine.cpp",
     "MessageDef.cpp",
     "MessageDef.h",
     "decoder.cpp",
@@ -37,6 +42,7 @@ static_library("app") {
   public_deps = [
     ":codec_headers",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
     "${chip_root}/src/system",
     "${nlio_root}:nlio",
   ]

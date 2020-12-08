@@ -117,7 +117,6 @@ static_library("core") {
 
   public_deps = [
     ":chip_config_header",
-    "${chip_root}/src/app",
     "${chip_root}/src/ble",
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/support",
@@ -130,6 +129,5 @@ static_library("core") {
     "${chip_root}/src/lib/support",
     "${chip_root}/src/inet",
     "${chip_root}/src/system",
-    "${chip_root}/src/app",
   ]
 }
