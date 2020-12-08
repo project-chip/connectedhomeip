@@ -40,6 +40,7 @@
 #include <CHIPVersion.h>
 
 #include <inet/IPAddress.h>
+#include <inet/InetArgParser.h>
 #include <system/SystemTimer.h>
 
 #include "TestInetCommon.h"
