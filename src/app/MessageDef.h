@@ -1842,9 +1842,16 @@ public:
     /**
      *  @brief Initialize a CommandList::Builder for writing into the TLV stream
      *
-     *  @return A reference to Path::Builder
+     *  @return A reference to CommandList::Builder
      */
     CommandList::Builder & CreateCommandListBuilder();
+
+    /**
+     *  @brief Get reference to CommandList::Builder
+     *
+     *  @return A reference to CommandList::Builder
+     */
+    CommandList::Builder & GetCommandListBuilder();
 
     /**
      *  @brief Mark the end of this InvokeCommand

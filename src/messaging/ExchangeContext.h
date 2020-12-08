@@ -55,6 +55,8 @@ class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, Exch
     friend class ExchangeContextDeletor;
 
 public:
+    typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
+
     /**
      *  Determine whether the context is the initiator of the exchange.
      *
@@ -146,14 +148,14 @@ public:
     void Free();
     void Reset();
 
+    void SetResponseTimeout(Timeout timeout);
+
 private:
     enum class ExFlagValues : uint16_t
     {
         kFlagInitiator        = 0x0001, // This context is the initiator of the exchange.
         kFlagResponseExpected = 0x0002, // If a response is expected for a message that is being sent.
     };
-
-    typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
 
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
     ExchangeDelegate * mDelegate   = nullptr;

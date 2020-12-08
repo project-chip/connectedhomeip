@@ -69,6 +69,11 @@ void ExchangeContext::SetResponseExpected(bool inResponseExpected)
     mFlags.Set(ExFlagValues::kFlagResponseExpected, inResponseExpected);
 }
 
+void ExchangeContext::SetResponseTimeout(Timeout timeout)
+{
+    mResponseTimeout = timeout;
+}
+
 CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, PacketBufferHandle msgBuf,
                                         const SendFlags & sendFlags, void * msgCtxt)
 {
