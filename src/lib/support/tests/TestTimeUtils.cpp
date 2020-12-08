@@ -24,14 +24,13 @@
  *
  */
 
-#include "TestSupport.h"
-
 #include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
 
 #include <support/TimeUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <support/logging/CHIPLogging.h>
 
 using namespace chip;
@@ -955,3 +954,5 @@ int TestTimeUtils(void)
 
     return (0);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestTimeUtils);

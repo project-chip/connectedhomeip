@@ -105,6 +105,7 @@ CHIP_ERROR ChipDeviceController::ConnectDevice(NodeId remoteDeviceId, Rendezvous
     CHIP_ERROR err = mCommissioner.PairDevice(remoteDeviceId, params, devicePort, interfaceId);
     SuccessOrExit(err);
 
+    mState           = kState_Initialized;
     mRemoteDeviceId  = remoteDeviceId;
     mAppReqState     = appReqState;
     mOnNewConnection = onConnected;
@@ -130,6 +131,7 @@ CHIP_ERROR ChipDeviceController::ConnectDeviceWithoutSecurePairing(NodeId remote
 
     mPairingWithoutSecurity = true;
 
+    mState           = kState_Initialized;
     mRemoteDeviceId  = remoteDeviceId;
     mAppReqState     = appReqState;
     mOnNewConnection = onConnected;

@@ -93,8 +93,8 @@ public:
     // Public functions:
     BLE_ERROR Init(void * an_app_state, bool expect_first_ack);
 
-    inline void SetTxFragmentSize(uint8_t size) { mTxFragmentSize = size; }
-    inline void SetRxFragmentSize(uint8_t size) { mRxFragmentSize = size; }
+    inline void SetTxFragmentSize(uint16_t size) { mTxFragmentSize = size; }
+    inline void SetRxFragmentSize(uint16_t size) { mRxFragmentSize = size; }
 
     uint16_t GetRxFragmentSize() { return mRxFragmentSize; }
     uint16_t GetTxFragmentSize() { return mTxFragmentSize; }

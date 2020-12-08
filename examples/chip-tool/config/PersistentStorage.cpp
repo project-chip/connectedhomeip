@@ -80,7 +80,7 @@ void PersistentStorage::SetKeyValue(const char * key, const char * value)
     auto section = mConfig.sections[kDefaultSectionName];
     section[key] = std::string(value);
 
-    mConfig.default_section(section);
+    mConfig.sections[kDefaultSectionName] = section;
     CommitConfig();
 }
 
@@ -89,7 +89,7 @@ void PersistentStorage::DeleteKeyValue(const char * key)
     auto section = mConfig.sections[kDefaultSectionName];
     section.erase(key);
 
-    mConfig.default_section(section);
+    mConfig.sections[kDefaultSectionName] = section;
     CommitConfig();
 }
 

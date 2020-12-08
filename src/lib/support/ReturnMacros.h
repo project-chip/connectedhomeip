@@ -34,6 +34,20 @@
         }                                                                                                                          \
     } while (false)
 
+/// Returns from the void function if expression evaluates to false
+///
+/// Use like:
+///   VerifyOrReturn(param != nullptr, LogError("param is nullptr"));
+#define VerifyOrReturn(expr, ...)                                                                                                  \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (!(expr))                                                                                                               \
+        {                                                                                                                          \
+            __VA_ARGS__;                                                                                                           \
+            return;                                                                                                                \
+        }                                                                                                                          \
+    } while (false)
+
 /// Returns a specified error code if expression evaluates to false
 ///
 /// Use like:

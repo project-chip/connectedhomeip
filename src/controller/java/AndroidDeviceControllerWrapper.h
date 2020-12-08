@@ -22,6 +22,7 @@
 #include <jni.h>
 
 #include <controller/CHIPDeviceController_deprecated.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
@@ -32,14 +33,15 @@
 class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate
 {
 public:
+    using DeviceNetworkInfo = chip::DeviceLayer::Internal::DeviceNetworkInfo;
+
     ~AndroidDeviceControllerWrapper();
 
     chip::DeviceController::ChipDeviceController * Controller() { return mController.get(); }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     void SendNetworkCredentials(const char * ssid, const char * password);
-
-    void DeprecatedHardcodeThreadCredentials();
+    void SendThreadCredentials(const DeviceNetworkInfo & threadData);
 
     // DevicePairingDelegate implementation
     void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;

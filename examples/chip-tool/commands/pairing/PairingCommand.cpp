@@ -82,6 +82,7 @@ CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress addr
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
+    UpdateWaitForResponse(false);
     return mCommissioner.UnpairDevice(remoteId);
 }
 
@@ -107,6 +108,7 @@ void PairingCommand::OnStatusUpdate(RendezvousSessionDelegate::Status status)
 void PairingCommand::OnNetworkCredentialsRequested(RendezvousDeviceCredentialsDelegate * callback)
 {
     ChipLogProgress(chipTool, "OnNetworkCredentialsRequested");
+    callback->SendNetworkCredentials(mSSID, mPassword);
 }
 
 void PairingCommand::OnOperationalCredentialsRequested(const char * csr, size_t csr_length,

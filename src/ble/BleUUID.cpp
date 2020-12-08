@@ -63,10 +63,11 @@ bool StringToUUID(const char * str, ChipBleUUID & uuid)
         if (nibbleId >= NUM_UUID_NIBBLES) // too long string!
             return false;
 
+        uint8_t & byte = uuid.bytes[nibbleId / 2];
         if (nibbleId % 2 == 0)
-            uuid.bytes[nibbleId / 2] = static_cast<uint8_t>(HexDigitToInt(*str) << 4);
+            byte = static_cast<uint8_t>(HexDigitToInt(*str) << 4);
         else
-            uuid.bytes[nibbleId / 2] |= HexDigitToInt(*str);
+            byte = static_cast<uint8_t>(byte | HexDigitToInt(*str));
 
         ++nibbleId;
     }

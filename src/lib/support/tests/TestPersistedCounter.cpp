@@ -28,6 +28,7 @@
 #endif
 
 #include <stdint.h>
+#include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
@@ -35,17 +36,11 @@
 
 #include <CHIPVersion.h>
 #include <platform/PersistedStorage.h>
-#include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
 #include <support/PersistedCounter.h>
+#include <support/UnitTestRegistration.h>
 
 #include "TestPersistedStorageImplementation.h"
-
-#define TOOL_NAME "TestPersistedCounter"
-#define TOOL_OPTIONS_ENV_VAR_NAME "CHIP_SUPPORT_TEST_OPTIONS"
-#define CHIP_TOOL_COPYRIGHT "Copyright (c) 2020 Project CHIP Authors\nAll rights reserved.\n"
-
-using namespace chip::ArgParser;
 
 struct TestPersistedCounterContext
 {
@@ -175,28 +170,19 @@ static void CheckWriteNextCounterStart(nlTestSuite * inSuite, void * inContext)
 /**
  *  Test Suite that lists all the test functions.
  */
-static const nlTest sTests[] = { NL_TEST_DEF("Out of box Test", CheckOOB), NL_TEST_DEF("Reboot Test", CheckReboot),
-                                 NL_TEST_DEF("Write Next Counter Start Test", CheckWriteNextCounterStart),
+static const nlTest sTests[] = {
+    NL_TEST_DEF("Out of box Test", CheckOOB),                                 //
+    NL_TEST_DEF("Reboot Test", CheckReboot),                                  //
+    NL_TEST_DEF("Write Next Counter Start Test", CheckWriteNextCounterStart), //
+    NL_TEST_SENTINEL()                                                        //
+};
 
-                                 NL_TEST_SENTINEL() };
-
-static HelpOptions gHelpOptions(TOOL_NAME, "Usage: " TOOL_NAME " [<options...>]\n", CHIP_VERSION_STRING "\n" CHIP_TOOL_COPYRIGHT,
-                                "Test persisted counter API.  Without any options, the program invokes a suite of local tests.\n");
-
-static OptionSet * gOptionSets[] = { &gHelpOptions, nullptr };
-
-extern "C" int TestPersistedCounter(int argc, char * argv[])
+int TestPersistedCounter()
 {
     TestPersistedCounterContext context;
 
     CHIP_ERROR error = chip::Platform::MemoryInit();
     if (error != CHIP_NO_ERROR)
-    {
-        return EXIT_FAILURE;
-    }
-
-    if (!ParseArgsFromEnvVar(TOOL_NAME, TOOL_OPTIONS_ENV_VAR_NAME, gOptionSets, nullptr, true) ||
-        !ParseArgs(TOOL_NAME, argc, argv, gOptionSets))
     {
         return EXIT_FAILURE;
     }
@@ -212,3 +198,5 @@ extern "C" int TestPersistedCounter(int argc, char * argv[])
 
     return r;
 }
+
+CHIP_REGISTER_TEST_SUITE(TestPersistedCounter);

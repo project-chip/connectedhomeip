@@ -25,6 +25,8 @@ chip_test_suite("tests") {
     "TestBleUUID.cpp",
   ]
 
+  cflags = [ "-Wconversion" ]
+
   public_deps = [
     "${chip_root}/src/ble",
     "${nlunit_test_root}:nlunit-test",

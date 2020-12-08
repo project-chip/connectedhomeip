@@ -18,7 +18,7 @@
 #include "CHIPDeviceManager.h"
 #include "DataModelHandler.h"
 #include "DeviceCallbacks.h"
-#include "RendezvousDeviceDelegate.h"
+#include "Server.h"
 #include "esp_heap_caps_init.h"
 #include "esp_log.h"
 #include "esp_netif.h"
@@ -34,41 +34,15 @@
 #include <string>
 #include <vector>
 
-#include <crypto/CHIPCryptoPAL.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <support/ErrorStr.h>
-#include <transport/SecureSessionMgr.h>
 
 using namespace ::chip;
 using namespace ::chip::DeviceManager;
 using namespace ::chip::DeviceLayer;
 
-// Used to indicate that an IP address has been added to the QRCode
-#define EXAMPLE_VENDOR_TAG_IP 1
-
-extern void PairingComplete(NodeId assignedNodeId, NodeId peerNodeId, SecurePairingSession * pairing);
-
 const char * TAG = "temperature-measurement-app";
 
 static DeviceCallbacks EchoCallbacks;
-RendezvousDeviceDelegate * rendezvousDelegate = nullptr;
-
-namespace {
-
-bool isRendezvousBLE()
-{
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kBLE;
-}
-
-bool isRendezvousBypassed()
-{
-    return static_cast<RendezvousInformationFlags>(CONFIG_RENDEZVOUS_MODE) == RendezvousInformationFlags::kNone;
-}
-
-static SecurePairingUsingTestSecret gTestPairing;
-
-} // namespace
 
 extern "C" void app_main()
 {
@@ -110,17 +84,7 @@ extern "C" void app_main()
         return;
     }
 
-    InitDataModelHandler();
-
-    if (isRendezvousBLE())
-    {
-        rendezvousDelegate = new RendezvousDeviceDelegate();
-    }
-    else if (isRendezvousBypassed())
-    {
-        ChipLogProgress(Ble, "Rendezvous and Secure Pairing skipped. Using test secret.");
-        PairingComplete(chip::kTestDeviceNodeId, chip::kTestControllerNodeId, &gTestPairing);
-    }
+    InitServer();
 
     // Run the UI Loop
     while (true)

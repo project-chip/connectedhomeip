@@ -1146,12 +1146,7 @@ BLEManagerImpl::CHIPoBLEConState * BLEManagerImpl::GetConnectionState(uint16_t c
     {
         if (freeIndex < kMaxConnections)
         {
-            mCons[freeIndex].PendingIndBuf = nullptr;
-            mCons[freeIndex].ConId         = conId;
-            mCons[freeIndex].MTU           = 0;
-            mCons[freeIndex].Allocated     = 1;
-            mCons[freeIndex].Subscribed    = 0;
-            mCons[freeIndex].Unused        = 0;
+            mCons[freeIndex].Set(conId);
             return &mCons[freeIndex];
         }
 
@@ -1167,8 +1162,7 @@ bool BLEManagerImpl::ReleaseConnectionState(uint16_t conId)
     {
         if (mCons[i].Allocated && mCons[i].ConId == conId)
         {
-            mCons[i].PendingIndBuf = nullptr;
-            mCons[i].Allocated     = 0;
+            mCons[i].Reset();
             return true;
         }
     }

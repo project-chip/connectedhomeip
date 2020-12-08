@@ -14,6 +14,7 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python.gni")
 
 import("${chip_root}/build/chip/tools.gni")
 import("${dir_pw_unit_test}/test.gni")
@@ -55,7 +56,7 @@ shared_library("ChipDeviceCtrl") {
   configs += [ ":controller_wno_deprecate" ]
 }
 
-pw_python_script("python") {
+pw_python_action("python") {
   script = "build-chip-wheel.py"
 
   _py_manifest_files = [

@@ -34,6 +34,8 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/ReturnMacros.h>
+#include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
 extern "C" {
@@ -140,6 +142,24 @@ private:
     JNIEnv * mEnv;
     jstring mString;
     const char * mChars;
+};
+
+class JniByteArray
+{
+public:
+    JniByteArray(JNIEnv * env, jbyteArray array) :
+        mEnv(env), mArray(array), mData(env->GetByteArrayElements(array, nullptr)), mDataLength(env->GetArrayLength(array))
+    {}
+    ~JniByteArray() { mEnv->ReleaseByteArrayElements(mArray, mData, 0); }
+
+    const jbyte * data() const { return mData; }
+    jsize size() const { return mDataLength; }
+
+private:
+    JNIEnv * mEnv;
+    jbyteArray mArray;
+    jbyte * mData;
+    jsize mDataLength;
 };
 
 } // namespace
@@ -310,9 +330,30 @@ JNI_METHOD(void, sendWiFiCredentials)(JNIEnv * env, jobject self, jlong handle, 
     AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
 }
 
-JNI_METHOD(void, deprecatedHardcodeThreadCredentials)(JNIEnv * env, jobject self, jlong handle)
+JNI_METHOD(void, sendThreadCredentials)
+(JNIEnv * env, jobject self, jlong handle, jint channel, jint panId, jbyteArray xpanId, jbyteArray masterKey)
 {
-    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->DeprecatedHardcodeThreadCredentials();
+    using namespace chip::DeviceLayer::Internal;
+
+    JniByteArray xpanIdBytes(env, xpanId);
+    JniByteArray masterKeyBytes(env, masterKey);
+
+    VerifyOrReturn(CanCastTo<uint8_t>(channel), ChipLogError(Controller, "sendThreadCredentials() called with invalid Channel"));
+    VerifyOrReturn(CanCastTo<uint16_t>(panId), ChipLogError(Controller, "sendThreadCredentials() called with invalid PAN ID"));
+    VerifyOrReturn(xpanIdBytes.size() <= static_cast<jsize>(kThreadExtendedPANIdLength),
+                   ChipLogError(Controller, "sendThreadCredentials() called with invalid XPAN ID"));
+    VerifyOrReturn(masterKeyBytes.size() <= static_cast<jsize>(kThreadMasterKeyLength),
+                   ChipLogError(Controller, "sendThreadCredentials() called with invalid Master Key"));
+
+    DeviceNetworkInfo threadData                = {};
+    threadData.ThreadChannel                    = channel;
+    threadData.ThreadPANId                      = panId;
+    threadData.FieldPresent.ThreadExtendedPANId = 1;
+    memcpy(threadData.ThreadExtendedPANId, xpanIdBytes.data(), xpanIdBytes.size());
+    memcpy(threadData.ThreadMasterKey, masterKeyBytes.data(), masterKeyBytes.size());
+
+    ScopedPthreadLock lock(&sStackLock);
+    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendThreadCredentials(threadData);
 }
 
 JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
@@ -415,8 +456,8 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
                 dataLength = encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, endpoint);
                 break;
             case 3:
-                dataLength = encodeLevelClusterMoveToLevelCommand(buffer->Start(), bufferSize, endpoint, (uint8_t)(aValue & 0xff),
-                                                                  0xFFFF, 0, 0);
+                dataLength = encodeLevelControlClusterMoveToLevelCommand(buffer->Start(), bufferSize, endpoint,
+                                                                         (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
                 break;
             default:
                 ChipLogError(Controller, "Unknown command: %d", commandID);

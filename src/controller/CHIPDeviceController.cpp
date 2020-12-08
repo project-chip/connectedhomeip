@@ -126,7 +126,12 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
     mSessionManager = chip::Platform::New<SecureSessionMgr>();
 
-    err = mTransportMgr->Init(Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6));
+    err = mTransportMgr->Init(Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6)
+#if INET_CONFIG_ENABLE_IPV4
+                                  ,
+                              Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv4)
+#endif
+    );
     SuccessOrExit(err);
 
     err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr);
@@ -468,12 +473,15 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
-    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle)
+    // TODO: We need to specify the peer address for BLE transport in bindings.
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
+        params.GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
     {
 #if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
         if (!params.HasBleLayer())
         {
             params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+            params.SetPeerAddress(Transport::PeerAddress::BLE());
         }
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
     }

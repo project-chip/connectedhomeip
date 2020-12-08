@@ -52,6 +52,7 @@ executable("minimal-mdns-server") {
     ":minimal-mdns-example-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/lib/mdns/minimal",
+    "${chip_root}/src/lib/mdns/minimal/responders",
   ]
 
   output_dir = root_out_dir

@@ -214,7 +214,7 @@ void AndroidDeviceControllerWrapper::OnPairingDeleted(CHIP_ERROR error)
     CallVoidInt(GetJavaEnv(), mJavaObjectRef, "onPairingDeleted", static_cast<jint>(error));
 }
 
-void AndroidDeviceControllerWrapper::DeprecatedHardcodeThreadCredentials()
+void AndroidDeviceControllerWrapper::SendThreadCredentials(const DeviceNetworkInfo & threadData)
 {
     if (mCredentialsDelegate == nullptr)
     {
@@ -222,28 +222,7 @@ void AndroidDeviceControllerWrapper::DeprecatedHardcodeThreadCredentials()
         return;
     }
 
-    using namespace chip::DeviceLayer::Internal;
-
-    // This is a dummy implementation of Thread provisioning which allows to test Rendezvous over BLE with
-    // Thread-enabled devices by sending OpenThread Border Router default credentials.
-    //
-    // TODO:
-    // 1. Figure out whether WiFi or Thread provisioning should be performed
-    // 2. Call Java code to prompt a user for credentials or use the commissioner component of the app
-
-    constexpr uint8_t XPAN_ID[kThreadExtendedPANIdLength]  = { 0x11, 0x11, 0x11, 0x11, 0x22, 0x22, 0x22, 0x22 };
-    constexpr uint8_t MESH_PREFIX[kThreadMeshPrefixLength] = { 0xFD, 0x11, 0x11, 0x11, 0x11, 0x22, 0x00, 0x00 };
-    constexpr uint8_t NETWORK_KEY[kThreadMasterKeyLength]  = { 0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77,
-                                                              0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF };
-
-    DeviceNetworkInfo threadData = {};
-    memcpy(threadData.ThreadExtendedPANId, XPAN_ID, sizeof(XPAN_ID));
-    memcpy(threadData.ThreadMeshPrefix, MESH_PREFIX, sizeof(MESH_PREFIX));
-    memcpy(threadData.ThreadMasterKey, NETWORK_KEY, sizeof(NETWORK_KEY));
-    threadData.ThreadPANId                      = 0x1234;
-    threadData.ThreadChannel                    = 15;
-    threadData.FieldPresent.ThreadExtendedPANId = 1;
-    threadData.FieldPresent.ThreadMeshPrefix    = 1;
-
+    ChipLogProgress(Controller, "Sending Thread credentials for channel %u, PAN ID %x...", threadData.ThreadChannel,
+                    threadData.ThreadPANId);
     mCredentialsDelegate->SendThreadCredentials(threadData);
 }

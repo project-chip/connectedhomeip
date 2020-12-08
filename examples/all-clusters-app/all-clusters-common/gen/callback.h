@@ -1918,7 +1918,8 @@ bool emberAfGroupsClusterAddGroupResponseCallback(uint8_t status, uint16_t group
  * @param groupList
  */
 
-bool emberAfGroupsClusterGetGroupMembershipResponseCallback(uint8_t capacity, uint8_t groupCount, uint8_t * groupList);
+bool emberAfGroupsClusterGetGroupMembershipResponseCallback(uint8_t capacity, uint8_t groupCount,
+                                                            /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 
 /**
  * @brief Groups Cluster RemoveGroupResponse Command callback
@@ -1959,7 +1960,8 @@ bool emberAfGroupsClusterAddGroupIfIdentifyingCallback(uint16_t groupId, uint8_t
  * @param groupList
  */
 
-bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount, uint8_t * groupList);
+bool emberAfGroupsClusterGetGroupMembershipCallback(uint8_t groupCount,
+                                                    /* TYPE WARNING: array array defaults to */ uint8_t * groupList);
 
 /**
  * @brief Groups Cluster RemoveAllGroups Command callback
@@ -2118,7 +2120,7 @@ bool emberAfScenesClusterAddSceneResponseCallback(uint8_t status, uint16_t group
  */
 
 bool emberAfScenesClusterGetSceneMembershipResponseCallback(uint8_t status, uint8_t capacity, uint16_t groupId, uint8_t sceneCount,
-                                                            uint8_t * sceneList);
+                                                            /* TYPE WARNING: array array defaults to */ uint8_t * sceneList);
 
 /**
  * @brief Scenes Cluster RemoveAllScenesResponse Command callback
@@ -2157,7 +2159,8 @@ bool emberAfScenesClusterStoreSceneResponseCallback(uint8_t status, uint16_t gro
  */
 
 bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
-                                                   uint8_t * sceneName, uint8_t * extensionFieldSets);
+                                                   uint8_t * sceneName,
+                                                   /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 /**
  * @brief Scenes Cluster AddScene Command callback
@@ -2169,7 +2172,7 @@ bool emberAfScenesClusterViewSceneResponseCallback(uint8_t status, uint16_t grou
  */
 
 bool emberAfScenesClusterAddSceneCallback(uint16_t groupId, uint8_t sceneId, uint16_t transitionTime, uint8_t * sceneName,
-                                          uint8_t * extensionFieldSets);
+                                          /* TYPE WARNING: array array defaults to */ uint8_t * extensionFieldSets);
 
 /**
  * @brief Scenes Cluster GetSceneMembership Command callback
