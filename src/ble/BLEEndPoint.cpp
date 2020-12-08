@@ -662,11 +662,11 @@ BLE_ERROR BLEEndPoint::Send(PacketBufferHandle data)
 
     // Ensure outgoing message fits in a single contiguous PacketBuffer, as currently required by the
     // message fragmentation and reassembly engine.
-    if (data->Next() != nullptr)
+    if (data->HasChainedBuffer())
     {
         data->CompactHead();
 
-        if (data->Next() != nullptr)
+        if (data->HasChainedBuffer())
         {
             err = BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG;
             ExitNow();
@@ -1056,7 +1056,6 @@ BLE_ERROR BLEEndPoint::DriveSending()
 #if CHIP_ENABLE_CHIPOBLE_TEST
         mBtpEngineTest.DoTxTiming(sentBuf, BTP_TX_DONE);
 #endif // CHIP_ENABLE_CHIPOBLE_TEST
-        mBtpEngine.ClearTxPacket();
 
         if (!mSendQueue.IsNull())
         {
@@ -1420,7 +1419,6 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
     {
         // Take ownership of message PacketBuffer
         System::PacketBufferHandle full_packet = mBtpEngine.TakeRxPacket();
-        mBtpEngine.ClearRxPacket();
 
         ChipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
 
