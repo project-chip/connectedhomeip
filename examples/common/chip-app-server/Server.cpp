@@ -162,10 +162,10 @@ void InitServer(AppDelegate * delegate)
     // TODO: advertise this only when really operational once we support both
     // operational and commisioning advertising is supported.
     {
-        constexpr uint64_t kTestFabricId = 12344321;
+        constexpr uint64_t kTestFabricId = 5544332211;
         err                              = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::OperationalAdvertisingParameters()
                                                                 .SetFabricId(kTestFabricId)
-                                                                .SetNodeId(chip::kTestDeviceNodeId)
+                                                                .SetNodeId(chip::kTestDev iceNodeId)
                                                                 .SetPort(CHIP_PORT)
 #if INET_CONFIG_ENABLE_IPV4
                                                                 .EnableIpV4(true)

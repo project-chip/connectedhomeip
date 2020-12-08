@@ -125,12 +125,14 @@ class AdvertiserMinMdns : public ServiceAdvertiser,
 {
 public:
     AdvertiserMinMdns() :
-        mResponseSender(&mServer, &mQueryResponder), mPtrResponder(mServerQName, mOperationalServiceQName),
+        mResponseSender(&mServer, &mQueryResponder), mPtrResponder(mOperationalServiceQName, mOperationalServerQName),
         mSrvResponder(mOperationalServiceQName,
                       mdns::Minimal::SrvResourceRecord(mOperationalServiceQName, mServerQName, CHIP_PORT)),
         mIPv4Responder(mServerQName), mIPv6Responder(mServerQName)
 
-    {}
+    {
+        mServer.SetDelegate(this);
+    }
 
     // Service advertiser
     CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
@@ -160,8 +162,9 @@ private:
     /// data members for variable things
     char mServerName[64] = "";
 
+    mdns::Minimal::QNamePart mOperationalServiceQName[3] = { "_chip", "_tcp", "local" };
+    mdns::Minimal::QNamePart mOperationalServerQName[4]  = { mServerName, "_chip", "_tcp", "local" };
     mdns::Minimal::QNamePart mServerQName[2]             = { mServerName, "local" };
-    mdns::Minimal::QNamePart mOperationalServiceQName[4] = { mServerName, "_chip", "_tcp", "local" };
 
     /// responders
     mdns::Minimal::PtrResponder mPtrResponder;
@@ -172,6 +175,8 @@ private:
 
 void AdvertiserMinMdns::OnQuery(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info)
 {
+    ChipLogDetail(Discovery, "MinMdns received a query.");
+
     mCurrentSource = info;
     if (!mdns::Minimal::ParsePacket(data, this))
     {
@@ -217,9 +222,17 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     {
         return CHIP_ERROR_NO_MEMORY;
     }
+    if (!mQueryResponder.AddResponder(&mPtrResponder)
+             .SetReportAdditional(mOperationalServerQName)
+             .SetReportInServiceListing(true)
+             .IsValid())
+    {
+        ChipLogError(Discovery, "Failed to add service PTR record mDNS responder");
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
     mSrvResponder.SetRecord(mdns::Minimal::SrvResourceRecord(mOperationalServiceQName, mServerQName, params.GetPort()));
-    if (!mQueryResponder.AddResponder(&mSrvResponder).SetReportInServiceListing(true).IsValid())
+    if (!mQueryResponder.AddResponder(&mSrvResponder).SetReportAdditional(mOperationalServerQName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
