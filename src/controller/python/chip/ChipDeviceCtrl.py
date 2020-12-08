@@ -207,7 +207,7 @@ class ChipDeviceController(object):
 
     def Connect(self, connObj, setupPinCode):
         def HandleComplete(dc, connState, appState):
-            print("Rendezvoud Complete")
+            print("Rendezvous Complete")
             self.state = DCState.RENDEZVOUS_CONNECTED
             self._ChipStack.callbackRes = True
             self._ChipStack.completeEvent.set()
@@ -221,7 +221,7 @@ class ChipDeviceController(object):
 
     def ConnectIP(self, ipaddr, setupPinCode):
         def HandleComplete(dc, connState, appState):
-            print("Rendezvoud Complete")
+            print("Rendezvous Complete")
             self.state = DCState.RENDEZVOUS_CONNECTED
             self._ChipStack.callbackRes = True
             self._ChipStack.completeEvent.set()
