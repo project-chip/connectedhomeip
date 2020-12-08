@@ -16,11 +16,11 @@ class PythonPersistentStorageDelegate : public PersistentStorageDelegate
 {
 public:
     PythonPersistentStorageDelegate() {}
-    void SetDelegate(PersistentStorageResultDelegate * delegate) override{}
-    void GetKeyValue(const char * key) override{}
+    void SetDelegate(PersistentStorageResultDelegate * delegate) override {}
+    void GetKeyValue(const char * key) override {}
     CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) override { return CHIP_ERROR_NOT_IMPLEMENTED; }
-    void SetKeyValue(const char * key, const char * value) override{}
-    void DeleteKeyValue(const char * key) override{}
+    void SetKeyValue(const char * key, const char * value) override {}
+    void DeleteKeyValue(const char * key) override {}
 };
 
 } // namespace Controller
