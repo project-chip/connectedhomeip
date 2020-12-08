@@ -29,8 +29,14 @@
 
 #include "common.h"
 
+#include <core/CHIPCore.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <support/ErrorStr.h>
+#include <system/SystemPacketBuffer.h>
+#include <transport/SecurePairingSession.h>
+#include <transport/SecureSessionMgr.h>
+#include <transport/raw/UDP.h>
 
 namespace {
 
@@ -58,7 +64,7 @@ int main(int argc, char * argv[])
     err = gTransportManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(kServerDeviceId, &DeviceLayer::SystemLayer, &gTransportManager);
+    err = gSessionManager.Init(kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransportManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
@@ -67,7 +73,7 @@ int main(int argc, char * argv[])
     err = gEchoServer.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, kClientDeviceId, &gTestPairing);
+    err = gSessionManager.NewPairing(peer, kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Request is received.

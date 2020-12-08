@@ -24,23 +24,12 @@
 
 #pragma once
 
-#include <core/CHIPCore.h>
 #include <messaging/ExchangeMgr.h>
-#include <platform/CHIPDeviceLayer.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <system/SystemPacketBuffer.h>
-#include <transport/SecureSessionMgr.h>
-#include <transport/raw/UDP.h>
 
 using namespace chip;
 
 #define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
 #define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
-
-constexpr chip::NodeId kClientDeviceId = 12344321;
-constexpr chip::NodeId kServerDeviceId = 12344322;
 
 extern Messaging::ExchangeManager gExchangeManager;
 

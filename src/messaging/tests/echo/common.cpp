@@ -25,6 +25,8 @@
 #include <errno.h>
 
 #include "common.h"
+#include <core/CHIPCore.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
 
 // The ExchangeManager global object.

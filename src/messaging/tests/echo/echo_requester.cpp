@@ -29,8 +29,14 @@
 
 #include "common.h"
 
+#include <core/CHIPCore.h>
+#include <platform/CHIPDeviceLayer.h>
 #include <protocols/echo/Echo.h>
 #include <support/ErrorStr.h>
+#include <system/SystemPacketBuffer.h>
+#include <transport/SecurePairingSession.h>
+#include <transport/SecureSessionMgr.h>
+#include <transport/raw/UDP.h>
 
 #define ECHO_CLIENT_PORT (CHIP_PORT + 1)
 
@@ -39,8 +45,8 @@ namespace {
 // Max value for the number of EchoRequests sent.
 constexpr size_t kMaxEchoCount = 3;
 
-// The CHIP Echo interval time in microseconds.
-constexpr int32_t gEchoInterval = 1000000;
+// The CHIP Echo interval time in milliseconds.
+constexpr int32_t gEchoInterval = 1000;
 
 // The EchoClient object.
 Protocols::EchoClient gEchoClient;
@@ -64,17 +70,11 @@ uint64_t gEchoCount = 0;
 // Count of the number of EchoResponses received.
 uint64_t gEchoRespCount = 0;
 
-uint64_t Now(void)
-{
-    struct timeval now;
-    gettimeofday(&now, NULL);
-
-    return static_cast<uint64_t>((now.tv_sec * 1000000) + now.tv_usec);
-}
-
 bool EchoIntervalExpired(void)
 {
-    return (Now() >= gLastEchoTime + gEchoInterval);
+    uint64_t now = System::Timer::GetCurrentEpoch();
+
+    return (now >= gLastEchoTime + gEchoInterval);
 }
 
 CHIP_ERROR SendEchoRequest(void)
@@ -94,14 +94,14 @@ CHIP_ERROR SendEchoRequest(void)
         int32_t len = snprintf(p, CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE, "Echo Message %" PRIu64 "\n", gEchoCount);
 
         // Set the datalength in the buffer appropriately.
-        payloadBuf->SetDataLength((uint16_t) len);
+        payloadBuf->SetDataLength(static_cast<uint16_t>(len));
     }
 
-    gLastEchoTime = Now();
+    gLastEchoTime = System::Timer::GetCurrentEpoch();
 
-    printf("\nSend echo request message to Node: %lu\n", kServerDeviceId);
+    printf("\nSend echo request message to Node: %lu\n", kTestDeviceNodeId);
 
-    err = gEchoClient.SendEchoRequest(kServerDeviceId, std::move(payloadBuf));
+    err = gEchoClient.SendEchoRequest(kTestDeviceNodeId, std::move(payloadBuf));
 
     if (err == CHIP_NO_ERROR)
     {
@@ -121,19 +121,19 @@ CHIP_ERROR EstablishSecureSession()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     SecurePairingUsingTestSecret * testSecurePairingSecret = Platform::New<SecurePairingUsingTestSecret>(
-        Optional<NodeId>::Value(kServerDeviceId), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+        Optional<NodeId>::Value(kTestDeviceNodeId), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Attempt to connect to the peer.
     err = gSessionManager.NewPairing(
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-        kServerDeviceId, testSecurePairingSecret);
+        kTestDeviceNodeId, testSecurePairingSecret);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         printf("Establish secure session failed, err: %s\n", ErrorStr(err));
-        gLastEchoTime = Now();
+        gLastEchoTime = System::Timer::GetCurrentEpoch();
     }
     else
     {
@@ -145,7 +145,7 @@ exit:
 
 void HandleEchoResponseReceived(NodeId nodeId, System::PacketBufferHandle payload)
 {
-    uint32_t respTime    = Now();
+    uint32_t respTime    = System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastEchoTime;
 
     gWaitingForEchoResp = false;
@@ -180,7 +180,7 @@ int main(int argc, char * argv[])
                                      .SetListenPort(ECHO_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(kClientDeviceId, &DeviceLayer::SystemLayer, &gTransportManager);
+    err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTransportManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
