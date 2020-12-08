@@ -30,6 +30,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/tcp.h>
+#include <lwip/tcpip.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -97,16 +102,19 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     uint16_t serializedLen = 0;
     SerializableDevice serializable;
 
-    nlSTATIC_ASSERT_PRINT(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner),
-                          "Size of serializable should be <= size of output");
+    static_assert(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner),
+                  "Size of serializable should be <= size of output");
 
     CHIP_ZERO_AT(serializable);
 
     memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
-    nlSTATIC_ASSERT_PRINT(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN,
-                          "Size of device address must fit within INET6_ADDRSTRLEN");
+    VerifyOrExit(
+        CHIP_NO_ERROR ==
+            Inet::GetInterfaceName(mInterface, Uint8::to_char(serializable.mInterfaceName), sizeof(serializable.mInterfaceName)),
+        error = CHIP_ERROR_INTERNAL);
+    static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
@@ -147,6 +155,21 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     memmove(&mPairing, &serializable.mOpsCreds, sizeof(mPairing));
     mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
+
+    // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
+    // LwIP stack.
+    mInterface = INET_NULL_INTERFACEID;
+    if (serializable.mInterfaceName[0] != '\0')
+    {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        LOCK_TCPIP_CORE();
+#endif
+        INET_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), mInterface);
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        UNLOCK_TCPIP_CORE();
+#endif
+        VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
+    }
 
 exit:
     return error;
@@ -254,7 +277,7 @@ void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback
     CallbackInfo info                 = { endpoint, cluster };
     Callback::Cancelable * cancelable = onResponse->Cancel();
 
-    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+    static_assert(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
 
     cancelable->mInfoScalar = 0;
     memmove(&cancelable->mInfoScalar, &info, sizeof(info));
@@ -266,7 +289,7 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::
     CallbackInfo info                 = { endpoint, cluster };
     Callback::Cancelable * cancelable = onReport->Cancel();
 
-    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+    static_assert(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
 
     cancelable->mInfoScalar = 0;
     memmove(&cancelable->mInfoScalar, &info, sizeof(info));
