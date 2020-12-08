@@ -205,8 +205,8 @@ function asChipUnderlyingType(label, type)
   } else if (zclHelper.isStrEqual(label, "commandId")) {
     return 'chip::CommandId'
   } else {
-    // Might want to use asUnderlyingZclType instead. TBD
-    return cHelper.asUnderlyingType.call(this, type)
+    const options = { 'hash' : {} };
+    return zclHelper.asUnderlyingZclType.call(this, type, options)
   }
 }
 
