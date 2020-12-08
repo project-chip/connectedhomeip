@@ -217,7 +217,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     mQueryResponder.Init(); // start fresh
 
     /// need to set server name
-    size_t len = snprintf(mServerName, sizeof(mServerName), "%" PRIu64 "-%" PRIu64, params.GetFabricId(), params.GetNodeId());
+    size_t len = snprintf(mServerName, sizeof(mServerName), "%" PRIX64 "-%" PRIX64, params.GetFabricId(), params.GetNodeId());
     if (len >= sizeof(mServerName))
     {
         return CHIP_ERROR_NO_MEMORY;
