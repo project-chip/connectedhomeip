@@ -31,6 +31,7 @@ import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.bluetooth.BluetoothManager
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
+import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -44,6 +45,11 @@ class DeviceProvisioningFragment : Fragment() {
   private lateinit var deviceInfo: CHIPDeviceInfo
 
   private var gatt: BluetoothGatt? = null
+
+  private val networkType: ProvisionNetworkType
+    get() = requireNotNull(
+        ProvisionNetworkType.fromName(arguments?.getString(ARG_PROVISION_NETWORK_TYPE))
+    )
 
   private val scope = CoroutineScope(Dispatchers.Main + Job())
 
@@ -104,12 +110,6 @@ class DeviceProvisioningFragment : Fragment() {
     }
   }
 
-   private fun closeChildFragments() {
-     childFragmentManager.fragments.forEach {
-       f -> childFragmentManager.beginTransaction().remove(f).commit()
-     }
-   }
-
   inner class ConnectionCallback : GenericChipDeviceListener() {
     override fun onConnectDeviceComplete() {
       Log.d(TAG, "onConnectDeviceComplete")
@@ -118,17 +118,16 @@ class DeviceProvisioningFragment : Fragment() {
     override fun onStatusUpdate(status: Int) {
       Log.i(TAG, "Pairing status update: $status");
 
-      when (status) {
-        STATUS_NETWORK_PROVISIONING_SUCCESS -> {
-          showMessage(R.string.rendezvous_over_ble_provisioning_success_text)
-          closeChildFragments()
-        }
+      if (status == STATUS_NETWORK_PROVISIONING_SUCCESS) {
+        showMessage(R.string.rendezvous_over_ble_provisioning_success_text)
+        FragmentUtil.getHost(this@DeviceProvisioningFragment, Callback::class.java)
+            ?.onPairingComplete()
       }
     }
 
     override fun onNetworkCredentialsRequested() {
       childFragmentManager.beginTransaction()
-          .add(R.id.fragment_container, EnterNetworkFragment.newInstance())
+          .add(R.id.fragment_container, EnterNetworkFragment.newInstance(networkType))
           .commit()
     }
 
@@ -149,14 +148,27 @@ class DeviceProvisioningFragment : Fragment() {
     }
   }
 
+  /** Callback from [DeviceProvisioningFragment] notifying any registered listeners. */
+  interface Callback {
+    /** Notifies that pairing has been completed. */
+    fun onPairingComplete()
+  }
+
   companion object {
     private const val TAG = "DeviceProvisioningFragment"
     private const val ARG_DEVICE_INFO = "device_info"
+    private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
     private const val STATUS_NETWORK_PROVISIONING_SUCCESS = 2
 
-    fun newInstance(deviceInfo: CHIPDeviceInfo): DeviceProvisioningFragment {
+    fun newInstance(
+        deviceInfo: CHIPDeviceInfo,
+        networkType: ProvisionNetworkType
+    ): DeviceProvisioningFragment {
       return DeviceProvisioningFragment().apply {
-        arguments = Bundle(1).apply { putParcelable(ARG_DEVICE_INFO, deviceInfo) }
+        arguments = Bundle(2).apply {
+          putParcelable(ARG_DEVICE_INFO, deviceInfo)
+          putString(ARG_PROVISION_NETWORK_TYPE, networkType.name)
+        }
       }
     }
   }

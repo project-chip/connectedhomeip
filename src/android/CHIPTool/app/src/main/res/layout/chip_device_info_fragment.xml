@@ -142,29 +142,5 @@
             android:orientation="vertical"
             android:layout_marginBottom="8dp"
             android:layout_below="@id/vendorTagsLabelTv"/>
-
-        <TextView
-            android:id="@+id/ble_rendezvous_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/vendorTagsContainer"
-            android:layout_alignParentStart="true"
-            android:background="@android:color/darker_gray"
-            android:layout_marginBottom="8dp"
-            android:padding="12dp"
-            android:textSize="20sp"
-            android:text="@string/rendezvous_over_ble_btn_text"/>
-
-        <TextView
-            android:id="@+id/softap_rendezvous_btn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/ble_rendezvous_btn"
-            android:layout_alignParentStart="true"
-            android:background="@android:color/darker_gray"
-            android:layout_marginBottom="8dp"
-            android:padding="12dp"
-            android:textSize="20sp"
-            android:text="@string/rendezvous_over_soft_ap_btn_text"/>
     </RelativeLayout>
 </ScrollView>
