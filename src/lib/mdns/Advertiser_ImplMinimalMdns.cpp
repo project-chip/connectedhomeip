@@ -196,8 +196,9 @@ void AdvertiserMinMdns::OnQuery(const mdns::Minimal::QueryData & data)
 
 CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t port)
 {
-    AllInterfaces allInterfaces;
+    mServer.Shutdown();
 
+    AllInterfaces allInterfaces;
     return mServer.Listen(inetLayer, &allInterfaces, port);
 }
 

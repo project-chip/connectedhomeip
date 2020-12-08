@@ -97,9 +97,9 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
 
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
         ChipLogProgress(AppServer, "Device was assigned network credentials");
-        if (chip::Mdns::ServiceAdvertiser::Instance().Start(DeviceLayer::InetLayer, chip::Mdns::kMdnsPort) != CHIP_NO_ERROR)
+        if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort) != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "Failed to start mDNS advertisement"));
+            ChipLogError(AppServer, "Failed to start mDNS advertisement");
         }
         if (mDelegate != nullptr)
         {
