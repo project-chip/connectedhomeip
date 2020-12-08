@@ -165,7 +165,7 @@ void InitServer(AppDelegate * delegate)
         constexpr uint64_t kTestFabricId = 5544332211;
         err                              = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::OperationalAdvertisingParameters()
                                                                 .SetFabricId(kTestFabricId)
-                                                                .SetNodeId(chip::kTestDev iceNodeId)
+                                                                .SetNodeId(chip::kTestDeviceNodeId)
                                                                 .SetPort(CHIP_PORT)
 #if INET_CONFIG_ENABLE_IPV4
                                                                 .EnableIpV4(true)
