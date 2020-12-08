@@ -17,9 +17,10 @@
 
 #pragma once
 
+#include <mdns/minimal/responders/ReplyFilter.h>
+
 #include "Parser.h"
 #include "Query.h"
-#include "ReplyFilter.h"
 
 namespace mdns {
 namespace Minimal {

@@ -456,8 +456,8 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
                 dataLength = encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, endpoint);
                 break;
             case 3:
-                dataLength = encodeLevelClusterMoveToLevelCommand(buffer->Start(), bufferSize, endpoint, (uint8_t)(aValue & 0xff),
-                                                                  0xFFFF, 0, 0);
+                dataLength = encodeLevelControlClusterMoveToLevelCommand(buffer->Start(), bufferSize, endpoint,
+                                                                         (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
                 break;
             default:
                 ChipLogError(Controller, "Unknown command: %d", commandID);

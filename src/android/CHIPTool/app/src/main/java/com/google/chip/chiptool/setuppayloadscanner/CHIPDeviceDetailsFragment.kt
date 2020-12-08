@@ -25,12 +25,9 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.chip.chiptool.R
-import com.google.chip.chiptool.util.FragmentUtil
-import kotlinx.android.synthetic.main.chip_device_info_fragment.view.ble_rendezvous_btn
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.discriminatorTv
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.productIdTv
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.setupCodeTv
-import kotlinx.android.synthetic.main.chip_device_info_fragment.view.softap_rendezvous_btn
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorIdTv
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorTagsContainer
 import kotlinx.android.synthetic.main.chip_device_info_fragment.view.vendorTagsLabelTv
@@ -71,26 +68,10 @@ class CHIPDeviceDetailsFragment : Fragment() {
                     vendorTagsContainer.addView(tv)
                 }
             }
-
-            ble_rendezvous_btn.setOnClickListener { onRendezvousBleClicked() }
-
-            // TODO: Until Rendezvous over hotspot is ready to implement
-            softap_rendezvous_btn.visibility = View.GONE
         }
     }
 
-
-
-    private fun onRendezvousBleClicked() {
-        FragmentUtil.getHost(this, Callback::class.java)?.onStartRendezvousOverBle(deviceInfo)
-    }
-
-    interface Callback {
-        fun onStartRendezvousOverBle(deviceInfo: CHIPDeviceInfo)
-    }
-
     companion object {
-        private const val TAG = "CHIPDeviceDetailsFragment"
         private const val ARG_DEVICE_INFO = "device_info"
 
         @JvmStatic fun newInstance(deviceInfo: CHIPDeviceInfo): CHIPDeviceDetailsFragment {

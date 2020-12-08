@@ -91,14 +91,14 @@ public:
     CHIP_ERROR Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port);
 
     /// Send the specified packet to a destination IP address over the specified address
-    CHIP_ERROR DirectSend(chip::System::PacketBuffer * data, const chip::Inet::IPAddress & addr, uint16_t port,
+    CHIP_ERROR DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                           chip::Inet::InterfaceId interface);
 
     /// Send a specific packet broadcast to all interfaces
     CHIP_ERROR BroadcastSend(chip::System::PacketBuffer * data, uint16_t port);
 
     /// Send a specific packet broadcast to a specific interface
-    CHIP_ERROR BroadcastSend(chip::System::PacketBuffer * data, uint16_t port, chip::Inet::InterfaceId interface);
+    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface);
 
     ServerBase & SetDelegate(ServerDelegate * d)
     {

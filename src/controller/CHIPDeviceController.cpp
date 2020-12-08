@@ -477,6 +477,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     if (!params.HasBleLayer())
     {
         params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+        params.SetPeerAddress(Transport::PeerAddress::BLE());
     }
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
 
