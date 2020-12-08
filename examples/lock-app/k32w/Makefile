@@ -52,8 +52,7 @@ SRCS = \
     $(CHIP_ROOT)/src/app/util/process-global-message.c                                                    \
     $(CHIP_ROOT)/src/app/util/util.c                                                                      \
     $(CHIP_ROOT)/src/app/clusters/on-off-server/on-off.c                                                  \
-    $(CHIP_ROOT)/examples/common/chip-app-server/DataModelHandler.cpp                                     \
-    $(CHIP_ROOT)/examples/common/chip-app-server/Server.cpp                                               \
+    $(CHIP_ROOT)/src/accessory/DataModelHandler.cpp                                                       \
     $(CHIP_ROOT)/examples/lock-app/lock-common/gen/call-command-handler.c                                 \
     $(CHIP_ROOT)/examples/lock-app/lock-common/gen/callback-stub.c                                        \
     $(K32W061_SDK_ROOT)/rtos/amazon-freertos/lib/FreeRTOS/tasks.c                                         \
@@ -109,7 +108,6 @@ INC_DIRS = \
     $(CHIP_ROOT)/examples/platform/k32w/app/support                                                       \
     $(CHIP_ROOT)/examples/platform/k32w/app/project_include                                               \
     $(CHIP_ROOT)/examples/lock-app/lock-common/                                                           \
-    $(CHIP_ROOT)/examples/common/chip-app-server/include/                                                 \
     $(CHIP_ROOT)/src/include/                                                                             \
     $(CHIP_ROOT)/src/lib                                                                                  \
     $(CHIP_ROOT)/src/                                                                                     \

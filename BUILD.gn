@@ -19,6 +19,7 @@ import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
 import("$dir_pw_build/python.gni")
+import("//src/platform/device.gni")
 
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
@@ -65,6 +66,10 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${nlio_root}:nlio",
       "${nlunit_test_root}:nlunit-test",
     ]
+
+    if (chip_device_platform != "none") {
+      deps += [ "${chip_root}/src/accessory" ]
+    }
 
     if (chip_build_tests) {
       deps += [ "//src:tests" ]

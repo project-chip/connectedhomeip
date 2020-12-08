@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "AppDelegate.h"
+#include <accessory/AppDelegate.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <transport/RendezvousSession.h>
 

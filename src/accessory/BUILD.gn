@@ -14,32 +14,23 @@
 
 import("//build_overrides/chip.gni")
 
-config("includes") {
-  include_dirs = [
-    ".",
-    "include",
-  ]
-}
+static_library("accessory") {
+  output_name = "libCHIPAccessory"
 
-static_library("chip-app-server") {
-  output_name = "chip-app-server"
-
-  # Issue #1630
-  # DataModelHandler.cpp includes files that relies on generated headers
-  # so we can't compile it into this static library.  It needs to be compiled
-  # directly by someone who knows where the generated files for the app we're
-  # compiling live.
   sources = [
     "RendezvousServer.cpp",
+    "RendezvousServer.h",
     "Server.cpp",
+    "Server.h",
+    "QRCodeUtil.cpp",
+    "QRCodeUtil.h",
   ]
 
-  deps = [
-    "${chip_root}/src/lib",
+  public_deps = [
+    "${chip_root}/src/platform",
+    "${chip_root}/src/transport",
+    "${chip_root}/src/setup_payload",
     "${chip_root}/src/lib/mdns",
   ]
 
-  public_configs = [ ":includes" ]
-
-  output_dir = root_out_dir
 }

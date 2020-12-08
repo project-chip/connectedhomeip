@@ -20,7 +20,7 @@
  *   This file implements the handler for data model messages.
  */
 
-#include "DataModelHandler.h"
+#include <accessory/DataModelHandler.h>
 
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>

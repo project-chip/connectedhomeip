@@ -16,7 +16,7 @@
  *    limitations under the License.
  */
 
-#include "QRCodeUtil.h"
+#include <accessory/QRCodeUtil.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
