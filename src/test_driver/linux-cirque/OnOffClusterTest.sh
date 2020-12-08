@@ -24,13 +24,14 @@ REPO_DIR="$SOURCE_DIR/../../../"
 
 chip_tool_dir=$REPO_DIR/examples/chip-tool
 chip_light_dir=$REPO_DIR/examples/lighting-app/linux
+address_sanitize_args='default_configs_sanitize=[ "//build/config/compiler:sanitize_address" ]'
 
 function build_chip_tool() {
     # These files should be successfully compiled elsewhere.
     source "$REPO_DIR/scripts/activate.sh" >/dev/null
     set -x
     cd "$chip_tool_dir"
-    gn gen --check --fail-on-unused-args out/debug >/dev/null
+    gn gen --check --fail-on-unused-args --args="$address_sanitize_args" out/debug >/dev/null
     run_ninja -C out/debug
     docker build -t chip_tool -f Dockerfile . 2>&1
 }
@@ -39,7 +40,8 @@ function build_chip_lighting() {
     source "$REPO_DIR/scripts/activate.sh" >/dev/null
     set -x
     cd "$chip_light_dir"
-    gn gen --check --fail-on-unused-args out/debug --args='chip_bypass_rendezvous=true'
+    gn gen --check --fail-on-unused-args out/debug \
+      --args="$address_sanitize_args chip_bypass_rendezvous=true"
     run_ninja -C out/debug
     docker build -t chip_server -f Dockerfile . 2>&1
     set +x

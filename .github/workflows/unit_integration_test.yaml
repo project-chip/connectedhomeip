@@ -68,7 +68,7 @@ jobs:
                      *) ;;
                   esac
 
-                  scripts/build/gn_gen.sh --args="$GN_ARGS chip_enable_happy_tests=true"
+                  scripts/build/gn_gen.sh --args="$GN_ARGS default_configs_sanitize=[ \"//build/config/compiler:sanitize_address\" ] chip_enable_happy_tests=true"
             - name: Run Build
               run: scripts/build/gn_build.sh
             - name: Run Tests

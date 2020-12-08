@@ -229,6 +229,17 @@ config("runtime_default") {
 }
 
 config("sanitize_default") {
+  if (is_debug && (current_os == "mac" || current_os == "linux")) {
+    cflags = [ "-fsanitize=address" ]
+    ldflags = [ "-fsanitize=address" ]
+  }
+}
+
+config("sanitize_address") {
+  if (!_is_embedded_arm) {
+    cflags = [ "-fsanitize=address" ]
+    ldflags = [ "-fsanitize=address" ]
+  }
 }
 
 config("fuzzing_default") {

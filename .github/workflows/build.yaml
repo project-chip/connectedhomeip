@@ -63,7 +63,7 @@ jobs:
                      *) ;;
                   esac
 
-                  scripts/build/gn_gen.sh --args="$GN_ARGS"
+                  scripts/build/gn_gen.sh --args="$GN_ARGS default_configs_sanitize=[ \"//build/config/compiler:sanitize_address\" ]"
             - name: Run Build
               run: scripts/build/gn_build.sh
             - name: Run Tests

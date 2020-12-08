@@ -16,7 +16,7 @@
 #
 
 from chip-cirque-device-base
-RUN apt-get update && apt-get install -y libglib2.0 avahi-daemon libavahi-client3 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libglib2.0 avahi-daemon libavahi-client3 libasan6 && rm -rf /var/lib/apt/lists/*
 COPY out/debug/chip-tool-server /usr/bin/
 COPY entrypoint.sh /
 
