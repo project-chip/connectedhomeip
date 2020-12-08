@@ -68,7 +68,6 @@ efr32_executable("lighting_app") {
   public_deps = [
     ":sdk",
     "${chip_root}/examples/common/QRCode",
-    "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lighting-app/lighting-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
@@ -81,6 +80,7 @@ efr32_executable("lighting_app") {
   include_dirs += [
     "${efr32_project_dir}/include",
     "${chip_root}/src/app/util",
+    "${chip_root}/src/accessory",
     "${examples_plat_dir}",
   ]
 

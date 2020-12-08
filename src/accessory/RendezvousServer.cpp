@@ -15,9 +15,9 @@
  *    limitations under the License.
  */
 
-#include "RendezvousServer.h"
+#include <accessory/RendezvousServer.h>
 
-#include "SessionManager.h"
+#include <accessory/SessionManager.h>
 #include <core/CHIPError.h>
 #include <support/CodeUtils.h>
 #include <transport/SecureSessionMgr.h>

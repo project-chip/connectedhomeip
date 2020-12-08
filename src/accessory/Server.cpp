@@ -15,11 +15,11 @@
  *    limitations under the License.
  */
 
-#include "Server.h"
+#include <accessory/Server.h>
 
-#include "DataModelHandler.h"
-#include "RendezvousServer.h"
-#include "SessionManager.h"
+#include <accessory/DataModelHandler.h>
+#include <accessory/RendezvousServer.h>
+#include <accessory/SessionManager.h>
 
 #include <ble/BLEEndPoint.h>
 #include <inet/IPAddress.h>

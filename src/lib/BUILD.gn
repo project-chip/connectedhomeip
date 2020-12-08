@@ -36,6 +36,10 @@ static_library("lib") {
     "${chip_root}/src/transport",
   ]
 
+  if (chip_device_platform != "none") {
+    public_deps += [ "${chip_root}/src/accessory" ]
+  }
+
   if (chip_enable_mdns) {
     public_deps += [ "${chip_root}/src/lib/mdns" ]
   }
