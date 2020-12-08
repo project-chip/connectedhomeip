@@ -85,7 +85,7 @@ class TestOnOffCluster(CHIPVirtualHome):
             ret = self.execute_device_cmd(
                 tool_device_id, "chip-tool pairing softap ssid_not_used passwd_not_used {} {} {} {}".format(SETUPPINCODE, DISCRIMINATOR, ip, CHIP_PORT))
             self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format(
-                "pairing bypass", ret['output']))
+                "pairing softap", ret['output']))
 
             ret = self.execute_device_cmd(tool_device_id, command.format("on"))
             self.assertEqual(
