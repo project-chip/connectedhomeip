@@ -61,6 +61,26 @@ private:
     ServerBase * mServer;
 };
 
+chip::System::PacketBufferHandle Clone(chip::System::PacketBufferHandle & original)
+{
+    chip::System::PacketBufferHandle other = chip::System::PacketBuffer::New();
+    if (other.IsNull())
+    {
+        return other;
+    }
+
+    if (other->AvailableDataLength() < original->DataLength())
+    {
+        other.Adopt(nullptr);
+        return other;
+    }
+
+    memcpy(other->Start(), original->Start(), original->DataLength());
+    other->SetDataLength(original->DataLength());
+
+    return other;
+}
+
 } // namespace
 
 ServerBase::~ServerBase()
@@ -173,7 +193,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
         }
 
         // data may be sent over multiple packets. Keep the one ref active all the time
-        chip::System::PacketBufferHandle extraCopy = data.Retain();
+        chip::System::PacketBufferHandle extraCopy = Clone(data);
 
         CHIP_ERROR err;
 
