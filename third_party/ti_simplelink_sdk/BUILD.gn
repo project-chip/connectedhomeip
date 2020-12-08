@@ -18,13 +18,20 @@ import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 declare_args() {
   # Build target to use for TI SimpleLink SDK. Use this to set global SDK defines.
   ti_simplelink_sdk_target = ""
+  ti_simplelink_sysconfig_target = ""
 }
 
 assert(ti_simplelink_sdk_target != "",
        "ti_simplelink_sdk_target must be specified")
+assert(ti_simplelink_sysconfig_target != "",
+       "ti_simplelink_sysconfig_target must be specified")
 
 group("ti_simplelink_sdk") {
   public_deps = [ ti_simplelink_sdk_target ]
+}
+
+group("ti_simplelink_sysconfig") {
+  public_deps = [ ti_simplelink_sysconfig_target ]
 }
 
 config("ti_simplelink_mbedtls_config") {

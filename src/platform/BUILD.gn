@@ -215,8 +215,6 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
 
     if (chip_device_platform == "cc13x2_26x2") {
       sources += [
-        # TODO: depends on ti_drivers
-        #"cc13x2_26x2/Logging.cpp",
         "FreeRTOS/SystemTimeSupport.cpp",
         "cc13x2_26x2/BlePlatformConfig.h",
         "cc13x2_26x2/CC13X2_26X2Config.cpp",
@@ -227,13 +225,18 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "cc13x2_26x2/ConfigurationManagerImpl.cpp",
         "cc13x2_26x2/ConnectivityManagerImpl.cpp",
         "cc13x2_26x2/ConnectivityManagerImpl.h",
+        "cc13x2_26x2/Logging.cpp",
         "cc13x2_26x2/InetPlatformConfig.h",
         "cc13x2_26x2/PlatformManagerImpl.cpp",
         "cc13x2_26x2/PlatformManagerImpl.h",
         "cc13x2_26x2/SystemPlatformConfig.h",
       ]
       if (chip_enable_openthread) {
-        public_deps += [ "${openthread_root}:libopenthread-mtd" ]
+        public_deps += [
+          "${openthread_root}:libopenthread-mtd",
+          "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+          "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
+        ]
 
         sources += [
           "OpenThread/OpenThreadUtils.cpp",

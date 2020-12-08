@@ -195,11 +195,54 @@ template("ti_simplelink_sdk") {
 
     public_deps = [
       "${chip_root}/third_party/ti_simplelink_sdk:freertos",
-      "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
     ]
 
     public_configs = [
       ":${sdk_target_name}_config",
     ]
   }
+
+ source_set("${sdk_target_name}_openthread_platform") {
+   defines = [ "NVOCMP_POSIX_MUTEX" ]
+   cflags = [
+     "-Wno-int-conversion",
+     "-Wno-address-of-packed-member",
+   ]
+   include_dirs = [
+     "${chip_root}/third_party/openthread/repo/examples/platforms",
+     "${chip_root}/third_party/openthread/repo/src/core",
+     "${ti_simplelink_sdk_root}/source/ti/devices/cc13x2_cc26x2",
+   ]
+   public_deps = [
+     ":${sdk_target_name}",
+     "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
+     "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
+     "${chip_root}/third_party/ti_simplelink_sdk:freertos",
+     "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
+     "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+   ]
+
+   configs -= [ "//build/config/compiler:std_default" ]
+   configs += [ ":${sdk_target_name}_posix_config" ]
+   sources = [
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/alarm.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/alarm_micro.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/crypto/aes_alt.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/crypto/ecjpake_alt.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/crypto/sha256_alt.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/diag.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/entropy.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/misc.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/nv/crc.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/nv/nvocmp.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/radio.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/settings.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/system.c",
+     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd/platform/uart.c",
+   ]
+
+   public_configs = [
+     ":${sdk_target_name}_config",
+   ]
+ }
 }

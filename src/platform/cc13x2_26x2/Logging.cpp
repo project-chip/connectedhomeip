@@ -100,18 +100,6 @@ void LogV(uint8_t module, uint8_t category, const char * msg, va_list v)
     DeviceLayer::OnLogOutput();
 }
 
-/**
- * Openchip log output function.
- */
-void Log(uint8_t module, uint8_t category, const char * msg, ...)
-{
-    va_list v;
-
-    va_start(v, msg);
-    LogV(module, category, msg, v);
-    va_end(v);
-}
-
 } // namespace Logging
 } // namespace chip
 
