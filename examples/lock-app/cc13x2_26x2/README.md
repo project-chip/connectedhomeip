@@ -66,12 +66,6 @@ section will need to be done when migrating to new versions of the SDK.
 
     -   This may have already been installed with your SimpleLink SDK install
 
--   Download and install [FreeRTOS][freertos]
-    ([FreeRTOSv10.3.1.zip][freertosv10.3.1])
-
-    -   Unzip to a useful installation location.
-    -   The GN build will look at `~/third_party/FreeRTOSv10.3.1` by default.
-
 -   If you have installed different versions, the build defaults will need to be
     changed to reflect this in
     `${chip_root}/examples/build_overrides/ti_simplelink_sdk.gni`.
@@ -170,8 +164,5 @@ terminal emulator to that port to see the output with the following options:
 [sysconfig]: https://www.ti.com/tool/SYSCONFIG
 [sysconfig-1.5.0_1397]:
     http://software-dl.ti.com/ccs/esd/sysconfig/sysconfig-1.5.0_1397-setup.run
-[freertos]: https://www.freertos.org/index.html
-[freertosv10.3.1]:
-    https://github.com/FreeRTOS/FreeRTOS/releases/download/V10.3.1/FreeRTOSv10.3.1.zip
 [ti_thread_dnd]:
     https://www.ti.com/wireless-connectivity/thread/design-development.html

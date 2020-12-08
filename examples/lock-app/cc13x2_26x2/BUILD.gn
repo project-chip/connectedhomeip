@@ -28,7 +28,6 @@ ti_simplelink_sdk("sdk") {
     "${project_dir}/main",
     "${project_dir}/main/include",
     "${chip_root}/src/platform/cc13x2_26x2",
-    "${project_dir}/main/include/",
     "${project_dir}/main/",
     "${chip_root}/third_party/openthread/repo/src/core",
     "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd",
@@ -37,7 +36,6 @@ ti_simplelink_sdk("sdk") {
 
   sources = [
     "${project_dir}/main/include/CHIPProjectConfig.h",
-    "${project_dir}/main/include/FreeRTOSConfig.h",
   ]
 
   defines = []

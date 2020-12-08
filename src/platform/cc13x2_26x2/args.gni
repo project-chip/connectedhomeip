@@ -21,6 +21,8 @@ arm_platform_config =
 
 chip_device_platform = "cc13x2_26x2"
 
+freertos_target = "${chip_root}/third_party/ti_simplelink_sdk:freertos"
+
 mbedtls_target = "${chip_root}/third_party/ti_simplelink_sdk:mbedtls"
 openthread_external_mbedtls = mbedtls_target
 openthread_external_platform =

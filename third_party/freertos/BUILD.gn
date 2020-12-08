@@ -13,13 +13,17 @@
 # limitations under the License.
 
 declare_args() {
-  # Root directory for TI SimpleLink SDK build helpers.
-  ti_simplelink_sdk_build_root =
-      "//third_party/connectedhomeip/third_party/ti_simplelink_sdk"
+  # Use a different target, such as a prebuilt FreeRTOS
+  freertos_target = ""
+}
 
-  # Root of the TI SimpleLink SDK for TI devices
-  # can be overriden by environment variable TI_SIMPLELINK_SDK_ROOT @ref ${ti_simplelink_sdk_build_root}/ti_simplelink_board.gni
-  ti_simplelink_sdk_cc13x2_26x2_root =
-      getenv("HOME") + "/ti/simplelink_cc13x2_26x2_sdk_4_30_00_54"
-  ti_sysconfig_root = getenv("HOME") + "/ti/sysconfig_1.6.0"
+if (freertos_target != "") {
+  group("freertos") {
+    public_deps = [ freertos_target ]
+  }
+} else {
+  import("freertos.gni")
+
+  freertos_target("freertos") {
+  }
 }

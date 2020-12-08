@@ -13,20 +13,17 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
+import("//build_overrides/freertos.gni")
 import("//build_overrides/mbedtls.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
 
+import("${freertos_root}/freertos.gni")
 import("${mbedtls_root}/mbedtls.gni")
 import("ti_simplelink_board.gni")
 
 declare_args() {
   # Location of the TI SimpleLink SDK.
   ti_simplelink_sdk_root = ""
-}
-
-if (freertos_root == "") {
-  # override TI SimpleLink SDK location
-  freertos_root = getenv("FREERTOS_ROOT")
 }
 
 if (ti_simplelink_sdk_root == "") {
@@ -40,7 +37,6 @@ if (ti_simplelink_sdk_root == "") {
 }
 
 assert(ti_simplelink_sdk_root != "", "ti_simplelink_sdk_root must be specified")
-assert(freertos_root != "", "freertos_root must be specified")
 
 template("ti_sysconfig") {
   assert(ti_sysconfig_root != "", "ti_sysconfig_root must be specified")
@@ -124,8 +120,6 @@ template("ti_simplelink_sdk") {
     # Treat these includes as system includes, so warnings in them are not fatal.
     include_dirs += [
       "${ti_simplelink_sdk_root}/kernel/freertos/builds/${ti_simplelink_device_family}/release",
-      "${freertos_root}/FreeRTOS/Source/include",
-      "${freertos_root}/FreeRTOS/Source/portable/GCC/ARM_CM4F",
 
       "${ti_simplelink_sdk_root}/source",
       "${ti_simplelink_sdk_root}/source/third_party/CMSIS/Include",
@@ -168,15 +162,6 @@ template("ti_simplelink_sdk") {
     configs -= [ "//build/config/compiler:std_default" ]
     configs += [ ":${sdk_target_name}_posix_config" ]
     sources = [
-      "${freertos_root}/FreeRTOS/Source/croutine.c",
-      "${freertos_root}/FreeRTOS/Source/event_groups.c",
-      "${freertos_root}/FreeRTOS/Source/list.c",
-      "${freertos_root}/FreeRTOS/Source/portable/GCC/ARM_CM4F/port.c",
-      "${freertos_root}/FreeRTOS/Source/portable/MemMang/heap_4.c",
-      "${freertos_root}/FreeRTOS/Source/queue.c",
-      "${freertos_root}/FreeRTOS/Source/stream_buffer.c",
-      "${freertos_root}/FreeRTOS/Source/tasks.c",
-      "${freertos_root}/FreeRTOS/Source/timers.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/AppHooks_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/ClockPCC26X2_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/DebugP_freertos.c",
@@ -208,9 +193,13 @@ template("ti_simplelink_sdk") {
       sources += invoker.sources
     }
 
+    public_deps = [
+      "${chip_root}/third_party/ti_simplelink_sdk:freertos",
+      "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
+    ]
+
     public_configs = [
       ":${sdk_target_name}_config",
-      "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_mbedtls_config",
     ]
   }
 }

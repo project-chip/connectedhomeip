@@ -46,3 +46,19 @@ mbedtls_target("mbedtls") {
 
   public_deps = []
 }
+
+config("ti_simplelink_freertos_config") {
+  include_dirs = [
+    "${chip_root}/src/platform/cc13x2_26x2",
+    "${freertos_root}/repo/portable/GCC/ARM_CM4F",
+  ]
+}
+
+freertos_target("freertos") {
+  sources = [
+    "${freertos_root}/repo/portable/GCC/ARM_CM4F/port.c",
+    "${freertos_root}/repo/portable/MemMang/heap_4.c",
+  ]
+
+  public_configs = [ ":ti_simplelink_freertos_config" ]
+}
