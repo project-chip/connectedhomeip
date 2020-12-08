@@ -146,20 +146,6 @@ void InitServer(AppDelegate * delegate)
         ChipLogProgress(AppServer, "Rendezvous and Secure Pairing skipped. Using test secret.");
         err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
         SuccessOrExit(err);
-
-        constexpr uint64_t kTestFabricId = 12344321;
-
-        err = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::OperationalAdvertisingParameters()
-                                                                .SetFabricId(kTestFabricId)
-                                                                .SetNodeId(chip::kTestDeviceNodeId)
-                                                                .SetPort(CHIP_PORT)
-#if INET_CONFIG_ENABLE_IPV4
-                                                                .EnableIpV4(true)
-#else
-                                                                .EnableIpV4(false)
-#endif
-        );
-        SuccessOrExit(err);
     }
     else
     {
@@ -171,6 +157,23 @@ void InitServer(AppDelegate * delegate)
             .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
             .SetPeerAddress(Transport::PeerAddress::BLE());
         SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
+    }
+
+    // TODO: advertise this only when really operational once we support both
+    // operational and commisioning advertising is supported.
+    {
+        constexpr uint64_t kTestFabricId = 12344321;
+        err                              = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::OperationalAdvertisingParameters()
+                                                                .SetFabricId(kTestFabricId)
+                                                                .SetNodeId(chip::kTestDeviceNodeId)
+                                                                .SetPort(CHIP_PORT)
+#if INET_CONFIG_ENABLE_IPV4
+                                                                .EnableIpV4(true)
+#else
+                                                                .EnableIpV4(false)
+#endif
+        );
+        SuccessOrExit(err);
     }
 
     err = Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);

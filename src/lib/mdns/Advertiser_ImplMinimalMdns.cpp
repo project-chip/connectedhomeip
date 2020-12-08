@@ -27,6 +27,7 @@
 #include <mdns/minimal/responders/QueryResponder.h>
 #include <mdns/minimal/responders/Srv.h>
 #include <mdns/minimal/responders/Txt.h>
+#include <support/ReturnMacros.h>
 
 namespace chip {
 namespace Mdns {
@@ -199,7 +200,11 @@ CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t 
     mServer.Shutdown();
 
     AllInterfaces allInterfaces;
-    return mServer.Listen(inetLayer, &allInterfaces, port);
+
+    ReturnErrorOnFailure(mServer.Listen(inetLayer, &allInterfaces, port));
+
+    ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
@@ -234,6 +239,8 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
             return CHIP_ERROR_NO_MEMORY;
         }
     }
+
+    ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Operational device'.");
 
     return CHIP_NO_ERROR;
 }
