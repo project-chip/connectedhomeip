@@ -18,6 +18,7 @@ import("//build_overrides/nlassert.gni")
 import("//build_overrides/nlio.gni")
 import("//build_overrides/nlunit_test.gni")
 import("//build_overrides/pigweed.gni")
+import("$dir_pw_build/python.gni")
 
 # This build file should not be used in superproject builds.
 assert(chip_root == "//")
@@ -30,6 +31,14 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     chip_enable_python_modules =
         (current_os == "mac" || current_os == "linux") &&
         (host_cpu == "x64" || host_cpu == "arm64")
+  }
+
+  # Python packages for supporting specific targets.
+  pw_python_group("python_packages") {
+    python_deps = [
+      "integrations/mobly:chip_mobly",
+      "third_party/happy",
+    ]
   }
 
   # This is a real toolchain. Build CHIP.
@@ -132,11 +141,11 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
     # Build the Linux all clusters app example.
     enable_linux_all_clusters_app_build =
-        enable_default_builds && host_os == "linux"
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # Build the Linux lighting app example.
     enable_linux_lighting_app_build =
-        enable_default_builds && host_os == "linux"
+        enable_default_builds && (host_os == "linux" || host_os == "mac")
 
     # Build the efr32 lock app example.
     enable_efr32_lock_app_build = enable_efr32_builds

@@ -30,9 +30,7 @@ import com.google.chip.chiptool.ChipClient
 import com.google.chip.chiptool.GenericChipDeviceListener
 import com.google.chip.chiptool.R
 import com.google.chip.chiptool.bluetooth.BluetoothManager
-import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
-import com.google.chip.chiptool.util.FragmentUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -106,18 +104,31 @@ class DeviceProvisioningFragment : Fragment() {
     }
   }
 
+   private fun closeChildFragments() {
+     childFragmentManager.fragments.forEach {
+       f -> childFragmentManager.beginTransaction().remove(f).commit()
+     }
+   }
+
   inner class ConnectionCallback : GenericChipDeviceListener() {
     override fun onConnectDeviceComplete() {
-      showMessage(R.string.rendezvous_over_ble_success_text)
+      Log.d(TAG, "onConnectDeviceComplete")
     }
 
     override fun onStatusUpdate(status: Int) {
       Log.i(TAG, "Pairing status update: $status");
+
+      when (status) {
+        STATUS_NETWORK_PROVISIONING_SUCCESS -> {
+          showMessage(R.string.rendezvous_over_ble_provisioning_success_text)
+          closeChildFragments()
+        }
+      }
     }
 
     override fun onNetworkCredentialsRequested() {
       childFragmentManager.beginTransaction()
-          .add(R.id.fragment_container, EnterWifiNetworkFragment.newInstance())
+          .add(R.id.fragment_container, EnterNetworkFragment.newInstance())
           .commit()
     }
 
@@ -141,6 +152,7 @@ class DeviceProvisioningFragment : Fragment() {
   companion object {
     private const val TAG = "DeviceProvisioningFragment"
     private const val ARG_DEVICE_INFO = "device_info"
+    private const val STATUS_NETWORK_PROVISIONING_SUCCESS = 2
 
     fun newInstance(deviceInfo: CHIPDeviceInfo): DeviceProvisioningFragment {
       return DeviceProvisioningFragment().apply {

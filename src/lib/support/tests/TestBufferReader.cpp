@@ -22,8 +22,6 @@
  *
  */
 
-#include "TestSupport.h"
-
 #include <support/BufferReader.h>
 #include <support/UnitTestRegistration.h>
 #include <type_traits>

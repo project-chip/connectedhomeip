@@ -89,6 +89,10 @@ public class ChipDeviceController {
     sendWiFiCredentials(deviceControllerPtr, ssid, password);
   }
 
+  public void sendThreadCredentials(int channel, int panId, byte[] xpanId, byte[] masterKey) {
+    sendThreadCredentials(deviceControllerPtr, channel, panId, xpanId, masterKey);
+  }
+
   public boolean disconnectDevice() {
     return disconnectDevice(deviceControllerPtr);
   }
@@ -192,7 +196,8 @@ public class ChipDeviceController {
 
   private native void sendWiFiCredentials(long deviceControllerPtr, String ssid, String password);
 
-  private native void deprecatedHardcodeThreadCredentials(long deviceControllerPtr);
+  private native void sendThreadCredentials(
+      long deviceControllerPtr, int channel, int panId, byte[] xpanId, byte[] masterKey);
 
   private native boolean disconnectDevice(long deviceControllerPtr);
 

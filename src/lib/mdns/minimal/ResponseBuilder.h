@@ -77,7 +77,7 @@ public:
             return *this;
         }
 
-        chip::BufBound out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
+        chip::Encoding::BigEndian::BufferWriter out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
 
         if (!record.Append(mHeader, type, out))
         {
