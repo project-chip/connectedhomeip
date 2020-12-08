@@ -23,7 +23,6 @@ transport (TCP, UDP, or CRMP).
 
 ```
 source scripts/activate.sh
-cd src/messaging/tests/echo
 gn gen out/debug
 ninja -C out/debug
 ```

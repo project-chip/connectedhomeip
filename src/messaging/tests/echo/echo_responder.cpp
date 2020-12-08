@@ -41,13 +41,13 @@
 namespace {
 
 // The EchoServer object.
-Protocols::EchoServer gEchoServer;
-TransportMgr<Transport::UDP> gTransportManager;
-SecureSessionMgr gSessionManager;
-SecurePairingUsingTestSecret gTestPairing;
+chip::Protocols::EchoServer gEchoServer;
+chip::TransportMgr<chip::Transport::UDP> gTransportManager;
+chip::SecureSessionMgr gSessionManager;
+chip::SecurePairingUsingTestSecret gTestPairing;
 
 // Callback handler when a CHIP EchoRequest is received.
-void HandleEchoRequestReceived(NodeId nodeId, System::PacketBufferHandle payload)
+void HandleEchoRequestReceived(chip::NodeId nodeId, chip::System::PacketBufferHandle payload)
 {
     printf("Echo Request from node %lu, len=%u ... sending response.\n", nodeId, payload->DataLength());
 }
@@ -57,14 +57,15 @@ void HandleEchoRequestReceived(NodeId nodeId, System::PacketBufferHandle payload
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    Optional<Transport::PeerAddress> peer(Transport::Type::kUndefined);
+    chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
 
     InitializeChip();
 
-    err = gTransportManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer).SetAddressType(Inet::kIPAddressType_IPv4));
+    err = gTransportManager.Init(
+        chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(kTestDeviceNodeId, &DeviceLayer::SystemLayer, &gTransportManager);
+    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
@@ -73,7 +74,7 @@ int main(int argc, char * argv[])
     err = gEchoServer.Init(&gExchangeManager);
     SuccessOrExit(err);
 
-    err = gSessionManager.NewPairing(peer, kTestControllerNodeId, &gTestPairing);
+    err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Request is received.
@@ -81,12 +82,12 @@ int main(int argc, char * argv[])
 
     printf("Listening for Echo requests...\n");
 
-    DeviceLayer::PlatformMgr().RunEventLoop();
+    chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        printf("EchoServer failed, err:%s\n", ErrorStr(err));
+        printf("EchoServer failed, err:%s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);
     }
 

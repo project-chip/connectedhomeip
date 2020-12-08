@@ -49,13 +49,13 @@ constexpr size_t kMaxEchoCount = 3;
 constexpr int32_t gEchoInterval = 1000;
 
 // The EchoClient object.
-Protocols::EchoClient gEchoClient;
+chip::Protocols::EchoClient gEchoClient;
 
-TransportMgr<Transport::UDP> gTransportManager;
+chip::TransportMgr<chip::Transport::UDP> gTransportManager;
 
-SecureSessionMgr gSessionManager;
+chip::SecureSessionMgr gSessionManager;
 
-Inet::IPAddress gDestAddr;
+chip::Inet::IPAddress gDestAddr;
 
 // The last time a CHIP Echo was attempted to be sent.
 uint64_t gLastEchoTime = 0;
@@ -72,15 +72,15 @@ uint64_t gEchoRespCount = 0;
 
 bool EchoIntervalExpired(void)
 {
-    uint64_t now = System::Timer::GetCurrentEpoch();
+    uint64_t now = chip::System::Timer::GetCurrentEpoch();
 
     return (now >= gLastEchoTime + gEchoInterval);
 }
 
 CHIP_ERROR SendEchoRequest(void)
 {
-    CHIP_ERROR err                        = CHIP_NO_ERROR;
-    System::PacketBufferHandle payloadBuf = System::PacketBuffer::New();
+    CHIP_ERROR err                              = CHIP_NO_ERROR;
+    chip::System::PacketBufferHandle payloadBuf = chip::System::PacketBuffer::New();
 
     if (payloadBuf.IsNull())
     {
@@ -97,11 +97,11 @@ CHIP_ERROR SendEchoRequest(void)
         payloadBuf->SetDataLength(static_cast<uint16_t>(len));
     }
 
-    gLastEchoTime = System::Timer::GetCurrentEpoch();
+    gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
 
-    printf("\nSend echo request message to Node: %lu\n", kTestDeviceNodeId);
+    printf("\nSend echo request message to Node: %lu\n", chip::kTestDeviceNodeId);
 
-    err = gEchoClient.SendEchoRequest(kTestDeviceNodeId, std::move(payloadBuf));
+    err = gEchoClient.SendEchoRequest(chip::kTestDeviceNodeId, std::move(payloadBuf));
 
     if (err == CHIP_NO_ERROR)
     {
@@ -110,7 +110,7 @@ CHIP_ERROR SendEchoRequest(void)
     }
     else
     {
-        printf("Send echo request failed, err: %s\n", ErrorStr(err));
+        printf("Send echo request failed, err: %s\n", chip::ErrorStr(err));
     }
 
     return err;
@@ -120,20 +120,20 @@ CHIP_ERROR EstablishSecureSession()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    SecurePairingUsingTestSecret * testSecurePairingSecret = Platform::New<SecurePairingUsingTestSecret>(
-        Optional<NodeId>::Value(kTestDeviceNodeId), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
+    chip::SecurePairingUsingTestSecret * testSecurePairingSecret = chip::Platform::New<chip::SecurePairingUsingTestSecret>(
+        chip::Optional<chip::NodeId>::Value(chip::kTestDeviceNodeId), static_cast<uint16_t>(0), static_cast<uint16_t>(0));
     VerifyOrExit(testSecurePairingSecret != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
     // Attempt to connect to the peer.
-    err = gSessionManager.NewPairing(
-        Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
-        kTestDeviceNodeId, testSecurePairingSecret);
+    err = gSessionManager.NewPairing(chip::Optional<chip::Transport::PeerAddress>::Value(
+                                         chip::Transport::PeerAddress::UDP(gDestAddr, CHIP_PORT, INET_NULL_INTERFACEID)),
+                                     chip::kTestDeviceNodeId, testSecurePairingSecret);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        printf("Establish secure session failed, err: %s\n", ErrorStr(err));
-        gLastEchoTime = System::Timer::GetCurrentEpoch();
+        printf("Establish secure session failed, err: %s\n", chip::ErrorStr(err));
+        gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
     }
     else
     {
@@ -143,9 +143,9 @@ exit:
     return err;
 }
 
-void HandleEchoResponseReceived(NodeId nodeId, System::PacketBufferHandle payload)
+void HandleEchoResponseReceived(chip::NodeId nodeId, chip::System::PacketBufferHandle payload)
 {
-    uint32_t respTime    = System::Timer::GetCurrentEpoch();
+    uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastEchoTime;
 
     gWaitingForEchoResp = false;
@@ -167,7 +167,7 @@ int main(int argc, char * argv[])
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    if (!Inet::IPAddress::FromString(argv[1], gDestAddr))
+    if (!chip::Inet::IPAddress::FromString(argv[1], gDestAddr))
     {
         printf("Invalid Echo Server IP address: %s\n", argv[1]);
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -175,12 +175,12 @@ int main(int argc, char * argv[])
 
     InitializeChip();
 
-    err = gTransportManager.Init(Transport::UdpListenParameters(&DeviceLayer::InetLayer)
-                                     .SetAddressType(Inet::kIPAddressType_IPv4)
+    err = gTransportManager.Init(chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer)
+                                     .SetAddressType(chip::Inet::kIPAddressType_IPv4)
                                      .SetListenPort(ECHO_CLIENT_PORT));
     SuccessOrExit(err);
 
-    err = gSessionManager.Init(kTestControllerNodeId, &DeviceLayer::SystemLayer, &gTransportManager);
+    err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
     SuccessOrExit(err);
 
     err = gExchangeManager.Init(&gSessionManager);
@@ -201,7 +201,7 @@ int main(int argc, char * argv[])
     {
         if (SendEchoRequest() != CHIP_NO_ERROR)
         {
-            printf("Send request failed: %s\n", ErrorStr(err));
+            printf("Send request failed: %s\n", chip::ErrorStr(err));
             break;
         }
 
@@ -226,7 +226,7 @@ int main(int argc, char * argv[])
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        printf("ChipEchoClient failed: %s\n", ErrorStr(err));
+        printf("ChipEchoClient failed: %s\n", chip::ErrorStr(err));
         exit(EXIT_FAILURE);
     }
 

@@ -26,12 +26,10 @@
 
 #include <messaging/ExchangeMgr.h>
 
-using namespace chip;
-
 #define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
 #define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
 
-extern Messaging::ExchangeManager gExchangeManager;
+extern chip::Messaging::ExchangeManager gExchangeManager;
 
 void InitializeChip(void);
 void ShutdownChip(void);

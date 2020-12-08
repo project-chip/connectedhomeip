@@ -30,7 +30,7 @@
 #include <support/ErrorStr.h>
 
 // The ExchangeManager global object.
-Messaging::ExchangeManager gExchangeManager;
+chip::Messaging::ExchangeManager gExchangeManager;
 
 void InitializeChip(void)
 {
