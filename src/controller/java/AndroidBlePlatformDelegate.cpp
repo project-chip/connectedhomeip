@@ -25,7 +25,6 @@
 #include <stddef.h>
 
 using namespace chip::Ble;
-using chip::System::PacketBuffer;
 
 AndroidBlePlatformDelegate::AndroidBlePlatformDelegate() :
     SendWriteRequestCb(NULL), SubscribeCharacteristicCb(NULL), UnsubscribeCharacteristicCb(NULL), CloseConnectionCb(NULL),
