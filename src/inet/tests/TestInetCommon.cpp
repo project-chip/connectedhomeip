@@ -35,9 +35,7 @@
 #endif
 
 #include "TestInetCommon.h"
-#include "TestInetCommonOptions.h"
 
-#include <errno.h>
 #include <vector>
 
 #include <inttypes.h>
@@ -47,9 +45,11 @@
 #include <sys/types.h>
 #include <unistd.h>
 
+#include <inet/InetFaultInjection.h>
+#include <support/CHIPFaultInjection.h>
 #include <support/CHIPMem.h>
-#include <support/ErrorStr.h>
 #include <support/ScopedBuffer.h>
+#include <system/SystemFaultInjection.h>
 #include <system/SystemTimer.h>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -102,6 +102,29 @@ static void ReleaseLwIP(void)
 }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+struct RestartCallbackContext
+{
+    int mArgc;
+    char ** mArgv;
+};
+
+static void RebootCallbackFn();
+static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::FaultInjection::Identifier aId,
+                                    nl::FaultInjection::Record * aFaultRecord);
+
+static struct RestartCallbackContext sRestartCallbackCtx;
+static nl::FaultInjection::Callback sFuzzECHeaderCb;
+static nl::FaultInjection::Callback sAsyncEventCb;
+
+// clang-format off
+static nl::FaultInjection::GlobalContext sFaultInjectionGlobalContext = {
+    {
+        RebootCallbackFn,
+        PostInjectionCallbackFn
+    }
+};
+// clang-format on
+
 System::Layer gSystemLayer;
 
 Inet::InetLayer gInet;
@@ -125,16 +148,8 @@ static void OnLwIPInitComplete(void * arg);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 char gDefaultTapDeviceName[32];
-bool gDone = false;
-
-void InetFailError(int32_t err, const char * msg)
-{
-    if (err != INET_NO_ERROR)
-    {
-        fprintf(stderr, "%s: %s\n", msg, ErrorStr(err));
-        exit(-1);
-    }
-}
+bool gDone            = false;
+bool gSigusr1Received = false;
 
 static void UseStdoutLineBuffering()
 {
@@ -152,6 +167,37 @@ void InitTestInetCommon()
 {
     chip::Platform::MemoryInit();
     UseStdoutLineBuffering();
+}
+
+static void ExitOnSIGUSR1Handler(int signum)
+{
+    // exit() allows us a slightly better clean up (gcov data) than SIGINT's exit
+    exit(0);
+}
+
+// We set a hook to exit when we receive SIGUSR1, SIGTERM or SIGHUP
+void SetSIGUSR1Handler()
+{
+    SetSignalHandler(ExitOnSIGUSR1Handler);
+}
+
+void SetSignalHandler(SignalHandler handler)
+{
+    struct sigaction sa;
+    int signals[] = { SIGUSR1 };
+    size_t i;
+
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = handler;
+
+    for (i = 0; i < sizeof(signals) / sizeof(signals[0]); i++)
+    {
+        if (sigaction(signals[i], &sa, nullptr) == -1)
+        {
+            perror("Can't catch signal");
+            exit(1);
+        }
+    }
 }
 
 void InitSystemLayer()
@@ -619,4 +665,138 @@ void DumpMemory(const uint8_t * mem, uint32_t len, const char * prefix)
     const uint32_t kRowWidth = 16;
 
     DumpMemory(mem, len, prefix, kRowWidth);
+}
+
+static void RebootCallbackFn()
+{
+    size_t i;
+    size_t j = 0;
+    chip::Platform::ScopedMemoryBuffer<char *> lArgv;
+    if (!lArgv.Alloc(static_cast<size_t>(sRestartCallbackCtx.mArgc + 2)))
+    {
+        printf("** failed to allocate memory **\n");
+        ExitNow();
+    }
+
+    if (gSigusr1Received)
+    {
+        printf("** skipping restart case after SIGUSR1 **\n");
+        ExitNow();
+    }
+
+    for (i = 0; sRestartCallbackCtx.mArgv[i] != nullptr; i++)
+    {
+        if (strcmp(sRestartCallbackCtx.mArgv[i], "--faults") == 0)
+        {
+            // Skip the --faults argument for now
+            i++;
+            continue;
+        }
+        lArgv[j++] = sRestartCallbackCtx.mArgv[i];
+    }
+
+    lArgv[j] = nullptr;
+
+    for (size_t idx = 0; lArgv[idx] != nullptr; idx++)
+    {
+        printf("argv[%d]: %s\n", static_cast<int>(idx), lArgv[idx]);
+    }
+
+    // Need to close any open file descriptor above stdin/out/err.
+    // There is no portable way to get the max fd number.
+    // Given that CHIP's test apps don't open a large number of files,
+    // FD_SETSIZE should be a reasonable upper bound (see the documentation
+    // of select).
+    for (int fd = 3; fd < FD_SETSIZE; fd++)
+    {
+        close(fd);
+    }
+
+    printf("********** Restarting *********\n");
+    fflush(stdout);
+    execvp(lArgv[0], lArgv.Get());
+
+exit:
+    return;
+}
+
+static void PostInjectionCallbackFn(nl::FaultInjection::Manager * aManager, nl::FaultInjection::Identifier aId,
+                                    nl::FaultInjection::Record * aFaultRecord)
+{
+    uint16_t numargs = aFaultRecord->mNumArguments;
+    uint16_t i;
+
+    printf("***** Injecting fault %s_%s, instance number: %u; reboot: %s", aManager->GetName(), aManager->GetFaultNames()[aId],
+           aFaultRecord->mNumTimesChecked, aFaultRecord->mReboot ? "yes" : "no");
+    if (numargs)
+    {
+        printf(" with %u args:", numargs);
+
+        for (i = 0; i < numargs; i++)
+        {
+            printf(" %d", aFaultRecord->mArguments[i]);
+        }
+    }
+
+    printf("\n");
+}
+
+static bool PrintFaultInjectionMaxArgCbFn(nl::FaultInjection::Manager & mgr, nl::FaultInjection::Identifier aId,
+                                          nl::FaultInjection::Record * aFaultRecord, void * aContext)
+{
+    const char * faultName = mgr.GetFaultNames()[aId];
+
+    if (gFaultInjectionOptions.PrintFaultCounters && aFaultRecord->mNumArguments)
+    {
+        printf("FI_instance_params: %s_%s_s%u maxArg: %u;\n", mgr.GetName(), faultName, aFaultRecord->mNumTimesChecked,
+               aFaultRecord->mArguments[0]);
+    }
+
+    return false;
+}
+
+static bool PrintCHIPFaultInjectionMaxArgCbFn(nl::FaultInjection::Identifier aId, nl::FaultInjection::Record * aFaultRecord,
+                                              void * aContext)
+{
+    nl::FaultInjection::Manager & mgr = chip::FaultInjection::GetManager();
+
+    return PrintFaultInjectionMaxArgCbFn(mgr, aId, aFaultRecord, aContext);
+}
+
+static bool PrintSystemFaultInjectionMaxArgCbFn(nl::FaultInjection::Identifier aId, nl::FaultInjection::Record * aFaultRecord,
+                                                void * aContext)
+{
+    nl::FaultInjection::Manager & mgr = chip::System::FaultInjection::GetManager();
+
+    return PrintFaultInjectionMaxArgCbFn(mgr, aId, aFaultRecord, aContext);
+}
+
+void SetupFaultInjectionContext(int argc, char * argv[])
+{
+    SetupFaultInjectionContext(argc, argv, nullptr, nullptr);
+}
+
+void SetupFaultInjectionContext(int argc, char * argv[], int32_t (*aNumEventsAvailable)(),
+                                void (*aInjectAsyncEvents)(int32_t index))
+{
+    nl::FaultInjection::Manager & weavemgr  = chip::FaultInjection::GetManager();
+    nl::FaultInjection::Manager & systemmgr = chip::System::FaultInjection::GetManager();
+
+    sRestartCallbackCtx.mArgc = argc;
+    sRestartCallbackCtx.mArgv = argv;
+
+    nl::FaultInjection::SetGlobalContext(&sFaultInjectionGlobalContext);
+
+    memset(&sFuzzECHeaderCb, 0, sizeof(sFuzzECHeaderCb));
+    sFuzzECHeaderCb.mCallBackFn = PrintCHIPFaultInjectionMaxArgCbFn;
+    weavemgr.InsertCallbackAtFault(chip::FaultInjection::kFault_FuzzExchangeHeaderTx, &sFuzzECHeaderCb);
+
+    if (aNumEventsAvailable && aInjectAsyncEvents)
+    {
+        memset(&sAsyncEventCb, 0, sizeof(sAsyncEventCb));
+        sAsyncEventCb.mCallBackFn = PrintSystemFaultInjectionMaxArgCbFn;
+        systemmgr.InsertCallbackAtFault(chip::System::FaultInjection::kFault_AsyncEvent, &sAsyncEventCb);
+
+        chip::System::FaultInjection::SetAsyncEventCallbacks(aNumEventsAvailable, aInjectAsyncEvents);
+    }
 }
