@@ -49,7 +49,7 @@ public:
     bool Parse(const BytesRange & validData, const uint8_t ** start);
 
     /// Write out this query data back into an output buffer.
-    bool Append(HeaderRef & hdr, chip::BufBound & out) const;
+    bool Append(HeaderRef & hdr, chip::Encoding::BigEndian::BufferWriter & out) const;
 
 private:
     QType mType            = QType::ANY;
