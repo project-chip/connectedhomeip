@@ -44,6 +44,7 @@
 #include <system/SystemTimer.h>
 
 #include "TestInetCommon.h"
+#include "TestSetupSignalling.h"
 
 using namespace chip;
 using namespace chip::Inet;
