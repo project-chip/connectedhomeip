@@ -33,7 +33,7 @@ static void HandleResolve(void * context, MdnsService * result, CHIP_ERROR error
     NL_TEST_ASSERT(suite, strcmp(result->mTextEntryies[0].mKey, "key") == 0);
     NL_TEST_ASSERT(suite, strcmp(reinterpret_cast<const char *>(result->mTextEntryies[0].mData), "val") == 0);
 
-    exit(0);
+    chip::DeviceLayer::PlatformMgr().Shutdown();
 }
 
 static void HandleBrowse(void * context, MdnsService * services, size_t servicesSize, CHIP_ERROR error)
@@ -121,5 +121,6 @@ int TestMdns()
         fprintf(stderr, "mDNS test timeout, is avahi daemon running?");
         retVal = EXIT_FAILURE;
     }
+    t.join();
     return retVal;
 }

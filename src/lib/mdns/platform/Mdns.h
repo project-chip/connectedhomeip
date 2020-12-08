@@ -73,10 +73,10 @@ public:
      * The CHIP stack callback function for adding a new cached service.
      *
      * The stack will NOT cache any query results unless explicitly added by calling
-     * this function. The stack will copy the service so the lifecycle beyond the
-     * function call is not required.
+     * this function. The service will be copied so it only needs to survive until
+     * this function call has returned.
      *
-     * @param[in] service    The added service.
+     * @param[in] service  The service to be added to the cache.
      *
      */
     virtual void AddMdnsService(const MdnsService & service) = 0;
@@ -84,10 +84,9 @@ public:
     /**
      * The CHIP stack callback function for updating the service.
      *
-     * The service will be copied so the lifcycle beyond the function call is not
-     * required.
+     * The service will be copied so it only needs to survive until this function call has returned.
      *
-     * @param[in] service  The updated service.
+     * @param[in] service  The service to be updated from the cache.
      *
      */
     virtual void UpdateMdnsService(const MdnsService & service) = 0;
@@ -95,7 +94,7 @@ public:
     /**
      * The CHIP stack callback function for removing a service.
      *
-     * @param[in] service  The reoved service.
+     * @param[in] service  The service to be removed from the cache.
      *
      */
     virtual void RemoveMdnsService(const MdnsService & service) = 0;

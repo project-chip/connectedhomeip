@@ -114,20 +114,20 @@ std::string GetFullType(const char * type, MdnsServiceProtocol protocol)
 
 MdnsServiceProtocol TruncateProtocolInType(char * type)
 {
-    char * deliminator           = strrchr(type, '.');
+    char * delimiter           = strrchr(type, '.');
     MdnsServiceProtocol protocol = MdnsServiceProtocol::kMdnsProtocolUnknown;
 
-    if (deliminator != NULL)
+    if (delimiter != NULL)
     {
-        if (strcmp("._tcp", deliminator) == 0)
+        if (strcmp("._tcp", delimiter) == 0)
         {
             protocol     = MdnsServiceProtocol::kMdnsProtocolTcp;
-            *deliminator = 0;
+            *delimiter = 0;
         }
-        else if (strcmp("._udp", deliminator) == 0)
+        else if (strcmp("._udp", delimiter) == 0)
         {
             protocol     = MdnsServiceProtocol::kMdnsProtocolUdp;
-            *deliminator = 0;
+            *delimiter = 0;
         }
     }
     return protocol;
@@ -544,9 +544,13 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
                              chip::Inet::InterfaceId interface, MdnsBrowseCallback callback, void * context)
 {
     AvahiServiceBrowser * browser;
-    BrowseContext * browseContext = static_cast<BrowseContext *>(chip::Platform::MemoryAlloc(sizeof(BrowseContext)));
+    BrowseContext * browseContext = new BrowseContext;
     AvahiIfIndex avahiInterface   = static_cast<AvahiIfIndex>(interface);
 
+    if (browseContext == nullptr)
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
     browseContext->mInstance = this;
     browseContext->mContext  = context;
     browseContext->mCallback = callback;
@@ -560,7 +564,7 @@ CHIP_ERROR MdnsAvahi::Browse(const char * type, MdnsServiceProtocol protocol, ch
     // Otherwise the browser will be freed in the callback
     if (browser == nullptr)
     {
-        chip::Platform::MemoryFree(browseContext);
+        delete browseContext;
     }
 
     return browser == nullptr ? CHIP_ERROR_INTERNAL : CHIP_NO_ERROR;
@@ -577,7 +581,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
     case AVAHI_BROWSER_FAILURE:
         context->mCallback(context->mContext, nullptr, 0, CHIP_ERROR_INTERNAL);
         avahi_service_browser_free(browser);
-        chip::Platform::MemoryFree(context);
+        delete context;
         break;
     case AVAHI_BROWSER_NEW:
         ChipLogProgress(DeviceLayer, "Avahi browse: cache new");
@@ -599,7 +603,7 @@ void MdnsAvahi::HandleBrowse(AvahiServiceBrowser * browser, AvahiIfIndex interfa
         ChipLogProgress(DeviceLayer, "Avahi browse: all for now");
         context->mCallback(context->mContext, context->mServices.data(), context->mServices.size(), CHIP_NO_ERROR);
         avahi_service_browser_free(browser);
-        chip::Platform::MemoryFree(context);
+        delete context;
         break;
     case AVAHI_BROWSER_REMOVE:
         ChipLogProgress(DeviceLayer, "Avahi browse: remove");
@@ -627,7 +631,7 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
 {
     AvahiServiceResolver * resolver;
     AvahiIfIndex avahiInterface     = static_cast<AvahiIfIndex>(interface);
-    ResolveContext * resolveContext = static_cast<ResolveContext *>(chip::Platform::MemoryAlloc(sizeof(ResolveContext)));
+    ResolveContext * resolveContext = new ResolveContext;
     CHIP_ERROR error                = CHIP_NO_ERROR;
 
     resolveContext->mInstance = this;
@@ -644,7 +648,7 @@ CHIP_ERROR MdnsAvahi::Resolve(const char * name, const char * type, MdnsServiceP
     if (resolver == nullptr)
     {
         error = CHIP_ERROR_INTERNAL;
-        chip::Platform::MemoryFree(resolver);
+        delete resolveContext;
     }
 
     return error;
@@ -724,7 +728,7 @@ void MdnsAvahi::HandleResolve(AvahiServiceResolver * resolver, AvahiIfIndex inte
     }
 
     avahi_service_resolver_free(resolver);
-    chip::Platform::MemoryFree(context);
+    delete context;
 }
 
 MdnsAvahi::~MdnsAvahi()

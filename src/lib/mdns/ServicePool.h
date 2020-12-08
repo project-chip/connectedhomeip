@@ -27,39 +27,109 @@ constexpr uint64_t kUndefinedNodeId = 0;
 class ServicePool
 {
 public:
-    ServicePool();
+    class Entry
+    {
+    public:
+        friend ServicePool;
 
-    CHIP_ERROR AddService(uint64_t nodeId, uint64_t fabricId, const MdnsService & service, bool deepCopy = true);
+        Entry();
+        Entry(Entry && rhs);
+        Entry & operator=(Entry && rhs);
+        MdnsService mService;
+        const uint64_t mNodeId;
+        const uint64_t mFabricId;
 
+        ~Entry();
+
+    private:
+        void Clear();
+
+        Entry & MoveFrom(Entry && rhs);
+        CHIP_ERROR Emplace(const MdnsService & service, uint64_t nodeId, uint64_t fabricId);
+        CHIP_ERROR Emplace(MdnsService && service, uint64_t nodeId, uint64_t fabricId);
+
+        bool mHasValue;
+        bool mHasPending;
+    };
+
+    ServicePool() = default;
+
+    /**
+     * This method adds a service to the service pool.
+     *
+     * We'll create a deep copy of the service and make no assumption about its
+     * lifecycle.
+     *
+     */
+    CHIP_ERROR AddService(uint64_t nodeId, uint64_t fabricId, const MdnsService & service);
+
+    /**
+     * This method adds a service to the service pool taking an r-value reference.
+     *
+     * We directly copy all the pointers inside the service and assumes them to be
+     * allocated from the CHIP heap. Take caution when using this API.
+     *
+     */
+    CHIP_ERROR AddService(uint64_t nodeId, uint64_t fabricId, MdnsService && service);
+
+    /**
+     * This method removes a service from the pool.
+     *
+     * Any dynamic memory in the service will be freed.
+     *
+     */
     CHIP_ERROR RemoveService(uint64_t nodeId, uint64_t fabricId);
 
+    /**
+     * This method updates the service with given node and fabric ID.
+     *
+     * We'll create a deep copy of the service and the dynamic memory in the old
+     * service will be freed.
+     *
+     */
     CHIP_ERROR UpdateService(uint64_t nodeId, uint64_t fabricId, const MdnsService & service);
 
-    bool FindService(uint64_t nodeId, uint64_t fabricId, MdnsService ** service);
+    /**
+     * This method removes a service from the pool.
+     *
+     * Any dynamic memory in the service will be freed.
+     *
+     */
+    Entry * FindService(uint64_t nodeId, uint64_t fabricId);
 
+    /**
+     * This method performs a hash-map rehash to reduce collision
+     *
+     */
     void ReHash();
 
-    bool ShouldReHash() { return mLazyDeleteCount > kServicePoolCapacity / 4; }
+    /**
+     * This method gives suggestions on when a re-hash is required.
+     *
+     * Calling ReHash when this function returns false is also valid.
+     *
+     */
+    bool ShouldReHash() { return mLazyDeleteCount > kServicePoolCapacity / 2; }
 
+    /**
+     * This method clears the hash map.
+     *
+     * All the dynamic memory will be freed.
+     *
+     */
     void Clear();
 
     static constexpr size_t kServicePoolCapacity = 32;
 
+    ~ServicePool() = default;
+
 private:
-    struct ServicePoolEntry
-    {
-        MdnsService mService;
-        uint64_t mNodeId;
-        uint64_t mFabricId;
-        bool mLazyDelete; // Only marked as deleted and needs to be handled in rehash
-    };
-
-    void ClearNoFree();
-
     ServicePool(const ServicePool &) = delete;
     ServicePool & operator=(const ServicePool &) = delete;
 
-    ServicePoolEntry mEntries[kServicePoolCapacity];
+    Entry & FindAvailableSlot(size_t hashValue);
+
+    Entry mEntries[kServicePoolCapacity];
     size_t mLazyDeleteCount;
 };
 
