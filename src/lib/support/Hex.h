@@ -23,6 +23,12 @@ namespace chip {
 
 constexpr uint8_t kInvalidDigitValue = UINT8_MAX;
 
+/*
+ * This function converts a hex character to int
+ *
+ * @retval    kInvalidDigitValue   The passed in character is not a valid hex value
+ * @returns   The integer value otherwise.
+ */
 uint8_t HexDigitToInt(const char c);
 
 } // namespace chip
