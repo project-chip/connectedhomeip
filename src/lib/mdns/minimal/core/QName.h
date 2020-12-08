@@ -108,7 +108,7 @@ public:
     bool operator==(const FullQName & other) const;
     bool operator!=(const FullQName & other) const { return !(*this == other); }
 
-    void Put(chip::BufBound & out) const
+    void Put(chip::Encoding::BigEndian::BufferWriter & out) const
     {
         SerializedQNameIterator copy = *this;
         while (copy.Next())
