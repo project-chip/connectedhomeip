@@ -204,7 +204,8 @@ public:
     AdvertiserMinMdns() :
         mResponseSender(&mServer, &mQueryResponder), mPtrResponder(mOperationalServiceQName, mOperationalServerQName),
         mSrvResponder(mOperationalServerQName, mdns::Minimal::SrvResourceRecord(mOperationalServerQName, mServerQName, CHIP_PORT)),
-        mIPv4Responder(mServerQName), mIPv6Responder(mServerQName)
+        mIPv4Responder(mServerQName), mIPv6Responder(mServerQName),
+        mTxtResponder(mdns::Minimal::TxtResourceRecord(mOperationalServerQName, mEmptyTextEntries))
 
     {
         mServer.SetDelegate(this);
@@ -247,6 +248,11 @@ private:
     mdns::Minimal::SrvResponder mSrvResponder;
     mdns::Minimal::IPv4Responder mIPv4Responder;
     mdns::Minimal::IPv6Responder mIPv6Responder;
+    mdns::Minimal::TxtResponder mTxtResponder;
+
+    const char * mEmptyTextEntries[1] = {
+        "=",
+    };
 };
 
 void AdvertiserMinMdns::OnQuery(const mdns::Minimal::BytesRange & data, const chip::Inet::IPPacketInfo * info)
@@ -313,6 +319,12 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     if (!mQueryResponder.AddResponder(&mSrvResponder).SetReportAdditional(mServerQName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    if (!mQueryResponder.AddResponder(&mTxtResponder).IsValid())
+    {
+        ChipLogError(Discovery, "Failed to add TXT record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
     }
 

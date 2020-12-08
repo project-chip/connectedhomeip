@@ -32,16 +32,16 @@ static_library("mdns") {
   ]
 
   sources = [
+    "Advertiser.h",
     "DiscoveryManager.cpp",
     "DiscoveryManager.h",
-    "Advertiser.h"
   ]
 
   if (chip_mdns_avertiser == "none") {
     sources += [ "Advertiser_ImplNone.cpp" ]
   } else if (chip_mdns_avertiser == "minimal-mdns") {
     sources += [ "Advertiser_ImplMinimalMdns.cpp" ]
-    public_deps += ["${chip_root}/src/lib/mdns/minimal"]
+    public_deps += [ "${chip_root}/src/lib/mdns/minimal" ]
   } else {
     assert(false, "Unknown mDNS advertiser implementation.")
   }
