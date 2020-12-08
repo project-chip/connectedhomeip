@@ -26,6 +26,7 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <lib/mdns/DiscoveryManager.h>
+#include <mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
@@ -157,6 +158,9 @@ void InitServer(AppDelegate * delegate)
             .SetPeerAddress(Transport::PeerAddress::BLE());
         SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
     }
+
+    err = Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    SuccessOrExit(err);
 
     err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);

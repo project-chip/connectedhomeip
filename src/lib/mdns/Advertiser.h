@@ -25,6 +25,8 @@
 namespace chip {
 namespace Mdns {
 
+static constexpr uint16_t kMdnsPort = 5353;
+
 /// Defines parameters required for advertising a CHIP node
 /// over mDNS as an 'operationally ready' node.
 class OperationalAdvertisingParameters

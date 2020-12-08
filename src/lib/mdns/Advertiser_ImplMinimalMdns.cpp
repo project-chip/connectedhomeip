@@ -39,6 +39,7 @@ public:
 
     bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) override
     {
+#if INET_CONFIG_ENABLE_IPV4
         if (mState == State::kIpV4)
         {
             *id    = INET_NULL_INTERFACEID;
@@ -48,6 +49,10 @@ public:
             SkipToFirstValidInterface();
             return true;
         }
+#else
+        mState = State::kIpV6;
+        SkipToFirstValidInterface();
+#endif
 
         if (!mIterator.HasCurrent())
         {
