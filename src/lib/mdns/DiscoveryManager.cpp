@@ -32,9 +32,17 @@
 
 namespace {
 
+void RehashServicePool(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
+{
+    chip::Mdns::ServicePool * pool = static_cast<chip::Mdns::ServicePool *>(appState);
+
+    pool->ReHash();
+}
+
+// returns whether valid node and fabric id is found in the service
 bool ParseNodeFabricId(const chip::Mdns::MdnsService & service, uint64_t * nodeId, uint64_t * fabricId)
 {
-    bool deliminatorFound             = false;
+    bool delimiterFound               = false;
     *nodeId                           = 0;
     *fabricId                         = 0;
     int digitCount                    = 0;
@@ -44,7 +52,7 @@ bool ParseNodeFabricId(const chip::Mdns::MdnsService & service, uint64_t * nodeI
     {
         if (service.mName[i] == '-')
         {
-            deliminatorFound = true;
+            delimiterFound = true;
         }
         else
         {
@@ -53,9 +61,8 @@ bool ParseNodeFabricId(const chip::Mdns::MdnsService & service, uint64_t * nodeI
             if (val == chip::kInvalidDigitValue)
             {
                 return false;
-                digitCount = 0;
             }
-            else if (!deliminatorFound)
+            else if (!delimiterFound)
             {
                 *nodeId = (*nodeId) * 16 + val;
                 digitCount++;
@@ -73,7 +80,7 @@ bool ParseNodeFabricId(const chip::Mdns::MdnsService & service, uint64_t * nodeI
         }
     }
 
-    return deliminatorFound;
+    return delimiterFound;
 }
 
 constexpr char kUnprovisionedServiceType[] = "_chipc";
@@ -244,11 +251,11 @@ CHIP_ERROR DiscoveryManager::StopPublishDevice()
 
 CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
 {
-    MdnsService * foundService;
+    ServicePool::Entry * entry = mServicePool.FindService(nodeId, fabricId);
 
-    if (mServicePool.FindService(nodeId, fabricId, &foundService) && foundService->mAddress.HasValue())
+    if (entry && entry->mService.mAddress.HasValue())
     {
-        HandleNodeIdResolve(this, foundService, CHIP_NO_ERROR);
+        HandleNodeIdResolve(this, &entry->mService, CHIP_NO_ERROR);
 
         return CHIP_NO_ERROR;
     }
@@ -319,6 +326,11 @@ void DiscoveryManager::AddMdnsService(const MdnsService & service)
             {
                 ChipLogError(Discovery, "Failed to add service to pool");
             }
+
+            if (mServicePool.ShouldReHash())
+            {
+                chip::DeviceLayer::SystemLayer.ScheduleWork(RehashServicePool, &mServicePool);
+            }
         }
         else
         {
@@ -340,16 +352,19 @@ void DiscoveryManager::UpdateMdnsService(const MdnsService & service)
             ChipLogError(Discovery, "Invalid service format during service update");
             return;
         }
-
         if (mServicePool.RemoveService(nodeId, fabricId) != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to remove service from pool");
             return;
         }
-
         if (mServicePool.AddService(nodeId, fabricId, service) != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to add service to pool");
+            return;
+        }
+        if (mServicePool.ShouldReHash())
+        {
+            chip::DeviceLayer::SystemLayer.ScheduleWork(RehashServicePool, &mServicePool);
         }
     }
 }
@@ -369,6 +384,10 @@ void DiscoveryManager::RemoveMdnsService(const MdnsService & service)
         if (mServicePool.RemoveService(nodeId, fabricId) != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Failed to remove service from pool");
+        }
+        if (mServicePool.ShouldReHash())
+        {
+            chip::DeviceLayer::SystemLayer.ScheduleWork(RehashServicePool, &mServicePool);
         }
     }
 }

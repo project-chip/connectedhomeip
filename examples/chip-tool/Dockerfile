@@ -17,8 +17,8 @@
 
 from chip-cirque-device-base
 RUN apt-get update && apt-get install -y libglib2.0 avahi-daemon libavahi-client3 && rm -rf /var/lib/apt/lists/*
-COPY out/debug/chip-tool /usr/bin/
-COPY out/debug/TestDiscoveryManager /usr/bin/
+COPY chip-tool /usr/bin/
+COPY obj/src/lib/mdns/tests/bin/TestDiscoveryManager /usr/bin/
 COPY entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh", "tool"]
