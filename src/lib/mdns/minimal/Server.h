@@ -95,7 +95,7 @@ public:
                           chip::Inet::InterfaceId interface);
 
     /// Send a specific packet broadcast to all interfaces
-    CHIP_ERROR BroadcastSend(chip::System::PacketBuffer * data, uint16_t port);
+    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port);
 
     /// Send a specific packet broadcast to a specific interface
     CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface);

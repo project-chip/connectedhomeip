@@ -199,7 +199,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t port)
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port)
 {
     for (size_t i = 0; i < mEndpointCount; i++)
     {
@@ -211,23 +211,20 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
         }
 
         // data may be sent over multiple packets. Keep the one ref active all the time
-        data->AddRef();
+        chip::System::PacketBufferHandle extraCopy = data.Retain();
 
         CHIP_ERROR err;
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), data);
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), extraCopy.Release_ForNow());
         }
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), data);
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), extraCopy.Release_ForNow());
         }
         else
         {
-            // remove extra ref and then also clear it
-            chip::System::PacketBuffer::Free(data);
-            chip::System::PacketBuffer::Free(data);
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
@@ -240,12 +237,10 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
         }
         else if (err != CHIP_NO_ERROR)
         {
-            chip::System::PacketBuffer::Free(data);
             return err;
         }
     }
 
-    chip::System::PacketBuffer::Free(data);
     return CHIP_NO_ERROR;
 }
 
