@@ -201,10 +201,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
         {
             err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), extraCopy.Release_ForNow());
         }
+#if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
             err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), extraCopy.Release_ForNow());
         }
+#endif
         else
         {
             return CHIP_ERROR_INCORRECT_STATE;
@@ -239,10 +241,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
         {
             err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), data);
         }
+#if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
             err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), data);
         }
+#endif
         else
         {
             // remove extra ref and then also clear it
