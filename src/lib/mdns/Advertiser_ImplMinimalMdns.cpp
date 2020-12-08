@@ -232,7 +232,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     }
 
     mSrvResponder.SetRecord(mdns::Minimal::SrvResourceRecord(mOperationalServiceQName, mServerQName, params.GetPort()));
-    if (!mQueryResponder.AddResponder(&mSrvResponder).SetReportAdditional(mOperationalServerQName).IsValid())
+    if (!mQueryResponder.AddResponder(&mSrvResponder).SetReportAdditional(mServerQName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
