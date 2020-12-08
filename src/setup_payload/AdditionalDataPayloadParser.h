@@ -45,11 +45,12 @@ public:
     CHIP_ERROR populatePayload(AdditionalDataPayload & outPayload);
 
 private:
-    CHIP_ERROR retrieveOptionalInfos(AdditionalDataPayload & outPayload, TLV::TLVReader & reader);
-    CHIP_ERROR populateTLV(AdditionalDataPayload & outPayload, const std::vector<uint8_t> & buf, size_t & index);
+    CHIP_ERROR DecodeInput(uint8_t * tlvDataStart, size_t tlvDataLengthInBytes);
     CHIP_ERROR parseTLVFields(chip::AdditionalDataPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes);
+    CHIP_ERROR parseTLVFields2(chip::AdditionalDataPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes);
     CHIP_ERROR DebugPrettyPrint(uint8_t * input, size_t & tlvDataLengthInBytes);
     CHIP_ERROR GenerateSamplePayload(uint8_t * output, size_t & tlvDataLengthInBytes);
+
 };
 
 } // namespace chip
