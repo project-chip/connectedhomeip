@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include "AppDelegate.h"
+#include <app/server/AppDelegate.h>
 #include <inet/InetConfig.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>

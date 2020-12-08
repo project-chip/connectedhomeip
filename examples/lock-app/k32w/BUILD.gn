@@ -31,6 +31,7 @@ k32w_sdk("sdk") {
     "${k32w_platform_dir}/app/support",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/app/util",
+    "${chip_root}/src/app/server",
     "${k32w_platform_dir}/util/include",
   ]
 
@@ -69,7 +70,6 @@ k32w_executable("lock_app") {
 
   deps = [
     ":sdk",
-    "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
     "${chip_root}/third_party/mbedtls:mbedtls",

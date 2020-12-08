@@ -227,6 +227,7 @@ zephyr_interface_library_named(chip)
 target_compile_definitions(chip INTERFACE CHIP_HAVE_CONFIG_H)
 target_include_directories(chip INTERFACE
     ${CHIP_ROOT}/src
+    ${CHIP_ROOT}/src/app/server
     ${CHIP_ROOT}/src/app/util
     ${CHIP_ROOT}/src/include
     ${CHIP_ROOT}/src/lib
