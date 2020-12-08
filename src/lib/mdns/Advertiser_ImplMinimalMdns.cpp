@@ -203,7 +203,7 @@ class AdvertiserMinMdns : public ServiceAdvertiser,
 public:
     AdvertiserMinMdns() :
         mResponseSender(&mServer, &mQueryResponder), mPtrResponder(mOperationalServiceQName, mOperationalServerQName),
-        mSrvResponder(mOperationalServerQName, mdns::Minimal::SrvResourceRecord(mOperationalServiceQName, mServerQName, CHIP_PORT)),
+        mSrvResponder(mOperationalServerQName, mdns::Minimal::SrvResourceRecord(mOperationalServerQName, mServerQName, CHIP_PORT)),
         mIPv4Responder(mServerQName), mIPv6Responder(mServerQName)
 
     {
@@ -309,7 +309,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    mSrvResponder.SetRecord(mdns::Minimal::SrvResourceRecord(mOperationalServiceQName, mServerQName, params.GetPort()));
+    mSrvResponder.SetRecord(mdns::Minimal::SrvResourceRecord(mOperationalServerQName, mServerQName, params.GetPort()));
     if (!mQueryResponder.AddResponder(&mSrvResponder).SetReportAdditional(mServerQName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
