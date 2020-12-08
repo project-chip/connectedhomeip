@@ -1023,7 +1023,7 @@ void PacketBufferTest::CheckNext(nlTestSuite * inSuite, void * inContext)
             {
                 theFirstContext->buf->next = theSecondContext->buf;
 
-                NL_TEST_ASSERT(inSuite, buffer_1->Next() == buffer_2);
+                NL_TEST_ASSERT(inSuite, buffer_1->Next_ForNow() == buffer_2);
             }
             else
             {

@@ -256,7 +256,7 @@ static bool HandleDataReceived(const PacketBufferHandle & aBuffer, TransferStats
     // Walk through each buffer in the packet chain, checking the
     // buffer for the expected pattern, if requested.
 
-    for (const PacketBuffer * lBuffer = aBuffer.Get_ForNow(); lBuffer != nullptr; lBuffer = lBuffer->Next())
+    for (PacketBufferHandle lBuffer = aBuffer.Retain(); !lBuffer.IsNull(); lBuffer.Advance())
     {
         const uint16_t lDataLength = lBuffer->DataLength();
 

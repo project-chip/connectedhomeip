@@ -243,6 +243,22 @@ public:
     bool AlignPayload(uint16_t aAlignBytes);
 
     /**
+     * Return the next buffer in a buffer chain.
+     *
+     *  If there is no next buffer, the handle will have \c IsNull() \c true.
+     *
+     *  @return a handle to the next buffer in the buffer chain.
+     */
+    CHECK_RETURN_VALUE PacketBufferHandle Next();
+
+    /**
+     * Return the last buffer in a buffer chain.
+     *
+     *  @return a handle to the next buffer in the buffer chain.
+     */
+    CHECK_RETURN_VALUE PacketBufferHandle Last();
+
+    /**
      * Allocates a PacketBuffer object with at least \c aReservedSize bytes reserved in the payload for headers, and at least
      *  \c aAllocSize bytes of space for additional data after the initial cursor pointer.
      *
@@ -293,7 +309,7 @@ public:
     static PacketBufferHandle New();
 
     // The following will shortly be removed or made private; do not use in new code.
-    PacketBuffer * Next() const { return static_cast<PacketBuffer *>(this->next); }
+    PacketBuffer * Next_ForNow() const { return static_cast<PacketBuffer *>(this->next); }
     void AddToEnd_ForNow(PacketBuffer * aPacket);
     void AddRef();
     static void Free(PacketBuffer * aPacket);
@@ -570,6 +586,16 @@ public:
         return buffer;
     }
 
+    void Advance()
+    {
+        PacketBuffer * next = mBuffer->Next_ForNow();
+        if (next != nullptr)
+        {
+            next->AddRef();
+        }
+        Adopt(next);
+    }
+
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     /**
      * Borrow a raw LwIP `pbuf *`.
@@ -593,6 +619,15 @@ private:
     // The caller's ownership is transferred to this.
     explicit PacketBufferHandle(PacketBuffer * buffer) : mBuffer(buffer) {}
 
+    static PacketBufferHandle Hold(PacketBuffer * buffer)
+    {
+        if (buffer != nullptr)
+        {
+            buffer->AddRef();
+        }
+        return PacketBufferHandle(buffer);
+    }
+
     PacketBuffer * Get() const { return mBuffer; }
 
     PacketBuffer * mBuffer;
@@ -604,6 +639,19 @@ private:
 inline void PacketBuffer::SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead)
 {
     SetDataLength(aNewLen, aChainHead.mBuffer);
+}
+
+inline PacketBufferHandle PacketBuffer::Next()
+{
+    return PacketBufferHandle::Hold(Next_ForNow());
+}
+
+inline PacketBufferHandle PacketBuffer::Last()
+{
+    PacketBuffer * p = this;
+    while (p->next != nullptr)
+        p = p->Next_ForNow();
+    return PacketBufferHandle::Hold(p);
 }
 
 } // namespace System
