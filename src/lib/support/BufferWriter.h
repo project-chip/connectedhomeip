@@ -137,21 +137,6 @@ public:
         }
         return *this;
     }
-
-    /// Allows treating of a buffer stream to a different endianess.
-    /// If input buffer does not fit, return value will not fit either.
-    template <typename T>
-    static BufferWriter StartingFrom(BufferWriterBase<T> & other)
-    {
-        if (!other.Fit())
-        {
-            return BufferWriter(other.Buffer() + other.Size(), 0, other.Needed() - other.Size());
-        }
-        return BufferWriter(other.Buffer() + other.Needed(), other.Size() - other.Needed());
-    }
-
-private:
-    BufferWriter(uint8_t * buf, size_t len, size_t needed) : BufferWriterBase<BufferWriter>(buf, len, needed) {}
 };
 
 } // namespace LittleEndian
@@ -174,21 +159,6 @@ public:
         }
         return *this;
     }
-
-    /// Allows treating of a buffer stream to a different endianess.
-    /// If input buffer does not fit, return value will not fit either.
-    template <typename T>
-    static BufferWriter StartingFrom(BufferWriterBase<T> & other)
-    {
-        if (!other.Fit())
-        {
-            return BufferWriter(other.Buffer() + other.Size(), 0, other.Needed() - other.Size());
-        }
-        return BufferWriter(other.Buffer() + other.Needed(), other.Size() - other.Needed());
-    }
-
-private:
-    BufferWriter(uint8_t * buf, size_t len, size_t needed) : BufferWriterBase<BufferWriter>(buf, len, needed) {}
 };
 
 } // namespace BigEndian
