@@ -113,7 +113,6 @@ protected:
     size_t mNeeded;
 
     BufferWriterBase(uint8_t * buf, size_t len) : mBuf(buf), mSize(len), mNeeded(0) {}
-    BufferWriterBase(uint8_t * buf, size_t len, size_t needed) : mBuf(buf), mSize(len), mNeeded(needed) {}
     BufferWriterBase(const BufferWriterBase & other) = default;
     BufferWriterBase & operator=(const BufferWriterBase & other) = default;
 };
