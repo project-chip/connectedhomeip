@@ -20,7 +20,7 @@
 #include <memory>
 
 #include <support/CHIPMem.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
