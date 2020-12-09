@@ -26,9 +26,7 @@ namespace Minimal {
 class SrvResponder : public Responder
 {
 public:
-    SrvResponder(const FullQName & qname, const SrvResourceRecord & record) : Responder(QType::SRV, qname), mRecord(record) {}
-
-    void SetRecord(const SrvResourceRecord & record) { mRecord = record; }
+    SrvResponder(const SrvResourceRecord & record) : Responder(QType::SRV, mRecord.GetName()), mRecord(record) {}
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
     {
@@ -36,7 +34,7 @@ public:
     }
 
 private:
-    SrvResourceRecord mRecord;
+    const SrvResourceRecord mRecord;
 };
 
 } // namespace Minimal

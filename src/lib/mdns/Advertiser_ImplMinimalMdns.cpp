@@ -373,7 +373,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!AddResponder<SrvResponder>(operationalServerName, SrvResourceRecord(operationalServerName, serverName, params.GetPort()))
+    if (!AddResponder<SrvResponder>(SrvResourceRecord(operationalServerName, serverName, params.GetPort()))
              .SetReportAdditional(serverName)
              .IsValid())
     {
