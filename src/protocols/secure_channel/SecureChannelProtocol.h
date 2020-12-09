@@ -23,8 +23,7 @@
  *
  */
 
-#ifndef _SECURE_CHANNEL_PROTOCOL_H
-#define _SECURE_CHANNEL_PROTOCOL_H
+#pragma once
 
 /**
  *   @namespace chip::Protocols::SecureChannel
@@ -77,5 +76,3 @@ enum
 } // namespace SecureChannel
 } // namespace Protocols
 } // namespace chip
-
-#endif // _SECURE_CHANNEL_PROTOCOL_H
