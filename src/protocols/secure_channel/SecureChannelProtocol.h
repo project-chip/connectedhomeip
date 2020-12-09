@@ -42,35 +42,35 @@ namespace SecureChannel {
 /**
  * SecureChannel Protocol Message Types
  */
-enum
+enum class MsgType
 {
     // Message Counter Synchronization Protocol Message Types
-    kMsgType_MsgCounterSyncReq = 0x00,
-    kMsgType_MsgCounterSyncRsp = 0x01,
+    MsgCounterSyncReq = 0x00,
+    MsgCounterSyncRsp = 0x01,
 
     // Reliable Messaging Protocol Message Types
-    kMsgType_StandaloneAck = 0x10,
+    StandaloneAck = 0x10,
 
     // Password-based session establishment Message Types
-    kMsgType_PASE_Spake2pA = 0x20,
-    kMsgType_PASE_Spake2pB = 0x21,
-    kMsgType_PASE_Spake2cA = 0x22,
+    PASE_Spake2pA = 0x20,
+    PASE_Spake2pB = 0x21,
+    PASE_Spake2cA = 0x22,
 
     // Certificate-based session establishment Message Types
-    kMsgType_CASE_SigmaR1  = 0x30,
-    kMsgType_CASE_SigmaR2  = 0x31,
-    kMsgType_CASE_SigmaR3  = 0x32,
-    kMsgType_CASE_SigmaErr = 0x3F,
+    CASE_SigmaR1  = 0x30,
+    CASE_SigmaR2  = 0x31,
+    CASE_SigmaR3  = 0x32,
+    CASE_SigmaErr = 0x3F,
 };
 
 /**
  * SecureChannel Protocol Status Codes
  */
-enum
+enum class StatusCode
 {
-    kStatusCode_AlreadyMemberOfFabric = 1, /**< The recipient is already a member of a fabric. */
-    kStatusCode_NotMemberOfFabric     = 2, /**< The recipient is not a member of a fabric. */
-    kStatusCode_InvalidFabricConfig   = 3  /**< The specified fabric configuration was invalid. */
+    AlreadyMemberOfFabric = 1, /**< The recipient is already a member of a fabric. */
+    NotMemberOfFabric     = 2, /**< The recipient is not a member of a fabric. */
+    InvalidFabricConfig   = 3  /**< The specified fabric configuration was invalid. */
 };
 
 } // namespace SecureChannel
