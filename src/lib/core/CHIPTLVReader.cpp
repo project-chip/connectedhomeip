@@ -1088,22 +1088,18 @@ TLVType TLVReader::GetContainerType() const
  */
 CHIP_ERROR TLVReader::Next()
 {
-    ChipLogProgress(AdditionalDataPayload, "TLVReader-Next");
     CHIP_ERROR err;
     TLVElementType elemType = ElementType();
 
     err = Skip();
-    ChipLogProgress(AdditionalDataPayload, "TLVReader-Next: Skip(), err:%d", err);
     if (err != CHIP_NO_ERROR)
         return err;
 
     err = ReadElement();
-    ChipLogProgress(AdditionalDataPayload, "TLVReader-Next: ReadElement(), err:%d", err);
     if (err != CHIP_NO_ERROR)
         return err;
 
     elemType = ElementType();
-    ChipLogProgress(AdditionalDataPayload, "TLVReader-Next: ElementType(), err:%d", err);
     if (elemType == TLVElementType::EndOfContainer)
         return CHIP_END_OF_TLV;
 
@@ -1282,7 +1278,6 @@ CHIP_ERROR TLVReader::SkipToEndOfContainer()
 
 CHIP_ERROR TLVReader::ReadElement()
 {
-    ChipLogProgress(AdditionalDataPayload, "TLVReader-ReadElement");
     CHIP_ERROR err;
     uint8_t stagingBuf[17]; // 17 = 1 control byte + 8 tag bytes + 8 length/value bytes
     const uint8_t * p;
@@ -1290,7 +1285,6 @@ CHIP_ERROR TLVReader::ReadElement()
 
     // Make sure we have input data. Return CHIP_END_OF_TLV if no more data is available.
     err = EnsureData(CHIP_END_OF_TLV);
-    ChipLogProgress(AdditionalDataPayload, "TLVReader-ReadElement: EnsureData, err:%d", err);
     if (err != CHIP_NO_ERROR)
         return err;
 
@@ -1359,16 +1353,13 @@ CHIP_ERROR TLVReader::ReadElement()
         mElemLenOrVal = LittleEndian::Read64(p);
         break;
     }
-    ChipLogProgress(AdditionalDataPayload, "TLVReader-ReadElement: VerifyElement, err:%d", err);
     return VerifyElement();
 }
 
 CHIP_ERROR TLVReader::VerifyElement()
 {
-    ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: elementType=%d, mContainerType=%d, mElemTag=%d", ElementType(), mContainerType, mElemTag);
     if (ElementType() == TLVElementType::EndOfContainer)
     {
-        ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: EndOfContainer");
         if (mContainerType == kTLVType_NotSpecified)
             return CHIP_ERROR_INVALID_TLV_ELEMENT;
         if (mElemTag != AnonymousTag)
@@ -1376,41 +1367,32 @@ CHIP_ERROR TLVReader::VerifyElement()
     }
     else
     {
-        ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: NOT EndOfContainer");
         if (mElemTag == UnknownImplicitTag) {
-            ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: UnknownImplicityTag");
             return CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG;
         }
-        ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: Choosing ContainerType");
         switch (mContainerType)
         {
         case kTLVType_NotSpecified:
-            ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: kTLVType_NotSpecified");
             if (IsContextTag(mElemTag)) {
-                ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: IsContextTag");
                 return CHIP_ERROR_INVALID_TLV_TAG;
             }
             break;
         case kTLVType_Structure:
-            ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: kTLVType_Structure");
             if (mElemTag == AnonymousTag)
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_Array:
-            ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: kTLVType_Array");
             if (mElemTag != AnonymousTag)
                 return CHIP_ERROR_INVALID_TLV_TAG;
             break;
         case kTLVType_UnknownContainer:
         case kTLVType_Path:
-            ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: kTLVType_UnknownContainer");
             break;
         default:
             return CHIP_ERROR_INCORRECT_STATE;
         }
     }
 
-    ChipLogProgress(AdditionalDataPayload, "TLVReader-VerifyElement: else");
     // If the current element encodes a specific length (e.g. a UTF8 string or a byte string), verify
     // that the purported length fits within the remaining bytes of the encoding (as delineated by mMaxLen).
     //
@@ -1567,7 +1549,6 @@ exit:
  */
 TLVElementType TLVReader::ElementType() const
 {
-    ChipLogProgress(AdditionalDataPayload, "ElementType: mControlByte:%d", mControlByte);
     if (mControlByte == static_cast<uint16_t>(kTLVControlByte_NotSpecified))
         return TLVElementType::NotSpecified;
     return static_cast<TLVElementType>(mControlByte & kTLVTypeMask);
