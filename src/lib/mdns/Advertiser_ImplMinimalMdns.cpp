@@ -170,6 +170,55 @@ private:
     }
 };
 
+/// A void* implementation that stores QNames as
+///   <ptr array> <name1> #0 <name2> #0 .... <namen> #0
+namespace ContigousFullQName {
+
+static size_t RequiredStorageSize()
+{
+    return 0;
+}
+
+template <typename... Args>
+static size_t RequiredStorageSize(const char * name, Args &&... rest)
+{
+    // need to store a pointer entry in the array, the name and null terminator plus
+    // the rest of the data
+    return sizeof(char *) + strlen(name) + 1 + RequiredStorageSize(std::forward<Args>(rest)...);
+}
+
+namespace Internal {
+
+// nothing left to initialize
+void Initialize(QNamePart * ptrLocation, char * nameLocation) {}
+
+template <typename... Args>
+void Initialize(QNamePart * ptrLocation, char * nameLocation, const char * name, Args &&... rest)
+{
+    *ptrLocation = nameLocation;
+    strcpy(nameLocation, name);
+
+    Initialize(ptrLocation + 1, nameLocation + strlen(nameLocation) + 1, std::forward<Args>(rest)...);
+}
+
+} // namespace Internal
+
+template <typename... Args>
+static FullQName Build(void * storage, Args &&... args)
+{
+    QNamePart * names = reinterpret_cast<QNamePart *>(storage);
+    char * nameOut    = reinterpret_cast<char *>(names + sizeof...(args));
+
+    Internal::Initialize(names, nameOut, std::forward<Args>(args)...);
+
+    FullQName result;
+    result.names     = names;
+    result.nameCount = sizeof...(args);
+    return result;
+}
+
+} // namespace ContigousFullQName
+
 class AdvertiserMinMdns : public ServiceAdvertiser,
                           public ServerDelegate, // gets queries
                           public ParserDelegate  // parses queries
@@ -183,6 +232,10 @@ public:
         for (size_t i = 0; i < kMaxAllocatedResponders; i++)
         {
             mAllocatedResponders[i] = nullptr;
+        }
+        for (size_t i = 0; i < kMaxAllocatedQNameData; i++)
+        {
+            mAllocatedQNameParts[i] = nullptr;
         }
     }
     ~AdvertiserMinMdns() { Clear(); }
@@ -227,12 +280,38 @@ private:
         }
 
         ChipLogError(Discovery, "Failed to find free slot for adding a responder");
-        return QueryResponderSettings(); // failed
+        return QueryResponderSettings();
+    }
+
+    template <typename... Args>
+    FullQName AllocateQName(Args &&... names)
+    {
+        for (size_t i = 0; i < kMaxAllocatedQNameData; i++)
+        {
+            if (mAllocatedQNameParts[i] != nullptr)
+            {
+                continue;
+            }
+
+            mAllocatedQNameParts[i] =
+                chip::Platform::MemoryAlloc(ContigousFullQName::RequiredStorageSize(std::forward<Args>(names)...));
+
+            if (mAllocatedQNameParts[i] == nullptr)
+            {
+                ChipLogError(Discovery, "QName memory allocation failed");
+                return FullQName();
+            }
+            return ContigousFullQName::Build(mAllocatedQNameParts[i], std::forward<Args>(names)...);
+        }
+
+        ChipLogError(Discovery, "Failed to find free slot for adding a qname");
+        return FullQName();
     }
 
     static constexpr size_t kMaxEndPoints           = 10;
     static constexpr size_t kMaxRecords             = 16;
     static constexpr size_t kMaxAllocatedResponders = 16;
+    static constexpr size_t kMaxAllocatedQNameData  = 8;
 
     Server<kMaxEndPoints> mServer;
     QueryResponder<kMaxRecords> mQueryResponder;
@@ -244,17 +323,7 @@ private:
 
     // dynamically allocated items
     Responder * mAllocatedResponders[kMaxAllocatedResponders];
-
-    // FIXME: QNamePart allocation??
-
-    /// FIXME: implement
-
-    /// data members for variable things
-    char mServerName[64] = "";
-
-    QNamePart mOperationalServiceQName[3] = { "_chip", "_tcp", "local" };
-    QNamePart mOperationalServerQName[4]  = { mServerName, "_chip", "_tcp", "local" };
-    QNamePart mServerQName[2]             = { mServerName, "local" };
+    void * mAllocatedQNameParts[kMaxAllocatedQNameData];
 
     const char * mEmptyTextEntries[1] = {
         "=",
@@ -316,21 +385,35 @@ void AdvertiserMinMdns::Clear()
             mAllocatedResponders[i] = nullptr;
         }
     }
+
+    for (size_t i = 0; i < kMaxAllocatedQNameData; i++)
+    {
+        if (mAllocatedQNameParts[i] != nullptr)
+        {
+            chip::Platform::MemoryFree(mAllocatedQNameParts[i]);
+        }
+    }
 }
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
     mQueryResponder.Init(); // start fresh
 
+    char uniqueName[64] = "";
+
     /// need to set server name
-    size_t len = snprintf(mServerName, sizeof(mServerName), "%" PRIX64 "-%" PRIX64, params.GetFabricId(), params.GetNodeId());
-    if (len >= sizeof(mServerName))
+    size_t len = snprintf(uniqueName, sizeof(uniqueName), "%" PRIX64 "-%" PRIX64, params.GetFabricId(), params.GetNodeId());
+    if (len >= sizeof(uniqueName))
     {
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!AddResponder<PtrResponder>(mOperationalServiceQName, mOperationalServerQName)
-             .SetReportAdditional(mOperationalServerQName)
+    FullQName operationalServiceName = AllocateQName("_chip", "_tcp", "local");
+    FullQName operationalServerName  = AllocateQName(uniqueName, "_chip", "_tcp", "local");
+    FullQName serverName             = AllocateQName(uniqueName, "local");
+
+    if (!AddResponder<PtrResponder>(operationalServiceName, operationalServerName)
+             .SetReportAdditional(operationalServerName)
              .SetReportInServiceListing(true)
              .IsValid())
     {
@@ -338,23 +421,22 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!AddResponder<SrvResponder>(mOperationalServerQName,
-                                    SrvResourceRecord(mOperationalServerQName, mServerQName, params.GetPort()))
-             .SetReportAdditional(mServerQName)
+    if (!AddResponder<SrvResponder>(operationalServerName, SrvResourceRecord(operationalServerName, serverName, params.GetPort()))
+             .SetReportAdditional(serverName)
              .IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
     }
-    if (!AddResponder<TxtResponder>(TxtResourceRecord(mOperationalServerQName, mEmptyTextEntries))
-             .SetReportAdditional(mServerQName)
+    if (!AddResponder<TxtResponder>(TxtResourceRecord(operationalServerName, mEmptyTextEntries))
+             .SetReportAdditional(serverName)
              .IsValid())
     {
         ChipLogError(Discovery, "Failed to add TXT record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!AddResponder<IPv6Responder>(mServerQName).IsValid())
+    if (!AddResponder<IPv6Responder>(serverName).IsValid())
     {
         ChipLogError(Discovery, "Failed to add IPv6 mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
@@ -362,7 +444,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
 
     if (params.IsIPv4Enabled())
     {
-        if (!AddResponder<IPv4Responder>(mServerQName).IsValid())
+        if (!AddResponder<IPv4Responder>(serverName).IsValid())
         {
             ChipLogError(Discovery, "Failed to add IPv4 mDNS responder");
             return CHIP_ERROR_NO_MEMORY;
