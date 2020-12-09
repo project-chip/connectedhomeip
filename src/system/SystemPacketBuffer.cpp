@@ -538,7 +538,7 @@ PacketBufferHandle PacketBufferHandle::PopHead()
 
 PacketBufferHandle PacketBufferHandle::Clone()
 {
-    if (mBuffer->Next() != nullptr)
+    if (!mBuffer->Next().IsNull())
     {
         // We do not clone an entire chain.
         return PacketBufferHandle();
