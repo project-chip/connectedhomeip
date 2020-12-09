@@ -62,7 +62,7 @@ void RendezvousServer::OnRendezvousMessageReceived(const PacketHeader & packetHe
 void RendezvousServer::OnRendezvousComplete()
 {
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
-    if (mRendezvousSession.GetLocalNodeId().HasValue() && mRendezvousSession.GetRemoteNodeId().HasValue())
+    if (mRendezvousSession.GetRemoteNodeId().HasValue())
     {
         SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, mRendezvousSession.GetRemoteNodeId().Value(),
                                     &mRendezvousSession.GetPairingSession());

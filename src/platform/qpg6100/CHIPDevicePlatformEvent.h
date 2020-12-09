@@ -26,12 +26,6 @@
 #include <platform/CHIPDeviceEvent.h>
 
 namespace chip {
-namespace System {
-class PacketBuffer;
-}
-} // namespace chip
-
-namespace chip {
 namespace DeviceLayer {
 
 namespace DeviceEventType {

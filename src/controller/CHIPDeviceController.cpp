@@ -473,24 +473,38 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
-#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
-    if (!params.HasBleLayer())
+    // TODO: We need to specify the peer address for BLE transport in bindings.
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
+        params.GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
     {
-        params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
-        params.SetPeerAddress(Transport::PeerAddress::BLE());
-    }
+#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+        if (!params.HasBleLayer())
+        {
+            params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+            params.SetPeerAddress(Transport::PeerAddress::BLE());
+        }
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+    }
 
     mDeviceBeingPaired = GetInactiveDeviceIndex();
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
+    mIsIPRendezvous    = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
     err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr);
     SuccessOrExit(err);
 
     device->Init(mTransportMgr, mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
+
+    // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
+    // provisiong cluster is ready.
+    if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
+    {
+        device->SetAddress(params.GetPeerAddress().GetIPAddress());
+        mRendezvousSession->OnRendezvousConnectionOpened();
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -675,7 +689,7 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
         ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
         mRendezvousSession->GetPairingSession().ToSerializable(device->GetPairing());
 
-        if (mPairingDelegate != nullptr)
+        if (!mIsIPRendezvous && mPairingDelegate != nullptr)
         {
             mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
         }
