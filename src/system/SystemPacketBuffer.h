@@ -341,6 +341,15 @@ public:
         mBuffer = PacketBuffer::FreeHead(mBuffer);
     }
 
+    /**
+     * Creates a copy of the data in this packet.
+     *
+     * Does NOT support chained buffers.
+     *
+     * @returns empty handle on allocation failure.
+     */
+    PacketBufferHandle Clone();
+
 private:
     PacketBufferHandle(const PacketBufferHandle &) = delete;
     PacketBufferHandle & operator=(const PacketBufferHandle &) = delete;

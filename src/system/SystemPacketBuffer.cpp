@@ -726,5 +726,31 @@ PacketBufferHandle PacketBufferHandle::PopHead()
     return PacketBufferHandle(head);
 }
 
+PacketBufferHandle PacketBufferHandle::Clone()
+{
+    if (mBuffer->Next() != nullptr)
+    {
+        // We do not clone an entire chain.
+        return PacketBufferHandle();
+    }
+
+    PacketBufferHandle other = PacketBuffer::New();
+    if (other.IsNull())
+    {
+        return other;
+    }
+
+    if (other->AvailableDataLength() < mBuffer->DataLength())
+    {
+        other.Adopt(nullptr);
+        return other;
+    }
+
+    memcpy(other->Start(), mBuffer->Start(), mBuffer->DataLength());
+    other->SetDataLength(mBuffer->DataLength());
+
+    return other;
+}
+
 } // namespace System
 } // namespace chip

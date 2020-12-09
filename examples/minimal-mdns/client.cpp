@@ -277,7 +277,7 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
         return;
     }
 
-    if (server->BroadcastSend(buffer.Release_ForNow(), gOptions.querySendPort) != CHIP_NO_ERROR)
+    if (server->BroadcastSend(std::move(buffer), gOptions.querySendPort) != CHIP_NO_ERROR)
     {
         printf("Error sending\n");
         return;
