@@ -88,8 +88,8 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     size_t payloadLength = 0;
 
     // Generate Dummy payload
-    GenerateSamplePayload(payload, payloadLength);
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Generated Dummy Payload, size=%d", payloadLength);
+    GenerateSamplePayload(&payload, payloadLength);
+    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Generated Dummy Payload, size=%d, payload[0]=%d", payloadLength, payload[0]);
     // Dump the payload TLV structure
     // DebugPrettyPrint(payload, payloadLength);
 
@@ -146,11 +146,33 @@ CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields2(chip::AdditionalDataPayl
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
-    err = reader.Skip();
+    chip::TLV::TLVReader innerReader;
+    // Outter Reader
+    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Init, size=%d", tlvDataLengthInBytes);
+    for(size_t i=0; i< tlvDataLengthInBytes; i++)
+    {
+        ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: tlvDataStart[%d]=%d", i, tlvDataStart[i]);
+    }
+    reader.Init(tlvDataStart, (uint32_t)tlvDataLengthInBytes);
+    reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
+    err = reader.Next();
     SuccessOrExit(err);
-    char value[256];
-    err = reader.GetString(value, sizeof(value));
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: parseTLVFields2, value:%s", value);
+
+    // Open the container
+    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: OpenContainer");
+    err = reader.OpenContainer(innerReader);
+    SuccessOrExit(err);
+
+    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: InnerReader.next()");
+    err = innerReader.Next();
+    SuccessOrExit(err);
+
+    // Get the value of the rotating device id
+    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Get value of the rotating device id");
+    char rotatingDeviceId[256];
+    err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId)+1);
+    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Done");
+    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: parseTLVFields2, rotatingDeviceId:%s", rotatingDeviceId);
 exit:
     return err;
 }
@@ -234,7 +256,7 @@ CHIP_ERROR AdditionalDataPayloadParser::DebugPrettyPrint(uint8_t * input, size_t
     return err;
 }
 
-CHIP_ERROR AdditionalDataPayloadParser::GenerateSamplePayload(uint8_t * output, size_t & tlvDataLengthInBytes)
+CHIP_ERROR AdditionalDataPayloadParser::GenerateSamplePayload(uint8_t ** output, size_t & tlvDataLengthInBytes)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     TLVWriter rootWriter;
@@ -246,10 +268,13 @@ CHIP_ERROR AdditionalDataPayloadParser::GenerateSamplePayload(uint8_t * output, 
     rootWriter.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
 
     TLVWriter innerStructureWriter;
-    err = rootWriter.OpenContainer(ProfileTag(rootWriter.ImplicitProfileId, kTag_AdditionalDataExensionDescriptor), kTLVType_Structure,
-                                       innerStructureWriter);
+    err = rootWriter.OpenContainer(ProfileTag(rootWriter.ImplicitProfileId, kTag_AdditionalDataExensionDescriptor),
+        kTLVType_Structure,
+        innerStructureWriter);
+
     SuccessOrExit(err);
-    err = innerStructureWriter.PutString(CommonTag(kRotatingDeviceIdTag), testRotatingDeviceId);
+    err = innerStructureWriter.PutString(ProfileTag(rootWriter.ImplicitProfileId, kRotatingDeviceIdTag),
+        testRotatingDeviceId);
     SuccessOrExit(err);
 
     err = rootWriter.CloseContainer(innerStructureWriter);
@@ -258,7 +283,7 @@ CHIP_ERROR AdditionalDataPayloadParser::GenerateSamplePayload(uint8_t * output, 
     err = rootWriter.Finalize();
     SuccessOrExit(err);
 
-    output = buffer->Start();
+    *output = buffer->Start();
     tlvDataLengthInBytes = rootWriter.GetLengthWritten();
     for(size_t i=0; i<tlvDataLengthInBytes; i++)
     {
