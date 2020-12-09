@@ -1066,12 +1066,10 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
         static_cast<TCPEndPoint &>(aTarget).HandleIncomingConnection(reinterpret_cast<TCPEndPoint *>(aArgument));
         break;
 
-    case kInetEvent_TCPDataReceived: {
-        chip::System::PacketBufferHandle buf;
-        buf.Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument));
-        static_cast<TCPEndPoint &>(aTarget).HandleDataReceived(std::move(buf));
-    }
-    break;
+    case kInetEvent_TCPDataReceived:
+        static_cast<TCPEndPoint &>(aTarget).HandleDataReceived(
+            System::PacketBufferHandle::Create(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
+        break;
 
     case kInetEvent_TCPDataSent:
         static_cast<TCPEndPoint &>(aTarget).HandleDataSent(static_cast<uint16_t>(aArgument));
@@ -1083,21 +1081,17 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
 #endif // INET_CONFIG_ENABLE_TCP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
-    case kInetEvent_RawDataReceived: {
-        chip::System::PacketBufferHandle buf;
-        buf.Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument));
-        static_cast<RawEndPoint &>(aTarget).HandleDataReceived(std::move(buf));
-    }
-    break;
+    case kInetEvent_RawDataReceived:
+        static_cast<RawEndPoint &>(aTarget).HandleDataReceived(
+            System::PacketBufferHandle::Create(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
+        break;
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
-    case kInetEvent_UDPDataReceived: {
-        chip::System::PacketBufferHandle buf;
-        buf.Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument));
-        static_cast<UDPEndPoint &>(aTarget).HandleDataReceived(std::move(buf));
-    }
-    break;
+    case kInetEvent_UDPDataReceived:
+        static_cast<UDPEndPoint &>(aTarget).HandleDataReceived(
+            System::PacketBufferHandle::Create(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
+        break;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 
 #if INET_CONFIG_ENABLE_DNS_RESOLVER
