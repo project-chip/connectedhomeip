@@ -989,7 +989,7 @@ static void TestSPAKE2P_spake2p_FEMul(nlTestSuite * inSuite, void * inContext)
         const struct spake2p_fe_mul_tv * vector = fe_mul_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(nullptr, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.FELoad(vector->fe1, vector->fe1_len, spake2p.w0);
@@ -1022,7 +1022,7 @@ static void TestSPAKE2P_spake2p_FELoadWrite(nlTestSuite * inSuite, void * inCont
         const struct spake2p_fe_rw_tv * vector = fe_rw_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(nullptr, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.FELoad(vector->fe_in, vector->fe_in_len, spake2p.w0);
@@ -1049,7 +1049,7 @@ static void TestSPAKE2P_spake2p_Mac(nlTestSuite * inSuite, void * inContext)
         const struct spake2p_hmac_tv * vector = hmac_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(nullptr, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.Mac(vector->key, vector->key_len, vector->input, vector->input_len, mac);
@@ -1079,7 +1079,7 @@ static void TestSPAKE2P_spake2p_PointMul(nlTestSuite * inSuite, void * inContext
         const struct spake2p_point_mul_tv * vector = point_mul_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(nullptr, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.PointLoad(vector->point, vector->point_len, spake2p.L);
@@ -1115,7 +1115,7 @@ static void TestSPAKE2P_spake2p_PointMulAdd(nlTestSuite * inSuite, void * inCont
         const struct spake2p_point_muladd_tv * vector = point_muladd_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(nullptr, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.PointLoad(vector->point1, vector->point1_len, spake2p.X);
@@ -1157,7 +1157,7 @@ static void TestSPAKE2P_spake2p_PointLoadWrite(nlTestSuite * inSuite, void * inC
         const struct spake2p_point_rw_tv * vector = point_rw_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(nullptr, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.PointLoad(vector->point, vector->point_len, spake2p.L);
@@ -1183,7 +1183,7 @@ static void TestSPAKE2P_spake2p_PointIsValid(nlTestSuite * inSuite, void * inCon
         const struct spake2p_point_valid_tv * vector = point_valid_tvs[vectorIndex];
 
         Spake2p_P256_SHA256_HKDF_HMAC spake2p;
-        CHIP_ERROR err = spake2p.Init(nullptr, 0);
+        CHIP_ERROR err = spake2p.Init(nullptr);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = spake2p.PointLoad(vector->point, vector->point_len, spake2p.L);
@@ -1255,8 +1255,16 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
         Test_Spake2p_P256_SHA256_HKDF_HMAC Verifier;
         Test_Spake2p_P256_SHA256_HKDF_HMAC Prover;
 
+        Hash_SHA256_stream hashContext;
+
+        error = hashContext.Begin();
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
+        error = hashContext.AddData(vector->context, vector->context_len);
+        NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
+
         // First start the prover
-        error = Prover.Init(vector->context, vector->context_len);
+        error = Prover.Init(&hashContext);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
         error = Prover.BeginProver(vector->prover_identity, vector->prover_identity_len, vector->verifier_identity,
@@ -1275,7 +1283,7 @@ static void TestSPAKE2P_RFC(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, memcmp(X, vector->X, vector->X_len) == 0);
 
         // Start up the verifier
-        error = Verifier.Init(vector->context, vector->context_len);
+        error = Verifier.Init(&hashContext);
         NL_TEST_ASSERT(inSuite, error == CHIP_NO_ERROR);
 
         // First pre-compute L (accessories with dynamic setup codes will do this)
