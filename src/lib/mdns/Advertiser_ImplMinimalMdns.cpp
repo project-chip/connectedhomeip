@@ -22,6 +22,7 @@
 
 #include <mdns/minimal/ResponseSender.h>
 #include <mdns/minimal/Server.h>
+#include <mdns/minimal/core/FlatAllocatedQName.h>
 #include <mdns/minimal/responders/IP.h>
 #include <mdns/minimal/responders/Ptr.h>
 #include <mdns/minimal/responders/QueryResponder.h>
@@ -170,55 +171,6 @@ private:
     }
 };
 
-/// A void* implementation that stores QNames as
-///   <ptr array> <name1> #0 <name2> #0 .... <namen> #0
-namespace ContigousFullQName {
-
-static size_t RequiredStorageSize()
-{
-    return 0;
-}
-
-template <typename... Args>
-static size_t RequiredStorageSize(const char * name, Args &&... rest)
-{
-    // need to store a pointer entry in the array, the name and null terminator plus
-    // the rest of the data
-    return sizeof(char *) + strlen(name) + 1 + RequiredStorageSize(std::forward<Args>(rest)...);
-}
-
-namespace Internal {
-
-// nothing left to initialize
-void Initialize(QNamePart * ptrLocation, char * nameLocation) {}
-
-template <typename... Args>
-void Initialize(QNamePart * ptrLocation, char * nameLocation, const char * name, Args &&... rest)
-{
-    *ptrLocation = nameLocation;
-    strcpy(nameLocation, name);
-
-    Initialize(ptrLocation + 1, nameLocation + strlen(nameLocation) + 1, std::forward<Args>(rest)...);
-}
-
-} // namespace Internal
-
-template <typename... Args>
-static FullQName Build(void * storage, Args &&... args)
-{
-    QNamePart * names = reinterpret_cast<QNamePart *>(storage);
-    char * nameOut    = reinterpret_cast<char *>(names + sizeof...(args));
-
-    Internal::Initialize(names, nameOut, std::forward<Args>(args)...);
-
-    FullQName result;
-    result.names     = names;
-    result.nameCount = sizeof...(args);
-    return result;
-}
-
-} // namespace ContigousFullQName
-
 class AdvertiserMinMdns : public ServiceAdvertiser,
                           public ServerDelegate, // gets queries
                           public ParserDelegate  // parses queries
@@ -294,14 +246,14 @@ private:
             }
 
             mAllocatedQNameParts[i] =
-                chip::Platform::MemoryAlloc(ContigousFullQName::RequiredStorageSize(std::forward<Args>(names)...));
+                chip::Platform::MemoryAlloc(FlatAllocatedQName::RequiredStorageSize(std::forward<Args>(names)...));
 
             if (mAllocatedQNameParts[i] == nullptr)
             {
                 ChipLogError(Discovery, "QName memory allocation failed");
                 return FullQName();
             }
-            return ContigousFullQName::Build(mAllocatedQNameParts[i], std::forward<Args>(names)...);
+            return FlatAllocatedQName::Build(mAllocatedQNameParts[i], std::forward<Args>(names)...);
         }
 
         ChipLogError(Discovery, "Failed to find free slot for adding a qname");
