@@ -28,83 +28,54 @@
 #include <mdns/minimal/responders/Srv.h>
 #include <mdns/minimal/responders/Txt.h>
 #include <support/ReturnMacros.h>
+#include <support/StringBuilder.h>
 
 namespace chip {
 namespace Mdns {
 namespace {
 
-template <size_t kSize>
-class StringBuilder
+const char * ToString(mdns::Minimal::QClass qClass)
 {
-public:
-    const char * c_str() const { return mBuffer; }
-
-    StringBuilder & Append(const char * s)
+    switch (qClass)
     {
-        size_t available = kSize - mUsed;
-        size_t len       = strlen(s);
-
-        if (len > available)
-        {
-            len = available - 1;
-        }
-        memcpy(mBuffer + mUsed, s, len);
-        mUsed += len;
-        mBuffer[mUsed] = 0;
-
-        return *this;
+    case mdns::Minimal::QClass::IN:
+        return "IN";
+    default:
+        return "???";
     }
+}
 
-private:
-    char mBuffer[kSize] = { 0 };
-    size_t mUsed        = 0;
-};
+const char * ToString(mdns::Minimal::QType qType)
+{
+    switch (qType)
+    {
+    case mdns::Minimal::QType::ANY:
+        return "ANY";
+    case mdns::Minimal::QType::A:
+        return "A";
+    case mdns::Minimal::QType::AAAA:
+        return "AAAA";
+    case mdns::Minimal::QType::TXT:
+        return "TXT";
+    case mdns::Minimal::QType::SRV:
+        return "SRV";
+    case mdns::Minimal::QType::PTR:
+        return "PTR";
+    default:
+        return "???";
+    }
+}
 
 void LogQuery(const mdns::Minimal::QueryData & data)
 {
     StringBuilder<128> logString;
 
-    logString.Append("QUERY ");
-    switch (data.GetClass())
-    {
-    case mdns::Minimal::QClass::IN:
-        logString.Append("IN");
-        break;
-    default:
-        logString.Append("???");
-        break;
-    }
-    logString.Append("/");
-    switch (data.GetType())
-    {
-    case mdns::Minimal::QType::ANY:
-        logString.Append("ANY");
-        break;
-    case mdns::Minimal::QType::A:
-        logString.Append("A");
-        break;
-    case mdns::Minimal::QType::AAAA:
-        logString.Append("AAAA");
-        break;
-    case mdns::Minimal::QType::TXT:
-        logString.Append("TXT");
-        break;
-    case mdns::Minimal::QType::SRV:
-        logString.Append("SRV");
-        break;
-    case mdns::Minimal::QType::PTR:
-        logString.Append("PTR");
-        break;
-    default:
-        logString.Append("???");
-        break;
-    }
-    logString.Append(": ");
+    logString.Add("QUERY ").Add(ToString(data.GetClass())).Add("/").Add(ToString(data.GetType())).Add(": ");
 
     mdns::Minimal::SerializedQNameIterator name = data.GetName();
     while (name.Next())
     {
-        logString.Append(name.Value()).Append(".");
+        logString.Add(name.Value()).Add(".");
     }
 
     ChipLogDetail(Discovery, "%s", logString.c_str());
