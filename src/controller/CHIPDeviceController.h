@@ -146,6 +146,8 @@ public:
      */
     CHIP_ERROR GetDevice(NodeId deviceId, Device ** device);
 
+    CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
+
     virtual void ReleaseDevice(Device * device);
 
     // ----- IO -----
@@ -188,6 +190,7 @@ protected:
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
 
+    uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();
     uint16_t FindDeviceIndex(NodeId id);
     void ReleaseDevice(uint16_t index);
