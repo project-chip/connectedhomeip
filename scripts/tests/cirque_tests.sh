@@ -115,6 +115,7 @@ function cirquetest_run_test() {
         docker container prune -f >/dev/null 2>&1
         docker network prune -f >/dev/null 2>&1
     fi
+    echo "Test log can be found at $DEVICE_LOG_DIR"
     return "$exitcode"
 }
 

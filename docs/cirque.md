@@ -41,3 +41,38 @@ logs).
 
 > Note: The container (as well as the networks) will be preserved for debugging.
 > You may need to clean it by yourself.
+
+## Run specific test
+
+You can run a single cirque test by:
+
+```
+scripts/tests/cirque_tests.sh run_test <test name>
+```
+
+The test name is the script (`.sh`) file in `src/test_driver/linux-cirque`, like `OnOffClusterTest`.
+
+For example, you can run `OnOffClusterTest` by:
+
+```
+scripts/tests/cirque_tests.sh run_test OnOffClusterTest
+```
+
+The output of the test will be written to `stdout` and `stderr`.
+
+## Specify log directory
+
+To specify log directory, simplily set `LOG_DIR` variable.
+
+```
+export LOG_DIR=/some/log/directory
+scripts/tests/cirque_tests.sh run_all_tests
+scripts/tests/cirque_tests.sh run_test OnOffClusterTest
+```
+
+Or
+
+```
+LOG_DIR=/some/log/directory scripts/tests/cirque_tests.sh run_all_tests
+LOG_DIR=/some/log/directory scripts/tests/cirque_tests.sh run_test OnOffClusterTest
+```
