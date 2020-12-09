@@ -397,7 +397,7 @@ void AdvertiserMinMdns::Clear()
 
 CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
 {
-    mQueryResponder.Init(); // start fresh
+    Clear();
 
     char uniqueName[64] = "";
 
