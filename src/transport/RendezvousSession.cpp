@@ -181,7 +181,26 @@ void RendezvousSession::OnPairingComplete()
         return;
     }
 
-    UpdateState(State::kNetworkProvisioning);
+    // TODO: This check of BLE transport should be removed in the future, after we have network provisioning cluster and ble becomes
+    // a transport.
+    if (mParams.GetPeerAddress().GetTransportType() != Transport::Type::kBle || // For rendezvous initializer
+        mPeerAddress.GetTransportType() != Transport::Type::kBle)               // For rendezvous target
+    {
+        if (mRendezvousRemoteNodeId.HasValue() && !mParams.HasRemoteNodeId())
+        {
+            ChipLogProgress(Ble, "Completed rendezvous with %llu", mRendezvousRemoteNodeId.Value());
+            mParams.SetRemoteNodeId(mRendezvousRemoteNodeId.Value());
+        }
+        UpdateState(State::kRendezvousComplete);
+        if (!mParams.IsController())
+        {
+            OnRendezvousConnectionClosed();
+        }
+    }
+    else
+    {
+        UpdateState(State::kNetworkProvisioning);
+    }
 }
 
 void RendezvousSession::OnNetworkProvisioningError(CHIP_ERROR err)
@@ -216,6 +235,7 @@ void RendezvousSession::OnRendezvousConnectionClosed()
     }
 
     mSecureSession.Reset();
+    mRendezvousRemoteNodeId.ClearValue();
 
     CHIP_ERROR err = WaitForPairing(mParams.GetLocalNodeId(), mParams.GetSetupPINCode());
     if (err != CHIP_NO_ERROR)
@@ -290,11 +310,17 @@ void RendezvousSession::OnRendezvousMessageReceived(const PacketHeader & packetH
                                                     PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
+    mPeerAddress   = peerAddress;
     // TODO: RendezvousSession should handle SecurePairing messages only
 
     switch (mCurrentState)
     {
     case State::kSecurePairing:
+        if (packetHeader.GetSourceNodeId().HasValue())
+        {
+            ChipLogProgress(Ble, "Received rendezvous message from %llu", packetHeader.GetSourceNodeId().Value());
+            mRendezvousRemoteNodeId.SetValue(packetHeader.GetSourceNodeId().Value());
+        }
         err = HandlePairingMessage(packetHeader, peerAddress, std::move(msgBuf));
         break;
 
