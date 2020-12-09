@@ -36,14 +36,18 @@ inline size_t RequiredStorageSize()
     return 0;
 }
 
+/// Deternmine the memory size required to store the given qname parts
+///
+/// Example:
+///   malloc(RequiredStorageSize("myhostname", "local"));
 template <typename... Args>
-inline size_t RequiredStorageSize(const char * name, Args &&... rest)
+inline size_t RequiredStorageSize(QNamePart name, Args &&... rest)
 {
     static_assert(CHAR_BIT == 8, "Assumption is that names can be stored in 1 byte");
 
     // need to store a pointer entry in the array, the name and null terminator plus
     // the rest of the data
-    return sizeof(char *) + strlen(name) + 1 + RequiredStorageSize(std::forward<Args>(rest)...);
+    return sizeof(QNamePart) + strlen(name) + 1 + RequiredStorageSize(std::forward<Args>(rest)...);
 }
 
 namespace Internal {
@@ -62,6 +66,13 @@ inline void Initialize(QNamePart * ptrLocation, char * nameLocation, const char 
 
 } // namespace Internal
 
+/// Build a qname inside the given storate
+///
+/// storage MUST be aligned to hold pointers
+///
+/// Example:
+///   void * data = malloc(RequiredStorageSize("myhostname", "local"));
+///   FullQName value = Build(data, "myhostname", "local");
 template <typename... Args>
 inline FullQName Build(void * storage, Args &&... args)
 {
