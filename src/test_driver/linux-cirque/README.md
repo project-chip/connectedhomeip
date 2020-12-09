@@ -50,7 +50,8 @@ You can run a single cirque test by:
 scripts/tests/cirque_tests.sh run_test <test name>
 ```
 
-The test name is the script (`.sh`) file in `src/test_driver/linux-cirque`, like `OnOffClusterTest`.
+The test name is the script (`.sh`) file in `src/test_driver/linux-cirque`, like
+`OnOffClusterTest`.
 
 For example, you can run `OnOffClusterTest` by:
 
