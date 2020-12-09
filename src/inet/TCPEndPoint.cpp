@@ -1239,7 +1239,7 @@ INET_ERROR TCPEndPoint::DriveSending()
                 unsentOffset = static_cast<uint16_t>(unsentOffset + sendLen);
                 if (unsentOffset == bufDataLen)
                 {
-                    currentUnsentBuf = currentUnsentBuf->Next();
+                    currentUnsentBuf = currentUnsentBuf->Next_ForNow();
                     unsentOffset     = 0;
                 }
 
@@ -1790,7 +1790,7 @@ TCPEndPoint::BufferOffset TCPEndPoint::FindStartOfUnsent()
         {
             // We have more to skip than current packet buffer size.
             // Follow the chain to continue.
-            currentUnsentBuf = currentUnsentBuf->Next();
+            currentUnsentBuf = currentUnsentBuf->Next_ForNow();
             leftToSkip       = static_cast<uint16_t>(leftToSkip - bufDataLen);
         }
         else
@@ -2417,7 +2417,7 @@ void TCPEndPoint::ReceiveData()
     else
     {
         rcvBuf = mRcvQueue.Get_ForNow();
-        for (PacketBuffer * nextBuf = rcvBuf->Next(); nextBuf != nullptr; rcvBuf = nextBuf, nextBuf = nextBuf->Next())
+        for (PacketBuffer * nextBuf = rcvBuf->Next_ForNow(); nextBuf != nullptr; rcvBuf = nextBuf, nextBuf = nextBuf->Next_ForNow())
             ;
 
         if (rcvBuf->AvailableDataLength() == 0)
