@@ -99,7 +99,7 @@ CHIP_ERROR SendEchoRequest(void)
 
     gLastEchoTime = chip::System::Timer::GetCurrentEpoch();
 
-    printf("\nSend echo request message to Node: %lu\n", chip::kTestDeviceNodeId);
+    printf("\nSend echo request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
     err = gEchoClient.SendEchoRequest(chip::kTestDeviceNodeId, std::move(payloadBuf));
 
@@ -151,8 +151,9 @@ void HandleEchoResponseReceived(chip::NodeId nodeId, chip::System::PacketBufferH
     gWaitingForEchoResp = false;
     gEchoRespCount++;
 
-    printf("Echo Response from node %lu : %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", nodeId, gEchoRespCount, gEchoCount,
-           static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
+    printf("Echo Response from node %" PRIu64 ": %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", nodeId, gEchoRespCount,
+           gEchoCount, static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(),
+           static_cast<double>(transitTime) / 1000);
 }
 
 } // namespace
