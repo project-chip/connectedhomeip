@@ -4,6 +4,7 @@
 
 -   Documentation about building from the command line can be found in
     [the build guide](./BUILDING.md)
+-   Documentation about running [cirque](https://github.com/openweave/cirque) tests can be found in [the cirque test guide](./cirque.md)
 -   Documentation about standard build & development flows using
     [Visual Studio Code](https://code.visualstudio.com/) can be found in
     [the development guide](./VSCODE_DEVELOPMENT.md)
