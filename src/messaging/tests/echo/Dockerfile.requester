@@ -1,5 +1,5 @@
 from chip-cirque-device-base
-RUN apt-get update && apt-get install -y libglib2.0 avahi-daemon libavahi-client3
+
 COPY out/chip-echo-requester /usr/bin/
 COPY entrypoint.sh /
 
