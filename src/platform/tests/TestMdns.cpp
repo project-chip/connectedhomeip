@@ -7,7 +7,7 @@
 #include "lib/mdns/platform/Mdns.h"
 #include "platform/CHIPDeviceLayer.h"
 #include "support/CHIPMem.h"
-#include "support/TestUtils.h"
+#include "support/UnitTestRegistration.h"
 
 using chip::Mdns::MdnsService;
 using chip::Mdns::MdnsServiceProtocol;
