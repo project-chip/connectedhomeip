@@ -87,9 +87,12 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     uint8_t * payload = nullptr;
     size_t payloadLength = 0;
 
+    err = DecodeInput(&payload, payloadLength);
+    SuccessOrExit(err);
+
     // Generate Dummy payload
-    GenerateSamplePayload(&payload, payloadLength);
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Generated Dummy Payload, size=%d, payload[0]=%d", payloadLength, payload[0]);
+    // GenerateSamplePayload(&payload, payloadLength);
+    // ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Generated Dummy Payload, size=%d, payload[0]=%d", payloadLength, payload[0]);
     // Dump the payload TLV structure
     // DebugPrettyPrint(payload, payloadLength);
 
@@ -101,7 +104,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
+CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(uint8_t ** output, size_t & tlvDataLengthInBytes)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     vector<uint8_t> buf;
@@ -135,7 +138,7 @@ CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(uint8_t * tlvDataStart, size
     ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: TLV buffer is created");
 
     // returning data
-    tlvDataStart = tlvArray.Get();
+    *output = tlvArray.Get();
     tlvDataLengthInBytes = tlvBytesLength;
 
 exit:
