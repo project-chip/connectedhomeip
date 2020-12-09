@@ -55,8 +55,6 @@ static CHIP_ERROR octetStringDecode(string octetString, vector<uint8_t> & result
     for(size_t i = 0; i < len; i += 2) {
         auto str = octetString.substr(i, 2);
         uint8_t x = (uint8_t)stoi(str, 0, 16);
-        ChipLogProgress(AdditionalDataPayload,
-            "AdditonalData - Parsing: octetStringDecode => str:%s, x:%d", str.c_str(), x);
         result.push_back(x);
     }
     return CHIP_NO_ERROR;
@@ -64,15 +62,11 @@ static CHIP_ERROR octetStringDecode(string octetString, vector<uint8_t> & result
 
 static CHIP_ERROR openTLVContainer(TLVReader & reader, TLVType type, uint64_t tag, TLVReader & containerReader)
 {
-    ChipLogProgress(AdditionalDataPayload,
-        "AdditonalData - Parsing: openTLVContainer,type=%d, tag=%d, getType()=%d, getTag()=%d, getLength()=%d",
-        type, tag, reader.GetType(), reader.GetTag(), reader.GetLength());
     CHIP_ERROR err = CHIP_NO_ERROR;
     VerifyOrExit(reader.GetType() == type, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(reader.GetTag() == tag, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(reader.GetLength() == 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: open");
     err = reader.OpenContainer(containerReader);
     SuccessOrExit(err);
 
@@ -87,15 +81,15 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     uint8_t * payload = nullptr;
     size_t payloadLength = 0;
 
+    // Decoding input
     err = DecodeInput(&payload, payloadLength);
-    SuccessOrExit(err);
 
     // Generate Dummy payload
-    // GenerateSamplePayload(&payload, payloadLength);
-    // ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Generated Dummy Payload, size=%d, payload[0]=%d", payloadLength, payload[0]);
+    //err = GenerateSamplePayload(&payload, payloadLength);
     // Dump the payload TLV structure
     // DebugPrettyPrint(payload, payloadLength);
 
+    SuccessOrExit(err);
     // Parse TLV fields
     err = parseTLVFields2(outPayload, payload, payloadLength);
     SuccessOrExit(err);
@@ -114,13 +108,11 @@ CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(uint8_t ** output, size_t & 
     size_t tlvBytesLength;
     chip::Platform::ScopedMemoryBuffer<uint8_t> tlvArray;
 
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Started");
     VerifyOrExit(mPayload.length() != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // convert the octet string to buf
     err = octetStringDecode(mPayload, buf);
     SuccessOrExit(err);
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: OctetString is decoded, Buf.size:%d", buf.size());
 
     // convert the buff to TLV buffer
     bitsLeftToRead = (buf.size() * 8) - index;
@@ -132,10 +124,8 @@ CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(uint8_t ** output, size_t & 
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
         uint64_t dest = buf[i];
-        ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: readBits => Buf:%d, Dest:%d", buf[index], dest);
         tlvArray[i] = static_cast<uint8_t>(dest);
     }
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: TLV buffer is created");
 
     // returning data
     *output = tlvArray.Get();
@@ -151,10 +141,8 @@ CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields2(chip::AdditionalDataPayl
     chip::TLV::TLVReader reader;
     chip::TLV::TLVReader innerReader;
     // Outter Reader
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Init, size=%d", tlvDataLengthInBytes);
     for(size_t i=0; i< tlvDataLengthInBytes; i++)
     {
-        ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: tlvDataStart[%d]=%d", i, tlvDataStart[i]);
     }
     reader.Init(tlvDataStart, (uint32_t)tlvDataLengthInBytes);
     reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
@@ -162,19 +150,15 @@ CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields2(chip::AdditionalDataPayl
     SuccessOrExit(err);
 
     // Open the container
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: OpenContainer");
     err = reader.OpenContainer(innerReader);
     SuccessOrExit(err);
 
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: InnerReader.next()");
     err = innerReader.Next();
     SuccessOrExit(err);
 
     // Get the value of the rotating device id
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Get value of the rotating device id");
     char rotatingDeviceId[256];
     err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId)+1);
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Done");
     ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: parseTLVFields2, rotatingDeviceId:%s", rotatingDeviceId);
 exit:
     return err;
@@ -182,26 +166,20 @@ exit:
 
 CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields(chip::AdditionalDataPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
 {
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Start Parsing TLV Fields, Length:%d", tlvDataLengthInBytes);
     CHIP_ERROR err = CHIP_NO_ERROR;
     if (!CanCastTo<uint32_t>(tlvDataLengthInBytes))
     {
-        ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Invalid TLV data length");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Init TLVReader");
     TLVReader rootReader;
     rootReader.Init(tlvDataStart, static_cast<uint32_t>(tlvDataLengthInBytes));
     rootReader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Start Reading TLV");
     err                          = rootReader.Next();
     SuccessOrExit(err);
 
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Checking TLV structure");
     if (rootReader.GetType() == kTLVType_Structure)
     {
-        ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Stucture is TLV");
         TLVReader innerStructureReader;
         err = openTLVContainer(rootReader, kTLVType_Structure,
                                ProfileTag(rootReader.ImplicitProfileId, kTag_AdditionalDataExensionDescriptor),
@@ -213,7 +191,6 @@ CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields(chip::AdditionalDataPaylo
     }
     else
     {
-        ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: Stucture is NOT TLV");
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
