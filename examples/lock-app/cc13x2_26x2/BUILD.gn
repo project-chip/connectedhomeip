@@ -23,9 +23,7 @@ assert(current_os == "freertos")
 project_dir = "${chip_root}/examples/lock-app/cc13x2_26x2"
 
 ti_simplelink_sdk("sdk") {
-  include_dirs = [
-    "${project_dir}/main/include",
-  ]
+  include_dirs = [ "${project_dir}/main/include" ]
 
   defines = []
   if (is_debug) {

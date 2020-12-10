@@ -170,13 +170,9 @@ template("ti_simplelink_sdk") {
       sources += invoker.sources
     }
 
-    public_deps = [
-      "${chip_root}/third_party/ti_simplelink_sdk:freertos",
-    ]
+    public_deps = [ "${chip_root}/third_party/ti_simplelink_sdk:freertos" ]
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-    ]
+    public_configs = [ ":${sdk_target_name}_config" ]
   }
 
   config("${sdk_target_name}_posix_config") {
@@ -209,13 +205,9 @@ template("ti_simplelink_sdk") {
       "${ti_simplelink_sdk_root}/source/ti/posix/freertos/timer.c",
     ]
 
-    public_deps = [
-      ":${sdk_target_name}_dpl",
-    ]
+    public_deps = [ ":${sdk_target_name}_dpl" ]
 
-    public_configs = [
-      ":${sdk_target_name}_config",
-    ]
+    public_configs = [ ":${sdk_target_name}_config" ]
   }
 
   config("${sdk_target_name}_openthread_platform_config") {
@@ -273,9 +265,7 @@ template("ti_simplelink_sdk") {
       ":${sdk_target_name}_freertos",
     ]
     if (ti_simplelink_device_family == "cc13x2_26x2") {
-      public_deps += [
-        ":${sdk_target_name}_openthread_platform",
-      ]
+      public_deps += [ ":${sdk_target_name}_openthread_platform" ]
     }
   }
 }

@@ -20,9 +20,7 @@ template("freertos_target") {
   _freertos_root = "${freertos_root}/repo"
 
   config("${freertos_target_name}_config") {
-    include_dirs = [
-      "${_freertos_root}/include",
-    ]
+    include_dirs = [ "${_freertos_root}/include" ]
   }
 
   source_set(freertos_target_name) {
