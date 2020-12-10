@@ -25,6 +25,7 @@
 #define ADDITIONAL_DATA_PAYLOAD_H
 
 #include <vector>
+#include <stdint.h>
 
 namespace chip {
 
