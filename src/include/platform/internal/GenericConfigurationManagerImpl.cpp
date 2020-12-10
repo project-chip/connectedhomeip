@@ -854,26 +854,27 @@ bool GenericConfigurationManagerImpl<ImplClass>::_IsPairedToAccount()
 }
 
 template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_SetFullyProvisioned(bool provisioned)
+{
+    if (provisioned)
+    {
+        ::chip::SetFlag(mFlags, kFlag_IsFullyProvisioned);
+    }
+    else
+    {
+        ::chip::ClearFlag(mFlags, kFlag_IsFullyProvisioned);
+    }
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
 bool GenericConfigurationManagerImpl<ImplClass>::_IsFullyProvisioned()
 {
 #if CHIP_BYPASS_RENDEZVOUS
     return true;
-#else // CHIP_BYPASS_RENDEZVOUS
-
-    return
-#if CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION
-        ConnectivityMgr().IsWiFiStationProvisioned() &&
+#else
+    return ::chip::GetFlag(mFlags, kFlag_IsFullyProvisioned);
 #endif
-#if CHIP_DEVICE_CONFIG_ENABLE_THREAD
-        ConnectivityMgr().IsThreadProvisioned() &&
-#endif
-#if CHIP_DEVICE_CONFIG_ENABLE_JUST_IN_TIME_PROVISIONING
-        (!UseManufacturerCredentialsAsOperational() && _OperationalDeviceCredentialsProvisioned()) &&
-#endif
-        // TODO: Add checks regarding fabric membership (IsMemberOfFabric()) and account pairing (IsPairedToAccount()),
-        // when functionalities will be implemented.
-        true;
-#endif // CHIP_BYPASS_RENDEZVOUS
 }
 
 template <class ImplClass>

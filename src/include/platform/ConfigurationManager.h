@@ -120,6 +120,8 @@ public:
     CHIP_ERROR RunUnitTests();
 #endif
 
+    CHIP_ERROR SetFullyProvisioned(bool provisioned);
+
     bool IsServiceProvisioned();
     bool IsPairedToAccount();
     bool IsMemberOfFabric();
@@ -471,6 +473,11 @@ inline bool ConfigurationManager::IsPairedToAccount()
 inline bool ConfigurationManager::IsMemberOfFabric()
 {
     return static_cast<ImplClass *>(this)->_IsMemberOfFabric();
+}
+
+inline CHIP_ERROR ConfigurationManager::SetFullyProvisioned(bool provisioned)
+{
+    return static_cast<ImplClass *>(this)->_SetFullyProvisioned(provisioned);
 }
 
 inline bool ConfigurationManager::IsFullyProvisioned()

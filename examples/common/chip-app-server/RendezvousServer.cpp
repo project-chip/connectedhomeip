@@ -64,6 +64,8 @@ void RendezvousServer::OnRendezvousComplete()
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
     if (mRendezvousSession.GetRemoteNodeId().HasValue())
     {
+        chip::DeviceLayer::ConfigurationMgr().SetFullyProvisioned(true);
+        chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice(kIPAddressType_IPv6);
         SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, mRendezvousSession.GetRemoteNodeId().Value(),
                                     &mRendezvousSession.GetPairingSession());
     }
