@@ -18,16 +18,14 @@
 
 #pragma once
 
-#include "QRCodeParseCommand.h"
-#include "AdditionalDataParseCommand.h"
+#include "../common/Command.h"
 
-void registerCommandsPayload(Commands & commands)
+class AdditionalDataParseCommand : public Command
 {
-    const char * clusterName      = "Payload";
-    commands_list clusterCommands = {
-        make_unique<QRCodeParseCommand>(),
-        make_unique<AdditionalDataParseCommand>()
-    };
+public:
+    AdditionalDataParseCommand() : Command("parse-additional-data") { AddArgument("payload", &mPayload); }
+    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
-    commands.Register(clusterName, clusterCommands);
-}
+private:
+    char * mPayload;
+};

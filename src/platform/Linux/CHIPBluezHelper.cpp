@@ -695,6 +695,11 @@ static void BluezConnectionInit(BluezConnection * apConn)
                 {
                     apConn->mpC2 = char1;
                 }
+                else if ((BluezIsCharOnService(char1, apConn->mpService) == TRUE) &&
+                         (strcmp(bluez_gatt_characteristic1_get_uuid(char1), CHIP_PLAT_BLE_UUID_C3_STRING) == 0))
+                {
+                    apConn->mpC3 = char1;
+                }
                 else
                 {
                     g_object_unref(char1);
@@ -1256,11 +1261,50 @@ void BluezObjectsCleanup(BluezEndpoint * apEndpoint)
     EndpointCleanup(apEndpoint);
 }
 
+static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * characteristic)
+{
+    // Construct the TLV for the additional data
+    GVariant * cValue = nullptr;
+    unsigned long err = 0;
+    TLVWriter writer;
+    chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
+    chip::System::PacketBuffer * buffer = bufferHandle.Get_ForNow();
+    char testRotatingDeviceId[] = "1122334455667788";
+
+    writer.Init(buffer);
+    TLVType containerType;
+    err = writer.StartContainer(AnonymousTag, kTLVType_Structure, containerType);
+    SuccessOrExit(err);
+
+    // Adding the rotating device id to the TLV data
+    err = writer.PutString(CommonTag(0), testRotatingDeviceId);
+    SuccessOrExit(err);
+
+    err = writer.EndContainer(containerType);
+    SuccessOrExit(err);
+
+    writer.Finalize();
+
+    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), buffer->Start(), buffer->DataLength(), TRUE, NULL, NULL);
+    bluez_gatt_characteristic1_set_value(characteristic, cValue);
+
+    ChipLogDetail(DeviceLayer, "Set Characteristics value to %s", g_variant_get_string(cValue, NULL));
+    return;
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(DeviceLayer, "Failed to generate TLV encoded Additional Data", __func__);
+    }
+    return;
+}
+
 static void BluezPeripheralObjectsSetup(gpointer apClosure)
 {
 
     static const char * const c1_flags[] = { "write", nullptr };
     static const char * const c2_flags[] = { "read", "indicate", nullptr };
+    static const char * const c3_flags[] = { "read", nullptr };
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
     VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
@@ -1290,8 +1334,23 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
     g_signal_connect(endpoint->mpC2, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), apClosure);
     g_signal_connect(endpoint->mpC2, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), apClosure);
 
+    // Additional data characteristics
+    endpoint->mpC3 =
+        BluezCharacteristicCreate(endpoint->mpService, g_strdup("c3"), g_strdup(CHIP_PLAT_BLE_UUID_C3_STRING), endpoint->mpRoot);
+    bluez_gatt_characteristic1_set_flags(endpoint->mpC3, c3_flags);
+    g_signal_connect(endpoint->mpC3, "handle-read-value", G_CALLBACK(BluezCharacteristicReadValue), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-write-value", G_CALLBACK(BluezCharacteristicWriteValueError), NULL);
+    g_signal_connect(endpoint->mpC3, "handle-acquire-write", G_CALLBACK(BluezCharacteristicAcquireWriteError), NULL);
+    g_signal_connect(endpoint->mpC3, "handle-acquire-notify", G_CALLBACK(BluezCharacteristicAcquireNotify), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-start-notify", G_CALLBACK(BluezCharacteristicStartNotify), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), apClosure);
+    g_signal_connect(endpoint->mpC3, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), apClosure);
+    // update the characteristic value
+    UpdateAdditionalDataCharacteristic(endpoint->mpC3);
+
     ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC1));
     ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC2));
+    ChipLogDetail(DeviceLayer, "CHIP BTP C3 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC3));
 
 exit:
     return;

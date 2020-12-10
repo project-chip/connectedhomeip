@@ -18,16 +18,19 @@
 
 #pragma once
 
-#include "QRCodeParseCommand.h"
-#include "AdditionalDataParseCommand.h"
+#include "../common/Command.h"
+#include <setup_payload/SetupPayload.h>
 
-void registerCommandsPayload(Commands & commands)
+class QRCodeParseCommand : public Command
 {
-    const char * clusterName      = "Payload";
-    commands_list clusterCommands = {
-        make_unique<QRCodeParseCommand>(),
-        make_unique<AdditionalDataParseCommand>()
-    };
+public:
+    QRCodeParseCommand() : Command("parse-qr-code") { AddArgument("code", &mCode); }
+    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
-    commands.Register(clusterName, clusterCommands);
-}
+private:
+    char * mCode;
+    CHIP_ERROR Parse(std::string codeString, chip::SetupPayload & payload);
+    CHIP_ERROR Print(chip::SetupPayload payload);
+    bool IsQRCode(std::string codeString);
+    const std::string QRCODE_PREFIX = "CH:";
+};

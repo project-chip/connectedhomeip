@@ -163,6 +163,10 @@ const ChipBleUUID BleLayer::CHIP_BLE_CHAR_2_ID = { { // 18EE2EF5-263D-4559-959F-
                                                      0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
                                                      0x9F, 0x9D, 0x12 } };
 
+const ChipBleUUID BleLayer::CHIP_BLE_CHAR_3_ID = { { // 18EE2EF5-263D-4559-959F-4F9C429F9D13
+                                                     0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42,
+                                                     0x9F, 0x9D, 0x13 } };
+
 void BleLayerObject::Release()
 {
     // Decrement the ref count.  When it reaches zero, NULL out the pointer to the chip::System::Layer
@@ -600,7 +604,7 @@ bool BleLayer::HandleSubscribeReceived(BLE_CONNECTION_OBJECT connObj, const Chip
         return false;
     }
 
-    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_ID, charId))
     {
         // Find end point already associated with BLE connection, if any.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
@@ -625,7 +629,7 @@ bool BleLayer::HandleSubscribeComplete(BLE_CONNECTION_OBJECT connObj, const Chip
         return false;
     }
 
-    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_ID, charId))
     {
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
 
@@ -649,7 +653,7 @@ bool BleLayer::HandleUnsubscribeReceived(BLE_CONNECTION_OBJECT connObj, const Ch
         return false;
     }
 
-    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_ID, charId))
     {
         // Find end point already associated with BLE connection, if any.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);
@@ -674,7 +678,7 @@ bool BleLayer::HandleUnsubscribeComplete(BLE_CONNECTION_OBJECT connObj, const Ch
         return false;
     }
 
-    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId))
+    if (UUIDsMatch(&CHIP_BLE_CHAR_2_ID, charId) || UUIDsMatch(&CHIP_BLE_CHAR_3_ID, charId))
     {
         // Find end point already associated with BLE connection, if any.
         BLEEndPoint * endPoint = sBLEEndPointPool.Find(connObj);

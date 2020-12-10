@@ -16,18 +16,22 @@
  *
  */
 
-#pragma once
-
-#include "QRCodeParseCommand.h"
 #include "AdditionalDataParseCommand.h"
 
-void registerCommandsPayload(Commands & commands)
-{
-    const char * clusterName      = "Payload";
-    commands_list clusterCommands = {
-        make_unique<QRCodeParseCommand>(),
-        make_unique<AdditionalDataParseCommand>()
-    };
+#include <setup_payload/AdditionalDataPayloadParser.h>
+#include <setup_payload/AdditionalDataPayload.h>
 
-    commands.Register(clusterName, clusterCommands);
+using namespace ::chip;
+
+CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
+{
+    std::string payload(mPayload);
+    AdditionalDataPayload resultPayload;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    SuccessOrExit(err);
+    ChipLogProgress(chipTool, "AdditionalDataParseCommand, payload=%s", payload.c_str());
+
+    err = AdditionalDataPayloadParser(payload).populatePayload(resultPayload);
+exit:
+    return err;
 }
