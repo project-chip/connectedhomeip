@@ -169,6 +169,9 @@ function asReadType(type)
       case 'int32_t':
       case 'uint32_t':
         return 'Int32u';
+      case 'int64_t':
+      case 'uint64_t':
+        return 'Int64u';
       default:
         error = 'Unhandled underlying type ' + zclType + ' for original type ' + type;
         throw error;
