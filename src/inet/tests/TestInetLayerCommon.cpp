@@ -29,6 +29,7 @@
 
 #include <stdlib.h>
 #include <string.h>
+#include <utility>
 
 #include <nlbyteorder.hpp>
 
@@ -162,14 +163,14 @@ exit:
     return (lStatus);
 }
 
-static PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternStartOffset, uint8_t aFirstValue)
+static PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternStartOffset, uint8_t aFirstValue)
 {
-    PacketBuffer * lBuffer = nullptr;
+    PacketBufferHandle lBuffer;
 
     VerifyOrExit(aPatternStartOffset <= aDesiredLength, );
 
     lBuffer = PacketBuffer::New();
-    VerifyOrExit(lBuffer != nullptr, );
+    VerifyOrExit(!lBuffer.IsNull(), );
 
     aDesiredLength = min(lBuffer->MaxDataLength(), aDesiredLength);
 
@@ -178,92 +179,76 @@ static PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternS
     lBuffer->SetDataLength(aDesiredLength);
 
 exit:
-    return (lBuffer);
+    return lBuffer;
 }
 
-static PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternStartOffset)
+static PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength, uint16_t aPatternStartOffset)
 {
-    const uint8_t lFirstValue = 0;
-    PacketBuffer * lBuffer    = nullptr;
-
-    lBuffer = MakeDataBuffer(aDesiredLength, aPatternStartOffset, lFirstValue);
-    VerifyOrExit(lBuffer != nullptr, );
+    constexpr uint8_t lFirstValue = 0;
+    PacketBufferHandle lBuffer    = MakeDataBuffer(aDesiredLength, aPatternStartOffset, lFirstValue);
+    VerifyOrExit(!lBuffer.IsNull(), );
 
 exit:
     return (lBuffer);
 }
 
 template <typename tType>
-static PacketBuffer * MakeICMPDataBuffer(uint16_t aDesiredUserLength, uint16_t aHeaderLength, uint16_t aPatternStartOffset,
-                                         uint8_t aType)
+static PacketBufferHandle MakeICMPDataBuffer(uint16_t aDesiredUserLength, uint16_t aHeaderLength, uint16_t aPatternStartOffset,
+                                             uint8_t aType)
 {
     static uint16_t lSequenceNumber = 0;
-    PacketBuffer * lBuffer          = nullptr;
+    PacketBufferHandle lBuffer;
 
     // To ensure there is enough room for the user data and the ICMP
     // header, include both the user data size and the ICMP header length.
 
-    lBuffer = MakeDataBuffer(aDesiredUserLength + aHeaderLength, aPatternStartOffset);
+    lBuffer = MakeDataBuffer(static_cast<uint16_t>(aDesiredUserLength + aHeaderLength), aPatternStartOffset);
 
-    if (lBuffer != nullptr)
+    if (!lBuffer.IsNull())
     {
         tType * lHeader = reinterpret_cast<tType *>(lBuffer->Start());
 
         lHeader->mType           = aType;
         lHeader->mCode           = 0;
         lHeader->mChecksum       = 0;
-        lHeader->mID             = rand() & UINT16_MAX;
+        lHeader->mID             = static_cast<uint16_t>(rand() & UINT16_MAX);
         lHeader->mSequenceNumber = nlByteOrderSwap16HostToBig(lSequenceNumber++);
     }
 
     return (lBuffer);
 }
 
-PacketBuffer * MakeICMPv4DataBuffer(uint16_t aDesiredUserLength)
+PacketBufferHandle MakeICMPv4DataBuffer(uint16_t aDesiredUserLength)
 {
-    const uint16_t lICMPHeaderLength   = sizeof(ICMPv4EchoHeader);
-    const uint16_t lPatternStartOffset = lICMPHeaderLength;
-    const uint8_t lType                = gICMPv4Types[kICMP_EchoRequestIndex];
-    PacketBuffer * lBuffer             = nullptr;
+    constexpr uint16_t lICMPHeaderLength   = sizeof(ICMPv4EchoHeader);
+    constexpr uint16_t lPatternStartOffset = lICMPHeaderLength;
+    const uint8_t lType                    = gICMPv4Types[kICMP_EchoRequestIndex];
 
-    lBuffer = MakeICMPDataBuffer<ICMPv4EchoHeader>(aDesiredUserLength, lICMPHeaderLength, lPatternStartOffset, lType);
-
-    return (lBuffer);
+    return MakeICMPDataBuffer<ICMPv4EchoHeader>(aDesiredUserLength, lICMPHeaderLength, lPatternStartOffset, lType);
 }
 
-PacketBuffer * MakeICMPv6DataBuffer(uint16_t aDesiredUserLength)
+PacketBufferHandle MakeICMPv6DataBuffer(uint16_t aDesiredUserLength)
 {
-    const uint16_t lICMPHeaderLength   = sizeof(ICMPv6EchoHeader);
-    const uint16_t lPatternStartOffset = lICMPHeaderLength;
-    const uint8_t lType                = gICMPv6Types[kICMP_EchoRequestIndex];
-    PacketBuffer * lBuffer             = nullptr;
+    constexpr uint16_t lICMPHeaderLength   = sizeof(ICMPv6EchoHeader);
+    constexpr uint16_t lPatternStartOffset = lICMPHeaderLength;
+    const uint8_t lType                    = gICMPv6Types[kICMP_EchoRequestIndex];
 
-    lBuffer = MakeICMPDataBuffer<ICMPv6EchoHeader>(aDesiredUserLength, lICMPHeaderLength, lPatternStartOffset, lType);
-
-    return (lBuffer);
+    return MakeICMPDataBuffer<ICMPv6EchoHeader>(aDesiredUserLength, lICMPHeaderLength, lPatternStartOffset, lType);
 }
 
-PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue)
+PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength, uint8_t aFirstValue)
 {
-    const uint16_t lPatternStartOffset = 0;
-    PacketBuffer * lBuffer             = nullptr;
-
-    lBuffer = MakeDataBuffer(aDesiredLength, lPatternStartOffset, aFirstValue);
-
-    return (lBuffer);
+    constexpr uint16_t lPatternStartOffset = 0;
+    return MakeDataBuffer(aDesiredLength, lPatternStartOffset, aFirstValue);
 }
 
-PacketBuffer * MakeDataBuffer(uint16_t aDesiredLength)
+PacketBufferHandle MakeDataBuffer(uint16_t aDesiredLength)
 {
-    const uint16_t lPatternStartOffset = 0;
-    PacketBuffer * lBuffer             = nullptr;
-
-    lBuffer = MakeDataBuffer(aDesiredLength, lPatternStartOffset);
-
-    return (lBuffer);
+    constexpr uint16_t lPatternStartOffset = 0;
+    return MakeDataBuffer(aDesiredLength, lPatternStartOffset);
 }
 
-static bool HandleDataReceived(const PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer,
+static bool HandleDataReceived(const PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer,
                                uint16_t aPatternStartOffset, uint8_t aFirstValue)
 {
     bool lStatus              = true;
@@ -272,7 +257,7 @@ static bool HandleDataReceived(const PacketBuffer * aBuffer, TransferStats & aSt
     // Walk through each buffer in the packet chain, checking the
     // buffer for the expected pattern, if requested.
 
-    for (const PacketBuffer * lBuffer = aBuffer; lBuffer != nullptr; lBuffer = lBuffer->Next())
+    for (PacketBufferHandle lBuffer = aBuffer.Retain(); !lBuffer.IsNull(); lBuffer.Advance())
     {
         const uint16_t lDataLength = lBuffer->DataLength();
 
@@ -284,8 +269,8 @@ static bool HandleDataReceived(const PacketBuffer * aBuffer, TransferStats & aSt
             VerifyOrExit(lStatus == true, );
         }
 
-        lTotalDataLength += lBuffer->DataLength();
-        aFirstValue += lBuffer->DataLength();
+        lTotalDataLength = static_cast<uint16_t>(lTotalDataLength + lBuffer->DataLength());
+        aFirstValue      = static_cast<uint8_t>(aFirstValue + lBuffer->DataLength());
     }
 
     // If we are accumulating stats by packet rather than by size,
@@ -297,7 +282,7 @@ exit:
     return (lStatus);
 }
 
-static bool HandleICMPDataReceived(PacketBuffer * aBuffer, uint16_t aHeaderLength, TransferStats & aStats, bool aStatsByPacket,
+static bool HandleICMPDataReceived(PacketBufferHandle aBuffer, uint16_t aHeaderLength, TransferStats & aStats, bool aStatsByPacket,
                                    bool aCheckBuffer)
 {
     const uint16_t lPatternStartOffset = 0;
@@ -310,27 +295,27 @@ static bool HandleICMPDataReceived(PacketBuffer * aBuffer, uint16_t aHeaderLengt
     return (lStatus);
 }
 
-bool HandleICMPv4DataReceived(PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
+bool HandleICMPv4DataReceived(PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
 {
     const uint16_t lICMPHeaderLength = sizeof(ICMPv4EchoHeader);
     bool lStatus;
 
-    lStatus = HandleICMPDataReceived(aBuffer, lICMPHeaderLength, aStats, aStatsByPacket, aCheckBuffer);
+    lStatus = HandleICMPDataReceived(std::move(aBuffer), lICMPHeaderLength, aStats, aStatsByPacket, aCheckBuffer);
 
     return (lStatus);
 }
 
-bool HandleICMPv6DataReceived(PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
+bool HandleICMPv6DataReceived(PacketBufferHandle aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
 {
     const uint16_t lICMPHeaderLength = sizeof(ICMPv6EchoHeader);
     bool lStatus;
 
-    lStatus = HandleICMPDataReceived(aBuffer, lICMPHeaderLength, aStats, aStatsByPacket, aCheckBuffer);
+    lStatus = HandleICMPDataReceived(std::move(aBuffer), lICMPHeaderLength, aStats, aStatsByPacket, aCheckBuffer);
 
     return (lStatus);
 }
 
-bool HandleDataReceived(const PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer,
+bool HandleDataReceived(const PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer,
                         uint8_t aFirstValue)
 {
     const uint16_t lPatternStartOffset = 0;
@@ -341,7 +326,7 @@ bool HandleDataReceived(const PacketBuffer * aBuffer, TransferStats & aStats, bo
     return (lStatus);
 }
 
-bool HandleDataReceived(const PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
+bool HandleDataReceived(const PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
 {
     const uint8_t lFirstValue          = 0;
     const uint16_t lPatternStartOffset = 0;
@@ -352,7 +337,7 @@ bool HandleDataReceived(const PacketBuffer * aBuffer, TransferStats & aStats, bo
     return (lStatus);
 }
 
-bool HandleUDPDataReceived(const PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
+bool HandleUDPDataReceived(const PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
 {
     bool lStatus;
 
@@ -361,7 +346,7 @@ bool HandleUDPDataReceived(const PacketBuffer * aBuffer, TransferStats & aStats,
     return (lStatus);
 }
 
-bool HandleTCPDataReceived(const PacketBuffer * aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
+bool HandleTCPDataReceived(const PacketBufferHandle & aBuffer, TransferStats & aStats, bool aStatsByPacket, bool aCheckBuffer)
 {
     bool lStatus;
 
@@ -383,7 +368,8 @@ void HandleSendTimerComplete(System::Layer * aSystemLayer, void * aAppState, Sys
 
 // Raw Endpoint Callback Handlers
 
-void HandleRawMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBuffer * aBuffer, const IPPacketInfo * aPacketInfo)
+void HandleRawMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBufferHandle & aBuffer,
+                              const IPPacketInfo * aPacketInfo)
 {
     char lSourceAddressBuffer[INET6_ADDRSTRLEN];
     char lDestinationAddressBuffer[INET6_ADDRSTRLEN];
@@ -413,7 +399,8 @@ void HandleRawReceiveError(const IPEndPointBasis * aEndPoint, const INET_ERROR &
 
 // UDP Endpoint Callback Handlers
 
-void HandleUDPMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBuffer * aBuffer, const IPPacketInfo * aPacketInfo)
+void HandleUDPMessageReceived(const IPEndPointBasis * aEndPoint, const PacketBufferHandle & aBuffer,
+                              const IPPacketInfo * aPacketInfo)
 {
     char lSourceAddressBuffer[INET6_ADDRSTRLEN];
     char lDestinationAddressBuffer[INET6_ADDRSTRLEN];

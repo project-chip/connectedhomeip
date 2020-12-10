@@ -42,9 +42,7 @@
  *******************************************************************************
  ******************************************************************************/
 
-//-----------------------------------------------------------------------------
-#ifndef SILABS_IAS_ZONE_SERVER_H
-#define SILABS_IAS_ZONE_SERVER_H
+#pragma once
 
 #include <app/util/af-types.h>
 
@@ -85,7 +83,8 @@ typedef struct
  * @return EMBER_SUCCESS if the attribute update and notify succeeded, error
  * code otherwise.
  */
-EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(uint8_t endpoint, uint16_t newStatus, uint16_t timeSinceStatusOccurredQs);
+EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(chip::EndpointId endpoint, uint16_t newStatus,
+                                                       uint16_t timeSinceStatusOccurredQs);
 
 /** @brief Gets the CIE assigned zone id of a given endpoint.
  *
@@ -96,7 +95,7 @@ EmberStatus emberAfPluginIasZoneServerUpdateZoneStatus(uint8_t endpoint, uint16_
  *
  * @return The zone ID assigned by the CIE at time of enrollment.
  */
-uint8_t emberAfPluginIasZoneServerGetZoneId(uint8_t endpoint);
+uint8_t emberAfPluginIasZoneServerGetZoneId(chip::EndpointId endpoint);
 
 /** @brief Determines the enrollment status of a given endpoint.
  *
@@ -107,7 +106,7 @@ uint8_t emberAfPluginIasZoneServerGetZoneId(uint8_t endpoint);
  *
  * @return True if enrolled, false otherwise.
  */
-bool emberAfIasZoneClusterAmIEnrolled(uint8_t endpoint);
+bool emberAfIasZoneClusterAmIEnrolled(chip::EndpointId endpoint);
 
 /** @brief Set the enrollment status.
  *
@@ -118,7 +117,7 @@ bool emberAfIasZoneClusterAmIEnrolled(uint8_t endpoint);
  *
  * @return An ::EmberAfStatus value indicating the status of the set action.
  */
-EmberAfStatus emberAfPluginIasZoneClusterSetEnrollmentMethod(uint8_t endpoint, EmberAfIasZoneEnrollmentMode method);
+EmberAfStatus emberAfPluginIasZoneClusterSetEnrollmentMethod(chip::EndpointId endpoint, EmberAfIasZoneEnrollmentMode method);
 
 /** @brief Configure the retry parameters of the status queue.
  *
@@ -148,5 +147,3 @@ void emberAfPluginIasZoneServerPrintQueue(void);
 /** @brief Prints the satus queue config.
  */
 void emberAfPluginIasZoneServerPrintQueueConfig(void);
-
-#endif // SILABS_IAS_ZONE_SERVER_H

@@ -480,7 +480,8 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXCharWrite(const Chip
     ChipLogDetail(DeviceLayer, "Write request received for CHIPoBLE RX characteristic (ConnId 0x%02" PRIx16 ")",
                   bt_conn_index(c1WriteEvent->BtConn));
 
-    HandleWriteReceived(c1WriteEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX, c1WriteEvent->Data);
+    HandleWriteReceived(c1WriteEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
+                        PacketBufferHandle::Create(c1WriteEvent->Data));
     bt_conn_unref(c1WriteEvent->BtConn);
 
     return CHIP_NO_ERROR;
@@ -607,7 +608,7 @@ bool GenericBLEManagerImpl_Zephyr<ImplClass>::UnsubscribeCharacteristic(BLE_CONN
 
 template <class ImplClass>
 bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                             const ChipBleUUID * charId, PacketBuffer * pBuf)
+                                                             const ChipBleUUID * charId, PacketBufferHandle pBuf)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
     uint8_t index                    = bt_conn_index(conId);
@@ -632,14 +633,12 @@ exit:
         ChipLogError(DeviceLayer, "GenericBLEManagerImpl_Zephyr<ImplClass>::SendIndication() failed: %s", ErrorStr(err));
     }
 
-    PacketBuffer::Free(pBuf);
-
     return err == CHIP_NO_ERROR;
 }
 
 template <class ImplClass>
 bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                               const ChipBleUUID * charId, PacketBuffer * pBuf)
+                                                               const ChipBleUUID * charId, PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return true;
@@ -647,7 +646,7 @@ bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendWriteRequest(BLE_CONNECTION_OB
 
 template <class ImplClass>
 bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                              const ChipBleUUID * charId, PacketBuffer * pBuf)
+                                                              const ChipBleUUID * charId, PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return true;
@@ -718,7 +717,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
                                                                const void * buf, uint16_t len, uint16_t offset, uint8_t flags)
 {
     ChipDeviceEvent event;
-    PacketBuffer * packetBuf = PacketBuffer::NewWithAvailableSize(len);
+    PacketBufferHandle packetBuf = PacketBuffer::NewWithAvailableSize(len);
 
     // Unfortunately the Zephyr logging macros end up assigning uint16_t
     // variables to uint16_t:10 fields, which triggers integer conversion
@@ -730,7 +729,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
 #pragma GCC diagnostic pop
 
     // If successful...
-    if (packetBuf != NULL)
+    if (!packetBuf.IsNull())
     {
         // Copy the characteristic value into the packet buffer.
         memcpy(packetBuf->Start(), buf, len);
@@ -739,7 +738,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
         // Arrange to post a CHIPoBLERXWriteEvent event to the CHIP queue.
         event.Type                            = DeviceEventType::kPlatformZephyrBleC1WriteEvent;
         event.Platform.BleC1WriteEvent.BtConn = bt_conn_ref(conId);
-        event.Platform.BleC1WriteEvent.Data   = packetBuf;
+        event.Platform.BleC1WriteEvent.Data   = packetBuf.Release_ForNow();
     }
 
     // If we failed to allocate a buffer, post a kPlatformZephyrBleOutOfBuffersEvent event.

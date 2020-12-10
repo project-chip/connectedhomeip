@@ -67,7 +67,9 @@ efr32_executable("lock_app") {
 
   public_deps = [
     ":sdk",
+    "${chip_root}/examples/common/QRCode",
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
+    "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
     "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/platforms:libopenthread-platform",
@@ -80,26 +82,9 @@ efr32_executable("lock_app") {
     "${efr32_project_dir}/include",
     "${chip_root}/src/app/util",
     "${examples_plat_dir}",
-    "${chip_root}/examples/common/QRCode/repo/c",
   ]
 
   sources = [
-    "${chip_root}/examples/common/QRCode/repo/c/qrcodegen.c",
-    "${chip_root}/examples/common/chip-app-server/DataModelHandler.cpp",
-    "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
-    "${chip_root}/src/app/util/af-event.cpp",
-    "${chip_root}/src/app/util/af-main-common.cpp",
-    "${chip_root}/src/app/util/attribute-size.cpp",
-    "${chip_root}/src/app/util/attribute-storage.cpp",
-    "${chip_root}/src/app/util/attribute-table.cpp",
-    "${chip_root}/src/app/util/binding-table.cpp",
-    "${chip_root}/src/app/util/chip-message-send.cpp",
-    "${chip_root}/src/app/util/client-api.cpp",
-    "${chip_root}/src/app/util/ember-print.cpp",
-    "${chip_root}/src/app/util/message.cpp",
-    "${chip_root}/src/app/util/process-cluster-message.cpp",
-    "${chip_root}/src/app/util/process-global-message.cpp",
-    "${chip_root}/src/app/util/util.cpp",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/hal-config.h",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_board.c",
     "${examples_plat_dir}/${efr32_family}/${efr32_board}/init_mcu.c",
@@ -110,8 +95,6 @@ efr32_executable("lock_app") {
     "src/BoltLockManager.cpp",
     "src/ButtonHandler.cpp",
     "src/ZclCallbacks.cpp",
-    "src/gen/call-command-handler.c",
-    "src/gen/callback-stub.c",
     "src/main.cpp",
   ]
 

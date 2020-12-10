@@ -18,23 +18,21 @@
 
 #pragma once
 
+#include "../../config/PersistentStorage.h"
 #include "Command.h"
 #include <map>
-
-#include <controller/CHIPDeviceController.h>
 
 class Commands
 {
 public:
-    using ChipDeviceController = ::chip::DeviceController::ChipDeviceController;
-    using NodeId               = ::chip::NodeId;
-    using CommandsVector       = ::std::vector<std::unique_ptr<Command>>;
+    using NodeId         = ::chip::NodeId;
+    using CommandsVector = ::std::vector<std::unique_ptr<Command>>;
 
     void Register(const char * clusterName, commands_list commandsList);
     int Run(NodeId localId, NodeId remoteId, int argc, char ** argv);
 
 private:
-    CHIP_ERROR RunCommand(ChipDeviceController & dc, NodeId remoteId, int argc, char ** argv);
+    CHIP_ERROR RunCommand(PersistentStorage & storage, NodeId localId, NodeId remoteId, int argc, char ** argv);
     std::map<std::string, CommandsVector>::iterator GetCluster(std::string clusterName);
     Command * GetCommand(CommandsVector & commands, std::string commandName);
     Command * GetGlobalCommand(CommandsVector & commands, std::string commandName, std::string attributeName);

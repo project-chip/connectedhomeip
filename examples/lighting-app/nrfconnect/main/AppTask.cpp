@@ -22,6 +22,7 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
+#include "LogUtils.h"
 #include "QRCodeUtil.h"
 #include "Server.h"
 #include "Service.h"
@@ -42,10 +43,7 @@
 #include <system/SystemClock.h>
 
 #include <dk_buttons_and_leds.h>
-#include <logging/log.h>
 #include <zephyr.h>
-
-LOG_MODULE_DECLARE(app);
 
 namespace {
 
@@ -239,7 +237,7 @@ void AppTask::LightingActionEventHandler(AppEvent * aEvent)
         actor  = AppEvent::kEventType_Button;
     }
 
-    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor))
+    if (action != LightingManager::INVALID_ACTION && !LightingMgr().InitiateAction(action, actor, 0, NULL))
         LOG_INF("Action is already in progress or active.");
 }
 
@@ -385,7 +383,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
 
     if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
-        ConnectivityMgr().SetBLEAdvertisingEnabled(ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
+        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
         LOG_INF("Enabled BLE Advertisement");
     }
     else
@@ -449,6 +447,10 @@ void AppTask::ActionInitiated(LightingManager::Action_t aAction, int32_t aActor)
     {
         LOG_INF("Turn Off Action has been initiated");
     }
+    else if (aAction == LightingManager::LEVEL_ACTION)
+    {
+        LOG_INF("Level Action has been initiated");
+    }
 }
 
 void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
@@ -460,6 +462,10 @@ void AppTask::ActionCompleted(LightingManager::Action_t aAction, int32_t aActor)
     else if (aAction == LightingManager::OFF_ACTION)
     {
         LOG_INF("Turn Off Action has been completed");
+    }
+    else if (aAction == LightingManager::LEVEL_ACTION)
+    {
+        LOG_INF("Level Action has been completed");
     }
 
     if (aActor == AppEvent::kEventType_Button)

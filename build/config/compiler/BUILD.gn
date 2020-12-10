@@ -138,12 +138,7 @@ config("disabled_warnings") {
     "-Wno-deprecated-declarations",
     "-Wno-unknown-warning-option",
     "-Wno-missing-field-initializers",
-    "-Wno-unused-but-set-variable",
-    "-Wno-unused-variable",
-  ]
-  cflags_cc = [
-    "-Wno-non-virtual-dtor",
-    "-Wno-deprecated-copy",
+    "-Wno-unused-parameter",
   ]
   if (!is_debug) {
     # assert() causes unused variable warnings in release.
@@ -153,13 +148,18 @@ config("disabled_warnings") {
     cflags += [
       "-Wno-psabi",
       "-Wno-cast-function-type",
-      "-Wno-maybe-uninitialized",
     ]
   }
 }
 
 config("strict_warnings") {
-  cflags = [ "-Wall" ]
+  cflags = [
+    "-Wall",
+    "-Wextra",
+    "-Wshadow",
+  ]
+
+  cflags_cc = [ "-Wnon-virtual-dtor" ]
 
   ldflags = []
 
@@ -186,21 +186,26 @@ config("warnings_default") {
   if (current_os != "mac" && current_os != "ios") {
     ldflags = [ "-Wl,--fatal-warnings" ]
   }
+
+  if (current_os != "mac" && current_os != "ios" && current_os != "linux" &&
+      current_os != "win") {
+    cflags = [ "-Wstack-usage=8192" ]
+  }
 }
 
 config("symbols_default") {
   cflags = [ "-g${symbol_level}" ]
 }
 
-config("gnu11") {
+config("gnu14") {
   cflags_c = [ "-std=gnu11" ]
   cflags_objc = [ "-std=gnu11" ]
-  cflags_cc = [ "-std=gnu++11" ]
-  cflags_objcc = [ "-std=gnu++11" ]
+  cflags_cc = [ "-std=gnu++14" ]
+  cflags_objcc = [ "-std=gnu++14" ]
 }
 
 config("std_default") {
-  configs = [ ":gnu11" ]
+  configs = [ ":gnu14" ]
 }
 
 config("cosmetic_default") {

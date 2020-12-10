@@ -54,3 +54,5 @@ RUN echo "PATH=/home/$USERNAME/bin:${PATH}" >> /home/$USERNAME/.bashrc
 # $USERNAME needs to own the esp-idf and tools for the examples to build
 RUN chown -R $USERNAME:$USERNAME /opt/espressif/esp-idf
 RUN chown -R $USERNAME:$USERNAME /opt/espressif/tools
+# $USERNAME needs to own west configuration to build nRF Connect examples
+RUN chown -R $USERNAME:$USERNAME /opt/NordicSemiconductor/nrfconnect/.west

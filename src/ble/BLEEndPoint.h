@@ -38,7 +38,7 @@
 namespace chip {
 namespace Ble {
 
-using ::chip::System::PacketBuffer;
+using ::chip::System::PacketBufferHandle;
 
 enum
 {
@@ -80,14 +80,14 @@ public:
     typedef void (*OnConnectCompleteFunct)(BLEEndPoint * endPoint, BLE_ERROR err);
     OnConnectCompleteFunct OnConnectComplete;
 
-    typedef void (*OnMessageReceivedFunct)(BLEEndPoint * endPoint, PacketBuffer * msg);
+    typedef void (*OnMessageReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle msg);
     OnMessageReceivedFunct OnMessageReceived;
 
     typedef void (*OnConnectionClosedFunct)(BLEEndPoint * endPoint, BLE_ERROR err);
     OnConnectionClosedFunct OnConnectionClosed;
 
 #if CHIP_ENABLE_CHIPOBLE_TEST
-    typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBuffer * msg);
+    typedef void (*OnCommandReceivedFunct)(BLEEndPoint * endPoint, PacketBufferHandle msg);
     OnCommandReceivedFunct OnCommandReceived;
     inline void SetOnCommandReceivedCB(OnCommandReceivedFunct cb) { OnCommandReceived = cb; };
     BtpEngineTest mBtpEngineTest;
@@ -96,8 +96,8 @@ public:
 #endif
 
     // Public functions:
-    BLE_ERROR Send(PacketBuffer * data);
-    BLE_ERROR Receive(PacketBuffer * data);
+    BLE_ERROR Send(PacketBufferHandle data);
+    BLE_ERROR Receive(PacketBufferHandle data);
     BLE_ERROR StartConnect();
 
     bool IsUnsubscribePending() const;
@@ -138,11 +138,11 @@ private:
     //
     // Re-used during connection setup to cache capabilities request and response payloads; payloads are freed when
     // connection is established.
-    PacketBuffer * mSendQueue;
+    PacketBufferHandle mSendQueue;
 
     // Pending stand-alone BTP acknolwedgement. Pre-empts regular send queue or fragmented message transmission in
     // progress.
-    PacketBuffer * mAckToSend;
+    PacketBufferHandle mAckToSend;
 
     BtpEngine mBtpEngine;
     BleRole mRole;
@@ -166,13 +166,13 @@ private:
     // Transmit path:
     BLE_ERROR DriveSending();
     BLE_ERROR DriveStandAloneAck();
-    bool PrepareNextFragment(PacketBuffer * data, bool & sentAck);
+    bool PrepareNextFragment(PacketBufferHandle data, bool & sentAck);
     BLE_ERROR SendNextMessage();
     BLE_ERROR ContinueMessageSend();
     BLE_ERROR DoSendStandAloneAck();
-    BLE_ERROR SendCharacteristic(PacketBuffer * buf);
-    bool SendIndication(PacketBuffer * buf);
-    bool SendWrite(PacketBuffer * buf);
+    BLE_ERROR SendCharacteristic(PacketBufferHandle buf);
+    bool SendIndication(PacketBufferHandle buf);
+    bool SendWrite(PacketBufferHandle buf);
 
     // Receive path:
     BLE_ERROR HandleConnectComplete();
@@ -183,8 +183,8 @@ private:
     BLE_ERROR HandleGattSendConfirmationReceived();
     BLE_ERROR HandleHandshakeConfirmationReceived();
     BLE_ERROR HandleFragmentConfirmationReceived();
-    BLE_ERROR HandleCapabilitiesRequestReceived(PacketBuffer * data);
-    BLE_ERROR HandleCapabilitiesResponseReceived(PacketBuffer * data);
+    BLE_ERROR HandleCapabilitiesRequestReceived(PacketBufferHandle data);
+    BLE_ERROR HandleCapabilitiesResponseReceived(PacketBufferHandle data);
     SequenceNumber_t AdjustRemoteReceiveWindow(SequenceNumber_t lastReceivedAck, SequenceNumber_t maxRemoteWindowSize,
                                                SequenceNumber_t newestUnackedSentSeqNum);
 
@@ -223,7 +223,7 @@ private:
     inline void QueueTxLock() {}
     inline void QueueTxUnlock() {}
 #endif
-    void QueueTx(PacketBuffer * data, PacketType_t type);
+    void QueueTx(PacketBufferHandle data, PacketType_t type);
 };
 
 } /* namespace Ble */

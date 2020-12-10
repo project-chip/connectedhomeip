@@ -68,7 +68,7 @@ struct ESP32ChipServiceData
 const ble_uuid128_t UUID_CHIPoBLEService = {
     BLE_UUID_TYPE_128, { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00 }
 };
-const uint8_t ShortUUID_CHIPoBLEService[] = { 0xAF, 0xFE };
+const ble_uuid16_t ShortUUID_CHIPoBLEService = { BLE_UUID_TYPE_16, 0xFEAF };
 
 const ble_uuid128_t UUID128_CHIPoBLEChar_RX = {
     BLE_UUID_TYPE_128, { 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
@@ -94,7 +94,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
     { .type = BLE_GATT_SVC_TYPE_PRIMARY,
-      .uuid = (ble_uuid_t *) (&UUID_CHIPoBLEService),
+      .uuid = (ble_uuid_t *) (&ShortUUID_CHIPoBLEService),
       .characteristics =
           (struct ble_gatt_chr_def[]){
               {
@@ -243,7 +243,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
-                            event->CHIPoBLEWriteReceived.Data);
+                            PacketBufferHandle::Create(event->CHIPoBLEWriteReceived.Data));
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
@@ -322,7 +322,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBuffer * data)
+                                    PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     struct os_mbuf * om;
@@ -350,21 +350,20 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-        PacketBuffer::Free(data);
         return false;
     }
     return true;
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBuffer * pBuf)
+                                      PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
     return false;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBuffer * pBuf)
+                                     PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
     return false;
@@ -442,7 +441,7 @@ void BLEManagerImpl::DriveBLEState(void)
             err = StartAdvertising();
             if (err != CHIP_NO_ERROR)
             {
-                ChipLogError(DeviceLayer, "Configure Adv Data failed: %s", ErrorStr(err));
+                ChipLogError(DeviceLayer, "Start advertising failed: %s", ErrorStr(err));
                 ExitNow();
             }
 
@@ -623,13 +622,13 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     }
 
     memset(advData, 0, sizeof(advData));
-    advData[index++] = 0x02;                            // length
-    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;        // AD type : flags
-    advData[index++] = CHIP_ADV_DATA_FLAGS;             // AD value
-    advData[index++] = 0x0A;                            // length
-    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA; // AD type: (Service Data - 16-bit UUID)
-    advData[index++] = ShortUUID_CHIPoBLEService[0];    // AD value
-    advData[index++] = ShortUUID_CHIPoBLEService[1];    // AD value
+    advData[index++] = 0x02;                                                                // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                            // AD type : flags
+    advData[index++] = CHIP_ADV_DATA_FLAGS;                                                 // AD value
+    advData[index++] = 0x0A;                                                                // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                     // AD type: (Service Data - 16-bit UUID)
+    advData[index++] = static_cast<uint8_t>(ShortUUID_CHIPoBLEService.value & 0xFF);        // AD value
+    advData[index++] = static_cast<uint8_t>((ShortUUID_CHIPoBLEService.value >> 8) & 0xFF); // AD value
 
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);
@@ -657,15 +656,14 @@ exit:
 
 void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    PacketBuffer * buf = NULL;
-    uint16_t data_len  = 0;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    uint16_t data_len = 0;
 
     ESP_LOGI(TAG, "Write request received for CHIPoBLE RX characteristic con %u %u", param->conn_handle, param->attr_handle);
 
     // Copy the data to a PacketBuffer.
-    buf = PacketBuffer::New(0);
-    VerifyOrExit(buf != NULL, err = CHIP_ERROR_NO_MEMORY);
+    PacketBufferHandle buf = PacketBuffer::New(0);
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     data_len = OS_MBUF_PKTLEN(param->ctxt->om);
     VerifyOrExit(buf->AvailableDataLength() >= data_len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     ble_hs_mbuf_to_flat(param->ctxt->om, buf->Start(), data_len, NULL);
@@ -676,19 +674,14 @@ void BLEManagerImpl::HandleRXCharWrite(struct ble_gatt_char_context * param)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = param->conn_handle;
-        event.CHIPoBLEWriteReceived.Data  = buf;
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
-        buf = NULL;
     }
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
-    }
-    if (buf != NULL)
-    {
-        PacketBuffer::Free(buf);
     }
 }
 
@@ -931,8 +924,6 @@ int BLEManagerImpl::ble_svr_gap_event(struct ble_gap_event * event, void * arg)
         break;
 
     case BLE_GAP_EVENT_ADV_COMPLETE:
-        err = sInstance.StartAdvertising();
-        SuccessOrExit(err);
         ESP_LOGD(TAG, "BLE_GAP_EVENT_ADV_COMPLETE event");
         break;
 
@@ -1057,6 +1048,24 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
     }
 
 exit:
+    if (err == BLE_HS_EALREADY && connectable)
+    {
+        ChipLogProgress(DeviceLayer,
+                        "Connectable advertising failed because device was already advertising , stop active advertisement");
+        err = ble_gap_adv_stop();
+        if (err != CHIP_NO_ERROR)
+        {
+            ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
+        }
+        else
+        {
+            err = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
+            if (err != CHIP_NO_ERROR)
+            {
+                ChipLogError(DeviceLayer, "Retried adv start; ble_gap_adv_start() failed: %s", ErrorStr(err));
+            }
+        }
+    }
     return err;
 }
 

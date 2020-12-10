@@ -111,7 +111,7 @@ static void iasClientLoadCommand(void);
 //-----------------------------------------------------------------------------
 // Functions
 
-void emberAfIasZoneClusterClientInitCallback(uint8_t endpoint)
+void emberAfIasZoneClusterClientInitCallback(EndpointId endpoint)
 {
     emAfClearServers();
     myEndpoint = endpoint;
@@ -163,7 +163,7 @@ static void setServerZoneState(uint8_t serverIndex, uint8_t zoneState)
     iasClientSaveCommand();
 }
 
-static void setServerEndpoint(uint8_t serverIndex, uint8_t endpoint)
+static void setServerEndpoint(uint8_t serverIndex, EndpointId endpoint)
 {
     emberAfIasZoneClientKnownServers[serverIndex].endpoint = endpoint;
     iasClientSaveCommand();
@@ -217,7 +217,8 @@ static void iasClientSaveCommand(void)
     }
     // Write something to mark the end of the file.
     fprintf(fp, "ff");
-    assert(fclose(fp) == 0);
+    int res = fclose(fp);
+    assert(res == 0);
 #endif //#if defined(EZSP_HOST) && !defined(EMBER_TEST) && defined(UNIX_HOST)
 }
 
@@ -261,7 +262,8 @@ static void iasClientLoadCommand(void)
             emberAfIasZoneClientKnownServers[i].ieeeAddress[j] = (uint8_t) data1;
         }
     }
-    assert(fclose(fp) == 0);
+    int res = fclose(fp);
+    assert(res == 0);
 #endif // #if defined(EZSP_HOST) && !defined(EMBER_TEST) && defined(UNIX_HOST)
 }
 
@@ -442,7 +444,6 @@ static void iasZoneClientServiceDiscoveryCallback(const EmberAfServiceDiscoveryR
 static void checkForIasZoneServer(EmberNodeId emberNodeId, uint8_t * ieeeAddress)
 {
     uint8_t endpointIndex = emberAfIndexFromEndpoint(myEndpoint);
-    uint16_t profileId    = emberAfProfileIdFromIndex(endpointIndex);
     uint8_t serverIndex   = addServer(emberNodeId, ieeeAddress);
 
     if (serverIndex == NO_INDEX)
@@ -463,9 +464,9 @@ static void checkForIasZoneServer(EmberNodeId emberNodeId, uint8_t * ieeeAddress
         return;
     }
 
-    EmberStatus status = emberAfFindDevicesByProfileAndCluster(emberNodeId, profileId, ZCL_IAS_ZONE_CLUSTER_ID,
-                                                               true, // server cluster?
-                                                               iasZoneClientServiceDiscoveryCallback);
+    EmberStatus status = emberAfFindDevicesByCluster(emberNodeId, ZCL_IAS_ZONE_CLUSTER_ID,
+                                                     true, // server cluster?
+                                                     iasZoneClientServiceDiscoveryCallback);
 
     if (status != EMBER_SUCCESS)
     {
@@ -515,7 +516,7 @@ void readIasZoneServerCieAddress(EmberNodeId nodeId)
     }
 }
 
-void emberAfPluginIasZoneClientWriteAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
+void emberAfPluginIasZoneClientWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     if (clusterId == ZCL_IAS_ZONE_CLUSTER_ID && iasZoneClientState == IAS_ZONE_CLIENT_STATE_SET_CIE_ADDRESS &&
         buffer[0] == EMBER_ZCL_STATUS_SUCCESS)
@@ -526,7 +527,7 @@ void emberAfPluginIasZoneClientWriteAttributesResponseCallback(EmberAfClusterId 
     return;
 }
 
-void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
+void emberAfPluginIasZoneClientReadAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen)
 {
     uint8_t zoneStatus, zoneType, zoneState;
     if (clusterId == ZCL_IAS_ZONE_CLUSTER_ID &&
@@ -537,8 +538,8 @@ void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId c
         while ((i + 3) <= bufLen)
         { // 3 to insure we can read at least the attribute ID
           // and the status
-            uint16_t attributeId = buffer[i] + (buffer[i + 1] << 8);
-            uint8_t status       = buffer[i + 2];
+            AttributeId attributeId = buffer[i] + (buffer[i + 1] << 8);
+            uint8_t status          = buffer[i + 2];
             i += 3;
             // emberAfIasZoneClusterPrintln("Parsing Attribute 0x%2X, Status: 0x%X", attributeId, status);
             if (status == EMBER_ZCL_STATUS_SUCCESS)
@@ -607,3 +608,9 @@ void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId c
         clearState();
     }
 }
+
+void emberAfPluginIasZoneClientZdoCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length) {}
+
+void emberAfPluginIasZoneClientWriteAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen) {}
+
+void emberAfPluginIasZoneClientReadAttributesResponseCallback(ClusterId clusterId, uint8_t * buffer, uint16_t bufLen) {}

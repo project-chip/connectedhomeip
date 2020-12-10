@@ -34,12 +34,14 @@
 namespace chip {
 namespace Ble {
 
-using ::chip::System::PacketBuffer;
+using ::chip::System::PacketBufferHandle;
 
 // Platform-agnostic BLE interface
 class DLL_EXPORT BlePlatformDelegate
 {
 public:
+    virtual ~BlePlatformDelegate() {}
+
     // Following APIs must be implemented by platform:
 
     // Subscribe to updates and indications on the specfied characteristic
@@ -75,15 +77,15 @@ public:
 
     // Send GATT characteristic indication request
     virtual bool SendIndication(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                PacketBuffer * pBuf) = 0;
+                                PacketBufferHandle pBuf) = 0;
 
     // Send GATT characteristic write request
     virtual bool SendWriteRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                  PacketBuffer * pBuf) = 0;
+                                  PacketBufferHandle pBuf) = 0;
 
     // Send GATT characteristic read request
     virtual bool SendReadRequest(BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                 PacketBuffer * pBuf) = 0;
+                                 PacketBufferHandle pBuf) = 0;
 
     // Send response to remote host's GATT chacteristic read response
     virtual bool SendReadResponse(BLE_CONNECTION_OBJECT connObj, BLE_READ_REQUEST_CONTEXT requestContext, const ChipBleUUID * svcId,

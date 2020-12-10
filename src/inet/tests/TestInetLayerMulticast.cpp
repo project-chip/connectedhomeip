@@ -40,10 +40,15 @@
 #include <CHIPVersion.h>
 
 #include <inet/IPAddress.h>
+#include <inet/InetArgParser.h>
+#include <support/CHIPArgParser.hpp>
 #include <system/SystemTimer.h>
 
 #include "TestInetCommon.h"
+#include "TestInetCommonOptions.h"
 #include "TestInetLayerCommon.hpp"
+#include "TestSetupFaultInjection.h"
+#include "TestSetupSignalling.h"
 
 using namespace chip;
 using namespace chip::ArgParser;
@@ -353,7 +358,7 @@ static bool HandleOption(const char * aProgram, OptionSet * aOptions, int aIdent
     {
 
     case kToolOptInterval:
-        if (!ParseInt(aValue, gSendIntervalMs) || gSendIntervalMs > UINT32_MAX)
+        if (!ParseInt(aValue, gSendIntervalMs))
         {
             PrintArgError("%s: invalid value specified for send interval: %s\n", aProgram, aValue);
             retval = false;
@@ -597,7 +602,7 @@ static void PrintReceivedStats(const GroupAddress & aGroupAddress)
            aGroupAddress.mStats.mReceive.mExpected, aGroupAddress.mGroup);
 }
 
-static bool HandleDataReceived(const PacketBuffer * aBuffer, GroupAddress & aGroupAddress, bool aCheckBuffer)
+static bool HandleDataReceived(const PacketBufferHandle & aBuffer, GroupAddress & aGroupAddress, bool aCheckBuffer)
 {
     const bool lStatsByPacket = true;
     bool lStatus              = true;
@@ -611,7 +616,7 @@ exit:
     return (lStatus);
 }
 
-static bool HandleDataReceived(const PacketBuffer * aBuffer, const IPPacketInfo & aPacketInfo, bool aCheckBuffer)
+static bool HandleDataReceived(const PacketBufferHandle & aBuffer, const IPPacketInfo & aPacketInfo, bool aCheckBuffer)
 {
     bool lStatus = true;
     GroupAddress * lGroupAddress;
@@ -630,7 +635,7 @@ exit:
 
 // Raw Endpoint Callbacks
 
-static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer * aBuffer, const IPPacketInfo * aPacketInfo)
+static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle aBuffer, const IPPacketInfo * aPacketInfo)
 {
     const bool lCheckBuffer   = true;
     const bool lStatsByPacket = true;
@@ -639,7 +644,7 @@ static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer *
     GroupAddress * lGroupAddress;
 
     VerifyOrExit(aEndPoint != nullptr, lStatus = false);
-    VerifyOrExit(aBuffer != nullptr, lStatus = false);
+    VerifyOrExit(!aBuffer.IsNull(), lStatus = false);
     VerifyOrExit(aPacketInfo != nullptr, lStatus = false);
 
     Common::HandleRawMessageReceived(aEndPoint, aBuffer, aPacketInfo);
@@ -656,11 +661,11 @@ static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer *
 
             aBuffer->ConsumeHead(kIPv4HeaderSize);
 
-            lStatus = Common::HandleICMPv4DataReceived(aBuffer, lGroupAddress->mStats, lStatsByPacket, lCheckBuffer);
+            lStatus = Common::HandleICMPv4DataReceived(std::move(aBuffer), lGroupAddress->mStats, lStatsByPacket, lCheckBuffer);
         }
         else if (lAddressType == kIPAddressType_IPv6)
         {
-            lStatus = Common::HandleICMPv6DataReceived(aBuffer, lGroupAddress->mStats, lStatsByPacket, lCheckBuffer);
+            lStatus = Common::HandleICMPv6DataReceived(std::move(aBuffer), lGroupAddress->mStats, lStatsByPacket, lCheckBuffer);
         }
         else
         {
@@ -674,11 +679,6 @@ static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer *
     }
 
 exit:
-    if (aBuffer != nullptr)
-    {
-        PacketBuffer::Free(aBuffer);
-    }
-
     if (!lStatus)
     {
         SetStatusFailed(sTestState.mStatus);
@@ -694,25 +694,20 @@ static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError
 
 // UDP Endpoint Callbacks
 
-static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer * aBuffer, const IPPacketInfo * aPacketInfo)
+static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle aBuffer, const IPPacketInfo * aPacketInfo)
 {
     const bool lCheckBuffer = true;
     bool lStatus;
 
     VerifyOrExit(aEndPoint != nullptr, lStatus = false);
-    VerifyOrExit(aBuffer != nullptr, lStatus = false);
+    VerifyOrExit(!aBuffer.IsNull(), lStatus = false);
     VerifyOrExit(aPacketInfo != nullptr, lStatus = false);
 
     Common::HandleUDPMessageReceived(aEndPoint, aBuffer, aPacketInfo);
 
-    lStatus = HandleDataReceived(aBuffer, *aPacketInfo, lCheckBuffer);
+    lStatus = HandleDataReceived(std::move(aBuffer), *aPacketInfo, lCheckBuffer);
 
 exit:
-    if (aBuffer != nullptr)
-    {
-        PacketBuffer::Free(aBuffer);
-    }
-
     if (!lStatus)
     {
         SetStatusFailed(sTestState.mStatus);
@@ -751,8 +746,8 @@ static INET_ERROR PrepareTransportForSend()
 
 static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
 {
-    PacketBuffer * lBuffer = nullptr;
-    INET_ERROR lStatus     = INET_NO_ERROR;
+    PacketBufferHandle lBuffer;
+    INET_ERROR lStatus = INET_NO_ERROR;
 
     if ((gOptFlags & (kOptFlagUseRawIP)) == (kOptFlagUseRawIP))
     {
@@ -764,17 +759,17 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
         if ((gOptFlags & kOptFlagUseIPv6) == (kOptFlagUseIPv6))
         {
             lBuffer = Common::MakeICMPv6DataBuffer(aSize);
-            VerifyOrExit(lBuffer != nullptr, lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if ((gOptFlags & kOptFlagUseIPv4) == (kOptFlagUseIPv4))
         {
             lBuffer = Common::MakeICMPv4DataBuffer(aSize);
-            VerifyOrExit(lBuffer != nullptr, lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        lStatus = sRawIPEndPoint->SendTo(aAddress, lBuffer);
+        lStatus = sRawIPEndPoint->SendTo(aAddress, lBuffer.Release_ForNow());
         SuccessOrExit(lStatus);
     }
     else
@@ -787,9 +782,9 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
             // patterned from zero to aSize - 1.
 
             lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
-            VerifyOrExit(lBuffer != nullptr, lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
 
-            lStatus = sUDPIPEndPoint->SendTo(aAddress, kUDPPort, lBuffer);
+            lStatus = sUDPIPEndPoint->SendTo(aAddress, kUDPPort, lBuffer.Release_ForNow());
             SuccessOrExit(lStatus);
         }
     }

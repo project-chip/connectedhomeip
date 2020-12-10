@@ -21,3 +21,7 @@ mobly
 
 # zephyr
 west>=0.8.0
+
+# happy tests
+lockfile
+psutil >= 5.7.3

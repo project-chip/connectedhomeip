@@ -44,11 +44,14 @@
 // *
 // * Copyright 2007 by Ember Corporation. All rights reserved.              *80*
 // *******************************************************************
+#include "identify.h"
 
 // this file contains all the common includes for clusters in the util
 #include <app/util/af.h>
 
 #include "common.h"
+
+using namespace chip;
 
 typedef struct
 {
@@ -58,24 +61,24 @@ typedef struct
 
 static EmAfIdentifyState stateTable[EMBER_AF_IDENTIFY_CLUSTER_SERVER_ENDPOINT_COUNT];
 
-static EmberAfStatus readIdentifyTime(uint8_t endpoint, uint16_t * identifyTime);
-static EmberAfStatus writeIdentifyTime(uint8_t endpoint, uint16_t identifyTime);
-static EmberStatus scheduleIdentifyTick(uint8_t endpoint);
+static EmberAfStatus readIdentifyTime(EndpointId endpoint, uint16_t * identifyTime);
+static EmberAfStatus writeIdentifyTime(EndpointId endpoint, uint16_t identifyTime);
+static EmberStatus scheduleIdentifyTick(EndpointId endpoint);
 
-static EmAfIdentifyState * getIdentifyState(uint8_t endpoint);
+static EmAfIdentifyState * getIdentifyState(EndpointId endpoint);
 
-static EmAfIdentifyState * getIdentifyState(uint8_t endpoint)
+static EmAfIdentifyState * getIdentifyState(EndpointId endpoint)
 {
     uint8_t ep = emberAfFindClusterServerEndpointIndex(endpoint, ZCL_IDENTIFY_CLUSTER_ID);
     return (ep == 0xFF ? NULL : &stateTable[ep]);
 }
 
-void emberAfIdentifyClusterServerInitCallback(uint8_t endpoint)
+void emberAfIdentifyClusterServerInitCallback(EndpointId endpoint)
 {
     scheduleIdentifyTick(endpoint);
 }
 
-void emberAfIdentifyClusterServerTickCallback(uint8_t endpoint)
+void emberAfIdentifyClusterServerTickCallback(EndpointId endpoint)
 {
     uint16_t identifyTime;
     if (readIdentifyTime(endpoint, &identifyTime) == EMBER_ZCL_STATUS_SUCCESS)
@@ -83,11 +86,11 @@ void emberAfIdentifyClusterServerTickCallback(uint8_t endpoint)
         // This tick writes the new attribute, which will trigger the Attribute
         // Changed callback below, which in turn will schedule or cancel the tick.
         // Because of this, the tick does not have to be scheduled here.
-        writeIdentifyTime(endpoint, (identifyTime == 0 ? 0 : identifyTime - 1));
+        writeIdentifyTime(endpoint, static_cast<uint16_t>(identifyTime == 0 ? 0 : identifyTime - 1));
     }
 }
 
-void emberAfIdentifyClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId)
+void emberAfIdentifyClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
 {
     if (attributeId == ZCL_IDENTIFY_TIME_ATTRIBUTE_ID)
     {
@@ -156,7 +159,7 @@ bool emberAfIdentifyClusterIdentifyQueryCallback(void)
     return true;
 }
 
-EmberAfStatus readIdentifyTime(uint8_t endpoint, uint16_t * identifyTime)
+EmberAfStatus readIdentifyTime(EndpointId endpoint, uint16_t * identifyTime)
 {
     EmberAfStatus status = emberAfReadAttribute(endpoint, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
                                                 CLUSTER_MASK_SERVER, (uint8_t *) identifyTime, sizeof(*identifyTime),
@@ -170,7 +173,7 @@ EmberAfStatus readIdentifyTime(uint8_t endpoint, uint16_t * identifyTime)
     return status;
 }
 
-static EmberAfStatus writeIdentifyTime(uint8_t endpoint, uint16_t identifyTime)
+static EmberAfStatus writeIdentifyTime(EndpointId endpoint, uint16_t identifyTime)
 {
     EmberAfStatus status = emberAfWriteAttribute(endpoint, ZCL_IDENTIFY_CLUSTER_ID, ZCL_IDENTIFY_TIME_ATTRIBUTE_ID,
                                                  CLUSTER_MASK_SERVER, (uint8_t *) &identifyTime, ZCL_INT16U_ATTRIBUTE_TYPE);
@@ -183,7 +186,7 @@ static EmberAfStatus writeIdentifyTime(uint8_t endpoint, uint16_t identifyTime)
     return status;
 }
 
-static EmberStatus scheduleIdentifyTick(uint8_t endpoint)
+static EmberStatus scheduleIdentifyTick(EndpointId endpoint)
 {
     EmberAfStatus status;
     EmAfIdentifyState * state = getIdentifyState(endpoint);
@@ -212,4 +215,16 @@ static EmberStatus scheduleIdentifyTick(uint8_t endpoint)
     state->identifying = false;
     emberAfPluginIdentifyStopFeedbackCallback(endpoint);
     return emberAfDeactivateServerTick(endpoint, ZCL_IDENTIFY_CLUSTER_ID);
+}
+
+bool emberAfPluginIdentifyStartFeedbackCallback(EndpointId endpoint, uint16_t identifyTime)
+{
+    emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Start identify callback on endpoint %d time %d", endpoint, identifyTime);
+    return false;
+}
+
+bool emberAfPluginIdentifyStopFeedbackCallback(EndpointId endpoint)
+{
+    emberAfPrintln(EMBER_AF_PRINT_IDENTIFY_CLUSTER, "Stop identify callback on endpoint %d", endpoint);
+    return false;
 }

@@ -51,7 +51,7 @@ public:
      *
      */
     template <class T>
-    void SetMessageReceiveHandler(void (*handler)(const PacketHeader &, const PeerAddress &, System::PacketBuffer *, T *),
+    void SetMessageReceiveHandler(void (*handler)(const PacketHeader &, const PeerAddress &, System::PacketBufferHandle, T *),
                                   T * param)
     {
         mMessageReceivedArgument = param;
@@ -67,8 +67,7 @@ public:
      *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
      *   behalf of the caller regardless of the return status.
      */
-    virtual CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
-                                   System::PacketBuffer * msgBuf) = 0;
+    virtual CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) = 0;
 
     /**
      * Determine if this transport can SendMessage to the specified peer address.
@@ -82,20 +81,21 @@ public:
      */
     virtual void Disconnect(const PeerAddress & address) {}
 
+    /**
+     * Close the open endpoint without destroying the object
+     */
+    virtual void Close(){};
+
 protected:
     /**
      * Method used by subclasses to notify that a packet has been received after
      * any associated headers have been decoded.
      */
-    void HandleMessageReceived(const PacketHeader & header, const PeerAddress & source, System::PacketBuffer * buffer)
+    void HandleMessageReceived(const PacketHeader & header, const PeerAddress & source, System::PacketBufferHandle buffer)
     {
         if (OnMessageReceived)
         {
-            OnMessageReceived(header, source, buffer, mMessageReceivedArgument);
-        }
-        else
-        {
-            System::PacketBuffer::Free(buffer);
+            OnMessageReceived(header, source, std::move(buffer), mMessageReceivedArgument);
         }
     }
 
@@ -107,8 +107,8 @@ protected:
      *
      * Callback *MUST* free msgBuf as a result of handling.
      */
-    typedef void (*MessageReceiveHandler)(const PacketHeader & header, const PeerAddress & source, System::PacketBuffer * msgBuf,
-                                          void * param);
+    typedef void (*MessageReceiveHandler)(const PacketHeader & header, const PeerAddress & source,
+                                          System::PacketBufferHandle msgBuf, void * param);
 
     MessageReceiveHandler OnMessageReceived = nullptr; ///< Callback on message receiving
     void * mMessageReceivedArgument         = nullptr; ///< Argument for callback

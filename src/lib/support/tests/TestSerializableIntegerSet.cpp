@@ -16,11 +16,10 @@
  *    limitations under the License.
  */
 
-#include "TestSupport.h"
-
 #include <support/CHIPMem.h>
+#include <support/CHIPMemString.h>
 #include <support/SerializableIntegerSet.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -62,7 +61,7 @@ void TestSerializableIntegerSet(nlTestSuite * inSuite, void * inContext)
     }
 
     set.Remove(8);
-    NL_TEST_ASSERT(inSuite, set.SerializedSize() == 0);
+    NL_TEST_ASSERT(inSuite, set.SerializedSize() == CHIP_MAX_SERIALIZED_SIZE_U64(0));
 }
 
 void TestSerializableIntegerSetNonZero(nlTestSuite * inSuite, void * inContext)
@@ -108,7 +107,7 @@ void TestSerializableIntegerSetNonZero(nlTestSuite * inSuite, void * inContext)
     }
 
     set.Remove(7);
-    NL_TEST_ASSERT(inSuite, set.SerializedSize() == 0);
+    NL_TEST_ASSERT(inSuite, set.SerializedSize() == CHIP_MAX_SERIALIZED_SIZE_U64(0));
 }
 
 void TestSerializableIntegerSetSerialize(nlTestSuite * inSuite, void * inContext)
@@ -126,17 +125,17 @@ void TestSerializableIntegerSetSerialize(nlTestSuite * inSuite, void * inContext
     NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf, size) == nullptr);
     NL_TEST_ASSERT(inSuite, size != 0);
 
-    char buf1[size];
-    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf1, size) == buf1);
+    chip::Platform::ScopedMemoryString buf1("", size);
+    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf1.Get(), size) == buf1.Get());
     NL_TEST_ASSERT(inSuite, size != 0);
 
     uint16_t size2 = static_cast<uint16_t>(2 * size);
-    char buf2[size2];
-    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf2, size2) == buf2);
+    chip::Platform::ScopedMemoryString buf2("", size2);
+    NL_TEST_ASSERT(inSuite, set.SerializeBase64(buf2.Get(), size2) == buf2.Get());
     NL_TEST_ASSERT(inSuite, size2 == size);
 
     chip::SerializableU64Set<8> set2;
-    NL_TEST_ASSERT(inSuite, set2.DeserializeBase64(buf2, size2) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, set2.DeserializeBase64(buf2.Get(), size2) == CHIP_NO_ERROR);
 
     for (uint64_t i = 1; i <= 6; i++)
     {
@@ -181,4 +180,4 @@ int TestSerializableIntegerSet(void)
     return nlTestRunnerStats(&theSuite);
 }
 
-CHIP_REGISTER_TEST_SUITE(TestBufBound)
+CHIP_REGISTER_TEST_SUITE(TestSerializableIntegerSet)

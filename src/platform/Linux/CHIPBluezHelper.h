@@ -200,7 +200,7 @@ struct ConnectionDataBundle
 
 CHIP_ERROR InitBluezBleLayer(bool aIsCentral, char * apBleAddr, BLEAdvConfig & aBleAdvConfig, void *& apEndpoint);
 bool BluezRunOnBluezThread(int (*aCallback)(void *), void * apClosure);
-bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBuffer * apBuf);
+bool SendBluezIndication(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
 bool CloseBluezConnection(BLE_CONNECTION_OBJECT apConn);
 CHIP_ERROR StartBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint);

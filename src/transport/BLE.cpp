@@ -22,9 +22,10 @@
  *
  */
 
+#include <transport/BLE.h>
+
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
-#include <transport/BLE.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <inttypes.h>
@@ -90,6 +91,7 @@ exit:
     {
         if (mBleEndPoint)
         {
+            mBleEndPoint->Close();
             mBleEndPoint = nullptr;
         }
     }
@@ -132,13 +134,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
-                            System::PacketBuffer * msgBuf)
+CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgIn)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     const uint16_t headerSize = header.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
+    PacketBufferHandle msgBuf;
 
+    msgBuf.Adopt(msgIn);
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mBleEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
@@ -146,22 +149,15 @@ CHIP_ERROR BLE::SendMessage(const PacketHeader & header, Header::Flags payloadFl
 
     msgBuf->SetStart(msgBuf->Start() - headerSize);
 
-    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags);
+    err = header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
     SuccessOrExit(err);
 
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
-    err    = mBleEndPoint->Send(msgBuf);
-    msgBuf = nullptr;
+    err = mBleEndPoint->Send(std::move(msgBuf));
     SuccessOrExit(err);
 
 exit:
-    if (msgBuf != nullptr)
-    {
-        System::PacketBuffer::Free(msgBuf);
-        msgBuf = nullptr;
-    }
-
     return err;
 }
 
@@ -190,13 +186,26 @@ void BLE::OnBleConnectionError(void * appState, BLE_ERROR err)
     }
 }
 
-void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBuffer * buffer)
+void BLE::OnBleEndPointReceive(BLEEndPoint * endPoint, PacketBufferHandle buffer)
 {
-    BLE * ble = reinterpret_cast<BLE *>(endPoint->mAppState);
+    BLE * ble      = reinterpret_cast<BLE *>(endPoint->mAppState);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     if (ble->mDelegate)
     {
-        ble->mDelegate->OnRendezvousMessageReceived(buffer);
+        uint16_t headerSize = 0;
+
+        PacketHeader header;
+        err = header.Decode(buffer->Start(), buffer->DataLength(), &headerSize);
+        SuccessOrExit(err);
+
+        buffer->ConsumeHead(headerSize);
+        ble->mDelegate->OnRendezvousMessageReceived(header, Transport::PeerAddress(Transport::Type::kBle), std::move(buffer));
+    }
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Inet, "Failed to receive BLE message: %s", ErrorStr(err));
     }
 }
 

@@ -110,7 +110,8 @@
         "queue": "cpp",
         "ratio": "cpp",
         "set": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "regex": "cpp"
     },
     "files.eol": "\n",
     "editor.formatOnSave": true,
@@ -153,5 +154,7 @@
         }
     ],
     "clang-format.fallbackStyle": "WebKit",
-    "files.trimFinalNewlines": true
+    "files.trimFinalNewlines": true,
+    "C_Cpp.default.cppStandard": "gnu++14",
+    "C_Cpp.default.cStandard": "gnu11"
 }

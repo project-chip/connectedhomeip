@@ -21,7 +21,8 @@ interface or standalone execution:
 
 usage: efr32_firmware_utils.py [-h] [--verbose] [--erase] [--application FILE]
                                [--verify_application] [--reset] [--skip_reset]
-                               [--commander FILE] [--serialno SERIAL]
+                               [--commander FILE] [--device DEVICE]
+                               [--serialno SERIAL]
 
 Flash EFR32 device
 
@@ -31,6 +32,8 @@ optional arguments:
 configuration:
   --verbose, -v         Report more verbosely
   --commander FILE      File name of the commander executable
+  --device DEVICE, -d DEVICE
+                        Device family or platform to target
   --serialno SERIAL, -s SERIAL
                         Serial number of device to flash
 
@@ -71,6 +74,14 @@ EFR32_OPTIONS = {
 
                 """,
         },
+        'device': {
+            'help': 'Device family or platform to target',
+            'default': 'EFR32',
+            'alias': ['-d'],
+            'argparse': {
+                'metavar': 'DEVICE'
+            },
+        },
         'serialno': {
             'help': 'Serial number of device to flash',
             'default': None,
@@ -91,7 +102,7 @@ class Flasher(firmware_utils.Flasher):
         self.define_options(EFR32_OPTIONS)
 
     # Common command line arguments for commander device subcommands.
-    DEVICE_ARGUMENTS = [{'optional': 'serialno'}]
+    DEVICE_ARGUMENTS = [{'optional': 'serialno'}, {'optional': 'device'}]
 
     def erase(self):
         """Perform `commander device masserase`."""

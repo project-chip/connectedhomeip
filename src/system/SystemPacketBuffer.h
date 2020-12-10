@@ -29,6 +29,7 @@
 #include <system/SystemConfig.h>
 
 // Include dependent headers
+#include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <system/SystemAlignSize.h>
 #include <system/SystemError.h>
@@ -41,8 +42,12 @@
 #include <lwip/pbuf.h>
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
+class PacketBufferTest;
+
 namespace chip {
 namespace System {
+
+class PacketBufferHandle;
 
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP
 struct pbuf
@@ -72,10 +77,9 @@ struct pbuf
  *      for protocol headers at each layer of a configurable communication stack.  For details, see `PacketBuffer::New()` as well
  *      as LwIP documentation.
  *
- *      PacketBuffer objects are reference-counted, and the prevailing usage mode within chip is "fire-and-forget".  As the packet
- *      (and its underlying PacketBuffer object) is dispatched through various protocol layers, the successful upcall or downcall
- *      between layers implies ownership transfer, and the callee is responsible for freeing the buffer.  On failure of a
- *      cross-layer call, the responsibilty for freeing the buffer rests with the caller.
+ *      PacketBuffer objects are reference-counted, and normally held and used through a PacketBufferHandle that owns one of the
+ *      counted references. When a PacketBufferHandle goes out of scope, its reference is released. To take ownership, a function
+ *      takes a PacketBufferHandle by value. To borrow ownership, a function takes a `const PacketBufferHandle &`.
  *
  *      New objects of PacketBuffer class are initialized at the beginning of an allocation of memory obtained from the underlying
  *      environment, e.g. from LwIP pbuf target pools, from the standard C library heap, from an internal buffer pool. In the
@@ -92,43 +96,225 @@ struct pbuf
 class DLL_EXPORT PacketBuffer : private pbuf
 {
 public:
+    /**
+     * Return the size of the allocation including the reserved and payload data spaces but not including space
+     * allocated for the PacketBuffer structure.
+     *
+     *  @note    The allocation size is equal to or greater than the \c aAllocSize parameter to the \c Create method).
+     *
+     *  @return     size of the allocation
+     */
     uint16_t AllocSize() const;
 
-    uint8_t * Start() const;
+    /**
+     * Get a pointer to the start of data in a buffer.
+     *
+     *  @return pointer to the start of data.
+     */
+    uint8_t * Start() const { return static_cast<uint8_t *>(this->payload); }
+
+    /**
+     *  Set the the start of data in a buffer, adjusting length and total length accordingly.
+     *
+     *  @note The data within the buffer is not moved, only accounting information is changed.  The function is commonly used to
+     *      either strip or prepend protocol headers in a zero-copy way.
+     *
+     *  @note This call should not be used on any buffer that is not the head of a buffer chain, as it only alters the current
+     *      buffer.
+     *
+     *  @param[in] aNewStart - A pointer to where the new payload should start.  newStart will be adjusted internally to fall within
+     *      the boundaries of the first buffer in the PacketBuffer chain.
+     */
     void SetStart(uint8_t * aNewStart);
 
-    uint16_t DataLength() const;
-    void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead = nullptr);
+    /**
+     * Get the length, in bytes, of data in a packet buffer.
+     *
+     *  @return length, in bytes (current payload length).
+     */
+    uint16_t DataLength() const { return this->len; }
 
-    uint16_t TotalLength() const;
+    /**
+     * Set the length, in bytes, of data in a packet buffer, adjusting total length accordingly.
+     *
+     *  The function sets the length, in bytes, of the data in the buffer, adjusting the total length appropriately. When the buffer
+     *  is not the head of the buffer chain (common case: the caller adds data to the last buffer in the PacketBuffer chain prior to
+     *  calling higher layers), the aChainHead __must__ be passed in to properly adjust the total lengths of each buffer ahead of
+     *  the current buffer.
+     *
+     *  @param[in] aNewLen - new length, in bytes, of this buffer.
+     *
+     *  @param[in,out] aChainHead - the head of the buffer chain the current buffer belongs to.  May be \c nullptr if the current
+     *      buffer is the head of the buffer chain.
+     */
+    void SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead);
+    void SetDataLength(uint16_t aNewLen) { SetDataLength(aNewLen, nullptr); }
+    // This version will shortly be made private; do not use in new code.
+    void SetDataLength(uint16_t aNewLen, PacketBuffer * aChainHead);
 
+    /**
+     * Get the total length of packet data in the buffer chain.
+     *
+     *  @return total length, in octets.
+     */
+    uint16_t TotalLength() const { return this->tot_len; }
+
+    /**
+     * Get the maximum amount, in bytes, of data that will fit in the buffer given the current start position and buffer size.
+     *
+     *  @return number of bytes that fits in the buffer given the current start position.
+     */
     uint16_t MaxDataLength() const;
+
+    /**
+     * Get the number of bytes of data that can be added to the current buffer given the current start position and data length.
+     *
+     *  @return the length, in bytes, of data that will fit in the current buffer given the current start position and data length.
+     */
     uint16_t AvailableDataLength() const;
 
+    /**
+     * Get the number of bytes within the current buffer between the start of the buffer and the current data start position.
+     *
+     *  @return the amount, in bytes, of space between the start of the buffer and the current data start position.
+     */
     uint16_t ReservedSize() const;
 
-    PacketBuffer * Next() const;
+    /**
+     * Determine whether there are any additional buffers chained to the current buffer.
+     *
+     *  @return \c true if there is a chained buffer.
+     */
+    bool HasChainedBuffer() const { return this->next != nullptr; }
 
-    void AddToEnd(PacketBuffer * aPacket);
-    PacketBuffer * DetachTail();
+    /**
+     * Add the given packet buffer to the end of the buffer chain, adjusting the total length of each buffer in the chain
+     * accordingly.
+     *
+     *  @note The current packet buffer must be the head of the buffer chain for the lengths to be adjusted properly.
+     *
+     *  @note Ownership is transferred from the argument to the `next` link at the end of the current chain.
+     *
+     *  @param[in] aPacket - the packet buffer to be added to the end of the current chain.
+     */
+    void AddToEnd(PacketBufferHandle aPacket);
+
+    /**
+     * Move data from subsequent buffers in the chain into the current buffer until it is full.
+     *
+     *  Only the current buffer is compacted: the data within the current buffer is moved to the front of the buffer, eliminating
+     *  any reserved space. The remaining available space is filled with data moved from subsequent buffers in the chain, until the
+     *  current buffer is full. If a subsequent buffer in the chain is moved into the current buffer in its entirety, it is removed
+     *  from the chain and freed. The method takes no parameters, returns no results and cannot fail.
+     */
     void CompactHead();
-    PacketBuffer * Consume(uint16_t aConsumeLength);
+
+    /**
+     * Adjust the current buffer to indicate the amount of data consumed.
+     *
+     *  Advance the data start position in the current buffer by the specified amount, in bytes, up to the length of data in the
+     *  buffer. Decrease the length and total length by the amount consumed.
+     *
+     *  @param[in] aConsumeLength - number of bytes to consume from the current buffer.
+     */
     void ConsumeHead(uint16_t aConsumeLength);
+
+    /**
+     * Ensure the buffer has at least the specified amount of reserved space.
+     *
+     *  Ensure the buffer has at least the specified amount of reserved space, moving the data in the buffer forward to make room if
+     *  necessary.
+     *
+     *  @param[in] aReservedSize - number of bytes desired for the headers.
+     *
+     *  @return \c true if the requested reserved size is available, \c false if there's not enough room in the buffer.
+     */
     bool EnsureReservedSize(uint16_t aReservedSize);
+
+    /**
+     * Align the buffer payload on the specified bytes boundary.
+     *
+     *  Moving the payload in the buffer forward if necessary.
+     *
+     *  @param[in] aAlignBytes - specifies number of bytes alignment for the payload start pointer.
+     *
+     *  @return \c true if alignment is successful, \c false if there's not enough room in the buffer.
+     */
     bool AlignPayload(uint16_t aAlignBytes);
 
+    /**
+     * Return the next buffer in a buffer chain.
+     *
+     *  If there is no next buffer, the handle will have \c IsNull() \c true.
+     *
+     *  @return a handle to the next buffer in the buffer chain.
+     */
+    CHECK_RETURN_VALUE PacketBufferHandle Next();
+
+    /**
+     * Return the last buffer in a buffer chain.
+     *
+     *  @return a handle to the next buffer in the buffer chain.
+     */
+    CHECK_RETURN_VALUE PacketBufferHandle Last();
+
+    /**
+     * Allocates a PacketBuffer object with at least \c aReservedSize bytes reserved in the payload for headers, and at least
+     *  \c aAllocSize bytes of space for additional data after the initial cursor pointer.
+     *
+     *  @param[in]  aReservedSize   Number of octets to reserve behind the cursor.
+     *  @param[in]  aAvailableSize  Number of octets to allocate after the cursor.
+     *
+     *  @return     On success, a pointer to the PacketBuffer in the allocated block. On fail, \c nullptr.
+     */
+    static PacketBufferHandle NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize);
+
+    /**
+     * Allocates a PacketBuffer with default reserved size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) in the payload for headers,
+     * and at least \c aAllocSize bytes of space for additional data after the initial cursor pointer.
+     *
+     * This usage is most appropriate when allocating a PacketBuffer for an application-layer message.
+     *
+     *  @param[in]  aAvailableSize  Number of octets to allocate after the cursor.
+     *
+     *  @return     On success, a pointer to the PacketBuffer in the allocated block. On fail, \c nullptr.
+     */
+    static PacketBufferHandle NewWithAvailableSize(uint16_t aAvailableSize);
+
+    /**
+     * Allocates a single PacketBuffer of maximum total size with a specific header reserve size.
+     *
+     *  The parameter passed in is the size reserved prior to the payload to accomodate packet headers from different stack layers,
+     *  __not__ the overall size of the buffer to allocate. The size of the buffer #CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX
+     *  and not, specified in the call.
+     *
+     *  `PacketBuffer::New(0)` : when called in this fashion, the buffer will be returned without any header reserved, consequently
+     *  the entire payload is usable by the caller. This pattern is particularly useful at the lower layers of networking stacks,
+     *  in cases where the user knows the payload will be copied out into the final message with appropriate header reserves or in
+     *  creating PacketBuffer that are appended to a chain of PacketBuffer via `PacketBuffer::AddToEnd()`.
+     *
+     *  @param[in] aReservedSize  amount of header space to reserve.
+     *
+     *  @return On success, a pointer to the PacketBuffer, on failure \c nullptr.
+     */
+    static PacketBufferHandle New(uint16_t aReservedSize);
+
+    /**
+     * Allocates a single PacketBuffer of default max size (#CHIP_SYSTEM_CONFIG_PACKETBUFFER_CAPACITY_MAX) with default reserved
+     * size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) in the payload.
+     *
+     * The reserved size (#CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE) is large enough to hold transport layer headers as well as
+     * headers required by \c chipMessageLayer and \c chipExchangeLayer.
+     */
+    static PacketBufferHandle New();
+
+    // The following will shortly be removed or made private; do not use in new code.
+    PacketBuffer * Next_ForNow() const { return static_cast<PacketBuffer *>(this->next); }
+    void AddToEnd_ForNow(PacketBuffer * aPacket);
     void AddRef();
-
-    static PacketBuffer * NewWithAvailableSize(uint16_t aAvailableSize);
-    static PacketBuffer * NewWithAvailableSize(uint16_t aReservedSize, uint16_t aAvailableSize);
-
-    static PacketBuffer * New();
-    static PacketBuffer * New(uint16_t aReservedSize);
-
-    static PacketBuffer * RightSize(PacketBuffer * aPacket);
-
     static void Free(PacketBuffer * aPacket);
-    static PacketBuffer * FreeHead(PacketBuffer * aPacket);
+    static PacketBuffer * FreeHead_ForNow(PacketBuffer * aPacket) { return FreeHead(aPacket); }
+    PacketBuffer * Consume(uint16_t aConsumeLength);
 
 private:
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
@@ -137,7 +323,16 @@ private:
     static PacketBuffer * BuildFreeList();
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+    static PacketBuffer * RightSize(PacketBuffer * aPacket);
+#endif
+
+    static PacketBuffer * FreeHead(PacketBuffer * aPacket);
+
     void Clear();
+
+    friend class PacketBufferHandle;
+    friend class ::PacketBufferTest;
 };
 
 } // namespace System
@@ -198,14 +393,6 @@ typedef union
 
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
 
-/**
- * Return the size of the allocation including the reserved and payload data spaces but not including space
- * allocated for the PacketBuffer structure.
- *
- *  @note    The allocation size is equal or greater than \c aAllocSize paramater to \c Create method).
- *
- *  @return     size of the allocation
- */
 inline uint16_t PacketBuffer::AllocSize() const
 {
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -226,6 +413,245 @@ inline uint16_t PacketBuffer::AllocSize() const
     return sizeof(gDummyBufferPoolElement.Block) - CHIP_SYSTEM_PACKETBUFFER_HEADER_SIZE;
 #endif // CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC != 0
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
+}
+
+} // namespace System
+} // namespace chip
+
+namespace chip {
+namespace System {
+
+/**
+ * @class PacketBufferHandle
+ *
+ * @brief
+ *  Tracks ownership of a PacketBuffer.
+ *
+ *  PacketBuffer objects are reference-counted, and normally held and used through a PacketBufferHandle that owns one of the
+ *  counted references. When a PacketBufferHandle goes out of scope, its reference is released. To take ownership, a function
+ *  takes a PacketBufferHandle by value. To borrow ownership, a function takes a `const PacketBufferHandle &`.
+ */
+class DLL_EXPORT PacketBufferHandle
+{
+public:
+    /**
+     * Construct an empty PacketBufferHandle.
+     */
+    PacketBufferHandle() : mBuffer(nullptr) {}
+    PacketBufferHandle(decltype(nullptr)) : mBuffer(nullptr) {}
+
+    /**
+     * Construct a PacketBufferHandle that takes ownership of a PacketBuffer from another.
+     */
+    PacketBufferHandle(PacketBufferHandle && aOther)
+    {
+        mBuffer        = aOther.mBuffer;
+        aOther.mBuffer = nullptr;
+    }
+
+    ~PacketBufferHandle() { Adopt(nullptr); }
+
+    /**
+     * Take ownership of a PacketBuffer from another PacketBufferHandle, freeing any existing owned buffer.
+     */
+    PacketBufferHandle & operator=(PacketBufferHandle && aOther)
+    {
+        if (mBuffer != nullptr)
+        {
+            PacketBuffer::Free(mBuffer);
+        }
+        mBuffer        = aOther.mBuffer;
+        aOther.mBuffer = nullptr;
+        return *this;
+    }
+
+    /**
+     * Free any buffer owned by this handle.
+     */
+    PacketBufferHandle & operator=(decltype(nullptr))
+    {
+        Adopt(nullptr);
+        return *this;
+    }
+
+    /**
+     * Get a new handle to an existing buffer.
+     *
+     * @return a PacketBufferHandle that shares ownership with this.
+     */
+    PacketBufferHandle Retain() const
+    {
+        mBuffer->AddRef();
+        return PacketBufferHandle(mBuffer);
+    }
+
+    /**
+     * Access a PackerBuffer's public methods.
+     */
+    PacketBuffer * operator->() const { return mBuffer; }
+    PacketBuffer & operator*() const { return *mBuffer; }
+
+    /**
+     * Test whether this PacketBufferHandle is empty, or owns a PacketBuffer.
+     *
+     * @return \c true if this PacketBufferHandle is empty; return \c false if it owns a PacketBuffer.
+     */
+    bool IsNull() const { return mBuffer == nullptr; }
+
+    /**
+     *  Detach and return the head of a buffer chain while updating this handle to point to the remaining buffers.
+     *  The current buffer must be the head of the chain.
+     *
+     *  This PacketBufferHandle now holds the ownership formerly held by the head of the chain.
+     *  The returned PacketBufferHandle holds the ownership formerly held by this.
+     *
+     *  @return the detached buffer formerly at the head of the buffer chain.
+     */
+    CHECK_RETURN_VALUE PacketBufferHandle PopHead();
+
+    /**
+     * Free the first buffer in a chain.
+     *
+     *  @note When the buffer chain is referenced by multiple handles, `FreeHead()` will detach the head, but will not forcibly
+     *  deallocate the head buffer.
+     */
+    void FreeHead()
+    {
+        // `PacketBuffer::FreeHead()` frees the current head; this takes ownership from the `next` link.
+        mBuffer = PacketBuffer::FreeHead(mBuffer);
+    }
+
+    /**
+     * Consume data in a chain of buffers.
+     *
+     *  Consume data in a chain of buffers starting with the current buffer and proceeding through the remaining buffers in the
+     *  chain. Each buffer that is completely consumed is freed and the handle holds the first buffer (if any) containing the
+     *  remaining data. The current buffer must be the head of the buffer chain.
+     *
+     *  @param[in] aConsumeLength - number of bytes to consume from the current chain.
+     */
+    void Consume(uint16_t aConsumeLength) { mBuffer = mBuffer->Consume(aConsumeLength); }
+
+    /**
+     * Copy the given buffer to a right-sized buffer if applicable.
+     * This function is a no-op for sockets.
+     *
+     *  @param[in] aPacket - buffer or buffer chain.
+     *
+     *  @return new packet buffer or the original buffer
+     */
+    void RightSize()
+    {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP && LWIP_PBUF_FROM_CUSTOM_POOLS
+        mBuffer = PacketBuffer::RightSize(mBuffer);
+#endif
+    }
+
+    /**
+     * Take ownership of a raw PacketBuffer pointer.
+     *
+     * @brief The caller's ownership is transferred to this. An existing owned buffer is freed.
+     *
+     * @note This should only be used in low-level code, e.g. to import buffers from LwIP or a similar stack.
+     */
+    void Adopt(PacketBuffer * buffer)
+    {
+        if (mBuffer != nullptr)
+        {
+            PacketBuffer::Free(mBuffer);
+        }
+        mBuffer = buffer;
+    }
+
+    /**
+     * Get a new handle to a raw PacketBuffer pointer.
+     *
+     * @brief The caller's ownership is transferred to this.
+     *
+     * @note This should only be used in low-level code, e.g. to import buffers from LwIP or a similar stack.
+     */
+    static PacketBufferHandle Create(PacketBuffer * buffer) { return PacketBufferHandle(buffer); }
+
+    /**
+     * Export a raw PacketBuffer pointer.
+     *
+     * @brief The PacketBufferHandle's ownership is transferred to the caller.
+     *
+     * @note This should only be used in low-level code, e.g. to export buffers from LwIP or a similar stack.
+     */
+    CHECK_RETURN_VALUE PacketBuffer * Release_ForNow()
+    {
+        PacketBuffer * buffer = mBuffer;
+        mBuffer               = nullptr;
+        return buffer;
+    }
+
+    /**
+     * Advance this PacketBufferHandle to the next buffer in a chain.
+     *
+     *  @note This differs from `FreeHead()` in that it does not touch any content in the currently referenced packet buffer;
+     *      it only changes which buffer this handle owns. (Note that this could result in the previous buffer being freed,
+     *      if there is no other.) `Advance()` is designed to be used with an addition handle to traverse a buffer chain,
+     *      whereas `FreeHead()` modifies a chain.
+     */
+    void Advance() { *this = Hold(mBuffer->Next_ForNow()); }
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    /**
+     * Borrow a raw LwIP `pbuf *`.
+     *
+     * @brief The caller has access but no ownership.
+     *
+     * @note This should be used ONLY by low-level code interfacing with LwIP.
+     */
+    struct pbuf * GetLwIPpbuf() { return static_cast<struct pbuf *>(mBuffer); }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
+    // DO NOT USE. This is intended to be used only to call existing TLV::Init() functions that have not yet been converted
+    // to take a PacketBufferHandle, and will be removed soon.
+    // The caller has access but no ownership.
+    PacketBuffer * Get_ForNow() const { return mBuffer; }
+
+private:
+    PacketBufferHandle(const PacketBufferHandle &) = delete;
+    PacketBufferHandle & operator=(const PacketBufferHandle &) = delete;
+
+    // The caller's ownership is transferred to this.
+    explicit PacketBufferHandle(PacketBuffer * buffer) : mBuffer(buffer) {}
+
+    static PacketBufferHandle Hold(PacketBuffer * buffer)
+    {
+        if (buffer != nullptr)
+        {
+            buffer->AddRef();
+        }
+        return PacketBufferHandle(buffer);
+    }
+
+    PacketBuffer * Get() const { return mBuffer; }
+
+    PacketBuffer * mBuffer;
+
+    friend class PacketBuffer;
+    friend class ::PacketBufferTest;
+};
+
+inline void PacketBuffer::SetDataLength(uint16_t aNewLen, const PacketBufferHandle & aChainHead)
+{
+    SetDataLength(aNewLen, aChainHead.mBuffer);
+}
+
+inline PacketBufferHandle PacketBuffer::Next()
+{
+    return PacketBufferHandle::Hold(Next_ForNow());
+}
+
+inline PacketBufferHandle PacketBuffer::Last()
+{
+    PacketBuffer * p = this;
+    while (p->Next_ForNow() != nullptr)
+        p = p->Next_ForNow();
+    return PacketBufferHandle::Hold(p);
 }
 
 } // namespace System

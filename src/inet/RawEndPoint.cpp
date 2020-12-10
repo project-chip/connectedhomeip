@@ -69,6 +69,7 @@
 #endif
 
 #include <string.h>
+#include <utility>
 
 namespace chip {
 namespace Inet {
@@ -545,11 +546,6 @@ INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBuffe
  *
  * @details
  *      Send the ICMP message in \c msg to the destination given in \c addr.
- *
- *      Where <tt>(sendFlags & kSendFlag_RetainBuffer) != 0</tt>, calls
- *      <tt>chip::System::PacketBuffer::Free</tt> on behalf of the caller, otherwise this
- *      method deep-copies \c msg into a fresh object, and queues that for
- *      transmission, leaving the original \c msg available after return.
  */
 INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags)
 {
@@ -588,22 +584,14 @@ INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip:
  *
  * @details
  *      Send the ICMP message \c msg using the destination information given in \c addr.
- *
- *      Where <tt>(sendFlags & kSendFlag_RetainBuffer) != 0</tt>, calls
- *      <tt>chip::System::PacketBuffer::Free</tt> on behalf of the caller, otherwise this
- *      method deep-copies \c msg into a fresh object, and queues that for
- *      transmission, leaving the original \c msg available after return.
  */
 INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags)
 {
     INET_ERROR res         = INET_NO_ERROR;
     const IPAddress & addr = pktInfo->DestAddress;
 
-    INET_FAULT_INJECT(FaultInjection::kFault_Send, if ((sendFlags & kSendFlag_RetainBuffer) == 0) PacketBuffer::Free(msg);
-                      return INET_ERROR_UNKNOWN_INTERFACE;);
-    INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical,
-                      if ((sendFlags & kSendFlag_RetainBuffer) == 0) PacketBuffer::Free(msg);
-                      return INET_ERROR_NO_MEMORY;);
+    INET_FAULT_INJECT(FaultInjection::kFault_Send, PacketBuffer::Free(msg); return INET_ERROR_UNKNOWN_INTERFACE;);
+    INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical, PacketBuffer::Free(msg); return INET_ERROR_NO_MEMORY;);
 
     // Do not allow sending an IPv4 address on an IPv6 end point and
     // vice versa.
@@ -620,41 +608,6 @@ INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::Pack
 #endif // INET_CONFIG_ENABLE_IPV4
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-
-    if (sendFlags & kSendFlag_RetainBuffer)
-    {
-        // when retaining a buffer, the caller expects the msg to be
-        // unmodified.  LwIP stack will normally prepend the packet
-        // headers as the packet traverses the IP/netif layers,
-        // which normally modifies the packet.  We prepend a small
-        // pbuf to the beginning of the pbuf chain, s.t. all headers
-        // are added to the temporary space, just large enough to hold
-        // the transport headers. Careful reader will note:
-        //
-        // * we're actually oversizing the reserved space, the
-        //   transport header is large enough for the TCP header which
-        //   is larger than the UDP header, but it seemed cleaner than
-        //   the combination of PBUF_IP for reserve space, UDP_HLEN
-        //   for payload, and post allocation adjustment of the header
-        //   space).
-        //
-        // * the code deviates from the existing PacketBuffer
-        //   abstractions and needs to reach into the underlying pbuf
-        //   code.  The code in PacketBuffer also forces us to perform
-        //   (effectively) a reinterpret_cast rather than a
-        //   static_cast.  JIRA WEAV-811 is filed to track the
-        //   re-architecting of the memory management.
-
-        pbuf * msgCopy = pbuf_alloc(PBUF_TRANSPORT, 0, PBUF_RAM);
-
-        if (msgCopy == NULL)
-        {
-            return INET_ERROR_NO_MEMORY;
-        }
-
-        pbuf_chain(msgCopy, (pbuf *) msg);
-        msg = (PacketBuffer *) msgCopy;
-    }
 
     // Lock LwIP stack
     LOCK_TCPIP_CORE();
@@ -706,9 +659,7 @@ INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::Pack
     SuccessOrExit(res);
 
     res = IPEndPointBasis::SendMsg(pktInfo, msg, sendFlags);
-
-    if ((sendFlags & kSendFlag_RetainBuffer) == 0)
-        PacketBuffer::Free(msg);
+    PacketBuffer::Free(msg);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 exit:
@@ -881,9 +832,9 @@ InterfaceId RawEndPoint::GetBoundInterface()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-void RawEndPoint::HandleDataReceived(PacketBuffer * msg)
+void RawEndPoint::HandleDataReceived(System::PacketBufferHandle msg)
 {
-    IPEndPointBasis::HandleDataReceived(msg);
+    IPEndPointBasis::HandleDataReceived(std::move(msg));
 }
 
 INET_ERROR RawEndPoint::GetPCB(IPAddressType addrType)
@@ -997,6 +948,7 @@ exit:
  * This fn() may be executed concurrently with SetICMPFilter()
  * - this fn() runs in the LwIP thread (and the lock has already been taken)
  * - SetICMPFilter() runs in the Inet thread.
+ * Returns non-zero if and only if ownership of the pbuf has been taken.
  */
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct pbuf * p, const ip_addr_t * addr)
@@ -1035,7 +987,9 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
 
     if (enqueue)
     {
-        pktInfo = GetPacketInfo(buf);
+        System::PacketBufferHandle bufHandle;
+        bufHandle.Adopt(buf);
+        pktInfo = GetPacketInfo(bufHandle);
 
         if (pktInfo != NULL)
         {
@@ -1062,8 +1016,12 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
             pktInfo->DestPort  = 0;
         }
 
+        buf = bufHandle.Release_ForNow();
         if (lSystemLayer.PostEvent(*ep, kInetEvent_RawDataReceived, (uintptr_t) buf) != INET_NO_ERROR)
+        {
+            // If PostEvent() failed, it has not taken ownership of the buffer, so we need to free it ourselves.
             PacketBuffer::Free(buf);
+        }
     }
 
     return enqueue;

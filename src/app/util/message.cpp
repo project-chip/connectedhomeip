@@ -43,6 +43,8 @@
 #include "config.h"
 #include "util.h"
 
+using namespace chip;
+
 //------------------------------------------------------------------------------
 
 // these variables are for storing responses that are created by zcl-utils
@@ -53,7 +55,7 @@
 // receives multiple ZCL messages, the stack will queue these and hand
 // these to the application via emberIncomingMsgHandler one at a time.
 EmberApsFrame emberAfResponseApsFrame;
-ChipNodeId emberAfResponseDestination;
+NodeId emberAfResponseDestination;
 uint8_t appResponseData[EMBER_AF_RESPONSE_BUFFER_LEN];
 uint16_t appResponseLength;
 
@@ -143,7 +145,7 @@ uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length)
     if ((appResponseLength + length) < EMBER_AF_RESPONSE_BUFFER_LEN)
     {
         memmove(appResponseData + appResponseLength, data, length);
-        appResponseLength += length;
+        appResponseLength = static_cast<uint16_t>(appResponseLength + length);
         return &appResponseData[appResponseLength - length];
     }
     else
@@ -155,7 +157,7 @@ uint8_t * emberAfPutBlockInResp(const uint8_t * data, uint16_t length)
 uint8_t * emberAfPutStringInResp(const uint8_t * buffer)
 {
     uint8_t length = emberAfStringLength(buffer);
-    return emberAfPutBlockInResp(buffer, length + 1);
+    return emberAfPutBlockInResp(buffer, static_cast<uint16_t>(length + 1));
 }
 
 uint8_t * emberAfPutDateInResp(EmberAfDate * value)

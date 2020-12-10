@@ -22,10 +22,8 @@
  *
  */
 
-#include "TestSupport.h"
-
 #include <support/BufBound.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -41,7 +39,7 @@ public:
 
     BBTest(size_t len) : BufBound(mBuf + 1, len), mLen(len) { memset(mBuf, kGuard, kLen); }
 
-    bool expect(const void * val, size_t written, size_t available)
+    bool expect(const void * val, size_t needed, size_t available)
     {
         // check guards
         for (size_t i = mLen + 1; i < sizeof(mBuf); i++)
@@ -56,19 +54,27 @@ public:
             return false;
         }
 
-        if ((mLen < written && Fit()) || (mLen >= written && !Fit()))
+        size_t written = 0xcafebabe;
+        bool fit       = Fit(written);
+        if (written == 0xcafebabe)
         {
-            printf("fit is wrong mLen == %zu, written == %zu, Fit() == %s\n", mLen, written, Fit() ? "true" : "false");
+            printf("Fit(written) didn't set written\n");
+            return false;
+        }
+        if ((fit && (mLen < needed || written != needed)) || (!fit && (mLen >= needed || written != mLen)))
+        {
+            printf("Fit(written) is wrong: mLen == %zu, needed == %zu, written == %zu, Fit() == %s\n", mLen, needed, written,
+                   fit ? "true" : "false");
             return false;
         }
 
         // check everything else
-        if (memcmp(mBuf + 1, val, written < mLen ? written : mLen) != 0)
+        if (memcmp(mBuf + 1, val, needed < mLen ? needed : mLen) != 0)
         {
             return false;
         }
 
-        return Available() == available && Written() == written;
+        return Available() == available && Needed() == needed;
     }
 };
 
@@ -109,20 +115,20 @@ static void TestBufBound_Buf(nlTestSuite * inSuite, void * inContext)
     }
 }
 
-static void TestBufBound_PutLE(nlTestSuite * inSuite, void * inContext)
+static void TestBufBound_Put(nlTestSuite * inSuite, void * inContext)
 {
     (void) inContext;
     {
         BBTest bb(2);
 
-        bb.PutLE16('h' + 'i' * 256);
+        bb.Put16('h' + 'i' * 256);
 
         NL_TEST_ASSERT(inSuite, bb.expect("hi", 2, 0));
     }
     {
         BBTest bb(4);
 
-        bb.PutLE32(0x01020304);
+        bb.Put32(0x01020304);
 
         NL_TEST_ASSERT(inSuite, bb.expect("\x04\x03\x02\x01", 4, 0));
     }
@@ -130,7 +136,7 @@ static void TestBufBound_PutLE(nlTestSuite * inSuite, void * inContext)
     {
         BBTest bb(8);
 
-        bb.PutLE64(0x0102030405060708);
+        bb.Put64(0x0102030405060708);
 
         NL_TEST_ASSERT(inSuite, bb.expect("\x08\x07\x06\x05\x04\x03\x02\x01", 8, 0));
     }
@@ -138,7 +144,7 @@ static void TestBufBound_PutLE(nlTestSuite * inSuite, void * inContext)
     {
         BBTest bb(3);
 
-        bb.PutLE(0x0102030405060708u, 3);
+        bb.Put(0x0102030405060708u, 3);
 
         NL_TEST_ASSERT(inSuite, bb.expect("\x08\x07\x06", 3, 0));
     }
@@ -185,7 +191,7 @@ static void TestBufBound_PutBE(nlTestSuite * inSuite, void * inContext)
  *   Test Suite. It lists all the test functions.
  */
 static const nlTest sTests[] = { NL_TEST_DEF_FN(TestBufBound_Str), NL_TEST_DEF_FN(TestBufBound_Buf),
-                                 NL_TEST_DEF_FN(TestBufBound_PutLE), NL_TEST_DEF_FN(TestBufBound_PutBE), NL_TEST_SENTINEL() };
+                                 NL_TEST_DEF_FN(TestBufBound_Put), NL_TEST_DEF_FN(TestBufBound_PutBE), NL_TEST_SENTINEL() };
 
 int TestBufBound(void)
 {

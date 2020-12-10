@@ -20,7 +20,8 @@ get_filename_component(CHIP_APP_SERVER ${CHIP_ROOT}/examples/common/chip-app-ser
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighting-common REALPATH)
 
-list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/overlay-sample-defaults.conf)
+set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/sample-defaults.conf prj.conf)
+set(CHIP_OPENTHREAD_CONFIG ${NRFCONNECT_COMMON}/project_include/OpenThreadConfig.h)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
 include(nrfconnect-app)
@@ -31,9 +32,10 @@ target_sources(app PRIVATE
                main/AppTask.cpp
                main/LightingManager.cpp
                main/main.cpp
+               main/Rpc.cpp
                main/ZclCallbacks.cpp
-               ${LIGHTING_COMMON}/gen/call-command-handler.c
-               ${LIGHTING_COMMON}/gen/callback-stub.c
+               ${LIGHTING_COMMON}/gen/call-command-handler.cpp
+               ${LIGHTING_COMMON}/gen/callback-stub.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
@@ -42,6 +44,8 @@ target_sources(app PRIVATE
                ${CHIP_APP_SERVER}/Server.cpp
                ${CHIP_APP_SERVER}/QRCodeUtil.cpp
                ${CHIP_APP_SERVER}/RendezvousServer.cpp
+               ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
+               ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/af-main-common.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size.cpp
@@ -55,4 +59,36 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
-               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp)
+               ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp
+               ${CHIP_ROOT}/src/app/clusters/level-control/level-control.cpp
+               )
+
+if (CONFIG_CHIP_PW_RPC)
+
+set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
+include(${PIGWEED_ROOT}/pw_build/pigweed.cmake)
+include(${PIGWEED_ROOT}/pw_protobuf_compiler/proto.cmake)
+
+pw_set_backend(pw_log pw_log_basic)
+pw_set_backend(pw_assert pw_assert_log)
+pw_set_backend(pw_sys_io pw_sys_io.nrfconnect)
+set(dir_pw_third_party_nanopb PRESENT CACHE STRING ${CHIP_ROOT}/third_party/nanopb/repo FORCE)
+
+add_subdirectory(third_party/connectedhomeip/examples/platform/nrfconnect/pw_sys_io)
+add_subdirectory(third_party/connectedhomeip/third_party/nanopb/repo)
+add_subdirectory(third_party/connectedhomeip/third_party/pigweed/repo)
+
+pw_proto_library(pigweed_lighting_protolib
+  SOURCES
+    main/pigweed_lighting.proto
+)
+
+target_link_libraries(app PRIVATE
+   pigweed_lighting_protolib.nanopb_rpc
+   pw_hdlc_lite
+    pw_log
+    pw_rpc.nanopb.echo_service
+    pw_rpc.server
+)
+
+endif(CONFIG_CHIP_PW_RPC)

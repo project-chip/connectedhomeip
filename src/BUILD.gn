@@ -38,26 +38,34 @@ if (chip_build_tests) {
 
   chip_test_group("tests") {
     deps = [
+      "${chip_root}/src/app/tests",
       "${chip_root}/src/crypto/tests",
       "${chip_root}/src/inet/tests",
+      "${chip_root}/src/lib/asn1/tests",
+      "${chip_root}/src/lib/core/tests",
+      "${chip_root}/src/lib/mdns/minimal/core/tests",
+      "${chip_root}/src/lib/mdns/minimal/records/tests",
+      "${chip_root}/src/lib/mdns/minimal/responders/tests",
+      "${chip_root}/src/lib/mdns/minimal/tests",
+      "${chip_root}/src/lib/support/tests",
       "${chip_root}/src/messaging/tests",
+      "${chip_root}/src/protocols/bdx/tests",
+      "${chip_root}/src/setup_payload/tests",
       "${chip_root}/src/system/tests",
       "${chip_root}/src/transport/raw/tests",
       "${chip_root}/src/transport/retransmit/tests",
       "${chip_root}/src/transport/tests",
     ]
 
-    if (chip_device_platform != "esp32") {
-      deps += [
-        "${chip_root}/src/lib/asn1/tests",
-        "${chip_root}/src/lib/core/tests",
-        "${chip_root}/src/lib/support/tests",
-        "${chip_root}/src/platform/tests",
-        "${chip_root}/src/setup_payload/tests",
-      ]
+    if (chip_device_platform != "none") {
+      deps += [ "${chip_root}/src/lib/mdns/minimal/tests" ]
     }
 
-    if (chip_config_network_layer_ble && chip_device_platform != "esp32") {
+    if (chip_device_platform != "esp32") {
+      deps += [ "${chip_root}/src/platform/tests" ]
+    }
+
+    if (chip_config_network_layer_ble) {
       deps += [ "${chip_root}/src/ble/tests" ]
     }
 

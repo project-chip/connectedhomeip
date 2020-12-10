@@ -25,37 +25,15 @@
 
 #include <stdint.h>
 
-/**
- * Types for use by CHIP C code, until we switch to C++.
- */
-typedef uint8_t CHIPEndpointId;
-typedef uint16_t CHIPClusterId;
-typedef uint16_t CHIPAttributeId;
-typedef uint16_t CHIPGroupId;
-
-/**
- * Types for use by generated Silicon Labs code until we convert the generator
- * to using CHIP types.
- */
-typedef CHIPClusterId EmberAfClusterId;
-typedef CHIPAttributeId EmberAfAttributeId;
-typedef CHIPGroupId EmberMulticastId;
-
-/**
- * @brief Type for referring to zigbee application profile id
- *        TODO: This is probably not needed for CHIP and should be removed.
- *        https://github.com/project-chip/connectedhomeip/issues/3444
- */
-typedef uint16_t EmberAfProfileId;
-
-#ifdef __cplusplus
 // Pull in NodeId
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
-typedef CHIPEndpointId EndpointId;
-typedef CHIPClusterId ClusterId;
-typedef CHIPAttributeId AttributeId;
-typedef CHIPGroupId GroupId;
+typedef uint8_t EndpointId;
+typedef uint16_t ClusterId;
+typedef uint16_t AttributeId;
+typedef uint16_t GroupId;
+typedef uint8_t CommandId;
+typedef uint16_t EventId;
+typedef uint64_t DataVersion;
 } // namespace chip
-#endif // __cplusplus

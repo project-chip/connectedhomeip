@@ -528,6 +528,49 @@ int cmd_device_sta(int argc, char ** argv)
         }
         streamer_printf(sout, "%s\r\n", typeStr);
     }
+    else if (strcmp(argv[0], "set_mode") == 0)
+    {
+        if (argc < 2)
+        {
+            streamer_printf(sout,
+                            "Invalid command: needs to specify mode:\r\n"
+                            "disable\r\n"
+                            "enable\r\n"
+                            "app_ctrl\r\n");
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else
+        {
+            ConnectivityManager::WiFiStationMode mode = ConnectivityManager::WiFiStationMode::kWiFiStationMode_NotSupported;
+
+            if (strcmp(argv[1], "disable") == 0)
+            {
+                mode = ConnectivityManager::WiFiStationMode::kWiFiStationMode_Disabled;
+            }
+            else if (strcmp(argv[1], "enable") == 0)
+            {
+                mode = ConnectivityManager::WiFiStationMode::kWiFiStationMode_Enabled;
+            }
+            else if (strcmp(argv[1], "app_ctrl") == 0)
+            {
+                mode = ConnectivityManager::WiFiStationMode::kWiFiStationMode_ApplicationControlled;
+            }
+
+            if (mode != ConnectivityManager::WiFiStationMode::kWiFiStationMode_NotSupported)
+            {
+                error = ConnectivityMgr().SetWiFiStationMode(mode);
+            }
+            else
+            {
+                streamer_printf(sout,
+                                "Invalid command: needs to be one of the following modes:\r\n"
+                                "disable\r\n"
+                                "enable\r\n"
+                                "app_ctrl\r\n");
+                error = CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+    }
     else if (strcmp(argv[0], "enabled") == 0)
     {
         bool isState = ConnectivityMgr().IsWiFiStationEnabled();
@@ -558,6 +601,20 @@ int cmd_device_sta(int argc, char ** argv)
         uint32_t interval = ConnectivityMgr().GetWiFiStationReconnectIntervalMS();
         streamer_printf(sout, "WiFi Station Reconnect Interval (in seconds): %d\r\n", interval / 1000);
     }
+    else if (strcmp(argv[0], "set_reconnect_interval") == 0)
+    {
+        if (argc < 2)
+        {
+            streamer_printf(sout, "Invalid command: needs to specify Station Reconnect Interval (in seconds):\r\n");
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else
+        {
+            uint32_t interval = std::stoi(argv[1]) * 1000;
+
+            ConnectivityMgr().SetWiFiStationReconnectIntervalMS(interval);
+        }
+    }
     else if (strcmp(argv[0], "stats") == 0)
     {
         SuccessOrExit(error = ConnectivityMgr().GetAndLogWifiStatsCounters());
@@ -566,6 +623,186 @@ int cmd_device_sta(int argc, char ** argv)
     else
     {
         ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+exit:
+    PlatformMgr().UnlockChipStack();
+    return error;
+}
+
+int cmd_device_ap(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrExit(PlatformMgr().TryLockChipStack(), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (strcmp(argv[0], "mode") == 0)
+    {
+        const char * typeStr                 = "Unknown";
+        ConnectivityManager::WiFiAPMode mode = ConnectivityMgr().GetWiFiAPMode();
+        switch (mode)
+        {
+        case ConnectivityManager::WiFiAPMode::kWiFiAPMode_NotSupported:
+            typeStr = "NotSupported";
+            break;
+        case ConnectivityManager::WiFiAPMode::kWiFiAPMode_ApplicationControlled:
+            typeStr = "ApplicationControlled";
+            break;
+        case ConnectivityManager::WiFiAPMode::kWiFiAPMode_Disabled:
+            typeStr = "Disabled";
+            break;
+        case ConnectivityManager::WiFiAPMode::kWiFiAPMode_Enabled:
+            typeStr = "Enabled";
+            break;
+        case ConnectivityManager::WiFiAPMode::kWiFiAPMode_OnDemand:
+            typeStr = "OnDemand";
+            break;
+        case ConnectivityManager::WiFiAPMode::kWiFiAPMode_OnDemand_NoStationProvision:
+            typeStr = "OnDemand-NoStation";
+            break;
+        }
+        streamer_printf(sout, "%s\r\n", typeStr);
+    }
+    else if (strcmp(argv[0], "set_mode") == 0)
+    {
+        if (argc < 2)
+        {
+            streamer_printf(sout,
+                            "Invalid command: needs to specify mode:\r\n"
+                            "disable\r\n"
+                            "enable\r\n"
+                            "on_demand\r\n"
+                            "on_demand_no_sta\r\n"
+                            "app_ctrl\r\n");
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else
+        {
+            ConnectivityManager::WiFiAPMode mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_NotSupported;
+
+            if (strcmp(argv[1], "disable") == 0)
+            {
+                mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_Disabled;
+            }
+            else if (strcmp(argv[1], "enable") == 0)
+            {
+                mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_Enabled;
+            }
+            else if (strcmp(argv[1], "on_demand") == 0)
+            {
+                mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_OnDemand;
+            }
+            else if (strcmp(argv[1], "on_demand_no_sta") == 0)
+            {
+                mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_OnDemand_NoStationProvision;
+            }
+            else if (strcmp(argv[1], "app_ctrl") == 0)
+            {
+                mode = ConnectivityManager::WiFiAPMode::kWiFiAPMode_ApplicationControlled;
+            }
+
+            if (mode != ConnectivityManager::WiFiAPMode::kWiFiAPMode_NotSupported)
+            {
+                error = ConnectivityMgr().SetWiFiAPMode(mode);
+            }
+            else
+            {
+                streamer_printf(sout,
+                                "Invalid command: needs to be one of the following modes:\r\n"
+                                "disable\r\n"
+                                "enable\r\n"
+                                "on_demand\r\n"
+                                "on_demand_no_sta\r\n"
+                                "app_ctrl\r\n");
+                error = CHIP_ERROR_INVALID_ARGUMENT;
+            }
+        }
+    }
+    else if (strcmp(argv[0], "active") == 0)
+    {
+        bool isState = ConnectivityMgr().IsWiFiAPActive();
+        streamer_printf(sout, "%s\r\n", (isState) ? "true" : "false");
+    }
+    else if (strcmp(argv[0], "controlled") == 0)
+    {
+        bool isState = ConnectivityMgr().IsWiFiAPApplicationControlled();
+        streamer_printf(sout, "%s\r\n", (isState) ? "true" : "false");
+    }
+    else if (strcmp(argv[0], "start") == 0)
+    {
+        ConnectivityMgr().DemandStartWiFiAP();
+        streamer_printf(sout, "start AP mode\r\n");
+    }
+    else if (strcmp(argv[0], "stop") == 0)
+    {
+        ConnectivityMgr().StopOnDemandWiFiAP();
+        streamer_printf(sout, "stop AP mode\r\n");
+    }
+    else if (strcmp(argv[0], "idle_timeout") == 0)
+    {
+        uint32_t interval = ConnectivityMgr().GetWiFiAPIdleTimeoutMS();
+        streamer_printf(sout, "WiFi AP Idle Timeout (in seconds): %d\r\n", interval / 1000);
+    }
+    else if (strcmp(argv[0], "set_idle") == 0)
+    {
+        if (argc < 2)
+        {
+            streamer_printf(sout, "Invalid command: needs to specify AP Idle Timeout (in seconds):\r\n");
+            error = CHIP_ERROR_INVALID_ARGUMENT;
+        }
+        else
+        {
+            uint32_t timeout = std::stoi(argv[1]) * 1000;
+
+            ConnectivityMgr().SetWiFiAPIdleTimeoutMS(timeout);
+        }
+    }
+    else
+    {
+        ExitNow(error = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+exit:
+    PlatformMgr().UnlockChipStack();
+    return error;
+}
+
+int cmd_device_connect(int argc, char ** argv)
+{
+    streamer_t * sout = streamer_get();
+
+    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrExit(argc > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    VerifyOrExit(PlatformMgr().TryLockChipStack(), error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    if (argc < 2)
+    {
+        streamer_printf(sout,
+                        "Invalid command: needs two arguments "
+                        "(network ssid and password)\r\n");
+        error = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else if (strlen(argv[0]) > 32)
+    {
+        streamer_printf(sout, "Invalid network SSID\r\n");
+        error = CHIP_ERROR_INVALID_ARGUMENT;
+    }
+    else
+    {
+        streamer_printf(sout, "Connect to WiFi network: SSID: %s\r\n", argv[0]);
+
+        error = ConnectivityMgrImpl().ProvisionWiFiNetwork(argv[0], argv[1]);
+
+        if (error != CHIP_NO_ERROR)
+        {
+            streamer_printf(sout, "Failed to connect to WiFi network: %s\r\n", chip::ErrorStr(error));
+        }
     }
 
 exit:
@@ -695,7 +932,9 @@ static const shell_command_t cmds_device[] = {
     { &cmd_device_thread, "thread", "Control the Thread interface. Usage: device thread <param_name>" },
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    { &cmd_device_sta, "sta", "Control the WiFi sta interface. Usage: device sta <param_name>" },
+    { &cmd_device_sta, "sta", "Control the WiFi STA interface. Usage: device sta <param_name>" },
+    { &cmd_device_ap, "ap", "Control the WiFi AP interface. Usage: device ap <param_name>" },
+    { &cmd_device_connect, "connect", "Join the network with the given SSID and PSK. Usage: device connect <ssid> <passphrase>" },
 #endif
 };
 

@@ -23,8 +23,6 @@
  *
  */
 
-#include "TestCore.h"
-
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
 
@@ -39,7 +37,7 @@
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/ScopedBuffer.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <string.h>
 
@@ -266,7 +264,7 @@ void TestBufferContents(nlTestSuite * inSuite, PacketBuffer * buf, const uint8_t
         expectedVal += len;
         expectedLen -= len;
 
-        buf = buf->Next();
+        buf = buf->Next_ForNow();
     }
 
     NL_TEST_ASSERT(inSuite, expectedLen == 0);
@@ -1945,28 +1943,26 @@ void WriteDeleteReadTest(nlTestSuite * inSuite)
  */
 void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
 {
-    PacketBuffer * buf = PacketBuffer::New(0);
+    System::PacketBufferHandle buf = PacketBuffer::New(0);
     TLVWriter writer;
     TLVReader reader;
 
-    writer.Init(buf);
+    writer.Init(buf.Get_ForNow());
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEncoding1(inSuite, writer);
 
-    TestBufferContents(inSuite, buf, Encoding1, sizeof(Encoding1));
+    TestBufferContents(inSuite, buf.Get_ForNow(), Encoding1, sizeof(Encoding1));
 
-    reader.Init(buf);
+    reader.Init(buf.Get_ForNow());
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
 
-    reader.Init(buf, buf->MaxDataLength(), false);
+    reader.Init(buf.Get_ForNow(), buf->MaxDataLength(), false);
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
-
-    PacketBuffer::Free(buf);
 }
 
 CHIP_ERROR CountEvictedMembers(CHIPCircularTLVBuffer & inBuffer, void * inAppData, TLVReader & inReader)
@@ -2447,9 +2443,9 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     TLVWriter writer;
     TLVReader reader;
 
-    PacketBuffer * buf  = PacketBuffer::New(0);
-    uint16_t maxDataLen = buf->MaxDataLength();
-    uint16_t reserve    = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
+    System::PacketBufferHandle buf = PacketBuffer::New(0);
+    uint16_t maxDataLen            = buf->MaxDataLength();
+    uint16_t reserve = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 
     // Repeatedly write and read a TLV encoding to a chain of PacketBuffers. Use progressively larger
     // and larger amounts of space in the first buffer to force the encoding/decoding to overlap the
@@ -2458,20 +2454,18 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     {
         buf->SetStart(buf->Start() + reserve);
 
-        writer.Init(buf);
+        writer.Init(buf.Get_ForNow());
         writer.GetNewBuffer      = TLVWriter::GetNewPacketBuffer;
         writer.ImplicitProfileId = TestProfile_2;
 
         WriteEncoding1(inSuite, writer);
 
-        TestBufferContents(inSuite, buf, Encoding1, sizeof(Encoding1));
+        TestBufferContents(inSuite, buf.Get_ForNow(), Encoding1, sizeof(Encoding1));
 
-        reader.Init(buf, 0xFFFFFFFFUL, true);
+        reader.Init(buf.Get_ForNow(), 0xFFFFFFFFUL, true);
         reader.ImplicitProfileId = TestProfile_2;
 
         ReadEncoding1(inSuite, reader);
-
-        PacketBuffer::Free(buf);
 
         buf = PacketBuffer::New(0);
     }

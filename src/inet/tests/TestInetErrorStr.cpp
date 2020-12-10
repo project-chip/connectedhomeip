@@ -32,8 +32,6 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TestInetLayer.h"
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
@@ -41,7 +39,7 @@
 #include <inet/InetError.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -82,8 +80,6 @@ static int32_t sContext[] =
     INET_ERROR_INCOMPATIBLE_IP_ADDRESS_TYPE
 };
 // clang-format on
-
-static const size_t kTestElements = sizeof(sContext) / sizeof(sContext[0]);
 
 static void CheckInetErrorStr(nlTestSuite * inSuite, void * inContext)
 {

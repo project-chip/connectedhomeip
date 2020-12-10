@@ -19,77 +19,96 @@
 #include "NetworkCommand.h"
 
 using namespace ::chip;
-using namespace ::chip::DeviceController;
-using namespace ::chip::System;
 
-static void onConnect(ChipDeviceController * dc, Transport::PeerConnectionState * state, void * appReqState)
-{
-    ChipLogDetail(chipTool, "OnConnect");
+constexpr uint16_t kWaitDurationInSeconds = 10;
 
-    NetworkCommand * command = reinterpret_cast<NetworkCommand *>(dc->AppState);
-    command->OnConnect(dc);
-}
+// Make sure our buffer is big enough, but this will need a better setup!
+constexpr uint16_t kMaxBufferSize = 1024;
 
-static void onError(ChipDeviceController * dc, void * appReqState, CHIP_ERROR err, const Inet::IPPacketInfo * pi)
-{
-    ChipLogError(chipTool, "OnError: %s", ErrorStr(err));
-
-    NetworkCommand * command = reinterpret_cast<NetworkCommand *>(dc->AppState);
-    command->OnError(dc, err);
-}
-
-static void onMessage(ChipDeviceController * dc, void * appReqState, PacketBuffer * buffer)
-{
-    ChipLogDetail(chipTool, "OnMessage: Received %zu bytes", buffer->DataLength());
-
-    NetworkCommand * command = reinterpret_cast<NetworkCommand *>(dc->AppState);
-    command->OnMessage(dc, buffer);
-
-    PacketBuffer::Free(buffer);
-}
-
-CHIP_ERROR NetworkCommand::Run(ChipDeviceController * dc, NodeId remoteId)
+CHIP_ERROR NetworkCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    dc->AppState = reinterpret_cast<void *>(this);
+    err = mCommissioner.Init(localId, &storage);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
 
-    switch (mNetworkType)
-    {
-    case NetworkType::BLE:
-        err = ConnectBLE(dc, remoteId);
-        break;
+    err = mCommissioner.ServiceEvents();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
 
-    case NetworkType::UDP:
-        err = ConnectUDP(dc, remoteId);
-        break;
+    err = RunInternal(remoteId);
+    SuccessOrExit(err);
 
-    case NetworkType::ALL:
-        ChipLogError(chipTool, "Not implemented yet.");
-        err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-        break;
-    }
+    VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);
 
-    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to connect to the device"));
+exit:
+    mCommissioner.ServiceEventSignal();
+    mCommissioner.Shutdown();
+    return err;
+}
+
+CHIP_ERROR NetworkCommand::RunInternal(NodeId remoteId)
+{
+    ChipDevice * device;
+    CHIP_ERROR err = mCommissioner.GetDevice(remoteId, &device);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Could not find a paired device. Are you sure it has been paired ?"));
+
+    device->SetDelegate(this);
+
+    err = RunCommandInternal(device);
+    SuccessOrExit(err);
+
+    UpdateWaitForResponse(true);
+    WaitForResponse(kWaitDurationInSeconds);
 
 exit:
     return err;
 }
 
-CHIP_ERROR NetworkCommand::ConnectBLE(ChipDeviceController * dc, NodeId remoteId)
+CHIP_ERROR NetworkCommand::RunCommandInternal(ChipDevice * device)
 {
-    snprintf(mName, sizeof(mName), "BLE:%u", mDiscriminator);
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    uint16_t payloadLen = 0;
 
-    RendezvousParameters params = RendezvousParameters().SetSetupPINCode(mSetupPINCode).SetDiscriminator(mDiscriminator);
-    return dc->ConnectDevice(remoteId, params, NULL, onConnect, onMessage, onError);
+    PacketBufferHandle buffer = PacketBuffer::NewWithAvailableSize(kMaxBufferSize);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    payloadLen = Encode(buffer, kMaxBufferSize);
+    VerifyOrExit(payloadLen != 0, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    buffer->SetDataLength(payloadLen);
+
+#ifdef DEBUG
+    PrintBuffer(buffer);
+#endif
+
+    err = device->SendMessage(std::move(buffer));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
+
+exit:
+    return err;
 }
 
-CHIP_ERROR NetworkCommand::ConnectUDP(ChipDeviceController * dc, NodeId remoteId)
+void NetworkCommand::OnMessage(PacketBufferHandle buffer)
 {
-    char hostIpStr[40];
-    mRemoteAddr.address.ToString(hostIpStr, sizeof(hostIpStr));
-    snprintf(mName, sizeof(mName), "%s:%d", hostIpStr, mRemotePort);
+    ChipLogDetail(chipTool, "OnMessage: Received %zu bytes", buffer->DataLength());
 
-    return dc->ConnectDeviceWithoutSecurePairing(remoteId, mRemoteAddr.address, nullptr, onConnect, onMessage, onError, mRemotePort,
-                                                 mRemoteAddr.interfaceId);
+    SetCommandExitStatus(Decode(buffer));
+    UpdateWaitForResponse(false);
+}
+
+void NetworkCommand::OnStatusChange(void)
+{
+    ChipLogProgress(chipTool, "DeviceStatusDelegate::OnStatusChange");
+}
+
+void NetworkCommand::PrintBuffer(PacketBufferHandle & buffer) const
+{
+    const size_t data_len = buffer->DataLength();
+
+    fprintf(stderr, "SENDING: %zu ", data_len);
+    for (size_t i = 0; i < data_len; ++i)
+    {
+        fprintf(stderr, "%d ", buffer->Start()[i]);
+    }
+    fprintf(stderr, "\n");
 }

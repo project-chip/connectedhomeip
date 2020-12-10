@@ -25,6 +25,7 @@
 #include <core/CHIPEncoding.h>
 #include <support/BufBound.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <transport/SecureSession.h>
 #include <transport/raw/MessageHeader.h>
 
@@ -46,51 +47,34 @@ SecureSession::SecureSession() : mKeyAvailable(false) {}
 CHIP_ERROR SecureSession::InitFromSecret(const uint8_t * secret, const size_t secret_length, const uint8_t * salt,
                                          const size_t salt_length, const uint8_t * info, const size_t info_length)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
 
-    VerifyOrExit(mKeyAvailable == false, error = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(secret != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(secret_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError(secret != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(secret_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError((salt_length == 0) || (salt != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(info_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    if (salt_length > 0)
-    {
-        VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(info != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    error = HKDF_SHA256(secret, secret_length, salt, salt_length, info, info_length, mKey, sizeof(mKey));
-    SuccessOrExit(error);
+    ReturnErrorOnFailure(HKDF_SHA256(secret, secret_length, salt, salt_length, info, info_length, mKey, sizeof(mKey)));
 
     mKeyAvailable = true;
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SecureSession::Init(const Crypto::P256Keypair & local_keypair, const Crypto::P256PublicKey & remote_public_key,
                                const uint8_t * salt, const size_t salt_length, const uint8_t * info, const size_t info_length)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
+
+    VerifyOrReturnError(mKeyAvailable == false, CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrReturnError((salt_length == 0) || (salt != nullptr), CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(info_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(info != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+
     P256ECDHDerivedSecret secret;
+    ReturnErrorOnFailure(local_keypair.ECDH_derive_secret(remote_public_key, secret));
 
-    VerifyOrExit(mKeyAvailable == false, error = CHIP_ERROR_INCORRECT_STATE);
-    if (salt_length > 0)
-    {
-        VerifyOrExit(salt != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    }
-
-    VerifyOrExit(info_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(info != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-
-    error = local_keypair.ECDH_derive_secret(remote_public_key, secret);
-    SuccessOrExit(error);
-
-    error = InitFromSecret(secret, secret.Length(), salt, salt_length, info, info_length);
-
-exit:
-    return error;
+    return InitFromSecret(secret, secret.Length(), salt, salt_length, info, info_length);
 }
 
 void SecureSession::Reset()
@@ -101,103 +85,80 @@ void SecureSession::Reset()
 
 CHIP_ERROR SecureSession::GetIV(const PacketHeader & header, uint8_t * iv, size_t len)
 {
-    CHIP_ERROR err  = CHIP_NO_ERROR;
-    uint64_t nodeID = 0;
+
+    VerifyOrReturnError(len == kAESCCMIVLen, CHIP_ERROR_INVALID_ARGUMENT);
 
     BufBound bbuf(iv, len);
 
-    VerifyOrExit(len == kAESCCMIVLen, err = CHIP_ERROR_INVALID_ARGUMENT);
+    bbuf.Put64(header.GetSourceNodeId().ValueOr(0));
+    bbuf.Put32(header.GetMessageId());
 
-    if (header.GetSourceNodeId().HasValue())
-    {
-        nodeID = header.GetSourceNodeId().Value();
-    }
-
-    bbuf.PutLE64(nodeID);
-    bbuf.PutLE32(header.GetMessageId());
-    VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-
-exit:
-    return err;
+    return bbuf.Fit() ? CHIP_NO_ERROR : CHIP_ERROR_NO_MEMORY;
 }
 
-CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, const Header::Flags payloadEncodeFlags, uint8_t * aad,
-                                                uint16_t & len)
+CHIP_ERROR SecureSession::GetAdditionalAuthData(const PacketHeader & header, uint8_t * aad, uint16_t & len)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t actualEncodedHeaderSize;
-
-    VerifyOrExit(len >= header.EncodeSizeBytes(), err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(len >= header.EncodeSizeBytes(), CHIP_ERROR_INVALID_ARGUMENT);
 
     // Use unencrypted part of header as AAD. This will help
     // integrity protect the whole message
-    err = header.Encode(aad, len, &actualEncodedHeaderSize, payloadEncodeFlags);
-    SuccessOrExit(err);
+    uint16_t actualEncodedHeaderSize;
 
-    VerifyOrExit(len >= actualEncodedHeaderSize, err = CHIP_ERROR_INVALID_ARGUMENT);
+    ReturnErrorOnFailure(header.Encode(aad, len, &actualEncodedHeaderSize));
+    VerifyOrReturnError(len >= actualEncodedHeaderSize, CHIP_ERROR_INVALID_ARGUMENT);
+
     len = actualEncodedHeaderSize;
 
-exit:
-    return err;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SecureSession::Encrypt(const uint8_t * input, size_t input_length, uint8_t * output, PacketHeader & header,
-                                  Header::Flags payloadFlags, MessageAuthenticationCode & mac)
+                                  MessageAuthenticationCode & mac)
 {
-    CHIP_ERROR error = CHIP_NO_ERROR;
-    uint8_t IV[kAESCCMIVLen];
-    uint8_t AAD[kMaxAADLen];
-    uint16_t aadLen = sizeof(AAD);
 
     constexpr Header::EncryptionType encType = Header::EncryptionType::kAESCCMTagLen16;
 
     const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(encType);
-    uint8_t tag[taglen];
+    assert(taglen <= kMaxTagLen);
 
-    VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
-    VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mKeyAvailable, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+    VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = GetIV(header, IV, sizeof(IV));
-    SuccessOrExit(error);
+    uint8_t AAD[kMaxAADLen];
+    uint8_t IV[kAESCCMIVLen];
+    uint16_t aadLen = sizeof(AAD);
+    uint8_t tag[kMaxTagLen];
 
-    error = GetAdditionalAuthData(header, payloadFlags, AAD, aadLen);
-    SuccessOrExit(error);
-
-    error = AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output, tag, taglen);
-    SuccessOrExit(error);
+    ReturnErrorOnFailure(GetIV(header, IV, sizeof(IV)));
+    ReturnErrorOnFailure(GetAdditionalAuthData(header, AAD, aadLen));
+    ReturnErrorOnFailure(
+        AES_CCM_encrypt(input, input_length, AAD, aadLen, mKey, sizeof(mKey), IV, sizeof(IV), output, tag, taglen));
 
     mac.SetTag(&header, encType, tag, taglen);
 
-exit:
-    return error;
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR SecureSession::Decrypt(const uint8_t * input, size_t input_length, uint8_t * output, const PacketHeader & header,
-                                  Header::Flags payloadFlags, const MessageAuthenticationCode & mac)
+                                  const MessageAuthenticationCode & mac)
 {
-    CHIP_ERROR error    = CHIP_NO_ERROR;
-    size_t taglen       = MessageAuthenticationCode::TagLenForEncryptionType(header.GetEncryptionType());
+    const size_t taglen = MessageAuthenticationCode::TagLenForEncryptionType(header.GetEncryptionType());
     const uint8_t * tag = mac.GetTag();
     uint8_t IV[kAESCCMIVLen];
     uint8_t AAD[kMaxAADLen];
     uint16_t aadLen = sizeof(AAD);
 
-    VerifyOrExit(mKeyAvailable, error = CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
-    VerifyOrExit(input != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(input_length > 0, error = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(output != nullptr, error = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(mKeyAvailable, CHIP_ERROR_INVALID_USE_OF_SESSION_KEY);
+    VerifyOrReturnError(input != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(input_length > 0, CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrReturnError(output != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
 
-    error = GetIV(header, IV, sizeof(IV));
-    SuccessOrExit(error);
+    ReturnErrorOnFailure(GetIV(header, IV, sizeof(IV)));
+    ReturnErrorOnFailure(GetAdditionalAuthData(header, AAD, aadLen));
 
-    error = GetAdditionalAuthData(header, payloadFlags, AAD, aadLen);
-    SuccessOrExit(error);
-
-    error = AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey), IV, sizeof(IV), output);
-exit:
-    return error;
+    return AES_CCM_decrypt(input, input_length, AAD, aadLen, tag, taglen, mKey, sizeof(mKey), IV, sizeof(IV), output);
 }
 
 } // namespace chip

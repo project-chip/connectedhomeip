@@ -105,7 +105,12 @@ public:
      */
     CHIP_ERROR Init(UdpListenParameters & params);
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
+    /**
+     * Close the open endpoint without destroying the object
+     */
+    void Close() override;
+
+    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
                            System::PacketBuffer * msgBuf) override;
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override
@@ -116,7 +121,8 @@ public:
 
 private:
     // UDP message receive handler.
-    static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const Inet::IPPacketInfo * pktInfo);
+    static void OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle buffer,
+                             const Inet::IPPacketInfo * pktInfo);
 
     Inet::UDPEndPoint * mUDPEndPoint     = nullptr;                                     ///< UDP socket used by the transport
     Inet::IPAddressType mUDPEndpointType = Inet::IPAddressType::kIPAddressType_Unknown; ///< Socket listening type

@@ -17,15 +17,21 @@
 
 #pragma once
 
-#include <transport/SecureSessionMgr.h>
+#include "AppDelegate.h"
+#include <inet/InetConfig.h>
+#include <transport/TransportMgr.h>
 #include <transport/raw/UDP.h>
 
-using DemoSessionManager = chip::SecureSessionMgr<chip::Transport::UDP>;
+#if INET_CONFIG_ENABLE_IPV4
+using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP, chip::Transport::UDP>;
+#else
+using DemoTransportMgr = chip::TransportMgr<chip::Transport::UDP>;
+#endif
 
 /**
  * Initialize DataModelHandler and start CHIP datamodel server, the server
  * assumes the platform's networking has been setup already.
  *
- * @param [in] sessions The demo's session manager.
+ * @param [in] delegate   An optional AppDelegate
  */
-void InitServer();
+void InitServer(AppDelegate * delegate = nullptr);

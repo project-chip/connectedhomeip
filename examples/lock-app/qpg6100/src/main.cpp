@@ -53,8 +53,7 @@
  *                    Includes Definitions
  *****************************************************************************/
 
-#define GP_COMPONENT_ID GP_COMPONENT_ID_APP
-
+// FreeRTOS
 #include "FreeRTOS.h"
 #include "task.h"
 
@@ -64,6 +63,9 @@
 // CHIP includes
 #include <platform/CHIPDeviceLayer.h>
 #include <support/logging/CHIPLogging.h>
+
+// Application level logic
+#include "AppTask.h"
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -86,10 +88,19 @@ using namespace ::chip::DeviceLayer::Internal;
 
 int Application_Init(void)
 {
+    int ret = CHIP_ERROR_MAX;
+
     /* Launch application task */
     ChipLogProgress(NotSpecified, "============================");
     ChipLogProgress(NotSpecified, "Qorvo " APP_NAME " Launching");
     ChipLogProgress(NotSpecified, "============================");
+
+    ret = GetAppTask().StartAppTask();
+    if (ret != CHIP_NO_ERROR)
+    {
+        ChipLogError(NotSpecified, "GetAppTask().Init() failed");
+        return -1;
+    }
 
     return 0;
 }

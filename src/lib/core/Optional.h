@@ -59,6 +59,17 @@ public:
         return mValue;
     }
 
+    /** Gets the current value of the optional if the optional has a value;
+        otherwise returns the provided default value. */
+    const T & ValueOr(const T & defaultValue) const
+    {
+        if (HasValue())
+        {
+            return mValue;
+        }
+        return defaultValue;
+    }
+
     /** Checks if the optional contains a value or not */
     bool HasValue() const { return mHasValue; }
 

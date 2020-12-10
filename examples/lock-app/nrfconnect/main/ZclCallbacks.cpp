@@ -28,8 +28,7 @@
 
 using namespace ::chip;
 
-extern "C" {
-void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clusterId, EmberAfAttributeId attributeId, uint8_t mask,
+void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
     if (clusterId != ZCL_ON_OFF_CLUSTER_ID)
@@ -47,16 +46,22 @@ void emberAfPostAttributeChangeCallback(uint8_t endpoint, EmberAfClusterId clust
     BoltLockMgr().InitiateAction(0, *value ? BoltLockManager::LOCK_ACTION : BoltLockManager::UNLOCK_ACTION);
 }
 
-/** @brief On/off Cluster Server Post Init
+/** @brief OnOff Cluster Init
  *
- * Following resolution of the On/Off state at startup for this endpoint,
- * perform any additional initialization needed; e.g., synchronize hardware
- * state.
+ * This function is called when a specific cluster is initialized. It gives the
+ * application an opportunity to take care of cluster initialization procedures.
+ * It is called exactly once for each endpoint where cluster is present.
  *
- * @param endpoint Endpoint that is being initialized  Ver.: always
+ * @param endpoint   Ver.: always
+ *
+ * TODO Issue #3841
+ * emberAfOnOffClusterInitCallback happens before the stack initialize the cluster
+ * attributes to the default value.
+ * The logic here expects something similar to the deprecated Plugins callback
+ * emberAfPluginOnOffClusterServerPostInitCallback.
+ *
  */
-void emberAfPluginOnOffClusterServerPostInitCallback(uint8_t endpoint)
+void emberAfOnOffClusterInitCallback(EndpointId endpoint)
 {
     GetAppTask().UpdateClusterState();
-}
 }

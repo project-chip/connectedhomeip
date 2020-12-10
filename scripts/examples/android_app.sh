@@ -16,6 +16,7 @@
 #    limitations under the License.
 #
 
+set -e
 set -x
 env
 
@@ -36,8 +37,8 @@ fi
 
 # Build shared CHIP libs
 source scripts/activate.sh
-gn gen out/"android_$TARGET_CPU" --args="target_os=\"android\" target_cpu=\"$TARGET_CPU\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\""
-ninja -C out/"android_$TARGET_CPU" src/setup_payload/java src/controller/java
+gn gen --check --fail-on-unused-args out/"android_$TARGET_CPU" --args="target_os=\"android\" target_cpu=\"$TARGET_CPU\" android_ndk_root=\"$ANDROID_NDK_HOME\" android_sdk_root=\"$ANDROID_HOME\""
+ninja -C out/"android_$TARGET_CPU" src/setup_payload/java src/controller/java default
 
 rsync -a out/"android_$TARGET_CPU"/lib/*.jar src/android/CHIPTool/app/libs
 rsync -a out/"android_$TARGET_CPU"/lib/jni/* src/android/CHIPTool/app/src/main/jniLibs

@@ -38,14 +38,18 @@
  *******************************************************************************
  ******************************************************************************/
 
+#pragma once
+
+#include <app/util/basic-types.h>
+
 typedef struct
 {
     EmberEUI64 ieeeAddress;
-    EmberNodeId nodeId;
+    chip::NodeId nodeId;
     uint16_t zoneType;
     uint16_t zoneStatus;
     uint8_t zoneState;
-    uint8_t endpoint;
+    chip::EndpointId endpoint;
     uint8_t zoneId;
 } IasZoneDevice;
 
@@ -56,18 +60,10 @@ extern IasZoneDevice emberAfIasZoneClientKnownServers[];
 
 #define UNKNOWN_ZONE_ID 0xFF
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 void emAfClearServers(void);
 
 void emberAfPluginIasZoneClientZdoCallback(EmberNodeId emberNodeId, EmberApsFrame * apsFrame, uint8_t * message, uint16_t length);
 
-void emberAfPluginIasZoneClientWriteAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
+void emberAfPluginIasZoneClientWriteAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
 
-void emberAfPluginIasZoneClientReadAttributesResponseCallback(EmberAfClusterId clusterId, uint8_t * buffer, uint16_t bufLen);
-
-#ifdef __cplusplus
-} // extern "C"
-#endif // __cplusplus
+void emberAfPluginIasZoneClientReadAttributesResponseCallback(chip::ClusterId clusterId, uint8_t * buffer, uint16_t bufLen);

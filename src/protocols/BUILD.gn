@@ -29,5 +29,6 @@ static_library("protocols") {
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/messaging",
+    "${chip_root}/src/protocols/bdx",
   ]
 }

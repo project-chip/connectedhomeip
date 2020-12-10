@@ -37,14 +37,13 @@
  *******************************************************************************
  ******************************************************************************/
 
-#ifndef SILABS_SCENES_PLUGIN_H
-#define SILABS_SCENES_PLUGIN_H
+#pragma once
 
 #include <app/util/af-types.h>
 #include <stdint.h>
 
-EmberAfStatus emberAfScenesSetSceneCountAttribute(uint8_t endpoint, uint8_t newCount);
-EmberAfStatus emberAfScenesMakeValid(uint8_t endpoint, uint8_t sceneId, CHIPGroupId groupId);
+EmberAfStatus emberAfScenesSetSceneCountAttribute(chip::EndpointId endpoint, uint8_t newCount);
+EmberAfStatus emberAfScenesMakeValid(chip::EndpointId endpoint, uint8_t sceneId, chip::GroupId groupId);
 
 // DEPRECATED.
 #define emberAfScenesMakeInvalid emberAfScenesClusterMakeInvalidCallback
@@ -80,8 +79,49 @@ extern EmberAfSceneTableEntry emberAfPluginScenesServerSceneTable[];
 #define emberAfPluginScenesServerDecrNumSceneEntriesInUse() (--emberAfPluginScenesServerEntriesInUse)
 #endif // Use tokens
 
-bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, CHIPGroupId groupId, uint8_t sceneId,
+bool emberAfPluginScenesServerParseAddScene(const EmberAfClusterCommand * cmd, chip::GroupId groupId, uint8_t sceneId,
                                             uint16_t transitionTime, uint8_t * sceneName, uint8_t * extensionFieldSets);
-bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, CHIPGroupId groupId, uint8_t sceneId);
+bool emberAfPluginScenesServerParseViewScene(const EmberAfClusterCommand * cmd, chip::GroupId groupId, uint8_t sceneId);
 
-#endif // SILABS_SCENES_PLUGIN_H
+/** @brief Scenes Cluster Recall Saved Scene
+ *
+ * This function is called by the framework when the application should recall a
+ * saved scene.
+ *
+ * @param endpoint The endpoint.  Ver.: always
+ * @param groupId The group identifier.  Ver.: always
+ * @param sceneId The scene identifier.  Ver.: always
+ */
+EmberAfStatus emberAfScenesClusterRecallSavedSceneCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t sceneId);
+
+/** @brief Scenes Cluster Store Current Scene
+ *
+ * This function is called by the framework when the application should store
+ * the current scene.  If an entry already exists in the scene table with the
+ * same scene and group ids, the application should update the entry with the
+ * current scene.  Otherwise, a new entry should be adde to the scene table, if
+ * possible.
+ *
+ * @param endpoint The endpoint.  Ver.: always
+ * @param groupId The group identifier.  Ver.: always
+ * @param sceneId The scene identifier.  Ver.: always
+ */
+EmberAfStatus emberAfScenesClusterStoreCurrentSceneCallback(chip::EndpointId endpoint, chip::GroupId groupId, uint8_t sceneId);
+
+/** @brief Scenes Cluster Remove Scenes In Group
+ *
+ * This function removes the scenes from a specified group.
+ *
+ * @param endpoint Endpoint  Ver.: always
+ * @param groupId Group ID  Ver.: always
+ */
+void emberAfScenesClusterRemoveScenesInGroupCallback(chip::EndpointId endpoint, chip::GroupId groupId);
+
+/** @brief Scenes Cluster Make Invalid
+ *
+ * This function is called to invalidate the valid attribute in the Scenes
+ * cluster.
+ *
+ * @param endpoint   Ver.: always
+ */
+EmberAfStatus emberAfScenesClusterMakeInvalidCallback(chip::EndpointId endpoint);

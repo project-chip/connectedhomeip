@@ -1558,7 +1558,7 @@ CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHan
     PacketBuffer *& buf = reinterpret_cast<PacketBuffer *&>(bufHandle);
 
     if (buf != nullptr)
-        buf = buf->Next();
+        buf = buf->Next_ForNow();
     if (buf != nullptr)
     {
         bufStart = buf->Start();
@@ -1571,6 +1571,40 @@ CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHan
     }
 
     return CHIP_NO_ERROR;
+}
+
+/**
+ * Position the destination reader on the next element with the given tag within this reader's current container context
+ *
+ * @param[in] tag                      The destination context tag value
+ * @param[in] destReader               The destination TLV reader value that was located by given tag
+ *
+ * @retval #CHIP_NO_ERROR              If the reader was successfully positioned at the given tag
+ * @retval #CHIP_END_OF_TLV            If the given tag cannot be found
+ * @retval other                       Other CHIP or platform error codes
+ */
+CHIP_ERROR TLVReader::FindElementWithTag(const uint64_t tag, TLVReader & destReader) const
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    chip::TLV::TLVReader reader;
+    reader.Init(*this);
+
+    while (CHIP_NO_ERROR == (err = reader.Next()))
+    {
+        VerifyOrExit(chip::TLV::kTLVType_NotSpecified != reader.GetType(), err = CHIP_ERROR_INVALID_TLV_ELEMENT);
+
+        if (tag == reader.GetTag())
+        {
+            destReader.Init(reader);
+            break;
+        }
+    }
+
+exit:
+    ChipLogIfFalse((CHIP_NO_ERROR == err) || (CHIP_END_OF_TLV == err));
+
+    return err;
 }
 
 } // namespace TLV

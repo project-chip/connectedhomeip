@@ -48,8 +48,8 @@ _SubscribeBleCharacteristicFunct = CFUNCTYPE(
 )
 _CloseBleFunct = CFUNCTYPE(c_bool, c_void_p)
 
-# typedef void (*OnConnectFunct)(Chip::DeviceController::hipDeviceController * dc, chip::Transport::PeerConnectionState * state,
-#                                void * appReqState);
+# typedef void (*OnConnectFunct)(Chip::DeviceController::hipDeviceController * dc,
+#                                const chip::Transport::PeerConnectionState * state, void * appReqState);
 # typedef void (*OnErrorFunct)(Chip::DeviceController::ChipDeviceController * dc, void * appReqState, CHIP_ERROR err,
 #                              const Inet::IPPacketInfo * pi);
 # typedef void (*OnMessageFunct)(Chip::DeviceController::ChipDeviceController * dc, void * appReqState, PacketBuffer * buffer);
@@ -94,12 +94,12 @@ class ChipDeviceController(object):
         res = self._dmLib.nl_Chip_DeviceController_NewDeviceController(pointer(devCtrl))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
-        
+
         pairingDelegate = c_void_p(None)
         res = self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate(pointer(pairingDelegate))
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
-        
+
         res = self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate(devCtrl, pairingDelegate)
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
@@ -108,9 +108,11 @@ class ChipDeviceController(object):
         self.pairingDelegate = pairingDelegate
         self._ChipStack.devCtrl = devCtrl
 
-        self.blockingCB = None  # set by other modules(BLE) that require service by thread while thread blocks.
+        # set by other modules(BLE) that require service by thread while thread blocks.
+        self.blockingCB = None
         self.cbHandleBleEvent = (
-            None  # set by other modules (BLE) that provide event callback to Chip.
+            # set by other modules (BLE) that provide event callback to Chip.
+            None
         )
         self.cbHandleBleWriteChar = None
         self.cbHandleBleSubscribeChar = None
@@ -118,9 +120,9 @@ class ChipDeviceController(object):
 
         def DeviceCtrlHandleMessage(appReqState, buffer):
             pass
-        
+
         self.cbHandleMessage = _OnMessageFunct(DeviceCtrlHandleMessage)
-    
+
         def HandleRendezvousError(appState, reqState, err, devStatusPtr):
             if self.state == DCState.RENDEZVOUS_ONGOING:
                 print("Failed to connect to device: {}".format(err))
@@ -128,7 +130,7 @@ class ChipDeviceController(object):
                 self._ChipStack.completeEvent.set()
             elif self.state == DCState.RENDEZVOUS_CONNECTED:
                 print("Disconnected from device")
-        
+
         self.cbHandleRendezvousError = _OnRendezvousErrorFunct(HandleRendezvousError)
 
         if startNetworkThread:
@@ -202,19 +204,33 @@ class ChipDeviceController(object):
                 self._ChipStack.cbHandleError,
             )
         )
-    
+
     def Connect(self, connObj, setupPinCode):
         def HandleComplete(dc, connState, appState):
-            print("Rendezvoud Complete")
+            print("Rendezvous Complete")
             self.state = DCState.RENDEZVOUS_CONNECTED
             self._ChipStack.callbackRes = True
             self._ChipStack.completeEvent.set()
-        
         onConnectFunct = _OnConnectFunct(HandleComplete)
 
         self.state = DCState.RENDEZVOUS_ONGOING
         return self._ChipStack.CallAsync(
-            lambda: self._dmLib.nl_Chip_DeviceController_Connect(self.devCtrl, connObj, setupPinCode, onConnectFunct, self.cbHandleMessage, self.cbHandleRendezvousError)
+            lambda: self._dmLib.nl_Chip_DeviceController_Connect(
+                self.devCtrl, connObj, setupPinCode, onConnectFunct, self.cbHandleMessage, self.cbHandleRendezvousError)
+        )
+
+    def ConnectIP(self, ipaddr, setupPinCode):
+        def HandleComplete(dc, connState, appState):
+            print("Rendezvous Complete")
+            self.state = DCState.RENDEZVOUS_CONNECTED
+            self._ChipStack.callbackRes = True
+            self._ChipStack.completeEvent.set()
+        onConnectFunct = _OnConnectFunct(HandleComplete)
+
+        self.state = DCState.RENDEZVOUS_ONGOING
+        return self._ChipStack.CallAsync(
+            lambda: self._dmLib.nl_Chip_DeviceController_ConnectIP(
+                self.devCtrl, ipaddr, setupPinCode, onConnectFunct, self.cbHandleMessage, self.cbHandleRendezvousError)
         )
 
     def Close(self):
@@ -237,7 +253,7 @@ class ChipDeviceController(object):
 
     def SetBlockingCB(self, blockingCB):
         self._ChipStack.blockingCB = blockingCB
-    
+
     def SetWifiCredential(self, ssid, password):
         ret = self._dmLib.nl_Chip_ScriptDevicePairingDelegate_SetWifiCredential(self.pairingDelegate, ssid.encode("utf-8"), password.encode("utf-8"))
         if ret != 0:
@@ -308,8 +324,13 @@ class ChipDeviceController(object):
             self._dmLib.nl_Chip_DeviceController_SetLogFilter.argtypes = [c_uint8]
             self._dmLib.nl_Chip_DeviceController_SetLogFilter.restype = None
 
-            self._dmLib.nl_Chip_DeviceController_Connect.argtypes = [c_void_p, c_void_p, c_uint32, _OnConnectFunct, _OnMessageFunct, _OnRendezvousErrorFunct]
+            self._dmLib.nl_Chip_DeviceController_Connect.argtypes = [
+                c_void_p, c_void_p, c_uint32, _OnConnectFunct, _OnMessageFunct, _OnRendezvousErrorFunct]
             self._dmLib.nl_Chip_DeviceController_Connect.restype = c_uint32
+
+            self._dmLib.nl_Chip_DeviceController_ConnectIP.argtypes = [
+                c_void_p, c_char_p, c_uint32, _OnConnectFunct, _OnMessageFunct, _OnRendezvousErrorFunct]
+            self._dmLib.nl_Chip_DeviceController_ConnectIP.restype = c_uint32
 
             self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate.argtypes = [POINTER(c_void_p)]
             self._dmLib.nl_Chip_ScriptDevicePairingDelegate_NewPairingDelegate.restype = c_uint32

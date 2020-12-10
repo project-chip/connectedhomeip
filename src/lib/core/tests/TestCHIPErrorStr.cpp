@@ -32,15 +32,13 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TestCore.h"
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
 
 #include <core/CHIPError.h>
 #include <support/ErrorStr.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -204,7 +202,7 @@ static int32_t sContext[] =
     CHIP_ERROR_UNAUTHORIZED_KEY_EXPORT_RESPONSE,
     CHIP_ERROR_EXPORTED_KEY_AUTHENTICATION_FAILED,
     CHIP_ERROR_TOO_MANY_SHARED_SESSION_END_NODES,
-    CHIP_ERROR_MALFORMED_DATA_ELEMENT,
+    CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_DATA_ELEMENT,
     CHIP_ERROR_WRONG_CERT_TYPE,
     CHIP_ERROR_DEFAULT_EVENT_HANDLER_NOT_CALLED,
     CHIP_ERROR_PERSISTED_STORAGE_FAILED,
@@ -219,11 +217,16 @@ static int32_t sContext[] =
     CHIP_ERROR_UNSUPPORTED_THREAD_NETWORK_CREATE,
     CHIP_ERROR_INCONSISTENT_CONDITIONALITY,
     CHIP_ERROR_LOCAL_DATA_INCONSISTENT,
-    CHIP_EVENT_ID_FOUND
+    CHIP_EVENT_ID_FOUND,
+    CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_PATH,
+    CHIP_ERROR_IM_MALFORMED_EVENT_PATH,
+    CHIP_ERROR_IM_MALFORMED_COMMAND_PATH,
+    CHIP_ERROR_IM_MALFORMED_ATTRIBUTE_STATUS_ELEMENT,
+    CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT,
+    CHIP_ERROR_IM_MALFORMED_EVENT_DATA_ELEMENT,
+    CHIP_ERROR_IM_MALFORMED_STATUS_CODE,
 };
 // clang-format on
-
-static const size_t kTestElements = sizeof(sContext) / sizeof(sContext[0]);
 
 static void CheckCoreErrorStr(nlTestSuite * inSuite, void * inContext)
 {

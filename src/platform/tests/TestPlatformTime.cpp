@@ -22,8 +22,6 @@
  *
  */
 
-#include "TestPlatformTime.h"
-
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -32,7 +30,7 @@
 
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <system/SystemClock.h>
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
@@ -204,7 +202,7 @@ static const nlTest sTests[] = {
 
 int TestPlatformTime()
 {
-    nlTestSuite theSuite = { "CHIP DeviceLayer tests", &sTests[0], nullptr, nullptr };
+    nlTestSuite theSuite = { "PlatformTime tests", &sTests[0], nullptr, nullptr };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);

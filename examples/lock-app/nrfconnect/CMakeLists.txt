@@ -20,7 +20,8 @@ get_filename_component(CHIP_APP_SERVER ${CHIP_ROOT}/examples/common/chip-app-ser
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(LOCK_COMMON ${CHIP_ROOT}/examples/lock-app/lock-common REALPATH)
 
-list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/overlay-sample-defaults.conf)
+set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/sample-defaults.conf prj.conf)
+set(CHIP_OPENTHREAD_CONFIG ${NRFCONNECT_COMMON}/project_include/OpenThreadConfig.h)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
 include(nrfconnect-app)
@@ -32,8 +33,8 @@ target_sources(app PRIVATE
                main/BoltLockManager.cpp
                main/main.cpp
                main/ZclCallbacks.cpp
-               ${LOCK_COMMON}/gen/call-command-handler.c
-               ${LOCK_COMMON}/gen/callback-stub.c
+               ${LOCK_COMMON}/gen/call-command-handler.cpp
+               ${LOCK_COMMON}/gen/callback-stub.cpp
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp
                ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
@@ -42,6 +43,8 @@ target_sources(app PRIVATE
                ${CHIP_APP_SERVER}/Server.cpp
                ${CHIP_APP_SERVER}/QRCodeUtil.cpp
                ${CHIP_APP_SERVER}/RendezvousServer.cpp
+               ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
+               ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
                ${CHIP_ROOT}/src/app/util/af-main-common.cpp
                ${CHIP_ROOT}/src/app/util/attribute-size.cpp

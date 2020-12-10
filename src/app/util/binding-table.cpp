@@ -24,7 +24,7 @@
 
 static EmberBindingTableEntry bindingTable[EMBER_BINDING_TABLE_SIZE];
 
-extern "C" EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result)
+EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * result)
 {
     if (index >= EMBER_BINDING_TABLE_SIZE)
     {
@@ -35,7 +35,7 @@ extern "C" EmberStatus emberGetBinding(uint8_t index, EmberBindingTableEntry * r
     return EMBER_SUCCESS;
 }
 
-extern "C" EmberStatus emberSetBinding(uint8_t index, EmberBindingTableEntry * result)
+EmberStatus emberSetBinding(uint8_t index, EmberBindingTableEntry * result)
 {
     if (index >= EMBER_BINDING_TABLE_SIZE)
     {
@@ -46,7 +46,7 @@ extern "C" EmberStatus emberSetBinding(uint8_t index, EmberBindingTableEntry * r
     return EMBER_SUCCESS;
 }
 
-extern "C" EmberStatus emberDeleteBinding(uint8_t index)
+EmberStatus emberDeleteBinding(uint8_t index)
 {
     if (index >= EMBER_BINDING_TABLE_SIZE)
     {

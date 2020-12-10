@@ -18,8 +18,10 @@
 #ifndef CHIP_DEVICE_CONTROLLER_H
 #define CHIP_DEVICE_CONTROLLER_H
 
-#import "CHIPError.h"
+#import <CHIP/CHIPDeviceStatusDelegate.h>
 #import <Foundation/Foundation.h>
+
+@class CHIPDevice;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -38,31 +40,18 @@ typedef void (^ControllerOnErrorBlock)(NSError * error);
 
 @end
 
-@interface CHIPDeviceController : NSObject
+@interface CHIPDeviceController : NSObject <CHIPDeviceStatusDelegate>
 
-- (BOOL)connect:(NSString *)ipAddress error:(NSError * __autoreleasing *)error;
-- (BOOL)connect:(uint16_t)discriminator setupPINCode:(uint32_t)setupPINCode error:(NSError * __autoreleasing *)error;
-- (BOOL)connectWithoutSecurePairing:(NSString *)ipAddress
-                              error:(NSError * __autoreleasing *)error
-    __attribute__((deprecated("Available until Rendezvous is fully integrated")));
-- (BOOL)sendMessage:(NSData *)message error:(NSError * __autoreleasing *)error;
-- (BOOL)sendOnCommand;
-- (BOOL)sendOffCommand;
-- (BOOL)sendToggleCommand;
-- (BOOL)sendIdentifyCommandWithDuration:(NSTimeInterval)duration;
+- (BOOL)pairDevice:(uint64_t)deviceID
+     discriminator:(uint16_t)discriminator
+      setupPINCode:(uint32_t)setupPINCode
+             error:(NSError * __autoreleasing *)error;
+- (BOOL)unpairDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+- (BOOL)stopDevicePairing:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+
+- (CHIPDevice *)getPairedDevice:(uint64_t)deviceID error:(NSError * __autoreleasing *)error;
+
 - (BOOL)disconnect:(NSError * __autoreleasing *)error;
-- (BOOL)isConnected;
-
-/**
- * Test whether a given message is likely to be a data model command.
- */
-+ (BOOL)isDataModelCommand:(NSData * _Nonnull)message;
-
-/**
- * Given a data model command, convert it to some sort of human-readable
- * string that describes what it is, as far as we can tell.
- */
-+ (NSString *)commandToString:(NSData * _Nonnull)command;
 
 - (instancetype)init NS_UNAVAILABLE;
 + (instancetype)new NS_UNAVAILABLE;

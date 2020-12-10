@@ -45,6 +45,8 @@
 
 #include <support/CodeUtils.h>
 
+using namespace chip;
+
 EmberEventControl emberAfPluginDoorLockServerLockoutEventControl;
 EmberEventControl emberAfPluginDoorLockServerRelockEventControl;
 
@@ -55,7 +57,7 @@ static EmberAfPluginDoorLockServerUser rfidUserTable[EMBER_AF_PLUGIN_DOOR_LOCK_S
 // This is the current number of invalid PIN/RFID's in a row.
 static uint8_t wrongCodeEntryCount = 0;
 
-bool emAfPluginDoorLockServerCheckForSufficientSpace(uint8_t spaceReq, uint8_t spaceAvail)
+bool emAfPluginDoorLockServerCheckForSufficientSpace(uint16_t spaceReq, uint8_t spaceAvail)
 {
     if (spaceReq > spaceAvail)
     {
@@ -666,7 +668,7 @@ static EmberAfStatus applyCode(uint8_t * code, uint8_t codeLength, EmberAfPlugin
     return EMBER_ZCL_STATUS_FAILURE;
 }
 
-extern "C" void emberAfPluginDoorLockServerLockoutEventHandler(void)
+void emberAfPluginDoorLockServerLockoutEventHandler(void)
 {
     emberEventControlSetInactive(&emberAfPluginDoorLockServerLockoutEventControl);
 
@@ -714,7 +716,7 @@ static void scheduleAutoRelock(uint32_t autoRelockTimeS)
     }
 }
 
-extern "C" void emberAfPluginDoorLockServerRelockEventHandler(void)
+void emberAfPluginDoorLockServerRelockEventHandler(void)
 {
     emberEventControlSetInactive(&emberAfPluginDoorLockServerRelockEventControl);
 
@@ -722,7 +724,7 @@ extern "C" void emberAfPluginDoorLockServerRelockEventHandler(void)
     emberAfDoorLockClusterPrintln("Door automatically relocked: 0x%X", status);
 }
 
-void emberAfDoorLockClusterServerAttributeChangedCallback(uint8_t endpoint, EmberAfAttributeId attributeId)
+void emberAfDoorLockClusterServerAttributeChangedCallback(EndpointId endpoint, AttributeId attributeId)
 {
     if (endpoint == DOOR_LOCK_SERVER_ENDPOINT && attributeId == ZCL_LOCK_STATE_ATTRIBUTE_ID)
     {
@@ -770,5 +772,10 @@ bool emberAfDoorLockClusterUnlockWithTimeoutCallback(uint16_t timeoutS, uint8_t 
         emberAfDoorLockClusterPrintln("Failed to send UnlockWithTimeoutResponse: 0x%X", status);
     }
 
+    return true;
+}
+
+bool emberAfPluginDoorLockServerActivateDoorLockCallback(bool activate)
+{
     return true;
 }

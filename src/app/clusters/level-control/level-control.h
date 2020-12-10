@@ -37,8 +37,9 @@
  *plugin, which implements the Level Control cluster.
  *******************************************************************************
  ******************************************************************************/
-#ifndef _LEVEL_CONTROL_H
-#define _LEVEL_CONTROL_H
+
+#pragma once
+
 // Rate of level control tick execution.
 // To increase tick frequency (for more granular updates of device state based
 // on level), redefine EMBER_AF_PLUGIN_LEVEL_CONTROL_TICKS_PER_SECOND.
@@ -48,9 +49,8 @@
 
 #include <stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif // #ifdef __cplusplus
+#include <app/util/basic-types.h>
+
 /** @brief On/off Cluster Server Post Init
  *
  * Following resolution of the On/Off state at startup for this endpoint, perform any
@@ -58,10 +58,4 @@ extern "C" {
  *
  * @param endpoint Endpoint that is being initialized  Ver.: always
  */
-void emberAfPluginLevelControlClusterServerPostInitCallback(uint8_t endpoint);
-
-#ifdef __cplusplus
-}
-#endif // #ifdef __cplusplus
-
-#endif // #ifndef _LEVEL_CONTROL_H
+void emberAfPluginLevelControlClusterServerPostInitCallback(chip::EndpointId endpoint);

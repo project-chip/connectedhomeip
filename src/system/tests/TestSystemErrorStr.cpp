@@ -32,8 +32,6 @@
 #define __STDC_LIMIT_MACROS
 #endif
 
-#include "TestSystemLayer.h"
-
 #include <inttypes.h>
 #include <stdint.h>
 #include <string.h>
@@ -41,7 +39,7 @@
 #include <inet/InetError.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -62,8 +60,6 @@ static int32_t sContext[] =
     CHIP_SYSTEM_ERROR_ACCESS_DENIED
 };
 // clang-format on
-
-static const size_t kTestElements = sizeof(sContext) / sizeof(sContext[0]);
 
 static void CheckSystemErrorStr(nlTestSuite * inSuite, void * inContext)
 {

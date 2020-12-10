@@ -81,8 +81,16 @@ public class ChipDeviceController {
     beginSendMessage(deviceControllerPtr, message);
   }
 
-  public void beginSendCommand(ChipCommandType command) {
-    beginSendCommand(deviceControllerPtr, command);
+  public void beginSendCommand(ChipCommandType command, int value) {
+    beginSendCommand(deviceControllerPtr, command, value);
+  }
+
+  public void sendWiFiCredentials(String ssid, String password) {
+    sendWiFiCredentials(deviceControllerPtr, ssid, password);
+  }
+
+  public void sendThreadCredentials(int channel, int panId, byte[] xpanId, byte[] masterKey) {
+    sendThreadCredentials(deviceControllerPtr, channel, panId, xpanId, masterKey);
   }
 
   public boolean disconnectDevice() {
@@ -95,6 +103,36 @@ public class ChipDeviceController {
 
   public void onSendMessageComplete(String message) {
     completionListener.onSendMessageComplete(message);
+  }
+
+  public void onNetworkCredentialsRequested() {
+    if (completionListener != null) {
+      completionListener.onNetworkCredentialsRequested();
+    }
+  }
+
+  public void onOperationalCredentialsRequested(byte[] csr) {
+    if (completionListener != null) {
+      completionListener.onOperationalCredentialsRequested(csr);
+    }
+  }
+
+  public void onStatusUpdate(int status) {
+    if (completionListener != null) {
+      completionListener.onStatusUpdate(status);
+    }
+  }
+
+  public void onPairingComplete(int errorCode) {
+    if (completionListener != null) {
+      completionListener.onPairingComplete(errorCode);
+    }
+  }
+
+  public void onPairingDeleted(int errorCode) {
+    if (completionListener != null) {
+      completionListener.onPairingDeleted(errorCode);
+    }
   }
 
   public void onNotifyChipConnectionClosed(int connId) {
@@ -153,7 +191,13 @@ public class ChipDeviceController {
 
   private native void beginSendMessage(long deviceControllerPtr, String message);
 
-  private native void beginSendCommand(long deviceControllerPtr, ChipCommandType command);
+  private native void beginSendCommand(
+      long deviceControllerPtr, ChipCommandType command, int value);
+
+  private native void sendWiFiCredentials(long deviceControllerPtr, String ssid, String password);
+
+  private native void sendThreadCredentials(
+      long deviceControllerPtr, int channel, int panId, byte[] xpanId, byte[] masterKey);
 
   private native boolean disconnectDevice(long deviceControllerPtr);
 
@@ -181,6 +225,21 @@ public class ChipDeviceController {
 
     /** Notifies the completion of "SendMessage" echo command. */
     void onSendMessageComplete(String message);
+
+    /** Notifies that the device is ready to receive Wi-Fi network credentials. */
+    void onNetworkCredentialsRequested();
+
+    /** Notifies that the device is ready to receive operational credentials. */
+    void onOperationalCredentialsRequested(byte[] csr);
+
+    /** Notifies the pairing status. */
+    void onStatusUpdate(int status);
+
+    /** Notifies the completion of pairing. */
+    void onPairingComplete(int errorCode);
+
+    /** Notifies the deletion of pairing session. */
+    void onPairingDeleted(int errorCode);
 
     /** Notifies that the Chip connection has been closed. */
     void onNotifyChipConnectionClosed();

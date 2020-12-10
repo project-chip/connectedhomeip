@@ -25,7 +25,7 @@
 #include <assert.h>
 #include <inet/InetLayer.h> // PacketBuffer and the like
 #include <support/logging/CHIPLogging.h>
-#include <transport/SecureSessionMgr.h> // For SecureSessionMgrBase
+#include <transport/SecureSessionMgr.h> // For SecureSessionMgr
 
 using namespace chip;
 
@@ -35,20 +35,19 @@ using namespace chip;
 //
 // https://github.com/project-chip/connectedhomeip/issues/2566 tracks that API.
 namespace chip {
-extern SecureSessionMgrBase & SessionManager();
+extern SecureSessionMgr & SessionManager();
 }
-
-extern "C" {
 
 EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16_t messageLength, uint8_t * message)
 {
-    uint16_t frameSize  = encodeApsFrame(nullptr, 0, apsFrame);
-    uint32_t dataLength = uint32_t(frameSize) + uint32_t(messageLength);
-    if (dataLength > UINT16_MAX)
+    uint16_t frameSize           = encodeApsFrame(nullptr, 0, apsFrame);
+    uint32_t dataLengthUnchecked = uint32_t(frameSize) + uint32_t(messageLength);
+    if (dataLengthUnchecked > UINT16_MAX)
     {
         // Definitely too long for a packet!
         return EMBER_MESSAGE_TOO_LONG;
     }
+    uint16_t dataLength = static_cast<uint16_t>(dataLengthUnchecked);
 
     if (frameSize == 0)
     {
@@ -56,8 +55,8 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
         return EMBER_ERR_FATAL;
     }
 
-    auto * buffer = System::PacketBuffer::NewWithAvailableSize(dataLength);
-    if (!buffer)
+    System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(dataLength);
+    if (buffer.IsNull())
     {
         // FIXME: Not quite right... what's the right way to indicate "out of
         // heap"?
@@ -68,14 +67,13 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     {
         // Something is very wrong here; our first call lied to us!
         ChipLogError(Zcl, "Something wrong happened trying to encode aps frame to respond with");
-        System::PacketBuffer::Free(buffer);
         return EMBER_ERR_FATAL;
     }
 
     memcpy(buffer->Start() + frameSize, message, messageLength);
     buffer->SetDataLength(dataLength);
 
-    CHIP_ERROR err = SessionManager().SendMessage(destination, buffer);
+    CHIP_ERROR err = SessionManager().SendMessage(destination, std::move(buffer));
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?
@@ -84,5 +82,3 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
 
     return EMBER_SUCCESS;
 }
-
-} // extern "C"

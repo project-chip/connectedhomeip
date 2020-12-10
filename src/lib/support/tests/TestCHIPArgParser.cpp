@@ -17,19 +17,17 @@
  *    limitations under the License.
  */
 
-#include "TestSupport.h"
-
 #include <stdarg.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include <core/CHIPCore.h>
+#include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
 #include <support/CHIPMemString.h>
-
-#include <support/CHIPArgParser.hpp>
 #include <support/ScopedBuffer.h>
+#include <support/UnitTestRegistration.h>
 
 #if CHIP_CONFIG_ENABLE_ARG_PARSER
 
@@ -761,6 +759,11 @@ static void HandleArgError(const char * msg, ...)
 
 int TestCHIPArgParser(void)
 {
+    if (chip::Platform::MemoryInit() != CHIP_NO_ERROR)
+    {
+        return EXIT_FAILURE;
+    }
+
     SimpleParseTest_SingleLongOption();
     SimpleParseTest_SingleShortOption();
     SimpleParseTest_SingleLongOptionWithValue();
@@ -792,3 +795,5 @@ int TestCHIPArgParser(void)
     return (EXIT_SUCCESS);
 }
 #endif // CHIP_CONFIG_ENABLE_ARG_PARSER
+
+CHIP_REGISTER_TEST_SUITE(TestCHIPArgParser);

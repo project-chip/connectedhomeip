@@ -29,8 +29,6 @@ shared_library("jni") {
     "AndroidBlePlatformDelegate.h",
     "AndroidDeviceControllerWrapper.cpp",
     "AndroidDeviceControllerWrapper.h",
-    "AndroidDevicePairingDelegate.cpp",
-    "AndroidDevicePairingDelegate.h",
     "CHIPDeviceController-JNI.cpp",
   ]
 

@@ -140,17 +140,16 @@ CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 
 CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * devName)
 {
-    CHIP_ERROR err;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    if (mServiceMode == ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
-    {
-        return CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
-    }
+    VerifyOrExit(mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported, err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE);
+
     if (devName != nullptr && devName[0] != 0)
     {
         err = qvCHIP_BleSetDeviceName(devName);
     }
 
+exit:
     return err;
 }
 
@@ -225,24 +224,22 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBuffer * data)
+                                    PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_ERROR_UNSUPPORTED_CHIP_FEATURE;
     bool isRxHandle;
     uint16_t cId;
-    uint16_t dataLen;
+    uint16_t dataLen = data->DataLength();
 
     VerifyOrExit(IsSubscribed(conId), err = CHIP_ERROR_INVALID_ARGUMENT);
     ChipLogDetail(DeviceLayer, "Sending indication for CHIPoBLE TX characteristic (con %u, len %u)", conId, dataLen);
 
     isRxHandle = UUIDsMatch(&chipUUID_CHIPoBLEChar_RX, charId);
-    dataLen    = data->DataLength();
     cId        = qvCHIP_BleGetHandle(isRxHandle);
 
     qvCHIP_TxData(conId, cId, dataLen, data->Start());
 
 exit:
-    PacketBuffer::Free(data);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
@@ -252,14 +249,14 @@ exit:
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBuffer * pBuf)
+                                      PacketBufferHandle pBuf)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
     return false;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBuffer * pBuf)
+                                     PacketBufferHandle pBuf)
 {
     ChipLogProgress(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
     return false;
@@ -401,14 +398,13 @@ void BLEManagerImpl::HandleTXCharRead(uint16_t connId, uint16_t handle, uint8_t 
 void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t operation, uint16_t offset, uint16_t len,
                                        uint8_t * pValue, qvCHIP_Ble_Attr_t * pAttr)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    PacketBuffer * buf = nullptr;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     ChipLogProgress(DeviceLayer, "Write request received for CHIPoBLE RX characteristic (con %u, len %u)", connId, len);
 
     // Copy the data to a PacketBuffer.
-    buf = PacketBuffer::New(0);
-    VerifyOrExit(buf != nullptr, err = CHIP_ERROR_NO_MEMORY);
+    PacketBufferHandle buf = PacketBuffer::New(0);
+    VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), pValue, len);
     buf->SetDataLength(len);
@@ -417,9 +413,8 @@ void BLEManagerImpl::HandleRXCharWrite(uint16_t connId, uint16_t handle, uint8_t
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = connId;
-        event.CHIPoBLEWriteReceived.Data  = buf;
+        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
         PlatformMgr().PostEvent(&event);
-        buf = nullptr;
     }
 
 exit:
@@ -428,7 +423,6 @@ exit:
         ChipLogError(DeviceLayer, "HandleRXCharWrite() failed: %s", ErrorStr(err));
         // TODO: fail connection???
     }
-    PacketBuffer::Free(buf);
 }
 
 void BLEManagerImpl::HandleTXCharCCCDWrite(qvCHIP_Ble_AttsCccEvt_t * pEvt)

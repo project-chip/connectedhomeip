@@ -131,23 +131,30 @@ public:
      * Get a peer connection state given a Peer address.
      *
      * @param address is the connection to find (based on address)
-     * @param state [out] the connection if found, null otherwise. MUST not be null.
+     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
      *
-     * @return true if a corresponding state was found.
+     * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    bool FindPeerConnectionState(const PeerAddress & address, PeerConnectionState ** state)
+    PeerConnectionState * FindPeerConnectionState(const PeerAddress & address, PeerConnectionState * begin)
     {
-        *state = nullptr;
-        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        PeerConnectionState * state = nullptr;
+        PeerConnectionState * iter  = &mStates[0];
+
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
-            if (mStates[i].GetPeerAddress() == address)
+            iter = begin + 1;
+        }
+
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
+        {
+            if (iter->GetPeerAddress() == address)
             {
-                *state = &mStates[i];
+                state = iter;
                 break;
             }
         }
-        return *state != nullptr;
+        return state;
     }
 
     /**
@@ -155,27 +162,34 @@ public:
      *
      * @param nodeId is the connection to find (based on nodeId). Note that initial connections
      *        do not have a node id set. Use this if you know the node id should be set.
-     * @param state [out] the connection if found, null otherwise. MUST not be null.
+     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
      *
-     * @return true if a corresponding state was found.
+     * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    bool FindPeerConnectionState(NodeId nodeId, PeerConnectionState ** state)
+    PeerConnectionState * FindPeerConnectionState(NodeId nodeId, PeerConnectionState * begin)
     {
-        *state = nullptr;
-        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        PeerConnectionState * state = nullptr;
+        PeerConnectionState * iter  = &mStates[0];
+
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
-            if (!mStates[i].IsInitialized())
+            iter = begin + 1;
+        }
+
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
+        {
+            if (!iter->IsInitialized())
             {
                 continue;
             }
-            if (mStates[i].GetPeerNodeId() == nodeId)
+            if (iter->GetPeerNodeId() == nodeId)
             {
-                *state = &mStates[i];
+                state = iter;
                 break;
             }
         }
-        return *state != nullptr;
+        return state;
     }
 
     /**
@@ -184,31 +198,37 @@ public:
      * @param nodeId is the connection to find (based on nodeId). Note that initial connections
      *        do not have a node id set. Use this if you know the node id should be set.
      * @param peerKeyId Encryption key ID used by the peer node.
-     * @param state [out] the connection if found, null otherwise. MUST not be null.
+     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
      *
-     * @return true if a corresponding state was found.
+     * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    bool FindPeerConnectionState(Optional<NodeId> nodeId, uint16_t peerKeyId, PeerConnectionState ** state)
+    PeerConnectionState * FindPeerConnectionState(Optional<NodeId> nodeId, uint16_t peerKeyId, PeerConnectionState * begin)
     {
-        *state = nullptr;
-        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        PeerConnectionState * state = nullptr;
+        PeerConnectionState * iter  = &mStates[0];
+
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
-            if (!mStates[i].IsInitialized())
+            iter = begin + 1;
+        }
+
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
+        {
+            if (!iter->IsInitialized())
             {
                 continue;
             }
-            if (mStates[i].GetPeerKeyID() == peerKeyId)
+            if (iter->GetPeerKeyID() == peerKeyId)
             {
-                if (!nodeId.HasValue() || mStates[i].GetPeerNodeId() == kUndefinedNodeId ||
-                    mStates[i].GetPeerNodeId() == nodeId.Value())
+                if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
                 {
-                    *state = &mStates[i];
+                    state = iter;
                     break;
                 }
             }
         }
-        return *state != nullptr;
+        return state;
     }
 
     /**
@@ -217,31 +237,38 @@ public:
      * @param nodeId is the connection to find (based on peer nodeId). Note that initial connections
      *        do not have a node id set. Use this if you know the node id should be set.
      * @param localKeyId Encryption key ID used by the local node.
-     * @param state [out] the connection if found, null otherwise. MUST not be null.
+     * @param begin If a member of the pool, will start search from the next item. Can be nullptr to search from start.
      *
-     * @return true if a corresponding state was found.
+     * @return the state found, nullptr if not found
      */
     CHECK_RETURN_VALUE
-    bool FindPeerConnectionStateByLocalKey(Optional<NodeId> nodeId, uint16_t localKeyId, PeerConnectionState ** state)
+    PeerConnectionState * FindPeerConnectionStateByLocalKey(Optional<NodeId> nodeId, uint16_t localKeyId,
+                                                            PeerConnectionState * begin)
     {
-        *state = nullptr;
-        for (size_t i = 0; i < kMaxConnectionCount; i++)
+        PeerConnectionState * state = nullptr;
+        PeerConnectionState * iter  = &mStates[0];
+
+        if (begin >= iter && begin < &mStates[kMaxConnectionCount])
         {
-            if (!mStates[i].IsInitialized())
+            iter = begin + 1;
+        }
+
+        for (; iter < &mStates[kMaxConnectionCount]; iter++)
+        {
+            if (!iter->IsInitialized())
             {
                 continue;
             }
-            if (mStates[i].GetLocalKeyID() == localKeyId)
+            if (iter->GetLocalKeyID() == localKeyId)
             {
-                if (!nodeId.HasValue() || mStates[i].GetPeerNodeId() == kUndefinedNodeId ||
-                    mStates[i].GetPeerNodeId() == nodeId.Value())
+                if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
                 {
-                    *state = &mStates[i];
+                    state = iter;
                     break;
                 }
             }
         }
-        return *state != nullptr;
+        return state;
     }
 
     /// Convenience method to mark a peer connection state as active
@@ -251,13 +278,10 @@ public:
     }
 
     /// Convenience method to expired a peer connection state and fired the related callback
-    void MarkConnectionExpired(PeerConnectionState * state)
+    template <typename Callback>
+    void MarkConnectionExpired(PeerConnectionState * state, Callback callback)
     {
-        if (OnConnectionExpired)
-        {
-            OnConnectionExpired(*state, mConnectionExpiredArgument);
-        }
-
+        callback(*state);
         *state = PeerConnectionState(PeerAddress::Uninitialized());
     }
 
@@ -267,7 +291,8 @@ public:
      *
      * Expiring a connection involves callback execution and then clearing the internal state.
      */
-    void ExpireInactiveConnections(uint64_t maxIdleTimeMs)
+    template <typename Callback>
+    void ExpireInactiveConnections(uint64_t maxIdleTimeMs, Callback callback)
     {
         const uint64_t currentTime = mTimeSource.GetCurrentMonotonicTimeMs();
 
@@ -284,35 +309,16 @@ public:
                 continue; // not expired
             }
 
-            MarkConnectionExpired(&mStates[i]);
+            MarkConnectionExpired(&mStates[i], callback);
         }
     }
 
     /// Allows access to the underlying time source used for keeping track of connection active time
     Time::TimeSource<kTimeSource> & GetTimeSource() { return mTimeSource; }
 
-    /**
-     * Sets the handler for expired connections
-     *
-     * @param[in] handler The callback to call when a connection is marked as expired
-     * @param[in] param   The argument to pass in to the handler function
-     *
-     */
-    template <class T>
-    void SetConnectionExpiredHandler(void (*handler)(const PeerConnectionState &, T *), T * param)
-    {
-        mConnectionExpiredArgument = param;
-        OnConnectionExpired        = reinterpret_cast<ConnectionExpiredHandler>(handler);
-    }
-
 private:
     Time::TimeSource<kTimeSource> mTimeSource;
     PeerConnectionState mStates[kMaxConnectionCount];
-
-    typedef void (*ConnectionExpiredHandler)(const PeerConnectionState & state, void * param);
-
-    ConnectionExpiredHandler OnConnectionExpired = nullptr; ///< Callback for connection expiry
-    void * mConnectionExpiredArgument            = nullptr; ///< Argument for callback
 };
 
 } // namespace Transport

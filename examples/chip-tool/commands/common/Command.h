@@ -22,10 +22,14 @@
 #include <inet/InetInterface.h>
 #include <support/logging/CHIPLogging.h>
 
+#include <atomic>
+#include <condition_variable>
 #include <memory>
+#include <mutex>
 #include <vector>
 
 class Command;
+class PersistentStorage;
 
 template <typename T, typename... Args>
 std::unique_ptr<Command> make_unique(Args &&... args)
@@ -69,10 +73,14 @@ struct Argument
 class Command
 {
 public:
-    using ChipDeviceController = ::chip::DeviceController::ChipDeviceController;
-    using IPAddress            = ::chip::Inet::IPAddress;
-    using PacketBuffer         = ::chip::System::PacketBuffer;
-    using NodeId               = ::chip::NodeId;
+    using ChipDeviceCommissioner = ::chip::Controller::DeviceCommissioner;
+    using ChipSerializedDevice   = ::chip::Controller::SerializedDevice;
+    using ChipDevice             = ::chip::Controller::Device;
+    using PeerAddress            = ::chip::Transport::PeerAddress;
+    using IPAddress              = ::chip::Inet::IPAddress;
+    using PacketBuffer           = ::chip::System::PacketBuffer;
+    using PacketBufferHandle     = ::chip::System::PacketBufferHandle;
+    using NodeId                 = ::chip::NodeId;
 
     struct AddressWithInterface
     {
@@ -133,10 +141,13 @@ public:
         return AddArgument(name, min, max, reinterpret_cast<void *>(out), Number_uint64);
     }
 
-    virtual CHIP_ERROR Run(ChipDeviceController * dc, NodeId remoteId) = 0;
+    virtual CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) = 0;
 
     bool GetCommandExitStatus() const { return mCommandExitStatus; }
     void SetCommandExitStatus(bool status) { mCommandExitStatus = status; }
+
+    void UpdateWaitForResponse(bool value);
+    void WaitForResponse(uint16_t duration);
 
 private:
     bool InitArgument(size_t argIndex, const char * argValue);
@@ -146,4 +157,8 @@ private:
     bool mCommandExitStatus = false;
     const char * mName      = nullptr;
     std::vector<Argument> mArgs;
+
+    std::condition_variable cvWaitingForResponse;
+    std::mutex cvWaitingForResponseMutex;
+    bool mWaitingForResponse{ false };
 };
