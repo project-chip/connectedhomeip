@@ -89,16 +89,21 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
     return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf));
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf)
+CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
+                                         System::EncryptedPacketBufferHandle * bufferRetainSlot)
 {
-    uint32_t msgId  = 0;
-    uint32_t length = 0;
+    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, false);
+}
 
-    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), msgId, length, false);
+CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId,
+                                         System::EncryptedPacketBufferHandle msgBuf,
+                                         System::EncryptedPacketBufferHandle * bufferRetainSlot)
+{
+    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, true);
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                                         uint32_t & msgId, uint32_t & payloadLength, bool isResend)
+                                         System::EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrpted)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
@@ -116,11 +121,12 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
     mPeerConnections.MarkConnectionActive(state);
 
     {
-        uint8_t * data = nullptr;
-        uint8_t * p    = nullptr;
-        uint16_t len   = 0;
+        uint8_t * data         = nullptr;
+        uint8_t * p            = nullptr;
+        uint32_t msgId         = 0;
+        uint32_t payloadLength = 0;
+        uint16_t len           = 0;
         PacketHeader packetHeader;
-        System::PacketBufferHandle retainedBuf;
         MessageAuthenticationCode mac;
 
         const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
@@ -128,7 +134,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         uint16_t totalLen = 0;
         uint16_t taglen   = 0;
 
-        if (!isResend)
+        if (!isEncrpted)
         {
             msgId = state->GetSendMessageIndex();
 
@@ -136,6 +142,11 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
                           "Addition to generate payloadLength might overflow");
             payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
             VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
+        }
+        else
+        {
+            msgId         = bufferRetainSlot->mMsgId;
+            payloadLength = bufferRetainSlot->mPayloadLen;
         }
 
         packetHeader
@@ -149,7 +160,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, peerNodeId);
 
         // Skip encryption process if the packet is resent by CRMP
-        if (!isResend)
+        if (!isEncrpted)
         {
             VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
@@ -166,7 +177,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
             SuccessOrExit(err);
 
             VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INTERNAL);
-            msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen), nullptr);
+            msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
             ChipLogDetail(Inet, "Secure transport transmitting msg %u after encryption", msgId);
         }
@@ -196,7 +207,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
     }
     SuccessOrExit(err);
 
-    if (!isResend)
+    if (!isEncrpted)
         state->IncrementSendMessageIndex();
 
 exit:

@@ -257,7 +257,8 @@ CHIP_ERROR ReliableMessageContext::SendThrottleFlow(uint32_t pauseTimeMillis)
     if (mExchange != nullptr)
     {
         err = mExchange->SendMessage(Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow,
-                                     std::move(msgBuf), BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
+                                     std::move(msgBuf),
+                                     BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
     }
     else
     {
@@ -320,7 +321,8 @@ CHIP_ERROR ReliableMessageContext::SendDelayedDelivery(uint32_t pauseTimeMillis,
     if (mExchange != nullptr)
     {
         err = mExchange->SendMessage(Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery,
-                                     std::move(msgBuf), BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
+                                     std::move(msgBuf),
+                                     BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
     }
     else
     {

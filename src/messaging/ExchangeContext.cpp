@@ -146,12 +146,22 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
         ReliableMessageManager::RetransTableEntry * entry = nullptr;
 
         // Add to Table for subsequent sending
-        err = mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(&mReliableMessageContext, payloadHeader, mPeerNodeId,
-                                                                       std::move(msgBuf), &entry);
+        err =
+            mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(&mReliableMessageContext, payloadHeader, mPeerNodeId, &entry);
         SuccessOrExit(err);
 
-        err = mExchangeMgr->GetReliableMessageMgr()->SendFromRetransTable(entry, false);
-        SuccessOrExit(err);
+        err = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, std::move(msgBuf), &entry->retainedBuf);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            // Remove from table
+            ChipLogError(ExchangeManager, "Failed to send message to 0x%lx with err %ld", mPeerNodeId, long(err));
+            mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(*entry);
+        }
+        else
+        {
+            mExchangeMgr->GetReliableMessageMgr()->StartFromRetransTable(entry);
+        }
     }
     else
     {

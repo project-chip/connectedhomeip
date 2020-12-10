@@ -35,6 +35,7 @@
 #include <system/SystemError.h>
 
 #include <stddef.h>
+#include <utility>
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 #include <lwip/mem.h>
@@ -45,6 +46,9 @@
 class PacketBufferTest;
 
 namespace chip {
+
+class SecureSessionMgr;
+
 namespace System {
 
 class PacketBufferHandle;
@@ -662,6 +666,28 @@ inline PacketBufferHandle PacketBuffer::Last()
         p = p->Next_ForNow();
     return PacketBufferHandle::Hold(p);
 }
+
+class EncryptedPacketBufferHandle : public PacketBufferHandle
+{
+public:
+    EncryptedPacketBufferHandle() : mMsgId(0), mPayloadLen(0) {}
+    EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
+
+    void operator=(EncryptedPacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
+
+    uint32_t GetMsgId() const { return mMsgId; }
+
+private:
+    // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
+    friend class chip::SecureSessionMgr;
+
+    EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)) {}
+
+    void operator=(PacketBufferHandle && aBuffer) { PacketBufferHandle::operator=(std::move(aBuffer)); }
+
+    uint32_t mMsgId;      // The message identifier of the CHIP message awaiting acknowledgment.
+    uint32_t mPayloadLen; // The payload length of the CHIP message awaiting acknowledgment.
+};
 
 } // namespace System
 } // namespace chip

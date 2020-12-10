@@ -36,9 +36,7 @@
 namespace chip {
 namespace Messaging {
 
-ReliableMessageManager::RetransTableEntry::RetransTableEntry() :
-    rc(nullptr), msgBuf(nullptr), peerNodeId(0), msgId(0), nextRetransTimeTick(0), sendCount(0)
-{}
+ReliableMessageManager::RetransTableEntry::RetransTableEntry() : rc(nullptr), peerNodeId(0), nextRetransTimeTick(0), sendCount(0) {}
 
 ReliableMessageManager::ReliableMessageManager(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
     mContextPool(contextPool), mSystemLayer(nullptr), mCurrentTimerExpiry(0),
@@ -195,7 +193,7 @@ void ReliableMessageManager::ExecuteActions()
             err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
             ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
-                         mRetransTable[i].msgId, sendCount, rc->mConfig.mMaxRetrans);
+                         mRetransTable[i].retainedBuf.GetMsgId(), sendCount, rc->mConfig.mMaxRetrans);
 
             // Remove from Table
             ClearRetransTable(mRetransTable[i]);
@@ -203,14 +201,14 @@ void ReliableMessageManager::ExecuteActions()
 
         // Resend from Table (if the operation fails, the entry is cleared)
         if (err == CHIP_NO_ERROR)
-            err = SendFromRetransTable(&(mRetransTable[i]), true);
+            err = SendFromRetransTable(&(mRetransTable[i]));
 
         if (err == CHIP_NO_ERROR)
         {
             // If the retransmission was successful, update the passive timer
             mRetransTable[i].nextRetransTimeTick = static_cast<uint16_t>(rc->GetCurrentRetransmitTimeoutTick());
 #if !defined(NDEBUG)
-            ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", mRetransTable[i].msgId,
+            ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", mRetransTable[i].retainedBuf.GetMsgId(),
                             mRetransTable[i].sendCount);
 #endif
         }
@@ -336,8 +334,6 @@ void ReliableMessageManager::Timeout(System::Layer * aSystemLayer, void * aAppSt
  *
  *  @param[in]    nodeId    A peer Node ID of the CHIP message to be retransmitted.
  *
- *  @param[in]    msgBuf    The message buffer holding the CHIP message to be retransmitted.
- *
  *  @param[out]   rEntry    A pointer to a pointer of a retransmission table entry added into the table.
  *
  *  @retval  #CHIP_ERROR_RETRANS_TABLE_FULL If there is no empty slot left in the table for addition.
@@ -385,6 +381,17 @@ CHIP_ERROR ReliableMessageManager::AddToRetransTable(ReliableMessageContext * rc
     return err;
 }
 
+void ReliableMessageManager::StartFromRetransTable(RetransTableEntry * entry)
+{
+    VerifyOrDie(entry != nullptr && entry->rc != nullptr);
+
+    entry->nextRetransTimeTick = static_cast<uint16_t>(entry->rc->GetCurrentRetransmitTimeoutTick() +
+                                                       GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
+
+    // Check if the timer needs to be started and start it.
+    StartTimer();
+}
+
 void ReliableMessageManager::PauseRetransTable(ReliableMessageContext * rc, uint32_t PauseTimeMillis)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
@@ -414,7 +421,7 @@ bool ReliableMessageManager::CheckAndRemRetransTable(ReliableMessageContext * rc
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        if ((mRetransTable[i].rc == rc) && mRetransTable[i].msgId == ackMsgId)
+        if ((mRetransTable[i].rc == rc) && mRetransTable[i].retainedBuf.GetMsgId() == ackMsgId)
         {
             // Clear the entry from the retransmision table.
             ClearRetransTable(mRetransTable[i]);
@@ -433,7 +440,6 @@ bool ReliableMessageManager::CheckAndRemRetransTable(ReliableMessageContext * rc
  *  Send the specified entry from the retransmission table.
  *
  *  @param[in]    entry                A pointer to a retransmission table entry object that needs to be sent.
- *  @param[in]    isResend             Set if resend from re-transmition table.
  *
  *  @return  #CHIP_NO_ERROR On success, else corresponding CHIP_ERROR returned from SendMessage.
  *

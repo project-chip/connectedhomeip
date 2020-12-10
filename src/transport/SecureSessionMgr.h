@@ -42,10 +42,6 @@
 
 namespace chip {
 
-namespace Messaging {
-class ReliableMessageManager;
-}
-
 class SecureSessionMgr;
 
 /**
@@ -107,21 +103,25 @@ public:
 
 class DLL_EXPORT SecureSessionMgr : public TransportMgrDelegate
 {
-    friend class Messaging::ReliableMessageManager;
-
 public:
     SecureSessionMgr();
     ~SecureSessionMgr() override;
 
     /**
      * @brief
-     *   Send a message to a currently connected peer, msgBuf->Start() points to the packet being transmitted and
-     *   msgBuf->DataLength() is its length in octets. Those values are stored before sending the packet and need
-     *   to be rewinded back after sending the packet so that msgBuf can be re-used for re-transmission.
+     *   Send a message to a currently connected peer.
+     *
+     * @details
+     *   msgBuf->Start() points to the packet being transmitted and msgBuf->DataLength()
+     *   is its length in octets. In case parameter bufferRetainSlot is not nullptr. Those
+     *   values are stored before sending the packet and rewinded back after sending the
+     *   packet so that msgBuf can be re-used for re-transmission.
      */
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf);
-
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
+                           System::EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::EncryptedPacketBufferHandle msgBuf,
+                           System::EncryptedPacketBufferHandle * bufferRetainSlot);
     /**
      * @brief
      *   Set the callback object.
@@ -188,8 +188,8 @@ private:
     SecureSessionMgrDelegate * mCB   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
 
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf, uint32_t & msgId,
-                           uint32_t & payloadLength, bool isResend);
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
+                           System::EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrpted);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
