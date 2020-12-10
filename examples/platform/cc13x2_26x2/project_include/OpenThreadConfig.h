@@ -122,7 +122,7 @@
 #define OPENTHREAD_CONFIG_UDP_FORWARD_ENABLE 0
 
 #define ENABLE_ALL_LOGS_TO_UART 0
-#if   ENABLE_ALL_LOGS_TO_UART
+#if ENABLE_ALL_LOGS_TO_UART
 /* Enable volumous logging via the below */
 
 /* Where should logs go?
@@ -130,7 +130,7 @@
  * ${openthread}/src/core/openthread-core-default-config.h
  * Note: Default is: OPENTHREAD_CONFIG_LOG_OUTPUT_NONE
  */
-#define OPENTHREAD_CONFIG_LOG_OUTPUT              OPENTHREAD_CONFIG_LOG_OUTPUT_DEBUG_UART
+#define OPENTHREAD_CONFIG_LOG_OUTPUT OPENTHREAD_CONFIG_LOG_OUTPUT_DEBUG_UART
 
 /* Details of the debug uart can be found in the file:
  * 'platform/dbg_uart.c' file within the examples.
@@ -139,13 +139,13 @@
 /*
  * This enables the Debug Uart, disabled by default
  */
-#define OPENTHREAD_CONFIG_ENABLE_DEBUG_UART       1
+#define OPENTHREAD_CONFIG_ENABLE_DEBUG_UART 1
 
 /*
  * For details & selections see:
  * ${openthread}/include/openthread/platform/logging.h
  */
-#define OPENTHREAD_CONFIG_LOG_LEVEL               OT_LOG_LEVEL_DEBG
+#define OPENTHREAD_CONFIG_LOG_LEVEL OT_LOG_LEVEL_DEBG
 
 /* Each significant area openthread can be configured to log, or not log
  * The areas are enabled via various #defines, see below for a partial list.
@@ -155,27 +155,27 @@
  * Also note above level is defined in the single ".h" log header
  * Whereas each area is controlled by the C++ header ".hpp" log header.
  */
-#define OPENTHREAD_CONFIG_LOG_API                 1
-#define OPENTHREAD_CONFIG_LOG_ARP                 1
-#define OPENTHREAD_CONFIG_LOG_CLI                 1
-#define OPENTHREAD_CONFIG_LOG_COAP                1
-#define OPENTHREAD_CONFIG_LOG_ICMP                1
-#define OPENTHREAD_CONFIG_LOG_IP6                 1
-#define OPENTHREAD_CONFIG_LOG_MAC                 1
-#define OPENTHREAD_CONFIG_LOG_MEM                 1
-#define OPENTHREAD_CONFIG_LOG_MLE                 1
-#define OPENTHREAD_CONFIG_LOG_NETDATA             1
-#define OPENTHREAD_CONFIG_LOG_NETDIAG             1
-#define OPENTHREAD_CONFIG_LOG_PKT_DUMP            1
-#define OPENTHREAD_CONFIG_LOG_PLATFORM            1
-#define OPENTHREAD_CONFIG_LOG_PREPEND_LEVEL       1
-#define OPENTHREAD_CONFIG_LOG_PREPEND_REGION      1
+#define OPENTHREAD_CONFIG_LOG_API 1
+#define OPENTHREAD_CONFIG_LOG_ARP 1
+#define OPENTHREAD_CONFIG_LOG_CLI 1
+#define OPENTHREAD_CONFIG_LOG_COAP 1
+#define OPENTHREAD_CONFIG_LOG_ICMP 1
+#define OPENTHREAD_CONFIG_LOG_IP6 1
+#define OPENTHREAD_CONFIG_LOG_MAC 1
+#define OPENTHREAD_CONFIG_LOG_MEM 1
+#define OPENTHREAD_CONFIG_LOG_MLE 1
+#define OPENTHREAD_CONFIG_LOG_NETDATA 1
+#define OPENTHREAD_CONFIG_LOG_NETDIAG 1
+#define OPENTHREAD_CONFIG_LOG_PKT_DUMP 1
+#define OPENTHREAD_CONFIG_LOG_PLATFORM 1
+#define OPENTHREAD_CONFIG_LOG_PREPEND_LEVEL 1
+#define OPENTHREAD_CONFIG_LOG_PREPEND_REGION 1
 
 #endif
 
 /* match the output buffer size to Diag process max buffer.
  * size = 256. Otherwise some output chars are chopped
  */
-#define OPENTHREAD_CONFIG_CLI_MAX_LINE_LENGTH     256
+#define OPENTHREAD_CONFIG_CLI_MAX_LINE_LENGTH 256
 
 #endif // OPENTHREAD_PLATFORM_CONFIG_H
