@@ -868,18 +868,38 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
                                                                               nullptr, &error);
         if (result)
         {
+            GError * gerror = nullptr;
+
             ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to network: SSID: %s", ssid);
+
+            result = wpa_fi_w1_wpa_supplicant1_interface_call_save_config_sync(mWpaSupplicant.iface, nullptr, &gerror);
+
+            if (result)
+            {
+                ChipLogProgress(DeviceLayer, "wpa_supplicant: save config succeeded!");
+            }
+            else
+            {
+                ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to save config: %s",
+                                gerror ? gerror->message : "unknown error");
+            }
+
+            if (gerror != nullptr)
+                g_error_free(gerror);
+
+            // Return success as long as the device is connected to the network
+            ret = CHIP_NO_ERROR;
         }
         else
         {
             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to connect to network: SSID: %s: %s", ssid,
                             error ? error->message : "unknown error");
+
+            ret = CHIP_ERROR_INTERNAL;
         }
 
         if (error != nullptr)
             g_error_free(error);
-
-        ret = CHIP_NO_ERROR;
     }
     else
     {

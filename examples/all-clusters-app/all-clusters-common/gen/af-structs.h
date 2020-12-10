@@ -87,7 +87,7 @@ typedef struct _DebtPayload
 // Struct for DeviceInformationRecord
 typedef struct _DeviceInformationRecord
 {
-    uint8_t * ieeeAddress;
+    uint64_t ieeeAddress;
     chip::EndpointId endpointId;
     uint16_t profileId;
     uint16_t deviceId;
@@ -113,10 +113,9 @@ typedef struct _EndpointInformationRecord
     uint8_t version;
 } EmberAfEndpointInformationRecord;
 
-// Struct for EphemeralData
-typedef struct _EphemeralData
-{
-} EmberAfEphemeralData;
+// Void typedef for EmberAfEphemeralData which is empty.
+// this will result in all the references to the data being as uint8_t*
+typedef uint8_t EmberAfEphemeralData;
 
 // Struct for EventConfigurationPayload
 typedef struct _EventConfigurationPayload
@@ -176,15 +175,14 @@ typedef struct _IasAceZoneStatusResult
     uint16_t zoneStatus;
 } EmberAfIasAceZoneStatusResult;
 
-// Struct for Identity
-typedef struct _Identity
-{
-} EmberAfIdentity;
+// Void typedef for EmberAfIdentity which is empty.
+// this will result in all the references to the data being as uint8_t*
+typedef uint8_t EmberAfIdentity;
 
 // Struct for NeighborInfo
 typedef struct _NeighborInfo
 {
-    uint8_t * neighbor;
+    uint64_t neighbor;
     int16_t x;
     int16_t y;
     int16_t z;
@@ -333,15 +331,13 @@ typedef struct _SeasonEntry
     uint8_t weekIdRef;
 } EmberAfSeasonEntry;
 
-// Struct for Signature
-typedef struct _Signature
-{
-} EmberAfSignature;
+// Void typedef for EmberAfSignature which is empty.
+// this will result in all the references to the data being as uint8_t*
+typedef uint8_t EmberAfSignature;
 
-// Struct for Smac
-typedef struct _Smac
-{
-} EmberAfSmac;
+// Void typedef for EmberAfSmac which is empty.
+// this will result in all the references to the data being as uint8_t*
+typedef uint8_t EmberAfSmac;
 
 // Struct for SnapshotResponsePayload
 typedef struct _SnapshotResponsePayload

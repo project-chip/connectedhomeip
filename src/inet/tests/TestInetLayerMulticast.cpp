@@ -40,10 +40,15 @@
 #include <CHIPVersion.h>
 
 #include <inet/IPAddress.h>
+#include <inet/InetArgParser.h>
+#include <support/CHIPArgParser.hpp>
 #include <system/SystemTimer.h>
 
 #include "TestInetCommon.h"
+#include "TestInetCommonOptions.h"
 #include "TestInetLayerCommon.hpp"
+#include "TestSetupFaultInjection.h"
+#include "TestSetupSignalling.h"
 
 using namespace chip;
 using namespace chip::ArgParser;

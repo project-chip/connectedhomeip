@@ -19,6 +19,9 @@
 #include <dbus/dbus.h>
 #include <memory>
 
+#include <support/CHIPMem.h>
+#include <support/UnitTestRegistration.h>
+
 #include "platform/internal/CHIPDeviceLayerInternal.h"
 
 #include "platform/PlatformManager.h"
@@ -61,6 +64,7 @@ int TestThreadStackManager()
     info.FieldPresent.ThreadPSKc          = false;
     memcpy(&info.ThreadMasterKey, &masterKey, sizeof(masterKey));
 
+    chip::Platform::MemoryInit();
     chip::DeviceLayer::PlatformMgrImpl().InitChipStack();
     chip::DeviceLayer::PlatformMgrImpl().AddEventHandler(EventHandler, 0);
 
@@ -75,3 +79,5 @@ int TestThreadStackManager()
 
     return -1;
 }
+
+CHIP_REGISTER_TEST_SUITE(TestThreadStackManager);

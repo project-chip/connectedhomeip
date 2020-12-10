@@ -15,27 +15,12 @@
  *    limitations under the License.
  */
 
-#include <condition_variable>
-#include <mutex>
-#include <thread>
+#pragma once
 
-#include "TestMdns.h"
+#include <ble/BleUUID.h>
 
-int main()
-{
-    std::mutex mtx;
-    std::unique_lock<std::mutex> lock(mtx);
-    std::condition_variable done;
-    int retVal = -1;
+#import <CoreBluetooth/CoreBluetooth.h>
 
-    std::thread t([&done, &retVal]() {
-        retVal = TestMdns();
-        done.notify_all();
-    });
-
-    if (done.wait_for(lock, std::chrono::seconds(5)) == std::cv_status::timeout)
-    {
-        fprintf(stderr, "mDNS test timeout, is avahi daemon running?");
-    }
-    return retVal;
-}
+@interface UUIDHelper : NSObject
++ (CBUUID *)GetShortestServiceUUID:(const chip::Ble::ChipBleUUID *)svcId;
+@end

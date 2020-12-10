@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2013-2017 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,14 +19,16 @@
 
 /**
  *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the Platform Time code code unit tests.
+ *      This file sets up signalling used in Linux CHIP Inet layer library test
+ *      applications and tools.
+ *
+ *      NOTE: These do not comprise a public part of the CHIP API and
+ *            are subject to change without notice.
  *
  */
 
-#include "TestPlatformTime.h"
+#pragma once
 
-int main()
-{
-    return (TestPlatformTime());
-}
+void SetSIGUSR1Handler();
+typedef void (*SignalHandler)(int signum);
+void SetSignalHandler(SignalHandler handler);

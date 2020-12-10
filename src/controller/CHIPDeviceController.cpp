@@ -88,6 +88,7 @@ DeviceController::DeviceController()
     mLocalDeviceId            = 0;
     mStorageDelegate          = nullptr;
     mPairedDevicesInitialized = false;
+    mListenPort               = CHIP_PORT;
 }
 
 CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegate * storageDelegate, System::Layer * systemLayer,
@@ -126,10 +127,11 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
     mSessionManager = chip::Platform::New<SecureSessionMgr>();
 
-    err = mTransportMgr->Init(Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6)
+    err = mTransportMgr->Init(
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
 #if INET_CONFIG_ENABLE_IPV4
-                                  ,
-                              Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv4)
+            ,
+        Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv4).SetListenPort(mListenPort)
 #endif
     );
     SuccessOrExit(err);
@@ -190,6 +192,17 @@ exit:
     return err;
 }
 
+CHIP_ERROR DeviceController::SetUdpListenPort(uint16_t listenPort)
+{
+    if (mState == State::Initialized)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+
+    mListenPort = listenPort;
+    return CHIP_NO_ERROR;
+}
+
 CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice & deviceInfo, Device ** out_device)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -214,7 +227,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
         err = device->Deserialize(deviceInfo);
         VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-        device->Init(mTransportMgr, mSessionManager, mInetLayer);
+        device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort);
     }
 
     *out_device = device;
@@ -276,7 +289,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             err = device->Deserialize(deviceInfo);
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-            device->Init(mTransportMgr, mSessionManager, mInetLayer);
+            device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort);
         }
     }
 
@@ -473,24 +486,38 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mDeviceBeingPaired == kNumMaxActiveDevices, err = CHIP_ERROR_INCORRECT_STATE);
 
-#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
-    if (!params.HasBleLayer())
+    // TODO: We need to specify the peer address for BLE transport in bindings.
+    if (params.GetPeerAddress().GetTransportType() == Transport::Type::kBle ||
+        params.GetPeerAddress().GetTransportType() == Transport::Type::kUndefined)
     {
-        params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
-        params.SetPeerAddress(Transport::PeerAddress::BLE());
-    }
+#if CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+        if (!params.HasBleLayer())
+        {
+            params.SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer());
+            params.SetPeerAddress(Transport::PeerAddress::BLE());
+        }
 #endif // CONFIG_DEVICE_LAYER && CONFIG_NETWORK_LAYER_BLE
+    }
 
     mDeviceBeingPaired = GetInactiveDeviceIndex();
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
+    mIsIPRendezvous    = (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle);
     mRendezvousSession = chip::Platform::New<RendezvousSession>(this);
     VerifyOrExit(mRendezvousSession != nullptr, err = CHIP_ERROR_NO_MEMORY);
     err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr);
     SuccessOrExit(err);
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
+
+    // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
+    // provisiong cluster is ready.
+    if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
+    {
+        device->SetAddress(params.GetPeerAddress().GetIPAddress());
+        mRendezvousSession->OnRendezvousConnectionOpened();
+    }
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -533,7 +560,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     testSecurePairingSecret->ToSerializable(device->GetPairing());
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, remoteDeviceId, remotePort, interfaceId);
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
 
     device->SetAddress(deviceAddr);
 
@@ -675,7 +702,7 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
         ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
         mRendezvousSession->GetPairingSession().ToSerializable(device->GetPairing());
 
-        if (mPairingDelegate != nullptr)
+        if (!mIsIPRendezvous && mPairingDelegate != nullptr)
         {
             mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
         }

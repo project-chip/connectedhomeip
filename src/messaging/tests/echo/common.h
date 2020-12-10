@@ -15,9 +15,22 @@
  *    limitations under the License.
  */
 
-#include "TestThreadStackMgr.h"
+/**
+ *    @file
+ *      This file defines some of the common constants, globals and interfaces
+ *      that are common to and used by CHIP example applications.
+ *
+ */
 
-int main()
-{
-    TestThreadStackManager();
-}
+#pragma once
+
+#include <messaging/ExchangeMgr.h>
+
+#define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
+#define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
+
+extern chip::Messaging::ExchangeManager gExchangeManager;
+
+void InitializeChip(void);
+void ShutdownChip(void);
+void DriveIO(void);

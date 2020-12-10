@@ -70,8 +70,6 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-            - name: Show tree
-              run: find .
             # - name: Remove third_party binaries for CodeQL Analysis
             #   run: find . -type d -name "third_party" -exec rm -rf {} +
             # - name: Remove m5stack-tft binaries for CodeQL Analysis

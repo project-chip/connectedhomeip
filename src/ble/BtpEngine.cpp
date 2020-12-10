@@ -357,7 +357,7 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
 
         // For now, limit BtpEngine message size to max length of 1 pbuf, as we do for chip messages sent via IP.
         // TODO add support for BtpEngine messages longer than 1 pbuf
-        VerifyOrExit(mRxBuf->Next() == nullptr, err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
+        VerifyOrExit(!mRxBuf->HasChainedBuffer(), err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
     }
     else
     {
@@ -417,13 +417,13 @@ exit:
     return err;
 }
 
-void BtpEngine::ClearRxPacket()
+PacketBufferHandle BtpEngine::TakeRxPacket()
 {
     if (mRxState == kState_Complete)
     {
         mRxState = kState_Idle;
     }
-    mRxBuf = nullptr;
+    return std::move(mRxBuf);
 }
 
 // Calling convention:
@@ -570,13 +570,13 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
     return true;
 }
 
-void BtpEngine::ClearTxPacket()
+PacketBufferHandle BtpEngine::TakeTxPacket()
 {
     if (mTxState == kState_Complete)
     {
         mTxState = kState_Idle;
     }
-    mTxBuf = nullptr;
+    return std::move(mTxBuf);
 }
 
 void BtpEngine::LogState() const

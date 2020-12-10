@@ -1,6 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,16 +16,18 @@
  *    limitations under the License.
  */
 
-/**
- *    @file
- *      This file implements a standalone/native program executable
- *      test driver for the Platform Manager code code unit tests.
- *
- */
+#pragma once
 
-#include "TestPlatformMgr.h"
+#include <kernel.h>
 
-int main()
-{
-    return (TestPlatformMgr());
-}
+namespace chip {
+namespace rpc {
+
+class LightingService;
+
+void RunRpcService(void *, void *, void *);
+
+k_tid_t Init();
+
+} // namespace rpc
+} // namespace chip
