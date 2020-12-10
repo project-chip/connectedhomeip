@@ -234,6 +234,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       if (chip_enable_openthread) {
         public_deps += [
           "${openthread_root}:libopenthread-mtd",
+          "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
           "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
           "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
         ]

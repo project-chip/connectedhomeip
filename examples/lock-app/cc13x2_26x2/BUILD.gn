@@ -24,18 +24,7 @@ project_dir = "${chip_root}/examples/lock-app/cc13x2_26x2"
 
 ti_simplelink_sdk("sdk") {
   include_dirs = [
-    "${project_dir}",
-    "${project_dir}/main",
     "${project_dir}/main/include",
-    "${chip_root}/src/platform/cc13x2_26x2",
-    "${project_dir}/main/",
-    "${chip_root}/third_party/openthread/repo/src/core",
-    "${ti_simplelink_sdk_root}/examples/rtos/${ti_simplelink_board}/thread/cli_mtd",
-    "${ti_simplelink_sdk_root}/source/ti/thread/rtos/${ti_simplelink_board}/thread/libmbedcrypto/config",
-  ]
-
-  sources = [
-    "${project_dir}/main/include/CHIPProjectConfig.h",
   ]
 
   defines = []
@@ -72,28 +61,17 @@ ti_simplelink_executable("lock_app") {
     "${project_dir}",
     "${project_dir}/main",
     "${project_dir}/main/include",
-    "${chip_root}/src/include",
-    "${chip_root}/src/lib",
-    "${chip_root}/src",
-    "${chip_root}/src/app/util",
-    "${chip_root}/src/system",
-    "${chip_root}/examples/common/chip-app-server/include",
-    "${chip_root}/examples/lock-app/lock-common",
-    "${chip_root}/third_party/openthread/repo/examples/platforms",
   ]
   defines = []
   output_name = "chip-cc13x2_26x2-lock-example.out"
 
   public_deps = [
     ":sdk",
-    ":sdk_openthread_platform",
     ":sysconfig",
     "${chip_root}/examples/common/chip-app-server:chip-app-server",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
-    "${chip_root}/src/setup_payload",
     "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
-    "${chip_root}/third_party/openthread/repo:libopenthread-mtd",
   ]
 
   sources = [
