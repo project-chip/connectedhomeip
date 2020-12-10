@@ -69,7 +69,7 @@ public:
      *
      * @retval CHIP_ERROR_INVALID_ARGUMENT  The text in the service is too long.
      * @retval CHIP_ERROR_NO_MEMORY         Cannot allocate memory to copy the service.
-     * 
+     *
      */
     CHIP_ERROR AddService(uint64_t nodeId, uint64_t fabricId, const MdnsService & service);
 
