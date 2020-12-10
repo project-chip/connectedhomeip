@@ -42,6 +42,9 @@
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
 #include <core/CHIPTLVDebug.hpp>
+#include <iomanip>
+#include <cstdlib>
+#include <iostream>
 
 using namespace chip;
 using namespace std;
@@ -89,6 +92,13 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     // Dump the payload TLV structure
     // DebugPrettyPrint(payload, payloadLength);
 
+    //std::cout <<"Dummy:" << payloadLength << ":";
+    for(uint8_t i=0; i<payloadLength; i++)
+    {
+        //std::cout << std::setfill('0') << std::setw(2) << std::hex << (0xff & (unsigned int)payload[i]);
+    }
+    //std::cout << std::endl;
+
     SuccessOrExit(err);
     // Parse TLV fields
     err = parseTLVFields2(outPayload, payload, payloadLength);
@@ -121,14 +131,16 @@ CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(uint8_t ** output, size_t & 
     tlvArray.Alloc(tlvBytesLength);
     VerifyOrExit(tlvArray, err = CHIP_ERROR_NO_MEMORY);
 
+    *output = new uint8_t[tlvBytesLength];
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
         uint64_t dest = buf[i];
+        (*output)[i] = static_cast<uint8_t>(dest);
         tlvArray[i] = static_cast<uint8_t>(dest);
     }
 
     // returning data
-    *output = tlvArray.Get();
+    //*output = tlvArray.Get();
     tlvDataLengthInBytes = tlvBytesLength;
 
 exit:
@@ -159,7 +171,7 @@ CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields2(chip::AdditionalDataPayl
     // Get the value of the rotating device id
     char rotatingDeviceId[256];
     err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId)+1);
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: parseTLVFields2, rotatingDeviceId:%s", rotatingDeviceId);
+    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: parseTLVFields, rotatingDeviceId:%s", rotatingDeviceId);
 exit:
     return err;
 }
@@ -265,10 +277,13 @@ CHIP_ERROR AdditionalDataPayloadParser::GenerateSamplePayload(uint8_t ** output,
 
     *output = buffer->Start();
     tlvDataLengthInBytes = rootWriter.GetLengthWritten();
+    //std::cout <<"Dummy:" << tlvDataLengthInBytes << ":";
     for(size_t i=0; i<tlvDataLengthInBytes; i++)
     {
-        ChipLogProgress(DataManagement, "GenerateSamplePayload[%d] = %d", i, output[i]);
+        //ChipLogProgress(DataManagement, "GenerateSamplePayload[%d] = %d", i, output[i]);
+        //std::cout << std::hex << buffer->Start()[i];
     }
+    //std::cout << std::endl;
 exit:
     return err;
 }
