@@ -57,9 +57,9 @@ public:
     {
         RetransTableEntry();
 
-        ReliableMessageContext * rc;   /**< The context for the stored CHIP message. */
-        System::PacketBuffer * msgBuf; /**< A pointer to the PacketBuffer object holding the CHIP message. */
-        uint32_t msgId;                /**< The message identifier of the CHIP message awaiting acknowledgment. */
+        ReliableMessageContext * rc;       /**< The context for the stored CHIP message. */
+        System::PacketBufferHandle msgBuf; /**< A pointer to the PacketBuffer object holding the CHIP message. */
+        uint32_t msgId;                    /**< The message identifier of the CHIP message awaiting acknowledgment. */
         uint16_t msgSendFlags;
         uint16_t nextRetransTimeTick; /**< A counter representing the next retransmission time for the message. */
         uint8_t sendCount;            /**< A counter representing the number of times the message has been sent. */
@@ -81,7 +81,7 @@ public:
     void ProcessDelayedDeliveryMessage(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
     static void Timeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
-    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, System::PacketBuffer * msgBuf, uint32_t messageId,
+    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, System::PacketBufferHandle msgBuf, uint32_t messageId,
                                  uint16_t msgSendFlags, RetransTableEntry ** rEntry);
     void PauseRetransTable(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
     void ResumeRetransTable(ReliableMessageContext * rc);
@@ -101,8 +101,8 @@ public:
 
 public:
     // public functions for ReliableMessageProtocol internal usage
-    CHIP_ERROR SendMessage(ReliableMessageContext * context, System::PacketBuffer * msgBuf, uint16_t sendFlags);
-    CHIP_ERROR SendMessage(ReliableMessageContext * context, uint32_t profileId, uint8_t msgType, System::PacketBuffer * msgBuf,
+    CHIP_ERROR SendMessage(ReliableMessageContext * context, System::PacketBufferHandle msgBuf, uint16_t sendFlags);
+    CHIP_ERROR SendMessage(ReliableMessageContext * context, uint32_t profileId, uint8_t msgType, System::PacketBufferHandle msgBuf,
                            BitFlags<uint16_t, SendMessageFlags> sendFlags);
 
 private:

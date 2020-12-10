@@ -188,10 +188,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgIn)
+CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle msgBuf;
 
     PayloadHeader payloadHeader;
 
@@ -202,7 +201,6 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize = 0;
 
-    msgBuf.Adopt(msgIn);
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetStart(msgBuf->Start() - headerSize);
@@ -211,7 +209,7 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
     err = mDelegate->SendPairingMessage(PacketHeader().SetSourceNodeId(mLocalNodeId).SetEncryptionKeyID(mLocalKeyId), mPeerAddress,
-                                        msgBuf.Release_ForNow());
+                                        std::move(msgBuf));
     SuccessOrExit(err);
 
 exit:
@@ -255,7 +253,7 @@ CHIP_ERROR SecurePairingSession::Pair(const Transport::PeerAddress peerAddress, 
     mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_pB_cB;
 
     // Call delegate to send the Compute_pA to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pA, resp.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pA, std::move(resp));
     SuccessOrExit(err);
     return err;
 
@@ -331,7 +329,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pA(const PacketHeader & header, c
     mNextExpectedMsg = Spake2pMsgType::kSpake2pCompute_cA;
 
     // Call delegate to send the Compute_pB_cB to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pB_cB, resp.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_pB_cB, std::move(resp));
     SuccessOrExit(err);
     return err;
 
@@ -377,7 +375,7 @@ CHIP_ERROR SecurePairingSession::HandleCompute_pB_cB(const PacketHeader & header
     resp->SetDataLength(verifier_len);
 
     // Call delegate to send the Compute_cA to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_cA, resp.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pCompute_cA, std::move(resp));
     SuccessOrExit(err);
 
     {

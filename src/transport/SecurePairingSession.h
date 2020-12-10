@@ -53,7 +53,7 @@ public:
      * @return CHIP_ERROR Error thrown when sending the message
      */
     virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                          System::PacketBuffer * msgBuf)
+                                          System::PacketBufferHandle msgBuf)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -216,7 +216,7 @@ private:
     CHIP_ERROR HandleCompute_pB_cB(const PacketHeader & header, const System::PacketBufferHandle & msg);
     CHIP_ERROR HandleCompute_cA(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-    CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgBuf);
+    CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBufferHandle msgBuf);
 
     static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 

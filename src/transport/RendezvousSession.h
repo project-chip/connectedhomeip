@@ -103,7 +103,7 @@ public:
 
     //////////// SecurePairingSessionDelegate Implementation ///////////////
     CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                  System::PacketBuffer * msgBuf) override;
+                                  System::PacketBufferHandle msgBuf) override;
     void OnPairingError(CHIP_ERROR err) override;
     void OnPairingComplete() override;
 
@@ -120,7 +120,7 @@ public:
     void SendOperationalCredentials() override;
 
     //////////// NetworkProvisioningDelegate Implementation ///////////////
-    CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBug) override;
+    CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBufferHandle msgBug) override;
     void OnNetworkProvisioningError(CHIP_ERROR error) override;
     void OnNetworkProvisioningComplete() override;
 

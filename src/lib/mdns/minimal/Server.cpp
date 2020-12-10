@@ -150,7 +150,7 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
             continue;
         }
 
-        return info->udp->SendTo(addr, port, data.Release_ForNow());
+        return info->udp->SendTo(addr, port, std::move(data));
     }
 
     return CHIP_ERROR_NOT_CONNECTED;
@@ -179,11 +179,11 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), extraCopy.Release_ForNow());
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(extraCopy));
         }
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), extraCopy.Release_ForNow());
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(extraCopy));
         }
         else
         {
@@ -199,7 +199,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t port)
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port)
 {
     for (size_t i = 0; i < mEndpointCount; i++)
     {
@@ -217,17 +217,15 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), data);
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(data));
         }
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), data);
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(data));
         }
         else
         {
             // remove extra ref and then also clear it
-            chip::System::PacketBuffer::Free(data);
-            chip::System::PacketBuffer::Free(data);
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
@@ -240,12 +238,10 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
         }
         else if (err != CHIP_NO_ERROR)
         {
-            chip::System::PacketBuffer::Free(data);
             return err;
         }
     }
 
-    chip::System::PacketBuffer::Free(data);
     return CHIP_NO_ERROR;
 }
 
