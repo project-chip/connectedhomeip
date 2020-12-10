@@ -24,6 +24,7 @@ config("includes") {
 
 source_set("lock-common") {
   sources = [
+    "${chip_root}/src/app/clusters/bindings/bindings.cpp",
     "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
     "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
     "${chip_root}/src/app/reporting/reporting.cpp",

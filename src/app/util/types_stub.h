@@ -522,7 +522,7 @@ enum
  * cluster ID and either the destination EUI64 (for unicast bindings) or the
  * 64-bit group address (for multicast bindings).
  */
-typedef struct
+struct EmberBindingTableEntry
 {
     /** The type of binding. */
     EmberBindingType type;
@@ -550,7 +550,27 @@ typedef struct
     };
     /** The index of the network the binding belongs to. */
     uint8_t networkIndex;
-} EmberBindingTableEntry;
+
+    bool operator==(EmberBindingTableEntry const & other) const
+    {
+        if (type != other.type)
+        {
+            return false;
+        }
+
+        if (type == EMBER_MULTICAST_BINDING && groupId != other.groupId)
+        {
+            return false;
+        }
+
+        if (type == EMBER_UNICAST_BINDING && nodeId != other.nodeId)
+        {
+            return false;
+        }
+
+        return local == other.local && clusterId == other.clusterId && remote == other.remote && networkIndex == other.networkIndex;
+    }
+};
 
 /**
  * @brief The decision made by the Trust Center when a node attempts to join.
