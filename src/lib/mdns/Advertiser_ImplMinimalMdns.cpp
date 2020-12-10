@@ -343,6 +343,7 @@ void AdvertiserMinMdns::Clear()
         if (mAllocatedQNameParts[i] != nullptr)
         {
             chip::Platform::MemoryFree(mAllocatedQNameParts[i]);
+            mAllocatedQNameParts[i] = nullptr;
         }
     }
 }
