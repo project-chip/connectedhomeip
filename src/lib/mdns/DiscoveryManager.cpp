@@ -32,13 +32,6 @@
 
 namespace {
 
-void RehashServicePool(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
-{
-    chip::Mdns::ServicePool * pool = static_cast<chip::Mdns::ServicePool *>(appState);
-
-    pool->ReHash();
-}
-
 // returns whether valid node and fabric id is found in the service
 bool ParseNodeFabricId(const chip::Mdns::MdnsService & service, uint64_t * nodeId, uint64_t * fabricId)
 {
@@ -52,6 +45,7 @@ bool ParseNodeFabricId(const chip::Mdns::MdnsService & service, uint64_t * nodeI
     {
         if (service.mName[i] == '-')
         {
+            digitCount     = 0;
             delimiterFound = true;
         }
         else
@@ -259,16 +253,13 @@ CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, I
 
         return CHIP_NO_ERROR;
     }
-    else
-    {
-        MdnsService service;
+    MdnsService service;
 
-        snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
-        strncpy(service.mType, kProvisionedServiceType, sizeof(service.mType));
-        service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
-        service.mAddressType = type;
-        return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
-    }
+    snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, nodeId, fabricId);
+    strncpy(service.mType, kProvisionedServiceType, sizeof(service.mType));
+    service.mProtocol    = MdnsServiceProtocol::kMdnsProtocolTcp;
+    service.mAddressType = type;
+    return ChipMdnsResolve(&service, INET_NULL_INTERFACEID, HandleNodeIdResolve, this);
 }
 
 void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error)
@@ -326,11 +317,6 @@ void DiscoveryManager::AddMdnsService(const MdnsService & service)
             {
                 ChipLogError(Discovery, "Failed to add service to pool");
             }
-
-            if (mServicePool.ShouldReHash())
-            {
-                chip::DeviceLayer::SystemLayer.ScheduleWork(RehashServicePool, &mServicePool);
-            }
         }
         else
         {
@@ -362,10 +348,6 @@ void DiscoveryManager::UpdateMdnsService(const MdnsService & service)
             ChipLogError(Discovery, "Failed to add service to pool");
             return;
         }
-        if (mServicePool.ShouldReHash())
-        {
-            chip::DeviceLayer::SystemLayer.ScheduleWork(RehashServicePool, &mServicePool);
-        }
     }
 }
 
@@ -385,11 +367,20 @@ void DiscoveryManager::RemoveMdnsService(const MdnsService & service)
         {
             ChipLogError(Discovery, "Failed to remove service from pool");
         }
-        if (mServicePool.ShouldReHash())
+        if (mServicePool.ShouldReHash() && !mIsRehashPending)
         {
-            chip::DeviceLayer::SystemLayer.ScheduleWork(RehashServicePool, &mServicePool);
+            mIsRehashPending = true;
+            chip::DeviceLayer::SystemLayer.ScheduleWork(RehashServicePool, this);
         }
     }
+}
+
+void DiscoveryManager::RehashServicePool(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
+{
+    chip::Mdns::DiscoveryManager * mgr = static_cast<chip::Mdns::DiscoveryManager *>(appState);
+
+    mgr->mServicePool.ReHash();
+    mgr->mIsRehashPending = false;
 }
 
 #else // CHIP_ENABLE_MDNS

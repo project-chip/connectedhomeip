@@ -22,6 +22,7 @@
 #include "lib/mdns/ServicePool.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "platform/CHIPDeviceConfig.h"
+#include "system/SystemLayer.h"
 
 namespace chip {
 namespace Mdns {
@@ -95,12 +96,14 @@ private:
     static void HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error);
     static void HandleMdnsInit(void * context, CHIP_ERROR initError);
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
+    static void RehashServicePool(chip::System::Layer * systemLayer, void * appState, chip::System::Error error);
 
 #if CHIP_ENABLE_MDNS
     uint64_t mUnprovisionedInstanceName;
     bool mMdnsInitialized               = false;
     bool mIsPublishingProvisionedDevice = false;
     bool mIsPublishing                  = false;
+    bool mIsRehashPending               = false;
     ServicePool mServicePool;
 #endif // CHIP_ENABLE_MDNS
     ResolveDelegate * mResolveDelegate = nullptr;
