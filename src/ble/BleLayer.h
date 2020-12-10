@@ -334,8 +334,6 @@ private:
     static const ChipBleUUID CHIP_BLE_CHAR_1_ID;
     // UUID of CHIP service characteristic used for peripheral indications.
     static const ChipBleUUID CHIP_BLE_CHAR_2_ID;
-    // UUID of CHIP service charadteristic used for additional data
-    static const ChipBleUUID CHIP_BLE_CHAR_3_ID;
 
     BleConnectionDelegate * mConnectionDelegate;
     BlePlatformDelegate * mPlatformDelegate;
