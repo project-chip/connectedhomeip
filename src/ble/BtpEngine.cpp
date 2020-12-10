@@ -585,7 +585,7 @@ void BtpEngine::LogState() const
 
     ChipLogError(Ble, "mRxFragmentSize: %d", mRxFragmentSize);
     ChipLogError(Ble, "mRxState: %d", mRxState);
-    ChipLogError(Ble, "mRxBuf: %p", mRxBuf.Get_ForNow());
+    ChipLogError(Ble, "mRxBuf: %d", !mRxBuf.IsNull());
     ChipLogError(Ble, "mRxNextSeqNum: %d", mRxNextSeqNum);
     ChipLogError(Ble, "mRxNewestUnackedSeqNum: %d", mRxNewestUnackedSeqNum);
     ChipLogError(Ble, "mRxOldestUnackedSeqNum: %d", mRxOldestUnackedSeqNum);
@@ -594,7 +594,7 @@ void BtpEngine::LogState() const
 
     ChipLogError(Ble, "mTxFragmentSize: %d", mTxFragmentSize);
     ChipLogError(Ble, "mTxState: %d", mTxState);
-    ChipLogError(Ble, "mTxBuf: %p", mTxBuf.Get_ForNow());
+    ChipLogError(Ble, "mTxBuf: %d", !mTxBuf.IsNull());
     ChipLogError(Ble, "mTxNextSeqNum: %d", mTxNextSeqNum);
     ChipLogError(Ble, "mTxNewestUnackedSeqNum: %d", mTxNewestUnackedSeqNum);
     ChipLogError(Ble, "mTxOldestUnackedSeqNum: %d", mTxOldestUnackedSeqNum);

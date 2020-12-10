@@ -869,9 +869,7 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
     UDPEndPoint * ep                   = static_cast<UDPEndPoint *>(arg);
     chip::System::Layer & lSystemLayer = ep->SystemLayer();
     IPPacketInfo * pktInfo             = NULL;
-    System::PacketBufferHandle buf;
-
-    buf.Adopt(reinterpret_cast<PacketBuffer *>(static_cast<void *>(p)));
+    System::PacketBufferHandle buf     = System::PacketBufferHandle::Adopt(p);
 
     pktInfo = GetPacketInfo(buf);
     if (pktInfo != NULL)

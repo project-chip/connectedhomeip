@@ -86,7 +86,7 @@ public:
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.
      *
-     *  @param[in]    msgPayload    A pointer to the PacketBuffer object holding the CHIP message.
+     *  @param[in]    msgPayload    A handle to the PacketBuffer object holding the CHIP message.
      *
      *  @param[in]    sendFlags     Flags set by the application for the CHIP message being sent.
      *

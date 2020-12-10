@@ -659,7 +659,7 @@ void PacketBufferTest::CheckDetachTail(nlTestSuite * inSuite, void * inContext)
             PacketBuffer * buffer_2 = PrepareTestBuffer(theSecondContext);
             PacketBuffer * returned = nullptr;
             buffer_1->AddRef(); // The test still holds ownership via buffer_1.
-            PacketBufferHandle buffer_handle = PacketBufferHandle::Create(buffer_1);
+            PacketBufferHandle buffer_handle = PacketBufferHandle::Adopt(buffer_1);
 
             if (theFirstContext != theSecondContext)
             {
@@ -1023,7 +1023,7 @@ void PacketBufferTest::CheckNext(nlTestSuite * inSuite, void * inContext)
             {
                 theFirstContext->buf->next = theSecondContext->buf;
 
-                NL_TEST_ASSERT(inSuite, buffer_1->Next_ForNow() == buffer_2);
+                NL_TEST_ASSERT(inSuite, buffer_1->ChainedBuffer() == buffer_2);
             }
             else
             {

@@ -1068,7 +1068,7 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
 
     case kInetEvent_TCPDataReceived:
         static_cast<TCPEndPoint &>(aTarget).HandleDataReceived(
-            System::PacketBufferHandle::Create(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
+            System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
         break;
 
     case kInetEvent_TCPDataSent:
@@ -1083,14 +1083,14 @@ chip::System::Error InetLayer::HandleInetLayerEvent(chip::System::Object & aTarg
 #if INET_CONFIG_ENABLE_RAW_ENDPOINT
     case kInetEvent_RawDataReceived:
         static_cast<RawEndPoint &>(aTarget).HandleDataReceived(
-            System::PacketBufferHandle::Create(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
+            System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
         break;
 #endif // INET_CONFIG_ENABLE_RAW_ENDPOINT
 
 #if INET_CONFIG_ENABLE_UDP_ENDPOINT
     case kInetEvent_UDPDataReceived:
         static_cast<UDPEndPoint &>(aTarget).HandleDataReceived(
-            System::PacketBufferHandle::Create(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
+            System::PacketBufferHandle::Adopt(reinterpret_cast<chip::System::PacketBuffer *>(aArgument)));
         break;
 #endif // INET_CONFIG_ENABLE_UDP_ENDPOINT
 

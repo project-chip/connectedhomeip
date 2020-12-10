@@ -697,7 +697,7 @@ void AttributePathTest(nlTestSuite * apSuite, void * apContext)
 
     ParseAttributePath(apSuite, reader);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void AttributePathListTest(nlTestSuite * apSuite, void * apContext)
@@ -719,7 +719,7 @@ void AttributePathListTest(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseAttributePathList(apSuite, reader);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void EventPathTest(nlTestSuite * apSuite, void * apContext)
@@ -746,7 +746,7 @@ void EventPathTest(nlTestSuite * apSuite, void * apContext)
     eventPathParser.Init(reader);
     ParseEventPath(apSuite, eventPathParser);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void EventPathListTest(nlTestSuite * apSuite, void * apContext)
@@ -768,7 +768,7 @@ void EventPathListTest(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseEventPathList(apSuite, reader);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void CommandPathTest(nlTestSuite * apSuite, void * apContext)
@@ -796,7 +796,7 @@ void CommandPathTest(nlTestSuite * apSuite, void * apContext)
 
     ParseCommandPath(apSuite, reader);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void EventDataElementTest(nlTestSuite * apSuite, void * apContext)
@@ -823,7 +823,7 @@ void EventDataElementTest(nlTestSuite * apSuite, void * apContext)
     eventDataElementParser.Init(reader);
     ParseEventDataElement(apSuite, eventDataElementParser);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void EventListTest(nlTestSuite * apSuite, void * apContext)
@@ -847,7 +847,7 @@ void EventListTest(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseEventList(apSuite, reader);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void StatusElementTest(nlTestSuite * apSuite, void * apContext)
@@ -874,7 +874,7 @@ void StatusElementTest(nlTestSuite * apSuite, void * apContext)
     statusElementParser.Init(reader);
     ParseStatusElement(apSuite, statusElementParser);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void AttributeStatusElementTest(nlTestSuite * apSuite, void * apContext)
@@ -901,7 +901,7 @@ void AttributeStatusElementTest(nlTestSuite * apSuite, void * apContext)
     attributeStatusElementParser.Init(reader);
     ParseAttributeStatusElement(apSuite, attributeStatusElementParser);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void AttributeStatusListTest(nlTestSuite * apSuite, void * apContext)
@@ -926,7 +926,7 @@ void AttributeStatusListTest(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseAttributeStatusList(apSuite, reader);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void AttributeDataElementTest(nlTestSuite * apSuite, void * apContext)
@@ -953,7 +953,7 @@ void AttributeDataElementTest(nlTestSuite * apSuite, void * apContext)
     attributeDataElementParser.Init(reader);
     ParseAttributeDataElement(apSuite, attributeDataElementParser);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void AttributeDataListTest(nlTestSuite * apSuite, void * apContext)
@@ -977,7 +977,7 @@ void AttributeDataListTest(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseAttributeDataList(apSuite, reader);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void CommandDataElementTest(nlTestSuite * apSuite, void * apContext)
@@ -1004,7 +1004,7 @@ void CommandDataElementTest(nlTestSuite * apSuite, void * apContext)
     commandDataElementParser.Init(reader);
     ParseCommandDataElement(apSuite, commandDataElementParser);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void CommandListTest(nlTestSuite * apSuite, void * apContext)
@@ -1028,7 +1028,7 @@ void CommandListTest(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseCommandList(apSuite, reader);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void ReportDataTest(nlTestSuite * apSuite, void * apContext)
@@ -1050,7 +1050,7 @@ void ReportDataTest(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseReportData(apSuite, reader);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 void InvokeCommandTest(nlTestSuite * apSuite, void * apContext)
@@ -1072,7 +1072,7 @@ void InvokeCommandTest(nlTestSuite * apSuite, void * apContext)
     NL_TEST_ASSERT(apSuite, err == CHIP_NO_ERROR);
     ParseInvokeCommand(apSuite, reader);
 
-    bufHandle.Adopt(nullptr);
+    bufHandle = nullptr;
 }
 
 /**
