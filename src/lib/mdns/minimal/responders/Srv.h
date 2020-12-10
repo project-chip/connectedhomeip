@@ -26,7 +26,7 @@ namespace Minimal {
 class SrvResponder : public Responder
 {
 public:
-    SrvResponder(const SrvResourceRecord & record) : Responder(QType::SRV, mRecord.GetName()), mRecord(record) {}
+    SrvResponder(const SrvResourceRecord & record) : Responder(QType::SRV, record.GetName()), mRecord(record) {}
 
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override
     {
