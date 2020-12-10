@@ -101,7 +101,6 @@ void TestAddDeleteFind(nlTestSuite * suite, void * context)
     NL_TEST_ASSERT(suite, foundEntry->mService.mPort == 103);
     NL_TEST_ASSERT(suite, pool.FindService(2, 0) == nullptr);
 
-    printf("Rehash\n");
     pool.ReHash();
 
     NL_TEST_ASSERT(suite, pool.FindService(96, 0) == nullptr);
