@@ -536,7 +536,7 @@ PacketBufferHandle PacketBufferHandle::PopHead()
     return PacketBufferHandle(head);
 }
 
-PacketBufferHandle PacketBufferHandle::Clone()
+PacketBufferHandle PacketBufferHandle::CloneData()
 {
     if (!mBuffer->Next().IsNull())
     {

@@ -177,7 +177,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
         /// The same packet needs to be sent over potentially multiple interfaces.
         /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
         /// TODO: this wastes one copy of the data and that could be optimized away
-        chip::System::PacketBufferHandle copy = data.Clone();
+        chip::System::PacketBufferHandle copy = data.CloneData();
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
@@ -219,7 +219,7 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
         /// The same packet needs to be sent over potentially multiple interfaces.
         /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
         /// TODO: this wastes one copy of the data and that could be optimized away
-        chip::System::PacketBufferHandle copy = data.Clone();
+        chip::System::PacketBufferHandle copy = data.CloneData();
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
