@@ -170,9 +170,10 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     char discriminatorBuf[5];  // hex representation of 16-bit discriminator
     char vendorProductBuf[10]; // "FFFF+FFFF"
     // TODO: The text entry will be updated in the spec, update accordingly.
-    TextEntry entries[2] = {
+    TextEntry entries[3] = {
         { "D", nullptr, 0 },
         { "VP", nullptr, 0 },
+        { "RI", nullptr, 0}
     };
 
     VerifyOrExit(mMdnsInitialized, error = CHIP_ERROR_INCORRECT_STATE);
@@ -189,6 +190,11 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     entries[0].mDataSize   = strnlen(discriminatorBuf, sizeof(discriminatorBuf));
     entries[1].mData       = reinterpret_cast<const uint8_t *>(vendorProductBuf);
     entries[1].mDataSize   = strnlen(discriminatorBuf, sizeof(vendorProductBuf));
+    // Rotating Device ID
+    entries[2].mData       = reinterpret_cast<const uint8_t *>("112233445566");
+    entries[2].mDataSize   = strnlen("112233445566", sizeof("112233445566"));
+
+
     service.mTextEntryies  = entries;
     service.mTextEntrySize = sizeof(entries) / sizeof(TextEntry);
     service.mPort          = CHIP_PORT;
