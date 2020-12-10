@@ -212,7 +212,6 @@ CHIP_ERROR SecurePairingSession::WaitForPairing(uint32_t mySetUpPINCode, uint32_
                                                 size_t saltLen, Optional<NodeId> myNodeId, uint16_t myKeyId,
                                                 SecurePairingSessionDelegate * delegate)
 {
-    //    size_t sizeof_point = sizeof(mPoint);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
