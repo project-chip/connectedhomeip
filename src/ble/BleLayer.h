@@ -66,8 +66,6 @@
 namespace chip {
 namespace Ble {
 
-using ::chip::System::PacketBuffer;
-
 /**
  *  @def NUM_SUPPORTED_PROTOCOL_VERSIONS
  *

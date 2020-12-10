@@ -35,7 +35,7 @@ void TestHelperWrittenAndParsedMatch(nlTestSuite * inSuite, void * inContext, Ms
     rcvBuf->SetDataLength(static_cast<uint16_t>(msgSize));
 
     MsgType testMsgRcvd;
-    err = testMsgRcvd.Parse(*rcvBuf);
+    err = testMsgRcvd.Parse(std::move(rcvBuf));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, testMsgRcvd == testMsg);
 }

@@ -1559,7 +1559,7 @@ CHIP_ERROR TLVReader::GetNextPacketBuffer(TLVReader & reader, uintptr_t & bufHan
     PacketBuffer *& buf = reinterpret_cast<PacketBuffer *&>(bufHandle);
 
     if (buf != nullptr)
-        buf = buf->Next();
+        buf = buf->Next_ForNow();
     if (buf != nullptr)
     {
         bufStart = buf->Start();

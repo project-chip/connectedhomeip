@@ -34,6 +34,7 @@
 #include <ble/BtpEngineTest.h>
 #endif
 
+#include <support/BufferReader.h>
 #include <support/CodeUtils.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -68,7 +69,7 @@ namespace Ble {
 
 static inline void IncSeqNum(SequenceNumber_t & a_seq_num)
 {
-    a_seq_num = 0xff & ((a_seq_num) + 1);
+    a_seq_num = static_cast<SequenceNumber_t>(0xff & ((a_seq_num) + 1));
 }
 
 static inline bool DidReceiveData(uint8_t rx_flags)
@@ -261,17 +262,17 @@ exit:
 BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle data, SequenceNumber_t & receivedAck,
                                                   bool & didReceiveAck)
 {
-    BLE_ERROR err            = BLE_NO_ERROR;
-    uint8_t rx_flags         = 0;
-    uint8_t cursor           = 0;
-    uint8_t * characteristic = data->Start();
+    BLE_ERROR err    = BLE_NO_ERROR;
+    uint8_t rx_flags = 0;
+    // BLE data uses little-endian byte order.
+    Encoding::LittleEndian::Reader reader(data->Start(), data->DataLength());
 
     VerifyOrExit(!data.IsNull(), err = BLE_ERROR_BAD_ARGS);
 
     mRxCharCount++;
 
     // Get header flags, always in first byte.
-    rx_flags = characteristic[cursor++];
+    VerifyOrExit(reader.Read8(&rx_flags).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 #if CHIP_ENABLE_CHIPOBLE_TEST
     if (GetFlag(rx_flags, kHeaderFlag_CommandMessage))
         SetRxPacketType(kType_Control);
@@ -284,14 +285,14 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
     // Get ack number, if any.
     if (didReceiveAck)
     {
-        receivedAck = characteristic[cursor++];
+        VerifyOrExit(reader.Read8(&receivedAck).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 
         err = HandleAckReceived(receivedAck);
         SuccessOrExit(err);
     }
 
     // Get sequence number.
-    mRxNewestUnackedSeqNum = characteristic[cursor++];
+    VerifyOrExit(reader.Read8(&mRxNewestUnackedSeqNum).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 
     // Verify that received sequence number is the next one we'd expect.
     VerifyOrExit(mRxNewestUnackedSeqNum == mRxNextSeqNum, err = BLE_ERROR_INVALID_BTP_SEQUENCE_NUMBER);
@@ -306,23 +307,32 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
     }
 
     // Truncate the incoming fragment length by the mRxFragmentSize as the negotiated
-    // mRxFragnentSize may be smaller than the characteristic size.
+    // mRxFragnentSize may be smaller than the characteristic size.  Make sure
+    // we're not truncating to a data length smaller than what we have already consumed.
+    VerifyOrExit(reader.OctetsRead() <= mRxFragmentSize, err = BLE_ERROR_REASSEMBLER_INCORRECT_STATE);
     data->SetDataLength(chip::min(data->DataLength(), mRxFragmentSize));
+
+    // Now mark the bytes we consumed as consumed.
+    data->ConsumeHead(reader.OctetsRead());
 
     ChipLogDebugBtpEngine(Ble, ">>> BTP reassembler received data:");
     PrintBufDebug(data);
 
     if (mRxState == kState_Idle)
     {
+        // We need a new reader, because the state of our outer reader no longer
+        // matches the state of the packetbuffer, both in terms of start
+        // position and available length.
+        Encoding::LittleEndian::Reader startReader(data->Start(), data->DataLength());
+
         // Verify StartMessage header flag set.
         VerifyOrExit(rx_flags & kHeaderFlag_StartMessage, err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
 
-        mRxLength = (characteristic[(cursor + 1)] << 8) | characteristic[cursor];
-        cursor += 2;
+        VerifyOrExit(startReader.Read16(&mRxLength).StatusCode() == CHIP_NO_ERROR, err = BLE_ERROR_MESSAGE_INCOMPLETE);
 
         mRxState = kState_InProgress;
 
-        data->SetStart(&(characteristic[cursor]));
+        data->ConsumeHead(startReader.OctetsRead());
 
         // Create a new buffer for use as the Rx re-assembly area.
         mRxBuf = PacketBuffer::New();
@@ -342,13 +352,12 @@ BLE_ERROR BtpEngine::HandleCharacteristicReceived(System::PacketBufferHandle dat
                      err = BLE_ERROR_INVALID_BTP_HEADER_FLAGS);
 
         // Add received fragment to reassembled message buffer.
-        data->SetStart(&(characteristic[cursor]));
         mRxBuf->AddToEnd(std::move(data));
         mRxBuf->CompactHead(); // will free 'data' and adjust rx buf's end/length
 
         // For now, limit BtpEngine message size to max length of 1 pbuf, as we do for chip messages sent via IP.
         // TODO add support for BtpEngine messages longer than 1 pbuf
-        VerifyOrExit(mRxBuf->Next() == nullptr, err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
+        VerifyOrExit(!mRxBuf->HasChainedBuffer(), err = BLE_ERROR_RECEIVED_MESSAGE_TOO_BIG);
     }
     else
     {
@@ -408,13 +417,13 @@ exit:
     return err;
 }
 
-void BtpEngine::ClearRxPacket()
+PacketBufferHandle BtpEngine::TakeRxPacket()
 {
     if (mRxState == kState_Complete)
     {
         mRxState = kState_Idle;
     }
-    mRxBuf = nullptr;
+    return std::move(mRxBuf);
 }
 
 // Calling convention:
@@ -481,12 +490,12 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         }
 
         characteristic[cursor++] = GetAndIncrementNextTxSeqNum();
-        characteristic[cursor++] = mTxLength & 0xff;
-        characteristic[cursor++] = mTxLength >> 8;
+        characteristic[cursor++] = static_cast<uint8_t>(mTxLength & 0xff);
+        characteristic[cursor++] = static_cast<uint8_t>(mTxLength >> 8);
 
         if ((mTxLength + cursor) <= mTxFragmentSize)
         {
-            mTxBuf->SetDataLength(mTxLength + cursor);
+            mTxBuf->SetDataLength(static_cast<uint16_t>(mTxLength + cursor));
             mTxLength = 0;
             SetFlag(characteristic[0], kHeaderFlag_EndMessage, true);
             mTxState = kState_Complete;
@@ -495,7 +504,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         else
         {
             mTxBuf->SetDataLength(mTxFragmentSize);
-            mTxLength -= mTxFragmentSize - cursor;
+            mTxLength = static_cast<uint16_t>((mTxLength + cursor) - mTxFragmentSize);
         }
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send first fragment:");
@@ -537,7 +546,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
 
         if ((mTxLength + cursor) <= mTxFragmentSize)
         {
-            mTxBuf->SetDataLength(mTxLength + cursor);
+            mTxBuf->SetDataLength(static_cast<uint16_t>(mTxLength + cursor));
             mTxLength = 0;
             SetFlag(characteristic[0], kHeaderFlag_EndMessage, true);
             mTxState = kState_Complete;
@@ -546,7 +555,7 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
         else
         {
             mTxBuf->SetDataLength(mTxFragmentSize);
-            mTxLength -= mTxFragmentSize - cursor;
+            mTxLength = static_cast<uint16_t>((mTxLength + cursor) - mTxFragmentSize);
         }
 
         ChipLogDebugBtpEngine(Ble, ">>> CHIPoBle preparing to send additional fragment:");
@@ -561,13 +570,13 @@ bool BtpEngine::HandleCharacteristicSend(System::PacketBufferHandle data, bool s
     return true;
 }
 
-void BtpEngine::ClearTxPacket()
+PacketBufferHandle BtpEngine::TakeTxPacket()
 {
     if (mTxState == kState_Complete)
     {
         mTxState = kState_Idle;
     }
-    mTxBuf = nullptr;
+    return std::move(mTxBuf);
 }
 
 void BtpEngine::LogState() const

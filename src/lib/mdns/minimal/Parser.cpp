@@ -66,6 +66,25 @@ bool QueryData::Parse(const BytesRange & validData, const uint8_t ** start)
     return true;
 }
 
+bool QueryData::Append(HeaderRef & hdr, chip::Encoding::BigEndian::BufferWriter & out) const
+{
+    if ((hdr.GetAdditionalCount() != 0) || (hdr.GetAnswerCount() != 0) || (hdr.GetAuthorityCount() != 0))
+    {
+        return false;
+    }
+
+    GetName().Put(out);
+    out.Put16(static_cast<uint16_t>(mType));
+    out.Put16(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0));
+
+    if (out.Fit())
+    {
+        hdr.SetQueryCount(static_cast<uint16_t>(hdr.GetQueryCount() + 1));
+    }
+
+    return out.Fit();
+}
+
 bool ResourceData::Parse(const BytesRange & validData, const uint8_t ** start)
 {
     // Structure is:

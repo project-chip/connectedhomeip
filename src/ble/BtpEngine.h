@@ -93,8 +93,8 @@ public:
     // Public functions:
     BLE_ERROR Init(void * an_app_state, bool expect_first_ack);
 
-    inline void SetTxFragmentSize(uint8_t size) { mTxFragmentSize = size; }
-    inline void SetRxFragmentSize(uint8_t size) { mRxFragmentSize = size; }
+    inline void SetTxFragmentSize(uint16_t size) { mTxFragmentSize = size; }
+    inline void SetRxFragmentSize(uint16_t size) { mRxFragmentSize = size; }
 
     uint16_t GetRxFragmentSize() { return mRxFragmentSize; }
     uint16_t GetTxFragmentSize() { return mTxFragmentSize; }
@@ -139,12 +139,12 @@ public:
     bool HandleCharacteristicSend(System::PacketBufferHandle data, bool send_ack);
     BLE_ERROR EncodeStandAloneAck(const PacketBufferHandle & data);
 
-    void ClearRxPacket();
-    PacketBufferHandle TakeRxPacket() { return std::move(mRxBuf); }
+    PacketBufferHandle TakeRxPacket();
     PacketBufferHandle BorrowRxPacket() { return mRxBuf.Retain(); }
-    void ClearTxPacket();
-    PacketBufferHandle TakeTxPacket() { return std::move(mTxBuf); }
+    void ClearRxPacket() { (void) TakeRxPacket(); }
+    PacketBufferHandle TakeTxPacket();
     PacketBufferHandle BorrowTxPacket() { return mTxBuf.Retain(); }
+    void ClearTxPacket() { (void) TakeTxPacket(); }
 
     void LogState() const;
     void LogStateDebug() const;

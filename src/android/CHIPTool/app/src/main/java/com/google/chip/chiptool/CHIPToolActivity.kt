@@ -29,7 +29,7 @@ import com.google.chip.chiptool.clusterclient.OnOffClientFragment
 import com.google.chip.chiptool.commissioner.CommissionerActivity
 import com.google.chip.chiptool.echoclient.EchoClientFragment
 import com.google.chip.chiptool.provisioning.DeviceProvisioningFragment
-import com.google.chip.chiptool.provisioning.EnterWifiNetworkFragment
+import com.google.chip.chiptool.provisioning.ProvisionNetworkType
 import com.google.chip.chiptool.setuppayloadscanner.BarcodeFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceDetailsFragment
 import com.google.chip.chiptool.setuppayloadscanner.CHIPDeviceInfo
@@ -39,7 +39,9 @@ class CHIPToolActivity :
     AppCompatActivity(),
     BarcodeFragment.Callback,
     SelectActionFragment.Callback,
-    CHIPDeviceDetailsFragment.Callback {
+    DeviceProvisioningFragment.Callback {
+
+  private var networkType: ProvisionNetworkType? = null
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -51,22 +53,45 @@ class CHIPToolActivity :
           .beginTransaction()
           .add(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
           .commit()
+    } else {
+      networkType =
+          ProvisionNetworkType.fromName(savedInstanceState.getString(ARG_PROVISION_NETWORK_TYPE))
     }
 
     if (intent?.action == NfcAdapter.ACTION_NDEF_DISCOVERED)
       onNfcIntent(intent)
   }
 
-  override fun onStartRendezvousOverBle(deviceInfo: CHIPDeviceInfo) {
-    showFragment(DeviceProvisioningFragment.newInstance(deviceInfo))
+  override fun onSaveInstanceState(outState: Bundle) {
+    outState.putString(ARG_PROVISION_NETWORK_TYPE, networkType?.name)
+
+    super.onSaveInstanceState(outState)
   }
 
   override fun onCHIPDeviceInfoReceived(deviceInfo: CHIPDeviceInfo) {
-    showFragment(CHIPDeviceDetailsFragment.newInstance(deviceInfo))
+    if (networkType == null) {
+      showFragment(CHIPDeviceDetailsFragment.newInstance(deviceInfo))
+    } else {
+      showFragment(DeviceProvisioningFragment.newInstance(deviceInfo, networkType!!), false)
+    }
+  }
+
+  override fun onPairingComplete() {
+    showFragment(OnOffClientFragment.newInstance(), false)
   }
 
   override fun handleScanQrCodeClicked() {
     showFragment(BarcodeFragment.newInstance())
+  }
+
+  override fun onProvisionWifiCredentialsClicked() {
+    networkType = ProvisionNetworkType.WIFI
+    showFragment(BarcodeFragment.newInstance(), false)
+  }
+
+  override fun onProvisionThreadCredentialsClicked() {
+    networkType = ProvisionNetworkType.THREAD
+    showFragment(BarcodeFragment.newInstance(), false)
   }
 
   override fun handleCommissioningClicked() {
@@ -95,12 +120,16 @@ class CHIPToolActivity :
     }
   }
 
-  private fun showFragment(fragment: Fragment) {
-    supportFragmentManager
+  private fun showFragment(fragment: Fragment, showOnBack: Boolean = true) {
+    val fragmentTransaction = supportFragmentManager
         .beginTransaction()
         .replace(R.id.fragment_container, fragment, fragment.javaClass.simpleName)
-        .addToBackStack(null)
-        .commit()
+
+    if (showOnBack) {
+      fragmentTransaction.addToBackStack(null)
+    }
+
+    fragmentTransaction.commit()
   }
 
   private fun onNfcIntent(intent: Intent?) {
@@ -129,6 +158,8 @@ class CHIPToolActivity :
   }
 
   companion object {
+    private const val ARG_PROVISION_NETWORK_TYPE = "provision_network_type"
+
     var REQUEST_CODE_COMMISSIONING = 0xB003
   }
 }

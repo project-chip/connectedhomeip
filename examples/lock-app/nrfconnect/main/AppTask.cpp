@@ -387,7 +387,7 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
 
     if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
-        ConnectivityMgr().SetBLEAdvertisingEnabled(ConnectivityManager::kCHIPoBLEServiceMode_Enabled);
+        ConnectivityMgr().SetBLEAdvertisingEnabled(true);
         LOG_INF("Enabled BLE Advertisement");
     }
     else

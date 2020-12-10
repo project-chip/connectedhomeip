@@ -35,7 +35,13 @@ class SelectActionFragment : Fragment() {
   ): View {
     return inflater.inflate(R.layout.select_action_fragment, container, false).apply {
       scanQrBtn.setOnClickListener { getCallback()?.handleScanQrCodeClicked() }
-      commissioningBtn.setOnClickListener { getCallback()?.handleCommissioningClicked() }
+      provisionWifiCredentialsBtn.setOnClickListener {
+        getCallback()?.onProvisionWifiCredentialsClicked()
+      }
+      provisionThreadCredentialsBtn.setOnClickListener {
+        getCallback()?.onProvisionThreadCredentialsClicked()
+      }
+      otCommissioningBtn.setOnClickListener { getCallback()?.handleCommissioningClicked() }
       echoClientBtn.setOnClickListener { getCallback()?.handleEchoClientClicked() }
       onOffClusterBtn.setOnClickListener { getCallback()?.handleOnOffClicked() }
       attestationTestBtn.setOnClickListener { getCallback()?.handleAttestationTestClicked() }
@@ -48,6 +54,10 @@ class SelectActionFragment : Fragment() {
   interface Callback {
     /** Notifies listener of Scan QR code button click. */
     fun handleScanQrCodeClicked()
+    /** Notifies listener of provision-Wifi-credentials button click. */
+    fun onProvisionWifiCredentialsClicked()
+    /** Notifies listener of provision-Thread-credentials button click. */
+    fun onProvisionThreadCredentialsClicked()
     /** Notifies listener of Commissioning button click. */
     fun handleCommissioningClicked()
     /** Notifies listener of Echo client button click. */

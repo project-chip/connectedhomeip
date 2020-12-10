@@ -25,9 +25,13 @@ using Sections = std::map<String, Section>;
 
 using namespace ::chip;
 using namespace ::chip::Controller;
+using namespace ::chip::Logging;
 
 constexpr const char kFilename[]           = "/tmp/chip_tool_config.ini";
 constexpr const char kDefaultSectionName[] = "Default";
+constexpr const char kPortKey[]            = "ListenPort";
+constexpr const char kLoggingKey[]         = "LoggingLevel";
+constexpr LogCategory kDefaultLoggingLevel = kLogCategory_Detail;
 
 CHIP_ERROR PersistentStorage::Init()
 {
@@ -66,7 +70,7 @@ CHIP_ERROR PersistentStorage::GetKeyValue(const char * key, char * value, uint16
     VerifyOrExit(inipp::extract(section[key], iniValue), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     iniValueLength = iniValue.size();
-    VerifyOrExit(iniValueLength < static_cast<size_t>(size) - 1, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+    VerifyOrExit(iniValueLength <= static_cast<size_t>(size) - 1, err = CHIP_ERROR_BUFFER_TOO_SMALL);
 
     iniValueLength        = iniValue.copy(value, iniValueLength);
     value[iniValueLength] = '\0';
@@ -80,7 +84,7 @@ void PersistentStorage::SetKeyValue(const char * key, const char * value)
     auto section = mConfig.sections[kDefaultSectionName];
     section[key] = std::string(value);
 
-    mConfig.default_section(section);
+    mConfig.sections[kDefaultSectionName] = section;
     CommitConfig();
 }
 
@@ -89,7 +93,7 @@ void PersistentStorage::DeleteKeyValue(const char * key)
     auto section = mConfig.sections[kDefaultSectionName];
     section.erase(key);
 
-    mConfig.default_section(section);
+    mConfig.sections[kDefaultSectionName] = section;
     CommitConfig();
 }
 
@@ -111,4 +115,61 @@ CHIP_ERROR PersistentStorage::CommitConfig()
 
 exit:
     return err;
+}
+
+uint16_t PersistentStorage::GetListenPort()
+{
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    uint16_t chipListenPort = CHIP_PORT;
+
+    char value[6];
+    uint16_t size = static_cast<uint16_t>(sizeof(value));
+    err           = GetKeyValue(kPortKey, value, size);
+    if (CHIP_NO_ERROR == err)
+    {
+        uint16_t tmpValue;
+        std::stringstream ss(value);
+        ss >> tmpValue;
+        if (!ss.fail() && ss.eof())
+        {
+            chipListenPort = tmpValue;
+        }
+    }
+
+    return chipListenPort;
+}
+
+LogCategory PersistentStorage::GetLoggingLevel()
+{
+    CHIP_ERROR err           = CHIP_NO_ERROR;
+    LogCategory chipLogLevel = kDefaultLoggingLevel;
+
+    char value[9];
+    uint16_t size = static_cast<uint16_t>(sizeof(value));
+    err           = GetKeyValue(kLoggingKey, value, size);
+    if (CHIP_NO_ERROR == err)
+    {
+        if (strcasecmp(value, "none") == 0)
+        {
+            chipLogLevel = kLogCategory_None;
+        }
+        else if (strcasecmp(value, "error") == 0)
+        {
+            chipLogLevel = kLogCategory_Error;
+        }
+        else if (strcasecmp(value, "progress") == 0)
+        {
+            chipLogLevel = kLogCategory_Progress;
+        }
+        else if (strcasecmp(value, "detail") == 0)
+        {
+            chipLogLevel = kLogCategory_Detail;
+        }
+        else if (strcasecmp(value, "retain") == 0)
+        {
+            chipLogLevel = kLogCategory_Retain;
+        }
+    }
+
+    return chipLogLevel;
 }

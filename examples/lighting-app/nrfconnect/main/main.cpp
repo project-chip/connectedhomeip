@@ -17,13 +17,13 @@
  */
 
 #include "AppTask.h"
+#include "LogUtils.h"
+#include "Rpc.h"
 
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPMem.h>
 
-#include <logging/log.h>
-
-LOG_MODULE_REGISTER(app);
+#include <kernel.h>
 
 using namespace ::chip;
 using namespace ::chip::Inet;
@@ -31,6 +31,7 @@ using namespace ::chip::DeviceLayer;
 
 int main(void)
 {
+    chip::rpc::Init();
     int ret = 0;
 
     k_thread_priority_set(k_current_get(), K_PRIO_COOP(CONFIG_NUM_COOP_PRIORITIES - 1));

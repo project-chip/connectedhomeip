@@ -19,22 +19,29 @@
 
 #include <system/SystemPacketBuffer.h>
 
-#include "DnsHeader.h"
-#include "ResourceRecord.h"
+#include <mdns/minimal/core/DnsHeader.h>
+#include <mdns/minimal/records/ResourceRecord.h>
 
 namespace mdns {
 namespace Minimal {
 
+/// Writes a MDNS reply into a given packet buffer.
 class ResponseBuilder
 {
 public:
-    ResponseBuilder(chip::System::PacketBuffer * packet) : mPacket(packet), mHeader(mPacket->Start())
+    ResponseBuilder() : mHeader(nullptr) {}
+    ResponseBuilder(chip::System::PacketBufferHandle && packet) : mHeader(nullptr) { Reset(std::move(packet)); }
+
+    ResponseBuilder & Reset(chip::System::PacketBufferHandle && packet)
     {
+        mPacket = std::move(packet);
+        mHeader = HeaderRef(mPacket->Start());
 
         if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
         {
             mPacket->SetDataLength(HeaderRef::kSizeBytes);
             mHeader.Clear();
+            mBuildOk = true;
         }
         else
         {
@@ -42,6 +49,20 @@ public:
         }
 
         mHeader.SetFlags(mHeader.GetFlags().SetResponse());
+        return *this;
+    }
+
+    CHECK_RETURN_VALUE
+    chip::System::PacketBufferHandle && ReleasePacket()
+    {
+        mHeader  = HeaderRef(nullptr);
+        mBuildOk = false;
+        return std::move(mPacket);
+    }
+
+    bool HasResponseRecords() const
+    {
+        return (mHeader.GetAnswerCount() != 0) || (mHeader.GetAuthorityCount() != 0) || (mHeader.GetAdditionalCount() != 0);
     }
 
     HeaderRef & Header() { return mHeader; }
@@ -56,7 +77,7 @@ public:
             return *this;
         }
 
-        chip::BufBound out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
+        chip::Encoding::BigEndian::BufferWriter out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
 
         if (!record.Append(mHeader, type, out))
         {
@@ -64,17 +85,38 @@ public:
         }
         else
         {
-            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Written()));
+            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Needed()));
+        }
+        return *this;
+    }
+
+    ResponseBuilder & AddQuery(const QueryData & query)
+    {
+        if (!mBuildOk)
+        {
+            return *this;
+        }
+
+        chip::Encoding::BigEndian::BufferWriter out(mPacket->Start() + mPacket->DataLength(), mPacket->AvailableDataLength());
+
+        if (!query.Append(mHeader, out))
+        {
+            mBuildOk = false;
+        }
+        else
+        {
+            mPacket->SetDataLength(static_cast<uint16_t>(mPacket->DataLength() + out.Needed()));
         }
         return *this;
     }
 
     bool Ok() const { return mBuildOk; }
+    bool HasPacketBuffer() const { return !mPacket.IsNull(); }
 
 private:
-    chip::System::PacketBuffer * mPacket;
+    chip::System::PacketBufferHandle mPacket;
     HeaderRef mHeader;
-    bool mBuildOk = true;
+    bool mBuildOk = false;
 };
 
 } // namespace Minimal

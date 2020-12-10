@@ -82,6 +82,7 @@ CHIP_ERROR PairingCommand::PairWithoutSecurity(NodeId remoteId, PeerAddress addr
 
 CHIP_ERROR PairingCommand::Unpair(NodeId remoteId)
 {
+    UpdateWaitForResponse(false);
     return mCommissioner.UnpairDevice(remoteId);
 }
 

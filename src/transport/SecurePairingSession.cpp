@@ -197,7 +197,7 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
 
     payloadHeader
         .SetMessageType(msgType) //
-        .SetProtocolID(Protocols::kProtocol_SecurityChannel);
+        .SetProtocolID(Protocols::kProtocol_SecureChannel);
 
     uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize = 0;
@@ -405,6 +405,10 @@ CHIP_ERROR SecurePairingSession::HandleCompute_cA(const PacketHeader & header, c
     CHIP_ERROR err       = CHIP_NO_ERROR;
     const uint8_t * hash = msg->Start();
 
+    // We will set NextExpectedMsg to kSpake2pMsgTypeMax in all cases
+    // However, when we are using IP rendezvous, we might set it to kSpake2pCompute_pA.
+    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
+
     VerifyOrExit(hash != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(msg->TotalLength() == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
@@ -423,8 +427,6 @@ CHIP_ERROR SecurePairingSession::HandleCompute_cA(const PacketHeader & header, c
     mDelegate->OnPairingComplete();
 
 exit:
-
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
     return err;
 }
 
@@ -442,7 +444,7 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
 
     msg->ConsumeHead(headerSize);
 
-    VerifyOrExit(payloadHeader.GetProtocolID() == Protocols::kProtocol_SecurityChannel, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
+    VerifyOrExit(payloadHeader.GetProtocolID() == Protocols::kProtocol_SecureChannel, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
     VerifyOrExit(payloadHeader.GetMessageType() == (uint8_t) mNextExpectedMsg, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
 
     mPeerAddress = peerAddress;

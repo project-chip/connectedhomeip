@@ -14,11 +14,12 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-#include "TestQRCodeTLV.h"
 #include "TestHelpers.h"
 
 #include <nlbyteorder.h>
 #include <nlunit-test.h>
+
+#include <support/UnitTestRegistration.h>
 
 using namespace chip;
 using namespace std;
@@ -328,3 +329,5 @@ int TestQRCodeTLV()
 
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestQRCodeTLV);

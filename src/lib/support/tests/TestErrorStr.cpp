@@ -15,9 +15,6 @@
  *    See the License for the specific language governing permissions and
  *    limitations under the License.
  */
-
-#include "TestSupport.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,6 +22,7 @@
 #include <core/CHIPCore.h>
 
 #include <support/ErrorStr.h>
+#include <support/UnitTestRegistration.h>
 
 using namespace chip;
 
@@ -175,3 +173,5 @@ int TestErrorStr(void)
 
     return EXIT_SUCCESS;
 }
+
+CHIP_REGISTER_TEST_SUITE(TestErrorStr);

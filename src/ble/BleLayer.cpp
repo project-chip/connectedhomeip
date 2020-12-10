@@ -100,7 +100,7 @@ class BleEndPointPool
 public:
     int Size() const { return BLE_LAYER_NUM_BLE_ENDPOINTS; }
 
-    BLEEndPoint * Get(int i) const
+    BLEEndPoint * Get(size_t i) const
     {
         static union
         {
@@ -123,7 +123,7 @@ public:
             return nullptr;
         }
 
-        for (int i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
+        for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
         {
             BLEEndPoint * elem = Get(i);
             if (elem->mBle != nullptr && elem->mConnObj == c)
@@ -137,7 +137,7 @@ public:
 
     BLEEndPoint * GetFree() const
     {
-        for (int i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
+        for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
         {
             BLEEndPoint * elem = Get(i);
             if (elem->mBle == nullptr)
@@ -192,13 +192,14 @@ void BleTransportCapabilitiesRequestMessage::SetSupportedProtocolVersion(uint8_t
     else
     {
         mask    = 0xF0;
-        version = version << 4;
+        version = static_cast<uint8_t>(version << 4);
     }
 
     version &= mask;
 
-    mSupportedProtocolVersions[(index / 2)] &= ~mask; // Clear version at index; leave other version in same byte alone
-    mSupportedProtocolVersions[(index / 2)] |= version;
+    uint8_t & slot = mSupportedProtocolVersions[(index / 2)];
+    slot           = static_cast<uint8_t>(slot & ~mask); // Clear version at index; leave other version in same byte alone
+    slot |= version;
 }
 
 BLE_ERROR BleTransportCapabilitiesRequestMessage::Encode(const PacketBufferHandle & msgBuf) const
@@ -346,7 +347,7 @@ BLE_ERROR BleLayer::Shutdown()
     mState = kState_NotInitialized;
 
     // Close and free all BLE end points.
-    for (int i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
+    for (size_t i = 0; i < BLE_LAYER_NUM_BLE_ENDPOINTS; i++)
     {
         BLEEndPoint * elem = sBLEEndPointPool.Get(i);
 

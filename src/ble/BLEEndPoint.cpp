@@ -106,8 +106,9 @@ BLE_ERROR BLEEndPoint::StartConnect()
     BLE_ERROR err = BLE_NO_ERROR;
     BleTransportCapabilitiesRequestMessage req;
     PacketBufferHandle buf;
-    int i;
-    int numVersions;
+    constexpr uint8_t numVersions =
+        CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION - CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION + 1;
+    static_assert(numVersions <= NUM_SUPPORTED_PROTOCOL_VERSIONS, "Incompatibly protocol versions");
 
     // Ensure we're in the correct state.
     VerifyOrExit(mState == kState_Ready, err = BLE_ERROR_INCORRECT_STATE);
@@ -125,11 +126,9 @@ BLE_ERROR BLEEndPoint::StartConnect()
     req.mWindowSize = BLE_MAX_RECEIVE_WINDOW_SIZE;
 
     // Populate request with highest supported protocol versions
-    numVersions = CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION - CHIP_BLE_TRANSPORT_PROTOCOL_MIN_SUPPORTED_VERSION + 1;
-    VerifyOrExit(numVersions <= NUM_SUPPORTED_PROTOCOL_VERSIONS, err = BLE_ERROR_INCOMPATIBLE_PROTOCOL_VERSIONS);
-    for (i = 0; i < numVersions; i++)
+    for (uint8_t i = 0; i < numVersions; i++)
     {
-        req.SetSupportedProtocolVersion(i, CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION - i);
+        req.SetSupportedProtocolVersion(i, static_cast<uint8_t>(CHIP_BLE_TRANSPORT_PROTOCOL_MAX_SUPPORTED_VERSION - i));
     }
 
     err = req.Encode(buf);
@@ -241,7 +240,7 @@ void BLEEndPoint::HandleSubscribeReceived()
     }
 
     // Shrink remote receive window counter by 1, since we've sent an indication which requires acknowledgement.
-    mRemoteReceiveWindowSize -= 1;
+    mRemoteReceiveWindowSize = static_cast<SequenceNumber_t>(mRemoteReceiveWindowSize - 1);
     ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
 
     // Start ack recvd timer for handshake indication.
@@ -610,7 +609,7 @@ BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle buf)
         else
         {
             // Write succeeded, so shrink remote receive window counter by 1.
-            mRemoteReceiveWindowSize -= 1;
+            mRemoteReceiveWindowSize = static_cast<SequenceNumber_t>(mRemoteReceiveWindowSize - 1);
             ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
         }
     }
@@ -623,7 +622,7 @@ BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle buf)
         else
         {
             // Indication succeeded, so shrink remote receive window counter by 1.
-            mRemoteReceiveWindowSize -= 1;
+            mRemoteReceiveWindowSize = static_cast<SequenceNumber_t>(mRemoteReceiveWindowSize - 1);
             ChipLogDebugBleEndPoint(Ble, "decremented remote rx window, new size = %u", mRemoteReceiveWindowSize);
         }
     }
@@ -670,11 +669,11 @@ BLE_ERROR BLEEndPoint::Send(PacketBufferHandle data)
 
     // Ensure outgoing message fits in a single contiguous PacketBuffer, as currently required by the
     // message fragmentation and reassembly engine.
-    if (data->Next() != nullptr)
+    if (data->HasChainedBuffer())
     {
         data->CompactHead();
 
-        if (data->Next() != nullptr)
+        if (data->HasChainedBuffer())
         {
             err = BLE_ERROR_OUTBOUND_MESSAGE_TOO_BIG;
             ExitNow();
@@ -1064,7 +1063,6 @@ BLE_ERROR BLEEndPoint::DriveSending()
 #if CHIP_ENABLE_CHIPOBLE_TEST
         mBtpEngineTest.DoTxTiming(sentBuf, BTP_TX_DONE);
 #endif // CHIP_ENABLE_CHIPOBLE_TEST
-        mBtpEngine.ClearTxPacket();
 
         if (!mSendQueue.IsNull())
         {
@@ -1222,7 +1220,7 @@ BLE_ERROR BLEEndPoint::HandleCapabilitiesResponseReceived(PacketBufferHandle dat
     ChipLogProgress(Ble, "local and remote recv window size = %u", resp.mWindowSize);
 
     // Shrink local receive window counter by 1, since connect handshake indication requires acknowledgement.
-    mLocalReceiveWindowSize -= 1;
+    mLocalReceiveWindowSize = static_cast<SequenceNumber_t>(mLocalReceiveWindowSize - 1);
     ChipLogDebugBleEndPoint(Ble, "decremented local rx window, new size = %u", mLocalReceiveWindowSize);
 
     // Send ack for connection handshake indication when timer expires. Sequence numbers always start at 0,
@@ -1252,17 +1250,17 @@ SequenceNumber_t BLEEndPoint::AdjustRemoteReceiveWindow(SequenceNumber_t lastRec
     //             also wrap.
 
     // Define new window boundary (inclusive) as uint16_t, so its value can temporarily exceed UINT8_MAX.
-    uint16_t newRemoteWindowBoundary = lastReceivedAck + maxRemoteWindowSize;
+    uint16_t newRemoteWindowBoundary = static_cast<uint16_t>(lastReceivedAck + maxRemoteWindowSize);
 
     if (newRemoteWindowBoundary > UINT8_MAX && newestUnackedSentSeqNum < lastReceivedAck)
     {
         // New window boundary WOULD wrap, and latest unacked seq num already HAS wrapped, so add offset to difference.
-        return (newRemoteWindowBoundary - (newestUnackedSentSeqNum + UINT8_MAX));
+        return static_cast<uint8_t>(newRemoteWindowBoundary - (newestUnackedSentSeqNum + UINT8_MAX));
     }
 
     // Neither values would or have wrapped, OR new boundary WOULD wrap but latest unacked seq num does not, so no
     // offset required.
-    return (newRemoteWindowBoundary - newestUnackedSentSeqNum);
+    return static_cast<uint8_t>(newRemoteWindowBoundary - newestUnackedSentSeqNum);
 }
 
 BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
@@ -1347,7 +1345,7 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
     SuccessOrExit(err);
 
     // Protocol engine accepted the fragment, so shrink local receive window counter by 1.
-    mLocalReceiveWindowSize -= 1;
+    mLocalReceiveWindowSize = static_cast<SequenceNumber_t>(mLocalReceiveWindowSize - 1);
     ChipLogDebugBleEndPoint(Ble, "decremented local rx window, new size = %u", mLocalReceiveWindowSize);
 
     // Respond to received ack, if any.
@@ -1428,7 +1426,6 @@ BLE_ERROR BLEEndPoint::Receive(PacketBufferHandle data)
     {
         // Take ownership of message PacketBuffer
         System::PacketBufferHandle full_packet = mBtpEngine.TakeRxPacket();
-        mBtpEngine.ClearRxPacket();
 
         ChipLogDebugBleEndPoint(Ble, "reassembled whole msg, len = %d", full_packet->DataLength());
 

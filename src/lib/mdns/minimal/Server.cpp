@@ -19,11 +19,7 @@
 
 #include <errno.h>
 
-#if CONFIG_DEVICE_LAYER
-#include <platform/CHIPDeviceLayer.h>
-#endif
-
-#include "DnsHeader.h"
+#include <mdns/minimal/core/DnsHeader.h>
 
 namespace mdns {
 namespace Minimal {
@@ -84,11 +80,10 @@ void ServerBase::Shutdown()
     }
 }
 
-CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
+CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port)
 {
     Shutdown(); // ensure everything starts fresh
 
-#if CONFIG_DEVICE_LAYER
     size_t endpointIndex                = 0;
     chip::Inet::InterfaceId interfaceId = INET_NULL_INTERFACEID;
     chip::Inet::IPAddressType addressType;
@@ -105,7 +100,7 @@ CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
         EndpointInfo * info = &mEndpoints[endpointIndex];
         info->addressType   = addressType;
 
-        CHIP_ERROR err = chip::DeviceLayer::InetLayer.NewUDPEndPoint(&info->udp);
+        CHIP_ERROR err = inetLayer->NewUDPEndPoint(&info->udp);
         if (err != CHIP_NO_ERROR)
         {
             return err;
@@ -130,12 +125,9 @@ CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
     }
 
     return autoShutdown.ReturnSuccess();
-#else // #if CONFIG_DEVICE_LAYER
-    return CHIP_ERROR_NOT_IMPLEMENTED;
-#endif
 }
 
-CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBuffer * data, const chip::Inet::IPAddress & addr, uint16_t port,
+CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                                   chip::Inet::InterfaceId interface)
 {
     for (size_t i = 0; i < mEndpointCount; i++)
@@ -158,11 +150,53 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBuffer * data, const chip:
             continue;
         }
 
-        return info->udp->SendTo(addr, port, data);
+        return info->udp->SendTo(addr, port, data.Release_ForNow());
     }
 
-    chip::System::PacketBuffer::Free(data);
     return CHIP_ERROR_NOT_CONNECTED;
+}
+
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface)
+{
+    for (size_t i = 0; i < mEndpointCount; i++)
+    {
+        EndpointInfo * info = &mEndpoints[i];
+
+        if (info->udp == nullptr)
+        {
+            continue;
+        }
+
+        if ((info->udp->GetBoundInterface() != interface) && (info->udp->GetBoundInterface() != INET_NULL_INTERFACEID))
+        {
+            continue;
+        }
+
+        // data may be sent over multiple packets. Keep the one ref active all the time
+        chip::System::PacketBufferHandle extraCopy = data.Retain();
+
+        CHIP_ERROR err;
+
+        if (info->addressType == chip::Inet::kIPAddressType_IPv6)
+        {
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), extraCopy.Release_ForNow());
+        }
+        else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
+        {
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), extraCopy.Release_ForNow());
+        }
+        else
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+    }
+
+    return CHIP_NO_ERROR;
 }
 
 CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t port)

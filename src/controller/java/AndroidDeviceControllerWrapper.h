@@ -22,6 +22,7 @@
 #include <jni.h>
 
 #include <controller/CHIPDeviceController_deprecated.h>
+#include <platform/internal/DeviceNetworkInfo.h>
 
 /**
  * This class contains all relevant information for the JNI view of CHIPDeviceController
@@ -38,8 +39,7 @@ public:
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     void SendNetworkCredentials(const char * ssid, const char * password);
-
-    void DeprecatedHardcodeThreadCredentials();
+    void SendThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData);
 
     // DevicePairingDelegate implementation
     void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;

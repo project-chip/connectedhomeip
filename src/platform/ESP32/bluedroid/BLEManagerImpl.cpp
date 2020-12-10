@@ -96,8 +96,8 @@ enum
 const esp_gatts_attr_db_t CHIPoBLEGATTAttrs[] = {
     // Service Declaration for Chip over BLE Service
     { { ESP_GATT_AUTO_RSP },
-      { ESP_UUID_LEN_16, (uint8_t *) UUID_PrimaryService, ESP_GATT_PERM_READ, ESP_UUID_LEN_128, ESP_UUID_LEN_128,
-        (uint8_t *) UUID_CHIPoBLEService } },
+      { ESP_UUID_LEN_16, (uint8_t *) UUID_PrimaryService, ESP_GATT_PERM_READ, ESP_UUID_LEN_16, ESP_UUID_LEN_16,
+        (uint8_t *) ShortUUID_CHIPoBLEService } },
 
     // ----- Chip over BLE RX Characteristic -----
 
@@ -248,13 +248,10 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
         HandleUnsubscribeReceived(event->CHIPoBLEUnsubscribe.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
         break;
 
-    case DeviceEventType::kCHIPoBLEWriteReceived: {
-        System::PacketBufferHandle data_ForNow;
-        data_ForNow.Adopt(event->CHIPoBLEWriteReceived.Data);
+    case DeviceEventType::kCHIPoBLEWriteReceived:
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
-                            std::move(data_ForNow));
-    }
-    break;
+                            PacketBufferHandle::Create(event->CHIPoBLEWriteReceived.Data));
+        break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
         HandleIndicationConfirmation(event->CHIPoBLEIndicateConfirm.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_TX);
@@ -1146,12 +1143,7 @@ BLEManagerImpl::CHIPoBLEConState * BLEManagerImpl::GetConnectionState(uint16_t c
     {
         if (freeIndex < kMaxConnections)
         {
-            mCons[freeIndex].PendingIndBuf = nullptr;
-            mCons[freeIndex].ConId         = conId;
-            mCons[freeIndex].MTU           = 0;
-            mCons[freeIndex].Allocated     = 1;
-            mCons[freeIndex].Subscribed    = 0;
-            mCons[freeIndex].Unused        = 0;
+            mCons[freeIndex].Set(conId);
             return &mCons[freeIndex];
         }
 
@@ -1167,8 +1159,7 @@ bool BLEManagerImpl::ReleaseConnectionState(uint16_t conId)
     {
         if (mCons[i].Allocated && mCons[i].ConId == conId)
         {
-            mCons[i].PendingIndBuf = nullptr;
-            mCons[i].Allocated     = 0;
+            mCons[i].Reset();
             return true;
         }
     }
