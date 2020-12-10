@@ -45,9 +45,7 @@ source_set("lock-common") {
     "gen/callback-stub.cpp",
   ]
 
-  deps = [
-    "${chip_root}/src/lib",
-  ]
+  deps = [ "${chip_root}/src/lib" ]
 
   public_configs = [ ":includes" ]
 }

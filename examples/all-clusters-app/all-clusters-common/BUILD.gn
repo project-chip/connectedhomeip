@@ -61,9 +61,7 @@ source_set("all-clusters-common") {
     "gen/callback-stub.cpp",
   ]
 
-  deps = [
-    "${chip_root}/src/lib",
-  ]
+  deps = [ "${chip_root}/src/lib" ]
 
   public_configs = [ ":includes" ]
 }

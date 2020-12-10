@@ -18,19 +18,18 @@ static_library("accessory") {
   output_name = "libCHIPAccessory"
 
   sources = [
+    "QRCodeUtil.cpp",
+    "QRCodeUtil.h",
     "RendezvousServer.cpp",
     "RendezvousServer.h",
     "Server.cpp",
     "Server.h",
-    "QRCodeUtil.cpp",
-    "QRCodeUtil.h",
   ]
 
   public_deps = [
-    "${chip_root}/src/platform",
-    "${chip_root}/src/transport",
-    "${chip_root}/src/setup_payload",
     "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/platform",
+    "${chip_root}/src/setup_payload",
+    "${chip_root}/src/transport",
   ]
-
 }
