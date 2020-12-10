@@ -105,6 +105,8 @@ public:
 #if !defined(NDEBUG)
     CHIP_ERROR _RunUnitTests(void);
 #endif
+    CHIP_ERROR _SetFullyProvisioned(bool provisioned);
+
     bool _IsServiceProvisioned();
     bool _IsMemberOfFabric();
     bool _IsPairedToAccount();
@@ -123,6 +125,7 @@ protected:
         kFlag_IsPairedToAccount                       = 0x04,
         kFlag_OperationalDeviceCredentialsProvisioned = 0x08,
         kFlag_UseManufacturerCredentialsAsOperational = 0x10,
+        kFlag_IsFullyProvisioned                      = 0x20,
     };
 
     uint8_t mFlags;
