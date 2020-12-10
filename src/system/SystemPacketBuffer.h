@@ -619,7 +619,7 @@ public:
      *
      * @returns empty handle on allocation failure.
      */
-    PacketBufferHandle Clone();
+    PacketBufferHandle CloneData();
 
 private:
     PacketBufferHandle(const PacketBufferHandle &) = delete;
