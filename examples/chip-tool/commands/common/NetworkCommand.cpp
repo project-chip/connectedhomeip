@@ -29,6 +29,9 @@ CHIP_ERROR NetworkCommand::Run(PersistentStorage & storage, NodeId localId, Node
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
+
     err = mCommissioner.Init(localId, &storage);
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
 

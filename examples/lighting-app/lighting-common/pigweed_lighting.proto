@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package chip.rpc;
+
+message Empty {
+}
+
+message Button {
+  //0=FUNCTION 1=LIGHTING 2=THREAD_START 3=BLE_START
+  uint32 idx = 1;
+
+  // 0=release 1=push
+  uint32 action = 2;
+}
+
+service LightingService {
+  rpc ButtonEvent(Button) returns (Empty){}
+}

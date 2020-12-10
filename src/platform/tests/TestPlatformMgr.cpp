@@ -22,8 +22,6 @@
  *
  */
 
-#include "TestPlatformMgr.h"
-
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -33,6 +31,7 @@
 #include <nlunit-test.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -123,9 +122,11 @@ int TestPlatformMgr_Teardown(void * inContext)
 
 int TestPlatformMgr()
 {
-    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], TestPlatformMgr_Setup, TestPlatformMgr_Teardown };
+    nlTestSuite theSuite = { "PlatformMgr tests", &sTests[0], TestPlatformMgr_Setup, TestPlatformMgr_Teardown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestPlatformMgr);

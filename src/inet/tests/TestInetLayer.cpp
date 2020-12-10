@@ -37,12 +37,16 @@
 
 #include <CHIPVersion.h>
 
+#include <inet/InetArgParser.h>
 #include <support/CodeUtils.h>
 
 #include <system/SystemTimer.h>
 
 #include "TestInetCommon.h"
+#include "TestInetCommonOptions.h"
 #include "TestInetLayerCommon.hpp"
+#include "TestSetupFaultInjection.h"
+#include "TestSetupSignalling.h"
 
 using namespace chip;
 using namespace chip::Inet;

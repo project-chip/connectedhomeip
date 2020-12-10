@@ -22,6 +22,7 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
+#include "LogUtils.h"
 #include "QRCodeUtil.h"
 #include "Server.h"
 #include "Service.h"
@@ -42,10 +43,7 @@
 #include <system/SystemClock.h>
 
 #include <dk_buttons_and_leds.h>
-#include <logging/log.h>
 #include <zephyr.h>
-
-LOG_MODULE_DECLARE(app);
 
 namespace {
 
