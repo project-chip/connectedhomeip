@@ -25,6 +25,7 @@
  */
 
 #include <controller/CHIPCluster.h>
+#include <protocols/Protocols.h>
 
 namespace chip {
 namespace Controller {
@@ -63,13 +64,17 @@ CHIP_ERROR ClusterBase::SendCommand(CommandEncoder commandEncoder, uint16_t maxC
     message->SetDataLength(encodedLength);
     VerifyOrExit(message->DataLength() >= encodedLength, err = CHIP_ERROR_NO_MEMORY);
 
-    err = mDevice->SendMessage(std::move(message));
-    SuccessOrExit(err);
-
-    if (responseHandler != nullptr)
+    if (mExchangeContext == nullptr)
     {
-        mDevice->AddResponseHandler(mEndpoint, mClusterId, responseHandler);
+        mExchangeContext = mDevice->NewExchange();
+        mExchangeContext->SetDelegate(this);
+        VerifyOrExit(mExchangeContext == nullptr, err = CHIP_ERROR_NO_MEMORY);
     }
+
+    mResponseHandle = responseHandler;
+
+    err = mExchangeContext->SendMessage(Protocols::kProtocol_InteractionModel, 0, std::move(message), Messaging::SendFlags{});
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -100,13 +105,17 @@ CHIP_ERROR ClusterBase::RequestAttributeReporting(RequestEncoder requestEncoder,
     message->SetDataLength(encodedLength);
     VerifyOrExit(message->DataLength() >= encodedLength, err = CHIP_ERROR_NO_MEMORY);
 
-    err = mDevice->SendMessage(std::move(message));
-    SuccessOrExit(err);
-
-    if (reportHandler != nullptr)
+    if (mExchangeContext == nullptr)
     {
-        mDevice->AddReportHandler(mEndpoint, mClusterId, reportHandler);
+        mExchangeContext = mDevice->NewExchange();
+        mExchangeContext->SetDelegate(this);
+        VerifyOrExit(mExchangeContext == nullptr, err = CHIP_ERROR_NO_MEMORY);
     }
+
+    mReportHandle = reportHandler;
+
+    err = mExchangeContext->SendMessage(Protocols::kProtocol_InteractionModel, 0, std::move(message), Messaging::SendFlags{});
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)
