@@ -52,7 +52,8 @@ third_party/bluez/repo/configure --prefix=/usr --mandir=/usr/share/man --sysconf
 make
 ```
 
-Note: You also need to install several packages on RPi if you want to build bluez
+Note: You also need to install several packages on RPi if you want to build
+bluez
 
 ```
 sudo apt-get install libtool m4 automake autotools-dev libudev-dev libical-dev libreadline-dev
