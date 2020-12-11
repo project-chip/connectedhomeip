@@ -207,10 +207,14 @@ private:
     /// allocated memory.
     void Clear();
 
-    /// Appends another responder to the internal replies.
-    template <typename ResponderType, typename... Args>
-    QueryResponderSettings AddResponder(Args &&... args)
+    QueryResponderSettings AddAllocatedResponder(Responder * responder)
     {
+        if (responder == nullptr)
+        {
+            ChipLogError(Discovery, "Responder memory allocation failed");
+            return QueryResponderSettings(); // failed
+        }
+
         for (size_t i = 0; i < kMaxAllocatedResponders; i++)
         {
             if (mAllocatedResponders[i] != nullptr)
@@ -218,18 +222,20 @@ private:
                 continue;
             }
 
-            mAllocatedResponders[i] = chip::Platform::New<ResponderType>(std::forward<Args>(args)...);
-            if (mAllocatedResponders[i] == nullptr)
-            {
-                ChipLogError(Discovery, "Responder memory allocation failed");
-                return QueryResponderSettings(); // failed
-            }
-
+            mAllocatedResponders[i] = responder;
             return mQueryResponder.AddResponder(mAllocatedResponders[i]);
         }
 
+        Platform::Delete(responder);
         ChipLogError(Discovery, "Failed to find free slot for adding a responder");
         return QueryResponderSettings();
+    }
+
+    /// Appends another responder to the internal replies.
+    template <typename ResponderType, typename... Args>
+    QueryResponderSettings AddResponder(Args &&... args)
+    {
+        return AddAllocatedResponder(chip::Platform::New<ResponderType>(std::forward<Args>(args)...));
     }
 
     template <typename... Args>
