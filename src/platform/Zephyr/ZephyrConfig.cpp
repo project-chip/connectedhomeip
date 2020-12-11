@@ -22,7 +22,8 @@
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
-#include <platform/nrfconnect/ZephyrConfig.h>
+
+#include <platform/Zephyr/ZephyrConfig.h>
 
 #include <core/CHIPEncoding.h>
 #include <platform/internal/testing/ConfigUnitTest.h>

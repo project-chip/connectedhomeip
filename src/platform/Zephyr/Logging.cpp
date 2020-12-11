@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides implementations for the CHIP logging functions
- *          on Nordic nRF Connect SDK platforms.
+ *          on Zephyr platforms.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
