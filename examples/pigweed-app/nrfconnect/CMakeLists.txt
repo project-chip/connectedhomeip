@@ -38,7 +38,7 @@ target_include_directories(app PRIVATE main/include
                            ${PIGWEED_ROOT}/pw_polyfill/public_overrides
                            ${PIGWEED_ROOT}/pw_status/public
                            ${PIGWEED_ROOT}/pw_preprocessor/public
-                           ${NRFCONNECT_COMMON}/pw_sys_io/include)
+                           ${NRFCONNECT_COMMON}/pw_sys_io/public)
 
 target_sources(app PRIVATE main/main.cpp 
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)
