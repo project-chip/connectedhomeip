@@ -18,6 +18,7 @@
 #include "Server.h"
 
 #include <errno.h>
+#include <utility>
 
 #include <mdns/minimal/core/DnsHeader.h>
 
