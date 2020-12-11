@@ -169,6 +169,9 @@ CHIP_ERROR nl_Chip_DeviceController_SetBleClose(CloseBleCBFunct closeBleCB);
 
 CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl);
 CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceController::ChipDeviceController * devCtrl);
+void nl_Chip_DeviceController_GetDeviceConrollerNewApi(chip::DeviceController::ChipDeviceController * devCtrl, chip::Controller::DeviceController ** out);
+
+CHIP_ERROR nl_Chip_Controller_NewDevice(chip::Controller::DeviceController * controller, chip::NodeId nodeId, chip::Controller::Device ** device);
 
 // Rendezvous
 CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceController * devCtrl, BLE_CONNECTION_OBJECT connObj,
@@ -209,6 +212,7 @@ CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     *outDevCtrl = new chip::DeviceController::ChipDeviceController();
+    (*outDevCtrl)->SetUdpListenPort(11095);
     VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
 
     err = (*outDevCtrl)->Init(kLocalDeviceId, &sSystemLayer, &sInetLayer, nullptr, &sStorageDelegate);
@@ -231,6 +235,18 @@ CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceControlle
         delete devCtrl;
     }
     return CHIP_NO_ERROR;
+}
+
+// Old device controller is deprecated, get the new controller.
+// When all functions are migrated to the new API, the new API will be return by defualt via NewDeviceController
+void nl_Chip_DeviceController_GetDeviceConrollerNewApi(chip::DeviceController::ChipDeviceController * devCtrl, chip::Controller::DeviceController ** out)
+{
+    *out = devCtrl->GetNewApi();
+}
+
+CHIP_ERROR nl_Chip_Controller_NewDevice(chip::Controller::DeviceController * controller, chip::NodeId nodeId, chip::Controller::Device ** device)
+{
+    return controller->NewDevice(nodeId, device);
 }
 
 CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)

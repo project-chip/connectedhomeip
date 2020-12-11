@@ -69,7 +69,7 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr, SecureSessionMgrDelegate * deviceController = nullptr);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -203,6 +203,9 @@ private:
     TransportMgrBase * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageManager mReliableMessageMgr;
+    // TODO: allow temporary propagate SecureSessionMgrDelegate events to device controller, it won't be necessary after
+    // fully migrated to messaging layer
+    SecureSessionMgrDelegate * mDeviceController;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;
@@ -212,9 +215,6 @@ private:
     BitMapObjectPool<ChannelContextHandleAssociation, CHIP_CONFIG_MAX_CHANNEL_HANDLES> mChannelHandles;
 
     ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate);
-
-    void DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                         System::PacketBufferHandle msgBuf);
 
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);

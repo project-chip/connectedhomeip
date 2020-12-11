@@ -25,6 +25,7 @@
  */
 
 #include <controller/CHIPCluster.h>
+#include <protocols/Protocols.h>
 
 namespace chip {
 namespace Controller {
@@ -51,13 +52,17 @@ CHIP_ERROR ClusterBase::SendCommand(chip::System::PacketBufferHandle payload, Ca
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(!payload.IsNull(), err = CHIP_ERROR_INTERNAL);
 
-    err = mDevice->SendMessage(std::move(payload));
-    SuccessOrExit(err);
-
-    if (responseHandler != nullptr)
+    if (mExchangeContext == nullptr)
     {
-        mDevice->AddResponseHandler(mEndpoint, mClusterId, responseHandler);
+        mExchangeContext = mDevice->NewExchange();
+        mExchangeContext->SetDelegate(this);
+        VerifyOrExit(mExchangeContext == nullptr, err = CHIP_ERROR_NO_MEMORY);
     }
+
+    mResponseHandle = responseHandler;
+
+    err = mExchangeContext->SendMessage(Protocols::kProtocol_InteractionModel, 0, std::move(payload), Messaging::SendFlags{});
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -73,11 +78,17 @@ CHIP_ERROR ClusterBase::RequestAttributeReporting(chip::System::PacketBufferHand
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    err = SendCommand(std::move(payload), responseHandler);
-    SuccessOrExit(err);
+    if (mExchangeContext == nullptr)
+    {
+        mExchangeContext = mDevice->NewExchange();
+        mExchangeContext->SetDelegate(this);
+        VerifyOrExit(mExchangeContext == nullptr, err = CHIP_ERROR_NO_MEMORY);
+    }
 
-    VerifyOrExit(reportHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
-    mDevice->AddReportHandler(mEndpoint, mClusterId, reportHandler);
+    mReportHandle = reportHandler;
+
+    err = mExchangeContext->SendMessage(Protocols::kProtocol_InteractionModel, 0, std::move(payload), Messaging::SendFlags{});
+    SuccessOrExit(err);
 
 exit:
     return err;

@@ -38,6 +38,7 @@ shared_library("ChipDeviceCtrl") {
     "ChipDeviceController-BleApplicationDelegate.h",
     "ChipDeviceController-BlePlatformDelegate.cpp",
     "ChipDeviceController-BlePlatformDelegate.h",
+    "ChipDeviceController-Device.cpp",
     "ChipDeviceController-ScriptBinding.cpp",
     "ChipDeviceController-ScriptDevicePairingDelegate.cpp",
     "ChipDeviceController-ScriptDevicePairingDelegate.h",

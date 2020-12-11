@@ -61,6 +61,12 @@ public:
     ChipDeviceController();
     ~ChipDeviceController();
 
+
+    Controller::DeviceController * GetNewApi()
+    {
+        return &mCommissioner;
+    }
+
     void * AppState;
 
     /**

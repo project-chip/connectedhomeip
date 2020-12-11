@@ -101,7 +101,7 @@ class DeviceMgrCmd(Cmd):
 
         self.bleMgr = None
 
-        self.devCtrl = ChipDeviceCtrl.ChipDeviceController()
+        self.devCtrl = ChipDeviceCtrl.ChipDeviceController(112233)
 
         self.historyFileName = os.path.expanduser(
             "~/.chip-device-ctrl-history")

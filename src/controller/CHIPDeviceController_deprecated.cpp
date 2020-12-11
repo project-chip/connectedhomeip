@@ -150,10 +150,7 @@ exit:
 
 CHIP_ERROR ChipDeviceController::SetUdpListenPort(uint16_t listenPort)
 {
-    if (mState != kState_Initialized)
-        return CHIP_ERROR_INCORRECT_STATE;
-    mListenPort = listenPort;
-    return CHIP_NO_ERROR;
+    return mCommissioner.SetUdpListenPort(listenPort);
 }
 
 CHIP_ERROR ChipDeviceController::ServiceEvents()

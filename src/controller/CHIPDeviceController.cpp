@@ -145,7 +145,8 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr);
     SuccessOrExit(err);
 
-    mSessionManager->SetDelegate(this);
+    mExchangeManager = chip::Platform::New<Messaging::ExchangeManager>();
+    mExchangeManager->Init(localDeviceId, mTransportMgr, mSessionManager, this);
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
@@ -215,6 +216,27 @@ CHIP_ERROR DeviceController::SetUdpListenPort(uint16_t listenPort)
     return CHIP_NO_ERROR;
 }
 
+CHIP_ERROR DeviceController::NewDevice(NodeId deviceId, Device ** out_device)
+{
+    CHIP_ERROR err  = CHIP_NO_ERROR;
+    Device * device = nullptr;
+    uint16_t index  = 0;
+
+    VerifyOrExit(out_device != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    index = FindDeviceIndex(deviceId);
+    VerifyOrExit(index >= kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_ARGUMENT);
+
+    index = GetInactiveDeviceIndex();
+    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
+    device = &mActiveDevices[index];
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, mExchangeManager, mListenPort);
+
+    *out_device = device;
+
+exit:
+    return err;
+}
+
 CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice & deviceInfo, Device ** out_device)
 {
     CHIP_ERROR err  = CHIP_NO_ERROR;
@@ -239,7 +261,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
         err = device->Deserialize(deviceInfo);
         VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-        device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort);
+        device->Init(mTransportMgr, mSessionManager, mInetLayer, mExchangeManager, mListenPort);
     }
 
     *out_device = device;
@@ -301,7 +323,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             err = device->Deserialize(deviceInfo);
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-            device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort);
+            device->Init(mTransportMgr, mSessionManager, mInetLayer, mExchangeManager, mListenPort);
         }
     }
 
@@ -569,7 +591,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
                                    mSessionManager);
     SuccessOrExit(err);
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, mExchangeManager, mListenPort, remoteDeviceId, remotePort, interfaceId);
 
     // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
     // provisiong cluster is ready.
@@ -621,7 +643,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
 
     testSecurePairingSecret->ToSerializable(device->GetPairing());
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
+    device->Init(mTransportMgr, mSessionManager, mInetLayer, mExchangeManager, mListenPort, remoteDeviceId, remotePort, interfaceId);
 
     device->SetAddress(deviceAddr);
 

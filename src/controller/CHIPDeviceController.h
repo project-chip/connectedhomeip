@@ -32,6 +32,7 @@
 #include <controller/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
+#include <messaging/ExchangeMgr.h>
 #include <support/DLLUtil.h>
 #include <support/SerializableIntegerSet.h>
 #include <transport/RendezvousSession.h>
@@ -121,6 +122,18 @@ public:
 
     /**
      * @brief
+     *   This function creates a new device in NotConnected state. The caller must not use the Device object If they
+     *   free the DeviceController object, or after they call ReleaseDevice() on the returned device object.
+     *
+     * @param[in] deviceId   Node ID for the CHIP device
+     * @param[out] device    The output device object
+     *
+     * @return CHIP_ERROR CHIP_NO_ERROR on success, or corresponding error code.
+     */
+    CHIP_ERROR NewDevice(NodeId deviceId, Device ** device);
+
+    /**
+     * @brief
      *   This function deserializes the provided deviceInfo object, and initializes and outputs the
      *   corresponding Device object. The lifetime of the output object is tied to that of the DeviceController
      *   object. The caller must not use the Device object If they free the DeviceController object, or
@@ -187,6 +200,7 @@ protected:
     NodeId mLocalDeviceId;
     DeviceTransportMgr * mTransportMgr;
     SecureSessionMgr * mSessionManager;
+    Messaging::ExchangeManager * mExchangeManager;
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
 

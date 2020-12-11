@@ -35,6 +35,7 @@ static_library("controller") {
   public_deps = [
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/transport",
   ]

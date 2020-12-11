@@ -27,11 +27,12 @@
 #pragma once
 
 #include <controller/CHIPDevice.h>
+#include <messaging/ExchangeDelegate.h>
 
 namespace chip {
 namespace Controller {
 
-class DLL_EXPORT ClusterBase
+class DLL_EXPORT ClusterBase : public Messaging::ExchangeDelegate
 {
 public:
     virtual ~ClusterBase() {}
@@ -73,6 +74,9 @@ protected:
     const ClusterId mClusterId;
     Device * mDevice;
     EndpointId mEndpoint;
+    Messaging::ExchangeContext * mExchangeContext;
+    Callback::Callback<> * mResponseHandle;
+    Callback::Callback<> * mReportHandle;
 };
 
 } // namespace Controller
