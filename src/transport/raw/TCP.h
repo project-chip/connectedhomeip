@@ -107,7 +107,7 @@ public:
     {
         std::fill(mActiveConnections, mActiveConnections + mActiveConnectionsSize, nullptr);
         std::generate(mPendingPackets, mPendingPackets + mPendingPacketsSize,
-                []() { return PendingPacket{.peerAddress = PeerAddress::Uninitialized(), .packetBuffer = nullptr}; });
+                      []() { return PendingPacket{ .peerAddress = PeerAddress::Uninitialized(), .packetBuffer = nullptr }; });
     }
     ~TCPBase() override;
 
