@@ -37,7 +37,8 @@ public:
     CHIP_ERROR Toggle(Callback::Callback<> * onCompletion);
 
     CHIP_ERROR ReadAttributeOnOff(Callback::Callback<> * onCompletion);
-    CHIP_ERROR ReportAttributeOnOff(Callback::Callback<> * onChange, uint16_t minInterval, uint16_t maxInterval);
+    CHIP_ERROR ReportAttributeOnOff(Callback::Callback<> * onCompletion, Callback::Callback<> * onChange, uint16_t minInterval,
+                                    uint16_t maxInterval);
 
     CHIP_ERROR ReadAttributeClusterRevision(Callback::Callback<> * onCompletion);
 };
