@@ -97,10 +97,7 @@ public:
      * @param[in] inetLayer    InetLayer object pointer
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      */
-    void Init(Messaging::ExchangeManager * exchangeManager)
-    {
-        mExchangeManager = exchangeManager;
-    }
+    void Init(Messaging::ExchangeManager * exchangeManager) { mExchangeManager = exchangeManager; }
 
     /**
      * @brief
@@ -120,8 +117,8 @@ public:
     void Init(Messaging::ExchangeManager * exchangeManager, NodeId deviceId)
     {
         Init(exchangeManager);
-        mDeviceId   = deviceId;
-        mState      = ConnectionState::Connecting;
+        mDeviceId = deviceId;
+        mState    = ConnectionState::Connecting;
     }
 
     /** @brief Serialize the Pairing Session to a string. It's guaranteed that the string
@@ -168,6 +165,7 @@ public:
     void OnEstablished() override;
     void OnClosed() override;
     void OnFail(CHIP_ERROR err) override;
+
 private:
     enum class ConnectionState
     {

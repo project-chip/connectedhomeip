@@ -53,29 +53,36 @@ class ChannelContext
 {
 public:
     ChannelState GetState() const { return mState; }
-    void Release() { /* TODO */ }
+    void Release()
+    { /* TODO */
+    }
 
     // events of ResolveDelegate
-    //void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const MdnsService & address);
+    // void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const MdnsService & address);
 
     // events of SecureSessionManager
     void OnNewConnection(const Transport::PeerConnectionState * state);
     void OnConnectionExpired(const Transport::PeerConnectionState * state);
+
 private:
-    ChannelState mState = ChannelState::kChanneState_Closed;
+    ChannelState mState         = ChannelState::kChanneState_Closed;
     ChannelDelegate * mDelegate = nullptr;
 
-    enum PrepareState {
+    enum PrepareState
+    {
         kPrepareState_AddressResolving,
         kPrepareState_SessionEstablishing,
     };
 
-    union {
-        struct {
+    union
+    {
+        struct
+        {
             PrepareState mState;
             NodeId mPeerNodeId;
         } mPreparing;
-        struct {
+        struct
+        {
             Transport::PeerConnectionState * mSession;
         } mReady;
     };

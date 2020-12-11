@@ -139,7 +139,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr);
     SuccessOrExit(err);
 
-    //mExchangeManager->Init(...);
+    // mExchangeManager->Init(...);
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
@@ -488,7 +488,7 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     // provisiong cluster is ready.
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
-        //device->SetAddress(params.GetPeerAddress().GetIPAddress());
+        // device->SetAddress(params.GetPeerAddress().GetIPAddress());
         mRendezvousSession->OnRendezvousConnectionOpened();
     }
 
@@ -667,8 +667,7 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
     device = &mActiveDevices[mDeviceBeingPaired];
     switch (status)
     {
-    case RendezvousSessionDelegate::SecurePairingSuccess:
-    {
+    case RendezvousSessionDelegate::SecurePairingSuccess: {
         ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
         auto secureSessionParameters = device->GetSecureSessoinParameters();
         mRendezvousSession->GetPairingSession().ToSerializable(secureSessionParameters);

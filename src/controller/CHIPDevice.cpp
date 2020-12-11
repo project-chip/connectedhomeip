@@ -64,7 +64,7 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     CHIP_ZERO_AT(serializable);
 
     memmove(&serializable.mOpsCreds, &mSecureSessionParameters, sizeof(serializable.mOpsCreds));
-    serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
+    serializable.mDeviceId = Encoding::LittleEndian::HostSwap64(mDeviceId);
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
                                        static_cast<uint16_t>(sizeof(serializable)), Uint8::to_char(output.inner));
@@ -95,7 +95,7 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     VerifyOrExit(deserializedLen <= sizeof(serializable), error = CHIP_ERROR_INVALID_ARGUMENT);
 
     memmove(&mSecureSessionParameters, &serializable.mOpsCreds, sizeof(mSecureSessionParameters));
-    mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
+    mDeviceId = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
 exit:
     return error;
 }
@@ -114,7 +114,7 @@ CHIP_ERROR Device::EstablishCaseSession()
         builder.SetPeerNodeId(mDeviceId)
             //.SetLocalKeyId(mSecureSessionParameters.mLocalKeyId)
             //.SetPeerKeyId(mSecureSessionParameters.mPeerKeyId)
-        ;
+            ;
         mCaseChannel = mExchangeManager->EstablishChannel(builder, this);
     }
 
