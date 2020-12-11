@@ -27,7 +27,7 @@ namespace Minimal {
 ///
 /// Usage:
 ///   - RequiredStorageSize("some", "name", "here") provides the memory block
-///   - BUILD(ptr, "some", "name", "here") stores all data in <ptr>
+///   - Build(ptr, "some", "name", "here") stores all data in [ptr]
 ///
 namespace FlatAllocatedQName {
 
