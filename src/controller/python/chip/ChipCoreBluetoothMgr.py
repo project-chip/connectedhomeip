@@ -44,6 +44,8 @@ from .ChipBleUtility import (
     BleDisconnectEventStruct,
     BleRxEventStruct,
     BleSubscribeEventStruct,
+    BleDeviceIdentificationInfo,
+    ParseServiceData,
 )
 
 from .ChipUtility import ChipUtility
@@ -104,6 +106,26 @@ def _VoidPtrToCBUUID(ptr, len):
 
     return ptr
 
+class BlePeripheral:
+    def __init__(self, peripheral, advData):
+        self.peripheral = peripheral
+        self.advData = dict(advData)
+    
+    def __eq__(self, another):
+        return self.peripheral == another.peripheral
+
+    def getPeripheralDevIdInfo(self):
+        # CHIP_SERVICE_SHORT
+        if not self.advData:
+            return None
+        servDataDict = self.advData.get("kCBAdvDataServiceData", None)
+        if not servDataDict:
+            return None
+        servDataDict = dict(servDataDict)
+        for i in servDataDict.keys():
+            if str(i).lower() == str(CHIP_SERVICE_SHORT).lower():
+                return ParseServiceData(bytes(servDataDict[i]))
+        return None
 
 class CoreBluetoothManager(ChipBleBase):
     def __init__(self, devCtrl, logger=None):
@@ -121,6 +143,7 @@ class CoreBluetoothManager(ChipBleBase):
         self.scan_quiet = False
         self.characteristics = {}
         self.peripheral_list = []
+        self.peripheral_adv_list = []
         self.bg_peripheral_name = None
         self.chip_queue = six.moves.queue.Queue()
 
@@ -220,8 +243,12 @@ class CoreBluetoothManager(ChipBleBase):
             if not time_expired:
                 result = True
 
-            for peripheral in self.peripheral_list:
-                if should_tuple[3] and str(peripheral._.name) == should_tuple[3]:
+            for peripheral in self.peripheral_adv_list:
+                if should_tuple[3] and str(peripheral.peripheral._.name) == should_tuple[3]:
+                    result = False
+                    break
+                devIdInfo = peripheral.getPeripheralDevIdInfo()
+                if devIdInfo and should_tuple[3] and str(devIdInfo.discriminator) == should_tuple[3]:
                     result = False
                     break
 
@@ -271,23 +298,31 @@ class CoreBluetoothManager(ChipBleBase):
                     self.logger.info("adding to scan list:")
                     self.logger.info("")
                     self.logger.info(
-                        "{0:<10}{1:<80}".format("Name =", str(peripheral._.name))
+                        "{0:<16}= {1:<80}".format("Name", str(peripheral._.name))
                     )
                     self.logger.info(
-                        "{0:<10}{1:<80}".format(
-                            "ID =", str(peripheral._.identifier.UUIDString())
+                        "{0:<16}= {1:<80}".format(
+                            "ID", str(peripheral._.identifier.UUIDString())
                         )
                     )
-                    self.logger.info("{0:<10}{1:<80}".format("RSSI =", rssi))
+                    self.logger.info("{0:<16}= {1:<80}".format("RSSI", rssi))
+                    devIdInfo = BlePeripheral(peripheral, data).getPeripheralDevIdInfo()
+                    if devIdInfo:
+                        self.logger.info("{0:<16}= {1}".format("Pairing State", devIdInfo.pairingState))
+                        self.logger.info("{0:<16}= {1}".format("Discriminator", devIdInfo.discriminator))
+                        self.logger.info("{0:<16}= {1}".format("Vendor Id", devIdInfo.vendorId))
+                        self.logger.info("{0:<16}= {1}".format("Product Id", devIdInfo.productId))
                     self.logger.info("ADV data: " + repr(data))
                     self.logger.info("")
 
                 self.peripheral_list.append(peripheral)
+                self.peripheral_adv_list.append(BlePeripheral(peripheral, data))
         else:
-            if peripheral._.name == self.bg_peripheral_name:
+            if (peripheral._.name == self.bg_peripheral_name) or (str(devIdInfo.discriminator) == self.bg_peripheral_name):
                 if len(self.peripheral_list) == 0:
                     self.logger.info("found background peripheral")
                 self.peripheral_list = [peripheral]
+                self.peripheral_adv_list = [BlePeripheral(peripheral, data)]
 
     def centralManager_didConnectPeripheral_(self, manager, peripheral):
         """Called by CoreBluetooth via runloop when a connection succeeds."""
@@ -462,7 +497,9 @@ class CoreBluetoothManager(ChipBleBase):
         self.scan_quiet = args[1]
         self.bg_peripheral_name = None
         del self.peripheral_list[:]
+        del self.peripheral_adv_list[:]
         self.peripheral_list = []
+        self.peripheral_adv_list = []
         # Filter on the service UUID Array or None to accept all scan results.
         self.manager.scanForPeripheralsWithServices_options_(
             [
@@ -510,14 +547,19 @@ class CoreBluetoothManager(ChipBleBase):
         if self.connect_state:
             self.logger.error("ERROR: Connection to a BLE device already exists!")
         else:
-            for p in self.peripheral_list:
+            for peripheral in self.peripheral_adv_list:
+                p = peripheral.peripheral
+                devIdInfo = peripheral.getPeripheralDevIdInfo()
+                if not devIdInfo:
+                    # Not a chip device
+                    continue
                 p_id = str(p.identifier().UUIDString())
                 p_name = str(p.name())
 
                 self.logger.debug(p_id + " vs " + str(identifier))
                 self.logger.debug(p_name + " vs " + str(identifier))
 
-                if p_id == str(identifier) or p_name == str(identifier):
+                if p_id == str(identifier) or p_name == str(identifier) or str(devIdInfo.discriminator) == str(identifier):
                     self.loop_condition = False
                     self.peripheral = p
                     self.manager.connectPeripheral_options_(p, None)
