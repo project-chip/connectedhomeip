@@ -649,7 +649,7 @@ inline PacketBufferHandle PacketBuffer::Next()
 inline PacketBufferHandle PacketBuffer::Last()
 {
     PacketBuffer * p = this;
-    while (p->next != nullptr)
+    while (p->Next_ForNow() != nullptr)
         p = p->Next_ForNow();
     return PacketBufferHandle::Hold(p);
 }

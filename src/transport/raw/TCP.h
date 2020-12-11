@@ -104,7 +104,11 @@ public:
             size_t packetsBuffersSize) :
         mActiveConnections(activeConnectionsBuffer),
         mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers), mPendingPacketsSize(packetsBuffersSize)
-    {}
+    {
+        std::fill(mActiveConnections, mActiveConnections + mActiveConnectionsSize, nullptr);
+        std::generate(mPendingPackets, mPendingPackets + mPendingPacketsSize,
+                []() { return PendingPacket{.peerAddress = PeerAddress::Uninitialized(), .packetBuffer = nullptr}; });
+    }
     ~TCPBase() override;
 
     /**

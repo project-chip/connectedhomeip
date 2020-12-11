@@ -489,12 +489,8 @@ void ReliableMessageManager::ClearRetransmitTable(RetransTableEntry & rEntry)
         ExpireTicks();
 
         rEntry.rc->Release();
-        rEntry.rc = nullptr;
-
-        if (!rEntry.msgBuf.IsNull())
-        {
-            rEntry.msgBuf = nullptr;
-        }
+        rEntry.rc     = nullptr;
+        rEntry.msgBuf = nullptr;
 
         // Clear all other fields
         rEntry = RetransTableEntry();

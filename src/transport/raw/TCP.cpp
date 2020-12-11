@@ -81,10 +81,7 @@ TCPBase::~TCPBase()
 
     for (size_t i = 0; i < mPendingPacketsSize; i++)
     {
-        if (!mPendingPackets[i].packetBuffer.IsNull())
-        {
-            mPendingPackets[i].packetBuffer = nullptr;
-        }
+        mPendingPackets[i].packetBuffer = nullptr;
     }
 }
 
