@@ -23,6 +23,8 @@
 
 #pragma once
 
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
 #include <bluetooth/bluetooth.h>
 #include <bluetooth/conn.h>
 #include <bluetooth/gatt.h>
@@ -36,13 +38,9 @@ namespace Internal {
 using namespace chip::Ble;
 
 /**
- * Template implementation of the GenericBLEManagerImpl_Zephyr singleton object for the Zephyr platforms.
+ * Concrete implementation of the BLEManager singleton object for the Zephyr platforms.
  */
-template <class ImplClass>
-class GenericBLEManagerImpl_Zephyr : public BLEManager,
-                                     private BleLayer,
-                                     private BlePlatformDelegate,
-                                     private BleApplicationDelegate
+class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePlatformDelegate, private BleApplicationDelegate
 {
     // Allow the BLEManager interface class to delegate method calls to
     // the implementation methods provided by this class.
@@ -127,6 +125,13 @@ private:
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
     static void HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, System::Error error);
 
+    // ===== Members for internal use by the following friends.
+
+    friend BLEManager & BLEMgr(void);
+    friend BLEManagerImpl & BLEMgrImpl(void);
+
+    static BLEManagerImpl sInstance;
+
 public:
     // Below callbacks are public in order to be visible from the global scope.
     static ssize_t HandleRXWrite(bt_conn * conn, const bt_gatt_attr * attr, const void * buf, uint16_t len, uint16_t offset,
@@ -134,32 +139,49 @@ public:
     static ssize_t HandleTXCCCWrite(bt_conn * conn, const bt_gatt_attr * attr, uint16_t value);
 };
 
-template <class ImplClass>
-inline BleLayer * GenericBLEManagerImpl_Zephyr<ImplClass>::_GetBleLayer()
+/**
+ * Returns a reference to the public interface of the BLEManager singleton object.
+ *
+ * Internal components should use this to access features of the BLEManager object
+ * that are common to all platforms.
+ */
+inline BLEManager & BLEMgr(void)
+{
+    return BLEManagerImpl::sInstance;
+}
+
+/**
+ * Returns the platform-specific implementation of the BLEManager singleton object.
+ *
+ * Internal components can use this to gain access to features of the BLEManager
+ * that are specific to the Zephyr platforms.
+ */
+inline BLEManagerImpl & BLEMgrImpl(void)
+{
+    return BLEManagerImpl::sInstance;
+}
+
+inline BleLayer * BLEManagerImpl::_GetBleLayer()
 {
     return this;
 }
 
-template <class ImplClass>
-inline BLEManager::CHIPoBLEServiceMode GenericBLEManagerImpl_Zephyr<ImplClass>::_GetCHIPoBLEServiceMode(void)
+inline BLEManager::CHIPoBLEServiceMode BLEManagerImpl::_GetCHIPoBLEServiceMode(void)
 {
     return mServiceMode;
 }
 
-template <class ImplClass>
-inline bool GenericBLEManagerImpl_Zephyr<ImplClass>::_IsAdvertisingEnabled(void)
+inline bool BLEManagerImpl::_IsAdvertisingEnabled(void)
 {
     return GetFlag(mFlags, kFlag_AdvertisingEnabled);
 }
 
-template <class ImplClass>
-inline bool GenericBLEManagerImpl_Zephyr<ImplClass>::_IsFastAdvertisingEnabled(void)
+inline bool BLEManagerImpl::_IsFastAdvertisingEnabled(void)
 {
     return GetFlag(mFlags, kFlag_FastAdvertisingEnabled);
 }
 
-template <class ImplClass>
-inline bool GenericBLEManagerImpl_Zephyr<ImplClass>::_IsAdvertising(void)
+inline bool BLEManagerImpl::_IsAdvertising(void)
 {
     return GetFlag(mFlags, kFlag_Advertising);
 }
@@ -167,3 +189,5 @@ inline bool GenericBLEManagerImpl_Zephyr<ImplClass>::_IsAdvertising(void)
 } // namespace Internal
 } // namespace DeviceLayer
 } // namespace chip
+
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

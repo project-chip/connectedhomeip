@@ -396,31 +396,31 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
     } else if (chip_device_platform == "nrfconnect") {
       sources += [
         "Zephyr/SystemTimeSupport.cpp",
-        "nrfconnect/BLEManagerImpl.cpp",
+        "Zephyr/BLEManagerImpl.cpp",
+        "Zephyr/ConfigurationManagerImpl.cpp",
+        "Zephyr/Logging.cpp",
+        "Zephyr/PlatformManagerImpl.cpp",
+        "Zephyr/ZephyrConfig.cpp",
+        "Zephyr/ZephyrConfig.h",
         "nrfconnect/BLEManagerImpl.h",
         "nrfconnect/BlePlatformConfig.h",
         "nrfconnect/CHIPDevicePlatformConfig.h",
         "nrfconnect/CHIPDevicePlatformEvent.h",
         "nrfconnect/CHIPPlatformConfig.h",
-        "nrfconnect/ConfigurationManagerImpl.cpp",
         "nrfconnect/ConfigurationManagerImpl.h",
         "nrfconnect/ConnectivityManagerImpl.cpp",
         "nrfconnect/ConnectivityManagerImpl.h",
         "nrfconnect/DeviceNetworkProvisioningDelegateImpl.cpp",
         "nrfconnect/DeviceNetworkProvisioningDelegateImpl.h",
         "nrfconnect/InetPlatformConfig.h",
-        "nrfconnect/Logging.cpp",
-        "nrfconnect/PlatformManagerImpl.cpp",
         "nrfconnect/PlatformManagerImpl.h",
         "nrfconnect/SystemPlatformConfig.h",
-        "nrfconnect/ZephyrConfig.cpp",
-        "nrfconnect/ZephyrConfig.h",
       ]
 
       if (chip_enable_openthread) {
         sources += [
           "OpenThread/OpenThreadUtils.cpp",
-          "nrfconnect/ThreadStackManagerImpl.cpp",
+          "Zephyr/ThreadStackManagerImpl.cpp",
           "nrfconnect/ThreadStackManagerImpl.h",
         ]
       }

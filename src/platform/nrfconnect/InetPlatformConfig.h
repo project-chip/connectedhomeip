@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the CHIP Inet
- *          Layer on Zephyr platforms.
+ *          Layer on nRF Connect SDK platform.
  *
  */
 

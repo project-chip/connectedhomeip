@@ -21,10 +21,11 @@
  *          for Zephyr platforms.
  */
 
-#ifndef GENERIC_BLE_MANAGER_IMPL_ZEPHYR_IPP
-#define GENERIC_BLE_MANAGER_IMPL_ZEPHYR_IPP
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
-#include <platform/Zephyr/GenericBLEManagerImpl_Zephyr.h>
+#if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
+#include <platform/Zephyr/BLEManagerImpl.h>
 
 #include <ble/CHIPBleServiceData.h>
 #include <platform/internal/BLEManager.h>
@@ -45,9 +46,6 @@ namespace chip {
 namespace DeviceLayer {
 namespace Internal {
 
-// Fully instantiate the generic implementation class in whatever compilation unit includes this file.
-template class GenericBLEManagerImpl_Zephyr<BLEManagerImpl>;
-
 namespace {
 
 const bt_uuid_128 UUID128_CHIPoBLEChar_RX =
@@ -62,8 +60,7 @@ const ChipBleUUID chipUUID_CHIPoBLEChar_RX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0
 const ChipBleUUID chipUUID_CHIPoBLEChar_TX = { { 0x18, 0xEE, 0x2E, 0xF5, 0x26, 0x3D, 0x45, 0x59, 0x95, 0x9F, 0x4F, 0x9C, 0x42, 0x9F,
                                                  0x9D, 0x12 } };
 
-_bt_gatt_ccc CHIPoBLEChar_TX_CCC =
-    BT_GATT_CCC_INITIALIZER(nullptr, GenericBLEManagerImpl_Zephyr<BLEManagerImpl>::HandleTXCCCWrite, nullptr);
+_bt_gatt_ccc CHIPoBLEChar_TX_CCC = BT_GATT_CCC_INITIALIZER(nullptr, BLEManagerImpl::HandleTXCCCWrite, nullptr);
 
 // clang-format off
 
@@ -72,7 +69,7 @@ BT_GATT_SERVICE_DEFINE(CHIPoBLE_Service,
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_RX.uuid,
                                BT_GATT_CHRC_WRITE | BT_GATT_CHRC_WRITE_WITHOUT_RESP,
                                BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
-                               nullptr, GenericBLEManagerImpl_Zephyr<BLEManagerImpl>::HandleRXWrite, nullptr),
+                               nullptr, BLEManagerImpl::HandleRXWrite, nullptr),
         BT_GATT_CHARACTERISTIC(&UUID128_CHIPoBLEChar_TX.uuid,
                                BT_GATT_CHRC_INDICATE,
                                BT_GATT_PERM_NONE,
@@ -88,8 +85,9 @@ constexpr int kCHIPoBLE_CCC_AttributeIndex = 3;
 
 } // unnamed namespace
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::_Init()
+BLEManagerImpl BLEManagerImpl::sInstance;
+
+CHIP_ERROR BLEManagerImpl::_Init()
 {
     CHIP_ERROR err;
 
@@ -118,14 +116,12 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::DriveBLEState(intptr_t arg)
+void BLEManagerImpl::DriveBLEState(intptr_t arg)
 {
     BLEMgrImpl().DriveBLEState();
 }
 
-template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::DriveBLEState()
+void BLEManagerImpl::DriveBLEState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -179,15 +175,13 @@ exit:
     }
 }
 
-template <class ImplClass>
-struct GenericBLEManagerImpl_Zephyr<ImplClass>::ServiceData
+struct BLEManagerImpl::ServiceData
 {
     uint8_t uuid[2];
     ChipBLEDeviceIdentificationInfo deviceIdInfo;
 } __attribute__((packed));
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::StartAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
     CHIP_ERROR err;
 
@@ -253,8 +247,7 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::StopAdvertising(void)
+CHIP_ERROR BLEManagerImpl::StopAdvertising(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -289,8 +282,7 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
+CHIP_ERROR BLEManagerImpl::_SetCHIPoBLEServiceMode(CHIPoBLEServiceMode val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -307,8 +299,7 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::_SetAdvertisingEnabled(bool val)
+CHIP_ERROR BLEManagerImpl::_SetAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -326,8 +317,7 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::_SetFastAdvertisingEnabled(bool val)
+CHIP_ERROR BLEManagerImpl::_SetFastAdvertisingEnabled(bool val)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -345,8 +335,7 @@ exit:
     return err;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::_GetDeviceName(char * buf, size_t bufSize)
+CHIP_ERROR BLEManagerImpl::_GetDeviceName(char * buf, size_t bufSize)
 {
     size_t len = bufSize - 1;
 
@@ -356,8 +345,7 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::_GetDeviceName(char * buf, s
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::_SetDeviceName(const char * deviceName)
+CHIP_ERROR BLEManagerImpl::_SetDeviceName(const char * deviceName)
 {
     if (mServiceMode != ConnectivityManager::kCHIPoBLEServiceMode_NotSupported)
     {
@@ -368,8 +356,7 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::_SetDeviceName(const char * 
     return MapErrorZephyr(bt_set_name(deviceName));
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleGAPConnect(const ChipDeviceEvent * event)
+CHIP_ERROR BLEManagerImpl::HandleGAPConnect(const ChipDeviceEvent * event)
 {
     const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
 
@@ -393,8 +380,7 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleGAPConnect(const ChipD
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleGAPDisconnect(const ChipDeviceEvent * event)
+CHIP_ERROR BLEManagerImpl::HandleGAPDisconnect(const ChipDeviceEvent * event)
 {
     const BleConnEventType * connEvent = &event->Platform.BleConnEvent;
 
@@ -435,8 +421,7 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleGAPDisconnect(const Ch
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
+CHIP_ERROR BLEManagerImpl::HandleTXCharCCCDWrite(const ChipDeviceEvent * event)
 {
     const BleCCCWriteEventType * writeEvent = &event->Platform.BleCCCWriteEvent;
 
@@ -472,8 +457,7 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXCharCCCDWrite(const 
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXCharWrite(const ChipDeviceEvent * event)
+CHIP_ERROR BLEManagerImpl::HandleRXCharWrite(const ChipDeviceEvent * event)
 {
     const BleC1WriteEventType * c1WriteEvent = &event->Platform.BleC1WriteEvent;
 
@@ -487,8 +471,7 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXCharWrite(const Chip
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXComplete(const ChipDeviceEvent * event)
+CHIP_ERROR BLEManagerImpl::HandleTXComplete(const ChipDeviceEvent * event)
 {
     const BleC2IndDoneEventType * c2IndDoneEvent = &event->Platform.BleC2IndDoneEvent;
 
@@ -502,16 +485,13 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXComplete(const ChipD
     return CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param,
-                                                                            System::Error error)
+void BLEManagerImpl::HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, System::Error error)
 {
     BLEMgr().SetAdvertisingEnabled(false);
     ChipLogProgress(DeviceLayer, "CHIPoBLE advertising disabled because of timeout expired");
 }
 
-template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::_OnPlatformEvent(const ChipDeviceEvent * event)
+void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -571,44 +551,36 @@ void GenericBLEManagerImpl_Zephyr<ImplClass>::_OnPlatformEvent(const ChipDeviceE
     }
 }
 
-template <class ImplClass>
-uint16_t GenericBLEManagerImpl_Zephyr<ImplClass>::_NumConnections(void)
+uint16_t BLEManagerImpl::_NumConnections(void)
 {
     return mGAPConns;
 }
 
-template <class ImplClass>
-bool GenericBLEManagerImpl_Zephyr<ImplClass>::CloseConnection(BLE_CONNECTION_OBJECT conId)
+bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 {
     ChipLogProgress(DeviceLayer, "Closing BLE GATT connection (ConnId %02" PRIx16 ")", bt_conn_index(conId));
     return bt_conn_disconnect(conId, BT_HCI_ERR_REMOTE_USER_TERM_CONN) == CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-uint16_t GenericBLEManagerImpl_Zephyr<ImplClass>::GetMTU(BLE_CONNECTION_OBJECT conId) const
+uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 {
     return bt_gatt_get_mtu(conId);
 }
 
-template <class ImplClass>
-bool GenericBLEManagerImpl_Zephyr<ImplClass>::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                                      const ChipBleUUID * charId)
+bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return true;
 }
 
-template <class ImplClass>
-bool GenericBLEManagerImpl_Zephyr<ImplClass>::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                                        const ChipBleUUID * charId)
+bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return true;
 }
 
-template <class ImplClass>
-bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                             const ChipBleUUID * charId, PacketBufferHandle pBuf)
+bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                    PacketBufferHandle pBuf)
 {
     CHIP_ERROR err                   = CHIP_NO_ERROR;
     uint8_t index                    = bt_conn_index(conId);
@@ -630,50 +602,44 @@ bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendIndication(BLE_CONNECTION_OBJE
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        ChipLogError(DeviceLayer, "GenericBLEManagerImpl_Zephyr<ImplClass>::SendIndication() failed: %s", ErrorStr(err));
+        ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
     }
 
     return err == CHIP_NO_ERROR;
 }
 
-template <class ImplClass>
-bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                               const ChipBleUUID * charId, PacketBufferHandle pBuf)
+bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                      PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return true;
 }
 
-template <class ImplClass>
-bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId,
-                                                              const ChipBleUUID * charId, PacketBufferHandle pBuf)
+bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
+                                     PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return true;
 }
 
-template <class ImplClass>
-bool GenericBLEManagerImpl_Zephyr<ImplClass>::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
-                                                               const ChipBleUUID * svcId, const ChipBleUUID * charId)
+bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQUEST_CONTEXT requestContext,
+                                      const ChipBleUUID * svcId, const ChipBleUUID * charId)
 {
     ChipLogError(DeviceLayer, "%s: NOT IMPLEMENTED", __PRETTY_FUNCTION__);
     return true;
 }
 
-template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
+void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId)
 {
     // Intentionally empty.
 }
 
-template <class ImplClass>
-bool GenericBLEManagerImpl_Zephyr<ImplClass>::IsSubscribed(bt_conn * conn)
+bool BLEManagerImpl::IsSubscribed(bt_conn * conn)
 {
     return mSubscribedConns[bt_conn_index(conn)];
 }
 
-template <class ImplClass>
-bool GenericBLEManagerImpl_Zephyr<ImplClass>::SetSubscribed(bt_conn * conn)
+bool BLEManagerImpl::SetSubscribed(bt_conn * conn)
 {
     uint8_t index           = bt_conn_index(conn);
     bool isSubscribed       = mSubscribedConns[index];
@@ -688,8 +654,7 @@ bool GenericBLEManagerImpl_Zephyr<ImplClass>::SetSubscribed(bt_conn * conn)
     return !isSubscribed;
 }
 
-template <class ImplClass>
-bool GenericBLEManagerImpl_Zephyr<ImplClass>::UnsetSubscribed(bt_conn * conn)
+bool BLEManagerImpl::UnsetSubscribed(bt_conn * conn)
 {
     uint8_t index           = bt_conn_index(conn);
     bool isSubscribed       = mSubscribedConns[index];
@@ -704,17 +669,15 @@ bool GenericBLEManagerImpl_Zephyr<ImplClass>::UnsetSubscribed(bt_conn * conn)
     return isSubscribed;
 }
 
-template <class ImplClass>
-uint32_t GenericBLEManagerImpl_Zephyr<ImplClass>::GetAdvertisingInterval()
+uint32_t BLEManagerImpl::GetAdvertisingInterval()
 {
     return (NumConnections() == 0 && !ConfigurationMgr().IsFullyProvisioned()) || GetFlag(mFlags, kFlag_FastAdvertisingEnabled)
         ? CHIP_DEVICE_CONFIG_BLE_FAST_ADVERTISING_INTERVAL
         : CHIP_DEVICE_CONFIG_BLE_SLOW_ADVERTISING_INTERVAL;
 }
 
-template <class ImplClass>
-ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr,
-                                                               const void * buf, uint16_t len, uint16_t offset, uint8_t flags)
+ssize_t BLEManagerImpl::HandleRXWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr, const void * buf, uint16_t len,
+                                      uint16_t offset, uint8_t flags)
 {
     ChipDeviceEvent event;
     PacketBufferHandle packetBuf = PacketBuffer::NewWithAvailableSize(len);
@@ -752,9 +715,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXWrite(struct bt_conn * 
     return len;
 }
 
-template <class ImplClass>
-ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXCCCWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr,
-                                                                  uint16_t value)
+ssize_t BLEManagerImpl::HandleTXCCCWrite(struct bt_conn * conId, const struct bt_gatt_attr * attr, uint16_t value)
 {
     ChipDeviceEvent event;
 
@@ -772,9 +733,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXCCCWrite(struct bt_conn
     return sizeof(value);
 }
 
-template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXIndicated(struct bt_conn * conId, const struct bt_gatt_attr * attr,
-                                                                uint8_t err)
+void BLEManagerImpl::HandleTXIndicated(struct bt_conn * conId, const struct bt_gatt_attr * attr, uint8_t err)
 {
     ChipDeviceEvent event;
 
@@ -785,8 +744,7 @@ void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXIndicated(struct bt_conn *
     PlatformMgr().PostEvent(&event);
 }
 
-template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleConnect(struct bt_conn * conId, uint8_t err)
+void BLEManagerImpl::HandleConnect(struct bt_conn * conId, uint8_t err)
 {
     ChipDeviceEvent event;
 
@@ -797,8 +755,7 @@ void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleConnect(struct bt_conn * con
     PlatformMgr().PostEvent(&event);
 }
 
-template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
+void BLEManagerImpl::HandleDisconnect(struct bt_conn * conId, uint8_t reason)
 {
     ChipDeviceEvent event;
 
@@ -813,4 +770,4 @@ void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleDisconnect(struct bt_conn * 
 } // namespace DeviceLayer
 } // namespace chip
 
-#endif // GENERIC_BLE_MANAGER_IMPL_ZEPHYR_IPP
+#endif // CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE

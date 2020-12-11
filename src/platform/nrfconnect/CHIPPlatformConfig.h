@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for CHIP on
- *          Zephyr platforms.
+ *          nRF Connect SDK platform.
  */
 
 #pragma once

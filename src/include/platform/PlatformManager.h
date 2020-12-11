@@ -53,8 +53,6 @@ class FabricProvisioningServer;
 class ServiceProvisioningServer;
 class BLEManagerImpl;
 template <class>
-class GenericBLEManagerImpl_Zephyr;
-template <class>
 class GenericConfigurationManagerImpl;
 template <class>
 class GenericPlatformManagerImpl;
@@ -108,8 +106,6 @@ private:
     friend class Internal::FabricProvisioningServer;
     friend class Internal::ServiceProvisioningServer;
     friend class Internal::BLEManagerImpl;
-    template <class>
-    friend class Internal::GenericBLEManagerImpl_Zephyr;
     template <class>
     friend class Internal::GenericPlatformManagerImpl;
     template <class>

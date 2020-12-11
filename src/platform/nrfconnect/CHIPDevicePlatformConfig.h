@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the chip Device Layer
- *          on Zephyr platforms.
+ *          on nRF Connect SDK platform.
  */
 
 #pragma once
