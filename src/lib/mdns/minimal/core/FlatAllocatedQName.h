@@ -23,7 +23,7 @@ namespace mdns {
 namespace Minimal {
 
 /// A void* implementation that stores QNames as
-///   <ptr array> <name1> #0 <name2> #0 .... <namen> #0
+///   [ptr array] [name1] #0 [name2] #0 .... [namen] #0
 ///
 /// Usage:
 ///   - RequiredStorageSize("some", "name", "here") provides the memory block
