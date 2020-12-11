@@ -29,6 +29,9 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <messaging/Channel.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
 #include <transport/SecurePairingSession.h>
@@ -51,10 +54,10 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #endif
                                         >;
 
-class DLL_EXPORT Device
+class DLL_EXPORT Device : public Messaging::ChannelDelegate
 {
 public:
-    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
+    Device() : mActive(false), mState(ConnectionState::NotConnected) {}
     ~Device() {}
 
     /**
@@ -66,17 +69,6 @@ public:
      * @param[in] delegate   The pointer to the delegate object.
      */
     void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
-
-    // ----- Messaging -----
-    /**
-     * @brief
-     *   Send the provided message to the device
-     *
-     * @param[in] message   The message to be sent.
-     *
-     * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR SendMessage(System::PacketBufferHandle message);
 
     /**
      * @brief
@@ -105,12 +97,9 @@ public:
      * @param[in] inetLayer    InetLayer object pointer
      * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort)
+    void Init(Messaging::ExchangeManager * exchangeManager)
     {
-        mTransportMgr   = transportMgr;
-        mSessionManager = sessionMgr;
-        mInetLayer      = inetLayer;
-        mListenPort     = listenPort;
+        mExchangeManager = exchangeManager;
     }
 
     /**
@@ -126,19 +115,12 @@ public:
      *
      * @param[in] transportMgr Transport manager object pointer
      * @param[in] sessionMgr   Secure session manager object pointer
-     * @param[in] inetLayer    InetLayer object pointer
-     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
-     * @param[in] devicePort   Port on which device is listening (typically CHIP_PORT)
-     * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId)
+    void Init(Messaging::ExchangeManager * exchangeManager, NodeId deviceId)
     {
-        Init(transportMgr, sessionMgr, inetLayer, mListenPort);
+        Init(exchangeManager);
         mDeviceId   = deviceId;
-        mDevicePort = devicePort;
-        mInterface  = interfaceId;
         mState      = ConnectionState::Connecting;
     }
 
@@ -158,21 +140,6 @@ public:
 
     /**
      * @brief
-     *   This function is called when a message is received from the corresponding CHIP
-     *   device. The message ownership is transferred to the function, and it is expected
-     *   to release the message buffer before returning.
-     *
-     * @param[in] header        Reference to common packet header of the received message
-     * @param[in] payloadHeader Reference to payload header in the message
-     * @param[in] state         Pointer to the peer connection state on which message is received
-     * @param[in] msgBuf        The message buffer
-     * @param[in] mgr           Pointer to secure session manager which received the message
-     */
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
-
-    /**
-     * @brief
      *   Return whether the current device object is actively associated with a paired CHIP
      *   device. An active object can be used to communicate with the corresponding device.
      */
@@ -184,20 +151,23 @@ public:
     {
         SetActive(false);
         mState          = ConnectionState::NotConnected;
-        mSessionManager = nullptr;
         mStatusDelegate = nullptr;
-        mInetLayer      = nullptr;
     }
 
     NodeId GetDeviceId() const { return mDeviceId; }
 
-    void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddr = deviceAddr; }
+    SecurePairingSessionSerializable GetSecureSessoinParameters() { return mSecureSessionParameters; }
 
-    SecurePairingSessionSerializable & GetPairing() { return mPairing; }
+    CHIP_ERROR EstablishPaseSession();
+    CHIP_ERROR EstablishCaseSession();
+    void CloseSession();
 
-    void AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse);
-    void AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport);
+    Messaging::ExchangeContext * NewExchange();
 
+    // Messaging::ChannelDelegate interface
+    void OnEstablished() override;
+    void OnClosed() override;
+    void OnFail(CHIP_ERROR err) override;
 private:
     enum class ConnectionState
     {
@@ -220,35 +190,15 @@ private:
     /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
 
-    /* IP Address of the CHIP device */
-    Inet::IPAddress mDeviceAddr;
-
-    /* Port on which the CHIP device is receiving messages. Typically it is CHIP_PORT */
-    uint16_t mDevicePort;
-
-    /* Local network interface that should be used to communicate with the device */
-    Inet::InterfaceId mInterface;
-
-    Inet::InetLayer * mInetLayer;
+    SecurePairingSessionSerializable mSecureSessionParameters;
 
     bool mActive;
     ConnectionState mState;
 
-    SecurePairingSessionSerializable mPairing;
-
     DeviceStatusDelegate * mStatusDelegate;
 
-    SecureSessionMgr * mSessionManager;
-
-    DeviceTransportMgr * mTransportMgr;
-
-    /* Track all outstanding response callbacks for this device. The callbacks are
-       registered when a command is sent to the device, to get notified with the results. */
-    Callback::CallbackDeque mResponses;
-
-    /* Track all outstanding callbacks for attribute reports from this device. The callbacks are
-       registered when the user requests attribute reporting for device attributes. */
-    Callback::CallbackDeque mReports;
+    Messaging::ExchangeManager * mExchangeManager;
+    Messaging::ChannelHandle mCaseChannel;
 
     /**
      * @brief
@@ -259,8 +209,6 @@ private:
      * @param[in] resetNeeded   Does the underlying network socket require a reset
      */
     CHIP_ERROR LoadSecureSessionParameters(ResetTransport resetNeeded);
-
-    uint16_t mListenPort;
 };
 
 /**
@@ -273,14 +221,6 @@ class DLL_EXPORT DeviceStatusDelegate
 {
 public:
     virtual ~DeviceStatusDelegate() {}
-
-    /**
-     * @brief
-     *   Called when a message is received from the device.
-     *
-     * @param[in] msg Received message buffer.
-     */
-    virtual void OnMessage(System::PacketBufferHandle msg) = 0;
 
     /**
      * @brief
@@ -300,9 +240,6 @@ typedef struct SerializableDevice
 {
     SecurePairingSessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
-    uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
-    uint16_t mDevicePort; /* This field is serealized in LittelEndian byte order */
-    uint8_t mInterfaceName[kMaxInterfaceName];
 } SerializableDevice;
 
 typedef struct SerializedDevice

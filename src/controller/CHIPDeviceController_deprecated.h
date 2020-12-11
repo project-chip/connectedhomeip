@@ -181,9 +181,6 @@ public:
      */
     CHIP_ERROR SetDevicePairingDelegate(Controller::DevicePairingDelegate * pairingDelegate);
 
-    //////////// DeviceStatusDelegate Implementation ///////////////
-    void OnMessage(System::PacketBufferHandle msg) override;
-
 private:
     enum
     {

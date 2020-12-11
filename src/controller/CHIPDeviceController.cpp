@@ -139,7 +139,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr);
     SuccessOrExit(err);
 
-    mSessionManager->SetDelegate(this);
+    //mExchangeManager->Init(...);
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
@@ -227,7 +227,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, const SerializedDevice &
         err = device->Deserialize(deviceInfo);
         VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-        device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort);
+        device->Init(mExchangeManager);
     }
 
     *out_device = device;
@@ -289,7 +289,7 @@ CHIP_ERROR DeviceController::GetDevice(NodeId deviceId, Device ** out_device)
             err = device->Deserialize(deviceInfo);
             VerifyOrExit(err == CHIP_NO_ERROR, ReleaseDevice(device));
 
-            device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort);
+            device->Init(mExchangeManager);
         }
     }
 
@@ -332,33 +332,6 @@ CHIP_ERROR DeviceController::ServiceEventSignal()
 
 exit:
     return err;
-}
-
-void DeviceController::OnNewConnection(const Transport::PeerConnectionState * peerConnection, SecureSessionMgr * mgr) {}
-
-void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                                         const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
-                                         SecureSessionMgr * mgr)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    uint16_t index = 0;
-    NodeId peer;
-
-    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(header.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    peer  = header.GetSourceNodeId().Value();
-    index = FindDeviceIndex(peer);
-    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
-
-    mActiveDevices[index].OnMessageReceived(header, payloadHeader, state, std::move(msgBuf), mgr);
-
-exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed to process received message: err %d", err);
-    }
-    return;
 }
 
 uint16_t DeviceController::GetInactiveDeviceIndex()
@@ -509,13 +482,13 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
     err = mRendezvousSession->Init(params.SetLocalNodeId(mLocalDeviceId).SetRemoteNodeId(remoteDeviceId), mTransportMgr);
     SuccessOrExit(err);
 
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
+    device->Init(mExchangeManager, remoteDeviceId);
 
     // TODO: BLE rendezvous and IP rendezvous should have same logic in the future after BLE becomes a transport and network
     // provisiong cluster is ready.
     if (params.GetPeerAddress().GetTransportType() != Transport::Type::kBle)
     {
-        device->SetAddress(params.GetPeerAddress().GetIPAddress());
+        //device->SetAddress(params.GetPeerAddress().GetIPAddress());
         mRendezvousSession->OnRendezvousConnectionOpened();
     }
 
@@ -558,11 +531,7 @@ CHIP_ERROR DeviceCommissioner::PairTestDeviceWithoutSecurity(NodeId remoteDevice
     VerifyOrExit(mDeviceBeingPaired < kNumMaxActiveDevices, err = CHIP_ERROR_NO_MEMORY);
     device = &mActiveDevices[mDeviceBeingPaired];
 
-    testSecurePairingSecret->ToSerializable(device->GetPairing());
-
-    device->Init(mTransportMgr, mSessionManager, mInetLayer, mListenPort, remoteDeviceId, remotePort, interfaceId);
-
-    device->SetAddress(deviceAddr);
+    device->Init(mExchangeManager, remoteDeviceId);
 
     device->Serialize(serialized);
 
@@ -699,22 +668,20 @@ void DeviceCommissioner::OnRendezvousStatusUpdate(RendezvousSessionDelegate::Sta
     switch (status)
     {
     case RendezvousSessionDelegate::SecurePairingSuccess:
+    {
         ChipLogDetail(Controller, "Remote device completed SPAKE2+ handshake\n");
-        mRendezvousSession->GetPairingSession().ToSerializable(device->GetPairing());
+        auto secureSessionParameters = device->GetSecureSessoinParameters();
+        mRendezvousSession->GetPairingSession().ToSerializable(secureSessionParameters);
 
         if (!mIsIPRendezvous && mPairingDelegate != nullptr)
         {
             mPairingDelegate->OnNetworkCredentialsRequested(mRendezvousSession);
         }
         break;
+    }
 
     case RendezvousSessionDelegate::SecurePairingFailed:
         ChipLogDetail(Controller, "Remote device failed in SPAKE2+ handshake\n");
-        break;
-
-    case RendezvousSessionDelegate::NetworkProvisioningSuccess:
-        ChipLogDetail(Controller, "Remote device was assigned an ip address\n");
-        device->SetAddress(mRendezvousSession->GetIPAddress());
         break;
 
     case RendezvousSessionDelegate::NetworkProvisioningFailed:
