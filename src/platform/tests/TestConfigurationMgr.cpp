@@ -22,8 +22,6 @@
  *
  */
 
-#include "TestConfigurationMgr.h"
-
 #include <inttypes.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -445,7 +443,7 @@ int TestConfigurationMgr_Teardown(void * inContext)
 
 int TestConfigurationMgr()
 {
-    nlTestSuite theSuite = { "CHIP DeviceLayer time tests", &sTests[0], TestConfigurationMgr_Setup, TestConfigurationMgr_Teardown };
+    nlTestSuite theSuite = { "ConfigurationMgr tests", &sTests[0], TestConfigurationMgr_Setup, TestConfigurationMgr_Teardown };
 
     // Run test suit againt one context.
     nlTestRunner(&theSuite, nullptr);

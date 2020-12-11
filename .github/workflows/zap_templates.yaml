@@ -1,0 +1,47 @@
+# Copyright (c) 2020 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+name: ZAP
+
+on:
+    push:
+    pull_request:
+
+jobs:
+    templates:
+        name: ZAP templates generation
+
+        runs-on: ubuntu-18.04
+
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v2
+              with:
+                  submodules: true
+            - name: Use Node.js 12.x
+              uses: actions/setup-node@v1
+              with:
+                node-version: '12.x'
+
+            - run: sudo apt-get update
+            - run: sudo apt-get install --fix-missing libpixman-1-dev libcairo-dev libsdl-pango-dev libjpeg-dev libgif-dev
+            - name: Setup ZAP
+              run: |
+                cd third_party/zap/repo/
+                npm ci
+                npm run version-stamp
+                npm rebuild canvas --update-binary
+                npm run build-spa
+            - name: Generate
+              run: scripts/tools/zap_generate.sh examples/all-clusters-app/all-clusters-common/all-clusters-app.zap

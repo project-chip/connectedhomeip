@@ -1,6 +1,8 @@
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2013-2017 Nest Labs, Inc.
+ *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,27 +17,18 @@
  *    limitations under the License.
  */
 
-#include <condition_variable>
-#include <mutex>
-#include <thread>
+/**
+ *    @file
+ *      This file sets up signalling used in Linux CHIP Inet layer library test
+ *      applications and tools.
+ *
+ *      NOTE: These do not comprise a public part of the CHIP API and
+ *            are subject to change without notice.
+ *
+ */
 
-#include "TestMdns.h"
+#pragma once
 
-int main()
-{
-    std::mutex mtx;
-    std::unique_lock<std::mutex> lock(mtx);
-    std::condition_variable done;
-    int retVal = -1;
-
-    std::thread t([&done, &retVal]() {
-        retVal = TestMdns();
-        done.notify_all();
-    });
-
-    if (done.wait_for(lock, std::chrono::seconds(5)) == std::cv_status::timeout)
-    {
-        fprintf(stderr, "mDNS test timeout, is avahi daemon running?");
-    }
-    return retVal;
-}
+void SetSIGUSR1Handler();
+typedef void (*SignalHandler)(int signum);
+void SetSignalHandler(SignalHandler handler);

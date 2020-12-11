@@ -132,16 +132,13 @@ private:
 
     void SkipToFirstValidInterface()
     {
-        if (SkipCurrentInterface())
+        do
         {
-            while (mIterator.Next())
+            if (!SkipCurrentInterface())
             {
-                if (!SkipCurrentInterface())
-                {
-                    break;
-                }
+                break;
             }
-        }
+        } while (mIterator.Next());
     }
 
     bool SkipCurrentInterface()
