@@ -32,6 +32,7 @@
 #include <inttypes.h>
 #include <string.h>
 
+#include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
 #include <protocols/Protocols.h>
 #include <support/BufBound.h>
@@ -399,8 +400,9 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamResponse()
     err   = DRBG_get_bytes(pResp->mRandom, sizeof(pResp->mRandom));
     SuccessOrExit(err);
 
-    pResp->mIterations = mIterationCount;
-    pResp->mSaltLength = mSaltLength;
+    chip::Encoding::LittleEndian::Put64(reinterpret_cast<uint8_t *>(&pResp->mIterations), mIterationCount);
+    chip::Encoding::LittleEndian::Put32(reinterpret_cast<uint8_t *>(&pResp->mSaltLength), mSaltLength);
+
     {
         BufBound bbuf(pResp->mSalt, mSaltLength);
         bbuf.Put(mSalt, mSaltLength);
@@ -435,26 +437,32 @@ CHIP_ERROR SecurePairingSession::HandlePBKDFParamResponse(const PacketHeader & h
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Response message processing
-    const uint8_t * resp             = msg->Start();
-    size_t resplen                   = msg->TotalLength();
+    const uint8_t * resp = msg->Start();
+    size_t resplen       = msg->TotalLength();
+    uint32_t saltlen     = 0;
+    uint64_t iterCount   = 0;
+
     const PBKDFParamResponse * pResp = reinterpret_cast<const PBKDFParamResponse *>(resp);
-    ;
 
     ChipLogDetail(Ble, "Received PBKDF param response");
 
     VerifyOrExit(resp != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(resplen >= sizeof(PBKDFParamResponse), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    VerifyOrExit(resplen == sizeof(PBKDFParamResponse) + pResp->mSaltLength, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    iterCount = chip::Encoding::LittleEndian::Get64(reinterpret_cast<const uint8_t *>(&pResp->mIterations));
+    saltlen   = chip::Encoding::LittleEndian::Get32(reinterpret_cast<const uint8_t *>(&pResp->mSaltLength));
+
+    VerifyOrExit(resplen == sizeof(PBKDFParamResponse) + saltlen, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Specifications allow message to carry a uint64_t sized iteration count. Current APIs are
     // limiting it to uint32_t. Let's make sure it'll fit the size limit.
-    VerifyOrExit(CanCastTo<uint32_t>(pResp->mIterations), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(CanCastTo<uint32_t>(iterCount), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     // Update commissioning hash with the received pbkdf2 param response
     err = mCommissioningHash.AddData(resp, resplen);
     SuccessOrExit(err);
 
-    err = SetupSpake2p(static_cast<uint32_t>(pResp->mIterations), pResp->mSalt, pResp->mSaltLength);
+    err = SetupSpake2p(static_cast<uint32_t>(iterCount), pResp->mSalt, saltlen);
     SuccessOrExit(err);
 
     err = SendMsg1();
