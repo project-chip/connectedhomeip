@@ -53,7 +53,7 @@ public:
     }
 
     CHECK_RETURN_VALUE
-    chip::System::PacketBufferHandle && ReleasePacket()
+    chip::System::PacketBufferHandle ReleasePacket()
     {
         mHeader  = HeaderRef(nullptr);
         mBuildOk = false;
