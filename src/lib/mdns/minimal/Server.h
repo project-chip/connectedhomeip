@@ -98,7 +98,7 @@ public:
     CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port);
 
     /// Send a specific packet broadcast to a specific interface
-    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface);
+    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port, chip::Inet::InterfaceId interface);
 
     ServerBase & SetDelegate(ServerDelegate * d)
     {

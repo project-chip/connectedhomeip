@@ -156,7 +156,7 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
     return CHIP_ERROR_NOT_CONNECTED;
 }
 
-CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, uint16_t port, chip::Inet::InterfaceId interface)
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port, chip::Inet::InterfaceId interface)
 {
     for (size_t i = 0; i < mEndpointCount; i++)
     {
@@ -172,19 +172,23 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle && data, u
             continue;
         }
 
-        // data may be sent over multiple packets. Keep the one ref active all the time
-        chip::System::PacketBufferHandle extraCopy = data.Retain();
-
         CHIP_ERROR err;
+
+        /// The same packet needs to be sent over potentially multiple interfaces.
+        /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
+        /// TODO: this wastes one copy of the data and that could be optimized away
+        chip::System::PacketBufferHandle copy = data.CloneData();
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(extraCopy));
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
         }
+#if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(extraCopy));
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
         }
+#endif
         else
         {
             return CHIP_ERROR_INCORRECT_STATE;
@@ -210,22 +214,25 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
             continue;
         }
 
-        // data may be sent over multiple packets. Keep the one ref active all the time
-        data->AddRef();
-
         CHIP_ERROR err;
+
+        /// The same packet needs to be sent over potentially multiple interfaces.
+        /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
+        /// TODO: this wastes one copy of the data and that could be optimized away
+        chip::System::PacketBufferHandle copy = data.CloneData();
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(data));
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
         }
+#if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(data));
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
         }
+#endif
         else
         {
-            // remove extra ref and then also clear it
             return CHIP_ERROR_INCORRECT_STATE;
         }
 

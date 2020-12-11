@@ -33,7 +33,7 @@
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include <app/util/basic-types.h>
-#include <lib/mdns/DiscoveryManager.h>
+#include <lib/mdns/Advertiser.h>
 #include <support/CodeUtils.h>
 
 static const char * TAG = "app-devicecallbacks";
@@ -92,7 +92,11 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     {
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
-        chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice();
+
+        if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort) != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "Failed to start mDNS advertisement");
+        }
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -102,7 +106,10 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
     if (event->InternetConnectivityChange.IPv6 == kConnectivity_Established)
     {
         ESP_LOGI(TAG, "IPv6 Server ready...");
-        chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice();
+        if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort) != CHIP_NO_ERROR)
+        {
+            ESP_LOGE(TAG, "Failed to start mDNS advertisement");
+        }
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {
