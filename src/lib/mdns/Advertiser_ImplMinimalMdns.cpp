@@ -362,6 +362,12 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     FullQName operationalServerName  = AllocateQName(uniqueName, "_chip", "_tcp", "local");
     FullQName serverName             = AllocateQName(uniqueName, "local");
 
+    if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
+    {
+        ChipLogError(Discovery, "Failed to allocate QNames.");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
     if (!AddResponder<PtrResponder>(operationalServiceName, operationalServerName)
              .SetReportAdditional(operationalServerName)
              .SetReportInServiceListing(true)
