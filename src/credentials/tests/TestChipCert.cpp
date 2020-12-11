@@ -49,7 +49,7 @@ static CHIP_ERROR LoadStandardCerts(ChipCertificateSet & certSet)
 {
     CHIP_ERROR err;
 
-    err = LoadTestCert(certSet, kTestCert_Root | kDecodeFlag_IsTrusted);
+    err = LoadTestCert(certSet, kTestCert_Root | kDecodeFlag_IsTrustAnchor);
     SuccessOrExit(err);
 
     err = LoadTestCert(certSet, kTestCert_NodeCA | kDecodeFlag_GenerateTBSHash);
@@ -158,7 +158,7 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         CA                    = kTestCert_NodeCA,
         Node                  = kTestCert_Node01,
         ReqSHA256             = kValidateFlag_RequireSHA256,
-        IsTrusted             = kDecodeFlag_IsTrusted,
+        IsTrusted             = kDecodeFlag_IsTrustAnchor,
         GenTBSHash            = kDecodeFlag_GenerateTBSHash,
         SupIsCA               = kTestCertLoadFlag_SuppressIsCA,
         SupKeyUsage           = kTestCertLoadFlag_SuppressKeyUsage,

@@ -222,7 +222,7 @@ enum
     kCertFlag_AuthKeyIdPresent            = 0x0020,
     kCertFlag_PathLenConstPresent         = 0x0040,
     kCertFlag_IsCA                        = 0x0080,
-    kCertFlag_IsTrusted                   = 0x0100,
+    kCertFlag_IsTrustAnchor               = 0x0100,
     kCertFlag_TBSHashPresent              = 0x0200,
     kCertFlag_UnsupportedSubjectDN        = 0x0400,
     kCertFlag_UnsupportedIssuerDN         = 0x0800,
@@ -235,7 +235,7 @@ enum
 enum
 {
     kDecodeFlag_GenerateTBSHash = 0x0001,
-    kDecodeFlag_IsTrusted       = 0x0002
+    kDecodeFlag_IsTrustAnchor   = 0x0002
 };
 
 /** CHIP Certificate Validate Flags
@@ -328,6 +328,8 @@ struct ChipCertificateData
     uint16_t NotAfterDate;
     uint8_t PathLenConstraint;
     uint8_t TBSHash[chip::Crypto::kSHA256_Hash_Length];
+
+    void Clear();
 };
 
 /**
@@ -374,7 +376,7 @@ public:
      *        This initialization method is used when all memory structures needed for operation are
      *        allocated internally using chip::Platform::MemoryAlloc() and freed with chip::Platform::MemoryFree().
      *
-     * @param maxCertsArraySize  Muximum number of CHIP certificates to be loaded to the set.
+     * @param maxCertsArraySize  Maximum number of CHIP certificates to be loaded to the set.
      * @param decodeBufSize      Size of the buffer that should be allocated to perform CHIP certificate decoding.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
