@@ -159,6 +159,7 @@ void InitServer(AppDelegate * delegate)
         SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
     }
 
+#if CHIP_ENABLE_MDNS
     // TODO: advertise this only when really operational once we support both
     // operational and commisioning advertising is supported.
     {
@@ -178,6 +179,7 @@ void InitServer(AppDelegate * delegate)
 
     err = Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
     SuccessOrExit(err);
+#endif
 
     err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
