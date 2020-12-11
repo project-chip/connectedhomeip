@@ -25,7 +25,8 @@ if sys.version_info[0] < 3:
     exit(1)
 
 # Check if we are in top of CHIP folder
-if not str(os.getcwd()).endswith("connectedhomeip"):
+scripts_path = os.path.join(os.getcwd(), 'scripts/tools/zap_regen_all.py')
+if not os.path.exists(scripts_path):
     print(os.getcwd())
     print('This script must be called from the root of the chip directory')
     exit(1)
