@@ -83,7 +83,7 @@ exit:
 
 CHIP_ERROR ModelCommand::RunCommandInternal(ChipDevice * device)
 {
-    CHIP_ERROR err      = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     ChipLogProgress(chipTool, "Endpoint id: '0x%02x', Cluster id: '0x%04x', Command id: '0x%02x'", mEndPointId, mClusterId,
                     mCommandId);
 
