@@ -20,7 +20,7 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libMinimalMdnsCoreTests"
 
-  test_sources = [ 
+  test_sources = [
     "TestFlatAllocatedQName.cpp",
     "TestQName.cpp",
   ]
