@@ -19,14 +19,7 @@ git clone https://github.com/project-chip/connectedhomeip.git
 
 2. Build CHIP
 
-```
-cd connectedhomeip
-./gn_build.sh
-```
-
-It will set up the environment, checkout submodules and build the whole CHIP
-source, on a workstation it will take about 2 minutes to build, and it takes
-about 10 minutes to build on Raspberry Pi 4.
+Follow [BUILDING.md](/docs/BUILDING.md) to build CHIP on your platform.
 
 3. Install Chip Device Controller
 
@@ -57,6 +50,12 @@ cd third_party/bluez/repo
 ./bootstrap
 third_party/bluez/repo/configure --prefix=/usr --mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var --enable-experimental --with-systemdsystemunitdir=/lib/systemd/system --with-systemduserunitdir=/usr/lib/systemd --enable-deprecated --enable-testing --enable-tools
 make
+```
+
+Note: You also need to install several packages on RPi if you want to build bluez
+
+```
+sudo apt-get install libtool m4 automake autotools-dev libudev-dev libical-dev libreadline-dev
 ```
 
 Run bluetoothd:
