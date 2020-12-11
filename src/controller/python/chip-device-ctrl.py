@@ -311,7 +311,10 @@ class DeviceMgrCmd(Cmd):
 
     def do_bleconnect(self, line):
         """
-        ble-connect
+        ble-connect <device-name>
+        ble-connect <mac-address (linux only)>
+        ble-connect <device-uuid>
+        ble-connect <discriminator>
 
         Connect to a BLE peripheral identified by line.
         """
@@ -324,7 +327,10 @@ class DeviceMgrCmd(Cmd):
 
     def do_blescanconnect(self, line):
         """
-        ble-scan-connect
+        ble-scan-connect <device-name>
+        ble-scan-connect <mac-address (linux only)>
+        ble-scan-connect <device-uuid>
+        ble-scan-connect <discriminator>
 
         Scan and connect to a BLE peripheral identified by line.
         """
