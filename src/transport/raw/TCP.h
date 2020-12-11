@@ -25,6 +25,7 @@
 #pragma once
 
 #include <algorithm>
+#include <new>
 #include <utility>
 
 #include <core/CHIPCore.h>
@@ -106,8 +107,14 @@ public:
         mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers), mPendingPacketsSize(packetsBuffersSize)
     {
         std::fill(mActiveConnections, mActiveConnections + mActiveConnectionsSize, nullptr);
-        std::generate(mPendingPackets, mPendingPackets + mPendingPacketsSize,
-                      []() { return PendingPacket{ .peerAddress = PeerAddress::Uninitialized(), .packetBuffer = nullptr }; });
+        for (size_t i = 0; i < mPendingPacketsSize; ++i)
+        {
+            mPendingPackets[i].peerAddress = PeerAddress::Uninitialized();
+            // In the typical case, the TCPBase constructor is invoked from the TCP constructor on its mPendingPackets,
+            // which has not yet been initialized. That means we can't do a normal move assignment or construction of
+            // the PacketBufferHandle, since that would call PacketBuffer::Free on the uninitialized data.
+            new (&mPendingPackets[i].packetBuffer) System::PacketBufferHandle();
+        }
     }
     ~TCPBase() override;
 
