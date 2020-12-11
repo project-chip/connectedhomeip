@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -254,7 +254,7 @@ public:
     /**
      * Return the last buffer in a buffer chain.
      *
-     *  @return a handle to the next buffer in the buffer chain.
+     *  @return a handle to the last buffer in the buffer chain.
      */
     CHECK_RETURN_VALUE PacketBufferHandle Last();
 
@@ -331,7 +331,6 @@ private:
     PacketBuffer * ChainedBuffer() const { return static_cast<PacketBuffer *>(this->next); }
     PacketBuffer * Consume(uint16_t aConsumeLength);
     void Clear();
-    void AddToEnd_ForNow(PacketBuffer * aPacket);
 
     friend class PacketBufferHandle;
     friend class ::PacketBufferTest;
@@ -583,7 +582,7 @@ public:
      *
      *  @note This differs from `FreeHead()` in that it does not touch any content in the currently referenced packet buffer;
      *      it only changes which buffer this handle owns. (Note that this could result in the previous buffer being freed,
-     *      if there is no other.) `Advance()` is designed to be used with an addition handle to traverse a buffer chain,
+     *      if there is no other owner.) `Advance()` is designed to be used with an additional handle to traverse a buffer chain,
      *      whereas `FreeHead()` modifies a chain.
      */
     void Advance() { *this = Hold(mBuffer->ChainedBuffer()); }
@@ -630,6 +629,8 @@ private:
     }
 
     PacketBuffer * Get() const { return mBuffer; }
+
+    bool operator==(const PacketBufferHandle & aOther) { return mBuffer == aOther.mBuffer; }
 
     PacketBuffer * mBuffer;
 
