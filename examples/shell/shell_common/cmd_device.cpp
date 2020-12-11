@@ -937,6 +937,10 @@ void cmd_device_init()
 
     streamer_t * sout = streamer_get();
 
+    error = chip::Platform::MemoryInit();
+    VerifyOrExit(error == CHIP_NO_ERROR,
+                 streamer_printf(sout, "Failed to init CHIP platform memory with error: %s\r\n", ErrorStr(error)));
+
     streamer_printf(sout, "Init CHIP Stack\r\n");
     error = PlatformMgr().InitChipStack();
     VerifyOrExit(error == CHIP_NO_ERROR, streamer_printf(sout, "Failed to init CHIP Stack with error: %s\r\n", ErrorStr(error)));
