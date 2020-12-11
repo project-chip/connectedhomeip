@@ -15,10 +15,13 @@
 #
 
 menuconfig CHIP
-	bool "Enable Connected Home over IP protocol stack"
+	bool "Connected Home over IP protocol stack"
 	default n
 	select CPLUSPLUS
 	imply LIB_CPLUSPLUS
+	imply REQUIRES_FULL_LIBC
+	imply POSIX_API if !ARCH_POSIX
+	imply EVENTFD if !ARCH_POSIX
 	imply REBOOT
 	imply ENTROPY_GENERATOR
 	imply NET_UDP
