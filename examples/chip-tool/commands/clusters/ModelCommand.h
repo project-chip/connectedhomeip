@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include "../common/NetworkCommand.h"
-
+#include "../../config/PersistentStorage.h"
+#include "../common/Command.h"
 #include <app/chip-zcl-zpro-codec.h>
 #include <core/CHIPEncoding.h>
 
@@ -28,24 +28,33 @@
 #define CHIP_ZCL_ENDPOINT_MIN 0x01
 #define CHIP_ZCL_ENDPOINT_MAX 0xF0
 
-class ModelCommand : public NetworkCommand
+class ModelCommand : public Command, public chip::Controller::DeviceStatusDelegate
 {
 public:
     ModelCommand(const char * commandName, uint16_t clusterId, uint8_t commandId) :
-        NetworkCommand(commandName), mClusterId(clusterId), mCommandId(commandId)
+        Command(commandName), mClusterId(clusterId), mCommandId(commandId)
     {}
 
     void AddArguments() { AddArgument("endpoint-id", CHIP_ZCL_ENDPOINT_MIN, CHIP_ZCL_ENDPOINT_MAX, &mEndPointId); }
 
-    /////////// NetworkCommand Interface /////////
-    uint16_t Encode(PacketBufferHandle & buffer, uint16_t bufferSize) override;
-    bool Decode(PacketBufferHandle & buffer) const override;
+    /////////// Command Interface /////////
+    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
+
+    /////////// DeviceStatusDelegate Interface /////////
+    void OnMessage(PacketBufferHandle buffer) override;
+    void OnStatusChange(void) override;
 
     virtual uint16_t EncodeCommand(const PacketBufferHandle & buffer, uint16_t bufferSize, uint8_t endPointId) = 0;
     virtual bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
     virtual bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
 
 private:
+    CHIP_ERROR RunInternal(NodeId remoteId);
+    CHIP_ERROR RunCommandInternal(ChipDevice * device);
+
+    void PrintBuffer(const PacketBufferHandle & buffer) const;
+
+    ChipDeviceCommissioner mCommissioner;
     const uint16_t mClusterId;
     const uint8_t mCommandId;
     uint8_t mEndPointId;
