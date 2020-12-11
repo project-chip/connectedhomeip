@@ -29,6 +29,9 @@
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
+#include <messaging/Channel.h>
+#include <messaging/ExchangeContext.h>
+#include <messaging/ExchangeMgr.h>
 #include <support/Base64.h>
 #include <support/DLLUtil.h>
 #include <transport/PASESession.h>
@@ -51,7 +54,7 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 #endif
                                         >;
 
-class DLL_EXPORT Device
+class DLL_EXPORT Device : public Messaging::ChannelDelegate
 {
 public:
     Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
@@ -76,7 +79,7 @@ public:
      *
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
-    CHIP_ERROR SendMessage(System::PacketBufferHandle message);
+    [[deprecated("Available until moved to Channel API")]] CHIP_ERROR SendMessage(System::PacketBufferHandle message);
 
     /**
      * @brief
@@ -100,17 +103,20 @@ public:
      *   that of this device object. If these objects are freed, while the device object is
      *   still using them, it can lead to unknown behavior and crashes.
      *
-     * @param[in] transportMgr Transport manager object pointer
-     * @param[in] sessionMgr   Secure session manager object pointer
-     * @param[in] inetLayer    InetLayer object pointer
-     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
+     * @param[in] transportMgr    Transport manager object pointer
+     * @param[in] sessionMgr      Secure session manager object pointer
+     * @param[in] inetLayer       InetLayer object pointer
+     * @param[in] exchangeManager ExchangeManager object pointer
+     * @param[in] listenPort      Port on which controller is listening (typically CHIP_PORT)
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer,
+              Messaging::ExchangeManager * exchangeManager, uint16_t listenPort)
     {
-        mTransportMgr   = transportMgr;
-        mSessionManager = sessionMgr;
-        mInetLayer      = inetLayer;
-        mListenPort     = listenPort;
+        mTransportMgr    = transportMgr;
+        mSessionManager  = sessionMgr;
+        mInetLayer       = inetLayer;
+        mExchangeManager = exchangeManager;
+        mListenPort      = listenPort;
     }
 
     /**
@@ -124,18 +130,20 @@ public:
      *   uninitialzed/unpaired device objects. The object is initialized only when the device
      *   is actually paired.
      *
-     * @param[in] transportMgr Transport manager object pointer
-     * @param[in] sessionMgr   Secure session manager object pointer
-     * @param[in] inetLayer    InetLayer object pointer
-     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
-     * @param[in] deviceId     Node ID of the device
-     * @param[in] devicePort   Port on which device is listening (typically CHIP_PORT)
-     * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
+     * @param[in] transportMgr    Transport manager object pointer
+     * @param[in] sessionMgr      Secure session manager object pointer
+     * @param[in] inetLayer       InetLayer object pointer
+     * @param[in] exchangeManager ExchangeManager object pointer
+     * @param[in] listenPort      Port on which controller is listening (typically CHIP_PORT)
+     * @param[in] deviceId        Node ID of the device
+     * @param[in] devicePort      Port on which device is listening (typically CHIP_PORT)
+     * @param[in] interfaceId     Local Interface ID that should be used to talk to the device
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
-              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer,
+              Messaging::ExchangeManager * exchangeManager, uint16_t listenPort, NodeId deviceId, uint16_t devicePort,
+              Inet::InterfaceId interfaceId)
     {
-        Init(transportMgr, sessionMgr, inetLayer, mListenPort);
+        Init(transportMgr, sessionMgr, inetLayer, exchangeManager, mListenPort);
         mDeviceId   = deviceId;
         mDevicePort = devicePort;
         mInterface  = interfaceId;
@@ -205,6 +213,7 @@ public:
     void Reset()
     {
         SetActive(false);
+        CloseSession();
         mState          = ConnectionState::NotConnected;
         mSessionManager = nullptr;
         mStatusDelegate = nullptr;
@@ -219,6 +228,23 @@ public:
 
     PASESessionSerializable & GetPairing() { return mPairing; }
 
+    /**
+     * @brief Establish a new PASE session, using given pin code
+     */
+    CHIP_ERROR EstablishPaseSession(Inet::IPAddress peerAddr, uint32_t setupPINCode);
+
+    /**
+     * @brief Close the session to the device, it will be deferred until all active exchanges are closed.
+     */
+    void CloseSession() { mChannel.Release(); }
+
+    Messaging::ExchangeContext * NewExchange();
+
+    // Messaging::ChannelDelegate interface
+    void OnEstablished() override;
+    void OnClosed() override;
+    void OnFail(CHIP_ERROR err) override;
+
     void AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse);
     void AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onReport);
 
@@ -228,6 +254,10 @@ private:
         NotConnected,
         Connecting,
         SecureConnected,
+        PaseConnecting,
+        PaseConnected,
+        Disconnected,
+        ConnectFailed,
     };
 
     struct CallbackInfo
@@ -263,6 +293,8 @@ private:
     DeviceStatusDelegate * mStatusDelegate;
 
     SecureSessionMgr * mSessionManager;
+    Messaging::ExchangeManager * mExchangeManager;
+    Messaging::ChannelHandle mChannel;
 
     DeviceTransportMgr * mTransportMgr;
 
@@ -306,7 +338,7 @@ public:
      *
      * @param[in] msg Received message buffer.
      */
-    virtual void OnMessage(System::PacketBufferHandle msg) = 0;
+    [[deprecated("Available until moved to Channel API")]] virtual void OnMessage(System::PacketBufferHandle msg) = 0;
 
     /**
      * @brief

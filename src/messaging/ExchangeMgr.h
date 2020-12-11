@@ -69,7 +69,8 @@ public:
      *  @retval #CHIP_NO_ERROR On success.
      *
      */
-    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr);
+    CHIP_ERROR Init(NodeId localNodeId, TransportMgrBase * transportMgr, SecureSessionMgr * sessionMgr,
+                    SecureSessionMgrDelegate * deviceController = nullptr);
 
     /**
      *  Shutdown the ExchangeManager. This terminates this instance
@@ -203,6 +204,9 @@ private:
     TransportMgrBase * mTransportMgr;
     SecureSessionMgr * mSessionMgr;
     ReliableMessageManager mReliableMessageMgr;
+    // TODO: allow temporary propagate SecureSessionMgrDelegate events to device controller, it won't be necessary after
+    // fully migrated to messaging layer
+    SecureSessionMgrDelegate * mDeviceController;
 
     std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;

@@ -283,6 +283,62 @@ bool Device::GetIpAddress(Inet::IPAddress & addr) const
     return true;
 }
 
+CHIP_ERROR Device::EstablishPaseSession(Inet::IPAddress peerAddr, uint32_t setupPINCode)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    if (mExchangeManager == nullptr || mState == ConnectionState::SecureConnected)
+    {
+        ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
+    }
+
+    {
+        auto state = mChannel.GetState();
+        if (state != Messaging::ChannelState::kChanneState_None && state != Messaging::ChannelState::kChanneState_Closed &&
+            state != Messaging::ChannelState::kChanneState_Failed)
+            ExitNow(err = CHIP_ERROR_INCORRECT_STATE);
+
+        mState = ConnectionState::PaseConnecting;
+        Messaging::ChannelBuilder builder;
+        builder.SetPeerNodeId(mDeviceId)
+            .SetHintPeerAddress(peerAddr)
+            .SetSessionType(Messaging::ChannelBuilder::SessionType::kSession_PASE)
+            .SetPeerSetUpPINCode(setupPINCode);
+        mChannel = mExchangeManager->EstablishChannel(builder, this);
+    }
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "EstablishPaseSession returning error %d\n", err);
+    }
+    return err;
+}
+
+void Device::OnEstablished()
+{
+    // device connected
+    if (mState == ConnectionState::PaseConnecting)
+        mState = ConnectionState::PaseConnected;
+    mStatusDelegate->OnStatusChange();
+}
+
+void Device::OnClosed()
+{
+    // device disconnected
+    if (mState == ConnectionState::PaseConnecting || mState == ConnectionState::PaseConnected)
+        mState = ConnectionState::Disconnected;
+    mStatusDelegate->OnStatusChange();
+}
+
+void Device::OnFail(CHIP_ERROR err)
+{
+    // device failure
+    if (mState == ConnectionState::PaseConnecting || mState == ConnectionState::PaseConnected)
+        mState = ConnectionState::ConnectFailed;
+    mStatusDelegate->OnStatusChange();
+}
+
 void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse)
 {
     CallbackInfo info                 = { endpoint, cluster };

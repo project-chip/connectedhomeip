@@ -135,14 +135,15 @@ public:
         return *this;
     }
 
-#ifndef NDEBUG
-    Optional<Inet::IPAddress> GetHintPeerAddress() const { return mHintPeerAddr; }
-    ChannelBuilder & SetHintPeerAddress(Inet::IPAddress peerAddr)
+    [[deprecated("Available until new mDNS is ready")]] Optional<Inet::IPAddress> GetHintPeerAddress() const
+    {
+        return mHintPeerAddr;
+    }
+    [[deprecated("Available until new mDNS is ready")]] ChannelBuilder & SetHintPeerAddress(Inet::IPAddress peerAddr)
     {
         mHintPeerAddr.SetValue(peerAddr);
         return *this;
     }
-#endif // NDEBUG
 
 private:
     NodeId mPeerNodeId                       = kUndefinedNodeId;
@@ -161,9 +162,7 @@ private:
         } mPaseParameters;
     };
 
-#ifndef NDEBUG
     Optional<Inet::IPAddress> mHintPeerAddr;
-#endif // NDEBUG
 };
 
 class ExchangeContext;

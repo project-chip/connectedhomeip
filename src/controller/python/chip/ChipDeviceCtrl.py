@@ -31,6 +31,7 @@ import time
 from threading import Thread
 from ctypes import *
 from .ChipStack import *
+from .Device import *
 import enum
 
 
@@ -80,13 +81,17 @@ class DCState(enum.IntEnum):
 
 @_singleton
 class ChipDeviceController(object):
-    def __init__(self, startNetworkThread=True):
+    def __init__(self, localNodeId, startNetworkThread=True):
         self.state = DCState.NOT_INITIALIZED
         self.devCtrl = None
         self.networkThread = None
         self.networkThreadRunable = False
         self._ChipStack = ChipStack()
         self._dmLib = None
+
+        if not isinstance(localNodeId, int):
+            raise TypeError("localNodeId is not int")
+        self.localNodeId = localNodeId
 
         self._InitLib()
 
@@ -104,9 +109,15 @@ class ChipDeviceController(object):
         if res != 0:
             raise self._ChipStack.ErrorToException(res)
 
+        devCtrlNewApi = c_void_p(None)
+        self._dmLib.nl_Chip_DeviceController_GetDeviceConrollerNewApi(devCtrl, pointer(devCtrlNewApi))
+
         self.devCtrl = devCtrl
+        self.devCtrlNewApi = devCtrlNewApi
         self.pairingDelegate = pairingDelegate
         self._ChipStack.devCtrl = devCtrl
+
+        self.device = Device(self._ChipStack, self.devCtrlNewApi, self.localNodeId)
 
         # set by other modules(BLE) that require service by thread while thread blocks.
         self.blockingCB = None
@@ -220,18 +231,7 @@ class ChipDeviceController(object):
         )
 
     def ConnectIP(self, ipaddr, setupPinCode):
-        def HandleComplete(dc, connState, appState):
-            print("Rendezvous Complete")
-            self.state = DCState.RENDEZVOUS_CONNECTED
-            self._ChipStack.callbackRes = True
-            self._ChipStack.completeEvent.set()
-        onConnectFunct = _OnConnectFunct(HandleComplete)
-
-        self.state = DCState.RENDEZVOUS_ONGOING
-        return self._ChipStack.CallAsync(
-            lambda: self._dmLib.nl_Chip_DeviceController_ConnectIP(
-                self.devCtrl, ipaddr, setupPinCode, onConnectFunct, self.cbHandleMessage, self.cbHandleRendezvousError)
-        )
+        return self.device.ConnectIP(ipaddr, setupPinCode)
 
     def Close(self):
         self._ChipStack.Call(
