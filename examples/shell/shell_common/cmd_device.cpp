@@ -497,6 +497,20 @@ exit:
 }
 
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+int cmd_device_start_wifi(int argc, char ** argv)
+{
+    CHIP_ERROR error  = CHIP_NO_ERROR;
+    streamer_t * sout = streamer_get();
+
+    VerifyOrExit(argc == 0, error = CHIP_ERROR_INVALID_ARGUMENT);
+
+    streamer_printf(sout, "Starting WiFi management\r\n");
+    ConnectivityMgrImpl().StartWiFiManagement();
+
+exit:
+    return error;
+}
+
 int cmd_device_sta(int argc, char ** argv)
 {
     streamer_t * sout = streamer_get();
@@ -932,6 +946,7 @@ static const shell_command_t cmds_device[] = {
     { &cmd_device_thread, "thread", "Control the Thread interface. Usage: device thread <param_name>" },
 #endif
 #if CHIP_DEVICE_CONFIG_ENABLE_WPA
+    { &cmd_device_start_wifi, "start_wifi", "Start WiFi management. Usage: device start_wifi" },
     { &cmd_device_sta, "sta", "Control the WiFi STA interface. Usage: device sta <param_name>" },
     { &cmd_device_ap, "ap", "Control the WiFi AP interface. Usage: device ap <param_name>" },
     { &cmd_device_connect, "connect", "Join the network with the given SSID and PSK. Usage: device connect <ssid> <passphrase>" },
