@@ -22,39 +22,41 @@
 namespace chip {
 namespace Controller {
 
-// TODO: Find a way to calculate maximum message length for clusters
-//       https://github.com/project-chip/connectedhomeip/issues/965
-constexpr uint16_t kMaxOnOffMessageLength = 64;
-
 CHIP_ERROR OnOffCluster::On(Callback::Callback<> * onCompletion)
 {
-    return SendCommand(encodeOnOffClusterOnCommand, kMaxOnOffMessageLength, onCompletion);
+    System::PacketBufferHandle payload = encodeOnOffClusterOnCommand(mEndpoint);
+    return SendCommand(payload, onCompletion);
 }
 
 CHIP_ERROR OnOffCluster::Off(Callback::Callback<> * onCompletion)
 {
-    return SendCommand(encodeOnOffClusterOffCommand, kMaxOnOffMessageLength, onCompletion);
+    System::PacketBufferHandle payload = encodeOnOffClusterOffCommand(mEndpoint);
+    return SendCommand(payload, onCompletion);
 }
 
 CHIP_ERROR OnOffCluster::Toggle(Callback::Callback<> * onCompletion)
 {
-    return SendCommand(encodeOnOffClusterToggleCommand, kMaxOnOffMessageLength, onCompletion);
+    System::PacketBufferHandle payload = encodeOnOffClusterToggleCommand(mEndpoint);
+    return SendCommand(payload, onCompletion);
 }
 
 CHIP_ERROR OnOffCluster::ReadAttributeOnOff(Callback::Callback<> * onCompletion)
 {
-    return SendCommand(encodeOnOffClusterReadOnOffAttribute, kMaxOnOffMessageLength, onCompletion);
+    System::PacketBufferHandle payload = encodeOnOffClusterReadOnOffAttribute(mEndpoint);
+    return SendCommand(payload, onCompletion);
 }
 
-CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Callback<> * onChange, uint16_t minInterval, uint16_t maxInterval)
+CHIP_ERROR OnOffCluster::ReportAttributeOnOff(Callback::Callback<> * onCompletion, Callback::Callback<> * onChange,
+                                              uint16_t minInterval, uint16_t maxInterval)
 {
-    return RequestAttributeReporting(encodeOnOffClusterReportOnOffAttribute, kMaxOnOffMessageLength, minInterval, maxInterval,
-                                     onChange);
+    System::PacketBufferHandle payload = encodeOnOffClusterReportOnOffAttribute(mEndpoint, minInterval, maxInterval);
+    return RequestAttributeReporting(payload, onCompletion, onChange);
 }
 
 CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Callback<> * onCompletion)
 {
-    return CHIP_NO_ERROR;
+    System::PacketBufferHandle payload = encodeOnOffClusterReadClusterRevisionAttribute(mEndpoint);
+    return SendCommand(payload, onCompletion);
 }
 
 } // namespace Controller

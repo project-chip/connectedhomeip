@@ -21,8 +21,6 @@
 using namespace ::chip;
 
 namespace {
-// Make sure our buffer is big enough, but this will need a better setup!
-constexpr uint16_t kMaxBufferSize                            = 1024;
 constexpr uint16_t kWaitDurationInSeconds                    = 10;
 constexpr uint8_t kZCLGlobalCmdFrameControlHeader            = 8;
 constexpr uint8_t kZCLClusterCmdFrameControlHeader           = 9;
@@ -86,18 +84,11 @@ exit:
 CHIP_ERROR ModelCommand::RunCommandInternal(ChipDevice * device)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
-    uint16_t payloadLen = 0;
-
-    PacketBufferHandle buffer = PacketBuffer::NewWithAvailableSize(kMaxBufferSize);
-    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
-
     ChipLogProgress(chipTool, "Endpoint id: '0x%02x', Cluster id: '0x%04x', Command id: '0x%02x'", mEndPointId, mClusterId,
                     mCommandId);
 
-    payloadLen = EncodeCommand(buffer, kMaxBufferSize, mEndPointId);
-    VerifyOrExit(payloadLen != 0, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-    buffer->SetDataLength(payloadLen);
+    PacketBufferHandle buffer = EncodeCommand(mEndPointId);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_INTERNAL);
 
 #ifdef DEBUG
     PrintBuffer(buffer);

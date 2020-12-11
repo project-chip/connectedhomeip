@@ -44,7 +44,7 @@ public:
     void OnMessage(PacketBufferHandle buffer) override;
     void OnStatusChange(void) override;
 
-    virtual uint16_t EncodeCommand(const PacketBufferHandle & buffer, uint16_t bufferSize, uint8_t endPointId) = 0;
+    virtual PacketBufferHandle EncodeCommand(uint8_t endPointId) = 0;
     virtual bool HandleGlobalResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
     virtual bool HandleSpecificResponse(uint8_t commandId, uint8_t * message, uint16_t messageLen) const { return false; }
 
