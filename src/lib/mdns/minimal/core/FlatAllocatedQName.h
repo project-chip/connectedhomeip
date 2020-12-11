@@ -36,7 +36,7 @@ inline size_t RequiredStorageSize()
     return 0;
 }
 
-/// Deternmine the memory size required to store the given qname parts
+/// Determines the memory size required to store the given qname parts.
 ///
 /// Example:
 ///   malloc(RequiredStorageSize("myhostname", "local"));
@@ -66,7 +66,7 @@ inline void Initialize(QNamePart * ptrLocation, char * nameLocation, const char 
 
 } // namespace Internal
 
-/// Build a qname inside the given storate
+/// Builds a qname inside the given storage.
 ///
 /// storage MUST be aligned to hold pointers
 ///

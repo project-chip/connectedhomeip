@@ -207,7 +207,7 @@ private:
     /// allocated memory.
     void Clear();
 
-    /// Append another responder to the internal replies
+    /// Appends another responder to the internal replies.
     template <typename ResponderType, typename... Args>
     QueryResponderSettings AddResponder(Args &&... args)
     {
