@@ -22,6 +22,8 @@
 
 #include "CHIPCryptoPAL.h"
 
+#include <type_traits>
+
 #include <mbedtls/bignum.h>
 #include <mbedtls/ccm.h>
 #include <mbedtls/ctr_drbg.h>

@@ -22,6 +22,8 @@
 
 #include "CHIPCryptoPAL.h"
 
+#include <type_traits>
+
 #include <openssl/bn.h>
 #include <openssl/conf.h>
 #include <openssl/ec.h>
