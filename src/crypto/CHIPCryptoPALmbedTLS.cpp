@@ -192,7 +192,8 @@ Hash_SHA256_stream::~Hash_SHA256_stream(void) {}
 
 static inline mbedtls_sha256_context * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
-    nlSTATIC_ASSERT_PRINT(sizeof(context->mOpaque) >= sizeof(mbedtls_sha256_context), "Need more memory for SHA256 Context");
+    static_assert(sizeof(context->mOpaque) >= sizeof(mbedtls_sha256_context), "Need more memory for SHA256 Context");
+    static_assert(std::is_trivially_copyable<mbedtls_sha256_context>(), "mbedtls_sha256_context values must copyable");
     return reinterpret_cast<mbedtls_sha256_context *>(context->mOpaque);
 }
 

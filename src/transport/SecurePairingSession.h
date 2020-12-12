@@ -266,19 +266,6 @@ private:
     uint16_t mSaltLength     = 0;
     uint8_t * mSalt          = nullptr;
 
-    struct PBKDFParamRequest
-    {
-        uint8_t mRandom[kPBKDFParamRandomNumberSize];
-    };
-
-    struct PBKDFParamResponse
-    {
-        uint8_t mRandom[kPBKDFParamRandomNumberSize];
-        uint64_t mIterations;
-        uint32_t mSaltLength;
-        uint8_t mSalt[0];
-    };
-
     struct Spake2pErrorMsg
     {
         Spake2pErrorType error;

@@ -350,6 +350,8 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, size_t data_length, uint8_t * out_b
 
 /**
  * @brief A class that defines stream based implementation of SHA-256 hash
+ *        It's expected that the object of this class can be safely copied.
+ *        All implementations must check for std::is_trivially_copyable.
  **/
 
 struct HashSHA256OpaqueContext
@@ -457,7 +459,7 @@ public:
      * @brief Initialize Spake2+ with some context specific information.
      *
      * @param context     The spake2p session will bootstrap from this hash context.
-     *                    If the provided context is null, the spake2p will bootstrap
+     *                    If the provided context pointer is null, the spake2p session will bootstrap
      *                    from a blank hash context.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise

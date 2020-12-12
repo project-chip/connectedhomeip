@@ -52,11 +52,14 @@ SecurePairingSession::SecurePairingSession() {}
 
 SecurePairingSession::~SecurePairingSession()
 {
+    // Let's clear out any security state stored in the object, before destroying it.
     Clear();
 }
 
 void SecurePairingSession::Clear()
 {
+    // This function zero's out and resets the memory used by the object.
+    // It's done so that no security related information will be leaked.
     memset(&mPoint[0], 0, sizeof(mPoint));
     memset(&mWS[0][0], 0, sizeof(mWS));
     memset(&mKe[0], 0, sizeof(mKe));
@@ -198,11 +201,11 @@ CHIP_ERROR SecurePairingSession::SetupSpake2p(uint32_t pbkdf2IterCount, const ui
     VerifyOrExit(salt != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(saltLen > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    err = mSpake2p.Init(&mCommissioningHash);
-    SuccessOrExit(err);
-
     err = pbkdf2_sha256(reinterpret_cast<const uint8_t *>(&mSetupPINCode), sizeof(mSetupPINCode), salt, saltLen, pbkdf2IterCount,
                         sizeof(mWS), &mWS[0][0]);
+    SuccessOrExit(err);
+
+    err = mSpake2p.Init(&mCommissioningHash);
     SuccessOrExit(err);
 
 exit:
@@ -318,21 +321,16 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamRequest()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    System::PacketBufferHandle req;
-    uint16_t reqlen          = sizeof(PBKDFParamRequest);
-    PBKDFParamRequest * pReq = nullptr;
-
-    req = System::PacketBuffer::NewWithAvailableSize(reqlen);
+    System::PacketBufferHandle req = System::PacketBuffer::NewWithAvailableSize(kPBKDFParamRandomNumberSize);
     VerifyOrExit(!req.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
-    pReq = reinterpret_cast<PBKDFParamRequest *>(req->Start());
-    err  = DRBG_get_bytes(pReq->mRandom, sizeof(pReq->mRandom));
+    err = DRBG_get_bytes(req->Start(), kPBKDFParamRandomNumberSize);
     SuccessOrExit(err);
 
-    req->SetDataLength(reqlen);
+    req->SetDataLength(kPBKDFParamRandomNumberSize);
 
     // Update commissioning hash with the pbkdf2 param request that's being sent.
-    err = mCommissioningHash.AddData(req->Start(), req->TotalLength());
+    err = mCommissioningHash.AddData(req->Start(), req->DataLength());
     SuccessOrExit(err);
 
     mNextExpectedMsg = Spake2pMsgType::kPBKDFParamResponse;
@@ -357,10 +355,10 @@ CHIP_ERROR SecurePairingSession::HandlePBKDFParamRequest(const PacketHeader & he
 
     // Request message processing
     const uint8_t * req = msg->Start();
-    size_t reqlen       = msg->TotalLength();
+    size_t reqlen       = msg->DataLength();
 
     VerifyOrExit(req != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
-    VerifyOrExit(reqlen == sizeof(PBKDFParamRequest), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(reqlen == kPBKDFParamRandomNumberSize, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     ChipLogDetail(Ble, "Received PBKDF param request");
 
@@ -385,34 +383,38 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamResponse()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     System::PacketBufferHandle resp;
-    uint16_t resplen           = 0;
-    PBKDFParamResponse * pResp = nullptr;
+    size_t resplen  = kPBKDFParamRandomNumberSize + sizeof(uint64_t) + sizeof(uint32_t) + mSaltLength;
+    uint16_t u16len = 0;
 
     size_t sizeof_point = sizeof(mPoint);
 
-    VerifyOrExit(CanCastTo<uint16_t>(sizeof(PBKDFParamResponse) + mSaltLength), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-    resplen = static_cast<uint16_t>(sizeof(PBKDFParamResponse) + mSaltLength);
+    uint8_t * msg = nullptr;
 
-    resp = System::PacketBuffer::NewWithAvailableSize(resplen);
+    VerifyOrExit(CanCastTo<uint16_t>(resplen), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    u16len = static_cast<uint16_t>(resplen);
+
+    resp = System::PacketBuffer::NewWithAvailableSize(u16len);
     VerifyOrExit(!resp.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
-    pResp = reinterpret_cast<PBKDFParamResponse *>(resp->Start());
-    err   = DRBG_get_bytes(pResp->mRandom, sizeof(pResp->mRandom));
+    msg = resp->Start();
+
+    // Fill in the random value
+    err = DRBG_get_bytes(msg, kPBKDFParamRandomNumberSize);
     SuccessOrExit(err);
 
-    chip::Encoding::LittleEndian::Put64(reinterpret_cast<uint8_t *>(&pResp->mIterations), mIterationCount);
-    chip::Encoding::LittleEndian::Put32(reinterpret_cast<uint8_t *>(&pResp->mSaltLength), mSaltLength);
-
+    // Let's construct the rest of the message using BufBound
     {
-        BufBound bbuf(pResp->mSalt, mSaltLength);
+        BufBound bbuf(&msg[kPBKDFParamRandomNumberSize], resplen - kPBKDFParamRandomNumberSize);
+        bbuf.Put64(mIterationCount);
+        bbuf.Put32(mSaltLength);
         bbuf.Put(mSalt, mSaltLength);
         VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
     }
 
-    resp->SetDataLength(resplen);
+    resp->SetDataLength(u16len);
 
     // Update commissioning hash with the pbkdf2 param response that's being sent.
-    err = mCommissioningHash.AddData(resp->Start(), resp->TotalLength());
+    err = mCommissioningHash.AddData(resp->Start(), resp->DataLength());
     SuccessOrExit(err);
 
     err = SetupSpake2p(mIterationCount, mSalt, mSaltLength);
@@ -438,32 +440,36 @@ CHIP_ERROR SecurePairingSession::HandlePBKDFParamResponse(const PacketHeader & h
 
     // Response message processing
     const uint8_t * resp = msg->Start();
-    size_t resplen       = msg->TotalLength();
-    uint32_t saltlen     = 0;
-    uint64_t iterCount   = 0;
+    size_t resplen       = msg->DataLength();
 
-    const PBKDFParamResponse * pResp = reinterpret_cast<const PBKDFParamResponse *>(resp);
+    // This the fixed part of the message. The variable part of the message contains the salt.
+    // The length of variable part is determined by the salt length in the fixed header.
+    size_t fixed_resplen = kPBKDFParamRandomNumberSize + sizeof(uint64_t) + sizeof(uint32_t);
 
     ChipLogDetail(Ble, "Received PBKDF param response");
 
     VerifyOrExit(resp != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
-    VerifyOrExit(resplen >= sizeof(PBKDFParamResponse), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(resplen >= fixed_resplen, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    iterCount = chip::Encoding::LittleEndian::Get64(reinterpret_cast<const uint8_t *>(&pResp->mIterations));
-    saltlen   = chip::Encoding::LittleEndian::Get32(reinterpret_cast<const uint8_t *>(&pResp->mSaltLength));
+    {
+        // Let's skip of the random number portion of the message
+        const uint8_t * msgptr = &resp[kPBKDFParamRandomNumberSize];
+        uint64_t iterCount     = chip::Encoding::LittleEndian::Read64(msgptr);
+        uint32_t saltlen       = chip::Encoding::LittleEndian::Read32(msgptr);
 
-    VerifyOrExit(resplen == sizeof(PBKDFParamResponse) + saltlen, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+        VerifyOrExit(resplen == fixed_resplen + saltlen, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    // Specifications allow message to carry a uint64_t sized iteration count. Current APIs are
-    // limiting it to uint32_t. Let's make sure it'll fit the size limit.
-    VerifyOrExit(CanCastTo<uint32_t>(iterCount), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+        // Specifications allow message to carry a uint64_t sized iteration count. Current APIs are
+        // limiting it to uint32_t. Let's make sure it'll fit the size limit.
+        VerifyOrExit(CanCastTo<uint32_t>(iterCount), err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
-    // Update commissioning hash with the received pbkdf2 param response
-    err = mCommissioningHash.AddData(resp, resplen);
-    SuccessOrExit(err);
+        // Update commissioning hash with the received pbkdf2 param response
+        err = mCommissioningHash.AddData(resp, resplen);
+        SuccessOrExit(err);
 
-    err = SetupSpake2p(static_cast<uint32_t>(iterCount), pResp->mSalt, saltlen);
-    SuccessOrExit(err);
+        err = SetupSpake2p(static_cast<uint32_t>(iterCount), msgptr, saltlen);
+        SuccessOrExit(err);
+    }
 
     err = SendMsg1();
     SuccessOrExit(err);
@@ -496,11 +502,7 @@ CHIP_ERROR SecurePairingSession::SendMsg1()
     msg_pA = System::PacketBuffer::NewWithAvailableSize(data_len);
     VerifyOrExit(!msg_pA.IsNull(), err = CHIP_SYSTEM_ERROR_NO_MEMORY);
 
-    {
-        BufBound bbuf(msg_pA->Start(), data_len);
-        bbuf.Put(&X[0], X_len);
-        VerifyOrExit(bbuf.Fit(), err = CHIP_ERROR_NO_MEMORY);
-    }
+    memcpy(msg_pA->Start(), &X[0], X_len);
 
     msg_pA->SetDataLength(data_len);
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsg2;
@@ -528,7 +530,7 @@ CHIP_ERROR SecurePairingSession::HandleMsg1_and_SendMsg2(const PacketHeader & he
     uint16_t data_len; // To be initialized once we compute it.
 
     const uint8_t * buf = msg->Start();
-    size_t buf_len      = msg->TotalLength();
+    size_t buf_len      = msg->DataLength();
 
     System::PacketBufferHandle resp;
 
@@ -592,7 +594,7 @@ CHIP_ERROR SecurePairingSession::HandleMsg2_and_SendMsg3(const PacketHeader & he
     uint16_t verifier_len; // To be inited one we check length is small enough
 
     const uint8_t * buf = msg->Start();
-    size_t buf_len      = msg->TotalLength();
+    size_t buf_len      = msg->DataLength();
 
     System::PacketBufferHandle resp;
 
@@ -668,7 +670,7 @@ CHIP_ERROR SecurePairingSession::HandleMsg3(const PacketHeader & header, const S
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgError;
 
     VerifyOrExit(hash != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
-    VerifyOrExit(msg->TotalLength() == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+    VerifyOrExit(msg->DataLength() == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     VerifyOrExit(header.GetSourceNodeId() == mPeerNodeId, err = CHIP_ERROR_WRONG_NODE_ID);
     VerifyOrExit(header.GetEncryptionKeyID() == mPeerKeyId, err = CHIP_ERROR_INVALID_KEY_ID);
@@ -724,7 +726,7 @@ void SecurePairingSession::HandleErrorMsg(const PacketHeader & header, const Sys
 {
     // Request message processing
     const uint8_t * buf    = msg->Start();
-    size_t buflen          = msg->TotalLength();
+    size_t buflen          = msg->DataLength();
     Spake2pErrorMsg * pMsg = nullptr;
 
     VerifyOrExit(buf != nullptr, ChipLogError(Ble, "Null error msg received during pairing"));
