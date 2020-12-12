@@ -58,7 +58,7 @@ SecurePairingSession::~SecurePairingSession()
 
 void SecurePairingSession::Clear()
 {
-    // This function zero's out and resets the memory used by the object.
+    // This function zeroes out and resets the memory used by the object.
     // It's done so that no security related information will be leaked.
     memset(&mPoint[0], 0, sizeof(mPoint));
     memset(&mWS[0][0], 0, sizeof(mWS));
@@ -383,6 +383,7 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamResponse()
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     System::PacketBufferHandle resp;
+    static_assert(CHAR_BIT == 8, "Assuming sizeof() returns octets here and for sizeof(mPoint)");
     size_t resplen  = kPBKDFParamRandomNumberSize + sizeof(uint64_t) + sizeof(uint32_t) + mSaltLength;
     uint16_t u16len = 0;
 
@@ -443,7 +444,8 @@ CHIP_ERROR SecurePairingSession::HandlePBKDFParamResponse(const PacketHeader & h
     size_t resplen       = msg->DataLength();
 
     // This the fixed part of the message. The variable part of the message contains the salt.
-    // The length of variable part is determined by the salt length in the fixed header.
+    // The length of the variable part is determined by the salt length in the fixed header.
+    static_assert(CHAR_BIT == 8, "Assuming that sizeof returns octets");
     size_t fixed_resplen = kPBKDFParamRandomNumberSize + sizeof(uint64_t) + sizeof(uint32_t);
 
     ChipLogDetail(Ble, "Received PBKDF param response");
@@ -452,7 +454,7 @@ CHIP_ERROR SecurePairingSession::HandlePBKDFParamResponse(const PacketHeader & h
     VerifyOrExit(resplen >= fixed_resplen, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
 
     {
-        // Let's skip of the random number portion of the message
+        // Let's skip the random number portion of the message
         const uint8_t * msgptr = &resp[kPBKDFParamRandomNumberSize];
         uint64_t iterCount     = chip::Encoding::LittleEndian::Read64(msgptr);
         uint32_t saltlen       = chip::Encoding::LittleEndian::Read32(msgptr);
