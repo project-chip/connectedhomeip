@@ -22,6 +22,8 @@
 
 #include "CHIPCryptoPAL.h"
 
+#include <type_traits>
+
 #include <openssl/bn.h>
 #include <openssl/conf.h>
 #include <openssl/ec.h>
@@ -298,7 +300,8 @@ Hash_SHA256_stream::~Hash_SHA256_stream() {}
 
 static inline SHA256_CTX * to_inner_hash_sha256_context(HashSHA256OpaqueContext * context)
 {
-    nlSTATIC_ASSERT_PRINT(sizeof(HashSHA256OpaqueContext) >= sizeof(SHA256_CTX), "Need more memory for SHA256 Context");
+    static_assert(sizeof(HashSHA256OpaqueContext) >= sizeof(SHA256_CTX), "Need more memory for SHA256 Context");
+    static_assert(std::is_trivially_copyable<SHA256_CTX>(), "SHA256_CTX values must copyable");
     return reinterpret_cast<SHA256_CTX *>(context->mOpaque);
 }
 

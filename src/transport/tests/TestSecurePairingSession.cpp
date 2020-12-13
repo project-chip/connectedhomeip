@@ -80,14 +80,11 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     SecurePairingSession pairing;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 500, nullptr, 0, Optional<NodeId>::Value(1), 0,
-                                &delegate) == CHIP_ERROR_INVALID_ARGUMENT);
+                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 0, nullptr) !=
+                       CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 500, (const uint8_t *) "salt", 4,
-                                Optional<NodeId>::Value(1), 0, nullptr) == CHIP_ERROR_INVALID_ARGUMENT);
-    NL_TEST_ASSERT(inSuite,
-                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 500, (const uint8_t *) "salt", 4,
-                                Optional<NodeId>::Value(1), 0, &delegate) == CHIP_NO_ERROR);
+                   pairing.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 0, &delegate) ==
+                       CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, delegate.mNumMessageSend == 1);
 
@@ -96,8 +93,8 @@ void SecurePairingStartTest(nlTestSuite * inSuite, void * inContext)
     SecurePairingSession pairing1;
 
     NL_TEST_ASSERT(inSuite,
-                   pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 500, (const uint8_t *) "salt", 4,
-                                 Optional<NodeId>::Value(1), 0, &delegate) == CHIP_ERROR_BAD_REQUEST);
+                   pairing1.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(1), 0, &delegate) ==
+                       CHIP_ERROR_BAD_REQUEST);
 }
 
 void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, SecurePairingSession & pairingCommissioner,
@@ -114,13 +111,13 @@ void SecurePairingHandshakeTestCommon(nlTestSuite * inSuite, void * inContext, S
                    pairingAccessory.WaitForPairing(1234, 500, (const uint8_t *) "salt", 4, Optional<NodeId>::Value(1), 0,
                                                    &delegateAccessory) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite,
-                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, 500, (const uint8_t *) "salt", 4,
-                                            Optional<NodeId>::Value(2), 0, &delegateCommissioner) == CHIP_NO_ERROR);
+                   pairingCommissioner.Pair(Transport::PeerAddress(Transport::Type::kBle), 1234, Optional<NodeId>::Value(2), 0,
+                                            &delegateCommissioner) == CHIP_NO_ERROR);
 
-    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 1);
+    NL_TEST_ASSERT(inSuite, delegateAccessory.mNumMessageSend == 2);
     NL_TEST_ASSERT(inSuite, delegateAccessory.mNumPairingComplete == 1);
 
-    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumMessageSend == 2);
+    NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumMessageSend == 3);
     NL_TEST_ASSERT(inSuite, delegateCommissioner.mNumPairingComplete == 1);
 }
 
@@ -252,6 +249,7 @@ void LogV(uint8_t module, uint8_t category, const char * format, va_list argptr)
 {
     (void) module, (void) category;
     vfprintf(stderr, format, argptr);
+    fprintf(stderr, "\n");
 }
 } // namespace Logging
 } // namespace chip

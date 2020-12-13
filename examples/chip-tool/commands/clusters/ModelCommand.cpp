@@ -21,34 +21,103 @@
 using namespace ::chip;
 
 namespace {
-constexpr uint8_t kZCLGlobalCmdFrameControlHeader  = 8;
-constexpr uint8_t kZCLClusterCmdFrameControlHeader = 9;
+// Make sure our buffer is big enough, but this will need a better setup!
+constexpr uint16_t kMaxBufferSize                            = 1024;
+constexpr uint16_t kWaitDurationInSeconds                    = 10;
+constexpr uint8_t kZCLGlobalCmdFrameControlHeader            = 8;
+constexpr uint8_t kZCLClusterCmdFrameControlHeader           = 9;
+constexpr uint8_t kZCLGlobalMfgSpecificCmdFrameControlHeader = 12;
 
 bool isValidFrame(uint8_t frameControl)
 {
     // Bit 3 of the frame control byte set means direction is server to client.
-    return (frameControl == kZCLGlobalCmdFrameControlHeader || frameControl == kZCLClusterCmdFrameControlHeader);
+    return (frameControl == kZCLGlobalCmdFrameControlHeader || frameControl == kZCLClusterCmdFrameControlHeader ||
+            kZCLGlobalMfgSpecificCmdFrameControlHeader);
 }
 
 bool isGlobalCommand(uint8_t frameControl)
 {
-    return (frameControl == kZCLGlobalCmdFrameControlHeader);
+    return (frameControl == kZCLGlobalCmdFrameControlHeader || frameControl == kZCLGlobalMfgSpecificCmdFrameControlHeader);
 }
 } // namespace
 
-uint16_t ModelCommand::Encode(PacketBufferHandle & buffer, uint16_t bufferSize)
+CHIP_ERROR ModelCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    err = mCommissioner.SetUdpListenPort(storage.GetListenPort());
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
+
+    err = mCommissioner.Init(localId, &storage);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Commissioner: %s", chip::ErrorStr(err)));
+
+    err = mCommissioner.ServiceEvents();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure! Run Loop: %s", chip::ErrorStr(err)));
+
+    err = RunInternal(remoteId);
+    SuccessOrExit(err);
+
+    VerifyOrExit(GetCommandExitStatus(), err = CHIP_ERROR_INTERNAL);
+
+exit:
+    mCommissioner.ServiceEventSignal();
+    mCommissioner.Shutdown();
+    return err;
+}
+
+CHIP_ERROR ModelCommand::RunInternal(NodeId remoteId)
+{
+    ChipDevice * device;
+    CHIP_ERROR err = mCommissioner.GetDevice(remoteId, &device);
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Could not find a paired device. Are you sure it has been paired ?"));
+
+    device->SetDelegate(this);
+
+    err = RunCommandInternal(device);
+    SuccessOrExit(err);
+
+    UpdateWaitForResponse(true);
+    WaitForResponse(kWaitDurationInSeconds);
+
+exit:
+    return err;
+}
+
+CHIP_ERROR ModelCommand::RunCommandInternal(ChipDevice * device)
+{
+    CHIP_ERROR err      = CHIP_NO_ERROR;
+    uint16_t payloadLen = 0;
+
+    PacketBufferHandle buffer = PacketBuffer::NewWithAvailableSize(kMaxBufferSize);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
     ChipLogProgress(chipTool, "Endpoint id: '0x%02x', Cluster id: '0x%04x', Command id: '0x%02x'", mEndPointId, mClusterId,
                     mCommandId);
 
-    return EncodeCommand(buffer, bufferSize, mEndPointId);
+    payloadLen = EncodeCommand(buffer, kMaxBufferSize, mEndPointId);
+    VerifyOrExit(payloadLen != 0, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
+
+    buffer->SetDataLength(payloadLen);
+
+#ifdef DEBUG
+    PrintBuffer(buffer);
+#endif
+
+    err = device->SendMessage(std::move(buffer));
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(chipTool, "Failed to send message: %s", ErrorStr(err)));
+
+exit:
+    return err;
 }
 
-bool ModelCommand::Decode(PacketBufferHandle & buffer) const
+void ModelCommand::OnMessage(PacketBufferHandle buffer)
 {
+    ChipLogDetail(chipTool, "OnMessage: Received %zu bytes", buffer->DataLength());
+
     EmberApsFrame frame;
     uint8_t * message;
     uint16_t messageLen;
+    uint16_t mfgCode;
     uint8_t frameControl;
     uint8_t sequenceNumber;
     uint8_t commandId;
@@ -62,9 +131,17 @@ bool ModelCommand::Decode(PacketBufferHandle & buffer) const
     ChipLogDetail(chipTool, "APS frame processing success!");
 
     messageLen = extractMessage(buffer->Start(), buffer->DataLength(), &message);
-    VerifyOrExit(messageLen >= 3, ChipLogError(chipTool, "Unexpected response length: %d", messageLen));
+    VerifyOrExit(messageLen >= 1, ChipLogError(chipTool, "Unexpected response length: %d", messageLen));
 
-    frameControl   = chip::Encoding::Read8(message);
+    frameControl = chip::Encoding::Read8(message);
+    if (frameControl & (1u << 2))
+    {
+        VerifyOrExit(messageLen >= 5, ChipLogError(chipTool, "Unexpected response length: %d", messageLen));
+        mfgCode = chip::Encoding::LittleEndian::Read16(message);
+        ChipLogDetail(chipTool, "Manufacturer specific code in response: 0x%04x", mfgCode);
+        messageLen = static_cast<uint16_t>(messageLen - 2);
+    }
+    VerifyOrExit(messageLen >= 3, ChipLogError(chipTool, "Unexpected response length: %d", messageLen));
     sequenceNumber = chip::Encoding::Read8(message);
     commandId      = chip::Encoding::Read8(message);
     messageLen     = static_cast<uint16_t>(messageLen - 3);
@@ -77,7 +154,24 @@ bool ModelCommand::Decode(PacketBufferHandle & buffer) const
 
     success = isGlobalCommand(frameControl) ? HandleGlobalResponse(commandId, message, messageLen)
                                             : HandleSpecificResponse(commandId, message, messageLen);
-
 exit:
-    return success;
+    SetCommandExitStatus(success);
+    UpdateWaitForResponse(false);
+}
+
+void ModelCommand::OnStatusChange(void)
+{
+    ChipLogProgress(chipTool, "DeviceStatusDelegate::OnStatusChange");
+}
+
+void ModelCommand::PrintBuffer(const PacketBufferHandle & buffer) const
+{
+    const size_t dataLen = buffer->DataLength();
+
+    fprintf(stderr, "SENDING: %zu ", dataLen);
+    for (size_t i = 0; i < dataLen; ++i)
+    {
+        fprintf(stderr, "%02x ", buffer->Start()[i]);
+    }
+    fprintf(stderr, "\n");
 }

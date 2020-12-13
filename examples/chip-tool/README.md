@@ -57,15 +57,6 @@ the ESP32 all-clusters-app:
 
     $ chip-tool pairing unpair
 
-## Using the Client to Request an Echo
-
-### Ping a device
-
-    $ chip-tool echo ip
-
-If valid values are supplied, it will send a message to the paired device and
-verify that the incoming echo from the server matches what was sent out.
-
 ## Using the Client to Send CHIP Commands
 
 To use the Client to send a CHIP commands, run the built executable and pass it
