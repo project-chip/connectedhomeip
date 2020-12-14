@@ -235,40 +235,30 @@ class CoreBluetoothManager(ChipBleBase):
         result = False
 
         time_expired = time.time() >= should_tuple[1] + should_tuple[2]
+        if time_expired:
+            return False
 
         if should_tuple[0] == "ready":
-            if not self.ready_condition and not time_expired:
-                result = True
+            return not self.ready_condition
         elif should_tuple[0] == "scan":
-            if not time_expired:
-                result = True
-
             for peripheral in self.peripheral_adv_list:
                 if should_tuple[3] and str(peripheral.peripheral._.name) == should_tuple[3]:
-                    result = False
-                    break
+                    return False
                 devIdInfo = peripheral.getPeripheralDevIdInfo()
                 if devIdInfo and should_tuple[3] and str(devIdInfo.discriminator) == should_tuple[3]:
-                    result = False
-                    break
-
+                    return False
         elif should_tuple[0] == "connect":
-            if not self.loop_condition and not time_expired:
-                result = True
+            return (not self.loop_condition)
         elif should_tuple[0] == "disconnect":
-            if not self.loop_condition and not time_expired:
-                result = True
+            return (not self.loop_condition)
         elif should_tuple[0] == "send":
-            if not self.send_condition and not time_expired:
-                result = True
+            return (not self.send_condition)
         elif should_tuple[0] == "subscribe":
-            if not self.subscribe_condition and not time_expired:
-                result = True
+            return (not self.subscribe_condition)
         elif should_tuple[0] == "unsubscribe":
-            if self.subscribe_condition and not time_expired:
-                result = True
+            return self.subscribe_condition
 
-        return result
+        return False
 
     def runLoopUntil(self, should_tuple):
         """Helper function to drive OSX runloop until an expected event is received or
