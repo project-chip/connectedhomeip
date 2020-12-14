@@ -179,8 +179,9 @@ void InitServer(AppDelegate * delegate)
     {
         chip::Optional<uint16_t> vendorId;
         chip::Optional<uint16_t> productId;
-        uint16_t value;
+        uint16_t discriminator;
 
+        uint16_t value;
         if (ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
         {
             ChipLogProgress(Discovery, "Vendor ID not known");
@@ -199,11 +200,17 @@ void InitServer(AppDelegate * delegate)
             productId = Optional<uint16_t>::Value(value);
         }
 
+        if (ConfigurationMgr().GetSetupDiscriminator(discriminator) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
+            discriminator = 840;
+        }
+
         err = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::CommisionableAdvertisingParameters()
                                                                 .SetPort(CHIP_PORT)
                                                                 .EnableIpV4(true)
-                                                                .SetShortDiscriminator(52)
-                                                                .SetLongDiscrimininator(840)
+                                                                .SetShortDiscriminator(static_cast<uint8_t>(discriminator & 0xFF))
+                                                                .SetLongDiscrimininator(discriminator)
                                                                 .SetVendorId(vendorId)
                                                                 .SetProductId(productId));
     }
