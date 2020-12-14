@@ -333,7 +333,7 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamRequest()
 
     mNextExpectedMsg = Spake2pMsgType::kPBKDFParamResponse;
 
-    err = AttachHeaderAndSend(Spake2pMsgType::kPBKDFParamRequest, req.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kPBKDFParamRequest, std::move(req));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent PBKDF param request");
@@ -508,7 +508,7 @@ CHIP_ERROR SecurePairingSession::SendMsg1()
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsg2;
 
     // Call delegate to send the Msg1 to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg1, msg_pA.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg1, std::move(msg_pA));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent spake2p msg1");
@@ -715,7 +715,7 @@ void SecurePairingSession::SendErrorMsg(Spake2pErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsgError, msg.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsgError, std::move(msg));
     SuccessOrExit(err);
 
 exit:
