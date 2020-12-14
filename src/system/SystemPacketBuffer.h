@@ -451,7 +451,7 @@ public:
         aOther.mBuffer = nullptr;
     }
 
-    ~PacketBufferHandle() { Free(); }
+    ~PacketBufferHandle() { *this = nullptr; }
 
     /**
      * Take ownership of a PacketBuffer from another PacketBufferHandle, freeing any existing owned buffer.
@@ -472,7 +472,11 @@ public:
      */
     PacketBufferHandle & operator=(decltype(nullptr))
     {
-        Free();
+        if (mBuffer != nullptr)
+        {
+            PacketBuffer::Free(mBuffer);
+        }
+        mBuffer = nullptr;
         return *this;
     }
 
@@ -623,15 +627,6 @@ private:
             buffer->AddRef();
         }
         return PacketBufferHandle(buffer);
-    }
-
-    void Free()
-    {
-        if (mBuffer != nullptr)
-        {
-            PacketBuffer::Free(mBuffer);
-        }
-        mBuffer = nullptr;
     }
 
     PacketBuffer * Get() const { return mBuffer; }
