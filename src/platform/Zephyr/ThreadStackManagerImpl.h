@@ -49,7 +49,7 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
     // the implementation methods provided by this class.
     friend class ThreadStackManager;
 
-//namespace Internal {
+    // namespace Internal {
 
     // Allow the generic implementation base classes to call helper methods on
     // this class.
@@ -75,7 +75,7 @@ protected:
     void _OnCHIPoBLEAdvertisingStart();
     void _OnCHIPoBLEAdvertisingStop();
 
-//} // namespace Internal
+    //} // namespace Internal
 
 private:
     // ===== Members for internal use by the following friends.

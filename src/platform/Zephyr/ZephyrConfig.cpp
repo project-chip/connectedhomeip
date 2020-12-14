@@ -21,8 +21,8 @@
  *          Zephyr platforms.
  */
 
-#include <platform/internal/CHIPDeviceLayerInternal.h>
 #include <platform/Zephyr/ZephyrConfig.h>
+#include <platform/internal/CHIPDeviceLayerInternal.h>
 
 #include <core/CHIPEncoding.h>
 #include <platform/internal/testing/ConfigUnitTest.h>
