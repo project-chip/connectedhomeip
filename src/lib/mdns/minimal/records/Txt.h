@@ -42,6 +42,13 @@ public:
         SetTtl(kDefaultTtl);
     }
 
+    // A FullQName is a holder of a string array.
+    TxtResourceRecord(const FullQName & qName, FullQName entries) :
+        ResourceRecord(QType::TXT, qName), mEntries(entries.names), mEntryCount(entries.nameCount)
+    {
+        SetTtl(kDefaultTtl);
+    }
+
 protected:
     bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override
     {
@@ -60,7 +67,7 @@ protected:
     }
 
 private:
-    const char ** mEntries;
+    const char * const * mEntries;
     const size_t mEntryCount;
 };
 
