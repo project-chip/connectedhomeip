@@ -791,6 +791,7 @@ class BluezManager(ChipBleBase):
             )
         self.scan_quiet = False
         self.peripheral_list = []
+        self.device_uuid_list = []
         self.chip_queue = six.moves.queue.Queue()
         self.Gmainloop = None
         self.daemon_thread = None
@@ -974,9 +975,11 @@ class BluezManager(ChipBleBase):
         found = False
         identifier = kwargs["identifier"]
         timeout = kwargs["timeout"] + time.time()
+        self.device_uuid_list = []
+        self.peripheral_list = []
 
         while time.time() < timeout:
-            self.peripheral_list = self.adapter.find_devices(
+            scanned_peripheral_list = self.adapter.find_devices(
                 [
                     chip_service,
                     chip_service_short,
@@ -984,10 +987,12 @@ class BluezManager(ChipBleBase):
                     chromecast_setup_service_short,
                 ]
             )
-            for device in self.peripheral_list:
+            for device in scanned_peripheral_list:
                 try:
-                    if not self.scan_quiet:
+                    if not self.scan_quiet and device.Address not in self.device_uuid_list:
                         # display all scanned results
+                        self.device_uuid_list.append(device.Address)
+                        self.peripheral_list.append(device)
                         self.dump_scan_result(device)
                     devIdInfo = self.get_peripheral_devIdInfo(device)
                     if not devIdInfo:
@@ -1002,8 +1007,8 @@ class BluezManager(ChipBleBase):
                         self.target = device
                         found = True
                         break
-                except Exception as ex:
-                    pass
+                except Exception:
+                    traceback.print_exc()
             if found:
                 break
 
