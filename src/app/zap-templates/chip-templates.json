@@ -11,6 +11,10 @@
         {
             "name": "cluster_header",
             "path": "partials/cluster_header.zapt"
+        },
+        {
+            "name": "command_handler_cluster_commands",
+            "path": "partials/command_handler_cluster_commands.zapt"
         }
     ],
     "templates": [

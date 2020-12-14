@@ -165,17 +165,17 @@ bool emberAfProcessMessageIntoZclCmd(EmberApsFrame * apsFrame, EmberIncomingMess
 EmberAfDifferenceType emberAfGetDifference(uint8_t * pData, EmberAfDifferenceType value, uint8_t dataSize);
 
 /**
- * Retrieves an uint32_t from the given Zigbee payload. The integer retrieved
+ * Retrieves an uint64_t from the given Zigbee payload. The integer retrieved
  * may be cast into an integer of the appropriate size depending on the
  * number of bytes requested from the message. In Zigbee, all integers are
  * passed over the air in LSB form. LSB to MSB conversion is
  * done within this function automatically before the integer is returned.
  *
  * Obviously (due to return value) this function can only handle
- * the retrieval of integers between 1 and 4 bytes in length.
+ * the retrieval of integers between 1 and 8 bytes in length.
  *
  */
-uint32_t emberAfGetInt(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen, uint8_t bytes);
+uint64_t emberAfGetInt(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen, uint8_t bytes);
 
 void emberAfClearResponseData(void);
 uint8_t * emberAfPutInt8uInResp(uint8_t value);

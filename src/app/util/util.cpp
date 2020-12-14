@@ -58,11 +58,6 @@
 
 using namespace chip;
 
-// TODO: Need to figure out what needs to happen wrt HAL tokens here, but for
-// now define ESZP_HOST to disable it.  See
-// https://github.com/project-chip/connectedhomeip/issues/3275
-#define EZSP_HOST
-
 //------------------------------------------------------------------------------
 // Forward Declarations
 

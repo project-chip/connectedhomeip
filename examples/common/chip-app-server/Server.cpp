@@ -26,6 +26,7 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <lib/mdns/DiscoveryManager.h>
+#include <mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
@@ -158,11 +159,32 @@ void InitServer(AppDelegate * delegate)
         SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
     }
 
+#if CHIP_ENABLE_MDNS
+    // TODO: advertise this only when really operational once we support both
+    // operational and commisioning advertising is supported.
+    {
+        constexpr uint64_t kTestFabricId = 5544332211;
+        err                              = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::OperationalAdvertisingParameters()
+                                                                .SetFabricId(kTestFabricId)
+                                                                .SetNodeId(chip::kTestDeviceNodeId)
+                                                                .SetPort(CHIP_PORT)
+#if INET_CONFIG_ENABLE_IPV4
+                                                                .EnableIpV4(true)
+#else
+                                                                .EnableIpV4(false)
+#endif
+        );
+        SuccessOrExit(err);
+    }
+
+    err = Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    SuccessOrExit(err);
+#endif
+
     err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
 
     gSessions.SetDelegate(&gCallbacks);
-    chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice(kIPAddressType_IPv6);
 
 exit:
     if (err != CHIP_NO_ERROR)

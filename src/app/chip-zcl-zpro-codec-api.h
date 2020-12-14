@@ -117,6 +117,7 @@ uint16_t encodeBarrierControlClusterReadClusterRevisionAttribute(uint8_t * buffe
 | Cluster Basic                                                       | 0x0000 |
 |------------------------------------------------------------------------------|
 | Commands:                                                           |        |
+| * MfgSpecificPing                                                   |   0x00 |
 | * ResetToFactoryDefaults                                            |   0x00 |
 |------------------------------------------------------------------------------|
 | Attributes:                                                         |        |
@@ -124,6 +125,12 @@ uint16_t encodeBarrierControlClusterReadClusterRevisionAttribute(uint8_t * buffe
 | * PowerSource                                                       | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
+/**
+ * @brief
+ *    Encode an MfgSpecificPing command for Basic server into buffer including the APS frame
+ */
+uint16_t encodeBasicClusterMfgSpecificPingCommand(uint8_t * buffer, uint16_t buf_length, chip::EndpointId destination_endpoint);
 
 /**
  * @brief

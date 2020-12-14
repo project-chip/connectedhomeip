@@ -419,8 +419,9 @@
 // Generated data for the command discovery
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
-        { 0x0000, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER },     /* Basic / ResetToFactoryDefaults */    \
-            { 0x0003, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Identify / Identify */               \
+        { 0x0000, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Basic / ResetToFactoryDefaults */        \
+            { 0x0000, 0x00, COMMAND_MASK_INCOMING_SERVER | COMMAND_MASK_MANUFACTURER_SPECIFIC }, /* Basic / MfgSpecificPing */     \
+            { 0x0003, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER },       /* Identify / Identify */         \
             { 0x0003, 0x00, COMMAND_MASK_OUTGOING_SERVER | COMMAND_MASK_INCOMING_CLIENT }, /* Identify / IdentifyQueryResponse */  \
             { 0x0003, 0x01, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Identify / IdentifyQuery */          \
             { 0x0004, 0x00, COMMAND_MASK_OUTGOING_CLIENT | COMMAND_MASK_INCOMING_SERVER }, /* Groups / AddGroup */                 \
@@ -592,16 +593,16 @@
             { 0x0B03, 0x02, COMMAND_MASK_INCOMING_CLIENT }, /* Appliance Statistics / LogQueueResponse */                          \
             { 0x0B03, 0x03, COMMAND_MASK_INCOMING_CLIENT }, /* Appliance Statistics / StatisticsAvailable */                       \
     }
-#define EMBER_AF_GENERATED_COMMAND_COUNT (160)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (161)
 
 // Command manufacturer codes
 #define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
     {                                                                                                                              \
         {                                                                                                                          \
-            0x00, 0x00                                                                                                             \
+            0x01, 0x1002                                                                                                           \
         }                                                                                                                          \
     }
-#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (0)
+#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (1)
 
 // Generated reporting configuration defaults
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS                                                                               \

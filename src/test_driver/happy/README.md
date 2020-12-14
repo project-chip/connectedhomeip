@@ -18,7 +18,7 @@
               --entrypoint /bin/bash \
               --sysctl "net.ipv6.conf.all.disable_ipv6=0 net.ipv4.conf.all.forwarding=1 net.ipv6.conf.all.forwarding=1" \
               -it --mount type=bind,source=`pwd`,target=`pwd` \
-              connectedhomeip/chip-build:0.4.16
+              connectedhomeip/chip-build:0.4.18
 
     Mount your checkout to the same path as your local path avoids errors during
     bootstrap.

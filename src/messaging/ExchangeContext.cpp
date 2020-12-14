@@ -120,13 +120,6 @@ exit:
         SetResponseExpected(false);
     }
 
-    if (sendFlags.Has(SendMessageFlags::kSendFlag_RetainBuffer))
-    {
-        // Nothing currently calls us with this flag. Ensure it stays that way until kSendFlag_RetainBuffer is removed
-        // in favour of callers Retain()ing buffers.
-        err = CHIP_ERROR_NOT_IMPLEMENTED;
-    }
-
     // Release the reference to the exchange context acquired above. Under normal circumstances
     // this will merely decrement the reference count, without actually freeing the exchange context.
     // However if one of the function calls in this method resulted in a callback to the protocol,
