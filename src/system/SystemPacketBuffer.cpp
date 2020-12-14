@@ -552,7 +552,7 @@ PacketBufferHandle PacketBufferHandle::CloneData()
 
     if (other->AvailableDataLength() < mBuffer->DataLength())
     {
-        other.Adopt(nullptr);
+        other.Free();
         return other;
     }
 
