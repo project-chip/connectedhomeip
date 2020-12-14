@@ -59,7 +59,7 @@ constexpr uint16_t kOptionAdvertisingMode = 'm';
 
 constexpr uint16_t kOptionCommisionableShordDiscriminator = 's';
 constexpr uint16_t kOptionCommisionableLongDiscriminaotr  = 'l';
-constexpr uint16_t kOptionCommisionableVendorId           = 'v';
+constexpr uint16_t kOptionCommisionableVendorId           = 0x100; // v is used by 'version'
 constexpr uint16_t kOptionCommisionableProductId          = 'p';
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
@@ -140,7 +140,6 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -l <value>\n"
                              "        Commisionable long discriminator.\n"
                              "  --vendor-id <value>\n"
-                             "  -v <value>\n"
                              "        Commisionable vendor id.\n"
                              "  --product-id <value>\n"
                              "  -p <value>\n"
@@ -178,29 +177,41 @@ int main(int argc, char ** args)
         return 1;
     }
 
-    chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, Mdns::kMdnsPort);
+    if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, Mdns::kMdnsPort) != CHIP_NO_ERROR)
+    {
+        printf("FAILED to start MDNS advertisement\n");
+        return 1;
+    }
+
+    CHIP_ERROR err;
 
     if (gOptions.advertisingMode == AdvertisingMode::kCommisionable)
     {
-        chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommisionableAdvertisingParameters()
-                                                                .EnableIpV4(gOptions.enableIpV4)
-                                                                .SetPort(CHIP_PORT)
-                                                                .SetShortDiscriminator(gOptions.shortDiscriminator)
-                                                                .SetLongDiscrimininator(gOptions.longDiscriminator)
-                                                                .SetVendorId(gOptions.vendorId)
-                                                                .SetProductId(gOptions.productId));
+        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommisionableAdvertisingParameters()
+                                                                      .EnableIpV4(gOptions.enableIpV4)
+                                                                      .SetPort(CHIP_PORT)
+                                                                      .SetShortDiscriminator(gOptions.shortDiscriminator)
+                                                                      .SetLongDiscrimininator(gOptions.longDiscriminator)
+                                                                      .SetVendorId(gOptions.vendorId)
+                                                                      .SetProductId(gOptions.productId));
     }
     else if (gOptions.advertisingMode == AdvertisingMode::kOperational)
     {
-        chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::OperationalAdvertisingParameters()
-                                                                .EnableIpV4(gOptions.enableIpV4)
-                                                                .SetPort(CHIP_PORT)
-                                                                .SetFabricId(gOptions.fabricId)
-                                                                .SetNodeId(gOptions.nodeId));
+        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::OperationalAdvertisingParameters()
+                                                                      .EnableIpV4(gOptions.enableIpV4)
+                                                                      .SetPort(CHIP_PORT)
+                                                                      .SetFabricId(gOptions.fabricId)
+                                                                      .SetNodeId(gOptions.nodeId));
     }
     else
     {
         printf("FAILED to determine advertising type.\n");
+        return 1;
+    }
+
+    if (err != CHIP_NO_ERROR)
+    {
+        printf("FAILED to setup advertisement parameters\n");
         return 1;
     }
 
