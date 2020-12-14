@@ -239,19 +239,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    mConnectivityFlag            = 0;
-    mWpaSupplicant.state         = GDBusWpaSupplicant::INIT;
-    mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
-    mWpaSupplicant.proxy         = nullptr;
-    mWpaSupplicant.iface         = nullptr;
-    mWpaSupplicant.interfacePath = nullptr;
-    mWpaSupplicant.networkPath   = nullptr;
-
-    wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                kWpaSupplicantObjectPath, nullptr, _OnWpaProxyReady, nullptr);
-#endif
-
     SuccessOrExit(err);
 
 exit:
@@ -628,6 +615,20 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
 
     if (err != nullptr)
         g_error_free(err);
+}
+
+void ConnectivityManagerImpl::StartWiFiManagement()
+{
+    mConnectivityFlag            = 0;
+    mWpaSupplicant.state         = GDBusWpaSupplicant::INIT;
+    mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
+    mWpaSupplicant.proxy         = nullptr;
+    mWpaSupplicant.iface         = nullptr;
+    mWpaSupplicant.interfacePath = nullptr;
+    mWpaSupplicant.networkPath   = nullptr;
+
+    wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
+                                                kWpaSupplicantObjectPath, nullptr, _OnWpaProxyReady, nullptr);
 }
 
 void ConnectivityManagerImpl::DriveAPState()
