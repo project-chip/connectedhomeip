@@ -395,11 +395,11 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       public_deps += [ "${chip_root}/third_party/inipp" ]
     } else if (chip_device_platform == "nrfconnect") {
       sources += [
-        "Zephyr/SystemTimeSupport.cpp",
         "Zephyr/BLEManagerImpl.cpp",
         "Zephyr/ConfigurationManagerImpl.cpp",
         "Zephyr/Logging.cpp",
         "Zephyr/PlatformManagerImpl.cpp",
+        "Zephyr/SystemTimeSupport.cpp",
         "Zephyr/ZephyrConfig.cpp",
         "Zephyr/ZephyrConfig.h",
         "nrfconnect/BLEManagerImpl.h",
