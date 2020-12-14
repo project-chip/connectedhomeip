@@ -58,7 +58,7 @@ executable("minimal-mdns-server") {
   output_dir = root_out_dir
 }
 
-executable("minimal-mdns-advertiser") {
+executable("mdns-advertiser") {
   sources = [ "advertiser.cpp" ]
 
   cflags = [ "-Wconversion" ]

@@ -24,7 +24,7 @@ the network while running.
 
 ## Example client
 
-The file -client.cpp` contains an example of a mdns client. By default it
+The file `client.cpp` contains an example of a mdns client. By default it
 queries for **\_services.\_dns-sd.\_udp.local** (DNS-SD list services) and uses
 unicast queries.
 
@@ -46,6 +46,29 @@ see
 
 ```sh
 ./out/minimal_mdns/minimal-mdns-client --help
+```
+
+for full command line details.
+
+## Example advertiser
+
+This example uses the chip built-in advertiser, implemented in the file
+`advertiser.cpp`.
+
+Example runs:
+
+```sh
+./out/minimal_mdns/mdns-advertiser -4 -m operational
+```
+
+```sh
+./out/minimal_mdns/mdns-advertiser -4 -m commisionable
+```
+
+see
+
+```sh
+./out/minimal_mdns/mdns-advertiser --help
 ```
 
 for full command line details.
