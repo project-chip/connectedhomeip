@@ -41,8 +41,8 @@ struct Options
     AdvertisingMode advertisingMode = AdvertisingMode::kCommisionable;
 
     // commisionable params
-    uint8_t shortDiscriminator = 12;
-    uint16_t longDiscriminator = 2233;
+    uint8_t shortDiscriminator = 52;
+    uint16_t longDiscriminator = 840;
     Optional<uint64_t> vendorId;
     Optional<uint64_t> productId;
 
