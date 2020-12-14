@@ -14,53 +14,67 @@
 #   limitations under the License.
 #
 
-mainmenu "CHIP application"
-
-source "Kconfig.zephyr"
-
-config CHIP
-	bool "Enable CHIP"
+menuconfig CHIP
+	bool "Connected Home over IP protocol stack"
 	default n
 	select CPLUSPLUS
 	imply LIB_CPLUSPLUS
+	imply REQUIRES_FULL_LIBC
+	imply POSIX_API if !ARCH_POSIX
+	imply EVENTFD if !ARCH_POSIX
 	imply REBOOT
-	select ENTROPY_GENERATOR
+	imply ENTROPY_GENERATOR
 	imply NET_UDP
 	imply NET_IPV6
 	imply NET_CONFIG_NEED_IPV6
 	imply NET_SOCKETS
-	imply MULTIPROTOCOL
 	help
-	  Use the CHIP protocol.
+	  This option enables Connected Home over IP libraries.
+
+if CHIP
+
+config CHIP_PROJECT_CONFIG
+	string "Project configuration file for CHIP"
+	help
+	  Project configuration file for CHIP. If specified, CHIP generic
+	  configuration files will include the project configuration file which can
+	  be used to override any CHIP default or platform-specific settings.
+
+config CHIP_OPENTHREAD_CONFIG
+	string "Custom OpenThread configuration file"
+	help
+	  This option can be used to replace Zephyr-supplied OpenThread
+	  configuration file with a custom one.
 
 config CHIP_LIB_SHELL
-	bool "Enable CHIP's shell library"
+	bool "Enable CHIP shell library"
+	default n
 	help
-	  Link the application with the library containing CHIP shell commands
+	  Link the application with the library containing CHIP shell commands.
 
 config CHIP_PW_RPC
 	bool "Enable Pigweed RPC library"
+	default n
 	help
-	  Link the application with the library containing Pigweed RPC functionalities
+	  Link the application with the library containing Pigweed RPC functionalities.
 
-config MULTIPROTOCOL
-	bool "Enable multiprotocol support"
-	select NRF_802154_MULTIPROTOCOL_SUPPORT
-	depends on BT && NET_L2_OPENTHREAD
+config CHIP_BUILD_TESTS
+	bool "Build CHIP unit tests"
+	default n
 	help
-	  Enable multiprotocol in the nRF 802.15.4 radio driver
+	  This option enables building CHIP unit tests.
 
 config CHIP_DISABLE_CHIPOBLE_ADVERTISING_WHEN_PROVISIONED
 	bool "Disable CHIPoBLE advertising when device is fully provisioned"
 	default y
 	help
-	  Enables CHIPoBLE advertising disabling when the device achieves a fully provisioned state.
+	  Disable CHIPoBLE advertising when the device achieves a fully provisioned state.
 
 config CHIP_ENABLE_CHIPOBLE_ADVERTISING_AUTOSTART
 	bool "Enable CHIPoBLE advertising autostart"
 	default n
 	help
-	  Enables starting CHIPoBLE advertising automatically after application boot.
+	  Start CHIPoBLE advertising automatically at application boot time.
 
 config CHIP_NFC_COMMISSIONING
 	bool "Enable NFC commissioning support"
@@ -73,3 +87,5 @@ config CHIP_NFC_COMMISSIONING
 	imply NFC_NDEF_URI_MSG
 	help
 	  Enables NFC commissioning by sharing onboarding payload in NFC tag.
+
+endif

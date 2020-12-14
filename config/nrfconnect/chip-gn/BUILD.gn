@@ -29,6 +29,10 @@ group("dummy") {
 group("nrfconnect") {
   deps = [ "${chip_root}/src/lib" ]
 
+  if (chip_build_tests) {
+    deps += [ "${chip_root}/src:tests" ]
+  }
+
   if (chip_build_libshell) {
     deps += [ "${chip_root}/src/lib/shell" ]
   }
@@ -36,14 +40,10 @@ group("nrfconnect") {
   # Building PW_RPC lib with GN may go obsolete after getting full CMake
   # support in Pigweed.
   if (chip_build_pw_rpc_lib) {
-    deps += [ "${chip_root}/config/nrfconnect/lib/pw_rpc" ]
+    deps += [ "//lib/pw_rpc" ]
   }
 }
 
 group("default") {
   deps = [ ":nrfconnect" ]
-
-  if (chip_build_tests) {
-    deps += [ "${chip_root}/src:tests" ]
-  }
 }
