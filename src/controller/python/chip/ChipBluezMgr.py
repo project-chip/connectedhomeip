@@ -998,9 +998,9 @@ class BluezManager(ChipBleBase):
                     if not devIdInfo:
                         # Not a chip device
                         continue
-                    if device.Name == identifier or str(device.Address).upper() == str(
+                    if identifier and (device.Name == identifier or str(device.Address).upper() == str(
                         identifier.upper()
-                    ) or str(devIdInfo.discriminator) == identifier:
+                    ) or str(devIdInfo.discriminator) == identifier):
                         if self.scan_quiet:
                             # only display the scanned target's info when quiet
                             self.dump_scan_result(device)
