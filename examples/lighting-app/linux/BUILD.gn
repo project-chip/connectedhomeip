@@ -23,7 +23,7 @@ config("includes") {
     ".",
     "include",
     "${chip_root}/src/app/util",
-    "${chip_root}/src/accessory"
+    "${chip_root}/src/accessory",
   ]
 }
 
