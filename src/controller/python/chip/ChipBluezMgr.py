@@ -946,21 +946,22 @@ class BluezManager(ChipBleBase):
             return False
 
     def dump_scan_result(self, device):
-        self.logger.info("{0:<10}{1}".format("Name =", device.Name))
-        self.logger.info("{0:<10}{1}".format("ID =", device.device_id))
-        self.logger.info("{0:<10}{1}".format("RSSI =", device.RSSI))
-        self.logger.info("{0:<10}{1}".format("address =", device.Address))
+        self.logger.info("{0:<16}= {1}".format("Name", device.Name))
+        self.logger.info("{0:<16}= {1}".format("ID", device.device_id))
+        self.logger.info("{0:<16}= {1}".format("RSSI", device.RSSI))
+        self.logger.info("{0:<16}= {1}".format("Address", device.Address))
+
+        devIdInfo = self.get_peripheral_devIdInfo(device)
+        if devIdInfo != None:
+            self.logger.info("{0:<16}= {1}".format("Pairing State", devIdInfo.pairingState))
+            self.logger.info("{0:<16}= {1}".format("Discriminator", devIdInfo.discriminator))
+            self.logger.info("{0:<16}= {1}".format("Vendor Id", devIdInfo.vendorId))
+            self.logger.info("{0:<16}= {1}".format("Product Id", devIdInfo.productId))
 
         if device.ServiceData:
             for advuuid in device.ServiceData:
-                self.logger.info("Adv UUID: " + str(advuuid))
-                self.logger.info("Adv Data: " + bytes(device.ServiceData[advuuid]).hex())
-                devIdInfo = self.get_peripheral_devIdInfo(device)
-                if devIdInfo != None:
-                    self.logger.info("Chip Dev: Pairing State = {}".format(devIdInfo.pairingState))
-                    self.logger.info("Chip Dev: Discriminator = {}".format(devIdInfo.discriminator))
-                    self.logger.info("Chip Dev: Vendor Id     = {}".format(devIdInfo.vendorId))
-                    self.logger.info("Chip Dev: Product Id    = {}".format(devIdInfo.productId))
+                self.logger.info("{0:<16}= {1}".format("Adv UUID", str(advuuid)))
+                self.logger.info("{0:<16}= {1}".format("Adv Data", bytes(device.ServiceData[advuuid]).hex()))
         else:
             self.logger.info("")
         self.logger.info("")
