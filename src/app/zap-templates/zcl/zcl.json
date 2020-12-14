@@ -1,9 +1,6 @@
 {
     "version": "ZCL Test Data",
-    "xmlRoot": [
-        ".",
-        "../../../../third_party/zap/repo/zcl-builtin/silabs/"
-    ],
+    "xmlRoot": [".", "../../../../third_party/zap/repo/zcl-builtin/silabs/"],
     "xmlFile": [
         "binding-cluster.xml",
         "clusters-extensions.xml",
@@ -45,7 +42,7 @@
             "defaultResponsePolicy": "always"
         },
         "bool": {
-          "commandDiscovery": true
+            "commandDiscovery": true
         }
     }
 }
