@@ -51,5 +51,5 @@
 // Use this macro to check if Reporting plugin is included
 #define EMBER_AF_PLUGIN_REPORTING
 // User options for plugin Reporting
-#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE 5
+#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE 20
 #define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS

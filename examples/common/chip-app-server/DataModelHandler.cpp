@@ -30,6 +30,10 @@
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemPacketBuffer.h>
 
+#ifdef EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS
+EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS
+#endif
+
 using namespace ::chip;
 
 /**
@@ -75,4 +79,9 @@ void InitDataModelHandler()
 {
     emberAfEndpointConfigure();
     emberAfInit();
+
+#ifdef EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS
+    EmberStatus status = EMBER_NETWORK_UP;
+    EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS
+#endif
 }
