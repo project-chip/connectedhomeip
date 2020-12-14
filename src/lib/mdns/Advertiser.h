@@ -92,25 +92,25 @@ public:
     }
     uint16_t GetLongDiscriminator() const { return mLongDiscriminator; }
 
-    CommisionableAdvertisingParameters & SetVendorId(Optional<uint64_t> vendorId)
+    CommisionableAdvertisingParameters & SetVendorId(Optional<uint16_t> vendorId)
     {
         mVendorId = vendorId;
         return *this;
     }
-    Optional<uint64_t> GetVendorId() const { return mVendorId; }
+    Optional<uint16_t> GetVendorId() const { return mVendorId; }
 
-    CommisionableAdvertisingParameters & SetProductId(Optional<uint64_t> productId)
+    CommisionableAdvertisingParameters & SetProductId(Optional<uint16_t> productId)
     {
         mProductId = productId;
         return *this;
     }
-    Optional<uint64_t> GetProductId() const { return mProductId; }
+    Optional<uint16_t> GetProductId() const { return mProductId; }
 
 private:
     uint8_t mShortDiscriminator = 0;
     uint16_t mLongDiscriminator = 0; // 12-bit according to spec
-    chip::Optional<uint64_t> mVendorId;
-    chip::Optional<uint64_t> mProductId;
+    chip::Optional<uint16_t> mVendorId;
+    chip::Optional<uint16_t> mProductId;
 };
 
 /// Handles advertising of CHIP nodes

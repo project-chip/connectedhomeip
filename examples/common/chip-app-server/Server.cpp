@@ -159,22 +159,55 @@ void InitServer(AppDelegate * delegate)
         SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
     }
 
-    // TODO: advertise this only when really operational once we support both
-    // operational and commisioning advertising is supported.
+    if (ConfigurationMgr().IsFullyProvisioned())
     {
-        constexpr uint64_t kTestFabricId = 5544332211;
-        err                              = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::OperationalAdvertisingParameters()
-                                                                .SetFabricId(kTestFabricId)
+        uint64_t fabricId;
+
+        if (ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Fabric ID not known. Using a default");
+            fabricId = 5544332211;
+        }
+
+        err = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::OperationalAdvertisingParameters()
+                                                                .SetFabricId(fabricId)
                                                                 .SetNodeId(chip::kTestDeviceNodeId)
                                                                 .SetPort(CHIP_PORT)
-#if INET_CONFIG_ENABLE_IPV4
-                                                                .EnableIpV4(true)
-#else
-                                                                .EnableIpV4(false)
-#endif
-        );
-        SuccessOrExit(err);
+                                                                .EnableIpV4(true));
     }
+    else
+    {
+        chip::Optional<uint16_t> vendorId;
+        chip::Optional<uint16_t> productId;
+        uint16_t value;
+
+        if (ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "Vendor ID not known");
+        }
+        else
+        {
+            vendorId = Optional<uint16_t>::Value(value);
+        }
+
+        if (ConfigurationMgr().GetProductId(value) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "Product ID not known");
+        }
+        else
+        {
+            productId = Optional<uint16_t>::Value(value);
+        }
+
+        err = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::CommisionableAdvertisingParameters()
+                                                                .SetPort(CHIP_PORT)
+                                                                .EnableIpV4(true)
+                                                                .SetShortDiscriminator(52)
+                                                                .SetLongDiscrimininator(840)
+                                                                .SetVendorId(vendorId)
+                                                                .SetProductId(productId));
+    }
+    SuccessOrExit(err);
 
     err = Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
     SuccessOrExit(err);

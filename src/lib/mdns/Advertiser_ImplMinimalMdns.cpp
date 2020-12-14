@@ -506,7 +506,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisionableAdvertisingParameters
 
     if (params.GetVendorId().HasValue())
     {
-        sprintf(nameBuffer, "V%" PRId64, params.GetVendorId().Value());
+        sprintf(nameBuffer, "V%d", params.GetVendorId().Value());
         FullQName vendorServiceName = AllocateQName(nameBuffer, "_sub", "_chipc", "_udp", "local");
         ReturnErrorCodeIf(vendorServiceName.nameCount == 0, CHIP_ERROR_NO_MEMORY);
 
@@ -548,11 +548,11 @@ FullQName AdvertiserMinMdns::GetCommisionableTextEntries(const CommisionableAdve
     char txtVidPid[64];
     if (params.GetProductId().HasValue())
     {
-        sprintf(txtVidPid, "V=%" PRId64 "+%" PRId64, params.GetVendorId().Value(), params.GetProductId().Value());
+        sprintf(txtVidPid, "V=%d+%d", params.GetVendorId().Value(), params.GetProductId().Value());
     }
     else
     {
-        sprintf(txtVidPid, "V=%" PRId64, params.GetVendorId().Value());
+        sprintf(txtVidPid, "V=%d", params.GetVendorId().Value());
     }
 
     return AllocateQName(txtDiscriminator, txtVidPid);

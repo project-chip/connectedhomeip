@@ -43,8 +43,8 @@ struct Options
     // commisionable params
     uint8_t shortDiscriminator = 52;
     uint16_t longDiscriminator = 840;
-    Optional<uint64_t> vendorId;
-    Optional<uint64_t> productId;
+    Optional<uint16_t> vendorId;
+    Optional<uint16_t> productId;
 
     // operational params
     uint64_t fabricId = 12345;
@@ -95,10 +95,10 @@ bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier
         gOptions.longDiscriminator = static_cast<uint16_t>(atoi(aValue));
         return true;
     case kOptionCommisionableVendorId:
-        gOptions.vendorId = Optional<uint64_t>::Value(atoll(aValue));
+        gOptions.vendorId = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
     case kOptionCommisionableProductId:
-        gOptions.productId = Optional<uint64_t>::Value(atoll(aValue));
+        gOptions.productId = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
     case kOptionOperationalFabricId:
         gOptions.fabricId = atoll(aValue);
