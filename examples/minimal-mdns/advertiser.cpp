@@ -113,7 +113,9 @@ bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier
 }
 
 OptionDef cmdLineOptionsDef[] = {
+#if INET_CONFIG_ENABLE_IPV4
     { "enable-ip-v4", kNoArgument, kOptionEnableIpV4 },
+#endif
     { "advertising-mode", kArgumentRequired, kOptionAdvertisingMode },
 
     { "short-discriminator", kArgumentRequired, kOptionCommisionableShordDiscriminator },
@@ -127,9 +129,11 @@ OptionDef cmdLineOptionsDef[] = {
 };
 
 OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS",
+#if INET_CONFIG_ENABLE_IPV4
                              "  -4\n"
                              "  --enable-ip-v4\n"
                              "        enable listening on IPv4\n"
+#endif
                              "  -m <mode>\n"
                              "  --advertising-mode <mode>\n"
                              "        Advertise in this mode (o/operational or c/commisionable).\n"
