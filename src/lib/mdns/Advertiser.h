@@ -75,31 +75,31 @@ private:
     uint64_t mNodeId   = 0;
 };
 
-class CommisionableAdvertisingParameters : public BaseAdvertisingParams<CommisionableAdvertisingParameters>
+class CommisioningAdvertisingParameters : public BaseAdvertisingParams<CommisioningAdvertisingParameters>
 {
 public:
-    CommisionableAdvertisingParameters & SetShortDiscriminator(uint8_t discriminator)
+    CommisioningAdvertisingParameters & SetShortDiscriminator(uint8_t discriminator)
     {
         mShortDiscriminator = discriminator;
         return *this;
     }
     uint8_t GetShortDiscriminator() const { return mShortDiscriminator; }
 
-    CommisionableAdvertisingParameters & SetLongDiscrimininator(uint16_t discriminator)
+    CommisioningAdvertisingParameters & SetLongDiscrimininator(uint16_t discriminator)
     {
         mLongDiscriminator = discriminator;
         return *this;
     }
     uint16_t GetLongDiscriminator() const { return mLongDiscriminator; }
 
-    CommisionableAdvertisingParameters & SetVendorId(Optional<uint16_t> vendorId)
+    CommisioningAdvertisingParameters & SetVendorId(Optional<uint16_t> vendorId)
     {
         mVendorId = vendorId;
         return *this;
     }
     Optional<uint16_t> GetVendorId() const { return mVendorId; }
 
-    CommisionableAdvertisingParameters & SetProductId(Optional<uint16_t> productId)
+    CommisioningAdvertisingParameters & SetProductId(Optional<uint16_t> productId)
     {
         mProductId = productId;
         return *this;
@@ -127,7 +127,7 @@ public:
     virtual CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) = 0;
 
     /// Advertises the CHIP node as a commisionable node
-    virtual CHIP_ERROR Advertise(const CommisionableAdvertisingParameters & params) = 0;
+    virtual CHIP_ERROR Advertise(const CommisioningAdvertisingParameters & params) = 0;
 
     /// Provides the system-wide implementation of the service advertiser
     static ServiceAdvertiser & Instance();
