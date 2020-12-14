@@ -253,10 +253,9 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgIn)
+CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    System::PacketBufferHandle msgBuf;
 
     PayloadHeader payloadHeader;
 
@@ -267,7 +266,6 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize = 0;
 
-    msgBuf.Adopt(msgIn);
     VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
     msgBuf->SetStart(msgBuf->Start() - headerSize);
@@ -276,7 +274,7 @@ CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::Pa
     VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
 
     err = mDelegate->SendPairingMessage(PacketHeader().SetSourceNodeId(mLocalNodeId).SetEncryptionKeyID(mLocalKeyId), mPeerAddress,
-                                        msgBuf.Release_ForNow());
+                                        std::move(msgBuf));
     SuccessOrExit(err);
 
 exit:
@@ -335,7 +333,7 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamRequest()
 
     mNextExpectedMsg = Spake2pMsgType::kPBKDFParamResponse;
 
-    err = AttachHeaderAndSend(Spake2pMsgType::kPBKDFParamRequest, req.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kPBKDFParamRequest, std::move(req));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent PBKDF param request");
@@ -426,7 +424,7 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamResponse()
 
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsg1;
 
-    err = AttachHeaderAndSend(Spake2pMsgType::kPBKDFParamResponse, resp.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kPBKDFParamResponse, std::move(resp));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent PBKDF param response");
@@ -510,7 +508,7 @@ CHIP_ERROR SecurePairingSession::SendMsg1()
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsg2;
 
     // Call delegate to send the Msg1 to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg1, msg_pA.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg1, std::move(msg_pA));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent spake2p msg1");
@@ -573,7 +571,7 @@ CHIP_ERROR SecurePairingSession::HandleMsg1_and_SendMsg2(const PacketHeader & he
     mNextExpectedMsg = Spake2pMsgType::kSpake2pMsg3;
 
     // Call delegate to send the Msg2 to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg2, resp.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg2, std::move(resp));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent spake2p msg2");
@@ -627,7 +625,7 @@ CHIP_ERROR SecurePairingSession::HandleMsg2_and_SendMsg3(const PacketHeader & he
     resp->SetDataLength(verifier_len);
 
     // Call delegate to send the Msg3 to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg3, resp.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg3, std::move(resp));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent spake2p msg3");
@@ -717,7 +715,7 @@ void SecurePairingSession::SendErrorMsg(Spake2pErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsgError, msg.Release_ForNow());
+    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsgError, std::move(msg));
     SuccessOrExit(err);
 
 exit:

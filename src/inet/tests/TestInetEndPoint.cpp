@@ -405,7 +405,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
 
     NL_TEST_ASSERT(inSuite, addr.Type() == kIPAddressType_IPv6);
 
-    err = testRaw4EP->SendTo(addr, buf.Release_ForNow());
+    err = testRaw4EP->SendTo(addr, std::move(buf));
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_WRONG_ADDRESS_TYPE);
     testRaw4EP->Free();
 #endif // INET_CONFIG_ENABLE_IPV4
@@ -441,7 +441,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = testUDPEP->Bind(kIPAddressType_IPv4, addr_v4, 3000, intId);
     NL_TEST_ASSERT(inSuite, err != INET_NO_ERROR);
     buf = PacketBuffer::New();
-    err = testUDPEP->SendTo(addr_v4, 3000, buf.Release_ForNow());
+    err = testUDPEP->SendTo(addr_v4, 3000, std::move(buf));
     testUDPEP->Free();
 #endif // INET_CONFIG_ENABLE_IPV4
 
@@ -449,7 +449,7 @@ static void TestInetEndPointInternal(nlTestSuite * inSuite, void * inContext)
     err = testTCPEP1->GetPeerInfo(nullptr, nullptr);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
     buf = PacketBuffer::New();
-    err = testTCPEP1->Send(buf.Release_ForNow(), false);
+    err = testTCPEP1->Send(std::move(buf), false);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);
     err = testTCPEP1->EnableKeepAlive(10, 100);
     NL_TEST_ASSERT(inSuite, err == INET_ERROR_INCORRECT_STATE);

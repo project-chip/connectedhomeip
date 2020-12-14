@@ -55,7 +55,7 @@ public:
      * @return CHIP_ERROR Error thrown when sending the message
      */
     virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
-                                          System::PacketBuffer * msgBuf)
+                                          System::PacketBufferHandle msgBuf)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -232,7 +232,7 @@ private:
     void SendErrorMsg(Spake2pErrorType errorCode);
     void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-    CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgBuf);
+    CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBufferHandle msgBuf);
 
     void Clear();
 

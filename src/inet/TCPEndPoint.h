@@ -32,6 +32,8 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#include <utility>
+
 namespace chip {
 namespace Inet {
 
@@ -192,12 +194,8 @@ public:
      *
      * @retval  INET_NO_ERROR           success: address and port extracted.
      * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
-     *
-     * @details
-     *  The <tt>chip::System::PacketBuffer::Free</tt> method is called on the \c data argument
-     *  regardless of whether the transmission is successful or failed.
      */
-    INET_ERROR Send(chip::System::PacketBuffer * data, bool push = true);
+    INET_ERROR Send(chip::System::PacketBufferHandle data, bool push = true);
 
     /**
      * @brief   Disable reception.
@@ -565,7 +563,7 @@ private:
     static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
 
     chip::System::PacketBufferHandle mRcvQueue;
-    chip::System::PacketBuffer * mSendQueue;
+    chip::System::PacketBufferHandle mSendQueue;
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
     uint16_t mIdleTimeout;       // in units of INET_TCP_IDLE_CHECK_INTERVAL; zero means no timeout
     uint16_t mRemainingIdleTime; // in units of INET_TCP_IDLE_CHECK_INTERVAL
@@ -636,7 +634,13 @@ private:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     struct BufferOffset
     {
-        const chip::System::PacketBuffer * buffer;
+        BufferOffset(System::PacketBufferHandle && aBuffer) : buffer(std::move(aBuffer)), offset(0) {}
+        BufferOffset(BufferOffset && aOther)
+        {
+            buffer = std::move(aOther.buffer);
+            offset = aOther.offset;
+        }
+        chip::System::PacketBufferHandle buffer;
         uint16_t offset;
     };
 
