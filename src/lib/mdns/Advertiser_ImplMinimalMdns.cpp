@@ -128,7 +128,7 @@ private:
         kIpV4,
         kIpV6,
     };
-    State mState;
+    State mState = State::kIpV4;
     chip::Inet::InterfaceIterator mIterator;
 
     void SkipToFirstValidInterface()
