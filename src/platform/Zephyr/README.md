@@ -1,7 +1,7 @@
 # Overview of Zephyr Adaption
 
-The following is a quick overview of the Zephyr adaptation of CHIP. Most of
-this code will have parallels in any new adaptation.
+The following is a quick overview of the Zephyr adaptation of CHIP. Most of this
+code will have parallels in any new adaptation.
 
 (All file names are relative to `connectedhomeip/src/...`).
 

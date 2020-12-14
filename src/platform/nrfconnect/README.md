@@ -36,4 +36,5 @@ this code will have parallels in any new adaptation.
 
 `include/platform/nrfconnect/CHIPDevicePlatformEvent.h`
 
--   Uses Zephyr platform definitions of platform-specific event types and data for the chip Device Layer.
+-   Uses Zephyr platform definitions of platform-specific event types and data
+    for the chip Device Layer.
