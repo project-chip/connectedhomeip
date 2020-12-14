@@ -23,8 +23,6 @@ executable("chip-tool") {
     "commands/clusters/ModelCommand.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
-    "commands/common/NetworkCommand.cpp",
-    "commands/echo/EchoCommand.cpp",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/ParseCommand.cpp",
     "config/PersistentStorage.cpp",

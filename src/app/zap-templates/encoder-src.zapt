@@ -10,6 +10,8 @@
 
 using namespace chip;
 
+constexpr uint16_t kNullManufacturerCode = 0x0000;
+
 #define CHECK_FRAME_LENGTH(value, name)                                                                                            \
     if (value == 0)                                                                                                                \
     {                                                                                                                              \
@@ -18,9 +20,10 @@ using namespace chip;
     }
 
 
-#define READ_ATTRIBUTES(name, cluster_id)                                                                                          \
+#define READ_ATTRIBUTES(name, cluster_id, mfgCode)                                                                                 \
     uint16_t attr_id_count = sizeof(attr_ids) / sizeof(attr_ids[0]);                                                               \
-    uint16_t result = encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, cluster_id, attr_ids, attr_id_count);  \
+    uint16_t result =                                                                                                              \
+        encodeReadAttributesCommand(buffer, buf_length, destination_endpoint, cluster_id, mfgCode, attr_ids, attr_id_count);       \
     if (result == 0)                                                                                                               \
     {                                                                                                                              \
         ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
@@ -28,9 +31,9 @@ using namespace chip;
     }                                                                                                                              \
     return result;
 
-#define WRITE_ATTRIBUTE(name, cluster_id, value)                                                                                   \
+#define WRITE_ATTRIBUTE(name, cluster_id, mfgCode, value)                                                                          \
     BufBound buf = BufBound(buffer, buf_length);                                                                                   \
-    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x02))                                                         \
+    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, mfgCode, 0x02))                                                \
     {                                                                                                                              \
         buf.Put16(attr_id);                                                                                                        \
         buf.Put(attr_type);                                                                                                        \
@@ -55,9 +58,9 @@ using namespace chip;
     }                                                                                                                              \
     return result;
 
-#define REPORT_ATTRIBUTE(name, cluster_id, isAnalog, value)                                                                        \
+#define REPORT_ATTRIBUTE(name, cluster_id, mfgCode, isAnalog, value)                                                               \
     BufBound buf = BufBound(buffer, buf_length);                                                                                   \
-    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x06))                                                         \
+    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, mfgCode, 0x06))                                                \
     {                                                                                                                              \
         uint8_t direction = 0x00;                                                                                                  \
         buf.Put(direction);                                                                                                        \
@@ -91,9 +94,9 @@ using namespace chip;
     }                                                                                                                              \
     return result;
 
-#define DISCOVER_ATTRIBUTES(name, cluster_id)                                                                                      \
+#define DISCOVER_ATTRIBUTES(name, cluster_id, mfgCode)                                                                             \
     BufBound buf = BufBound(buffer, buf_length);                                                                                   \
-    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x0c))                                                         \
+    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, mfgCode, 0x0c))                                                \
     {                                                                                                                              \
         /* Discover all attributes */                                                                                              \
         buf.Put16(0x0000);                                                                                                         \
@@ -108,9 +111,9 @@ using namespace chip;
     }                                                                                                                              \
     return result;
 
-#define COMMAND_HEADER(name, cluster_id, command_id)                                                                               \
+#define COMMAND_HEADER(name, cluster_id, mfgCode, command_id)                                                                      \
     BufBound buf    = BufBound(buffer, buf_length);                                                                                \
-    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, cluster_id, command_id);                            \
+    uint16_t result = _encodeClusterSpecificCommand(buf, destination_endpoint, cluster_id, mfgCode, command_id);                   \
     if (result == 0)                                                                                                               \
     {                                                                                                                              \
         ChipLogError(Zcl, "Error encoding %s command", name);                                                                      \
@@ -138,8 +141,8 @@ using namespace chip;
         buf.Put(str);                                                                                                              \
     }                                                                                                                              \
 
-#define COMMAND(name, cluster_id, command_id)                                                                                      \
-    COMMAND_HEADER(name, cluster_id, command_id);                                                                                  \
+#define COMMAND(name, cluster_id, mfgCode, command_id)                                                                             \
+    COMMAND_HEADER(name, cluster_id, mfgCode, command_id);                                                                         \
     COMMAND_FOOTER(name);
 
 using namespace chip;
@@ -194,7 +197,8 @@ uint16_t encodeApsFrame(uint8_t * buffer, uint16_t buf_length, EmberApsFrame * a
                             apsFrame->options, apsFrame->groupId, apsFrame->sequence, apsFrame->radius, !buffer);
 }
 
-uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, CommandId command, uint8_t frame_control)
+uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint16_t mfgCode, CommandId command,
+                        uint8_t frame_control)
 {
     CHECK_FRAME_LENGTH(buf.Size(), "Buffer is empty");
 
@@ -204,6 +208,10 @@ uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, Cluster
     if (doEncodeApsFrame(buf, cluster_id, source_endpoint, destination_endpoint, 0, 0, 0, 0, false))
     {
         buf.Put(frame_control);
+        if (mfgCode != kNullManufacturerCode)
+        {
+            buf.Put16(mfgCode);
+        }
         buf.Put(seq_num);
         buf.Put(command);
     }
@@ -211,31 +219,39 @@ uint16_t _encodeCommand(BufBound & buf, EndpointId destination_endpoint, Cluster
     return buf.Fit() && CanCastTo<uint16_t>(buf.Needed()) ? static_cast<uint16_t>(buf.Needed()) : 0;
 }
 
-uint16_t _encodeClusterSpecificCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, CommandId command)
+uint16_t _encodeClusterSpecificCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint16_t mfgCode,
+                                       CommandId command)
 {
-    // This is a cluster-specific command so low two bits are 0b01.  The command
-    // is standard, so does not need a manufacturer code, and we're sending
+    // This is a cluster-specific command so low two bits are 0b01 and we're sending
     // client to server, so all the remaining bits are 0.
     uint8_t frame_control = 0x01;
+    if (mfgCode != kNullManufacturerCode)
+    {
+        frame_control = frame_control | (1u << 2);
+    }
 
-    return _encodeCommand(buf, destination_endpoint, cluster_id, command, frame_control);
+    return _encodeCommand(buf, destination_endpoint, cluster_id, mfgCode, command, frame_control);
 }
 
-uint16_t _encodeGlobalCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, CommandId command)
+uint16_t _encodeGlobalCommand(BufBound & buf, EndpointId destination_endpoint, ClusterId cluster_id, uint16_t mfgCode,
+                              CommandId command)
 {
-    // This is a global command, so the low bits are 0b00.  The command is
-    // standard, so does not need a manufacturer code, and we're sending client
+    // This is a global command, so the low bits are 0b00 and we're sending client
     // to server, so all the remaining bits are 0.
     uint8_t frame_control = 0x00;
+    if (mfgCode != kNullManufacturerCode)
+    {
+        frame_control = frame_control | (1u << 2);
+    }
 
-    return _encodeCommand(buf, destination_endpoint, cluster_id, command, frame_control);
+    return _encodeCommand(buf, destination_endpoint, cluster_id, mfgCode, command, frame_control);
 }
 
 uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint, ClusterId cluster_id,
-                                     const uint16_t * attr_ids, uint16_t attr_id_count)
+                                     uint16_t mfgCode, const uint16_t * attr_ids, uint16_t attr_id_count)
 {
     BufBound buf = BufBound(buffer, buf_length);
-    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, 0x00))
+    if (_encodeGlobalCommand(buf, destination_endpoint, cluster_id, mfgCode, 0x00))
     {
         for (uint16_t i = 0; i < attr_id_count; ++i)
         {
@@ -257,7 +273,7 @@ uint16_t encodeReadAttributesCommand(uint8_t * buffer, uint16_t buf_length, Endp
 uint16_t encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
 {
     const char * kName = "{{asCamelCased clusterName false}}{{asType name}}";
-    COMMAND_HEADER(kName, {{parent.define}}_ID, {{asHex code 2}});
+    COMMAND_HEADER(kName, {{parent.define}}_ID, {{asHex mfgCode 4}}, {{asHex code 2}});
     {{#chip_server_cluster_command_arguments}}
     {{#if (isString type)}}
     COMMAND_INSERT_STRING(kName, {{asCamelCased label}});
@@ -273,7 +289,7 @@ uint16_t encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(u
 {{/chip_server_cluster_commands}}
 uint16_t encode{{asCamelCased name false}}ClusterDiscoverAttributes(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint)
 {
-    DISCOVER_ATTRIBUTES("Discover{{asCamelCased name false}}Attributes", {{define}}_ID);
+    DISCOVER_ATTRIBUTES("Discover{{asCamelCased name false}}Attributes", {{define}}_ID, {{asHex mfgCode 4}});
 }
 
 {{#chip_server_cluster_attributes}}
@@ -283,7 +299,7 @@ uint16_t encode{{asCamelCased name false}}ClusterDiscoverAttributes(uint8_t * bu
 uint16_t encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(uint8_t * buffer, uint16_t buf_length, EndpointId destination_endpoint)
 {
     uint16_t attr_ids[] = { {{asHex attributeCode 4}} };
-    READ_ATTRIBUTES("Read{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID);
+    READ_ATTRIBUTES("Read{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID, {{asHex mfgCode 4}});
 }
 
 {{#if (isWritableAttribute)}}
@@ -291,7 +307,7 @@ uint16_t encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name
 {
     uint16_t attr_id = {{asHex attributeCode 4}};
     uint8_t attr_type = { {{atomicTypeId}} };
-    WRITE_ATTRIBUTE("Write{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID, {{asCamelCased name}});
+    WRITE_ATTRIBUTE("Write{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID, {{asHex mfgCode 4}}, {{asCamelCased name}});
 }
 
 {{/if}}
@@ -300,7 +316,7 @@ uint16_t encode{{asCamelCased parent.name false}}ClusterReport{{asCamelCased nam
 {
     uint16_t attr_id = {{asHex attributeCode 4}};
     uint8_t attr_type = { {{atomicTypeId}} };
-    REPORT_ATTRIBUTE("Report{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID, {{#unless (isDiscreteType)}}true, change{{else}}false, 0{{/unless}});
+    REPORT_ATTRIBUTE("Report{{asCamelCased parent.name false}}{{asCamelCased name false}}", {{parent.define}}_ID, {{asHex mfgCode 4}}, {{#unless (isDiscreteType)}}true, change{{else}}false, 0{{/unless}});
 }
 
 {{/if}}

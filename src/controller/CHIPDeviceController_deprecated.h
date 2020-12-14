@@ -143,7 +143,7 @@ public:
      *
      * @return bool   If IP Address was returned
      */
-    bool GetIpAddress(Inet::IPAddress & addr) const;
+    bool GetIpAddress(Inet::IPAddress & addr);
 
     // ----- Messaging -----
     /**
@@ -185,6 +185,8 @@ public:
     void OnMessage(System::PacketBufferHandle msg) override;
 
 private:
+    CHIP_ERROR InitDevice();
+
     enum
     {
         kState_NotInitialized = 0,
