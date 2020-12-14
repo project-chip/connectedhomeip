@@ -183,13 +183,12 @@ void Device::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr
 
 void Device::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
-    mState = ConnectionState::NotConnected;
+    mState         = ConnectionState::NotConnected;
     mSecureSession = SecureSessionHandle{};
 }
 
-void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                               SecureSessionHandle session, System::PacketBufferHandle msgBuf,
-                               SecureSessionMgr * mgr)
+void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                               System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
 {
     if (mState == ConnectionState::SecureConnected)
     {

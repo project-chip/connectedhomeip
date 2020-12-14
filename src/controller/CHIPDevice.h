@@ -188,8 +188,8 @@ public:
      * @param[in] msgBuf        The message buffer
      * @param[in] mgr           Pointer to secure session manager which received the message
      */
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
 
     /**
      * @brief

@@ -129,7 +129,8 @@ void ExchangeManager::OnReceiveError(CHIP_ERROR error, const Transport::PeerAddr
     ChipLogError(ExchangeManager, "Accept FAILED, err = %s", ErrorStr(error));
 }
 
-ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate)
+ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
+                                                ExchangeDelegate * delegate)
 {
     CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return nullptr);
 
@@ -145,8 +146,8 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, SecureSessi
     return nullptr;
 }
 
-void ExchangeManager::DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                      System::PacketBufferHandle msgBuf)
+void ExchangeManager::DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader,
+                                      const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
 {
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
@@ -199,8 +200,7 @@ void ExchangeManager::DispatchMessage(SecureSessionHandle session, const PacketH
     // If we found a handler or we need to create a new exchange context (EC).
     if (matchingUMH != nullptr)
     {
-        auto * ec =
-            AllocContext(payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
+        auto * ec = AllocContext(payloadHeader.GetExchangeID(), session, false, matchingUMH->Delegate);
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
         ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - ContextPool.begin(), ec->GetExchangeId(),
@@ -265,8 +265,7 @@ CHIP_ERROR ExchangeManager::UnregisterUMH(uint32_t protocolId, int16_t msgType)
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf,
-                                        SecureSessionMgr * msgLayer)
+                                        SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer)
 {
     DispatchMessage(session, packetHeader, payloadHeader, std::move(msgBuf));
 }

@@ -151,17 +151,14 @@ void HandleEchoResponseReceived(chip::Messaging::ExchangeContext * ec, chip::Sys
     gWaitingForEchoResp = false;
     gEchoRespCount++;
 
-    printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount,
-           gEchoCount, static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(),
-           static_cast<double>(transitTime) / 1000);
+    printf("Echo Response: %" PRIu64 "/%" PRIu64 "(%.2f%%) len=%u time=%.3fms\n", gEchoRespCount, gEchoCount,
+           static_cast<double>(gEchoRespCount) * 100 / gEchoCount, payload->DataLength(), static_cast<double>(transitTime) / 1000);
 }
 
 class TestSecureSessionMgrDelegate : public chip::SecureSessionMgrDelegate
 {
 public:
-    void OnNewConnection(chip::SecureSessionHandle session, chip::SecureSessionMgr * mgr) override {
-        mSecureSession = session;
-    }
+    void OnNewConnection(chip::SecureSessionHandle session, chip::SecureSessionMgr * mgr) override { mSecureSession = session; }
 
     chip::SecureSessionHandle mSecureSession;
 } gTestSecureSessionMgrDelegate;

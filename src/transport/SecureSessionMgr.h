@@ -44,7 +44,6 @@ namespace chip {
 
 class SecureSessionMgr;
 
-
 class SecureSessionHandle
 {
 public:
@@ -55,6 +54,7 @@ public:
     {
         return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
     }
+
 private:
     friend class SecureSessionMgr;
     NodeId mPeerNodeId;
@@ -83,8 +83,7 @@ public:
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   SecureSessionHandle session, System::PacketBufferHandle msgBuf,
-                                   SecureSessionMgr * mgr)
+                                   SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**

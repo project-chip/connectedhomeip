@@ -92,7 +92,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, System::Pa
     return SendMessage(session, payloadHeader, std::move(msgBuf));
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                         System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = GetPeerConnectionState(session);
@@ -350,7 +351,8 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
 
         if (mCB != nullptr)
         {
-            mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID() }, std::move(msg), this);
+            mCB->OnMessageReceived(packetHeader, payloadHeader, { state->GetPeerNodeId(), state->GetPeerKeyID() }, std::move(msg),
+                                   this);
         }
     }
 

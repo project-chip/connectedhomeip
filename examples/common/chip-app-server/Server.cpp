@@ -61,11 +61,10 @@ bool isRendezvousBypassed()
 class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           SecureSessionHandle session, System::PacketBufferHandle buffer,
-                           SecureSessionMgr * mgr) override
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                           System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
     {
-        auto state = mgr->GetPeerConnectionState(session);
+        auto state            = mgr->GetPeerConnectionState(session);
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
 

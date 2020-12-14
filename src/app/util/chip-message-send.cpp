@@ -74,7 +74,7 @@ EmberStatus chipSendUnicast(NodeId destination, EmberApsFrame * apsFrame, uint16
     buffer->SetDataLength(dataLength);
 
     // TODO: temprary create a handle from node id, will be fix in PR 3602
-    CHIP_ERROR err = SessionManager().SendMessage({destination, Transport::kAnyKeyId}, std::move(buffer));
+    CHIP_ERROR err = SessionManager().SendMessage({ destination, Transport::kAnyKeyId }, std::move(buffer));
     if (err != CHIP_NO_ERROR)
     {
         // FIXME: Figure out better translations between our error types?
