@@ -952,10 +952,9 @@ class BluezManager(ChipBleBase):
         self.logger.info("{0:<10}{1}".format("address =", device.Address))
 
         if device.ServiceData:
-            serviceDataDict = dict(device.ServiceData)
-            for i in serviceDataDict.keys():
-                self.logger.info("Adv UUID: " + str(i))
-                self.logger.info("Adv Data: " + str(bytes(serviceDataDict[i])))
+            for advuuid in device.ServiceData:
+                self.logger.info("Adv UUID: " + str(advuuid))
+                self.logger.info("Adv Data: " + bytes(device.ServiceData[advuuid]).hex())
                 devIdInfo = self.get_peripheral_devIdInfo(device)
                 if devIdInfo != None:
                     self.logger.info("Chip Dev: Pairing State = {}".format(devIdInfo.pairingState))
@@ -1078,10 +1077,9 @@ class BluezManager(ChipBleBase):
     def get_peripheral_devIdInfo(self, peripheral):
         if not peripheral.ServiceData:
             return None
-        servDataDict = dict(peripheral.ServiceData)
-        for i in servDataDict.keys():
-            if str(i).lower() == str(chip_service).lower():
-                return ParseServiceData(bytes(servDataDict[i]))
+        for advuuid in peripheral.ServiceData:
+            if str(advuuid).lower() == str(chip_service).lower():
+                return ParseServiceData(bytes(peripheral.ServiceData[advuuid]))
         return None
 
     def connect(self, identifier):
