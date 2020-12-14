@@ -16,6 +16,7 @@
 #    limitations under the License.
 #
 
+ZAP_TEMPLATES=$PWD/src/app/zap-templates
 cd ./third_party/zap/repo/
 
-node ./src-script/zap-start.js --logToStdout --gen ../../../src/app/zap-templates/chip-templates.json
+node ./src-script/zap-start.js --logToStdout -z "$ZAP_TEMPLATES"/zcl/zcl.json --gen "$ZAP_TEMPLATES"/chip-templates.json
