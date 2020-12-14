@@ -193,7 +193,7 @@ public:
     // Service advertiser
     CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
     CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
-    CHIP_ERROR Advertise(const CommisionableAdvertisingParameters & params) override;
+    CHIP_ERROR Advertise(const CommisioningAdvertisingParameters & params) override;
 
     // ServerDelegate
     void OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -265,7 +265,7 @@ private:
         return FullQName();
     }
 
-    FullQName GetCommisionableTextEntries(const CommisionableAdvertisingParameters & params);
+    FullQName GetCommisioningTextEntries(const CommisioningAdvertisingParameters & params);
 
     static constexpr size_t kMaxEndPoints           = 10;
     static constexpr size_t kMaxRecords             = 16;
@@ -422,7 +422,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisionableAdvertisingParameters & params)
+CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisioningAdvertisingParameters & params)
 {
     Clear();
 
@@ -520,7 +520,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisionableAdvertisingParameters
         }
     }
 
-    if (!AddResponder<TxtResponder>(TxtResourceRecord(operationalServerName, GetCommisionableTextEntries(params)))
+    if (!AddResponder<TxtResponder>(TxtResourceRecord(operationalServerName, GetCommisioningTextEntries(params)))
              .SetReportAdditional(serverName)
              .IsValid())
     {
@@ -528,12 +528,12 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const CommisionableAdvertisingParameters
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commisionable device'.");
+    ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Commisioning device'.");
 
     return CHIP_NO_ERROR;
 }
 
-FullQName AdvertiserMinMdns::GetCommisionableTextEntries(const CommisionableAdvertisingParameters & params)
+FullQName AdvertiserMinMdns::GetCommisioningTextEntries(const CommisioningAdvertisingParameters & params)
 {
     // a discriminator always exists
     char txtDiscriminator[32];

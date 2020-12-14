@@ -206,7 +206,7 @@ void InitServer(AppDelegate * delegate)
             discriminator = 840;
         }
 
-        err = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::CommisionableAdvertisingParameters()
+        err = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::CommisioningAdvertisingParameters()
                                                                 .SetPort(CHIP_PORT)
                                                                 .EnableIpV4(true)
                                                                 .SetShortDiscriminator(static_cast<uint8_t>(discriminator & 0xFF))

@@ -31,14 +31,14 @@ namespace {
 
 enum class AdvertisingMode
 {
-    kCommisionable,
+    kCommisioning,
     kOperational,
 };
 
 struct Options
 {
     bool enableIpV4                 = false;
-    AdvertisingMode advertisingMode = AdvertisingMode::kCommisionable;
+    AdvertisingMode advertisingMode = AdvertisingMode::kCommisioning;
 
     // commisionable params
     uint8_t shortDiscriminator = 52;
@@ -57,10 +57,10 @@ using namespace chip::ArgParser;
 constexpr uint16_t kOptionEnableIpV4      = '4';
 constexpr uint16_t kOptionAdvertisingMode = 'm';
 
-constexpr uint16_t kOptionCommisionableShordDiscriminator = 's';
-constexpr uint16_t kOptionCommisionableLongDiscriminaotr  = 'l';
-constexpr uint16_t kOptionCommisionableVendorId           = 0x100; // v is used by 'version'
-constexpr uint16_t kOptionCommisionableProductId          = 'p';
+constexpr uint16_t kOptionCommisioningShordDiscriminator = 's';
+constexpr uint16_t kOptionCommisioningLongDiscriminaotr  = 'l';
+constexpr uint16_t kOptionCommisioningVendorId           = 0x100; // v is used by 'version'
+constexpr uint16_t kOptionCommisioningProductId          = 'p';
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
@@ -79,7 +79,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier
         }
         else if ((strcmp(aValue, "commisionable") == 0) || (strcmp(aValue, "c") == 0))
         {
-            gOptions.advertisingMode = AdvertisingMode::kCommisionable;
+            gOptions.advertisingMode = AdvertisingMode::kCommisioning;
         }
         else
         {
@@ -88,16 +88,16 @@ bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier
             return false;
         }
         return true;
-    case kOptionCommisionableShordDiscriminator:
+    case kOptionCommisioningShordDiscriminator:
         gOptions.shortDiscriminator = static_cast<uint8_t>(atoi(aValue));
         return true;
-    case kOptionCommisionableLongDiscriminaotr:
+    case kOptionCommisioningLongDiscriminaotr:
         gOptions.longDiscriminator = static_cast<uint16_t>(atoi(aValue));
         return true;
-    case kOptionCommisionableVendorId:
+    case kOptionCommisioningVendorId:
         gOptions.vendorId = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
-    case kOptionCommisionableProductId:
+    case kOptionCommisioningProductId:
         gOptions.productId = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
     case kOptionOperationalFabricId:
@@ -118,10 +118,10 @@ OptionDef cmdLineOptionsDef[] = {
 #endif
     { "advertising-mode", kArgumentRequired, kOptionAdvertisingMode },
 
-    { "short-discriminator", kArgumentRequired, kOptionCommisionableShordDiscriminator },
-    { "long-discriminator", kArgumentRequired, kOptionCommisionableLongDiscriminaotr },
-    { "vendor-id", kArgumentRequired, kOptionCommisionableVendorId },
-    { "product-id", kArgumentRequired, kOptionCommisionableProductId },
+    { "short-discriminator", kArgumentRequired, kOptionCommisioningShordDiscriminator },
+    { "long-discriminator", kArgumentRequired, kOptionCommisioningLongDiscriminaotr },
+    { "vendor-id", kArgumentRequired, kOptionCommisioningVendorId },
+    { "product-id", kArgumentRequired, kOptionCommisioningProductId },
 
     { "fabrid-id", kArgumentRequired, kOptionOperationalFabricId },
     { "node-id", kArgumentRequired, kOptionOperationalNodeId },
@@ -139,15 +139,15 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "        Advertise in this mode (o/operational or c/commisionable).\n"
                              "  --short-discriminator <value>\n"
                              "  -s <value>\n"
-                             "        Commisionable short discriminator.\n"
+                             "        Commisioning short discriminator.\n"
                              "  --long-discriminator <value>\n"
                              "  -l <value>\n"
-                             "        Commisionable long discriminator.\n"
+                             "        Commisioning long discriminator.\n"
                              "  --vendor-id <value>\n"
-                             "        Commisionable vendor id.\n"
+                             "        Commisioning vendor id.\n"
                              "  --product-id <value>\n"
                              "  -p <value>\n"
-                             "        Commisionable product id.\n"
+                             "        Commisioning product id.\n"
                              "  --fabrid-id <value>\n"
                              "  -f <value>\n"
                              "        Operational fabric id.\n"
@@ -189,9 +189,9 @@ int main(int argc, char ** args)
 
     CHIP_ERROR err;
 
-    if (gOptions.advertisingMode == AdvertisingMode::kCommisionable)
+    if (gOptions.advertisingMode == AdvertisingMode::kCommisioning)
     {
-        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommisionableAdvertisingParameters()
+        err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommisioningAdvertisingParameters()
                                                                       .EnableIpV4(gOptions.enableIpV4)
                                                                       .SetPort(CHIP_PORT)
                                                                       .SetShortDiscriminator(gOptions.shortDiscriminator)
