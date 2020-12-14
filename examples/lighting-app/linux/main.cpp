@@ -44,8 +44,6 @@ using namespace chip::Inet;
 using namespace chip::Transport;
 using namespace chip::DeviceLayer;
 
-constexpr uint32_t kDefaultSetupPinCode = 12345678; // TODO: Should be a macro in CHIPProjectConfig.h like other example apps.
-
 void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId, AttributeId attributeId, uint8_t mask,
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {
@@ -113,19 +111,9 @@ CHIP_ERROR PrintQRCodeContent()
     std::string result;
 
     err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        setUpPINCode = kDefaultSetupPinCode;
-        err          = ConfigurationMgr().StoreSetupPinCode(setUpPINCode);
-    }
     SuccessOrExit(err);
 
     err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
-    if (err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
-    {
-        setUpDiscriminator = GetRandU16() & 0xFFF;
-        err                = ConfigurationMgr().StoreSetupDiscriminator(setUpDiscriminator);
-    }
     SuccessOrExit(err);
 
     err = ConfigurationMgr().GetVendorId(vendorId);
