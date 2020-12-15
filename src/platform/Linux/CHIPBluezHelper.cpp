@@ -1265,7 +1265,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
 {
     // Construct the TLV for the additional data
     GVariant * cValue = nullptr;
-    unsigned long err = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     TLVWriter writer;
     chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
     chip::System::PacketBuffer * buffer = bufferHandle.Get_ForNow();
