@@ -142,6 +142,7 @@ static void PrettyPrintIM(bool aIsNewLine, const char * aFmt, ...)
 #define PRETTY_PRINT_CHECKPOINT()
 #define PRETTY_PRINT(fmt, ...)
 #define PRETTY_PRINT(fmt, ...)
+#define PRETTY_PRINT_SAMELINE(fmt, ...)
 #define PRETTY_PRINT_INCDEPTH()
 #define PRETTY_PRINT_DECDEPTH()
 #endif // CHIP_DETAIL_LOGGING
