@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -88,7 +87,7 @@ typedef struct _DebtPayload
 typedef struct _DeviceInformationRecord
 {
     uint64_t ieeeAddress;
-    chip::EndpointId endpointId;
+    uint8_t endpointId;
     uint16_t profileId;
     uint16_t deviceId;
     uint8_t version;
@@ -107,7 +106,7 @@ typedef struct _DiscoverAttributesInfoRecord
 typedef struct _EndpointInformationRecord
 {
     uint16_t networkAddress;
-    chip::EndpointId endpointId;
+    uint8_t endpointId;
     uint16_t profileId;
     uint16_t deviceId;
     uint8_t version;
@@ -153,7 +152,7 @@ typedef struct _GpTranslationTableUpdateTranslation
 {
     uint8_t index;
     uint8_t gpdCommandId;
-    chip::EndpointId endpoint;
+    uint8_t endpoint;
     uint16_t profile;
     uint16_t cluster;
     uint8_t zigbeeCommandId;
@@ -164,7 +163,7 @@ typedef struct _GpTranslationTableUpdateTranslation
 // Struct for GroupInformationRecord
 typedef struct _GroupInformationRecord
 {
-    chip::GroupId groupId;
+    uint16_t groupId;
     uint8_t groupType;
 } EmberAfGroupInformationRecord;
 
@@ -195,7 +194,7 @@ typedef struct _NodeInformation
 {
     uint16_t uid;
     uint16_t address;
-    chip::EndpointId endpoint;
+    uint8_t endpoint;
     uint8_t * nickname;
 } EmberAfNodeInformation;
 

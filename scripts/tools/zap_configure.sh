@@ -18,4 +18,4 @@
 
 cd ./third_party/zap/repo/
 
-node ./src-script/zap-start.js --logToStdout --gen ../../../src/app/zap-templates/chip-templates.json
+node ./src-script/zap-start.js --logToStdout --gen ../../../src/app/zap-templates/app-templates.json
