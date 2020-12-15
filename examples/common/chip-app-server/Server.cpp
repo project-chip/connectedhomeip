@@ -153,9 +153,13 @@ void InitServer(AppDelegate * delegate)
         uint32_t pinCode;
 
         SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
+#if CONFIG_NETWORK_LAYER_BLE
         params.SetSetupPINCode(pinCode)
             .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
             .SetPeerAddress(Transport::PeerAddress::BLE());
+#else
+        params.SetSetupPINCode(pinCode);
+#endif // CONFIG_NETWORK_LAYER_BLE
         SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
     }
 

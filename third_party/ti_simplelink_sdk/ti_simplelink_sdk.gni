@@ -142,6 +142,10 @@ template("ti_simplelink_sdk") {
     defines = []
     include_dirs = []
 
+    cflags = [
+      "-Wno-sign-compare",
+    ]
+
     sources = [
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/AppHooks_freertos.c",
       "${ti_simplelink_sdk_root}/kernel/freertos/dpl/ClockPCC26X2_freertos.c",
@@ -172,6 +176,7 @@ template("ti_simplelink_sdk") {
     cflags = [
       "-std=c11",
       "-Wno-maybe-uninitialized",
+      "-Wno-sign-compare",
     ]
   }
 
@@ -216,6 +221,7 @@ template("ti_simplelink_sdk") {
     cflags = [
       "-Wno-int-conversion",
       "-Wno-address-of-packed-member",
+      "-Wno-implicit-fallthrough",
     ]
     public_deps = [
       ":${sdk_target_name}_freertos",
