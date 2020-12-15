@@ -377,6 +377,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     if (payloadHeader.IsAckMsg())
     {
         err = mReliableMessageContext.HandleRcvdAck(payloadHeader.GetAckId().Value());
+        SuccessOrExit(err);
     }
 
     if (payloadHeader.IsNeedsAck())
@@ -391,6 +392,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         mReliableMessageContext.SetPeerRequestedAck(true);
 
         err = mReliableMessageContext.HandleNeedsAck(messageId, msgFlags);
+        SuccessOrExit(err);
     }
 
     //  The Common::Null message type is only used for CRMP; do not pass such messages to the application layer.
