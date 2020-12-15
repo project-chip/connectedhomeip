@@ -22,8 +22,6 @@
  *
  */
 
-#include "TestManualCode.h"
-
 #include <nlunit-test.h>
 #include <stdio.h>
 
@@ -32,6 +30,7 @@
 #include "SetupPayload.cpp"
 #include "SetupPayload.h"
 
+#include <support/UnitTestRegistration.h>
 #include <support/verhoeff/Verhoeff.h>
 
 using namespace chip;
@@ -144,7 +143,7 @@ void TestDecimalRepresentation_InvalidPayload(nlTestSuite * inSuite, void * inCo
 }
 
 void assertPayloadValues(nlTestSuite * inSuite, CHIP_ERROR actualError, CHIP_ERROR expectedError, const SetupPayload & payload,
-                         uint32_t pinCode, uint8_t discriminator, uint16_t vendorID, uint16_t productID)
+                         uint32_t pinCode, uint16_t discriminator, uint16_t vendorID, uint16_t productID)
 {
     NL_TEST_ASSERT(inSuite, actualError == expectedError);
     NL_TEST_ASSERT(inSuite, payload.setUpPINCode == pinCode);
@@ -453,7 +452,7 @@ void TestDecimalStringToNumber(nlTestSuite * inSuite, void * inContext)
 void TestReadCharsFromDecimalString(nlTestSuite * inSuite, void * inContext)
 {
     uint64_t number;
-    int index = 3;
+    size_t index = 3;
     NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("12345", index, number, 2) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 45);
 
@@ -480,14 +479,14 @@ void TestReadCharsFromDecimalString(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("12345", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
     NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("12", index, number, 5) == CHIP_ERROR_INVALID_STRING_LENGTH);
 
-    index = -2;
-    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("6256276377282", index, number, 7) == CHIP_ERROR_INVALID_ARGUMENT);
+    index = 200;
+    NL_TEST_ASSERT(inSuite, readDigitsFromDecimalString("6256276377282", index, number, 1) == CHIP_ERROR_INVALID_STRING_LENGTH);
 }
 
 void TestReadBitsFromNumber(nlTestSuite * inSuite, void * inContext)
 {
     uint64_t number;
-    int index = 3;
+    size_t index = 3;
     NL_TEST_ASSERT(inSuite, readBitsFromNumber(12345, index, number, 6, 14) == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, number == 7);
 
@@ -517,13 +516,13 @@ void TestReadBitsFromNumber(nlTestSuite * inSuite, void * inContext)
 void TestShortCodeCharLengths(nlTestSuite * inSuite, void * inContext)
 {
     size_t numBits                        = 1 + kSetupPINCodeFieldLengthInBits + kManualSetupDiscriminatorFieldLengthInBits;
-    size_t manualSetupShortCodeCharLength = ceil(log10(pow(2, numBits)));
+    size_t manualSetupShortCodeCharLength = static_cast<size_t>(ceil(log10(pow(2, numBits))));
     NL_TEST_ASSERT(inSuite, manualSetupShortCodeCharLength == kManualSetupShortCodeCharLength);
 
-    size_t manualSetupVendorIdCharLength = ceil(log10(pow(2, kVendorIDFieldLengthInBits)));
+    size_t manualSetupVendorIdCharLength = static_cast<size_t>(ceil(log10(pow(2, kVendorIDFieldLengthInBits))));
     NL_TEST_ASSERT(inSuite, manualSetupVendorIdCharLength == kManualSetupVendorIdCharLength);
 
-    size_t manualSetupProductIdCharLength = ceil(log10(pow(2, kProductIDFieldLengthInBits)));
+    size_t manualSetupProductIdCharLength = static_cast<size_t>(ceil(log10(pow(2, kProductIDFieldLengthInBits))));
     NL_TEST_ASSERT(inSuite, manualSetupProductIdCharLength == kManualSetupProductIdCharLength);
 
     size_t manualSetupLongCodeCharLength =
@@ -597,3 +596,5 @@ int TestManualSetupCode()
 
     return nlTestRunnerStats(&theSuite);
 }
+
+CHIP_REGISTER_TEST_SUITE(TestManualSetupCode);

@@ -51,7 +51,7 @@ public:
      * @param msgBuf    the buffer of (encrypted) payload
      */
     virtual void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                                   System::PacketBuffer * msgBuf) = 0;
+                                   System::PacketBufferHandle msgBuf) = 0;
 };
 
 class TransportMgrBase
@@ -59,10 +59,9 @@ class TransportMgrBase
 public:
     CHIP_ERROR Init(Transport::Base * transport);
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
-                           System::PacketBuffer * msgBuf)
+    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
     {
-        return mTransport->SendMessage(header, payloadFlags, address, msgBuf);
+        return mTransport->SendMessage(header, address, std::move(msgBuf));
     }
 
     void Disconnect(const Transport::PeerAddress & address) { mTransport->Disconnect(address); }
@@ -73,7 +72,7 @@ public:
 
 private:
     static void HandleMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                      System::PacketBuffer * msg, TransportMgrBase * dispatcher);
+                                      System::PacketBufferHandle msg, TransportMgrBase * dispatcher);
 
     TransportMgrDelegate * mSecureSessionMgr = nullptr;
     TransportMgrDelegate * mRendezvous       = nullptr;

@@ -30,6 +30,7 @@
 #include "IPEndPointBasis.h"
 
 #include <string.h>
+#include <utility>
 
 #include <inet/EndPointBasis.h>
 #include <inet/InetInterface.h>
@@ -608,7 +609,7 @@ void IPEndPointBasis::Init(InetLayer * aInetLayer)
 }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-void IPEndPointBasis::HandleDataReceived(PacketBuffer * aBuffer)
+void IPEndPointBasis::HandleDataReceived(System::PacketBufferHandle aBuffer)
 {
     if ((mState == kState_Listening) && (OnMessageReceived != NULL))
     {
@@ -618,18 +619,13 @@ void IPEndPointBasis::HandleDataReceived(PacketBuffer * aBuffer)
         {
             const IPPacketInfo pktInfoCopy = *pktInfo; // copy the address info so that the app can free the
                                                        // PacketBuffer without affecting access to address info.
-            OnMessageReceived(this, aBuffer, &pktInfoCopy);
+            OnMessageReceived(this, std::move(aBuffer), &pktInfoCopy);
         }
         else
         {
             if (OnReceiveError != NULL)
                 OnReceiveError(this, INET_ERROR_INBOUND_MESSAGE_TOO_BIG, NULL);
-            PacketBuffer::Free(aBuffer);
         }
-    }
-    else
-    {
-        PacketBuffer::Free(aBuffer);
     }
 }
 
@@ -659,7 +655,7 @@ void IPEndPointBasis::HandleDataReceived(PacketBuffer * aBuffer)
  *     packets that arrive without an Ethernet header.
  *
  */
-IPPacketInfo * IPEndPointBasis::GetPacketInfo(PacketBuffer * aBuffer)
+IPPacketInfo * IPEndPointBasis::GetPacketInfo(const System::PacketBufferHandle & aBuffer)
 {
     uintptr_t lStart;
     uintptr_t lPacketInfoStart;
@@ -678,6 +674,20 @@ IPPacketInfo * IPEndPointBasis::GetPacketInfo(PacketBuffer * aBuffer)
 done:
     return (lPacketInfo);
 }
+
+System::Error IPEndPointBasis::PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget,
+                                                     System::EventType aEventType, System::PacketBufferHandle aBuffer)
+{
+    System::PacketBuffer * buf = aBuffer.Release_ForNow();
+    System::Error error        = aLayer.PostEvent(aTarget, aEventType, (uintptr_t) buf);
+    if (error != INET_NO_ERROR)
+    {
+        // If PostEvent() failed, it has not taken ownership of the buffer, so we need to retake it so that it will be freed.
+        aBuffer.Adopt(buf);
+    }
+    return error;
+}
+
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -797,7 +807,7 @@ INET_ERROR IPEndPointBasis::BindInterface(IPAddressType aAddressType, InterfaceI
     return (lRetval);
 }
 
-INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags)
+INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle aBuffer, uint16_t aSendFlags)
 {
     INET_ERROR res = INET_NO_ERROR;
     PeerSockAddr peerSockAddr;
@@ -810,7 +820,7 @@ INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System:
     VerifyOrExit(mAddrType == aPktInfo->DestAddress.Type(), res = INET_ERROR_BAD_ARGS);
 
     // For now the entire message must fit within a single buffer.
-    VerifyOrExit(aBuffer->Next() == nullptr, res = INET_ERROR_MESSAGE_TOO_LONG);
+    VerifyOrExit(!aBuffer->HasChainedBuffer(), res = INET_ERROR_MESSAGE_TOO_LONG);
 
     memset(&msgHeader, 0, sizeof(msgHeader));
 
@@ -1161,7 +1171,7 @@ void IPEndPointBasis::HandlePendingIO(uint16_t aPort)
 
     if (lStatus == INET_NO_ERROR)
     {
-        OnMessageReceived(this, lBuffer.Release_ForNow(), &lPacketInfo);
+        OnMessageReceived(this, std::move(lBuffer), &lPacketInfo);
     }
     else
     {
@@ -1237,7 +1247,7 @@ exit:
     return res;
 }
 
-INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags)
+INET_ERROR IPEndPointBasis::SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle aBuffer, uint16_t aSendFlags)
 {
     __block INET_ERROR res = INET_NO_ERROR;
     dispatch_data_t content;

@@ -19,7 +19,7 @@
 #include <nlunit-test.h>
 
 #include <support/CHIPCounter.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 static void CheckStartWithZero(nlTestSuite * inSuite, void * inContext)
 {
@@ -77,7 +77,7 @@ static int TestTeardown(void * inContext)
     return (SUCCESS);
 }
 
-extern "C" int TestCHIPCounter(void)
+int TestCHIPCounter(void)
 {
     // clang-format off
     nlTestSuite theSuite = {

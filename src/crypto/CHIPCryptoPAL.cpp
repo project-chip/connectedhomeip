@@ -82,21 +82,18 @@ Spake2p::Spake2p(size_t _fe_size, size_t _point_size, size_t _hash_size)
     tempbn = nullptr;
 }
 
-CHIP_ERROR Spake2p::Init(const uint8_t * context, size_t context_len)
+CHIP_ERROR Spake2p::Init(const Hash_SHA256_stream * context)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
     state            = CHIP_SPAKE2P_STATE::PREINIT;
 
-    error = InitImpl();
+    error = InitImpl(context);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
     error = PointLoad(spake2p_M_p256, sizeof(spake2p_M_p256), M);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
     error = PointLoad(spake2p_N_p256, sizeof(spake2p_N_p256), N);
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
-
-    error = InternalHash(context, context_len);
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
 
     state = CHIP_SPAKE2P_STATE::INIT;
@@ -387,12 +384,19 @@ exit:
     return error;
 }
 
-CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl()
+CHIP_ERROR Spake2p_P256_SHA256_HKDF_HMAC::InitImpl(const Hash_SHA256_stream * context)
 {
     CHIP_ERROR error = CHIP_ERROR_INTERNAL;
 
-    error = sha256_hash_ctx.Begin();
-    VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    if (context != nullptr)
+    {
+        sha256_hash_ctx = (*context);
+    }
+    else
+    {
+        error = sha256_hash_ctx.Begin();
+        VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);
+    }
 
     error = InitInternal();
     VerifyOrExit(error == CHIP_NO_ERROR, error = CHIP_ERROR_INTERNAL);

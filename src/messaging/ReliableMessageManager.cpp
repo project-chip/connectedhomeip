@@ -34,7 +34,7 @@
 #include <support/logging/CHIPLogging.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 ReliableMessageManager::RetransTableEntry::RetransTableEntry() :
     rc(nullptr), msgBuf(nullptr), msgId(0), msgSendFlags(0), nextRetransTimeTick(0), sendCount(0)
@@ -305,8 +305,8 @@ void ReliableMessageManager::Timeout(System::Layer * aSystemLayer, void * aAppSt
  *  @retval  #CHIP_NO_ERROR On success.
  *
  */
-CHIP_ERROR ReliableMessageManager::AddToRetransTable(ReliableMessageContext * rc, System::PacketBuffer * msgBuf, uint32_t messageId,
-                                                     uint16_t msgSendFlags, RetransTableEntry ** rEntry)
+CHIP_ERROR ReliableMessageManager::AddToRetransTable(ReliableMessageContext * rc, System::PacketBufferHandle msgBuf,
+                                                     uint32_t messageId, uint16_t msgSendFlags, RetransTableEntry ** rEntry)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -321,7 +321,7 @@ CHIP_ERROR ReliableMessageManager::AddToRetransTable(ReliableMessageContext * rc
 
             RetransTable[i].rc                  = rc;
             RetransTable[i].msgId               = messageId;
-            RetransTable[i].msgBuf              = msgBuf;
+            RetransTable[i].msgBuf              = std::move(msgBuf);
             RetransTable[i].msgSendFlags        = msgSendFlags;
             RetransTable[i].sendCount           = 0;
             RetransTable[i].nextRetransTimeTick = static_cast<uint16_t>(
@@ -419,8 +419,7 @@ CHIP_ERROR ReliableMessageManager::SendFromRetransTable(RetransTableEntry * entr
 
         // Send the message through
         uint16_t msgSendFlags = entry->msgSendFlags;
-        SetFlag(msgSendFlags, MessageFlagValues::kChipMessageFlag_RetainBuffer);
-        err = SendMessage(rc, entry->msgBuf, msgSendFlags);
+        err                   = SendMessage(rc, entry->msgBuf.Retain(), msgSendFlags);
 
         // Reset the msgBuf start pointer and data length after sending
         entry->msgBuf->SetStart(p);
@@ -490,13 +489,8 @@ void ReliableMessageManager::ClearRetransmitTable(RetransTableEntry & rEntry)
         ExpireTicks();
 
         rEntry.rc->Release();
-        rEntry.rc = nullptr;
-
-        if (rEntry.msgBuf)
-        {
-            System::PacketBuffer::Free(rEntry.msgBuf);
-            rEntry.msgBuf = nullptr;
-        }
+        rEntry.rc     = nullptr;
+        rEntry.msgBuf = nullptr;
 
         // Clear all other fields
         rEntry = RetransTableEntry();
@@ -642,5 +636,5 @@ int ReliableMessageManager::TestGetCountRetransTable()
     return count;
 }
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip

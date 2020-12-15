@@ -29,12 +29,12 @@
 #include <messaging/ErrorCategory.h>
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageManager.h>
-#include <protocols/CHIPProtocols.h>
+#include <protocols/Protocols.h>
 #include <protocols/common/CommonProtocol.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 void ReliableMessageContextDeletor::Release(ReliableMessageContext * obj)
 {
@@ -221,8 +221,8 @@ CHIP_ERROR ReliableMessageContext::SendThrottleFlow(uint32_t pauseTimeMillis)
     // Send a Throttle Flow message to the peer.  Throttle Flow messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow,
-                                msgBuf.Release_ForNow(),
+    err = mManager->SendMessage(this, Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow,
+                                std::move(msgBuf),
                                 BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
 
 exit:
@@ -277,8 +277,8 @@ CHIP_ERROR ReliableMessageContext::SendDelayedDelivery(uint32_t pauseTimeMillis,
     // Send a Delayed Delivery message to the peer.  Delayed Delivery messages must never request
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
-    err = mManager->SendMessage(this, Protocols::kChipProtocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery,
-                                msgBuf.Release_ForNow(),
+    err = mManager->SendMessage(this, Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery,
+                                std::move(msgBuf),
                                 BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
 exit:
@@ -351,7 +351,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
     mManager->ExpireTicks();
 
     // If the message IS a duplicate.
-    if (MsgFlags.Has(MessageFlagValues::kChipMessageFlag_DuplicateMessage))
+    if (MsgFlags.Has(MessageFlagValues::kMessageFlag_DuplicateMessage))
     {
 #if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Forcing tx of solitary ack for duplicate MsgId:%08" PRIX32, MessageId);
@@ -454,8 +454,8 @@ CHIP_ERROR ReliableMessageContext::SendCommonNullMessage()
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
     // Send the null message
-    err = mManager->SendMessage(this, chip::Protocols::kChipProtocol_Common, chip::Protocols::Common::kMsgType_Null,
-                                msgBuf.Release_ForNow(),
+    err = mManager->SendMessage(this, chip::Protocols::kProtocol_Protocol_Common, chip::Protocols::Common::kMsgType_Null,
+                                std::move(msgBuf),
                                 BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
 exit:
@@ -472,5 +472,5 @@ exit:
     return err;
 }
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip

@@ -25,6 +25,7 @@
 #pragma once
 
 #include <algorithm>
+#include <new>
 #include <utility>
 
 #include <core/CHIPCore.h>
@@ -83,8 +84,8 @@ private:
  */
 struct PendingPacket
 {
-    PeerAddress peerAddress;             // where the packet is being sent to
-    System::PacketBuffer * packetBuffer; // what data needs to be sent
+    PeerAddress peerAddress;                 // where the packet is being sent to
+    System::PacketBufferHandle packetBuffer; // what data needs to be sent
 };
 
 /** Implements a transport using TCP. */
@@ -105,13 +106,15 @@ public:
         mActiveConnections(activeConnectionsBuffer),
         mActiveConnectionsSize(bufferSize), mPendingPackets(packetBuffers), mPendingPacketsSize(packetsBuffersSize)
     {
-        PendingPacket emptyPending{
-            .peerAddress  = PeerAddress::Uninitialized(),
-            .packetBuffer = nullptr,
-        };
-
         std::fill(mActiveConnections, mActiveConnections + mActiveConnectionsSize, nullptr);
-        std::fill(mPendingPackets, mPendingPackets + mPendingPacketsSize, emptyPending);
+        for (size_t i = 0; i < mPendingPacketsSize; ++i)
+        {
+            mPendingPackets[i].peerAddress = PeerAddress::Uninitialized();
+            // In the typical case, the TCPBase constructor is invoked from the TCP constructor on its mPendingPackets,
+            // which has not yet been initialized. That means we can't do a normal move assignment or construction of
+            // the PacketBufferHandle, since that would call PacketBuffer::Free on the uninitialized data.
+            new (&mPendingPackets[i].packetBuffer) System::PacketBufferHandle();
+        }
     }
     ~TCPBase() override;
 
@@ -127,8 +130,7 @@ public:
      */
     CHIP_ERROR Init(TcpListenParameters & params);
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const PeerAddress & address,
-                           System::PacketBuffer * msgBuf) override;
+    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override;
 
     void Disconnect(const PeerAddress & address) override;
 
@@ -166,7 +168,7 @@ private:
      * Ownership of msg is taken over and will be freed at some unspecified time
      * in the future (once connection succeeds/fails).
      */
-    CHIP_ERROR SendAfterConnect(const PeerAddress & addr, System::PacketBuffer * msg);
+    CHIP_ERROR SendAfterConnect(const PeerAddress & addr, System::PacketBufferHandle msg);
 
     /**
      * Process a single received buffer from the specified peer address.
@@ -178,7 +180,8 @@ private:
      * Ownership of buffer is taken over and will be freed (or re-enqueued to the endPoint receive queue)
      * as needed during processing.
      */
-    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress, System::PacketBuffer * buffer);
+    CHIP_ERROR ProcessReceivedBuffer(Inet::TCPEndPoint * endPoint, const PeerAddress & peerAddress,
+                                     System::PacketBufferHandle buffer);
 
     /**
      * Process a single message of the specified size from a buffer.
@@ -186,15 +189,13 @@ private:
      * @param peerAddress the peer the data is coming from
      * @param buffer the buffer containing the message
      * @param messageSize how much of the head contains the actual message
-     *
-     * Does *not* free buffer.
      */
-    CHIP_ERROR ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, System::PacketBuffer * buffer,
+    CHIP_ERROR ProcessSingleMessageFromBufferHead(const PeerAddress & peerAddress, const System::PacketBufferHandle & buffer,
                                                   uint16_t messageSize);
 
     // Callback handler for TCPEndPoint. TCP message receive handler.
     // @see TCPEndpoint::OnDataReceivedFunct
-    static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBuffer * buffer);
+    static void OnTcpReceive(Inet::TCPEndPoint * endPoint, System::PacketBufferHandle buffer);
 
     // Callback handler for TCPEndPoint. Called when a connection has been completed.
     // @see TCPEndpoint::OnConnectCompleteFunct
@@ -240,7 +241,7 @@ public:
     TCP() : TCPBase(mConnectionsBuffer, kActiveConnectionsSize, mPendingPackets, kPendingPacketSize) {}
 
 private:
-    Inet::TCPEndPoint * mConnectionsBuffer[kActiveConnectionsSize];
+    Inet::TCPEndPoint * mConnectionsBuffer[kActiveConnectionsSize] = { 0 };
     PendingPacket mPendingPackets[kPendingPacketSize];
 };
 

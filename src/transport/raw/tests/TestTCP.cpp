@@ -25,7 +25,7 @@
 
 #include <core/CHIPCore.h>
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <transport/raw/TCP.h>
 
 #include <nlbyteorder.h>
@@ -56,7 +56,7 @@ TestContext sContext;
 const char PAYLOAD[]        = "Hello!";
 int ReceiveHandlerCallCount = 0;
 
-void MessageReceiveHandler(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBuffer * msgBuf,
+void MessageReceiveHandler(const PacketHeader & header, const Transport::PeerAddress & source, System::PacketBufferHandle msgBuf,
                            nlTestSuite * inSuite)
 {
     NL_TEST_ASSERT(inSuite, header.GetSourceNodeId() == Optional<NodeId>::Value(kSourceNodeId));
@@ -66,8 +66,6 @@ void MessageReceiveHandler(const PacketHeader & header, const Transport::PeerAdd
     size_t data_len = msgBuf->DataLength();
     int compare     = memcmp(msgBuf->Start(), PAYLOAD, data_len);
     NL_TEST_ASSERT(inSuite, compare == 0);
-
-    System::PacketBuffer::Free(msgBuf);
 
     ReceiveHandlerCallCount++;
 }
@@ -125,7 +123,7 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext, const IPAddress &
     header.SetSourceNodeId(kSourceNodeId).SetDestinationNodeId(kDestinationNodeId).SetMessageId(kMessageId);
 
     // Should be able to send a message to itself by just calling send.
-    err = tcp.SendMessage(header, Header::Flags(), Transport::PeerAddress::TCP(addr), buffer.Release_ForNow());
+    err = tcp.SendMessage(header, Transport::PeerAddress::TCP(addr), std::move(buffer));
     if (err == System::MapErrorPOSIX(EADDRNOTAVAIL))
     {
         // TODO(#2698): the underlying system does not support IPV6. This early return

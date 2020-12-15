@@ -96,8 +96,8 @@ enum
 const esp_gatts_attr_db_t CHIPoBLEGATTAttrs[] = {
     // Service Declaration for Chip over BLE Service
     { { ESP_GATT_AUTO_RSP },
-      { ESP_UUID_LEN_16, (uint8_t *) UUID_PrimaryService, ESP_GATT_PERM_READ, ESP_UUID_LEN_128, ESP_UUID_LEN_128,
-        (uint8_t *) UUID_CHIPoBLEService } },
+      { ESP_UUID_LEN_16, (uint8_t *) UUID_PrimaryService, ESP_GATT_PERM_READ, ESP_UUID_LEN_16, ESP_UUID_LEN_16,
+        (uint8_t *) ShortUUID_CHIPoBLEService } },
 
     // ----- Chip over BLE RX Characteristic -----
 
@@ -250,7 +250,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
-                            event->CHIPoBLEWriteReceived.Data);
+                            PacketBufferHandle::Create(event->CHIPoBLEWriteReceived.Data));
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
@@ -331,7 +331,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBuffer * data)
+                                    PacketBufferHandle data)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     CHIPoBLEConState * conState = GetConnectionState(conId);
@@ -340,7 +340,7 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     VerifyOrExit(conState != NULL, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    VerifyOrExit(conState->PendingIndBuf == NULL, err = CHIP_ERROR_INCORRECT_STATE);
+    VerifyOrExit(conState->PendingIndBuf.IsNull(), err = CHIP_ERROR_INCORRECT_STATE);
 
     err = esp_ble_gatts_send_indicate(mAppIf, conId, mTXCharAttrHandle, data->DataLength(), data->Start(), false);
     if (err != CHIP_NO_ERROR)
@@ -351,28 +351,26 @@ bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUU
 
     // Save a reference to the buffer until we get a indication from the ESP BLE layer that it
     // has been sent.
-    conState->PendingIndBuf = data;
-    data                    = NULL;
+    conState->PendingIndBuf = std::move(data);
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-        PacketBuffer::Free(data);
         return false;
     }
     return true;
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBuffer * pBuf)
+                                      PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
     return false;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBuffer * pBuf)
+                                     PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
     return false;
@@ -1066,8 +1064,7 @@ void BLEManagerImpl::HandleTXCharConfirm(CHIPoBLEConState * conState, esp_ble_ga
              param->conf.status);
 
     // If there is a pending indication buffer for the connection, release it now.
-    PacketBuffer::Free(conState->PendingIndBuf);
-    conState->PendingIndBuf = NULL;
+    conState->PendingIndBuf = nullptr;
 
     // If the confirmation was successful...
     if (param->conf.status == ESP_GATT_OK)
@@ -1146,9 +1143,7 @@ BLEManagerImpl::CHIPoBLEConState * BLEManagerImpl::GetConnectionState(uint16_t c
     {
         if (freeIndex < kMaxConnections)
         {
-            memset(&mCons[freeIndex], 0, sizeof(CHIPoBLEConState));
-            mCons[freeIndex].Allocated = 1;
-            mCons[freeIndex].ConId     = conId;
+            mCons[freeIndex].Set(conId);
             return &mCons[freeIndex];
         }
 
@@ -1164,8 +1159,7 @@ bool BLEManagerImpl::ReleaseConnectionState(uint16_t conId)
     {
         if (mCons[i].Allocated && mCons[i].ConId == conId)
         {
-            PacketBuffer::Free(mCons[i].PendingIndBuf);
-            mCons[i].Allocated = 0;
+            mCons[i].Reset();
             return true;
         }
     }

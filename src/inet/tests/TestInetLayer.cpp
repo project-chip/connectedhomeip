@@ -37,12 +37,16 @@
 
 #include <CHIPVersion.h>
 
+#include <inet/InetArgParser.h>
 #include <support/CodeUtils.h>
 
 #include <system/SystemTimer.h>
 
 #include "TestInetCommon.h"
+#include "TestInetCommonOptions.h"
 #include "TestInetLayerCommon.hpp"
+#include "TestSetupFaultInjection.h"
+#include "TestSetupSignalling.h"
 
 using namespace chip;
 using namespace chip::Inet;
@@ -498,7 +502,7 @@ static void PrintReceivedStats(const TransferStats & aStats)
     printf("%u/%u received\n", aStats.mReceive.mActual, aStats.mReceive.mExpected);
 }
 
-static bool HandleDataReceived(const PacketBuffer * aBuffer, bool aCheckBuffer, uint8_t aFirstValue)
+static bool HandleDataReceived(const PacketBufferHandle & aBuffer, bool aCheckBuffer, uint8_t aFirstValue)
 {
     const bool lStatsByPacket = true;
     bool lStatus              = true;
@@ -512,7 +516,7 @@ exit:
     return (lStatus);
 }
 
-static bool HandleDataReceived(const PacketBuffer * aBuffer, bool aCheckBuffer)
+static bool HandleDataReceived(const PacketBufferHandle & aBuffer, bool aCheckBuffer)
 {
     const uint8_t lFirstValue = 0;
     bool lStatus              = true;
@@ -591,7 +595,7 @@ static void HandleTCPConnectionClosed(TCPEndPoint * aEndPoint, INET_ERROR aError
 
 static void HandleTCPDataSent(TCPEndPoint * aEndPoint, uint16_t len) {}
 
-static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBuffer * aBuffer)
+static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBufferHandle aBuffer)
 {
     const uint32_t lFirstValueReceived = sTestState.mStats.mReceive.mActual;
     const uint8_t lFirstValue          = uint8_t(lFirstValueReceived);
@@ -606,12 +610,11 @@ static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBuffer * aBuffe
     VerifyOrExit(lFirstValue == lFirstValueReceived, lStatus = INET_ERROR_UNEXPECTED_EVENT);
 
     VerifyOrExit(aEndPoint != nullptr, lStatus = INET_ERROR_BAD_ARGS);
-    VerifyOrExit(aBuffer != nullptr, lStatus = INET_ERROR_BAD_ARGS);
+    VerifyOrExit(!aBuffer.IsNull(), lStatus = INET_ERROR_BAD_ARGS);
 
     if (aEndPoint->State != TCPEndPoint::kState_Connected)
     {
-        lStatus = aEndPoint->PutBackReceivedData(aBuffer);
-        aBuffer = nullptr;
+        lStatus = aEndPoint->PutBackReceivedData(std::move(aBuffer));
         INET_FAIL_ERROR(lStatus, "TCPEndPoint::PutBackReceivedData failed");
         goto exit;
     }
@@ -631,11 +634,6 @@ static void HandleTCPDataReceived(TCPEndPoint * aEndPoint, PacketBuffer * aBuffe
     INET_FAIL_ERROR(lStatus, "TCPEndPoint::AckReceive failed");
 
 exit:
-    if (aBuffer != nullptr)
-    {
-        PacketBuffer::Free(aBuffer);
-    }
-
     if (lStatus != INET_NO_ERROR)
     {
         SetStatusFailed(sTestState.mStatus);
@@ -668,7 +666,7 @@ static void HandleTCPConnectionReceived(TCPEndPoint * aListenEndPoint, TCPEndPoi
 
 // Raw Endpoint Callbacks
 
-static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer * aBuffer, const IPPacketInfo * aPacketInfo)
+static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle aBuffer, const IPPacketInfo * aPacketInfo)
 {
     const bool lCheckBuffer   = true;
     const bool lStatsByPacket = true;
@@ -676,7 +674,7 @@ static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer *
     bool lStatus;
 
     VerifyOrExit(aEndPoint != nullptr, lStatus = false);
-    VerifyOrExit(aBuffer != nullptr, lStatus = false);
+    VerifyOrExit(!aBuffer.IsNull(), lStatus = false);
     VerifyOrExit(aPacketInfo != nullptr, lStatus = false);
 
     Common::HandleRawMessageReceived(aEndPoint, aBuffer, aPacketInfo);
@@ -689,11 +687,11 @@ static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer *
 
         aBuffer->ConsumeHead(kIPv4HeaderSize);
 
-        lStatus = Common::HandleICMPv4DataReceived(aBuffer, sTestState.mStats, !lStatsByPacket, lCheckBuffer);
+        lStatus = Common::HandleICMPv4DataReceived(std::move(aBuffer), sTestState.mStats, !lStatsByPacket, lCheckBuffer);
     }
     else if (lAddressType == kIPAddressType_IPv6)
     {
-        lStatus = Common::HandleICMPv6DataReceived(aBuffer, sTestState.mStats, !lStatsByPacket, lCheckBuffer);
+        lStatus = Common::HandleICMPv6DataReceived(std::move(aBuffer), sTestState.mStats, !lStatsByPacket, lCheckBuffer);
     }
     else
     {
@@ -706,11 +704,6 @@ static void HandleRawMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer *
     }
 
 exit:
-    if (aBuffer != nullptr)
-    {
-        PacketBuffer::Free(aBuffer);
-    }
-
     if (!lStatus)
     {
         SetStatusFailed(sTestState.mStatus);
@@ -726,13 +719,13 @@ static void HandleRawReceiveError(IPEndPointBasis * aEndPoint, INET_ERROR aError
 
 // UDP Endpoint Callbacks
 
-static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer * aBuffer, const IPPacketInfo * aPacketInfo)
+static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBufferHandle aBuffer, const IPPacketInfo * aPacketInfo)
 {
     const bool lCheckBuffer = true;
     bool lStatus;
 
     VerifyOrExit(aEndPoint != nullptr, lStatus = false);
-    VerifyOrExit(aBuffer != nullptr, lStatus = false);
+    VerifyOrExit(!aBuffer.IsNull(), lStatus = false);
     VerifyOrExit(aPacketInfo != nullptr, lStatus = false);
 
     Common::HandleUDPMessageReceived(aEndPoint, aBuffer, aPacketInfo);
@@ -740,11 +733,6 @@ static void HandleUDPMessageReceived(IPEndPointBasis * aEndPoint, PacketBuffer *
     lStatus = HandleDataReceived(aBuffer, lCheckBuffer);
 
 exit:
-    if (aBuffer != nullptr)
-    {
-        PacketBuffer::Free(aBuffer);
-    }
-
     if (!lStatus)
     {
         SetStatusFailed(sTestState.mStatus);
@@ -819,8 +807,8 @@ static INET_ERROR PrepareTransportForSend()
 
 static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t aSize)
 {
-    PacketBuffer * lBuffer = nullptr;
-    INET_ERROR lStatus     = INET_NO_ERROR;
+    PacketBufferHandle lBuffer;
+    INET_ERROR lStatus = INET_NO_ERROR;
 
     if ((gOptFlags & (kOptFlagUseRawIP)) == (kOptFlagUseRawIP))
     {
@@ -832,17 +820,17 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
         if ((gOptFlags & kOptFlagUseIPv6) == (kOptFlagUseIPv6))
         {
             lBuffer = Common::MakeICMPv6DataBuffer(aSize);
-            VerifyOrExit(lBuffer != nullptr, lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if ((gOptFlags & kOptFlagUseIPv4) == (kOptFlagUseIPv4))
         {
             lBuffer = Common::MakeICMPv4DataBuffer(aSize);
-            VerifyOrExit(lBuffer != nullptr, lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 
-        lStatus = sRawIPEndPoint->SendTo(aAddress, lBuffer);
+        lStatus = sRawIPEndPoint->SendTo(aAddress, std::move(lBuffer));
         SuccessOrExit(lStatus);
     }
     else
@@ -855,9 +843,9 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
             // patterned from zero to aSize - 1.
 
             lBuffer = Common::MakeDataBuffer(aSize, lFirstValue);
-            VerifyOrExit(lBuffer != nullptr, lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
 
-            lStatus = sUDPIPEndPoint->SendTo(aAddress, kUDPPort, lBuffer);
+            lStatus = sUDPIPEndPoint->SendTo(aAddress, kUDPPort, std::move(lBuffer));
             SuccessOrExit(lStatus);
         }
         else if ((gOptFlags & kOptFlagUseTCPIP) == kOptFlagUseTCPIP)
@@ -871,9 +859,9 @@ static INET_ERROR DriveSendForDestination(const IPAddress & aAddress, uint16_t a
             // sTestState.mStats.mTransmit.mExpected - 1.
 
             lBuffer = Common::MakeDataBuffer(aSize, uint8_t(lFirstValue));
-            VerifyOrExit(lBuffer != nullptr, lStatus = INET_ERROR_NO_MEMORY);
+            VerifyOrExit(!lBuffer.IsNull(), lStatus = INET_ERROR_NO_MEMORY);
 
-            lStatus = sTCPIPEndPoint->Send(lBuffer);
+            lStatus = sTCPIPEndPoint->Send(std::move(lBuffer));
             SuccessOrExit(lStatus);
         }
     }

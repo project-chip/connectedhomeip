@@ -40,7 +40,7 @@ namespace {
 
 using namespace chip;
 using namespace chip::Inet;
-using namespace chip::messaging;
+using namespace chip::Messaging;
 
 using TestContext = chip::Test::IOContext;
 
@@ -100,7 +100,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     rc.SetDelegate(&delegate);
     ReliableMessageManager::RetransTableEntry * entry;
     auto buf = System::PacketBuffer::New();
-    m.AddToRetransTable(&rc, buf.Release_ForNow(), 1, 0, &entry);
+    m.AddToRetransTable(&rc, std::move(buf), 1, 0, &entry);
     NL_TEST_ASSERT(inSuite, m.TestGetCountRetransTable() == 1);
     NL_TEST_ASSERT(inSuite, !delegate.SendErrorCalled);
     m.FailRetransmitTableEntries(&rc, CHIP_NO_ERROR);
@@ -127,7 +127,7 @@ void CheckRetransExpire(nlTestSuite * inSuite, void * inContext)
     });
     ReliableMessageManager::RetransTableEntry * entry;
     auto buf = System::PacketBuffer::New();
-    m.AddToRetransTable(&rc, buf.Release_ForNow(), 1, 0, &entry);
+    m.AddToRetransTable(&rc, std::move(buf), 1, 0, &entry);
     NL_TEST_ASSERT(inSuite, m.TestGetCountRetransTable() == 1);
 
     test_os_sleep_ms(20);
@@ -168,7 +168,7 @@ void CheckDelayDelivery(nlTestSuite * inSuite, void * inContext)
     });
     ReliableMessageManager::RetransTableEntry * entry;
     auto buf = System::PacketBuffer::New();
-    m.AddToRetransTable(&rc, buf.Release_ForNow(), 1, 0, &entry);
+    m.AddToRetransTable(&rc, std::move(buf), 1, 0, &entry);
     m.ProcessDelayedDeliveryMessage(&rc, 64);
     NL_TEST_ASSERT(inSuite, m.TestGetCountRetransTable() == 1);
 
@@ -243,21 +243,22 @@ int Finalize(void * aContext)
 } // namespace
 
 namespace chip {
-namespace messaging {
+namespace Messaging {
 
 // Stub implementation
-CHIP_ERROR ReliableMessageManager::SendMessage(ReliableMessageContext * context, System::PacketBuffer * msgBuf, uint16_t sendFlags)
+CHIP_ERROR ReliableMessageManager::SendMessage(ReliableMessageContext * context, System::PacketBufferHandle msgBuf,
+                                               uint16_t sendFlags)
 {
     return CHIP_NO_ERROR;
 }
 CHIP_ERROR ReliableMessageManager::SendMessage(ReliableMessageContext * context, uint32_t profileId, uint8_t msgType,
-                                               System::PacketBuffer * msgBuf, BitFlags<uint16_t, SendMessageFlags> sendFlags)
+                                               System::PacketBufferHandle msgBuf, BitFlags<uint16_t, SendMessageFlags> sendFlags)
 {
     return CHIP_NO_ERROR;
 }
 void ReliableMessageManager::FreeContext(ReliableMessageContext *) {}
 
-} // namespace messaging
+} // namespace Messaging
 } // namespace chip
 
 /**

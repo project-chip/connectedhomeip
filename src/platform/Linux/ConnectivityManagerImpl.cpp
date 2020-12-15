@@ -239,19 +239,6 @@ CHIP_ERROR ConnectivityManagerImpl::_Init()
     GenericConnectivityManagerImpl_Thread<ConnectivityManagerImpl>::_Init();
 #endif
 
-#if CHIP_DEVICE_CONFIG_ENABLE_WPA
-    mConnectivityFlag            = 0;
-    mWpaSupplicant.state         = GDBusWpaSupplicant::INIT;
-    mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
-    mWpaSupplicant.proxy         = nullptr;
-    mWpaSupplicant.iface         = nullptr;
-    mWpaSupplicant.interfacePath = nullptr;
-    mWpaSupplicant.networkPath   = nullptr;
-
-    wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
-                                                kWpaSupplicantObjectPath, nullptr, _OnWpaProxyReady, nullptr);
-#endif
-
     SuccessOrExit(err);
 
 exit:
@@ -630,6 +617,20 @@ void ConnectivityManagerImpl::_OnWpaProxyReady(GObject * source_object, GAsyncRe
         g_error_free(err);
 }
 
+void ConnectivityManagerImpl::StartWiFiManagement()
+{
+    mConnectivityFlag            = 0;
+    mWpaSupplicant.state         = GDBusWpaSupplicant::INIT;
+    mWpaSupplicant.scanState     = GDBusWpaSupplicant::WIFI_SCANNING_IDLE;
+    mWpaSupplicant.proxy         = nullptr;
+    mWpaSupplicant.iface         = nullptr;
+    mWpaSupplicant.interfacePath = nullptr;
+    mWpaSupplicant.networkPath   = nullptr;
+
+    wpa_fi_w1_wpa_supplicant1_proxy_new_for_bus(G_BUS_TYPE_SYSTEM, G_DBUS_PROXY_FLAGS_NONE, kWpaSupplicantServiceName,
+                                                kWpaSupplicantObjectPath, nullptr, _OnWpaProxyReady, nullptr);
+}
+
 void ConnectivityManagerImpl::DriveAPState()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -868,18 +869,38 @@ CHIP_ERROR ConnectivityManagerImpl::ProvisionWiFiNetwork(const char * ssid, cons
                                                                               nullptr, &error);
         if (result)
         {
+            GError * gerror = nullptr;
+
             ChipLogProgress(DeviceLayer, "wpa_supplicant: connected to network: SSID: %s", ssid);
+
+            result = wpa_fi_w1_wpa_supplicant1_interface_call_save_config_sync(mWpaSupplicant.iface, nullptr, &gerror);
+
+            if (result)
+            {
+                ChipLogProgress(DeviceLayer, "wpa_supplicant: save config succeeded!");
+            }
+            else
+            {
+                ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to save config: %s",
+                                gerror ? gerror->message : "unknown error");
+            }
+
+            if (gerror != nullptr)
+                g_error_free(gerror);
+
+            // Return success as long as the device is connected to the network
+            ret = CHIP_NO_ERROR;
         }
         else
         {
             ChipLogProgress(DeviceLayer, "wpa_supplicant: failed to connect to network: SSID: %s: %s", ssid,
                             error ? error->message : "unknown error");
+
+            ret = CHIP_ERROR_INTERNAL;
         }
 
         if (error != nullptr)
             g_error_free(error);
-
-        ret = CHIP_NO_ERROR;
     }
     else
     {

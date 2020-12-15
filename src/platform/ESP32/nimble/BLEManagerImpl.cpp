@@ -68,7 +68,7 @@ struct ESP32ChipServiceData
 const ble_uuid128_t UUID_CHIPoBLEService = {
     BLE_UUID_TYPE_128, { 0xFB, 0x34, 0x9B, 0x5F, 0x80, 0x00, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00, 0xAF, 0xFE, 0x00, 0x00 }
 };
-const uint8_t ShortUUID_CHIPoBLEService[] = { 0xAF, 0xFE };
+const ble_uuid16_t ShortUUID_CHIPoBLEService = { BLE_UUID_TYPE_16, 0xFEAF };
 
 const ble_uuid128_t UUID128_CHIPoBLEChar_RX = {
     BLE_UUID_TYPE_128, { 0x11, 0x9D, 0x9F, 0x42, 0x9C, 0x4F, 0x9F, 0x95, 0x59, 0x45, 0x3D, 0x26, 0xF5, 0x2E, 0xEE, 0x18 }
@@ -94,7 +94,7 @@ BLEManagerImpl BLEManagerImpl::sInstance;
 
 const struct ble_gatt_svc_def BLEManagerImpl::CHIPoBLEGATTAttrs[] = {
     { .type = BLE_GATT_SVC_TYPE_PRIMARY,
-      .uuid = (ble_uuid_t *) (&UUID_CHIPoBLEService),
+      .uuid = (ble_uuid_t *) (&ShortUUID_CHIPoBLEService),
       .characteristics =
           (struct ble_gatt_chr_def[]){
               {
@@ -243,7 +243,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
-                            event->CHIPoBLEWriteReceived.Data);
+                            PacketBufferHandle::Create(event->CHIPoBLEWriteReceived.Data));
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
@@ -322,7 +322,7 @@ uint16_t BLEManagerImpl::GetMTU(BLE_CONNECTION_OBJECT conId) const
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                    PacketBuffer * data)
+                                    PacketBufferHandle data)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     struct os_mbuf * om;
@@ -350,21 +350,20 @@ exit:
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(DeviceLayer, "BLEManagerImpl::SendIndication() failed: %s", ErrorStr(err));
-        PacketBuffer::Free(data);
         return false;
     }
     return true;
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                      PacketBuffer * pBuf)
+                                      PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendWriteRequest() not supported");
     return false;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const ChipBleUUID * charId,
-                                     PacketBuffer * pBuf)
+                                     PacketBufferHandle pBuf)
 {
     ChipLogError(DeviceLayer, "BLEManagerImpl::SendReadRequest() not supported");
     return false;
@@ -623,13 +622,13 @@ CHIP_ERROR BLEManagerImpl::ConfigureAdvertisingData(void)
     }
 
     memset(advData, 0, sizeof(advData));
-    advData[index++] = 0x02;                            // length
-    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;        // AD type : flags
-    advData[index++] = CHIP_ADV_DATA_FLAGS;             // AD value
-    advData[index++] = 0x0A;                            // length
-    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA; // AD type: (Service Data - 16-bit UUID)
-    advData[index++] = ShortUUID_CHIPoBLEService[0];    // AD value
-    advData[index++] = ShortUUID_CHIPoBLEService[1];    // AD value
+    advData[index++] = 0x02;                                                                // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_FLAGS;                                            // AD type : flags
+    advData[index++] = CHIP_ADV_DATA_FLAGS;                                                 // AD value
+    advData[index++] = 0x0A;                                                                // length
+    advData[index++] = CHIP_ADV_DATA_TYPE_SERVICE_DATA;                                     // AD type: (Service Data - 16-bit UUID)
+    advData[index++] = static_cast<uint8_t>(ShortUUID_CHIPoBLEService.value & 0xFF);        // AD value
+    advData[index++] = static_cast<uint8_t>((ShortUUID_CHIPoBLEService.value >> 8) & 0xFF); // AD value
 
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceIdInfo;
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(deviceIdInfo);

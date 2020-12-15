@@ -53,7 +53,7 @@ NetworkProvisioning::~NetworkProvisioning()
 #endif
 }
 
-CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, System::PacketBuffer * msgBuf)
+CHIP_ERROR NetworkProvisioning::HandleNetworkProvisioningMessage(uint8_t msgType, const System::PacketBufferHandle & msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -176,7 +176,7 @@ CHIP_ERROR NetworkProvisioning::SendIPAddress(const Inet::IPAddress & addr)
     buffer->SetDataLength(static_cast<uint16_t>(addrLen));
 
     err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning, NetworkProvisioning::MsgTypes::kIPAddressAssigned,
-                                       buffer.Release_ForNow());
+                                       std::move(buffer));
     SuccessOrExit(err);
 
 exit:
@@ -202,7 +202,7 @@ CHIP_ERROR NetworkProvisioning::SendNetworkCredentials(const char * ssid, const 
     buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
     err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                       NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, buffer.Release_ForNow());
+                                       NetworkProvisioning::MsgTypes::kWiFiAssociationRequest, std::move(buffer));
     SuccessOrExit(err);
 
 exit:
@@ -237,7 +237,7 @@ CHIP_ERROR NetworkProvisioning::SendThreadCredentials(const DeviceLayer::Interna
         buffer->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
 
         err = mDelegate->SendSecureMessage(Protocols::kProtocol_NetworkProvisioning,
-                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, buffer.Release_ForNow());
+                                           NetworkProvisioning::MsgTypes::kThreadAssociationRequest, std::move(buffer));
     }
 
 exit:
@@ -247,7 +247,7 @@ exit:
 }
 
 #ifdef CHIP_ENABLE_OPENTHREAD
-CHIP_ERROR NetworkProvisioning::DecodeThreadAssociationRequest(System::PacketBuffer * msgBuf)
+CHIP_ERROR NetworkProvisioning::DecodeThreadAssociationRequest(const System::PacketBufferHandle & msgBuf)
 {
     CHIP_ERROR err                                       = CHIP_NO_ERROR;
     DeviceLayer::Internal::DeviceNetworkInfo networkInfo = {};
@@ -321,7 +321,7 @@ exit:
     return err;
 }
 #else  // CHIP_ENABLE_OPENTHREAD
-CHIP_ERROR NetworkProvisioning::DecodeThreadAssociationRequest(System::PacketBuffer *)
+CHIP_ERROR NetworkProvisioning::DecodeThreadAssociationRequest(const System::PacketBufferHandle &)
 {
     return CHIP_ERROR_INVALID_MESSAGE_TYPE;
 }

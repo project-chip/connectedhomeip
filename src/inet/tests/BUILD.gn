@@ -24,20 +24,21 @@ config("tests_config") {
   include_dirs = [ "." ]
 }
 
-chip_test_suite("tests") {
-  output_name = "libInetLayerTests"
+static_library("helpers") {
+  output_name = "libInetTestHelpers"
+  output_dir = "${root_out_dir}/lib"
 
   sources = [
-    "TestInetAddress.cpp",
-    "TestInetCommon.cpp",
     "TestInetCommon.h",
     "TestInetCommonOptions.cpp",
     "TestInetCommonOptions.h",
-    "TestInetEndPoint.cpp",
-    "TestInetErrorStr.cpp",
+    "TestInetCommonPosix.cpp",
     "TestInetLayer.cpp",
-    "TestInetLayer.h",
     "TestInetLayerCommon.cpp",
+    "TestSetupFaultInjection.h",
+    "TestSetupFaultInjectionPosix.cpp",
+    "TestSetupSignalling.h",
+    "TestSetupSignallingPosix.cpp",
   ]
 
   if (lwip_platform == "standalone") {
@@ -47,29 +48,45 @@ chip_test_suite("tests") {
     ]
   }
 
-  public_configs = [ ":tests_config" ]
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/inet",
     "${chip_root}/src/lib/core",
     "${nlunit_test_root}:nlunit-test",
   ]
+}
 
-  tests = [
-    "TestInetAddress",
-    "TestInetErrorStr",
-    "TestInetEndPoint",
+chip_test_suite("tests") {
+  output_name = "libInetLayerTests"
+
+  public_configs = [ ":tests_config" ]
+
+  public_deps = [
+    ":helpers",
+    "${chip_root}/src/inet",
+    "${chip_root}/src/lib/core",
+    "${nlunit_test_root}:nlunit-test",
   ]
+
+  test_sources = [
+    "TestInetAddress.cpp",
+    "TestInetErrorStr.cpp",
+  ]
+  sources = []
+
+  if (current_os != "zephyr") {
+    test_sources += [ "TestInetEndPoint.cpp" ]
+  }
 
   # This fails on Raspberry Pi (Linux arm64), so only enable on Linux
   # x64.
-  if (current_os != "mac" && chip_device_platform != "esp32" &&
-      current_cpu == "x64") {
-    sources += [
-      "TestInetLayerDNS.cpp",
-      "TestLwIPDNS.cpp",
-    ]
-    tests += [ "TestInetLayerDNS" ]
+  if (current_os != "mac" && current_os != "zephyr" &&
+      chip_device_platform != "esp32" && current_cpu == "x64") {
+    test_sources += [ "TestInetLayerDNS.cpp" ]
+
+    # TODO: This test does not seem executed
+    sources += [ "TestLwIPDNS.cpp" ]
   }
 }
 

@@ -22,10 +22,8 @@
  *
  */
 
-#include "TestSupport.h"
-
 #include <support/BufBound.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 

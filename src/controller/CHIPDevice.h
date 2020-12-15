@@ -44,12 +44,17 @@ class DeviceController;
 class DeviceStatusDelegate;
 struct SerializedDevice;
 
-using DeviceTransportMgr = TransportMgr<Transport::UDP>;
+using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
+#if INET_CONFIG_ENABLE_IPV4
+                                        ,
+                                        Transport::UDP /* IPv4 */
+#endif
+                                        >;
 
 class DLL_EXPORT Device
 {
 public:
-    Device() : mActive(false), mState(ConnectionState::NotConnected) {}
+    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
     ~Device() {}
 
     /**
@@ -63,19 +68,6 @@ public:
     void SetDelegate(DeviceStatusDelegate * delegate) { mStatusDelegate = delegate; }
 
     // ----- Messaging -----
-    /**
-     * @brief
-     *   Send the provided message to the device
-     *
-     * @param[in] message   The message to be sent. The ownership of the message buffer
-     *                      is handed over to Device object. SendMessage() will
-     *                      decrement the reference count of the message buffer before
-     *                      returning.
-     *
-     * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
-     */
-    CHIP_ERROR SendMessage(System::PacketBuffer * message);
-
     /**
      * @brief
      *   Send the provided message to the device
@@ -111,12 +103,14 @@ public:
      * @param[in] transportMgr Transport manager object pointer
      * @param[in] sessionMgr   Secure session manager object pointer
      * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort)
     {
         mTransportMgr   = transportMgr;
         mSessionManager = sessionMgr;
         mInetLayer      = inetLayer;
+        mListenPort     = listenPort;
     }
 
     /**
@@ -133,14 +127,15 @@ public:
      * @param[in] transportMgr Transport manager object pointer
      * @param[in] sessionMgr   Secure session manager object pointer
      * @param[in] inetLayer    InetLayer object pointer
+     * @param[in] listenPort   Port on which controller is listening (typically CHIP_PORT)
      * @param[in] deviceId     Node ID of the device
      * @param[in] devicePort   Port on which device is listening (typically CHIP_PORT)
      * @param[in] interfaceId  Local Interface ID that should be used to talk to the device
      */
-    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, NodeId deviceId,
-              uint16_t devicePort, Inet::InterfaceId interfaceId)
+    void Init(DeviceTransportMgr * transportMgr, SecureSessionMgr * sessionMgr, Inet::InetLayer * inetLayer, uint16_t listenPort,
+              NodeId deviceId, uint16_t devicePort, Inet::InterfaceId interfaceId)
     {
-        Init(transportMgr, sessionMgr, inetLayer);
+        Init(transportMgr, sessionMgr, inetLayer, mListenPort);
         mDeviceId   = deviceId;
         mDevicePort = devicePort;
         mInterface  = interfaceId;
@@ -174,7 +169,7 @@ public:
      * @param[in] mgr           Pointer to secure session manager which received the message
      */
     void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgr * mgr);
+                           const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
 
     /**
      * @brief
@@ -217,6 +212,11 @@ private:
         ClusterId cluster;
     };
 
+    enum class ResetTransport
+    {
+        kYes,
+        kNo,
+    };
     /* Node ID assigned to the CHIP device */
     NodeId mDeviceId;
 
@@ -255,8 +255,12 @@ private:
      *   This function loads the secure session object from the serialized operational
      *   credentials corresponding to the device. This is typically done when the device
      *   does not have an active secure channel.
+     *
+     * @param[in] resetNeeded   Does the underlying network socket require a reset
      */
-    CHIP_ERROR LoadSecureSessionParameters();
+    CHIP_ERROR LoadSecureSessionParameters(ResetTransport resetNeeded);
+
+    uint16_t mListenPort;
 };
 
 /**
@@ -276,7 +280,7 @@ public:
      *
      * @param[in] msg Received message buffer.
      */
-    virtual void OnMessage(System::PacketBuffer * msg) = 0;
+    virtual void OnMessage(System::PacketBufferHandle msg) = 0;
 
     /**
      * @brief
@@ -286,12 +290,19 @@ public:
     virtual void OnStatusChange(void){};
 };
 
+#ifdef IFNAMSIZ
+constexpr uint16_t kMaxInterfaceName = IFNAMSIZ;
+#else
+constexpr uint16_t kMaxInterfaceName = 32;
+#endif
+
 typedef struct SerializableDevice
 {
     SecurePairingSessionSerializable mOpsCreds;
     uint64_t mDeviceId; /* This field is serialized in LittleEndian byte order */
     uint8_t mDeviceAddr[INET6_ADDRSTRLEN];
     uint16_t mDevicePort; /* This field is serealized in LittelEndian byte order */
+    uint8_t mInterfaceName[kMaxInterfaceName];
 } SerializableDevice;
 
 typedef struct SerializedDevice

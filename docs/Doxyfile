@@ -840,11 +840,11 @@ INPUT                  = README.md \
                          src/lib/core \
                          src/lib/support \
                          src/lib/shell \
-                         src/lib/message/support/crypto \
                          src/platform \
                          src/setup_payload \
                          src/system \
-                         src/transport
+                         src/transport \
+                         src/test_driver/linux-cirque/README.md
 
 USE_MDFILE_AS_MAINPAGE = README.md
 

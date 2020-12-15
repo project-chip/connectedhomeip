@@ -222,11 +222,13 @@ void emberAfLevelControlClusterServerTickCallback(EndpointId endpoint)
 
     updateCoupledColorTemp(endpoint);
 
+#ifdef EMBER_AF_PLUGIN_SCENES
     // The level has changed, so the scene is no longer valid.
     if (emberAfContainsServer(endpoint, ZCL_SCENES_CLUSTER_ID))
     {
         emberAfScenesClusterMakeInvalidCallback(endpoint);
     }
+#endif
 
     // Are we at the requested level?
     if (currentLevel == state->moveToLevel)

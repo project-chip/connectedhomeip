@@ -57,10 +57,10 @@ public:
     InterfaceId GetBoundInterface();
     uint16_t GetBoundPort();
     INET_ERROR Listen();
-    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
-    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg,
+    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle msg,
                       uint16_t sendFlags = 0);
-    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
     void Close();
     void Free();
 
@@ -74,7 +74,7 @@ private:
     void Init(InetLayer * inetLayer);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    void HandleDataReceived(chip::System::PacketBuffer * msg);
+    void HandleDataReceived(chip::System::PacketBufferHandle msg);
     INET_ERROR GetPCB(IPAddressType addrType4);
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
     static void LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct pbuf * p, const ip_addr_t * addr, u16_t port);

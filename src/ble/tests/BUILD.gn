@@ -20,19 +20,15 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libBleLayerTests"
 
-  sources = [
+  test_sources = [
     "TestBleErrorStr.cpp",
-    "TestBleLayer.h",
     "TestBleUUID.cpp",
   ]
+
+  cflags = [ "-Wconversion" ]
 
   public_deps = [
     "${chip_root}/src/ble",
     "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestBleErrorStr",
-    "TestBleUUID",
   ]
 }

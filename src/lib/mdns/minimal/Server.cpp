@@ -18,10 +18,9 @@
 #include "Server.h"
 
 #include <errno.h>
+#include <utility>
 
-#include <platform/CHIPDeviceLayer.h>
-
-#include "DnsHeader.h"
+#include <mdns/minimal/core/DnsHeader.h>
 
 namespace mdns {
 namespace Minimal {
@@ -82,7 +81,7 @@ void ServerBase::Shutdown()
     }
 }
 
-CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
+CHIP_ERROR ServerBase::Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port)
 {
     Shutdown(); // ensure everything starts fresh
 
@@ -102,7 +101,7 @@ CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
         EndpointInfo * info = &mEndpoints[endpointIndex];
         info->addressType   = addressType;
 
-        CHIP_ERROR err = chip::DeviceLayer::InetLayer.NewUDPEndPoint(&info->udp);
+        CHIP_ERROR err = inetLayer->NewUDPEndPoint(&info->udp);
         if (err != CHIP_NO_ERROR)
         {
             return err;
@@ -129,7 +128,7 @@ CHIP_ERROR ServerBase::Listen(ListenIterator * it, uint16_t port)
     return autoShutdown.ReturnSuccess();
 }
 
-CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBuffer * data, const chip::Inet::IPAddress & addr, uint16_t port,
+CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                                   chip::Inet::InterfaceId interface)
 {
     for (size_t i = 0; i < mEndpointCount; i++)
@@ -152,14 +151,13 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBuffer * data, const chip:
             continue;
         }
 
-        return info->udp->SendTo(addr, port, data);
+        return info->udp->SendTo(addr, port, std::move(data));
     }
 
-    chip::System::PacketBuffer::Free(data);
     return CHIP_ERROR_NOT_CONNECTED;
 }
 
-CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t port)
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port, chip::Inet::InterfaceId interface)
 {
     for (size_t i = 0; i < mEndpointCount; i++)
     {
@@ -170,24 +168,72 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
             continue;
         }
 
-        // data may be sent over multiple packets. Keep the one ref active all the time
-        data->AddRef();
+        if ((info->udp->GetBoundInterface() != interface) && (info->udp->GetBoundInterface() != INET_NULL_INTERFACEID))
+        {
+            continue;
+        }
 
         CHIP_ERROR err;
 
+        /// The same packet needs to be sent over potentially multiple interfaces.
+        /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
+        /// TODO: this wastes one copy of the data and that could be optimized away
+        chip::System::PacketBufferHandle copy = data.CloneData();
+
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), data);
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
         }
+#if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), data);
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
         }
+#endif
         else
         {
-            // remove extra ref and then also clear it
-            chip::System::PacketBuffer::Free(data);
-            chip::System::PacketBuffer::Free(data);
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+
+        if (err != CHIP_NO_ERROR)
+        {
+            return err;
+        }
+    }
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port)
+{
+    for (size_t i = 0; i < mEndpointCount; i++)
+    {
+        EndpointInfo * info = &mEndpoints[i];
+
+        if (info->udp == nullptr)
+        {
+            continue;
+        }
+
+        CHIP_ERROR err;
+
+        /// The same packet needs to be sent over potentially multiple interfaces.
+        /// LWIP does not like having a pbuf sent over serparate interfaces, hence we create a copy
+        /// TODO: this wastes one copy of the data and that could be optimized away
+        chip::System::PacketBufferHandle copy = data.CloneData();
+
+        if (info->addressType == chip::Inet::kIPAddressType_IPv6)
+        {
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
+        }
+#if INET_CONFIG_ENABLE_IPV4
+        else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
+        {
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
+        }
+#endif
+        else
+        {
             return CHIP_ERROR_INCORRECT_STATE;
         }
 
@@ -200,28 +246,23 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBuffer * data, uint16_t
         }
         else if (err != CHIP_NO_ERROR)
         {
-            chip::System::PacketBuffer::Free(data);
             return err;
         }
     }
 
-    chip::System::PacketBuffer::Free(data);
     return CHIP_NO_ERROR;
 }
 
-void ServerBase::OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBuffer * buffer,
+void ServerBase::OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle buffer,
                                      const chip::Inet::IPPacketInfo * info)
 {
-    chip::System::PacketBufferHandle autoFree;
-    autoFree.Adopt(buffer);
-
     ServerBase * srv = static_cast<ServerBase *>(endPoint->AppState);
     if (!srv->mDelegate)
     {
         return;
     }
-    mdns::Minimal::BytesRange data(buffer->Start(), buffer->Start() + buffer->DataLength());
 
+    mdns::Minimal::BytesRange data(buffer->Start(), buffer->Start() + buffer->DataLength());
     if (data.Size() < HeaderRef::kSizeBytes)
     {
         ChipLogError(Discovery, "Packet to small for mDNS data: %d bytes", static_cast<int>(data.Size()));

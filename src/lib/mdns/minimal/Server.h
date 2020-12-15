@@ -20,9 +20,10 @@
 #include <core/CHIPError.h>
 #include <inet/IPAddress.h>
 #include <inet/InetInterface.h>
+#include <inet/InetLayer.h>
 #include <inet/UDPEndPoint.h>
 
-#include "BytesRange.h"
+#include <mdns/minimal/core/BytesRange.h>
 
 namespace mdns {
 namespace Minimal {
@@ -87,14 +88,17 @@ public:
     ///
     /// Since mDNS uses link-local addresses, one generally wants to listen on all
     /// non-loopback interfaces.
-    CHIP_ERROR Listen(ListenIterator * it, uint16_t port);
+    CHIP_ERROR Listen(chip::Inet::InetLayer * inetLayer, ListenIterator * it, uint16_t port);
 
     /// Send the specified packet to a destination IP address over the specified address
-    CHIP_ERROR DirectSend(chip::System::PacketBuffer * data, const chip::Inet::IPAddress & addr, uint16_t port,
+    CHIP_ERROR DirectSend(chip::System::PacketBufferHandle && data, const chip::Inet::IPAddress & addr, uint16_t port,
                           chip::Inet::InterfaceId interface);
 
     /// Send a specific packet broadcast to all interfaces
-    CHIP_ERROR BroadcastSend(chip::System::PacketBuffer * data, uint16_t port);
+    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port);
+
+    /// Send a specific packet broadcast to a specific interface
+    CHIP_ERROR BroadcastSend(chip::System::PacketBufferHandle data, uint16_t port, chip::Inet::InterfaceId interface);
 
     ServerBase & SetDelegate(ServerDelegate * d)
     {
@@ -103,7 +107,7 @@ public:
     }
 
 private:
-    static void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBuffer * buffer,
+    static void OnUdpPacketReceived(chip::Inet::IPEndPointBasis * endPoint, chip::System::PacketBufferHandle buffer,
                                     const chip::Inet::IPPacketInfo * info);
 
     EndpointInfo * mEndpoints;   // possible endpoints, to listen on multiple interfaces

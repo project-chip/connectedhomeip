@@ -68,8 +68,8 @@ public:
      */
     CHIP_ERROR Init(RendezvousSessionDelegate * delegate, const RendezvousParameters & params);
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
-                           System::PacketBuffer * msgBuf) override;
+    CHIP_ERROR SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
+                           System::PacketBufferHandle msgBuf) override;
 
     bool CanSendToPeer(const Transport::PeerAddress & address) override
     {
@@ -98,7 +98,7 @@ private:
     static void OnBleConnectionError(void * appState, BLE_ERROR err);
 
     // Those functions are BLEEndPoint callbacks
-    static void OnBleEndPointReceive(Ble::BLEEndPoint * endPoint, System::PacketBuffer * buffer);
+    static void OnBleEndPointReceive(Ble::BLEEndPoint * endPoint, System::PacketBufferHandle buffer);
     static void OnBleEndPointConnectionComplete(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
     static void OnBleEndPointConnectionClosed(Ble::BLEEndPoint * endPoint, BLE_ERROR err);
 

@@ -16,41 +16,27 @@
 
 #
 #   @file
-#         CMake project for building and running all CHIP unit tests
+#     CMake project for building and running selected CHIP unit tests using
+#     'nrfconnect' platform integration layer in CHIP and Zephyr
+#     'native_posix[_64]' platforms. Note that certain design decisions behind
+#     the native_posix platforms make them inapplicable for some unit tests,
+#     hence only a subset of CHIP unit tests is listed in the project.
+#     See: https://docs.zephyrproject.org/1.12.0/boards/posix/native_posix/doc/board.html
+#     for more details.
 #
-
-# TODO:
-# As long as we use autotools under the hood we build all CHIP libraries and tests in this project
-# but ideally we would have a subdirectory for each CHIP test directory so that it be possible to
-# build a test driver for a single test directory and required dependencies, e.g.
-#
-# src/test_driver/zephyr/:
-# - CMakeLists.txt          <- build test driver and run all tests
-# - system/CMakeLists.txt   <- build and run only system tests
-# - inet/CMakeLists.txt     <- build and run only inet tests
-# - ...
 
 cmake_minimum_required(VERSION 3.13.1)
 
-set(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip)
-get_filename_component(CHIP_ROOT ${CHIP_ROOT} REALPATH)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
+get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 
-# Make sure all components can see our mbedtls config
+# Make sure all components can see project mbedTLS config
 include_directories(AFTER ${CMAKE_CURRENT_SOURCE_DIR}/main/include)
 
 # ==================================================
-# Load NCS/Zephyr build system
-# ==================================================
-find_package(Zephyr HINTS $ENV{ZEPHYR_BASE})
-
-# ==================================================
-# General settings
+# Setup CHIP build
 # ==================================================
 
-include(chip-lib)
-
-set(CHIP_COMMON_FLAGS
+set(CHIP_CFLAGS
     -DCHIP_SYSTEM_CONFIG_USE_POSIX_TIME_FUNCTS=1
     -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_SOCKET_EXTENSIONS=0
     -DCHIP_SYSTEM_CONFIG_USE_ZEPHYR_NET_IF=0
@@ -60,45 +46,45 @@ set(CHIP_COMMON_FLAGS
     -isystem${ZEPHYR_BASE}/../mbedtls/include
 )
 
-set(CHIP_LIBRARIES
-    -lCHIP
-    -lInetLayerTests
-    -lnlunit-test
-)
-
 set(CHIP_TESTS
-    -lSupportTests
+    # TODO: this list is hard to maintain manually (and currently incomplete).
+    # An automated way that includes figuring out dependencies would be much better
+    -lAppTests
+    -lASN1Tests
+    -lBleLayerTests
+    -lChipCryptoTests
     -lCoreTests
+    -lInetLayerTests
+    -lMessagingLayerTests
+    -lPlatformTests
+    # TODO: raw transport tests fail by running out of TCP/UDP endpoints
+    # -lRawTransportTests
+    -lRetransmitTests
+    -lSupportTests
     -lSystemLayerTests
     -lTransportLayerTests
-    -lChipCryptoTests
-    -lPlatformTests
 )
 
-# ==================================================
-# Setup CHIP build (including unit tests)
-# ==================================================
-project(AllChipTests)
-enable_testing()
-
-chip_configure(ChipConfig
-    BUILD_TESTS
-    PROJECT_CONFIG ${CMAKE_CURRENT_SOURCE_DIR}/main/include/CHIPProjectConfig.h
-    CFLAGS ${CHIP_COMMON_FLAGS}
-    CXXFLAGS ${CHIP_COMMON_FLAGS}
+set(CHIP_LIBRARIES
+    -lCHIP
+    -lInetTestHelpers
+    -lNetworkTestHelpers
+    -lnlunit-test
+    ${CHIP_TESTS}
 )
 
-chip_build(ChipLib ChipConfig
-    BUILD_COMMAND ninja
-    BUILD_ARTIFACTS ${CHIP_LIBRARIES} ${CHIP_TESTS}
-)
+include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
 
 # ==================================================
 # Build 'all tests' runner
 # ==================================================
+
+project(AllChipTests)
+enable_testing()
+
 target_sources(app PRIVATE main/runner.cpp)
 target_link_options(app PUBLIC -Wl,--whole-archive ${CHIP_TESTS} -Wl,--no-whole-archive)
-target_link_libraries(app PUBLIC ChipLib $<TARGET_FILE:kernel>)
+target_link_libraries(app PUBLIC chip $<TARGET_FILE:kernel>)
 target_compile_definitions(app PUBLIC CHIP_HAVE_CONFIG_H)
 
 add_test(AllChipTests zephyr/zephyr.exe)

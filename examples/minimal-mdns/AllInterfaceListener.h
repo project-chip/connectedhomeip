@@ -25,7 +25,13 @@ namespace MdnsExample {
 class AllInterfaces : public mdns::Minimal::ListenIterator
 {
 public:
-    AllInterfaces(bool enableIpV4) : mState(enableIpV4 ? State::kIpV4 : State::kIpV6) {}
+    AllInterfaces(bool enableIpV4) : mState(enableIpV4 ? State::kIpV4 : State::kIpV6)
+    {
+        if (!enableIpV4)
+        {
+            SkipToFirstValidInterface();
+        }
+    }
 
     bool Next(chip::Inet::InterfaceId * id, chip::Inet::IPAddressType * type) override
     {
@@ -34,6 +40,9 @@ public:
             *id    = INET_NULL_INTERFACEID;
             *type  = chip::Inet::kIPAddressType_IPv4;
             mState = State::kIpV6;
+
+            SkipToFirstValidInterface();
+
             return true;
         }
 
@@ -60,6 +69,20 @@ private:
     State mState;
     chip::Inet::InterfaceIterator mIterator;
 
+    void SkipToFirstValidInterface()
+    {
+        if (SkipCurrentInterface())
+        {
+            while (mIterator.Next())
+            {
+                if (!SkipCurrentInterface())
+                {
+                    break;
+                }
+            }
+        }
+    }
+
     bool SkipCurrentInterface()
     {
         if (!mIterator.HasCurrent())
@@ -72,7 +95,7 @@ private:
             return true; // not a usable interface
         }
         char name[64];
-        if (!mIterator.GetInterfaceName(name, sizeof(name)) == CHIP_NO_ERROR)
+        if (mIterator.GetInterfaceName(name, sizeof(name)) != CHIP_NO_ERROR)
         {
             printf("!!!! FAILED TO GET INTERFACE NAME\n");
             return true;

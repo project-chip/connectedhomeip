@@ -48,12 +48,15 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         switch (cmd->apsFrame->clusterId)
         {
         {{#all_user_clusters}}
-        {{#if (isEnabled enabled)}}
         {{#if (isClient side) }}
         case ZCL_{{asDelimitedMacro define}}_ID :
+            {{#if (user_cluster_has_enabled_command name side)}}
             result = emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(cmd);
+            {{else}}
+            // No commands are enabled for cluster {{name}}
+            result = status(false, true, cmd->mfgSpecific);
+            {{/if}}
             break;
-        {{/if}}
         {{/if}}
         {{/all_user_clusters}}
         default:
@@ -67,13 +70,16 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
         switch (cmd->apsFrame->clusterId)
         {
         {{#all_user_clusters}}
-        {{#if (isEnabled enabled)}}
-        {{#unless (isClient  side) }}
+        {{#unless (isClient side) }}
         case ZCL_{{asDelimitedMacro define}}_ID :
+            {{#if (user_cluster_has_enabled_command name side)}}
             result = emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(cmd);
+            {{else}}
+            // No commands are enabled for cluster {{name}}
+            result = status(false, true, cmd->mfgSpecific);
+            {{/if}}
             break;
         {{/unless}}
-        {{/if}}
         {{/all_user_clusters}}
         default:
             // Unrecognized cluster ID, error status will apply.
@@ -86,36 +92,45 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
 // Cluster specific command parsing
 
 {{#all_user_clusters}}
-{{#if (isEnabled enabled)}}
+{{#if (user_cluster_has_enabled_command name side)}}
 EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(EmberAfClusterCommand * cmd)
 {
     bool wasHandled = false;
 
+    {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
+    if (cmd->mfgSpecific)
+    {
+        {{#all_user_cluster_commands}}
+        {{#if mfgCode}}
+        {{#if (isStrEqual clusterName parent.name)}}
+        {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+        if (cmd->mfgCode == {{mfgCode}} && cmd->commandId == ZCL_{{asDelimitedMacro name}}_COMMAND_ID)
+        {
+        {{> command_handler_cluster_commands}}
+        }
+        {{/if}}
+        {{/if}}
+        {{/if}}
+        {{/all_user_cluster_commands}}
+    }
+    else
+    {{else}}
     if (!cmd->mfgSpecific)
+    {{/if}}
     {
         switch (cmd->commandId)
         {
         {{#all_user_cluster_commands}}
+        {{#unless mfgCode}}
         {{#if (isStrEqual clusterName parent.name)}}
         {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
         case ZCL_{{asDelimitedMacro name}}_COMMAND_ID: {
-            {{#if (zcl_command_arguments_count this.id)}}
-            uint32_t argOffset = 0;
-            {{#zcl_command_arguments}}
-            {{asUnderlyingType type}} * {{asSymbol label}} = ({{asUnderlyingType type}} *)(cmd->buffer + argOffset);
-            {{#unless (isLastElement index count)}}
-            argOffset+= sizeof({{asUnderlyingType type}});
-            {{/unless}}
-            {{/zcl_command_arguments}}
-
-            wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback({{#zcl_command_arguments}} *{{asSymbol label}}{{#unless (isLastElement index count)}}, {{/unless}}{{/zcl_command_arguments}});
-            {{else}}
-            wasHandled = emberAf{{asCamelCased parent.name false}}Cluster{{asCamelCased name false}}Callback();
-            {{/if}}
+        {{> command_handler_cluster_commands}}
             break;
         }
         {{/if}}
         {{/if}}
+        {{/unless}}
         {{/all_user_cluster_commands}}
         default: {
             // Unrecognized command ID, error status will apply.

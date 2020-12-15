@@ -20,16 +20,19 @@
  *   This file implements the handler for data model messages.
  */
 
-#include <lib/support/logging/CHIPLogging.h>
-#include <support/logging/CHIPLogging.h>
-#include <system/SystemPacketBuffer.h>
-
 #include "DataModelHandler.h"
 
 #include <app/chip-zcl-zpro-codec.h>
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
+#include <lib/support/logging/CHIPLogging.h>
+#include <support/logging/CHIPLogging.h>
+#include <system/SystemPacketBuffer.h>
+
+#ifdef EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS
+EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS
+#endif
 
 using namespace ::chip;
 
@@ -40,7 +43,7 @@ using namespace ::chip;
  * @param [in] buffer The buffer holding the message.  This function guarantees
  *                    that it will free the buffer before returning.
  */
-void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * buffer, SecureSessionMgr * mgr)
+void HandleDataModelMessage(const PacketHeader & header, System::PacketBufferHandle buffer, SecureSessionMgr * mgr)
 {
     EmberApsFrame frame;
     bool ok = extractApsFrame(buffer->Start(), buffer->DataLength(), &frame) > 0;
@@ -51,7 +54,6 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * 
     else
     {
         ChipLogProgress(Zcl, "APS frame processing failure!");
-        System::PacketBuffer::Free(buffer);
         return;
     }
 
@@ -62,8 +64,6 @@ void HandleDataModelMessage(const PacketHeader & header, System::PacketBuffer * 
                                message, messageLen,
                                header.GetSourceNodeId().Value(), // source identifier
                                NULL);
-
-    System::PacketBuffer::Free(buffer);
 
     if (ok)
     {
@@ -79,4 +79,9 @@ void InitDataModelHandler()
 {
     emberAfEndpointConfigure();
     emberAfInit();
+
+#ifdef EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS
+    EmberStatus status = EMBER_NETWORK_UP;
+    EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS
+#endif
 }

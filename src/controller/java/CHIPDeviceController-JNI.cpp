@@ -27,6 +27,7 @@
 #include "AndroidBlePlatformDelegate.h"
 #include "AndroidDeviceControllerWrapper.h"
 
+#include <app/chip-zcl-zpro-codec.h>
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController_deprecated.h>
 #include <jni.h>
@@ -34,11 +35,9 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/ReturnMacros.h>
+#include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
-
-extern "C" {
-#include <app/chip-zcl-zpro-codec.h>
-} // extern "C"
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #ifndef PTHREAD_NULL
@@ -68,7 +67,7 @@ using namespace chip::DeviceController;
 
 static void HandleKeyExchange(ChipDeviceController * deviceController, const Transport::PeerConnectionState * state,
                               void * appReqState);
-static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+static void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBufferHandle payload);
 static void HandleSimpleOperationComplete(ChipDeviceController * deviceController, const char * operation);
 static void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj);
 static bool HandleSendCharacteristic(BLE_CONNECTION_OBJECT connObj, const uint8_t * svcId, const uint8_t * charId,
@@ -140,6 +139,24 @@ private:
     JNIEnv * mEnv;
     jstring mString;
     const char * mChars;
+};
+
+class JniByteArray
+{
+public:
+    JniByteArray(JNIEnv * env, jbyteArray array) :
+        mEnv(env), mArray(array), mData(env->GetByteArrayElements(array, nullptr)), mDataLength(env->GetArrayLength(array))
+    {}
+    ~JniByteArray() { mEnv->ReleaseByteArrayElements(mArray, mData, 0); }
+
+    const jbyte * data() const { return mData; }
+    jsize size() const { return mDataLength; }
+
+private:
+    JNIEnv * mEnv;
+    jbyteArray mArray;
+    jbyte * mData;
+    jsize mDataLength;
 };
 
 } // namespace
@@ -288,7 +305,8 @@ JNI_METHOD(void, beginConnectDevice)(JNIEnv * env, jobject self, jlong handle, j
         RendezvousParameters params = RendezvousParameters()
                                           .SetSetupPINCode(pinCode)
                                           .SetConnectionObject(reinterpret_cast<BLE_CONNECTION_OBJECT>(connObj))
-                                          .SetBleLayer(&sBleLayer);
+                                          .SetBleLayer(&sBleLayer)
+                                          .SetPeerAddress(Transport::PeerAddress::BLE());
         err = wrapper->Controller()->ConnectDevice(kRemoteDeviceId, params, (void *) "ConnectDevice", HandleKeyExchange,
                                                    HandleEchoResponse, HandleError);
     }
@@ -309,9 +327,30 @@ JNI_METHOD(void, sendWiFiCredentials)(JNIEnv * env, jobject self, jlong handle, 
     AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendNetworkCredentials(ssidStr.c_str(), passwordStr.c_str());
 }
 
-JNI_METHOD(void, deprecatedHardcodeThreadCredentials)(JNIEnv * env, jobject self, jlong handle)
+JNI_METHOD(void, sendThreadCredentials)
+(JNIEnv * env, jobject self, jlong handle, jint channel, jint panId, jbyteArray xpanId, jbyteArray masterKey)
 {
-    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->DeprecatedHardcodeThreadCredentials();
+    using namespace chip::DeviceLayer::Internal;
+
+    JniByteArray xpanIdBytes(env, xpanId);
+    JniByteArray masterKeyBytes(env, masterKey);
+
+    VerifyOrReturn(CanCastTo<uint8_t>(channel), ChipLogError(Controller, "sendThreadCredentials() called with invalid Channel"));
+    VerifyOrReturn(CanCastTo<uint16_t>(panId), ChipLogError(Controller, "sendThreadCredentials() called with invalid PAN ID"));
+    VerifyOrReturn(xpanIdBytes.size() <= static_cast<jsize>(kThreadExtendedPANIdLength),
+                   ChipLogError(Controller, "sendThreadCredentials() called with invalid XPAN ID"));
+    VerifyOrReturn(masterKeyBytes.size() <= static_cast<jsize>(kThreadMasterKeyLength),
+                   ChipLogError(Controller, "sendThreadCredentials() called with invalid Master Key"));
+
+    DeviceNetworkInfo threadData                = {};
+    threadData.ThreadChannel                    = channel;
+    threadData.ThreadPANId                      = panId;
+    threadData.FieldPresent.ThreadExtendedPANId = 1;
+    memcpy(threadData.ThreadExtendedPANId, xpanIdBytes.data(), xpanIdBytes.size());
+    memcpy(threadData.ThreadMasterKey, masterKeyBytes.data(), masterKeyBytes.size());
+
+    ScopedPthreadLock lock(&sStackLock);
+    AndroidDeviceControllerWrapper::FromJNIHandle(handle)->SendThreadCredentials(threadData);
 }
 
 JNI_METHOD(void, beginConnectDeviceIp)(JNIEnv * env, jobject self, jlong handle, jstring deviceAddr)
@@ -361,7 +400,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
         {
             memcpy(buffer->Start(), messageStr, messageLen);
             buffer->SetDataLength(messageLen);
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", std::move(buffer));
         }
     }
 
@@ -374,7 +413,7 @@ JNI_METHOD(void, beginSendMessage)(JNIEnv * env, jobject self, jlong handle, jst
     }
 }
 
-JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, jobject commandObj)
+JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, jobject commandObj, jint aValue)
 {
     CHIP_ERROR err                           = CHIP_NO_ERROR;
     AndroidDeviceControllerWrapper * wrapper = AndroidDeviceControllerWrapper::FromJNIHandle(handle);
@@ -387,10 +426,29 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
 
     {
         ScopedPthreadLock lock(&sStackLock);
+        System::PacketBufferHandle buffer;
 
-        // Make sure our buffer is big enough, but this will need a better setup!
-        static const size_t bufferSize    = 1024;
-        System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(bufferSize);
+        // Hardcode endpoint to 1 for now
+        uint8_t endpoint = 1;
+
+        switch (commandID)
+        {
+        case 0:
+            buffer = encodeOnOffClusterOffCommand(endpoint);
+            break;
+        case 1:
+            buffer = encodeOnOffClusterOnCommand(endpoint);
+            break;
+        case 2:
+            buffer = encodeOnOffClusterToggleCommand(endpoint);
+            break;
+        case 3:
+            buffer = encodeLevelControlClusterMoveToLevelCommand(endpoint, (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
+            break;
+        default:
+            ChipLogError(Controller, "Unknown command: %d", commandID);
+            return;
+        }
 
         if (buffer.IsNull())
         {
@@ -399,29 +457,7 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
         else
         {
             // Hardcode endpoint to 1 for now
-            uint8_t endpoint = 1;
-
-            uint16_t dataLength = 0;
-            switch (commandID)
-            {
-            case 0:
-                dataLength = encodeOnOffClusterOffCommand(buffer->Start(), bufferSize, endpoint);
-                break;
-            case 1:
-                dataLength = encodeOnOffClusterOnCommand(buffer->Start(), bufferSize, endpoint);
-                break;
-            case 2:
-                dataLength = encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, endpoint);
-                break;
-            default:
-                ChipLogError(Controller, "Unknown command: %d", commandID);
-                return;
-            }
-
-            buffer->SetDataLength(dataLength);
-
-            // Hardcode endpoint to 1 for now
-            err = wrapper->Controller()->SendMessage((void *) "SendMessage", buffer.Release_ForNow());
+            err = wrapper->Controller()->SendMessage((void *) "SendMessage", std::move(buffer));
         }
     }
 
@@ -469,7 +505,7 @@ JNI_ANDROID_CHIP_STACK_METHOD(void, handleIndicationReceived)
     buffer->SetDataLength(valueLength);
 
     pthread_mutex_lock(&sStackLock);
-    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, buffer.Release_ForNow());
+    sBleLayer.HandleIndicationReceived(connObj, &svcUUID, &charUUID, std::move(buffer));
     pthread_mutex_unlock(&sStackLock);
 exit:
     env->ReleaseByteArrayElements(value, valueBegin, 0);
@@ -670,7 +706,7 @@ void HandleKeyExchange(ChipDeviceController * deviceController, const Transport:
     HandleSimpleOperationComplete(deviceController, (const char *) appReqState);
 }
 
-void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload)
+void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqState, System::PacketBufferHandle payload)
 {
     StackUnlockGuard unlockGuard;
     JNIEnv * env;
@@ -703,7 +739,6 @@ void HandleEchoResponse(ChipDeviceController * deviceController, void * appReqSt
 
 exit:
     env->ExceptionClear();
-    System::PacketBuffer::Free(payload);
 }
 
 void HandleNotifyChipConnectionClosed(BLE_CONNECTION_OBJECT connObj)

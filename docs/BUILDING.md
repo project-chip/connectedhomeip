@@ -83,6 +83,8 @@ Finally, install some Raspberry Pi specific dependencies:
 sudo apt-get install pi-bluetooth
 ```
 
+You need to reboot your RPi after install `pi-bluetooth`.
+
 ### Build Preparation
 
 Before running any other build command, the `scripts/activate.sh` environment
@@ -212,7 +214,7 @@ expensive to build everything for every edit. To save time, you can name the
 configuration to build:
 
 ```
-ninja -C out/unified all_host_gcc
+ninja -C out/unified host_gcc
 ninja -C out/unified check_host_gcc
 ```
 

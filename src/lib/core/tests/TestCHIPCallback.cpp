@@ -21,12 +21,9 @@
  *      This file implements a test for  CHIP Callback
  *
  */
-
-#include "TestCore.h"
-
 #include <core/CHIPCallback.h>
 #include <support/CHIPMem.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 #include <nlunit-test.h>
 
@@ -216,6 +213,9 @@ static void NotifierTest(nlTestSuite * inSuite, void * inContext)
     notifier.Register(&cb);
     notifier.Notify(8);
     NL_TEST_ASSERT(inSuite, n == 1);
+
+    cb.Cancel();
+    cancelcb.Cancel();
 }
 
 /**

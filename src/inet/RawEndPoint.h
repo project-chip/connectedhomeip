@@ -75,9 +75,9 @@ public:
     INET_ERROR BindInterface(IPAddressType addrType, InterfaceId intfId);
     InterfaceId GetBoundInterface();
     INET_ERROR Listen();
-    INET_ERROR SendTo(const IPAddress & addr, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
-    INET_ERROR SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
-    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(const IPAddress & addr, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
+    INET_ERROR SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
+    INET_ERROR SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags = 0);
     INET_ERROR SetICMPFilter(uint8_t numICMPTypes, const uint8_t * aICMPTypes);
     void Close();
     void Free();
@@ -95,7 +95,7 @@ private:
     uint8_t NumICMPTypes;
     const uint8_t * ICMPTypes;
 
-    void HandleDataReceived(chip::System::PacketBuffer * msg);
+    void HandleDataReceived(chip::System::PacketBufferHandle msg);
     INET_ERROR GetPCB(IPAddressType addrType);
 
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5

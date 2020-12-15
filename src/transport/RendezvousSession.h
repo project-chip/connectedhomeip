@@ -102,8 +102,8 @@ public:
     Optional<NodeId> GetRemoteNodeId() const { return mParams.GetRemoteNodeId(); }
 
     //////////// SecurePairingSessionDelegate Implementation ///////////////
-    CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
-                                  const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf) override;
+    CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                  System::PacketBufferHandle msgBuf) override;
     void OnPairingError(CHIP_ERROR err) override;
     void OnPairingComplete() override;
 
@@ -112,7 +112,7 @@ public:
     void OnRendezvousConnectionClosed() override;
     void OnRendezvousError(CHIP_ERROR err) override;
     void OnRendezvousMessageReceived(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                     System::PacketBuffer * buffer) override;
+                                     System::PacketBufferHandle buffer) override;
 
     //////////// RendezvousDeviceCredentialsDelegate Implementation ///////////////
     void SendNetworkCredentials(const char * ssid, const char * passwd) override;
@@ -120,13 +120,13 @@ public:
     void SendOperationalCredentials() override;
 
     //////////// NetworkProvisioningDelegate Implementation ///////////////
-    CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBug) override;
+    CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBufferHandle msgBug) override;
     void OnNetworkProvisioningError(CHIP_ERROR error) override;
     void OnNetworkProvisioningComplete() override;
 
     //////////// TransportMgrDelegate Implementation ///////////////
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBuffer * msgBuf) override;
+                           System::PacketBufferHandle msgBuf) override;
 
     /**
      * @brief
@@ -139,12 +139,12 @@ public:
 
 private:
     CHIP_ERROR HandlePairingMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                    System::PacketBuffer * msgBug);
+                                    System::PacketBufferHandle msgBuf);
     CHIP_ERROR Pair(Optional<NodeId> nodeId, uint32_t setupPINCode);
     CHIP_ERROR WaitForPairing(Optional<NodeId> nodeId, uint32_t setupPINCode);
 
     CHIP_ERROR HandleSecureMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                   System::PacketBuffer * msgBuf);
+                                   System::PacketBufferHandle msgBuf);
     Transport::Base * mTransport          = nullptr; ///< Underlying transport
     RendezvousSessionDelegate * mDelegate = nullptr; ///< Underlying transport events
     RendezvousParameters mParams;                    ///< Rendezvous configuration
@@ -152,6 +152,8 @@ private:
     SecurePairingSession mPairingSession;
     NetworkProvisioning mNetworkProvision;
     SecureSession mSecureSession;
+    Transport::PeerAddress mPeerAddress; // Current peer address we are doing rendezvous with.
+    Optional<NodeId> mRendezvousRemoteNodeId;
     TransportMgrBase * mTransportMgr;
     uint32_t mSecureMessageIndex = 0;
     uint16_t mNextKeyId          = 0;

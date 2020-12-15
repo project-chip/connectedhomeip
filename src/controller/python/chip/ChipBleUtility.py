@@ -345,3 +345,20 @@ class BleSubscribeEventStruct(Structure):
         bleSubscribeEventStruct.Operation = bleSubscribeEvent.Operation
         bleSubscribeEventStruct.Status = bleSubscribeEvent.Status
         return bleSubscribeEventStruct
+
+class BleDeviceIdentificationInfo:
+    def __init__(self, pairingState, discriminator, vendorId, productId):
+        self.pairingState = pairingState
+        self.discriminator = discriminator
+        self.vendorId = vendorId
+        self.productId = productId
+
+def ParseServiceData(data):
+    if len(data) != 7:
+        return None
+    return BleDeviceIdentificationInfo(
+        int(data[0]),
+        int.from_bytes(data[1:3], byteorder='little'),
+        int.from_bytes(data[3:5], byteorder='little'),
+        int.from_bytes(data[5:7], byteorder='little'),
+    )

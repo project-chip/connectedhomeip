@@ -44,13 +44,16 @@
 #endif /* CONFIG_NETWORK_LAYER_BLE */
 
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
+#include "ChipDeviceController-StorageDelegate.h"
 
 #include <controller/CHIPDeviceController_deprecated.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 
+using namespace chip;
 using namespace chip::Ble;
 using namespace chip::DeviceController;
 
@@ -64,7 +67,7 @@ typedef void (*OnConnectFunct)(chip::DeviceController::ChipDeviceController * dc
 typedef void (*OnErrorFunct)(chip::DeviceController::ChipDeviceController * dc, void * appReqState, CHIP_ERROR err,
                              const chip::Inet::IPPacketInfo * pi);
 typedef void (*OnMessageFunct)(chip::DeviceController::ChipDeviceController * dc, void * appReqState,
-                               chip::System::PacketBuffer * buffer);
+                               chip::System::PacketBufferHandle buffer);
 }
 
 enum BleEventType
@@ -125,6 +128,7 @@ public:
 
 static chip::System::Layer sSystemLayer;
 static chip::Inet::InetLayer sInetLayer;
+static chip::Controller::PythonPersistentStorageDelegate sStorageDelegate;
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without
@@ -170,6 +174,9 @@ CHIP_ERROR nl_Chip_DeviceController_DeleteDeviceController(chip::DeviceControlle
 CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceController * devCtrl, BLE_CONNECTION_OBJECT connObj,
                                             uint32_t setupPinCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
                                             OnErrorFunct onError);
+CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerAddrStr,
+                                              uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                              OnErrorFunct onError);
 
 // Network Provisioning
 CHIP_ERROR
@@ -204,7 +211,7 @@ CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::
     *outDevCtrl = new chip::DeviceController::ChipDeviceController();
     VerifyOrExit(*outDevCtrl != NULL, err = CHIP_ERROR_NO_MEMORY);
 
-    err = (*outDevCtrl)->Init(kLocalDeviceId, &sSystemLayer, &sInetLayer);
+    err = (*outDevCtrl)->Init(kLocalDeviceId, &sSystemLayer, &sInetLayer, nullptr, &sStorageDelegate);
     SuccessOrExit(err);
 
 exit:
@@ -240,8 +247,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
     int maxFDs = 0;
 #if CONFIG_NETWORK_LAYER_BLE
     uint8_t bleWakeByte;
-    bool result = false;
-    chip::System::PacketBuffer * msgBuf;
+    chip::System::PacketBufferHandle msgBuf;
     ChipBleUUID svcId, charId;
     union
     {
@@ -305,8 +311,8 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                     {
                     case kBleEventType_Rx:
                         // build a packet buffer from the rxEv and send to blelayer.
-                        msgBuf = chip::System::PacketBuffer::New().Release_ForNow();
-                        VerifyOrExit(msgBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+                        msgBuf = chip::System::PacketBuffer::New();
+                        VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
                         memcpy(msgBuf->Start(), evu.rxEv->buffer, evu.rxEv->length);
                         msgBuf->SetDataLength(evu.rxEv->length);
@@ -315,14 +321,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         memcpy(svcId.bytes, evu.rxEv->svcId, sizeof(svcId.bytes));
                         memcpy(charId.bytes, evu.rxEv->charId, sizeof(charId.bytes));
 
-                        result = sBle.HandleIndicationReceived(evu.txEv->connObj, &svcId, &charId, msgBuf);
-
-                        if (!result)
-                        {
-                            chip::System::PacketBuffer::Free(msgBuf);
-                        }
-
-                        msgBuf = NULL;
+                        sBle.HandleIndicationReceived(evu.txEv->connObj, &svcId, &charId, std::move(msgBuf));
                         break;
 
                     case kBleEventType_Tx:
@@ -330,7 +329,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         memcpy(svcId.bytes, evu.txEv->svcId, sizeof(svcId.bytes));
                         memcpy(charId.bytes, evu.txEv->charId, sizeof(charId.bytes));
 
-                        result = sBle.HandleWriteConfirmation(evu.txEv->connObj, &svcId, &charId);
+                        sBle.HandleWriteConfirmation(evu.txEv->connObj, &svcId, &charId);
                         break;
 
                     case kBleEventType_Subscribe:
@@ -342,7 +341,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         case kBleSubOp_Subscribe:
                             if (evu.subscribeEv->status)
                             {
-                                result = sBle.HandleSubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
+                                sBle.HandleSubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
                             }
                             else
                             {
@@ -353,7 +352,7 @@ CHIP_ERROR nl_Chip_DeviceController_DriveIO(uint32_t sleepTimeMS)
                         case kBleSubOp_Unsubscribe:
                             if (evu.subscribeEv->status)
                             {
-                                result = sBle.HandleUnsubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
+                                sBle.HandleUnsubscribeComplete(evu.subscribeEv->connObj, &svcId, &charId);
                             }
                             else
                             {
@@ -539,14 +538,29 @@ CHIP_ERROR nl_Chip_DeviceController_Connect(chip::DeviceController::ChipDeviceCo
                                             uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
                                             OnErrorFunct onError)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::RendezvousParameters params =
-        chip::RendezvousParameters().SetSetupPINCode(setupPINCode).SetConnectionObject(connObj).SetBleLayer(&sBle);
-    err = devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
-    SuccessOrExit(err);
+    return devCtrl->ConnectDevice(kRemoteDeviceId,
+                                  chip::RendezvousParameters()
+                                      .SetPeerAddress(Transport::PeerAddress(Transport::Type::kBle))
+                                      .SetSetupPINCode(setupPINCode)
+                                      .SetConnectionObject(connObj)
+                                      .SetBleLayer(&sBle),
+                                  (void *) devCtrl, onConnect, onMessage, onError);
+}
 
-exit:
-    return err;
+CHIP_ERROR nl_Chip_DeviceController_ConnectIP(chip::DeviceController::ChipDeviceController * devCtrl, const char * peerAddrStr,
+                                              uint32_t setupPINCode, OnConnectFunct onConnect, OnMessageFunct onMessage,
+                                              OnErrorFunct onError)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    chip::Inet::IPAddress peerAddr;
+    chip::Transport::PeerAddress addr;
+    chip::RendezvousParameters params = chip::RendezvousParameters().SetSetupPINCode(setupPINCode);
+
+    VerifyOrReturnError(chip::Inet::IPAddress::FromString(peerAddrStr, peerAddr), err = CHIP_ERROR_INVALID_ARGUMENT);
+    // TODO: IP rendezvous should use TCP connection.
+    addr.SetTransportType(chip::Transport::Type::kUdp).SetIPAddress(peerAddr);
+    params.SetPeerAddress(addr).SetDiscriminator(0);
+    return devCtrl->ConnectDevice(kRemoteDeviceId, params, (void *) devCtrl, onConnect, onMessage, onError);
 }
 
 CHIP_ERROR

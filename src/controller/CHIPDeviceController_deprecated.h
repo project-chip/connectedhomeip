@@ -50,7 +50,8 @@ typedef void (*NewConnectionHandler)(ChipDeviceController * deviceController, co
 typedef void (*CompleteHandler)(ChipDeviceController * deviceController, void * appReqState);
 typedef void (*ErrorHandler)(ChipDeviceController * deviceController, void * appReqState, CHIP_ERROR err,
                              const Inet::IPPacketInfo * pktInfo);
-typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState, System::PacketBuffer * payload);
+typedef void (*MessageReceiveHandler)(ChipDeviceController * deviceController, void * appReqState,
+                                      System::PacketBufferHandle payload);
 
 class DLL_EXPORT ChipDeviceController : public Controller::DeviceStatusDelegate
 {
@@ -142,7 +143,7 @@ public:
      *
      * @return bool   If IP Address was returned
      */
-    bool GetIpAddress(Inet::IPAddress & addr) const;
+    bool GetIpAddress(Inet::IPAddress & addr);
 
     // ----- Messaging -----
     /**
@@ -154,7 +155,7 @@ public:
      * @param[in] peerDevice    Device ID of the peer device
      * @return CHIP_ERROR   The return status
      */
-    CHIP_ERROR SendMessage(void * appReqState, System::PacketBuffer * buffer, NodeId peerDevice = kUndefinedNodeId);
+    CHIP_ERROR SendMessage(void * appReqState, System::PacketBufferHandle buffer, NodeId peerDevice = kUndefinedNodeId);
 
     // ----- IO -----
     /**
@@ -181,9 +182,11 @@ public:
     CHIP_ERROR SetDevicePairingDelegate(Controller::DevicePairingDelegate * pairingDelegate);
 
     //////////// DeviceStatusDelegate Implementation ///////////////
-    void OnMessage(System::PacketBuffer * msg) override;
+    void OnMessage(System::PacketBufferHandle msg) override;
 
 private:
+    CHIP_ERROR InitDevice();
+
     enum
     {
         kState_NotInitialized = 0,

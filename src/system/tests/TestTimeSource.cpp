@@ -24,16 +24,13 @@
 #ifndef __STDC_LIMIT_MACROS
 #define __STDC_LIMIT_MACROS
 #endif
-// config
-#include <system/SystemConfig.h>
 
-// module header
-#include "TestSystemLayer.h"
+#include <system/SystemConfig.h>
 
 #include <nlunit-test.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 #include <system/TimeSource.h>
 
 namespace {

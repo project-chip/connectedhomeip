@@ -131,11 +131,6 @@
         0                                                                                                                          \
     }
 
-#define EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS                                                               \
-    void emberAfPluginNetworkSteeringStackStatusCallback(EmberStatus status);
-
-#define EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS emberAfPluginNetworkSteeringStackStatusCallback(status);
-
 // Generated data for the command discovery
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \

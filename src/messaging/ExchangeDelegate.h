@@ -27,6 +27,7 @@
 #include <transport/raw/MessageHeader.h>
 
 namespace chip {
+namespace Messaging {
 
 class ExchangeContext;
 
@@ -53,7 +54,7 @@ public:
      *  @param[in]    payload       A pointer to the PacketBuffer object holding the message payload.
      */
     virtual void OnMessageReceived(ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId, uint8_t msgType,
-                                   System::PacketBuffer * payload) = 0;
+                                   System::PacketBufferHandle payload) = 0;
 
     /**
      * @brief
@@ -74,4 +75,5 @@ public:
     virtual void OnExchangeClosing(ExchangeContext * ec) {}
 };
 
+} // namespace Messaging
 } // namespace chip

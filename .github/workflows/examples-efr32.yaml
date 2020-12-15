@@ -29,7 +29,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-efr32:0.4.16
+            image: connectedhomeip/chip-build-efr32:0.4.18
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -69,8 +69,6 @@ jobs:
                   path: |
                       out/lock_app_debug/BRD4161A/chip-efr32-lock-example.out
                       out/lighting_app_debug/BRD4161A/chip-efr32-lighting-example.out
-            - name: Show tree
-              run: find .
             - name: Remove third_party binaries for CodeQL Analysis
               run: find out -type d -name "third_party" -exec rm -rf {} +
             - name: Remove SiliconLabs binaries for CodeQL Analysis

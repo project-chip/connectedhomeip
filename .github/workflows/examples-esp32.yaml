@@ -29,7 +29,7 @@ jobs:
         runs-on: ubuntu-latest
 
         container:
-            image: connectedhomeip/chip-build-esp32:0.4.16
+            image: connectedhomeip/chip-build-esp32:0.4.18
             volumes:
                 - "/tmp/bloat_reports:/tmp/bloat_reports"
                 - "/tmp/output_binaries:/tmp/output_binaries"
@@ -70,8 +70,6 @@ jobs:
                       ${{ env.BUILD_TYPE }}-example-build-${{
                       steps.outsuffix.outputs.value }}
                   path: /tmp/output_binaries/${{ env.BUILD_TYPE }}-build
-            - name: Show tree
-              run: find .
             # - name: Remove third_party binaries for CodeQL Analysis
             #   run: find . -type d -name "third_party" -exec rm -rf {} +
             # - name: Remove m5stack-tft binaries for CodeQL Analysis

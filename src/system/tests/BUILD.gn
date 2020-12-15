@@ -20,9 +20,8 @@ import("${chip_root}/build/chip/chip_test_suite.gni")
 chip_test_suite("tests") {
   output_name = "libSystemLayerTests"
 
-  sources = [
+  test_sources = [
     "TestSystemErrorStr.cpp",
-    "TestSystemLayer.h",
     "TestSystemObject.cpp",
     "TestSystemPacketBuffer.cpp",
     "TestSystemTimer.cpp",
@@ -36,14 +35,5 @@ chip_test_suite("tests") {
     "${chip_root}/src/inet",
     "${chip_root}/src/system",
     "${nlunit_test_root}:nlunit-test",
-  ]
-
-  tests = [
-    "TestSystemErrorStr",
-    "TestSystemObject",
-    "TestSystemPacketBuffer",
-    "TestSystemTimer",
-    "TestSystemWakeEvent",
-    "TestTimeSource",
   ]
 }

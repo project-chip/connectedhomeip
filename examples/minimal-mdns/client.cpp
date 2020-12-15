@@ -21,10 +21,9 @@
 
 #include <inet/InetInterface.h>
 #include <inet/UDPEndPoint.h>
-#include <mdns/minimal/DnsHeader.h>
-#include <mdns/minimal/QName.h>
 #include <mdns/minimal/QueryBuilder.h>
 #include <mdns/minimal/Server.h>
+#include <mdns/minimal/core/QName.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/CHIPArgParser.hpp>
 #include <support/CHIPMem.h>
@@ -40,12 +39,13 @@ namespace {
 
 struct Options
 {
-    bool enableIpV4        = false;
-    bool unicastAnswers    = true;
-    uint32_t runtimeMs     = 500;
-    uint16_t querySendPort = 5353;
-    uint16_t listenPort    = 5388;
-    const char * query     = "_services._dns-sd._udp.local";
+    bool enableIpV4           = false;
+    bool unicastAnswers       = true;
+    uint32_t runtimeMs        = 500;
+    uint16_t querySendPort    = 5353;
+    uint16_t listenPort       = 5388;
+    const char * query        = "_services._dns-sd._udp.local";
+    mdns::Minimal::QType type = mdns::Minimal::QType::ANY;
 } gOptions;
 
 constexpr uint32_t kTestMessageId   = 0x1234;
@@ -55,6 +55,7 @@ using namespace chip::ArgParser;
 
 constexpr uint16_t kOptionEnableIpV4 = '4';
 constexpr uint16_t kOptionQuery      = 'q';
+constexpr uint16_t kOptionType       = 't';
 
 // non-ascii options have no short option version
 constexpr uint16_t kOptionListenPort       = 0x100;
@@ -79,6 +80,41 @@ bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier
         return true;
     case kOptionQuery:
         gOptions.query = aValue;
+        return true;
+    case kOptionType:
+        if (strcasecmp(aValue, "ANY") == 0)
+        {
+            gOptions.type = mdns::Minimal::QType::ANY;
+        }
+        else if (strcasecmp(aValue, "A") == 0)
+        {
+            gOptions.type = mdns::Minimal::QType::A;
+        }
+        else if (strcasecmp(aValue, "AAAA") == 0)
+        {
+            gOptions.type = mdns::Minimal::QType::AAAA;
+        }
+        else if (strcasecmp(aValue, "PTR") == 0)
+        {
+            gOptions.type = mdns::Minimal::QType::PTR;
+        }
+        else if (strcasecmp(aValue, "TXT") == 0)
+        {
+            gOptions.type = mdns::Minimal::QType::TXT;
+        }
+        else if (strcasecmp(aValue, "SRV") == 0)
+        {
+            gOptions.type = mdns::Minimal::QType::SRV;
+        }
+        else if (strcasecmp(aValue, "CNAME") == 0)
+        {
+            gOptions.type = mdns::Minimal::QType::CNAME;
+        }
+        else
+        {
+            PrintArgError("%s: invalid value for query type: %s\n", aProgram, aValue);
+            return false;
+        }
         return true;
 
     case kOptionQueryPort:
@@ -111,6 +147,7 @@ OptionDef cmdLineOptionsDef[] = {
     { "listen-port", kArgumentRequired, kOptionListenPort },
     { "enable-ip-v4", kNoArgument, kOptionEnableIpV4 },
     { "query", kArgumentRequired, kOptionQuery },
+    { "type", kArgumentRequired, kOptionType },
     { "query-port", kArgumentRequired, kOptionQueryPort },
     { "timeout-ms", kArgumentRequired, kOptionRuntimeMs },
     { "multicast-reply", kNoArgument, kOptionMulticastReplies },
@@ -126,6 +163,9 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -q\n"
                              "  --query\n"
                              "        The query to send\n"
+                             "  -t\n"
+                             "  --type\n"
+                             "        The query type to ask for (ANY/PTR/A/AAAA/SRV/TXT)\n"
                              "  --query-port\n"
                              "        On what port to multicast the query\n"
                              "  --timeout-ms\n"
@@ -193,7 +233,15 @@ public:
         }
     }
 
-    mdns::Minimal::Query MdnsQuery() const { return mdns::Minimal::Query(mParts.data(), static_cast<uint16_t>(mParts.size())); }
+    mdns::Minimal::Query MdnsQuery() const
+    {
+        mdns::Minimal::FullQName qName;
+
+        qName.nameCount = mParts.size();
+        qName.names     = mParts.data();
+
+        return mdns::Minimal::Query(qName);
+    }
 
 private:
     std::vector<mdns::Minimal::QNamePart> mParts;
@@ -216,10 +264,12 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
     mdns::Minimal::QueryBuilder builder(buffer.Get_ForNow());
 
     builder.Header().SetMessageId(kTestMessageId);
-    builder.AddQuery(query.MdnsQuery()
-                         .SetClass(mdns::Minimal::QClass::IN)
-                         .SetType(mdns::Minimal::QType::ANY)
-                         .SetAnswerViaUnicast(gOptions.unicastAnswers));
+    builder.AddQuery(query
+                         .MdnsQuery()                                  //
+                         .SetClass(mdns::Minimal::QClass::IN)          //
+                         .SetType(gOptions.type)                       //
+                         .SetAnswerViaUnicast(gOptions.unicastAnswers) //
+    );
 
     if (!builder.Ok())
     {
@@ -227,7 +277,7 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
         return;
     }
 
-    if (server->BroadcastSend(buffer.Release_ForNow(), gOptions.querySendPort) != CHIP_NO_ERROR)
+    if (server->BroadcastSend(std::move(buffer), gOptions.querySendPort) != CHIP_NO_ERROR)
     {
         printf("Error sending\n");
         return;
@@ -265,7 +315,7 @@ int main(int argc, char ** args)
     {
         MdnsExample::AllInterfaces allInterfaces(gOptions.enableIpV4);
 
-        if (mdnsServer.Listen(&allInterfaces, gOptions.listenPort) != CHIP_NO_ERROR)
+        if (mdnsServer.Listen(&chip::DeviceLayer::InetLayer, &allInterfaces, gOptions.listenPort) != CHIP_NO_ERROR)
         {
             printf("Server failed to listen on all interfaces\n");
             return 1;

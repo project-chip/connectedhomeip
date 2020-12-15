@@ -216,7 +216,7 @@ void BLEManagerImpl::_OnPlatformEvent(const ChipDeviceEvent * event)
 
     case DeviceEventType::kCHIPoBLEWriteReceived:
         HandleWriteReceived(event->CHIPoBLEWriteReceived.ConId, &CHIP_BLE_SVC_ID, &ChipUUID_CHIPoBLEChar_RX,
-                            event->CHIPoBLEWriteReceived.Data);
+                            PacketBufferHandle::Create(event->CHIPoBLEWriteReceived.Data));
         break;
 
     case DeviceEventType::kCHIPoBLEIndicateConfirm:
@@ -340,20 +340,20 @@ bool BLEManagerImpl::CloseConnection(BLE_CONNECTION_OBJECT conId)
 }
 
 bool BLEManagerImpl::SendIndication(BLE_CONNECTION_OBJECT conId, const ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                    chip::System::PacketBuffer * pBuf)
+                                    chip::System::PacketBufferHandle pBuf)
 {
-    return SendBluezIndication(conId, pBuf);
+    return SendBluezIndication(conId, std::move(pBuf));
 }
 
 bool BLEManagerImpl::SendWriteRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                      chip::System::PacketBuffer * pBuf)
+                                      chip::System::PacketBufferHandle pBuf)
 {
     ChipLogError(Ble, "SendWriteRequest: Not implemented");
     return true;
 }
 
 bool BLEManagerImpl::SendReadRequest(BLE_CONNECTION_OBJECT conId, const Ble::ChipBleUUID * svcId, const Ble::ChipBleUUID * charId,
-                                     chip::System::PacketBuffer * pBuf)
+                                     chip::System::PacketBufferHandle pBuf)
 {
     ChipLogError(Ble, "SendReadRequest: Not implemented");
     return true;

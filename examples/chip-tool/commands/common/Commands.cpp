@@ -19,7 +19,6 @@
 #include "Commands.h"
 
 #include "Command.h"
-#include "Logging.h"
 
 #include <algorithm>
 #include <string>
@@ -36,36 +35,25 @@ void Commands::Register(const char * clusterName, commands_list commandsList)
 
 int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
-    ConfigureChipLogging();
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PersistentStorage storage;
 
-    CHIP_ERROR err = chip::Platform::MemoryInit();
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err));
-    }
-    else
-    {
+    err = chip::Platform::MemoryInit();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err)));
 
-        ChipDeviceController dc;
-        ChipToolPersistentStorageDelegate storage;
+    err = storage.Init();
+    VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
 
-        err = dc.Init(localId, nullptr, &storage);
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init failure: %s", chip::ErrorStr(err)));
+    chip::Logging::SetLogFilter(storage.GetLoggingLevel());
 
-        err = dc.ServiceEvents();
-        VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Run Loop failure: %s", chip::ErrorStr(err)));
+    err = RunCommand(storage, localId, remoteId, argc, argv);
+    SuccessOrExit(err);
 
-        err = RunCommand(dc, remoteId, argc, argv);
-        SuccessOrExit(err);
-
-    exit:
-        dc.ServiceEventSignal();
-        dc.Shutdown();
-    }
+exit:
     return (err == CHIP_NO_ERROR) ? EXIT_SUCCESS : EXIT_FAILURE;
 }
 
-CHIP_ERROR Commands::RunCommand(ChipDeviceController & dc, NodeId remoteId, int argc, char ** argv)
+CHIP_ERROR Commands::RunCommand(PersistentStorage & storage, NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     std::map<std::string, CommandsVector>::iterator cluster;
@@ -127,7 +115,7 @@ CHIP_ERROR Commands::RunCommand(ChipDeviceController & dc, NodeId remoteId, int 
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    err = command->Run(&dc, remoteId);
+    err = command->Run(storage, localId, remoteId);
     if (err != CHIP_NO_ERROR)
     {
         ChipLogError(chipTool, "Run command failure: %s", chip::ErrorStr(err));

@@ -25,6 +25,7 @@ LOG_DIR=${LOG_DIR:-$(mktemp -d)}
 
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
+    "EchoTest"
     "OnOffClusterTest"
 )
 
@@ -56,7 +57,7 @@ function __cirquetest_start_flask() {
     echo 'Start Flask'
     cd "$REPO_DIR"/third_party/cirque/repo
     FLASK_APP='cirque/restservice/service.py' \
-        PATH="$PATH":"$REPO_DIR"/third_party/cirque/repo/openthread/output/x86_64-unknown-linux-gnu/bin/ \
+        PATH="$PATH":"$REPO_DIR"/third_party/openthread/repo/output/x86_64-unknown-linux-gnu/bin/ \
         python3 -m flask run >"$LOG_DIR/$CURRENT_TEST/flask.log" 2>&1
 }
 
@@ -67,12 +68,21 @@ function __cirquetest_clean_flask() {
     __virtual_thread_clean
 }
 
+function __cirquetest_build_ot() {
+    pushd .
+    cd "$REPO_DIR"/third_party/openthread/repo
+    ./bootstrap
+    make -f examples/Makefile-simulation
+    popd
+}
+
 function cirquetest_bootstrap() {
     set -e
     cd "$REPO_DIR"/third_party/cirque/repo
     pip3 install pycodestyle==2.5.0 wheel
     make NO_GRPC=1 install -j
-    ./dependency_modules.sh
+    "$REPO_DIR"/integrations/docker/images/chip-cirque-device-base/build.sh
+    __cirquetest_build_ot
     pip3 install -r requirements_nogrpc.txt
 
     # Call activate here so the later tests can be faster
@@ -106,6 +116,7 @@ function cirquetest_run_test() {
         docker container prune -f >/dev/null 2>&1
         docker network prune -f >/dev/null 2>&1
     fi
+    echo "Test log can be found at $DEVICE_LOG_DIR"
     return "$exitcode"
 }
 

@@ -88,12 +88,8 @@ void UDP::Close()
     mState = State::kNotReady;
 }
 
-CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFlags, const Transport::PeerAddress & address,
-                            System::PacketBuffer * msgIn)
+CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
-    System::PacketBufferHandle msgBuf;
-    msgBuf.Adopt(msgIn);
-
     const uint16_t headerSize = header.EncodeSizeBytes();
 
     VerifyOrReturnError(address.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
@@ -112,14 +108,14 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, Header::Flags payloadFl
     msgBuf->SetStart(msgBuf->Start() - headerSize);
 
     uint16_t actualEncodedHeaderSize;
-    ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize, payloadFlags));
+    ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize));
 
     VerifyOrReturnError(headerSize == actualEncodedHeaderSize, CHIP_ERROR_INTERNAL);
 
-    return mUDPEndPoint->SendMsg(&addrInfo, msgBuf.Release_ForNow());
+    return mUDPEndPoint->SendMsg(&addrInfo, std::move(msgBuf));
 }
 
-void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * buffer, const Inet::IPPacketInfo * pktInfo)
+void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle buffer, const Inet::IPPacketInfo * pktInfo)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
     UDP * udp               = reinterpret_cast<UDP *>(endPoint->AppState);
@@ -131,7 +127,7 @@ void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBuffer * 
     SuccessOrExit(err);
 
     buffer->ConsumeHead(headerSize);
-    udp->HandleMessageReceived(header, peerAddress, buffer);
+    udp->HandleMessageReceived(header, peerAddress, std::move(buffer));
 
 exit:
     if (err != CHIP_NO_ERROR)

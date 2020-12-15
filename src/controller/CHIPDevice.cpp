@@ -30,6 +30,11 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+#include <lwip/tcp.h>
+#include <lwip/tcpip.h>
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
+
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -47,66 +52,48 @@ using namespace chip::Callback;
 namespace chip {
 namespace Controller {
 
-CHIP_ERROR Device::SendMessage(System::PacketBuffer * buffer)
+CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    System::PacketBuffer * resend = nullptr;
+    System::PacketBufferHandle resend;
 
     VerifyOrExit(mSessionManager != nullptr, err = CHIP_ERROR_INCORRECT_STATE);
-    VerifyOrExit(buffer != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(!buffer.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // If there is no secure connection to the device, try establishing it
     if (mState != ConnectionState::SecureConnected)
     {
-        err = LoadSecureSessionParameters();
+        err = LoadSecureSessionParameters(ResetTransport::kNo);
         SuccessOrExit(err);
     }
     else
     {
         // Secure connection already exists
         // Hold on to the buffer, in case session resumption and resend is needed
-        buffer->AddRef();
-        resend = buffer;
+        resend = buffer.Retain();
     }
 
-    err    = mSessionManager->SendMessage(mDeviceId, buffer);
+    err    = mSessionManager->SendMessage(mDeviceId, std::move(buffer));
     buffer = nullptr;
     ChipLogDetail(Controller, "SendMessage returned %d", err);
 
     // The send could fail due to network timeouts (e.g. broken pipe)
     // Try sesion resumption if needed
-    if (err != CHIP_NO_ERROR && resend != nullptr && mState == ConnectionState::SecureConnected)
+    if (err != CHIP_NO_ERROR && !resend.IsNull() && mState == ConnectionState::SecureConnected)
     {
         mState = ConnectionState::NotConnected;
 
-        err = LoadSecureSessionParameters();
+        err = LoadSecureSessionParameters(ResetTransport::kYes);
         SuccessOrExit(err);
 
-        err    = mSessionManager->SendMessage(mDeviceId, resend);
-        resend = nullptr;
+        err = mSessionManager->SendMessage(mDeviceId, std::move(resend));
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
         SuccessOrExit(err);
     }
 
 exit:
-
-    if (buffer != nullptr)
-    {
-        PacketBuffer::Free(buffer);
-    }
-
-    if (resend != nullptr)
-    {
-        PacketBuffer::Free(resend);
-    }
-
     return err;
-}
-
-CHIP_ERROR Device::SendMessage(System::PacketBufferHandle message)
-{
-    return SendMessage(message.Release_ForNow());
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -115,16 +102,19 @@ CHIP_ERROR Device::Serialize(SerializedDevice & output)
     uint16_t serializedLen = 0;
     SerializableDevice serializable;
 
-    nlSTATIC_ASSERT_PRINT(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner),
-                          "Size of serializable should be <= size of output");
+    static_assert(BASE64_ENCODED_LEN(sizeof(serializable)) <= sizeof(output.inner),
+                  "Size of serializable should be <= size of output");
 
     CHIP_ZERO_AT(serializable);
 
     memmove(&serializable.mOpsCreds, &mPairing, sizeof(mPairing));
     serializable.mDeviceId   = Encoding::LittleEndian::HostSwap64(mDeviceId);
     serializable.mDevicePort = Encoding::LittleEndian::HostSwap16(mDevicePort);
-    nlSTATIC_ASSERT_PRINT(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN,
-                          "Size of device address must fit within INET6_ADDRSTRLEN");
+    VerifyOrExit(
+        CHIP_NO_ERROR ==
+            Inet::GetInterfaceName(mInterface, Uint8::to_char(serializable.mInterfaceName), sizeof(serializable.mInterfaceName)),
+        error = CHIP_ERROR_INTERNAL);
+    static_assert(sizeof(serializable.mDeviceAddr) <= INET6_ADDRSTRLEN, "Size of device address must fit within INET6_ADDRSTRLEN");
     mDeviceAddr.ToString(Uint8::to_char(serializable.mDeviceAddr), sizeof(serializable.mDeviceAddr));
 
     serializedLen = chip::Base64Encode(Uint8::to_const_uchar(reinterpret_cast<uint8_t *>(&serializable)),
@@ -166,18 +156,34 @@ CHIP_ERROR Device::Deserialize(const SerializedDevice & input)
     mDeviceId   = Encoding::LittleEndian::HostSwap64(serializable.mDeviceId);
     mDevicePort = Encoding::LittleEndian::HostSwap16(serializable.mDevicePort);
 
+    // The InterfaceNameToId() API requires initialization of mInterface, and lock/unlock of
+    // LwIP stack.
+    mInterface = INET_NULL_INTERFACEID;
+    if (serializable.mInterfaceName[0] != '\0')
+    {
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        LOCK_TCPIP_CORE();
+#endif
+        INET_ERROR inetErr = Inet::InterfaceNameToId(Uint8::to_const_char(serializable.mInterfaceName), mInterface);
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+        UNLOCK_TCPIP_CORE();
+#endif
+        VerifyOrExit(CHIP_NO_ERROR == inetErr, error = CHIP_ERROR_INTERNAL);
+    }
+
 exit:
     return error;
 }
 
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                               const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf, SecureSessionMgr * mgr)
+                               const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
+                               SecureSessionMgr * mgr)
 {
     if (mState == ConnectionState::SecureConnected)
     {
         if (mStatusDelegate != nullptr)
         {
-            mStatusDelegate->OnMessage(msgBuf);
+            mStatusDelegate->OnMessage(std::move(msgBuf));
         }
 
         // TODO: The following callback processing will need further work
@@ -219,7 +225,7 @@ void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader 
     }
 }
 
-CHIP_ERROR Device::LoadSecureSessionParameters()
+CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     SecurePairingSession pairingSession;
@@ -232,8 +238,17 @@ CHIP_ERROR Device::LoadSecureSessionParameters()
     err = pairingSession.FromSerializable(mPairing);
     SuccessOrExit(err);
 
-    err = mTransportMgr->ResetTransport(Transport::UdpListenParameters(mInetLayer).SetAddressType(mDeviceAddr.Type()));
-    SuccessOrExit(err);
+    if (resetNeeded == ResetTransport::kYes)
+    {
+        err = mTransportMgr->ResetTransport(
+            Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv6).SetListenPort(mListenPort)
+#if INET_CONFIG_ENABLE_IPV4
+                ,
+            Transport::UdpListenParameters(mInetLayer).SetAddressType(kIPAddressType_IPv4).SetListenPort(mListenPort)
+#endif
+        );
+        SuccessOrExit(err);
+    }
 
     err = mSessionManager->NewPairing(
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)), mDeviceId,
@@ -253,9 +268,10 @@ exit:
 
 bool Device::GetIpAddress(Inet::IPAddress & addr) const
 {
-    if (mState == ConnectionState::SecureConnected)
-        addr = mDeviceAddr;
-    return mState == ConnectionState::SecureConnected;
+    if (mState == ConnectionState::NotConnected)
+        return false;
+    addr = mDeviceAddr;
+    return true;
 }
 
 void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback::Callback<> * onResponse)
@@ -263,7 +279,7 @@ void Device::AddResponseHandler(EndpointId endpoint, ClusterId cluster, Callback
     CallbackInfo info                 = { endpoint, cluster };
     Callback::Cancelable * cancelable = onResponse->Cancel();
 
-    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+    static_assert(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
 
     cancelable->mInfoScalar = 0;
     memmove(&cancelable->mInfoScalar, &info, sizeof(info));
@@ -275,7 +291,7 @@ void Device::AddReportHandler(EndpointId endpoint, ClusterId cluster, Callback::
     CallbackInfo info                 = { endpoint, cluster };
     Callback::Cancelable * cancelable = onReport->Cancel();
 
-    nlSTATIC_ASSERT_PRINT(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
+    static_assert(sizeof(info) <= sizeof(cancelable->mInfoScalar), "Size of CallbackInfo should be <= size of mInfoScalar");
 
     cancelable->mInfoScalar = 0;
     memmove(&cancelable->mInfoScalar, &info, sizeof(info));

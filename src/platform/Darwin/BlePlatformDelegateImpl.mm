@@ -28,11 +28,11 @@
 #include <platform/Darwin/BlePlatformDelegate.h>
 #include <support/logging/CHIPLogging.h>
 
-#import <CoreBluetooth/CoreBluetooth.h>
+#import "UUIDHelper.h"
 
 using namespace ::chip;
 using namespace ::chip::Ble;
-using ::chip::System::PacketBuffer;
+using ::chip::System::PacketBufferHandle;
 
 namespace chip {
 namespace DeviceLayer {
@@ -46,7 +46,7 @@ namespace DeviceLayer {
             CBPeripheral * peripheral = (CBPeripheral *) connObj;
 
             if (NULL != svcId) {
-                serviceId = [CBUUID UUIDWithData:[NSData dataWithBytes:svcId->bytes length:16]];
+                serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
             }
 
             if (NULL != charId) {
@@ -77,7 +77,7 @@ namespace DeviceLayer {
             CBPeripheral * peripheral = (CBPeripheral *) connObj;
 
             if (NULL != svcId) {
-                serviceId = [CBUUID UUIDWithData:[NSData dataWithBytes:svcId->bytes length:16]];
+                serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
             }
             if (NULL != charId) {
                 characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
@@ -103,16 +103,13 @@ namespace DeviceLayer {
         uint16_t BlePlatformDelegateImpl::GetMTU(BLE_CONNECTION_OBJECT connObj) const { return 0; }
 
         bool BlePlatformDelegateImpl::SendIndication(
-            BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBuffer * pBuf)
+            BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBufferHandle pBuf)
         {
-            if (pBuf) {
-                PacketBuffer::Free(pBuf);
-            }
             return false;
         }
 
         bool BlePlatformDelegateImpl::SendWriteRequest(
-            BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBuffer * pBuf)
+            BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBufferHandle pBuf)
         {
             bool found = false;
             CBUUID * serviceId = nil;
@@ -121,12 +118,12 @@ namespace DeviceLayer {
             CBPeripheral * peripheral = (CBPeripheral *) connObj;
 
             if (NULL != svcId) {
-                serviceId = [CBUUID UUIDWithData:[NSData dataWithBytes:svcId->bytes length:16]];
+                serviceId = [UUIDHelper GetShortestServiceUUID:svcId];
             }
             if (NULL != charId) {
                 characteristicId = [CBUUID UUIDWithData:[NSData dataWithBytes:charId->bytes length:sizeof(charId->bytes)]];
             }
-            if (NULL != pBuf) {
+            if (!pBuf.IsNull()) {
                 data = [NSData dataWithBytes:pBuf->Start() length:pBuf->DataLength()];
             }
 
@@ -142,20 +139,15 @@ namespace DeviceLayer {
                 }
             }
 
-            if (pBuf) {
-                // Release delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip stack free their
-                // references to it. We release pBuf's reference here since its payload bytes were copied into a new NSData object
-                PacketBuffer::Free(pBuf);
-            }
+            // Going out of scope releases delegate's reference to pBuf. pBuf will be freed when both platform delegate and Chip
+            // stack free their references to it. We release pBuf's reference here since its payload bytes were copied into a new
+            // NSData object
             return found;
         }
 
         bool BlePlatformDelegateImpl::SendReadRequest(
-            BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBuffer * pBuf)
+            BLE_CONNECTION_OBJECT connObj, const ChipBleUUID * svcId, const ChipBleUUID * charId, PacketBufferHandle pBuf)
         {
-            if (pBuf) {
-                PacketBuffer::Free(pBuf);
-            }
             return false;
         }
 

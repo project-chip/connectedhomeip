@@ -38,6 +38,8 @@ namespace chip {
 extern const char * kSpake2pI2RSessionInfo;
 extern const char * kSpake2pR2ISessionInfo;
 
+constexpr uint16_t kPBKDFParamRandomNumberSize = 32;
+
 using namespace Crypto;
 
 class DLL_EXPORT SecurePairingSessionDelegate
@@ -48,13 +50,12 @@ public:
      *   Called when pairing session generates a new message that should be sent to peer.
      *
      * @param header the message header for the sent message
-     * @param payloadFlags payload encoding flags
      * @param peerAddress the destination of the message
      * @param msgBuf the raw data for the message being sent
      * @return CHIP_ERROR Error thrown when sending the message
      */
-    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, Header::Flags payloadFlags,
-                                          const Transport::PeerAddress & peerAddress, System::PacketBuffer * msgBuf)
+    virtual CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                          System::PacketBufferHandle msgBuf)
     {
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
@@ -123,18 +124,14 @@ public:
      *
      * @param peerAddress      Address of peer to pair
      * @param peerSetUpPINCode Setup PIN code of the peer device
-     * @param pbkdf2IterCount  Iteration count for PBKDF2 function
-     * @param salt             Salt to be used for SPAKE2P opertation
-     * @param saltLen          Length of salt
      * @param myNodeId         Optional node id of local node
      * @param myKeyId          Key ID to be assigned to the secure session on the peer node
      * @param delegate         Callback object
      *
      * @return CHIP_ERROR      The result of initialization
      */
-    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, uint32_t pbkdf2IterCount,
-                    const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId, uint16_t myKeyId,
-                    SecurePairingSessionDelegate * delegate);
+    CHIP_ERROR Pair(const Transport::PeerAddress peerAddress, uint32_t peerSetUpPINCode, Optional<NodeId> myNodeId,
+                    uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
 
     /**
      * @brief
@@ -159,7 +156,7 @@ public:
      * @return CHIP_ERROR The result of message processing
      */
     virtual CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                         System::PacketBuffer * msg);
+                                         System::PacketBufferHandle msg);
 
     /**
      * @brief
@@ -210,28 +207,50 @@ public:
     CHIP_ERROR FromSerializable(const SecurePairingSessionSerializable & output);
 
 private:
-    CHIP_ERROR Init(uint32_t setupCode, uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen, Optional<NodeId> myNodeId,
-                    uint16_t myKeyId, SecurePairingSessionDelegate * delegate);
+    enum Spake2pErrorType : uint8_t
+    {
+        kInvalidKeyConfirmation = 0x00,
+        kUnexpected             = 0xff,
+    };
 
-    CHIP_ERROR HandleCompute_pA(const PacketHeader & header, System::PacketBuffer * msg);
-    CHIP_ERROR HandleCompute_pB_cB(const PacketHeader & header, System::PacketBuffer * msg);
-    CHIP_ERROR HandleCompute_cA(const PacketHeader & header, System::PacketBuffer * msg);
+    CHIP_ERROR Init(Optional<NodeId> myNodeId, uint16_t myKeyId, uint32_t setupCode, SecurePairingSessionDelegate * delegate);
 
-    CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBuffer * msgBuf);
+    CHIP_ERROR SetupSpake2p(uint32_t pbkdf2IterCount, const uint8_t * salt, size_t saltLen);
+
+    CHIP_ERROR SendPBKDFParamRequest();
+    CHIP_ERROR HandlePBKDFParamRequest(const PacketHeader & header, const System::PacketBufferHandle & msg);
+
+    CHIP_ERROR SendPBKDFParamResponse();
+    CHIP_ERROR HandlePBKDFParamResponse(const PacketHeader & header, const System::PacketBufferHandle & msg);
+
+    CHIP_ERROR SendMsg1();
+
+    CHIP_ERROR HandleMsg1_and_SendMsg2(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg2_and_SendMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg);
+    CHIP_ERROR HandleMsg3(const PacketHeader & header, const System::PacketBufferHandle & msg);
+
+    void SendErrorMsg(Spake2pErrorType errorCode);
+    void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
+
+    CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBufferHandle msgBuf);
+
+    void Clear();
 
     static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 
     enum Spake2pMsgType : uint8_t
     {
-        kSpake2pCompute_pA    = 0,
-        kSpake2pCompute_pB_cB = 1,
-        kSpake2pCompute_cA    = 2,
-        kSpake2pMsgTypeMax    = 3,
+        kPBKDFParamRequest  = 0x20,
+        kPBKDFParamResponse = 0x21,
+        kSpake2pMsg1        = 0x22,
+        kSpake2pMsg2        = 0x23,
+        kSpake2pMsg3        = 0x24,
+        kSpake2pMsgError    = 0x2f,
     };
 
     SecurePairingSessionDelegate * mDelegate = nullptr;
 
-    Spake2pMsgType mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgTypeMax;
+    Spake2pMsgType mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgError;
 
     Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
 
@@ -239,6 +258,18 @@ private:
 
     /* w0s and w1s */
     uint8_t mWS[2][kSpake2p_WS_Length];
+
+    uint32_t mSetupPINCode;
+
+    Hash_SHA256_stream mCommissioningHash;
+    uint32_t mIterationCount = 0;
+    uint16_t mSaltLength     = 0;
+    uint8_t * mSalt          = nullptr;
+
+    struct Spake2pErrorMsg
+    {
+        Spake2pErrorType error;
+    };
 
 protected:
     Optional<NodeId> mLocalNodeId = Optional<NodeId>::Value(kUndefinedNodeId);
@@ -311,7 +342,7 @@ public:
     }
 
     CHIP_ERROR HandlePeerMessage(const PacketHeader & packetHeader, const Transport::PeerAddress & peerAddress,
-                                 System::PacketBuffer * msg) override
+                                 System::PacketBufferHandle msg) override
     {
         return CHIP_NO_ERROR;
     }

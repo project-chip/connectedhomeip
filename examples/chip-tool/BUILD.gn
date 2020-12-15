@@ -20,12 +20,12 @@ assert(chip_build_tools)
 
 executable("chip-tool") {
   sources = [
+    "commands/clusters/ModelCommand.cpp",
     "commands/common/Command.cpp",
     "commands/common/Commands.cpp",
-    "commands/common/EchoCommand.cpp",
-    "commands/common/Logging.cpp",
-    "commands/common/ModelCommand.cpp",
-    "commands/common/NetworkCommand.cpp",
+    "commands/pairing/PairingCommand.cpp",
+    "commands/payload/ParseCommand.cpp",
+    "config/PersistentStorage.cpp",
     "main.cpp",
   ]
 
@@ -37,7 +37,10 @@ executable("chip-tool") {
 
   cflags = [ "-Wconversion" ]
 
-  public_deps = [ "${chip_root}/src/lib" ]
+  public_deps = [
+    "${chip_root}/src/lib",
+    "${chip_root}/third_party/inipp",
+  ]
 
   output_dir = root_out_dir
 }

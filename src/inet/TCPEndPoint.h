@@ -32,6 +32,8 @@
 
 #include <system/SystemPacketBuffer.h>
 
+#include <utility>
+
 namespace chip {
 namespace Inet {
 
@@ -192,12 +194,8 @@ public:
      *
      * @retval  INET_NO_ERROR           success: address and port extracted.
      * @retval  INET_ERROR_INCORRECT_STATE  TCP connection not established.
-     *
-     * @details
-     *  The <tt>chip::System::PacketBuffer::Free</tt> method is called on the \c data argument
-     *  regardless of whether the transmission is successful or failed.
      */
-    INET_ERROR Send(chip::System::PacketBuffer * data, bool push = true);
+    INET_ERROR Send(chip::System::PacketBufferHandle data, bool push = true);
 
     /**
      * @brief   Disable reception.
@@ -323,7 +321,7 @@ public:
      *  portion remaining after the bytes acknowledged by a prior call to the
      *  <tt>AckReceive(uint16_t len)</tt> method.
      */
-    INET_ERROR PutBackReceivedData(chip::System::PacketBuffer * data);
+    INET_ERROR PutBackReceivedData(chip::System::PacketBufferHandle data);
 
     /**
      * @brief   Extract the length of the data awaiting first transmit.
@@ -444,7 +442,7 @@ public:
      *  the \c AckReceive method. The \c Free method on the data buffer must
      *  also be invoked unless the \c PutBackReceivedData is used instead.
      */
-    typedef void (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBuffer * data);
+    typedef void (*OnDataReceivedFunct)(TCPEndPoint * endPoint, chip::System::PacketBufferHandle data);
 
     /**
      * The endpoint's message text reception event handling function delegate.
@@ -564,8 +562,8 @@ public:
 private:
     static chip::System::ObjectPool<TCPEndPoint, INET_CONFIG_NUM_TCP_ENDPOINTS> sPool;
 
-    chip::System::PacketBuffer * mRcvQueue;
-    chip::System::PacketBuffer * mSendQueue;
+    chip::System::PacketBufferHandle mRcvQueue;
+    chip::System::PacketBufferHandle mSendQueue;
 #if INET_TCP_IDLE_CHECK_INTERVAL > 0
     uint16_t mIdleTimeout;       // in units of INET_TCP_IDLE_CHECK_INTERVAL; zero means no timeout
     uint16_t mRemainingIdleTime; // in units of INET_TCP_IDLE_CHECK_INTERVAL
@@ -634,12 +632,26 @@ private:
     void StopConnectTimer();
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
-    chip::System::PacketBuffer * mUnsentQueue;
-    uint16_t mUnsentOffset;
+    struct BufferOffset
+    {
+        BufferOffset(System::PacketBufferHandle && aBuffer) : buffer(std::move(aBuffer)), offset(0) {}
+        BufferOffset(BufferOffset && aOther)
+        {
+            buffer = std::move(aOther.buffer);
+            offset = aOther.offset;
+        }
+        chip::System::PacketBufferHandle buffer;
+        uint16_t offset;
+    };
 
+    uint16_t mUnackedLength; // Amount sent but awaiting ACK. Used as a form of reference count
+                             // to hang-on to backing packet buffers until they are no longer needed.
+
+    uint16_t RemainingToSend();
+    BufferOffset FindStartOfUnsent();
     INET_ERROR GetPCB(IPAddressType addrType);
     void HandleDataSent(uint16_t len);
-    void HandleDataReceived(chip::System::PacketBuffer * buf);
+    void HandleDataReceived(chip::System::PacketBufferHandle buf);
     void HandleIncomingConnection(TCPEndPoint * pcb);
     void HandleError(INET_ERROR err);
 

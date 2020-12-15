@@ -72,7 +72,8 @@ EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
             result = emberAfBasicClusterServerCommandParse(cmd);
             break;
         case ZCL_TEMP_MEASUREMENT_CLUSTER_ID:
-            result = emberAfTemperatureMeasurementClusterServerCommandParse(cmd);
+            // No commands are enabled for cluster Temperature Measurement
+            result = status(false, true, cmd->mfgSpecific);
             break;
         default:
             // Unrecognized cluster ID, error status will apply.
@@ -96,22 +97,6 @@ EmberAfStatus emberAfBasicClusterServerCommandParse(EmberAfClusterCommand * cmd)
             wasHandled = emberAfBasicClusterResetToFactoryDefaultsCallback();
             break;
         }
-        default: {
-            // Unrecognized command ID, error status will apply.
-            break;
-        }
-        }
-    }
-    return status(wasHandled, true, cmd->mfgSpecific);
-}
-EmberAfStatus emberAfTemperatureMeasurementClusterServerCommandParse(EmberAfClusterCommand * cmd)
-{
-    bool wasHandled = false;
-
-    if (!cmd->mfgSpecific)
-    {
-        switch (cmd->commandId)
-        {
         default: {
             // Unrecognized command ID, error status will apply.
             break;

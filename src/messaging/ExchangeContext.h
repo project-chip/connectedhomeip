@@ -25,12 +25,14 @@
 
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/ExchangeDelegate.h>
+#include <messaging/Flags.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
 #include <transport/SecureSessionMgr.h>
 
 namespace chip {
+namespace Messaging {
 
 class ExchangeManager;
 class ExchangeContext;
@@ -53,12 +55,6 @@ class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, Exch
     friend class ExchangeContextDeletor;
 
 public:
-    enum
-    {
-        kSendFlag_ExpectResponse = 0x0001, // Used to indicate that a response is expected within a specified timeout.
-        kSendFlag_RetainBuffer   = 0x0002, // Used to indicate that the message buffer should not be freed after sending.
-    };
-
     /**
      *  Determine whether the context is the initiator of the exchange.
      *
@@ -108,7 +104,7 @@ public:
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully sent the message down to the
      *                                                       network layer.
      */
-    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBuffer * msgPayload, uint16_t sendFlags = 0,
+    CHIP_ERROR SendMessage(uint16_t protocolId, uint8_t msgType, System::PacketBufferHandle msgPayload, const SendFlags & sendFlags,
                            void * msgCtxt = nullptr);
 
     /**
@@ -118,14 +114,15 @@ public:
      *
      *  @param[in]    payloadHeader A reference to the PayloadHeader object.
      *
-     *  @param[in]    msgBuf        A pointer to the PacketBuffer object holding the CHIP message.
+     *  @param[in]    msgBuf        A handle to the PacketBuffer object holding the CHIP message.
      *
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this HandleMessage API.
      *  @retval  #CHIP_ERROR_INCORRECT_STATE                if the state of the exchange context is incorrect.
      *  @retval  #CHIP_NO_ERROR                             if the CHIP layer successfully delivered the message up to the
      *                                                       protocol layer.
      */
-    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBuffer * msgBuf);
+    CHIP_ERROR HandleMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                             System::PacketBufferHandle msgBuf);
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
@@ -191,4 +188,5 @@ inline void ExchangeContextDeletor::Release(ExchangeContext * obj)
     obj->Free();
 }
 
+} // namespace Messaging
 } // namespace chip

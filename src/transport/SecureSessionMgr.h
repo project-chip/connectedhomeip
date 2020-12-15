@@ -66,7 +66,7 @@ public:
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   const Transport::PeerConnectionState * state, System::PacketBuffer * msgBuf,
+                                   const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
                                    SecureSessionMgr * mgr)
     {}
 
@@ -117,13 +117,9 @@ public:
     /**
      * @brief
      *   Send a message to a currently connected peer
-     *
-     * @details
-     *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
-     *   behalf of the caller regardless of the return status.
      */
-    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBuffer * msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBuffer * msgBuf);
+    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf);
     SecureSessionMgr();
     ~SecureSessionMgr() override;
 
@@ -173,7 +169,7 @@ protected:
      * @param msgBuf    the buffer of (encrypted) payload
      */
     void OnMessageReceived(const PacketHeader & header, const Transport::PeerAddress & source,
-                           System::PacketBuffer * msgBuf) override;
+                           System::PacketBufferHandle msgBuf) override;
 
 private:
     /**

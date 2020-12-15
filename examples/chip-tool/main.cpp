@@ -19,7 +19,8 @@
 #include "commands/common/Commands.h"
 
 #include "commands/clusters/Commands.h"
-#include "commands/echo/Commands.h"
+#include "commands/pairing/Commands.h"
+#include "commands/payload/Commands.h"
 
 #include <transport/SecurePairingSession.h>
 
@@ -29,8 +30,8 @@
 int main(int argc, char * argv[])
 {
     Commands commands;
-
-    registerCommandsEcho(commands);
+    registerCommandsPayload(commands);
+    registerCommandsPairing(commands);
     registerClusters(commands);
 
     return commands.Run(chip::kTestControllerNodeId, chip::kTestDeviceNodeId, argc, argv);
