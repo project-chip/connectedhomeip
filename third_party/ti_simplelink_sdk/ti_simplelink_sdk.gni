@@ -24,19 +24,11 @@ import("ti_simplelink_board.gni")
 declare_args() {
   # Location of the TI SimpleLink SDK.
   ti_simplelink_sdk_root = ""
-}
-
-if (ti_simplelink_sdk_root == "") {
-  # override TI SimpleLink SDK location
-  env_ti_simplelink_sdk_root = getenv("TI_SIMPLELINK_SDK_ROOT")
-  if (env_ti_simplelink_sdk_root != "") {
-    ti_simplelink_sdk_root = env_ti_simplelink_sdk_root
-  } else if ("cc13x2_26x2" == ti_simplelink_device_family) {
-    ti_simplelink_sdk_root = ti_simplelink_sdk_cc13x2_26x2_root
-  }
+  ti_sysconfig_root = ""
 }
 
 assert(ti_simplelink_sdk_root != "", "ti_simplelink_sdk_root must be specified")
+assert(ti_sysconfig_root != "", "ti_sysconfig_root must be specified")
 
 template("ti_sysconfig") {
   assert(ti_sysconfig_root != "", "ti_sysconfig_root must be specified")
