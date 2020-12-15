@@ -3,7 +3,7 @@
 // Prevent multiple inclusion
 #pragma once
 
-// General cluster attributes ids
+// Global cluster attribute ids
 {{#zcl_attributes}}
 {{#unless clusterRef}}
 #define ZCL_{{asDelimitedMacro define}}_ATTRIBUTE_ID ({{asHex code 4}})
