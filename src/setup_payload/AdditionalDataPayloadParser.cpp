@@ -66,21 +66,20 @@ static CHIP_ERROR octetStringDecode(string octetString, vector<uint8_t> & result
 CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & outPayload)
 {
     CHIP_ERROR err          = CHIP_NO_ERROR;
-    uint8_t * payload       = nullptr;
-    size_t payloadLength    = 0;
+    std::vector<uint8_t> payload;
 
     // Decoding input
-    err = DecodeInput(&payload, payloadLength);
+    err = DecodeInput(&payload);
     SuccessOrExit(err);
     // Parse TLV fields
-    err = parseTLVFields(outPayload, payload, payloadLength);
+    err = parseTLVFields(outPayload, payload);
     SuccessOrExit(err);
 
 exit:
     return err;
 }
 
-CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(uint8_t ** output, size_t & tlvDataLengthInBytes)
+CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(std::vector<uint8_t>* output)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     vector<uint8_t> buf;
@@ -103,29 +102,24 @@ CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(uint8_t ** output, size_t & 
     tlvArray.Alloc(tlvBytesLength);
     VerifyOrExit(tlvArray, err = CHIP_ERROR_NO_MEMORY);
 
-    *output = new uint8_t[tlvBytesLength];
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
         uint64_t dest = buf[i];
-        (*output)[i] = static_cast<uint8_t>(dest);
+        (*output).push_back(static_cast<uint8_t>(dest));
         tlvArray[i] = static_cast<uint8_t>(dest);
     }
-    tlvDataLengthInBytes = tlvBytesLength;
 
 exit:
     return err;
 }
 
-CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields(chip::AdditionalDataPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
+CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields(chip::AdditionalDataPayload & outPayload, std::vector<uint8_t> tlvData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
     chip::TLV::TLVReader innerReader;
-    // Outter Reader
-    for(size_t i=0; i< tlvDataLengthInBytes; i++)
-    {
-    }
-    reader.Init(tlvDataStart, (uint32_t)tlvDataLengthInBytes);
+
+    reader.Init(&tlvData[0], (uint32_t)tlvData.size());
     reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
     err = reader.Next();
     SuccessOrExit(err);

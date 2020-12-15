@@ -45,8 +45,8 @@ public:
     CHIP_ERROR populatePayload(AdditionalDataPayload & outPayload);
 
 private:
-    CHIP_ERROR DecodeInput(uint8_t ** output, size_t & tlvDataLengthInBytes);
-    CHIP_ERROR parseTLVFields(chip::AdditionalDataPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes);
+    CHIP_ERROR DecodeInput(std::vector<uint8_t>* output);
+    CHIP_ERROR parseTLVFields(chip::AdditionalDataPayload & outPayload, std::vector<uint8_t> tlvData);
 
 };
 
