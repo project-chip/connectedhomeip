@@ -57,6 +57,7 @@
 
 #include "ble/CHIPBleServiceData.h"
 #include "platform/Linux/dbus/bluez/DbusBluez.h"
+#include "platform/CHIPDeviceConfig.h"
 
 namespace chip {
 namespace DeviceLayer {
@@ -81,7 +82,6 @@ namespace Internal {
 #define CHIP_BLE_SERVICE_PREFIX_LENGTH 8
 #define CHIP_BLE_BASE_SERVICE_PREFIX "0000"
 #define CHIP_BLE_UUID_SERVICE_SHORT_STRING "fffb"
-#define CHIL_ROTATING_DEVICE_ID "1122334455667788"
 
 #define CHIP_BLE_UUID_SERVICE_STRING                                                                                               \
     CHIP_BLE_BASE_SERVICE_PREFIX CHIP_BLE_UUID_SERVICE_SHORT_STRING CHIP_BLE_BASE_SERVICE_UUID_STRING
