@@ -18,8 +18,8 @@
 
 #include "AdditionalDataParseCommand.h"
 
-#include <setup_payload/AdditionalDataPayloadParser.h>
 #include <setup_payload/AdditionalDataPayload.h>
+#include <setup_payload/AdditionalDataPayloadParser.h>
 
 using namespace ::chip;
 

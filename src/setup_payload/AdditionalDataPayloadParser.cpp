@@ -24,27 +24,26 @@
 #include "AdditionalDataPayloadParser.h"
 #include "Base41.h"
 
+#include <iomanip>
 #include <math.h>
 #include <memory>
+#include <sstream>
 #include <string.h>
 #include <vector>
-#include <sstream>
-#include <iomanip>
-
 
 #include <core/CHIPCore.h>
 #include <core/CHIPError.h>
 #include <core/CHIPTLVData.hpp>
+#include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
+#include <cstdlib>
+#include <iomanip>
+#include <iostream>
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
-#include <core/CHIPTLVDebug.hpp>
-#include <iomanip>
-#include <cstdlib>
-#include <iostream>
 
 using namespace chip;
 using namespace std;
@@ -62,15 +61,16 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     tlvData.clear();
     size_t len = mPayload.length();
 
-    for(size_t i = 0; i < len; i += 2) {
-        auto str = mPayload.substr(i, 2);
-        uint8_t x = (uint8_t)stoi(str, 0, 16);
+    for (size_t i = 0; i < len; i += 2)
+    {
+        auto str  = mPayload.substr(i, 2);
+        uint8_t x = (uint8_t) stoi(str, 0, 16);
         tlvData.push_back(x);
     }
 
-    reader.Init(&tlvData[0], (uint32_t)tlvData.size());
+    reader.Init(&tlvData[0], (uint32_t) tlvData.size());
     reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
-    err = reader.Next();
+    err                      = reader.Next();
     SuccessOrExit(err);
 
     // Open the container
@@ -82,7 +82,7 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
 
     // Get the value of the rotating device id
     char rotatingDeviceId[kRotatingDeviceIdLength];
-    err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId)+1);
+    err                         = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId) + 1);
     outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
 
 exit:
