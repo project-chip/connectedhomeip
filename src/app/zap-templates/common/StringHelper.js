@@ -15,7 +15,27 @@
  *    limitations under the License.
  */
 
-// Prevent multiple inclusion
-#pragma once
+const stringShortTypes = [ 'CHAR_STRING', 'OCTET_STRING' ];
+const stringLongTypes  = [ 'LONG_CHAR_STRING', 'LONG_OCTET_STRING' ];
 
-#include "af-types.h"
+function isShortString(type)
+{
+  return stringShortTypes.includes(type);
+}
+
+function isLongString(type)
+{
+  return stringLongTypes.includes(type);
+}
+
+function isString(type)
+{
+  return isShortString(type) || isLongString(type);
+}
+
+//
+// Module exports
+//
+exports.isString      = isString;
+exports.isShortString = isShortString;
+exports.isLongString  = isLongString;

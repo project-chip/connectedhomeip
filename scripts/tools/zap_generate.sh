@@ -32,4 +32,9 @@ if [ ! -d "$OUTPUT_DIRECTORY" ]; then
 fi
 
 cd ./third_party/zap/repo/
-node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ../../../src/app/zap-templates/chip-templates.json -i "$FILE_PATH" -o "$OUTPUT_DIRECTORY"
+node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ../../../src/app/zap-templates/app-templates.json -i "$FILE_PATH" -o "$OUTPUT_DIRECTORY"
+
+# Check if clang-format is available
+if command -v clang-format &>/dev/null; then
+    clang-format -i "$OUTPUT_DIRECTORY"*
+fi
