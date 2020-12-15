@@ -110,9 +110,6 @@ CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(uint8_t ** output, size_t & 
         (*output)[i] = static_cast<uint8_t>(dest);
         tlvArray[i] = static_cast<uint8_t>(dest);
     }
-
-    // returning data
-    //*output = tlvArray.Get();
     tlvDataLengthInBytes = tlvBytesLength;
 
 exit:
