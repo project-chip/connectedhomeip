@@ -191,8 +191,8 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     entries[1].mData       = reinterpret_cast<const uint8_t *>(vendorProductBuf);
     entries[1].mDataSize   = strnlen(discriminatorBuf, sizeof(vendorProductBuf));
     // Rotating Device ID
-    entries[2].mData       = reinterpret_cast<const uint8_t *>(CHIL_ROTATING_DEVICE_ID);
-    entries[2].mDataSize   = strnlen(CHIL_ROTATING_DEVICE_ID, sizeof(CHIL_ROTATING_DEVICE_ID));
+    entries[2].mData       = reinterpret_cast<const uint8_t *>(CHIP_ROTATING_DEVICE_ID);
+    entries[2].mDataSize   = strnlen(CHIP_ROTATING_DEVICE_ID, sizeof(CHIP_ROTATING_DEVICE_ID));
 
 
     service.mTextEntryies  = entries;

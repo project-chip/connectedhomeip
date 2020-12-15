@@ -1276,7 +1276,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     SuccessOrExit(err);
 
     // Adding the rotating device id to the TLV data
-    err = writer.PutString(CommonTag(0), CHIL_ROTATING_DEVICE_ID);
+    err = writer.PutString(CommonTag(0), CHIP_ROTATING_DEVICE_ID);
     SuccessOrExit(err);
 
     err = writer.EndContainer(containerType);

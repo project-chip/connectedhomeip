@@ -21,15 +21,14 @@
  *      data enumerated from a byte stream
  */
 
-#ifndef ADDITIONAL_DATA_PAYLOAD_H
-#define ADDITIONAL_DATA_PAYLOAD_H
+#pragma once
 
 #include <string>
 
 namespace chip {
 
-const uint8_t   kRotatingDeviceIdTag                    = 0x01;
-const uint32_t  kTag_AdditionalDataExensionDescriptor   = 0x00;
+constexpr uint8_t   kRotatingDeviceIdTag                    = 0x01;
+constexpr uint32_t  kTag_AdditionalDataExensionDescriptor   = 0x00;
 
 class AdditionalDataPayload
 {
@@ -38,5 +37,3 @@ public:
 };
 
 } // namespace chip
-
-#endif  // ADDITIONAL_DATA_PAYLOAD_H

@@ -65,9 +65,9 @@ static CHIP_ERROR octetStringDecode(string octetString, vector<uint8_t> & result
 
 CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & outPayload)
 {
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    uint8_t * payload = nullptr;
-    size_t payloadLength = 0;
+    CHIP_ERROR err          = CHIP_NO_ERROR;
+    uint8_t * payload       = nullptr;
+    size_t payloadLength    = 0;
 
     // Decoding input
     err = DecodeInput(&payload, payloadLength);
