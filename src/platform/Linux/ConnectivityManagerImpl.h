@@ -178,6 +178,7 @@ private:
     uint32_t mWiFiAPIdleTimeoutMS;
 };
 
+#if CHIP_DEVICE_CONFIG_ENABLE_WPA
 inline ConnectivityManager::WiFiAPMode ConnectivityManagerImpl::_GetWiFiAPMode()
 {
     return mWiFiAPMode;
@@ -202,6 +203,7 @@ inline bool ConnectivityManagerImpl::_HaveServiceConnectivity()
 {
     return _HaveServiceConnectivityViaThread();
 }
+#endif
 
 /**
  * Returns the public interface of the ConnectivityManager singleton object.
