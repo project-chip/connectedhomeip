@@ -51,60 +51,22 @@ using namespace std;
 using namespace chip::TLV;
 using namespace chip::TLV::Utilities;
 
-static CHIP_ERROR octetStringDecode(string octetString, vector<uint8_t> & result) {
-    result.clear();
-    size_t len = octetString.length();
-
-    for(size_t i = 0; i < len; i += 2) {
-        auto str = octetString.substr(i, 2);
-        uint8_t x = (uint8_t)stoi(str, 0, 16);
-        result.push_back(x);
-    }
-    return CHIP_NO_ERROR;
-}
-
 CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & outPayload)
 {
-    CHIP_ERROR err          = CHIP_NO_ERROR;
-    std::vector<uint8_t> payload;
-
-    // Decoding input
-    err = DecodeInput(&payload);
-    SuccessOrExit(err);
-    // Parse TLV fields
-    err = parseTLVFields(outPayload, payload);
-    SuccessOrExit(err);
-
-exit:
-    return err;
-}
-
-CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(std::vector<uint8_t>* output)
-{
-    CHIP_ERROR err         = CHIP_NO_ERROR;
-    vector<uint8_t> buf;
-
-    VerifyOrExit(mPayload.length() != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    // convert the octet string to buf
-    err = octetStringDecode(mPayload, buf);
-    SuccessOrExit(err);
-
-    for (size_t i = 0; i < mPayload.length(); i++)
-    {
-        uint64_t dest = buf[i];
-        (*output).push_back(static_cast<uint8_t>(dest));
-    }
-
-exit:
-    return err;
-}
-
-CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields(chip::AdditionalDataPayload & outPayload, std::vector<uint8_t> tlvData)
-{
     CHIP_ERROR err = CHIP_NO_ERROR;
+    std::vector<uint8_t> tlvData;
     chip::TLV::TLVReader reader;
     chip::TLV::TLVReader innerReader;
+
+    // Decode input payload
+    tlvData.clear();
+    size_t len = mPayload.length();
+
+    for(size_t i = 0; i < len; i += 2) {
+        auto str = mPayload.substr(i, 2);
+        uint8_t x = (uint8_t)stoi(str, 0, 16);
+        tlvData.push_back(x);
+    }
 
     reader.Init(&tlvData[0], (uint32_t)tlvData.size());
     reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
@@ -119,9 +81,10 @@ CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields(chip::AdditionalDataPaylo
     SuccessOrExit(err);
 
     // Get the value of the rotating device id
-    char rotatingDeviceId[256];
+    char rotatingDeviceId[kRotatingDeviceIdLength];
     err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId)+1);
     outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
+
 exit:
     return err;
 }

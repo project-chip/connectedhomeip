@@ -21,6 +21,8 @@
  *      CHIP specification.
  */
 
+#pragma once
+
 #include "AdditionalDataPayload.h"
 
 #include <core/CHIPError.h>
@@ -43,10 +45,6 @@ private:
 public:
     AdditionalDataPayloadParser(std::string payload) : mPayload(std::move(payload)) {}
     CHIP_ERROR populatePayload(AdditionalDataPayload & outPayload);
-
-private:
-    CHIP_ERROR DecodeInput(std::vector<uint8_t>* output);
-    CHIP_ERROR parseTLVFields(chip::AdditionalDataPayload & outPayload, std::vector<uint8_t> tlvData);
 
 };
 
