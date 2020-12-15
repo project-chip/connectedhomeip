@@ -1269,7 +1269,6 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     TLVWriter writer;
     chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
     chip::System::PacketBuffer * buffer = bufferHandle.Get_ForNow();
-    char testRotatingDeviceId[] = "1122334455667788";
 
     writer.Init(buffer);
     TLVType containerType;
@@ -1277,7 +1276,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     SuccessOrExit(err);
 
     // Adding the rotating device id to the TLV data
-    err = writer.PutString(CommonTag(0), testRotatingDeviceId);
+    err = writer.PutString(CommonTag(0), CHIL_ROTATING_DEVICE_ID);
     SuccessOrExit(err);
 
     err = writer.EndContainer(containerType);

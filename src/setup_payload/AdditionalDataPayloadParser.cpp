@@ -63,21 +63,6 @@ static CHIP_ERROR octetStringDecode(string octetString, vector<uint8_t> & result
     return CHIP_NO_ERROR;
 }
 
-static CHIP_ERROR openTLVContainer(TLVReader & reader, TLVType type, uint64_t tag, TLVReader & containerReader)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    VerifyOrExit(reader.GetType() == type, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(reader.GetTag() == tag, err = CHIP_ERROR_INVALID_ARGUMENT);
-    VerifyOrExit(reader.GetLength() == 0, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-    err = reader.OpenContainer(containerReader);
-    SuccessOrExit(err);
-
-    VerifyOrExit(containerReader.GetContainerType() == type, err = CHIP_ERROR_INVALID_ARGUMENT);
-exit:
-    return err;
-}
-
 CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & outPayload)
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
@@ -86,22 +71,9 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
 
     // Decoding input
     err = DecodeInput(&payload, payloadLength);
-
-    // Generate Dummy payload
-    //err = GenerateSamplePayload(&payload, payloadLength);
-    // Dump the payload TLV structure
-    // DebugPrettyPrint(payload, payloadLength);
-
-    //std::cout <<"Dummy:" << payloadLength << ":";
-    for(uint8_t i=0; i<payloadLength; i++)
-    {
-        //std::cout << std::setfill('0') << std::setw(2) << std::hex << (0xff & (unsigned int)payload[i]);
-    }
-    //std::cout << std::endl;
-
     SuccessOrExit(err);
     // Parse TLV fields
-    err = parseTLVFields2(outPayload, payload, payloadLength);
+    err = parseTLVFields(outPayload, payload, payloadLength);
     SuccessOrExit(err);
 
 exit:
@@ -126,7 +98,7 @@ CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(uint8_t ** output, size_t & 
 
     // convert the buff to TLV buffer
     bitsLeftToRead = (buf.size() * 8) - index;
-    tlvBytesLength = (bitsLeftToRead + 7) / 8; // ceil(bitsLeftToRead/8)
+    tlvBytesLength = (bitsLeftToRead + 7) / 8;
     SuccessOrExit(tlvBytesLength == 0);
     tlvArray.Alloc(tlvBytesLength);
     VerifyOrExit(tlvArray, err = CHIP_ERROR_NO_MEMORY);
@@ -147,7 +119,7 @@ exit:
     return err;
 }
 
-CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields2(chip::AdditionalDataPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
+CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields(chip::AdditionalDataPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::TLV::TLVReader reader;
@@ -171,119 +143,7 @@ CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields2(chip::AdditionalDataPayl
     // Get the value of the rotating device id
     char rotatingDeviceId[256];
     err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId)+1);
-    ChipLogProgress(AdditionalDataPayload, "AdditonalData - Parsing: parseTLVFields, rotatingDeviceId:%s", rotatingDeviceId);
-exit:
-    return err;
-}
-
-CHIP_ERROR AdditionalDataPayloadParser::parseTLVFields(chip::AdditionalDataPayload & outPayload, uint8_t * tlvDataStart, size_t tlvDataLengthInBytes)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    if (!CanCastTo<uint32_t>(tlvDataLengthInBytes))
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    TLVReader rootReader;
-    rootReader.Init(tlvDataStart, static_cast<uint32_t>(tlvDataLengthInBytes));
-    rootReader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
-    err                          = rootReader.Next();
-    SuccessOrExit(err);
-
-    if (rootReader.GetType() == kTLVType_Structure)
-    {
-        TLVReader innerStructureReader;
-        err = openTLVContainer(rootReader, kTLVType_Structure,
-                               ProfileTag(rootReader.ImplicitProfileId, kTag_AdditionalDataExensionDescriptor),
-                               innerStructureReader);
-        SuccessOrExit(err);
-        err = innerStructureReader.Next();
-        SuccessOrExit(err);
-        //err = retrieveOptionalInfos(outPayload, innerStructureReader);
-    }
-    else
-    {
-        return CHIP_ERROR_INVALID_ARGUMENT;
-    }
-
-    if (err == CHIP_END_OF_TLV)
-    {
-        err = CHIP_NO_ERROR;
-    }
-exit:
-    return err;
-}
-
-static void TLVPrettyPrinter(const char * aFormat, ...)
-{
-    va_list args;
-
-    va_start(args, aFormat);
-
-    vprintf(aFormat, args);
-
-    va_end(args);
-}
-
-CHIP_ERROR AdditionalDataPayloadParser::DebugPrettyPrint(uint8_t * input, size_t & tlvDataLengthInBytes)
-{
-    chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buffer = bufferHandle.Get_ForNow();
-
-    buffer->SetStart(input);
-    buffer->SetDataLength((uint16_t)tlvDataLengthInBytes);
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-    reader.Init(buffer);
-    err = reader.Next();
-     ChipLogProgress(DataManagement, "DebugPrettyPrint Start:");
-    chip::TLV::Debug::Dump(reader, TLVPrettyPrinter);
-    ChipLogProgress(DataManagement, "DebugPrettyPrint End");
-
-    if (CHIP_NO_ERROR != err)
-    {
-        ChipLogProgress(DataManagement, "DebugPrettyPrint fails with err %d", err);
-    }
-
-    return err;
-}
-
-CHIP_ERROR AdditionalDataPayloadParser::GenerateSamplePayload(uint8_t ** output, size_t & tlvDataLengthInBytes)
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-    TLVWriter rootWriter;
-    chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buffer = bufferHandle.Get_ForNow();
-
-    char testRotatingDeviceId[] = "1122334455667788";
-    rootWriter.Init(buffer);
-    rootWriter.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
-
-    TLVWriter innerStructureWriter;
-    err = rootWriter.OpenContainer(ProfileTag(rootWriter.ImplicitProfileId, kTag_AdditionalDataExensionDescriptor),
-        kTLVType_Structure,
-        innerStructureWriter);
-
-    SuccessOrExit(err);
-    err = innerStructureWriter.PutString(ProfileTag(rootWriter.ImplicitProfileId, kRotatingDeviceIdTag),
-        testRotatingDeviceId);
-    SuccessOrExit(err);
-
-    err = rootWriter.CloseContainer(innerStructureWriter);
-    SuccessOrExit(err);
-
-    err = rootWriter.Finalize();
-    SuccessOrExit(err);
-
-    *output = buffer->Start();
-    tlvDataLengthInBytes = rootWriter.GetLengthWritten();
-    //std::cout <<"Dummy:" << tlvDataLengthInBytes << ":";
-    for(size_t i=0; i<tlvDataLengthInBytes; i++)
-    {
-        //ChipLogProgress(DataManagement, "GenerateSamplePayload[%d] = %d", i, output[i]);
-        //std::cout << std::hex << buffer->Start()[i];
-    }
-    //std::cout << std::endl;
+    outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
 exit:
     return err;
 }

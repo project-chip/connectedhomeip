@@ -24,8 +24,7 @@
 #ifndef ADDITIONAL_DATA_PAYLOAD_H
 #define ADDITIONAL_DATA_PAYLOAD_H
 
-#include <vector>
-#include <stdint.h>
+#include <string>
 
 namespace chip {
 
@@ -35,7 +34,7 @@ const uint32_t  kTag_AdditionalDataExensionDescriptor   = 0x00;
 class AdditionalDataPayload
 {
 public:
-    std::vector<uint8_t> rotatingDeviceId;
+    std::string rotatingDeviceId;
 };
 
 } // namespace chip

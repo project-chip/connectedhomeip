@@ -29,9 +29,8 @@ CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId l
     AdditionalDataPayload resultPayload;
     CHIP_ERROR err = CHIP_NO_ERROR;
     SuccessOrExit(err);
-    ChipLogProgress(chipTool, "AdditionalDataParseCommand, payload=%s", payload.c_str());
-
     err = AdditionalDataPayloadParser(payload).populatePayload(resultPayload);
+    ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());
 exit:
     return err;
 }
