@@ -83,11 +83,6 @@ CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(std::vector<uint8_t>* output
 {
     CHIP_ERROR err         = CHIP_NO_ERROR;
     vector<uint8_t> buf;
-    // TLV parsing
-    size_t index = 0;
-    size_t bitsLeftToRead;
-    size_t tlvBytesLength;
-    chip::Platform::ScopedMemoryBuffer<uint8_t> tlvArray;
 
     VerifyOrExit(mPayload.length() != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -95,18 +90,10 @@ CHIP_ERROR AdditionalDataPayloadParser::DecodeInput(std::vector<uint8_t>* output
     err = octetStringDecode(mPayload, buf);
     SuccessOrExit(err);
 
-    // convert the buff to TLV buffer
-    bitsLeftToRead = (buf.size() * 8) - index;
-    tlvBytesLength = (bitsLeftToRead + 7) / 8;
-    SuccessOrExit(tlvBytesLength == 0);
-    tlvArray.Alloc(tlvBytesLength);
-    VerifyOrExit(tlvArray, err = CHIP_ERROR_NO_MEMORY);
-
-    for (size_t i = 0; i < tlvBytesLength; i++)
+    for (size_t i = 0; i < mPayload.length(); i++)
     {
         uint64_t dest = buf[i];
         (*output).push_back(static_cast<uint8_t>(dest));
-        tlvArray[i] = static_cast<uint8_t>(dest);
     }
 
 exit:
