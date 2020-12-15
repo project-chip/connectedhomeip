@@ -23,7 +23,6 @@ config("includes") {
 
 source_set("all-clusters-common") {
   sources = [
-    "${chip_root}/src/app/server/DataModelHandler.cpp",
     "${chip_root}/src/app/clusters/barrier-control-server/barrier-control-server.cpp",
     "${chip_root}/src/app/clusters/basic/basic.cpp",
     "${chip_root}/src/app/clusters/color-control-server/color-control-server.cpp",
@@ -44,6 +43,7 @@ source_set("all-clusters-common") {
     "${chip_root}/src/app/clusters/temperature-measurement-server/temperature-measurement-server.cpp",
     "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
     "${chip_root}/src/app/reporting/reporting.cpp",
+    "${chip_root}/src/app/server/DataModelHandler.cpp",
     "${chip_root}/src/app/util/af-event.cpp",
     "${chip_root}/src/app/util/af-main-common.cpp",
     "${chip_root}/src/app/util/attribute-size.cpp",

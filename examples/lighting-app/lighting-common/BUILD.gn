@@ -23,11 +23,11 @@ config("includes") {
 
 source_set("lighting-common") {
   sources = [
-    "${chip_root}/src/app/server/DataModelHandler.cpp",
     "${chip_root}/src/app/clusters/level-control/level-control.cpp",
     "${chip_root}/src/app/clusters/on-off-server/on-off.cpp",
     "${chip_root}/src/app/reporting/reporting-default-configuration.cpp",
     "${chip_root}/src/app/reporting/reporting.cpp",
+    "${chip_root}/src/app/server/DataModelHandler.cpp",
     "${chip_root}/src/app/util/af-event.cpp",
     "${chip_root}/src/app/util/af-main-common.cpp",
     "${chip_root}/src/app/util/attribute-size.cpp",
