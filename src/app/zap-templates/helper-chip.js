@@ -242,7 +242,6 @@ function asPutLength(zclType)
   switch (zclType) {
   case 'int8_t':
   case 'uint8_t':
-    return '';
   case 'int16_t':
   case 'uint16_t':
   case 'int32_t':
@@ -474,42 +473,18 @@ function chip_server_cluster_attributes(options)
   {
     return getAttributes.call(this, pkgId, options).then(atts => {
       atts = atts.filter(att => att.clusterCode == clusterCode && att.side == clusterSide);
+      atts.forEach(att => {
+        if (att.writable || att.reportable.included) {
+          att.chipTypePutLength   = asPutLength(att.chipType);
+          att.chipTypePutCastType = asPutCastType(att.chipType);
+        }
+      })
       return templateUtil.collectBlocks(atts, options, this);
     })
   }
 
   const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
   return templateUtil.templatePromise(this.global, promise);
-}
-
-function chip_server_attributes_types(options, cond = att => true)
-{
-  function fn(pkgId)
-  {
-    return getAttributes.call(this, pkgId, options).then(atts => {
-      atts = atts.filter(cond);
-      atts = atts.filter((att, index) => atts.findIndex(att2 => att.atomicTypeId == att2.atomicTypeId) == index);
-      // Enhanced the attribute with chipTypePutLength and chipTypePutCastType properties for convenience.
-      atts.forEach(att => {
-        att.chipTypePutLength   = asPutLength(att.chipType);
-        att.chipTypePutCastType = asPutCastType(att.chipType);
-      })
-      return templateUtil.collectBlocks(atts, options, this);
-    });
-  }
-
-  const promise = templateUtil.ensureZclPackageId(this).then(fn.bind(this)).catch(err => console.log(err));
-  return templateUtil.templatePromise(this.global, promise);
-}
-
-function chip_server_writable_attributes_types(options)
-{
-  return chip_server_attributes_types.call(this, options, att => att.writable);
-}
-
-function chip_server_reportable_attributes_types(options)
-{
-  return chip_server_attributes_types.call(this, options, att => att.reportable.included);
 }
 
 /**
@@ -571,6 +546,25 @@ function user_cluster_has_enabled_manufacturer_command(name, side, options)
       })
 }
 
+/**
+ * Returns if a given command is manufacturer specific
+ *
+ * This function is meant to be used inside a {{#chip_server_cluster_commands}} block.
+ * It will throws otherwise.
+ *
+ * @param {*} options
+ */
+function isManufacturerSpecificCommand()
+{
+  if (this.commandSource == undefined) {
+    const error = 'isManufacturerSpecificCommand: Not inside a ({#chip_server_cluster_commands}} block.';
+    console.log(error);
+    throw error;
+  }
+
+  return !!this.mfgCode;
+}
+
 // WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 //
 // Note: these exports are public API. Templates that might have been created in the past and are
@@ -593,6 +587,5 @@ exports.isDiscreteType                                = isDiscreteType;
 exports.chip_server_cluster_attributes                = chip_server_cluster_attributes;
 exports.isWritableAttribute                           = isWritableAttribute;
 exports.isReportableAttribute                         = isReportableAttribute;
-exports.chip_server_writable_attributes_types         = chip_server_writable_attributes_types;
-exports.chip_server_reportable_attributes_types       = chip_server_reportable_attributes_types;
 exports.user_cluster_has_enabled_manufacturer_command = user_cluster_has_enabled_manufacturer_command;
+exports.isManufacturerSpecificCommand                 = isManufacturerSpecificCommand;
