@@ -367,9 +367,9 @@ class DLL_EXPORT ChipCertificateSet
 public:
     ChipCertificateSet();
 
-    ChipCertificateData * Certs; // [READ-ONLY] Pointer to array of certificate data
-    uint8_t CertCount;           // [READ-ONLY] Number of certificates in Certs array
-    uint8_t MaxCerts;            // [READ-ONLY] Length of Certs array
+    ChipCertificateData * mCerts; // [READ-ONLY] Pointer to array of certificate data
+    uint8_t mCertCount;           // [READ-ONLY] Number of certificates in mCerts array
+    uint8_t mMaxCerts;            // [READ-ONLY] Length of mCerts array
 
     /**
      * @brief Initialize ChipCertificateSet.
@@ -479,7 +479,7 @@ public:
     /**
      * @return A pointer to the last certificate data in the set. Returns NULL if certificate set is empty.
      **/
-    const ChipCertificateData * LastCert() const { return (CertCount > 0) ? &Certs[CertCount - 1] : nullptr; }
+    const ChipCertificateData * LastCert() const { return (mCertCount > 0) ? &mCerts[mCertCount - 1] : nullptr; }
 
     /**
      * @brief Validate CHIP certificate.

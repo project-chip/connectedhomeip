@@ -299,12 +299,12 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
                 NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
             }
         // Make sure the test case is valid.
-        NL_TEST_ASSERT(inSuite, testCase.SubjectCertIndex >= 0 && testCase.SubjectCertIndex < certSet.CertCount);
+        NL_TEST_ASSERT(inSuite, testCase.SubjectCertIndex >= 0 && testCase.SubjectCertIndex < certSet.mCertCount);
         if (testCase.ExpectedResult == CHIP_NO_ERROR)
         {
-            NL_TEST_ASSERT(inSuite, testCase.ExpectedCertIndex >= 0 && testCase.ExpectedCertIndex < certSet.CertCount);
+            NL_TEST_ASSERT(inSuite, testCase.ExpectedCertIndex >= 0 && testCase.ExpectedCertIndex < certSet.mCertCount);
             NL_TEST_ASSERT(inSuite,
-                           testCase.ExpectedTrustAnchorIndex >= 0 && testCase.ExpectedTrustAnchorIndex < certSet.CertCount);
+                           testCase.ExpectedTrustAnchorIndex >= 0 && testCase.ExpectedTrustAnchorIndex < certSet.mCertCount);
         }
 
         // Initialize the validation context.
@@ -317,8 +317,8 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         validContext.RequiredCertType    = testCase.RequiredCertType;
 
         // Locate the subject DN and key id that will be used as input the FindValidCert() method.
-        const ChipDN & subjectDN              = certSet.Certs[testCase.SubjectCertIndex].SubjectDN;
-        const CertificateKeyId & subjectKeyId = certSet.Certs[testCase.SubjectCertIndex].SubjectKeyId;
+        const ChipDN & subjectDN              = certSet.mCerts[testCase.SubjectCertIndex].SubjectDN;
+        const CertificateKeyId & subjectKeyId = certSet.mCerts[testCase.SubjectCertIndex].SubjectKeyId;
 
         // Invoke the FindValidCert() method (the method being tested).
         err = certSet.FindValidCert(subjectDN, subjectKeyId, validContext, resultCert);
@@ -328,10 +328,10 @@ static void TestChipCert_CertValidation(nlTestSuite * inSuite, void * inContext)
         if (err == CHIP_NO_ERROR)
         {
             // Verify that the method found the correct certificate.
-            NL_TEST_ASSERT(inSuite, resultCert == &certSet.Certs[testCase.ExpectedCertIndex]);
+            NL_TEST_ASSERT(inSuite, resultCert == &certSet.mCerts[testCase.ExpectedCertIndex]);
 
             // Verify that the method selected the correct trust anchor.
-            NL_TEST_ASSERT(inSuite, validContext.TrustAnchor == &certSet.Certs[testCase.ExpectedTrustAnchorIndex]);
+            NL_TEST_ASSERT(inSuite, validContext.TrustAnchor == &certSet.mCerts[testCase.ExpectedTrustAnchorIndex]);
         }
 
         // Clear the certificate set.
@@ -357,13 +357,13 @@ static void TestChipCert_CertValidTime(nlTestSuite * inSuite, void * inContext)
     // Before certificate validity period.
     err = SetEffectiveTime(validContext, 2020, 1, 3);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = certSet.ValidateCert(certSet.Certs[certSet.CertCount - 1], validContext);
+    err = certSet.ValidateCert(certSet.mCerts[certSet.mCertCount - 1], validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_VALID_YET);
 
     // 1 second before validity period.
     err = SetEffectiveTime(validContext, 2020, 10, 14, 23, 59, 59);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = certSet.ValidateCert(certSet.Certs[certSet.CertCount - 1], validContext);
+    err = certSet.ValidateCert(certSet.mCerts[certSet.mCertCount - 1], validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_NOT_VALID_YET);
 
     // 1st second of 1st day of validity period.
@@ -371,40 +371,40 @@ static void TestChipCert_CertValidTime(nlTestSuite * inSuite, void * inContext)
     // However for simplicity's sake, the Chip cert validation algorithm rounds the validity period to whole days.
     err = SetEffectiveTime(validContext, 2020, 10, 15, 0, 0, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = certSet.ValidateCert(certSet.Certs[certSet.CertCount - 1], validContext);
+    err = certSet.ValidateCert(certSet.mCerts[certSet.mCertCount - 1], validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Last second of last day of validity period.
     // As above, this time is considered valid because of rounding to whole days.
     err = SetEffectiveTime(validContext, 2040, 10, 15, 23, 59, 59);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = certSet.ValidateCert(certSet.Certs[certSet.CertCount - 1], validContext);
+    err = certSet.ValidateCert(certSet.mCerts[certSet.mCertCount - 1], validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // 1 second after end of certificate validity period.
     err = SetEffectiveTime(validContext, 2040, 10, 16, 0, 0, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = certSet.ValidateCert(certSet.Certs[certSet.CertCount - 1], validContext);
+    err = certSet.ValidateCert(certSet.mCerts[certSet.mCertCount - 1], validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_EXPIRED);
 
     // After end of certificate validity period.
     err = SetEffectiveTime(validContext, 2042, 4, 25, 0, 0, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = certSet.ValidateCert(certSet.Certs[certSet.CertCount - 1], validContext);
+    err = certSet.ValidateCert(certSet.mCerts[certSet.mCertCount - 1], validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_ERROR_CERT_EXPIRED);
 
     // Ignore 'not before' time.
     validContext.ValidateFlags = kValidateFlag_IgnoreNotBefore;
     err                        = SetEffectiveTime(validContext, 2020, 4, 23, 23, 59, 59);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = certSet.ValidateCert(certSet.Certs[certSet.CertCount - 1], validContext);
+    err = certSet.ValidateCert(certSet.mCerts[certSet.mCertCount - 1], validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Ignore 'not after' time.
     validContext.ValidateFlags = kValidateFlag_IgnoreNotAfter;
     err                        = SetEffectiveTime(validContext, 2042, 5, 25, 0, 0, 0);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = certSet.ValidateCert(certSet.Certs[certSet.CertCount - 1], validContext);
+    err = certSet.ValidateCert(certSet.mCerts[certSet.mCertCount - 1], validContext);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     certSet.Release();
@@ -529,7 +529,7 @@ static void TestChipCert_CertUsage(nlTestSuite * inSuite, void * inContext)
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
         validContext.RequiredKeyUsages   = sUsageTestCases[i].RequiredKeyUsages;
         validContext.RequiredKeyPurposes = sUsageTestCases[i].RequiredKeyPurposes;
-        err                              = certSet.ValidateCert(certSet.Certs[sUsageTestCases[i].CertIndex], validContext);
+        err                              = certSet.ValidateCert(certSet.mCerts[sUsageTestCases[i].CertIndex], validContext);
         NL_TEST_ASSERT(inSuite, err == sUsageTestCases[i].ExpectedResult);
     }
 
@@ -578,7 +578,7 @@ static void TestChipCert_CertType(nlTestSuite * inSuite, void * inContext)
         certSet.Init(1, kTestCertBufSize);
         err = LoadTestCert(certSet, testCase.Cert);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-        NL_TEST_ASSERT(inSuite, certSet.Certs[0].CertType == testCase.ExpectedCertType);
+        NL_TEST_ASSERT(inSuite, certSet.mCerts[0].CertType == testCase.ExpectedCertType);
     }
 }
 

@@ -54,9 +54,9 @@ extern CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, 
 
 ChipCertificateSet::ChipCertificateSet()
 {
-    Certs                = nullptr;
-    CertCount            = 0;
-    MaxCerts             = 0;
+    mCerts               = nullptr;
+    mCertCount           = 0;
+    mMaxCerts            = 0;
     mDecodeBuf           = nullptr;
     mDecodeBufSize       = 0;
     mMemoryAllocInternal = false;
@@ -67,18 +67,22 @@ CHIP_ERROR ChipCertificateSet::Init(uint8_t maxCertsArraySize, uint16_t decodeBu
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     VerifyOrExit(maxCertsArraySize > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
+    mCerts = reinterpret_cast<ChipCertificateData *>(chip::Platform::MemoryAlloc(sizeof(ChipCertificateData) * maxCertsArraySize));
+    VerifyOrExit(mCerts != nullptr, err = CHIP_ERROR_NO_MEMORY);
+
     VerifyOrExit(decodeBufSize > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
+    mDecodeBuf = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(decodeBufSize));
+    VerifyOrExit(mDecodeBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-    Certs = reinterpret_cast<ChipCertificateData *>(chip::Platform::MemoryAlloc(sizeof(ChipCertificateData) * maxCertsArraySize));
-    VerifyOrExit(Certs != nullptr, err = CHIP_ERROR_NO_MEMORY);
-
-    CertCount            = 0;
-    MaxCerts             = maxCertsArraySize;
-    mDecodeBuf           = nullptr;
+    mCertCount           = 0;
+    mMaxCerts            = maxCertsArraySize;
     mDecodeBufSize       = decodeBufSize;
     mMemoryAllocInternal = true;
 
 exit:
+    if (err != CHIP_NO_ERROR)
+        Release();
+
     return err;
 }
 
@@ -92,9 +96,9 @@ CHIP_ERROR ChipCertificateSet::Init(ChipCertificateData * certsArray, uint8_t ce
     VerifyOrExit(decodeBuf != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(decodeBufSize > 0, err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    CertCount            = 0;
-    Certs                = certsArray;
-    MaxCerts             = certsArraySize;
+    mCertCount           = 0;
+    mCerts               = certsArray;
+    mMaxCerts            = certsArraySize;
     mDecodeBuf           = decodeBuf;
     mDecodeBufSize       = decodeBufSize;
     mMemoryAllocInternal = false;
@@ -107,10 +111,10 @@ void ChipCertificateSet::Release()
 {
     if (mMemoryAllocInternal)
     {
-        if (Certs != nullptr)
+        if (mCerts != nullptr)
         {
-            chip::Platform::MemoryFree(Certs);
-            Certs = nullptr;
+            chip::Platform::MemoryFree(mCerts);
+            mCerts = nullptr;
         }
         if (mDecodeBuf != nullptr)
         {
@@ -122,10 +126,10 @@ void ChipCertificateSet::Release()
 
 void ChipCertificateSet::Clear()
 {
-    for (int i = 0; i < MaxCerts; i++)
-        Certs[i].Clear();
+    for (int i = 0; i < mMaxCerts; i++)
+        mCerts[i].Clear();
 
-    CertCount = 0;
+    mCertCount = 0;
 }
 
 CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipCertLen, uint16_t decodeFlags,
@@ -150,7 +154,6 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags
 {
     CHIP_ERROR err;
     ASN1Writer writer;
-    uint8_t * decodeBuf = nullptr;
 
     cert = nullptr;
 
@@ -158,19 +161,9 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags
     VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Verify we have room for the new certificate.
-    VerifyOrExit(CertCount < MaxCerts, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(mCertCount < mMaxCerts, err = CHIP_ERROR_NO_MEMORY);
 
-    if (mMemoryAllocInternal)
-    {
-        decodeBuf = reinterpret_cast<uint8_t *>(chip::Platform::MemoryAlloc(mDecodeBufSize));
-        VerifyOrExit(decodeBuf != nullptr, err = CHIP_ERROR_NO_MEMORY);
-    }
-    else
-    {
-        decodeBuf = mDecodeBuf;
-    }
-
-    cert = &Certs[CertCount];
+    cert = &mCerts[mCertCount];
     cert->Clear();
 
     // Record the starting point of the certificate's elements.
@@ -186,7 +179,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags
         // Initialize an ASN1Writer and convert the TBS (to-be-signed) portion of the certificate to ASN.1 DER
         // encoding.  At the same time, parse various components within the certificate and set the corresponding
         // fields in the CertificateData object.
-        writer.Init(decodeBuf, mDecodeBufSize);
+        writer.Init(mDecodeBuf, mDecodeBufSize);
         err = DecodeConvertTBSCert(reader, writer, *cert);
         SuccessOrExit(err);
 
@@ -208,7 +201,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags
             SuccessOrExit(err);
 
             // Generate a SHA hash of the encoded TBS certificate.
-            chip::Crypto::Hash_SHA256(decodeBuf, writer.GetLengthWritten(), cert->TBSHash);
+            chip::Crypto::Hash_SHA256(mDecodeBuf, writer.GetLengthWritten(), cert->TBSHash);
 
             cert->CertFlags |= kCertFlag_TBSHashPresent;
         }
@@ -249,7 +242,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags
     // Record the overall size of the certificate.
     cert->EncodedCertLen = reader.GetReadPoint() - cert->EncodedCert;
 
-    CertCount++;
+    mCertCount++;
 
     // If requested by the caller, mark the certificate as trusted.
     if (decodeFlags & kDecodeFlag_IsTrustAnchor)
@@ -262,15 +255,6 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags
     SuccessOrExit(err);
 
 exit:
-    if (mMemoryAllocInternal)
-    {
-        if (decodeBuf != nullptr)
-        {
-            chip::Platform::MemoryFree(decodeBuf);
-            decodeBuf = nullptr;
-        }
-    }
-
     return err;
 }
 
@@ -344,9 +328,9 @@ CHIP_ERROR ChipCertificateSet::AddTrustedKey(uint64_t caId, OID curveOID, const 
     ChipCertificateData * cert;
 
     // Verify we have room for the new certificate.
-    VerifyOrExit(CertCount < MaxCerts, err = CHIP_ERROR_NO_MEMORY);
+    VerifyOrExit(mCertCount < mMaxCerts, err = CHIP_ERROR_NO_MEMORY);
 
-    cert = &Certs[CertCount];
+    cert = &mCerts[mCertCount];
     cert->Clear();
     cert->SubjectDN.AttrOID          = kOID_AttributeType_ChipCAId;
     cert->SubjectDN.AttrValue.ChipId = caId;
@@ -362,7 +346,7 @@ CHIP_ERROR ChipCertificateSet::AddTrustedKey(uint64_t caId, OID curveOID, const 
     cert->CertFlags = kCertFlag_AuthKeyIdPresent | kCertFlag_ExtPresent_AuthKeyId | kCertFlag_ExtPresent_BasicConstraints |
         kCertFlag_ExtPresent_SubjectKeyId | kCertFlag_ExtPresent_KeyUsage | kCertFlag_IsCA | kCertFlag_IsTrustAnchor;
 
-    CertCount++;
+    mCertCount++;
 
 exit:
     return err;
@@ -370,9 +354,9 @@ exit:
 
 const ChipCertificateData * ChipCertificateSet::FindCert(const CertificateKeyId & subjectKeyId) const
 {
-    for (uint8_t i = 0; i < CertCount; i++)
+    for (uint8_t i = 0; i < mCertCount; i++)
     {
-        ChipCertificateData & cert = Certs[i];
+        ChipCertificateData & cert = mCerts[i];
         if (cert.SubjectKeyId.IsEqual(subjectKeyId))
             return &cert;
     }
@@ -383,12 +367,12 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(ChipCertificateData & cert, Validati
 {
     CHIP_ERROR err;
 
-    VerifyOrExit(&cert >= Certs && &cert < &Certs[CertCount], err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(&cert >= mCerts && &cert < &mCerts[mCertCount], err = CHIP_ERROR_INVALID_ARGUMENT);
 
 #if CHIP_CONFIG_DEBUG_CERT_VALIDATION
     if (context.CertValidationResults != nullptr)
     {
-        VerifyOrExit(context.CertValidationResultsLen >= CertCount, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(context.CertValidationResultsLen >= mCertCount, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         for (uint8_t i = 0; i < context.CertValidationResultsLen; i++)
             context.CertValidationResults[i] = CHIP_CERT_NOT_USED;
@@ -412,7 +396,7 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
 
     if (context.CertValidationResults != nullptr)
     {
-        VerifyOrExit(context.CertValidationResultsLen >= CertCount, err = CHIP_ERROR_INVALID_ARGUMENT);
+        VerifyOrExit(context.CertValidationResultsLen >= mCertCount, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         for (uint8_t i = 0; i < context.CertValidationResultsLen; i++)
             context.CertValidationResults[i] = CHIP_CERT_NOT_USED;
@@ -559,7 +543,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(ChipCertificateData & cert, Validati
     // Verify that the certificate depth is less than the total number of certificates. It is technically possible to create
     // a circular chain of certificates.  Limiting the maximum depth of the certificate path prevents infinite
     // recursion in such a case.
-    VerifyOrExit(depth < CertCount, err = CHIP_ERROR_CERT_PATH_TOO_LONG);
+    VerifyOrExit(depth < mCertCount, err = CHIP_ERROR_CERT_PATH_TOO_LONG);
 
     // Verify that a hash of the 'to-be-signed' portion of the certificate has been computed. We will need this to
     // verify the cert's signature below.
@@ -580,7 +564,7 @@ exit:
 
 #if CHIP_CONFIG_DEBUG_CERT_VALIDATION
     if (context.CertValidationResults != nullptr)
-        context.CertValidationResults[&cert - Certs] = err;
+        context.CertValidationResults[&cert - mCerts] = err;
 #endif
 
     return err;
@@ -600,9 +584,9 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
         ExitNow();
 
     // For each cert in the set...
-    for (uint8_t i = 0; i < CertCount; i++)
+    for (uint8_t i = 0; i < mCertCount; i++)
     {
-        ChipCertificateData & candidateCert = Certs[i];
+        ChipCertificateData & candidateCert = mCerts[i];
 
         // Skip the certificate if its subject DN and key id do not match the input criteria.
         if (!subjectDN.IsEmpty() && !candidateCert.SubjectDN.IsEqual(subjectDN))
