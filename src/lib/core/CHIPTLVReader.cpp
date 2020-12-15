@@ -1367,13 +1367,15 @@ CHIP_ERROR TLVReader::VerifyElement()
     }
     else
     {
-        if (mElemTag == UnknownImplicitTag)
+        if (mElemTag == UnknownImplicitTag) {
             return CHIP_ERROR_UNKNOWN_IMPLICIT_TLV_TAG;
+        }
         switch (mContainerType)
         {
         case kTLVType_NotSpecified:
-            if (IsContextTag(mElemTag))
+            if (IsContextTag(mElemTag)) {
                 return CHIP_ERROR_INVALID_TLV_TAG;
+            }
             break;
         case kTLVType_Structure:
             if (mElemTag == AnonymousTag)
