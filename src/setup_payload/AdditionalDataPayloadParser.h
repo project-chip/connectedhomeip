@@ -45,7 +45,6 @@ private:
 public:
     AdditionalDataPayloadParser(std::string payload) : mPayload(std::move(payload)) {}
     CHIP_ERROR populatePayload(AdditionalDataPayload & outPayload);
-
 };
 
 } // namespace chip

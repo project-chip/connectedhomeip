@@ -170,11 +170,7 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     char discriminatorBuf[5];  // hex representation of 16-bit discriminator
     char vendorProductBuf[10]; // "FFFF+FFFF"
     // TODO: The text entry will be updated in the spec, update accordingly.
-    TextEntry entries[3] = {
-        { "D", nullptr, 0 },
-        { "VP", nullptr, 0 },
-        { "RI", nullptr, 0}
-    };
+    TextEntry entries[3] = { { "D", nullptr, 0 }, { "VP", nullptr, 0 }, { "RI", nullptr, 0 } };
 
     VerifyOrExit(mMdnsInitialized, error = CHIP_ERROR_INCORRECT_STATE);
     ChipLogProgress(Discovery, "setup mdns service");
@@ -186,14 +182,13 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetProductId(productID));
     snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04X", discriminator);
     snprintf(vendorProductBuf, sizeof(vendorProductBuf), "%04X+%04X", vendorID, productID);
-    entries[0].mData       = reinterpret_cast<const uint8_t *>(discriminatorBuf);
-    entries[0].mDataSize   = strnlen(discriminatorBuf, sizeof(discriminatorBuf));
-    entries[1].mData       = reinterpret_cast<const uint8_t *>(vendorProductBuf);
-    entries[1].mDataSize   = strnlen(discriminatorBuf, sizeof(vendorProductBuf));
+    entries[0].mData     = reinterpret_cast<const uint8_t *>(discriminatorBuf);
+    entries[0].mDataSize = strnlen(discriminatorBuf, sizeof(discriminatorBuf));
+    entries[1].mData     = reinterpret_cast<const uint8_t *>(vendorProductBuf);
+    entries[1].mDataSize = strnlen(discriminatorBuf, sizeof(vendorProductBuf));
     // Rotating Device ID
-    entries[2].mData       = reinterpret_cast<const uint8_t *>(CHIP_ROTATING_DEVICE_ID);
-    entries[2].mDataSize   = strnlen(CHIP_ROTATING_DEVICE_ID, sizeof(CHIP_ROTATING_DEVICE_ID));
-
+    entries[2].mData     = reinterpret_cast<const uint8_t *>(CHIP_ROTATING_DEVICE_ID);
+    entries[2].mDataSize = strnlen(CHIP_ROTATING_DEVICE_ID, sizeof(CHIP_ROTATING_DEVICE_ID));
 
     service.mTextEntryies  = entries;
     service.mTextEntrySize = sizeof(entries) / sizeof(TextEntry);

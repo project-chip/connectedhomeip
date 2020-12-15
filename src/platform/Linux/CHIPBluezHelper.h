@@ -56,8 +56,8 @@
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 
 #include "ble/CHIPBleServiceData.h"
-#include "platform/Linux/dbus/bluez/DbusBluez.h"
 #include "platform/CHIPDeviceConfig.h"
+#include "platform/Linux/dbus/bluez/DbusBluez.h"
 
 namespace chip {
 namespace DeviceLayer {
