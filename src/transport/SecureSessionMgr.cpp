@@ -90,20 +90,20 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                                         System::EncryptedPacketBufferHandle * bufferRetainSlot)
+                                         EncryptedPacketBufferHandle * bufferRetainSlot)
 {
-    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, false);
+    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, false, 0, 0);
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId,
-                                         System::EncryptedPacketBufferHandle msgBuf,
-                                         System::EncryptedPacketBufferHandle * bufferRetainSlot)
+CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, EncryptedPacketBufferHandle msgBuf,
+                                         EncryptedPacketBufferHandle * bufferRetainSlot, uint32_t msgIdIn, uint32_t payloadLenIn)
 {
-    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, true);
+    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, true, msgIdIn, payloadLenIn);
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                                         System::EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrpted)
+                                         EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted, uint32_t msgIdIn,
+                                         uint32_t payloadLenIn)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
@@ -124,7 +124,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         uint8_t * data         = nullptr;
         uint8_t * p            = nullptr;
         uint32_t msgId         = 0;
-        uint32_t payloadLength = 0;
+        uint32_t payloadLength = 0; // Make sure it's big enough to add two 16-bit ints without overflowing.
         uint16_t len           = 0;
         PacketHeader packetHeader;
         MessageAuthenticationCode mac;
@@ -134,7 +134,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         uint16_t totalLen = 0;
         uint16_t taglen   = 0;
 
-        if (!isEncrpted)
+        if (!isEncrypted)
         {
             msgId = state->GetSendMessageIndex();
 
@@ -145,8 +145,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         }
         else
         {
-            msgId         = bufferRetainSlot->mMsgId;
-            payloadLength = bufferRetainSlot->mPayloadLen;
+            msgId         = msgIdIn;
+            payloadLength = payloadLenIn;
         }
 
         packetHeader
@@ -160,7 +160,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, peerNodeId);
 
         // Skip encryption process if the packet is resent by CRMP
-        if (!isEncrpted)
+        if (!isEncrypted)
         {
             VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
@@ -201,13 +201,13 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         if (bufferRetainSlot)
         {
             // Rewind the start and len of the buffer back to pre-send state for following possible retransmition.
-            bufferRetainSlot->Get_ForNow()->SetStart(p);
-            bufferRetainSlot->Get_ForNow()->SetDataLength(len);
+            (*bufferRetainSlot)->SetStart(p);
+            (*bufferRetainSlot)->SetDataLength(len);
         }
     }
     SuccessOrExit(err);
 
-    if (!isEncrpted)
+    if (!isEncrypted)
         state->IncrementSendMessageIndex();
 
 exit:

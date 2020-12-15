@@ -59,12 +59,12 @@ public:
     {
         RetransTableEntry();
 
-        ReliableMessageContext * rc;                     /**< The context for the stored CHIP message. */
-        System::EncryptedPacketBufferHandle retainedBuf; /**< The PacketBuffer object holding the CHIP message. */
-        PayloadHeader payloadHeader;                     /**< Exchange Header for the stored CHIP message. */
-        uint64_t peerNodeId;                             /**< Node ID of peer node. */
-        uint16_t nextRetransTimeTick; /**< A counter representing the next retransmission time for the message. */
-        uint8_t sendCount;            /**< A counter representing the number of times the message has been sent. */
+        ReliableMessageContext * rc;             /**< The context for the stored CHIP message. */
+        EncryptedPacketBufferHandle retainedBuf; /**< The PacketBuffer object holding the CHIP message. */
+        PayloadHeader payloadHeader;             /**< Exchange Header for the stored CHIP message. */
+        uint64_t peerNodeId;                     /**< Node ID of peer node. */
+        uint16_t nextRetransTimeTick;            /**< A counter representing the next retransmission time for the message. */
+        uint8_t sendCount;                       /**< A counter representing the number of times the message has been sent. */
     };
 
 public:
@@ -78,18 +78,17 @@ public:
     uint64_t GetTickCounterFromTimeDelta(uint64_t newTime);
 
     void ExecuteActions();
-    void ProcessDelayedDeliveryMessage(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
     static void Timeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
-    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, PayloadHeader & payloadHeader, NodeId nodeId,
+    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, const PayloadHeader & payloadHeader, NodeId nodeId,
                                  RetransTableEntry ** rEntry);
-    void StartFromRetransTable(RetransTableEntry * entry);
+    void StartRetransmision(RetransTableEntry * entry);
     void PauseRetransTable(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
     void ResumeRetransTable(ReliableMessageContext * rc);
     bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t msgId);
     CHIP_ERROR SendFromRetransTable(RetransTableEntry * entry);
-    void ClearRetransTable(ReliableMessageContext * rc);
-    void ClearRetransTable(RetransTableEntry & rEntry);
+    void ClearRetransmitTable(ReliableMessageContext * rc);
+    void ClearRetransmitTable(RetransTableEntry & rEntry);
     void FailRetransmitTableEntries(ReliableMessageContext * rc, CHIP_ERROR err);
 
     void StartTimer();
@@ -121,7 +120,7 @@ private:
     void TicklessDebugDumpRetransTable(const char * log);
 
     // ReliableMessageProtocol Global tables for timer context
-    RetransTableEntry mRetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
+    RetransTableEntry RetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
 };
 
 } // namespace Messaging

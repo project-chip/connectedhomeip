@@ -151,7 +151,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 
     rm->AddToRetransTable(rc, header, 1, &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-    rm->ClearRetransTable(*entry);
+    rm->ClearRetransmitTable(*entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
 
@@ -241,7 +241,7 @@ void CheckRetransExpire(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
 
-    rm->StartFromRetransTable(entry);
+    rm->StartRetransmision(entry);
 
     test_os_sleep_ms(20);
     ReliableMessageManager::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
@@ -255,72 +255,6 @@ void CheckRetransExpire(nlTestSuite * inSuite, void * inContext)
     // 2nd retrans
 
     test_os_sleep_ms(40);
-    ReliableMessageManager::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
-    NL_TEST_ASSERT(inSuite, delegate.SendErrorCalled);
-    // send error
-}
-
-void CheckDelayDelivery(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    TransportMgr<LoopbackTransport> transportMgr;
-    SecureSessionMgr secureSessionMgr;
-    CHIP_ERROR err;
-
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
-
-    err = transportMgr.Init("LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    MockAppDelegate mockAppDelegate;
-
-    ExchangeContext * exchange = exchangeMgr.NewContext(kSourceNodeId, &mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, exchange != nullptr);
-
-    ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
-    ReliableMessageContext * rc = exchange->GetReliableMessageContext();
-    NL_TEST_ASSERT(inSuite, rm != nullptr);
-    NL_TEST_ASSERT(inSuite, rc != nullptr);
-
-    ReliableMessageDelegateObject delegate;
-    rc->SetDelegate(&delegate);
-    rc->SetConfig({
-        1, // CHIP_CONFIG_RMP_DEFAULT_INITIAL_RETRANS_TIMEOUT_TICK
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACTIVE_RETRANS_TIMEOUT_TICK
-        1, // CHIP_CONFIG_RMP_DEFAULT_ACK_TIMEOUT_TICK
-        1, // CHIP_CONFIG_RMP_DEFAULT_MAX_RETRANS
-    });
-
-    ReliableMessageManager::RetransTableEntry * entry;
-    PayloadHeader header;
-
-    err = rm->AddToRetransTable(rc, header, 1, &entry);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-    rm->StartFromRetransTable(entry);
-    rm->ProcessDelayedDeliveryMessage(64, kSourceNodeId);
-    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-
-    test_os_sleep_ms(50);
-    ReliableMessageManager::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-    // not send, delayed
-
-    test_os_sleep_ms(50);
-    ReliableMessageManager::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
-    NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-    NL_TEST_ASSERT(inSuite, !delegate.SendErrorCalled);
-    // 1st retrans
-
-    test_os_sleep_ms(50);
     ReliableMessageManager::Timeout(&ctx.GetSystemLayer(), rm, CHIP_SYSTEM_NO_ERROR);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
     NL_TEST_ASSERT(inSuite, delegate.SendErrorCalled);
@@ -412,7 +346,6 @@ const nlTest sTests[] =
     NL_TEST_DEF("Test ReliableMessageManager::CheckAddClearRetrans", CheckAddClearRetrans),
     NL_TEST_DEF("Test ReliableMessageManager::CheckFailRetrans", CheckFailRetrans),
     NL_TEST_DEF("Test ReliableMessageManager::CheckRetransExpire", CheckRetransExpire),
-    NL_TEST_DEF("Test ReliableMessageManager::CheckDelayDelivery", CheckDelayDelivery),
     NL_TEST_DEF("Test ReliableMessageManager::CheckResendMessage", CheckResendMessage),
 
     NL_TEST_SENTINEL()

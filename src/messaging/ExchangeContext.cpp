@@ -100,22 +100,19 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
 
     payloadHeader.SetInitiator(IsInitiator());
 
-    // If sending via UDP and the auto-request ACK feature is enabled, automatically
-    // request an acknowledgment, UNLESS the NoAutoRequestAck send flag has been specified.
+    // If auto-request ACK feature is enabled, automatically request an acknowledgment,
+    // UNLESS the NoAutoRequestAck send flag has been specified.
     if (mReliableMessageContext.AutoRequestAck() && !sendFlags.Has(SendMessageFlags::kSendFlag_NoAutoRequestAck))
     {
         payloadHeader.SetNeedsAck(true);
     }
-
-    // Abort early if Throttle is already set.
-    VerifyOrExit(!mReliableMessageContext.IsThrottling(), err = CHIP_ERROR_SEND_THROTTLED);
 
     // If there is a pending acknowledgment piggyback it on this message.
     if (mReliableMessageContext.HasPeerRequestedAck())
     {
         payloadHeader.SetAckId(mReliableMessageContext.mPendingPeerAckId);
 
-        // Set AckPending flag to false after setting the Ack flag;
+        // Set AckPending flag to false since current ougoing message is set to ack the peer on this exchange.
         mReliableMessageContext.SetAckPending(false);
 
 #if !defined(NDEBUG)
@@ -155,12 +152,12 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
         if (err != CHIP_NO_ERROR)
         {
             // Remove from table
-            ChipLogError(ExchangeManager, "Failed to send message to 0x%lx with err %ld", mPeerNodeId, long(err));
-            mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(*entry);
+            ChipLogError(ExchangeManager, "Failed to send message to 0x%" PRIx64 "with err %ld", mPeerNodeId, long(err));
+            mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(*entry);
         }
         else
         {
-            mExchangeMgr->GetReliableMessageMgr()->StartFromRetransTable(entry);
+            mExchangeMgr->GetReliableMessageMgr()->StartRetransmision(entry);
         }
     }
     else
@@ -186,16 +183,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR ExchangeContext::SendThrottleFlow(uint32_t PauseTimeMillis)
-{
-    return mReliableMessageContext.SendThrottleFlow(PauseTimeMillis);
-}
-
-CHIP_ERROR ExchangeContext::SendDelayedDelivery(uint32_t PauseTimeMillis, uint64_t DelayedNodeId)
-{
-    return mReliableMessageContext.SendDelayedDelivery(PauseTimeMillis, DelayedNodeId);
-}
-
 void ExchangeContext::DoClose(bool clearRetransTable)
 {
     // Clear protocol callbacks
@@ -205,13 +192,18 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     }
     mDelegate = nullptr;
 
-    // Flush any pending CRMP acks
+    // Closure of an EC is based on ref counting. The Protocol when it calls DoClose(), indicates that
+    // it is done with the EC and the ML sets all callbacks to NULL and does not send anything recvd on
+    // the EC, upward. When the protocol layer decides to close the exchange, at which point the messaging
+    // layer needs to handle the remaining work to be done on that exchange(Send all pending acks) before
+    // truly cleaning it up.
     mReliableMessageContext.FlushAcks();
 
-    // Clear the CRMP retransmission table
+    // In case the protocol wants a harder release of the EC right away, such as calling Abort(), exchange
+    // needs to clear the CRMP retransmission table immediately.
     if (clearRetransTable)
     {
-        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(&mReliableMessageContext);
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(&mReliableMessageContext);
     }
 
     // Cancel the response timer.
@@ -276,7 +268,7 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     mReliableMessageContext.Init(em->GetReliableMessageMgr(), this);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
-    ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->mContextPool + 1), em->GetContextsInUse(),
+    ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), em->GetContextsInUse(),
                     this);
 #endif
     SYSTEM_STATS_INCREMENT(chip::System::Stats::kExchangeMgr_NumContexts);
@@ -391,37 +383,18 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     {
         MessageFlags msgFlags;
 
+        // An acknowledgment needs to be sent back to the peer for this message on this exchange,
         // Set the flag in message header indicating an ack requested by peer;
         msgFlags.Set(MessageFlagValues::kMessageFlag_PeerRequestedAck);
 
-        // Set the flag in the exchange context indicating an ack requested;
+        // Also set the flag in the exchange context indicating an ack requested;
         mReliableMessageContext.SetPeerRequestedAck(true);
 
-        if (!mReliableMessageContext.ShouldDropAckDebug())
-        {
-            err = mReliableMessageContext.HandleNeedsAck(messageId, msgFlags);
-        }
+        err = mReliableMessageContext.HandleNeedsAck(messageId, msgFlags);
     }
 
-    // Received Flow Throttle
-    if (protocolId == Protocols::kProtocol_Protocol_Common && messageType == Protocols::Common::kMsgType_RMP_Throttle_Flow)
-    {
-        const uint8_t * p        = nullptr;
-        uint32_t PauseTimeMillis = 0;
-
-        // Extract PauseTimeMillis from msgBuf
-        p                  = msgBuf->Start();
-        const uint16_t len = msgBuf->DataLength();
-
-        VerifyOrExit(len == 4, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-        PauseTimeMillis = LittleEndian::Read32(p);
-        mReliableMessageContext.HandleThrottleFlow(PauseTimeMillis);
-
-        ExitNow(err = CHIP_NO_ERROR);
-    }
-    // Return and not pass this to Application if Common::Null Msg Type
-    else if ((protocolId == Protocols::kProtocol_Protocol_Common) && (messageType == Protocols::Common::kMsgType_Null))
+    //  The Common::Null message type is only used for CRMP; do not pass such messages to the application layer.
+    if ((protocolId == Protocols::kProtocol_Protocol_Common) && (messageType == Protocols::Common::kMsgType_Null))
     {
         ExitNow(err = CHIP_NO_ERROR);
     }

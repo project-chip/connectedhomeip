@@ -60,7 +60,7 @@ namespace Messaging {
  *    prior to use.
  *
  */
-ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
+ExchangeManager::ExchangeManager() : mReliableMessageMgr(ContextPool)
 {
     mState = State::kState_NotInitialized;
 }
@@ -110,7 +110,7 @@ ExchangeContext * ExchangeManager::NewContext(const NodeId & peerNodeId, Exchang
 
 ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, ExchangeDelegate * delegate, bool isInitiator)
 {
-    for (auto & ec : mContextPool)
+    for (auto & ec : ContextPool)
     {
         if (ec.GetReferenceCount() > 0 && ec.GetPeerNodeId() == peerNodeId && ec.GetDelegate() == delegate &&
             ec.IsInitiator() == isInitiator)
@@ -150,7 +150,7 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t Pe
 {
     CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return nullptr);
 
-    for (auto & ec : mContextPool)
+    for (auto & ec : ContextPool)
     {
         if (ec.GetReferenceCount() == 0)
         {
@@ -168,31 +168,10 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     CHIP_ERROR err                          = CHIP_NO_ERROR;
     UnsolicitedMessageHandler * umh         = nullptr;
     UnsolicitedMessageHandler * matchingUMH = nullptr;
-    const uint16_t protocolId               = payloadHeader.GetProtocolID();
-    const uint8_t messageType               = payloadHeader.GetMessageType();
     bool sendAckAndCloseExchange            = false;
 
-    // Received Delayed Delivery Message: Extend time for pending retrans objects
-    if (protocolId == Protocols::kProtocol_Protocol_Common && messageType == Protocols::Common::kMsgType_RMP_Delayed_Delivery)
-    {
-        const uint8_t * p        = msgBuf->Start();
-        const uint16_t len       = msgBuf->DataLength();
-        uint32_t PauseTimeMillis = 0;
-        uint64_t DelayedNodeId   = 0;
-
-        VerifyOrExit(len == 12, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
-
-        PauseTimeMillis = LittleEndian::Read32(p);
-        DelayedNodeId   = LittleEndian::Read64(p);
-
-        mReliableMessageMgr.ProcessDelayedDeliveryMessage(PauseTimeMillis, DelayedNodeId);
-
-        // Return after processing Delayed Delivery message
-        ExitNow(err = CHIP_NO_ERROR);
-    }
-
     // Search for an existing exchange that the message applies to. If a match is found...
-    for (auto & ec : mContextPool)
+    for (auto & ec : ContextPool)
     {
         if (ec.GetReferenceCount() > 0 && ec.MatchExchange(packetHeader, payloadHeader))
         {
@@ -236,14 +215,15 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
             }
         }
     }
-    // Discard the message if it isn't marked as being sent by an initiator and the message does not needs to send
-    // ack to the peer.
+    // Discard the message if it isn't marked as being sent by an initiator and the message does not need to send
+    // an ack to the peer.
     else if (!payloadHeader.IsNeedsAck())
     {
         ExitNow(err = CHIP_ERROR_UNSOLICITED_MSG_NO_ORIGINATOR);
     }
 
-    // Create new exchange to send ack for a duplicate message and then close this exchange.
+    // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
+    // to hand this message. Needs to create a temporary exchange to send ack for this message and then close this exchange.
     sendAckAndCloseExchange = payloadHeader.IsNeedsAck() && (matchingUMH == nullptr);
 
     // If we found a handler or we need to create a new exchange context (EC).
@@ -265,7 +245,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
 
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-        ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
+        ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - ContextPool.begin(), ec->GetExchangeId(),
                         ec->GetDelegate());
 
         ec->HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
@@ -339,7 +319,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
 void ExchangeManager::OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
 {
-    for (auto & ec : mContextPool)
+    for (auto & ec : ContextPool)
     {
         if (ec.GetReferenceCount() > 0 && ec.GetPeerNodeId() == state->GetPeerNodeId())
         {

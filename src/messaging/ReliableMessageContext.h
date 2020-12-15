@@ -58,8 +58,6 @@ public:
 
 class ReliableMessageContext
 {
-    friend class ExchangeContext;
-
 public:
     ReliableMessageContext();
 
@@ -71,8 +69,6 @@ public:
     uint64_t GetPeerNodeId();
     uint64_t GetCurrentRetransmitTimeoutTick();
 
-    CHIP_ERROR SendThrottleFlow(uint32_t PauseTimeMillis);
-    CHIP_ERROR SendDelayedDelivery(uint32_t PauseTimeMillis, uint64_t DelayedNodeId);
     CHIP_ERROR SendCommonNullMessage();
 
     bool AutoRequestAck() const;
@@ -85,7 +81,6 @@ public:
     void SetPeerRequestedAck(bool inPeerRequestedAck);
     bool HasRcvdMsgFromPeer() const;
     void SetMsgRcvdFromPeer(bool inMsgRcvdFromPeer);
-    bool IsThrottling() const { return (mThrottleTimeoutTick != 0); }
 
 private:
     enum class Flags : uint16_t
@@ -113,12 +108,15 @@ private:
 
     BitFlags<uint16_t, Flags> mFlags; // Internal state flags
 
+    void Retain();
+    void Release();
     CHIP_ERROR HandleRcvdAck(uint32_t AckMsgId);
     CHIP_ERROR HandleNeedsAck(uint32_t MessageId, BitFlags<uint32_t, MessageFlagValues> Flags);
     CHIP_ERROR HandleThrottleFlow(uint32_t PauseTimeMillis);
 
 private:
     friend class ReliableMessageManager;
+    friend class ExchangeContext;
 
     ReliableMessageManager * mManager;
     ExchangeContext * mExchange;
