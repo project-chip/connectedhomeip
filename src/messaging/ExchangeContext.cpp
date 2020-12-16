@@ -112,7 +112,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     {
         payloadHeader.SetAckId(mReliableMessageContext.mPendingPeerAckId);
 
-        // Set AckPending flag to false since current ougoing message is set to ack the peer on this exchange.
+        // Set AckPending flag to false since current outgoing message is going to serve as the ack on this exchange.
         mReliableMessageContext.SetAckPending(false);
 
 #if !defined(NDEBUG)
