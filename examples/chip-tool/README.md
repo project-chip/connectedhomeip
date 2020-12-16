@@ -118,7 +118,8 @@ and the `parse-qr-code` command
     $ chip-tool payload parse-qr-code :#####"
 
 # Using the Client for Additional Data Payload
-To parse an additional data payload, run the built executable with the `payload` cluster name
-and the `parse-additional-data` command
+
+To parse an additional data payload, run the built executable with the `payload`
+cluster name and the `parse-additional-data` command
 
     $ chip-tool payload parse-additional-data "#####"
