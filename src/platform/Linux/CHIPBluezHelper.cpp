@@ -1271,7 +1271,7 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
     chip::System::PacketBuffer * buffer           = bufferHandle.Get_ForNow();
 
-    if(characteristic == nullptr)
+    if (characteristic == nullptr)
     {
         return;
     }
