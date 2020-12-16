@@ -22,6 +22,7 @@
 #include <setup_payload/AdditionalDataPayloadParser.h>
 
 using namespace ::chip;
+using namespace ::chip::SetupPayload;
 
 CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {

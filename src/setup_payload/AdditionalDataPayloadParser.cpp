@@ -47,6 +47,7 @@
 
 using namespace chip;
 using namespace std;
+using namespace chip::SetupPayload;
 using namespace chip::TLV;
 using namespace chip::TLV::Utilities;
 
