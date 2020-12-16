@@ -773,8 +773,7 @@ ssize_t GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXCCCWrite(struct bt_conn
 }
 
 template <class ImplClass>
-void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXIndicated(struct bt_conn * conId, const struct bt_gatt_attr * attr,
-                                                                uint8_t err)
+void GenericBLEManagerImpl_Zephyr<ImplClass>::HandleTXIndicated(struct bt_conn * conId, IndicationAttrType, uint8_t err)
 {
     ChipDeviceEvent event;
 
