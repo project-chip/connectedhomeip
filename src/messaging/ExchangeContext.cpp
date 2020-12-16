@@ -152,7 +152,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
         if (err != CHIP_NO_ERROR)
         {
             // Remove from table
-            ChipLogError(ExchangeManager, "Failed to send message to 0x%" PRIx64 "with err %ld", mPeerNodeId, long(err));
+            ChipLogError(ExchangeManager, "Failed to send message to 0x%" PRIx64 " with err %ld", mPeerNodeId, long(err));
             mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(*entry);
         }
         else
