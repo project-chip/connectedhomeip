@@ -170,8 +170,11 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     char discriminatorBuf[5];  // hex representation of 16-bit discriminator
     char vendorProductBuf[10]; // "FFFF+FFFF"
     // TODO: The text entry will be updated in the spec, update accordingly.
+#if CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING
+    TextEntry entries[2] = { { "D", nullptr, 0 }, { "VP", nullptr, 0 } };
+#else
     TextEntry entries[3] = { { "D", nullptr, 0 }, { "VP", nullptr, 0 }, { "RI", nullptr, 0 } };
-
+#endif
     VerifyOrExit(mMdnsInitialized, error = CHIP_ERROR_INCORRECT_STATE);
     ChipLogProgress(Discovery, "setup mdns service");
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
@@ -186,9 +189,12 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     entries[0].mDataSize = strnlen(discriminatorBuf, sizeof(discriminatorBuf));
     entries[1].mData     = reinterpret_cast<const uint8_t *>(vendorProductBuf);
     entries[1].mDataSize = strnlen(discriminatorBuf, sizeof(vendorProductBuf));
+
+#if !CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING
     // Rotating Device ID
     entries[2].mData     = reinterpret_cast<const uint8_t *>(CHIP_ROTATING_DEVICE_ID);
     entries[2].mDataSize = strnlen(CHIP_ROTATING_DEVICE_ID, sizeof(CHIP_ROTATING_DEVICE_ID));
+#endif
 
     service.mTextEntryies  = entries;
     service.mTextEntrySize = sizeof(entries) / sizeof(TextEntry);

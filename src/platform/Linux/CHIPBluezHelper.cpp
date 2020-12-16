@@ -1261,6 +1261,7 @@ void BluezObjectsCleanup(BluezEndpoint * apEndpoint)
     EndpointCleanup(apEndpoint);
 }
 
+#if !CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING
 static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * characteristic)
 {
     // Construct the TLV for the additional data
@@ -1269,6 +1270,11 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     TLVWriter writer;
     chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
     chip::System::PacketBuffer * buffer           = bufferHandle.Get_ForNow();
+
+    if(characteristic == nullptr)
+    {
+        return;
+    }
 
     writer.Init(buffer);
     TLVType containerType;
@@ -1297,6 +1303,7 @@ exit:
     }
     return;
 }
+#endif
 
 static void BluezPeripheralObjectsSetup(gpointer apClosure)
 {
@@ -1333,6 +1340,14 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
     g_signal_connect(endpoint->mpC2, "handle-stop-notify", G_CALLBACK(BluezCharacteristicStopNotify), apClosure);
     g_signal_connect(endpoint->mpC2, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), apClosure);
 
+    ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC1));
+    ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC2));
+
+#if CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING
+    ChipLogDetail(DeviceLayer, "CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING is TRUE");
+    (void) c3_flags;
+#else
+    ChipLogDetail(DeviceLayer, "CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING is FALSE");
     // Additional data characteristics
     endpoint->mpC3 =
         BluezCharacteristicCreate(endpoint->mpService, g_strdup("c3"), g_strdup(CHIP_PLAT_BLE_UUID_C3_STRING), endpoint->mpRoot);
@@ -1346,10 +1361,8 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
     g_signal_connect(endpoint->mpC3, "handle-confirm", G_CALLBACK(BluezCharacteristicConfirm), apClosure);
     // update the characteristic value
     UpdateAdditionalDataCharacteristic(endpoint->mpC3);
-
-    ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC1));
-    ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC2));
     ChipLogDetail(DeviceLayer, "CHIP BTP C3 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC3));
+#endif
 
 exit:
     return;

@@ -44,6 +44,9 @@ if (chip_device_platform != "none") {
 
     # By pass provision and secure session
     chip_bypass_rendezvous = false
+
+    # Bypass including the additional data in the advertisement packets
+    chip_bypass_additional_data_advertising = false
   }
 
   buildconfig_header("platform_buildconfig") {
@@ -77,6 +80,12 @@ if (chip_device_platform != "none") {
 
     if (chip_bypass_rendezvous) {
       defines += [ "CHIP_BYPASS_RENDEZVOUS=1" ]
+    }
+
+    if(chip_bypass_additional_data_advertising) {
+      defines += [ "CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING=1" ]
+    } else {
+      defines += [ "CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING=0" ]
     }
 
     if (chip_device_platform == "darwin") {
