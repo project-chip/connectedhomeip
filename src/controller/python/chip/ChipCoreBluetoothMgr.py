@@ -240,7 +240,10 @@ class CoreBluetoothManager(ChipBleBase):
         pyos_inputhook_ptr.value = cast(self.hookFuncPtr, c_void_p).value
 
     def shouldLoop(self, cond):
-        """ Used by runLoopUntil to determine whether it should exit the runloop."""
+        """
+        shouldLoop(BgLoopCondition): 
+        Used by runLoopUntil to determine whether it should exit the runloop.
+        """
 
         if cond.TimeLimitExceeded():
             return False
