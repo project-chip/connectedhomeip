@@ -52,9 +52,12 @@ enum class MsgType
     StandaloneAck = 0x10,
 
     // Password-based session establishment Message Types
-    PASE_Spake2pA = 0x20,
-    PASE_Spake2pB = 0x21,
-    PASE_Spake2cA = 0x22,
+    PBKDFParamRequest  = 0x20,
+    PBKDFParamResponse = 0x21,
+    PASE_Spake2p1      = 0x22,
+    PASE_Spake2p2      = 0x23,
+    PASE_Spake2p3      = 0x24,
+    PASE_Spake2pError  = 0x2F,
 
     // Certificate-based session establishment Message Types
     CASE_SigmaR1  = 0x30,

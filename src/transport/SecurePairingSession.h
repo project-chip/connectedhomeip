@@ -27,6 +27,7 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
+#include <protocols/secure_channel/SecureChannelProtocol.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSession.h>
@@ -232,25 +233,15 @@ private:
     void SendErrorMsg(Spake2pErrorType errorCode);
     void HandleErrorMsg(const PacketHeader & header, const System::PacketBufferHandle & msg);
 
-    CHIP_ERROR AttachHeaderAndSend(uint8_t msgType, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf);
 
     void Clear();
 
     static constexpr size_t kSpake2p_WS_Length = kP256_FE_Length + 8;
 
-    enum Spake2pMsgType : uint8_t
-    {
-        kPBKDFParamRequest  = 0x20,
-        kPBKDFParamResponse = 0x21,
-        kSpake2pMsg1        = 0x22,
-        kSpake2pMsg2        = 0x23,
-        kSpake2pMsg3        = 0x24,
-        kSpake2pMsgError    = 0x2f,
-    };
-
     SecurePairingSessionDelegate * mDelegate = nullptr;
 
-    Spake2pMsgType mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgError;
+    Protocols::SecureChannel::MsgType mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
 
     Spake2p_P256_SHA256_HKDF_HMAC mSpake2p;
 
