@@ -223,7 +223,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     }
 
     // If we didn't find an existing exchange that matches the message, and no unsolicited message handler registered
-    // to hand this message. Needs to create a temporary exchange to send ack for this message and then close this exchange.
+    // to hand this message, we need to create a temporary exchange to send an ack for this message and then close this exchange.
     sendAckAndCloseExchange = payloadHeader.IsNeedsAck() && (matchingUMH == nullptr);
 
     // If we found a handler or we need to create a new exchange context (EC).
