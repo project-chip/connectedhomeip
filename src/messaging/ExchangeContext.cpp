@@ -192,7 +192,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     }
     mDelegate = nullptr;
 
-    // Closure of an EC is based on ref counting. The Protocol when it calls DoClose(), indicates that
+    // Closure of an EC is based on ref counting. The Protocol, when it calls DoClose(), indicates that
     // it is done with the EC and the ML sets all callbacks to NULL and does not send anything recvd on
     // the EC, upward. When the protocol layer decides to close the exchange, at which point the messaging
     // layer needs to handle the remaining work to be done on that exchange(Send all pending acks) before
