@@ -82,7 +82,7 @@ if (chip_device_platform != "none") {
       defines += [ "CHIP_BYPASS_RENDEZVOUS=1" ]
     }
 
-    if(chip_bypass_additional_data_advertising) {
+    if (chip_bypass_additional_data_advertising) {
       defines += [ "CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING=1" ]
     } else {
       defines += [ "CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING=0" ]
