@@ -31,6 +31,8 @@
 
 #include <support/logging/CHIPLogging.h>
 
+#include <type_traits>
+
 namespace chip {
 namespace DeviceLayer {
 namespace Internal {
@@ -47,6 +49,14 @@ class BLEManagerImpl final : public BLEManager, private BleLayer, private BlePla
     friend BLEManager;
 
 private:
+    // As a result of https://github.com/zephyrproject-rtos/zephyr/issues/29357, BLE indication
+    // callback parameter type has changed in recent Zephyr revisions. Select the compatible type
+    // below to support both versions for now.
+    using IndicationAttrType = std::conditional_t<
+        std::is_same<bt_gatt_indicate_func_t, void(*)(bt_conn*, bt_gatt_indicate_params*, uint8_t)>::value,
+        bt_gatt_indicate_params*,
+        const bt_gatt_attr*>;
+
     // ===== Members that implement the BLEManager internal interface.
 
     CHIP_ERROR _Init(void);
@@ -120,7 +130,7 @@ private:
     static void DriveBLEState(intptr_t arg);
 
     // Below callbacks run from the system workqueue context and have a limited stack capacity.
-    static void HandleTXIndicated(bt_conn * conn, const bt_gatt_attr * attr, uint8_t err);
+    static void HandleTXIndicated(bt_conn * conn, IndicationAttrType attr, uint8_t err);
     static void HandleConnect(bt_conn * conn, uint8_t err);
     static void HandleDisconnect(bt_conn * conn, uint8_t reason);
     static void HandleBLEAdvertisementTimeout(System::Layer * layer, void * param, System::Error error);
