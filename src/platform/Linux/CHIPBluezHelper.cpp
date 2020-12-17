@@ -1283,7 +1283,8 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
 
     writer.Init(buffer);
 
-    err = writer.OpenContainer(ProfileTag(kProtocol_ServiceProvisioning, kTag_AdditionalDataExensionDescriptor), kTLVType_Structure, innerWriter);
+    err = writer.OpenContainer(ProfileTag(kProtocol_ServiceProvisioning, kTag_AdditionalDataExensionDescriptor), kTLVType_Structure,
+                               innerWriter);
     SuccessOrExit(err);
 
     // Adding the rotating device id to the TLV data
@@ -1295,7 +1296,8 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
 
     writer.Finalize();
 
-    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), buffer->Start(), buffer->DataLength(), TRUE,  g_free, g_memdup(buffer->Start(), buffer->DataLength()));
+    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), buffer->Start(), buffer->DataLength(), TRUE, g_free,
+                                     g_memdup(buffer->Start(), buffer->DataLength()));
     bluez_gatt_characteristic1_set_value(characteristic, cValue);
 
     return;
