@@ -198,27 +198,35 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     }
   }
 
+  standalone_toolchain = "${chip_root}/config/standalone/toolchain:standalone"
+  not_needed([ "standalone_toolchain" ])  # Might not be needed.
+
   if (enable_standalone_chip_tool_build) {
     group("standalone_chip_tool") {
-      deps = [ "${chip_root}/examples/chip-tool(${chip_root}/config/standalone/toolchain:standalone)" ]
+      deps = [ "${chip_root}/examples/chip-tool(${standalone_toolchain})" ]
     }
   }
 
   if (enable_standalone_shell_build) {
     group("standalone_shell") {
-      deps = [ "${chip_root}/examples/shell/standalone(${chip_root}/config/standalone/toolchain:standalone)" ]
+      deps =
+          [ "${chip_root}/examples/shell/standalone(${standalone_toolchain})" ]
     }
   }
 
   if (enable_linux_all_clusters_app_build) {
     group("linux_all_clusters_app") {
-      deps = [ "${chip_root}/examples/all-clusters-app/linux(${chip_root}/config/standalone/toolchain:standalone)" ]
+      deps = [
+        "${chip_root}/examples/all-clusters-app/linux(${standalone_toolchain})",
+      ]
     }
   }
 
   if (enable_linux_lighting_app_build) {
     group("linux_lighting_app") {
-      deps = [ "${chip_root}/examples/lighting-app/linux(${chip_root}/config/standalone/toolchain:standalone)" ]
+      deps = [
+        "${chip_root}/examples/lighting-app/linux(${standalone_toolchain})",
+      ]
     }
   }
 
