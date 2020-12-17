@@ -96,9 +96,12 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, EncryptedPacketBufferHandle msgBuf,
-                                         EncryptedPacketBufferHandle * bufferRetainSlot, uint32_t msgIdIn, uint32_t payloadLenIn)
+                                         EncryptedPacketBufferHandle * bufferRetainSlot)
 {
-    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, true, msgIdIn, payloadLenIn);
+    uint32_t msgId      = msgBuf.GetMsgId();
+    uint32_t payloadLen = msgBuf.GetPayloadLen();
+
+    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, true, msgId, payloadLen);
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,

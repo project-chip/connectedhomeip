@@ -416,11 +416,7 @@ CHIP_ERROR ReliableMessageManager::SendFromRetransTable(RetransTableEntry * entr
 
     if (rc)
     {
-        uint32_t msgId      = entry->retainedBuf.GetMsgId();
-        uint32_t payloadLen = entry->retainedBuf.GetPayloadLen();
-
-        err = mSessionMgr->SendMessage(entry->payloadHeader, entry->peerNodeId, std::move(entry->retainedBuf), &entry->retainedBuf,
-                                       msgId, payloadLen);
+        err = mSessionMgr->SendMessage(entry->payloadHeader, entry->peerNodeId, std::move(entry->retainedBuf), &entry->retainedBuf);
 
         if (err == CHIP_NO_ERROR)
         {

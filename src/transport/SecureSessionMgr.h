@@ -163,7 +163,7 @@ public:
     CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
                            EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
     CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, EncryptedPacketBufferHandle msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot, uint32_t msgIdIn, uint32_t payloadLenIn);
+                           EncryptedPacketBufferHandle * bufferRetainSlot);
     /**
      * @brief
      *   Set the callback object.
