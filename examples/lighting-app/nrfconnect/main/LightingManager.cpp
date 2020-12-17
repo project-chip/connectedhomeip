@@ -21,30 +21,25 @@
 #include "AppConfig.h"
 #include "LogUtils.h"
 
+#include <drivers/pwm.h>
 #include <zephyr.h>
 
 LightingManager LightingManager::sLight;
 
-int LightingManager::Init(const char * gpioDeviceName, gpio_pin_t gpioPin)
+int LightingManager::Init(const char * pwmDeviceName, uint32_t pwmChannel)
 {
     // We use a gpioPin instead of a LEDWidget here because we want to use PWM
     // and other features instead of just on/off.
 
     mState      = kState_On;
-    mGPIOPin    = gpioPin;
-    mGPIODevice = const_cast<device *>(device_get_binding(gpioDeviceName));
+    mLevel      = kMaxLevel;
+    mPwmDevice  = device_get_binding(pwmDeviceName);
+    mPwmChannel = pwmChannel;
 
-    if (!mGPIODevice)
+    if (!mPwmDevice)
     {
-        LOG_ERR("Cannot find GPIO port %s", LOG_STRDUP(gpioDeviceName));
+        LOG_ERR("Cannot find PWM device %s", LOG_STRDUP(pwmDeviceName));
         return -ENODEV;
-    }
-
-    int res = gpio_pin_configure(mGPIODevice, mGPIOPin, GPIO_OUTPUT);
-    if (res != 0)
-    {
-        LOG_ERR("Cannot configure GPIO pin");
-        return res;
     }
 
     Set(false);
@@ -114,20 +109,20 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint8_t s
 
 void LightingManager::SetLevel(uint8_t aLevel)
 {
-    LOG_INF("LEVEL %u", aLevel);
-    // TODO: use the level for PWM
+    LOG_INF("Setting brightness level to %u", aLevel);
+    mLevel = aLevel;
+    UpdateLight();
 }
 
 void LightingManager::Set(bool aOn)
 {
-    if (aOn)
-    {
-        mState = kState_On;
-        gpio_pin_set_raw(mGPIODevice, mGPIOPin, 0);
-    }
-    else
-    {
-        mState = kState_Off;
-        gpio_pin_set_raw(mGPIODevice, mGPIOPin, 1);
-    }
+    mState = aOn ? kState_On : kState_Off;
+    UpdateLight();
+}
+
+void LightingManager::UpdateLight()
+{
+    constexpr uint32_t kPwmWidthUs = 1000u;
+    const uint8_t level            = mState == kState_On ? mLevel : 0;
+    pwm_pin_set_usec(mPwmDevice, mPwmChannel, kPwmWidthUs, kPwmWidthUs * level / kMaxLevel, 0);
 }

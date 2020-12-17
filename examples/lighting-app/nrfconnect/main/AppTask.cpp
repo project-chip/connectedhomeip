@@ -100,7 +100,7 @@ int AppTask::Init()
     k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
-    ret = LightingMgr().Init(LIGHTING_GPIO_DEVICE_NAME, LIGHTING_GPIO_PIN);
+    ret = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL);
     if (ret != 0)
         return ret;
 

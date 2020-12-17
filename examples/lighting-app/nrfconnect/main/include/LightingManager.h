@@ -43,22 +43,26 @@ public:
 
     using LightingCallback_fn = void (*)(Action_t, int32_t);
 
-    int Init(const char * gpioDeviceName, gpio_pin_t gpioPin);
+    int Init(const char * pwmDeviceName, uint32_t pwmChannel);
     bool IsTurnedOn() const { return mState == kState_On; }
     bool InitiateAction(Action_t aAction, int32_t aActor, uint8_t size, uint8_t * value);
     void SetCallbacks(LightingCallback_fn aActionInitiated_CB, LightingCallback_fn aActionCompleted_CB);
 
 private:
-    friend LightingManager & LightingMgr(void);
+    static constexpr uint8_t kMaxLevel = 255;
+
+    friend LightingManager & LightingMgr();
     State_t mState;
-    gpio_pin_t mGPIOPin;
-    device * mGPIODevice;
+    uint8_t mLevel;
+    const device * mPwmDevice;
+    uint32_t mPwmChannel;
 
     LightingCallback_fn mActionInitiated_CB;
     LightingCallback_fn mActionCompleted_CB;
 
     void Set(bool aOn);
     void SetLevel(uint8_t aLevel);
+    void UpdateLight();
 
     static LightingManager sLight;
 };
