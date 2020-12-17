@@ -23,7 +23,7 @@ The EFR32 lock example provides a baseline demonstration of a door lock control
 device, built using CHIP and the Silicon Labs gecko SDK. It can be controlled by
 a Chip controller over Openthread network..
 
-The EFR32 device can be comissionned over Bluetooth Low Energy where the device
+The EFR32 device can be commissioned over Bluetooth Low Energy where the device
 and the Chip controller will exchange security information with the Rendez-vous
 procedure. Thread Network credentials are then provided to the EFR32 device
 which will then join the network.
@@ -90,11 +90,12 @@ Silicon Labs platform.
           $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ rm -rf out/
 
-OR use the script cd ~/connectedhomeip
-$ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
-          $ export
-EFR32_BOARD=BRD4161A ./scripts/examples/gn_efr32_example.sh
-examples/lock-app/efr32/ out/debug/efr32_lock_app
+OR use the script
+
+          cd ~/connectedhomeip
+          $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
+          $ export EFR32_BOARD=BRD4161A
+          ./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/debug/efr32_lock_app
 
 -   To delete generated executable, libraries and object files use:
     $ cd ~/connectedhomeip
@@ -165,8 +166,8 @@ combination with JLinkRTTClient as follows:
 
 ## Running the Complete Example
 
--   It is assumed here that you already have a OpenThread border router
-    configured and running. If not See the following guide
+-   It is assumed here that you already have an OpenThread border router
+    configured and running. If not, see the following guide
     [OpenThread Border Router](https://openthread.io/guides/border-router) for
     more information on how to setup a border router. Take note that the RCP
     code is available directly through
@@ -207,7 +208,7 @@ combination with JLinkRTTClient as follows:
         -   _Blinking_ ; Bolt is moving to the desired state
         -   _Off_ ; Bolt is unlocked
 
-    **Push Button 0** - Press and Release : If not commissionned, start thread
+    **Push Button 0** - Press and Release : If not commissioned, start thread
     with default configurations (DEBUG)
 
 
@@ -219,40 +220,47 @@ combination with JLinkRTTClient as follows:
     **Push Button 1**
         Toggles the bolt state On/Off
 
--   Once the device is provisonned and it will join the Thread network is
-    established Look for the RTT log [DL] Device Role: CHILD [DL] Partition Id:
-    0x6A7491B7 [DL] \_OnPlatformEvent default: event->Type = 32778 [DL]
-    OpenThread State Changed (Flags: 0x00000001) [DL] Thread Unicast Addresses:
-    [DL] 2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred [DL]
-    FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc [DL]
-    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred [DL]
-    FE80::D8F2:592E:C109:CF00/64 valid preferred [DL] LwIP Thread interface
-    addresses updated [DL] FE80::D8F2:592E:C109:CF00 IPv6 link-local address,
-    preferred) [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local
-    address, preferred) [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast
-    address, preferred)
+-   Once the device is provisioned, it will join the Thread network is
+    established, look for the RTT log
+    ``` 
+        [DL] Device Role: CHILD 
+        [DL] Partition Id:0x6A7491B7 
+        [DL] \_OnPlatformEvent default: event->Type = 32778 
+        [DL] OpenThread State Changed (Flags: 0x00000001) 
+        [DL] Thread Unicast Addresses:
+        [DL]    2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred 
+        [DL]    FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc 
+        [DL]    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred 
+        [DL]    FE80::D8F2:592E:C109:CF00/64 valid preferred 
+        [DL] LwIP Thread interface addresses updated 
+        [DL] FE80::D8F2:592E:C109:CF00 IPv6 link-local address, preferred) 
+        [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred) 
+        [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
+    ```
 
-    Keep The gloabl unicast address, It is to be used to reach the Device with
-    the chip-tool The device will be promoted to Router shortly after [DL]
+    Keep The global unicast address; It is to be used to reach the Device with
+    the chip-tool. The device will be promoted to Router shortly after [DL]
     Device Role: ROUTER
 
-    (you can verify that the device is on the thread netowrk with the command
+    (you can verify that the device is on the thread network with the command
     `router table` using a serial terminal (screen / minicom etc.) on the board
-    running the lighting-app example You can also get the address list with the
-    command ipaddr again in the serial termianl )
+    running the lighting-app example. You can also get the address list with the
+    command ipaddr again in the serial terminal )
 
 -   Using chip-tool you can now control the lock status with on/off command such
-    as `chip-tool onoff on 1` \*\* Currently, chip-tool for Mac or Linux do not
-    yet have the Thread provisionning feature
-    `chip-tool bypass <Global ipv6 address of the node> 11097` You can Provision
-    the Chip device using Chip tool Android or iOS app or Through CLI commands
-    on your OT BR
+    as `chip-tool onoff on 1` 
+    
+    \*\* Currently, chip-tool for Mac or Linux do not yet have the Thread provisioning feature
+    `chip-tool bypass <Global ipv6 address of the node> 11097` 
+    
+    You can provision the Chip device using Chip tool Android or iOS app or through
+    CLI commands on your OT BR
 
 ### Notes
 
 -   Depending on your network settings your router might not provide native ipv6
     addresses to your devices (Border router / PC). If this is the case, you
-    need to add a static ipv6 addresses on both device and then a ipv6 route to
+    need to add a static ipv6 addresses on both device and then an ipv6 route to
     the border router on your PC
 
           # On Border Router :
