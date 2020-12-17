@@ -25,7 +25,7 @@ executable("chip-tool") {
     "commands/common/Commands.cpp",
     "commands/pairing/PairingCommand.cpp",
     "commands/payload/AdditionalDataParseCommand.cpp",
-    "commands/payload/QRCodeParseCommand.cpp",
+    "commands/payload/SetupPayloadParseCommand.cpp",
     "config/PersistentStorage.cpp",
     "main.cpp",
   ]

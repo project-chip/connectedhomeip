@@ -19,12 +19,12 @@
 #pragma once
 
 #include "AdditionalDataParseCommand.h"
-#include "QRCodeParseCommand.h"
+#include "SetupPayloadParseCommand.h"
 
 void registerCommandsPayload(Commands & commands)
 {
     const char * clusterName      = "Payload";
-    commands_list clusterCommands = { make_unique<QRCodeParseCommand>(), make_unique<AdditionalDataParseCommand>() };
+    commands_list clusterCommands = { make_unique<SetupPayloadParseCommand>(), make_unique<AdditionalDataParseCommand>() };
 
     commands.Register(clusterName, clusterCommands);
 }
