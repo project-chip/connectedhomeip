@@ -26,7 +26,7 @@
 #include "AdditionalDataPayload.h"
 
 #include <core/CHIPError.h>
-#include <string>
+#include <vector>
 
 namespace chip {
 
@@ -37,10 +37,10 @@ namespace chip {
 class AdditionalDataPayloadParser
 {
 private:
-    std::string mPayload;
+    std::vector<uint8_t> mPayload;
 
 public:
-    AdditionalDataPayloadParser(std::string payload) : mPayload(std::move(payload)) {}
+    AdditionalDataPayloadParser(std::vector<uint8_t> payload) : mPayload(std::move(payload)) {}
     CHIP_ERROR populatePayload(SetupPayload::AdditionalDataPayload & outPayload);
 };
 

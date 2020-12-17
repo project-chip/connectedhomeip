@@ -42,21 +42,10 @@ using namespace chip::TLV::Utilities;
 CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & outPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    std::vector<uint8_t> tlvData;
     chip::TLV::TLVReader reader;
     chip::TLV::TLVReader innerReader;
 
-    // Decode input payload
-    size_t len = mPayload.length();
-
-    for (size_t i = 0; i < len; i += 2)
-    {
-        auto str  = mPayload.substr(i, 2);
-        uint8_t x = (uint8_t) stoi(str, 0, 16);
-        tlvData.push_back(x);
-    }
-
-    reader.Init(&tlvData[0], (uint32_t) tlvData.size());
+    reader.Init(&mPayload[0], (uint32_t) mPayload.size());
     reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
     err                      = reader.Next();
     SuccessOrExit(err);

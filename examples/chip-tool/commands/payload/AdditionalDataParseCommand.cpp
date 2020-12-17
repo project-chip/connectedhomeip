@@ -26,10 +26,21 @@ using namespace ::chip::SetupPayload;
 
 CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId localId, NodeId remoteId)
 {
-    std::string payload(mPayload);
+    std::vector<uint8_t> payloadData;
     AdditionalDataPayload resultPayload;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err            = AdditionalDataPayloadParser(payload).populatePayload(resultPayload);
+    std::string payloadString(mPayload);
+
+    // Decode input payload
+    size_t len = payloadString.length();
+
+    for (size_t i = 0; i < len; i += 2)
+    {
+        auto str  = payloadString.substr(i, 2);
+        uint8_t x = (uint8_t) stoi(str, 0, 16);
+        payloadData.push_back(x);
+    }
+    err            = AdditionalDataPayloadParser(payloadData).populatePayload(resultPayload);
     SuccessOrExit(err);
     ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());
 exit:
