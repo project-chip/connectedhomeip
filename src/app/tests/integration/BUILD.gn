@@ -20,17 +20,17 @@ assert(chip_build_tools)
 
 executable("chip-im-requester") {
   sources = [
-    "common.cpp",
     "chip_im_initiator.cpp",
+    "common.cpp",
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
-    "${chip_root}/src/app",
   ]
 
   output_dir = root_out_dir
@@ -38,18 +38,18 @@ executable("chip-im-requester") {
 
 executable("chip-im-responder") {
   sources = [
-    "common.cpp",
     "chip_im_responder.cpp",
+    "common.cpp",
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
     "${chip_root}/src/platform",
     "${chip_root}/src/protocols",
     "${chip_root}/src/system",
-    "${chip_root}/src/app",
   ]
 
   output_dir = root_out_dir
