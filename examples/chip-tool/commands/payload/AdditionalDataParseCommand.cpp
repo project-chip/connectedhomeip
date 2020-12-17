@@ -40,7 +40,7 @@ CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId l
         uint8_t x = (uint8_t) stoi(str, 0, 16);
         payloadData.push_back(x);
     }
-    err            = AdditionalDataPayloadParser(payloadData).populatePayload(resultPayload);
+    err = AdditionalDataPayloadParser(payloadData).populatePayload(resultPayload);
     SuccessOrExit(err);
     ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());
 exit:
