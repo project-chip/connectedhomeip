@@ -41,8 +41,8 @@
 #include <system/SystemPacketBuffer.h>
 
 #include <app/Command.h>
-#include <app/CommandSender.h>
 #include <app/CommandHandler.h>
+#include <app/CommandSender.h>
 
 #define CHIP_MAX_NUM_COMMAND_HANDLER_OBJECTS 1
 
