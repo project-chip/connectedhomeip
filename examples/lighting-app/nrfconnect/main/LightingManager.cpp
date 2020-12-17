@@ -69,7 +69,7 @@ bool LightingManager::InitiateAction(Action_t aAction, int32_t aActor, uint8_t s
         action_initiated = true;
         new_state        = kState_Off;
     }
-    else if (aAction == LEVEL_ACTION)
+    else if (aAction == LEVEL_ACTION && *value != mLevel)
     {
         action_initiated = true;
         if (*value == 0)
