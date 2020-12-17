@@ -69,7 +69,7 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     SuccessOrExit(err);
 
     // Get the value of the rotating device id
-    if(chip::TLV::TagNumFromTag(innerReader.GetTag()) == kRotatingDeviceIdTag)
+    if (chip::TLV::TagNumFromTag(innerReader.GetTag()) == kRotatingDeviceIdTag)
     {
         char rotatingDeviceId[kRotatingDeviceIdLength];
         err                         = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
