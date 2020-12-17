@@ -16,6 +16,8 @@
 #define GENERATED_DEFAULTS {{endpoint_attribute_long_defaults endian="little"}}
 #endif // BIGENDIAN_CPU
 
+#define GENERATED_DEFAULTS_COUNT ({{endpoint_attribute_long_defaults_count}})
+
 #define ZAP_TYPE(type) ZCL_ ## type ## _ATTRIBUTE_TYPE
 #define ZAP_LONG_DEFAULTS_INDEX(index) {(uint8_t*)(&generatedDefaults[index])}
 #define ZAP_MIN_MAX_DEFAULTS_INDEX(index) {(uint8_t*)(&minMaxDefault[index])}
@@ -32,12 +34,13 @@
 // This is an array of EmberAfCluster structures.
 #define ZAP_ATTRIBUTE_INDEX(index) ((EmberAfAttributeMetadata *)(&generatedAttributes[index]))
 
+#define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_ ## mask
 #define GENERATED_CLUSTER_COUNT {{endpoint_cluster_count}}
 #define GENERATED_CLUSTERS {{endpoint_cluster_list}}
 
 #define ZAP_CLUSTER_INDEX(index) ((EmberAfCluster*)(&generatedClusters[index]))
 
-#define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_ ## mask
+
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES {{endpoint_types_list}}
 
@@ -95,8 +98,22 @@
 #define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_ ## x
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
+{{#if (endpoint_reporting_config_default_count)}}
+// TODO Issue #3871 Reporting should only be enabled if there are reportable attributes
+// Use this macro to check if Reporting plugin is included
+#define EMBER_AF_PLUGIN_REPORTING
+// User options for plugin Reporting
+#define EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE ({{endpoint_reporting_config_default_count}})
+#define EMBER_AF_PLUGIN_REPORTING_ENABLE_GROUP_BOUND_REPORTS
+{{/if}}
+
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE ({{endpoint_reporting_config_default_count}})
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS {{endpoint_reporting_config_defaults}}
 
-
 {{/endpoint_config}}
+
+// CLUSTER defines to replace PLUGIN logic where needed.
+// To be discussed in a TT meeting in January 2020 (issue #4248)
+{{#all_user_clusters}}
+#define CHIP_{{asDelimitedMacro define}}_{{asDelimitedMacro side}}
+{{/all_user_clusters}}

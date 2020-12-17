@@ -565,6 +565,12 @@ function isManufacturerSpecificCommand()
   return !!this.mfgCode;
 }
 
+// Temporary function. This will be part of ZAP Core helper. Can only be called within
+// endpoint_config iterator.
+function endpoint_attribute_long_defaults_count(options) {
+  return this.longDefaultsList.length
+}
+
 // WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 //
 // Note: these exports are public API. Templates that might have been created in the past and are
@@ -589,3 +595,5 @@ exports.isWritableAttribute                           = isWritableAttribute;
 exports.isReportableAttribute                         = isReportableAttribute;
 exports.user_cluster_has_enabled_manufacturer_command = user_cluster_has_enabled_manufacturer_command;
 exports.isManufacturerSpecificCommand                 = isManufacturerSpecificCommand;
+
+exports.endpoint_attribute_long_defaults_count = endpoint_attribute_long_defaults_count
