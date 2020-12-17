@@ -29,7 +29,7 @@ CHIP_ERROR AdditionalDataParseCommand::Run(PersistentStorage & storage, NodeId l
     std::string payload(mPayload);
     AdditionalDataPayload resultPayload;
     CHIP_ERROR err = CHIP_NO_ERROR;
-    err = AdditionalDataPayloadParser(payload).populatePayload(resultPayload);
+    err            = AdditionalDataPayloadParser(payload).populatePayload(resultPayload);
     SuccessOrExit(err);
     ChipLogProgress(chipTool, "AdditionalDataParseCommand, RotatingDeviceId=%s", resultPayload.rotatingDeviceId.c_str());
 exit:

@@ -27,10 +27,10 @@
 #include <string.h>
 #include <vector>
 
-#include <protocols/Protocols.h>
 #include <core/CHIPError.h>
 #include <core/CHIPTLVData.hpp>
 #include <core/CHIPTLVUtilities.hpp>
+#include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 
 using namespace chip;
