@@ -22,8 +22,8 @@
  *
  */
 
-#include "Command.h"
 #include "CommandSender.h"
+#include "Command.h"
 #include "CommandHandler.h"
 #include "InteractionModelEngine.h"
 
@@ -44,8 +44,9 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId)
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(CHIP_INVOKE_COMMAND_RSP_TIMEOUT);
 
-    err = mpExchangeCtx->SendMessage(Protocols::kProtocol_InteractionModel, kMsgType_InvokeCommandRequest, std::move(mCommandMessageBuf),
-                                    Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_ExpectResponse));
+    err = mpExchangeCtx->SendMessage(Protocols::kProtocol_InteractionModel, kMsgType_InvokeCommandRequest,
+                                     std::move(mCommandMessageBuf),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_ExpectResponse));
     SuccessOrExit(err);
     MoveToState(kState_Sending);
 
@@ -60,7 +61,7 @@ exit:
 }
 
 void CommandSender::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                                   uint8_t aMsgType, System::PacketBufferHandle aPayload)
+                                      uint8_t aMsgType, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     // Assert that the exchange context matches the client's current context.
@@ -101,20 +102,20 @@ void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apEc)
 
 CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement)
 {
-    CHIP_ERROR err               = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     CommandPath::Parser commandPath;
     chip::TLV::TLVReader commandDataReader;
     chip::ClusterId clusterId;
     chip::CommandId commandId;
-    uint16_t generalCode                = 0;
-    uint32_t protocolId                 = 0;
-    uint16_t protocolCode               = 0;
+    uint16_t generalCode  = 0;
+    uint32_t protocolId   = 0;
+    uint16_t protocolCode = 0;
     StatusElement::Parser statusElementParser;
 
     err = aCommandElement.GetStatusElement(&statusElementParser);
     if (CHIP_NO_ERROR == err)
     {
-        //Response has status element since either there is error in command response or it is empty response
+        // Response has status element since either there is error in command response or it is empty response
         err = statusElementParser.CheckSchemaValidity();
         SuccessOrExit(err);
 
@@ -137,11 +138,9 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         {
             err = CHIP_NO_ERROR;
             ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-            AddStatusCode(0, chip::Protocols::kProtocol_Protocol_Common,
-                          CHIP_ERROR_INVALID_ARGUMENT, clusterId);
+            AddStatusCode(0, chip::Protocols::kProtocol_Protocol_Common, CHIP_ERROR_INVALID_ARGUMENT, clusterId);
         }
-        InteractionModelEngine::GetInstance()->ProcessCommand(clusterId, commandId, commandDataReader, this,
-                                                              kCommandSenderId);
+        InteractionModelEngine::GetInstance()->ProcessCommand(clusterId, commandId, commandDataReader, this, kCommandSenderId);
     }
 
 exit:

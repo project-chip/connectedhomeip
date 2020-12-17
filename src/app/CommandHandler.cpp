@@ -22,15 +22,15 @@
  *
  */
 
+#include "CommandHandler.h"
 #include "Command.h"
 #include "CommandSender.h"
-#include "CommandHandler.h"
 #include "InteractionModelEngine.h"
 
 namespace chip {
 namespace app {
 void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const PacketHeader & packetHeader, uint32_t protocolId,
-                                      uint8_t msgType, System::PacketBufferHandle payload)
+                                       uint8_t msgType, System::PacketBufferHandle payload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle response;
@@ -57,8 +57,9 @@ CHIP_ERROR CommandHandler::SendCommandResponse(NodeId aNodeId)
     SuccessOrExit(err);
 
     VerifyOrExit(mpExchangeCtx != NULL, err = CHIP_ERROR_INCORRECT_STATE);
-    err = mpExchangeCtx->SendMessage(Protocols::kProtocol_InteractionModel, kMsgType_InvokeCommandResponse, std::move(mCommandMessageBuf),
-                                    Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
+    err = mpExchangeCtx->SendMessage(Protocols::kProtocol_InteractionModel, kMsgType_InvokeCommandResponse,
+                                     std::move(mCommandMessageBuf),
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
     SuccessOrExit(err);
 
     MoveToState(kState_Sending);
@@ -92,13 +93,11 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
         // Empty Command, Add status code in invoke command response, notify cluster handler to hand it further.
         err = CHIP_NO_ERROR;
         ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-        AddStatusCode(COMMON_STATUS_SUCCESS, chip::Protocols::kProtocol_Protocol_Common,
-                      CHIP_ERROR_INVALID_ARGUMENT, clusterId);
+        AddStatusCode(COMMON_STATUS_SUCCESS, chip::Protocols::kProtocol_Protocol_Common, CHIP_ERROR_INVALID_ARGUMENT, clusterId);
     }
     else if (CHIP_NO_ERROR == err)
     {
-        InteractionModelEngine::GetInstance()->ProcessCommand(clusterId, commandId, commandDataReader, this,
-                                                              kCommandHandlerId);
+        InteractionModelEngine::GetInstance()->ProcessCommand(clusterId, commandId, commandDataReader, this, kCommandHandlerId);
     }
 
 exit:

@@ -27,7 +27,11 @@
 #ifndef _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H
 #define _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H
 
+#include <app/Command.h>
+#include <app/MessageDef.h>
 #include <core/CHIPCore.h>
+#include <core/CHIPTLVDebug.hpp>
+#include <map>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -35,16 +39,12 @@
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
-#include <app/MessageDef.h>
-#include <core/CHIPTLVDebug.hpp>
 #include <system/SystemPacketBuffer.h>
-#include <map>
-#include <app/Command.h>
 
 namespace chip {
 namespace app {
 
-class DLL_EXPORT CommandHandler: public Command
+class DLL_EXPORT CommandHandler : public Command
 {
 public:
     CHIP_ERROR SendCommandResponse(NodeId aNodeId);
@@ -54,7 +54,7 @@ public:
 private:
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 };
-} // namespace Protocols
 } // namespace app
+} // namespace chip
 
 #endif // _CHIP_INTERACTION_MODEL_COMMAND_HANDLER_H

@@ -23,18 +23,18 @@
  *
  */
 
-#include "Command.h"
-#include "CommandSender.h"
-#include "CommandHandler.h"
 #include "InteractionModelEngine.h"
+#include "Command.h"
+#include "CommandHandler.h"
+#include "CommandSender.h"
 
 namespace chip {
 namespace app {
-InteractionModelEngine::InteractionModelEngine() { }
+InteractionModelEngine::InteractionModelEngine() {}
 
 void InteractionModelEngine::SetEventCallback(void * const apAppState, const EventCallback aEventCallback)
 {
-    mpAppState      = apAppState;
+    mpAppState     = apAppState;
     mEventCallback = aEventCallback;
 }
 
@@ -72,8 +72,8 @@ void InteractionModelEngine::Shutdown()
     mHandlersMap.clear();
 }
 
-void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                                            uint8_t aMsgType, System::PacketBufferHandle aPayload)
+void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                                              uint32_t aProtocolId, uint8_t aMsgType, System::PacketBufferHandle aPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -84,11 +84,11 @@ void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apEc,
         buffer = nullptr;
     }
 
-    ChipLogDetail(DataManagement, "Msg type %d not supported", (int)aMsgType);
+    ChipLogDetail(DataManagement, "Msg type %d not supported", (int) aMsgType);
 
-    //Todo: Add status report
-    //err = SendStatusReport(ec, kChipProfile_Common, kStatus_UnsupportedMessage);
-    //SuccessOrExit(err);
+    // Todo: Add status report
+    // err = SendStatusReport(ec, kChipProfile_Common, kStatus_UnsupportedMessage);
+    // SuccessOrExit(err);
 
     apEc->Close();
     apEc = NULL;
@@ -102,10 +102,10 @@ void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apEc,
     }
 }
 
-void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                                            uint8_t aMsgType, System::PacketBufferHandle aPayload)
+void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                                                    uint32_t aProtocolId, uint8_t aMsgType, System::PacketBufferHandle aPayload)
 {
-    CHIP_ERROR err = CHIP_NO_ERROR;
+    CHIP_ERROR err                 = CHIP_NO_ERROR;
     CommandHandler * commandServer = nullptr;
 
     if (nullptr != mEventCallback)
@@ -116,7 +116,7 @@ void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext *
         outParam.Clear();
         outParam.mIncomingInvokeCommandRequest.mShouldContinueProcessing = true;
         outParam.mIncomingInvokeCommandRequest.mShouldContinueProcessing = true;
-        inParam.mIncomingInvokeCommandRequest.mpPacketHeader = & aPacketHeader;
+        inParam.mIncomingInvokeCommandRequest.mpPacketHeader             = &aPacketHeader;
 
         mEventCallback(mpAppState, kEvent_OnIncomingInvokeCommandRequest, inParam, outParam);
 
@@ -132,7 +132,7 @@ void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext *
         if (mCommandHandlerObjs[i].IsFree())
         {
             commandServer = &mCommandHandlerObjs[i];
-            err = commandServer->Init(mpExchangeMgr);
+            err           = commandServer->Init(mpExchangeMgr);
             SuccessOrExit(err);
             commandServer->OnMessageReceived(apEc, aPacketHeader, aProtocolId, aMsgType, std::move(aPayload));
             apEc = nullptr;
@@ -150,17 +150,17 @@ exit:
     }
 }
 
-void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
-                                      uint8_t aMsgType, System::PacketBufferHandle aPayload)
+void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader,
+                                               uint32_t aProtocolId, uint8_t aMsgType, System::PacketBufferHandle aPayload)
 {
     switch (aMsgType)
     {
-        case kMsgType_InvokeCommandRequest:
-            OnInvokeCommandRequest(apEc, aPacketHeader, aProtocolId, aMsgType, std::move(aPayload));
-            break;
-        default:
-            OnUnknownMsgType(apEc, aPacketHeader, aProtocolId, aMsgType, std::move(aPayload));
-            break;
+    case kMsgType_InvokeCommandRequest:
+        OnInvokeCommandRequest(apEc, aPacketHeader, aProtocolId, aMsgType, std::move(aPayload));
+        break;
+    default:
+        OnUnknownMsgType(apEc, aPacketHeader, aProtocolId, aMsgType, std::move(aPayload));
+        break;
     }
 }
 
@@ -169,33 +169,27 @@ void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Node: %llu", ec->GetPeerNodeId());
 }
 
-InteractionModelEngine::HandlerKey::HandlerKey(chip::ClusterId aClusterId,
-                                               chip::CommandId aCommandId, Command::CommandRoleId aCommandRoleId)
-        : mClusterId(aClusterId)
-        , mCommandId(aCommandId)
-        , mCommandRoleId(aCommandRoleId)
+InteractionModelEngine::HandlerKey::HandlerKey(chip::ClusterId aClusterId, chip::CommandId aCommandId,
+                                               Command::CommandRoleId aCommandRoleId) :
+    mClusterId(aClusterId),
+    mCommandId(aCommandId), mCommandRoleId(aCommandRoleId)
+{}
+
+inline bool InteractionModelEngine::HandlerKey::operator<(const HandlerKey & aOtherKey) const
 {
+    return ((mClusterId != aOtherKey.mClusterId)
+                ? (mClusterId < aOtherKey.mClusterId)
+                : ((mCommandId != aOtherKey.mCommandId) ? (mCommandId < aOtherKey.mCommandId)
+                                                        : ((mCommandRoleId < aOtherKey.mCommandRoleId))));
 }
 
-inline bool InteractionModelEngine::HandlerKey::operator<(const HandlerKey& aOtherKey) const
-{
-    return ((mClusterId != aOtherKey.mClusterId) ?
-            (mClusterId < aOtherKey.mClusterId) : (
-                    (mCommandId != aOtherKey.mCommandId) ?
-                    (mCommandId < aOtherKey.mCommandId) : (
-                            (mCommandRoleId < aOtherKey.mCommandRoleId))));
-}
-
-CHIP_ERROR InteractionModelEngine::RegisterClusterCommandHandler(chip::ClusterId  aClusterId,
-                                                                 chip::CommandId aCommandId,
-                                                                 Command::CommandRoleId aCommandRoleId,
-                                                                 CommandCbFunct aDispatcher)
+CHIP_ERROR InteractionModelEngine::RegisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
+                                                                 Command::CommandRoleId aCommandRoleId, CommandCbFunct aDispatcher)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     std::pair<HandlersMapType::iterator, bool> insertResult =
-            mHandlersMap.insert(HandlersMapType::value_type(
-                    HandlerKey(aClusterId, aCommandId, aCommandRoleId), aDispatcher));
+        mHandlersMap.insert(HandlersMapType::value_type(HandlerKey(aClusterId, aCommandId, aCommandRoleId), aDispatcher));
 
     if (insertResult.second == false)
     {
@@ -203,36 +197,29 @@ CHIP_ERROR InteractionModelEngine::RegisterClusterCommandHandler(chip::ClusterId
     }
     else
     {
-        ChipLogDetail(DataManagement, "%s: RegisterClusterCommandHandler registered handler for ClusterId = %d, CommandId = %d, CommandRoleId = %d, Dispatcher = %p",
-                      __FUNCTION__,
-                      aClusterId,
-                      aCommandId,
-                      aCommandRoleId,
-                      (void*)aDispatcher);
+        ChipLogDetail(DataManagement,
+                      "%s: RegisterClusterCommandHandler registered handler for ClusterId = %d, CommandId = %d, CommandRoleId = "
+                      "%d, Dispatcher = %p",
+                      __FUNCTION__, aClusterId, aCommandId, aCommandRoleId, (void *) aDispatcher);
     }
 
     return err;
 }
 
-CHIP_ERROR InteractionModelEngine::DeregisterClusterCommandHandler(chip::ClusterId aClusterId,
-                                                                   chip::CommandId  aCommandId, Command::CommandRoleId aCommandRoleId)
+CHIP_ERROR InteractionModelEngine::DeregisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
+                                                                   Command::CommandRoleId aCommandRoleId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    HandlersMapType::iterator handlerIt = mHandlersMap.find(
-            HandlerKey(aClusterId,
-                       aCommandId,
-                       aCommandRoleId));
+    HandlersMapType::iterator handlerIt = mHandlersMap.find(HandlerKey(aClusterId, aCommandId, aCommandRoleId));
     if (handlerIt != mHandlersMap.end())
     {
         CommandCbFunct pDispatcher = handlerIt->second;
 
-        ChipLogDetail(DataManagement, "%s: DeregisterClusterCommandHandler unregistered handler for ClusterId = %d, CommandId = %d, CommandRoleId = %d, Dispatcher = %p",
-                      __FUNCTION__,
-                      aClusterId,
-                      aCommandId,
-                      aCommandRoleId,
-                      (void*)pDispatcher);
+        ChipLogDetail(DataManagement,
+                      "%s: DeregisterClusterCommandHandler unregistered handler for ClusterId = %d, CommandId = %d, CommandRoleId "
+                      "= %d, Dispatcher = %p",
+                      __FUNCTION__, aClusterId, aCommandId, aCommandRoleId, (void *) pDispatcher);
         mHandlersMap.erase(handlerIt);
     }
     else
@@ -243,20 +230,15 @@ CHIP_ERROR InteractionModelEngine::DeregisterClusterCommandHandler(chip::Cluster
     return err;
 }
 
-void InteractionModelEngine::ProcessCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::TLV::TLVReader & aReader, Command * apCommandObj, Command::CommandRoleId aCommandRoleId)
+void InteractionModelEngine::ProcessCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::TLV::TLVReader & aReader,
+                                            Command * apCommandObj, Command::CommandRoleId aCommandRoleId)
 {
     HandlersMapType::iterator handlerIt;
 
-    handlerIt = mHandlersMap.find(
-            HandlerKey(aClusterId,
-                       aCommandId,
-                       aCommandRoleId));
+    handlerIt = mHandlersMap.find(HandlerKey(aClusterId, aCommandId, aCommandRoleId));
 
-    ChipLogDetail(DataManagement,"%s for ClusterId = %d, CommandId = %d, CommandRoleId = %d",
-                  __FUNCTION__,
-                  (int)(aClusterId),
-                  (int)(aCommandId),
-                  aCommandRoleId);
+    ChipLogDetail(DataManagement, "%s for ClusterId = %d, CommandId = %d, CommandRoleId = %d", __FUNCTION__, (int) (aClusterId),
+                  (int) (aCommandId), aCommandRoleId);
 
     if (handlerIt != mHandlersMap.end())
     {

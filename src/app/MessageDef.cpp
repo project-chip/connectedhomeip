@@ -2900,10 +2900,11 @@ CHIP_ERROR CommandDataElement::Parser::CheckSchemaValidity() const
     if (CHIP_END_OF_TLV == err)
     {
         // check for at most field:
-        const uint16_t CheckDataField = 1 << kCsTag_Data;
+        const uint16_t CheckDataField          = 1 << kCsTag_Data;
         const uint16_t CheckStatusElementField = 1 << kCsTag_StatusElement;
 
-        if ((TagPresenceMask & CheckDataField) == CheckDataField && (TagPresenceMask & CheckStatusElementField) == CheckStatusElementField)
+        if ((TagPresenceMask & CheckDataField) == CheckDataField &&
+            (TagPresenceMask & CheckStatusElementField) == CheckStatusElementField)
         {
             // kCsTag_Data and kCsTag_StatusElement both exist
             err = CHIP_ERROR_IM_MALFORMED_COMMAND_DATA_ELEMENT;

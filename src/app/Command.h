@@ -27,6 +27,7 @@
 #ifndef _CHIP_INTERACTION_MODEL_COMMAND_H
 #define _CHIP_INTERACTION_MODEL_COMMAND_H
 
+#include <app/MessageDef.h>
 #include <core/CHIPCore.h>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
@@ -35,7 +36,6 @@
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
-#include <app/MessageDef.h>
 #include <system/SystemPacketBuffer.h>
 
 namespace chip {
@@ -46,34 +46,35 @@ class Command
 public:
     enum CommandRoleId
     {
-        kCommandSenderId = 0,
+        kCommandSenderId  = 0,
         kCommandHandlerId = 1,
     };
 
     enum CommandState
     {
-        kState_Uninitialized = 0,    ///< The invoke command message has not been initialized
-        kState_Initialized,          ///< The invoke command message has been initialized and is ready
-        kState_AddCommand,           ///< The invoke command message has added Command
-        kState_Sending,              ///< The invoke command message  has sent out the invoke command
+        kState_Uninitialized = 0, ///< The invoke command message has not been initialized
+        kState_Initialized,       ///< The invoke command message has been initialized and is ready
+        kState_AddCommand,        ///< The invoke command message has added Command
+        kState_Sending,           ///< The invoke command message  has sent out the invoke command
     };
 
     /**
      * Encapsulates arguments to be passed into SendCommand().
      *
      */
-    struct CommandParams {
+    struct CommandParams
+    {
         chip::EndpointId EndpointId;
         chip::GroupId GroupId;
         chip::ClusterId ClusterId;
         chip::CommandId CommandId;
-        uint8_t  Flags;
+        uint8_t Flags;
     };
 
     enum CommandPathFlags
     {
-        kCommandPathFlag_EndpointIdValid   = 0x0001,  /**< Set when the EndpointId field is valid */
-        kCommandPathFlag_GroupIdValid  = 0x0002,     /**< Set when the GroupId field is valid */
+        kCommandPathFlag_EndpointIdValid = 0x0001, /**< Set when the EndpointId field is valid */
+        kCommandPathFlag_GroupIdValid    = 0x0002, /**< Set when the GroupId field is valid */
     } CommandPathFlags;
 
     /**
@@ -111,10 +112,11 @@ public:
     CHIP_ERROR FinalizeCommandsMessage();
 
     chip::TLV::TLVWriter & CreateCommandDataElementTLVWriter();
-    CHIP_ERROR AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId, chip::CommandId aCommandId, uint8_t Flags);
-    CHIP_ERROR AddCommand(CommandParams &aCommandParams);
-    CHIP_ERROR AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId,
-                             const uint16_t aProtocolCode, const chip::ClusterId aNamespacedClusterId);
+    CHIP_ERROR AddCommand(chip::EndpointId aEndpintId, chip::GroupId aGroupId, chip::ClusterId aClusterId,
+                          chip::CommandId aCommandId, uint8_t Flags);
+    CHIP_ERROR AddCommand(CommandParams & aCommandParams);
+    CHIP_ERROR AddStatusCode(const uint16_t aGeneralCode, const uint32_t aProtocolId, const uint16_t aProtocolCode,
+                             const chip::ClusterId aNamespacedClusterId);
     CHIP_ERROR ClearExistingExchangeContext();
 
     CHIP_ERROR Reset();

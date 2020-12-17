@@ -28,7 +28,9 @@
 #ifndef _CHIP_INTERACTION_MODEL_ENGINE_H
 #define _CHIP_INTERACTION_MODEL_ENGINE_H
 
+#include <app/MessageDef.h>
 #include <core/CHIPCore.h>
+#include <map>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -36,9 +38,7 @@
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
-#include <app/MessageDef.h>
 #include <system/SystemPacketBuffer.h>
-#include <map>
 
 #include "Command.h"
 
@@ -60,19 +60,20 @@ class InteractionModelEngine : public Messaging::ExchangeDelegate
 public:
     enum EventID
     {
-        kEvent_OnIncomingInvokeCommandRequest = 0, ///< Called when an incoming invoke command request has arrived before applying commands..
+        kEvent_OnIncomingInvokeCommandRequest =
+            0, ///< Called when an incoming invoke command request has arrived before applying commands..
     };
 
     /**
-    * Incoming parameters sent with events generated directly from this component
-    *
-    */
+     * Incoming parameters sent with events generated directly from this component
+     *
+     */
     union InEventParam
     {
         void Clear(void) { memset(this, 0, sizeof(*this)); }
         struct
         {
-            const PacketHeader * mpPacketHeader;           ///< A pointer to the message information for the request
+            const PacketHeader * mpPacketHeader; ///< A pointer to the message information for the request
         } mIncomingInvokeCommandRequest;
     };
 
@@ -132,14 +133,12 @@ public:
 
     void Shutdown();
 
-    CHIP_ERROR DeregisterClusterCommandHandler(chip::ClusterId aClusterId,
-                                               chip::CommandId  aCommandId,
+    CHIP_ERROR DeregisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
                                                Command::CommandRoleId aCommandRoleId);
-    CHIP_ERROR RegisterClusterCommandHandler(chip::ClusterId  aClusterId,
-                                             chip::CommandId aCommandId,
-                                             Command::CommandRoleId aCommandRoleId,
-                                             CommandCbFunct aDispatcher);
-    void ProcessCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::TLV::TLVReader & aReader, Command * apCommandObj, Command::CommandRoleId aCommandRoleId);
+    CHIP_ERROR RegisterClusterCommandHandler(chip::ClusterId aClusterId, chip::CommandId aCommandId,
+                                             Command::CommandRoleId aCommandRoleId, CommandCbFunct aDispatcher);
+    void ProcessCommand(chip::ClusterId aClusterId, chip::CommandId aCommandId, chip::TLV::TLVReader & aReader,
+                        Command * apCommandObj, Command::CommandRoleId aCommandRoleId);
 
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
 
@@ -154,26 +153,24 @@ private:
 
     struct HandlerKey
     {
-        HandlerKey(chip::ClusterId aClusterId,
-                   chip::CommandId aCommandId,
-                   Command::CommandRoleId aCommandRoleId);
+        HandlerKey(chip::ClusterId aClusterId, chip::CommandId aCommandId, Command::CommandRoleId aCommandRoleId);
 
         chip::ClusterId mClusterId;
         chip::CommandId mCommandId;
         Command::CommandRoleId mCommandRoleId;
-        bool operator<(const HandlerKey& aOtherKey) const;
+        bool operator<(const HandlerKey & aOtherKey) const;
     };
 
-    typedef std::map< HandlerKey, CommandCbFunct > HandlersMapType;
+    typedef std::map<HandlerKey, CommandCbFunct> HandlersMapType;
 
     HandlersMapType mHandlersMap;
     Messaging::ExchangeManager * mpExchangeMgr = nullptr;
-    void * mpAppState = nullptr;
+    void * mpAppState                          = nullptr;
     EventCallback mEventCallback;
     CommandHandler mCommandHandlerObjs[CHIP_MAX_NUM_COMMAND_HANDLER_OBJECTS];
 };
 
-} // namespace Protocols
 } // namespace app
+} // namespace chip
 
 #endif //_CHIP_INTERACTION_MODEL_ENGINE_H

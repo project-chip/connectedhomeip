@@ -27,7 +27,10 @@
 #ifndef _CHIP_INTERACTION_MODEL_COMMAND_SENDER_H
 #define _CHIP_INTERACTION_MODEL_COMMAND_SENDER_H
 
+#include <app/MessageDef.h>
 #include <core/CHIPCore.h>
+#include <core/CHIPTLVDebug.hpp>
+#include <map>
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <messaging/Flags.h>
@@ -35,10 +38,7 @@
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/logging/CHIPLogging.h>
-#include <app/MessageDef.h>
-#include <core/CHIPTLVDebug.hpp>
 #include <system/SystemPacketBuffer.h>
-#include <map>
 
 #include <app/Command.h>
 
@@ -53,15 +53,15 @@ class DLL_EXPORT DLL_EXPORT CommandSender : public Command, public Messaging::Ex
 public:
     CHIP_ERROR SendCommandRequest(NodeId aNodeId);
 
-    void OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId, uint8_t aMsgType,
-                           System::PacketBufferHandle aPayload) override;
+    void OnMessageReceived(Messaging::ExchangeContext * apEc, const PacketHeader & aPacketHeader, uint32_t aProtocolId,
+                           uint8_t aMsgType, System::PacketBufferHandle aPayload) override;
     void OnResponseTimeout(Messaging::ExchangeContext * apEc) override;
 
 private:
     CHIP_ERROR ProcessCommandDataElement(CommandDataElement::Parser & aCommandElement) override;
 };
 
-} // namespace Protocols
 } // namespace app
+} // namespace chip
 
 #endif // _CHIP_INTERACTION_MODEL_COMMAND_SENDER_H

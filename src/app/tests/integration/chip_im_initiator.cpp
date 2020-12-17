@@ -26,11 +26,11 @@
 
 #include "common.h"
 
+#include <app/CommandHandler.h>
+#include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <app/CommandSender.h>
-#include <app/CommandHandler.h>
-#include <app/InteractionModelEngine.h>
 
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
@@ -38,18 +38,17 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
-
 #define IM_CLIENT_PORT (CHIP_PORT + 1)
 
 namespace chip {
-namespace app{
+namespace app {
 InteractionModelEngine sInteractionModelEngine;
-InteractionModelEngine* InteractionModelEngine::GetInstance()
+InteractionModelEngine * InteractionModelEngine::GetInstance()
 {
     return &sInteractionModelEngine;
 }
-}
-}
+} // namespace app
+} // namespace chip
 
 namespace {
 
@@ -81,7 +80,6 @@ uint64_t gCommandCount = 0;
 // Count of the number of CommandResponses received.
 uint64_t gCommandRespCount = 0;
 
-
 bool CommandIntervalExpired(void)
 {
     uint64_t now = chip::System::Timer::GetCurrentEpoch();
@@ -91,24 +89,22 @@ bool CommandIntervalExpired(void)
 
 CHIP_ERROR SendCommandRequest(void)
 {
-    CHIP_ERROR err                              = CHIP_NO_ERROR;
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
     gLastCommandTime = chip::System::Timer::GetCurrentEpoch();
 
     printf("\nSend invoke command request message to Node: %lu\n", chip::kTestDeviceNodeId);
 
-    chip::app::Command::CommandParams CommandParams = {
-            1, //Endpoint
-            0, //GroupId
-            6, //ClusterId
-            40, //CommandId
-            (chip::app::Command::kCommandPathFlag_EndpointIdValid)
-    };
+    chip::app::Command::CommandParams CommandParams = { 1,  // Endpoint
+                                                        0,  // GroupId
+                                                        6,  // ClusterId
+                                                        40, // CommandId
+                                                        (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
 
     // Add command data here
 
-    uint8_t effectIdentifier = 1; //Dying light
-    uint8_t effectVariant = 1;
+    uint8_t effectIdentifier = 1; // Dying light
+    uint8_t effectVariant    = 1;
 
     chip::TLV::TLVType dummyType = chip::TLV::kTLVType_NotSpecified;
 
@@ -135,10 +131,13 @@ CHIP_ERROR SendCommandRequest(void)
     err = gCommandSender.SendCommandRequest(chip::kTestDeviceNodeId);
     SuccessOrExit(err);
 
-    if (err == CHIP_NO_ERROR) {
+    if (err == CHIP_NO_ERROR)
+    {
         gWaitingForCommandResp = true;
         gCommandCount++;
-    } else {
+    }
+    else
+    {
         printf("Send invoke command request failed, err: %s\n", chip::ErrorStr(err));
     }
 exit:
@@ -172,7 +171,7 @@ exit:
     return err;
 }
 
-void HandleCommandResponseReceived(chip::TLV::TLVReader & aReader,  chip::app::Command * apCommandObj)
+void HandleCommandResponseReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)
 {
     uint32_t respTime    = chip::System::Timer::GetCurrentEpoch();
     uint32_t transitTime = respTime - gLastCommandTime;
@@ -222,8 +221,8 @@ int main(int argc, char * argv[])
     err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchangeManager);
     SuccessOrExit(err);
 
-
-    chip::app::InteractionModelEngine::GetInstance()->RegisterClusterCommandHandler(6, 40, chip::app::Command::CommandRoleId::kCommandSenderId, HandleCommandResponseReceived);
+    chip::app::InteractionModelEngine::GetInstance()->RegisterClusterCommandHandler(
+        6, 40, chip::app::Command::CommandRoleId::kCommandSenderId, HandleCommandResponseReceived);
 
     // Start the CHIP connection to the CHIP im responder.
     err = EstablishSecureSession();
@@ -255,7 +254,8 @@ int main(int argc, char * argv[])
         }
     }
 
-    chip::app::InteractionModelEngine::GetInstance()->DeregisterClusterCommandHandler(6, 40, chip::app::Command::CommandRoleId::kCommandSenderId);
+    chip::app::InteractionModelEngine::GetInstance()->DeregisterClusterCommandHandler(
+        6, 40, chip::app::Command::CommandRoleId::kCommandSenderId);
 
     gCommandSender.Shutdown();
     chip::app::InteractionModelEngine::GetInstance()->Shutdown();

@@ -26,9 +26,9 @@
 
 #include "common.h"
 #include <core/CHIPCore.h>
+#include <core/CHIPTLVDebug.hpp>
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
-#include <core/CHIPTLVDebug.hpp>
 
 // The ExchangeManager global object.
 chip::Messaging::ExchangeManager gExchangeManager;

@@ -26,28 +26,28 @@
 
 #include "common.h"
 
+#include "app/InteractionModelEngine.h"
+#include <app/CommandHandler.h>
+#include <app/CommandSender.h>
 #include <core/CHIPCore.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <app/CommandSender.h>
-#include <app/CommandHandler.h>
-#include "app/InteractionModelEngine.h"
 
+#include "InteractionModelEngine.h"
 #include <support/ErrorStr.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecurePairingSession.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
-#include "InteractionModelEngine.h"
 
 namespace chip {
-namespace app{
+namespace app {
 InteractionModelEngine sInteractionModelEngine;
-InteractionModelEngine* InteractionModelEngine::GetInstance()
+InteractionModelEngine * InteractionModelEngine::GetInstance()
 {
     return &sInteractionModelEngine;
 }
-}
-}
+} // namespace app
+} // namespace chip
 
 namespace {
 
@@ -66,18 +66,16 @@ void HandleCommandRequestReceived(chip::TLV::TLVReader & aReader, chip::app::Com
         chip::TLV::Debug::Dump(aReader, TLVPrettyPrinter);
     }
 
-    chip::app::Command::CommandParams commandParams = {
-            1, //Endpoint
-            0, //GroupId
-            6, //ClusterId
-            40, //CommandId
-            (chip::app::Command::kCommandPathFlag_EndpointIdValid)
-    };
+    chip::app::Command::CommandParams commandParams = { 1,  // Endpoint
+                                                        0,  // GroupId
+                                                        6,  // ClusterId
+                                                        40, // CommandId
+                                                        (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
 
     // Add command data here
 
-    uint8_t effectIdentifier = 1; //Dying light
-    uint8_t effectVariant = 1;
+    uint8_t effectIdentifier = 1; // Dying light
+    uint8_t effectVariant    = 1;
 
     chip::TLV::TLVType dummyType = chip::TLV::kTLVType_NotSpecified;
 
@@ -104,7 +102,6 @@ void HandleCommandRequestReceived(chip::TLV::TLVReader & aReader, chip::app::Com
 
 exit:
     return;
-
 }
 
 } // namespace
@@ -132,13 +129,15 @@ int main(int argc, char * argv[])
     err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
 
-    chip::app::InteractionModelEngine::GetInstance()->RegisterClusterCommandHandler(6, 40, chip::app::Command::CommandRoleId::kCommandHandlerId, HandleCommandRequestReceived);
+    chip::app::InteractionModelEngine::GetInstance()->RegisterClusterCommandHandler(
+        6, 40, chip::app::Command::CommandRoleId::kCommandHandlerId, HandleCommandRequestReceived);
     printf("Listening for IM requests...\n");
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 
 exit:
-    chip::app::InteractionModelEngine::GetInstance()->DeregisterClusterCommandHandler(6, 40, chip::app::Command::CommandRoleId::kCommandHandlerId);
+    chip::app::InteractionModelEngine::GetInstance()->DeregisterClusterCommandHandler(
+        6, 40, chip::app::Command::CommandRoleId::kCommandHandlerId);
 
     if (err != CHIP_NO_ERROR)
     {
