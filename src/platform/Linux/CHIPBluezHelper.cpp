@@ -48,10 +48,10 @@
  *          Provides Bluez dbus implementatioon for BLE
  */
 
+#include <AdditionalDataPayload.h>
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
 #include <platform/CHIPDeviceLayer.h>
-#include <AdditionalDataPayload.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <errno.h>
