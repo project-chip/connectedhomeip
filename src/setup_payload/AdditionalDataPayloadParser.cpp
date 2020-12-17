@@ -45,7 +45,7 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     chip::TLV::TLVReader reader;
     chip::TLV::TLVReader innerReader;
 
-    reader.Init(&mPayload[0], (uint32_t) mPayload.size());
+    reader.Init(mPayload.data(), (uint32_t) mPayload.size());
     reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
     err                      = reader.Next();
     SuccessOrExit(err);
