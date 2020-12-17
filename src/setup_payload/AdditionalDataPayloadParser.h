@@ -26,10 +26,7 @@
 #include "AdditionalDataPayload.h"
 
 #include <core/CHIPError.h>
-#include <core/CHIPTLV.h>
-
 #include <string>
-#include <utility>
 
 namespace chip {
 

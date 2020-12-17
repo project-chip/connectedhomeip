@@ -1264,17 +1264,17 @@ void BluezObjectsCleanup(BluezEndpoint * apEndpoint)
 #if !CHIP_BYPASS_ADDITIONAL_DATA_ADVERTISING
 static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * characteristic)
 {
+    if (characteristic == nullptr)
+    {
+        return;
+    }
+
     // Construct the TLV for the additional data
     GVariant * cValue = nullptr;
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TLVWriter writer;
     chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
     chip::System::PacketBuffer * buffer           = bufferHandle.Get_ForNow();
-
-    if (characteristic == nullptr)
-    {
-        return;
-    }
 
     writer.Init(buffer);
     TLVType containerType;

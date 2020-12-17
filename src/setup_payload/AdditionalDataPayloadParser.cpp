@@ -22,28 +22,16 @@
  */
 
 #include "AdditionalDataPayloadParser.h"
-#include "Base41.h"
 
-#include <iomanip>
-#include <math.h>
-#include <memory>
-#include <sstream>
+#include <cstdlib>
 #include <string.h>
 #include <vector>
 
-#include <core/CHIPCore.h>
+#include <protocols/Protocols.h>
 #include <core/CHIPError.h>
 #include <core/CHIPTLVData.hpp>
-#include <core/CHIPTLVDebug.hpp>
 #include <core/CHIPTLVUtilities.hpp>
-#include <cstdlib>
-#include <iomanip>
-#include <iostream>
-#include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
-#include <support/RandUtils.h>
-#include <support/SafeInt.h>
-#include <support/ScopedBuffer.h>
 
 using namespace chip;
 using namespace std;

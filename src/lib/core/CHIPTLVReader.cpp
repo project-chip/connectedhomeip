@@ -1353,6 +1353,7 @@ CHIP_ERROR TLVReader::ReadElement()
         mElemLenOrVal = LittleEndian::Read64(p);
         break;
     }
+
     return VerifyElement();
 }
 
