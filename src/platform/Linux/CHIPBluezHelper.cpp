@@ -51,6 +51,7 @@
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <AdditionalDataPayload.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <errno.h>
@@ -65,6 +66,7 @@
 #include <support/CodeUtils.h>
 
 using namespace ::nl;
+using namespace chip::SetupPayload;
 
 namespace chip {
 namespace DeviceLayer {
@@ -1278,11 +1280,11 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
 
     writer.Init(buffer);
     TLVType containerType;
-    err = writer.StartContainer(AnonymousTag, kTLVType_Structure, containerType);
+    err = writer.StartContainer(kTag_AdditionalDataExensionDescriptor, kTLVType_Structure, containerType);
     SuccessOrExit(err);
 
     // Adding the rotating device id to the TLV data
-    err = writer.PutString(CommonTag(0), CHIP_ROTATING_DEVICE_ID);
+    err = writer.PutString(ContextTag(kRotatingDeviceIdTag), CHIP_ROTATING_DEVICE_ID);
     SuccessOrExit(err);
 
     err = writer.EndContainer(containerType);
