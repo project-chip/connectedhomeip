@@ -30,9 +30,9 @@ static_library("chip-app-server") {
   # directly by someone who knows where the generated files for the app we're
   # compiling live.
   sources = [
+    "QRCodeUtil.cpp",
     "RendezvousServer.cpp",
     "Server.cpp",
-    "QRCodeUtil.cpp"
   ]
 
   deps = [
