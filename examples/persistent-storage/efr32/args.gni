@@ -14,14 +14,6 @@
 
 import("//build_overrides/chip.gni")
 import("//build_overrides/pigweed.gni")
+import("${chip_root}/examples/platform/efr32/args.gni")
 
-declare_args() {
-  # Root directory for erf32 SDK.
-  efr32_sdk_build_root = "//third_party/connectedhomeip/third_party/efr32_sdk"
-
-  dir_pw_log_chip =
-      get_path_info("//../../../src/lib/support/pw_log_chip", "abspath")
-}
-
-pw_log_BACKEND = "$dir_pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log"
+efr32_sdk_target = get_label_info(":sdk", "label_no_toolchain")

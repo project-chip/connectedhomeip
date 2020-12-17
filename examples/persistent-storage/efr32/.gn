@@ -12,16 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
-import("//build_overrides/pigweed.gni")
+# The location of the build configuration file.
+buildconfig = "//build/config/BUILDCONFIG.gn"
 
-declare_args() {
-  # Root directory for erf32 SDK.
-  efr32_sdk_build_root = "//third_party/connectedhomeip/third_party/efr32_sdk"
+# CHIP uses angle bracket includes.
+check_system_includes = true
 
-  dir_pw_log_chip =
-      get_path_info("//../../../src/lib/support/pw_log_chip", "abspath")
+default_args = {
+  target_cpu = "arm"
+  target_os = "freertos"
+
+  import("//args.gni")
 }
-
-pw_log_BACKEND = "$dir_pw_log_chip"
-pw_assert_BACKEND = "$dir_pw_assert_log"
