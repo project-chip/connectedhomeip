@@ -47,7 +47,6 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     chip::TLV::TLVReader innerReader;
 
     // Decode input payload
-    tlvData.clear();
     size_t len = mPayload.length();
 
     for (size_t i = 0; i < len; i += 2)
@@ -70,9 +69,12 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     SuccessOrExit(err);
 
     // Get the value of the rotating device id
-    char rotatingDeviceId[kRotatingDeviceIdLength];
-    err                         = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId) + 1);
-    outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
+    if(chip::TLV::TagNumFromTag(innerReader.GetTag()) == kRotatingDeviceIdTag)
+    {
+        char rotatingDeviceId[kRotatingDeviceIdLength];
+        err                         = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
+        outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
+    }
 
 exit:
     return err;
