@@ -51,6 +51,7 @@
 static_assert(sizeof(chip::NodeId) == sizeof(uint64_t), "Unexpected node if size");
 
 #include "gen/gen_config.h"
+#include "gen/endpoint_config.h"
 
 /**
  * @brief Defines binding types.

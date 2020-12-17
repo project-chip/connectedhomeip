@@ -571,6 +571,12 @@ function user_cluster_has_enabled_manufacturer_command(name, side, options)
       })
 }
 
+// Temporary function. This will be part of ZAP Core helper. Can only be called within
+// endpoint_config iterator.
+function endpoint_attribute_long_defaults_count(options) {
+  return this.longDefaultsList.length
+}
+
 // WARNING! WARNING! WARNING! WARNING! WARNING! WARNING!
 //
 // Note: these exports are public API. Templates that might have been created in the past and are
@@ -596,3 +602,5 @@ exports.isReportableAttribute                         = isReportableAttribute;
 exports.chip_server_writable_attributes_types         = chip_server_writable_attributes_types;
 exports.chip_server_reportable_attributes_types       = chip_server_reportable_attributes_types;
 exports.user_cluster_has_enabled_manufacturer_command = user_cluster_has_enabled_manufacturer_command;
+
+exports.endpoint_attribute_long_defaults_count = endpoint_attribute_long_defaults_count
