@@ -32,6 +32,7 @@ static_library("chip-app-server") {
   sources = [
     "RendezvousServer.cpp",
     "Server.cpp",
+    "QRCodeUtil.cpp"
   ]
 
   deps = [

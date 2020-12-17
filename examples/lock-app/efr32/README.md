@@ -19,13 +19,21 @@ An example showing the use of CHIP on the Silicon Labs EFR32 MG12.
 
 ## Introduction
 
-The EFR32 lock example provides a baseline demonstration of a door lock device,
-built using CHIP and the Silicon Labs gecko SDK. The example currently support
-OpenThread. The BLE feature is still a work in progress.
+The EFR32 lock example provides a baseline demonstration of a door lock control
+device, built using CHIP and the Silicon Labs gecko SDK. It can be controlled by a Chip
+controller over Openthread network..
 
-The lock example is intended to serve both as a means to explore the workings of
-CHIP as well as a template for creating real products based on the Silicon Labs
-platform.
+The EFR32 device can be comissionned over Bluetooth Low Energy where the device 
+and the Chip controller will exchange security information with the Rendez-vous
+procedure. Thread Network credentials are then provided to the EFR32 device which will 
+then join the network.
+
+The LCD on the Silabs WSTK shows a QR Code containing the needed commissioning information 
+for the BLE connection and starting the Rendez-vous procedure.
+
+The lighting example is intended to serve both as a means to explore the
+workings of CHIP as well as a template for creating real products based on the
+Silicon Labs platform.
 
 <a name="building"></a>
 
@@ -79,8 +87,18 @@ platform.
 
 -   To delete generated executable, libraries and object files use:
 
-          $ cd ~/connectedhomeip/examples/lighting-app/efr32
+          $ cd ~/connectedhomeip/examples/lock-app/efr32
           $ rm -rf out/
+
+OR use the script
+          cd ~/connectedhomeip
+          $ export EFR32_SDK_ROOT=<path-to-silabs-sdk-v2.7>
+          $ export EFR32_BOARD=BRD4161A
+          ./scripts/examples/gn_efr32_example.sh examples/lock-app/efr32/ out/debug/efr32_lock_app
+
+-   To delete generated executable, libraries and object files use:
+          $ cd ~/connectedhomeip
+          $ rm -rf out/debug/efr32_lock_app
 
 <a name="flashing"></a>
 
@@ -105,7 +123,8 @@ embedded application without the need for a dedicated UART.
 Using the RTT facility requires downloading and installing the _SEGGER J-Link
 Software and Documentation Pack_
 ([web site](https://www.segger.com/downloads/jlink#J-LinkSoftwareAndDocumentationPack)).
-Alternatively the _SEGGER Ozone - J-Link Debugger_ can be used to view RTT logs.
+
+Alternatively, SEGGER Ozone J-Link debugger can be used to view RTT logs too after flashing the .out file.
 
 -   Download the J-Link installer by navigating to the appropriate URL and
     agreeing to the license agreement.
@@ -145,18 +164,95 @@ combination with JLinkRTTClient as follows:
 
 ## Running the Complete Example
 
--   Once the example is flashed on the board, you should be able to establish a
-    connection with an OpenThread border router. See
+-   It is assumed here that you already have a OpenThread border router configured and running. 
+    If not See the following guide
     [OpenThread Border Router](https://openthread.io/guides/border-router) for
     more information on how to setup a border router. Take note that the RCP
     code is available directly through
     [Simplicity Studio 5](https://www.silabs.com/products/development-tools/software/simplicity-studio/simplicity-studio-5)
     under File->New->Project Wizard->Examples->Thread : ot-rcp
--   Once said connectection is established (you can verify that with the command
+
+-   User interface :
+    **LCD**
+        The LCD on Silabs WSTK shows a QR Code. This QR Code is be scanned by the CHIP Tool app
+        For the Rendez-vous procedure over BLE
+
+        * On devices that do not have or support the LCD Display like the BRD4166A Thunderboard Sense 2,
+          a URL can be found in the RTT logs.
+
+          <info  > [SVR] Copy/paste the below URL in a browser to see the QR Code:
+          <info  > [SVR] https://dhrishi.github.io/connectedhomeip/qrcode.html?data=CH%3AI34NM%20-00%200C9SS0
+    
+    **LED 0**
+        shows the overall state of the device and its connectivity. The
+        following states are possible:
+
+        -   _Short Flash On (50 ms on/950 ms off)_ ; The device is in the
+            unprovisioned (unpaired) state and is waiting for a commissioning
+            application to connect.
+
+        -   _Rapid Even Flashing_ ; (100 ms on/100 ms off)_ &mdash; The device is in the
+            unprovisioned state and a commissioning application is connected through
+            Bluetooth LE.
+
+        -   _Short Flash Off_ ; (950ms on/50ms off)_ &mdash; The device is fully
+            provisioned, but does not yet have full Thread network or service
+            connectivity.
+
+        -   _Solid On_ ; The device is fully provisioned and has full Thread
+            network and service connectivity.
+
+    **LED 1**
+        Simulates the Lock The following states are possible:
+
+        -   _Solid On_ ; Bolt is locked
+        -   _Blinking_ ; Bolt is moving to the desired state
+        -   _Off_ ; Bolt is unlocked
+
+    **Push Button 0**
+        -   Press and Release : If not commissionned, start thread with default configurations (DEBUG)
+
+
+        -   Pressed and hold for 6 s: Initiates the factory reset of the device.
+            Releasing the button within the 6-second window cancels the factory reset
+            procedure. **LEDs** blink in unison when the factory reset procedure is
+            initiated.
+
+    **Push Button 1**
+        Toggles the bolt state On/Off
+
+
+-   Once the device is provisonned and it will join the Thread network is established 
+    Look for the RTT log
+        [DL]    Device Role: CHILD
+        [DL]    Partition Id: 0x6A7491B7
+        [DL] _OnPlatformEvent default:  event->Type = 32778
+        [DL] OpenThread State Changed (Flags: 0x00000001)
+        [DL]    Thread Unicast Addresses:
+        [DL]         2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred
+        [DL]         FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc
+        [DL]         FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred
+        [DL]         FE80::D8F2:592E:C109:CF00/64 valid preferred
+        [DL] LwIP Thread interface addresses updated
+        [DL]    FE80::D8F2:592E:C109:CF00 IPv6 link-local address, preferred)
+        [DL]    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred)
+        [DL]    2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
+
+    Keep The gloabl unicast address, It is to be used to reach the Device with the chip-tool
+    The device will be promoted to Router shortly after
+        [DL]    Device Role: ROUTER
+
+    (you can verify that the device is on the thread netowrk with the command
     `router table` using a serial terminal (screen / minicom etc.) on the board
-    running the lock-app example)
--   Using chip-tool you can now control the lock status with on/off command such
-    as `chip-tool onoff on 1 <ipv6 address of the node> 11097`
+    running the lighting-app example
+    You can also get the address list with the command ipaddr again in the serial termianl
+    )
+-   Using chip-tool you can now control the lock status with on/off command
+    such as `chip-tool onoff on 1`
+    ** Currently, chip-tool for Mac or Linux do not yet have the Thread provisionning feature
+        `chip-tool bypass <Global ipv6 address of the node> 11097`
+        You can Provision the Chip device using Chip tool Android or iOS app
+        or Through CLI commands on your OT BR     
 
 ### Notes
 
@@ -172,4 +268,4 @@ combination with JLinkRTTClient as follows:
           $ sudo ip addr add dev <Network interface> 2002::1/64
 
           # Add Ipv6 route on PC (Linux)
-          $ sudo ip route add <Thread ipv6 prefix>/64 via 2002::2
+          $ sudo ip route add <Thread global ipv6 prefix>/64 via 2002::2

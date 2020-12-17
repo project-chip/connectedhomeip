@@ -35,16 +35,16 @@ void PrintQRCode(chip::RendezvousInformationFlags rendezvousFlags)
 
     if (GetQRCode(setupPinCode, QRCode, rendezvousFlags) == CHIP_NO_ERROR)
     {
-        ChipLogProgress(AppServer, "SetupPINCode: [%" PRIu32 "]", setupPinCode);
-        ChipLogProgress(AppServer, "SetupQRCode:  [%s]", QRCode.c_str());
-
         chip::Platform::ScopedMemoryBuffer<char> qrCodeBuffer;
         const size_t qrCodeBufferMaxSize = 3 * QRCode.size() + 1;
         qrCodeBuffer.Alloc(qrCodeBufferMaxSize);
+
+        ChipLogProgress(AppServer, "SetupPINCode: [%" PRIu32 "]", setupPinCode);
+        ChipLogProgress(AppServer, "SetupQRCode:  [%s]", QRCode.c_str());
         if (EncodeQRCodeToUrl(QRCode.c_str(), QRCode.size(), &qrCodeBuffer[0], qrCodeBufferMaxSize) == CHIP_NO_ERROR)
         {
-            ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:\n\t%s?data=%s", qrCodeBaseUrl,
-                            &qrCodeBuffer[0]);
+            ChipLogProgress(AppServer, "Copy/paste the below URL in a browser to see the QR Code:");
+            ChipLogProgress(AppServer, "%s?data=%s", qrCodeBaseUrl, &qrCodeBuffer[0]);
         }
     }
     else

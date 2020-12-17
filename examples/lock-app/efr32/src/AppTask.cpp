@@ -23,6 +23,7 @@
 #include "ButtonHandler.h"
 #include "DataModelHandler.h"
 #include "LEDWidget.h"
+#include "QRCodeUtil.h"
 #include "Server.h"
 #include "Service.h"
 #include "attribute-storage.h"
@@ -130,55 +131,22 @@ int AppTask::Init()
     sLockLED.Set(!BoltLockMgr().IsUnlocked());
     UpdateClusterState();
 
-// Print setup info on LCD if available
+    // Print setup info on LCD if available
 #ifdef DISPLAY_ENABLED
-    chip::SetupPayload payload;
-    uint32_t setUpPINCode       = 0;
-    uint16_t setUpDiscriminator = 0;
-    uint16_t vendorId           = 0;
-    uint16_t productId          = 0;
+    uint32_t setupPinCode;
+    std::string QRCode;
 
-    err = ConfigurationMgr().GetSetupPinCode(setUpPINCode);
-    if (err != CHIP_NO_ERROR)
+    if (GetQRCode(setupPinCode, QRCode, chip::RendezvousInformationFlags::kBLE) == CHIP_NO_ERROR)
     {
-        EFR32_LOG("ConfigurationMgr().GetSetupPinCode() failed: %s", chip::ErrorStr(err));
+        EFR32_LOG("SetupPINCode: [%09u]", setupPinCode);
+        LCDWriteQRCode((uint8_t *) QRCode.c_str());
     }
-
-    err = ConfigurationMgr().GetSetupDiscriminator(setUpDiscriminator);
-    if (err != CHIP_NO_ERROR)
+    else
     {
-        EFR32_LOG("ConfigurationMgr().GetSetupDiscriminator() failed: %s", chip::ErrorStr(err));
+        EFR32_LOG("Getting QR code failed!");
     }
-
-    err = ConfigurationMgr().GetVendorId(vendorId);
-    if (err != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("ConfigurationMgr().GetVendorId() failed: %s", chip::ErrorStr(err));
-    }
-
-    err = ConfigurationMgr().GetProductId(productId);
-    if (err != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("ConfigurationMgr().GetProductId() failed: %s", chip::ErrorStr(err));
-    }
-
-    payload.version       = 1;
-    payload.vendorID      = vendorId;
-    payload.productID     = productId;
-    payload.setUpPINCode  = setUpPINCode;
-    payload.discriminator = setUpDiscriminator;
-    chip::QRCodeSetupPayloadGenerator generator(payload);
-
-    std::string result;
-    err = generator.payloadBase41Representation(result);
-    if (err != CHIP_NO_ERROR)
-    {
-        EFR32_LOG("Failed to get Base41 payload for QR code with %s", chip::ErrorStr(err));
-    }
-
-    EFR32_LOG("SetupPINCode: [%09u]", setUpPINCode);
-    LCDWriteQRCode((uint8_t *) result.c_str());
-
+#else
+    PrintQRCode(chip::RendezvousInformationFlags::kBLE);
 #endif
 
     return err;
@@ -220,6 +188,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             sIsThreadEnabled         = ConnectivityMgr().IsThreadEnabled();
             sIsThreadAttached        = ConnectivityMgr().IsThreadAttached();
             sHaveBLEConnections      = (ConnectivityMgr().NumBLEConnections() != 0);
+            sIsPairedToAccount       = ConfigurationMgr().IsPairedToAccount();
             sHaveServiceConnectivity = ConnectivityMgr().HaveServiceConnectivity();
             PlatformMgr().UnlockChipStack();
         }
@@ -244,8 +213,7 @@ void AppTask::AppTaskMain(void * pvParameter)
             {
                 sStatusLED.Set(true);
             }
-            else if (sIsThreadProvisioned && sIsThreadEnabled && sIsPairedToAccount &&
-                     (!sIsThreadAttached || !sHaveServiceConnectivity))
+            else if (sIsThreadProvisioned && sIsThreadEnabled && (!sIsThreadAttached || !sHaveServiceConnectivity))
             {
                 sStatusLED.Blink(950, 50);
             }
