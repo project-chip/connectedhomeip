@@ -192,11 +192,10 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     }
     mDelegate = nullptr;
 
-    // Closure of an EC is based on ref counting. The Protocol, when it calls DoClose(), indicates that
-    // it is done with the EC and the ML sets all callbacks to NULL and does not send anything recvd on
-    // the exchange context up to higher layers.  At this point, the message
-    // layer needs to handle the remaining work to be done on that exchange, (e.g. send all pending acks) before
-    // truly cleaning it up.
+    // Closure of an exchange context is based on ref counting. The Protocol, when it calls DoClose(), indicates that
+    // it is done with the exchange context and the message layer sets all callbacks to NULL and does not send anything
+    // received on the exchange context up to higher layers.  At this point, the message layer needs to handle the
+    // remaining work to be done on that exchange, (e.g. send all pending acks) before truly cleaning it up.
     mReliableMessageContext.FlushAcks();
 
     // In case the protocol wants a harder release of the EC right away, such as calling Abort(), exchange

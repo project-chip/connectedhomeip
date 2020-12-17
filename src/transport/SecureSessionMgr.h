@@ -55,11 +55,9 @@ class EncryptedPacketBufferHandle : public System::PacketBufferHandle
 {
 public:
     EncryptedPacketBufferHandle() : mMsgId(0), mPayloadLen(0) {}
-    EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer))
-    {
-        mMsgId      = aBuffer.mMsgId;
-        mPayloadLen = aBuffer.mPayloadLen;
-    }
+    EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) :
+        PacketBufferHandle(std::move(aBuffer)), mMsgId(aBuffer.mMsgId), mPayloadLen(aBuffer.mPayloadLen)
+    {}
 
     void operator=(EncryptedPacketBufferHandle && aBuffer)
     {
