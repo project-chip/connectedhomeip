@@ -52,6 +52,7 @@
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
 #include <platform/CHIPDeviceLayer.h>
+#include <protocols/Protocols.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <errno.h>
@@ -67,6 +68,7 @@
 
 using namespace ::nl;
 using namespace chip::SetupPayload;
+using namespace chip::Protocols;
 
 namespace chip {
 namespace DeviceLayer {
@@ -1275,27 +1277,27 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     GVariant * cValue = nullptr;
     CHIP_ERROR err    = CHIP_NO_ERROR;
     TLVWriter writer;
+    TLVWriter innerWriter;
     chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
     chip::System::PacketBuffer * buffer           = bufferHandle.Get_ForNow();
 
     writer.Init(buffer);
-    TLVType containerType;
-    err = writer.StartContainer(kTag_AdditionalDataExensionDescriptor, kTLVType_Structure, containerType);
+
+    err = writer.OpenContainer(ProfileTag(kProtocol_ServiceProvisioning, kTag_AdditionalDataExensionDescriptor), kTLVType_Structure, innerWriter);
     SuccessOrExit(err);
 
     // Adding the rotating device id to the TLV data
-    err = writer.PutString(ContextTag(kRotatingDeviceIdTag), CHIP_ROTATING_DEVICE_ID);
+    err = innerWriter.PutString(ProfileTag(kProtocol_ServiceProvisioning, kRotatingDeviceIdTag), CHIP_ROTATING_DEVICE_ID);
     SuccessOrExit(err);
 
-    err = writer.EndContainer(containerType);
+    err = writer.CloseContainer(innerWriter);
     SuccessOrExit(err);
 
     writer.Finalize();
 
-    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), buffer->Start(), buffer->DataLength(), TRUE, NULL, NULL);
+    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), buffer->Start(), buffer->DataLength(), TRUE,  g_free, g_memdup(buffer->Start(), buffer->DataLength()));
     bluez_gatt_characteristic1_set_value(characteristic, cValue);
 
-    ChipLogDetail(DeviceLayer, "Set Characteristics value to %s", g_variant_get_string(cValue, NULL));
     return;
 
 exit:
