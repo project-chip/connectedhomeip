@@ -221,19 +221,20 @@ combination with JLinkRTTClient as follows:
 
 -   Once the device is provisioned, it will join the Thread network is
     established, look for the RTT log
-    ``` 
-        [DL] Device Role: CHILD 
-        [DL] Partition Id:0x6A7491B7 
-        [DL] \_OnPlatformEvent default: event->Type = 32778 
-        [DL] OpenThread State Changed (Flags: 0x00000001) 
+
+    ```
+        [DL] Device Role: CHILD
+        [DL] Partition Id:0x6A7491B7
+        [DL] \_OnPlatformEvent default: event->Type = 32778
+        [DL] OpenThread State Changed (Flags: 0x00000001)
         [DL] Thread Unicast Addresses:
-        [DL]    2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred 
-        [DL]    FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc 
-        [DL]    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred 
-        [DL]    FE80::D8F2:592E:C109:CF00/64 valid preferred 
-        [DL] LwIP Thread interface addresses updated 
-        [DL] FE80::D8F2:592E:C109:CF00 IPv6 link-local address, preferred) 
-        [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred) 
+        [DL]    2001:DB8::E1A2:87F1:7D5D:FECA/64 valid preferred
+        [DL]    FDDE:AD00:BEEF::FF:FE00:2402/64 valid preferred rloc
+        [DL]    FDDE:AD00:BEEF:0:383F:5E81:A05A:B168/64 valid preferred
+        [DL]    FE80::D8F2:592E:C109:CF00/64 valid preferred
+        [DL] LwIP Thread interface addresses updated
+        [DL] FE80::D8F2:592E:C109:CF00 IPv6 link-local address, preferred)
+        [DL] FDDE:AD00:BEEF:0:383F:5E81:A05A:B168 Thread mesh-local address, preferred)
         [DL] 2001:DB8::E1A2:87F1:7D5D:FECA IPv6 global unicast address, preferred)
     ```
 
@@ -247,13 +248,14 @@ combination with JLinkRTTClient as follows:
     command ipaddr again in the serial terminal )
 
 -   Using chip-tool you can now control the light status with on/off command
-    such as `chip-tool onoff on 1` 
-    
-    \*\* Currently, chip-tool for Mac or Linux do not yet have the Thread provisioning feature
-    `chip-tool bypass <Global ipv6 address of the node> 11097` 
-    
-    You can provision the Chip device using Chip tool Android or iOS app or through 
-    CLI commands on your OT BR
+    such as `chip-tool onoff on 1`
+
+    \*\* Currently, chip-tool for Mac or Linux do not yet have the Thread
+    provisioning feature
+    `chip-tool bypass <Global ipv6 address of the node> 11097`
+
+    You can provision the Chip device using Chip tool Android or iOS app or
+    through CLI commands on your OT BR
 
 ### Notes
 
