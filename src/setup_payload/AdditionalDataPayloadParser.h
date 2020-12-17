@@ -32,7 +32,7 @@ namespace chip {
 
 /**
  * @class AdditionalDataPayloadParser
- * A class that can be used to convert a base41 encoded payload to a AdditionalDataPayload object
+ * A class that can be used to convert a HEX encoded payload to a AdditionalDataPayload object
  * */
 class AdditionalDataPayloadParser
 {
