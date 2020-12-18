@@ -17,9 +17,9 @@
  */
 
 #include "AdditionalDataParseCommand.h"
-#include <string>
 #include <setup_payload/AdditionalDataPayload.h>
 #include <setup_payload/AdditionalDataPayloadParser.h>
+#include <string>
 
 using namespace ::chip;
 using namespace ::chip::SetupPayload;

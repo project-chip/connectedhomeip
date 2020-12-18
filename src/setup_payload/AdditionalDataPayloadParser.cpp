@@ -62,7 +62,7 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     if (TagNumFromTag(innerReader.GetTag()) == kRotatingDeviceIdTag)
     {
         char rotatingDeviceId[kRotatingDeviceIdLength];
-        err                         = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
+        err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
         SuccessOrExit(err);
         outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
     }
