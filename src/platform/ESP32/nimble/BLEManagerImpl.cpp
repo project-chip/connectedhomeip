@@ -1050,7 +1050,7 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
             ret = ble_gap_adv_stop();
             if (ret != 0)
             {
-                ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %d, cannot restart", %d);
+                ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %d, cannot restart", % d);
                 return CHIP_ERROR_INTERNAL;
             }
             else
