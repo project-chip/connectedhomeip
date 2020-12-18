@@ -117,13 +117,13 @@ uint8_t emAfExtendedPanId[EXTENDED_PAN_ID_SIZE] = {
 };
 
 #ifdef CHIP_TEMP_MEASUREMENT_CLUSTER_SERVER
-    void emberAfPluginTemperatureMeasurementServerInitCallback(void);
+void emberAfPluginTemperatureMeasurementServerInitCallback(void);
 #endif
 #ifdef CHIP_BARRIER_CONTROL_CLUSTER_SERVER
-    void emberAfPluginBarrierControlServerInitCallback(void);
+void emberAfPluginBarrierControlServerInitCallback(void);
 #endif
 #ifdef CHIP_DOOR_LOCK_CLUSTER_SERVER
-    void emberAfPluginDoorLockServerInitCallback(void);
+void emberAfPluginDoorLockServerInitCallback(void);
 #endif
 
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
