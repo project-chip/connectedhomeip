@@ -567,7 +567,8 @@ function isManufacturerSpecificCommand()
 
 // Temporary function. This will be part of ZAP Core helper. Can only be called within
 // endpoint_config iterator.
-function endpoint_attribute_long_defaults_count(options) {
+function endpoint_attribute_long_defaults_count(options)
+{
   return this.longDefaultsList.length
 }
 
