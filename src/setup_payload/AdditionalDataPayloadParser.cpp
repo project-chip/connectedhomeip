@@ -47,7 +47,7 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     TLVReader innerReader;
 
     reader.Init(mPayloadBufferData, mPayloadBufferLength);
-    err                      = reader.Next(kTLVType_Structure, AnonymousTag);
+    err = reader.Next(kTLVType_Structure, AnonymousTag);
     SuccessOrExit(err);
 
     // Open the container
@@ -59,7 +59,7 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
 
     // Get the value of the rotating device id
     char rotatingDeviceId[kRotatingDeviceIdLength];
-    err                         = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
+    err = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
     SuccessOrExit(err);
     outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
 

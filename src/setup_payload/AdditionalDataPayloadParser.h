@@ -25,8 +25,8 @@
 
 #include "AdditionalDataPayload.h"
 
-#include <stdint.h>
 #include <core/CHIPError.h>
+#include <stdint.h>
 
 namespace chip {
 
@@ -40,9 +40,10 @@ private:
     const uint8_t * mPayloadBufferData;
     const uint32_t mPayloadBufferLength;
 
-
 public:
-    AdditionalDataPayloadParser(const uint8_t * payloadBufferData, const uint32_t payloadBufferLength) : mPayloadBufferData(payloadBufferData), mPayloadBufferLength(payloadBufferLength) {}
+    AdditionalDataPayloadParser(const uint8_t * payloadBufferData, const uint32_t payloadBufferLength) :
+        mPayloadBufferData(payloadBufferData), mPayloadBufferLength(payloadBufferLength)
+    {}
     CHIP_ERROR populatePayload(SetupPayload::AdditionalDataPayload & outPayload);
 };
 
