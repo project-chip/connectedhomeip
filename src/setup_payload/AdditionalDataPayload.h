@@ -40,8 +40,7 @@ namespace chip {
 namespace SetupPayload {
 
 constexpr uint8_t kRotatingDeviceIdLength                = 18;
-constexpr uint8_t kRotatingDeviceIdTag                   = 0x01;
-constexpr uint32_t kTag_AdditionalDataExensionDescriptor = 0x00;
+constexpr uint8_t kRotatingDeviceIdTag                   = 0x00;
 
 struct AdditionalDataPayload
 {

@@ -47,30 +47,21 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     TLVReader innerReader;
 
     reader.Init(mPayload.data(), (uint32_t) mPayload.size());
-    reader.ImplicitProfileId = kProtocol_ServiceProvisioning;
-    err                      = reader.Next();
+    err                      = reader.Next(kTLVType_Structure, AnonymousTag);
     SuccessOrExit(err);
 
     // Open the container
     err = reader.OpenContainer(innerReader);
     SuccessOrExit(err);
 
-    err = innerReader.Next();
+    err = innerReader.Next(kTLVType_UTF8String, ContextTag(kRotatingDeviceIdTag));
     SuccessOrExit(err);
 
     // Get the value of the rotating device id
-    if (TagNumFromTag(innerReader.GetTag()) == kRotatingDeviceIdTag)
-    {
-        char rotatingDeviceId[kRotatingDeviceIdLength];
-        err                         = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
-        SuccessOrExit(err);
-        outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
-    }
-    else
-    {
-        ChipLogError(AdditionalDataPayload, "Unable to identify the included tag, TagFound=%d", innerReader.GetTag());
-        return CHIP_ERROR_INVALID_TLV_TAG;
-    }
+    char rotatingDeviceId[kRotatingDeviceIdLength];
+    err                         = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
+    SuccessOrExit(err);
+    outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
 
 exit:
     return err;

@@ -1283,12 +1283,11 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
 
     writer.Init(buffer);
 
-    err = writer.OpenContainer(ProfileTag(kProtocol_ServiceProvisioning, kTag_AdditionalDataExensionDescriptor), kTLVType_Structure,
-                               innerWriter);
+    err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
     SuccessOrExit(err);
 
     // Adding the rotating device id to the TLV data
-    err = innerWriter.PutString(ProfileTag(kProtocol_ServiceProvisioning, kRotatingDeviceIdTag), CHIP_ROTATING_DEVICE_ID);
+    err = innerWriter.PutString(ContextTag(kRotatingDeviceIdTag), CHIP_ROTATING_DEVICE_ID);
     SuccessOrExit(err);
 
     err = writer.CloseContainer(innerWriter);
