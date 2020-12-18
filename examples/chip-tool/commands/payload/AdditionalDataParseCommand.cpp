@@ -17,7 +17,7 @@
  */
 
 #include "AdditionalDataParseCommand.h"
-
+#include <string>
 #include <setup_payload/AdditionalDataPayload.h>
 #include <setup_payload/AdditionalDataPayloadParser.h>
 

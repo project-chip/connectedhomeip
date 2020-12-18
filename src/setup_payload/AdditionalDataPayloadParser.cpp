@@ -38,15 +38,16 @@ using namespace std;
 using namespace chip::SetupPayload;
 using namespace chip::TLV;
 using namespace chip::TLV::Utilities;
+using namespace chip::Protocols;
 
 CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & outPayload)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
-    chip::TLV::TLVReader innerReader;
+    TLVReader reader;
+    TLVReader innerReader;
 
     reader.Init(mPayload.data(), (uint32_t) mPayload.size());
-    reader.ImplicitProfileId = chip::Protocols::kProtocol_ServiceProvisioning;
+    reader.ImplicitProfileId = kProtocol_ServiceProvisioning;
     err                      = reader.Next();
     SuccessOrExit(err);
 
@@ -58,11 +59,17 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     SuccessOrExit(err);
 
     // Get the value of the rotating device id
-    if (chip::TLV::TagNumFromTag(innerReader.GetTag()) == kRotatingDeviceIdTag)
+    if (TagNumFromTag(innerReader.GetTag()) == kRotatingDeviceIdTag)
     {
         char rotatingDeviceId[kRotatingDeviceIdLength];
         err                         = innerReader.GetString(rotatingDeviceId, sizeof(rotatingDeviceId));
+        SuccessOrExit(err);
         outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
+    }
+    else
+    {
+        ChipLogError(AdditionalDataPayload, "Unable to identify the included tag, TagFound=%d", innerReader.GetTag());
+        return CHIP_ERROR_INVALID_TLV_TAG;
     }
 
 exit:
