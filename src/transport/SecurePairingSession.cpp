@@ -63,7 +63,7 @@ void SecurePairingSession::Clear()
     memset(&mPoint[0], 0, sizeof(mPoint));
     memset(&mWS[0][0], 0, sizeof(mWS));
     memset(&mKe[0], 0, sizeof(mKe));
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgError;
+    mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
     mSpake2p.Init(nullptr);
     mCommissioningHash.Clear();
     mIterationCount = 0;
@@ -240,7 +240,7 @@ CHIP_ERROR SecurePairingSession::WaitForPairing(uint32_t mySetUpPINCode, uint32_
 
     mIterationCount = pbkdf2IterCount;
 
-    mNextExpectedMsg = Spake2pMsgType::kPBKDFParamRequest;
+    mNextExpectedMsg = Protocols::SecureChannel::MsgType::PBKDFParamRequest;
     mPairingComplete = false;
 
     ChipLogDetail(Ble, "Waiting for PBKDF param request");
@@ -253,14 +253,14 @@ exit:
     return err;
 }
 
-CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(uint8_t msgType, System::PacketBufferHandle msgBuf)
+CHIP_ERROR SecurePairingSession::AttachHeaderAndSend(Protocols::SecureChannel::MsgType msgType, System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     PayloadHeader payloadHeader;
 
     payloadHeader
-        .SetMessageType(msgType) //
+        .SetMessageType(static_cast<uint8_t>(msgType)) //
         .SetProtocolID(Protocols::kProtocol_SecureChannel);
 
     uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
@@ -331,9 +331,9 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamRequest()
     err = mCommissioningHash.AddData(req->Start(), req->DataLength());
     SuccessOrExit(err);
 
-    mNextExpectedMsg = Spake2pMsgType::kPBKDFParamResponse;
+    mNextExpectedMsg = Protocols::SecureChannel::MsgType::PBKDFParamResponse;
 
-    err = AttachHeaderAndSend(Spake2pMsgType::kPBKDFParamRequest, std::move(req));
+    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PBKDFParamRequest, std::move(req));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent PBKDF param request");
@@ -422,9 +422,9 @@ CHIP_ERROR SecurePairingSession::SendPBKDFParamResponse()
     err = mSpake2p.ComputeL(mPoint, &sizeof_point, &mWS[1][0], kSpake2p_WS_Length);
     SuccessOrExit(err);
 
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsg1;
+    mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p1;
 
-    err = AttachHeaderAndSend(Spake2pMsgType::kPBKDFParamResponse, std::move(resp));
+    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PBKDFParamResponse, std::move(resp));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent PBKDF param response");
@@ -505,10 +505,10 @@ CHIP_ERROR SecurePairingSession::SendMsg1()
     memcpy(msg_pA->Start(), &X[0], X_len);
 
     msg_pA->SetDataLength(data_len);
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsg2;
+    mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p2;
 
     // Call delegate to send the Msg1 to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg1, std::move(msg_pA));
+    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p1, std::move(msg_pA));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent spake2p msg1");
@@ -568,10 +568,10 @@ CHIP_ERROR SecurePairingSession::HandleMsg1_and_SendMsg2(const PacketHeader & he
     }
 
     resp->SetDataLength(data_len);
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsg3;
+    mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2p3;
 
     // Call delegate to send the Msg2 to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg2, std::move(resp));
+    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p2, std::move(resp));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent spake2p msg2");
@@ -625,7 +625,7 @@ CHIP_ERROR SecurePairingSession::HandleMsg2_and_SendMsg3(const PacketHeader & he
     resp->SetDataLength(verifier_len);
 
     // Call delegate to send the Msg3 to peer
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsg3, std::move(resp));
+    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2p3, std::move(resp));
     SuccessOrExit(err);
 
     ChipLogDetail(Ble, "Sent spake2p msg3");
@@ -665,9 +665,9 @@ CHIP_ERROR SecurePairingSession::HandleMsg3(const PacketHeader & header, const S
 
     ChipLogDetail(Ble, "Received spake2p msg3");
 
-    // We will set NextExpectedMsg to kSpake2pMsgError in all cases
-    // However, when we are using IP rendezvous, we might set it to kSpake2pMsg1.
-    mNextExpectedMsg = Spake2pMsgType::kSpake2pMsgError;
+    // We will set NextExpectedMsg to PASE_Spake2pError in all cases
+    // However, when we are using IP rendezvous, we might set it to PASE_Spake2p1.
+    mNextExpectedMsg = Protocols::SecureChannel::MsgType::PASE_Spake2pError;
 
     VerifyOrExit(hash != nullptr, err = CHIP_ERROR_MESSAGE_INCOMPLETE);
     VerifyOrExit(msg->DataLength() == kMAX_Hash_Length, err = CHIP_ERROR_INVALID_MESSAGE_LENGTH);
@@ -715,7 +715,7 @@ void SecurePairingSession::SendErrorMsg(Spake2pErrorType errorCode)
 
     msg->SetDataLength(msglen);
 
-    err = AttachHeaderAndSend(Spake2pMsgType::kSpake2pMsgError, std::move(msg));
+    err = AttachHeaderAndSend(Protocols::SecureChannel::MsgType::PASE_Spake2pError, std::move(msg));
     SuccessOrExit(err);
 
 exit:
@@ -758,25 +758,25 @@ CHIP_ERROR SecurePairingSession::HandlePeerMessage(const PacketHeader & packetHe
 
     mPeerAddress = peerAddress;
 
-    switch (static_cast<Spake2pMsgType>(payloadHeader.GetMessageType()))
+    switch (static_cast<Protocols::SecureChannel::MsgType>(payloadHeader.GetMessageType()))
     {
-    case Spake2pMsgType::kPBKDFParamRequest:
+    case Protocols::SecureChannel::MsgType::PBKDFParamRequest:
         err = HandlePBKDFParamRequest(packetHeader, msg);
         break;
 
-    case Spake2pMsgType::kPBKDFParamResponse:
+    case Protocols::SecureChannel::MsgType::PBKDFParamResponse:
         err = HandlePBKDFParamResponse(packetHeader, msg);
         break;
 
-    case Spake2pMsgType::kSpake2pMsg1:
+    case Protocols::SecureChannel::MsgType::PASE_Spake2p1:
         err = HandleMsg1_and_SendMsg2(packetHeader, msg);
         break;
 
-    case Spake2pMsgType::kSpake2pMsg2:
+    case Protocols::SecureChannel::MsgType::PASE_Spake2p2:
         err = HandleMsg2_and_SendMsg3(packetHeader, msg);
         break;
 
-    case Spake2pMsgType::kSpake2pMsg3:
+    case Protocols::SecureChannel::MsgType::PASE_Spake2p3:
         err = HandleMsg3(packetHeader, msg);
         break;
 
