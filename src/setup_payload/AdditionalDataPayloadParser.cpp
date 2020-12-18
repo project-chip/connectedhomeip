@@ -46,7 +46,7 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     TLVReader reader;
     TLVReader innerReader;
 
-    reader.Init(mPayload.data(), (uint32_t) mPayload.size());
+    reader.Init(mPayloadBufferData, mPayloadBufferLength);
     err                      = reader.Next(kTLVType_Structure, AnonymousTag);
     SuccessOrExit(err);
 
