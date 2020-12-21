@@ -37,7 +37,6 @@ target_sources(app PRIVATE
                main/AppTask.cpp
                main/LightingManager.cpp
                main/main.cpp
-               main/Rpc.cpp
                main/ZclCallbacks.cpp
                ${LIGHTING_COMMON}/gen/call-command-handler.cpp
                ${LIGHTING_COMMON}/gen/callback-stub.cpp
@@ -88,12 +87,20 @@ pw_proto_library(pigweed_lighting_protolib
     main/pigweed_lighting.proto
 )
 
+target_sources(app PRIVATE
+  main/Rpc.cpp
+  ${NRFCONNECT_COMMON}/util/PigweedLogger.cpp
+)
+
+target_include_directories(app PRIVATE
+  ${ZEPHYR_BASE}/subsys // required to get access to `log_output_std.h`
+)
+
 target_link_libraries(app PRIVATE
-   pigweed_lighting_protolib.nanopb_rpc
-   pw_hdlc_lite
-    pw_log
-    pw_rpc.nanopb.echo_service
-    pw_rpc.server
+  pigweed_lighting_protolib.nanopb_rpc
+  pw_hdlc_lite
+  pw_log
+  pw_rpc.server
 )
 
 endif(CONFIG_CHIP_PW_RPC)
