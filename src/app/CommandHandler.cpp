@@ -93,7 +93,8 @@ CHIP_ERROR CommandHandler::ProcessCommandDataElement(CommandDataElement::Parser 
         // Empty Command, Add status code in invoke command response, notify cluster handler to hand it further.
         err = CHIP_NO_ERROR;
         ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-        AddStatusCode(COMMON_STATUS_SUCCESS, chip::Protocols::kProtocol_Protocol_Common, CHIP_ERROR_INVALID_ARGUMENT, clusterId);
+        //Todo: Define ProtocolCode for StatusCode.
+        AddStatusCode(COMMON_STATUS_SUCCESS, chip::Protocols::kProtocol_Protocol_Common, 0, clusterId);
     }
     else if (CHIP_NO_ERROR == err)
     {
