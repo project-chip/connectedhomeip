@@ -138,7 +138,7 @@ CHIP_ERROR CommandSender::ProcessCommandDataElement(CommandDataElement::Parser &
         {
             err = CHIP_NO_ERROR;
             ChipLogDetail(DataManagement, "Add Status code for empty command, cluster Id is %d", clusterId);
-            //Todo: Define protocol code for StatusCode
+            // Todo: Define protocol code for StatusCode
             AddStatusCode(0, chip::Protocols::kProtocol_Protocol_Common, 0, clusterId);
         }
         InteractionModelEngine::GetInstance()->ProcessCommand(clusterId, commandId, commandDataReader, this, kCommandSenderId);
