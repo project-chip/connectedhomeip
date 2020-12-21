@@ -144,7 +144,7 @@ public:
                         Command * apCommandObj, Command::CommandRoleId aCommandRoleId);
 
     Messaging::ExchangeManager * GetExchangeManager(void) const { return mpExchangeMgr; };
-    
+
     CHIP_ERROR NewCommandSender(CommandSender ** const apComandSender);
 
 private:

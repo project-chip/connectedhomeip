@@ -74,7 +74,7 @@ void InteractionModelEngine::Shutdown()
 
 CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apComandSender)
 {
-    CHIP_ERROR err = CHIP_ERROR_NO_MEMORY;
+    CHIP_ERROR err  = CHIP_ERROR_NO_MEMORY;
     *apComandSender = nullptr;
 
     for (size_t i = 0; i < CHIP_MAX_NUM_COMMAND_SENDER_OBJECTS; ++i)
@@ -82,7 +82,7 @@ CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCom
         if (mCommandHandlerObjs[i].IsFree())
         {
             *apComandSender = &mCommandSenderObjs[i];
-            err           = mCommandSenderObjs[i].Init(mpExchangeMgr);
+            err             = mCommandSenderObjs[i].Init(mpExchangeMgr);
             SuccessOrExit(err);
             if (CHIP_NO_ERROR != err)
             {
@@ -92,7 +92,7 @@ CHIP_ERROR InteractionModelEngine::NewCommandSender(CommandSender ** const apCom
             break;
         }
     }
-    
+
 exit:
     return err;
 }
