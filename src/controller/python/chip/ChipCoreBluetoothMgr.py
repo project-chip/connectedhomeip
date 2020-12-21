@@ -106,7 +106,7 @@ def _VoidPtrToCBUUID(ptr, len):
 
     return ptr
 
-class BgLoopCondition:
+class LoopCondition:
     def __init__(self, op, timelimit, arg = None):
         self.op = op
         self.due = time.time() + timelimit
@@ -167,7 +167,7 @@ class CoreBluetoothManager(ChipBleBase):
         self.send_condition = False
         self.subscribe_condition = False
 
-        self.runLoopUntil(BgLoopCondition("ready", 10.0))
+        self.runLoopUntil(LoopCondition("ready", 10.0))
 
         self.orig_input_hook = None
         self.hookFuncPtr = None
@@ -203,7 +203,7 @@ class CoreBluetoothManager(ChipBleBase):
                 self.logger.info("disconnecting old connection.")
                 self.loop_condition = False
                 self.manager.cancelPeripheralConnection_(periph)
-                self.runLoopUntil(BgLoopCondition("disconnect", 5.0))
+                self.runLoopUntil(LoopCondition("disconnect", 5.0))
 
             self.connect_state = False
             self.loop_condition = False
@@ -239,11 +239,8 @@ class CoreBluetoothManager(ChipBleBase):
         # set the new hook. readLine will call this periodically as it polls for input.
         pyos_inputhook_ptr.value = cast(self.hookFuncPtr, c_void_p).value
 
-    def shouldLoop(self, cond):
-        """
-        shouldLoop(BgLoopCondition): 
-        Used by runLoopUntil to determine whether it should exit the runloop.
-        """
+    def shouldLoop(self, cond:LoopCondition):
+        """ Used by runLoopUntil to determine whether it should exit the runloop. """
 
         if cond.TimeLimitExceeded():
             return False
@@ -270,7 +267,7 @@ class CoreBluetoothManager(ChipBleBase):
 
         return True
 
-    def runLoopUntil(self, cond):
+    def runLoopUntil(self, cond:LoopCondition):
         """Helper function to drive OSX runloop until an expected event is received or
         the timeout expires."""
         runLoop = NSRunLoop.currentRunLoop()
@@ -512,7 +509,7 @@ class CoreBluetoothManager(ChipBleBase):
         )
         # self.manager.scanForPeripheralsWithServices_options_(None, None)
 
-        self.runLoopUntil(BgLoopCondition("scan", args[0], args[2]))
+        self.runLoopUntil(LoopCondition("scan", args[0], args[2]))
 
         self.manager.stopScan()
         self.logger.info("scanning stopped")
@@ -564,7 +561,7 @@ class CoreBluetoothManager(ChipBleBase):
                     self.peripheral = p
                     self.manager.connectPeripheral_options_(p, None)
 
-                    self.runLoopUntil(BgLoopCondition("connect", 15.0))
+                    self.runLoopUntil(LoopCondition("connect", 15.0))
                     # Cleanup when the connect fails due to timeout,
                     # otherwise CoreBluetooth will continue to try to connect after this
                     # API exits.
@@ -592,7 +589,7 @@ class CoreBluetoothManager(ChipBleBase):
             self.loop_condition = False
             self.manager.cancelPeripheralConnection_(self.peripheral)
 
-            self.runLoopUntil(BgLoopCondition("disconnect", 10.0))
+            self.runLoopUntil(LoopCondition("disconnect", 10.0))
 
         resString = "disconnect " + (
             "success" if self.loop_condition and not self.connect_state else "fail"
