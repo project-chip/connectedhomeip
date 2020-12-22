@@ -83,9 +83,9 @@ if (chip_device_platform != "none") {
     }
 
     if (chip_enable_additional_data_advertising) {
-      defines += [ "CHIP_ENABLE_ADDITIONAL_ADVERTISING=1" ]
+      defines += [ "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=1" ]
     } else {
-      defines += [ "CHIP_ENABLE_ADDITIONAL_ADVERTISING=0" ]
+      defines += [ "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=0" ]
     }
 
     if (chip_device_platform == "darwin") {

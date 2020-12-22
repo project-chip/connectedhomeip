@@ -1265,7 +1265,7 @@ void BluezObjectsCleanup(BluezEndpoint * apEndpoint)
     EndpointCleanup(apEndpoint);
 }
 
-#if CHIP_ENABLE_ADDITIONAL_ADVERTISING
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
 static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * characteristic)
 {
     if (characteristic == nullptr)
@@ -1348,8 +1348,8 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
     ChipLogDetail(DeviceLayer, "CHIP BTP C1 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC1));
     ChipLogDetail(DeviceLayer, "CHIP BTP C2 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC2));
 
-#if CHIP_ENABLE_ADDITIONAL_ADVERTISING
-    ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_ADVERTISING is TRUE");
+#if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is TRUE");
     // Additional data characteristics
     endpoint->mpC3 =
         BluezCharacteristicCreate(endpoint->mpService, g_strdup("c3"), g_strdup(CHIP_PLAT_BLE_UUID_C3_STRING), endpoint->mpRoot);
@@ -1365,7 +1365,7 @@ static void BluezPeripheralObjectsSetup(gpointer apClosure)
     UpdateAdditionalDataCharacteristic(endpoint->mpC3);
     ChipLogDetail(DeviceLayer, "CHIP BTP C3 %s", bluez_gatt_characteristic1_get_service(endpoint->mpC3));
 #else
-    ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_ADVERTISING is FALSE");
+    ChipLogDetail(DeviceLayer, "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING is FALSE");
     (void) c3_flags;
 #endif
 
