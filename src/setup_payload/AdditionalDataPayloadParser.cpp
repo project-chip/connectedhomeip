@@ -63,6 +63,10 @@ CHIP_ERROR AdditionalDataPayloadParser::populatePayload(AdditionalDataPayload & 
     SuccessOrExit(err);
     outPayload.rotatingDeviceId = std::string(rotatingDeviceId);
 
+    // Verify the end of the container
+    err = reader.VerifyEndOfContainer();
+    SuccessOrExit(err);
+
 exit:
     return err;
 }
