@@ -109,7 +109,6 @@ enum LogModule
     kLogModule_Shell,
     kLogModule_DeviceLayer,
     kLogModule_SetupPayload,
-    kLogModule_AdditionalDataPayload,
     kLogModule_AppServer,
     kLogModule_Discovery,
 
