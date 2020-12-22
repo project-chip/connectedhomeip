@@ -111,9 +111,3 @@
 #define EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS {{endpoint_reporting_config_defaults}}
 
 {{/endpoint_config}}
-
-// CLUSTER defines to replace PLUGIN logic where needed.
-// To be discussed in a TT meeting in January 2020 (issue #4248)
-{{#all_user_clusters}}
-#define CHIP_{{asDelimitedMacro define}}_{{asDelimitedMacro side}}
-{{/all_user_clusters}}

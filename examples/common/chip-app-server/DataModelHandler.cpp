@@ -33,10 +33,10 @@
 #ifdef EMBER_AF_PLUGIN_REPORTING
 void emberAfPluginReportingStackStatusCallback(EmberStatus status);
 #endif
-#ifdef CHIP_TEMP_MEASUREMENT_CLUSTER_SERVER
+#ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
 void emberAfPluginTemperatureMeasurementServerStackStatusCallback(EmberStatus status);
 #endif
-#ifdef CHIP_IAS_ZONE_CLUSTER_SERVER
+#ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
 void emberAfPluginIasZoneServerStackStatusCallback(EmberStatus status);
 #endif
 
@@ -86,17 +86,17 @@ void InitDataModelHandler()
     emberAfEndpointConfigure();
     emberAfInit();
 
-#if defined(EMBER_AF_PLUGIN_REPORTING) || defined(CHIP_TEMP_MEASUREMENT_CLUSTER_SERVER) || defined(CHIP_IAS_ZONE_CLUSTER_SERVER)
+#if defined(EMBER_AF_PLUGIN_REPORTING) || defined(EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER) || defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
     EmberStatus status = EMBER_NETWORK_UP;
 #endif
 
 #ifdef EMBER_AF_PLUGIN_REPORTING
     emberAfPluginReportingStackStatusCallback(status);
 #endif
-#ifdef CHIP_TEMP_MEASUREMENT_CLUSTER_SERVER
+#ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
     emberAfPluginTemperatureMeasurementServerStackStatusCallback(status);
 #endif
-#ifdef CHIP_IAS_ZONE_CLUSTER_SERVER
+#ifdef EMBER_AF_PLUGIN_IAS_ZONE_SERVER
     emberAfPluginIasZoneServerStackStatusCallback(status);
 #endif
 }
