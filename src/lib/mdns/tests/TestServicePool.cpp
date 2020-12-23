@@ -116,7 +116,7 @@ void TestReplace(nlTestSuite * suite, void * context)
 
     pool.Clear();
     testService.mAddress.SetValue(chip::Inet::IPAddress::Any);
-    testService.mPort = 80;
+    testService.mPort          = 80;
     testService.mTextEntryies  = nullptr;
     testService.mTextEntrySize = 0;
 
