@@ -10,78 +10,10 @@ using chip::Mdns::kMdnsTextMaxSize;
 using chip::Mdns::MdnsService;
 using chip::Mdns::TextEntry;
 
-namespace {
-
-// Only for MdnsService inside the ServicePool::Entry
-void FreeTextEntries(MdnsService * service)
-{
-    if (service->mTextEntryies)
-    {
-        for (size_t i = 0; i < service->mTextEntrySize; i++)
-        {
-            TextEntry & entry = service->mTextEntryies[i];
-
-            if (entry.mKey)
-            {
-                chip::Platform::MemoryFree(const_cast<char *>(entry.mKey));
-            }
-            if (entry.mData)
-            {
-                chip::Platform::MemoryFree(const_cast<uint8_t *>(entry.mData));
-            }
-        }
-        chip::Platform::MemoryFree(service->mTextEntryies);
-        service->mTextEntryies = nullptr;
-    }
-}
-
-CHIP_ERROR CopyTextEntries(MdnsService * dest, const MdnsService & source)
-{
-    CHIP_ERROR error = CHIP_NO_ERROR;
-
-    if (source.mTextEntrySize)
-    {
-        dest->mTextEntryies = static_cast<TextEntry *>(chip::Platform::MemoryCalloc(source.mTextEntrySize, sizeof(TextEntry)));
-        VerifyOrExit(dest->mTextEntryies != nullptr, error = CHIP_ERROR_NO_MEMORY);
-        dest->mTextEntrySize = source.mTextEntrySize;
-
-        for (size_t i = 0; i < source.mTextEntrySize; i++)
-        {
-            TextEntry & entry = dest->mTextEntryies[i];
-            size_t keySize    = strnlen(source.mTextEntryies[i].mKey, kMdnsTextMaxSize);
-            char * key        = static_cast<char *>(chip::Platform::MemoryAlloc(keySize + 1));
-            uint8_t * data    = static_cast<uint8_t *>(chip::Platform::MemoryAlloc(source.mTextEntryies[i].mDataSize));
-
-            VerifyOrExit(keySize < kMdnsTextMaxSize, error = CHIP_ERROR_INVALID_ARGUMENT);
-            VerifyOrExit(key != nullptr, error = CHIP_ERROR_NO_MEMORY);
-            VerifyOrExit(data != nullptr, error = CHIP_ERROR_NO_MEMORY);
-            strncpy(key, source.mTextEntryies[i].mKey, keySize + 1);
-            entry.mDataSize = source.mTextEntryies[i].mDataSize;
-            memcpy(data, source.mTextEntryies[i].mData, entry.mDataSize);
-            entry.mKey  = key;
-            entry.mData = data;
-        }
-    }
-
-exit:
-    if (error != CHIP_NO_ERROR)
-    {
-        FreeTextEntries(dest);
-    }
-
-    return error;
-}
-
-} // namespace
-
 namespace chip {
 namespace Mdns {
 
-ServicePool::Entry::Entry() : mHasValue(false), mIsTombstone(false), mNodeId(0), mFabricId(0)
-{
-    mService.mTextEntryies  = nullptr;
-    mService.mTextEntrySize = 0;
-}
+ServicePool::Entry::Entry() : mHasValue(false), mIsTombstone(false), mNodeId(0), mFabricId(0), mPort(0) {}
 
 ServicePool::Entry::Entry(Entry && rhs)
 {
@@ -90,65 +22,32 @@ ServicePool::Entry::Entry(Entry && rhs)
 
 ServicePool::Entry & ServicePool::Entry::MoveFrom(Entry && rhs)
 {
-    mService     = rhs.mService;
     mNodeId      = rhs.mNodeId;
     mFabricId    = rhs.mFabricId;
     mHasValue    = rhs.mHasValue;
     mIsTombstone = rhs.mIsTombstone;
+    mAddress     = rhs.mAddress;
+    mPort        = rhs.mPort;
 
-    rhs.mHasValue               = false;
-    rhs.mIsTombstone            = false;
-    rhs.mService.mTextEntryies  = nullptr;
-    rhs.mService.mTextEntrySize = 0;
+    rhs.mHasValue    = false;
+    rhs.mIsTombstone = false;
 
     return *this;
 }
 
-CHIP_ERROR ServicePool::Entry::Emplace(const MdnsService & service, uint64_t nodeId, uint64_t fabricId)
+void ServicePool::Entry::Emplace(uint64_t nodeId, uint64_t fabricId, const Inet::IPAddress & address, uint16_t port)
 {
-    CHIP_ERROR error;
+    mAddress  = address;
+    mPort     = port;
+    mNodeId   = nodeId;
+    mFabricId = fabricId;
 
-    if (mHasValue)
-    {
-        FreeTextEntries(&mService);
-    }
-    mService               = service;
-    mNodeId                = nodeId;
-    mFabricId              = fabricId;
-    mService.mTextEntryies = nullptr;
-    error                  = CopyTextEntries(&mService, service);
-
-    if (error == CHIP_NO_ERROR)
-    {
-        mHasValue    = true;
-        mIsTombstone = false;
-    }
-    return error;
-}
-
-CHIP_ERROR ServicePool::Entry::Emplace(MdnsService && service, uint64_t nodeId, uint64_t fabricId)
-{
-    if (mHasValue)
-    {
-        FreeTextEntries(&mService);
-    }
-    mService               = service;
-    mNodeId                = nodeId;
-    mFabricId              = fabricId;
-    service.mTextEntryies  = nullptr;
-    service.mTextEntrySize = 0;
-    mHasValue              = true;
-    mIsTombstone           = false;
-
-    return CHIP_NO_ERROR;
+    mHasValue    = true;
+    mIsTombstone = false;
 }
 
 void ServicePool::Entry::Clear()
 {
-    if (mHasValue)
-    {
-        FreeTextEntries(&mService);
-    }
     mHasValue    = false;
     mIsTombstone = false;
 }
@@ -184,20 +83,19 @@ ServicePool::Entry & ServicePool::FindAvailableSlot(uint64_t nodeId)
     return mEntries[i];
 }
 
-CHIP_ERROR ServicePool::AddService(uint64_t nodeId, uint64_t fabricId, const MdnsService & service)
+void ServicePool::AddService(uint64_t nodeId, uint64_t fabricId, const MdnsService & service)
 {
-    return FindAvailableSlot(nodeId).Emplace(service, nodeId, fabricId);
+    FindAvailableSlot(nodeId).Emplace(nodeId, fabricId, service.mAddress.Value(), service.mPort);
 }
 
-CHIP_ERROR ServicePool::AddService(uint64_t nodeId, uint64_t fabricId, MdnsService && service)
+void ServicePool::AddService(uint64_t nodeId, uint64_t fabricId, const Inet::IPAddress & address, uint16_t port)
 {
-
-    return FindAvailableSlot(nodeId).Emplace(std::move(service), nodeId, fabricId);
+    FindAvailableSlot(nodeId).Emplace(nodeId, fabricId, address, port);
 }
 
 CHIP_ERROR ServicePool::RemoveService(uint64_t nodeId, uint64_t fabricId)
 {
-    Entry * entry = FindService(nodeId, fabricId);
+    Entry * entry = FindServiceMutable(nodeId, fabricId);
 
     if (!entry)
     {
@@ -213,17 +111,23 @@ CHIP_ERROR ServicePool::RemoveService(uint64_t nodeId, uint64_t fabricId)
 
 CHIP_ERROR ServicePool::UpdateService(uint64_t nodeId, uint64_t fabricId, const MdnsService & service)
 {
-    Entry * entry = FindService(nodeId, fabricId);
+    Entry * entry = FindServiceMutable(nodeId, fabricId);
 
     if (!entry)
     {
         return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
-    return entry->Emplace(service, nodeId, fabricId);
+    entry->Emplace(nodeId, fabricId, service.mAddress.Value(), service.mPort);
+    return CHIP_NO_ERROR;
 }
 
-ServicePool::Entry * ServicePool::FindService(uint64_t nodeId, uint64_t fabricId)
+const ServicePool::Entry * ServicePool::FindService(uint64_t nodeId, uint64_t fabricId)
+{
+    return FindServiceMutable(nodeId, fabricId);
+}
+
+ServicePool::Entry * ServicePool::FindServiceMutable(uint64_t nodeId, uint64_t fabricId)
 {
     size_t hashValue = nodeId % kServicePoolCapacity;
     size_t i         = hashValue;
@@ -263,7 +167,7 @@ void ServicePool::ReHash()
     {
         if (copyEntry.mHasValue)
         {
-            AddService(copyEntry.mNodeId, copyEntry.mFabricId, std::move(copyEntry.mService));
+            AddService(copyEntry.GetNodeId(), copyEntry.GetFabricId(), copyEntry.GetAddress(), copyEntry.GetPort());
         }
     }
 }

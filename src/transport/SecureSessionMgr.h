@@ -205,7 +205,8 @@ private:
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
 
-    void HandleNodeIdResolve(CHIP_ERROR error, NodeId nodeId, const Mdns::MdnsService & service) override;
+    void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, uint64_t fabricId, const chip::Inet::IPAddress & address,
+                             uint16_t port) override;
 };
 
 } // namespace chip

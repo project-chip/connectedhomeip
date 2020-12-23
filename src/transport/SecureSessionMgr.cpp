@@ -225,7 +225,8 @@ exit:
     return err;
 }
 
-void SecureSessionMgr::HandleNodeIdResolve(CHIP_ERROR error, NodeId nodeId, const Mdns::MdnsService & service)
+void SecureSessionMgr::HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, uint64_t fabricId,
+                                           const chip::Inet::IPAddress & address, uint16_t port)
 {
     if (error != CHIP_NO_ERROR && mCB != nullptr)
     {
@@ -242,7 +243,7 @@ void SecureSessionMgr::HandleNodeIdResolve(CHIP_ERROR error, NodeId nodeId, cons
         bool hasAddressUpdate = false;
 
         // Though the spec says the service name is _chip._tcp, we are not supporting tcp for now.
-        addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(service.mAddress.Value()).SetPort(service.mPort);
+        addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(address).SetPort(port);
 
         while ((state = mPeerConnections.FindPeerConnectionState(nodeId, state)) != nullptr)
         {
