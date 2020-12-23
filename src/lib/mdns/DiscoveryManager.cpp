@@ -109,7 +109,7 @@ void DiscoveryManager::HandleMdnsInit(void * context, CHIP_ERROR initError)
     }
     else
     {
-        ChipLogError(Discovery, "mDNS initialization failed with %s", chip::ErrorStr(initError));
+        ChipLogError(Discovery, "mDNS initialization failed with %s", ErrorStr(initError));
     }
 }
 
@@ -122,11 +122,11 @@ void DiscoveryManager::HandleMdnsError(void * context, CHIP_ERROR error)
     }
     else
     {
-        ChipLogError(Discovery, "mDNS error: %s", chip::ErrorStr(error));
+        ChipLogError(Discovery, "mDNS error: %s", ErrorStr(error));
     }
 }
 
-CHIP_ERROR DiscoveryManager::StartPublishDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
+CHIP_ERROR DiscoveryManager::StartPublishDevice(Inet::IPAddressType addressType, Inet::InterfaceId interface)
 {
     CHIP_ERROR error;
 
@@ -135,13 +135,13 @@ CHIP_ERROR DiscoveryManager::StartPublishDevice(chip::Inet::IPAddressType addres
     {
         SuccessOrExit(error = SetupHostname());
     }
-    else if (chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned() != mIsPublishingProvisionedDevice)
+    else if (DeviceLayer::ConfigurationMgr().IsFullyProvisioned() != mIsPublishingProvisionedDevice)
     {
         SuccessOrExit(error = StopPublishDevice());
         // Set hostname again in case the mac address changes when shifting from soft-AP to station
         SuccessOrExit(error = SetupHostname());
     }
-    mIsPublishingProvisionedDevice = chip::DeviceLayer::ConfigurationMgr().IsFullyProvisioned();
+    mIsPublishingProvisionedDevice = DeviceLayer::ConfigurationMgr().IsFullyProvisioned();
 
     if (mIsPublishingProvisionedDevice)
     {
@@ -162,7 +162,7 @@ CHIP_ERROR DiscoveryManager::SetupHostname()
     char hostname[13]; // Hostname will be the hex representation of mac.
     CHIP_ERROR error;
 
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac));
+    SuccessOrExit(error = DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(mac));
     for (size_t i = 0; i < sizeof(mac); i++)
     {
         snprintf(&hostname[i * 2], sizeof(hostname) - i * 2, "%02X", mac[i]);
@@ -173,7 +173,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
+CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(Inet::IPAddressType addressType, Inet::InterfaceId interface)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     MdnsService service;
@@ -190,12 +190,12 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
 
     VerifyOrExit(mMdnsInitialized, error = CHIP_ERROR_INCORRECT_STATE);
     ChipLogProgress(Discovery, "setup mdns service");
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
+    SuccessOrExit(error = DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
     snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mUnprovisionedInstanceName);
     strncpy(service.mType, kUnprovisionedServiceType, sizeof(service.mType));
     service.mProtocol = MdnsServiceProtocol::kMdnsProtocolUdp;
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetVendorId(vendorID));
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetProductId(productID));
+    SuccessOrExit(error = DeviceLayer::ConfigurationMgr().GetVendorId(vendorID));
+    SuccessOrExit(error = DeviceLayer::ConfigurationMgr().GetProductId(productID));
     snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04X", discriminator);
     snprintf(vendorProductBuf, sizeof(vendorProductBuf), "%04X+%04X", vendorID, productID);
     entries[0].mData       = reinterpret_cast<const uint8_t *>(discriminatorBuf);
@@ -213,7 +213,7 @@ exit:
     return error;
 }
 
-CHIP_ERROR DiscoveryManager::PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
+CHIP_ERROR DiscoveryManager::PublishProvisionedDevice(Inet::IPAddressType addressType, Inet::InterfaceId interface)
 {
     uint64_t deviceId;
     uint64_t fabricId;
@@ -221,8 +221,8 @@ CHIP_ERROR DiscoveryManager::PublishProvisionedDevice(chip::Inet::IPAddressType 
     CHIP_ERROR error = CHIP_NO_ERROR;
 
     // TODO: There may be multilple device/fabrid ids after multi-admin.
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetFabricId(fabricId));
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetDeviceId(deviceId));
+    SuccessOrExit(error = DeviceLayer::ConfigurationMgr().GetFabricId(fabricId));
+    SuccessOrExit(error = DeviceLayer::ConfigurationMgr().GetDeviceId(deviceId));
     snprintf(service.mName, sizeof(service.mName), "%" PRIX64 "-%" PRIX64, deviceId, fabricId);
     strncpy(service.mType, kProvisionedServiceType, sizeof(service.mType));
     service.mProtocol      = MdnsServiceProtocol::kMdnsProtocolTcp;
@@ -245,11 +245,12 @@ CHIP_ERROR DiscoveryManager::StopPublishDevice()
 
 CHIP_ERROR DiscoveryManager::ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type)
 {
-    ServicePool::Entry * entry = mServicePool.FindService(nodeId, fabricId);
+    const ServicePool::Entry * entry = mServicePool.FindService(nodeId, fabricId);
 
-    if (entry && entry->mService.mAddress.HasValue())
+    if (entry)
     {
-        HandleNodeIdResolve(this, &entry->mService, CHIP_NO_ERROR);
+        mResolveDelegate->HandleNodeIdResolve(CHIP_NO_ERROR, entry->GetNodeId(), entry->GetFabricId(), entry->GetAddress(),
+                                              entry->GetPort());
 
         return CHIP_NO_ERROR;
     }
@@ -272,13 +273,14 @@ void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result,
     }
     if (error != CHIP_NO_ERROR)
     {
-        ChipLogError(Discovery, "Node ID resolved failed with %s", chip::ErrorStr(error));
-        mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, MdnsService{});
+        ChipLogError(Discovery, "Node ID resolved failed with %s", ErrorStr(error));
+        mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, kUndefinedFabricId, Inet::IPAddress::Any, 0);
     }
     else if (result == nullptr)
     {
         ChipLogError(Discovery, "Node ID resolve not found");
-        mgr->mResolveDelegate->HandleNodeIdResolve(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, MdnsService{});
+        mgr->mResolveDelegate->HandleNodeIdResolve(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, kUndefinedFabricId,
+                                                   Inet::IPAddress::Any, 0);
     }
     else if (strncmp(result->mType, kProvisionedServiceType, sizeof(result->mType)) == 0 &&
              result->mProtocol == MdnsServiceProtocol::kMdnsProtocolTcp)
@@ -292,12 +294,12 @@ void DiscoveryManager::HandleNodeIdResolve(void * context, MdnsService * result,
         if (validService)
         {
             ChipLogProgress(Discovery, "Node ID resolved for %" PRIX64, nodeId);
-            mgr->mResolveDelegate->HandleNodeIdResolve(error, nodeId, *result);
+            mgr->mResolveDelegate->HandleNodeIdResolve(CHIP_NO_ERROR, nodeId, fabricId, result->mAddress.Value(), result->mPort);
         }
         else
         {
             ChipLogProgress(Discovery, "Invalid service entry from node %" PRIX64, nodeId);
-            mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, *result);
+            mgr->mResolveDelegate->HandleNodeIdResolve(error, kUndefinedNodeId, kUndefinedFabricId, Inet::IPAddress::Any, 0);
         }
     }
 }
@@ -309,14 +311,11 @@ void DiscoveryManager::AddMdnsService(const MdnsService & service)
     {
         uint64_t nodeId   = 0;
         uint64_t fabricId = 0;
-        bool validService = ParseNodeFabricId(service, &nodeId, &fabricId);
+        bool validService = ParseNodeFabricId(service, &nodeId, &fabricId) && service.mAddress.HasValue();
 
         if (validService)
         {
-            if (mServicePool.AddService(nodeId, fabricId, service) != CHIP_NO_ERROR)
-            {
-                ChipLogError(Discovery, "Failed to add service to pool");
-            }
+            mServicePool.AddService(nodeId, fabricId, service);
         }
         else
         {
@@ -338,14 +337,9 @@ void DiscoveryManager::UpdateMdnsService(const MdnsService & service)
             ChipLogError(Discovery, "Invalid service format during service update");
             return;
         }
-        if (mServicePool.RemoveService(nodeId, fabricId) != CHIP_NO_ERROR)
+        if (mServicePool.UpdateService(nodeId, fabricId, service) != CHIP_NO_ERROR)
         {
-            ChipLogError(Discovery, "Failed to remove service from pool");
-            return;
-        }
-        if (mServicePool.AddService(nodeId, fabricId, service) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Failed to add service to pool");
+            ChipLogError(Discovery, "Failed to update service %s", service.mName);
             return;
         }
     }
@@ -370,14 +364,14 @@ void DiscoveryManager::RemoveMdnsService(const MdnsService & service)
         if (mServicePool.ShouldReHash() && !mIsRehashPending)
         {
             mIsRehashPending = true;
-            chip::DeviceLayer::SystemLayer.ScheduleWork(RehashServicePool, this);
+            DeviceLayer::SystemLayer.ScheduleWork(RehashServicePool, this);
         }
     }
 }
 
-void DiscoveryManager::RehashServicePool(chip::System::Layer * systemLayer, void * appState, chip::System::Error error)
+void DiscoveryManager::RehashServicePool(System::Layer * systemLayer, void * appState, System::Error error)
 {
-    chip::Mdns::DiscoveryManager * mgr = static_cast<chip::Mdns::DiscoveryManager *>(appState);
+    auto * mgr = static_cast<DiscoveryManager *>(appState);
 
     mgr->mServicePool.ReHash();
     mgr->mIsRehashPending = false;
@@ -390,7 +384,7 @@ CHIP_ERROR DiscoveryManager::Init()
     return CHIP_NO_ERROR;
 }
 
-CHIP_ERROR DiscoveryManager::StartPublishDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface)
+CHIP_ERROR DiscoveryManager::StartPublishDevice(Inet::IPAddressType addressType, Inet::InterfaceId interface)
 {
     return CHIP_ERROR_NOT_IMPLEMENTED;
 }

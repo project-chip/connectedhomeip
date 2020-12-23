@@ -27,10 +27,14 @@
 namespace chip {
 namespace Mdns {
 
+constexpr uint64_t kUndefinedNodeId   = 0;
+constexpr uint64_t kUndefinedFabricId = 0;
+
 class ResolveDelegate
 {
 public:
-    virtual void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const MdnsService & address) = 0;
+    virtual void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, uint64_t fabricId, const Inet::IPAddress & address,
+                                     uint16_t port) = 0;
     virtual ~ResolveDelegate() {}
 };
 
@@ -54,8 +58,8 @@ public:
      * @param[in] interface   The interface to send mDNS multicast.
      *
      */
-    CHIP_ERROR StartPublishDevice(chip::Inet::IPAddressType addressType = chip::Inet::kIPAddressType_Any,
-                                  chip::Inet::InterfaceId interface     = INET_NULL_INTERFACEID);
+    CHIP_ERROR StartPublishDevice(Inet::IPAddressType addressType = Inet::kIPAddressType_Any,
+                                  Inet::InterfaceId interface     = INET_NULL_INTERFACEID);
 
     /**
      * This function stops publishing the device on mDNS.
@@ -73,7 +77,7 @@ public:
      * This function resolves a node id to its address.
      *
      */
-    CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, chip::Inet::IPAddressType type = chip::Inet::kIPAddressType_Any);
+    CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, Inet::IPAddressType type = Inet::kIPAddressType_Any);
 
     void AddMdnsService(const MdnsService & service) override;
 
@@ -89,14 +93,15 @@ private:
     DiscoveryManager(const DiscoveryManager &) = delete;
     DiscoveryManager & operator=(const DiscoveryManager &) = delete;
 
-    CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
-    CHIP_ERROR PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
+    CHIP_ERROR PublishUnprovisionedDevice(Inet::IPAddressType addressType, Inet::InterfaceId interface);
+    CHIP_ERROR PublishProvisionedDevice(Inet::IPAddressType addressType, Inet::InterfaceId interface);
     CHIP_ERROR SetupHostname();
 
     static void HandleNodeIdResolve(void * context, MdnsService * result, CHIP_ERROR error);
+
     static void HandleMdnsInit(void * context, CHIP_ERROR initError);
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
-    static void RehashServicePool(chip::System::Layer * systemLayer, void * appState, chip::System::Error error);
+    static void RehashServicePool(System::Layer * systemLayer, void * appState, System::Error error);
 
 #if CHIP_ENABLE_MDNS
     uint64_t mUnprovisionedInstanceName;

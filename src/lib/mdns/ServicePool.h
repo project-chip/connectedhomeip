@@ -23,8 +23,6 @@
 namespace chip {
 namespace Mdns {
 
-constexpr uint64_t kUndefinedNodeId = 0;
-
 class ServicePool
 {
 public:
@@ -35,28 +33,31 @@ public:
 
         Entry();
         Entry(Entry && rhs);
-        MdnsService mService;
 
-        uint64_t GetNodeId() { return mNodeId; }
-        uint64_t GetFabricId() { return mFabricId; }
+        uint64_t GetNodeId() const { return mNodeId; }
+        uint64_t GetFabricId() const { return mFabricId; }
+        Inet::IPAddress GetAddress() const { return mAddress; }
+        uint16_t GetPort() const { return mPort; }
 
         ~Entry();
 
     private:
-        Entry(Entry & rhs) = delete;
-        Entry & operator=(Entry & rhs) = delete;
+        Entry(const Entry & rhs) = delete;
+        Entry & operator=(const Entry & rhs) = delete;
         Entry & operator=(Entry && rhs) = delete;
 
         void Clear();
 
         Entry & MoveFrom(Entry && rhs);
-        CHIP_ERROR Emplace(const MdnsService & service, uint64_t nodeId, uint64_t fabricId);
-        CHIP_ERROR Emplace(MdnsService && service, uint64_t nodeId, uint64_t fabricId);
+        void Emplace(uint64_t nodeId, uint64_t fabricId, const Inet::IPAddress & address, uint16_t port);
 
         bool mHasValue;
         bool mIsTombstone;
+
         uint64_t mNodeId;
         uint64_t mFabricId;
+        Inet::IPAddress mAddress;
+        uint16_t mPort;
     };
 
     ServicePool() = default;
@@ -71,17 +72,7 @@ public:
      * @retval CHIP_ERROR_NO_MEMORY         Cannot allocate memory to copy the service.
      *
      */
-    CHIP_ERROR AddService(uint64_t nodeId, uint64_t fabricId, const MdnsService & service);
-
-    /**
-     * This method adds a service to the service pool taking an r-value reference.
-     *
-     * We directly copy all the pointers inside the service and assume them to be
-     * allocated from the CHIP heap. Take caution when using this API.
-     * After this call service will have null mTextEntries.
-     *
-     */
-    CHIP_ERROR AddService(uint64_t nodeId, uint64_t fabricId, MdnsService && service);
+    void AddService(uint64_t nodeId, uint64_t fabricId, const MdnsService & service);
 
     /**
      * This method removes a service from the pool.
@@ -109,7 +100,7 @@ public:
      * @retval nullptr  No service with matching node and fabricID is found.
      *
      */
-    Entry * FindService(uint64_t nodeId, uint64_t fabricId);
+    const Entry * FindService(uint64_t nodeId, uint64_t fabricId);
 
     /**
      * This method performs a hash-map rehash to reduce collision
@@ -138,6 +129,9 @@ public:
     ~ServicePool() = default;
 
 private:
+    Entry * FindServiceMutable(uint64_t nodeId, uint64_t fabricId);
+    void AddService(uint64_t nodeId, uint64_t fabricId, const Inet::IPAddress & address, uint16_t port);
+
     ServicePool(const ServicePool &) = delete;
     ServicePool & operator=(const ServicePool &) = delete;
 

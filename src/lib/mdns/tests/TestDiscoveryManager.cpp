@@ -17,11 +17,11 @@ class TestResolveDelegate : public chip::Mdns::ResolveDelegate
 public:
     TestResolveDelegate(nlTestSuite * suite) : mSuite(suite), mCount(0) {}
 
-    void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, const chip::Mdns::MdnsService & address) override
+    void HandleNodeIdResolve(CHIP_ERROR error, uint64_t nodeId, uint64_t fabricId, const chip::Inet::IPAddress & address,
+                             uint16_t port) override
     {
         NL_TEST_ASSERT(mSuite, error == CHIP_NO_ERROR);
         NL_TEST_ASSERT(mSuite, nodeId == kTestNodeId);
-        NL_TEST_ASSERT(mSuite, address.mAddress.HasValue());
         if (mCount == 0)
         {
             mCount++;
