@@ -124,7 +124,10 @@ void QueryResponderBase::MarkAdditionalRepliesFor(QueryResponderIterator it)
     {
         keepAdding = false;
 
-        for (auto ait = additional_begin(); ait != additional_end(); ait++)
+        QueryResponderRecordFilter filter;
+        filter.SetIncludeAdditionalRepliesOnly(true);
+
+        for (auto ait = begin(&filter); ait != end(); ait++)
         {
             if (ait.GetInternal()->alsoReportAdditionalQName)
             {

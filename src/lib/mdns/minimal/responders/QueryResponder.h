@@ -17,6 +17,7 @@
 
 #pragma once
 
+#include "ReplyFilter.h"
 #include "Responder.h"
 
 #include <inet/InetLayer.h>
@@ -26,21 +27,23 @@
 namespace mdns {
 namespace Minimal {
 
+/// Represents available data (replies) for mDNS queries.
 struct QueryResponderRecord
 {
-    Responder * responder = nullptr; // where the response is sent
-    bool reportService    = false;   // report as a service when listing dnssd services
+    Responder * responder      = nullptr; // what response/data is available
+    bool reportService         = false;   // report as a service when listing dnssd services
+    uint64_t lastMulticastTime = 0;       // last time this record was multicast
 };
 
 namespace Internal {
 
-// Includes internally used tracking information
+/// Internal information for query responder records.
 struct QueryResponderInfo : public QueryResponderRecord
 {
     bool reportNowAsAdditional; // report as additional data required
 
     bool alsoReportAdditionalQName = false; // report more data when this record is listed
-    FullQName additionalQName;
+    FullQName additionalQName;              // if alsoReportAdditionalQName is set, send this extra data
 
     void Clear()
     {
@@ -61,6 +64,7 @@ public:
     QueryResponderSettings(Internal::QueryResponderInfo * info) : mInfo(info) {}
     QueryResponderSettings(const QueryResponderSettings & other) = default;
 
+    /// This record should be part of dns-sd service listing requests
     QueryResponderSettings & SetReportInServiceListing(bool reportService)
     {
         if (IsValid())
@@ -70,6 +74,11 @@ public:
         return *this;
     }
 
+    /// When this record is send back, additional records should also be provided.
+    ///
+    /// This is useful to avoid chattyness by sending back referenced records
+    /// (e.g. when sending a PTR record, send the corresponding SRV and when sending
+    ///  SRV, send back the corresponding A/AAAA records).
     QueryResponderSettings & SetReportAdditional(const FullQName & qname)
     {
         if (IsValid())
@@ -86,12 +95,79 @@ private:
     Internal::QueryResponderInfo * mInfo;
 };
 
+/// Determines what query records should be included in a response.
+///
+/// Provides an 'Accept' method to determine if a reply is to be sent or not.
+class QueryResponderRecordFilter
+{
+public:
+    /// Default contstructor accepts everything that is not null
+    QueryResponderRecordFilter() {}
+    QueryResponderRecordFilter(const QueryResponderRecordFilter & other) = default;
+    QueryResponderRecordFilter & operator=(const QueryResponderRecordFilter & other) = default;
+
+    /// Set if to include only items marked as 'additional reply' or everything.
+    QueryResponderRecordFilter & SetIncludeAdditionalRepliesOnly(bool includeAdditionalRepliesOnly)
+    {
+        mIncludeAdditionalRepliesOnly = includeAdditionalRepliesOnly;
+        return *this;
+    }
+
+    /// Filter out anything rejected by the given reply filter.
+    /// If replyFilter is nullptr, no such filtering is applied.
+    QueryResponderRecordFilter & SetReplyFilter(ReplyFilter * replyFilter)
+    {
+        mReplyFilter = replyFilter;
+        return *this;
+    }
+
+    /// Filter out anything that was multicast past ms.
+    /// If ms is 0, no filtering is done
+    QueryResponderRecordFilter & SetIncludeOnlyMulticastBeforeMS(uint64_t ms)
+    {
+        mIncludeOnlyMulticastBeforeMS = ms;
+        return *this;
+    }
+
+    bool Accept(Internal::QueryResponderInfo * record) const
+    {
+        if (record->responder == nullptr)
+        {
+            return false;
+        }
+
+        if (mIncludeAdditionalRepliesOnly && !record->reportNowAsAdditional)
+        {
+            return false;
+        }
+
+        if ((mIncludeOnlyMulticastBeforeMS > 0) && (record->lastMulticastTime >= mIncludeOnlyMulticastBeforeMS))
+        {
+            return false;
+        }
+
+        if ((mReplyFilter != nullptr) &&
+            !mReplyFilter->Accept(record->responder->GetQType(), record->responder->GetQClass(), record->responder->GetQName()))
+        {
+            return false;
+        }
+        return true;
+    }
+
+private:
+    bool mIncludeAdditionalRepliesOnly     = false;
+    ReplyFilter * mReplyFilter             = nullptr;
+    uint64_t mIncludeOnlyMulticastBeforeMS = 0;
+};
+
+/// Iterates over an array of QueryResponderRecord items, providing only 'valid' ones, where
+/// valid is based on the provided filter.
 class QueryResponderIterator : public std::iterator<std::input_iterator_tag, QueryResponderRecord>
 {
 public:
-    QueryResponderIterator() : mAdditionalOnly(false), mCurrent(nullptr), mRemaining(0) {}
-    QueryResponderIterator(bool additionalOnly, Internal::QueryResponderInfo * pos, size_t size) :
-        mAdditionalOnly(additionalOnly), mCurrent(pos), mRemaining(size)
+    QueryResponderIterator() : mCurrent(nullptr), mRemaining(0) {}
+    QueryResponderIterator(QueryResponderRecordFilter * recordFilter, Internal::QueryResponderInfo * pos, size_t size) :
+        mFilter(recordFilter), mCurrent(pos), mRemaining(size)
     {
         SkipInvalid();
     }
@@ -126,31 +202,11 @@ public:
     const Internal::QueryResponderInfo * GetInternal() const { return mCurrent; }
 
 private:
-    /// Checks if the value pointed to by 'mCurrent' is a valid reply value.
-    ///
-    /// Valid is being described as
-    ///   - has a responder
-    ///   - record type matches the 'addtional only' setting for the iterator.
-    bool isCurrentValid() const
-    {
-        if (mCurrent->responder == nullptr)
-        {
-            return false;
-        }
-
-        if (mAdditionalOnly && !mCurrent->reportNowAsAdditional)
-        {
-            return false;
-        }
-
-        return true;
-    }
-
     /// Skips invalid/not useful values.
     /// ensures that if mRemaining is 0, mCurrent is nullptr;
     void SkipInvalid()
     {
-        while ((mRemaining > 0) && !isCurrentValid())
+        while ((mRemaining > 0) && !mFilter->Accept(mCurrent))
         {
             mRemaining--;
             mCurrent++;
@@ -161,7 +217,7 @@ private:
         }
     }
 
-    bool mAdditionalOnly;
+    QueryResponderRecordFilter * mFilter;
     Internal::QueryResponderInfo * mCurrent;
     size_t mRemaining;
 };
@@ -194,7 +250,10 @@ public:
     /// Adds responses for all known _dns-sd services.
     void AddAllResponses(const chip::Inet::IPPacketInfo * source, ResponderDelegate * delegate) override;
 
-    QueryResponderIterator begin() { return QueryResponderIterator(false, mResponderInfos, mResponderInfoSize); }
+    QueryResponderIterator begin(QueryResponderRecordFilter * filter)
+    {
+        return QueryResponderIterator(filter, mResponderInfos, mResponderInfoSize);
+    }
     QueryResponderIterator end() { return QueryResponderIterator(); }
 
     /// Clear any items marked as 'additional'.
@@ -206,9 +265,6 @@ public:
 
     /// Flag any additional responses required for the given iterator
     void MarkAdditionalRepliesFor(QueryResponderIterator it);
-
-    QueryResponderIterator additional_begin() { return QueryResponderIterator(true, mResponderInfos, mResponderInfoSize); }
-    QueryResponderIterator additional_end() { return QueryResponderIterator(); }
 
 private:
     Internal::QueryResponderInfo * mResponderInfos;

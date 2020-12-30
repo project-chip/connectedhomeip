@@ -23,25 +23,17 @@ if (chip_device_platform != "none") {
   chip_test_suite("tests") {
     output_name = "libPlatformTests"
 
-    sources = [
-      "TestConfigurationMgr.cpp",
-      "TestConfigurationMgr.h",
-      "TestPlatformMgr.cpp",
-      "TestPlatformMgr.h",
-      "TestPlatformTime.cpp",
-      "TestPlatformTime.h",
-    ]
+    test_sources = []
 
-    tests = [ "TestPlatformMgr" ]
+    if (current_os != "zephyr") {
+      # TODO: unclear as to why this fails on zephyr
+      #       pre-conversion this test was not registered as CHIP_REGISTER_TEST_SUITE
+      test_sources += [ "TestPlatformMgr.cpp" ]
+    }
 
     if (chip_enable_mdns && chip_enable_happy_tests &&
         chip_device_platform == "linux") {
-      sources += [
-        "TestMdns.cpp",
-        "TestMdns.h",
-      ]
-
-      tests += [ "TestMdns" ]
+      test_sources += [ "TestMdns.cpp" ]
     }
 
     public_deps = [
@@ -53,30 +45,31 @@ if (chip_device_platform != "none") {
 
     # These tests appear to be broken on Mac.
     if (current_os != "mac") {
-      tests += [
-        "TestConfigurationMgr",
-        "TestPlatformTime",
+      test_sources += [
+        "TestConfigurationMgr.cpp",
+        "TestPlatformTime.cpp",
       ]
     }
 
     if (chip_enable_openthread) {
-      sources += [
-        "TestThreadStackMgr.cpp",
-        "TestThreadStackMgr.h",
-      ]
       # FIXME: TestThreadStackMgr requires ot-br-posix daemon to be running
-      # tests += [ "TestThreadStackMgr" ]
+      # test_sources += [ "TestThreadStackMgr.cpp" ]
     }
 
     if (chip_enable_ble) {
-      sources += [
+      # FIXME: TestCHIPoBLEStackMgr requires bluetoothd daemon to be running
+      #
+      # TODO: Driver code has a check for only running the test
+      #       if the first argument to the test is a '1'.
+      #       This is very odd and test should probably be moved as an integration
+      #       test rather than a unit test
+      #
+      sources = [
         "TestCHIPoBLEStackMgr.cpp",
         "TestCHIPoBLEStackMgr.h",
         "TestCHIPoBLEStackMgrDriver.cpp",
       ]
-
-      # FIXME: TestCHIPoBLEStackMgr requires bluetoothd daemon to be running
-      tests += [ "TestCHIPoBLEStackMgr" ]
+      tests = [ "TestCHIPoBLEStackMgr" ]
     }
   }
 } else {

@@ -264,7 +264,7 @@ void TestBufferContents(nlTestSuite * inSuite, PacketBuffer * buf, const uint8_t
         expectedVal += len;
         expectedLen -= len;
 
-        buf = buf->Next();
+        buf = buf->Next_ForNow();
     }
 
     NL_TEST_ASSERT(inSuite, expectedLen == 0);

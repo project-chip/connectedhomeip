@@ -19,11 +19,9 @@
 #include "LightingManager.h"
 
 #include "AppConfig.h"
+#include "LogUtils.h"
 
-#include <logging/log.h>
 #include <zephyr.h>
-
-LOG_MODULE_DECLARE(app);
 
 LightingManager LightingManager::sLight;
 
@@ -38,7 +36,7 @@ int LightingManager::Init(const char * gpioDeviceName, gpio_pin_t gpioPin)
 
     if (!mGPIODevice)
     {
-        LOG_ERR("Cannot find GPIO port %s", log_strdup(gpioDeviceName));
+        LOG_ERR("Cannot find GPIO port %s", LOG_STRDUP(gpioDeviceName));
         return -ENODEV;
     }
 

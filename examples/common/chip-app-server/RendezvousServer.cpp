@@ -25,7 +25,7 @@
 #if CHIP_ENABLE_OPENTHREAD
 #include <platform/ThreadStackManager.h>
 #endif
-#include <lib/mdns/DiscoveryManager.h>
+#include <mdns/Advertiser.h>
 
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
@@ -62,7 +62,7 @@ void RendezvousServer::OnRendezvousMessageReceived(const PacketHeader & packetHe
 void RendezvousServer::OnRendezvousComplete()
 {
     ChipLogProgress(AppServer, "Device completed Rendezvous process");
-    if (mRendezvousSession.GetLocalNodeId().HasValue() && mRendezvousSession.GetRemoteNodeId().HasValue())
+    if (mRendezvousSession.GetRemoteNodeId().HasValue())
     {
         SessionManager().NewPairing(Optional<Transport::PeerAddress>{}, mRendezvousSession.GetRemoteNodeId().Value(),
                                     &mRendezvousSession.GetPairingSession());
@@ -97,7 +97,10 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
 
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
         ChipLogProgress(AppServer, "Device was assigned network credentials");
-        chip::Mdns::DiscoveryManager::GetInstance().StartPublishDevice();
+        if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort) != CHIP_NO_ERROR)
+        {
+            ChipLogError(AppServer, "Failed to start mDNS advertisement");
+        }
         if (mDelegate != nullptr)
         {
             mDelegate->OnRendezvousStopped();

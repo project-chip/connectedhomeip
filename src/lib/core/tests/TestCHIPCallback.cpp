@@ -213,6 +213,9 @@ static void NotifierTest(nlTestSuite * inSuite, void * inContext)
     notifier.Register(&cb);
     notifier.Notify(8);
     NL_TEST_ASSERT(inSuite, n == 1);
+
+    cb.Cancel();
+    cancelcb.Cancel();
 }
 
 /**

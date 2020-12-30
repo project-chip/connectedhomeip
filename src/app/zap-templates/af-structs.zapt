@@ -9,20 +9,16 @@
 
 {{#zcl_structs}}
 
+{{#if itemCnt}}
 // Struct for {{label}}
 typedef struct _{{asType label}} {
 {{#zcl_struct_items}}
-{{#if (isStrEqual label "endpoint")}}
-{{ident}}chip::EndpointId {{asSymbol label}};
-{{else if (isStrEqual label "endpointId")}}
-{{ident}}chip::EndpointId {{asSymbol label}};
-{{else if (isStrEqual label "groupId")}}
-{{ident}}chip::GroupId {{asSymbol label}};
-{{else if (isStrEqual label "commandId")}}
-{{ident}}chip::CommandId {{asSymbol label}};
-{{else}}
-{{ident}}{{asUnderlyingZclType type}} {{asSymbol label}};
-{{/if}}
+{{ident}}{{asChipUnderlyingType label type}} {{asSymbol label}};
 {{/zcl_struct_items}}
 } {{asUnderlyingType label}};
+{{else}}
+// Void typedef for {{asUnderlyingType label}} which is empty.
+// this will result in all the references to the data being as uint8_t*
+typedef uint8_t {{asUnderlyingType label}};
+{{/if}}
 {{/zcl_structs}}

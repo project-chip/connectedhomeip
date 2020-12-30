@@ -20,6 +20,7 @@
 #include "QueryReplyFilter.h"
 
 #include <support/ReturnMacros.h>
+#include <system/SystemClock.h>
 
 #define RETURN_IF_ERROR(err)                                                                                                       \
     do                                                                                                                             \
@@ -45,53 +46,80 @@ constexpr uint16_t kMdnsStandardPort = 5353;
 constexpr uint16_t kPacketSizeBytes = 512;
 
 } // namespace
+namespace Internal {
+
+bool ResponseSendingState::SendUnicast() const
+{
+    return mQuery->RequestedUnicastAnswer() || (mSource->SrcPort != kMdnsStandardPort);
+}
+
+bool ResponseSendingState::IncludeQuery() const
+{
+    return (mSource->SrcPort != kMdnsStandardPort);
+}
+
+} // namespace Internal
 
 CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, const chip::Inet::IPPacketInfo * querySource)
 {
-    mSendError = CHIP_NO_ERROR;
-
-    mCurrentSource    = querySource;
-    mCurrentMessageId = messageId;
-    mSendUnicast      = query.RequestedUnicastAnswer() || (querySource->SrcPort != kMdnsStandardPort);
-    // TODO: at this point we may want to ensure we protect against excessive multicast packet flooding.
-    // According to https://tools.ietf.org/html/rfc6762#section-6  we should multicast at most 1/sec
-    // TBD: do we filter out frequent multicasts or should we switch to unicast in those cases
+    mSendState.Reset(messageId, query, querySource);
 
     // Responder has a stateful 'additional replies required' that is used within the response
     // loop. 'no additionals required' is set at the start and additionals are marked as the query
     // reply is built.
     mResponder->ResetAdditionals();
 
-    mCurrentResourceType = ResourceType::kAnswer; // direct answer
-    QueryReplyFilter filter(query);
-    for (auto it = mResponder->begin(); it != mResponder->end(); it++)
+    // send all 'Answer' replies
     {
-        Responder * responder = it->responder;
+        const uint64_t kTimeNowMs = chip::System::Platform::Layer::GetClock_MonotonicMS();
 
-        if (!filter.Accept(responder->GetQType(), responder->GetQClass(), responder->GetQName()))
+        QueryReplyFilter queryReplyFilter(query);
+
+        QueryResponderRecordFilter responseFilter;
+
+        responseFilter.SetReplyFilter(&queryReplyFilter);
+
+        if (!mSendState.SendUnicast())
         {
-            continue;
+            // According to https://tools.ietf.org/html/rfc6762#section-6  we should multicast at most 1/sec
+            //
+            // TODO: the 'last sent' value does NOT track the interface we used to send, so this may cause
+            //       broadcasts on one interface to throttle broadcasts on another interface.
+            constexpr uint64_t kOneSecondMs = 1000;
+            responseFilter.SetIncludeOnlyMulticastBeforeMS(kTimeNowMs - kOneSecondMs);
         }
 
-        responder->AddAllResponses(querySource, this);
-        ReturnErrorOnFailure(mSendError);
+        for (auto it = mResponder->begin(&responseFilter); it != mResponder->end(); it++)
+        {
+            it->responder->AddAllResponses(querySource, this);
+            ReturnErrorOnFailure(mSendState.GetError());
 
-        mResponder->MarkAdditionalRepliesFor(it);
+            mResponder->MarkAdditionalRepliesFor(it);
+
+            if (!mSendState.SendUnicast())
+            {
+                it->lastMulticastTime = kTimeNowMs;
+            }
+        }
     }
 
-    mCurrentResourceType = ResourceType::kAdditional; // Additional parts
-    filter.SetIgnoreNameMatch(true);
-    for (auto it = mResponder->additional_begin(); it != mResponder->additional_end(); it++)
+    // send all 'Additional' replies
     {
-        Responder * responder = it->responder;
+        mSendState.SetResourceType(ResourceType::kAdditional);
 
-        if (!filter.Accept(responder->GetQType(), responder->GetQClass(), responder->GetQName()))
+        QueryReplyFilter queryReplyFilter(query);
+        queryReplyFilter.SetIgnoreNameMatch(true);
+
+        QueryResponderRecordFilter responseFilter;
+        responseFilter
+            .SetReplyFilter(&queryReplyFilter) //
+            .SetIncludeAdditionalRepliesOnly(true);
+
+        for (auto it = mResponder->begin(&responseFilter); it != mResponder->end(); it++)
         {
-            continue;
+            it->responder->AddAllResponses(querySource, this);
+            ReturnErrorOnFailure(mSendState.GetError());
         }
-
-        it->responder->AddAllResponses(querySource, this);
-        ReturnErrorOnFailure(mSendError);
     }
 
     return FlushReply();
@@ -99,25 +127,23 @@ CHIP_ERROR ResponseSender::Respond(uint32_t messageId, const QueryData & query, 
 
 CHIP_ERROR ResponseSender::FlushReply()
 {
-    ReturnErrorCodeIf(mCurrentPacket.IsNull(), CHIP_NO_ERROR); // nothing to flush
+    ReturnErrorCodeIf(!mResponseBuilder.HasPacketBuffer(), CHIP_NO_ERROR); // nothing to flush
 
     if (mResponseBuilder.HasResponseRecords())
     {
 
-        if (mSendUnicast)
+        if (mSendState.SendUnicast())
         {
-            ChipLogProgress(Discovery, "Directly sending mDns reply to peer on port %d", mCurrentSource->SrcPort);
-            ReturnErrorOnFailure(mServer->DirectSend(mCurrentPacket.Release_ForNow(), mCurrentSource->SrcAddress,
-                                                     mCurrentSource->SrcPort, mCurrentSource->Interface));
+            ChipLogProgress(Discovery, "Directly sending mDns reply to peer on port %d", mSendState.GetSourcePort());
+            ReturnErrorOnFailure(mServer->DirectSend(mResponseBuilder.ReleasePacket(), mSendState.GetSourceAddress(),
+                                                     mSendState.GetSourcePort(), mSendState.GetSourceInterfaceId()));
         }
         else
         {
             ChipLogProgress(Discovery, "Broadcasting mDns reply");
             ReturnErrorOnFailure(
-                mServer->BroadcastSend(mCurrentPacket.Release_ForNow(), kMdnsStandardPort, mCurrentSource->Interface));
+                mServer->BroadcastSend(mResponseBuilder.ReleasePacket(), kMdnsStandardPort, mSendState.GetSourceInterfaceId()));
         }
-        mResponseBuilder.Invalidate();
-        mCurrentPacket.Adopt(nullptr);
     }
 
     return CHIP_NO_ERROR;
@@ -125,33 +151,37 @@ CHIP_ERROR ResponseSender::FlushReply()
 
 CHIP_ERROR ResponseSender::PrepareNewReplyPacket()
 {
-    mCurrentPacket = chip::System::PacketBuffer::NewWithAvailableSize(kPacketSizeBytes);
-    ReturnErrorCodeIf(mCurrentPacket.IsNull(), CHIP_ERROR_NO_MEMORY);
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(kPacketSizeBytes);
+    ReturnErrorCodeIf(buffer.IsNull(), CHIP_ERROR_NO_MEMORY);
 
-    mResponseBuilder.Reset(mCurrentPacket.Get_ForNow());
+    mResponseBuilder.Reset(std::move(buffer));
+    mResponseBuilder.Header().SetMessageId(mSendState.GetMessageId());
 
-    mResponseBuilder.Header().SetMessageId(mCurrentMessageId);
+    if (mSendState.IncludeQuery())
+    {
+        mResponseBuilder.AddQuery(*mSendState.GetQuery());
+    }
 
     return CHIP_NO_ERROR;
 }
 
 void ResponseSender::AddResponse(const ResourceRecord & record)
 {
-    RETURN_IF_ERROR(mSendError);
+    RETURN_IF_ERROR(mSendState.GetError());
 
-    if (mCurrentPacket.IsNull())
+    if (!mResponseBuilder.HasPacketBuffer())
     {
-        mSendError = PrepareNewReplyPacket();
-        RETURN_IF_ERROR(mSendError);
+        mSendState.SetError(PrepareNewReplyPacket());
+        RETURN_IF_ERROR(mSendState.GetError());
     }
 
     if (!mResponseBuilder.Ok())
     {
-        mSendError = CHIP_ERROR_INCORRECT_STATE;
+        mSendState.SetError(CHIP_ERROR_INCORRECT_STATE);
         return;
     }
 
-    mResponseBuilder.AddRecord(mCurrentResourceType, record);
+    mResponseBuilder.AddRecord(mSendState.GetResourceType(), record);
 
     // ResponseBuilder AddRecord will only fail if insufficient space is available (or at least this is
     // the assumption here). It also guarantees that existing data and header are unchanged on
@@ -160,18 +190,15 @@ void ResponseSender::AddResponse(const ResourceRecord & record)
     {
         mResponseBuilder.Header().SetFlags(mResponseBuilder.Header().GetFlags().SetTruncated(true));
 
-        mSendError = FlushReply();
-        RETURN_IF_ERROR(mSendError);
+        RETURN_IF_ERROR(mSendState.SetError(FlushReply()));
+        RETURN_IF_ERROR(mSendState.SetError(PrepareNewReplyPacket()));
 
-        mSendError = PrepareNewReplyPacket();
-        RETURN_IF_ERROR(mSendError);
-
-        mResponseBuilder.AddRecord(mCurrentResourceType, record);
+        mResponseBuilder.AddRecord(mSendState.GetResourceType(), record);
         if (!mResponseBuilder.Ok())
         {
             // Very much unexpected: single record addtion should fit (our records should not be that big).
             ChipLogError(Discovery, "Failed to add single record to mDNS response.");
-            mSendError = CHIP_ERROR_INTERNAL;
+            mSendState.SetError(CHIP_ERROR_INTERNAL);
         }
     }
 }

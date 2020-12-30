@@ -20,14 +20,19 @@ get_filename_component(CHIP_APP_SERVER ${CHIP_ROOT}/examples/common/chip-app-ser
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(LOCK_COMMON ${CHIP_ROOT}/examples/lock-app/lock-common REALPATH)
 
-set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/sample-defaults.conf prj.conf)
-set(CHIP_OPENTHREAD_CONFIG ${NRFCONNECT_COMMON}/project_include/OpenThreadConfig.h)
+set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
-include(nrfconnect-app)
+include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
 
 project(chip-nrf52840-lock-example)
-target_include_directories(app PRIVATE main/include ${LOCK_COMMON} ${NRFCONNECT_COMMON}/util/include ${NRFCONNECT_COMMON}/app/include ${CHIP_APP_SERVER}/include)
+
+target_include_directories(app PRIVATE 
+                           main/include 
+                           ${LOCK_COMMON} 
+                           ${NRFCONNECT_COMMON}/util/include 
+                           ${NRFCONNECT_COMMON}/app/include 
+                           ${CHIP_APP_SERVER}/include)
+
 target_sources(app PRIVATE
                main/AppTask.cpp
                main/BoltLockManager.cpp

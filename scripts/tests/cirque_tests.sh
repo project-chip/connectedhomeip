@@ -25,6 +25,7 @@ LOG_DIR=${LOG_DIR:-$(mktemp -d)}
 
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
+    "EchoTest"
     "OnOffClusterTest"
 )
 
@@ -115,6 +116,7 @@ function cirquetest_run_test() {
         docker container prune -f >/dev/null 2>&1
         docker network prune -f >/dev/null 2>&1
     fi
+    echo "Test log can be found at $DEVICE_LOG_DIR"
     return "$exitcode"
 }
 

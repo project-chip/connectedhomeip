@@ -24,6 +24,7 @@
 namespace {
 
 using namespace chip;
+using namespace chip::Encoding::BigEndian;
 using namespace mdns::Minimal;
 
 const QNamePart kNames[] = { "foo", "bar" };
@@ -34,7 +35,7 @@ public:
     FakeResourceRecord(const char * data) : ResourceRecord(QType::ANY, kNames), mData(data) {}
 
 protected:
-    bool WriteData(chip::BufBound & out) const override
+    bool WriteData(BufferWriter & out) const override
     {
         out.Put(mData);
         return out.Fit();
@@ -52,7 +53,7 @@ void CanWriteSimpleRecord(nlTestSuite * inSuite, void * inContext)
     HeaderRef header(headerBuffer);
     header.Clear();
 
-    BufBound output(dataBuffer, sizeof(dataBuffer));
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
     FakeResourceRecord record("somedata");
 
     record.SetTtl(0x11223344);
@@ -85,7 +86,7 @@ void CanWriteMultipleRecords(nlTestSuite * inSuite, void * inContext)
     HeaderRef header(headerBuffer);
     header.Clear();
 
-    BufBound output(dataBuffer, sizeof(dataBuffer));
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
     FakeResourceRecord record1("somedata");
     FakeResourceRecord record2("moredata");
     FakeResourceRecord record3("xyz");
@@ -147,7 +148,7 @@ void RecordOrderIsEnforced(nlTestSuite * inSuite, void * inContext)
 
     HeaderRef header(headerBuffer);
 
-    BufBound output(dataBuffer, sizeof(dataBuffer));
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
     FakeResourceRecord record("somedata");
 
     header.Clear();
@@ -189,7 +190,7 @@ void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
     for (size_t i = 0; i < sizeof(expectedOutput); i++)
     {
         memset(dataBuffer, 0, sizeof(dataBuffer));
-        BufBound output(dataBuffer, i);
+        BufferWriter output(dataBuffer, i);
 
         NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output) == false);
 
@@ -198,7 +199,7 @@ void ErrorsOutOnSmallBuffers(nlTestSuite * inSuite, void * inContext)
     }
 
     memset(dataBuffer, 0, sizeof(dataBuffer));
-    BufBound output(dataBuffer, sizeof(expectedOutput));
+    BufferWriter output(dataBuffer, sizeof(expectedOutput));
 
     NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output));
     NL_TEST_ASSERT(inSuite, output.Needed() == sizeof(expectedOutput));
@@ -219,7 +220,7 @@ void RecordCount(nlTestSuite * inSuite, void * inContext)
 
     for (int i = 0; i < kAppendCount; i++)
     {
-        BufBound output(dataBuffer, sizeof(dataBuffer));
+        BufferWriter output(dataBuffer, sizeof(dataBuffer));
         NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAnswer, output));
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == i + 1);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == 0);
@@ -228,7 +229,7 @@ void RecordCount(nlTestSuite * inSuite, void * inContext)
 
     for (int i = 0; i < kAppendCount; i++)
     {
-        BufBound output(dataBuffer, sizeof(dataBuffer));
+        BufferWriter output(dataBuffer, sizeof(dataBuffer));
         NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAuthority, output));
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == kAppendCount);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == i + 1);
@@ -237,7 +238,7 @@ void RecordCount(nlTestSuite * inSuite, void * inContext)
 
     for (int i = 0; i < kAppendCount; i++)
     {
-        BufBound output(dataBuffer, sizeof(dataBuffer));
+        BufferWriter output(dataBuffer, sizeof(dataBuffer));
         NL_TEST_ASSERT(inSuite, record.Append(header, ResourceType::kAdditional, output));
         NL_TEST_ASSERT(inSuite, header.GetAnswerCount() == kAppendCount);
         NL_TEST_ASSERT(inSuite, header.GetAuthorityCount() == kAppendCount);

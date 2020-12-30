@@ -222,7 +222,7 @@ CHIP_ERROR ReliableMessageContext::SendThrottleFlow(uint32_t pauseTimeMillis)
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
     err = mManager->SendMessage(this, Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_RMP_Throttle_Flow,
-                                msgBuf.Release_ForNow(),
+                                std::move(msgBuf),
                                 BitFlags<uint16_t, SendMessageFlags>(SendMessageFlags::kSendFlag_NoAutoRequestAck));
 
 exit:
@@ -278,7 +278,7 @@ CHIP_ERROR ReliableMessageContext::SendDelayedDelivery(uint32_t pauseTimeMillis,
     // acknowledgment, so suppress the auto-request ACK feature on the exchange in case it has been
     // enabled by the application.
     err = mManager->SendMessage(this, Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_RMP_Delayed_Delivery,
-                                msgBuf.Release_ForNow(),
+                                std::move(msgBuf),
                                 BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
 exit:
@@ -455,7 +455,7 @@ CHIP_ERROR ReliableMessageContext::SendCommonNullMessage()
 
     // Send the null message
     err = mManager->SendMessage(this, chip::Protocols::kProtocol_Protocol_Common, chip::Protocols::Common::kMsgType_Null,
-                                msgBuf.Release_ForNow(),
+                                std::move(msgBuf),
                                 BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
 
 exit:

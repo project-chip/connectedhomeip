@@ -21,6 +21,7 @@
 
 using namespace chip;
 
+// Cluster Init Functions
 void emberAfClusterInitCallback(EndpointId endpoint, ClusterId clusterId)
 {
     switch (clusterId)

@@ -39,7 +39,7 @@ function build_chip_lighting() {
     source "$REPO_DIR/scripts/activate.sh" >/dev/null
     set -x
     cd "$chip_light_dir"
-    gn gen --check --fail-on-unused-args out/debug --args='chip_bypass_rendezvous=true'
+    gn gen --check --fail-on-unused-args out/debug
     run_ninja -C out/debug
     docker build -t chip_server -f Dockerfile . 2>&1
     set +x

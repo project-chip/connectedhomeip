@@ -28,6 +28,7 @@ public:
     SrvResourceRecord(const FullQName & qName, const FullQName & serverName, uint16_t port) :
         ResourceRecord(QType::SRV, qName), mServerName(serverName), mPort(port)
     {}
+    SrvResourceRecord & operator=(const SrvResourceRecord & other) = default;
 
     FullQName GetServerName() const { return mServerName; }
     uint16_t GetPort() const { return mPort; }
@@ -38,19 +39,19 @@ public:
     void SetWeight(uint16_t value) { mWeight = value; }
 
 protected:
-    bool WriteData(chip::BufBound & out) const override
+    bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override
     {
-        out.PutBE16(mPriority);
-        out.PutBE16(mWeight);
-        out.PutBE16(mPort);
+        out.Put16(mPriority);
+        out.Put16(mWeight);
+        out.Put16(mPort);
         mServerName.Output(out);
 
         return out.Fit();
     }
 
 private:
-    const FullQName mServerName;
-    const uint16_t mPort;
+    FullQName mServerName;
+    uint16_t mPort;
     uint16_t mPriority = 0;
     uint16_t mWeight   = 0;
 };

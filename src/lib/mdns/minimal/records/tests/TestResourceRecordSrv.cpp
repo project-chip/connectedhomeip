@@ -23,6 +23,7 @@
 namespace {
 
 using namespace chip;
+using namespace chip::Encoding;
 using namespace mdns::Minimal;
 
 void TestSrv(nlTestSuite * inSuite, void * inContext)
@@ -36,7 +37,7 @@ void TestSrv(nlTestSuite * inSuite, void * inContext)
 
     HeaderRef header(headerBuffer);
 
-    BufBound output(dataBuffer, sizeof(dataBuffer));
+    BigEndian::BufferWriter output(dataBuffer, sizeof(dataBuffer));
 
     SrvResourceRecord record(kName, kServerName, kPort);
     record.SetTtl(128);

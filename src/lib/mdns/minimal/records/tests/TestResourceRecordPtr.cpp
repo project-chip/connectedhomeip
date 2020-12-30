@@ -24,6 +24,7 @@ namespace {
 
 using namespace chip;
 using namespace mdns::Minimal;
+using namespace chip::Encoding;
 
 void TestPtrResourceRecord(nlTestSuite * inSuite, void * inContext)
 {
@@ -35,7 +36,7 @@ void TestPtrResourceRecord(nlTestSuite * inSuite, void * inContext)
 
     HeaderRef header(headerBuffer);
 
-    BufBound output(dataBuffer, sizeof(dataBuffer));
+    BigEndian::BufferWriter output(dataBuffer, sizeof(dataBuffer));
     PtrResourceRecord record(kName, kPtr);
 
     record.SetTtl(123);

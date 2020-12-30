@@ -48,6 +48,9 @@ public:
     /// returns true on parse success, false on failure.
     bool Parse(const BytesRange & validData, const uint8_t ** start);
 
+    /// Write out this query data back into an output buffer.
+    bool Append(HeaderRef & hdr, chip::Encoding::BigEndian::BufferWriter & out) const;
+
 private:
     QType mType            = QType::ANY;
     QClass mClass          = QClass::ANY;

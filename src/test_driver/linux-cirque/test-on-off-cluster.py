@@ -46,6 +46,8 @@ DEVICE_CONFIG = {
     }
 }
 
+SETUPPINCODE = 12345678
+DISCRIMINATOR = 1  # Randomw number, not used
 CHIP_PORT = 11097
 
 CIRQUE_URL = "http://localhost:5000"
@@ -80,22 +82,30 @@ class TestOnOffCluster(CHIPVirtualHome):
         command = "chip-tool onoff {} 1"
 
         for ip in server_ip_address:
-            ret = self.execute_device_cmd(tool_device_id, "chip-tool pairing bypass {} {}".format(ip, CHIP_PORT))
-            self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format("pairing bypass", ret['output']))
+            ret = self.execute_device_cmd(
+                tool_device_id, "chip-tool pairing softap ssid_not_used passwd_not_used {} {} {} {}".format(SETUPPINCODE, DISCRIMINATOR, ip, CHIP_PORT))
+            self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format(
+                "pairing softap", ret['output']))
 
             ret = self.execute_device_cmd(tool_device_id, command.format("on"))
-            self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format("on", ret['output']))
+            self.assertEqual(
+                ret['return_code'], '0', "{} command failure: {}".format("on", ret['output']))
 
-            ret = self.execute_device_cmd(tool_device_id, command.format("off"))
-            self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format("off", ret['output']))
+            ret = self.execute_device_cmd(
+                tool_device_id, command.format("off"))
+            self.assertEqual(
+                ret['return_code'], '0', "{} command failure: {}".format("off", ret['output']))
 
-            ret = self.execute_device_cmd(tool_device_id, "chip-tool pairing unpair")
-            self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format("pairing unpair", ret['output']))
+            ret = self.execute_device_cmd(
+                tool_device_id, "chip-tool pairing unpair")
+            self.assertEqual(ret['return_code'], '0', "{} command failure: {}".format(
+                "pairing unpair", ret['output']))
 
         time.sleep(1)
 
         for device_id in server_ids:
-            self.logger.info("checking device log for {}".format(self.get_device_pretty_id(device_id)))
+            self.logger.info("checking device log for {}".format(
+                self.get_device_pretty_id(device_id)))
             self.assertTrue(self.sequenceMatch(self.get_device_log(device_id).decode('utf-8'), ["LightingManager::InitiateAction(ON_ACTION)", "LightingManager::InitiateAction(OFF_ACTION)"]),
                             "Datamodel test failed: cannot find matching string from device {}".format(device_id))
 

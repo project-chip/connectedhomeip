@@ -43,7 +43,7 @@ public:
     }
 
 protected:
-    bool WriteData(chip::BufBound & out) const override
+    bool WriteData(chip::Encoding::BigEndian::BufferWriter & out) const override
     {
         for (size_t i = 0; i < mEntryCount; i++)
         {

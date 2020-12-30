@@ -20,6 +20,7 @@
 
 #include <controller/CHIPDeviceController.h>
 #include <inipp/inipp.h>
+#include <support/logging/CHIPLogging.h>
 
 class PersistentStorage : public chip::Controller::PersistentStorageDelegate
 {
@@ -32,6 +33,9 @@ public:
     CHIP_ERROR GetKeyValue(const char * key, char * value, uint16_t & size) override;
     void SetKeyValue(const char * key, const char * value) override;
     void DeleteKeyValue(const char * key) override;
+
+    uint16_t GetListenPort();
+    chip::Logging::LogCategory GetLoggingLevel();
 
 private:
     CHIP_ERROR CommitConfig();

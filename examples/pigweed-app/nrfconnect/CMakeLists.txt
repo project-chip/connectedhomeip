@@ -17,14 +17,13 @@ cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
+set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
 
 if(${BOARD} STREQUAL "nrf52840dongle_nrf52840")
-list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/overlay-usb_support.conf)
+    list(INSERT OVERLAY_CONFIG 0 ${CHIP_ROOT}/config/nrfconnect/app/overlay-usb_support.conf)
 endif()
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
-set(PIGWEED_ROOT "${CHIP_ROOT}/third_party/pigweed/repo")
-include(nrfconnect-app)
+include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
 
 project(chip-nrf52840-pigweed-example)
 
@@ -38,7 +37,7 @@ target_include_directories(app PRIVATE main/include
                            ${PIGWEED_ROOT}/pw_polyfill/public_overrides
                            ${PIGWEED_ROOT}/pw_status/public
                            ${PIGWEED_ROOT}/pw_preprocessor/public
-                           ${NRFCONNECT_COMMON}/pw_sys_io/include)
+                           ${NRFCONNECT_COMMON}/pw_sys_io/public)
 
 target_sources(app PRIVATE main/main.cpp 
                ${NRFCONNECT_COMMON}/util/LEDWidget.cpp)

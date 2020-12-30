@@ -3,6 +3,20 @@
     "version": "chip-v1",
     "helpers": ["helper-chip.js"],
     "override": "override.js",
+    "partials": [
+        {
+            "name": "clusters_header",
+            "path": "partials/clusters_header.zapt"
+        },
+        {
+            "name": "cluster_header",
+            "path": "partials/cluster_header.zapt"
+        },
+        {
+            "name": "command_handler_cluster_commands",
+            "path": "partials/command_handler_cluster_commands.zapt"
+        }
+    ],
     "templates": [
         {
             "path": "af-structs.zapt",

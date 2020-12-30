@@ -80,20 +80,20 @@ typedef struct _DebtPayload
 {
     uint32_t collectionTime;
     uint32_t amountCollected;
-    EmberAfRepaymentDebtType debtType;
+    uint8_t debtType;
     uint32_t outstandingDebt;
 } EmberAfDebtPayload;
 
 // Struct for DeviceInformationRecord
 typedef struct _DeviceInformationRecord
 {
-    uint8_t * ieeeAddress;
+    uint64_t ieeeAddress;
     chip::EndpointId endpointId;
     uint16_t profileId;
     uint16_t deviceId;
     uint8_t version;
     uint8_t groupIdCount;
-    EmberAfDeviceInformationRecordSort sort;
+    uint8_t sort;
 } EmberAfDeviceInformationRecord;
 
 // Struct for DiscoverAttributesInfoRecord
@@ -113,10 +113,9 @@ typedef struct _EndpointInformationRecord
     uint8_t version;
 } EmberAfEndpointInformationRecord;
 
-// Struct for EphemeralData
-typedef struct _EphemeralData
-{
-} EmberAfEphemeralData;
+// Void typedef for EmberAfEphemeralData which is empty.
+// this will result in all the references to the data being as uint8_t*
+typedef uint8_t EmberAfEphemeralData;
 
 // Struct for EventConfigurationPayload
 typedef struct _EventConfigurationPayload
@@ -128,7 +127,7 @@ typedef struct _EventConfigurationPayload
 // Struct for EventLogPayload
 typedef struct _EventLogPayload
 {
-    EmberAfEventLogId logId;
+    uint8_t logId;
     uint16_t eventId;
     uint32_t eventTime;
     uint8_t * eventData;
@@ -176,15 +175,14 @@ typedef struct _IasAceZoneStatusResult
     uint16_t zoneStatus;
 } EmberAfIasAceZoneStatusResult;
 
-// Struct for Identity
-typedef struct _Identity
-{
-} EmberAfIdentity;
+// Void typedef for EmberAfIdentity which is empty.
+// this will result in all the references to the data being as uint8_t*
+typedef uint8_t EmberAfIdentity;
 
 // Struct for NeighborInfo
 typedef struct _NeighborInfo
 {
-    uint8_t * neighbor;
+    uint64_t neighbor;
     int16_t x;
     int16_t y;
     int16_t z;
@@ -316,7 +314,7 @@ typedef struct _ScheduleEntryFriendlyCreditSwitchTimes
 typedef struct _ScheduleEntryRateSwitchTimes
 {
     uint16_t startTime;
-    EmberAfPriceTier priceTier;
+    uint8_t priceTier;
 } EmberAfScheduleEntryRateSwitchTimes;
 
 // Struct for ScheduledPhase
@@ -333,21 +331,19 @@ typedef struct _SeasonEntry
     uint8_t weekIdRef;
 } EmberAfSeasonEntry;
 
-// Struct for Signature
-typedef struct _Signature
-{
-} EmberAfSignature;
+// Void typedef for EmberAfSignature which is empty.
+// this will result in all the references to the data being as uint8_t*
+typedef uint8_t EmberAfSignature;
 
-// Struct for Smac
-typedef struct _Smac
-{
-} EmberAfSmac;
+// Void typedef for EmberAfSmac which is empty.
+// this will result in all the references to the data being as uint8_t*
+typedef uint8_t EmberAfSmac;
 
 // Struct for SnapshotResponsePayload
 typedef struct _SnapshotResponsePayload
 {
     uint8_t snapshotScheduleId;
-    EmberAfSnapshotScheduleConfirmation snapshotScheduleConfirmation;
+    uint8_t snapshotScheduleConfirmation;
 } EmberAfSnapshotResponsePayload;
 
 // Struct for SnapshotSchedulePayload
@@ -356,7 +352,7 @@ typedef struct _SnapshotSchedulePayload
     uint8_t snapshotScheduleId;
     uint32_t snapshotStartTime;
     uint32_t snapshotSchedule;
-    EmberAfSnapshotPayloadType snapshotPayloadType;
+    uint8_t snapshotPayloadType;
     uint32_t snapshotCause;
 } EmberAfSnapshotSchedulePayload;
 

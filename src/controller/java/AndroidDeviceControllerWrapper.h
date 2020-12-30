@@ -33,15 +33,13 @@
 class AndroidDeviceControllerWrapper : public chip::Controller::DevicePairingDelegate
 {
 public:
-    using DeviceNetworkInfo = chip::DeviceLayer::Internal::DeviceNetworkInfo;
-
     ~AndroidDeviceControllerWrapper();
 
     chip::DeviceController::ChipDeviceController * Controller() { return mController.get(); }
     void SetJavaObjectRef(JavaVM * vm, jobject obj);
 
     void SendNetworkCredentials(const char * ssid, const char * password);
-    void SendThreadCredentials(const DeviceNetworkInfo & threadData);
+    void SendThreadCredentials(const chip::DeviceLayer::Internal::DeviceNetworkInfo & threadData);
 
     // DevicePairingDelegate implementation
     void OnNetworkCredentialsRequested(chip::RendezvousDeviceCredentialsDelegate * callback) override;

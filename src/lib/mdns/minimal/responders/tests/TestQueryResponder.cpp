@@ -75,7 +75,8 @@ void CanIterateOverResponders(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty3).SetReportInServiceListing(true).IsValid());
 
     int idx = 0;
-    for (auto it = responder.begin(); it != responder.end(); it++, idx++)
+    QueryResponderRecordFilter noFilter;
+    for (auto it = responder.begin(&noFilter); it != responder.end(); it++, idx++)
     {
         FullQName qName = it->responder->GetQName();
         NL_TEST_ASSERT(inSuite, (idx != 0) || (qName == kDnsSdname));
@@ -89,6 +90,7 @@ void CanIterateOverResponders(nlTestSuite * inSuite, void * inContext)
 void RespondsToDnsSdQueries(nlTestSuite * inSuite, void * inContext)
 {
     QueryResponder<10> responder;
+    QueryResponderRecordFilter noFilter;
 
     EmptyResponder empty1(kName1);
     EmptyResponder empty2(kName2);
@@ -101,7 +103,7 @@ void RespondsToDnsSdQueries(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, responder.AddResponder(&empty4).IsValid());
 
     // It reports itself inside the iterator
-    NL_TEST_ASSERT(inSuite, &(*responder.begin()->responder) == &responder);
+    NL_TEST_ASSERT(inSuite, &(*responder.begin(&noFilter)->responder) == &responder);
 
     // It reponds dnssd PTR answers
     NL_TEST_ASSERT(inSuite, responder.GetQClass() == QClass::IN);
@@ -136,7 +138,8 @@ void LimitedStorage(nlTestSuite * inSuite, void * inContext)
     }
 
     int idx = 0;
-    for (auto it = responder.begin(); it != responder.end(); it++, idx++)
+    QueryResponderRecordFilter noFilter;
+    for (auto it = responder.begin(&noFilter); it != responder.end(); it++, idx++)
     {
         FullQName qName = it->responder->GetQName();
         NL_TEST_ASSERT(inSuite, (idx != 0) || (qName == kDnsSdname));

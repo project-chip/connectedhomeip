@@ -20,6 +20,7 @@
 
 #include "AppEvent.h"
 #include "LightingManager.h"
+#include "Rpc.h"
 
 #include <platform/CHIPDeviceLayer.h>
 
@@ -37,6 +38,7 @@ public:
     void UpdateClusterState();
 
 private:
+    friend class chip::rpc::LightingService;
     friend AppTask & GetAppTask(void);
 
     int Init();

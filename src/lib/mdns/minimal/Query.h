@@ -17,7 +17,7 @@
 
 #pragma once
 
-#include <support/BufBound.h>
+#include <support/BufferWriter.h>
 
 #include <mdns/minimal/core/Constants.h>
 #include <mdns/minimal/core/QName.h>
@@ -56,7 +56,7 @@ public:
     ///
     /// @param hdr will be updated with a query count
     /// @param out where to write the query data
-    bool Append(HeaderRef & hdr, chip::BufBound & out) const
+    bool Append(HeaderRef & hdr, chip::Encoding::BigEndian::BufferWriter & out) const
     {
         // Questions can only be appended before any other data is added
         if ((hdr.GetAdditionalCount() != 0) || (hdr.GetAnswerCount() != 0) || (hdr.GetAuthorityCount() != 0))
@@ -66,8 +66,8 @@ public:
 
         mQName.Output(out);
 
-        out.PutBE16(static_cast<uint16_t>(mType));
-        out.PutBE16(static_cast<uint16_t>(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0)));
+        out.Put16(static_cast<uint16_t>(mType));
+        out.Put16(static_cast<uint16_t>(static_cast<uint16_t>(mClass) | (mAnswerViaUnicast ? kQClassUnicastAnswerFlag : 0)));
 
         if (out.Fit())
         {

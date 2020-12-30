@@ -452,9 +452,9 @@ void UDPEndPoint::Free()
 /**
  *  A synonym for <tt>SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags)</tt>.
  */
-INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBuffer * msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
 {
-    return SendTo(addr, port, INET_NULL_INTERFACEID, msg, sendFlags);
+    return SendTo(addr, port, INET_NULL_INTERFACEID, std::move(msg), sendFlags);
 }
 
 /**
@@ -491,7 +491,7 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, chip::Syst
  *      identifier for IPv6 link-local destinations) and \c port with the
  *      transmit option flags encoded in \c sendFlags.
  */
-INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBuffer * msg,
+INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceId intfId, chip::System::PacketBufferHandle msg,
                                uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
@@ -499,7 +499,7 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceI
     pktInfo.DestAddress = addr;
     pktInfo.DestPort    = port;
     pktInfo.Interface   = intfId;
-    return SendMsg(&pktInfo, msg, sendFlags);
+    return SendMsg(&pktInfo, std::move(msg), sendFlags);
 }
 
 /**
@@ -535,13 +535,13 @@ INET_ERROR UDPEndPoint::SendTo(const IPAddress & addr, uint16_t port, InterfaceI
  *      over the specified interface.  If \c pktInfo contains a source address, the
  *      given address will be used as the source of the UDP message.
  */
-INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg, uint16_t sendFlags)
+INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBufferHandle msg, uint16_t sendFlags)
 {
     INET_ERROR res             = INET_NO_ERROR;
     const IPAddress & destAddr = pktInfo->DestAddress;
 
-    INET_FAULT_INJECT(FaultInjection::kFault_Send, PacketBuffer::Free(msg); return INET_ERROR_UNKNOWN_INTERFACE;);
-    INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical, PacketBuffer::Free(msg); return INET_ERROR_NO_MEMORY;);
+    INET_FAULT_INJECT(FaultInjection::kFault_Send, return INET_ERROR_UNKNOWN_INTERFACE;);
+    INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical, return INET_ERROR_NO_MEMORY;);
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
@@ -578,9 +578,9 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg
         }
 
         if (intfId != INET_NULL_INTERFACEID)
-            lwipErr = udp_sendto_if(mUDP, (pbuf *) msg, &lwipDestAddr, destPort, intfId);
+            lwipErr = udp_sendto_if(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort, intfId);
         else
-            lwipErr = udp_sendto(mUDP, (pbuf *) msg, &lwipDestAddr, destPort);
+            lwipErr = udp_sendto(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort);
 
         ip_addr_copy(mUDP->local_ip, boundAddr);
 
@@ -600,9 +600,9 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg
             }
 
             if (intfId != INET_NULL_INTERFACEID)
-                lwipErr = udp_sendto_if_ip6(mUDP, (pbuf *) msg, &lwipDestAddr, destPort, intfId);
+                lwipErr = udp_sendto_if_ip6(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort, intfId);
             else
-                lwipErr = udp_sendto_ip6(mUDP, (pbuf *) msg, &lwipDestAddr, destPort);
+                lwipErr = udp_sendto_ip6(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort);
         }
 
 #if INET_CONFIG_ENABLE_IPV4
@@ -619,9 +619,9 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg
             }
 
             if (intfId != INET_NULL_INTERFACEID)
-                lwipErr = udp_sendto_if(mUDP, (pbuf *) msg, &lwipDestAddr, destPort, intfId);
+                lwipErr = udp_sendto_if(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort, intfId);
             else
-                lwipErr = udp_sendto(mUDP, (pbuf *) msg, &lwipDestAddr, destPort);
+                lwipErr = udp_sendto(mUDP, msg.GetLwIPpbuf(), &lwipDestAddr, destPort);
         }
 
         ipX_addr_copy(mUDP->local_ip, boundAddr);
@@ -635,8 +635,6 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
-
-    PacketBuffer::Free(msg);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -647,13 +645,11 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, PacketBuffer * msg
     res = GetSocket(destAddr.Type());
     SuccessOrExit(res);
 
-    res = IPEndPointBasis::SendMsg(pktInfo, msg, sendFlags);
-    PacketBuffer::Free(msg);
+    res = IPEndPointBasis::SendMsg(pktInfo, std::move(msg), sendFlags);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 #if CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
-    res = IPEndPointBasis::SendMsg(pktInfo, msg, sendFlags);
-    PacketBuffer::Free(msg);
+    res = IPEndPointBasis::SendMsg(pktInfo, std::move(msg), sendFlags);
 #endif // CHIP_SYSTEM_CONFIG_USE_NETWORK_FRAMEWORK
 
 exit:
@@ -871,13 +867,13 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
     UDPEndPoint * ep                   = static_cast<UDPEndPoint *>(arg);
-    PacketBuffer * buf                 = reinterpret_cast<PacketBuffer *>(static_cast<void *>(p));
     chip::System::Layer & lSystemLayer = ep->SystemLayer();
     IPPacketInfo * pktInfo             = NULL;
+    System::PacketBufferHandle buf;
 
-    System::PacketBufferHandle buf_ForNow;
-    buf_ForNow.Adopt(buf);
-    pktInfo = GetPacketInfo(buf_ForNow);
+    buf.Adopt(reinterpret_cast<PacketBuffer *>(static_cast<void *>(p)));
+
+    pktInfo = GetPacketInfo(buf);
     if (pktInfo != NULL)
     {
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
@@ -903,12 +899,7 @@ void UDPEndPoint::LwIPReceiveUDPMessage(void * arg, struct udp_pcb * pcb, struct
         pktInfo->DestPort  = pcb->local_port;
     }
 
-    buf = buf_ForNow.Release_ForNow();
-    if (lSystemLayer.PostEvent(*ep, kInetEvent_UDPDataReceived, (uintptr_t) buf) != INET_NO_ERROR)
-    {
-        // If PostEvent() failed, it has not taken ownership of the buffer, so we need to free it ourselves.
-        PacketBuffer::Free(buf);
-    }
+    PostPacketBufferEvent(lSystemLayer, *ep, kInetEvent_UDPDataReceived, std::move(buf));
 }
 
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP

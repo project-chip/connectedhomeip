@@ -38,9 +38,13 @@
 
 #include <CHIPVersion.h>
 
+#include <inet/InetArgParser.h>
 #include <inet/InetLayer.h>
 
 #include "TestInetCommon.h"
+#include "TestInetCommonOptions.h"
+#include "TestSetupFaultInjection.h"
+#include "TestSetupSignalling.h"
 
 using namespace chip;
 using namespace chip::Inet;

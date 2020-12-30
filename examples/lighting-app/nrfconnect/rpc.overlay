@@ -1,0 +1,34 @@
+#
+#    Copyright (c) 2020 Project CHIP Authors
+#
+#    Licensed under the Apache License, Version 2.0 (the "License");
+#    you may not use this file except in compliance with the License.
+#    You may obtain a copy of the License at
+#
+#        http://www.apache.org/licenses/LICENSE-2.0
+#
+#    Unless required by applicable law or agreed to in writing, software
+#    distributed under the License is distributed on an "AS IS" BASIS,
+#    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#    See the License for the specific language governing permissions and
+#    limitations under the License.
+#
+
+# This file should be used as a configuration overlay to build Pigweed RPCs to
+# lighting-app:
+#
+# west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=rpc.overlay
+
+# Enable Pigweed RPC
+CONFIG_CHIP_PW_RPC=y
+
+# Add support for C++17 to build Pigweed components
+CONFIG_STD_CPP17=y
+
+# Add support for Zephyr console component to use it for Pigweed console purposes
+CONFIG_CONSOLE_SUBSYS=y
+CONFIG_CONSOLE_GETCHAR=y
+
+CONFIG_BOOT_BANNER=n
+CONFIG_LOG=n
+CONFIG_SHELL=n

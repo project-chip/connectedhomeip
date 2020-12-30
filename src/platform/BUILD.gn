@@ -236,6 +236,8 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
           "Darwin/BleConnectionDelegateImpl.mm",
           "Darwin/BlePlatformDelegate.h",
           "Darwin/BlePlatformDelegateImpl.mm",
+          "Darwin/UUIDHelper.h",
+          "Darwin/UUIDHelperImpl.mm",
         ]
       }
     } else if (chip_device_platform == "efr32") {

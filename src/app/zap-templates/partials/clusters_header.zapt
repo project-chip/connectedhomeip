@@ -1,0 +1,7 @@
+{{pad '/*' 78 '-'}}*\
+{{pad "| Cluster Name" 70 ' '}}{{pad "|   ID" 9 ' '}}|
+{{pad "|" 70 '-'}}{{pad "+" 9 '-'}}|
+{{#chip_server_clusters}}
+{{pad (concat "| " (asCamelCased name false)) 70  " "}}{{pad (concat "| " (asHex code 4)) 9 ' '}}|
+{{/chip_server_clusters}}
+{{pad '\*' 78 '-'}}*/

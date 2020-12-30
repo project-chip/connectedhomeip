@@ -27,6 +27,7 @@
 namespace {
 
 using namespace chip;
+using namespace chip::Encoding;
 using namespace chip::Inet;
 using namespace mdns::Minimal;
 
@@ -51,7 +52,7 @@ public:
             uint8_t headerBuffer[HeaderRef::kSizeBytes];
             uint8_t buffer[128];
 
-            BufBound out(buffer, sizeof(buffer));
+            BigEndian::BufferWriter out(buffer, sizeof(buffer));
 
             HeaderRef hdr(headerBuffer);
             hdr.Clear();

@@ -58,6 +58,8 @@ void emberAfPluginReportingLoadReportingConfigDefaults(void)
 {
 #if (defined EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE &&                                                            \
      0 != EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE)
+    static_assert(EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE <= EMBER_AF_PLUGIN_REPORTING_TABLE_SIZE,
+                  "Not enough slots to hold EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS");
     for (int i = 0; i < EMBER_AF_GENERATED_REPORTING_CONFIG_DEFAULTS_TABLE_SIZE; i++)
     {
         emAfPluginReportingConditionallyAddReportingEntry((EmberAfPluginReportingEntry *) &generatedReportingConfigDefaults[i]);

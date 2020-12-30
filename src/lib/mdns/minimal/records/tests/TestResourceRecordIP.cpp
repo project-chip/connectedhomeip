@@ -25,6 +25,7 @@ namespace {
 using namespace mdns::Minimal;
 using namespace chip;
 using namespace chip::Inet;
+using namespace chip::Encoding::BigEndian;
 
 const QNamePart kNames[] = { "some", "test", "local" };
 
@@ -40,7 +41,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
     HeaderRef header(headerBuffer);
 
     {
-        BufBound output(dataBuffer, sizeof(dataBuffer));
+        BufferWriter output(dataBuffer, sizeof(dataBuffer));
         IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
         ipResourceRecord.SetTtl(123);
@@ -68,7 +69,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
     }
 
     {
-        BufBound output(dataBuffer, sizeof(dataBuffer));
+        BufferWriter output(dataBuffer, sizeof(dataBuffer));
 
         IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
@@ -97,7 +98,7 @@ void WriteIPv4(nlTestSuite * inSuite, void * inContext)
     }
 
     {
-        BufBound output(dataBuffer, sizeof(dataBuffer));
+        BufferWriter output(dataBuffer, sizeof(dataBuffer));
 
         IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
@@ -137,7 +138,7 @@ void WriteIPv6(nlTestSuite * inSuite, void * inContext)
 
     HeaderRef header(headerBuffer);
 
-    BufBound output(dataBuffer, sizeof(dataBuffer));
+    BufferWriter output(dataBuffer, sizeof(dataBuffer));
     IPResourceRecord ipResourceRecord(kNames, ipAddress);
 
     ipResourceRecord.SetTtl(0x12345678);

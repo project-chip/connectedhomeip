@@ -512,9 +512,9 @@ void RawEndPoint::Free()
  *  A synonym for <tt>SendTo(addr, INET_NULL_INTERFACEID, msg,
  *  sendFlags)</tt>.
  */
-INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBuffer * msg, uint16_t sendFlags)
+INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
 {
-    return SendTo(addr, INET_NULL_INTERFACEID, msg, sendFlags);
+    return SendTo(addr, INET_NULL_INTERFACEID, std::move(msg), sendFlags);
 }
 
 /**
@@ -547,13 +547,13 @@ INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBuffe
  * @details
  *      Send the ICMP message in \c msg to the destination given in \c addr.
  */
-INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBuffer * msg, uint16_t sendFlags)
+INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
     pktInfo.Clear();
     pktInfo.DestAddress = addr;
     pktInfo.Interface   = intfId;
-    return SendMsg(&pktInfo, msg, sendFlags);
+    return SendMsg(&pktInfo, std::move(msg), sendFlags);
 }
 
 /**
@@ -585,13 +585,13 @@ INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip:
  * @details
  *      Send the ICMP message \c msg using the destination information given in \c addr.
  */
-INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBuffer * msg, uint16_t sendFlags)
+INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
 {
     INET_ERROR res         = INET_NO_ERROR;
     const IPAddress & addr = pktInfo->DestAddress;
 
-    INET_FAULT_INJECT(FaultInjection::kFault_Send, PacketBuffer::Free(msg); return INET_ERROR_UNKNOWN_INTERFACE;);
-    INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical, PacketBuffer::Free(msg); return INET_ERROR_NO_MEMORY;);
+    INET_FAULT_INJECT(FaultInjection::kFault_Send, return INET_ERROR_UNKNOWN_INTERFACE;);
+    INET_FAULT_INJECT(FaultInjection::kFault_SendNonCritical, return INET_ERROR_NO_MEMORY;);
 
     // Do not allow sending an IPv4 address on an IPv6 end point and
     // vice versa.
@@ -623,20 +623,20 @@ INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::Pack
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip_addr_t ipAddr = addr.ToLwIPAddr();
 
-        lwipErr = raw_sendto(mRaw, (pbuf *) msg, &ipAddr);
+        lwipErr = raw_sendto(mRaw, msg.GetLwIPpbuf(), &ipAddr);
 #else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
         if (PCB_ISIPV6(mRaw))
         {
             ip6_addr_t ipv6Addr = addr.ToIPv6();
 
-            lwipErr = raw_sendto_ip6(mRaw, (pbuf *) msg, &ipv6Addr);
+            lwipErr = raw_sendto_ip6(mRaw, msg.GetLwIPpbuf(), &ipv6Addr);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else
         {
             ip4_addr_t ipv4Addr = addr.ToIPv4();
 
-            lwipErr = raw_sendto(mRaw, (pbuf *) msg, &ipv4Addr);
+            lwipErr = raw_sendto(mRaw, msg.GetLwIPpbuf(), &ipv4Addr);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5
@@ -647,8 +647,6 @@ INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::Pack
 
     // Unlock LwIP stack
     UNLOCK_TCPIP_CORE();
-
-    PacketBuffer::Free(msg);
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 #if CHIP_SYSTEM_CONFIG_USE_SOCKETS
@@ -658,8 +656,7 @@ INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::Pack
     res = GetSocket(addr.Type());
     SuccessOrExit(res);
 
-    res = IPEndPointBasis::SendMsg(pktInfo, msg, sendFlags);
-    PacketBuffer::Free(msg);
+    res = IPEndPointBasis::SendMsg(pktInfo, std::move(msg), sendFlags);
 #endif // CHIP_SYSTEM_CONFIG_USE_SOCKETS
 
 exit:
@@ -957,10 +954,12 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
 #endif // LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
 {
     RawEndPoint * ep                   = static_cast<RawEndPoint *>(arg);
-    PacketBuffer * buf                 = reinterpret_cast<PacketBuffer *>(static_cast<void *>(p));
     chip::System::Layer & lSystemLayer = ep->SystemLayer();
     IPPacketInfo * pktInfo             = NULL;
     uint8_t enqueue                    = 1;
+    System::PacketBufferHandle buf;
+
+    buf.Adopt(reinterpret_cast<PacketBuffer *>(static_cast<void *>(p)));
 
     // Filtering based on the saved ICMP6 types (the only protocol currently supported.)
     if ((ep->IPVer == kIPVersion_6) && (ep->IPProto == kIPProtocol_ICMPv6))
@@ -987,9 +986,7 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
 
     if (enqueue)
     {
-        System::PacketBufferHandle bufHandle;
-        bufHandle.Adopt(buf);
-        pktInfo = GetPacketInfo(bufHandle);
+        pktInfo = GetPacketInfo(buf);
 
         if (pktInfo != NULL)
         {
@@ -1016,12 +1013,7 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
             pktInfo->DestPort  = 0;
         }
 
-        buf = bufHandle.Release_ForNow();
-        if (lSystemLayer.PostEvent(*ep, kInetEvent_RawDataReceived, (uintptr_t) buf) != INET_NO_ERROR)
-        {
-            // If PostEvent() failed, it has not taken ownership of the buffer, so we need to free it ourselves.
-            PacketBuffer::Free(buf);
-        }
+        PostPacketBufferEvent(lSystemLayer, *ep, kInetEvent_RawDataReceived, std::move(buf));
     }
 
     return enqueue;
