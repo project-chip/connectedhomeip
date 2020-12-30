@@ -1,39 +1,64 @@
-#include <transport/bdx/BDXMessages.h>
-#include <transport/bdx/BDXState.h>
+#include <protocols/bdx/BdxMessages.h>
+#include <protocols/bdx/BdxTransferSession.h>
 #include <transport/raw/MessageHeader.h>
 
 #include <nlunit-test.h>
 
 #include <support/CodeUtils.h>
-#include <support/TestUtils.h>
+#include <support/UnitTestRegistration.h>
 
 using namespace ::chip;
 
 static const uint16_t kTestMaxBlockSize = 256;
 
-class DLL_EXPORT MockBDXStateDelegate : public BDX::BDXStateDelegate
+class DLL_EXPORT MockMessagingDelegate : public BDX::TransferSession::MessagingDelegate
 {
 public:
-    CHIP_ERROR SendMessage(BDXMsgType msgType, System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendMessage(BDX::MessageType msgType, System::PacketBuffer * msgBuf) override
     {
         mLastMessageSent = msgType;
         return CHIP_NO_ERROR;
     }
 
-    uint16_t mLastMessageSent;
+    CHIP_ERROR SendStatusReport(CHIP_ERROR error) override { mLastStatus = error; }
+
+    BDX::MessageType mLastMessageSent;
+    CHIP_ERROR mLastStatus;
+};
+
+class DLL_EXPORT MockPlatformDelegate : public BDX::TransferSession::PlatformDelegate
+{
+public:
+    CHIP_ERROR StoreBlock(Encoding::LittleEndian::Reader & blockBuf) override
+    {
+        ++numStores;
+        return CHIP_NO_ERROR;
+    }
+
+    CHIP_ERROR ReadBlock(BufBound & buffer, uint16_t length) override
+    {
+        ++numReads;
+        return CHIP_NO_ERROR;
+    }
+
+    bool AreParametersAcceptable() override { return true; }
+
+    uint16_t numStores = 0;
+    uint16_t numReads  = 0;
 };
 
 void TestHandleReceiveInit(nlTestSuite * inSuite, void * inContext)
 {
-    MockBDXStateDelegate mockDelegate;
-    System::PacketBuffer * pEmptyMsg = System::PacketBuffer::New(10);
+    MockMessagingDelegate mockMessagingDelegate;
+    MockPlatformDelegate mockPlatformDelegate;
+    System::PacketBufferHandle pEmptyMsg = System::PacketBuffer::New(10);
 
     // Support Sender and Receiver drive, no async, no range offsets
     BDX::TransferControlParams transferParams = { false, true, true };
     BDX::RangeControlParams rangeParams       = { false, 0, 0 };
 
     // Initialize Receiver state machine
-    BDX::TransferManager bdxReceiver;
+    BDX::TransferSession bdxReceiver(&mockMessagingDelegate, &mockPlatformDelegate);
     bdxReceiver.Init(BDX::kReceiver, transferParams, rangeParams, kTestMaxBlockSize, &mockDelegate);
 
     // Verify Receiver cannot respond to ReceiveInit
@@ -42,7 +67,7 @@ void TestHandleReceiveInit(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mockDelegate.mLastMessageSent == BDX::BDXMsgType::kStatusReport_Temp);
 
     // Initialize Sender state machine
-    BDX::TransferManager bdxSender;
+    BDX::TransferSession bdxSender;
     bdxSender.Init(BDX::kSender, transferParams, rangeParams, kTestMaxBlockSize, &mockDelegate);
 
     // Verify Sender sends ReceiveAccept in response to ReceiveInit
@@ -59,7 +84,6 @@ void TestHandleReceiveInit(nlTestSuite * inSuite, void * inContext)
 static const nlTest sTests[] =
 {
     NL_TEST_DEF("ReceiveInitSenderOnly", TestHandleReceiveInit),
-
     NL_TEST_SENTINEL()
 };
 // clang-format on
@@ -67,7 +91,7 @@ static const nlTest sTests[] =
 // clang-format off
 static nlTestSuite sSuite =
 {
-    "Test-CHIP-TransferManager",
+    "Test-CHIP-TransferSession",
     &sTests[0],
     nullptr,
     nullptr
@@ -77,7 +101,7 @@ static nlTestSuite sSuite =
 /**
  *  Main
  */
-int TestBDXState()
+int TestBdxTransferSession()
 {
     // Run test suit against one context
     nlTestRunner(&sSuite, nullptr);
@@ -85,4 +109,4 @@ int TestBDXState()
     return (nlTestRunnerStats(&sSuite));
 }
 
-CHIP_REGISTER_TEST_SUITE(TestBDXState)
+CHIP_REGISTER_TEST_SUITE(TestBdxTransferSession)

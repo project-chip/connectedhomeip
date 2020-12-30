@@ -32,6 +32,19 @@
 namespace chip {
 namespace BDX {
 
+enum MessageType : uint8_t
+{
+    kSendInit      = 0x01,
+    kSendAccept    = 0x02,
+    kReceiveInit   = 0x04,
+    kReceiveAccept = 0x05,
+    kBlockQuery    = 0x10,
+    kBlock         = 0x11,
+    kBlockEOF      = 0x12,
+    kBlockAck      = 0x13,
+    kBlockAckEOF   = 0x14,
+};
+
 enum TransferControlFlags : uint8_t
 {
     // first 4 bits reserved for version

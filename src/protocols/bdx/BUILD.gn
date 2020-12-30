@@ -20,8 +20,8 @@ static_library("bdx") {
   sources = [
     "BdxMessages.cpp",
     "BdxMessages.h",
-    "BDXState.cpp",
-    "BDXState.h",
+    "BdxTransferSession.cpp",
+    "BdxTransferSession.h",
   ]
 
   cflags = [ "-Wconversion" ]
