@@ -28,7 +28,6 @@
 #include <support/BufBound.h>
 #include <support/CodeUtils.h>
 #include <system/SystemPacketBuffer.h>
-
 namespace chip {
 namespace BDX {
 
@@ -43,6 +42,25 @@ enum MessageType : uint8_t
     kBlockEOF      = 0x12,
     kBlockAck      = 0x13,
     kBlockAckEOF   = 0x14,
+};
+
+enum StatusCode : uint8_t
+{
+    kOverflow                   = 0x0011,
+    kLengthTooLarge             = 0x0012,
+    kLengthTooShort             = 0x0013,
+    kLengthMismatch             = 0x0014,
+    kLengthRequired             = 0x0015,
+    kBadMessageContents         = 0x0016,
+    kBadBlockCounter            = 0x0017,
+    kTransferFailedUnknownError = 0x001F,
+    kServerBadState             = 0x0020,
+    kFailureToSend              = 0x0021,
+    kTransferMethodNotSupported = 0x0050,
+    kFileDesignatorUnknown      = 0x0051,
+    kStartOffsetNotSupported    = 0x0052,
+    kVersionNotSupported        = 0x0053,
+    kUnknown                    = 0x005F,
 };
 
 enum TransferControlFlags : uint8_t

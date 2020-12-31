@@ -39,13 +39,16 @@ public:
     class DLL_EXPORT MessagingDelegate;
     class DLL_EXPORT PlatformDelegate;
 
-    TransferSession(MessagingDelegate * msgDelegate, PlatformDelegate * platformDelegate);
+    TransferSession();
 
-    CHIP_ERROR StartTransfer(TransferRole role, const TransferInit & initMsg);
-    CHIP_ERROR WaitForTransfer(TransferRole role, BitFlags<uint8_t, TransferControlFlags> xferControlOpts, uint16_t maxBlockSize);
+    // TODO: should we return error if initMsg breaks spec?
+    // TODO: could break this up into StartSend() and StartReceive()
+    CHIP_ERROR StartTransfer(MessagingDelegate * msgDelegate, PlatformDelegate * platformDelegate, TransferRole role,
+                             const TransferInit & initMsg);
+    CHIP_ERROR WaitForTransfer(MessagingDelegate * msgDelegate, PlatformDelegate * platformDelegate, TransferRole role,
+                               BitFlags<uint8_t, TransferControlFlags> xferControlOpts, uint16_t maxBlockSize);
 
-    CHIP_ERROR HandleMessageReceived(const PacketHeader & packetHeader, System::PacketBufferHandle msg);
-    void HandleReceiveInit(const System::PacketBufferHandle & msgData);
+    CHIP_ERROR HandleMessageReceived(System::PacketBufferHandle msg);
 
     // TODO: are these the same?
     void HandleMessageError(CHIP_ERROR error);
@@ -54,16 +57,19 @@ public:
     TransferStates GetState() const { return mState; }
 
 private:
+    void HandleReceiveInit(System::PacketBufferHandle msgData);
+    CHIP_ERROR AttachHeaderAndSend(MessageType msgType, System::PacketBufferHandle msgBuf);
+
     MessagingDelegate * mMessagingDelegate;
     PlatformDelegate * mPlatformDelegate;
 
+    TransferStates mState;
     TransferRole mRole;
 
     // pre-transfer negotiation
     BitFlags<uint8_t, TransferControlFlags> mSuppportedXferOpts;
     uint8_t mVersion;
     uint16_t mMaxSupportedBlockSize;
-    TransferStates mState;
 
     // post-negotiation
     TransferControlFlags mControlMode;
@@ -81,13 +87,13 @@ public:
      *   Called when a TransferSession object needs to send a message to the other endpoint.
      *
      */
-    virtual CHIP_ERROR SendMessage(MessageType msgType, System::PacketBuffer * msgBuf) = 0;
+    virtual CHIP_ERROR SendMessage(System::PacketBufferHandle msg) = 0;
 
     /**
      * @brief
      *   TODO: BDX_ERROR ?
      */
-    virtual CHIP_ERROR OnTransferError(CHIP_ERROR error) = 0;
+    virtual CHIP_ERROR OnTransferError(StatusCode code) = 0;
 };
 
 class DLL_EXPORT TransferSession::PlatformDelegate

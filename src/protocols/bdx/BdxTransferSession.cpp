@@ -6,21 +6,64 @@
 
 #include <protocols/bdx/BdxTransferSession.h>
 
+#include <protocols/Protocols.h>
 #include <protocols/bdx/BdxMessages.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
 namespace BDX {
 
-TransferSession::TransferSession(MessagingDelegate * msgDelegate, PlatformDelegate * platformDelegate)
+TransferSession::TransferSession()
 {
-    mState             = kIdle;
+    mState = kIdle;
+}
+
+CHIP_ERROR TransferSession::StartTransfer(MessagingDelegate * msgDelegate, PlatformDelegate * platformDelegate, TransferRole role,
+                                          const TransferInit & initMsg)
+{
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    size_t msgDataSize = 0;
+    System::PacketBufferHandle msgBuf;
+    MessageType msgType;
+
+    VerifyOrExit(msgDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(platformDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     mMessagingDelegate = msgDelegate;
     mPlatformDelegate  = platformDelegate;
+    mRole              = role;
+
+    msgDataSize = initMsg.MessageSize();
+    msgBuf      = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgDataSize));
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    msgType = (mRole == kSender) ? kSendInit : kReceiveInit;
+
+    {
+        BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
+        initMsg.WriteToBuffer(bbuf);
+        msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
+        err = AttachHeaderAndSend(msgType, std::move(msgBuf));
+    }
+
+    SuccessOrExit(err);
+
+    mState = (mRole == kSender) ? kNegotiateSend : kNegotiateReceive;
+
+exit:
+    return err;
+}
+
+CHIP_ERROR TransferSession::WaitForTransfer(MessagingDelegate * msgDelegate, PlatformDelegate * platformDelegate, TransferRole role,
+                                            BitFlags<uint8_t, TransferControlFlags> xferControlOpts, uint16_t maxBlockSize)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+exit:
+    return err;
 }
 
 // TODO: change parameter to PacketHeader
-CHIP_ERROR TransferSession::HandleMessageReceived(const PacketHeader & packetHeader, System::PacketBufferHandle msg)
+CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
     uint16_t headerSize = 0;
@@ -48,7 +91,7 @@ CHIP_ERROR TransferSession::HandleMessageReceived(const PacketHeader & packetHea
                 break;
     */
     case kReceiveInit:
-        HandleReceiveInit(msg);
+        HandleReceiveInit(std::move(msg));
         break;
         /*        case kReceiveAccept:
                     HandleReceiveAccept();
@@ -88,19 +131,19 @@ void TransferSession::HandleSendAccept()
 
 }
 */
-void TransferSession::HandleReceiveInit(const System::PacketBufferHandle & msgData)
+void TransferSession::HandleReceiveInit(System::PacketBufferHandle msgData)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReceiveInit rcvInit;
+    ReceiveAccept acceptMsg;
     BitFlags<uint8_t, TransferControlFlags> commonOpts;
+    size_t msgDataSize = 0;
+    System::PacketBufferHandle msgBuf;
+    MessageType msgType;
 
-    // TODO: must be configured as a sender
     VerifyOrExit(mRole == kSender, mMessagingDelegate->OnTransferError(kTransferMethodNotSupported));
-
-    // TODO: must not be in the middle of a transfer
     VerifyOrExit(mState == kIdle, mMessagingDelegate->OnTransferError(kServerBadState));
 
-    // TODO: need to review PacketBuffer ownership
     err = rcvInit.Parse(msgData.Retain());
     SuccessOrExit(err);
 
@@ -161,8 +204,29 @@ void TransferSession::HandleReceiveInit(const System::PacketBufferHandle & msgDa
     // Metadata
     //      - TODO: pass to platform layer (if any exists)
 
-    // TODO: fill out ReceiveAccept message
-    mMessagingDelegate->SendMessage(kReceiveAccept, NULL);
+    acceptMsg.TransferCtlFlags.SetRaw(0).Set(mControlMode, true);
+    acceptMsg.Version      = mVersion;
+    acceptMsg.MaxBlockSize = mTransferMaxBlockSize;
+    acceptMsg.StartOffset  = mStartOffset;
+    acceptMsg.Length       = mMaxLength;
+    // TODO: metadata
+
+    msgDataSize = acceptMsg.MessageSize();
+    msgBuf      = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgDataSize));
+    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+
+    msgType = (mRole == kSender) ? kSendInit : kReceiveInit;
+
+    {
+        BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
+        acceptMsg.WriteToBuffer(bbuf);
+        msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
+        err = AttachHeaderAndSend(msgType, std::move(msgBuf));
+    }
+
+    err = AttachHeaderAndSend(kReceiveAccept, std::move(msgBuf));
+    SuccessOrExit(err);
+
     mState = kTransferInProgress;
 
 exit:
@@ -243,34 +307,36 @@ TransferSession::HandleBlockAckEOF()
 }
 */
 
-CHIP_ERROR TransferSession::StartTransfer()
-{
-    CHIP_ERROR err = CHIP_NO_ERROR;
-
-    if (mRole == kSender && mControlMode == kSenderDrive)
-    {
-        // TODO: send Block message
-    }
-    else if (mRole == kReceiver && mControlMode == kReceiverDrive)
-    {
-        // TODO: send BlockQuery
-    }
-
-    return err;
-}
-
 void TransferSession::EndTransfer(CHIP_ERROR error)
 {
     // TODO:
-    mControlMode = kNotSpecified;
-    mState       = kIdle;
+    mState = kIdle;
 }
 
-bool TransferSession::AreParametersCompatible()
+CHIP_ERROR TransferSession::AttachHeaderAndSend(MessageType msgType, System::PacketBufferHandle msgBuf)
 {
-    // TODO:
-    mControlMode = kSenderDrive;
-    return true;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    PayloadHeader payloadHeader;
+
+    payloadHeader
+        .SetMessageType(static_cast<uint8_t>(msgType)) //
+        .SetProtocolID(Protocols::kProtocol_BDX);
+
+    uint16_t headerSize              = payloadHeader.EncodeSizeBytes();
+    uint16_t actualEncodedHeaderSize = 0;
+
+    VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
+
+    msgBuf->SetStart(msgBuf->Start() - headerSize);
+    err = payloadHeader.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize);
+    SuccessOrExit(err);
+    VerifyOrExit(headerSize == actualEncodedHeaderSize, err = CHIP_ERROR_INTERNAL);
+
+    err = mMessagingDelegate->SendMessage(std::move(msgBuf));
+    SuccessOrExit(err);
+
+exit:
+    return err;
 }
 
 } // namespace BDX
