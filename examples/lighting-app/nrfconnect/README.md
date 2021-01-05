@@ -1,9 +1,9 @@
 # CHIP nRF Connect Lighting Example Application
 
 The nRF Connect Lighting Example demonstrates how to remotely control a white
-non-dimmable light bulb. It uses buttons to test changing the lighting and
-device states and LEDs to show the state of these changes. You can use this
-example as a reference for creating your own application.
+dimmable light bulb. It uses buttons to test changing the lighting and device
+states and LEDs to show the state of these changes. You can use this example as
+a reference for creating your own application.
 
 The example is based on [CHIP](https://github.com/project-chip/connectedhomeip)
 and the nRF Connect platform, and supports remote access and control of a
