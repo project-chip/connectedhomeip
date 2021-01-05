@@ -86,7 +86,8 @@ void InitDataModelHandler()
     emberAfEndpointConfigure();
     emberAfInit();
 
-#if defined(EMBER_AF_PLUGIN_REPORTING) || defined(EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER) || defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
+#if defined(EMBER_AF_PLUGIN_REPORTING) || defined(EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER) ||                               \
+    defined(EMBER_AF_PLUGIN_IAS_ZONE_SERVER)
     EmberStatus status = EMBER_NETWORK_UP;
 #endif
 
