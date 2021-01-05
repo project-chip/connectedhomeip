@@ -204,6 +204,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   }
 
   standalone_toolchain = "${chip_root}/config/standalone/toolchain:standalone"
+  not_needed([ "standalone_toolchain" ])  # Might not be needed.
 
   if (enable_standalone_chip_tool_build) {
     group("standalone_chip_tool") {
