@@ -101,25 +101,25 @@ with the target cluster name and the target command name
 ### How to parse a setup code
 
 To parse a setup code, run the built executable with the `payload` cluster name
-and the `parse-qr-code` command
+and the `parse-setup-payload` command
 
-    $ chip-tool payload parse-qr-code code
+    $ chip-tool payload parse-setup-payload code
 
 #### QR Code
 
-    $ chip-tool payload parse-qr-code "CH:#####"
+    $ chip-tool payload parse-setup-payload "CH:#####"
 
 #### QR Code with optional Vendor Info
 
-    $ chip-tool chip-tool payload parse-qr-code "CH:#####"
+    $ chip-tool chip-tool payload parse-setup-payload "CH:#####"
 
 #### Manual Setup Code
 
-    $ chip-tool payload parse-qr-code :#####"
+    $ chip-tool payload parse-setup-payload :#####"
 
 # Using the Client for Additional Data Payload
 
 To parse an additional data payload, run the built executable with the `payload`
-cluster name and the `parse-additional-data` command
+cluster name and the `parse-additional-data-payload` command
 
-    $ chip-tool payload parse-additional-data "#####"
+    $ chip-tool payload parse-additional-data-payload "#####"
