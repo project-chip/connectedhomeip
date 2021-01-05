@@ -380,6 +380,7 @@ void BLEManagerImpl::NotifyChipConnectionClosed(BLE_CONNECTION_OBJECT conId) {}
 
 void BLEManagerImpl::DriveBLEState(void)
 {
+    int ret;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     // Perform any initialization actions that must occur after the Chip task is running.
@@ -469,9 +470,10 @@ void BLEManagerImpl::DriveBLEState(void)
     {
         if (GetFlag(mFlags, kFlag_Advertising))
         {
-            err = ble_gap_adv_stop();
-            if (err != CHIP_NO_ERROR)
+            ret = ble_gap_adv_stop();
+            if (ret != 0)
             {
+                err = CHIP_ERROR_INTERNAL;
                 ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
                 ExitNow();
             }
@@ -1008,7 +1010,8 @@ int BLEManagerImpl::gatt_svr_chr_access(uint16_t conn_handle, uint16_t attr_hand
 
 CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
 {
-    CHIP_ERROR err;
+    int ret;
+
     ble_gap_adv_params adv_params;
     memset(&adv_params, 0, sizeof(adv_params));
     uint8_t own_addr_type = BLE_OWN_ADDR_PUBLIC;
@@ -1039,34 +1042,33 @@ CHIP_ERROR BLEManagerImpl::StartAdvertising(void)
                     (((uint32_t) adv_params.itvl_min) * 10) / 16, (connectable) ? "" : "non-", mDeviceName);
 
     {
-        err = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
-        if (err != CHIP_NO_ERROR)
+        ret = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
+        if (ret == BLE_HS_EALREADY)
         {
-            ChipLogError(DeviceLayer, "ble_gap_adv_start() failed: %s", ErrorStr(err));
-            ExitNow();
+            /* This error code indicates that the advertising is already active. Stop and restart with the new parameters */
+            ChipLogProgress(DeviceLayer, "Device already advertising, stop active advertisement and restart");
+            ret = ble_gap_adv_stop();
+            if (ret != 0)
+            {
+                ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %d, cannot restart", ret);
+                return CHIP_ERROR_INTERNAL;
+            }
+            else
+            {
+                ret = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
+            }
         }
-    }
 
-exit:
-    if (err == BLE_HS_EALREADY && connectable)
-    {
-        ChipLogProgress(DeviceLayer,
-                        "Connectable advertising failed because device was already advertising , stop active advertisement");
-        err = ble_gap_adv_stop();
-        if (err != CHIP_NO_ERROR)
+        if (ret == 0)
         {
-            ChipLogError(DeviceLayer, "ble_gap_adv_stop() failed: %s", ErrorStr(err));
+            return CHIP_NO_ERROR;
         }
         else
         {
-            err = ble_gap_adv_start(own_addr_type, NULL, BLE_HS_FOREVER, &adv_params, ble_svr_gap_event, NULL);
-            if (err != CHIP_NO_ERROR)
-            {
-                ChipLogError(DeviceLayer, "Retried adv start; ble_gap_adv_start() failed: %s", ErrorStr(err));
-            }
+            ChipLogError(DeviceLayer, "ble_gap_adv_start() failed: %d", ret);
+            return CHIP_ERROR_INTERNAL;
         }
     }
-    return err;
 }
 
 void BLEManagerImpl::DriveBLEState(intptr_t arg)
