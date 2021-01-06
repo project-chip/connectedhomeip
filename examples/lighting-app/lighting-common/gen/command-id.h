@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -46,6 +45,7 @@
 
 // Commands for cluster: Basic
 #define ZCL_RESET_TO_FACTORY_DEFAULTS_COMMAND_ID (0x00)
+#define ZCL_MFG_SPECIFIC_PING_COMMAND_ID (0x00)
 
 // Commands for cluster: Identify
 #define ZCL_IDENTIFY_COMMAND_ID (0x00)
