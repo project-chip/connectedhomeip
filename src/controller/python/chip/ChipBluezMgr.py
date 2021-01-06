@@ -284,6 +284,12 @@ class BluezDbusAdapter:
                 if i in uuids:
                     found.append(device)
                     break
+            # Some devices do not advertise their uuid lists, thus we should also check service data.
+            if device.ServiceData:
+                for i in device.ServiceData:
+                    if uuid.UUID(str(i)) in uuids:
+                        found.append(device)
+                        break
         return found
 
     def clear_adapter(self):
