@@ -230,7 +230,8 @@ CHIP_ERROR InteractionModelEngine::RegisterClusterCommandHandler(chip::ClusterId
     {
         ChipLogDetail(DataManagement,
                       "RegisterClusterCommandHandler registered handler for ClusterId = %d, CommandId = %d, CommandRoleId = "
-                      "%d, Dispatcher = %p", aClusterId, aCommandId, aCommandRoleId, (void *) aDispatcher);
+                      "%d, Dispatcher = %p",
+                      aClusterId, aCommandId, aCommandRoleId, (void *) aDispatcher);
     }
 
     return err;
@@ -248,7 +249,8 @@ CHIP_ERROR InteractionModelEngine::DeregisterClusterCommandHandler(chip::Cluster
 
         ChipLogDetail(DataManagement,
                       "DeregisterClusterCommandHandler unregistered handler for ClusterId = %d, CommandId = %d, CommandRoleId "
-                      "= %d, Dispatcher = %p", aClusterId, aCommandId, aCommandRoleId, (void *) pDispatcher);
+                      "= %d, Dispatcher = %p",
+                      aClusterId, aCommandId, aCommandRoleId, (void *) pDispatcher);
         mHandlersMap.erase(handlerIt);
     }
     else
@@ -266,8 +268,8 @@ void InteractionModelEngine::ProcessCommand(chip::ClusterId aClusterId, chip::Co
 
     handlerIt = mHandlersMap.find(HandlerKey(aClusterId, aCommandId, aCommandRoleId));
 
-    ChipLogDetail(DataManagement, "ClusterId = %d, CommandId = %d, CommandRoleId = %d", (int) (aClusterId),
-                  (int) (aCommandId), aCommandRoleId);
+    ChipLogDetail(DataManagement, "ClusterId = %d, CommandId = %d, CommandRoleId = %d", (int) (aClusterId), (int) (aCommandId),
+                  aCommandRoleId);
 
     if (handlerIt != mHandlersMap.end())
     {

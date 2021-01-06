@@ -55,7 +55,8 @@ typedef void (*CommandCbFunct)(chip::TLV::TLVReader & aReader, Command * apComma
 /**
  * @class InteractionModelEngine
  *
- * @brief This is a singleton hosting all CHIP unsolicited message processing and managing interaction model related clients and handlers
+ * @brief This is a singleton hosting all CHIP unsolicited message processing and managing interaction model related clients and
+ * handlers
  *
  */
 class InteractionModelEngine : public Messaging::ExchangeDelegate
