@@ -91,20 +91,15 @@
     return YES;
 }
 
-- (BOOL)sendCHIPCommand:(uint32_t (^)(const chip::System::PacketBufferHandle &, uint16_t))encodeCommandBlock
+- (BOOL)sendCHIPCommand:(chip::System::PacketBufferHandle (^)())encodeCommandBlock
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
     [self.lock lock];
-    // FIXME: This needs a better buffersizing setup!
-    static const size_t bufferSize = 1024;
-    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(bufferSize);
+    chip::System::PacketBufferHandle buffer = encodeCommandBlock();
     if (buffer.IsNull()) {
         err = CHIP_ERROR_NO_MEMORY;
     } else {
-        uint32_t dataLength = encodeCommandBlock(buffer, (uint16_t) bufferSize);
-        buffer->SetDataLength(dataLength);
-
         err = self.cppDevice->SendMessage(std::move(buffer));
     }
     [self.lock unlock];
@@ -122,9 +117,9 @@
         duration = UINT16_MAX;
     }
 
-    return [self sendCHIPCommand:^uint32_t(const chip::System::PacketBufferHandle & buffer, uint16_t bufferSize) {
+    return [self sendCHIPCommand:^chip::System::PacketBufferHandle() {
         // Hardcode endpoint to 1 for now
-        return encodeIdentifyClusterIdentifyCommand(buffer->Start(), bufferSize, 1, duration);
+        return encodeIdentifyClusterIdentifyCommand(1, duration);
     }];
 }
 
