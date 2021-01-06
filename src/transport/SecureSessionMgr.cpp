@@ -74,9 +74,6 @@ CHIP_ERROR SecureSessionMgr::Init(NodeId localNodeId, System::Layer * systemLaye
 
     ChipLogProgress(Inet, "local node id is %llu\n", mLocalNodeId);
 
-    Mdns::DiscoveryManager::GetInstance().Init();
-    Mdns::DiscoveryManager::GetInstance().RegisterResolveDelegate(this);
-
     ScheduleExpiryTimer();
 
     mTransportMgr->SetSecureSessionMgr(this);
@@ -207,12 +204,7 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
              (peerAddr.Value().GetTransportType() == Transport::Type::kTcp ||
               peerAddr.Value().GetTransportType() == Transport::Type::kUdp))
     {
-        uint64_t fabricId = 0;
-
-#if !CHIP_DEVICE_LAYER_NONE
-        SuccessOrExit(err = chip::DeviceLayer::ConfigurationMgr().GetFabricId(fabricId));
-#endif
-        SuccessOrExit(err = Mdns::DiscoveryManager::GetInstance().ResolveNodeId(peerNodeId, fabricId));
+        return CHIP_ERROR_INVALID_ARGUMENT;
     }
 
     if (state != nullptr)
@@ -223,40 +215,6 @@ CHIP_ERROR SecureSessionMgr::NewPairing(const Optional<Transport::PeerAddress> &
 
 exit:
     return err;
-}
-
-void SecureSessionMgr::HandleNodeIdResolve(CHIP_ERROR error, NodeId nodeId, const Mdns::MdnsService & service)
-{
-    if (error != CHIP_NO_ERROR && mCB != nullptr)
-    {
-        mCB->OnAddressResolved(error, kUndefinedNodeId, this);
-    }
-    else if (nodeId == kUndefinedNodeId && mCB != nullptr)
-    {
-        mCB->OnAddressResolved(CHIP_ERROR_UNKNOWN_RESOURCE_ID, kUndefinedNodeId, this);
-    }
-    else if (error == CHIP_NO_ERROR && nodeId != kUndefinedNodeId)
-    {
-        PeerConnectionState * state = nullptr;
-        PeerAddress addr;
-        bool hasAddressUpdate = false;
-
-        // Though the spec says the service name is _chip._tcp, we are not supporting tcp for now.
-        addr.SetTransportType(Transport::Type::kUdp).SetIPAddress(service.mAddress.Value()).SetPort(service.mPort);
-
-        while ((state = mPeerConnections.FindPeerConnectionState(nodeId, state)) != nullptr)
-        {
-            if (state->GetPeerAddress().GetIPAddress() == Inet::IPAddress::Any)
-            {
-                hasAddressUpdate = true;
-                state->SetPeerAddress(addr);
-            }
-        }
-        if (hasAddressUpdate)
-        {
-            mCB->OnAddressResolved(CHIP_NO_ERROR, nodeId, this);
-        }
-    }
 }
 
 void SecureSessionMgr::ScheduleExpiryTimer()
