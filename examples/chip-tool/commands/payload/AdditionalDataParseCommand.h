@@ -18,13 +18,14 @@
 
 #pragma once
 
-#include "AdditionalDataParseCommand.h"
-#include "SetupPayloadParseCommand.h"
+#include "../common/Command.h"
 
-void registerCommandsPayload(Commands & commands)
+class AdditionalDataParseCommand : public Command
 {
-    const char * clusterName      = "Payload";
-    commands_list clusterCommands = { make_unique<SetupPayloadParseCommand>(), make_unique<AdditionalDataParseCommand>() };
+public:
+    AdditionalDataParseCommand() : Command("parse-additional-data-payload") { AddArgument("payload", &mPayload); }
+    CHIP_ERROR Run(PersistentStorage & storage, NodeId localId, NodeId remoteId) override;
 
-    commands.Register(clusterName, clusterCommands);
-}
+private:
+    char * mPayload;
+};
