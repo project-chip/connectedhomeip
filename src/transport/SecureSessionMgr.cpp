@@ -92,25 +92,34 @@ CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBuffer
 CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
                                          EncryptedPacketBufferHandle * bufferRetainSlot)
 {
-    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, false, 0, 0);
+    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, false);
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, EncryptedPacketBufferHandle msgBuf,
-                                         EncryptedPacketBufferHandle * bufferRetainSlot)
+CHIP_ERROR SecureSessionMgr::SendMessage(EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
-    uint32_t msgId      = msgBuf.GetMsgId();
-    uint32_t payloadLen = msgBuf.GetPayloadLen();
+    PayloadHeader payloadHeader;
 
-    return SendMessage(payloadHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, true, msgId, payloadLen);
+    return SendMessage(payloadHeader, 0, std::move(msgBuf), bufferRetainSlot, true);
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                                         EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted, uint32_t msgIdIn,
-                                         uint32_t payloadLenIn)
+                                         EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
-    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
+    PeerConnectionState * state = nullptr;
+    PacketHeader packetHeader;
+    uint16_t headerSize = 0;
 
+    if (isEncrypted)
+    {
+        err = packetHeader.Decode(msgBuf->Start(), msgBuf->DataLength(), &headerSize);
+        SuccessOrExit(err);
+
+        VerifyOrExit(packetHeader.GetDestinationNodeId().HasValue(), err = CHIP_ERROR_INVALID_DESTINATION_NODE_ID);
+        peerNodeId = packetHeader.GetDestinationNodeId().Value();
+    }
+
+    state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
 
     VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -129,13 +138,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         uint32_t msgId         = 0;
         uint32_t payloadLength = 0; // Make sure it's big enough to add two 16-bit ints without overflowing.
         uint16_t len           = 0;
-        PacketHeader packetHeader;
         MessageAuthenticationCode mac;
-
-        const uint16_t headerSize = payloadHeader.EncodeSizeBytes();
-        uint16_t actualEncodedHeaderSize;
-        uint16_t totalLen = 0;
-        uint16_t taglen   = 0;
 
         if (!isEncrypted)
         {
@@ -143,28 +146,34 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
 
             static_assert(std::is_same<decltype(msgBuf->TotalLength()), uint16_t>::value,
                           "Addition to generate payloadLength might overflow");
+
+            headerSize    = payloadHeader.EncodeSizeBytes();
             payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
             VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
+
+            packetHeader
+                .SetSourceNodeId(mLocalNodeId)              //
+                .SetDestinationNodeId(peerNodeId)           //
+                .SetMessageId(msgId)                        //
+                .SetEncryptionKeyID(state->GetLocalKeyID()) //
+                .SetPayloadLength(static_cast<uint16_t>(payloadLength));
+            packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
         }
         else
         {
-            msgId         = msgIdIn;
-            payloadLength = payloadLenIn;
+            // Advancing the start to encrypted header, since the transport will attach the packet header on top of it
+            msgBuf->SetStart(msgBuf->Start() + headerSize);
         }
-
-        packetHeader
-            .SetSourceNodeId(mLocalNodeId)              //
-            .SetDestinationNodeId(peerNodeId)           //
-            .SetMessageId(msgId)                        //
-            .SetEncryptionKeyID(state->GetLocalKeyID()) //
-            .SetPayloadLength(static_cast<uint16_t>(payloadLength));
-        packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
 
         ChipLogProgress(Inet, "Sending msg from %llu to %llu", mLocalNodeId, peerNodeId);
 
-        // Skip encryption process if the packet is resent by CRMP
+        // Encrypt the packet if it's not already encrypted
         if (!isEncrypted)
         {
+            uint16_t totalLen = 0;
+            uint16_t taglen   = 0;
+            uint16_t actualEncodedHeaderSize;
+
             VerifyOrExit(msgBuf->EnsureReservedSize(headerSize), err = CHIP_ERROR_NO_MEMORY);
 
             msgBuf->SetStart(msgBuf->Start() - headerSize);
@@ -188,15 +197,16 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
         if (bufferRetainSlot)
         {
             // The start of buffer points to the beginning of the encrypted header, and the length of buffer
-            // contains both the encrypted header and encrypted data. Locally store the start and length of the
-            // buffer before send.
-            p   = msgBuf->Start();
-            len = msgBuf->DataLength();
+            // contains both the encrypted header and encrypted data.
+            // Locally store the start and length of the retained buffer after accounting for the size of packet header.
+            headerSize = packetHeader.EncodeSizeBytes();
+
+            p   = static_cast<uint8_t *>(msgBuf->Start() - headerSize);
+            len = static_cast<uint16_t>(msgBuf->DataLength() + headerSize);
 
             // Retain the PacketBuffer for following retransmit.
-            *bufferRetainSlot             = msgBuf.Retain();
-            bufferRetainSlot->mMsgId      = msgId;
-            bufferRetainSlot->mPayloadLen = payloadLength;
+            *bufferRetainSlot        = msgBuf.Retain();
+            bufferRetainSlot->mMsgId = msgId;
         }
 
         err = mTransportMgr->SendMessage(packetHeader, state->GetPeerAddress(), std::move(msgBuf));

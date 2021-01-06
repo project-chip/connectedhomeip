@@ -61,8 +61,6 @@ public:
 
         ReliableMessageContext * rc;             /**< The context for the stored CHIP message. */
         EncryptedPacketBufferHandle retainedBuf; /**< The PacketBuffer object holding the CHIP message. */
-        PayloadHeader payloadHeader;             /**< Exchange Header for the stored CHIP message. */
-        uint64_t peerNodeId;                     /**< Node ID of peer node. */
         uint16_t nextRetransTimeTick;            /**< A counter representing the next retransmission time for the message. */
         uint8_t sendCount;                       /**< A counter representing the number of times the message has been sent. */
     };
@@ -80,8 +78,7 @@ public:
     void ExecuteActions();
     static void Timeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
-    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, const PayloadHeader & payloadHeader, NodeId nodeId,
-                                 RetransTableEntry ** rEntry);
+    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry);
     void StartRetransmision(RetransTableEntry * entry);
     void PauseRetransTable(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
     void ResumeRetransTable(ReliableMessageContext * rc);

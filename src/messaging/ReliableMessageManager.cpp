@@ -36,7 +36,7 @@
 namespace chip {
 namespace Messaging {
 
-ReliableMessageManager::RetransTableEntry::RetransTableEntry() : rc(nullptr), peerNodeId(0), nextRetransTimeTick(0), sendCount(0) {}
+ReliableMessageManager::RetransTableEntry::RetransTableEntry() : rc(nullptr), nextRetransTimeTick(0), sendCount(0) {}
 
 ReliableMessageManager::ReliableMessageManager(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
     mContextPool(contextPool), mSystemLayer(nullptr), mSessionMgr(nullptr), mCurrentTimerExpiry(0),
@@ -295,18 +295,13 @@ void ReliableMessageManager::Timeout(System::Layer * aSystemLayer, void * aAppSt
  *
  *  @param[in]    rc        A pointer to the ExchangeContext object.
  *
- *  @param[in]    header    A reference to the Payload Header for the CHIP message to be retransmitted.
- *
- *  @param[in]    nodeId    A peer Node ID of the CHIP message to be retransmitted.
- *
  *  @param[out]   rEntry    A pointer to a pointer of a retransmission table entry added into the table.
  *
  *  @retval  #CHIP_ERROR_RETRANS_TABLE_FULL If there is no empty slot left in the table for addition.
  *  @retval  #CHIP_NO_ERROR On success.
  *
  */
-CHIP_ERROR ReliableMessageManager::AddToRetransTable(ReliableMessageContext * rc, const PayloadHeader & header, NodeId nodeId,
-                                                     RetransTableEntry ** rEntry)
+CHIP_ERROR ReliableMessageManager::AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -321,11 +316,9 @@ CHIP_ERROR ReliableMessageManager::AddToRetransTable(ReliableMessageContext * rc
             // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
             ExpireTicks();
 
-            RetransTable[i].rc            = rc;
-            RetransTable[i].payloadHeader = header;
-            RetransTable[i].peerNodeId    = nodeId;
-            RetransTable[i].sendCount     = 0;
-            RetransTable[i].retainedBuf   = EncryptedPacketBufferHandle();
+            RetransTable[i].rc          = rc;
+            RetransTable[i].sendCount   = 0;
+            RetransTable[i].retainedBuf = EncryptedPacketBufferHandle();
 
             *rEntry = &RetransTable[i];
 
@@ -416,7 +409,7 @@ CHIP_ERROR ReliableMessageManager::SendFromRetransTable(RetransTableEntry * entr
 
     if (rc)
     {
-        err = mSessionMgr->SendMessage(entry->payloadHeader, entry->peerNodeId, std::move(entry->retainedBuf), &entry->retainedBuf);
+        err = mSessionMgr->SendMessage(std::move(entry->retainedBuf), &entry->retainedBuf);
 
         if (err == CHIP_NO_ERROR)
         {
