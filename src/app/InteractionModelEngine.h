@@ -55,7 +55,8 @@ typedef void (*CommandCbFunct)(chip::TLV::TLVReader & aReader, Command * apComma
 /**
  * @class InteractionModelEngine
  *
- * @brief This is a singleton hosting all CHIP IM unsolicitted message and manage IM related clients and handlers.
+ * @brief This is a singleton hosting all CHIP unsolicited message processing and managing interaction model related clients and
+ * handlers
  *
  */
 class InteractionModelEngine : public Messaging::ExchangeDelegate
@@ -97,20 +98,20 @@ public:
     /**
      * @brief Set the event back function and pointer to associated state object for SubscriptionEngine specific call backs
      *
-     * @param[in]  aAppState    A pointer to application layer supplied state object
+     * @param[in]  apAppState    A pointer to application layer supplied state object
      * @param[in]  aEvent       A function pointer for event call back
      * @param[in]  aInParam     A const reference to the input parameter for this event
      * @param[out] aOutParam    A reference to the output parameter for this event
      */
-    typedef void (*EventCallback)(void * const aAppState, EventID aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
+    typedef void (*EventCallback)(void * apAppState, EventID aEvent, const InEventParam & aInParam, OutEventParam & aOutParam);
 
     /**
      * @brief Set the event back function and pointer to associated state object for SubscriptionEngine specific call backs
      *
-     * @param[in]  aAppState  		A pointer to application layer supplied state object
+     * @param[in]  apAppState  		A pointer to application layer supplied state object
      * @param[in]  aEventCallback  	A function pointer for event call back
      */
-    void SetEventCallback(void * const aAppState, const EventCallback aEventCallback);
+    void SetEventCallback(void * apAppState, EventCallback aEventCallback);
 
     /**
      * @brief This is the default event handler to be called by application layer for any ignored or unrecognized event

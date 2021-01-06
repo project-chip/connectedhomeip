@@ -30,9 +30,16 @@
 
 namespace chip {
 namespace app {
+InteractionModelEngine sInteractionModelEngine;
+
 InteractionModelEngine::InteractionModelEngine() {}
 
-void InteractionModelEngine::SetEventCallback(void * const apAppState, const EventCallback aEventCallback)
+InteractionModelEngine * InteractionModelEngine::GetInstance()
+{
+    return &sInteractionModelEngine;
+}
+
+void InteractionModelEngine::SetEventCallback(void * apAppState, EventCallback aEventCallback)
 {
     mpAppState     = apAppState;
     mEventCallback = aEventCallback;
@@ -140,7 +147,6 @@ void InteractionModelEngine::OnInvokeCommandRequest(Messaging::ExchangeContext *
         inParam.Clear();
         outParam.Clear();
         outParam.mIncomingInvokeCommandRequest.mShouldContinueProcessing = true;
-        outParam.mIncomingInvokeCommandRequest.mShouldContinueProcessing = true;
         inParam.mIncomingInvokeCommandRequest.mpPacketHeader             = &aPacketHeader;
 
         mEventCallback(mpAppState, kEvent_OnIncomingInvokeCommandRequest, inParam, outParam);
@@ -216,16 +222,16 @@ CHIP_ERROR InteractionModelEngine::RegisterClusterCommandHandler(chip::ClusterId
     std::pair<HandlersMapType::iterator, bool> insertResult =
         mHandlersMap.insert(HandlersMapType::value_type(HandlerKey(aClusterId, aCommandId, aCommandRoleId), aDispatcher));
 
-    if (insertResult.second == false)
+    if (!insertResult.second)
     {
         err = CHIP_ERROR_INVALID_ARGUMENT;
     }
     else
     {
         ChipLogDetail(DataManagement,
-                      "%s: RegisterClusterCommandHandler registered handler for ClusterId = %d, CommandId = %d, CommandRoleId = "
+                      "RegisterClusterCommandHandler registered handler for ClusterId = %d, CommandId = %d, CommandRoleId = "
                       "%d, Dispatcher = %p",
-                      __FUNCTION__, aClusterId, aCommandId, aCommandRoleId, (void *) aDispatcher);
+                      aClusterId, aCommandId, aCommandRoleId, (void *) aDispatcher);
     }
 
     return err;
@@ -242,9 +248,9 @@ CHIP_ERROR InteractionModelEngine::DeregisterClusterCommandHandler(chip::Cluster
         CommandCbFunct pDispatcher = handlerIt->second;
 
         ChipLogDetail(DataManagement,
-                      "%s: DeregisterClusterCommandHandler unregistered handler for ClusterId = %d, CommandId = %d, CommandRoleId "
+                      "DeregisterClusterCommandHandler unregistered handler for ClusterId = %d, CommandId = %d, CommandRoleId "
                       "= %d, Dispatcher = %p",
-                      __FUNCTION__, aClusterId, aCommandId, aCommandRoleId, (void *) pDispatcher);
+                      aClusterId, aCommandId, aCommandRoleId, (void *) pDispatcher);
         mHandlersMap.erase(handlerIt);
     }
     else
@@ -262,8 +268,8 @@ void InteractionModelEngine::ProcessCommand(chip::ClusterId aClusterId, chip::Co
 
     handlerIt = mHandlersMap.find(HandlerKey(aClusterId, aCommandId, aCommandRoleId));
 
-    ChipLogDetail(DataManagement, "%s for ClusterId = %d, CommandId = %d, CommandRoleId = %d", __FUNCTION__, (int) (aClusterId),
-                  (int) (aCommandId), aCommandRoleId);
+    ChipLogDetail(DataManagement, "ClusterId = %d, CommandId = %d, CommandRoleId = %d", (int) (aClusterId), (int) (aCommandId),
+                  aCommandRoleId);
 
     if (handlerIt != mHandlersMap.end())
     {

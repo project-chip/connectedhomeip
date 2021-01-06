@@ -40,16 +40,6 @@
 
 #define IM_CLIENT_PORT (CHIP_PORT + 1)
 
-namespace chip {
-namespace app {
-InteractionModelEngine sInteractionModelEngine;
-InteractionModelEngine * InteractionModelEngine::GetInstance()
-{
-    return &sInteractionModelEngine;
-}
-} // namespace app
-} // namespace chip
-
 namespace {
 
 // Max value for the number of command request sent.

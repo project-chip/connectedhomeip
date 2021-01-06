@@ -39,16 +39,6 @@
 #include <transport/SecureSessionMgr.h>
 #include <transport/raw/UDP.h>
 
-namespace chip {
-namespace app {
-InteractionModelEngine sInteractionModelEngine;
-InteractionModelEngine * InteractionModelEngine::GetInstance()
-{
-    return &sInteractionModelEngine;
-}
-} // namespace app
-} // namespace chip
-
 namespace {
 
 // The CommandHandler object
