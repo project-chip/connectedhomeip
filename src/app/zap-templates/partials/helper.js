@@ -15,7 +15,25 @@
  *    limitations under the License.
  */
 
-// Prevent multiple inclusion
-#pragma once
+function pad(label, len, ch = ' ')
+{
+  return label.padEnd(len, ch);
+}
 
-#include "af-types.h"
+function concat()
+{
+  let str = ''
+  for (let arg in arguments)
+  {
+    if (typeof arguments[arg] != 'object') {
+      str += arguments[arg];
+    }
+  }
+  return str
+}
+
+//
+// Module exports
+//
+exports.pad    = pad;
+exports.concat = concat;

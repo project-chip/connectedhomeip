@@ -1,6 +1,6 @@
-{{chip_header}}
+{{> header}}
 
 // Prevent multiple inclusion
 #pragma once
 
-#include "af-types.h"
+// TODO issue #3637
