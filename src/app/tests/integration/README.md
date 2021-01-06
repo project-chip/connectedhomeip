@@ -16,13 +16,6 @@ After constructing a CHIP ExchangeContext, CHIP messages are sent and received
 using the ChipMessageLayer class which sends the CHIP message over a chosen
 transport (TCP, UDP, or CRMP).
 
-## Building
-
-./gn_build.sh
-
--   After the applications are built, it can be found in the build directory as
-    `out/debug/linux_x64_clang/chip-im-requester and out/debug/linux_x64_clang/chip-im-responder`
-
 ## Example Applications Walk Through
 
 As part of this example, we have a ChipImInitiator program that acts as the
