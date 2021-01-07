@@ -225,8 +225,11 @@ private:
     SecureSessionMgrDelegate * mCB   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
 
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted);
+    CHIP_ERROR EncryptMessage(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                              NodeId peerNodeId, System::PacketBufferHandle & msgBuf);
+
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, PacketHeader & packetHeader, NodeId peerNodeId,
+                           System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
