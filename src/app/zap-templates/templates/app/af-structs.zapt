@@ -1,0 +1,24 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+#include <stdint.h>
+#include "basic-types.h"
+#include "enums.h"
+
+{{#zcl_structs}}
+
+{{#if itemCnt}}
+// Struct for {{label}}
+typedef struct _{{asType label}} {
+{{#zcl_struct_items}}
+{{ident}}{{asChipUnderlyingType label type}} {{asSymbol label}};
+{{/zcl_struct_items}}
+} {{asUnderlyingType label}};
+{{else}}
+// Void typedef for {{asUnderlyingType label}} which is empty.
+// this will result in all the references to the data being as uint8_t*
+typedef uint8_t {{asUnderlyingType label}};
+{{/if}}
+{{/zcl_structs}}

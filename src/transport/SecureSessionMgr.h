@@ -98,20 +98,10 @@ public:
      */
     virtual void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
 
-    /**
-     * @brief
-     *   Called when the peer address is resolved from NodeID.
-     *
-     * @param error   The resolution resolve error code
-     * @param nodeId  The node ID resolved, 0 on error
-     * @param mgr     A pointer to the SecureSessionMgr
-     */
-    virtual void OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgr * mgr) {}
-
     virtual ~SecureSessionMgrDelegate() {}
 };
 
-class DLL_EXPORT SecureSessionMgr : public Mdns::ResolveDelegate, public TransportMgrDelegate
+class DLL_EXPORT SecureSessionMgr : public TransportMgrDelegate
 {
 public:
     /**
@@ -204,8 +194,6 @@ private:
      * Callback for timer expiry check
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
-
-    void HandleNodeIdResolve(CHIP_ERROR error, NodeId nodeId, const Mdns::MdnsService & service) override;
 };
 
 } // namespace chip

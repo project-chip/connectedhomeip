@@ -35,7 +35,6 @@
 #endif
 
 #include "TestInetCommon.h"
-#include "LogUtils.h"
 
 #include <vector>
 
