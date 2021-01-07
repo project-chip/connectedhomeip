@@ -147,8 +147,8 @@ opposite one.
 **Button 3** &mdash; Pressing the button once starts the Thread networking in
 the test mode using the default configuration.
 
-**Button 4** &mdash; Pressing the button once starts the NFC tag emulation
-and enables Bluetooth LE advertising for the predefined period of time.
+**Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
+enables Bluetooth LE advertising for the predefined period of time.
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
