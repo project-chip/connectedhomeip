@@ -37,6 +37,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
+#include <protocols/common/CommonProtocol.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemTimer.h>
 
@@ -97,6 +98,29 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     // Set the message type for this header.
     payloadHeader.SetMessageType(msgType);
 
+    payloadHeader.SetInitiator(IsInitiator());
+
+    // If auto-request ACK feature is enabled, automatically request an acknowledgment,
+    // UNLESS the NoAutoRequestAck send flag has been specified.
+    if (mReliableMessageContext.AutoRequestAck() && !sendFlags.Has(SendMessageFlags::kSendFlag_NoAutoRequestAck))
+    {
+        payloadHeader.SetNeedsAck(true);
+    }
+
+    // If there is a pending acknowledgment piggyback it on this message.
+    if (mReliableMessageContext.HasPeerRequestedAck())
+    {
+        payloadHeader.SetAckId(mReliableMessageContext.mPendingPeerAckId);
+
+        // Set AckPending flag to false since current outgoing message is going to serve as the ack on this exchange.
+        mReliableMessageContext.SetAckPending(false);
+
+#if !defined(NDEBUG)
+        ChipLogProgress(ExchangeManager, "Piggybacking Ack for MsgId:%08" PRIX32 " with msg",
+                        mReliableMessageContext.mPendingPeerAckId);
+#endif
+    }
+
     // If a response message is expected...
     if (sendFlags.Has(SendMessageFlags::kSendFlag_ExpectResponse))
     {
@@ -113,10 +137,33 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
         }
     }
 
-    payloadHeader.SetInitiator(IsInitiator());
+    // Send the message.
+    if (payloadHeader.IsNeedsAck())
+    {
+        ReliableMessageManager::RetransTableEntry * entry = nullptr;
 
-    err = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, std::move(msgBuf));
-    SuccessOrExit(err);
+        // Add to Table for subsequent sending
+        err = mExchangeMgr->GetReliableMessageMgr()->AddToRetransTable(&mReliableMessageContext, &entry);
+        SuccessOrExit(err);
+
+        err = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, std::move(msgBuf), &entry->retainedBuf);
+
+        if (err != CHIP_NO_ERROR)
+        {
+            // Remove from table
+            ChipLogError(ExchangeManager, "Failed to send message to 0x%" PRIx64 " with err %ld", mPeerNodeId, long(err));
+            mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(*entry);
+        }
+        else
+        {
+            mExchangeMgr->GetReliableMessageMgr()->StartRetransmision(entry);
+        }
+    }
+    else
+    {
+        err = mExchangeMgr->GetSessionMgr()->SendMessage(payloadHeader, mPeerNodeId, std::move(msgBuf));
+        SuccessOrExit(err);
+    }
 
 exit:
     if (err != CHIP_NO_ERROR && IsResponseExpected())
@@ -143,6 +190,19 @@ void ExchangeContext::DoClose(bool clearRetransTable)
         mDelegate->OnExchangeClosing(this);
     }
     mDelegate = nullptr;
+
+    // Closure of an exchange context is based on ref counting. The Protocol, when it calls DoClose(), indicates that
+    // it is done with the exchange context and the message layer sets all callbacks to NULL and does not send anything
+    // received on the exchange context up to higher layers.  At this point, the message layer needs to handle the
+    // remaining work to be done on that exchange, (e.g. send all pending acks) before truly cleaning it up.
+    mReliableMessageContext.FlushAcks();
+
+    // In case the protocol wants a harder release of the EC right away, such as calling Abort(), exchange
+    // needs to clear the CRMP retransmission table immediately.
+    if (clearRetransTable)
+    {
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(&mReliableMessageContext);
+    }
 
     // Cancel the response timer.
     CancelResponseTimer();
@@ -192,7 +252,6 @@ void ExchangeContext::Reset()
 ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
                                          ExchangeDelegate * delegate)
 {
-    VerifyOrDie(delegate != nullptr);
     VerifyOrDie(mExchangeMgr == nullptr && GetReferenceCount() == 0);
 
     Reset();
@@ -203,6 +262,8 @@ ExchangeContext * ExchangeContext::Alloc(ExchangeManager * em, uint16_t Exchange
     mPeerNodeId = PeerNodeId;
     mFlags.Set(ExFlagValues::kFlagInitiator, Initiator);
     mDelegate = delegate;
+
+    mReliableMessageContext.Init(em->GetReliableMessageMgr(), this);
 
 #if defined(CHIP_EXCHANGE_CONTEXT_DETAIL_LOGGING)
     ChipLogProgress(ExchangeManager, "ec++ id: %d, inUse: %d, addr: 0x%x", (this - em->ContextPool + 1), em->GetContextsInUse(),
@@ -297,6 +358,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
                                           PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
+    uint32_t messageId  = 0;
     uint16_t protocolId = 0;
     uint8_t messageType = 0;
 
@@ -306,25 +368,56 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
     // layer has completed its work on the ExchangeContext.
     Retain();
 
+    messageId   = packetHeader.GetMessageId();
     protocolId  = payloadHeader.GetProtocolID();
     messageType = payloadHeader.GetMessageType();
 
-    // Since we got the response, cancel the response timer.
-    CancelResponseTimer();
-
-    // If the context was expecting a response to a previously sent message, this message
-    // is implicitly that response.
-    SetResponseExpected(false);
-
-    if (mDelegate != nullptr)
+    if (payloadHeader.IsAckMsg())
     {
-        mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
+        err = mReliableMessageContext.HandleRcvdAck(payloadHeader.GetAckId().Value());
+        SuccessOrExit(err);
+    }
+
+    if (payloadHeader.IsNeedsAck())
+    {
+        MessageFlags msgFlags;
+
+        // An acknowledgment needs to be sent back to the peer for this message on this exchange,
+        // Set the flag in message header indicating an ack requested by peer;
+        msgFlags.Set(MessageFlagValues::kMessageFlag_PeerRequestedAck);
+
+        // Also set the flag in the exchange context indicating an ack requested;
+        mReliableMessageContext.SetPeerRequestedAck(true);
+
+        err = mReliableMessageContext.HandleNeedsAck(messageId, msgFlags);
+        SuccessOrExit(err);
+    }
+
+    //  The Common::Null message type is only used for CRMP; do not pass such messages to the application layer.
+    if ((protocolId == Protocols::kProtocol_Protocol_Common) && (messageType == Protocols::Common::kMsgType_Null))
+    {
+        ExitNow(err = CHIP_NO_ERROR);
     }
     else
     {
-        DefaultOnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
+        // Since we got the response, cancel the response timer.
+        CancelResponseTimer();
+
+        // If the context was expecting a response to a previously sent message, this message
+        // is implicitly that response.
+        SetResponseExpected(false);
+
+        if (mDelegate != nullptr)
+        {
+            mDelegate->OnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
+        }
+        else
+        {
+            DefaultOnMessageReceived(this, packetHeader, protocolId, messageType, std::move(msgBuf));
+        }
     }
 
+exit:
     // Release the reference to the ExchangeContext that was held at the beginning of this function.
     // This call should also do the needful of closing the ExchangeContext if the protocol has
     // already made a prior call to Close().
