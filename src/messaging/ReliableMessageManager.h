@@ -23,8 +23,10 @@
 
 #pragma once
 
+#include <array>
 #include <stdint.h>
 
+#include <messaging/ExchangeContext.h>
 #include <messaging/ReliableMessageProtocolConfig.h>
 
 #include <core/CHIPError.h>
@@ -57,32 +59,27 @@ public:
     {
         RetransTableEntry();
 
-        ReliableMessageContext * rc;       /**< The context for the stored CHIP message. */
-        System::PacketBufferHandle msgBuf; /**< A handle to the PacketBuffer object holding the CHIP message. */
-        uint32_t msgId;                    /**< The message identifier of the CHIP message awaiting acknowledgment. */
-        uint16_t msgSendFlags;
-        uint16_t nextRetransTimeTick; /**< A counter representing the next retransmission time for the message. */
-        uint8_t sendCount;            /**< A counter representing the number of times the message has been sent. */
+        ReliableMessageContext * rc;             /**< The context for the stored CHIP message. */
+        EncryptedPacketBufferHandle retainedBuf; /**< The PacketBuffer object holding the CHIP message. */
+        uint16_t nextRetransTimeTick;            /**< A counter representing the next retransmission time for the message. */
+        uint8_t sendCount;                       /**< A counter representing the number of times the message has been sent. */
     };
 
 public:
-    ReliableMessageManager();
+    ReliableMessageManager(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool);
     ~ReliableMessageManager();
 
-    void Init(chip::System::Layer & system) { mSystemLayer = &system; }
-    void Shutdown() {}
-
-    void FreeContext(ReliableMessageContext * rc);
+    void Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr);
+    void Shutdown();
 
     uint64_t GetTickCounterFromTimePeriod(uint64_t period);
     uint64_t GetTickCounterFromTimeDelta(uint64_t newTime);
 
     void ExecuteActions();
-    void ProcessDelayedDeliveryMessage(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
     static void Timeout(System::Layer * aSystemLayer, void * aAppState, System::Error aError);
 
-    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, System::PacketBufferHandle msgBuf, uint32_t messageId,
-                                 uint16_t msgSendFlags, RetransTableEntry ** rEntry);
+    CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry);
+    void StartRetransmision(RetransTableEntry * entry);
     void PauseRetransTable(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
     void ResumeRetransTable(ReliableMessageContext * rc);
     bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t msgId);
@@ -99,14 +96,10 @@ public:
     int TestGetCountRetransTable();
     void TestSetIntervalShift(uint16_t value) { mTimerIntervalShift = value; }
 
-public:
-    // public functions for ReliableMessageProtocol internal usage
-    CHIP_ERROR SendMessage(ReliableMessageContext * context, System::PacketBufferHandle msgBuf, uint16_t sendFlags);
-    CHIP_ERROR SendMessage(ReliableMessageContext * context, uint32_t profileId, uint8_t msgType, System::PacketBufferHandle msgBuf,
-                           BitFlags<uint16_t, SendMessageFlags> sendFlags);
-
 private:
+    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & mContextPool;
     chip::System::Layer * mSystemLayer;
+    SecureSessionMgr * mSessionMgr;
     uint64_t mTimeStampBase;                  // ReliableMessageProtocol timer base value to add offsets to evaluate timeouts
     System::Timer::Epoch mCurrentTimerExpiry; // Tracks when the ReliableMessageProtocol timer will next expire
     uint16_t mTimerIntervalShift;             // ReliableMessageProtocol Timer tick period shift
@@ -114,7 +107,12 @@ private:
     /* Placeholder function to run a function for all exchanges */
     template <typename Function>
     void ExecuteForAllContext(Function function)
-    {}
+    {
+        for (auto & ec : mContextPool)
+        {
+            function(ec.GetReliableMessageContext());
+        }
+    }
 
     void TicklessDebugDumpRetransTable(const char * log);
 
