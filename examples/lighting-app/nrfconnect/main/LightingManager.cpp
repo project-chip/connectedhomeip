@@ -19,10 +19,12 @@
 #include "LightingManager.h"
 
 #include "AppConfig.h"
-#include "LogUtils.h"
 
 #include <drivers/pwm.h>
+#include <logging/log.h>
 #include <zephyr.h>
+
+LOG_MODULE_DECLARE(app);
 
 LightingManager LightingManager::sLight;
 
@@ -38,7 +40,7 @@ int LightingManager::Init(const char * pwmDeviceName, uint32_t pwmChannel)
 
     if (!mPwmDevice)
     {
-        LOG_ERR("Cannot find PWM device %s", LOG_STRDUP(pwmDeviceName));
+        LOG_ERR("Cannot find PWM device %s", log_strdup(pwmDeviceName));
         return -ENODEV;
     }
 
