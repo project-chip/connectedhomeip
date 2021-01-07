@@ -522,6 +522,11 @@ uint8_t emberAfGetAttributeAnalogOrDiscreteType(uint8_t dataType);
 bool emberAfIsTypeSigned(EmberAfAttributeType dataType);
 
 /**
+ * @brief Function that extracts a 64-bit integer from the message buffer
+ */
+uint64_t emberAfGetInt64u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);
+
+/**
  * @brief Function that extracts a 32-bit integer from the message buffer
  */
 uint32_t emberAfGetInt32u(const uint8_t * message, uint16_t currentIndex, uint16_t msgLen);

@@ -35,11 +35,11 @@ namespace Messaging {
  *
  *  @brief
  *    The default ReliableMessageProtocol timer tick interval shift in
- *    milliseconds. 8 bit equals 256 milliseconds
+ *    milliseconds. 6 bit equals 64 milliseconds
  *
  */
 #ifndef CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
-#define CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT 8
+#define CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT 6
 #endif // CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT
 
 /**

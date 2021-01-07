@@ -612,6 +612,15 @@ public:
     // The caller has access but no ownership.
     PacketBuffer * Get_ForNow() const { return mBuffer; }
 
+    /**
+     * Creates a copy of the data in this packet.
+     *
+     * Does NOT support chained buffers.
+     *
+     * @returns empty handle on allocation failure.
+     */
+    PacketBufferHandle CloneData();
+
 private:
     PacketBufferHandle(const PacketBufferHandle &) = delete;
     PacketBufferHandle & operator=(const PacketBufferHandle &) = delete;

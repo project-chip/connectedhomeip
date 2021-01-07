@@ -17,7 +17,7 @@ import("//build_overrides/pigweed.gni")
 
 import("$dir_pw_build/target_types.gni")
 config("default_config") {
-  include_dirs = [ "include" ]
+  include_dirs = [ "public" ]
 }
 
 pw_source_set("pw_sys_io_nrfconnect") {

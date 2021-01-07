@@ -27,6 +27,7 @@
 #include "AndroidBlePlatformDelegate.h"
 #include "AndroidDeviceControllerWrapper.h"
 
+#include <app/chip-zcl-zpro-codec.h>
 #include <ble/BleUUID.h>
 #include <controller/CHIPDeviceController_deprecated.h>
 #include <jni.h>
@@ -37,10 +38,6 @@
 #include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
-
-extern "C" {
-#include <app/chip-zcl-zpro-codec.h>
-} // extern "C"
 
 // Choose an approximation of PTHREAD_NULL if pthread.h doesn't define one.
 #ifndef PTHREAD_NULL
@@ -429,10 +426,29 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
 
     {
         ScopedPthreadLock lock(&sStackLock);
+        System::PacketBufferHandle buffer;
 
-        // Make sure our buffer is big enough, but this will need a better setup!
-        static const size_t bufferSize    = 1024;
-        System::PacketBufferHandle buffer = System::PacketBuffer::NewWithAvailableSize(bufferSize);
+        // Hardcode endpoint to 1 for now
+        uint8_t endpoint = 1;
+
+        switch (commandID)
+        {
+        case 0:
+            buffer = encodeOnOffClusterOffCommand(endpoint);
+            break;
+        case 1:
+            buffer = encodeOnOffClusterOnCommand(endpoint);
+            break;
+        case 2:
+            buffer = encodeOnOffClusterToggleCommand(endpoint);
+            break;
+        case 3:
+            buffer = encodeLevelControlClusterMoveToLevelCommand(endpoint, (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
+            break;
+        default:
+            ChipLogError(Controller, "Unknown command: %d", commandID);
+            return;
+        }
 
         if (buffer.IsNull())
         {
@@ -440,32 +456,6 @@ JNI_METHOD(void, beginSendCommand)(JNIEnv * env, jobject self, jlong handle, job
         }
         else
         {
-            // Hardcode endpoint to 1 for now
-            uint8_t endpoint = 1;
-
-            uint16_t dataLength = 0;
-            switch (commandID)
-            {
-            case 0:
-                dataLength = encodeOnOffClusterOffCommand(buffer->Start(), bufferSize, endpoint);
-                break;
-            case 1:
-                dataLength = encodeOnOffClusterOnCommand(buffer->Start(), bufferSize, endpoint);
-                break;
-            case 2:
-                dataLength = encodeOnOffClusterToggleCommand(buffer->Start(), bufferSize, endpoint);
-                break;
-            case 3:
-                dataLength = encodeLevelControlClusterMoveToLevelCommand(buffer->Start(), bufferSize, endpoint,
-                                                                         (uint8_t)(aValue & 0xff), 0xFFFF, 0, 0);
-                break;
-            default:
-                ChipLogError(Controller, "Unknown command: %d", commandID);
-                return;
-            }
-
-            buffer->SetDataLength(dataLength);
-
             // Hardcode endpoint to 1 for now
             err = wrapper->Controller()->SendMessage((void *) "SendMessage", std::move(buffer));
         }

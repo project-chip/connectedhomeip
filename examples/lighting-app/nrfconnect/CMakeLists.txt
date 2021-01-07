@@ -16,23 +16,25 @@
 cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
-get_filename_component(CHIP_APP_SERVER ${CHIP_ROOT}/examples/common/chip-app-server REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(LIGHTING_COMMON ${CHIP_ROOT}/examples/lighting-app/lighting-common REALPATH)
 
-set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/sample-defaults.conf prj.conf)
-set(CHIP_OPENTHREAD_CONFIG ${NRFCONNECT_COMMON}/project_include/OpenThreadConfig.h)
+set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
-include(nrfconnect-app)
+include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
 
 project(chip-nrf52840-lighting-example)
-target_include_directories(app PRIVATE main/include ${LIGHTING_COMMON} ${NRFCONNECT_COMMON}/util/include ${NRFCONNECT_COMMON}/app/include ${CHIP_APP_SERVER}/include)
+
+target_include_directories(app PRIVATE 
+                           main/include 
+                           ${LIGHTING_COMMON} 
+                           ${NRFCONNECT_COMMON}/util/include 
+                           ${NRFCONNECT_COMMON}/app/include)
+
 target_sources(app PRIVATE
                main/AppTask.cpp
                main/LightingManager.cpp
                main/main.cpp
-               main/Rpc.cpp
                main/ZclCallbacks.cpp
                ${LIGHTING_COMMON}/gen/call-command-handler.cpp
                ${LIGHTING_COMMON}/gen/callback-stub.cpp
@@ -40,10 +42,7 @@ target_sources(app PRIVATE
                ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${NRFCONNECT_COMMON}/app/Service.cpp
-               ${CHIP_APP_SERVER}/DataModelHandler.cpp
-               ${CHIP_APP_SERVER}/Server.cpp
-               ${CHIP_APP_SERVER}/QRCodeUtil.cpp
-               ${CHIP_APP_SERVER}/RendezvousServer.cpp
+               ${CHIP_ROOT}/src/app/server/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp
@@ -83,12 +82,20 @@ pw_proto_library(pigweed_lighting_protolib
     main/pigweed_lighting.proto
 )
 
+target_sources(app PRIVATE
+  main/Rpc.cpp
+  ${NRFCONNECT_COMMON}/util/PigweedLogger.cpp
+)
+
+target_include_directories(app PRIVATE
+  ${ZEPHYR_BASE}/subsys // required to get access to `log_output_std.h`
+)
+
 target_link_libraries(app PRIVATE
-   pigweed_lighting_protolib.nanopb_rpc
-   pw_hdlc_lite
-    pw_log
-    pw_rpc.nanopb.echo_service
-    pw_rpc.server
+  pigweed_lighting_protolib.nanopb_rpc
+  pw_hdlc_lite
+  pw_log
+  pw_rpc.server
 )
 
 endif(CONFIG_CHIP_PW_RPC)

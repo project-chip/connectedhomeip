@@ -16,18 +16,21 @@
 cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
-get_filename_component(CHIP_APP_SERVER ${CHIP_ROOT}/examples/common/chip-app-server REALPATH)
 get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 get_filename_component(LOCK_COMMON ${CHIP_ROOT}/examples/lock-app/lock-common REALPATH)
 
-set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/sample-defaults.conf prj.conf)
-set(CHIP_OPENTHREAD_CONFIG ${NRFCONNECT_COMMON}/project_include/OpenThreadConfig.h)
+set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
-include(nrfconnect-app)
+include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
 
 project(chip-nrf52840-lock-example)
-target_include_directories(app PRIVATE main/include ${LOCK_COMMON} ${NRFCONNECT_COMMON}/util/include ${NRFCONNECT_COMMON}/app/include ${CHIP_APP_SERVER}/include)
+
+target_include_directories(app PRIVATE 
+                           main/include 
+                           ${LOCK_COMMON} 
+                           ${NRFCONNECT_COMMON}/util/include 
+                           ${NRFCONNECT_COMMON}/app/include)
+
 target_sources(app PRIVATE
                main/AppTask.cpp
                main/BoltLockManager.cpp
@@ -39,10 +42,7 @@ target_sources(app PRIVATE
                ${NRFCONNECT_COMMON}/util/NFCWidget.cpp
                ${NRFCONNECT_COMMON}/util/ThreadUtil.cpp
                ${NRFCONNECT_COMMON}/app/Service.cpp
-               ${CHIP_APP_SERVER}/DataModelHandler.cpp
-               ${CHIP_APP_SERVER}/Server.cpp
-               ${CHIP_APP_SERVER}/QRCodeUtil.cpp
-               ${CHIP_APP_SERVER}/RendezvousServer.cpp
+               ${CHIP_ROOT}/src/app/server/DataModelHandler.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting-default-configuration.cpp
                ${CHIP_ROOT}/src/app/reporting/reporting.cpp
                ${CHIP_ROOT}/src/app/util/af-event.cpp

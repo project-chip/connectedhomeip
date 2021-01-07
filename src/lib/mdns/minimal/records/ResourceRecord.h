@@ -35,6 +35,8 @@ public:
 
     virtual ~ResourceRecord() {}
 
+    ResourceRecord & operator=(const ResourceRecord & other) = default;
+
     const FullQName & GetName() const { return mQName; }
     QClass GetClass() const { return QClass::IN; }
     QType GetType() const { return mType; }
@@ -57,9 +59,9 @@ protected:
     ResourceRecord(QType type, FullQName name) : mType(type), mQName(name) {}
 
 private:
-    const QType mType;
+    QType mType;
     uint64_t mTtl = kDefaultTtl;
-    const FullQName mQName;
+    FullQName mQName;
 };
 
 } // namespace Minimal

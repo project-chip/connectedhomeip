@@ -1,0 +1,30 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+{{#zcl_command_tree}}
+
+/** @brief Command description for {{label}}
+ *
+ * Command: {{label}}
+{{#zcl_command_arguments}}
+ * @param {{name}} {{type}} {{toggle isArray '[]' ''}}{{toggle hasLength '
+ * @param ' ''}}{{toggle hasLength nameLength ''}}{{toggle hasLength ' int' ''}}
+{{/zcl_command_arguments}}
+ */
+#define emberAfFillCommand{{clientMacroName}}({{toggle isGlobal 'clusterId,' ''}} \
+{{#zcl_command_arguments}}
+  {{name}}{{toggle hasLength ', ' ''}}{{toggle hasLength nameLength ''}}{{#not_last}},{{/not_last}} \
+{{/zcl_command_arguments}}
+) \
+  emberAfFillExternalBuffer( \
+    mask, \
+    {{toggle isGlobal 'clusterId, ' ''}} \
+    ZCL_{{asDelimitedMacro label}}_COMMAND_ID, \
+    "{{argsstring}}", \
+{{#zcl_command_arguments}}
+    {{name}}{{toggle hasLength ', ' ''}}{{toggle hasLength nameLength ''}}{{#not_last}},{{/not_last}} \
+{{/zcl_command_arguments}}
+  );
+{{/zcl_command_tree}}

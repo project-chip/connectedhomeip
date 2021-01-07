@@ -17,15 +17,17 @@ cmake_minimum_required(VERSION 3.13.1)
 
 get_filename_component(CHIP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/third_party/connectedhomeip REALPATH)
 get_filename_component(APP_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/.. REALPATH)
-get_filename_component(NRFCONNECT_COMMON ${CHIP_ROOT}/examples/platform/nrfconnect REALPATH)
 
-set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/sample-defaults.conf prj.conf)
-set(CHIP_OPENTHREAD_CONFIG ${NRFCONNECT_COMMON}/project_include/OpenThreadConfig.h)
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CHIP_ROOT}/config/nrfconnect/)
-include(nrfconnect-app)
+set(CONF_FILE ${CHIP_ROOT}/config/nrfconnect/app/sample-defaults.conf prj.conf)
+
+include(${CHIP_ROOT}/config/nrfconnect/app/app.cmake)
 
 project(chip-nrf52840-shell-example)
-target_include_directories(app PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${APP_ROOT}/shell_common/include)
+
+target_include_directories(app PRIVATE
+                           ${CMAKE_CURRENT_SOURCE_DIR}
+                           ${APP_ROOT}/shell_common/include)
+
 target_sources(app PRIVATE
     ${APP_ROOT}/shell_common/cmd_base64.cpp
     ${APP_ROOT}/shell_common/cmd_device.cpp

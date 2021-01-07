@@ -44,6 +44,12 @@ void emberAfPostAttributeChangeCallback(EndpointId endpoint, ClusterId clusterId
                                         uint16_t manufacturerCode, uint8_t type, uint8_t size, uint8_t * value)
 {}
 
+bool emberAfBasicClusterMfgSpecificPingCallback(void)
+{
+    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
+    return true;
+}
+
 int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;

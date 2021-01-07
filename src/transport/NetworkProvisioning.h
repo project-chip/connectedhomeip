@@ -48,7 +48,7 @@ public:
      * @param msgBuf the new message that should be sent to the peer
      * @return CHIP_ERROR Error thrown when sending the message
      */
-    virtual CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBuffer * msgBuf)
+    virtual CHIP_ERROR SendSecureMessage(Protocols::CHIPProtocolId protocol, uint8_t msgType, System::PacketBufferHandle msgBuf)
     {
         return CHIP_NO_ERROR;
     }
