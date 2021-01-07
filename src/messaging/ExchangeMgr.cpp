@@ -60,7 +60,7 @@ namespace Messaging {
  *    prior to use.
  *
  */
-ExchangeManager::ExchangeManager() : mReliableMessageMgr(ContextPool)
+ExchangeManager::ExchangeManager() : mReliableMessageMgr(mContextPool)
 {
     mState = State::kState_NotInitialized;
 }
@@ -110,7 +110,7 @@ ExchangeContext * ExchangeManager::NewContext(const NodeId & peerNodeId, Exchang
 
 ExchangeContext * ExchangeManager::FindContext(NodeId peerNodeId, ExchangeDelegate * delegate, bool isInitiator)
 {
-    for (auto & ec : ContextPool)
+    for (auto & ec : mContextPool)
     {
         if (ec.GetReferenceCount() > 0 && ec.GetPeerNodeId() == peerNodeId && ec.GetDelegate() == delegate &&
             ec.IsInitiator() == isInitiator)
@@ -150,7 +150,7 @@ ExchangeContext * ExchangeManager::AllocContext(uint16_t ExchangeId, uint64_t Pe
 {
     CHIP_FAULT_INJECT(FaultInjection::kFault_AllocExchangeContext, return nullptr);
 
-    for (auto & ec : ContextPool)
+    for (auto & ec : mContextPool)
     {
         if (ec.GetReferenceCount() == 0)
         {
@@ -171,7 +171,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
     bool sendAckAndCloseExchange            = false;
 
     // Search for an existing exchange that the message applies to. If a match is found...
-    for (auto & ec : ContextPool)
+    for (auto & ec : mContextPool)
     {
         if (ec.GetReferenceCount() > 0 && ec.MatchExchange(packetHeader, payloadHeader))
         {
@@ -245,7 +245,7 @@ void ExchangeManager::DispatchMessage(const PacketHeader & packetHeader, const P
 
         VerifyOrExit(ec != nullptr, err = CHIP_ERROR_NO_MEMORY);
 
-        ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - ContextPool.begin(), ec->GetExchangeId(),
+        ChipLogProgress(ExchangeManager, "ec pos: %d, id: %d, Delegate: 0x%x", ec - mContextPool.begin(), ec->GetExchangeId(),
                         ec->GetDelegate());
 
         ec->HandleMessage(packetHeader, payloadHeader, std::move(msgBuf));
@@ -319,7 +319,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
 void ExchangeManager::OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr)
 {
-    for (auto & ec : ContextPool)
+    for (auto & ec : mContextPool)
     {
         if (ec.GetReferenceCount() > 0 && ec.GetPeerNodeId() == state->GetPeerNodeId())
         {

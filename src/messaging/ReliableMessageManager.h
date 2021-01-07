@@ -117,7 +117,7 @@ private:
     void TicklessDebugDumpRetransTable(const char * log);
 
     // ReliableMessageProtocol Global tables for timer context
-    RetransTableEntry RetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
+    RetransTableEntry mRetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
 };
 
 } // namespace Messaging
