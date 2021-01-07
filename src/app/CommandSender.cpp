@@ -47,7 +47,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId)
 
     err = mpExchangeCtx->SendMessage(Protocols::kProtocol_InteractionModel, kMsgType_InvokeCommandRequest,
                                      std::move(mCommandMessageBuf),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_ExpectResponse));
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(kState_Sending);
 

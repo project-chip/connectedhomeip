@@ -265,7 +265,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     gSendMessageCount = 0;
 
     err = exchange->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(buffer),
-                                Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
+                                Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit
