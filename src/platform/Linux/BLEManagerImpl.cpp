@@ -63,7 +63,6 @@ CHIP_ERROR BLEManagerImpl::_Init()
     err = BleLayer::Init(this, this, this, &SystemLayer);
     SuccessOrExit(err);
 
-    // TODO: for chip-tool set mIsCentral   = true;
     mServiceMode = ConnectivityManager::kCHIPoBLEServiceMode_Enabled;
     mFlags       = (CHIP_DEVICE_CONFIG_CHIPOBLE_ENABLE_ADVERTISING_AUTOSTART && !mIsCentral) ? kFlag_AdvertisingEnabled : 0;
     mAppState    = nullptr;
