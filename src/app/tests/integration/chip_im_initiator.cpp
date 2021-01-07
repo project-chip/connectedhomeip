@@ -83,7 +83,7 @@ CHIP_ERROR SendCommandRequest(void)
 
     gLastCommandTime = chip::System::Timer::GetCurrentEpoch();
 
-    printf("\nSend invoke command request message to Node: %lu\n", chip::kTestDeviceNodeId);
+    printf("\nSend invoke command request message to Node: %" PRIu64 "\n", chip::kTestDeviceNodeId);
 
     chip::app::Command::CommandParams CommandParams = { 1,  // Endpoint
                                                         0,  // GroupId
