@@ -159,7 +159,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 
     rm->AddToRetransTable(rc, &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-    rm->ClearRetransmitTable(*entry);
+    rm->ClearRetransTable(*entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
 
@@ -199,7 +199,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     rm->AddToRetransTable(rc, &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     NL_TEST_ASSERT(inSuite, !delegate.SendErrorCalled);
-    rm->FailRetransmitTableEntries(rc, CHIP_NO_ERROR);
+    rm->FailRetransTableEntries(rc, CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
     NL_TEST_ASSERT(inSuite, delegate.SendErrorCalled);
 }
