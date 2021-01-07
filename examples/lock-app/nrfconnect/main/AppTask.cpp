@@ -113,13 +113,6 @@ int AppTask::Init()
     }
 
     PlatformMgr().AddEventHandler(AppTask::ThreadProvisioningHandler, 0);
-
-    ret = StartNFCTag();
-    if (ret)
-    {
-        LOG_ERR("Starting NFC Tag failed");
-        return ret;
-    }
 #endif
 
     return 0;
@@ -384,6 +377,22 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
 {
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
+
+    if (!sNFC.GetTagState())
+    {
+        if (!GetAppTask().StartNFCTag())
+        {
+            LOG_INF("Started NFC Tag emulation");
+        }
+        else
+        {
+            LOG_ERR("Starting NFC Tag failed");
+        }
+    }
+    else
+    {
+        LOG_INF("NFC Tag emulation is already started");
+    }
 
     if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
