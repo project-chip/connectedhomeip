@@ -52,10 +52,9 @@ private:
     // As a result of https://github.com/zephyrproject-rtos/zephyr/issues/29357, BLE indication
     // callback parameter type has changed in recent Zephyr revisions. Select the compatible type
     // below to support both versions for now.
-    using IndicationAttrType = std::conditional_t<
-        std::is_same<bt_gatt_indicate_func_t, void(*)(bt_conn*, bt_gatt_indicate_params*, uint8_t)>::value,
-        bt_gatt_indicate_params*,
-        const bt_gatt_attr*>;
+    using IndicationAttrType =
+        std::conditional_t<std::is_same<bt_gatt_indicate_func_t, void (*)(bt_conn *, bt_gatt_indicate_params *, uint8_t)>::value,
+                           bt_gatt_indicate_params *, const bt_gatt_attr *>;
 
     // ===== Members that implement the BLEManager internal interface.
 
