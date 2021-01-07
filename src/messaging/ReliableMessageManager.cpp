@@ -233,21 +233,11 @@ void ReliableMessageManager::ExpireTicks()
         }
     });
 
-    // Process Throttle Time
-    // Check Throttle timeout stored in EC to set/unset Throttle flag
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         ReliableMessageContext * rc = mRetransTable[i].rc;
         if (rc)
         {
-            // Process Retransmit Table
-            // Decrement Throttle timeout by elapsed timeticks
-            TickProceed(rc->mThrottleTimeoutTick, deltaTicks);
-#if defined(RMP_TICKLESS_DEBUG)
-            ChipLogProgress(ExchangeManager, "ReliableMessageManager::ExpireTicks set mThrottleTimeoutTick to %u",
-                            mRetransTable[i].nextRetransTimeTick);
-#endif
-
             // Decrement Retransmit timeout by elapsed timeticks
             TickProceed(mRetransTable[i].nextRetransTimeTick, deltaTicks);
 #if defined(RMP_TICKLESS_DEBUG)
@@ -530,16 +520,6 @@ void ReliableMessageManager::StartTimer()
         ReliableMessageContext * rc = mRetransTable[i].rc;
         if (rc)
         {
-            // When do we need to next wake up for throttle retransmission?
-            if (rc->mThrottleTimeoutTick != 0 && rc->mThrottleTimeoutTick < nextWakeTimeTick)
-            {
-                nextWakeTimeTick = rc->mThrottleTimeoutTick;
-                foundWake        = true;
-#if defined(RMP_TICKLESS_DEBUG)
-                ChipLogProgress(ExchangeManager, "ReliableMessageManager::StartTimer throttle timeout %u", nextWakeTimeTick);
-#endif
-            }
-
             // When do we need to next wake up for ReliableMessageProtocol retransmit?
             if (mRetransTable[i].nextRetransTimeTick < nextWakeTimeTick)
             {

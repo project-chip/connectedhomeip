@@ -39,7 +39,7 @@ namespace Messaging {
 
 ReliableMessageContext::ReliableMessageContext() :
     mManager(nullptr), mExchange(nullptr), mDelegate(nullptr), mConfig(gDefaultReliableMessageProtocolConfig), mNextAckTimeTick(0),
-    mThrottleTimeoutTick(0), mPendingPeerAckId(0)
+    mPendingPeerAckId(0)
 {}
 
 void ReliableMessageContext::Init(ReliableMessageManager * manager, ExchangeContext * exchange)
@@ -330,37 +330,6 @@ exit:
     // Schedule next physical wakeup
     mManager->StartTimer();
     return err;
-}
-
-CHIP_ERROR ReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
-{
-    // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-    mManager->ExpireTicks();
-
-    // Flow Control Message Received; Adjust Throttle timeout accordingly.
-    // A PauseTimeMillis of zero indicates that peer is unthrottling this Exchange.
-
-    if (0 != PauseTimeMillis)
-    {
-        mThrottleTimeoutTick =
-            static_cast<uint16_t>(mManager->GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch() + PauseTimeMillis));
-        mManager->PauseRetransTable(this, PauseTimeMillis);
-    }
-    else
-    {
-        mThrottleTimeoutTick = 0;
-        mManager->ResumeRetransTable(this);
-    }
-
-    // Call OnThrottleRcvd application callback
-    if (mDelegate)
-    {
-        mDelegate->OnThrottleRcvd(PauseTimeMillis);
-    }
-
-    // Schedule next physical wakeup
-    mManager->StartTimer();
-    return CHIP_NO_ERROR;
 }
 
 /**

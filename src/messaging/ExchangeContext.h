@@ -97,8 +97,6 @@ public:
      *                              with the message being sent.
 
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this SendMessage API.
-     *  @retval  #CHIP_ERROR_SEND_THROTTLED                 if this exchange context has been throttled when using the
-     *                                                       CHIP reliable messaging protocol.
      *  @retval  #CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE if there is a mismatch in the specific send operation and the
      *                                                       CHIP message protocol version that is supported.
      *  @retval  #CHIP_ERROR_NOT_CONNECTED                  if the context was associated with a connection that is now
