@@ -30,6 +30,7 @@
 #include <protocols/Protocols.h>
 #include <protocols/echo/Echo.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/tests/NetworkTestHelpers.h>
@@ -61,7 +62,7 @@ constexpr NodeId kDestinationNodeId = 111222333;
 
 int gSendMessageCount = 0;
 
-class LoopbackTransport : public Transport::Base
+class OutgoingTransport : public Transport::Base
 {
 public:
     /// Transports are required to have a constructor that takes exactly one argument
@@ -69,6 +70,15 @@ public:
 
     CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
+        const uint16_t headerSize = header.EncodeSizeBytes();
+
+        VerifyOrReturnError(msgBuf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
+
+        msgBuf->SetStart(msgBuf->Start() - headerSize);
+
+        uint16_t actualEncodedHeaderSize;
+        ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize));
+
         gSendMessageCount++;
 
         return CHIP_NO_ERROR;
@@ -121,7 +131,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    TransportMgr<LoopbackTransport> transportMgr;
+    TransportMgr<OutgoingTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
     CHIP_ERROR err;
 
@@ -158,7 +168,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
 
-    TransportMgr<LoopbackTransport> transportMgr;
+    TransportMgr<OutgoingTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
     CHIP_ERROR err;
 
@@ -212,7 +222,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     IPAddress::FromString("127.0.0.1", addr);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    TransportMgr<LoopbackTransport> transportMgr;
+    TransportMgr<OutgoingTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
 
     err = transportMgr.Init("LOOPBACK");
