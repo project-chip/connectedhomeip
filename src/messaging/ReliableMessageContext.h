@@ -69,7 +69,7 @@ public:
     uint64_t GetPeerNodeId();
     uint64_t GetCurrentRetransmitTimeoutTick();
 
-    CHIP_ERROR SendCommonNullMessage();
+    CHIP_ERROR SendStandaloneAckMessage();
 
     bool AutoRequestAck() const;
     void SetAutoRequestAck(bool autoReqAck);
