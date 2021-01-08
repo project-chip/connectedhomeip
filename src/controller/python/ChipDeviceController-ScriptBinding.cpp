@@ -46,14 +46,14 @@
 #include "ChipDeviceController-ScriptDevicePairingDelegate.h"
 #include "ChipDeviceController-StorageDelegate.h"
 
+#include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
 #include <controller/CHIPDeviceController_deprecated.h>
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
-#include <app/CommandSender.h>
-#include <app/InteractionModelEngine.h>
 
 using namespace chip;
 using namespace chip::Ble;
@@ -138,11 +138,13 @@ namespace app {
 // TODO: This function should not look like this, find a better way!
 CommandSender * GetCommandSender()
 {
-    if (sCommandSender != nullptr) {
+    if (sCommandSender != nullptr)
+    {
         return sCommandSender;
     }
     CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sCommandSender);
-    if (err != CHIP_NO_ERROR) {
+    if (err != CHIP_NO_ERROR)
+    {
         return nullptr;
     }
     return sCommandSender;

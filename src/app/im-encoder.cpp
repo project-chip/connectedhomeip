@@ -17,10 +17,10 @@
 
 #include "im-encoder.h"
 
-#include <app/util/basic-types.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/util/basic-types.h>
 #include <support/ErrorStr.h>
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
@@ -28,7 +28,6 @@
 namespace chip {
 namespace app {
 namespace cluster {
-
 
 namespace BarrierControl {
 
@@ -49,16 +48,18 @@ namespace BarrierControl {
 /*
  * Command BarrierControlGoToPercent
  */
-CHIP_ERROR EncodeBarrierControlGoToPercentCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t percentOpen)
+CHIP_ERROR EncodeBarrierControlGoToPercentCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                                  chip::GroupId ZCLgroupId, const uint8_t percentOpen)
 {
-    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, BarrierControl::kClusterId, BarrierControl::kBarrierControlGoToPercentCommandId,
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, BarrierControl::kClusterId,
+                                         BarrierControl::kBarrierControlGoToPercentCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // percentOpen: int8u
@@ -73,16 +74,18 @@ CHIP_ERROR EncodeBarrierControlGoToPercentCommand(chip::app::Command * ZCLcomman
 /*
  * Command BarrierControlStop
  */
-CHIP_ERROR EncodeBarrierControlStopCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+CHIP_ERROR EncodeBarrierControlStopCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                           chip::GroupId ZCLgroupId)
 {
-    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, BarrierControl::kClusterId, BarrierControl::kBarrierControlStopCommandId,
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, BarrierControl::kClusterId,
+                                         BarrierControl::kBarrierControlStopCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
@@ -92,39 +95,23 @@ CHIP_ERROR EncodeBarrierControlStopCommand(chip::app::Command * ZCLcommand, chip
     return CHIP_NO_ERROR;
 }
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->RegisterClusterCommandHandler(
-        BarrierControl::kClusterId,
-        BarrierControl::kBarrierControlGoToPercentCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleBarrierControlGoToPercentCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        BarrierControl::kClusterId,
-        BarrierControl::kBarrierControlStopCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleBarrierControlStopCommandReceived
-        );
+    ime->RegisterClusterCommandHandler(BarrierControl::kClusterId, BarrierControl::kBarrierControlGoToPercentCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleBarrierControlGoToPercentCommandReceived);
+    ime->RegisterClusterCommandHandler(BarrierControl::kClusterId, BarrierControl::kBarrierControlStopCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleBarrierControlStopCommandReceived);
 }
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->DeregisterClusterCommandHandler(
-        BarrierControl::kClusterId,
-        BarrierControl::kBarrierControlGoToPercentCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        BarrierControl::kClusterId,
-        BarrierControl::kBarrierControlStopCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
+    ime->DeregisterClusterCommandHandler(BarrierControl::kClusterId, BarrierControl::kBarrierControlGoToPercentCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(BarrierControl::kClusterId, BarrierControl::kBarrierControlStopCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
 }
 
 } // namespace BarrierControl
-
 
 namespace Basic {
 
@@ -142,16 +129,17 @@ namespace Basic {
 /*
  * Command ResetToFactoryDefaults
  */
-CHIP_ERROR EncodeResetToFactoryDefaultsCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
+CHIP_ERROR EncodeResetToFactoryDefaultsCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                               chip::GroupId ZCLgroupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Basic::kClusterId, Basic::kResetToFactoryDefaultsCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
@@ -161,28 +149,19 @@ CHIP_ERROR EncodeResetToFactoryDefaultsCommand(chip::app::Command * ZCLcommand, 
     return CHIP_NO_ERROR;
 }
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->RegisterClusterCommandHandler(
-        Basic::kClusterId,
-        Basic::kResetToFactoryDefaultsCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleResetToFactoryDefaultsCommandReceived
-        );
+    ime->RegisterClusterCommandHandler(Basic::kClusterId, Basic::kResetToFactoryDefaultsCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleResetToFactoryDefaultsCommandReceived);
 }
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->DeregisterClusterCommandHandler(
-        Basic::kClusterId,
-        Basic::kResetToFactoryDefaultsCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
+    ime->DeregisterClusterCommandHandler(Basic::kClusterId, Basic::kResetToFactoryDefaultsCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
 }
 
 } // namespace Basic
-
 
 namespace ColorControl {
 
@@ -261,16 +240,18 @@ namespace ColorControl {
 /*
  * Command MoveColor
  */
-CHIP_ERROR EncodeMoveColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const int16_t rateX, const int16_t rateY, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeMoveColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                  const int16_t rateX, const int16_t rateY, const uint8_t optionsMask,
+                                  const uint8_t optionsOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveColorCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // rateX: int16s
@@ -291,16 +272,20 @@ CHIP_ERROR EncodeMoveColorCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 /*
  * Command MoveColorTemperature
  */
-CHIP_ERROR EncodeMoveColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t moveMode, const uint16_t rate, const uint16_t colorTemperatureMinimum, const uint16_t colorTemperatureMaximum, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeMoveColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                             chip::GroupId ZCLgroupId, const uint8_t moveMode, const uint16_t rate,
+                                             const uint16_t colorTemperatureMinimum, const uint16_t colorTemperatureMaximum,
+                                             const uint8_t optionsMask, const uint8_t optionsOverride)
 {
-    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveColorTemperatureCommandId,
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kMoveColorTemperatureCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // moveMode: hueMoveMode
@@ -325,16 +310,18 @@ CHIP_ERROR EncodeMoveColorTemperatureCommand(chip::app::Command * ZCLcommand, ch
 /*
  * Command MoveHue
  */
-CHIP_ERROR EncodeMoveHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t moveMode, const uint8_t rate, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeMoveHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                const uint8_t moveMode, const uint8_t rate, const uint8_t optionsMask,
+                                const uint8_t optionsOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveHueCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // moveMode: hueMoveMode
@@ -355,16 +342,19 @@ CHIP_ERROR EncodeMoveHueCommand(chip::app::Command * ZCLcommand, chip::EndpointI
 /*
  * Command MoveSaturation
  */
-CHIP_ERROR EncodeMoveSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t moveMode, const uint8_t rate, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeMoveSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                       const uint8_t moveMode, const uint8_t rate, const uint8_t optionsMask,
+                                       const uint8_t optionsOverride)
 {
-    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveSaturationCommandId,
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kMoveSaturationCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // moveMode: saturationMoveMode
@@ -385,16 +375,18 @@ CHIP_ERROR EncodeMoveSaturationCommand(chip::app::Command * ZCLcommand, chip::En
 /*
  * Command MoveToColor
  */
-CHIP_ERROR EncodeMoveToColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t colorX, const uint16_t colorY, const uint16_t transitionTime, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeMoveToColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                    const uint16_t colorX, const uint16_t colorY, const uint16_t transitionTime,
+                                    const uint8_t optionsMask, const uint8_t optionsOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveToColorCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // colorX: int16u
@@ -417,16 +409,20 @@ CHIP_ERROR EncodeMoveToColorCommand(chip::app::Command * ZCLcommand, chip::Endpo
 /*
  * Command MoveToColorTemperature
  */
-CHIP_ERROR EncodeMoveToColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t colorTemperature, const uint16_t transitionTime, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeMoveToColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                               chip::GroupId ZCLgroupId, const uint16_t colorTemperature,
+                                               const uint16_t transitionTime, const uint8_t optionsMask,
+                                               const uint8_t optionsOverride)
 {
-    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveToColorTemperatureCommandId,
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kMoveToColorTemperatureCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // colorTemperature: int16u
@@ -447,16 +443,18 @@ CHIP_ERROR EncodeMoveToColorTemperatureCommand(chip::app::Command * ZCLcommand, 
 /*
  * Command MoveToHue
  */
-CHIP_ERROR EncodeMoveToHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t hue, const uint8_t direction, const uint16_t transitionTime, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeMoveToHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                  const uint8_t hue, const uint8_t direction, const uint16_t transitionTime,
+                                  const uint8_t optionsMask, const uint8_t optionsOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveToHueCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // hue: int8u
@@ -479,16 +477,20 @@ CHIP_ERROR EncodeMoveToHueCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 /*
  * Command MoveToHueAndSaturation
  */
-CHIP_ERROR EncodeMoveToHueAndSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t hue, const uint8_t saturation, const uint16_t transitionTime, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeMoveToHueAndSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                               chip::GroupId ZCLgroupId, const uint8_t hue, const uint8_t saturation,
+                                               const uint16_t transitionTime, const uint8_t optionsMask,
+                                               const uint8_t optionsOverride)
 {
-    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveToHueAndSaturationCommandId,
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kMoveToHueAndSaturationCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // hue: int8u
@@ -511,16 +513,19 @@ CHIP_ERROR EncodeMoveToHueAndSaturationCommand(chip::app::Command * ZCLcommand, 
 /*
  * Command MoveToSaturation
  */
-CHIP_ERROR EncodeMoveToSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t saturation, const uint16_t transitionTime, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeMoveToSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                         const uint8_t saturation, const uint16_t transitionTime, const uint8_t optionsMask,
+                                         const uint8_t optionsOverride)
 {
-    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kMoveToSaturationCommandId,
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kMoveToSaturationCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // saturation: int8u
@@ -541,16 +546,18 @@ CHIP_ERROR EncodeMoveToSaturationCommand(chip::app::Command * ZCLcommand, chip::
 /*
  * Command StepColor
  */
-CHIP_ERROR EncodeStepColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const int16_t stepX, const int16_t stepY, const uint16_t transitionTime, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeStepColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                  const int16_t stepX, const int16_t stepY, const uint16_t transitionTime,
+                                  const uint8_t optionsMask, const uint8_t optionsOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kStepColorCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // stepX: int16s
@@ -573,16 +580,21 @@ CHIP_ERROR EncodeStepColorCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 /*
  * Command StepColorTemperature
  */
-CHIP_ERROR EncodeStepColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t stepMode, const uint16_t stepSize, const uint16_t transitionTime, const uint16_t colorTemperatureMinimum, const uint16_t colorTemperatureMaximum, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeStepColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                             chip::GroupId ZCLgroupId, const uint8_t stepMode, const uint16_t stepSize,
+                                             const uint16_t transitionTime, const uint16_t colorTemperatureMinimum,
+                                             const uint16_t colorTemperatureMaximum, const uint8_t optionsMask,
+                                             const uint8_t optionsOverride)
 {
-    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kStepColorTemperatureCommandId,
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kStepColorTemperatureCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // stepMode: hueStepMode
@@ -609,16 +621,18 @@ CHIP_ERROR EncodeStepColorTemperatureCommand(chip::app::Command * ZCLcommand, ch
 /*
  * Command StepHue
  */
-CHIP_ERROR EncodeStepHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t stepMode, const uint8_t stepSize, const uint8_t transitionTime, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeStepHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                const uint8_t stepMode, const uint8_t stepSize, const uint8_t transitionTime,
+                                const uint8_t optionsMask, const uint8_t optionsOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kStepHueCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // stepMode: hueStepMode
@@ -641,16 +655,19 @@ CHIP_ERROR EncodeStepHueCommand(chip::app::Command * ZCLcommand, chip::EndpointI
 /*
  * Command StepSaturation
  */
-CHIP_ERROR EncodeStepSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t stepMode, const uint8_t stepSize, const uint8_t transitionTime, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeStepSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                       const uint8_t stepMode, const uint8_t stepSize, const uint8_t transitionTime,
+                                       const uint8_t optionsMask, const uint8_t optionsOverride)
 {
-    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kStepSaturationCommandId,
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId,
+                                         ColorControl::kStepSaturationCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // stepMode: saturationStepMode
@@ -673,16 +690,17 @@ CHIP_ERROR EncodeStepSaturationCommand(chip::app::Command * ZCLcommand, chip::En
 /*
  * Command StopMoveStep
  */
-CHIP_ERROR EncodeStopMoveStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t optionsMask, const uint8_t optionsOverride)
+CHIP_ERROR EncodeStopMoveStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                     const uint8_t optionsMask, const uint8_t optionsOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, ColorControl::kClusterId, ColorControl::kStopMoveStepCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // optionsMask: bitmap8
@@ -696,171 +714,71 @@ CHIP_ERROR EncodeStopMoveStepCommand(chip::app::Command * ZCLcommand, chip::Endp
     return CHIP_NO_ERROR;
 }
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveColorCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveColorCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveColorTemperatureCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveColorTemperatureCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveHueCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveHueCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveSaturationCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveSaturationCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveToColorCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveToColorCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveToColorTemperatureCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveToColorTemperatureCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveToHueCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveToHueCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveToHueAndSaturationCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveToHueAndSaturationCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveToSaturationCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveToSaturationCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kStepColorCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleStepColorCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kStepColorTemperatureCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleStepColorTemperatureCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kStepHueCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleStepHueCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kStepSaturationCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleStepSaturationCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kStopMoveStepCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleStopMoveStepCommandReceived
-        );
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveColorCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveColorCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveColorTemperatureCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveColorTemperatureCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveHueCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveHueCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveSaturationCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveSaturationCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveToColorCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveToColorCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveToColorTemperatureCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveToColorTemperatureCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveToHueCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveToHueCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveToHueAndSaturationCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveToHueAndSaturationCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveToSaturationCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveToSaturationCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kStepColorCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleStepColorCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kStepColorTemperatureCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleStepColorTemperatureCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kStepHueCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleStepHueCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kStepSaturationCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleStepSaturationCommandReceived);
+    ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kStopMoveStepCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleStopMoveStepCommandReceived);
 }
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveColorCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveColorTemperatureCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveHueCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveSaturationCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveToColorCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveToColorTemperatureCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveToHueCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveToHueAndSaturationCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kMoveToSaturationCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kStepColorCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kStepColorTemperatureCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kStepHueCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kStepSaturationCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        ColorControl::kClusterId,
-        ColorControl::kStopMoveStepCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveColorCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveColorTemperatureCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveHueCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveSaturationCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveToColorCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveToColorTemperatureCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveToHueCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveToHueAndSaturationCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveToSaturationCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kStepColorCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kStepColorTemperatureCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kStepHueCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kStepSaturationCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kStopMoveStepCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
 }
 
 } // namespace ColorControl
-
 
 namespace DoorLock {
 
@@ -905,12 +823,12 @@ CHIP_ERROR EncodeClearAllPinsCommand(chip::app::Command * ZCLcommand, chip::Endp
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearAllPinsCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
@@ -927,12 +845,12 @@ CHIP_ERROR EncodeClearAllRfidsCommand(chip::app::Command * ZCLcommand, chip::End
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearAllRfidsCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
@@ -945,16 +863,17 @@ CHIP_ERROR EncodeClearAllRfidsCommand(chip::app::Command * ZCLcommand, chip::End
 /*
  * Command ClearHolidaySchedule
  */
-CHIP_ERROR EncodeClearHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t scheduleId)
+CHIP_ERROR EncodeClearHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                             chip::GroupId ZCLgroupId, const uint8_t scheduleId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearHolidayScheduleCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // scheduleId: int8u
@@ -969,16 +888,17 @@ CHIP_ERROR EncodeClearHolidayScheduleCommand(chip::app::Command * ZCLcommand, ch
 /*
  * Command ClearPin
  */
-CHIP_ERROR EncodeClearPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t userId)
+CHIP_ERROR EncodeClearPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                 const uint16_t userId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearPinCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // userId: int16u
@@ -993,16 +913,17 @@ CHIP_ERROR EncodeClearPinCommand(chip::app::Command * ZCLcommand, chip::Endpoint
 /*
  * Command ClearRfid
  */
-CHIP_ERROR EncodeClearRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t userId)
+CHIP_ERROR EncodeClearRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                  const uint16_t userId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearRfidCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // userId: int16u
@@ -1017,16 +938,17 @@ CHIP_ERROR EncodeClearRfidCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 /*
  * Command ClearWeekdaySchedule
  */
-CHIP_ERROR EncodeClearWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
+CHIP_ERROR EncodeClearWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                             chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearWeekdayScheduleCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // scheduleId: int8u
@@ -1043,16 +965,17 @@ CHIP_ERROR EncodeClearWeekdayScheduleCommand(chip::app::Command * ZCLcommand, ch
 /*
  * Command ClearYeardaySchedule
  */
-CHIP_ERROR EncodeClearYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
+CHIP_ERROR EncodeClearYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                             chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearYeardayScheduleCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // scheduleId: int8u
@@ -1069,16 +992,17 @@ CHIP_ERROR EncodeClearYeardayScheduleCommand(chip::app::Command * ZCLcommand, ch
 /*
  * Command GetHolidaySchedule
  */
-CHIP_ERROR EncodeGetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t scheduleId)
+CHIP_ERROR EncodeGetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetHolidayScheduleCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // scheduleId: int8u
@@ -1093,16 +1017,17 @@ CHIP_ERROR EncodeGetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip
 /*
  * Command GetLogRecord
  */
-CHIP_ERROR EncodeGetLogRecordCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t logIndex)
+CHIP_ERROR EncodeGetLogRecordCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                     const uint16_t logIndex)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetLogRecordCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // logIndex: int16u
@@ -1117,16 +1042,17 @@ CHIP_ERROR EncodeGetLogRecordCommand(chip::app::Command * ZCLcommand, chip::Endp
 /*
  * Command GetPin
  */
-CHIP_ERROR EncodeGetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t userId)
+CHIP_ERROR EncodeGetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                               const uint16_t userId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetPinCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // userId: int16u
@@ -1141,16 +1067,17 @@ CHIP_ERROR EncodeGetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId
 /*
  * Command GetRfid
  */
-CHIP_ERROR EncodeGetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t userId)
+CHIP_ERROR EncodeGetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                const uint16_t userId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetRfidCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // userId: int16u
@@ -1165,16 +1092,17 @@ CHIP_ERROR EncodeGetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointI
 /*
  * Command GetUserType
  */
-CHIP_ERROR EncodeGetUserTypeCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t userId)
+CHIP_ERROR EncodeGetUserTypeCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                    const uint16_t userId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetUserTypeCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // userId: int16u
@@ -1189,16 +1117,17 @@ CHIP_ERROR EncodeGetUserTypeCommand(chip::app::Command * ZCLcommand, chip::Endpo
 /*
  * Command GetWeekdaySchedule
  */
-CHIP_ERROR EncodeGetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
+CHIP_ERROR EncodeGetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetWeekdayScheduleCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // scheduleId: int8u
@@ -1215,16 +1144,17 @@ CHIP_ERROR EncodeGetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip
 /*
  * Command GetYeardaySchedule
  */
-CHIP_ERROR EncodeGetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
+CHIP_ERROR EncodeGetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kGetYeardayScheduleCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // scheduleId: int8u
@@ -1241,16 +1171,17 @@ CHIP_ERROR EncodeGetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip
 /*
  * Command LockDoor
  */
-CHIP_ERROR EncodeLockDoorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const char * pin)
+CHIP_ERROR EncodeLockDoorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                 const char * pin)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kLockDoorCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // pin: char_string
@@ -1265,16 +1196,18 @@ CHIP_ERROR EncodeLockDoorCommand(chip::app::Command * ZCLcommand, chip::Endpoint
 /*
  * Command SetHolidaySchedule
  */
-CHIP_ERROR EncodeSetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint32_t localStartTime, const uint32_t localEndTime, const uint8_t operatingModeDuringHoliday)
+CHIP_ERROR EncodeSetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint32_t localStartTime,
+                                           const uint32_t localEndTime, const uint8_t operatingModeDuringHoliday)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetHolidayScheduleCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // scheduleId: int8u
@@ -1295,16 +1228,17 @@ CHIP_ERROR EncodeSetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip
 /*
  * Command SetPin
  */
-CHIP_ERROR EncodeSetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t userId, const uint8_t userStatus, const uint8_t userType, const char * pin)
+CHIP_ERROR EncodeSetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                               const uint16_t userId, const uint8_t userStatus, const uint8_t userType, const char * pin)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetPinCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // userId: int16u
@@ -1325,16 +1259,17 @@ CHIP_ERROR EncodeSetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId
 /*
  * Command SetRfid
  */
-CHIP_ERROR EncodeSetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t userId, const uint8_t userStatus, const uint8_t userType, const char * id)
+CHIP_ERROR EncodeSetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                const uint16_t userId, const uint8_t userStatus, const uint8_t userType, const char * id)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetRfidCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // userId: int16u
@@ -1355,16 +1290,17 @@ CHIP_ERROR EncodeSetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointI
 /*
  * Command SetUserType
  */
-CHIP_ERROR EncodeSetUserTypeCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t userId, const uint8_t userType)
+CHIP_ERROR EncodeSetUserTypeCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                    const uint16_t userId, const uint8_t userType)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetUserTypeCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // userId: int16u
@@ -1381,16 +1317,19 @@ CHIP_ERROR EncodeSetUserTypeCommand(chip::app::Command * ZCLcommand, chip::Endpo
 /*
  * Command SetWeekdaySchedule
  */
-CHIP_ERROR EncodeSetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId, const uint8_t daysMask, const uint8_t startHour, const uint8_t startMinute, const uint8_t endHour, const uint8_t endMinute)
+CHIP_ERROR EncodeSetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId,
+                                           const uint8_t daysMask, const uint8_t startHour, const uint8_t startMinute,
+                                           const uint8_t endHour, const uint8_t endMinute)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetWeekdayScheduleCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // scheduleId: int8u
@@ -1417,16 +1356,18 @@ CHIP_ERROR EncodeSetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip
 /*
  * Command SetYeardaySchedule
  */
-CHIP_ERROR EncodeSetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId, const uint32_t localStartTime, const uint32_t localEndTime)
+CHIP_ERROR EncodeSetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                           chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId,
+                                           const uint32_t localStartTime, const uint32_t localEndTime)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kSetYeardayScheduleCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // scheduleId: int8u
@@ -1447,16 +1388,17 @@ CHIP_ERROR EncodeSetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip
 /*
  * Command UnlockDoor
  */
-CHIP_ERROR EncodeUnlockDoorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const char * pin)
+CHIP_ERROR EncodeUnlockDoorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                   const char * pin)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kUnlockDoorCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // pin: char_string
@@ -1471,16 +1413,17 @@ CHIP_ERROR EncodeUnlockDoorCommand(chip::app::Command * ZCLcommand, chip::Endpoi
 /*
  * Command UnlockWithTimeout
  */
-CHIP_ERROR EncodeUnlockWithTimeoutCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t timeoutInSeconds, const char * pin)
+CHIP_ERROR EncodeUnlockWithTimeoutCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                          const uint16_t timeoutInSeconds, const char * pin)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kUnlockWithTimeoutCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // timeoutInSeconds: int16u
@@ -1494,270 +1437,107 @@ CHIP_ERROR EncodeUnlockWithTimeoutCommand(chip::app::Command * ZCLcommand, chip:
     return CHIP_NO_ERROR;
 }
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearAllPinsCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleClearAllPinsCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearAllRfidsCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleClearAllRfidsCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearHolidayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleClearHolidayScheduleCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearPinCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleClearPinCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearRfidCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleClearRfidCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearWeekdayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleClearWeekdayScheduleCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearYeardayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleClearYeardayScheduleCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetHolidayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleGetHolidayScheduleCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetLogRecordCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleGetLogRecordCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetPinCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleGetPinCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetRfidCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleGetRfidCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetUserTypeCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleGetUserTypeCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetWeekdayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleGetWeekdayScheduleCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetYeardayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleGetYeardayScheduleCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kLockDoorCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleLockDoorCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetHolidayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleSetHolidayScheduleCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetPinCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleSetPinCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetRfidCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleSetRfidCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetUserTypeCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleSetUserTypeCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetWeekdayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleSetWeekdayScheduleCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetYeardayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleSetYeardayScheduleCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kUnlockDoorCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleUnlockDoorCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kUnlockWithTimeoutCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleUnlockWithTimeoutCommandReceived
-        );
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearAllPinsCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleClearAllPinsCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearAllRfidsCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleClearAllRfidsCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearHolidayScheduleCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleClearHolidayScheduleCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearPinCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleClearPinCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearRfidCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleClearRfidCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearWeekdayScheduleCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleClearWeekdayScheduleCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearYeardayScheduleCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleClearYeardayScheduleCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetHolidayScheduleCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleGetHolidayScheduleCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetLogRecordCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleGetLogRecordCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetPinCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleGetPinCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetRfidCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleGetRfidCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetUserTypeCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleGetUserTypeCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetWeekdayScheduleCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleGetWeekdayScheduleCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetYeardayScheduleCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleGetYeardayScheduleCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kLockDoorCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleLockDoorCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetHolidayScheduleCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleSetHolidayScheduleCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetPinCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleSetPinCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetRfidCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleSetRfidCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetUserTypeCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleSetUserTypeCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetWeekdayScheduleCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleSetWeekdayScheduleCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetYeardayScheduleCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleSetYeardayScheduleCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kUnlockDoorCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleUnlockDoorCommandReceived);
+    ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kUnlockWithTimeoutCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleUnlockWithTimeoutCommandReceived);
 }
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearAllPinsCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearAllRfidsCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearHolidayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearPinCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearRfidCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearWeekdayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kClearYeardayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetHolidayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetLogRecordCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetPinCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetRfidCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetUserTypeCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetWeekdayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kGetYeardayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kLockDoorCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetHolidayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetPinCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetRfidCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetUserTypeCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetWeekdayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kSetYeardayScheduleCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kUnlockDoorCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        DoorLock::kClusterId,
-        DoorLock::kUnlockWithTimeoutCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearAllPinsCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearAllRfidsCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearHolidayScheduleCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearPinCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearRfidCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearWeekdayScheduleCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearYeardayScheduleCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetHolidayScheduleCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetLogRecordCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetPinCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetRfidCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetUserTypeCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetWeekdayScheduleCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kGetYeardayScheduleCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kLockDoorCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetHolidayScheduleCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetPinCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetRfidCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetUserTypeCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetWeekdayScheduleCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kSetYeardayScheduleCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kUnlockDoorCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kUnlockWithTimeoutCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
 }
 
 } // namespace DoorLock
-
 
 namespace Groups {
 
@@ -1779,16 +1559,17 @@ namespace Groups {
 /*
  * Command AddGroup
  */
-CHIP_ERROR EncodeAddGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId, const char * groupName)
+CHIP_ERROR EncodeAddGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                 const uint16_t groupId, const char * groupName)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kAddGroupCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -1805,16 +1586,17 @@ CHIP_ERROR EncodeAddGroupCommand(chip::app::Command * ZCLcommand, chip::Endpoint
 /*
  * Command AddGroupIfIdentifying
  */
-CHIP_ERROR EncodeAddGroupIfIdentifyingCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId, const char * groupName)
+CHIP_ERROR EncodeAddGroupIfIdentifyingCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                              chip::GroupId ZCLgroupId, const uint16_t groupId, const char * groupName)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kAddGroupIfIdentifyingCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -1831,16 +1613,17 @@ CHIP_ERROR EncodeAddGroupIfIdentifyingCommand(chip::app::Command * ZCLcommand, c
 /*
  * Command GetGroupMembership
  */
-CHIP_ERROR EncodeGetGroupMembershipCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t groupCount, const uint16_t groupList)
+CHIP_ERROR EncodeGetGroupMembershipCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                           chip::GroupId ZCLgroupId, const uint8_t groupCount, const uint16_t groupList)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kGetGroupMembershipCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupCount: int8u
@@ -1861,12 +1644,12 @@ CHIP_ERROR EncodeRemoveAllGroupsCommand(chip::app::Command * ZCLcommand, chip::E
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kRemoveAllGroupsCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
@@ -1879,16 +1662,17 @@ CHIP_ERROR EncodeRemoveAllGroupsCommand(chip::app::Command * ZCLcommand, chip::E
 /*
  * Command RemoveGroup
  */
-CHIP_ERROR EncodeRemoveGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId)
+CHIP_ERROR EncodeRemoveGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                    const uint16_t groupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kRemoveGroupCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -1903,16 +1687,17 @@ CHIP_ERROR EncodeRemoveGroupCommand(chip::app::Command * ZCLcommand, chip::Endpo
 /*
  * Command ViewGroup
  */
-CHIP_ERROR EncodeViewGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId)
+CHIP_ERROR EncodeViewGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                  const uint16_t groupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kViewGroupCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -1924,83 +1709,38 @@ CHIP_ERROR EncodeViewGroupCommand(chip::app::Command * ZCLcommand, chip::Endpoin
     return CHIP_NO_ERROR;
 }
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->RegisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kAddGroupCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleAddGroupCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kAddGroupIfIdentifyingCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleAddGroupIfIdentifyingCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kGetGroupMembershipCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleGetGroupMembershipCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kRemoveAllGroupsCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleRemoveAllGroupsCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kRemoveGroupCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleRemoveGroupCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kViewGroupCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleViewGroupCommandReceived
-        );
+    ime->RegisterClusterCommandHandler(Groups::kClusterId, Groups::kAddGroupCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleAddGroupCommandReceived);
+    ime->RegisterClusterCommandHandler(Groups::kClusterId, Groups::kAddGroupIfIdentifyingCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleAddGroupIfIdentifyingCommandReceived);
+    ime->RegisterClusterCommandHandler(Groups::kClusterId, Groups::kGetGroupMembershipCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleGetGroupMembershipCommandReceived);
+    ime->RegisterClusterCommandHandler(Groups::kClusterId, Groups::kRemoveAllGroupsCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleRemoveAllGroupsCommandReceived);
+    ime->RegisterClusterCommandHandler(Groups::kClusterId, Groups::kRemoveGroupCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleRemoveGroupCommandReceived);
+    ime->RegisterClusterCommandHandler(Groups::kClusterId, Groups::kViewGroupCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleViewGroupCommandReceived);
 }
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->DeregisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kAddGroupCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kAddGroupIfIdentifyingCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kGetGroupMembershipCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kRemoveAllGroupsCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kRemoveGroupCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Groups::kClusterId,
-        Groups::kViewGroupCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
+    ime->DeregisterClusterCommandHandler(Groups::kClusterId, Groups::kAddGroupCommandId, Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Groups::kClusterId, Groups::kAddGroupIfIdentifyingCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Groups::kClusterId, Groups::kGetGroupMembershipCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Groups::kClusterId, Groups::kRemoveAllGroupsCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Groups::kClusterId, Groups::kRemoveGroupCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Groups::kClusterId, Groups::kViewGroupCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
 }
 
 } // namespace Groups
-
 
 namespace IasZone {
 
@@ -2018,16 +1758,11 @@ namespace IasZone {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-void InitCluster(chip::app::InteractionModelEngine * ime)
-{
-}
+void InitCluster(chip::app::InteractionModelEngine * ime) {}
 
-void ShutdownCluster(chip::app::InteractionModelEngine * ime)
-{
-}
+void ShutdownCluster(chip::app::InteractionModelEngine * ime) {}
 
 } // namespace IasZone
-
 
 namespace Identify {
 
@@ -2045,16 +1780,17 @@ namespace Identify {
 /*
  * Command Identify
  */
-CHIP_ERROR EncodeIdentifyCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t identifyTime)
+CHIP_ERROR EncodeIdentifyCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                 const uint16_t identifyTime)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Identify::kClusterId, Identify::kIdentifyCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // identifyTime: int16u
@@ -2073,12 +1809,12 @@ CHIP_ERROR EncodeIdentifyQueryCommand(chip::app::Command * ZCLcommand, chip::End
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Identify::kClusterId, Identify::kIdentifyQueryCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
@@ -2088,39 +1824,23 @@ CHIP_ERROR EncodeIdentifyQueryCommand(chip::app::Command * ZCLcommand, chip::End
     return CHIP_NO_ERROR;
 }
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->RegisterClusterCommandHandler(
-        Identify::kClusterId,
-        Identify::kIdentifyCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleIdentifyCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Identify::kClusterId,
-        Identify::kIdentifyQueryCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleIdentifyQueryCommandReceived
-        );
+    ime->RegisterClusterCommandHandler(Identify::kClusterId, Identify::kIdentifyCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleIdentifyCommandReceived);
+    ime->RegisterClusterCommandHandler(Identify::kClusterId, Identify::kIdentifyQueryCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleIdentifyQueryCommandReceived);
 }
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->DeregisterClusterCommandHandler(
-        Identify::kClusterId,
-        Identify::kIdentifyCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Identify::kClusterId,
-        Identify::kIdentifyQueryCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
+    ime->DeregisterClusterCommandHandler(Identify::kClusterId, Identify::kIdentifyCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Identify::kClusterId, Identify::kIdentifyQueryCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
 }
 
 } // namespace Identify
-
 
 namespace LevelControl {
 
@@ -2144,16 +1864,17 @@ namespace LevelControl {
 /*
  * Command Move
  */
-CHIP_ERROR EncodeMoveCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t moveMode, const uint8_t rate, const uint8_t optionMask, const uint8_t optionOverride)
+CHIP_ERROR EncodeMoveCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                             const uint8_t moveMode, const uint8_t rate, const uint8_t optionMask, const uint8_t optionOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kMoveCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // moveMode: moveMode
@@ -2174,16 +1895,18 @@ CHIP_ERROR EncodeMoveCommand(chip::app::Command * ZCLcommand, chip::EndpointId Z
 /*
  * Command MoveToLevel
  */
-CHIP_ERROR EncodeMoveToLevelCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t level, const uint16_t transitionTime, const uint8_t optionMask, const uint8_t optionOverride)
+CHIP_ERROR EncodeMoveToLevelCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                    const uint8_t level, const uint16_t transitionTime, const uint8_t optionMask,
+                                    const uint8_t optionOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kMoveToLevelCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // level: int8u
@@ -2204,16 +1927,18 @@ CHIP_ERROR EncodeMoveToLevelCommand(chip::app::Command * ZCLcommand, chip::Endpo
 /*
  * Command MoveToLevelWithOnOff
  */
-CHIP_ERROR EncodeMoveToLevelWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t level, const uint16_t transitionTime)
+CHIP_ERROR EncodeMoveToLevelWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                             chip::GroupId ZCLgroupId, const uint8_t level, const uint16_t transitionTime)
 {
-    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kMoveToLevelWithOnOffCommandId,
+    Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId,
+                                         LevelControl::kMoveToLevelWithOnOffCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // level: int8u
@@ -2230,16 +1955,17 @@ CHIP_ERROR EncodeMoveToLevelWithOnOffCommand(chip::app::Command * ZCLcommand, ch
 /*
  * Command MoveWithOnOff
  */
-CHIP_ERROR EncodeMoveWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t moveMode, const uint8_t rate)
+CHIP_ERROR EncodeMoveWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                      const uint8_t moveMode, const uint8_t rate)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kMoveWithOnOffCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // moveMode: moveMode
@@ -2256,16 +1982,18 @@ CHIP_ERROR EncodeMoveWithOnOffCommand(chip::app::Command * ZCLcommand, chip::End
 /*
  * Command Step
  */
-CHIP_ERROR EncodeStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t stepMode, const uint8_t stepSize, const uint16_t transitionTime, const uint8_t optionMask, const uint8_t optionOverride)
+CHIP_ERROR EncodeStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                             const uint8_t stepMode, const uint8_t stepSize, const uint16_t transitionTime,
+                             const uint8_t optionMask, const uint8_t optionOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kStepCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // stepMode: stepMode
@@ -2288,16 +2016,17 @@ CHIP_ERROR EncodeStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId Z
 /*
  * Command StepWithOnOff
  */
-CHIP_ERROR EncodeStepWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t stepMode, const uint8_t stepSize, const uint16_t transitionTime)
+CHIP_ERROR EncodeStepWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                      const uint8_t stepMode, const uint8_t stepSize, const uint16_t transitionTime)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kStepWithOnOffCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // stepMode: stepMode
@@ -2316,16 +2045,17 @@ CHIP_ERROR EncodeStepWithOnOffCommand(chip::app::Command * ZCLcommand, chip::End
 /*
  * Command Stop
  */
-CHIP_ERROR EncodeStopCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint8_t optionMask, const uint8_t optionOverride)
+CHIP_ERROR EncodeStopCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                             const uint8_t optionMask, const uint8_t optionOverride)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kStopCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // optionMask: bitmap8
@@ -2346,12 +2076,12 @@ CHIP_ERROR EncodeStopWithOnOffCommand(chip::app::Command * ZCLcommand, chip::End
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kStopWithOnOffCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
@@ -2361,105 +2091,47 @@ CHIP_ERROR EncodeStopWithOnOffCommand(chip::app::Command * ZCLcommand, chip::End
     return CHIP_NO_ERROR;
 }
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->RegisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kMoveCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kMoveToLevelCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveToLevelCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kMoveToLevelWithOnOffCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveToLevelWithOnOffCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kMoveWithOnOffCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleMoveWithOnOffCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kStepCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleStepCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kStepWithOnOffCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleStepWithOnOffCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kStopCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleStopCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kStopWithOnOffCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleStopWithOnOffCommandReceived
-        );
+    ime->RegisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveCommandReceived);
+    ime->RegisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveToLevelCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveToLevelCommandReceived);
+    ime->RegisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveToLevelWithOnOffCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveToLevelWithOnOffCommandReceived);
+    ime->RegisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveWithOnOffCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleMoveWithOnOffCommandReceived);
+    ime->RegisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kStepCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleStepCommandReceived);
+    ime->RegisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kStepWithOnOffCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleStepWithOnOffCommandReceived);
+    ime->RegisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kStopCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleStopCommandReceived);
+    ime->RegisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kStopWithOnOffCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleStopWithOnOffCommandReceived);
 }
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->DeregisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kMoveCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kMoveToLevelCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kMoveToLevelWithOnOffCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kMoveWithOnOffCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kStepCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kStepWithOnOffCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kStopCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        LevelControl::kClusterId,
-        LevelControl::kStopWithOnOffCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
+    ime->DeregisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveToLevelCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveToLevelWithOnOffCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveWithOnOffCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kStepCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kStepWithOnOffCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kStopCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kStopWithOnOffCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
 }
 
 } // namespace LevelControl
-
 
 namespace OnOff {
 
@@ -2482,12 +2154,12 @@ CHIP_ERROR EncodeOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZC
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, OnOff::kClusterId, OnOff::kOffCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
@@ -2504,12 +2176,12 @@ CHIP_ERROR EncodeOnCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCL
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, OnOff::kClusterId, OnOff::kOnCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
@@ -2526,12 +2198,12 @@ CHIP_ERROR EncodeToggleCommand(chip::app::Command * ZCLcommand, chip::EndpointId
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, OnOff::kClusterId, OnOff::kToggleCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
@@ -2541,50 +2213,24 @@ CHIP_ERROR EncodeToggleCommand(chip::app::Command * ZCLcommand, chip::EndpointId
     return CHIP_NO_ERROR;
 }
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->RegisterClusterCommandHandler(
-        OnOff::kClusterId,
-        OnOff::kOffCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleOffCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        OnOff::kClusterId,
-        OnOff::kOnCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleOnCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        OnOff::kClusterId,
-        OnOff::kToggleCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleToggleCommandReceived
-        );
+    ime->RegisterClusterCommandHandler(OnOff::kClusterId, OnOff::kOffCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleOffCommandReceived);
+    ime->RegisterClusterCommandHandler(OnOff::kClusterId, OnOff::kOnCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleOnCommandReceived);
+    ime->RegisterClusterCommandHandler(OnOff::kClusterId, OnOff::kToggleCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleToggleCommandReceived);
 }
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->DeregisterClusterCommandHandler(
-        OnOff::kClusterId,
-        OnOff::kOffCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        OnOff::kClusterId,
-        OnOff::kOnCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        OnOff::kClusterId,
-        OnOff::kToggleCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
+    ime->DeregisterClusterCommandHandler(OnOff::kClusterId, OnOff::kOffCommandId, Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(OnOff::kClusterId, OnOff::kOnCommandId, Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(OnOff::kClusterId, OnOff::kToggleCommandId, Command::CommandRoleId::kCommandHandlerId);
 }
 
 } // namespace OnOff
-
 
 namespace Scenes {
 
@@ -2611,16 +2257,18 @@ namespace Scenes {
 /*
  * Command AddScene
  */
-CHIP_ERROR EncodeAddSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId, const uint8_t sceneId, const uint16_t transitionTime, const char * sceneName, const chip::ClusterId clusterId, const uint8_t length, const uint8_t value)
+CHIP_ERROR EncodeAddSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                 const uint16_t groupId, const uint8_t sceneId, const uint16_t transitionTime,
+                                 const char * sceneName, const chip::ClusterId clusterId, const uint8_t length, const uint8_t value)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kAddSceneCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -2647,16 +2295,17 @@ CHIP_ERROR EncodeAddSceneCommand(chip::app::Command * ZCLcommand, chip::Endpoint
 /*
  * Command GetSceneMembership
  */
-CHIP_ERROR EncodeGetSceneMembershipCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId)
+CHIP_ERROR EncodeGetSceneMembershipCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
+                                           chip::GroupId ZCLgroupId, const uint16_t groupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kGetSceneMembershipCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -2671,16 +2320,17 @@ CHIP_ERROR EncodeGetSceneMembershipCommand(chip::app::Command * ZCLcommand, chip
 /*
  * Command RecallScene
  */
-CHIP_ERROR EncodeRecallSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId, const uint8_t sceneId, const uint16_t transitionTime)
+CHIP_ERROR EncodeRecallSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                    const uint16_t groupId, const uint8_t sceneId, const uint16_t transitionTime)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kRecallSceneCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -2699,16 +2349,17 @@ CHIP_ERROR EncodeRecallSceneCommand(chip::app::Command * ZCLcommand, chip::Endpo
 /*
  * Command RemoveAllScenes
  */
-CHIP_ERROR EncodeRemoveAllScenesCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId)
+CHIP_ERROR EncodeRemoveAllScenesCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                        const uint16_t groupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kRemoveAllScenesCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -2723,16 +2374,17 @@ CHIP_ERROR EncodeRemoveAllScenesCommand(chip::app::Command * ZCLcommand, chip::E
 /*
  * Command RemoveScene
  */
-CHIP_ERROR EncodeRemoveSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId, const uint8_t sceneId)
+CHIP_ERROR EncodeRemoveSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                    const uint16_t groupId, const uint8_t sceneId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kRemoveSceneCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -2749,16 +2401,17 @@ CHIP_ERROR EncodeRemoveSceneCommand(chip::app::Command * ZCLcommand, chip::Endpo
 /*
  * Command StoreScene
  */
-CHIP_ERROR EncodeStoreSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId, const uint8_t sceneId)
+CHIP_ERROR EncodeStoreSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                   const uint16_t groupId, const uint8_t sceneId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kStoreSceneCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -2775,16 +2428,17 @@ CHIP_ERROR EncodeStoreSceneCommand(chip::app::Command * ZCLcommand, chip::Endpoi
 /*
  * Command ViewScene
  */
-CHIP_ERROR EncodeViewSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, const uint16_t groupId, const uint8_t sceneId)
+CHIP_ERROR EncodeViewSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
+                                  const uint16_t groupId, const uint8_t sceneId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Scenes::kClusterId, Scenes::kViewSceneCommandId,
                                          (chip::app::Command::kCommandPathFlag_EndpointIdValid) };
-    TLV::TLVWriter writer  = ZCLcommand->CreateCommandDataElementTLVWriter();
+    TLV::TLVWriter writer            = ZCLcommand->CreateCommandDataElementTLVWriter();
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
     uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
+    (void) argSeqNumber;
 
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
     // groupId: int16u
@@ -2798,94 +2452,42 @@ CHIP_ERROR EncodeViewSceneCommand(chip::app::Command * ZCLcommand, chip::Endpoin
     return CHIP_NO_ERROR;
 }
 
-
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->RegisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kAddSceneCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleAddSceneCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kGetSceneMembershipCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleGetSceneMembershipCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kRecallSceneCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleRecallSceneCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kRemoveAllScenesCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleRemoveAllScenesCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kRemoveSceneCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleRemoveSceneCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kStoreSceneCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleStoreSceneCommandReceived
-        );
-    ime->RegisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kViewSceneCommandId,
-        Command::CommandRoleId::kCommandHandlerId,
-        HandleViewSceneCommandReceived
-        );
+    ime->RegisterClusterCommandHandler(Scenes::kClusterId, Scenes::kAddSceneCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleAddSceneCommandReceived);
+    ime->RegisterClusterCommandHandler(Scenes::kClusterId, Scenes::kGetSceneMembershipCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleGetSceneMembershipCommandReceived);
+    ime->RegisterClusterCommandHandler(Scenes::kClusterId, Scenes::kRecallSceneCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleRecallSceneCommandReceived);
+    ime->RegisterClusterCommandHandler(Scenes::kClusterId, Scenes::kRemoveAllScenesCommandId,
+                                       Command::CommandRoleId::kCommandHandlerId, HandleRemoveAllScenesCommandReceived);
+    ime->RegisterClusterCommandHandler(Scenes::kClusterId, Scenes::kRemoveSceneCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleRemoveSceneCommandReceived);
+    ime->RegisterClusterCommandHandler(Scenes::kClusterId, Scenes::kStoreSceneCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleStoreSceneCommandReceived);
+    ime->RegisterClusterCommandHandler(Scenes::kClusterId, Scenes::kViewSceneCommandId, Command::CommandRoleId::kCommandHandlerId,
+                                       HandleViewSceneCommandReceived);
 }
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
-    ime->DeregisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kAddSceneCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kGetSceneMembershipCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kRecallSceneCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kRemoveAllScenesCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kRemoveSceneCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kStoreSceneCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
-    ime->DeregisterClusterCommandHandler(
-        Scenes::kClusterId,
-        Scenes::kViewSceneCommandId,
-        Command::CommandRoleId::kCommandHandlerId
-        );
+    ime->DeregisterClusterCommandHandler(Scenes::kClusterId, Scenes::kAddSceneCommandId, Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Scenes::kClusterId, Scenes::kGetSceneMembershipCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Scenes::kClusterId, Scenes::kRecallSceneCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Scenes::kClusterId, Scenes::kRemoveAllScenesCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Scenes::kClusterId, Scenes::kRemoveSceneCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Scenes::kClusterId, Scenes::kStoreSceneCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
+    ime->DeregisterClusterCommandHandler(Scenes::kClusterId, Scenes::kViewSceneCommandId,
+                                         Command::CommandRoleId::kCommandHandlerId);
 }
 
 } // namespace Scenes
-
 
 namespace TemperatureMeasurement {
 
@@ -2901,16 +2503,11 @@ namespace TemperatureMeasurement {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-void InitCluster(chip::app::InteractionModelEngine * ime)
-{
-}
+void InitCluster(chip::app::InteractionModelEngine * ime) {}
 
-void ShutdownCluster(chip::app::InteractionModelEngine * ime)
-{
-}
+void ShutdownCluster(chip::app::InteractionModelEngine * ime) {}
 
 } // namespace TemperatureMeasurement
-
 
 void InitClusters(chip::app::InteractionModelEngine * ime)
 {

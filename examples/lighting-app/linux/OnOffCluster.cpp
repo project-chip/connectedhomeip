@@ -2,8 +2,8 @@
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/MessageDef.h>
-#include <app/util/basic-types.h>
 #include <app/im-encoder.h>
+#include <app/util/basic-types.h>
 
 #include <support/logging/CHIPLogging.h>
 

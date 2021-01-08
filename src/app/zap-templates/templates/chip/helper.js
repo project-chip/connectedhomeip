@@ -345,8 +345,9 @@ function isManufacturerSpecificCommand()
   return !!this.mfgCode;
 }
 
-function asPythonType(type) {
-  switch(type) {
+function asPythonType(type)
+{
+  switch (type) {
   case 'int8_t':
   case 'int16_t':
   case 'int32_t':
@@ -364,8 +365,9 @@ function asPythonType(type) {
   }
 }
 
-function asPythonCType(type) {
-  switch(type) {
+function asPythonCType(type)
+{
+  switch (type) {
   case 'int8_t':
     return 'c_int8';
   case 'int16_t':

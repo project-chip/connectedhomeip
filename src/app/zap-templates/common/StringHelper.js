@@ -17,7 +17,7 @@
 
 const stringShortTypes = [ 'CHAR_STRING', 'OCTET_STRING' ];
 const stringLongTypes  = [ 'LONG_CHAR_STRING', 'LONG_OCTET_STRING' ];
-const bytesTypes  = [ 'OCTET_STRING', 'LONG_OCTET_STRING' ];
+const bytesTypes       = [ 'OCTET_STRING', 'LONG_OCTET_STRING' ];
 
 function isShortString(type)
 {
