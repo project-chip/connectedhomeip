@@ -58,4 +58,5 @@ target_sources(app PRIVATE
                ${CHIP_ROOT}/src/app/util/process-cluster-message.cpp
                ${CHIP_ROOT}/src/app/util/process-global-message.cpp
                ${CHIP_ROOT}/src/app/util/util.cpp
+               ${CHIP_ROOT}/src/app/clusters/bindings/bindings.cpp
                ${CHIP_ROOT}/src/app/clusters/on-off-server/on-off.cpp)
