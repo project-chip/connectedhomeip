@@ -26,6 +26,7 @@ LOG_DIR=${LOG_DIR:-$(mktemp -d)}
 # Append test name here to add more tests for run_all_tests
 CIRQUE_TESTS=(
     "EchoTest"
+    "InteractionModelTest"
     "OnOffClusterTest"
 )
 
