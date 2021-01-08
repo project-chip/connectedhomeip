@@ -224,7 +224,7 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
     }
     MoveToState(kState_AddCommand);
 
-exit :
+exit:
     mCommandDataBuf = nullptr;
     ChipLogFunctError(err);
     return err;
