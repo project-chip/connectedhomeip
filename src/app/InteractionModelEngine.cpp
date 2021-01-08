@@ -109,13 +109,6 @@ void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apEc,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    System::PacketBuffer * buffer = aPayload.Release_ForNow();
-    if (buffer != NULL)
-    {
-        System::PacketBuffer::Free(buffer);
-        buffer = nullptr;
-    }
-
     ChipLogDetail(DataManagement, "Msg type %d not supported", (int) aMsgType);
 
     // Todo: Add status report
