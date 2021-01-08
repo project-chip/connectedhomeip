@@ -82,6 +82,21 @@ exit:
     return err;
 }
 
+Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
+{
+    PeerConnectionState * state = mPeerConnections.FindPeerConnectionState(peerNodeId, nullptr);
+
+    if (state)
+    {
+        Transport::PeerAddress peerAddr = state->GetPeerAddress();
+        return peerAddr.GetTransportType();
+    }
+    else
+    {
+        return Transport::Type::kUndefined;
+    }
+}
+
 CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf)
 {
     PayloadHeader payloadHeader;

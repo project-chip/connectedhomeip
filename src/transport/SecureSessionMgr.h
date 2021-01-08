@@ -38,6 +38,7 @@
 #include <transport/SecureSession.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
+#include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
 
 namespace chip {
@@ -194,6 +195,12 @@ public:
      * @param transportMgr   Transport to use
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
+
+    /**
+     * @brief
+     *   Return the transport type used by current SecureSessionMgr.
+     */
+    Transport::Type GetTransportType(NodeId peerNodeId);
 
 protected:
     /**

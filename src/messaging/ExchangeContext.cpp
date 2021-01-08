@@ -100,9 +100,10 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
 
     payloadHeader.SetInitiator(IsInitiator());
 
-    // If auto-request ACK feature is enabled, automatically request an acknowledgment,
+    // If sending via UDP and auto-request ACK feature is enabled, automatically request an acknowledgment,
     // UNLESS the NoAutoRequestAck send flag has been specified.
-    if (mReliableMessageContext.AutoRequestAck() && !sendFlags.Has(SendMessageFlags::kSendFlag_NoAutoRequestAck))
+    if ((mExchangeMgr->GetSessionMgr()->GetTransportType(mPeerNodeId) == Transport::Type::kUdp) &&
+        mReliableMessageContext.AutoRequestAck() && !sendFlags.Has(SendMessageFlags::kSendFlag_NoAutoRequestAck))
     {
         payloadHeader.SetNeedsAck(true);
     }
