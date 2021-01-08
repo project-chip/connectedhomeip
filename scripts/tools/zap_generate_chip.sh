@@ -16,5 +16,6 @@
 #    limitations under the License.
 #
 
+ZAP_TEMPLATES=$PWD/src/app/zap-templates
 cd ./third_party/zap/repo/
-node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ../../../src/app/zap-templates/chip-templates.json -i ../../../examples/all-clusters-app/all-clusters-common/all-clusters-app.zap -o ../../../
+node ./src-script/zap-generate.js -z "$ZAP_TEMPLATES"/zcl/zcl.json -g "$ZAP_TEMPLATES"/chip-templates.json -i ../../../examples/all-clusters-app/all-clusters-common/all-clusters-app.zap -o ../../../
