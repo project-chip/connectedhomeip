@@ -41,7 +41,7 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId)
 
     // Create a new exchange context.
     // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
-    mpExchangeCtx = mpExchangeMgr->NewContext({aNodeId, Transport::kAnyKeyId}, this);
+    mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, Transport::kAnyKeyId }, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(CHIP_INVOKE_COMMAND_RSP_TIMEOUT);
 

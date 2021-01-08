@@ -89,19 +89,23 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, System::Pa
     return SendMessage(session, payloadHeader, std::move(msgBuf));
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                         System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     return SendMessage(session, payloadHeader, std::move(msgBuf), bufferRetainSlot, false);
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
+                                         EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     PayloadHeader payloadHeader;
 
     return SendMessage(session, payloadHeader, std::move(msgBuf), bufferRetainSlot, true);
 }
 
-CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted)
+CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader,
+                                         System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
+                                         bool isEncrypted)
 {
     CHIP_ERROR err              = CHIP_NO_ERROR;
     PeerConnectionState * state = GetPeerConnectionState(session);
@@ -145,8 +149,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
             payloadLength = static_cast<uint32_t>(headerSize + msgBuf->TotalLength());
             VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
 
-            packetHeader
-                .SetSourceNodeId(mLocalNodeId)
+            packetHeader.SetSourceNodeId(mLocalNodeId)
                 .SetDestinationNodeId(state->GetPeerNodeId())
                 .SetMessageId(msgId)
                 .SetEncryptionKeyID(state->GetLocalKeyID())

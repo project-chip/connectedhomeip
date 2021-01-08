@@ -171,8 +171,10 @@ public:
      *   to retransmit it, will be stored in *bufferRetainSlot.
      */
     CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle msgBuf);
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
-    CHIP_ERROR SendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf,
+                           EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
+                           EncryptedPacketBufferHandle * bufferRetainSlot);
 
     Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
 
@@ -242,7 +244,8 @@ private:
     SecureSessionMgrDelegate * mCB   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
 
-    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf,
+                           EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
