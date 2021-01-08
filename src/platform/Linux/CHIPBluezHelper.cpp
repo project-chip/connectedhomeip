@@ -63,8 +63,10 @@
 #include <unistd.h>
 #include <utility>
 
+#include "BLEManagerImpl.h"
 #include "CHIPBluezHelper.h"
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <system/TLVPacketBufferBackingStore.h>
 
 using namespace ::nl;
@@ -890,95 +892,92 @@ static void BluezSignalInterfacePropertiesChanged(GDBusObjectManagerClient * aMa
 {
 
     BluezEndpoint * endpoint = static_cast<BluezEndpoint *>(apClosure);
-    VerifyOrExit(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
-    VerifyOrExit(endpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL endpoint->mpAdapter in %s", __func__));
+    VerifyOrReturn(endpoint != nullptr, ChipLogError(DeviceLayer, "endpoint is NULL in %s", __func__));
+    VerifyOrReturn(endpoint->mpAdapter != nullptr, ChipLogError(DeviceLayer, "FAIL: NULL endpoint->mpAdapter in %s", __func__));
+    VerifyOrReturn(strcmp(g_dbus_proxy_get_interface_name(aInterface), DEVICE_INTERFACE) == 0, );
 
-    if (strcmp(g_dbus_proxy_get_interface_name(aInterface), DEVICE_INTERFACE) == 0)
+    BluezDevice1 * device = BLUEZ_DEVICE1(aInterface);
+    VerifyOrReturn(BluezIsDeviceOnAdapter(device, endpoint->mpAdapter));
+
+    BluezConnection * conn =
+        static_cast<BluezConnection *>(g_hash_table_lookup(endpoint->mpConnMap, g_dbus_proxy_get_object_path(aInterface)));
+    GVariantIter iter;
+    GVariant * value;
+    char * key;
+
+    g_variant_iter_init(&iter, aChangedProperties);
+    while (g_variant_iter_next(&iter, "{&sv}", &key, &value))
     {
-        BluezDevice1 * device = BLUEZ_DEVICE1(aInterface);
-        GVariantIter iter;
-        GVariant * value;
-        char * key;
-
-        if (BluezIsDeviceOnAdapter(device, endpoint->mpAdapter))
+        if (strcmp(key, "Connected") == 0)
         {
-            BluezConnection * conn =
-                static_cast<BluezConnection *>(g_hash_table_lookup(endpoint->mpConnMap, g_dbus_proxy_get_object_path(aInterface)));
-            g_variant_iter_init(&iter, aChangedProperties);
-            while (g_variant_iter_next(&iter, "{&sv}", &key, &value))
+            gboolean connected;
+            connected = g_variant_get_boolean(value);
+
+            if (connected)
             {
-                if (strcmp(key, "Connected") == 0)
+                ChipLogDetail(DeviceLayer, "Bluez coonnected");
+                // for a central, the connection has been already allocated.  For a peripheral, it has not.
+                // todo do we need this ? we could handle all connection the same wa...
+                if (endpoint->mIsCentral)
+                    SuccessOrExit(conn != nullptr);
+
+                if (!endpoint->mIsCentral)
                 {
-                    gboolean connected;
-                    connected = g_variant_get_boolean(value);
-
-                    if (connected)
-                    {
-                        ChipLogDetail(DeviceLayer, "Bluez coonnected");
-                        // for a central, the connection has been already allocated.  For a peripheral, it has not.
-                        // todo do we need this ? we could handle all connection the same wa...
-                        if (endpoint->mIsCentral)
-                            SuccessOrExit(conn != nullptr);
-
-                        if (!endpoint->mIsCentral)
-                        {
-                            VerifyOrExit(conn == nullptr,
-                                         ChipLogError(DeviceLayer, "FAIL: connection already tracked: conn: %x device: %s", conn,
-                                                      g_dbus_proxy_get_object_path(aInterface)));
-                            conn                = g_new0(BluezConnection, 1);
-                            conn->mpPeerAddress = g_strdup(bluez_device1_get_address(device));
-                            conn->mpDevice      = static_cast<BluezDevice1 *>(g_object_ref(device));
-                            conn->mpEndpoint    = endpoint;
-                            BluezConnectionInit(conn);
-                            endpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(aInterface));
-                            ChipLogDetail(DeviceLayer, "Device %s (Path: %s) Connected", conn->mpPeerAddress,
-                                          endpoint->mpPeerDevicePath);
-                            g_hash_table_insert(endpoint->mpConnMap, endpoint->mpPeerDevicePath, conn);
-                        }
-                        // for central, we do not call BluezConnectionInit until the services have been resolved
-
-                        BLEManagerImpl::CHIPoBluez_NewConnection(conn);
-                    }
-                    else
-                    {
-                        ChipLogDetail(DeviceLayer, "Bluez disconnected");
-                        BLEManagerImpl::CHIPoBluez_ConnectionClosed(conn);
-                        BluezOTConnectionDestroy(conn);
-                        g_hash_table_remove(endpoint->mpConnMap, g_dbus_proxy_get_object_path(aInterface));
-                    }
+                    VerifyOrExit(conn == nullptr,
+                                    ChipLogError(DeviceLayer, "FAIL: connection already tracked: conn: %x device: %s", conn,
+                                                g_dbus_proxy_get_object_path(aInterface)));
+                    conn                = g_new0(BluezConnection, 1);
+                    conn->mpPeerAddress = g_strdup(bluez_device1_get_address(device));
+                    conn->mpDevice      = static_cast<BluezDevice1 *>(g_object_ref(device));
+                    conn->mpEndpoint    = endpoint;
+                    BluezConnectionInit(conn);
+                    endpoint->mpPeerDevicePath = g_strdup(g_dbus_proxy_get_object_path(aInterface));
+                    ChipLogDetail(DeviceLayer, "Device %s (Path: %s) Connected", conn->mpPeerAddress,
+                                    endpoint->mpPeerDevicePath);
+                    g_hash_table_insert(endpoint->mpConnMap, endpoint->mpPeerDevicePath, conn);
                 }
-                else if (strcmp(key, "ServicesResolved") == 0)
-                {
-                    gboolean resolved;
-                    resolved = g_variant_get_boolean(value);
+                // for central, we do not call BluezConnectionInit until the services have been resolved
 
-                    if (endpoint->mIsCentral && conn != nullptr && resolved == TRUE)
-                    {
-                        /* delay to idle, this is to workaround race in handling
-                         * of interface-added and properites-changed signals
-                         * it looks like we cannot specify order of those
-                         * handlers and currently implementation assumes
-                         * that interfaces-added is called first.
-                         *
-                         * TODO figure out if we can avoid this
-                         */
-                        g_idle_add(BluezConnectionInitIdle, conn);
-                    }
-                }
-                else if (strcmp(key, "RSSI") == 0)
-                {
-                    /* when discovery starts we will get this one device is
-                     * found even if device object was already present
-                     */
-                    if (endpoint->mIsCentral)
-                    {
-                        BluezHandleAdvertisementFromDevice(device, endpoint);
-                    }
-                }
-
-                g_variant_unref(value);
+                BLEManagerImpl::CHIPoBluez_NewConnection(conn);
+            }
+            else
+            {
+                ChipLogDetail(DeviceLayer, "Bluez disconnected");
+                BLEManagerImpl::CHIPoBluez_ConnectionClosed(conn);
+                BluezOTConnectionDestroy(conn);
+                g_hash_table_remove(endpoint->mpConnMap, g_dbus_proxy_get_object_path(aInterface));
             }
         }
+        else if (strcmp(key, "ServicesResolved") == 0)
+        {
+            gboolean resolved;
+            resolved = g_variant_get_boolean(value);
+
+            if (endpoint->mIsCentral && conn != nullptr && resolved == TRUE)
+            {
+                /* delay to idle, this is to workaround race in handling
+                    * of interface-added and properites-changed signals
+                    * it looks like we cannot specify order of those
+                    * handlers and currently implementation assumes
+                    * that interfaces-added is called first.
+                    *
+                    * TODO figure out if we can avoid this
+                    */
+                g_idle_add(BluezConnectionInitIdle, conn);
+            }
+        }
+        else if (strcmp(key, "RSSI") == 0)
+        {
+            /* when discovery starts we will get this one device is
+                * found even if device object was already present
+                */
+            if (endpoint->mIsCentral)
+            {
+                BluezHandleAdvertisementFromDevice(device, endpoint);
+            }
+        }
+
+        g_variant_unref(value);
     }
 exit:
     return;
