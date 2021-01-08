@@ -167,15 +167,17 @@ CHIP_ERROR SecureSessionMgr::EncryptMessage(Transport::PeerConnectionState * sta
     VerifyOrExit(CanCastTo<uint16_t>(totalLen + taglen), err = CHIP_ERROR_INTERNAL);
     msgBuf->SetDataLength(static_cast<uint16_t>(totalLen + taglen));
 
-    state->IncrementSendMessageIndex();
-
     ChipLogDetail(Inet, "Secure transport encrypted msg %u", msgId);
 
 exit:
-    if (!msgBuf.IsNull())
+    if (err != CHIP_NO_ERROR)
     {
         const char * errStr = ErrorStr(err);
         ChipLogError(Inet, "Secure transport failed to encrypt msg %u: %s", state->GetSendMessageIndex(), errStr);
+    }
+    else
+    {
+        state->IncrementSendMessageIndex();
     }
 
     return err;
@@ -238,7 +240,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, PacketHe
         encryptedMsg->SetStart(msgStart);
         encryptedMsg->SetDataLength(msgLen);
 
-        (*bufferRetainSlot) = encryptedMsg.Retain();
+        (*bufferRetainSlot)      = encryptedMsg.Retain();
+        bufferRetainSlot->mMsgId = encryptedMsg.mMsgId;
     }
 
 exit:
