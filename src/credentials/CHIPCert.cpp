@@ -190,7 +190,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags
             VerifyOrExit((cert->CertFlags & expectedFlags) == expectedFlags, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
         }
 
-        // Verify the cert was signed with ECDSA-SHA256. This is the only signature algorithms currently supported.
+        // Verify the cert was signed with ECDSA-SHA256. This is the only signature algorithm currently supported.
         VerifyOrExit(cert->SigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, err = CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
 
         // If requested, generate the hash of the TBS portion of the certificate...
@@ -295,7 +295,7 @@ CHIP_ERROR ChipCertificateSet::LoadCerts(TLVReader & reader, uint16_t decodeFlag
         SuccessOrExit(err);
     }
 
-    // Other we expect to be position on an Array or Path that contains a sequence of
+    // Other we expect to be positioned on an Array or Path that contains a sequence of
     // zero or more certificates...
     else
     {

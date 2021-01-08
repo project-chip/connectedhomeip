@@ -258,7 +258,7 @@ enum
  *  @struct ChipDN
  *
  *  @brief
- *    A data structure represents a Distinguished Name in a CHIP certificate.
+ *    A data structure representing a Distinguished Name in a CHIP certificate.
  */
 struct ChipDN
 {
@@ -282,7 +282,7 @@ struct ChipDN
  *  @struct CertificateKeyId
  *
  *  @brief
- *    A data structure represents a certificate key identifier.
+ *    A data structure representing a certificate key identifier.
  */
 struct CertificateKeyId
 {
@@ -676,7 +676,7 @@ CHIP_ERROR UnpackCertTime(uint32_t packedTime, chip::ASN1::ASN1UniversalTime & t
  *
  * @param packedTime  The packed certificate date/time to be converted.
  *
- * @return A corresponding packet certificate date.
+ * @return A corresponding packed certificate date.
  **/
 uint16_t PackedCertTimeToDate(uint32_t packedTime);
 
@@ -687,7 +687,7 @@ uint16_t PackedCertTimeToDate(uint32_t packedTime);
  *
  * @param packedDate  The packed certificate date to be converted.
  *
- * @return  A corresponding packet certificate date/time.
+ * @return  A corresponding packed certificate date/time.
  **/
 uint32_t PackedCertDateToTime(uint16_t packedDate);
 
@@ -699,7 +699,7 @@ uint32_t PackedCertDateToTime(uint16_t packedDate);
  *                           Note: this value is compatible with *positive* values
  *                           of the POSIX time_t value, up to the year 2105.
  *
- * @return  A corresponding packet certificate date/time.
+ * @return  A corresponding packed certificate date/time.
  **/
 uint32_t SecondsSinceEpochToPackedCertTime(uint32_t secondsSinceEpoch);
 

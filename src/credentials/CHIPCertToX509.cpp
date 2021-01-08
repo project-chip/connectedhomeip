@@ -76,7 +76,7 @@ static CHIP_ERROR DecodeConvertDN(TLVReader & reader, ASN1Writer & writer, ChipD
     err = reader.EnterContainer(outerContainer);
     SuccessOrExit(err);
 
-    // Read the first TLV element in the Path.  This represents the first RDN in the original ASN.1 DN.
+    // Read the first TLV element in the List.  This represents the first RDN in the original ASN.1 DN.
     //
     // NOTE: Although CHIP certificate encoding allows for DNs containing multiple RDNs, and/or multiple
     // attributes per RDN, this implementation only supports DNs with a single RDN that contains exactly
