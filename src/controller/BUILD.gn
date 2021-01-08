@@ -48,6 +48,6 @@ static_library("controller") {
   defines = []
 
   if (chip_devctrl_use_interation_model) {
-    defines += ["CHIP_DEVCTRL_USE_INTERACTION_MODEL"]
+    defines += [ "CHIP_DEVCTRL_USE_INTERACTION_MODEL" ]
   }
 }
