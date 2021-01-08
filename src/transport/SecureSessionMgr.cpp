@@ -235,8 +235,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, PacketHe
         encryptedMsg->SetStart(msgStart);
         encryptedMsg->SetDataLength(msgLen);
 
-        (*bufferRetainSlot)      = std::move(encryptedMsg);
-        bufferRetainSlot->mMsgId = encryptedMsg.mMsgId;
+        (*bufferRetainSlot) = std::move(encryptedMsg);
     }
 
 exit:
