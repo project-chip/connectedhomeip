@@ -481,7 +481,7 @@ CHIP_ERROR GenericBLEManagerImpl_Zephyr<ImplClass>::HandleRXCharWrite(const Chip
                   bt_conn_index(c1WriteEvent->BtConn));
 
     HandleWriteReceived(c1WriteEvent->BtConn, &CHIP_BLE_SVC_ID, &chipUUID_CHIPoBLEChar_RX,
-                        PacketBufferHandle::Create(c1WriteEvent->Data));
+                        PacketBufferHandle::Adopt(c1WriteEvent->Data));
     bt_conn_unref(c1WriteEvent->BtConn);
 
     return CHIP_NO_ERROR;
