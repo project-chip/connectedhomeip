@@ -122,30 +122,13 @@ CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle payload, Co
     }
 
 exit:
-    if (!payload.IsNull())
-    {
-        System::PacketBuffer * buffer = payload.Release_ForNow();
-        if (buffer != NULL)
-        {
-            System::PacketBuffer::Free(buffer);
-            buffer = nullptr;
-        }
-    }
     return err;
 }
 
 void Command::Shutdown()
 {
     VerifyOrExit(mState != kState_Uninitialized, );
-    if (!mCommandMessageBuf.IsNull())
-    {
-        System::PacketBuffer * buffer = mCommandDataBuf.Release_ForNow();
-        if (buffer != NULL)
-        {
-            System::PacketBuffer::Free(buffer);
-            buffer = nullptr;
-        }
-    }
+    mCommandMessageBuf = nullptr;
 
     if (mpExchangeCtx != nullptr)
     {
@@ -241,14 +224,8 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
     }
     MoveToState(kState_AddCommand);
 
-exit : {
-    System::PacketBuffer * buffer = mCommandDataBuf.Release_ForNow();
-    if (buffer != NULL)
-    {
-        System::PacketBuffer::Free(buffer);
-        buffer = nullptr;
-    }
-}
+exit:
+    mCommandDataBuf = nullptr;
     ChipLogFunctError(err);
     return err;
 }
