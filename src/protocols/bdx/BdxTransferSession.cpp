@@ -10,6 +10,24 @@
 #include <protocols/bdx/BdxMessages.h>
 #include <support/CodeUtils.h>
 
+template <class BdxMsgType>
+CHIP_ERROR WriteToPacketBuffer(const BdxMsgType & msgStruct, ::chip::System::PacketBufferHandle & msgBuf)
+{
+    CHIP_ERROR err     = CHIP_NO_ERROR;
+    size_t msgDataSize = msgStruct.MessageSize();
+    msgBuf             = ::chip::System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgDataSize));
+    if (msgBuf.IsNull())
+    {
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    ::chip::BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
+    msgStruct.WriteToBuffer(bbuf);
+    msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
+
+    return err;
+}
+
 namespace chip {
 namespace BDX {
 
@@ -21,8 +39,7 @@ TransferSession::TransferSession()
 CHIP_ERROR TransferSession::StartTransfer(MessagingDelegate * msgDelegate, PlatformDelegate * platformDelegate, TransferRole role,
                                           const TransferInit & initMsg)
 {
-    CHIP_ERROR err     = CHIP_NO_ERROR;
-    size_t msgDataSize = 0;
+    CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferHandle msgBuf;
     MessageType msgType;
 
@@ -32,19 +49,11 @@ CHIP_ERROR TransferSession::StartTransfer(MessagingDelegate * msgDelegate, Platf
     mPlatformDelegate  = platformDelegate;
     mRole              = role;
 
-    msgDataSize = initMsg.MessageSize();
-    msgBuf      = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgDataSize));
-    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    err = WriteToPacketBuffer<TransferInit>(initMsg, msgBuf);
+    SuccessOrExit(err);
 
     msgType = (mRole == kSender) ? kSendInit : kReceiveInit;
-
-    {
-        BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
-        initMsg.WriteToBuffer(bbuf);
-        msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
-        err = AttachHeaderAndSend(msgType, std::move(msgBuf));
-    }
-
+    err     = AttachHeaderAndSend(msgType, std::move(msgBuf));
     SuccessOrExit(err);
 
     mState = (mRole == kSender) ? kNegotiateSend : kNegotiateReceive;
@@ -58,11 +67,19 @@ CHIP_ERROR TransferSession::WaitForTransfer(MessagingDelegate * msgDelegate, Pla
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrExit(msgDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(platformDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    mMessagingDelegate     = msgDelegate;
+    mPlatformDelegate      = platformDelegate;
+    mRole                  = role;
+    mSuppportedXferOpts    = xferControlOpts;
+    mMaxSupportedBlockSize = maxBlockSize;
+    mState                 = kIdle;
+
 exit:
     return err;
 }
 
-// TODO: change parameter to PacketHeader
 CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg)
 {
     CHIP_ERROR err      = CHIP_NO_ERROR;
@@ -77,7 +94,6 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
 
     msg->ConsumeHead(headerSize);
 
-    // TODO: define Bdx protocol type
     VerifyOrExit(payloadHeader.GetProtocolID() == Protocols::kProtocol_BDX, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
     msgType = payloadHeader.GetMessageType();
 
@@ -93,9 +109,10 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
     case kReceiveInit:
         HandleReceiveInit(std::move(msg));
         break;
-        /*        case kReceiveAccept:
-                    HandleReceiveAccept();
-                    break;
+    case kReceiveAccept:
+        HandleReceiveAccept(std::move(msg));
+        break;
+        /*
                 case kBlockQuery:
                     HandleBlockQuery();
                     break;
@@ -113,12 +130,14 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
         */
         break;
     default:
+        printf("unknown message type\n");
         // unknown message type
         break;
     }
 
 exit:
-    return CHIP_NO_ERROR;
+    printf("err = %d\n", err);
+    return err;
 }
 /*
 void TransferSession::HandleSendInit()
@@ -137,10 +156,9 @@ void TransferSession::HandleReceiveInit(System::PacketBufferHandle msgData)
     ReceiveInit rcvInit;
     ReceiveAccept acceptMsg;
     BitFlags<uint8_t, TransferControlFlags> commonOpts;
-    size_t msgDataSize = 0;
-    System::PacketBufferHandle msgBuf;
-    MessageType msgType;
+    System::PacketBufferHandle outMsgBuf;
 
+    // TODO: correct errors?
     VerifyOrExit(mRole == kSender, mMessagingDelegate->OnTransferError(kTransferMethodNotSupported));
     VerifyOrExit(mState == kIdle, mMessagingDelegate->OnTransferError(kServerBadState));
 
@@ -160,13 +178,15 @@ void TransferSession::HandleReceiveInit(System::PacketBufferHandle msgData)
     {
         // TODO: TRANSFER METHOD NOT SUPPORTED ?
         // BAD MESSAGE CONTENTS ?
+        mMessagingDelegate->OnTransferError(kTransferMethodNotSupported);
         return;
     }
 
     commonOpts.SetRaw(rcvInit.TransferCtlOptions.Raw() & mSuppportedXferOpts.Raw());
     if (commonOpts.Raw() == 0)
     {
-        // TODO: TRANSFER METHOD NOT SUPPORTED
+        // TODO: TRANSFER METHOD NOT SUPPORTED ?
+        mMessagingDelegate->OnTransferError(kTransferMethodNotSupported);
         return;
     }
     else if (commonOpts.HasOnly(kAsync))
@@ -190,7 +210,7 @@ void TransferSession::HandleReceiveInit(System::PacketBufferHandle msgData)
     // End Transfer control //////////////////////////////////////////
 
     // Range Control
-    //      - just accept all values (TODO: do we need to consider widerange?)
+    //      - just accept all values (TODO: do we need to consider widerange? is it assumed all devices support 32 and 64?)
     mStartOffset = rcvInit.StartOffset;
     mMaxLength   = rcvInit.MaxLength;
 
@@ -200,9 +220,14 @@ void TransferSession::HandleReceiveInit(System::PacketBufferHandle msgData)
 
     // File designator
     //      - TODO: pass to platform layer
+    mPlatformDelegate->OnFileDesignatorReceived();
 
     // Metadata
     //      - TODO: pass to platform layer (if any exists)
+    if (rcvInit.Metadata != nullptr && rcvInit.MetadataLength > 0)
+    {
+        mPlatformDelegate->OnMetadataReceived();
+    }
 
     acceptMsg.TransferCtlFlags.SetRaw(0).Set(mControlMode, true);
     acceptMsg.Version      = mVersion;
@@ -211,20 +236,10 @@ void TransferSession::HandleReceiveInit(System::PacketBufferHandle msgData)
     acceptMsg.Length       = mMaxLength;
     // TODO: metadata
 
-    msgDataSize = acceptMsg.MessageSize();
-    msgBuf      = System::PacketBuffer::NewWithAvailableSize(static_cast<uint16_t>(msgDataSize));
-    VerifyOrExit(!msgBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
+    err = WriteToPacketBuffer<ReceiveAccept>(acceptMsg, outMsgBuf);
+    SuccessOrExit(err);
 
-    msgType = (mRole == kSender) ? kSendInit : kReceiveInit;
-
-    {
-        BufBound bbuf(msgBuf->Start(), msgBuf->AvailableDataLength());
-        acceptMsg.WriteToBuffer(bbuf);
-        msgBuf->SetDataLength(static_cast<uint16_t>(bbuf.Needed()));
-        err = AttachHeaderAndSend(msgType, std::move(msgBuf));
-    }
-
-    err = AttachHeaderAndSend(kReceiveAccept, std::move(msgBuf));
+    err = AttachHeaderAndSend(kReceiveAccept, std::move(outMsgBuf));
     SuccessOrExit(err);
 
     mState = kTransferInProgress;
@@ -232,14 +247,18 @@ void TransferSession::HandleReceiveInit(System::PacketBufferHandle msgData)
 exit:
     return;
 }
-/*
-TransferSession::HandleReceiveAccept(System::PacketBuffer *msgData)
+
+void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
 {
-    // was the last message sent a ReceiveInit?
-    if (mState != kNegotiatingReceive)
-    {
-        //TODO
-    }
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    ReceiveAccept rcvAcceptMsg;
+    System::PacketBufferHandle outMsgBuf;
+
+    VerifyOrExit(mRole == kReceiver, mMessagingDelegate->OnTransferError(kTransferMethodNotSupported));
+    VerifyOrExit(mState == kNegotiateReceive, mMessagingDelegate->OnTransferError(kServerBadState));
+
+    err = rcvAcceptMsg.Parse(msgData.Retain());
+    SuccessOrExit(err);
 
     // double-check that parameters are acceptable:
     //    need to decode message first
@@ -247,6 +266,8 @@ TransferSession::HandleReceiveAccept(System::PacketBuffer *msgData)
     // acceptable? transfer control
     // acceptable? range control
     // acceptable? max size
+
+    // TODO: metadata
 
     // if acceptable...
     if (mControlMode == kReceiverDrive)
@@ -259,8 +280,14 @@ TransferSession::HandleReceiveAccept(System::PacketBuffer *msgData)
         // await Block
     }
 
+    // err = AttachHeaderAndSend(kReceiveAccept, std::move(outMsgBuf));
+    SuccessOrExit(err);
+
+exit:
+    return;
 }
 
+/*
 TransferSession::HandleBlockQuery()
 {
 

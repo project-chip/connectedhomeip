@@ -23,7 +23,6 @@ public:
             PayloadHeader payloadHeader;
             uint16_t headerSize;
             payloadHeader.Decode(msg->Start(), msg->DataLength(), &headerSize);
-            msg->ConsumeHead(headerSize);
             mLastMessageType = payloadHeader.GetMessageType();
             mLastMessageSent = std::move(msg);
         }
@@ -59,6 +58,8 @@ public:
         return CHIP_NO_ERROR;
     }
 
+    void OnFileDesignatorReceived() override {}
+
     CHIP_ERROR ChooseControlMode(const BitFlags<uint8_t, TransferControlFlags> & proposed,
                                  const BitFlags<uint8_t, TransferControlFlags> & supported, TransferControlFlags & choice) override
     {
@@ -77,8 +78,8 @@ void TestStartTransfer(nlTestSuite * inSuite, void * inContext)
     MockPlatformDelegate mockPlatformDelegate;
     TransferSession initiatingReceiver;
 
-    // Initialize a correct TransferInit message
-    TransferInit testMsg;
+    // Initialize a valid TransferInit message
+    ReceiveInit testMsg;
     testMsg.TransferCtlOptions.SetRaw(0).Set(kReceiverDrive, true);
     testMsg.MaxBlockSize   = kTestMaxBlockSize;
     char testFileDes[9]    = { "test.txt" };
@@ -104,49 +105,50 @@ void TestStartTransfer(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, mockMsgDelegate.mNumErr == 0);
 }
 
-/*
-void TestHandleReceiveInit(nlTestSuite * inSuite, void * inContext)
+void TestInitiatingReceiverFullExchange(nlTestSuite * inSuite, void * inContext)
 {
-    MockMessagingDelegate mockResponderDelegate;
-    MockMessagingDelegate mockInitiatorDelegate;
-    MockPlatformDelegate mockPlatformDelegate;
-    System::PacketBufferHandle pEmptyMsg = System::PacketBuffer::New(10);
+    CHIP_ERROR err = CHIP_NO_ERROR;
 
-    BitFlags<uint8_t, TransferControlFlags> xferOpts;
-    xferOpts.Set(kSenderDrive);
+    MockMessagingDelegate receiverMsgDelegate;
+    MockMessagingDelegate senderMsgDelegate;
+    MockPlatformDelegate platformDelegate; // share platfrom delegate since this test won't query it
+    TransferSession initiatingReceiver;
+    TransferSession respondingSender;
 
-    ReceiveInit testMsg;
-    testMsg.TransferCtlOptions.SetRaw(0).Set(kReceiverDrive, true);
-    testMsg.MaxBlockSize   = kTestMaxBlockSize;
+    // Initialize a valid ReceiveInit message
+    ReceiveInit initMsg;
+    initMsg.TransferCtlOptions.Set(kReceiverDrive);
+    initMsg.MaxBlockSize   = kTestMaxBlockSize;
     char testFileDes[9]    = { "test.txt" };
-    testMsg.FileDesLength  = 9;
-    testMsg.FileDesignator = reinterpret_cast<uint8_t *>(testFileDes);
+    initMsg.FileDesLength  = 9;
+    initMsg.FileDesignator = reinterpret_cast<uint8_t *>(testFileDes);
 
-    // Initialize Receiver state machine
-    TransferSession respondingReceiver(&mockResponderDelegate, &mockPlatformDelegate);
-    respondingReceiver.WaitForTransfer(kReceiver, xferOpts, kTestMaxBlockSize);
-
-    TransferSession initiatingReceiver(&mockInitiatorDelegate, &mockPlatformDelegate);
-    initiatingReceiver.StartTransfer(kReceiver, testMsg);
+    // Initialize RespondingSender to wait for ReceiveInit message
+    BitFlags<uint8_t, TransferControlFlags> xferOpts;
+    xferOpts.Set(kReceiverDrive);
+    respondingSender.WaitForTransfer(&senderMsgDelegate, &platformDelegate, kSender, xferOpts, kTestMaxBlockSize);
 
     // Verify StartTransfer(kReceiver...) sends ReceiveInit messsage
-    NL_TEST_ASSERT(inSuite, mockInitiatorDelegate.mLastMessageType == kReceiveInit);
+    initiatingReceiver.StartTransfer(&receiverMsgDelegate, &platformDelegate, kReceiver, initMsg);
+    NL_TEST_ASSERT(inSuite, receiverMsgDelegate.mNumSentMsgs == 1);
+    NL_TEST_ASSERT(inSuite, receiverMsgDelegate.mLastMessageType == kReceiveInit);
 
-    respondingReceiver.HandleMessageReceived(std::move(mockInitiatorDelegate.mLastMessageSent));
+    // Verfiy Sender responds to ReceiveInit with ReceiveAccept
+    err = respondingSender.HandleMessageReceived(std::move(receiverMsgDelegate.mLastMessageSent));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, senderMsgDelegate.mNumSentMsgs == 1);
+    NL_TEST_ASSERT(inSuite, senderMsgDelegate.mLastMessageType == kReceiveAccept);
 
-    // Verify Responding Receiver cannot reply to ReceiveInit
-    // TODO: is this an actual constraint?
-    bdxSender.HandleMessageReceived(kReceiveInit, pEmptyMsg);
-    NL_TEST_ASSERT(inSuite, mockDelegate.mLastMessageSent == BDX::BDXMsgType::kStatusReport_Temp);
+    // Since this is ReceiverDrive, the Receiver should now respond to ReceiveAccept with BlockQuery
+    err = initiatingReceiver.HandleMessageReceived(std::move(senderMsgDelegate.mLastMessageSent));
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite, receiverMsgDelegate.mNumSentMsgs == 2);
+    NL_TEST_ASSERT(inSuite, receiverMsgDelegate.mLastMessageType == kBlockQuery);
 
-    // Initialize Sender state machine
-    BDX::TransferSession bdxSender;
-    bdxSender.Init(BDX::kSender, transferParams, rangeParams, kTestMaxBlockSize, &mockDelegate);
-
-    // Verify Sender sends ReceiveAccept in response to ReceiveInit
-    bdxSender.HandleMessageReceived(BDX::BDXMsgType::kReceiveInit, pEmptyMsg);
-    NL_TEST_ASSERT(inSuite, mockDelegate.mLastMessageSent == BDX::BDXMsgType::kReceiveAccept);
-}*/
+    // Verify no errors during the entire exchange
+    NL_TEST_ASSERT(inSuite, senderMsgDelegate.mNumErr == 0);
+    NL_TEST_ASSERT(inSuite, receiverMsgDelegate.mNumErr == 0);
+}
 
 // Test Suite
 
@@ -157,6 +159,7 @@ void TestHandleReceiveInit(nlTestSuite * inSuite, void * inContext)
 static const nlTest sTests[] =
 {
     NL_TEST_DEF("TestStartTransfer", TestStartTransfer),
+    NL_TEST_DEF("TestInitiatingReceiverFullExchange", TestInitiatingReceiverFullExchange),
     NL_TEST_SENTINEL()
 };
 // clang-format on

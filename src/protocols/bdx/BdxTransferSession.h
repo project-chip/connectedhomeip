@@ -58,6 +58,8 @@ public:
 
 private:
     void HandleReceiveInit(System::PacketBufferHandle msgData);
+    void HandleReceiveAccept(System::PacketBufferHandle msgData);
+
     CHIP_ERROR AttachHeaderAndSend(MessageType msgType, System::PacketBufferHandle msgBuf);
 
     MessagingDelegate * mMessagingDelegate;
@@ -94,6 +96,8 @@ public:
      *   TODO: BDX_ERROR ?
      */
     virtual CHIP_ERROR OnTransferError(StatusCode code) = 0;
+
+    virtual ~MessagingDelegate() {}
 };
 
 class DLL_EXPORT TransferSession::PlatformDelegate
@@ -103,12 +107,17 @@ public:
 
     virtual CHIP_ERROR ReadBlock(BufBound & buffer, uint16_t length) = 0;
 
+    // TODO: how to pass file
+    virtual void OnFileDesignatorReceived() = 0;
+
     // TODO: how to pass metadata
     virtual void OnMetadataReceived() {}
 
     virtual CHIP_ERROR ChooseControlMode(const BitFlags<uint8_t, TransferControlFlags> & proposed,
                                          const BitFlags<uint8_t, TransferControlFlags> & supported,
                                          TransferControlFlags & choice) = 0;
+
+    virtual ~PlatformDelegate() {}
 };
 
 } // namespace BDX
