@@ -119,9 +119,9 @@ public:
      * Parsing begins at the backing store's start position and continues until the
      * end of the data in the buffer, or maxLen bytes have been parsed.
      *
-     * @param[in]   buf     A pointer to a TLVBackingStore providing the TLV data to be parsed.
-     * @param[in]   maxLen  The maximum of bytes to parse. Defaults to the amount of data
-     *                      in the input buffer.
+     * @param[in]   backingStore    A pointer to a TLVBackingStore providing the TLV data to be parsed.
+     * @param[in]   maxLen          The maximum of bytes to parse. Defaults to the amount of data
+     *                              in the input buffer.
      *
      * @retval #CHIP_NO_ERROR  If the method succeeded.
      * @retval other           Other error codes returned by TLVBackingStore::OnInit().
@@ -747,7 +747,7 @@ public:
     /**
      * Position the destination reader on the next element with the given tag within this reader's current container context
      *
-     * @param[in] tag                      The destination context tag value
+     * @param[in] tagInApiForm             The destination context tag value
      * @param[in] destReader               The destination TLV reader value that was located by given tag
      *
      * @retval #CHIP_NO_ERROR              If the reader was successfully positioned at the given tag
@@ -2300,8 +2300,6 @@ public:
      * or closing a file descriptor.
      *
      * @param[in]       writer          A reference to the TLVWriter object that is being finalized.
-     * @param[in,out]   bufHandle       A uintptr_t context value that was set by previous calls to the
-     *                                  @p GetNewBuffer function.
      * @param[in,out]   bufStart        A pointer to the beginning of the current (and final) output buffer.
      * @param[in,out]   bufLen          The number of bytes contained in the buffer pointed to by @p bufStart.
      *
