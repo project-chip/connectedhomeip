@@ -52,6 +52,8 @@
 #include <support/DLLUtil.h>
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
+#include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
 
 using namespace chip;
 using namespace chip::Ble;
@@ -129,6 +131,24 @@ public:
 static chip::System::Layer sSystemLayer;
 static chip::Inet::InetLayer sInetLayer;
 static chip::Controller::PythonPersistentStorageDelegate sStorageDelegate;
+static chip::app::CommandSender * sCommandSender;
+
+namespace chip {
+namespace app {
+// TODO: This function should not look like this, find a better way!
+CommandSender * GetCommandSender()
+{
+    if (sCommandSender != nullptr) {
+        return sCommandSender;
+    }
+    CHIP_ERROR err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&sCommandSender);
+    if (err != CHIP_NO_ERROR) {
+        return nullptr;
+    }
+    return sCommandSender;
+}
+} // namespace app
+} // namespace chip
 
 // NOTE: Remote device ID is in sync with the echo server device id
 // At some point, we may want to add an option to connect to a device without

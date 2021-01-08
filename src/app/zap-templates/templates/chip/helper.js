@@ -345,6 +345,50 @@ function isManufacturerSpecificCommand()
   return !!this.mfgCode;
 }
 
+function asPythonType(type) {
+  switch(type) {
+  case 'int8_t':
+  case 'int16_t':
+  case 'int32_t':
+  case 'int64_t':
+  case 'uint8_t':
+  case 'uint16_t':
+  case 'uint32_t':
+  case 'uint64_t':
+  case 'chip::ClusterId':
+    return 'int';
+  case 'char *':
+    return 'str';
+  case 'uint8_t *':
+    return 'byte';
+  }
+}
+
+function asPythonCType(type) {
+  switch(type) {
+  case 'int8_t':
+    return 'c_int8';
+  case 'int16_t':
+    return 'c_int16';
+  case 'int32_t':
+    return 'c_int32';
+  case 'int64_t':
+    return 'c_int64';
+  case 'uint8_t':
+    return 'c_uint8';
+  case 'uint16_t':
+  case 'chip::ClusterId':
+    return 'c_uint16';
+  case 'uint32_t':
+    return 'c_uint32';
+  case 'uint64_t':
+    return 'c_uint64';
+  case 'char *':
+  case 'uint8_t *':
+    return 'c_char_p';
+  }
+}
+
 //
 // Module exports
 //
@@ -357,3 +401,5 @@ exports.chip_server_cluster_attributes        = chip_server_cluster_attributes;
 exports.isWritableAttribute                   = isWritableAttribute;
 exports.isReportableAttribute                 = isReportableAttribute;
 exports.isManufacturerSpecificCommand         = isManufacturerSpecificCommand;
+exports.asPythonType                          = asPythonType;
+exports.asPythonCType                         = asPythonCType;

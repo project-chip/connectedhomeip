@@ -31,6 +31,7 @@ executable("chip-tool-server") {
   sources = [
     "LightingManager.cpp",
     "Options.cpp",
+    "OnOffCluster.cpp",
     "include/LightingManager.h",
     "main.cpp",
   ]
@@ -39,6 +40,10 @@ executable("chip-tool-server") {
     defines = [ "BUILD_RELEASE=0" ]
   } else {
     defines = [ "BUILD_RELEASE=1" ]
+  }
+
+  if (chip_app_use_interation_model) {
+    defines += ["CHIP_APP_USE_INTERACTION_MODEL"]
   }
 
   public_configs = [ ":includes" ]

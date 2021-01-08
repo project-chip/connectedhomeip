@@ -1,0 +1,79 @@
+'''
+{{> header}}
+'''
+
+from ctypes import *
+from .ChipStack import *
+from .ChipExceptions import *
+
+__all__ = ["ChipCluster"]
+
+class ChipCluster:
+    def __init__(self, chipstack, devctl):
+        self._ChipStack = chipstack
+        self._devCtrl = devctl
+        pass
+
+    def SendCommand(self, nodeId: int):
+        self._ChipStack.Call(
+            lambda: self._dmLib.chip_ime_SendCommand(nodeId)
+        )
+
+    def ListClusters(self):
+        return {
+{{#chip_server_clusters}}
+            "{{asCamelCased name false}}": {
+{{#chip_server_cluster_commands}}
+                "{{asCamelCased name false}}": [
+{{#chip_server_cluster_command_arguments}}
+                    ("{{asPythonType chipType}}", "{{asCamelCased label}}"),
+{{/chip_server_cluster_command_arguments}}
+                ],
+{{/chip_server_cluster_commands}}
+            },
+{{/chip_server_clusters}}
+        }
+
+    def PrepareCommand(self, cluster: str, command: str, endpoint: int, groupid: int, args):
+        func = getattr(self, "Cluster{}_Command{}".format(cluster, command))
+        if not func:
+            raise UnknownCluster(cluster)
+        func(endpoint, groupid, args)
+
+{{#chip_server_clusters}}
+{{#chip_server_cluster_commands}}
+    def Cluster{{asCamelCased clusterName false}}_Command{{asCamelCased name false}}(self, ZCLendpoint: int, ZCLgroupid: int, args):
+        totArgs = 0{{#chip_server_cluster_command_arguments}} + 1{{/chip_server_cluster_command_arguments}}
+        if len(args) != totArgs:
+            raise InvalidArgumentCount(totArgs, len(args))
+        argCnt = 0
+{{#chip_server_cluster_command_arguments}}
+{{#if (isByteString type)}}
+        {{asCamelCased label}} = bytes.fromhex(args[argCnt])
+{{else if (isString type)}}
+        {{asCamelCased label}} = args[argCnt].encode("utf-8")
+{{else}}
+        {{asCamelCased label}} = {{asPythonType chipType}}(args[argCnt])
+{{/if}}
+        argCnt += 1
+{{/chip_server_cluster_command_arguments}}
+        self._ChipStack.Call(
+            lambda: self._dmLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(
+                ZCLendpoint, ZCLgroupid{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, len({{asCamelCased label}}){{/if}}{{/chip_server_cluster_command_arguments}}
+            )
+        )
+
+{{/chip_server_cluster_commands}}
+{{/chip_server_clusters}}
+    def InitLib(self, dmLib):
+        self._dmLib = dmLib
+        self._dmLib.chip_ime_SendCommand.argtypes = [c_uint64]
+        self._dmLib.chip_ime_SendCommand.restype = c_uint32
+{{#chip_server_clusters}}
+        # Cluster {{asCamelCased name false}}
+{{#chip_server_cluster_commands}}
+        # Cluster {{asCamelCased clusterName false}} Command {{asCamelCased name false}}
+        self._dmLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.argtypes = [c_uint8, c_uint16{{#chip_server_cluster_command_arguments}}{{#if (isByteString type)}}, c_char_p, c_uint32{{else}}, {{asPythonCType chipType}}{{/if}}{{/chip_server_cluster_command_arguments}}]
+        self._dmLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.restype = c_uint32
+{{/chip_server_cluster_commands}}
+{{/chip_server_clusters}}

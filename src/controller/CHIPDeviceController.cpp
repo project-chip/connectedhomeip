@@ -39,6 +39,7 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
+#include <app/InteractionModelEngine.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
 #include <core/CHIPSafeCasts.h>
@@ -124,8 +125,9 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
         mStorageDelegate->SetDelegate(this);
     }
 
-    mTransportMgr   = chip::Platform::New<DeviceTransportMgr>();
-    mSessionManager = chip::Platform::New<SecureSessionMgr>();
+    mTransportMgr    = chip::Platform::New<DeviceTransportMgr>();
+    mSessionManager  = chip::Platform::New<SecureSessionMgr>();
+    mExchangeManager = chip::Platform::New<Messaging::ExchangeManager>();
 
     err = mTransportMgr->Init(
         Transport::UdpListenParameters(mInetLayer).SetAddressType(Inet::kIPAddressType_IPv6).SetListenPort(mListenPort)
@@ -139,7 +141,14 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr);
     SuccessOrExit(err);
 
+#ifdef CHIP_DEVCTRL_USE_INTERACTION_MODEL
+    err = mExchangeManager->Init(mSessionManager);
+    SuccessOrExit(err);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager);
+    SuccessOrExit(err);
+#else
     mSessionManager->SetDelegate(this);
+#endif
 
     mState         = State::Initialized;
     mLocalDeviceId = localDeviceId;
@@ -663,6 +672,8 @@ void DeviceCommissioner::OnRendezvousComplete()
     device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
+    mSessionManager->NewPairing(Optional<Transport::PeerAddress>(mRendezvousSession->GetPeerAddress()), device->GetDeviceId(),
+                                &mRendezvousSession->GetPairingSession());
 
     // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
     // requires a valid storage delegate. However, test pairing usecase, that's used

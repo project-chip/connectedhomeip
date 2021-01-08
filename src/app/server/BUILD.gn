@@ -27,9 +27,17 @@ static_library("server") {
   ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/mdns",
+    "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/setup_payload",
     "${chip_root}/src/transport",
   ]
+
+  defines = []
+
+  if (chip_app_use_interation_model) {
+    defines += ["CHIP_APP_USE_INTERACTION_MODEL"]
+  }
 }

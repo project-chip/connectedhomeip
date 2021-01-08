@@ -31,6 +31,7 @@ import time
 from threading import Thread
 from ctypes import *
 from .ChipStack import *
+from .ChipCluster import *
 import enum
 
 
@@ -117,6 +118,8 @@ class ChipDeviceController(object):
         self.cbHandleBleWriteChar = None
         self.cbHandleBleSubscribeChar = None
         self.cbHandleBleClose = None
+        self._Cluster = ChipCluster(self._ChipStack, self.devCtrl)
+        self._Cluster.InitLib(self._dmLib)
 
         def DeviceCtrlHandleMessage(appReqState, buffer):
             pass
@@ -232,6 +235,13 @@ class ChipDeviceController(object):
             lambda: self._dmLib.nl_Chip_DeviceController_ConnectIP(
                 self.devCtrl, ipaddr, setupPinCode, onConnectFunct, self.cbHandleMessage, self.cbHandleRendezvousError)
         )
+
+    def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
+        self._Cluster.PrepareCommand(cluster, command, endpoint, groupid, args)
+        self._Cluster.SendCommand(nodeid)
+
+    def ZCLList(self):
+        return self._Cluster.ListClusters()
 
     def Close(self):
         self._ChipStack.Call(

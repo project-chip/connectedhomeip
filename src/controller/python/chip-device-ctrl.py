@@ -131,6 +131,7 @@ class DeviceMgrCmd(Cmd):
         "ble-debug-log",
 
         "connect",
+        "zcl",
         "set-pairing-wifi-credential",
     ]
 
@@ -399,6 +400,42 @@ class DeviceMgrCmd(Cmd):
             print(str(ex))
             return
         print("Connected")
+
+    def do_zcl(self, line):
+        """
+        To send ZCL message to device:
+        zcl <cluster> <command> <nodeid> <endpoint> <groupid> [[args]]
+        To get a list of clusters:
+        zcl ?
+        To get a list of commands in cluster:
+        zcl ? <cluster>
+
+        Send ZCL command to device nodeid
+        """
+        try:
+            args = shlex.split(line)
+            if len(args) == 1 and args[0] == '?':
+                print(self.devCtrl.ZCLList().keys())
+            elif len(args) == 2 and args[0] == '?':
+                cluster = self.devCtrl.ZCLList().get(args[1], None)
+                if not cluster:
+                    print("UnknownCluster: {}".format(cluster))
+                    return
+                for commands in cluster.items():
+                    args = ", ".join(["{}: {}".format(x[1], x[0]) for x in commands[1]])
+                    print(commands[0])
+                    if commands[1]:
+                        print("  ", args)
+                    else:
+                        print("  <no arguments>")
+            elif len(args) > 4:
+                self.devCtrl.ZCLSend(args[0], args[1], int(args[2]), int(args[3]), int(args[4]), args[5:])
+            else:
+                self.do_help("zcl")
+                return
+        except ChipStack.ChipStackException as ex:
+            print(str(ex))
+            return
 
     def do_setpairingwificredential(self, line):
         """

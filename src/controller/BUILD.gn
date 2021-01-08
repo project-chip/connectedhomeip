@@ -14,6 +14,10 @@
 
 import("//build_overrides/chip.gni")
 
+declare_args() {
+  chip_devctrl_use_interation_model = false
+}
+
 static_library("controller") {
   output_name = "libChipController"
 
@@ -33,9 +37,17 @@ static_library("controller") {
   cflags = [ "-Wconversion" ]
 
   public_deps = [
+    "${chip_root}/src/app",
     "${chip_root}/src/lib/core",
     "${chip_root}/src/lib/support",
+    "${chip_root}/src/messaging",
     "${chip_root}/src/platform",
     "${chip_root}/src/transport",
   ]
+
+  defines = []
+
+  if (chip_devctrl_use_interation_model) {
+    defines += ["CHIP_DEVCTRL_USE_INTERACTION_MODEL"]
+  }
 }

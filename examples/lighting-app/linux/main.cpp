@@ -26,6 +26,7 @@
 #include <app/util/af-types.h>
 #include <app/util/attribute-storage.h>
 #include <app/util/util.h>
+#include <app/im-encoder.h>
 #include <core/CHIPError.h>
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>
@@ -188,6 +189,10 @@ int main(int argc, char * argv[])
 
     // Init ZCL Data Model and CHIP App Server
     InitServer();
+
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    chip::app::cluster::OnOff::InitCluster(chip::app::InteractionModelEngine::GetInstance());
+#endif
 
     chip::DeviceLayer::PlatformMgr().RunEventLoop();
 

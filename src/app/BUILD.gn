@@ -37,6 +37,8 @@ static_library("app") {
     "MessageDef.h",
     "decoder.cpp",
     "encoder.cpp",
+    "im-encoder.cpp",
+    "im-encoder.h",
   ]
 
   public_deps = [

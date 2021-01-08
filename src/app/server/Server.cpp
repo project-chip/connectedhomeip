@@ -17,6 +17,7 @@
 
 #include <app/server/Server.h>
 
+#include <app/InteractionModelEngine.h>
 #include <app/server/DataModelHandler.h>
 #include <app/server/RendezvousServer.h>
 #include <app/server/SessionManager.h>
@@ -27,6 +28,7 @@
 #include <inet/InetLayer.h>
 #include <lib/mdns/DiscoveryManager.h>
 #include <mdns/Advertiser.h>
+#include <messaging/ExchangeMgr.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
@@ -40,6 +42,7 @@ using namespace ::chip;
 using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
+using namespace ::chip::Messaging;
 
 namespace {
 
@@ -104,6 +107,7 @@ private:
 };
 
 DemoTransportMgr gTransports;
+Messaging::ExchangeManager gExchange;
 SecureSessionMgr gSessions;
 ServerCallback gCallbacks;
 SecurePairingUsingTestSecret gTestPairing;
@@ -184,7 +188,14 @@ void InitServer(AppDelegate * delegate)
     err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
     SuccessOrExit(err);
 
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    err = gExchange.Init(&gSessions);
+    SuccessOrExit(err);
+    err = chip::app::InteractionModelEngine::GetInstance()->Init(&gExchange);
+    SuccessOrExit(err);
+#else
     gSessions.SetDelegate(&gCallbacks);
+#endif
 
 exit:
     if (err != CHIP_NO_ERROR)

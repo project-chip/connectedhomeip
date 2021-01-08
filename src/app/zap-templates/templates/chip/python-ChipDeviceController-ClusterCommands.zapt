@@ -1,0 +1,49 @@
+{{> header}}
+
+#include <core/CHIPCore.h>
+
+#include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
+#include <app/im-encoder.h>
+
+// TODO: This file should be generated
+
+using namespace chip;
+using namespace chip::app;
+
+namespace chip{
+namespace app {
+CommandSender * GetCommandSender();
+namespace cluster {
+
+// Empty command handlers
+{{#chip_server_clusters}}
+namespace {{asCamelCased name false}} {
+{{#chip_server_cluster_commands}}
+void Handle{{asType name}}CommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj) {}
+{{/chip_server_cluster_commands}}
+} // namespace {{asCamelCased name false}}
+{{/chip_server_clusters}}
+}
+}
+}
+
+extern "C" {
+
+{{#chip_server_clusters}}
+// Cluster {{asCamelCased name false}}
+{{#chip_server_cluster_commands}}
+// Cluster {{asCamelCased clusterName false}} Command {{asCamelCased name false}}
+CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{#if (isByteString type)}}, uint32_t {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}})
+{
+    return app::cluster::{{asCamelCased clusterName false}}::Encode{{asType name}}Command(GetCommandSender(), ZCLendpointId, ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}});
+}
+{{/chip_server_cluster_commands}}
+{{/chip_server_clusters}}
+
+CHIP_ERROR chip_ime_SendCommand(chip::NodeId nodeId)
+{
+    return GetCommandSender()->SendCommandRequest(nodeId);
+}
+
+}

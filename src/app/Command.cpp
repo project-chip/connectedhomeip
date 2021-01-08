@@ -199,7 +199,8 @@ CHIP_ERROR Command::AddCommand(CommandParams & aCommandParams)
 
     if (apCommandLen > 0)
     {
-        VerifyOrExit(apCommandLen > 2, err = CHIP_ERROR_INVALID_ARGUMENT);
+        // Command argument list can be empty.
+        VerifyOrExit(apCommandLen >= 2, err = CHIP_ERROR_INVALID_ARGUMENT);
         VerifyOrExit(apCommandData[0] == chip::TLV::kTLVType_Structure, err = CHIP_ERROR_INVALID_ARGUMENT);
 
         apCommandData += 1;

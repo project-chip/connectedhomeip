@@ -1,0 +1,46 @@
+
+{{> header}}
+
+#pragma once
+
+#include <app/util/basic-types.h>
+#include <app/MessageDef.h>
+#include <app/CommandSender.h>
+#include <app/CommandHandler.h>
+#include <app/InteractionModelEngine.h>
+
+namespace chip {
+namespace app {
+namespace cluster {
+
+{{#chip_server_clusters}}
+
+namespace {{asCamelCased name false}} {
+{{> cluster_header}}
+constexpr uint16_t kClusterId = {{asHex code 4}};
+{{#chip_server_cluster_commands}}
+constexpr uint8_t k{{asCamelCased name false}}CommandId = {{asHex code 2}};
+{{/chip_server_cluster_commands}}
+
+{{#chip_server_cluster_commands}}
+void Handle{{asType name}}CommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj);
+{{/chip_server_cluster_commands}}
+
+{{#chip_server_cluster_commands}}
+// The "ZCL" prefix here is used for avoiding duplicate names.
+CHIP_ERROR Encode{{asType name}}Command(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId{{#chip_server_cluster_command_arguments}}, const {{chipType}} {{asCamelCased label}}{{#if (isByteString type)}}, uint32_t {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}});
+{{/chip_server_cluster_commands}}
+
+void InitCluster(chip::app::InteractionModelEngine * ime);
+void ShutdownCluster(chip::app::InteractionModelEngine * ime);
+
+} // namespace {{asCamelCased name false}}
+
+{{/chip_server_clusters}}
+
+void InitClusters(chip::app::InteractionModelEngine * ime);
+void ShutdownClusters(chip::app::InteractionModelEngine * ime);
+
+} // namespace cluster
+} // namespace app
+} // namespace chip
