@@ -1,0 +1,6 @@
+from chip-cirque-device-base
+
+COPY out/chip-im-initiator /usr/bin/
+COPY entrypoint.sh /
+
+ENTRYPOINT ["/entrypoint.sh", "initiator"]
