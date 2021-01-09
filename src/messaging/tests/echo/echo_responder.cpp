@@ -42,7 +42,7 @@
 namespace {
 
 // The EchoServer object.
-chip::Protocols::EchoServer gEchoServer;
+chip::Protocols::Echo::EchoServer gEchoServer;
 chip::TransportMgr<chip::Transport::UDP> gUDPManager;
 chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::SecureSessionMgr gSessionManager;

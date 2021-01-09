@@ -264,7 +264,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 
     gSendMessageCount = 0;
 
-    err = exchange->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(buffer),
+    err = exchange->SendMessage(kProtocol_Echo, Echo::kEchoMessageType_EchoRequest, std::move(buffer),
                                 Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 

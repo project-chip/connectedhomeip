@@ -251,7 +251,7 @@ void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     payloadHeader.SetProtocolID(chip::Protocols::kProtocol_Echo);
 
     // Set the message type for this header.
-    payloadHeader.SetMessageType(chip::Protocols::kEchoMessageType_EchoRequest);
+    payloadHeader.SetMessageType(chip::Protocols::Echo::kEchoMessageType_EchoRequest);
 
     payloadHeader.SetInitiator(true);
 
@@ -320,10 +320,10 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     payloadHeader.SetExchangeID(0);
 
     // Set the protocol ID for this header.
-    payloadHeader.SetProtocolID(chip::Protocols::kProtocol_Echo);
+    payloadHeader.SetProtocolID(Protocols::kProtocol_Echo);
 
     // Set the message type for this header.
-    payloadHeader.SetMessageType(chip::Protocols::kEchoMessageType_EchoRequest);
+    payloadHeader.SetMessageType(Protocols::Echo::kEchoMessageType_EchoRequest);
 
     payloadHeader.SetInitiator(true);
 

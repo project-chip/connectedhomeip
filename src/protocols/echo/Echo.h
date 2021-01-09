@@ -36,6 +36,7 @@
 
 namespace chip {
 namespace Protocols {
+namespace Echo {
 
 enum
 {
@@ -145,5 +146,6 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
+} // namespace Echo
 } // namespace Protocols
 } // namespace chip
