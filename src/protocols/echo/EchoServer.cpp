@@ -27,6 +27,7 @@
 
 namespace chip {
 namespace Protocols {
+namespace Echo {
 
 CHIP_ERROR EchoServer::Init(Messaging::ExchangeManager * exchangeMgr)
 {
@@ -38,7 +39,7 @@ CHIP_ERROR EchoServer::Init(Messaging::ExchangeManager * exchangeMgr)
     OnEchoRequestReceived = nullptr;
 
     // Register to receive unsolicited Echo Request messages from the exchange manager.
-    mExchangeMgr->RegisterUnsolicitedMessageHandler(kProtocol_Echo, kEchoMessageType_EchoRequest, this);
+    mExchangeMgr->RegisterUnsolicitedMessageHandler(kProtocol_Echo, static_cast<uint8_t>(MsgType::EchoRequest), this);
 
     return CHIP_NO_ERROR;
 }
@@ -47,7 +48,7 @@ void EchoServer::Shutdown()
 {
     if (mExchangeMgr != nullptr)
     {
-        mExchangeMgr->UnregisterUnsolicitedMessageHandler(kProtocol_Echo, kEchoMessageType_EchoRequest);
+        mExchangeMgr->UnregisterUnsolicitedMessageHandler(kProtocol_Echo, static_cast<uint8_t>(MsgType::EchoRequest));
         mExchangeMgr = nullptr;
     }
 }
@@ -78,12 +79,13 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     response->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 
     // Send an Echo Response back to the sender.
-    ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, std::move(response),
+    ec->SendMessage(kProtocol_Echo, static_cast<uint8_t>(MsgType::EchoResponse), std::move(response),
                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
 
     // Discard the exchange context.
     ec->Close();
 }
 
+} // namespace Echo
 } // namespace Protocols
 } // namespace chip

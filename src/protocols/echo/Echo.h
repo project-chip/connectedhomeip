@@ -36,11 +36,15 @@
 
 namespace chip {
 namespace Protocols {
+namespace Echo {
 
-enum
+/**
+ * Echo Protocol Message Types
+ */
+enum class MsgType
 {
-    kEchoMessageType_EchoRequest  = 1,
-    kEchoMessageType_EchoResponse = 2
+    EchoRequest  = 1,
+    EchoResponse = 2
 };
 
 using EchoFunct = void (*)(Messaging::ExchangeContext * ec, System::PacketBufferHandle payload);
@@ -145,5 +149,6 @@ private:
     void OnResponseTimeout(Messaging::ExchangeContext * ec) override {}
 };
 
+} // namespace Echo
 } // namespace Protocols
 } // namespace chip

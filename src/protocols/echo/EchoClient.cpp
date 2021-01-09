@@ -27,6 +27,7 @@
 
 namespace chip {
 namespace Protocols {
+namespace Echo {
 
 CHIP_ERROR EchoClient::Init(Messaging::ExchangeManager * exchangeMgr, SecureSessionHandle session)
 {
@@ -71,7 +72,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
     }
 
     // Send an Echo Request message.  Discard the exchange context if the send fails.
-    err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(payload),
+    err = mExchangeCtx->SendMessage(kProtocol_Echo, static_cast<uint8_t>(MsgType::EchoRequest), std::move(payload),
                                     Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
 
     if (err != CHIP_NO_ERROR)
@@ -94,7 +95,7 @@ void EchoClient::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
 
     // Verify that the message is an Echo Response.
     // If not, close the exchange and free the payload.
-    if (protocolId != kProtocol_Echo || msgType != kEchoMessageType_EchoResponse)
+    if (protocolId != kProtocol_Echo || msgType != static_cast<uint8_t>(MsgType::EchoResponse))
     {
         ec->Close();
         mExchangeCtx = nullptr;
@@ -120,5 +121,6 @@ void EchoClient::OnResponseTimeout(Messaging::ExchangeContext * ec)
     ChipLogProgress(Echo, "Time out! failed to receive echo response from Exchange: %p", ec);
 }
 
+} // namespace Echo
 } // namespace Protocols
 } // namespace chip
