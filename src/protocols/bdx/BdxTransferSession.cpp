@@ -43,6 +43,8 @@ CHIP_ERROR TransferSession::StartTransfer(MessagingDelegate * msgDelegate, Platf
     System::PacketBufferHandle msgBuf;
     MessageType msgType;
 
+    VerifyOrExit(mState == kIdle, err = CHIP_ERROR_INCORRECT_STATE);
+
     VerifyOrExit(msgDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(platformDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     mMessagingDelegate = msgDelegate;
@@ -67,8 +69,11 @@ CHIP_ERROR TransferSession::WaitForTransfer(MessagingDelegate * msgDelegate, Pla
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrExit(mState == kIdle, err = CHIP_ERROR_INCORRECT_STATE);
+
     VerifyOrExit(msgDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(platformDelegate != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
     mMessagingDelegate     = msgDelegate;
     mPlatformDelegate      = platformDelegate;
     mRole                  = role;
@@ -94,6 +99,7 @@ CHIP_ERROR TransferSession::HandleMessageReceived(System::PacketBufferHandle msg
 
     msg->ConsumeHead(headerSize);
 
+    // TODO: handle StatusReport
     VerifyOrExit(payloadHeader.GetProtocolID() == Protocols::kProtocol_BDX, err = CHIP_ERROR_INVALID_MESSAGE_TYPE);
     msgType = payloadHeader.GetMessageType();
 
@@ -139,6 +145,12 @@ exit:
     printf("err = %d\n", err);
     return err;
 }
+
+void TransferSession::EndTransfer(CHIP_ERROR error)
+{
+    // TODO: send status report?
+    mState = kIdle;
+}
 /*
 void TransferSession::HandleSendInit()
 {
@@ -155,39 +167,85 @@ void TransferSession::HandleReceiveInit(System::PacketBufferHandle msgData)
     CHIP_ERROR err = CHIP_NO_ERROR;
     ReceiveInit rcvInit;
     ReceiveAccept acceptMsg;
-    BitFlags<uint8_t, TransferControlFlags> commonOpts;
     System::PacketBufferHandle outMsgBuf;
 
-    // TODO: correct errors?
+    // TODO: (spec) correct errors?
     VerifyOrExit(mRole == kSender, mMessagingDelegate->OnTransferError(kTransferMethodNotSupported));
     VerifyOrExit(mState == kIdle, mMessagingDelegate->OnTransferError(kServerBadState));
 
     err = rcvInit.Parse(msgData.Retain());
     SuccessOrExit(err);
 
-    // Transfer Control ///////////////////////////////////////////
-    //      - version needs to be equal or less than ours
-    //      - at least one drive bit is set, otherwise reject
-    //      - if async, pick async
-    //      - if both sender and receiver drive, platform picks?
-    // TODO: Version - will it be hardcoded into the image or chosen at runtime?
+    // TODO: (spec) Version - will it be hardcoded into the image or chosen at runtime?
     mVersion = ::chip::min(mVersion, rcvInit.Version);
 
-    // Must specify at least one synchronous option
-    if (!rcvInit.TransferCtlOptions.Has(kSenderDrive) && !rcvInit.TransferCtlOptions.Has(kReceiverDrive))
+    err = ResolveTransferControlOptions(rcvInit.TransferCtlOptions);
+    SuccessOrExit(err);
+
+    // Range Control
+    //      - just accept all values
+    //      TODO: (spec) do we need to consider widerange? is it assumed all devices support 32 and 64?)
+    mStartOffset = rcvInit.StartOffset;
+    mMaxLength   = rcvInit.MaxLength;
+
+    mTransferMaxBlockSize = ::chip::min(mMaxSupportedBlockSize, rcvInit.MaxBlockSize);
+
+    // File designator
+    //      - TODO: do we need to store backup in this object to protect null access?
+    err = mPlatformDelegate->OnFileDesignatorReceived(rcvInit.FileDesignator, rcvInit.FileDesLength);
+    SuccessOrExit(err);
+
+    // Metadata
+    //      - TODO: do we need to store backup in this object to protect null access?
+    if (rcvInit.Metadata != nullptr && rcvInit.MetadataLength > 0)
     {
-        // TODO: TRANSFER METHOD NOT SUPPORTED ?
-        // BAD MESSAGE CONTENTS ?
-        mMessagingDelegate->OnTransferError(kTransferMethodNotSupported);
-        return;
+        err = mPlatformDelegate->OnMetadataReceived(rcvInit.Metadata, rcvInit.MetadataLength);
+        SuccessOrExit(err);
     }
 
-    commonOpts.SetRaw(rcvInit.TransferCtlOptions.Raw() & mSuppportedXferOpts.Raw());
+    // TODO: move ReceiveAccept sending to a public method?????
+    acceptMsg.TransferCtlFlags.SetRaw(0).Set(mControlMode, true);
+    acceptMsg.Version      = mVersion;
+    acceptMsg.MaxBlockSize = mTransferMaxBlockSize;
+    acceptMsg.StartOffset  = mStartOffset;
+    acceptMsg.Length       = mMaxLength;
+
+    // TODO: does this work?
+    mPlatformDelegate->ProvideResponseMetadata(acceptMsg.Metadata, acceptMsg.MetadataLength);
+
+    err = WriteToPacketBuffer<ReceiveAccept>(acceptMsg, outMsgBuf);
+    SuccessOrExit(err);
+
+    err = AttachHeaderAndSend(kReceiveAccept, std::move(outMsgBuf));
+    SuccessOrExit(err);
+
+    // TODO: states, or expected message?
+    mState = kTransferInProgress;
+
+exit:
+    printf("HandeReceiveInit err %d\n", err);
+    return;
+}
+
+CHIP_ERROR TransferSession::ResolveTransferControlOptions(const BitFlags<uint8_t, TransferControlFlags> & proposed)
+{
+    // Must specify at least one synchronous option
+    if (!proposed.Has(kSenderDrive) && !proposed.Has(kReceiverDrive))
+    {
+        // TODO: (spec) TRANSFER METHOD NOT SUPPORTED ?
+        // BAD MESSAGE CONTENTS ?
+        mMessagingDelegate->OnTransferError(kTransferMethodNotSupported);
+        return CHIP_ERROR_INTERNAL;
+    }
+
+    // Ensure there are options supported by both nodes.
+    // If there is only one common option, choose that one. Otherwise, let the application pick.
+    BitFlags<uint8_t, TransferControlFlags> commonOpts;
+    commonOpts.SetRaw(proposed.Raw() & mSuppportedXferOpts.Raw());
     if (commonOpts.Raw() == 0)
     {
-        // TODO: TRANSFER METHOD NOT SUPPORTED ?
         mMessagingDelegate->OnTransferError(kTransferMethodNotSupported);
-        return;
+        return CHIP_ERROR_INTERNAL;
     }
     else if (commonOpts.HasOnly(kAsync))
     {
@@ -203,49 +261,47 @@ void TransferSession::HandleReceiveInit(System::PacketBufferHandle msgData)
     }
     else
     {
-        // multiple supported options, application chooses
-        err = mPlatformDelegate->ChooseControlMode(rcvInit.TransferCtlOptions, mSuppportedXferOpts, mControlMode);
-        SuccessOrExit(err);
+        return mPlatformDelegate->ChooseControlMode(proposed, mSuppportedXferOpts, mControlMode);
     }
-    // End Transfer control //////////////////////////////////////////
 
-    // Range Control
-    //      - just accept all values (TODO: do we need to consider widerange? is it assumed all devices support 32 and 64?)
-    mStartOffset = rcvInit.StartOffset;
-    mMaxLength   = rcvInit.MaxLength;
+    return CHIP_NO_ERROR;
+}
 
-    // Max Block Size
-    //      - respond with minimum, check against supported MBS
-    mTransferMaxBlockSize = ::chip::min(mMaxSupportedBlockSize, rcvInit.MaxBlockSize);
+CHIP_ERROR TransferSession::VerifyProposedMode(const BitFlags<uint8_t, TransferControlFlags> & proposed)
+{
+    TransferControlFlags mode;
 
-    // File designator
-    //      - TODO: pass to platform layer
-    mPlatformDelegate->OnFileDesignatorReceived();
-
-    // Metadata
-    //      - TODO: pass to platform layer (if any exists)
-    if (rcvInit.Metadata != nullptr && rcvInit.MetadataLength > 0)
+    // Must specify only one mode in Accept messages
+    if (proposed.HasOnly(kAsync))
     {
-        mPlatformDelegate->OnMetadataReceived();
+        mode = kAsync;
+    }
+    else if (proposed.HasOnly(kReceiverDrive))
+    {
+        mode = kReceiverDrive;
+    }
+    else if (proposed.HasOnly(kSenderDrive))
+    {
+        mode = kSenderDrive;
+    }
+    else
+    {
+        mMessagingDelegate->OnTransferError(kTransferMethodNotSupported);
+        return CHIP_ERROR_INTERNAL;
     }
 
-    acceptMsg.TransferCtlFlags.SetRaw(0).Set(mControlMode, true);
-    acceptMsg.Version      = mVersion;
-    acceptMsg.MaxBlockSize = mTransferMaxBlockSize;
-    acceptMsg.StartOffset  = mStartOffset;
-    acceptMsg.Length       = mMaxLength;
-    // TODO: metadata
+    // Verify the proposed mode is supported by this instance
+    if (mSuppportedXferOpts.Has(mode))
+    {
+        mControlMode = mode;
+    }
+    else
+    {
+        mMessagingDelegate->OnTransferError(kTransferMethodNotSupported);
+        return CHIP_ERROR_INTERNAL;
+    }
 
-    err = WriteToPacketBuffer<ReceiveAccept>(acceptMsg, outMsgBuf);
-    SuccessOrExit(err);
-
-    err = AttachHeaderAndSend(kReceiveAccept, std::move(outMsgBuf));
-    SuccessOrExit(err);
-
-    mState = kTransferInProgress;
-
-exit:
-    return;
+    return CHIP_NO_ERROR;
 }
 
 void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
@@ -260,10 +316,9 @@ void TransferSession::HandleReceiveAccept(System::PacketBufferHandle msgData)
     err = rcvAcceptMsg.Parse(msgData.Retain());
     SuccessOrExit(err);
 
-    // double-check that parameters are acceptable:
-    //    need to decode message first
+    err = VerifyProposedMode(rcvAcceptMsg.TransferCtlFlags);
+    SuccessOrExit(err);
 
-    // acceptable? transfer control
     // acceptable? range control
     // acceptable? max size
 
@@ -333,12 +388,6 @@ TransferSession::HandleBlockAckEOF()
     EndTransfer(CHIP_NO_ERROR);
 }
 */
-
-void TransferSession::EndTransfer(CHIP_ERROR error)
-{
-    // TODO:
-    mState = kIdle;
-}
 
 CHIP_ERROR TransferSession::AttachHeaderAndSend(MessageType msgType, System::PacketBufferHandle msgBuf)
 {

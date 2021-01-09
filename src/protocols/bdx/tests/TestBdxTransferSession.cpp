@@ -58,12 +58,24 @@ public:
         return CHIP_NO_ERROR;
     }
 
-    void OnFileDesignatorReceived() override {}
+    CHIP_ERROR OnFileDesignatorReceived(const uint8_t * fileDesignator, uint16_t length) override
+    {
+        if (fileDesignator == nullptr)
+            printf("====== file des null\n");
+
+        if ((fileDesignator != NULL) && (length > 0))
+        {
+            return CHIP_NO_ERROR;
+        }
+        else
+        {
+            return CHIP_ERROR_INTERNAL;
+        }
+    }
 
     CHIP_ERROR ChooseControlMode(const BitFlags<uint8_t, TransferControlFlags> & proposed,
                                  const BitFlags<uint8_t, TransferControlFlags> & supported, TransferControlFlags & choice) override
     {
-
         return CHIP_NO_ERROR;
     }
 

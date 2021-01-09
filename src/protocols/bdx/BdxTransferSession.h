@@ -42,7 +42,7 @@ public:
     TransferSession();
 
     // TODO: should we return error if initMsg breaks spec?
-    // TODO: could break this up into StartSend() and StartReceive()
+    // TODO: RequestTransfer() then BeginTransfer() ?
     CHIP_ERROR StartTransfer(MessagingDelegate * msgDelegate, PlatformDelegate * platformDelegate, TransferRole role,
                              const TransferInit & initMsg);
     CHIP_ERROR WaitForTransfer(MessagingDelegate * msgDelegate, PlatformDelegate * platformDelegate, TransferRole role,
@@ -50,8 +50,6 @@ public:
 
     CHIP_ERROR HandleMessageReceived(System::PacketBufferHandle msg);
 
-    // TODO: are these the same?
-    void HandleMessageError(CHIP_ERROR error);
     void EndTransfer(CHIP_ERROR error);
 
     TransferStates GetState() const { return mState; }
@@ -61,6 +59,9 @@ private:
     void HandleReceiveAccept(System::PacketBufferHandle msgData);
 
     CHIP_ERROR AttachHeaderAndSend(MessageType msgType, System::PacketBufferHandle msgBuf);
+
+    CHIP_ERROR ResolveTransferControlOptions(const BitFlags<uint8_t, TransferControlFlags> & proposed);
+    CHIP_ERROR VerifyProposedMode(const BitFlags<uint8_t, TransferControlFlags> & proposed);
 
     MessagingDelegate * mMessagingDelegate;
     PlatformDelegate * mPlatformDelegate;
@@ -107,11 +108,13 @@ public:
 
     virtual CHIP_ERROR ReadBlock(BufBound & buffer, uint16_t length) = 0;
 
-    // TODO: how to pass file
-    virtual void OnFileDesignatorReceived() = 0;
+    // Error will prevent transfer from proceeding
+    virtual CHIP_ERROR OnFileDesignatorReceived(const uint8_t * fileDesignator, uint16_t length) = 0;
 
-    // TODO: how to pass metadata
-    virtual void OnMetadataReceived() {}
+    // error will prevent transfer from proceeding
+    virtual CHIP_ERROR OnMetadataReceived(const uint8_t * metadata, uint16_t length) { return CHIP_NO_ERROR; }
+
+    virtual void ProvideResponseMetadata(const uint8_t * metadata, uint16_t & length) {}
 
     virtual CHIP_ERROR ChooseControlMode(const BitFlags<uint8_t, TransferControlFlags> & proposed,
                                          const BitFlags<uint8_t, TransferControlFlags> & supported,
