@@ -29,9 +29,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #include <support/ErrorStr.h>
 
-// The ExchangeManager global object.
-chip::Messaging::ExchangeManager gExchangeManager;
-
 void InitializeChip(void)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
@@ -56,7 +53,7 @@ exit:
 
 void ShutdownChip(void)
 {
-    gExchangeManager.Shutdown();
+    chip::Messaging::ExchangeMgr.Shutdown();
     chip::DeviceLayer::SystemLayer.Shutdown();
 }
 

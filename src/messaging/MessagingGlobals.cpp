@@ -17,19 +17,17 @@
 
 /**
  *    @file
- *      This file defines some of the common constants, globals and interfaces
- *      that are common to and used by CHIP example applications.
+ *      This file implements various singleton objects in Messaging Layer.
  *
  */
 
-#pragma once
-
-#include <messaging/ExchangeMgr.h>
 #include <messaging/MessagingGlobals.h>
+#include <support/DLLUtil.h>
 
-#define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
-#define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
+namespace chip {
+namespace Messaging {
 
-void InitializeChip(void);
-void ShutdownChip(void);
-void DriveIO(void);
+DLL_EXPORT ExchangeManager ExchangeMgr;
+
+} // namespace Messaging
+} // namespace chip

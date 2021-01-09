@@ -68,10 +68,10 @@ int main(int argc, char * argv[])
     err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
     SuccessOrExit(err);
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = chip::Messaging::ExchangeMgr.Init(&gSessionManager);
     SuccessOrExit(err);
 
-    err = gEchoServer.Init(&gExchangeManager);
+    err = gEchoServer.Init(&chip::Messaging::ExchangeMgr);
     SuccessOrExit(err);
 
     err = gSessionManager.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);

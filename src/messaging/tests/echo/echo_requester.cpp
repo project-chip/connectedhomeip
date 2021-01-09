@@ -184,10 +184,10 @@ int main(int argc, char * argv[])
     err = gSessionManager.Init(chip::kTestControllerNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
     SuccessOrExit(err);
 
-    err = gExchangeManager.Init(&gSessionManager);
+    err = chip::Messaging::ExchangeMgr.Init(&gSessionManager);
     SuccessOrExit(err);
 
-    err = gEchoClient.Init(&gExchangeManager);
+    err = gEchoClient.Init(&chip::Messaging::ExchangeMgr);
     SuccessOrExit(err);
 
     // Arrange to get a callback whenever an Echo Response is received.
