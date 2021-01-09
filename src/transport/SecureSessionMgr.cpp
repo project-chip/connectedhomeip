@@ -88,13 +88,10 @@ Transport::Type SecureSessionMgr::GetTransportType(NodeId peerNodeId)
 
     if (state)
     {
-        Transport::PeerAddress peerAddr = state->GetPeerAddress();
-        return peerAddr.GetTransportType();
+        return state->GetPeerAddress().GetTransportType();
     }
-    else
-    {
-        return Transport::Type::kUndefined;
-    }
+
+    return Transport::Type::kUndefined;
 }
 
 CHIP_ERROR SecureSessionMgr::SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf)

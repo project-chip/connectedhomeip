@@ -198,7 +198,9 @@ public:
 
     /**
      * @brief
-     *   Return the transport type used by current SecureSessionMgr.
+     *   Return the transport type of current connection to the node with id peerNodeId.
+     *   'Transport::Type::kUndefined' will be returned if the connection to the specified
+     *   peer node does not exist.
      */
     Transport::Type GetTransportType(NodeId peerNodeId);
 
