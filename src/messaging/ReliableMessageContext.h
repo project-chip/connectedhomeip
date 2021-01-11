@@ -50,8 +50,8 @@ public:
     virtual ~ReliableMessageDelegate() {}
 
     /* Application callbacks */
-    virtual void OnSendError(CHIP_ERROR err)        = 0; /**< Application callback for error while sending. */
-    virtual void OnAckRcvd()                        = 0; /**< Application callback for received acknowledgment. */
+    virtual void OnSendError(CHIP_ERROR err) = 0; /**< Application callback for error while sending. */
+    virtual void OnAckRcvd()                 = 0; /**< Application callback for received acknowledgment. */
 };
 
 class ReliableMessageContext
@@ -119,7 +119,7 @@ private:
     ExchangeContext * mExchange;
     ReliableMessageDelegate * mDelegate;
     ReliableMessageProtocolConfig mConfig;
-    uint16_t mNextAckTimeTick;     // Next time for triggering Solo Ack
+    uint16_t mNextAckTimeTick; // Next time for triggering Solo Ack
     uint32_t mPendingPeerAckId;
 };
 
