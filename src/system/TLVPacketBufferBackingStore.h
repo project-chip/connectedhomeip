@@ -68,7 +68,7 @@ public:
      *
      * @note TLV operations must no longer be performed on this store.
      */
-    chip::System::PacketBufferHandle Release()
+    CHECK_RETURN_VALUE chip::System::PacketBufferHandle Release()
     {
         mCurrentBuffer = nullptr;
         return std::move(mHeadBuffer);
@@ -126,13 +126,38 @@ public:
         chip::TLV::TLVWriter::Init(mBackingStore);
     }
     /**
-     * Return ownership of the underlying PacketBuffer.
+     * Finish the writing of a TLV encoding and release ownership of the underlying PacketBuffer.
+     *
+     * @param[in,out] outBuffer     The backing packet buffer.
+     *
+     * @retval #CHIP_NO_ERROR       If the encoding was finalized successfully.
+     * @retval #CHIP_ERROR_TLV_CONTAINER_OPEN
+     *                              If a container writer has been opened on the current writer and not
+     *                              yet closed.
+     * @retval #CHIP_ERROR_INVALID_ARGUMENT
+     *                              If the apparent data length does not fit in uint16_t.
      *
      * @note No further TLV operations may be performed, unless or until this PacketBufferTLVWriter is re-initialized.
      */
-    chip::System::PacketBufferHandle Release() { return mBackingStore.Release(); }
+    CHIP_ERROR Finalize(chip::System::PacketBufferHandle * outBuffer)
+    {
+        CHIP_ERROR err = Finalize();
+        *outBuffer     = mBackingStore.Release();
+        return err;
+    }
+    /**
+     * Free the underlying PacketBuffer.
+     *
+     * @note No further TLV operations may be performed, unless or until this PacketBufferTLVWriter is re-initialized.
+     */
+// TODO: pragmas can be removed after PR #4301
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-result"
+    void Reset() { static_cast<void>(mBackingStore.Release()); }
+#pragma GCC diagnostic pop
 
 private:
+    CHIP_ERROR Finalize() { return chip::TLV::TLVWriter::Finalize(); }
     TLVPacketBufferBackingStore mBackingStore;
 };
 

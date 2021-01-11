@@ -128,7 +128,7 @@ exit:
 void Command::Shutdown()
 {
     VerifyOrExit(mState != kState_Uninitialized, );
-    mCommandMessageWriter.Release();
+    mCommandMessageWriter.Reset();
     mCommandMessageBuf = nullptr;
 
     if (mpExchangeCtx != nullptr)
@@ -271,10 +271,9 @@ CHIP_ERROR Command::FinalizeCommandsMessage()
     err = mInvokeCommandBuilder.GetError();
     SuccessOrExit(err);
 
-    err = mCommandMessageWriter.Finalize();
+    err = mCommandMessageWriter.Finalize(&mCommandMessageBuf);
     SuccessOrExit(err);
 
-    mCommandMessageBuf = mCommandMessageWriter.Release();
     mCommandMessageBuf->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);
 
 exit:

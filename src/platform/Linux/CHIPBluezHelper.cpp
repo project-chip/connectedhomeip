@@ -1293,10 +1293,10 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     err = writer.CloseContainer(innerWriter);
     SuccessOrExit(err);
 
-    writer.Finalize();
+    err = writer.Finalize(&bufferHandle);
+    SuccessOrExit(err);
 
-    bufferHandle = writer.Release();
-    cValue       = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,
+    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,
                                      g_memdup(bufferHandle->Start(), bufferHandle->DataLength()));
     bluez_gatt_characteristic1_set_value(characteristic, cValue);
 

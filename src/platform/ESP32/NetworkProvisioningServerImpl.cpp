@@ -306,12 +306,12 @@ void NetworkProvisioningServerImpl::HandleScanDone()
         }
         err = writer.EndContainer(outerContainerType);
         SuccessOrExit(err);
-        err = writer.Finalize();
+        err = writer.Finalize(&respBuf);
         SuccessOrExit(err);
 
         // Send the scan results to the requestor.  Note that this method takes ownership of the
         // buffer, success or fail.
-        err = SendNetworkScanComplete(encodedResultCount, writerStore.Release());
+        err = SendNetworkScanComplete(encodedResultCount, std::move(respBuf));
         SuccessOrExit(err);
     }
 

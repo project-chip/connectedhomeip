@@ -119,8 +119,8 @@ public:
      * Parsing begins at the backing store's start position and continues until the
      * end of the data in the buffer, or maxLen bytes have been parsed.
      *
-     * @param[in]   backingStore    A pointer to a TLVBackingStore providing the TLV data to be parsed.
-     * @param[in]   maxLen          The maximum of bytes to parse. Defaults to the amount of data
+     * @param[in]   backingStore    A reference to a TLVBackingStore providing the TLV data to be parsed.
+     * @param[in]   maxLen          The maximum number of bytes to parse. Defaults to the amount of data
      *                              in the input buffer.
      *
      * @retval #CHIP_NO_ERROR  If the method succeeded.
@@ -837,9 +837,7 @@ public:
     void Init(uint8_t * buf, uint32_t maxLen);
 
     /**
-     * Initializes a TLVWriter object to write into memory provided by a BackingStore.
-     *
-     * @note If a chain of buffers is given, data will only be written to the first buffer.
+     * Initializes a TLVWriter object to write into memory provided by a TLVBackingStore.
      *
      * @note Applications must call Finalize() on the writer before using the contents of the buffer.
      *
