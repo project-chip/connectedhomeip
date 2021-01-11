@@ -68,7 +68,7 @@ int main(int argc, char * argv[])
         ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
     }
 
-    if ((argc == 2) && (strcmp(argv[1], "tcp") == 0))
+    if ((argc == 2) && (strcmp(argv[1], "--tcp") == 0))
     {
         useTCP = true;
     }
