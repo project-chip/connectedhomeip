@@ -31,7 +31,7 @@
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageManager.h>
 #include <protocols/Protocols.h>
-#include <protocols/common/CommonProtocol.h>
+#include <protocols/secure_channel/SecureChannelProtocol.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
@@ -193,8 +193,8 @@ CHIP_ERROR ReliableMessageContext::FlushAcks()
 
     if (IsAckPending())
     {
-        // Send the acknowledgment as a Common::Null message
-        err = SendCommonNullMessage();
+        // Send the acknowledgment as a SecureChannel::StandStandaloneAck message
+        err = SendStandaloneAckMessage();
 
         if (err == CHIP_NO_ERROR)
         {
@@ -292,8 +292,8 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
         // Set the pending ack id.
         mPendingPeerAckId = MessageId;
 
-        // Send the Ack for the duplication message in a Common::Null message.
-        err = SendCommonNullMessage();
+        // Send the Ack for the duplication message in a SecureChannel::StandaloneAck message.
+        err = SendStandaloneAckMessage();
 
         // If there was pending ack for a different message id.
         if (wasAckPending)
@@ -314,8 +314,8 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
             ChipLogProgress(ExchangeManager, "Pending ack queue full; forcing tx of solitary ack for MsgId:%08" PRIX32,
                             mPendingPeerAckId);
 #endif
-            // Send the Ack for the currently pending Ack in a Common::Null message.
-            err = SendCommonNullMessage();
+            // Send the Ack for the currently pending Ack in a SecureChannel::StandaloneAck message.
+            err = SendStandaloneAckMessage();
             SuccessOrExit(err);
         }
 
@@ -364,7 +364,7 @@ CHIP_ERROR ReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
 }
 
 /**
- *  Send a Common::Null message.
+ *  Send a SecureChannel::StandaloneAck message.
  *
  *  @note  When sent via UDP, the null message is sent *without* requesting an acknowledgment,
  *  even in the case where the auto-request acknowledgment feature has been enabled on the
@@ -375,7 +375,7 @@ CHIP_ERROR ReliableMessageContext::HandleThrottleFlow(uint32_t PauseTimeMillis)
  *  @retval  other                    Another critical error returned by SendMessage().
  *
  */
-CHIP_ERROR ReliableMessageContext::SendCommonNullMessage()
+CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -386,7 +386,8 @@ CHIP_ERROR ReliableMessageContext::SendCommonNullMessage()
     // Send the null message
     if (mExchange != nullptr)
     {
-        err = mExchange->SendMessage(Protocols::kProtocol_Protocol_Common, Protocols::Common::kMsgType_Null, std::move(msgBuf),
+        err = mExchange->SendMessage(Protocols::kProtocol_SecureChannel,
+                                     static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck), std::move(msgBuf),
                                      BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
     }
     else

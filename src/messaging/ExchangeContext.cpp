@@ -37,7 +37,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
-#include <protocols/common/CommonProtocol.h>
+#include <protocols/secure_channel/SecureChannelProtocol.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemTimer.h>
 
@@ -394,8 +394,9 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
         SuccessOrExit(err);
     }
 
-    //  The Common::Null message type is only used for CRMP; do not pass such messages to the application layer.
-    if ((protocolId == Protocols::kProtocol_Protocol_Common) && (messageType == Protocols::Common::kMsgType_Null))
+    //  The SecureChannel::StandaloneAck message type is only used for CRMP; do not pass such messages to the application layer.
+    if ((protocolId == Protocols::kProtocol_SecureChannel) &&
+        (messageType == static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck)))
     {
         ExitNow(err = CHIP_NO_ERROR);
     }

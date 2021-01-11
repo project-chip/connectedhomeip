@@ -132,8 +132,8 @@ void ReliableMessageManager::ExecuteActions()
 #if defined(RMP_TICKLESS_DEBUG)
                 ChipLogProgress(ExchangeManager, "ReliableMessageManager::ExecuteActions sending ACK");
 #endif
-                // Send the Ack in a Common::Null message
-                rc->SendCommonNullMessage();
+                // Send the Ack in a SecureChannel::StandaloneAck message
+                rc->SendStandaloneAckMessage();
                 rc->SetAckPending(false);
             }
         }
