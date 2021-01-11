@@ -562,7 +562,7 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, Va
 
     // Search for a valid CA certificate that matches the Issuer DN and Authority Key Id of the current certificate.
     // Fail if no acceptable certificate is found.
-    err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, validateFlags, depth + 1, caCert);
+    err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, validateFlags, static_cast<uint8_t>(depth + 1), caCert);
     if (err != CHIP_NO_ERROR)
     {
         ExitNow(err = CHIP_ERROR_CA_CERT_NOT_FOUND);
