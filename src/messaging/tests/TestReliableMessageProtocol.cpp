@@ -120,7 +120,6 @@ public:
 
     /* Application callbacks */
     void OnThrottleRcvd(uint32_t pauseTime) override {}
-    void OnDelayedDeliveryRcvd(uint32_t pauseTime) override {}
     void OnSendError(CHIP_ERROR err) override { SendErrorCalled = true; }
     void OnAckRcvd() override {}
 
