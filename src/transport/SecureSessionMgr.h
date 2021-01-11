@@ -38,6 +38,7 @@
 #include <transport/SecureSession.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
+#include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
 
 namespace chip {
@@ -194,6 +195,14 @@ public:
      * @param transportMgr   Transport to use
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
+
+    /**
+     * @brief
+     *   Return the transport type of current connection to the node with id peerNodeId.
+     *   'Transport::Type::kUndefined' will be returned if the connection to the specified
+     *   peer node does not exist.
+     */
+    Transport::Type GetTransportType(NodeId peerNodeId);
 
 protected:
     /**
