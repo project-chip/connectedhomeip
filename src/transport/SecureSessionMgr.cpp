@@ -92,7 +92,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, NodeId p
 {
     PacketHeader ununsedPacketHeader;
     return SendMessage(payloadHeader, ununsedPacketHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot,
-                       EncryptionState::kUnencrypted);
+                       EncryptionState::kPayloadIsUnencrypted);
 }
 
 CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(EncryptedPacketBufferHandle msgBuf,
@@ -111,8 +111,8 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(EncryptedPacketBufferHandle ms
     msgBuf->SetStart(msgBuf->Start() + headerSize);
 
     PayloadHeader payloadHeader;
-    ReturnErrorOnFailure(
-        SendMessage(payloadHeader, packetHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot, EncryptionState::kEncrypted));
+    ReturnErrorOnFailure(SendMessage(payloadHeader, packetHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot,
+                                     EncryptionState::kPayloadIsEncrypted));
 
     return CHIP_NO_ERROR;
 }
@@ -206,7 +206,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(PayloadHeader & payloadHeader, PacketHe
     // This marks any connection where we send data to as 'active'
     mPeerConnections.MarkConnectionActive(state);
 
-    if (encryptionState == EncryptionState::kUnencrypted)
+    if (encryptionState == EncryptionState::kPayloadIsUnencrypted)
     {
         err = EncryptPayload(state, payloadHeader, packetHeader, peerNodeId, msgBuf);
         SuccessOrExit(err);

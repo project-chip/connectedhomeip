@@ -219,8 +219,8 @@ private:
 
     enum class EncryptionState
     {
-        kEncrypted,
-        kUnencrypted,
+        kPayloadIsEncrypted,
+        kPayloadIsUnencrypted,
     };
 
     System::Layer * mSystemLayer = nullptr;
@@ -236,7 +236,7 @@ private:
 
     CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, PacketHeader & packetHeader, NodeId peerNodeId,
                            System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
-                           EncryptionState encrypted);
+                           EncryptionState encryptionState);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
