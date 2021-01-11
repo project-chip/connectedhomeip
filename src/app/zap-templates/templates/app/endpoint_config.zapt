@@ -1,0 +1,6 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+// TODO issue #3637

@@ -56,7 +56,7 @@ if (chip_logging_style == "") {
     chip_logging_style = "android"
   } else if (current_os == "mac" || current_os == "ios") {
     chip_logging_style = "darwin"
-  } else if (current_os != "freertos") {
+  } else if (current_os != "freertos" && current_os != "zephyr") {
     chip_logging_style = "stdio"
   } else {
     chip_logging_style = "external"

@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -4458,6 +4457,16 @@
 #define ZCL_REPORTING_STATUS_SERVER_ATTRIBUTE_ID (0xFFFE)
 
 // Attribute ids for cluster: ZLL Commissioning
+
+// Client attributes
+#define ZCL_CLUSTER_REVISION_CLIENT_ATTRIBUTE_ID (0xFFFD)
+#define ZCL_REPORTING_STATUS_CLIENT_ATTRIBUTE_ID (0xFFFE)
+
+// Server attributes
+#define ZCL_CLUSTER_REVISION_SERVER_ATTRIBUTE_ID (0xFFFD)
+#define ZCL_REPORTING_STATUS_SERVER_ATTRIBUTE_ID (0xFFFE)
+
+// Attribute ids for cluster: Binding
 
 // Client attributes
 #define ZCL_CLUSTER_REVISION_CLIENT_ATTRIBUTE_ID (0xFFFD)

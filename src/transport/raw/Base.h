@@ -62,12 +62,8 @@ public:
      * @brief Send a message to the specified target.
      *
      * On connection-oriented transports, sending a message implies connecting to the target first.
-     *
-     * @details
-     *   This method calls <tt>chip::System::PacketBuffer::Free</tt> on
-     *   behalf of the caller regardless of the return status.
      */
-    virtual CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) = 0;
+    virtual CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) = 0;
 
     /**
      * Determine if this transport can SendMessage to the specified peer address.
@@ -103,7 +99,7 @@ protected:
      * This function is the application callback that is invoked when a message is received over a
      * Chip connection.
      *
-     * @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
+     * @param[in]    msgBuf        A handle to the PacketBuffer object holding the message.
      *
      * Callback *MUST* free msgBuf as a result of handling.
      */

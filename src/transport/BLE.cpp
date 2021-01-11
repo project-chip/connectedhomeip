@@ -134,14 +134,12 @@ exit:
     return err;
 }
 
-CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgIn)
+CHIP_ERROR BLE::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
     CHIP_ERROR err            = CHIP_NO_ERROR;
     const uint16_t headerSize = header.EncodeSizeBytes();
     uint16_t actualEncodedHeaderSize;
-    PacketBufferHandle msgBuf;
 
-    msgBuf.Adopt(msgIn);
     VerifyOrExit(address.GetTransportType() == Type::kBle, err = CHIP_ERROR_INVALID_ARGUMENT);
     VerifyOrExit(mState == State::kInitialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(mBleEndPoint != nullptr, err = CHIP_ERROR_INCORRECT_STATE);

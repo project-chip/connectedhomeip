@@ -33,6 +33,7 @@
 #include "gen/attribute-id.h"
 #include "gen/cluster-id.h"
 #include <app/util/basic-types.h>
+#include <app/util/util.h>
 #include <lib/mdns/Advertiser.h>
 #include <support/CodeUtils.h>
 
@@ -166,4 +167,10 @@ void DeviceCallbacks::OnIdentifyPostAttributeChangeCallback(EndpointId endpointI
 
 exit:
     return;
+}
+
+bool emberAfBasicClusterMfgSpecificPingCallback(void)
+{
+    emberAfSendDefaultResponse(emberAfCurrentCommand(), EMBER_ZCL_STATUS_SUCCESS);
+    return true;
 }

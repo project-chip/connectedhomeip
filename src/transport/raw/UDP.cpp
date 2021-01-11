@@ -88,11 +88,8 @@ void UDP::Close()
     mState = State::kNotReady;
 }
 
-CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgIn)
+CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBufferHandle msgBuf)
 {
-    System::PacketBufferHandle msgBuf;
-    msgBuf.Adopt(msgIn);
-
     const uint16_t headerSize = header.EncodeSizeBytes();
 
     VerifyOrReturnError(address.GetTransportType() == Type::kUdp, CHIP_ERROR_INVALID_ARGUMENT);
@@ -115,7 +112,7 @@ CHIP_ERROR UDP::SendMessage(const PacketHeader & header, const Transport::PeerAd
 
     VerifyOrReturnError(headerSize == actualEncodedHeaderSize, CHIP_ERROR_INTERNAL);
 
-    return mUDPEndPoint->SendMsg(&addrInfo, msgBuf.Release_ForNow());
+    return mUDPEndPoint->SendMsg(&addrInfo, std::move(msgBuf));
 }
 
 void UDP::OnUdpReceive(Inet::IPEndPointBasis * endPoint, System::PacketBufferHandle buffer, const Inet::IPPacketInfo * pktInfo)

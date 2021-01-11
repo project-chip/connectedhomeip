@@ -26,6 +26,7 @@
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
+#include <messaging/ReliableMessageContext.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
@@ -55,6 +56,8 @@ class DLL_EXPORT ExchangeContext : public ReferenceCounted<ExchangeContext, Exch
     friend class ExchangeContextDeletor;
 
 public:
+    typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
+
     /**
      *  Determine whether the context is the initiator of the exchange.
      *
@@ -86,7 +89,7 @@ public:
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.
      *
-     *  @param[in]    msgPayload    A pointer to the PacketBuffer object holding the CHIP message.
+     *  @param[in]    msgPayload    A handle to the PacketBuffer object holding the CHIP message.
      *
      *  @param[in]    sendFlags     Flags set by the application for the CHIP message being sent.
      *
@@ -126,8 +129,11 @@ public:
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
+    void SetReliableMessageDelegate(ReliableMessageDelegate * delegate) { mReliableMessageContext.SetDelegate(delegate); }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
+
+    ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
 
     uint64_t GetPeerNodeId() const { return mPeerNodeId; }
 
@@ -146,6 +152,8 @@ public:
     void Free();
     void Reset();
 
+    void SetResponseTimeout(Timeout timeout);
+
 private:
     enum class ExFlagValues : uint16_t
     {
@@ -153,9 +161,8 @@ private:
         kFlagResponseExpected = 0x0002, // If a response is expected for a message that is being sent.
     };
 
-    typedef uint32_t Timeout; // Type used to express the timeout in this ExchangeContext, in milliseconds
-
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    ReliableMessageContext mReliableMessageContext;
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
 

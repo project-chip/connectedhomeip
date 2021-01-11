@@ -81,11 +81,7 @@ TCPBase::~TCPBase()
 
     for (size_t i = 0; i < mPendingPacketsSize; i++)
     {
-        if (mPendingPackets[i].packetBuffer != nullptr)
-        {
-            System::PacketBuffer::Free(mPendingPackets[i].packetBuffer);
-            mPendingPackets[i].packetBuffer = nullptr;
-        }
+        mPendingPackets[i].packetBuffer = nullptr;
     }
 }
 
@@ -171,11 +167,9 @@ Inet::TCPEndPoint * TCPBase::FindActiveConnection(const PeerAddress & address)
     return nullptr;
 }
 
-CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address, System::PacketBuffer * msgBuf)
+CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, const Transport::PeerAddress & address,
+                                System::PacketBufferHandle msgBuf)
 {
-    System::PacketBufferHandle autofree;
-    autofree.Adopt(msgBuf);
-
     // Sent buffer data format is:
     //    - packet size as a uint16_t (inludes size of header and actual data)
     //    - header
@@ -210,15 +204,15 @@ CHIP_ERROR TCPBase::SendMessage(const PacketHeader & header, const Transport::Pe
 
     if (endPoint != nullptr)
     {
-        return endPoint->Send(autofree.Release_ForNow());
+        return endPoint->Send(std::move(msgBuf));
     }
     else
     {
-        return SendAfterConnect(address, autofree.Release_ForNow());
+        return SendAfterConnect(address, std::move(msgBuf));
     }
 }
 
-CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuffer * msg)
+CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBufferHandle msg)
 {
     // This will initiate a connection to the specified peer
     CHIP_ERROR err               = CHIP_NO_ERROR;
@@ -231,7 +225,7 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
     // does NOT need to be re-established.
     for (size_t i = 0; i < mPendingPacketsSize; i++)
     {
-        if (mPendingPackets[i].packetBuffer == nullptr)
+        if (mPendingPackets[i].packetBuffer.IsNull())
         {
             if (packet == nullptr)
             {
@@ -247,10 +241,9 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
             // ensure packets are ORDERED
             if (packet != nullptr)
             {
-                packet->peerAddress             = addr;
-                packet->packetBuffer            = mPendingPackets[i].packetBuffer;
-                mPendingPackets[i].packetBuffer = nullptr;
-                packet                          = mPendingPackets + i;
+                packet->peerAddress  = addr;
+                packet->packetBuffer = std::move(mPendingPackets[i].packetBuffer);
+                packet               = mPendingPackets + i;
             }
         }
     }
@@ -283,18 +276,12 @@ CHIP_ERROR TCPBase::SendAfterConnect(const PeerAddress & addr, System::PacketBuf
 
     // enqueue the packet once the connection succeeds
     packet->peerAddress  = addr;
-    packet->packetBuffer = msg;
-    msg                  = nullptr;
+    packet->packetBuffer = std::move(msg);
     mUsedEndPointCount++;
 
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (msg != nullptr)
-        {
-            System::PacketBuffer::Free(msg);
-            msg = nullptr;
-        }
         if (endPoint != nullptr)
         {
             endPoint->Free();
@@ -434,23 +421,19 @@ void TCPBase::OnConnectionComplete(Inet::TCPEndPoint * endPoint, INET_ERROR inet
     // Send any pending packets
     for (size_t i = 0; i < tcp->mPendingPacketsSize; i++)
     {
-        if ((tcp->mPendingPackets[i].peerAddress != addr) || (tcp->mPendingPackets[i].packetBuffer == nullptr))
+        if ((tcp->mPendingPackets[i].peerAddress != addr) || (tcp->mPendingPackets[i].packetBuffer.IsNull()))
         {
             continue;
         }
         foundPendingPacket = true;
 
+        System::PacketBufferHandle buffer   = std::move(tcp->mPendingPackets[i].packetBuffer);
+        tcp->mPendingPackets[i].peerAddress = PeerAddress::Uninitialized();
+
         if ((inetErr == CHIP_NO_ERROR) && (err == CHIP_NO_ERROR))
         {
-            err = endPoint->Send(tcp->mPendingPackets[i].packetBuffer);
+            err = endPoint->Send(std::move(buffer));
         }
-        else
-        {
-            System::PacketBuffer::Free(tcp->mPendingPackets[i].packetBuffer);
-        }
-
-        tcp->mPendingPackets[i].packetBuffer = nullptr;
-        tcp->mPendingPackets[i].peerAddress  = PeerAddress::Uninitialized();
     }
 
     if (err == CHIP_NO_ERROR)

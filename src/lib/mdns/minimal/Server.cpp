@@ -18,6 +18,7 @@
 #include "Server.h"
 
 #include <errno.h>
+#include <utility>
 
 #include <mdns/minimal/core/DnsHeader.h>
 
@@ -150,7 +151,7 @@ CHIP_ERROR ServerBase::DirectSend(chip::System::PacketBufferHandle && data, cons
             continue;
         }
 
-        return info->udp->SendTo(addr, port, data.Release_ForNow());
+        return info->udp->SendTo(addr, port, std::move(data));
     }
 
     return CHIP_ERROR_NOT_CONNECTED;
@@ -181,12 +182,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), copy.Release_ForNow());
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), copy.Release_ForNow());
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #endif
         else
@@ -223,12 +224,12 @@ CHIP_ERROR ServerBase::BroadcastSend(chip::System::PacketBufferHandle data, uint
 
         if (info->addressType == chip::Inet::kIPAddressType_IPv6)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), copy.Release_ForNow());
+            err = info->udp->SendTo(kBroadcastIp.ipv6, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #if INET_CONFIG_ENABLE_IPV4
         else if (info->addressType == chip::Inet::kIPAddressType_IPv4)
         {
-            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), copy.Release_ForNow());
+            err = info->udp->SendTo(kBroadcastIp.ipv4, port, info->udp->GetBoundInterface(), std::move(copy));
         }
 #endif
         else

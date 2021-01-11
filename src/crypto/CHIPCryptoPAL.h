@@ -350,6 +350,8 @@ CHIP_ERROR Hash_SHA256(const uint8_t * data, size_t data_length, uint8_t * out_b
 
 /**
  * @brief A class that defines stream based implementation of SHA-256 hash
+ *        It's expected that the object of this class can be safely copied.
+ *        All implementations must check for std::is_trivially_copyable.
  **/
 
 struct HashSHA256OpaqueContext
@@ -456,14 +458,13 @@ public:
     /**
      * @brief Initialize Spake2+ with some context specific information.
      *
-     * @param context     The context is arbitrary but should include information about the
-     *                    protocol being run, contain the transcript for negotiation, include
-     *                    the PKBDF parameters, etc.
-     * @param context_len The length of the context.
+     * @param context     The spake2p session will bootstrap from this hash context.
+     *                    If the provided context pointer is null, the spake2p session will bootstrap
+     *                    from a blank hash context.
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    CHIP_ERROR Init(const uint8_t * context, size_t context_len);
+    CHIP_ERROR Init(const Hash_SHA256_stream * context);
 
     /**
      * @brief Start the Spake2+ process as a verifier (i.e. an accessory being provisioned).
@@ -716,7 +717,7 @@ protected:
      *
      * @return Returns a CHIP_ERROR on error, CHIP_NO_ERROR otherwise
      **/
-    virtual CHIP_ERROR InitImpl() = 0;
+    virtual CHIP_ERROR InitImpl(const Hash_SHA256_stream * context) = 0;
 
     /**
      * @brief Hash in_len bytes of in into the internal hash context.
@@ -828,7 +829,7 @@ public:
     CHIP_ERROR ComputeL(uint8_t * Lout, size_t * L_len, const uint8_t * w1in, size_t w1in_len) override;
 
 protected:
-    CHIP_ERROR InitImpl() override;
+    CHIP_ERROR InitImpl(const Hash_SHA256_stream * context) override;
     CHIP_ERROR Hash(const uint8_t * in, size_t in_len) override;
     CHIP_ERROR HashFinalize(uint8_t * out) override;
     CHIP_ERROR KDF(const uint8_t * secret, size_t secret_length, const uint8_t * salt, size_t salt_length, const uint8_t * info,

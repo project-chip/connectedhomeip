@@ -22,7 +22,10 @@
  */
 
 #include <core/CHIPCore.h>
+#include <protocols/Protocols.h>
+#include <protocols/echo/Echo.h>
 #include <support/CodeUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/UnitTestRegistration.h>
 #include <transport/SecureSessionMgr.h>
 #include <transport/TransportMgr.h>
@@ -53,11 +56,32 @@ public:
     /// Transports are required to have a constructor that takes exactly one argument
     CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
 
-    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBuffer * msgBuf) override
+    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
     {
-        System::PacketBufferHandle msg_ForNow;
-        msg_ForNow.Adopt(msgBuf);
-        HandleMessageReceived(header, address, std::move(msg_ForNow));
+        HandleMessageReceived(header, address, std::move(msgBuf));
+        return CHIP_NO_ERROR;
+    }
+
+    bool CanSendToPeer(const PeerAddress & address) override { return true; }
+};
+
+class OutgoingTransport : public Transport::Base
+{
+public:
+    /// Transports are required to have a constructor that takes exactly one argument
+    CHIP_ERROR Init(const char * unused) { return CHIP_NO_ERROR; }
+
+    CHIP_ERROR SendMessage(const PacketHeader & header, const PeerAddress & address, System::PacketBufferHandle msgBuf) override
+    {
+        const uint16_t headerSize = header.EncodeSizeBytes();
+
+        VerifyOrReturnError(msgBuf->EnsureReservedSize(headerSize), CHIP_ERROR_NO_MEMORY);
+
+        msgBuf->SetStart(msgBuf->Start() - headerSize);
+
+        uint16_t actualEncodedHeaderSize;
+        ReturnErrorOnFailure(header.Encode(msgBuf->Start(), msgBuf->DataLength(), &actualEncodedHeaderSize));
+
         return CHIP_NO_ERROR;
     }
 
@@ -158,6 +182,70 @@ void CheckMessageTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 1);
 }
 
+void SendEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
+{
+    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
+
+    uint16_t payload_len = sizeof(PAYLOAD);
+
+    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
+
+    chip::System::PacketBufferHandle buffer = chip::System::PacketBuffer::NewWithAvailableSize(payload_len);
+    NL_TEST_ASSERT(inSuite, !buffer.IsNull());
+
+    memmove(buffer->Start(), PAYLOAD, payload_len);
+    buffer->SetDataLength(payload_len);
+
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    CHIP_ERROR err = CHIP_NO_ERROR;
+
+    TransportMgr<OutgoingTransport> transportMgr;
+    SecureSessionMgr secureSessionMgr;
+
+    err = transportMgr.Init("LOOPBACK");
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    callback.mSuite = inSuite;
+
+    secureSessionMgr.SetDelegate(&callback);
+
+    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
+    Optional<Transport::PeerAddress> peer(Transport::PeerAddress::UDP(addr, CHIP_PORT));
+
+    err = secureSessionMgr.NewPairing(peer, kDestinationNodeId, &pairing1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
+    err = secureSessionMgr.NewPairing(peer, kSourceNodeId, &pairing2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    // Should be able to send a message to itself by just calling send.
+    callback.ReceiveHandlerCallCount = 0;
+
+    PayloadHeader payloadHeader;
+    EncryptedPacketBufferHandle msgBuf;
+
+    // Set the exchange ID for this header.
+    payloadHeader.SetExchangeID(0);
+
+    // Set the protocol ID for this header.
+    payloadHeader.SetProtocolID(chip::Protocols::kProtocol_Echo);
+
+    // Set the message type for this header.
+    payloadHeader.SetMessageType(chip::Protocols::kEchoMessageType_EchoRequest);
+
+    payloadHeader.SetInitiator(true);
+
+    err = secureSessionMgr.SendMessage(payloadHeader, kDestinationNodeId, std::move(buffer), &msgBuf);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+
+    err = secureSessionMgr.SendMessage(std::move(msgBuf), nullptr);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+}
+
 // Test Suite
 
 /**
@@ -168,6 +256,7 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("Simple Init Test",              CheckSimpleInitTest),
     NL_TEST_DEF("Message Self Test",             CheckMessageTest),
+    NL_TEST_DEF("Send Encrypted Packet Test",    SendEncryptedPacketTest),
 
     NL_TEST_SENTINEL()
 };

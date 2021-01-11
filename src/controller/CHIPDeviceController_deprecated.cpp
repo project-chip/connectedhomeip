@@ -171,12 +171,15 @@ bool ChipDeviceController::IsConnected() const
     return mState == kState_Initialized;
 }
 
-bool ChipDeviceController::GetIpAddress(Inet::IPAddress & addr) const
+bool ChipDeviceController::GetIpAddress(Inet::IPAddress & addr)
 {
-    if (IsConnected() && mDevice != nullptr)
-        return mDevice->GetIpAddress(addr);
+    if (!IsConnected())
+        return false;
 
-    return false;
+    if (mDevice == nullptr)
+        InitDevice();
+
+    return mDevice != nullptr && mDevice->GetIpAddress(addr);
 }
 
 CHIP_ERROR ChipDeviceController::DisconnectDevice()
@@ -205,15 +208,7 @@ CHIP_ERROR ChipDeviceController::SendMessage(void * appReqState, PacketBufferHan
 
     if (mDevice == nullptr)
     {
-        if (mPairingWithoutSecurity)
-        {
-            err = mCommissioner.GetDevice(mRemoteDeviceId, mSerializedTestDevice, &mDevice);
-        }
-        else
-        {
-            err = mCommissioner.GetDevice(mRemoteDeviceId, &mDevice);
-        }
-        SuccessOrExit(err);
+        SuccessOrExit(InitDevice());
     }
 
     VerifyOrExit(mDevice != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -238,6 +233,12 @@ void ChipDeviceController::OnMessage(System::PacketBufferHandle msgBuf)
     {
         mOnComplete.Response(this, mAppReqState, std::move(msgBuf));
     }
+}
+
+CHIP_ERROR ChipDeviceController::InitDevice()
+{
+    return mPairingWithoutSecurity ? mCommissioner.GetDevice(mRemoteDeviceId, mSerializedTestDevice, &mDevice)
+                                   : mCommissioner.GetDevice(mRemoteDeviceId, &mDevice);
 }
 
 } // namespace DeviceController

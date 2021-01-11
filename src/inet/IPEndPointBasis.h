@@ -122,6 +122,8 @@ protected:
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 public:
     static struct netif * FindNetifFromInterfaceId(InterfaceId aInterfaceId);
+    static System::Error PostPacketBufferEvent(chip::System::Layer & aLayer, System::Object & aTarget, System::EventType aEventType,
+                                               System::PacketBufferHandle aBuffer);
 
 protected:
     void HandleDataReceived(chip::System::PacketBufferHandle aBuffer);
@@ -134,7 +136,7 @@ protected:
 
     INET_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, InterfaceId aInterfaceId);
     INET_ERROR BindInterface(IPAddressType aAddressType, InterfaceId aInterfaceId);
-    INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
+    INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle aBuffer, uint16_t aSendFlags);
     INET_ERROR GetSocket(IPAddressType aAddressType, int aType, int aProtocol);
     SocketEvents PrepareIO();
     void HandlePendingIO(uint16_t aPort);
@@ -152,7 +154,7 @@ protected:
 
     INET_ERROR Bind(IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort, const nw_parameters_t & aParameters);
     INET_ERROR ConfigureProtocol(IPAddressType aAddressType, const nw_parameters_t & aParameters);
-    INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBuffer * aBuffer, uint16_t aSendFlags);
+    INET_ERROR SendMsg(const IPPacketInfo * aPktInfo, chip::System::PacketBufferHandle aBuffer, uint16_t aSendFlags);
     INET_ERROR StartListener();
     INET_ERROR GetConnection(const IPPacketInfo * aPktInfo);
     INET_ERROR GetEndPoint(nw_endpoint_t & aEndpoint, const IPAddressType aAddressType, const IPAddress & aAddress, uint16_t aPort);

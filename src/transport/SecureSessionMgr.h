@@ -38,11 +38,50 @@
 #include <transport/SecureSession.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
+#include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
 
 namespace chip {
 
 class SecureSessionMgr;
+
+/**
+ * @brief
+ *  Tracks ownership of a encrypted PacketBuffer.
+ *
+ *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a PacketBuffer
+ *  object whose payload has already been encrypted.
+ */
+class EncryptedPacketBufferHandle final : public System::PacketBufferHandle
+{
+public:
+    EncryptedPacketBufferHandle() : mMsgId(0) {}
+    EncryptedPacketBufferHandle(EncryptedPacketBufferHandle && aBuffer) :
+        PacketBufferHandle(std::move(aBuffer)), mMsgId(aBuffer.mMsgId)
+    {}
+
+    void operator=(EncryptedPacketBufferHandle && aBuffer)
+    {
+        PacketBufferHandle::operator=(std::move(aBuffer));
+        mMsgId                      = aBuffer.mMsgId;
+    }
+
+    uint32_t GetMsgId() const { return mMsgId; }
+
+private:
+    // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
+    friend class SecureSessionMgr;
+
+    EncryptedPacketBufferHandle(PacketBufferHandle && aBuffer) : PacketBufferHandle(std::move(aBuffer)), mMsgId(0) {}
+
+    void operator=(PacketBufferHandle && aBuffer)
+    {
+        PacketBufferHandle::operator=(std::move(aBuffer));
+        mMsgId                      = 0;
+    }
+
+    uint32_t mMsgId; // The message identifier of the CHIP message awaiting acknowledgment.
+};
 
 /**
  * @brief
@@ -98,30 +137,28 @@ public:
      */
     virtual void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
 
-    /**
-     * @brief
-     *   Called when the peer address is resolved from NodeID.
-     *
-     * @param error   The resolution resolve error code
-     * @param nodeId  The node ID resolved, 0 on error
-     * @param mgr     A pointer to the SecureSessionMgr
-     */
-    virtual void OnAddressResolved(CHIP_ERROR error, NodeId nodeId, SecureSessionMgr * mgr) {}
-
     virtual ~SecureSessionMgrDelegate() {}
 };
 
-class DLL_EXPORT SecureSessionMgr : public Mdns::ResolveDelegate, public TransportMgrDelegate
+class DLL_EXPORT SecureSessionMgr : public TransportMgrDelegate
 {
 public:
-    /**
-     * @brief
-     *   Send a message to a currently connected peer
-     */
-    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf);
     SecureSessionMgr();
     ~SecureSessionMgr() override;
+
+    /**
+     * @brief
+     *   Send a message to a currently connected peer.
+     *
+     * @details
+     *   msgBuf contains the data to be transmitted.  If bufferRetainSlot is not null and this function
+     *   returns success, the encrypted data that was sent, as well as various other information needed
+     *   to retransmit it, will be stored in *bufferRetainSlot.
+     */
+    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
+                           EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
+    CHIP_ERROR SendMessage(EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot);
 
     /**
      * @brief
@@ -159,6 +196,14 @@ public:
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
 
+    /**
+     * @brief
+     *   Return the transport type of current connection to the node with id peerNodeId.
+     *   'Transport::Type::kUndefined' will be returned if the connection to the specified
+     *   peer node does not exist.
+     */
+    Transport::Type GetTransportType(NodeId peerNodeId);
+
 protected:
     /**
      * @brief
@@ -189,6 +234,9 @@ private:
     SecureSessionMgrDelegate * mCB   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
 
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
+                           EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted);
+
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
 
@@ -204,8 +252,6 @@ private:
      * Callback for timer expiry check
      */
     static void ExpiryTimerCallback(System::Layer * layer, void * param, System::Error error);
-
-    void HandleNodeIdResolve(CHIP_ERROR error, NodeId nodeId, const Mdns::MdnsService & service) override;
 };
 
 } // namespace chip

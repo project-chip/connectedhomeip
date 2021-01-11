@@ -101,7 +101,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE 3
+#define ATTRIBUTE_MAX_SIZE 6
 
 // Array of endpoints that are supported
 #define FIXED_ENDPOINT_ARRAY                                                                                                       \
@@ -138,11 +138,6 @@
     {                                                                                                                              \
         0                                                                                                                          \
     }
-
-#define EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_DECLARATIONS                                                               \
-    void emberAfPluginNetworkSteeringStackStatusCallback(EmberStatus status);
-
-#define EMBER_AF_GENERATED_PLUGIN_STACK_STATUS_FUNCTION_CALLS emberAfPluginNetworkSteeringStackStatusCallback(status);
 
 // Generated data for the command discovery
 #define GENERATED_COMMANDS                                                                                                         \

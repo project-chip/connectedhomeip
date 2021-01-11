@@ -1,0 +1,27 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+{{#zcl_clusters}}
+// Attribute ids for cluster: {{label}}
+
+{{#zcl_attributes_client}}
+{{#first}}
+// Client attributes
+{{/first}}
+#define ZCL_{{asDelimitedMacro define}}_ATTRIBUTE_ID ({{asHex code 4}})
+{{#last}}
+
+{{/last}}
+{{/zcl_attributes_client}}
+{{#zcl_attributes_server}}
+{{#first}}
+// Server attributes
+{{/first}}
+#define ZCL_{{asDelimitedMacro define}}_ATTRIBUTE_ID ({{asHex code 4}})
+{{#last}}
+
+{{/last}}
+{{/zcl_attributes_server}}
+{{/zcl_clusters}}

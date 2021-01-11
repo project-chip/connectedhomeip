@@ -265,8 +265,6 @@ private:
         return FullQName();
     }
 
-    FullQName GetCommisioningTextEntries(const CommisioningAdvertisingParameters & params);
-
     static constexpr size_t kMaxEndPoints           = 10;
     static constexpr size_t kMaxRecords             = 16;
     static constexpr size_t kMaxAllocatedResponders = 16;
@@ -365,6 +363,7 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
     size_t len = snprintf(uniqueName, sizeof(uniqueName), "%" PRIX64 "-%" PRIX64, params.GetFabricId(), params.GetNodeId());
     if (len >= sizeof(uniqueName))
     {
+        ChipLogError(Discovery, "Failed to allocate QNames.");
         return CHIP_ERROR_NO_MEMORY;
     }
 

@@ -63,6 +63,8 @@ from .ChipBleUtility import (
     BleDisconnectEventStruct,
     BleRxEventStruct,
     BleSubscribeEventStruct,
+    BleDeviceIdentificationInfo,
+    ParseServiceData,
 )
 
 from .ChipBleBase import ChipBleBase
@@ -282,6 +284,12 @@ class BluezDbusAdapter:
                 if i in uuids:
                     found.append(device)
                     break
+            # Some devices do not advertise their uuid lists, thus we should also check service data.
+            if device.ServiceData:
+                for i in device.ServiceData:
+                    if uuid.UUID(str(i)) in uuids:
+                        found.append(device)
+                        break
         return found
 
     def clear_adapter(self):
@@ -789,6 +797,7 @@ class BluezManager(ChipBleBase):
             )
         self.scan_quiet = False
         self.peripheral_list = []
+        self.device_uuid_list = []
         self.chip_queue = six.moves.queue.Queue()
         self.Gmainloop = None
         self.daemon_thread = None
@@ -944,15 +953,24 @@ class BluezManager(ChipBleBase):
             return False
 
     def dump_scan_result(self, device):
-        self.logger.info("{0:<10}{1}".format("Name =", device.Name))
-        self.logger.info("{0:<10}{1}".format("ID =", device.device_id))
-        self.logger.info("{0:<10}{1}".format("RSSI =", device.RSSI))
-        self.logger.info("{0:<10}{1}".format("address =", device.Address))
-        self.logger.info(
-            "ADV data: " + ("".join([str(i) for i in dict(device.ServiceData).keys()]))
-            if device.ServiceData
-            else ""
-        )
+        self.logger.info("{0:<16}= {1}".format("Name", device.Name))
+        self.logger.info("{0:<16}= {1}".format("ID", device.device_id))
+        self.logger.info("{0:<16}= {1}".format("RSSI", device.RSSI))
+        self.logger.info("{0:<16}= {1}".format("Address", device.Address))
+
+        devIdInfo = self.get_peripheral_devIdInfo(device)
+        if devIdInfo != None:
+            self.logger.info("{0:<16}= {1}".format("Pairing State", devIdInfo.pairingState))
+            self.logger.info("{0:<16}= {1}".format("Discriminator", devIdInfo.discriminator))
+            self.logger.info("{0:<16}= {1}".format("Vendor Id", devIdInfo.vendorId))
+            self.logger.info("{0:<16}= {1}".format("Product Id", devIdInfo.productId))
+
+        if device.ServiceData:
+            for advuuid in device.ServiceData:
+                self.logger.info("{0:<16}= {1}".format("Adv UUID", str(advuuid)))
+                self.logger.info("{0:<16}= {1}".format("Adv Data", bytes(device.ServiceData[advuuid]).hex()))
+        else:
+            self.logger.info("")
         self.logger.info("")
 
     def scan_bg_implementation(self, **kwargs):
@@ -963,9 +981,11 @@ class BluezManager(ChipBleBase):
         found = False
         identifier = kwargs["identifier"]
         timeout = kwargs["timeout"] + time.time()
+        self.device_uuid_list = []
+        self.peripheral_list = []
 
         while time.time() < timeout:
-            self.peripheral_list = self.adapter.find_devices(
+            scanned_peripheral_list = self.adapter.find_devices(
                 [
                     chip_service,
                     chip_service_short,
@@ -973,22 +993,28 @@ class BluezManager(ChipBleBase):
                     chromecast_setup_service_short,
                 ]
             )
-            for device in self.peripheral_list:
+            for device in scanned_peripheral_list:
                 try:
-                    if not self.scan_quiet:
+                    if not self.scan_quiet and device.Address not in self.device_uuid_list:
                         # display all scanned results
+                        self.device_uuid_list.append(device.Address)
+                        self.peripheral_list.append(device)
                         self.dump_scan_result(device)
-                    if device.Name == identifier or str(device.Address).upper() == str(
+                    devIdInfo = self.get_peripheral_devIdInfo(device)
+                    if not devIdInfo:
+                        # Not a chip device
+                        continue
+                    if identifier and (device.Name == identifier or str(device.Address).upper() == str(
                         identifier.upper()
-                    ):
+                    ) or str(devIdInfo.discriminator) == identifier):
                         if self.scan_quiet:
                             # only display the scanned target's info when quiet
                             self.dump_scan_result(device)
                         self.target = device
                         found = True
                         break
-                except Exception as ex:
-                    pass
+                except Exception:
+                    traceback.print_exc()
             if found:
                 break
 
@@ -1060,20 +1086,36 @@ class BluezManager(ChipBleBase):
             self.service.destroy()
             self.service = None
 
+    def get_peripheral_devIdInfo(self, peripheral):
+        if not peripheral.ServiceData:
+            return None
+        for advuuid in peripheral.ServiceData:
+            if str(advuuid).lower() == str(chip_service).lower():
+                return ParseServiceData(bytes(peripheral.ServiceData[advuuid]))
+        return None
+
     def connect(self, identifier):
         found = False
         self.logger.info("trying to connect to " + identifier)
         for p in self.peripheral_list:
+            p_discriminator = None
+            devIdInfo = self.get_peripheral_devIdInfo(p)
+            if not devIdInfo:
+                # Not a chip device
+                continue
+            p_discriminator = devIdInfo.discriminator
             p_id = str(p.device_id)
             p_name = str(p.Name)
             p_address = str(p.Address)
             self.logger.debug(p_id + " vs " + str(identifier))
             self.logger.debug(p_name + " vs " + str(identifier))
             self.logger.debug(p_address + " vs " + str(identifier))
+            self.logger.debug(str(p_discriminator) + " vs " + str(identifier))
             if (
                 p_id == str(identifier)
                 or p_name == str(identifier)
                 or p_address.upper() == str(identifier).upper()
+                or str(p_discriminator) == str(identifier)
             ):
                 self.target = p
                 found = True
