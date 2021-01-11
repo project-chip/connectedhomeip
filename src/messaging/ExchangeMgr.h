@@ -189,7 +189,7 @@ private:
     SecureSessionMgr * mSessionMgr;
     ReliableMessageManager mReliableMessageMgr;
 
-    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> ContextPool;
+    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
