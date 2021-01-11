@@ -74,8 +74,6 @@
 namespace chip {
 namespace Inet {
 
-using chip::System::PacketBuffer;
-
 chip::System::ObjectPool<RawEndPoint, INET_CONFIG_NUM_RAW_ENDPOINTS> RawEndPoint::sPool;
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
@@ -623,20 +621,20 @@ INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::Pack
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip_addr_t ipAddr = addr.ToLwIPAddr();
 
-        lwipErr = raw_sendto(mRaw, msg.GetLwIPpbuf(), &ipAddr);
+        lwipErr = raw_sendto(mRaw, msg.UnsafeGetLwIPpbuf(), &ipAddr);
 #else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
         if (PCB_ISIPV6(mRaw))
         {
             ip6_addr_t ipv6Addr = addr.ToIPv6();
 
-            lwipErr = raw_sendto_ip6(mRaw, msg.GetLwIPpbuf(), &ipv6Addr);
+            lwipErr = raw_sendto_ip6(mRaw, msg.UnsafeGetLwIPpbuf(), &ipv6Addr);
         }
 #if INET_CONFIG_ENABLE_IPV4
         else
         {
             ip4_addr_t ipv4Addr = addr.ToIPv4();
 
-            lwipErr = raw_sendto(mRaw, msg.GetLwIPpbuf(), &ipv4Addr);
+            lwipErr = raw_sendto(mRaw, msg.UnsafeGetLwIPpbuf(), &ipv4Addr);
         }
 #endif // INET_CONFIG_ENABLE_IPV4
 #endif // LWIP_VERSION_MAJOR <= 1 || LWIP_VERSION_MINOR >= 5

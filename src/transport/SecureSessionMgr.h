@@ -64,9 +64,9 @@ private:
 
 /**
  * @brief
- *  Tracks ownership of a encrypted PacketBuffer.
+ *  Tracks ownership of a encrypted packet buffer.
  *
- *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a PacketBuffer
+ *  EncryptedPacketBufferHandle is a kind of PacketBufferHandle class and used to hold a packet buffer
  *  object whose payload has already been encrypted.
  */
 class EncryptedPacketBufferHandle final : public System::PacketBufferHandle

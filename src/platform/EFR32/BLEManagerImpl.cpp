@@ -821,8 +821,8 @@ void BLEManagerImpl::HandleRXCharWrite(volatile struct gecko_cmd_packet * evt)
     uint16_t writeLen = evt->data.evt_gatt_server_user_write_request.value.len;
     uint8_t * data    = (uint8_t *) evt->data.evt_gatt_server_user_write_request.value.data;
 
-    // Copy the data to a PacketBuffer.
-    buf = PacketBuffer::New(0);
+    // Copy the data to a packet buffer.
+    buf = System::PacketBuffer::New(0);
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= writeLen, err = CHIP_ERROR_BUFFER_TOO_SMALL);
     memcpy(buf->Start(), data, writeLen);
@@ -836,7 +836,7 @@ void BLEManagerImpl::HandleRXCharWrite(volatile struct gecko_cmd_packet * evt)
         ChipDeviceEvent event;
         event.Type                        = DeviceEventType::kCHIPoBLEWriteReceived;
         event.CHIPoBLEWriteReceived.ConId = evt->data.evt_gatt_server_user_write_request.connection;
-        event.CHIPoBLEWriteReceived.Data  = buf.Release_ForNow();
+        event.CHIPoBLEWriteReceived.Data  = std::move(buf).UnsafeRelease();
         PlatformMgr().PostEvent(&event);
     }
 

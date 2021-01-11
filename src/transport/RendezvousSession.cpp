@@ -381,7 +381,7 @@ CHIP_ERROR RendezvousSession::HandleSecureMessage(const PacketHeader & packetHea
     System::PacketBufferHandle origMsg;
 
     origMsg = std::move(msgBuf);
-    msgBuf  = PacketBuffer::NewWithAvailableSize(len);
+    msgBuf  = System::PacketBuffer::NewWithAvailableSize(len);
 
     ReturnErrorCodeIf(msgBuf.IsNull(), CHIP_ERROR_NO_MEMORY);
 

@@ -43,7 +43,6 @@
 
 namespace chip {
 
-using System::PacketBuffer;
 using System::PacketBufferHandle;
 using Transport::PeerAddress;
 using Transport::PeerConnectionState;
@@ -227,7 +226,7 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
     msgStart = static_cast<uint8_t *>(msgBuf->Start() - headerSize);
     msgLen   = static_cast<uint16_t>(msgBuf->DataLength() + headerSize);
 
-    // Retain the PacketBuffer in case it's needed for retransmissions.
+    // Retain the packet buffer in case it's needed for retransmissions.
     encryptedMsg        = msgBuf.Retain();
     encryptedMsg.mMsgId = packetHeader.GetMessageId();
 
@@ -360,7 +359,7 @@ void SecureSessionMgr::OnMessageReceived(const PacketHeader & packetHeader, cons
         /* This is a workaround for the case where PacketBuffer payload is not
            allocated as an inline buffer to PacketBuffer structure */
         origMsg = std::move(msg);
-        msg     = PacketBuffer::NewWithAvailableSize(len);
+        msg     = System::PacketBuffer::NewWithAvailableSize(len);
         VerifyOrExit(!msg.IsNull(), ChipLogError(Inet, "Insufficient memory for packet buffer."));
         msg->SetDataLength(len);
 #endif

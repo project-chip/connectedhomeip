@@ -86,7 +86,7 @@ CHIP_ERROR SendEchoRequest(void)
 
     if (payloadBuf.IsNull())
     {
-        printf("Unable to allocate PacketBuffer\n");
+        printf("Unable to allocate packet buffer\n");
         return CHIP_ERROR_NO_MEMORY;
     }
     else
