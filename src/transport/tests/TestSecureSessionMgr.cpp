@@ -322,7 +322,8 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     // Change Destination Node ID
     EncryptedPacketBufferHandle badDestNodeIdMsg = msgBuf.CloneData();
-    NL_TEST_ASSERT(inSuite, packetHeader.Decode(badDestNodeIdMsg->Start(), badDestNodeIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   packetHeader.Decode(badDestNodeIdMsg->Start(), badDestNodeIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
 
     NL_TEST_ASSERT(inSuite, packetHeader.GetDestinationNodeId().Value() == kDestinationNodeId);
     packetHeader.SetDestinationNodeId(kSourceNodeId);
@@ -337,7 +338,8 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     // Change Source Node ID
     EncryptedPacketBufferHandle badSrcNodeIdMsg = msgBuf.CloneData();
-    NL_TEST_ASSERT(inSuite, packetHeader.Decode(badSrcNodeIdMsg->Start(), badSrcNodeIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   packetHeader.Decode(badSrcNodeIdMsg->Start(), badSrcNodeIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
 
     packetHeader.SetSourceNodeId(kDestinationNodeId);
     packetHeader.Encode(badSrcNodeIdMsg->Start(), badSrcNodeIdMsg->DataLength(), &headerSize);
@@ -351,7 +353,8 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     // Change Message ID
     EncryptedPacketBufferHandle badMessageIdMsg = msgBuf.CloneData();
-    NL_TEST_ASSERT(inSuite, packetHeader.Decode(badMessageIdMsg->Start(), badMessageIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
+    NL_TEST_ASSERT(inSuite,
+                   packetHeader.Decode(badMessageIdMsg->Start(), badMessageIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
 
     uint32_t msgID = packetHeader.GetMessageId();
     packetHeader.SetMessageId(msgID + 1);
@@ -385,7 +388,6 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
 
     ctx.DriveIOUntil(1000 /* ms */, []() { return callback.ReceiveHandlerCallCount != 1; });
     NL_TEST_ASSERT(inSuite, callback.ReceiveHandlerCallCount == 2);
-
 }
 
 // Test Suite
