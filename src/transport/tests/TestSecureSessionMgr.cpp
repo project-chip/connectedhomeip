@@ -371,8 +371,8 @@ void SendBadEncryptedPacketTest(nlTestSuite * inSuite, void * inContext)
     EncryptedPacketBufferHandle badKeyIdMsg = msgBuf.CloneData();
     NL_TEST_ASSERT(inSuite, packetHeader.Decode(badKeyIdMsg->Start(), badKeyIdMsg->DataLength(), &headerSize) == CHIP_NO_ERROR);
 
-    uint16_t keyID = packetHeader.GetEncryptionKeyID();
-    packetHeader.SetEncryptionKeyID(keyID + 1);
+    // the secure channel is setup to use key ID 1, and 2. So let's use 3 here. 
+    packetHeader.SetEncryptionKeyID(3);
     packetHeader.Encode(badKeyIdMsg->Start(), badKeyIdMsg->DataLength(), &headerSize);
 
     err = secureSessionMgr.SendEncryptedMessage(std::move(badKeyIdMsg), nullptr);
