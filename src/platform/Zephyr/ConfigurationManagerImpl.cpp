@@ -27,7 +27,7 @@
 #include <platform/internal/GenericConfigurationManagerImpl.cpp>
 
 #include <core/CHIPVendorIdentifiers.hpp>
-#include <platform/nrfconnect/ZephyrConfig.h>
+#include <platform/Zephyr/ZephyrConfig.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_FACTORY_PROVISIONING
 #include <platform/internal/FactoryProvisioning.cpp>

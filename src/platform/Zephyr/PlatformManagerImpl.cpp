@@ -18,7 +18,7 @@
 /**
  *    @file
  *          Provides an implementation of the PlatformManager object
- *          for nRF Connect SDK platforms.
+ *          for Zephyr platforms.
  */
 
 #include <platform/internal/CHIPDeviceLayerInternal.h>
