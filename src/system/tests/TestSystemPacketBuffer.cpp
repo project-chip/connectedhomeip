@@ -910,11 +910,13 @@ void PacketBufferTest::CheckCompactHead(nlTestSuite * inSuite, void * inContext)
                         }
                     }
 
+                    NL_TEST_ASSERT(inSuite, config_1.handle->ref == 2);
                     config_1.handle = nullptr;
+
+                    // Verify and release handles.
+                    NL_TEST_ASSERT(inSuite, test->ResetHandles());
                 }
             }
-            // Verify and release handles.
-            NL_TEST_ASSERT(inSuite, test->ResetHandles());
         }
     }
 }
@@ -1489,6 +1491,8 @@ void PacketBufferTest::CheckHandleMove(nlTestSuite * inSuite, void * inContext)
 
             config_1.handle = nullptr;
         }
+        // Verify and release handles.
+        NL_TEST_ASSERT(inSuite, test->ResetHandles());
     }
 }
 
