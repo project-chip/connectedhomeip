@@ -150,11 +150,7 @@ public:
      *
      * @note No further TLV operations may be performed, unless or until this PacketBufferTLVWriter is re-initialized.
      */
-// TODO: pragmas can be removed after PR #4301
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-result"
     void Reset() { static_cast<void>(mBackingStore.Release()); }
-#pragma GCC diagnostic pop
 
 private:
     CHIP_ERROR Finalize() { return chip::TLV::TLVWriter::Finalize(); }
