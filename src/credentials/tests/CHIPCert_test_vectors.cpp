@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *    All rights reserved.
@@ -35,28 +35,27 @@ using namespace chip::Credentials;
 using namespace chip::ASN1;
 
 // clang-format off
-extern const int gTestCerts[] = {
-    kTestCert_Root,
-    kTestCert_NodeCA,
-    kTestCert_Node01,
-    kTestCert_FirmwareSigningCA,
-    kTestCert_FirmwareSigning,
+extern const uint8_t gTestCerts[] = {
+    TestCertTypes::kRoot,
+    TestCertTypes::kNodeCA,
+    TestCertTypes::kNode01,
+    TestCertTypes::kFirmwareSigningCA,
+    TestCertTypes::kFirmwareSigning,
 };
 // clang-format on
 
 extern const size_t gNumTestCerts = sizeof(gTestCerts) / sizeof(gTestCerts[0]);
 
-CHIP_ERROR GetTestCert(int selector, const uint8_t *& certData, size_t & certDataLen)
+CHIP_ERROR GetTestCert(uint8_t certType, BitFlags<uint8_t, TestCertLoadFlags> certLoadFlags, const uint8_t *& certData,
+                       uint32_t & certDataLen)
 {
     CHIP_ERROR err;
-    bool derForm = (selector & kTestCertLoadFlag_DERForm) != 0;
-
-    selector = (selector & kTestCert_Mask);
+    bool derForm = certLoadFlags.Has(TestCertLoadFlags::kDERForm);
 
 #define SELECT_CERT(NAME)                                                                                                          \
     do                                                                                                                             \
     {                                                                                                                              \
-        if (selector == kTestCert_##NAME)                                                                                          \
+        if (certType == TestCertTypes::k##NAME)                                                                                    \
         {                                                                                                                          \
             if (derForm)                                                                                                           \
             {                                                                                                                      \
@@ -84,14 +83,12 @@ exit:
     return err;
 }
 
-const char * GetTestCertName(int selector)
+const char * GetTestCertName(uint8_t certType)
 {
-    selector = (selector & kTestCert_Mask);
-
 #define NAME_CERT(NAME)                                                                                                            \
     do                                                                                                                             \
     {                                                                                                                              \
-        if (selector == kTestCert_##NAME)                                                                                          \
+        if (certType == TestCertTypes::k##NAME)                                                                                    \
         {                                                                                                                          \
             return #NAME;                                                                                                          \
         }                                                                                                                          \
@@ -106,15 +103,16 @@ const char * GetTestCertName(int selector)
     return nullptr;
 }
 
-CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, int selector)
+CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, uint8_t certType, BitFlags<uint8_t, TestCertLoadFlags> certLoadFlags,
+                        BitFlags<uint8_t, CertDecodeFlags> decodeFlags)
 {
     CHIP_ERROR err;
     ChipCertificateData * cert;
     const uint8_t * certData;
-    size_t certDataLen;
+    uint32_t certDataLen;
 
     // Special case for loading the root public key only.
-    if ((selector & kTestCert_Mask) == kTestCert_RootKey)
+    if (certType == TestCertTypes::kRootKey)
     {
         // Add the trusted root key to the certificate set.
         err = certSet.AddTrustedKey(sTestCert_Root_Id, kOID_EllipticCurve_prime256v1, sTestCert_Root_PublicKey,
@@ -123,28 +121,38 @@ CHIP_ERROR LoadTestCert(ChipCertificateSet & certSet, int selector)
     }
 
     // Get the requested certificate data.
-    err = GetTestCert(selector, certData, certDataLen);
+    err = GetTestCert(certType, certLoadFlags, certData, certDataLen);
     SuccessOrExit(err);
 
     // Load it into the certificate set.
-    err = certSet.LoadCert(certData, certDataLen, selector & kDecodeFlag_Mask, cert);
+    err = certSet.LoadCert(certData, certDataLen, decodeFlags);
     SuccessOrExit(err);
 
+    // Get loaded certificate data.
+    cert = const_cast<ChipCertificateData *>(certSet.GetLastCert());
+    VerifyOrExit(cert != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+
     // Apply load flags.
-    if ((selector & kTestCertLoadFlag_SuppressIsCA) != 0)
-        cert->CertFlags &= ~kCertFlag_IsCA;
-    if ((selector & kTestCertLoadFlag_SuppressKeyUsage) != 0)
-        cert->CertFlags &= ~kCertFlag_ExtPresent_KeyUsage;
-    if ((selector & kTestCertLoadFlag_SuppressKeyCertSign) != 0)
-        cert->KeyUsageFlags &= ~kKeyUsageFlag_KeyCertSign;
-    if ((selector & kTestCertLoadFlag_SetPathLenConstZero) != 0)
+    if (certLoadFlags.Has(TestCertLoadFlags::kSuppressIsCA))
     {
-        cert->CertFlags |= kCertFlag_PathLenConstPresent;
-        cert->PathLenConstraint = 0;
+        cert->mCertFlags.Clear(CertFlags::kIsCA);
     }
-    if ((selector & kTestCertLoadFlag_SetAppDefinedCertType) != 0)
+    if (certLoadFlags.Has(TestCertLoadFlags::kSuppressKeyUsage))
     {
-        cert->CertType = kCertType_AppDefinedBase;
+        cert->mCertFlags.Clear(CertFlags::kExtPresent_KeyUsage);
+    }
+    if (certLoadFlags.Has(TestCertLoadFlags::kSuppressKeyCertSign))
+    {
+        cert->mKeyUsageFlags.Clear(KeyUsageFlags::kKeyCertSign);
+    }
+    if (certLoadFlags.Has(TestCertLoadFlags::kSetPathLenConstZero))
+    {
+        cert->mCertFlags.Set(CertFlags::kPathLenConstraintPresent);
+        cert->mPathLenConstraint = 0;
+    }
+    if (certLoadFlags.Has(TestCertLoadFlags::kSetAppDefinedCertType))
+    {
+        cert->mCertType = kCertType_AppDefinedBase;
     }
 
 exit:
@@ -225,7 +233,7 @@ extern const uint8_t sTestCert_Root_Chip[] = {
     0x10, 0xfe, 0x29, 0xe7, 0xf2, 0x89, 0x1f, 0x77, 0x11, 0x7f, 0xd7, 0xf0, 0x9c, 0xe5, 0xf4, 0x0b, 0x31, 0x18, 0x18,
 };
 
-extern const size_t sTestCert_Root_Chip_Len = sizeof(sTestCert_Root_Chip);
+extern const uint32_t sTestCert_Root_Chip_Len = sizeof(sTestCert_Root_Chip);
 
 extern const uint8_t sTestCert_Root_DER[] = {
     0x30, 0x82, 0x01, 0x84, 0x30, 0x82, 0x01, 0x2b, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x4f, 0xfa, 0x84, 0x4d, 0x83, 0x89,
@@ -249,7 +257,7 @@ extern const uint8_t sTestCert_Root_DER[] = {
     0xe7, 0xf2, 0x89, 0x1f, 0x77, 0x11, 0x7f, 0xd7, 0xf0, 0x9c, 0xe5, 0xf4, 0x0b, 0x31,
 };
 
-extern const size_t sTestCert_Root_DER_Len = sizeof(sTestCert_Root_DER);
+extern const uint32_t sTestCert_Root_DER_Len = sizeof(sTestCert_Root_DER);
 
 extern const uint8_t sTestCert_Root_PublicKey[] = {
     0x04, 0x9d, 0x30, 0xfe, 0x21, 0x2d, 0x09, 0xea, 0xf2, 0xec, 0xc7, 0x9c, 0x56, 0x24, 0xdf, 0x3c, 0x22,
@@ -258,20 +266,20 @@ extern const uint8_t sTestCert_Root_PublicKey[] = {
     0xfe, 0x9c, 0xb8, 0x49, 0x91, 0x70, 0xfc, 0xfc, 0x1e, 0xc6, 0x67, 0x23, 0xd8, 0xdf,
 };
 
-extern const size_t sTestCert_Root_PublicKey_Len = sizeof(sTestCert_Root_PublicKey);
+extern const uint8_t sTestCert_Root_PublicKey_Len = sizeof(sTestCert_Root_PublicKey);
 
 extern const uint8_t sTestCert_Root_PrivateKey[] = {
     0x4e, 0x83, 0x6b, 0x0f, 0x86, 0x9c, 0xf5, 0x63, 0x54, 0x27, 0x6d, 0x5d, 0x60, 0xd1, 0x95, 0x4e,
     0xcc, 0x80, 0x85, 0x2f, 0xc9, 0x28, 0x3a, 0x57, 0xcd, 0xa7, 0xff, 0x5b, 0x48, 0xa4, 0x80, 0xc6,
 };
 
-extern const size_t sTestCert_Root_PrivateKey_Len = sizeof(sTestCert_Root_PrivateKey);
+extern const uint8_t sTestCert_Root_PrivateKey_Len = sizeof(sTestCert_Root_PrivateKey);
 
 extern const uint8_t sTestCert_Root_SubjectKeyId[] = {
     0x4F, 0x5A, 0xCC, 0x78, 0x01, 0x43, 0x03, 0x52,
 };
 
-extern const size_t sTestCert_Root_SubjectKeyId_Len = sizeof(sTestCert_Root_SubjectKeyId);
+extern const uint8_t sTestCert_Root_SubjectKeyId_Len = sizeof(sTestCert_Root_SubjectKeyId);
 
 extern const uint64_t sTestCert_Root_Id = 0xCACACACA00000001ULL;
 
@@ -347,7 +355,7 @@ extern const uint8_t sTestCert_NodeCA_Chip[] = {
     0xb4, 0x16, 0xf9, 0x3a, 0x9f, 0x4d, 0x5a, 0xb8, 0xf0, 0x41, 0xc4, 0x97, 0xb5, 0x4a, 0xc4, 0x6f, 0x76, 0xc0, 0x18, 0x18,
 };
 
-extern const size_t sTestCert_NodeCA_Chip_Len = sizeof(sTestCert_NodeCA_Chip);
+extern const uint32_t sTestCert_NodeCA_Chip_Len = sizeof(sTestCert_NodeCA_Chip);
 
 extern const uint8_t sTestCert_NodeCA_DER[] = {
     0x30, 0x82, 0x01, 0x85, 0x30, 0x82, 0x01, 0x2b, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x2e, 0x76, 0xc5, 0xde, 0xc1, 0xe2,
@@ -371,7 +379,7 @@ extern const uint8_t sTestCert_NodeCA_DER[] = {
     0x3a, 0x9f, 0x4d, 0x5a, 0xb8, 0xf0, 0x41, 0xc4, 0x97, 0xb5, 0x4a, 0xc4, 0x6f, 0x76, 0xc0,
 };
 
-extern const size_t sTestCert_NodeCA_DER_Len = sizeof(sTestCert_NodeCA_DER);
+extern const uint32_t sTestCert_NodeCA_DER_Len = sizeof(sTestCert_NodeCA_DER);
 
 extern const uint8_t sTestCert_NodeCA_PublicKey[] = {
     0x04, 0x8a, 0x34, 0x94, 0x8d, 0x8c, 0x9f, 0xc4, 0x2b, 0x64, 0xe7, 0xdf, 0x9e, 0x3c, 0x7f, 0xa8, 0x80,
@@ -380,20 +388,20 @@ extern const uint8_t sTestCert_NodeCA_PublicKey[] = {
     0x00, 0x92, 0x72, 0x0d, 0x92, 0xfc, 0x40, 0x1d, 0xa1, 0xad, 0xa5, 0x5b, 0x5b, 0x6c,
 };
 
-extern const size_t sTestCert_NodeCA_PublicKey_Len = sizeof(sTestCert_NodeCA_PublicKey);
+extern const uint8_t sTestCert_NodeCA_PublicKey_Len = sizeof(sTestCert_NodeCA_PublicKey);
 
 extern const uint8_t sTestCert_NodeCA_PrivateKey[] = {
     0xee, 0xb5, 0x4c, 0x87, 0x3a, 0xe1, 0x33, 0x8a, 0x10, 0x30, 0x08, 0x65, 0xa3, 0x17, 0x62, 0xab,
     0xbf, 0x13, 0xb4, 0x6a, 0xeb, 0x57, 0x03, 0x88, 0x49, 0x17, 0x45, 0x6e, 0x9b, 0x14, 0x8e, 0xd3,
 };
 
-extern const size_t sTestCert_NodeCA_PrivateKey_Len = sizeof(sTestCert_NodeCA_PrivateKey);
+extern const uint8_t sTestCert_NodeCA_PrivateKey_Len = sizeof(sTestCert_NodeCA_PrivateKey);
 
 extern const uint8_t sTestCert_NodeCA_SubjectKeyId[] = {
     0x45, 0x24, 0xB6, 0xE8, 0x4A, 0x64, 0xEB, 0x12,
 };
 
-extern const size_t sTestCert_NodeCA_SubjectKeyId_Len = sizeof(sTestCert_NodeCA_SubjectKeyId);
+extern const uint8_t sTestCert_NodeCA_SubjectKeyId_Len = sizeof(sTestCert_NodeCA_SubjectKeyId);
 
 extern const uint64_t sTestCert_NodeCA_Id = 0xCACACACA00000002ULL;
 
@@ -472,7 +480,7 @@ extern const uint8_t sTestCert_Node01_Chip[] = {
     0x2f, 0xed, 0x8d, 0x75, 0xc4, 0xfc, 0xf5, 0x18, 0x18,
 };
 
-extern const size_t sTestCert_Node01_Chip_Len = sizeof(sTestCert_Node01_Chip);
+extern const uint32_t sTestCert_Node01_Chip_Len = sizeof(sTestCert_Node01_Chip);
 
 extern const uint8_t sTestCert_Node01_DER[] = {
     0x30, 0x82, 0x01, 0xa4, 0x30, 0x82, 0x01, 0x4a, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x31, 0xd1, 0xb0, 0xea, 0xb7, 0xc8,
@@ -498,7 +506,7 @@ extern const uint8_t sTestCert_Node01_DER[] = {
     0x75, 0xc4, 0xfc, 0xf5,
 };
 
-extern const size_t sTestCert_Node01_DER_Len = sizeof(sTestCert_Node01_DER);
+extern const uint32_t sTestCert_Node01_DER_Len = sizeof(sTestCert_Node01_DER);
 
 extern const uint8_t sTestCert_Node01_PublicKey[] = {
     0x04, 0x80, 0x52, 0x1c, 0x92, 0x47, 0xf8, 0xe5, 0xe3, 0x08, 0xa7, 0xac, 0x57, 0x5b, 0x7a, 0xd3, 0xc1,
@@ -507,20 +515,20 @@ extern const uint8_t sTestCert_Node01_PublicKey[] = {
     0xc1, 0x4c, 0xe2, 0xdd, 0x2e, 0x3f, 0xb0, 0x9d, 0x6e, 0x04, 0x10, 0x09, 0xf4, 0x70,
 };
 
-extern const size_t sTestCert_Node01_PublicKey_Len = sizeof(sTestCert_Node01_PublicKey);
+extern const uint8_t sTestCert_Node01_PublicKey_Len = sizeof(sTestCert_Node01_PublicKey);
 
 extern const uint8_t sTestCert_Node01_PrivateKey[] = {
     0x89, 0xf8, 0x7d, 0x48, 0x60, 0xbb, 0xf7, 0x33, 0x80, 0xf5, 0x4d, 0xd6, 0xfa, 0x58, 0x18, 0xf9,
     0x99, 0xe6, 0x76, 0x4b, 0x0d, 0xa7, 0x89, 0xc9, 0x50, 0xa2, 0x6c, 0x89, 0x59, 0xb9, 0xaf, 0x10,
 };
 
-extern const size_t sTestCert_Node01_PrivateKey_Len = sizeof(sTestCert_Node01_PrivateKey);
+extern const uint8_t sTestCert_Node01_PrivateKey_Len = sizeof(sTestCert_Node01_PrivateKey);
 
 extern const uint8_t sTestCert_Node01_SubjectKeyId[] = {
     0x4F, 0x81, 0xF0, 0x44, 0xC8, 0x5F, 0xC3, 0xD9,
 };
 
-extern const size_t sTestCert_Node01_SubjectKeyId_Len = sizeof(sTestCert_Node01_SubjectKeyId);
+extern const uint8_t sTestCert_Node01_SubjectKeyId_Len = sizeof(sTestCert_Node01_SubjectKeyId);
 
 extern const uint64_t sTestCert_Node01_Id = 0xDEDEDEDE00000001ULL;
 
@@ -596,7 +604,7 @@ extern const uint8_t sTestCert_FirmwareSigningCA_Chip[] = {
     0x40, 0x84, 0x48, 0xa4, 0x3c, 0x23, 0xd1, 0x32, 0xba, 0xf0, 0x02, 0x21, 0x55, 0x9d, 0xcb, 0x2c, 0xe8, 0x0c, 0x18, 0x18,
 };
 
-extern const size_t sTestCert_FirmwareSigningCA_Chip_Len = sizeof(sTestCert_FirmwareSigningCA_Chip);
+extern const uint32_t sTestCert_FirmwareSigningCA_Chip_Len = sizeof(sTestCert_FirmwareSigningCA_Chip);
 
 extern const uint8_t sTestCert_FirmwareSigningCA_DER[] = {
     0x30, 0x82, 0x01, 0x85, 0x30, 0x82, 0x01, 0x2b, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x43, 0x6e, 0x68, 0x3f, 0x1a, 0x61,
@@ -620,7 +628,7 @@ extern const uint8_t sTestCert_FirmwareSigningCA_DER[] = {
     0xa4, 0x3c, 0x23, 0xd1, 0x32, 0xba, 0xf0, 0x02, 0x21, 0x55, 0x9d, 0xcb, 0x2c, 0xe8, 0x0c,
 };
 
-extern const size_t sTestCert_FirmwareSigningCA_DER_Len = sizeof(sTestCert_FirmwareSigningCA_DER);
+extern const uint32_t sTestCert_FirmwareSigningCA_DER_Len = sizeof(sTestCert_FirmwareSigningCA_DER);
 
 extern const uint8_t sTestCert_FirmwareSigningCA_PublicKey[] = {
     0x04, 0x67, 0x47, 0x90, 0xa4, 0xcb, 0x5a, 0x98, 0x8c, 0x50, 0x01, 0x1d, 0xc0, 0x3b, 0x11, 0xf5, 0xd0,
@@ -629,20 +637,20 @@ extern const uint8_t sTestCert_FirmwareSigningCA_PublicKey[] = {
     0xcf, 0x47, 0xfe, 0xa2, 0x61, 0x76, 0x82, 0xfc, 0x6d, 0xe3, 0x6e, 0x43, 0x34, 0xd1,
 };
 
-extern const size_t sTestCert_FirmwareSigningCA_PublicKey_Len = sizeof(sTestCert_FirmwareSigningCA_PublicKey);
+extern const uint8_t sTestCert_FirmwareSigningCA_PublicKey_Len = sizeof(sTestCert_FirmwareSigningCA_PublicKey);
 
 extern const uint8_t sTestCert_FirmwareSigningCA_PrivateKey[] = {
     0xb6, 0xef, 0x09, 0xad, 0xed, 0xe7, 0x5b, 0xcc, 0xa5, 0x5f, 0xce, 0x09, 0xe0, 0xe1, 0xcd, 0x0f,
     0xd9, 0x85, 0x33, 0x9f, 0x8f, 0x53, 0xbb, 0xe6, 0x99, 0x2d, 0x4d, 0x98, 0x7b, 0x77, 0xd9, 0x26,
 };
 
-extern const size_t sTestCert_FirmwareSigningCA_PrivateKey_Len = sizeof(sTestCert_FirmwareSigningCA_PrivateKey);
+extern const uint8_t sTestCert_FirmwareSigningCA_PrivateKey_Len = sizeof(sTestCert_FirmwareSigningCA_PrivateKey);
 
 extern const uint8_t sTestCert_FirmwareSigningCA_SubjectKeyId[] = {
     0x4D, 0xCB, 0xCD, 0x82, 0x9E, 0xBF, 0x5C, 0xEB,
 };
 
-extern const size_t sTestCert_FirmwareSigningCA_SubjectKeyId_Len = sizeof(sTestCert_FirmwareSigningCA_SubjectKeyId);
+extern const uint8_t sTestCert_FirmwareSigningCA_SubjectKeyId_Len = sizeof(sTestCert_FirmwareSigningCA_SubjectKeyId);
 
 extern const uint64_t sTestCert_FirmwareSigningCA_Id = 0xCACACACA00000004ULL;
 
@@ -721,7 +729,7 @@ extern const uint8_t sTestCert_FirmwareSigning_Chip[] = {
     0x48, 0x67, 0xd6, 0x7a, 0x04, 0x1b, 0x1e, 0x1d, 0x2e, 0xb7, 0x4c, 0xbd, 0x71, 0xd4, 0x23, 0x83, 0x3e, 0x18, 0x18,
 };
 
-extern const size_t sTestCert_FirmwareSigning_Chip_Len = sizeof(sTestCert_FirmwareSigning_Chip);
+extern const uint32_t sTestCert_FirmwareSigning_Chip_Len = sizeof(sTestCert_FirmwareSigning_Chip);
 
 extern const uint8_t sTestCert_FirmwareSigning_DER[] = {
     0x30, 0x82, 0x01, 0x9a, 0x30, 0x82, 0x01, 0x40, 0xa0, 0x03, 0x02, 0x01, 0x02, 0x02, 0x08, 0x0f, 0xa2, 0x66, 0xf2, 0xb7, 0xb1,
@@ -746,7 +754,7 @@ extern const uint8_t sTestCert_FirmwareSigning_DER[] = {
     0xd6, 0x7a, 0x04, 0x1b, 0x1e, 0x1d, 0x2e, 0xb7, 0x4c, 0xbd, 0x71, 0xd4, 0x23, 0x83, 0x3e,
 };
 
-extern const size_t sTestCert_FirmwareSigning_DER_Len = sizeof(sTestCert_FirmwareSigning_DER);
+extern const uint32_t sTestCert_FirmwareSigning_DER_Len = sizeof(sTestCert_FirmwareSigning_DER);
 
 extern const uint8_t sTestCert_FirmwareSigning_PublicKey[] = {
     0x04, 0xdf, 0xfd, 0xb3, 0xfe, 0xde, 0xd3, 0x1f, 0x39, 0xf4, 0x04, 0x9a, 0xfd, 0x90, 0x58, 0xdd, 0x6d,
@@ -755,20 +763,20 @@ extern const uint8_t sTestCert_FirmwareSigning_PublicKey[] = {
     0xad, 0x78, 0x57, 0x02, 0x93, 0x1c, 0x31, 0xfe, 0x41, 0xa3, 0xd8, 0xae, 0xe4, 0xef,
 };
 
-extern const size_t sTestCert_FirmwareSigning_PublicKey_Len = sizeof(sTestCert_FirmwareSigning_PublicKey);
+extern const uint8_t sTestCert_FirmwareSigning_PublicKey_Len = sizeof(sTestCert_FirmwareSigning_PublicKey);
 
 extern const uint8_t sTestCert_FirmwareSigning_PrivateKey[] = {
     0xec, 0x81, 0xa8, 0xf5, 0xf6, 0x8e, 0x50, 0xc0, 0xde, 0xe8, 0x92, 0xf8, 0x6f, 0xad, 0xd0, 0x43,
     0x6b, 0x3d, 0x9f, 0xb7, 0x88, 0x97, 0x4f, 0x4e, 0x96, 0x9f, 0x2b, 0xac, 0xb1, 0x8c, 0xaa, 0xf8,
 };
 
-extern const size_t sTestCert_FirmwareSigning_PrivateKey_Len = sizeof(sTestCert_FirmwareSigning_PrivateKey);
+extern const uint8_t sTestCert_FirmwareSigning_PrivateKey_Len = sizeof(sTestCert_FirmwareSigning_PrivateKey);
 
 extern const uint8_t sTestCert_FirmwareSigning_SubjectKeyId[] = {
     0x42, 0x8E, 0x80, 0x02, 0xA4, 0xBF, 0x23, 0x1D,
 };
 
-extern const size_t sTestCert_FirmwareSigning_SubjectKeyId_Len = sizeof(sTestCert_FirmwareSigning_SubjectKeyId);
+extern const uint8_t sTestCert_FirmwareSigning_SubjectKeyId_Len = sizeof(sTestCert_FirmwareSigning_SubjectKeyId);
 
 extern const uint64_t sTestCert_FirmwareSigning_Id = 0xFFFFFFFF00000001ULL;
 

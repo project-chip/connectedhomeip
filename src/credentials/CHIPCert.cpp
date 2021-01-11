@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
@@ -51,6 +51,7 @@ using namespace chip::Protocols;
 using namespace chip::Crypto;
 
 extern CHIP_ERROR DecodeConvertTBSCert(TLVReader & reader, ASN1Writer & writer, ChipCertificateData & certData);
+extern CHIP_ERROR DecodeECDSASignature(TLVReader & reader, ChipCertificateData & certData);
 
 ChipCertificateSet::ChipCertificateSet()
 {
@@ -60,6 +61,11 @@ ChipCertificateSet::ChipCertificateSet()
     mDecodeBuf           = nullptr;
     mDecodeBufSize       = 0;
     mMemoryAllocInternal = false;
+}
+
+ChipCertificateSet::~ChipCertificateSet()
+{
+    Release();
 }
 
 CHIP_ERROR ChipCertificateSet::Init(uint8_t maxCertsArraySize, uint16_t decodeBufSize)
@@ -81,7 +87,9 @@ CHIP_ERROR ChipCertificateSet::Init(uint8_t maxCertsArraySize, uint16_t decodeBu
 
 exit:
     if (err != CHIP_NO_ERROR)
+    {
         Release();
+    }
 
     return err;
 }
@@ -126,14 +134,16 @@ void ChipCertificateSet::Release()
 
 void ChipCertificateSet::Clear()
 {
-    for (int i = 0; i < mMaxCerts; i++)
+    for (int i = 0; i < mCertCount; i++)
+    {
         mCerts[i].Clear();
+    }
 
     mCertCount = 0;
 }
 
-CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipCertLen, uint16_t decodeFlags,
-                                        ChipCertificateData *& cert)
+CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipCertLen,
+                                        BitFlags<uint8_t, CertDecodeFlags> decodeFlags)
 {
     CHIP_ERROR err;
     TLVReader reader;
@@ -144,18 +154,18 @@ CHIP_ERROR ChipCertificateSet::LoadCert(const uint8_t * chipCert, uint32_t chipC
     err = reader.Next(kTLVType_Structure, ProfileTag(kProtocol_OpCredentials, kTag_ChipCertificate));
     SuccessOrExit(err);
 
-    err = LoadCert(reader, decodeFlags, cert);
+    err = LoadCert(reader, decodeFlags);
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags, ChipCertificateData *& cert)
+CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, BitFlags<uint8_t, CertDecodeFlags> decodeFlags)
 {
     CHIP_ERROR err;
-    ASN1Writer writer;
-
-    cert = nullptr;
+    ASN1Writer writer; // ASN1Writer is used to encode TBS portion of the certificate for the purpose of signature
+                       // validation, which should be performed on the TBS data encoded in ASN.1 DER form.
+    ChipCertificateData * cert = nullptr;
 
     // Must be positioned on the structure element representing the certificate.
     VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_INVALID_ARGUMENT);
@@ -163,11 +173,7 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags
     // Verify we have room for the new certificate.
     VerifyOrExit(mCertCount < mMaxCerts, err = CHIP_ERROR_NO_MEMORY);
 
-    cert = &mCerts[mCertCount];
-    cert->Clear();
-
-    // Record the starting point of the certificate's elements.
-    cert->EncodedCert = reader.GetReadPoint();
+    cert = new (&mCerts[mCertCount]) ChipCertificateData();
 
     {
         TLVType containerType;
@@ -185,79 +191,64 @@ CHIP_ERROR ChipCertificateSet::LoadCert(TLVReader & reader, uint16_t decodeFlags
 
         // Verify the cert has both the Subject Key Id and Authority Key Id extensions present.
         // Only certs with both these extensions are supported for the purposes of certificate validation.
-        {
-            const uint16_t expectedFlags = kCertFlag_ExtPresent_SubjectKeyId | kCertFlag_ExtPresent_AuthKeyId;
-            VerifyOrExit((cert->CertFlags & expectedFlags) == expectedFlags, err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
-        }
+        VerifyOrExit(cert->mCertFlags.Has(CertFlags::kExtPresent_SubjectKeyId) &&
+                         cert->mCertFlags.Has(CertFlags::kExtPresent_AuthKeyId),
+                     err = CHIP_ERROR_UNSUPPORTED_CERT_FORMAT);
 
         // Verify the cert was signed with ECDSA-SHA256. This is the only signature algorithm currently supported.
-        VerifyOrExit(cert->SigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, err = CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
+        VerifyOrExit(cert->mSigAlgoOID == kOID_SigAlgo_ECDSAWithSHA256, err = CHIP_ERROR_UNSUPPORTED_SIGNATURE_TYPE);
 
         // If requested, generate the hash of the TBS portion of the certificate...
-        if ((decodeFlags & kDecodeFlag_GenerateTBSHash) != 0)
+        if (decodeFlags.Has(CertDecodeFlags::kGenerateTBSHash))
         {
             // Finish writing the ASN.1 DER encoding of the TBS certificate.
             err = writer.Finalize();
             SuccessOrExit(err);
 
             // Generate a SHA hash of the encoded TBS certificate.
-            chip::Crypto::Hash_SHA256(mDecodeBuf, writer.GetLengthWritten(), cert->TBSHash);
-            cert->CertFlags |= kCertFlag_TBSHashPresent;
+            chip::Crypto::Hash_SHA256(mDecodeBuf, writer.GetLengthWritten(), cert->mTBSHash);
+
+            cert->mCertFlags.Set(CertFlags::kTBSHashPresent);
         }
 
-        // Extract the certificate's signature...
-        {
-            TLVType containerType2;
+        // Decode the certificate's signature...
+        err = DecodeECDSASignature(reader, *cert);
+        SuccessOrExit(err);
 
-            // Verify the tag and type
-            VerifyOrExit(reader.GetType() == kTLVType_Structure, err = CHIP_ERROR_WRONG_TLV_TYPE);
-            VerifyOrExit(reader.GetTag() == ContextTag(kTag_ECDSASignature), err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
-
-            err = reader.EnterContainer(containerType2);
-            SuccessOrExit(err);
-
-            // Extract the signature r value
-            err = reader.Next(kTLVType_ByteString, ContextTag(kTag_ECDSASignature_r));
-            SuccessOrExit(err);
-            err = reader.GetDataPtr(reinterpret_cast<const uint8_t *&>(cert->Signature.R));
-            SuccessOrExit(err);
-            cert->Signature.RLen = reader.GetLength();
-
-            // Extract the signature s value
-            err = reader.Next(kTLVType_ByteString, ContextTag(kTag_ECDSASignature_s));
-            SuccessOrExit(err);
-            err = reader.GetDataPtr(reinterpret_cast<const uint8_t *&>(cert->Signature.S));
-            SuccessOrExit(err);
-            cert->Signature.SLen = reader.GetLength();
-
-            err = reader.ExitContainer(containerType2);
-            SuccessOrExit(err);
-        }
+        // Verify no more elements in the certificate.
+        err = reader.VerifyEndOfContainer();
+        SuccessOrExit(err);
 
         err = reader.ExitContainer(containerType);
         SuccessOrExit(err);
     }
 
-    // Record the overall size of the certificate.
-    cert->EncodedCertLen = reader.GetReadPoint() - cert->EncodedCert;
-
-    mCertCount++;
-
     // If requested by the caller, mark the certificate as trusted.
-    if (decodeFlags & kDecodeFlag_IsTrustAnchor)
+    if (decodeFlags.Has(CertDecodeFlags::kIsTrustAnchor))
     {
-        cert->CertFlags |= kCertFlag_IsTrustAnchor;
+        cert->mCertFlags.Set(CertFlags::kIsTrustAnchor);
     }
 
     // Assign a default type for the certificate based on its subject and attributes.
     err = DetermineCertType(*cert);
     SuccessOrExit(err);
 
+    mCertCount++;
+
 exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        if (cert != nullptr)
+        {
+            cert->Clear();
+        }
+    }
+
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::LoadCerts(const uint8_t * chipCerts, uint32_t chipCertsLen, uint16_t decodeFlags)
+CHIP_ERROR ChipCertificateSet::LoadCerts(const uint8_t * chipCerts, uint32_t chipCertsLen,
+                                         BitFlags<uint8_t, CertDecodeFlags> decodeFlags)
 {
     CHIP_ERROR err;
     TLVReader reader;
@@ -274,7 +265,7 @@ CHIP_ERROR ChipCertificateSet::LoadCerts(const uint8_t * chipCerts, uint32_t chi
     tag  = reader.GetTag();
 
     VerifyOrExit((type == kTLVType_Structure && tag == ProfileTag(kProtocol_OpCredentials, kTag_ChipCertificate)) ||
-                     (type == kTLVType_Array && tag == ProfileTag(kProtocol_OpCredentials, kTag_ChipCertificateList)),
+                     (type == kTLVType_Array && tag == ProfileTag(kProtocol_OpCredentials, kTag_ChipCertificateArray)),
                  err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
 
     err = LoadCerts(reader, decodeFlags);
@@ -283,19 +274,19 @@ exit:
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::LoadCerts(TLVReader & reader, uint16_t decodeFlags)
+CHIP_ERROR ChipCertificateSet::LoadCerts(TLVReader & reader, BitFlags<uint8_t, CertDecodeFlags> decodeFlags)
 {
     CHIP_ERROR err;
-    ChipCertificateData * cert;
+    uint8_t initialCertCount = mCertCount;
 
     // If positioned on a structure, we assume that structure is a single certificate.
     if (reader.GetType() == kTLVType_Structure)
     {
-        err = LoadCert(reader, decodeFlags, cert);
+        err = LoadCert(reader, decodeFlags);
         SuccessOrExit(err);
     }
 
-    // Other we expect to be positioned on an Array or Path that contains a sequence of
+    // Other we expect to be positioned on an Array that contains a sequence of
     // zero or more certificates...
     else
     {
@@ -306,22 +297,35 @@ CHIP_ERROR ChipCertificateSet::LoadCerts(TLVReader & reader, uint16_t decodeFlag
 
         while ((err = reader.Next()) == CHIP_NO_ERROR)
         {
-            err = LoadCert(reader, decodeFlags, cert);
+            VerifyOrExit(reader.GetTag() == AnonymousTag, err = CHIP_ERROR_UNEXPECTED_TLV_ELEMENT);
+
+            err = LoadCert(reader, decodeFlags);
             SuccessOrExit(err);
         }
         if (err != CHIP_END_OF_TLV)
+        {
             ExitNow();
+        }
 
         err = reader.ExitContainer(containerType);
         SuccessOrExit(err);
     }
 
 exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        for (uint8_t i = initialCertCount; i < mCertCount; i++)
+        {
+            mCerts[i].Clear();
+        }
+        mCertCount = initialCertCount;
+    }
+
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::AddTrustedKey(uint64_t caId, OID curveOID, const uint8_t * pubKey, uint16_t pubKeyLen,
-                                             const uint8_t * pubKeyId, uint16_t pubKeyIdLen)
+CHIP_ERROR ChipCertificateSet::AddTrustedKey(uint64_t caId, OID curveOID, const uint8_t * pubKey, uint8_t pubKeyLen,
+                                             const uint8_t * pubKeyId, uint8_t pubKeyIdLen)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     ChipCertificateData * cert;
@@ -329,21 +333,27 @@ CHIP_ERROR ChipCertificateSet::AddTrustedKey(uint64_t caId, OID curveOID, const 
     // Verify we have room for the new certificate.
     VerifyOrExit(mCertCount < mMaxCerts, err = CHIP_ERROR_NO_MEMORY);
 
-    cert = &mCerts[mCertCount];
-    cert->Clear();
-    cert->SubjectDN.AttrOID          = kOID_AttributeType_ChipCAId;
-    cert->SubjectDN.AttrValue.ChipId = caId;
-    cert->IssuerDN                   = cert->SubjectDN;
-    cert->PubKeyCurveOID             = curveOID;
-    cert->PublicKey                  = pubKey;
-    cert->PublicKeyLen               = pubKeyLen;
-    cert->SubjectKeyId.Id            = pubKeyId;
-    cert->SubjectKeyId.Len           = pubKeyIdLen;
-    cert->AuthKeyId                  = cert->SubjectKeyId;
-    cert->KeyUsageFlags              = kKeyUsageFlag_KeyCertSign;
-    cert->CertType                   = kCertType_CA;
-    cert->CertFlags = kCertFlag_AuthKeyIdPresent | kCertFlag_ExtPresent_AuthKeyId | kCertFlag_ExtPresent_BasicConstraints |
-        kCertFlag_ExtPresent_SubjectKeyId | kCertFlag_ExtPresent_KeyUsage | kCertFlag_IsCA | kCertFlag_IsTrustAnchor;
+    cert = new (&mCerts[mCertCount]) ChipCertificateData();
+
+    cert->mSubjectDN.mAttrOID           = kOID_AttributeType_ChipCAId;
+    cert->mSubjectDN.mAttrValue.mChipId = caId;
+    cert->mIssuerDN                     = cert->mSubjectDN;
+    cert->mPubKeyCurveOID               = curveOID;
+    cert->mPublicKey                    = pubKey;
+    cert->mPublicKeyLen                 = pubKeyLen;
+    cert->mSubjectKeyId.mId             = pubKeyId;
+    cert->mSubjectKeyId.mLen            = pubKeyIdLen;
+    cert->mAuthKeyId                    = cert->mSubjectKeyId;
+    cert->mCertType                     = kCertType_CA;
+
+    cert->mCertFlags.Set(CertFlags::kExtPresent_BasicConstraints);
+    cert->mCertFlags.Set(CertFlags::kExtPresent_KeyUsage);
+    cert->mCertFlags.Set(CertFlags::kExtPresent_SubjectKeyId);
+    cert->mCertFlags.Set(CertFlags::kExtPresent_AuthKeyId);
+    cert->mCertFlags.Set(CertFlags::kIsCA);
+    cert->mCertFlags.Set(CertFlags::kIsTrustAnchor);
+
+    cert->mKeyUsageFlags.Set(KeyUsageFlags::kKeyCertSign);
 
     mCertCount++;
 
@@ -356,31 +366,37 @@ const ChipCertificateData * ChipCertificateSet::FindCert(const CertificateKeyId 
     for (uint8_t i = 0; i < mCertCount; i++)
     {
         ChipCertificateData & cert = mCerts[i];
-        if (cert.SubjectKeyId.IsEqual(subjectKeyId))
+        if (cert.mSubjectKeyId.IsEqual(subjectKeyId))
+        {
             return &cert;
+        }
     }
+
     return nullptr;
 }
 
-CHIP_ERROR ChipCertificateSet::ValidateCert(ChipCertificateData & cert, ValidationContext & context)
+bool ChipCertificateSet::IsCertInTheSet(const ChipCertificateData * cert) const
+{
+    for (uint8_t i = 0; i < mCertCount; i++)
+    {
+        if (cert == &mCerts[i])
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, ValidationContext & context)
 {
     CHIP_ERROR err;
 
-    VerifyOrExit(&cert >= mCerts && &cert < &mCerts[mCertCount], err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(IsCertInTheSet(cert), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-#if CHIP_CONFIG_DEBUG_CERT_VALIDATION
-    if (context.CertValidationResults != nullptr)
-    {
-        VerifyOrExit(context.CertValidationResultsLen >= mCertCount, err = CHIP_ERROR_INVALID_ARGUMENT);
+    context.mTrustAnchor = nullptr;
 
-        for (uint8_t i = 0; i < context.CertValidationResultsLen; i++)
-            context.CertValidationResults[i] = CHIP_CERT_NOT_USED;
-    }
-#endif
-
-    context.TrustAnchor = nullptr;
-
-    err = ValidateCert(cert, context, context.ValidateFlags, 0);
+    err = ValidateCert(cert, context, context.mValidateFlags, 0);
 
 exit:
     return err;
@@ -391,46 +407,38 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
 {
     CHIP_ERROR err;
 
-#if CHIP_CONFIG_DEBUG_CERT_VALIDATION
+    context.mTrustAnchor = nullptr;
 
-    if (context.CertValidationResults != nullptr)
-    {
-        VerifyOrExit(context.CertValidationResultsLen >= mCertCount, err = CHIP_ERROR_INVALID_ARGUMENT);
-
-        for (uint8_t i = 0; i < context.CertValidationResultsLen; i++)
-            context.CertValidationResults[i] = CHIP_CERT_NOT_USED;
-    }
-
-#endif
-
-    context.TrustAnchor = nullptr;
-
-    err = FindValidCert(subjectDN, subjectKeyId, context, context.ValidateFlags, 0, cert);
+    err = FindValidCert(subjectDN, subjectKeyId, context, context.mValidateFlags, 0, cert);
     SuccessOrExit(err);
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::VerifySignature(ChipCertificateData & cert, ChipCertificateData & caCert)
+CHIP_ERROR ChipCertificateSet::VerifySignature(const ChipCertificateData * cert, const ChipCertificateData * caCert)
 {
+    static constexpr size_t kMaxBytesForDeferredLenList = sizeof(uint8_t *) + // size of a single pointer in the deferred list
+        4 + // extra memory allocated for the deferred length field (kLengthFieldReserveSize - 1)
+        3;  // the deferred length list is alligned to 32bit boundary
+
     CHIP_ERROR err;
     P256PublicKey caPublicKey;
     P256ECDSASignature signature;
-    uint8_t tmpBuf[signature.Capacity() + 28]; // extra storage for deferred length list.
+    uint8_t tmpBuf[signature.Capacity() + kMaxBytesForDeferredLenList];
     ASN1Writer writer;
 
-    writer.Init(tmpBuf, sizeof(tmpBuf));
+    writer.Init(tmpBuf, static_cast<uint32_t>(sizeof(tmpBuf)));
 
     // Ecdsa-Sig-Value ::= SEQUENCE
     ASN1_START_SEQUENCE
     {
         // r INTEGER
-        err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, cert.Signature.R, cert.Signature.RLen);
+        err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, cert->mSignature.R, cert->mSignature.RLen);
         SuccessOrExit(err);
 
         // s INTEGER
-        err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, cert.Signature.S, cert.Signature.SLen);
+        err = writer.PutValue(kASN1TagClass_Universal, kASN1UniversalTag_Integer, false, cert->mSignature.S, cert->mSignature.SLen);
         SuccessOrExit(err);
     }
     ASN1_END_SEQUENCE;
@@ -444,17 +452,17 @@ CHIP_ERROR ChipCertificateSet::VerifySignature(ChipCertificateData & cert, ChipC
     err = signature.SetLength(writer.GetLengthWritten());
     SuccessOrExit(err);
 
-    memcpy(caPublicKey, caCert.PublicKey, caCert.PublicKeyLen);
+    memcpy(caPublicKey, caCert->mPublicKey, caCert->mPublicKeyLen);
 
-    err = caPublicKey.ECDSA_validate_hash_signature(cert.TBSHash, chip::Crypto::kSHA256_Hash_Length, signature);
+    err = caPublicKey.ECDSA_validate_hash_signature(cert->mTBSHash, chip::Crypto::kSHA256_Hash_Length, signature);
     SuccessOrExit(err);
 
 exit:
     return err;
 }
 
-CHIP_ERROR ChipCertificateSet::ValidateCert(ChipCertificateData & cert, ValidationContext & context, uint16_t validateFlags,
-                                            uint8_t depth)
+CHIP_ERROR ChipCertificateSet::ValidateCert(const ChipCertificateData * cert, ValidationContext & context,
+                                            BitFlags<uint8_t, CertValidateFlags> validateFlags, uint8_t depth)
 {
     CHIP_ERROR err                        = CHIP_NO_ERROR;
     ChipCertificateData * caCert          = nullptr;
@@ -464,14 +472,14 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(ChipCertificateData & cert, Validati
     if (depth > 0)
     {
         // Verify the isCA flag is present.
-        VerifyOrExit((cert.CertFlags & kCertFlag_IsCA) != 0, err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
+        VerifyOrExit(cert->mCertFlags.Has(CertFlags::kIsCA), err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
 
         // Verify the key usage extension is present and contains the 'keyCertSign' flag.
-        VerifyOrExit((cert.CertFlags & kCertFlag_ExtPresent_KeyUsage) != 0 && (cert.KeyUsageFlags & kKeyUsageFlag_KeyCertSign) != 0,
+        VerifyOrExit(cert->mCertFlags.Has(CertFlags::kExtPresent_KeyUsage) && cert->mKeyUsageFlags.Has(KeyUsageFlags::kKeyCertSign),
                      err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
 
         // Verify that the certificate type is set to "CA".
-        VerifyOrExit(cert.CertType == kCertType_CA, err = CHIP_ERROR_WRONG_CERT_TYPE);
+        VerifyOrExit(cert->mCertType == kCertType_CA, err = CHIP_ERROR_WRONG_CERT_TYPE);
 
         // If a path length constraint was included, verify the cert depth vs. the specified constraint.
         //
@@ -480,8 +488,10 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(ChipCertificateData & cert, Validati
         // (Note: The last certificate in the certification path is not an intermediate certificate,
         // and is not included in this limit...)"
         //
-        if ((cert.CertFlags & kCertFlag_PathLenConstPresent) != 0)
-            VerifyOrExit((depth - 1) <= cert.PathLenConstraint, err = CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED);
+        if (cert->mCertFlags.Has(CertFlags::kPathLenConstraintPresent))
+        {
+            VerifyOrExit((depth - 1) <= cert->mPathLenConstraint, err = CHIP_ERROR_CERT_PATH_LEN_CONSTRAINT_EXCEEDED);
+        }
     }
 
     // Otherwise verify the desired certificate usages/purposes/type given in the validation context...
@@ -489,45 +499,45 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(ChipCertificateData & cert, Validati
     {
         // If a set of desired key usages has been specified, verify that the key usage extension exists
         // in the certificate and that the corresponding usages are supported.
-        if (context.RequiredKeyUsages != kKeyUsage_NotSpecified)
+        if (context.mRequiredKeyUsages.Raw() != 0)
         {
-            VerifyOrExit((cert.CertFlags & kCertFlag_ExtPresent_KeyUsage) != 0 &&
-                             (cert.KeyUsageFlags & context.RequiredKeyUsages) == context.RequiredKeyUsages,
+            VerifyOrExit(cert->mCertFlags.Has(CertFlags::kExtPresent_KeyUsage) &&
+                             cert->mKeyUsageFlags.Has(context.mRequiredKeyUsages.Raw()),
                          err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
         }
 
         // If a set of desired key purposes has been specified, verify that the extended key usage extension
         // exists in the certificate and that the corresponding purposes are supported.
-        if (context.RequiredKeyPurposes != kKeyPurpose_NotSpecified)
+        if (context.mRequiredKeyPurposes.Raw() != 0)
         {
-            VerifyOrExit((cert.CertFlags & kCertFlag_ExtPresent_ExtendedKeyUsage) != 0 &&
-                             (cert.KeyPurposeFlags & context.RequiredKeyPurposes) == context.RequiredKeyPurposes,
+            VerifyOrExit(cert->mCertFlags.Has(CertFlags::kExtPresent_ExtendedKeyUsage) &&
+                             cert->mKeyPurposeFlags.Has(context.mRequiredKeyPurposes.Raw()),
                          err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
         }
 
         // If a required certificate type has been specified, verify it against the current certificate's type.
-        if (context.RequiredCertType != kCertType_NotSpecified)
+        if (context.mRequiredCertType != kCertType_NotSpecified)
         {
-            VerifyOrExit(cert.CertType == context.RequiredCertType, err = CHIP_ERROR_WRONG_CERT_TYPE);
+            VerifyOrExit(cert->mCertType == context.mRequiredCertType, err = CHIP_ERROR_WRONG_CERT_TYPE);
         }
     }
 
     // Verify the validity time of the certificate, if requested.
-    if (cert.NotBeforeDate != 0 && (validateFlags & kValidateFlag_IgnoreNotBefore) == 0)
+    if (cert->mNotBeforeDate != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotBefore))
     {
-        VerifyOrExit(context.EffectiveTime >= PackedCertDateToTime(cert.NotBeforeDate), err = CHIP_ERROR_CERT_NOT_VALID_YET);
+        VerifyOrExit(context.mEffectiveTime >= PackedCertDateToTime(cert->mNotBeforeDate), err = CHIP_ERROR_CERT_NOT_VALID_YET);
     }
-    if (cert.NotAfterDate != 0 && (validateFlags & kValidateFlag_IgnoreNotAfter) == 0)
+    if (cert->mNotAfterDate != 0 && !validateFlags.Has(CertValidateFlags::kIgnoreNotAfter))
     {
-        VerifyOrExit(context.EffectiveTime <= PackedCertDateToTime(cert.NotAfterDate) + kLastSecondOfDay,
+        VerifyOrExit(context.mEffectiveTime <= PackedCertDateToTime(cert->mNotAfterDate) + kLastSecondOfDay,
                      err = CHIP_ERROR_CERT_EXPIRED);
     }
 
     // If the certificate itself is trusted, then it is implicitly valid.  Record this certificate as the trust
     // anchor and return success.
-    if ((cert.CertFlags & kCertFlag_IsTrustAnchor) != 0)
+    if (cert->mCertFlags.Has(CertFlags::kIsTrustAnchor))
     {
-        context.TrustAnchor = &cert;
+        context.mTrustAnchor = cert;
         ExitNow(err = CHIP_NO_ERROR);
     }
 
@@ -536,8 +546,10 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(ChipCertificateData & cert, Validati
 
     // Fail validation if the certificate is self-signed. Since we don't trust this certificate (see the check above) and
     // it has no path we can follow to a trust anchor, it can't be considered valid.
-    if (cert.IssuerDN.IsEqual(cert.SubjectDN) && cert.AuthKeyId.IsEqual(cert.SubjectKeyId))
+    if (cert->mIssuerDN.IsEqual(cert->mSubjectDN) && cert->mAuthKeyId.IsEqual(cert->mSubjectKeyId))
+    {
         ExitNow(err = CHIP_ERROR_CERT_NOT_TRUSTED);
+    }
 
     // Verify that the certificate depth is less than the total number of certificates. It is technically possible to create
     // a circular chain of certificates.  Limiting the maximum depth of the certificate path prevents infinite
@@ -546,32 +558,28 @@ CHIP_ERROR ChipCertificateSet::ValidateCert(ChipCertificateData & cert, Validati
 
     // Verify that a hash of the 'to-be-signed' portion of the certificate has been computed. We will need this to
     // verify the cert's signature below.
-    VerifyOrExit((cert.CertFlags & kCertFlag_TBSHashPresent) != 0, err = CHIP_ERROR_INVALID_ARGUMENT);
+    VerifyOrExit(cert->mCertFlags.Has(CertFlags::kTBSHashPresent), err = CHIP_ERROR_INVALID_ARGUMENT);
 
     // Search for a valid CA certificate that matches the Issuer DN and Authority Key Id of the current certificate.
     // Fail if no acceptable certificate is found.
-    err = FindValidCert(cert.IssuerDN, cert.AuthKeyId, context, validateFlags, depth + 1, caCert);
+    err = FindValidCert(cert->mIssuerDN, cert->mAuthKeyId, context, validateFlags, depth + 1, caCert);
     if (err != CHIP_NO_ERROR)
+    {
         ExitNow(err = CHIP_ERROR_CA_CERT_NOT_FOUND);
+    }
 
     // Verify signature of the current certificate against public key of the CA certificate. If signature verification
     // succeeds, the current certificate is valid.
-    err = VerifySignature(cert, *caCert);
+    err = VerifySignature(cert, caCert);
     SuccessOrExit(err);
 
 exit:
-
-#if CHIP_CONFIG_DEBUG_CERT_VALIDATION
-    if (context.CertValidationResults != nullptr)
-        context.CertValidationResults[&cert - mCerts] = err;
-#endif
-
     return err;
 }
 
 CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const CertificateKeyId & subjectKeyId,
-                                             ValidationContext & context, uint16_t validateFlags, uint8_t depth,
-                                             ChipCertificateData *& cert)
+                                             ValidationContext & context, BitFlags<uint8_t, CertValidateFlags> validateFlags,
+                                             uint8_t depth, ChipCertificateData *& cert)
 {
     CHIP_ERROR err;
 
@@ -580,18 +588,24 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
 
     // Fail immediately if neither of the input criteria are specified.
     if (subjectDN.IsEmpty() && subjectKeyId.IsEmpty())
+    {
         ExitNow();
+    }
 
     // For each cert in the set...
     for (uint8_t i = 0; i < mCertCount; i++)
     {
-        ChipCertificateData & candidateCert = mCerts[i];
+        ChipCertificateData * candidateCert = &mCerts[i];
 
         // Skip the certificate if its subject DN and key id do not match the input criteria.
-        if (!subjectDN.IsEmpty() && !candidateCert.SubjectDN.IsEqual(subjectDN))
+        if (!subjectDN.IsEmpty() && !candidateCert->mSubjectDN.IsEqual(subjectDN))
+        {
             continue;
-        if (!subjectKeyId.IsEmpty() && !candidateCert.SubjectKeyId.IsEqual(subjectKeyId))
+        }
+        if (!subjectKeyId.IsEmpty() && !candidateCert->mSubjectKeyId.IsEqual(subjectKeyId))
+        {
             continue;
+        }
 
         // Attempt to validate the cert.  If the cert is valid, return it to the caller. Otherwise,
         // save the returned error and continue searching.  If there are no other matching certs this
@@ -599,7 +613,7 @@ CHIP_ERROR ChipCertificateSet::FindValidCert(const ChipDN & subjectDN, const Cer
         err = ValidateCert(candidateCert, context, validateFlags, depth);
         if (err == CHIP_NO_ERROR)
         {
-            cert = &candidateCert;
+            cert = candidateCert;
             ExitNow();
         }
     }
@@ -610,72 +624,77 @@ exit:
     return err;
 }
 
+ChipCertificateData::ChipCertificateData()
+{
+    Clear();
+}
+
+ChipCertificateData::~ChipCertificateData() {}
+
 void ChipCertificateData::Clear()
 {
-    SubjectDN.Clear();
-    IssuerDN.Clear();
-    SubjectKeyId.Clear();
-    AuthKeyId.Clear();
-    PublicKey         = nullptr;
-    Signature.R       = nullptr;
-    Signature.RLen    = 0;
-    Signature.S       = nullptr;
-    Signature.SLen    = 0;
-    PubKeyCurveOID    = 0;
-    EncodedCert       = nullptr;
-    EncodedCertLen    = 0;
-    CertFlags         = 0;
-    KeyUsageFlags     = kKeyUsage_NotSpecified;
-    PubKeyAlgoOID     = 0;
-    SigAlgoOID        = 0;
-    CertType          = kCertType_NotSpecified;
-    KeyPurposeFlags   = kKeyPurpose_NotSpecified;
-    NotBeforeDate     = 0;
-    NotAfterDate      = 0;
-    PathLenConstraint = 0;
-    memset(TBSHash, 0, sizeof(TBSHash));
+    mSubjectDN.Clear();
+    mIssuerDN.Clear();
+    mSubjectKeyId.Clear();
+    mAuthKeyId.Clear();
+    mNotBeforeDate  = 0;
+    mNotAfterDate   = 0;
+    mPublicKey      = nullptr;
+    mPublicKeyLen   = 0;
+    mPubKeyCurveOID = 0;
+    mPubKeyAlgoOID  = 0;
+    mSigAlgoOID     = 0;
+    mCertFlags.SetRaw(0);
+    mKeyUsageFlags.SetRaw(0);
+    mKeyPurposeFlags.SetRaw(0);
+    mPathLenConstraint = 0;
+    mCertType          = kCertType_NotSpecified;
+    mSignature.R       = nullptr;
+    mSignature.RLen    = 0;
+    mSignature.S       = nullptr;
+    mSignature.SLen    = 0;
+    memset(mTBSHash, 0, sizeof(mTBSHash));
 }
 
 void ValidationContext::Reset()
 {
-    EffectiveTime     = 0;
-    TrustAnchor       = nullptr;
-    SigningCert       = nullptr;
-    RequiredKeyUsages = kKeyUsage_NotSpecified;
-    ValidateFlags     = 0;
-#if CHIP_CONFIG_DEBUG_CERT_VALIDATION
-    CertValidationResults    = CHIP_NO_ERROR;
-    CertValidationResultsLen = 0;
-#endif
-    RequiredKeyPurposes = kKeyPurpose_NotSpecified;
-    RequiredCertType    = kCertType_NotSpecified;
+    mEffectiveTime = 0;
+    mTrustAnchor   = nullptr;
+    mSigningCert   = nullptr;
+    mRequiredKeyUsages.SetRaw(0);
+    mRequiredKeyPurposes.SetRaw(0);
+    mValidateFlags.SetRaw(0);
+    mRequiredCertType = kCertType_NotSpecified;
 }
 
 CHIP_ERROR DetermineCertType(ChipCertificateData & cert)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    // If the BasicConstraints isCA flag is true...
-    if ((cert.CertFlags & kCertFlag_IsCA) != 0)
+    // If the certificate subject contains a ChipCAId attribute...
+    if (cert.mSubjectDN.mAttrOID == kOID_AttributeType_ChipCAId)
     {
+        // Verify the BasicConstraints isCA flag is true.
+        VerifyOrExit(cert.mCertFlags.Has(CertFlags::kIsCA), err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
+
         // Verify the key usage extension is present and contains the 'keyCertSign' flag.
-        VerifyOrExit((cert.CertFlags & kCertFlag_ExtPresent_KeyUsage) != 0 && (cert.KeyUsageFlags & kKeyUsageFlag_KeyCertSign) != 0,
+        VerifyOrExit(cert.mCertFlags.Has(CertFlags::kExtPresent_KeyUsage) && cert.mKeyUsageFlags.Has(KeyUsageFlags::kKeyCertSign),
                      err = CHIP_ERROR_CERT_USAGE_NOT_ALLOWED);
 
         // Set the certificate type to CA.
-        cert.CertType = kCertType_CA;
+        cert.mCertType = kCertType_CA;
     }
 
     // If the certificate subject contains a ChipNodeId attribute set the certificate type to Node.
-    else if (cert.SubjectDN.AttrOID == kOID_AttributeType_ChipNodeId)
+    else if (cert.mSubjectDN.mAttrOID == kOID_AttributeType_ChipNodeId)
     {
-        cert.CertType = kCertType_Node;
+        cert.mCertType = kCertType_Node;
     }
 
     // If the certificate subject contains a ChipSoftwarePublisherId attribute set the certificate type to FirmwareSigning.
-    else if (cert.SubjectDN.AttrOID == kOID_AttributeType_ChipSoftwarePublisherId)
+    else if (cert.mSubjectDN.mAttrOID == kOID_AttributeType_ChipSoftwarePublisherId)
     {
-        cert.CertType = kCertType_FirmwareSigning;
+        cert.mCertType = kCertType_FirmwareSigning;
     }
 
     else
@@ -689,19 +708,25 @@ exit:
 
 bool ChipDN::IsEqual(const ChipDN & other) const
 {
-    if (AttrOID == kOID_Unknown || AttrOID == kOID_NotSpecified || AttrOID != other.AttrOID)
+    if (mAttrOID == kOID_Unknown || mAttrOID == kOID_NotSpecified || mAttrOID != other.mAttrOID)
+    {
         return false;
+    }
 
-    if (IsChipIdX509Attr(AttrOID))
-        return AttrValue.ChipId == other.AttrValue.ChipId;
+    if (IsChipIdX509Attr(mAttrOID))
+    {
+        return mAttrValue.mChipId == other.mAttrValue.mChipId;
+    }
     else
-        return (AttrValue.String.Len == other.AttrValue.String.Len &&
-                memcmp(AttrValue.String.Value, other.AttrValue.String.Value, AttrValue.String.Len) == 0);
+    {
+        return (mAttrValue.mString.mLen == other.mAttrValue.mString.mLen &&
+                memcmp(mAttrValue.mString.mValue, other.mAttrValue.mString.mValue, mAttrValue.mString.mLen) == 0);
+    }
 }
 
 bool CertificateKeyId::IsEqual(const CertificateKeyId & other) const
 {
-    return Id != nullptr && other.Id != nullptr && Len == other.Len && memcmp(Id, other.Id, Len) == 0;
+    return mId != nullptr && other.mId != nullptr && mLen == other.mLen && memcmp(mId, other.mId, mLen) == 0;
 }
 
 DLL_EXPORT CHIP_ERROR PackCertTime(const ASN1UniversalTime & time, uint32_t & packedTime)
@@ -716,7 +741,9 @@ DLL_EXPORT CHIP_ERROR PackCertTime(const ASN1UniversalTime & time, uint32_t & pa
 
     // The packed time in a CHIP certificate cannot represent dates prior to 2020/01/01.
     if (time.Year < kCertTimeBaseYear)
+    {
         return ASN1_ERROR_UNSUPPORTED_ENCODING;
+    }
 
     // X.509/RFC5280 defines the special time 99991231235959Z to mean 'no well-defined expiration date'.
     // We represent that as a packed time value of 0, which for simplicity's sake is assigned to any
@@ -730,7 +757,9 @@ DLL_EXPORT CHIP_ERROR PackCertTime(const ASN1UniversalTime & time, uint32_t & pa
     // Technically packed certificate time values could grow beyond 32bits. However we restrict it here
     // to dates that fit within 32bits to reduce code size and eliminate the need for 64bit math.
     if (time.Year > kCertTimeMaxYear)
+    {
         return ASN1_ERROR_UNSUPPORTED_ENCODING;
+    }
 
     packedTime = time.Year - kCertTimeBaseYear;
     packedTime = packedTime * kMonthsPerYear + time.Month - 1;
@@ -764,22 +793,22 @@ DLL_EXPORT CHIP_ERROR UnpackCertTime(uint32_t packedTime, ASN1UniversalTime & ti
 
     else
     {
-        time.Second = packedTime % kSecondsPerMinute;
+        time.Second = static_cast<uint8_t>(packedTime % kSecondsPerMinute);
         packedTime /= kSecondsPerMinute;
 
-        time.Minute = packedTime % kMinutesPerHour;
+        time.Minute = static_cast<uint8_t>(packedTime % kMinutesPerHour);
         packedTime /= kMinutesPerHour;
 
-        time.Hour = packedTime % kHoursPerDay;
+        time.Hour = static_cast<uint8_t>(packedTime % kHoursPerDay);
         packedTime /= kHoursPerDay;
 
-        time.Day = (packedTime % kMaxDaysPerMonth) + 1;
+        time.Day = static_cast<uint8_t>((packedTime % kMaxDaysPerMonth) + 1);
         packedTime /= kMaxDaysPerMonth;
 
-        time.Month = (packedTime % kMonthsPerYear) + 1;
+        time.Month = static_cast<uint8_t>((packedTime % kMonthsPerYear) + 1);
         packedTime /= kMonthsPerYear;
 
-        time.Year = packedTime + kCertTimeBaseYear;
+        time.Year = static_cast<uint16_t>(packedTime + kCertTimeBaseYear);
     }
 
     return CHIP_NO_ERROR;
