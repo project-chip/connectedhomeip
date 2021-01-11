@@ -40,7 +40,7 @@ struct Options
     bool enableIpV4                 = false;
     AdvertisingMode advertisingMode = AdvertisingMode::kCommisioning;
 
-    // commisionable params
+    // commisioning params
     uint8_t shortDiscriminator = 52;
     uint16_t longDiscriminator = 840;
     Optional<uint16_t> vendorId;
@@ -77,7 +77,7 @@ bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier
         {
             gOptions.advertisingMode = AdvertisingMode::kOperational;
         }
-        else if ((strcmp(aValue, "commisionable") == 0) || (strcmp(aValue, "c") == 0))
+        else if ((strcmp(aValue, "commisioning") == 0) || (strcmp(aValue, "c") == 0))
         {
             gOptions.advertisingMode = AdvertisingMode::kCommisioning;
         }
@@ -136,7 +136,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
 #endif
                              "  -m <mode>\n"
                              "  --advertising-mode <mode>\n"
-                             "        Advertise in this mode (o/operational or c/commisionable).\n"
+                             "        Advertise in this mode (o/operational or c/commisioning).\n"
                              "  --short-discriminator <value>\n"
                              "  -s <value>\n"
                              "        Commisioning short discriminator.\n"

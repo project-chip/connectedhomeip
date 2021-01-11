@@ -126,7 +126,7 @@ public:
     /// Advertises the CHIP node as an operational node
     virtual CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) = 0;
 
-    /// Advertises the CHIP node as a commisionable node
+    /// Advertises the CHIP node as a commisioning node
     virtual CHIP_ERROR Advertise(const CommisioningAdvertisingParameters & params) = 0;
 
     /// Provides the system-wide implementation of the service advertiser
