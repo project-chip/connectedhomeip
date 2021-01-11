@@ -265,6 +265,8 @@ private:
         return FullQName();
     }
 
+    FullQName GetCommisioningTextEntries(const CommisioningAdvertisingParameters & params);
+
     static constexpr size_t kMaxEndPoints           = 10;
     static constexpr size_t kMaxRecords             = 16;
     static constexpr size_t kMaxAllocatedResponders = 16;
