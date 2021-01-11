@@ -158,7 +158,7 @@ public:
     CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
     CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
                            EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
-    CHIP_ERROR SendMessage(EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot);
+    CHIP_ERROR SendEncryptedMessage(EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot);
 
     /**
      * @brief
@@ -226,6 +226,12 @@ private:
         kInitialized, /**< State when the object is ready connect to other peers. */
     };
 
+    enum class EncryptionState
+    {
+        kPayloadIsEncrypted,
+        kPayloadIsUnencrypted,
+    };
+
     System::Layer * mSystemLayer = nullptr;
     NodeId mLocalNodeId;                                                                // < Id of the current node
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
@@ -234,8 +240,12 @@ private:
     SecureSessionMgrDelegate * mCB   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
 
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted);
+    CHIP_ERROR EncryptPayload(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                              NodeId peerNodeId, System::PacketBufferHandle & msgBuf);
+
+    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, PacketHeader & packetHeader, NodeId peerNodeId,
+                           System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
+                           EncryptionState encryptionState);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();
