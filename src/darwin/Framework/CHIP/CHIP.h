@@ -22,7 +22,7 @@
 #import <CHIP/CHIPDevicePairingDelegate.h>
 #import <CHIP/CHIPError.h>
 #import <CHIP/CHIPManualSetupPayloadParser.h>
-#import <CHIP/CHIPOnOff.h>
+#import <CHIP/CHIPClustersObjc.h>
 #import <CHIP/CHIPPersistentStorageDelegate.h>
 #import <CHIP/CHIPQRCodeSetupPayloadParser.h>
 #import <CHIP/CHIPSetupPayload.h>
