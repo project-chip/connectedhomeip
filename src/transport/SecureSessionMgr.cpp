@@ -123,10 +123,8 @@ CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(EncryptedPacketBufferHandle ms
     msgBuf->SetStart(msgBuf->Start() + headerSize);
 
     PayloadHeader payloadHeader;
-    ReturnErrorOnFailure(SendMessage(payloadHeader, packetHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot,
-                                     EncryptionState::kPayloadIsEncrypted));
-
-    return CHIP_NO_ERROR;
+    return SendMessage(payloadHeader, packetHeader, peerNodeId, std::move(msgBuf), bufferRetainSlot,
+                                     EncryptionState::kPayloadIsEncrypted);
 }
 
 CHIP_ERROR SecureSessionMgr::EncryptPayload(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader,
