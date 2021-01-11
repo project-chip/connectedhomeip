@@ -75,10 +75,7 @@ public:
      *
      * @returns empty handle on allocation failure.
      */
-    EncryptedPacketBufferHandle CloneData()
-    {
-        return EncryptedPacketBufferHandle(PacketBufferHandle::CloneData());
-    }
+    EncryptedPacketBufferHandle CloneData() { return EncryptedPacketBufferHandle(PacketBufferHandle::CloneData()); }
 
 private:
     // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
