@@ -19,6 +19,7 @@ namespace cluster {
 namespace {{asCamelCased name false}} {
 
 {{> cluster_header}}
+
 {{#chip_server_cluster_commands}}
 /*
  * Command {{asCamelCased name false}}

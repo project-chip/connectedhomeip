@@ -33,10 +33,7 @@ class ChipStackException(Exception):
 class ChipStackError(ChipStackException):
     def __init__(self, err, msg=None):
         self.err = err
-        if msg != None:
-            self.msg = msg
-        else:
-            self.msg = "Chip Stack Error %ld" % (err)
+        self.msg = msg if msg else "Chip Stack Error %d" % err
 
     def __str__(self):
         return self.msg
@@ -47,15 +44,10 @@ class DeviceError(ChipStackException):
         self.profileId = profileId
         self.statusCode = statusCode
         self.systemErrorCode = systemErrorCode
-        if msg is None:
+        if not msg:
+            self.msg = "[ %08X:%d ]" % (profileId, statusCode)
             if systemErrorCode:
-                self.msg = "[ %08X:%d ] (system err %d)" % (
-                    profileId,
-                    statusCode,
-                    systemErrorCode,
-                )
-            else:
-                self.msg = "[ %08X:%d ]" % (profileId, statusCode)
+                self.msg += " (system err %d)" % systemErrorCode
         else:
             self.msg = msg
 

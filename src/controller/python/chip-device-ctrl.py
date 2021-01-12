@@ -27,6 +27,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from chip import ChipStack
 from chip import ChipDeviceCtrl
+from chip import ChipExceptions
 from builtins import range
 import sys
 import os
@@ -208,7 +209,7 @@ class DeviceMgrCmd(Cmd):
 
         try:
             self.devCtrl.Close()
-        except ChipStack.ChipStackException as ex:
+        except ChipExceptions.ChipStackException as ex:
             print(str(ex))
 
     def do_setlogoutput(self, line):
@@ -243,7 +244,7 @@ class DeviceMgrCmd(Cmd):
 
         try:
             self.devCtrl.SetLogFilter(category)
-        except ChipStack.ChipStackException as ex:
+        except ChipExceptions.ChipStackException as ex:
             print(str(ex))
             return
 
@@ -364,7 +365,7 @@ class DeviceMgrCmd(Cmd):
         """
         try:
             self.devCtrl.ConnectBle(bleConnection=FAKE_CONN_OBJ_VALUE)
-        except ChipStack.ChipStackException as ex:
+        except ChipExceptions.ChipStackException as ex:
             print(str(ex))
             return
 
@@ -396,7 +397,7 @@ class DeviceMgrCmd(Cmd):
                 print("Usage:")
                 self.do_help("connect SetupPinCode")
                 return
-        except ChipStack.ChipStackException as ex:
+        except ChipExceptions.ChipStackException as ex:
             print(str(ex))
             return
         print("Connected")
@@ -404,7 +405,7 @@ class DeviceMgrCmd(Cmd):
     def do_zcl(self, line):
         """
         To send ZCL message to device:
-        zcl <cluster> <command> <nodeid> <endpoint> <groupid> [[args]]
+        zcl <cluster> <command> <nodeid> <endpoint> <groupid> [key=value]...
         To get a list of clusters:
         zcl ?
         To get a list of commands in cluster:
@@ -422,18 +423,48 @@ class DeviceMgrCmd(Cmd):
                     print("UnknownCluster: {}".format(cluster))
                     return
                 for commands in cluster.items():
-                    args = ", ".join(["{}: {}".format(x[1], x[0]) for x in commands[1]])
+                    args = ", ".join(["{}: {}".format(argName, argType)
+                                      for argName, argType in commands[1]])
                     print(commands[0])
                     if commands[1]:
                         print("  ", args)
                     else:
                         print("  <no arguments>")
             elif len(args) > 4:
-                self.devCtrl.ZCLSend(args[0], args[1], int(args[2]), int(args[3]), int(args[4]), args[5:])
+                commandArgs = {}
+                cluster = self.devCtrl.ZCLList().get(args[0], None)
+                if not cluster:
+                    raise ChipExceptions.UnknownCluster(args[0])
+                command = cluster.get(args[1], None)
+                if not cluster:
+                    raise ChipExceptions.UnknownCommand(args[0], args[1])
+                for kvPair in args[5:]:
+                    if kvPair.find("=") < 0:
+                        print("Argument should in key=value format")
+                        return
+                    key, value = kvPair.split("=", 1)
+                    valueType = command.find(key, None)
+                    if valueType == 'int':
+                        commandArgs[key] = int(value)
+                    elif valueType == 'str':
+                        commandArgs[key] = value
+                    elif valueType == 'bytes':
+                        enc, encValue = value.split(":", 1)
+                        if enc == "str":
+                            commandArgs[key] = encValue.encode(
+                                "utf-8") + b'\x00'
+                        elif enc == "hex":
+                            commandArgs[key] = bytes.fromhex(encValue)
+                        else:
+                            print(
+                                "Unsupported encoding, supported encoding: str, hex")
+                            return
+                self.devCtrl.ZCLSend(args[0], args[1], int(
+                    args[2]), int(args[3]), int(args[4]), commandArgs)
             else:
                 self.do_help("zcl")
                 return
-        except ChipStack.ChipStackException as ex:
+        except ChipExceptions.ChipStackException as ex:
             print(str(ex))
             return
 
@@ -446,7 +477,7 @@ class DeviceMgrCmd(Cmd):
         try:
             args = shlex.split(line)
             self.devCtrl.SetWifiCredential(args[0], args[1])
-        except ChipStack.ChipStackException as ex:
+        except ChipExceptions.ChipStackException as ex:
             print(str(ex))
             return
 

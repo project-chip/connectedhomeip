@@ -2,7 +2,7 @@
 {{> header}}
 '''
 
-from ctypes import *
+import ctypes
 from .ChipStack import *
 from .ChipExceptions import *
 
@@ -12,7 +12,6 @@ class ChipCluster:
     def __init__(self, chipstack, devctl):
         self._ChipStack = chipstack
         self._devCtrl = devctl
-        pass
 
     def SendCommand(self, nodeId: int):
         self._ChipStack.Call(
@@ -24,11 +23,11 @@ class ChipCluster:
 {{#chip_server_clusters}}
             "{{asCamelCased name false}}": {
 {{#chip_server_cluster_commands}}
-                "{{asCamelCased name false}}": [
+                "{{asCamelCased name false}}": {
 {{#chip_server_cluster_command_arguments}}
-                    ("{{asPythonType chipType}}", "{{asCamelCased label}}"),
+                    "{{asCamelCased label}}": "{{asPythonType chipType}}",
 {{/chip_server_cluster_command_arguments}}
-                ],
+                },
 {{/chip_server_cluster_commands}}
             },
 {{/chip_server_clusters}}
@@ -38,24 +37,16 @@ class ChipCluster:
         func = getattr(self, "Cluster{}_Command{}".format(cluster, command))
         if not func:
             raise UnknownCluster(cluster)
-        func(endpoint, groupid, args)
+        func(endpoint, groupid, **args)
 
 {{#chip_server_clusters}}
 {{#chip_server_cluster_commands}}
-    def Cluster{{asCamelCased clusterName false}}_Command{{asCamelCased name false}}(self, ZCLendpoint: int, ZCLgroupid: int, args):
-        totArgs = 0{{#chip_server_cluster_command_arguments}} + 1{{/chip_server_cluster_command_arguments}}
-        if len(args) != totArgs:
-            raise InvalidArgumentCount(totArgs, len(args))
-        argCnt = 0
+    def Cluster{{asCamelCased clusterName false}}_Command{{asCamelCased name false}}(self, ZCLendpoint: int, ZCLgroupid: int{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}: {{asPythonType chipType}}{{/chip_server_cluster_command_arguments}}):
 {{#chip_server_cluster_command_arguments}}
 {{#if (isByteString type)}}
-        {{asCamelCased label}} = bytes.fromhex(args[argCnt])
 {{else if (isString type)}}
-        {{asCamelCased label}} = args[argCnt].encode("utf-8")
-{{else}}
-        {{asCamelCased label}} = {{asPythonType chipType}}(args[argCnt])
+        {{asCamelCased label}} = {{asCamelCased label}}.encode("utf-8") + b'\x00'
 {{/if}}
-        argCnt += 1
 {{/chip_server_cluster_command_arguments}}
         self._ChipStack.Call(
             lambda: self._dmLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(
@@ -67,13 +58,13 @@ class ChipCluster:
 {{/chip_server_clusters}}
     def InitLib(self, dmLib):
         self._dmLib = dmLib
-        self._dmLib.chip_ime_SendCommand.argtypes = [c_uint64]
-        self._dmLib.chip_ime_SendCommand.restype = c_uint32
+        self._dmLib.chip_ime_SendCommand.argtypes = [ctypes.c_uint64]
+        self._dmLib.chip_ime_SendCommand.restype = ctypes.c_uint32
 {{#chip_server_clusters}}
         # Cluster {{asCamelCased name false}}
 {{#chip_server_cluster_commands}}
         # Cluster {{asCamelCased clusterName false}} Command {{asCamelCased name false}}
-        self._dmLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.argtypes = [c_uint8, c_uint16{{#chip_server_cluster_command_arguments}}{{#if (isByteString type)}}, c_char_p, c_uint32{{else}}, {{asPythonCType chipType}}{{/if}}{{/chip_server_cluster_command_arguments}}]
-        self._dmLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.restype = c_uint32
+        self._dmLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.argtypes = [ctypes.c_uint8, ctypes.c_uint16{{#chip_server_cluster_command_arguments}}{{#if (isByteString type)}}, ctypes.c_char_p, ctypes.c_uint32{{else}}, ctypes.{{asPythonCType chipType}}{{/if}}{{/chip_server_cluster_command_arguments}}]
+        self._dmLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}.restype = ctypes.c_uint32
 {{/chip_server_cluster_commands}}
 {{/chip_server_clusters}}

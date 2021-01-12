@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -45,6 +45,7 @@ namespace BarrierControl {
 | * BarrierPosition                                                   | 0x000A |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
 /*
  * Command BarrierControlGoToPercent
  */
@@ -126,6 +127,7 @@ namespace Basic {
 | * PowerSource                                                       | 0x0007 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
 /*
  * Command ResetToFactoryDefaults
  */
@@ -237,6 +239,7 @@ namespace ColorControl {
 | * StartUpColorTemperatureMireds                                     | 0x4010 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
 /*
  * Command MoveColor
  */
@@ -816,6 +819,7 @@ namespace DoorLock {
 | * ActuatorEnabled                                                   | 0x0002 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
 /*
  * Command ClearAllPins
  */
@@ -1556,6 +1560,7 @@ namespace Groups {
 | * NameSupport                                                       | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
 /*
  * Command AddGroup
  */
@@ -1777,6 +1782,7 @@ namespace Identify {
 | * IdentifyTime                                                      | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
 /*
  * Command Identify
  */
@@ -1861,6 +1867,7 @@ namespace LevelControl {
 | * CurrentLevel                                                      | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
 /*
  * Command Move
  */
@@ -2147,6 +2154,7 @@ namespace OnOff {
 | * OnOff                                                             | 0x0000 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
 /*
  * Command Off
  */
@@ -2254,6 +2262,7 @@ namespace Scenes {
 | * NameSupport                                                       | 0x0004 |
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
+
 /*
  * Command AddScene
  */
