@@ -17,6 +17,7 @@
 
 #include "Advertiser.h"
 
+#include <assert.h>
 #include <inttypes.h>
 #include <stdio.h>
 
@@ -190,8 +191,9 @@ public:
     ~AdvertiserMinMdns() { Clear(); }
 
     // Service advertiser
-    CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint16_t port) override;
-    CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
+    CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint64_t macAddress, uint16_t port, bool enableIPv4) override;
+    CHIP_ERROR AdvertiseOperational(const OperationalAdvertisingParameters & params) override;
+    CHIP_ERROR AdvertiseCommission(const CommissionAdvertisingParameters & params) override;
 
     // ServerDelegate
     void OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info) override;
@@ -275,6 +277,7 @@ private:
     // current request handling
     const chip::Inet::IPPacketInfo * mCurrentSource = nullptr;
     uint32_t mMessageId                             = 0;
+    FullQName mHostname;
 
     // dynamically allocated items
     Responder * mAllocatedResponders[kMaxAllocatedResponders];
@@ -283,6 +286,10 @@ private:
     const char * mEmptyTextEntries[1] = {
         "=",
     };
+
+    char mDiscriminatorText[7];
+    char mVendorProductIdText[15];
+    const char * mCommissionTextEntries[2] = { mDiscriminatorText, mVendorProductIdText };
 };
 
 void AdvertiserMinMdns::OnQuery(const BytesRange & data, const chip::Inet::IPPacketInfo * info)
@@ -314,13 +321,37 @@ void AdvertiserMinMdns::OnQuery(const QueryData & data)
     }
 }
 
-CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint16_t port)
+CHIP_ERROR AdvertiserMinMdns::Start(chip::Inet::InetLayer * inetLayer, uint64_t macAddress, uint16_t port, bool enableIPv4)
 {
     mServer.Shutdown();
 
-    AllInterfaces allInterfaces;
+    char mac[17];
+    ssize_t len = snprintf(mac, sizeof(mac), "%" PRIX64, macAddress);
+    assert(static_cast<size_t>(len) < sizeof(mac));
+    mHostname = AllocateQName(mac, "local");
+    if (mHostname.nameCount == 0)
+    {
+        ChipLogError(Discovery, "Failed to allocate hostname.");
+        return CHIP_ERROR_NO_MEMORY;
+    }
 
+    AllInterfaces allInterfaces;
     ReturnErrorOnFailure(mServer.Listen(inetLayer, &allInterfaces, port));
+
+    if (!AddResponder<IPv6Responder>(mHostname).IsValid())
+    {
+        ChipLogError(Discovery, "Failed to add IPv6 mDNS responder");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    if (enableIPv4)
+    {
+        if (!AddResponder<IPv4Responder>(mHostname).IsValid())
+        {
+            ChipLogError(Discovery, "Failed to add IPv4 mDNS responder");
+            return CHIP_ERROR_NO_MEMORY;
+        }
+    }
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS started advertising.");
     return CHIP_NO_ERROR;
@@ -351,24 +382,20 @@ void AdvertiserMinMdns::Clear()
     }
 }
 
-CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters & params)
+CHIP_ERROR AdvertiserMinMdns::AdvertiseOperational(const OperationalAdvertisingParameters & params)
 {
     Clear();
 
     char uniqueName[64] = "";
 
     /// need to set server name
-    size_t len = snprintf(uniqueName, sizeof(uniqueName), "%" PRIX64 "-%" PRIX64, params.GetFabricId(), params.GetNodeId());
-    if (len >= sizeof(uniqueName))
-    {
-        return CHIP_ERROR_NO_MEMORY;
-    }
+    ssize_t len = snprintf(uniqueName, sizeof(uniqueName), "%" PRIX64 "-%" PRIX64, params.GetFabricId(), params.GetNodeId());
+    assert(static_cast<size_t>(len) < sizeof(uniqueName));
 
     FullQName operationalServiceName = AllocateQName("_chip", "_tcp", "local");
     FullQName operationalServerName  = AllocateQName(uniqueName, "_chip", "_tcp", "local");
-    FullQName serverName             = AllocateQName(uniqueName, "local");
 
-    if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0) || (serverName.nameCount == 0))
+    if ((operationalServiceName.nameCount == 0) || (operationalServerName.nameCount == 0))
     {
         ChipLogError(Discovery, "Failed to allocate QNames.");
         return CHIP_ERROR_NO_MEMORY;
@@ -383,38 +410,79 @@ CHIP_ERROR AdvertiserMinMdns::Advertise(const OperationalAdvertisingParameters &
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!AddResponder<SrvResponder>(SrvResourceRecord(operationalServerName, serverName, params.GetPort()))
-             .SetReportAdditional(serverName)
+    if (!AddResponder<SrvResponder>(SrvResourceRecord(operationalServerName, mHostname, params.GetPort()))
+             .SetReportAdditional(mHostname)
              .IsValid())
     {
         ChipLogError(Discovery, "Failed to add SRV record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
     }
     if (!AddResponder<TxtResponder>(TxtResourceRecord(operationalServerName, mEmptyTextEntries))
-             .SetReportAdditional(serverName)
+             .SetReportAdditional(mHostname)
              .IsValid())
     {
         ChipLogError(Discovery, "Failed to add TXT record mDNS responder");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (!AddResponder<IPv6Responder>(serverName).IsValid())
+    ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Operational device'.");
+
+    return CHIP_NO_ERROR;
+}
+
+CHIP_ERROR AdvertiserMinMdns::AdvertiseCommission(const CommissionAdvertisingParameters & params)
+{
+    char uniqueName[17];
+    char discriminatorName[7];
+
+    ssize_t len = snprintf(uniqueName, sizeof(uniqueName), "%" PRIX64, params.GetIdentifier());
+    assert(static_cast<size_t>(len) < sizeof(uniqueName));
+    len = snprintf(discriminatorName, sizeof(discriminatorName), "_L%04X", params.GetDiscriminator());
+    assert(static_cast<size_t>(len) < sizeof(discriminatorName));
+    len = snprintf(mDiscriminatorText, sizeof(mDiscriminatorText), "D=%04X", params.GetDiscriminator());
+    assert(static_cast<size_t>(len) < sizeof(mDiscriminatorText));
+    len = snprintf(mVendorProductIdText, sizeof(mVendorProductIdText), "VP=%d+%d", params.GetVendorId(), params.GetProductId());
+    assert(static_cast<size_t>(len) < sizeof(mVendorProductIdText));
+
+    FullQName commissionServiceName = AllocateQName("_chipc", "_udp", "local");
+    FullQName commissionServerName  = AllocateQName(uniqueName, "_chipc", "_udp", "local");
+    FullQName discriptorSubTypeName = AllocateQName(discriminatorName, "_sub", "_chipc", "_udp", "local");
+
+    if (!AddResponder<PtrResponder>(commissionServiceName, commissionServerName)
+             .SetReportAdditional(commissionServerName)
+             .SetReportInServiceListing(true)
+             .IsValid())
     {
-        ChipLogError(Discovery, "Failed to add IPv6 mDNS responder");
+        ChipLogError(Discovery, "Failed to add commission service PTR record");
         return CHIP_ERROR_NO_MEMORY;
     }
 
-    if (params.IsIPv4Enabled())
+    if (!AddResponder<PtrResponder>(discriptorSubTypeName, commissionServerName)
+             .SetReportAdditional(commissionServerName)
+             .SetReportInServiceListing(true)
+             .IsValid())
     {
-        if (!AddResponder<IPv4Responder>(serverName).IsValid())
-        {
-            ChipLogError(Discovery, "Failed to add IPv4 mDNS responder");
-            return CHIP_ERROR_NO_MEMORY;
-        }
+        ChipLogError(Discovery, "Failed to add commission service PTR record");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    if (!AddResponder<SrvResponder>(SrvResourceRecord(commissionServerName, mHostname, params.GetPort()))
+             .SetReportAdditional(mHostname)
+             .IsValid())
+    {
+        ChipLogError(Discovery, "Failed to add commission service SRV record");
+        return CHIP_ERROR_NO_MEMORY;
+    }
+
+    if (!AddResponder<TxtResponder>(TxtResourceRecord(commissionServerName, mCommissionTextEntries))
+             .SetReportAdditional(mHostname)
+             .IsValid())
+    {
+        ChipLogError(Discovery, "Failed to add commission service TXT record");
+        return CHIP_ERROR_NO_MEMORY;
     }
 
     ChipLogProgress(Discovery, "CHIP minimal mDNS configured as 'Operational device'.");
-
     return CHIP_NO_ERROR;
 }
 

@@ -66,7 +66,9 @@ public:
     CHIP_ERROR GetProductRevision(uint16_t & productRev);
     CHIP_ERROR GetSerialNumber(char * buf, size_t bufSize, size_t & serialNumLen);
     CHIP_ERROR GetPrimaryWiFiMACAddress(uint8_t * buf);
+    CHIP_ERROR GetPrimaryWiFiMACAddress(uint64_t & macAddress);
     CHIP_ERROR GetPrimary802154MACAddress(uint8_t * buf);
+    CHIP_ERROR GetPrimary802154MACAddress(uint64_t & macAddress);
     CHIP_ERROR GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth);
     CHIP_ERROR GetFirmwareRevision(char * buf, size_t bufSize, size_t & outLen);
     CHIP_ERROR GetFirmwareBuildTime(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth, uint8_t & hour, uint8_t & minute,
@@ -235,9 +237,47 @@ inline CHIP_ERROR ConfigurationManager::GetPrimaryWiFiMACAddress(uint8_t * buf)
     return static_cast<ImplClass *>(this)->_GetPrimaryWiFiMACAddress(buf);
 }
 
+inline CHIP_ERROR ConfigurationManager::GetPrimaryWiFiMACAddress(uint64_t & macAddress)
+{
+    uint8_t mac[6];
+    CHIP_ERROR error = static_cast<ImplClass *>(this)->_GetPrimaryWiFiMACAddress(mac);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+
+    macAddress = 0;
+    for (uint8_t val : mac)
+    {
+        macAddress |= val;
+        macAddress <<= 8;
+    }
+    return CHIP_NO_ERROR;
+}
+
 inline CHIP_ERROR ConfigurationManager::GetPrimary802154MACAddress(uint8_t * buf)
 {
     return static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(buf);
+}
+
+inline CHIP_ERROR ConfigurationManager::GetPrimary802154MACAddress(uint64_t & macAddress)
+{
+    uint8_t mac[8];
+    CHIP_ERROR error = static_cast<ImplClass *>(this)->_GetPrimary802154MACAddress(mac);
+
+    if (error != CHIP_NO_ERROR)
+    {
+        return error;
+    }
+
+    macAddress = 0;
+    for (uint8_t val : mac)
+    {
+        macAddress |= val;
+        macAddress <<= 8;
+    }
+    return CHIP_NO_ERROR;
 }
 
 inline CHIP_ERROR ConfigurationManager::GetManufacturingDate(uint16_t & year, uint8_t & month, uint8_t & dayOfMonth)

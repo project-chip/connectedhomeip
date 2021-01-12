@@ -31,6 +31,19 @@ using namespace ::chip::Inet;
 using namespace ::chip::Transport;
 using namespace ::chip::DeviceLayer;
 
+namespace {
+
+CHIP_ERROR AdvertiseOperational()
+{
+    constexpr uint64_t kTestFabricId = 5544332211;
+    return chip::Mdns::ServiceAdvertiser::Instance().AdvertiseOperational(chip::Mdns::OperationalAdvertisingParameters()
+                                                                                        .SetFabricId(kTestFabricId)
+                                                                                        .SetNodeId(chip::kTestDeviceNodeId)
+                                                                                        .SetPort(CHIP_PORT));
+}
+
+} // namespace
+
 namespace chip {
 
 RendezvousServer::RendezvousServer() : mRendezvousSession(this) {}
@@ -97,9 +110,9 @@ void RendezvousServer::OnRendezvousStatusUpdate(Status status, CHIP_ERROR err)
 
     case RendezvousSessionDelegate::NetworkProvisioningSuccess:
         ChipLogProgress(AppServer, "Device was assigned network credentials");
-        if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort) != CHIP_NO_ERROR)
+        if (AdvertiseOperational() != CHIP_NO_ERROR)
         {
-            ChipLogError(AppServer, "Failed to start mDNS advertisement");
+            ChipLogError(AppServer, "Failed to start operational mDNS advertisement");
         }
         if (mDelegate != nullptr)
         {
