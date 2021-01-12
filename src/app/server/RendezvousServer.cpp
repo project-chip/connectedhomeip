@@ -37,9 +37,9 @@ CHIP_ERROR AdvertiseOperational()
 {
     constexpr uint64_t kTestFabricId = 5544332211;
     return chip::Mdns::ServiceAdvertiser::Instance().AdvertiseOperational(chip::Mdns::OperationalAdvertisingParameters()
-                                                                                        .SetFabricId(kTestFabricId)
-                                                                                        .SetNodeId(chip::kTestDeviceNodeId)
-                                                                                        .SetPort(CHIP_PORT));
+                                                                              .SetFabricId(kTestFabricId)
+                                                                              .SetNodeId(chip::kTestDeviceNodeId)
+                                                                              .SetPort(CHIP_PORT));
 }
 
 } // namespace
