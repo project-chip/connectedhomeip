@@ -887,13 +887,10 @@ exit:
     return G_SOURCE_REMOVE;
 }
 
-/***********************************************************************
- * GATT Characteristic object
- ***********************************************************************/
-
-static bool BluezGetChipDeviceInfo(BluezDevice1 * aDevice, chip::Ble::ChipBLEDeviceIdentificationInfo & aDeviceInfo)
+/// Retrieve CHIP device identification info from the device advertising data
+static bool BluezGetChipDeviceInfo(BluezDevice1 & aDevice, chip::Ble::ChipBLEDeviceIdentificationInfo & aDeviceInfo)
 {
-    GVariant * serviceData = bluez_device1_get_service_data(aDevice);
+    GVariant * serviceData = bluez_device1_get_service_data(&aDevice);
     VerifyOrReturnError(serviceData != nullptr, false);
 
     GVariant * dataValue = g_variant_lookup_value(serviceData, CHIP_BLE_UUID_SERVICE_STRING, nullptr);
@@ -901,17 +898,13 @@ static bool BluezGetChipDeviceInfo(BluezDevice1 * aDevice, chip::Ble::ChipBLEDev
 
     size_t dataLen         = 0;
     const void * dataBytes = g_variant_get_fixed_array(dataValue, &dataLen, sizeof(uint8_t));
+    VerifyOrReturnError(dataBytes != nullptr && dataLen >= sizeof(aDeviceInfo), false);
 
-    if (dataBytes == nullptr || dataLen < sizeof(chip::Ble::ChipBLEDeviceIdentificationInfo))
-    {
-        ChipLogError(DeviceLayer, "TRACE: Invalid CHIP BLE Device info");
-        return false;
-    }
-
-    memcpy(&aDeviceInfo, dataBytes, dataLen);
+    memcpy(&aDeviceInfo, dataBytes, sizeof(aDeviceInfo));
     return true;
 }
 
+/// Handle advertisement from a device and connect to it if its discriminator is the requested one.
 static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndpoint * aEndpoint)
 {
     const char * address   = bluez_device1_get_address(aDevice);
@@ -924,7 +917,7 @@ static void BluezHandleAdvertisementFromDevice(BluezDevice1 * aDevice, BluezEndp
     debugStr = g_variant_print(serviceData, TRUE);
     ChipLogDetail(DeviceLayer, "TRACE: Device %s Service data: %s", address, debugStr);
 
-    VerifyOrExit(BluezGetChipDeviceInfo(aDevice, deviceInfo), );
+    VerifyOrExit(BluezGetChipDeviceInfo(*aDevice, deviceInfo), );
     ChipLogDetail(DeviceLayer, "TRACE: Found CHIP BLE Device: %" PRIu16, deviceInfo.GetDeviceDiscriminator());
 
     if (aEndpoint->mDiscoveryRequest.mDiscriminator == deviceInfo.GetDeviceDiscriminator())
@@ -933,38 +926,43 @@ exit:
     g_free(debugStr);
 }
 
-static void UpdateConnectionTable(BluezDevice1 * device, BluezEndpoint & endpoint)
+/// Update the table of open BLE connections whevener a new device is spotted or its attributes have changed.
+static void UpdateConnectionTable(BluezDevice1 * apDevice, BluezEndpoint & aEndpoint)
 {
-    const gchar * objectPath     = g_dbus_proxy_get_object_path(G_DBUS_PROXY(device));
-    BluezConnection * connection = static_cast<BluezConnection *>(g_hash_table_lookup(endpoint.mpConnMap, objectPath));
+    const gchar * objectPath     = g_dbus_proxy_get_object_path(G_DBUS_PROXY(apDevice));
+    BluezConnection * connection = static_cast<BluezConnection *>(g_hash_table_lookup(aEndpoint.mpConnMap, objectPath));
 
-    if (connection != nullptr && !bluez_device1_get_connected(device))
+    if (connection != nullptr && !bluez_device1_get_connected(apDevice))
     {
         ChipLogDetail(DeviceLayer, "Bluez disconnected");
         BLEManagerImpl::CHIPoBluez_ConnectionClosed(connection);
-        BluezOTConnectionDestroy(connection); // TODO: postpone it until BLEManagerImpl cleans itself up after the disconnection.
-        g_hash_table_remove(endpoint.mpConnMap, objectPath);
+        // TODO: the connection object should be released after BLEManagerImpl finishes cleaning up its resources
+        // after the disconnection. Releasing it here doesn't cause any issues, but it's error-prone.
+        BluezOTConnectionDestroy(connection);
+        g_hash_table_remove(aEndpoint.mpConnMap, objectPath);
         return;
     }
 
-    if (connection == nullptr && !bluez_device1_get_connected(device) && endpoint.mIsCentral)
+    if (connection == nullptr && !bluez_device1_get_connected(apDevice) && aEndpoint.mIsCentral)
     {
         // Check if the new device is the one that the central is trying to connect to.
-        BluezHandleAdvertisementFromDevice(device, &endpoint);
+        BluezHandleAdvertisementFromDevice(apDevice, &aEndpoint);
         return;
     }
 
-    if (connection == nullptr && bluez_device1_get_connected(device) &&
-        (!endpoint.mIsCentral || bluez_device1_get_services_resolved(device)))
+    if (connection == nullptr && bluez_device1_get_connected(apDevice) &&
+        (!aEndpoint.mIsCentral || bluez_device1_get_services_resolved(apDevice)))
     {
         connection                = g_new0(BluezConnection, 1);
-        connection->mpPeerAddress = g_strdup(bluez_device1_get_address(device));
-        connection->mpDevice      = static_cast<BluezDevice1 *>(g_object_ref(device));
-        connection->mpEndpoint    = &endpoint;
+        connection->mpPeerAddress = g_strdup(bluez_device1_get_address(apDevice));
+        connection->mpDevice      = static_cast<BluezDevice1 *>(g_object_ref(apDevice));
+        connection->mpEndpoint    = &aEndpoint;
         BluezConnectionInit(connection);
-        endpoint.mpPeerDevicePath = g_strdup(objectPath);
-        ChipLogDetail(DeviceLayer, "Device %s (Path: %s) Connected", connection->mpPeerAddress, endpoint.mpPeerDevicePath);
-        g_hash_table_insert(endpoint.mpConnMap, endpoint.mpPeerDevicePath, connection);
+        aEndpoint.mpPeerDevicePath = g_strdup(objectPath);
+        g_hash_table_insert(aEndpoint.mpConnMap, aEndpoint.mpPeerDevicePath, connection);
+
+        ChipLogDetail(DeviceLayer, "New BLE connection %p, device %s, path %s", connection, connection->mpPeerAddress,
+                      aEndpoint.mpPeerDevicePath);
 
         BLEManagerImpl::HandleNewConnection(connection);
     }
@@ -1857,23 +1855,23 @@ exit:
         g_error_free(error);
 }
 
-static bool CheckIfAlreadyDiscovered(BluezEndpoint & endpoint)
+static bool CheckIfAlreadyDiscovered(BluezEndpoint & aEndpoint)
 {
     chip::Ble::ChipBLEDeviceIdentificationInfo deviceInfo;
 
-    for (BluezObject & object : BluezObjectList(&endpoint))
+    for (BluezObject & object : BluezObjectList(&aEndpoint))
     {
         BluezDevice1 * device = bluez_object_get_device1(&object);
-        if (device == nullptr || !BluezIsDeviceOnAdapter(device, endpoint.mpAdapter))
+        if (device == nullptr || !BluezIsDeviceOnAdapter(device, aEndpoint.mpAdapter))
             continue;
 
-        if (!BluezGetChipDeviceInfo(device, deviceInfo))
+        if (!BluezGetChipDeviceInfo(*device, deviceInfo))
             continue;
 
-        if (deviceInfo.GetDeviceDiscriminator() != endpoint.mDiscoveryRequest.mDiscriminator)
+        if (deviceInfo.GetDeviceDiscriminator() != aEndpoint.mDiscoveryRequest.mDiscriminator)
             continue;
 
-        UpdateConnectionTable(device, endpoint);
+        UpdateConnectionTable(device, aEndpoint);
         return true;
     }
 

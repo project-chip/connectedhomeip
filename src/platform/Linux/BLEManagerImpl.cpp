@@ -344,9 +344,9 @@ bool BLEManagerImpl::SubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, const 
     bool result = false;
 
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
-                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
+                 ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
-                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
+                 ChipLogError(DeviceLayer, "SubscribeCharacteristic() called with invalid characteristic ID"));
 
     result = BluezSubscribeCharacteristic(conId);
 exit:
@@ -358,9 +358,9 @@ bool BLEManagerImpl::UnsubscribeCharacteristic(BLE_CONNECTION_OBJECT conId, cons
     bool result = false;
 
     VerifyOrExit(Ble::UUIDsMatch(svcId, &CHIP_BLE_SVC_ID),
-                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid service ID"));
+                 ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid service ID"));
     VerifyOrExit(Ble::UUIDsMatch(charId, &ChipUUID_CHIPoBLEChar_TX),
-                 ChipLogError(DeviceLayer, "SendWriteRequest() called with invalid characteristic ID"));
+                 ChipLogError(DeviceLayer, "UnsubscribeCharacteristic() called with invalid characteristic ID"));
 
     result = BluezUnsubscribeCharacteristic(conId);
 exit:
@@ -410,8 +410,6 @@ bool BLEManagerImpl::SendReadResponse(BLE_CONNECTION_OBJECT conId, BLE_READ_REQU
 
 void BLEManagerImpl::HandleNewConnection(BLE_CONNECTION_OBJECT conId)
 {
-    ChipLogProgress(Ble, "New BLE connection: %p", conId);
-
     if (sInstance.mIsCentral)
     {
         ChipDeviceEvent event;
@@ -445,7 +443,7 @@ void BLEManagerImpl::HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint
     CHIP_ERROR err                 = CHIP_NO_ERROR;
     System::PacketBufferHandle buf = PacketBuffer::New();
 
-    ChipLogProgress(Ble, "Indication received, conn = %p", conId);
+    ChipLogProgress(DeviceLayer, "Indication received, conn = %p", conId);
 
     VerifyOrExit(!buf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     VerifyOrExit(buf->AvailableDataLength() >= len, err = CHIP_ERROR_BUFFER_TOO_SMALL);
