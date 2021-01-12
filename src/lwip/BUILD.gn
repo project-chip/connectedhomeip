@@ -43,8 +43,6 @@ if (lwip_platform == "cc13x2_26x2") {
   import("//build_overrides/ti_simplelink_sdk.gni")
 } else if (lwip_platform == "efr32") {
   import("//build_overrides/efr32_sdk.gni")
-} else if (lwip_platform == "nrf5") {
-  import("//build_overrides/nrf5_sdk.gni")
 } else if (lwip_platform == "qpg6100") {
   import("//build_overrides/qpg6100_sdk.gni")
 } else if (lwip_platform == "k32w") {
@@ -113,8 +111,6 @@ if (current_os == "zephyr") {
       public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
     } else if (lwip_platform == "efr32") {
       public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
-    } else if (lwip_platform == "nrf5") {
-      public_deps += [ "${nrf5_sdk_build_root}:nrf5_sdk" ]
     } else if (lwip_platform == "qpg6100") {
       public_deps += [ "${qpg6100_sdk_build_root}:qpg6100_sdk" ]
     } else if (lwip_platform == "standalone") {
