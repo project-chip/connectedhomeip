@@ -63,7 +63,7 @@ constexpr uint16_t kOptionQueryPort        = 0x101;
 constexpr uint16_t kOptionRuntimeMs        = 0x102;
 constexpr uint16_t kOptionMulticastReplies = 0x103;
 
-bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier, const char * aName, const char * aValue)
+bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     switch (aIdentifier)
     {
@@ -277,7 +277,7 @@ void BroadcastPacket(mdns::Minimal::ServerBase * server)
         return;
     }
 
-    if (server->BroadcastSend(builder.ReleasePacket, gOptions.querySendPort) != CHIP_NO_ERROR)
+    if (server->BroadcastSend(builder.ReleasePacket(), gOptions.querySendPort) != CHIP_NO_ERROR)
     {
         printf("Error sending\n");
         return;

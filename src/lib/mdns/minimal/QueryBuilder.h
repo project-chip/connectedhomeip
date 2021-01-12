@@ -34,6 +34,8 @@ public:
     QueryBuilder & Reset(chip::System::PacketBufferHandle && packet)
     {
         mPacket = std::move(packet);
+        mHeader = HeaderRef(mPacket->Start());
+
         if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
         {
             mPacket->SetDataLength(HeaderRef::kSizeBytes);

@@ -56,7 +56,7 @@ constexpr uint16_t kOptionEnableIpV4   = '4';
 constexpr uint16_t kOptionListenPort   = 'p';
 constexpr uint16_t kOptionInstanceName = 'i';
 
-bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier, const char * aName, const char * aValue)
+bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     switch (aIdentifier)
     {
