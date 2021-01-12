@@ -117,7 +117,6 @@ struct IOChannel
 struct BluezDiscoveryRequest
 {
     uint16_t mDiscriminator;
-    bool mAutoConnect;
 };
 
 struct BluezEndpoint

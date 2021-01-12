@@ -627,7 +627,7 @@ void BLEManagerImpl::DriveBLEState()
     // Configure BLE scanning
     if (mBLEScanConfig.mDiscriminator && !GetFlag(mFlags, kFlag_Scanning))
     {
-        err = StartDiscovery(static_cast<BluezEndpoint *>(mpAppState), { mBLEScanConfig.mDiscriminator, /* mAutoConnect= */ true });
+        err = StartDiscovery(static_cast<BluezEndpoint *>(mpAppState), { mBLEScanConfig.mDiscriminator });
         SuccessOrExit(err);
         SetFlag(mFlags, kFlag_Scanning);
     }
