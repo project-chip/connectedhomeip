@@ -399,7 +399,8 @@ CHIP_ERROR ReliableMessageManager::SendFromRetransTable(RetransTableEntry * entr
 
     if (rc)
     {
-        err = mSessionMgr->SendEncryptedMessage(entry->rc->mExchange->GetSecureSession(), std::move(entry->retainedBuf), &entry->retainedBuf);
+        err = mSessionMgr->SendEncryptedMessage(entry->rc->mExchange->GetSecureSession(), std::move(entry->retainedBuf),
+                                                &entry->retainedBuf);
 
         if (err == CHIP_NO_ERROR)
         {

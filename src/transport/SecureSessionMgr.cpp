@@ -107,7 +107,8 @@ CHIP_ERROR SecureSessionMgr::SendMessage(SecureSessionHandle session, PayloadHea
                        EncryptionState::kPayloadIsUnencrypted);
 }
 
-CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot)
+CHIP_ERROR SecureSessionMgr::SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
+                                                  EncryptedPacketBufferHandle * bufferRetainSlot)
 {
     VerifyOrReturnError(!msgBuf.IsNull(), CHIP_ERROR_INVALID_ARGUMENT);
 
@@ -144,10 +145,10 @@ CHIP_ERROR SecureSessionMgr::EncryptPayload(Transport::PeerConnectionState * sta
     VerifyOrExit(CanCastTo<uint16_t>(payloadLength), err = CHIP_ERROR_NO_MEMORY);
 
     packetHeader
-        .SetSourceNodeId(mLocalNodeId)              //
-        .SetDestinationNodeId(state->GetPeerNodeId())           //
-        .SetMessageId(msgId)                        //
-        .SetEncryptionKeyID(state->GetLocalKeyID()) //
+        .SetSourceNodeId(mLocalNodeId)                //
+        .SetDestinationNodeId(state->GetPeerNodeId()) //
+        .SetMessageId(msgId)                          //
+        .SetEncryptionKeyID(state->GetLocalKeyID())   //
         .SetPayloadLength(static_cast<uint16_t>(payloadLength));
     packetHeader.GetFlags().Set(Header::FlagValues::kSecure);
 

@@ -105,8 +105,8 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     // UNLESS the NoAutoRequestAck send flag has been specified.
     state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
     VerifyOrExit(state != nullptr, CHIP_ERROR_NOT_CONNECTED);
-    if ((state->GetPeerAddress().GetTransportType() == Transport::Type::kUdp) &&
-        mReliableMessageContext.AutoRequestAck() && !sendFlags.Has(SendMessageFlags::kSendFlag_NoAutoRequestAck))
+    if ((state->GetPeerAddress().GetTransportType() == Transport::Type::kUdp) && mReliableMessageContext.AutoRequestAck() &&
+        !sendFlags.Has(SendMessageFlags::kSendFlag_NoAutoRequestAck))
     {
         payloadHeader.SetNeedsAck(true);
     }
