@@ -308,9 +308,6 @@ public:
      */
     static PacketBufferHandle New();
 
-    // DO NOT USE. This is present only for existing TLV code that has not yet been converted, and will be removed soon.
-    PacketBuffer * Next_ForNow() const { return ChainedBuffer(); }
-
     // DO NOT USE. Will be made private after #4094 merges.
     void AddRef();
 
@@ -583,7 +580,7 @@ public:
      *
      *  @note This differs from `FreeHead()` in that it does not touch any content in the currently referenced packet buffer;
      *      it only changes which buffer this handle owns. (Note that this could result in the previous buffer being freed,
-     *      if there is no other.) `Advance()` is designed to be used with an addition handle to traverse a buffer chain,
+     *      if there is no other owner.) `Advance()` is designed to be used with an additional handle to traverse a buffer chain,
      *      whereas `FreeHead()` modifies a chain.
      */
     void Advance() { *this = Hold(mBuffer->ChainedBuffer()); }
@@ -598,11 +595,6 @@ public:
      */
     struct pbuf * GetLwIPpbuf() { return static_cast<struct pbuf *>(mBuffer); }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
-    // DO NOT USE. This is intended to be used only to call existing TLV::Init() functions that have not yet been converted
-    // to take a PacketBufferHandle, and will be removed soon.
-    // The caller has access but no ownership.
-    PacketBuffer * Get_ForNow() const { return mBuffer; }
 
     /**
      * Creates a copy of the data in this packet.

@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2013-2017 Nest Labs, Inc.
  *    All rights reserved.
  *
@@ -38,6 +38,8 @@
 #include <support/RandUtils.h>
 #include <support/ScopedBuffer.h>
 #include <support/UnitTestRegistration.h>
+
+#include <system/TLVPacketBufferBackingStore.h>
 
 #include <string.h>
 
@@ -252,9 +254,11 @@ void TestDupBytes(nlTestSuite * inSuite, TLVReader & reader, uint64_t tag, const
     NL_TEST_ASSERT(inSuite, memcmp(val, expectedVal, expectedLen) == 0);
 }
 
-void TestBufferContents(nlTestSuite * inSuite, PacketBuffer * buf, const uint8_t * expectedVal, uint32_t expectedLen)
+void TestBufferContents(nlTestSuite * inSuite, const System::PacketBufferHandle & buffer, const uint8_t * expectedVal,
+                        uint32_t expectedLen)
 {
-    while (buf != nullptr)
+    System::PacketBufferHandle buf = buffer.Retain();
+    while (!buf.IsNull())
     {
         uint16_t len = buf->DataLength();
         NL_TEST_ASSERT(inSuite, len <= expectedLen);
@@ -264,7 +268,7 @@ void TestBufferContents(nlTestSuite * inSuite, PacketBuffer * buf, const uint8_t
         expectedVal += len;
         expectedLen -= len;
 
-        buf = buf->Next_ForNow();
+        buf.Advance();
     }
 
     NL_TEST_ASSERT(inSuite, expectedLen == 0);
@@ -639,7 +643,8 @@ void WriteEncoding3(nlTestSuite * inSuite, TLVWriter & writer)
         TLVWriter writer1;
 
         err = writer.OpenContainer(ProfileTag(TestProfile_1, 1), kTLVType_Structure, writer1);
-        NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+        if (err)
+            NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
         err = writer1.PutBoolean(ProfileTag(TestProfile_2, 2), false);
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -1943,23 +1948,23 @@ void WriteDeleteReadTest(nlTestSuite * inSuite)
  */
 void CheckPacketBuffer(nlTestSuite * inSuite, void * inContext)
 {
-    System::PacketBufferHandle buf = PacketBuffer::New(0);
-    TLVWriter writer;
-    TLVReader reader;
+    System::PacketBufferHandle buf = System::PacketBuffer::New(0);
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferTLVReader reader;
 
-    writer.Init(buf.Get_ForNow());
+    writer.Init(buf.Retain());
     writer.ImplicitProfileId = TestProfile_2;
 
     WriteEncoding1(inSuite, writer);
 
-    TestBufferContents(inSuite, buf.Get_ForNow(), Encoding1, sizeof(Encoding1));
+    TestBufferContents(inSuite, buf, Encoding1, sizeof(Encoding1));
 
-    reader.Init(buf.Get_ForNow());
+    reader.Init(buf.Retain());
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
 
-    reader.Init(buf.Get_ForNow(), buf->MaxDataLength(), false);
+    reader.Init(buf.Retain(), buf->MaxDataLength());
     reader.ImplicitProfileId = TestProfile_2;
 
     ReadEncoding1(inSuite, reader);
@@ -1995,7 +2000,7 @@ void CheckCircularTLVBufferSimple(nlTestSuite * inSuite, void * inContext)
     CircularTLVReader reader;
     TestTLVContext * context = static_cast<TestTLVContext *>(inContext);
     CHIPCircularTLVBuffer buffer(backingStore, 30);
-    writer.Init(&buffer);
+    writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
     context->mEvictionCount = 0;
@@ -2018,7 +2023,7 @@ void CheckCircularTLVBufferSimple(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, (buffer.DataLength() + context->mEvictedBytes) == writer.GetLengthWritten());
 
     // At this point the buffer should contain 2 instances of Encoding3.
-    reader.Init(&buffer);
+    reader.Init(buffer);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestNext<TLVReader>(inSuite, reader);
@@ -2045,7 +2050,7 @@ void CheckCircularTLVBufferStartMidway(nlTestSuite * inSuite, void * inContext)
     CircularTLVReader reader;
     TestTLVContext * context = static_cast<TestTLVContext *>(inContext);
     CHIPCircularTLVBuffer buffer(backingStore, 30, &(backingStore[15]));
-    writer.Init(&buffer);
+    writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
     context->mEvictionCount = 0;
@@ -2068,7 +2073,7 @@ void CheckCircularTLVBufferStartMidway(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, (buffer.DataLength() + context->mEvictedBytes) == writer.GetLengthWritten());
 
     // At this point the buffer should contain 2 instances of Encoding3.
-    reader.Init(&buffer);
+    reader.Init(buffer);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestNext<TLVReader>(inSuite, reader);
@@ -2096,7 +2101,7 @@ void CheckCircularTLVBufferEvictStraddlingEvent(nlTestSuite * inSuite, void * in
     CircularTLVWriter writer;
     CircularTLVReader reader;
     CHIPCircularTLVBuffer buffer(backingStore, 30);
-    writer.Init(&buffer);
+    writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
     context->mEvictionCount = 0;
@@ -2132,7 +2137,7 @@ void CheckCircularTLVBufferEvictStraddlingEvent(nlTestSuite * inSuite, void * in
     NL_TEST_ASSERT(inSuite, context->mEvictionCount == 7);
 
     // At this point the buffer should contain 2 instances of Encoding3.
-    reader.Init(&buffer);
+    reader.Init(buffer);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestNext<TLVReader>(inSuite, reader);
@@ -2159,7 +2164,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
 
     CHIPCircularTLVBuffer buffer(backingStore, sizeof(backingStore));
     CHIPCircularTLVBuffer buffer1(backingStore1, sizeof(backingStore1));
-    writer.Init(&buffer);
+    writer.Init(buffer);
     writer.ImplicitProfileId = TestProfile_2;
 
     context->mEvictionCount = 0;
@@ -2178,7 +2183,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
     err = writer.Finalize();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
     // At this point the buffer should contain only the boolean we just wrote
-    reader.Init(&buffer);
+    reader.Init(buffer);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestNext<TLVReader>(inSuite, reader);
@@ -2202,7 +2207,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
     int i = 0;
     for (i = 0; i < 2; i++)
     {
-        writer.Init(&buffer1);
+        writer.Init(buffer1);
         writer.ImplicitProfileId = TestProfile_2;
 
         err = writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
@@ -2211,7 +2216,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
         err = writer.Finalize();
         NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-        reader.Init(&buffer1);
+        reader.Init(buffer1);
         reader.ImplicitProfileId = TestProfile_2;
 
         TestNext<TLVReader>(inSuite, reader);
@@ -2220,12 +2225,12 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
 
         buffer1.EvictHead();
 
-        reader.Init(&buffer1);
+        reader.Init(buffer1);
         reader.ImplicitProfileId = TestProfile_2;
         TestEnd<TLVReader>(inSuite, reader);
     }
 
-    writer.Init(&buffer1);
+    writer.Init(buffer1);
     writer.ImplicitProfileId = TestProfile_2;
 
     context->mEvictionCount = 0;
@@ -2244,7 +2249,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
     err = writer.Finalize();
 
     // Verify that we can read out two elements from the buffer
-    reader.Init(&buffer1);
+    reader.Init(buffer1);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestNext<TLVReader>(inSuite, reader);
@@ -2260,7 +2265,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
     buffer1.EvictHead();
 
     // At this point the buffer should contain only the second boolean
-    reader.Init(&buffer1);
+    reader.Init(buffer1);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestNext<TLVReader>(inSuite, reader);
@@ -2271,7 +2276,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
 
     // Write another boolean, verify that the buffer is full and contains two booleans
 
-    writer.Init(&buffer1);
+    writer.Init(buffer1);
     writer.ImplicitProfileId = TestProfile_2;
 
     err = writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
@@ -2281,7 +2286,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // Verify that we can read out two elements from the buffer
-    reader.Init(&buffer1);
+    reader.Init(buffer1);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestNext<TLVReader>(inSuite, reader);
@@ -2298,7 +2303,7 @@ void CheckCircularTLVBufferEdge(nlTestSuite * inSuite, void * inContext)
     buffer1.EvictHead();
     buffer1.EvictHead();
 
-    reader.Init(&buffer1);
+    reader.Init(buffer1);
     reader.ImplicitProfileId = TestProfile_2;
 
     TestEnd<TLVReader>(inSuite, reader);
@@ -2347,7 +2352,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
 
     // Initial test: Verify that a straight printf works as expected into continuous buffer.
 
-    writer.Init(&buffer);
+    writer.Init(buffer);
     snprintf(strBuffer, sizeof(strBuffer), "Sample string %zu", num);
 
     err = writer.PutBoolean(ProfileTag(TestProfile_1, 2), true);
@@ -2362,7 +2367,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     err = writer.Finalize();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    reader.Init(&buffer);
+    reader.Init(buffer);
 
     // Skip over the initial element
     err = reader.Next();
@@ -2388,7 +2393,7 @@ void CheckCHIPTLVPutStringFCircular(nlTestSuite * inSuite, void * inContext)
     err = writer.Finalize();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    reader.Init(&buffer);
+    reader.Init(buffer);
     err = reader.Next();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
@@ -2409,7 +2414,7 @@ void CheckCHIPTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
     CHIPCircularTLVBuffer buffer(backingStore, bufsize);
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    writer.Init(&buffer);
+    writer.Init(buffer);
 
     err = writer.PutString(AnonymousTag, testString);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2426,7 +2431,7 @@ void CheckCHIPTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
     err = writer.Finalize();
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    reader.Init(&buffer);
+    reader.Init(buffer);
 
     err = reader.Next(); // position the reader at the straddling element
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
@@ -2440,10 +2445,10 @@ void CheckCHIPTLVSkipCircular(nlTestSuite * inSuite, void * inContext)
  */
 void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
 {
-    TLVWriter writer;
-    TLVReader reader;
+    System::PacketBufferTLVWriter writer;
+    System::PacketBufferTLVReader reader;
 
-    System::PacketBufferHandle buf = PacketBuffer::New(0);
+    System::PacketBufferHandle buf = System::PacketBuffer::New(0);
     uint16_t maxDataLen            = buf->MaxDataLength();
     uint16_t reserve = static_cast<uint16_t>((sizeof(Encoding1) < maxDataLen) ? (maxDataLen - sizeof(Encoding1)) + 2 : 0);
 
@@ -2454,20 +2459,19 @@ void CheckBufferOverflow(nlTestSuite * inSuite, void * inContext)
     {
         buf->SetStart(buf->Start() + reserve);
 
-        writer.Init(buf.Get_ForNow());
-        writer.GetNewBuffer      = TLVWriter::GetNewPacketBuffer;
+        writer.Init(buf.Retain(), /* useChainedBuffers = */ true);
         writer.ImplicitProfileId = TestProfile_2;
 
         WriteEncoding1(inSuite, writer);
 
-        TestBufferContents(inSuite, buf.Get_ForNow(), Encoding1, sizeof(Encoding1));
+        TestBufferContents(inSuite, buf, Encoding1, sizeof(Encoding1));
 
-        reader.Init(buf.Get_ForNow(), 0xFFFFFFFFUL, true);
+        reader.Init(buf.Retain(), /* useChainedBuffers = */ true);
         reader.ImplicitProfileId = TestProfile_2;
 
         ReadEncoding1(inSuite, reader);
 
-        buf = PacketBuffer::New(0);
+        buf = System::PacketBuffer::New(0);
     }
 }
 

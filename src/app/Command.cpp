@@ -62,7 +62,7 @@ CHIP_ERROR Command::Reset()
         VerifyOrExit(!mCommandMessageBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
     }
 
-    mCommandMessageWriter.Init(mCommandMessageBuf.Get_ForNow());
+    mCommandMessageWriter.Init(std::move(mCommandMessageBuf));
     err = mInvokeCommandBuilder.Init(&mCommandMessageWriter);
     SuccessOrExit(err);
 
@@ -78,12 +78,12 @@ exit:
 CHIP_ERROR Command::ProcessCommandMessage(System::PacketBufferHandle payload, CommandRoleId aCommandRoleId)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    chip::TLV::TLVReader reader;
+    chip::System::PacketBufferTLVReader reader;
     chip::TLV::TLVReader commandListReader;
     InvokeCommand::Parser invokeCommandParser;
     CommandList::Parser commandListParser;
 
-    reader.Init(payload.Get_ForNow());
+    reader.Init(std::move(payload));
     err = reader.Next();
     SuccessOrExit(err);
 
@@ -128,6 +128,7 @@ exit:
 void Command::Shutdown()
 {
     VerifyOrExit(mState != kState_Uninitialized, );
+    mCommandMessageWriter.Reset();
     mCommandMessageBuf = nullptr;
 
     if (mpExchangeCtx != nullptr)
@@ -150,7 +151,7 @@ chip::TLV::TLVWriter & Command::CreateCommandDataElementTLVWriter()
         ChipLogDetail(DataManagement, "Unable to allocate PacketBuffer");
     }
 
-    mCommandDataWriter.Init(mCommandDataBuf.Get_ForNow());
+    mCommandDataWriter.Init(mCommandDataBuf.Retain());
 
     return mCommandDataWriter;
 }
@@ -270,7 +271,7 @@ CHIP_ERROR Command::FinalizeCommandsMessage()
     err = mInvokeCommandBuilder.GetError();
     SuccessOrExit(err);
 
-    err = mCommandMessageWriter.Finalize();
+    err = mCommandMessageWriter.Finalize(&mCommandMessageBuf);
     SuccessOrExit(err);
 
     mCommandMessageBuf->EnsureReservedSize(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE);

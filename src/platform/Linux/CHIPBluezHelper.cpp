@@ -65,6 +65,7 @@
 
 #include "CHIPBluezHelper.h"
 #include <support/CodeUtils.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 using namespace ::nl;
 using namespace chip::SetupPayload;
@@ -1276,12 +1277,11 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     // Construct the TLV for the additional data
     GVariant * cValue = nullptr;
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    TLVWriter writer;
+    System::PacketBufferTLVWriter writer;
     TLVWriter innerWriter;
-    chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buffer           = bufferHandle.Get_ForNow();
+    chip::System::PacketBufferHandle bufferHandle;
 
-    writer.Init(buffer);
+    writer.Init(chip::System::PacketBuffer::New());
 
     err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
     SuccessOrExit(err);
@@ -1293,10 +1293,11 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     err = writer.CloseContainer(innerWriter);
     SuccessOrExit(err);
 
-    writer.Finalize();
+    err = writer.Finalize(&bufferHandle);
+    SuccessOrExit(err);
 
-    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), buffer->Start(), buffer->DataLength(), TRUE, g_free,
-                                     g_memdup(buffer->Start(), buffer->DataLength()));
+    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,
+                                     g_memdup(bufferHandle->Start(), bufferHandle->DataLength()));
     bluez_gatt_characteristic1_set_value(characteristic, cValue);
 
     return;
