@@ -87,7 +87,7 @@
 
 #define ZAP_ATTRIBUTE_MASK(mask) ATTRIBUTE_MASK_##mask
 // This is an array of EmberAfAttributeMetadata structures.
-#define GENERATED_ATTRIBUTE_COUNT 101
+#define GENERATED_ATTRIBUTE_COUNT 103
 #define GENERATED_ATTRIBUTES                                                                                                       \
     {                                                                                                                              \
         { 0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 3 } }, /* Basic (client): cluster revision */     \
@@ -234,13 +234,17 @@
             { 0x0002, ZAP_TYPE(BITMAP16), 2, 0, { (uint8_t *) 0x0000 } }, /* IAS Zone (server): zone status */                     \
             {                                                                                                                      \
                 0x0010, ZAP_TYPE(IEEE_ADDRESS), 8, ZAP_ATTRIBUTE_MASK(WRITABLE), { (uint8_t *) ZAP_LONG_DEFAULTS_INDEX(254) }      \
-            },                                                         /* IAS Zone (server): IAS CIE address */                    \
-            { 0x0011, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0xff } },   /* IAS Zone (server): Zone ID */                            \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },     /* Basic (server): cluster revision */                      \
-            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x08 } },   /* Basic (server): ZCL version */                           \
-            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0x00 } },   /* Basic (server): power source */                          \
-            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },     /* On/off (server): cluster revision */                     \
-            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } }, /* On/off (server): on/off */                               \
+            },                                                       /* IAS Zone (server): IAS CIE address */                      \
+            { 0x0011, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0xff } }, /* IAS Zone (server): Zone ID */                              \
+            {                                                                                                                      \
+                0xFFFD, ZAP_TYPE(INT16U), 2, ZAP_ATTRIBUTE_MASK(CLIENT), { (uint8_t *) 0x0001 }                                    \
+            },                                                          /* Binding (client): cluster revision */                   \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 0x0001 } }, /* Binding (server): cluster revision */                   \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 3 } },      /* Basic (server): cluster revision */                     \
+            { 0x0000, ZAP_TYPE(INT8U), 1, 0, { (uint8_t *) 0x08 } },    /* Basic (server): ZCL version */                          \
+            { 0x0007, ZAP_TYPE(ENUM8), 1, 0, { (uint8_t *) 0x00 } },    /* Basic (server): power source */                         \
+            { 0xFFFD, ZAP_TYPE(INT16U), 2, 0, { (uint8_t *) 2 } },      /* On/off (server): cluster revision */                    \
+            { 0x0000, ZAP_TYPE(BOOLEAN), 1, 0, { (uint8_t *) 0x00 } },  /* On/off (server): on/off */                              \
     }
 
 // This is an array of EmberAfCluster structures.
@@ -277,7 +281,7 @@
     };
 
 #define ZAP_CLUSTER_MASK(mask) CLUSTER_MASK_##mask
-#define GENERATED_CLUSTER_COUNT 22
+#define GENERATED_CLUSTER_COUNT 24
 #define GENERATED_CLUSTERS                                                                                                         \
     {                                                                                                                              \
         { 0x0000, ZAP_ATTRIBUTE_INDEX(0), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL },     /* Endpoint: 1, Cluster: Basic (client) */   \
@@ -355,9 +359,15 @@
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION) | ZAP_CLUSTER_MASK(PRE_ATTRIBUTE_CHANGED_FUNCTION) |      \
                   ZAP_CLUSTER_MASK(MESSAGE_SENT_FUNCTION),                                                                         \
               chipFuncArrayIasZoneServer }, /* Endpoint: 1, Cluster: IAS Zone (server) */                                          \
-            { 0x0000, ZAP_ATTRIBUTE_INDEX(96), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 2, Cluster: Basic (server) */  \
+            {                                                                                                                      \
+                0xF000, ZAP_ATTRIBUTE_INDEX(96), 1, 2, ZAP_CLUSTER_MASK(CLIENT), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Binding (client) */                                                                        \
+            {                                                                                                                      \
+                0xF000, ZAP_ATTRIBUTE_INDEX(97), 1, 2, ZAP_CLUSTER_MASK(SERVER), NULL                                              \
+            }, /* Endpoint: 1, Cluster: Binding (server) */                                                                        \
+            { 0x0000, ZAP_ATTRIBUTE_INDEX(98), 3, 4, ZAP_CLUSTER_MASK(SERVER), NULL }, /* Endpoint: 2, Cluster: Basic (server) */  \
             { 0x0006,                                                                                                              \
-              ZAP_ATTRIBUTE_INDEX(99),                                                                                             \
+              ZAP_ATTRIBUTE_INDEX(101),                                                                                            \
               2,                                                                                                                   \
               3,                                                                                                                   \
               ZAP_CLUSTER_MASK(SERVER) | ZAP_CLUSTER_MASK(INIT_FUNCTION),                                                          \
@@ -369,7 +379,7 @@
 // This is an array of EmberAfEndpointType structures.
 #define GENERATED_ENDPOINT_TYPES                                                                                                   \
     {                                                                                                                              \
-        { ZAP_CLUSTER_INDEX(0), 20, 415 }, { ZAP_CLUSTER_INDEX(20), 2, 7 },                                                        \
+        { ZAP_CLUSTER_INDEX(0), 22, 419 }, { ZAP_CLUSTER_INDEX(22), 2, 7 },                                                        \
     }
 
 // Largest attribute size is needed for various buffers
@@ -379,7 +389,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (0)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE (422)
+#define ATTRIBUTE_MAX_SIZE (426)
 
 // Number of fixed endpoints
 #define FIXED_ENDPOINT_COUNT (2)
@@ -423,7 +433,7 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (167)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (171)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0000, 0x00,                                                                                                            \
@@ -697,6 +707,10 @@
             { 0x0500, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* IAS Zone (server): ZoneEnrollResponse */                       \
             { 0x0500, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* IAS Zone (server): ZoneStatusChangeNotification */             \
             { 0x0500, 0x01, ZAP_COMMAND_MASK(INCOMING_CLIENT) }, /* IAS Zone (server): ZoneEnrollRequest */                        \
+            { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Bind */                                      \
+            { 0xF000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (server): Bind */                                      \
+            { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (client): Unbind */                                    \
+            { 0xF000, 0x01, ZAP_COMMAND_MASK(INCOMING_SERVER) }, /* Binding (server): Unbind */                                    \
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.

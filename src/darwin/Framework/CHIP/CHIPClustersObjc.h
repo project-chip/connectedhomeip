@@ -65,6 +65,31 @@ NS_ASSUME_NONNULL_END
 
 NS_ASSUME_NONNULL_BEGIN
 
+@interface CHIPBinding : NSObject
+
+- (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
+- (BOOL)bind:(CHIPDeviceCallback)onCompletion
+        nodeId:(uint64_t)nodeId
+       groupId:(uint16_t)groupId
+    endpointId:(uint8_t)endpointId
+     clusterId:(uint16_t)clusterId;
+- (BOOL)unbind:(CHIPDeviceCallback)onCompletion
+        nodeId:(uint64_t)nodeId
+       groupId:(uint16_t)groupId
+    endpointId:(uint8_t)endpointId
+     clusterId:(uint16_t)clusterId;
+
+- (BOOL)readAttributeClusterRevision:(CHIPDeviceCallback)onCompletion;
+
+- (instancetype)init NS_UNAVAILABLE;
++ (instancetype)new NS_UNAVAILABLE;
+
+@end
+
+NS_ASSUME_NONNULL_END
+
+NS_ASSUME_NONNULL_BEGIN
+
 @interface CHIPColorControl : NSObject
 
 - (nullable instancetype)initWithDevice:(CHIPDevice *)device endpoint:(uint8_t)endpoint queue:(dispatch_queue_t)queue;
