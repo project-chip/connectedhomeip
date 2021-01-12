@@ -18,8 +18,9 @@
 #import <AVFoundation/AVFoundation.h>
 #import <CHIP/CHIP.h>
 #import <UIKit/UIKit.h>
+#import <CoreNFC/CoreNFC.h>
 
 @interface QRCodeViewController
-    : UIViewController <AVCaptureMetadataOutputObjectsDelegate, CHIPDeviceControllerDelegate, CHIPDevicePairingDelegate>
+    : UIViewController <AVCaptureMetadataOutputObjectsDelegate, CHIPDeviceControllerDelegate, CHIPDevicePairingDelegate, NFCNDEFReaderSessionDelegate>
 
 @end

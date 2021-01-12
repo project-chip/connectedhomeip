@@ -69,6 +69,7 @@
 		B232D8B92514BD0800792CB4 /* CHIPUIViewUtils.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = CHIPUIViewUtils.m; sourceTree = "<group>"; };
 		B243A6672513A73600E56FEA /* RootViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RootViewController.h; sourceTree = "<group>"; };
 		B243A6682513A73600E56FEA /* RootViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RootViewController.m; sourceTree = "<group>"; };
+		B27FAB67255D4B980038F0D2 /* CHIPTool.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = CHIPTool.entitlements; sourceTree = "<group>"; };
 		B2946A4024C99D53005C87D0 /* WifiViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = WifiViewController.h; sourceTree = "<group>"; };
 		B2946A4124C99D53005C87D0 /* WifiViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = WifiViewController.m; sourceTree = "<group>"; };
 		B2946A9924C9A7BF005C87D0 /* DefaultsUtils.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DefaultsUtils.h; sourceTree = "<group>"; };
@@ -152,6 +153,7 @@
 		B204A61E244E1D0600C7C0E1 /* CHIPTool */ = {
 			isa = PBXGroup;
 			children = (
+				B27FAB67255D4B980038F0D2 /* CHIPTool.entitlements */,
 				B204A62B244E1D0700C7C0E1 /* Assets.xcassets */,
 				B2F53AE9245B0D140010745E /* LaunchScreen.storyboard */,
 				B204A630244E1D0700C7C0E1 /* Info.plist */,
@@ -477,6 +479,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = CHIPTool/CHIPTool.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
@@ -499,6 +502,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = CHIPTool/CHIPTool.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = "";
