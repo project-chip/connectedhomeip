@@ -43,13 +43,13 @@ void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const Pa
     err = ProcessCommandMessage(std::move(payload), kCommandHandlerId);
     SuccessOrExit(err);
 
-    SendCommandResponse(ec->GetPeerNodeId());
+    SendCommandResponse();
 
 exit:
     ChipLogFunctError(err);
 }
 
-CHIP_ERROR CommandHandler::SendCommandResponse(NodeId aNodeId)
+CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
