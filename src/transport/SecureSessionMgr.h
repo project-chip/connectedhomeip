@@ -68,6 +68,15 @@ public:
 
     uint32_t GetMsgId() const { return mMsgId; }
 
+    /**
+     * Creates a copy of the data in this packet.
+     *
+     * Does NOT support chained buffers.
+     *
+     * @returns empty handle on allocation failure.
+     */
+    EncryptedPacketBufferHandle CloneData() { return EncryptedPacketBufferHandle(PacketBufferHandle::CloneData()); }
+
 private:
     // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
     friend class SecureSessionMgr;
