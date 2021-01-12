@@ -116,3 +116,6 @@ RUN set -x \
     && cd .. \
     && rm -rf node_js \
     && : # last line
+
+ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
+ENV PATH=$PATH:/home/node/.npm-global/bin
