@@ -13,7 +13,7 @@ pyelftools>=0.22
 requests>=2.24.0
 
 # device controller wheel package
-wheel>=0.34.2
+wheel==0.34.2
 
 # mobly tests
 portpicker
@@ -25,3 +25,9 @@ west>=0.8.0
 # happy tests
 lockfile
 psutil >= 5.7.3
+
+# pigweed
+ipython
+coloredlogs
+watchdog
+protobuf

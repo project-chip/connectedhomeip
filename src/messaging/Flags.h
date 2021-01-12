@@ -39,8 +39,6 @@ enum class MessageFlagValues : uint32_t
 {
     /**< Indicates that the existing source node identifier must be reused. */
     kMessageFlag_ReuseSourceId = 0x00000020,
-    /**< Indicates that the sending of the message needs to be delayed. */
-    kMessageFlag_DelaySend = 0x00000040,
     /**< Indicates that the CHIP message is already encoded. */
     kMessageFlag_MessageEncoded = 0x00001000,
     /**< Indicates that default IPv6 source address selection should be used when sending IPv6 multicast messages. */
@@ -66,8 +64,6 @@ enum class SendMessageFlags : uint16_t
     kSendFlag_AutoRetrans = 0x0001,
     /**< Used to indicate that a response is expected within a specified timeout. */
     kSendFlag_ExpectResponse = 0x0002,
-    /**< Used to indicate that the sending of the current message needs to be delayed. */
-    kSendFlag_DelaySend = 0x0008,
     /**< Used to indicate that the source node ID in the message header can be reused. */
     kSendFlag_ReuseSourceId = 0x0020,
     /**< Used to indicate that the message is already encoded. */

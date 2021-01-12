@@ -1,4 +1,3 @@
-
 /*
  *
  *    Copyright (c) 2020 Project CHIP Authors
@@ -330,6 +329,9 @@
 
 // Definitions for cluster: ZLL Commissioning
 #define ZCL_ZLL_COMMISSIONING_CLUSTER_ID (0x1000)
+
+// Definitions for cluster: Binding
+#define ZCL_BINDING_CLUSTER_ID (0xF000)
 
 // Definitions for cluster: Sample Mfg Specific Cluster
 #define ZCL_SAMPLE_MFG_SPECIFIC_CLUSTER_ID (0xFC00)

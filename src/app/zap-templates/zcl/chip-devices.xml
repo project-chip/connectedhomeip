@@ -1,0 +1,191 @@
+<?xml version="1.0"?>
+<!--
+Copyright (c) 2020 Project CHIP Authors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<configurator>
+  <deviceType>
+    <name>CHIP-All-Clusters-Server</name>
+    <domain>CHIP</domain>
+    <typeName>CHIP all-clusters-app server example</typeName>
+    <profileId editable="false">0x0103</profileId>
+    <deviceId editable="false">0x0000</deviceId>
+    <clusters lockOthers="true">
+      <include cluster="Basic" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>VERSION</requireAttribute>
+        <requireAttribute>POWER_SOURCE</requireAttribute>
+        <requireCommand>ResetToFactoryDefaults</requireCommand>
+        <requireCommand>MfgSpecificPing</requireCommand>
+      </include>
+      <include cluster="Barrier Control" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>BarrierControlGoToPercent</requireCommand>
+        <requireCommand>BarrierControlStop</requireCommand>
+      </include>
+      <include cluster="Color Control" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>COLOR_CONTROL_CURRENT_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_SATURATION</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_REMAINING_TIME</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_CURRENT_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_DRIFT_COMPENSATION</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COMPENSATION_TEXT</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMPERATURE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_MODE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_OPTIONS</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_NUMBER_OF_PRIMARIES</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_1_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_2_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_3_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_4_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_5_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_PRIMARY_6_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_WHITE_POINT_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_WHITE_POINT_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_POINT_R_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_POINT_R_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_POINT_R_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_POINT_G_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_POINT_G_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_POINT_G_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_POINT_B_X</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_POINT_B_Y</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_POINT_B_INTENSITY</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_TEMPERATURE_LEVEL_MIN_MIREDS</requireAttribute>
+        <requireAttribute>START_UP_COLOR_TEMPERATURE_MIREDS</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_ENHANCED_CURRENT_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_ENHANCED_COLOR_MODE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_ACTIVE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_DIRECTION</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_LOOP_TIME</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_START_ENHANCED_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_STORED_ENHANCED_HUE</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_CAPABILITIES</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MIN</requireAttribute>
+        <requireAttribute>COLOR_CONTROL_COLOR_TEMP_PHYSICAL_MAX</requireAttribute>
+        <requireCommand>MoveToHue</requireCommand>
+        <requireCommand>MoveHue</requireCommand>
+        <requireCommand>StepHue</requireCommand>
+        <requireCommand>MoveToSaturation</requireCommand>
+        <requireCommand>MoveSaturation</requireCommand>
+        <requireCommand>StepSaturation</requireCommand>
+        <requireCommand>MoveToHueAndSaturation</requireCommand>
+        <requireCommand>MoveToColor</requireCommand>
+        <requireCommand>MoveColor</requireCommand>
+        <requireCommand>StepColor</requireCommand>
+        <requireCommand>MoveToColorTemperature</requireCommand>
+        <requireCommand>MoveColorTemperature</requireCommand>
+        <requireCommand>StepColorTemperature</requireCommand>
+        <requireCommand>StopMoveStep</requireCommand>
+      </include>
+      <include cluster="Door Lock" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>LockDoor</requireCommand>
+        <requireCommand>UnlockDoor</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+        <requireCommand>UnlockWithTimeout</requireCommand>
+        <requireCommand>GetLogRecord</requireCommand>
+        <requireCommand>SetPin</requireCommand>
+        <requireCommand>GetPin</requireCommand>
+        <requireCommand>ClearPin</requireCommand>
+        <requireCommand>ClearAllPins</requireCommand>
+        <requireCommand>SetWeekdaySchedule</requireCommand>
+        <requireCommand>GetWeekdaySchedule</requireCommand>
+        <requireCommand>ClearWeekdaySchedule</requireCommand>
+        <requireCommand>SetYearDaySchedule</requireCommand>
+        <requireCommand>GetYearDaySchedule</requireCommand>
+        <requireCommand>ClearYearDaySchedule</requireCommand>
+        <requireCommand>SetHolidaySchedule</requireCommand>
+        <requireCommand>GetHolidaySchedule</requireCommand>
+        <requireCommand>ClearHolidaySchedule</requireCommand>
+        <requireCommand>SetUserType</requireCommand>
+        <requireCommand>GetUserType</requireCommand>
+        <requireCommand>SetRfid</requireCommand>
+        <requireCommand>GetRfid</requireCommand>
+        <requireCommand>ClearRfid</requireCommand>
+        <requireCommand>ClearAllRfids</requireCommand>
+      </include>
+      <include cluster="Groups" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>GROUP_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddGroup</requireCommand>
+        <requireCommand>AddGroupResponse</requireCommand>
+        <requireCommand>ViewGroup</requireCommand>
+        <requireCommand>ViewGroupResponse</requireCommand>
+        <requireCommand>GetGroupMembership</requireCommand>
+        <requireCommand>GetGroupMembershipResponse</requireCommand>
+        <requireCommand>RemoveGroup</requireCommand>
+        <requireCommand>RemoveGroupResponse</requireCommand>
+        <requireCommand>RemoveAllGroups</requireCommand>
+        <requireCommand>AddGroupIfIdentifying</requireCommand>
+      </include>
+      <include cluster="IAS Zone" client="false" server="true" clientLocked="true" serverLocked="true">
+        <requireCommand>ZoneEnrollResponse</requireCommand>
+      </include>
+      <include cluster="Identify" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>IDENTIFY_TIME</requireAttribute>
+        <requireCommand>Identify</requireCommand>
+        <requireCommand>IdentifyQuery</requireCommand>
+      </include>
+      <include cluster="Level Control" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>CURRENT_LEVEL</requireAttribute>
+        <requireCommand>MoveToLevel</requireCommand>
+        <requireCommand>Move</requireCommand>
+        <requireCommand>Step</requireCommand>
+        <requireCommand>Stop</requireCommand>
+        <requireCommand>MoveToLevelWithOnOff</requireCommand>
+        <requireCommand>MoveWithOnOff</requireCommand>
+        <requireCommand>StepWithOnOff</requireCommand>
+        <requireCommand>StopWithOnOff</requireCommand>
+      </include>
+      <include cluster="On/off" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>ON_OFF</requireAttribute>
+        <requireCommand>Off</requireCommand>
+        <requireCommand>On</requireCommand>
+        <requireCommand>Toggle</requireCommand>
+      </include>
+      <include cluster="Scenes" client="true" server="true" clientLocked="true" serverLocked="true">
+        <requireAttribute>SCENE_COUNT</requireAttribute>
+        <requireAttribute>CURRENT_SCENE</requireAttribute>
+        <requireAttribute>CURRENT_GROUP</requireAttribute>
+        <requireAttribute>SCENE_VALID</requireAttribute>
+        <requireAttribute>SCENE_NAME_SUPPORT</requireAttribute>
+        <requireCommand>AddScene</requireCommand>
+        <requireCommand>AddSceneResponse</requireCommand>
+        <requireCommand>ViewScene</requireCommand>
+        <requireCommand>ViewSceneResponse</requireCommand>
+        <requireCommand>RemoveScene</requireCommand>
+        <requireCommand>RemoveSceneResponse</requireCommand>
+        <requireCommand>RemoveAllScenes</requireCommand>
+        <requireCommand>RemoveAllScenesResponse</requireCommand>
+        <requireCommand>StoreScene</requireCommand>
+        <requireCommand>StoreSceneResponse</requireCommand>
+        <requireCommand>RecallScene</requireCommand>
+        <requireCommand>GetSceneMembership</requireCommand>
+        <requireCommand>GetSceneMembershipResponse</requireCommand>
+      </include>
+      <include cluster="Temperature Measurement" client="false" server="true" clientLocked="true" serverLocked="true">
+      </include>
+    </clusters>
+  </deviceType>
+</configurator>

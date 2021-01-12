@@ -1,0 +1,11 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+// ZCL attribute sizes
+{{#zcl_atomics}}
+{{#if size}}
+{{ident}}ZCL_{{asDelimitedMacro name}}_ATTRIBUTE_TYPE, {{size}},
+{{/if}}
+{{/zcl_atomics}}

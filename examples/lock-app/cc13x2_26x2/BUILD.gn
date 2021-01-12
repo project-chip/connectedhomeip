@@ -14,6 +14,7 @@
 
 import("//build/config/defaults.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/openthread.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_executable.gni")
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
@@ -56,6 +57,8 @@ ti_sysconfig("sysconfig") {
 
 ti_simplelink_executable("lock_app") {
   include_dirs = [
+    "${chip_root}/src/app/util",
+    "${chip_root}/src/app/server",
     "${project_dir}",
     "${project_dir}/main",
     "${project_dir}/main/include",
@@ -66,10 +69,10 @@ ti_simplelink_executable("lock_app") {
   public_deps = [
     ":sdk",
     ":sysconfig",
-    "${chip_root}/examples/common/chip-app-server:chip-app-server",
+    "${openthread_root}:libopenthread-cli-mtd",
+    #"${openthread_root}:libopenthread-mtd",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
-    "${chip_root}/third_party/openthread/repo:libopenthread-cli-mtd",
   ]
 
   sources = [

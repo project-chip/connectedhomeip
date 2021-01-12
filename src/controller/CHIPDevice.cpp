@@ -74,7 +74,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
         resend = buffer.Retain();
     }
 
-    err    = mSessionManager->SendMessage(mDeviceId, std::move(buffer));
+    err    = mSessionManager->SendMessage(mSecureSession, std::move(buffer));
     buffer = nullptr;
     ChipLogDetail(Controller, "SendMessage returned %d", err);
 
@@ -87,7 +87,7 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
         err = LoadSecureSessionParameters(ResetTransport::kYes);
         SuccessOrExit(err);
 
-        err = mSessionManager->SendMessage(mDeviceId, std::move(resend));
+        err = mSessionManager->SendMessage(mSecureSession, std::move(resend));
         ChipLogDetail(Controller, "Re-SendMessage returned %d", err);
         SuccessOrExit(err);
     }
@@ -175,9 +175,20 @@ exit:
     return error;
 }
 
-void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                               const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
-                               SecureSessionMgr * mgr)
+void Device::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+    mState         = ConnectionState::SecureConnected;
+    mSecureSession = session;
+}
+
+void Device::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+    mState         = ConnectionState::NotConnected;
+    mSecureSession = SecureSessionHandle{};
+}
+
+void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                               System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
 {
     if (mState == ConnectionState::SecureConnected)
     {
@@ -254,8 +265,6 @@ CHIP_ERROR Device::LoadSecureSessionParameters(ResetTransport resetNeeded)
         Optional<Transport::PeerAddress>::Value(Transport::PeerAddress::UDP(mDeviceAddr, mDevicePort, mInterface)), mDeviceId,
         &pairingSession);
     SuccessOrExit(err);
-
-    mState = ConnectionState::SecureConnected;
 
 exit:
 

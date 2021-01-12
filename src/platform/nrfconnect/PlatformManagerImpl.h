@@ -17,62 +17,11 @@
 
 /**
  *    @file
- *          Provides an implementation of the PlatformManager object.
+ *          Provides an implementation of the PlatformManager object
+ *          for nRF Connect SDK platforms, by including Zephyr platform
+ *          implementation.
  */
 
 #pragma once
 
-#include <platform/PlatformManager.h>
-#include <platform/internal/GenericPlatformManagerImpl_Zephyr.h>
-
-namespace chip {
-namespace DeviceLayer {
-
-/**
- * Concrete implementation of the PlatformManager singleton object for the nRF Connect SDK platforms.
- */
-class PlatformManagerImpl final : public PlatformManager, public Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>
-{
-    // Allow the PlatformManager interface class to delegate method calls to
-    // the implementation methods provided by this class.
-    friend PlatformManager;
-
-    // Allow the generic implementation base class to call helper methods on
-    // this class.
-#ifndef DOXYGEN_SHOULD_SKIP_THIS
-    friend Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>;
-#endif
-
-public:
-    // ===== Platform-specific members that may be accessed directly by the application.
-
-    /* none so far */
-
-private:
-    // ===== Methods that implement the PlatformManager abstract interface.
-
-    CHIP_ERROR _InitChipStack(void);
-
-    // ===== Members for internal use by the following friends.
-
-    friend PlatformManager & PlatformMgr(void);
-    friend PlatformManagerImpl & PlatformMgrImpl(void);
-    friend class Internal::BLEManagerImpl;
-
-    explicit PlatformManagerImpl(ThreadStack & stack) : Internal::GenericPlatformManagerImpl_Zephyr<PlatformManagerImpl>(stack) {}
-
-    static PlatformManagerImpl sInstance;
-};
-
-/**
- * Returns the public interface of the PlatformManager singleton object.
- *
- * chip applications should use this to access features of the PlatformManager object
- * that are common to all platforms.
- */
-inline PlatformManager & PlatformMgr(void)
-{
-    return PlatformManagerImpl::sInstance;
-}
-} // namespace DeviceLayer
-} // namespace chip
+#include <platform/Zephyr/PlatformManagerImpl.h>

@@ -1,9 +1,9 @@
 # CHIP nRF Connect Lighting Example Application
 
 The nRF Connect Lighting Example demonstrates how to remotely control a white
-non-dimmable light bulb. It uses buttons to test changing the lighting and
-device states and LEDs to show the state of these changes. You can use this
-example as a reference for creating your own application.
+dimmable light bulb. It uses buttons to test changing the lighting and device
+states and LEDs to show the state of these changes. You can use this example as
+a reference for creating your own application.
 
 The example is based on [CHIP](https://github.com/project-chip/connectedhomeip)
 and the nRF Connect platform, and supports remote access and control of a
@@ -14,23 +14,21 @@ into an existing CHIP network and can be controlled by this network.
 
 <hr>
 
--   [CHIP nRF Connect Lighting Example Application](#chip-nrf-connect-lighting-example-application)
-    -   [Overview](#overview)
-        -   [Bluetooth LE advertising](#bluetooth-le-advertising)
-        -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
-            -   [Thread provisioning](#thread-provisioning)
-    -   [Requirements](#requirements)
-    -   [Device UI](#device-ui)
-    -   [Setting up the environment](#setting-up-the-environment)
-        -   [Using Docker container for setup](#using-docker-container-for-setup)
-        -   [Using native shell for setup](#using-native-shell-for-setup)
-    -   [Building](#building)
-        -   [Removing build artifacts](#removing-build-artifacts)
-        -   [Building with release configuration](#building-with-release-configuration)
-    -   [Configuring the example](#configuring-the-example)
+-   [Overview](#overview)
+    -   [Bluetooth LE advertising](#bluetooth-le-advertising)
+    -   [Bluetooth LE rendezvous](#bluetooth-le-rendezvous)
+-   [Requirements](#requirements)
+-   [Device UI](#device-ui)
+-   [Setting up the environment](#setting-up-the-environment)
+    -   [Using Docker container for setup](#using-docker-container-for-setup)
+    -   [Using native shell for setup](#using-native-shell-for-setup)
+-   [Building](#building)
+    -   [Removing build artifacts](#removing-build-artifacts)
+    -   [Building with release configuration](#building-with-release-configuration)
     -   [Building with Pigweed RPCs](#building-with-pigweed-rpcs)
-    -   [Flashing and debugging](#flashing-and-debugging)
-    -   [Testing the example](#testing-the-example)
+-   [Configuring the example](#configuring-the-example)
+-   [Flashing and debugging](#flashing-and-debugging)
+-   [Testing the example](#testing-the-example)
 
 <hr>
 
@@ -69,7 +67,9 @@ commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to
-the UART console, and shared using an NFC tag.
+the UART console, and shared using an NFC tag. For security reasons, you must
+start NFC tag emulation manually after powering up the device by pressing
+**Button 4**.
 
 #### Thread provisioning
 
@@ -145,8 +145,8 @@ opposite one.
 **Button 3** &mdash; Pressing the button once starts the Thread networking in
 the test mode using the default configuration.
 
-**Button 4** &mdash; Pressing the button once starts the Bluetooth LE
-advertising for the predefined period of time.
+**Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
+enables Bluetooth LE advertising for the predefined period of time.
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the
@@ -299,6 +299,15 @@ features like logs and command-line interface, run the following command:
 Remember to replace _board-name_ with the name of the Nordic Semiconductor's
 board you own.
 
+### Building with Pigweed RPCs
+
+The RPCs in `lighting-common/pigweed-lighting.proto` can be used to control
+various functionalities of the lighting app from a USB-connected host computer.
+To build the example with the RPC server, run the following command with
+_board-name_ replaced with the name of the Nordic Semiconductor's board you own:
+
+    $ west build -b board-name -- -DOVERLAY_CONFIG=rpc.overlay
+
 <hr>
 
 <a name="configuring"></a>
@@ -325,18 +334,6 @@ page.
 <hr>
 
 <a name="flashing"></a>
-
-## Building with Pigweed RPCs
-
-The RPCs in lighting-common/pigweed-lighting.proto can be used to control
-various functionalities of the lighting app from a USB-connected host computer.
-
-        $ cd <example-dir>
-        # First time build
-        $ west build -b nrf52840dk_nrf52840 -- -DOVERLAY_CONFIG=rpc.overlay
-
-        # Any subsequent build
-        $ west build -- -DOVERLAY_CONFIG=rpc.overlay
 
 ## Flashing and debugging
 

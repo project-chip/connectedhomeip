@@ -1,0 +1,144 @@
+{{> header}}
+
+#include <stdint.h>
+
+#include "af-structs.h"
+#include "call-command-handler.h"
+#include "callback.h"
+#include "command-id.h"
+#include "util.h"
+
+using namespace chip;
+
+{{#all_user_clusters}}
+{{#if (isEnabled enabled)}}
+EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(EmberAfClusterCommand * cmd);
+{{/if}}
+{{/all_user_clusters}}
+
+
+static EmberAfStatus status(bool wasHandled, bool clusterExists, bool mfgSpecific)
+{
+    if (wasHandled)
+    {
+        return EMBER_ZCL_STATUS_SUCCESS;
+    }
+    else if (mfgSpecific)
+    {
+        return EMBER_ZCL_STATUS_UNSUP_MANUF_CLUSTER_COMMAND;
+    }
+    else if (clusterExists)
+    {
+        return EMBER_ZCL_STATUS_UNSUP_COMMAND;
+    }
+    else
+    {
+        return EMBER_ZCL_STATUS_UNSUPPORTED_CLUSTER;
+    }
+}
+
+
+// Main command parsing controller.
+EmberAfStatus emberAfClusterSpecificCommandParse(EmberAfClusterCommand * cmd)
+{
+    EmberAfStatus result = status(false, false, cmd->mfgSpecific);
+    if (cmd->direction == (uint8_t) ZCL_DIRECTION_SERVER_TO_CLIENT &&
+        emberAfContainsClientWithMfgCode(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId, cmd->mfgCode))
+    {
+        switch (cmd->apsFrame->clusterId)
+        {
+        {{#all_user_clusters}}
+        {{#if (isClient side) }}
+        case ZCL_{{asDelimitedMacro define}}_ID :
+            {{#if (user_cluster_has_enabled_command name side)}}
+            result = emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(cmd);
+            {{else}}
+            // No commands are enabled for cluster {{name}}
+            result = status(false, true, cmd->mfgSpecific);
+            {{/if}}
+            break;
+        {{/if}}
+        {{/all_user_clusters}}
+        default:
+            // Unrecognized cluster ID, error status will apply.
+            break;
+        }
+    }
+    else if (cmd->direction == (uint8_t) ZCL_DIRECTION_CLIENT_TO_SERVER &&
+             emberAfContainsServerWithMfgCode(cmd->apsFrame->destinationEndpoint, cmd->apsFrame->clusterId, cmd->mfgCode))
+    {
+        switch (cmd->apsFrame->clusterId)
+        {
+        {{#all_user_clusters}}
+        {{#unless (isClient side) }}
+        case ZCL_{{asDelimitedMacro define}}_ID :
+            {{#if (user_cluster_has_enabled_command name side)}}
+            result = emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(cmd);
+            {{else}}
+            // No commands are enabled for cluster {{name}}
+            result = status(false, true, cmd->mfgSpecific);
+            {{/if}}
+            break;
+        {{/unless}}
+        {{/all_user_clusters}}
+        default:
+            // Unrecognized cluster ID, error status will apply.
+            break;
+        }
+    }
+    return result;
+}
+
+// Cluster specific command parsing
+
+{{#all_user_clusters}}
+{{#if (user_cluster_has_enabled_command name side)}}
+EmberAfStatus emberAf{{asCamelCased name false}}Cluster{{asCamelCased side false}}CommandParse(EmberAfClusterCommand * cmd)
+{
+    bool wasHandled = false;
+
+    {{#if (user_cluster_has_enabled_manufacturer_command name side)}}
+    if (cmd->mfgSpecific)
+    {
+        {{#all_user_cluster_commands}}
+        {{#if mfgCode}}
+        {{#if (isStrEqual clusterName parent.name)}}
+        {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+        if (cmd->mfgCode == {{mfgCode}} && cmd->commandId == ZCL_{{asDelimitedMacro name}}_COMMAND_ID)
+        {
+        {{> command_handler_cluster_commands}}
+        }
+        {{/if}}
+        {{/if}}
+        {{/if}}
+        {{/all_user_cluster_commands}}
+    }
+    else
+    {{else}}
+    if (!cmd->mfgSpecific)
+    {{/if}}
+    {
+        switch (cmd->commandId)
+        {
+        {{#all_user_cluster_commands}}
+        {{#unless mfgCode}}
+        {{#if (isStrEqual clusterName parent.name)}}
+        {{#if (isCommandAvailable parent.side incoming outgoing commandSource name)}}
+        case ZCL_{{asDelimitedMacro name}}_COMMAND_ID: {
+        {{> command_handler_cluster_commands}}
+            break;
+        }
+        {{/if}}
+        {{/if}}
+        {{/unless}}
+        {{/all_user_cluster_commands}}
+        default: {
+            // Unrecognized command ID, error status will apply.
+            break;
+        }
+        }
+    }
+    return status(wasHandled, true, cmd->mfgSpecific);
+}
+{{/if}}
+{{/all_user_clusters}}

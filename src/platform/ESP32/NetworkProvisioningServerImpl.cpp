@@ -25,6 +25,7 @@
 #include <core/CHIPTLV.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 #include "esp_event.h"
 #include "esp_wifi.h"
@@ -262,7 +263,7 @@ void NetworkProvisioningServerImpl::HandleScanDone()
     // If the ScanNetworks request is still outstanding...
     if (GetCurrentOp() == kMsgType_ScanNetworks)
     {
-        chip::TLV::TLVWriter writer;
+        System::PacketBufferTLVWriter writer;
         TLVType outerContainerType;
 
         // Sort results by rssi.
@@ -274,7 +275,7 @@ void NetworkProvisioningServerImpl::HandleScanDone()
 
         // Encode the list of scan results into the response buffer.  If the encoded size of all
         // the results exceeds the size of the buffer, encode only what will fit.
-        writer.Init(respBuf.Get_ForNow(), respBuf->AvailableDataLength() - 1);
+        writer.Init(std::move(respBuf));
         err = writer.StartContainer(AnonymousTag, kTLVType_Array, outerContainerType);
         SuccessOrExit(err);
         for (encodedResultCount = 0; encodedResultCount < scanResultCount; encodedResultCount++)
@@ -305,7 +306,7 @@ void NetworkProvisioningServerImpl::HandleScanDone()
         }
         err = writer.EndContainer(outerContainerType);
         SuccessOrExit(err);
-        err = writer.Finalize();
+        err = writer.Finalize(&respBuf);
         SuccessOrExit(err);
 
         // Send the scan results to the requestor.  Note that this method takes ownership of the

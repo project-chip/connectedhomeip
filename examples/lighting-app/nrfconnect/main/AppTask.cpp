@@ -22,7 +22,6 @@
 #include "AppEvent.h"
 #include "LEDWidget.h"
 #include "LightingManager.h"
-#include "LogUtils.h"
 #include "QRCodeUtil.h"
 #include "Server.h"
 #include "Service.h"
@@ -43,7 +42,10 @@
 #include <system/SystemClock.h>
 
 #include <dk_buttons_and_leds.h>
+#include <logging/log.h>
 #include <zephyr.h>
+
+LOG_MODULE_DECLARE(app);
 
 namespace {
 
@@ -100,7 +102,7 @@ int AppTask::Init()
     k_timer_init(&sFunctionTimer, &AppTask::TimerEventHandler, nullptr);
     k_timer_user_data_set(&sFunctionTimer, this);
 
-    ret = LightingMgr().Init(LIGHTING_GPIO_DEVICE_NAME, LIGHTING_GPIO_PIN);
+    ret = LightingMgr().Init(LIGHTING_PWM_DEVICE, LIGHTING_PWM_CHANNEL);
     if (ret != 0)
         return ret;
 
@@ -119,13 +121,6 @@ int AppTask::Init()
     }
 
     PlatformMgr().AddEventHandler(AppTask::ThreadProvisioningHandler, 0);
-
-    ret = StartNFCTag();
-    if (ret)
-    {
-        LOG_ERR("Starting NFC Tag failed");
-        return ret;
-    }
 #endif
 
     return 0;
@@ -381,6 +376,22 @@ void AppTask::StartBLEAdvertisementHandler(AppEvent * aEvent)
     if (aEvent->ButtonEvent.PinNo != BLE_ADVERTISEMENT_START_BUTTON)
         return;
 
+    if (!sNFC.IsTagEmulationStarted())
+    {
+        if (!(GetAppTask().StartNFCTag() < 0))
+        {
+            LOG_INF("Started NFC Tag emulation");
+        }
+        else
+        {
+            LOG_ERR("Starting NFC Tag failed");
+        }
+    }
+    else
+    {
+        LOG_INF("NFC Tag emulation is already started");
+    }
+
     if (!ConnectivityMgr().IsBLEAdvertisingEnabled())
     {
         ConnectivityMgr().SetBLEAdvertisingEnabled(true);
@@ -430,7 +441,7 @@ int AppTask::StartNFCTag()
     VerifyOrExit(!result, ChipLogError(AppServer, "Getting QR code payload failed"));
 
     result = sNFC.StartTagEmulation(QRCode.c_str(), QRCode.size());
-    VerifyOrExit(!result, ChipLogError(AppServer, "Starting NFC Tag emulation failed"));
+    VerifyOrExit(result >= 0, ChipLogError(AppServer, "Starting NFC Tag emulation failed"));
 
 exit:
     return result;
@@ -505,13 +516,23 @@ void AppTask::DispatchEvent(AppEvent * aEvent)
 
 void AppTask::UpdateClusterState()
 {
-    uint8_t newValue = LightingMgr().IsTurnedOn();
+    uint8_t onoff = LightingMgr().IsTurnedOn();
 
     // write the new on/off value
-    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &newValue,
+    EmberAfStatus status = emberAfWriteAttribute(1, ZCL_ON_OFF_CLUSTER_ID, ZCL_ON_OFF_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &onoff,
                                                  ZCL_BOOLEAN_ATTRIBUTE_TYPE);
     if (status != EMBER_ZCL_STATUS_SUCCESS)
     {
-        LOG_ERR("Updating on/off %x", status);
+        LOG_ERR("Updating on/off cluster failed: %x", status);
+    }
+
+    uint8_t level = LightingMgr().GetLevel();
+
+    status = emberAfWriteAttribute(1, ZCL_LEVEL_CONTROL_CLUSTER_ID, ZCL_CURRENT_LEVEL_ATTRIBUTE_ID, CLUSTER_MASK_SERVER, &level,
+                                   ZCL_DATA8_ATTRIBUTE_TYPE);
+
+    if (status != EMBER_ZCL_STATUS_SUCCESS)
+    {
+        LOG_ERR("Updating level cluster failed: %x", status);
     }
 }

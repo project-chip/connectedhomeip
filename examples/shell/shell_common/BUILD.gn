@@ -44,7 +44,8 @@ static_library("shell_common") {
     "${chip_root}/src/setup_payload",
   ]
 
-  if (current_os == "freertos" || current_os == "zephyr") {
+  if (chip_enable_openthread &&
+      (current_os == "freertos" || current_os == "zephyr")) {
     public_deps += [
       "${openthread_root}:libopenthread-cli-ftd",
       "${openthread_root}:libopenthread-ftd",
