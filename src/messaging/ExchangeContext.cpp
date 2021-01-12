@@ -156,7 +156,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
         {
             // Remove from table
             ChipLogError(ExchangeManager, "Failed to send message with err %ld", long(err));
-            mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(*entry);
+            mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(*entry);
         }
         else
         {
@@ -205,7 +205,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // needs to clear the CRMP retransmission table immediately.
     if (clearRetransTable)
     {
-        mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(&mReliableMessageContext);
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(&mReliableMessageContext);
     }
 
     // Cancel the response timer.
