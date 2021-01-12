@@ -1,0 +1,123 @@
+/*
+ *
+ *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020 Texas Instruments Incorporated
+ *    All rights reserved.
+ *
+ *    Licensed under the Apache License, Version 2.0 (the "License");
+ *    you may not use this file except in compliance with the License.
+ *    You may obtain a copy of the License at
+ *
+ *        http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *    Unless required by applicable law or agreed to in writing, software
+ *    distributed under the License is distributed on an "AS IS" BASIS,
+ *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *    See the License for the specific language governing permissions and
+ *    limitations under the License.
+ */
+
+/*
+ *  chip.syscfg
+ */
+
+/* Modules */
+var AESCCM   = scripting.addModule("/ti/drivers/AESCCM");
+var AESECB   = scripting.addModule("/ti/drivers/AESECB");
+var Button   = scripting.addModule("/ti/drivers/apps/Button");
+var ECJPAKE  = scripting.addModule("/ti/drivers/ECJPAKE");
+var LED      = scripting.addModule("/ti/drivers/apps/LED");
+var NVS      = scripting.addModule("/ti/drivers/NVS");
+var RF       = scripting.addModule("/ti/drivers/RF");
+var RFDesign = scripting.addModule("ti/devices/radioconfig/rfdesign");
+var RTOS     = scripting.addModule("/ti/drivers/RTOS");
+var TRNG     = scripting.addModule("/ti/drivers/TRNG");
+var Thread   = scripting.addModule("/ti/thread/thread");
+var SHA2     = scripting.addModule("/ti/drivers/SHA2");
+var UART     = scripting.addModule("/ti/drivers/UART");
+
+/* Instances */
+var AESCCM  = AESCCM.addInstance();
+var AESECB  = AESECB.addInstance();
+var Button1 = Button.addInstance();
+var Button2 = Button.addInstance();
+var ECJPAKE = ECJPAKE.addInstance();
+var NVS1    = NVS.addInstance();
+var SHA21   = SHA2.addInstance();
+var LED1    = LED.addInstance();
+var LED2    = LED.addInstance();
+var TRNG1   = TRNG.addInstance();
+var UART1   = UART.addInstance();
+var UART2   = UART.addInstance();
+
+/* RTOS */
+RTOS.name = "FreeRTOS";
+
+/* Left Button */
+Button1.$name                       = "CONFIG_BTN_LEFT";
+Button1.$hardware                   = system.deviceData.board.components["BTN-1"];
+Button1.gpioPin.$name               = "CONFIG_GPIO_BTN1";
+Button1.gpioPin.pull                = "Pull Up";
+Button1.gpioPin.interruptTrigger    = "Falling Edge";
+Button1.gpioPin.pinInstance.$name   = "CONFIG_PIN_BTN1";
+
+/* Left Button */
+Button2.$name                       = "CONFIG_BTN_RIGHT";
+Button2.$hardware                   = system.deviceData.board.components["BTN-2"];
+Button2.gpioPin.$name               = "CONFIG_GPIO_BTN2";
+Button2.gpioPin.pull                = "Pull Up";
+Button2.gpioPin.interruptTrigger    = "Falling Edge";
+Button2.gpioPin.pinInstance.$name   = "CONFIG_PIN_BTN2";
+
+/* NVS */
+NVS1.$name                      = "CONFIG_NVSINTERNAL";
+NVS1.internalFlash.regionBase   = 0x52000; // Base Address of Region
+NVS1.internalFlash.regionSize   = 0x4000; // Size of Region (in bytes)
+
+/* RF */
+RF.$name = "CONFIG_RF0";
+/* if an antenna component exists, assign it to the rf instance */
+if (system.deviceData.board && system.deviceData.board.components.RF) {
+    RF.$hardware = system.deviceData.board.components.RF;
+}
+
+const rfDesignSettings = system.getScript("/ti/common/lprf_rf_design_settings.js").rfDesignSettings;
+for(var setting in rfDesignSettings)
+{
+    RFDesign[setting] = rfDesignSettings[setting];
+}
+
+/* Red LED */
+LED1.$name                      = "CONFIG_LED_RED";
+LED1.$hardware                  = system.deviceData.board.components.LED_RED;
+LED1.gpioPin.$name              = "CONFIG_GPIO_RLED";
+LED1.gpioPin.mode               = "Output";
+LED1.gpioPin.callbackFunction   = "";
+LED1.gpioPin.pinInstance.$name  = "CONFIG_PIN_RLED";
+
+/* Green LED */
+LED2.$name                      = "CONFIG_LED_GREEN";
+LED2.$hardware                  = system.deviceData.board.components.LED_GREEN;
+LED2.gpioPin.$name              = "CONFIG_GPIO_GLED";
+LED2.gpioPin.mode               = "Output";
+LED2.gpioPin.callbackFunction   = "";
+LED2.gpioPin.pinInstance.$name  = "CONFIG_PIN_GLED";
+
+/* Debug UART  */
+UART1.$hardware     = system.deviceData.board.components.XDS110UART;
+UART1.$name         = "CONFIG_UART_DEBUG";
+
+/* Display UART  */
+UART2.$name                         = "CONFIG_DISPLAY_UART";
+UART2.uart.txPin.$suggestSolution   = "boosterpack.32";
+UART2.uart.rxPin.$suggestSolution   = "boosterpack.18";
+
+/* TRNG */
+TRNG1.$name     = "CONFIG_TRNG_0";
+
+/* Thread */
+Thread.deviceType         = "mtd";
+Thread.deviceTypeReadOnly = true;
+/* Thread SysConfig generated sources are not used until the upstream modules
+ * can be updated to enable CHIP.
+ */

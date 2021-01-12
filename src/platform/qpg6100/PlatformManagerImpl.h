@@ -38,7 +38,9 @@ class PlatformManagerImpl final : public PlatformManager, public Internal::Gener
 
     // Allow the generic implementation base class to call helper methods on
     // this class.
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend Internal::GenericPlatformManagerImpl_FreeRTOS<PlatformManagerImpl>;
+#endif
 
 public:
     // ===== Platform-specific members that may be accessed directly by the application.

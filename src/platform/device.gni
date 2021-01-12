@@ -15,7 +15,7 @@
 import("//build_overrides/chip.gni")
 
 declare_args() {
-  # Device platform layer: darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w, qpg6100, none.
+  # Device platform layer: cc13x2_26x2, darwin, efr32, esp32, external, freertos, linux, nrfconnect, k32w, qpg6100, none.
   chip_device_platform = "auto"
   chip_platform_target = ""
 }
@@ -33,8 +33,9 @@ if (chip_device_platform == "auto") {
 declare_args() {
   # Enable openthread support.
   chip_enable_openthread =
-      chip_device_platform == "linux" || chip_device_platform == "efr32" ||
-      chip_device_platform == "k32w"
+      chip_device_platform == "linux" ||
+      chip_device_platform == "cc13x2_26x2" ||
+      chip_device_platform == "efr32" || chip_device_platform == "k32w"
 
   # Enable wifi support.
   chip_enable_wifi = chip_device_platform == "linux"
@@ -48,7 +49,9 @@ declare_args() {
 }
 
 _chip_device_layer = "none"
-if (chip_device_platform == "darwin") {
+if (chip_device_platform == "cc13x2_26x2") {
+  _chip_device_layer = "cc13x2_26x2"
+} else if (chip_device_platform == "darwin") {
   _chip_device_layer = "Darwin"
 } else if (chip_device_platform == "efr32") {
   _chip_device_layer = "EFR32"
@@ -95,6 +98,7 @@ if (_chip_device_layer != "none" && chip_device_platform != "external") {
 
 assert(
     (current_os != "freertos" && chip_device_platform == "none") ||
+        chip_device_platform == "cc13x2_26x2" ||
         chip_device_platform == "darwin" || chip_device_platform == "efr32" ||
         chip_device_platform == "esp32" || chip_device_platform == "external" ||
         chip_device_platform == "linux" ||
