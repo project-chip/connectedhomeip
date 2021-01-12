@@ -31,6 +31,7 @@
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
@@ -103,6 +104,78 @@ private:
     AppDelegate * mDelegate = nullptr;
 };
 
+#if CHIP_ENABLE_MDNS
+
+CHIP_ERROR InitMdns()
+{
+    auto & mdnsAdvertiser = Mdns::ServiceAdvertiser::Instance();
+
+    // TODO: advertise this only when really operational once we support both
+    // operational and commisioning advertising is supported.
+    if (ConfigurationMgr().IsFullyProvisioned())
+    {
+        uint64_t fabricId;
+
+        if (ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Fabric ID not known. Using a default");
+            fabricId = 5544332211;
+        }
+
+        const auto advertiseParameters = Mdns::OperationalAdvertisingParameters()
+                                             .SetFabricId(fabricId)
+                                             .SetNodeId(chip::kTestDeviceNodeId)
+                                             .SetPort(CHIP_PORT)
+                                             .EnableIpV4(true);
+
+        ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
+    }
+    else
+    {
+        chip::Optional<uint16_t> vendorId;
+        chip::Optional<uint16_t> productId;
+        uint16_t discriminator;
+
+        uint16_t value;
+        if (ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "Vendor ID not known");
+        }
+        else
+        {
+            vendorId = Optional<uint16_t>::Value(value);
+        }
+
+        if (ConfigurationMgr().GetProductId(value) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "Product ID not known");
+        }
+        else
+        {
+            productId = Optional<uint16_t>::Value(value);
+        }
+
+        if (ConfigurationMgr().GetSetupDiscriminator(discriminator) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
+            discriminator = 840;
+        }
+
+        const auto advertiseParameters = Mdns::CommisioningAdvertisingParameters()
+                                             .SetPort(CHIP_PORT)
+                                             .EnableIpV4(true)
+                                             .SetShortDiscriminator(static_cast<uint8_t>(discriminator & 0xFF))
+                                             .SetLongDiscrimininator(discriminator)
+                                             .SetVendorId(vendorId)
+                                             .SetProductId(productId);
+
+        ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
+    }
+
+    return mdnsAdvertiser.Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+}
+#endif
+
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
 ServerCallback gCallbacks;
@@ -160,66 +233,7 @@ void InitServer(AppDelegate * delegate)
     }
 
 #if CHIP_ENABLE_MDNS
-    // TODO: advertise this only when really operational once we support both
-    // operational and commisioning advertising is supported.
-    if (ConfigurationMgr().IsFullyProvisioned())
-    {
-        uint64_t fabricId;
-
-        if (ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Fabric ID not known. Using a default");
-            fabricId = 5544332211;
-        }
-
-        err = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::OperationalAdvertisingParameters()
-                                                                .SetFabricId(fabricId)
-                                                                .SetNodeId(chip::kTestDeviceNodeId)
-                                                                .SetPort(CHIP_PORT)
-                                                                .EnableIpV4(true));
-    }
-    else
-    {
-        chip::Optional<uint16_t> vendorId;
-        chip::Optional<uint16_t> productId;
-        uint16_t discriminator;
-
-        uint16_t value;
-        if (ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(Discovery, "Vendor ID not known");
-        }
-        else
-        {
-            vendorId = Optional<uint16_t>::Value(value);
-        }
-
-        if (ConfigurationMgr().GetProductId(value) != CHIP_NO_ERROR)
-        {
-            ChipLogProgress(Discovery, "Product ID not known");
-        }
-        else
-        {
-            productId = Optional<uint16_t>::Value(value);
-        }
-
-        if (ConfigurationMgr().GetSetupDiscriminator(discriminator) != CHIP_NO_ERROR)
-        {
-            ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
-            discriminator = 840;
-        }
-
-        err = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::CommisioningAdvertisingParameters()
-                                                                .SetPort(CHIP_PORT)
-                                                                .EnableIpV4(true)
-                                                                .SetShortDiscriminator(static_cast<uint8_t>(discriminator & 0xFF))
-                                                                .SetLongDiscrimininator(discriminator)
-                                                                .SetVendorId(vendorId)
-                                                                .SetProductId(productId));
-    }
-    SuccessOrExit(err);
-
-    err = Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    err = InitMdns();
     SuccessOrExit(err);
 #endif
 

@@ -65,7 +65,7 @@ constexpr uint16_t kOptionCommisioningProductId          = 'p';
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
 
-bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier, const char * aName, const char * aValue)
+bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     switch (aIdentifier)
     {
@@ -166,13 +166,13 @@ int main(int argc, char ** args)
 {
     if (Platform::MemoryInit() != CHIP_NO_ERROR)
     {
-        printf("FAILED to initialize memory\n");
+        fprintf(stderr, "FAILED to initialize memory\n");
         return 1;
     }
 
     if (DeviceLayer::PlatformMgr().InitChipStack() != CHIP_NO_ERROR)
     {
-        printf("FAILED to initialize chip stack\n");
+        fprintf(stderr, "FAILED to initialize chip stack\n");
         return 1;
     }
 
@@ -183,7 +183,7 @@ int main(int argc, char ** args)
 
     if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, Mdns::kMdnsPort) != CHIP_NO_ERROR)
     {
-        printf("FAILED to start MDNS advertisement\n");
+        fprintf(stderr, "FAILED to start MDNS advertisement\n");
         return 1;
     }
 
@@ -209,13 +209,13 @@ int main(int argc, char ** args)
     }
     else
     {
-        printf("FAILED to determine advertising type.\n");
+        fprintf(stderr, "FAILED to determine advertising type.\n");
         return 1;
     }
 
     if (err != CHIP_NO_ERROR)
     {
-        printf("FAILED to setup advertisement parameters\n");
+        fprintf(stderr, "FAILED to setup advertisement parameters\n");
         return 1;
     }
 
