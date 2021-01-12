@@ -46,9 +46,6 @@ namespace BarrierControl {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-/*
- * Command BarrierControlGoToPercent
- */
 CHIP_ERROR EncodeBarrierControlGoToPercentCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                                   chip::GroupId ZCLgroupId, const uint8_t percentOpen)
 {
@@ -72,9 +69,6 @@ CHIP_ERROR EncodeBarrierControlGoToPercentCommand(chip::app::Command * ZCLcomman
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command BarrierControlStop
- */
 CHIP_ERROR EncodeBarrierControlStopCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                            chip::GroupId ZCLgroupId)
 {
@@ -128,9 +122,6 @@ namespace Basic {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-/*
- * Command ResetToFactoryDefaults
- */
 CHIP_ERROR EncodeResetToFactoryDefaultsCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                                chip::GroupId ZCLgroupId)
 {
@@ -240,9 +231,6 @@ namespace ColorControl {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-/*
- * Command MoveColor
- */
 CHIP_ERROR EncodeMoveColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                   const int16_t rateX, const int16_t rateY, const uint8_t optionsMask,
                                   const uint8_t optionsOverride)
@@ -272,9 +260,6 @@ CHIP_ERROR EncodeMoveColorCommand(chip::app::Command * ZCLcommand, chip::Endpoin
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveColorTemperature
- */
 CHIP_ERROR EncodeMoveColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                              chip::GroupId ZCLgroupId, const uint8_t moveMode, const uint16_t rate,
                                              const uint16_t colorTemperatureMinimum, const uint16_t colorTemperatureMaximum,
@@ -310,9 +295,6 @@ CHIP_ERROR EncodeMoveColorTemperatureCommand(chip::app::Command * ZCLcommand, ch
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveHue
- */
 CHIP_ERROR EncodeMoveHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                 const uint8_t moveMode, const uint8_t rate, const uint8_t optionsMask,
                                 const uint8_t optionsOverride)
@@ -342,9 +324,6 @@ CHIP_ERROR EncodeMoveHueCommand(chip::app::Command * ZCLcommand, chip::EndpointI
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveSaturation
- */
 CHIP_ERROR EncodeMoveSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                        const uint8_t moveMode, const uint8_t rate, const uint8_t optionsMask,
                                        const uint8_t optionsOverride)
@@ -375,9 +354,6 @@ CHIP_ERROR EncodeMoveSaturationCommand(chip::app::Command * ZCLcommand, chip::En
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveToColor
- */
 CHIP_ERROR EncodeMoveToColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                     const uint16_t colorX, const uint16_t colorY, const uint16_t transitionTime,
                                     const uint8_t optionsMask, const uint8_t optionsOverride)
@@ -409,9 +385,6 @@ CHIP_ERROR EncodeMoveToColorCommand(chip::app::Command * ZCLcommand, chip::Endpo
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveToColorTemperature
- */
 CHIP_ERROR EncodeMoveToColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                                chip::GroupId ZCLgroupId, const uint16_t colorTemperature,
                                                const uint16_t transitionTime, const uint8_t optionsMask,
@@ -443,9 +416,6 @@ CHIP_ERROR EncodeMoveToColorTemperatureCommand(chip::app::Command * ZCLcommand, 
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveToHue
- */
 CHIP_ERROR EncodeMoveToHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                   const uint8_t hue, const uint8_t direction, const uint16_t transitionTime,
                                   const uint8_t optionsMask, const uint8_t optionsOverride)
@@ -477,9 +447,6 @@ CHIP_ERROR EncodeMoveToHueCommand(chip::app::Command * ZCLcommand, chip::Endpoin
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveToHueAndSaturation
- */
 CHIP_ERROR EncodeMoveToHueAndSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                                chip::GroupId ZCLgroupId, const uint8_t hue, const uint8_t saturation,
                                                const uint16_t transitionTime, const uint8_t optionsMask,
@@ -513,9 +480,6 @@ CHIP_ERROR EncodeMoveToHueAndSaturationCommand(chip::app::Command * ZCLcommand, 
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveToSaturation
- */
 CHIP_ERROR EncodeMoveToSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                          const uint8_t saturation, const uint16_t transitionTime, const uint8_t optionsMask,
                                          const uint8_t optionsOverride)
@@ -546,9 +510,6 @@ CHIP_ERROR EncodeMoveToSaturationCommand(chip::app::Command * ZCLcommand, chip::
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command StepColor
- */
 CHIP_ERROR EncodeStepColorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                   const int16_t stepX, const int16_t stepY, const uint16_t transitionTime,
                                   const uint8_t optionsMask, const uint8_t optionsOverride)
@@ -580,9 +541,6 @@ CHIP_ERROR EncodeStepColorCommand(chip::app::Command * ZCLcommand, chip::Endpoin
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command StepColorTemperature
- */
 CHIP_ERROR EncodeStepColorTemperatureCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                              chip::GroupId ZCLgroupId, const uint8_t stepMode, const uint16_t stepSize,
                                              const uint16_t transitionTime, const uint16_t colorTemperatureMinimum,
@@ -621,9 +579,6 @@ CHIP_ERROR EncodeStepColorTemperatureCommand(chip::app::Command * ZCLcommand, ch
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command StepHue
- */
 CHIP_ERROR EncodeStepHueCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                 const uint8_t stepMode, const uint8_t stepSize, const uint8_t transitionTime,
                                 const uint8_t optionsMask, const uint8_t optionsOverride)
@@ -655,9 +610,6 @@ CHIP_ERROR EncodeStepHueCommand(chip::app::Command * ZCLcommand, chip::EndpointI
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command StepSaturation
- */
 CHIP_ERROR EncodeStepSaturationCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                        const uint8_t stepMode, const uint8_t stepSize, const uint8_t transitionTime,
                                        const uint8_t optionsMask, const uint8_t optionsOverride)
@@ -690,9 +642,6 @@ CHIP_ERROR EncodeStepSaturationCommand(chip::app::Command * ZCLcommand, chip::En
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command StopMoveStep
- */
 CHIP_ERROR EncodeStopMoveStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                      const uint8_t optionsMask, const uint8_t optionsOverride)
 {
@@ -820,9 +769,6 @@ namespace DoorLock {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-/*
- * Command ClearAllPins
- */
 CHIP_ERROR EncodeClearAllPinsCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearAllPinsCommandId,
@@ -842,9 +788,6 @@ CHIP_ERROR EncodeClearAllPinsCommand(chip::app::Command * ZCLcommand, chip::Endp
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command ClearAllRfids
- */
 CHIP_ERROR EncodeClearAllRfidsCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, DoorLock::kClusterId, DoorLock::kClearAllRfidsCommandId,
@@ -864,9 +807,6 @@ CHIP_ERROR EncodeClearAllRfidsCommand(chip::app::Command * ZCLcommand, chip::End
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command ClearHolidaySchedule
- */
 CHIP_ERROR EncodeClearHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                              chip::GroupId ZCLgroupId, const uint8_t scheduleId)
 {
@@ -889,9 +829,6 @@ CHIP_ERROR EncodeClearHolidayScheduleCommand(chip::app::Command * ZCLcommand, ch
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command ClearPin
- */
 CHIP_ERROR EncodeClearPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                  const uint16_t userId)
 {
@@ -914,9 +851,6 @@ CHIP_ERROR EncodeClearPinCommand(chip::app::Command * ZCLcommand, chip::Endpoint
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command ClearRfid
- */
 CHIP_ERROR EncodeClearRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                   const uint16_t userId)
 {
@@ -939,9 +873,6 @@ CHIP_ERROR EncodeClearRfidCommand(chip::app::Command * ZCLcommand, chip::Endpoin
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command ClearWeekdaySchedule
- */
 CHIP_ERROR EncodeClearWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                              chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
 {
@@ -966,9 +897,6 @@ CHIP_ERROR EncodeClearWeekdayScheduleCommand(chip::app::Command * ZCLcommand, ch
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command ClearYeardaySchedule
- */
 CHIP_ERROR EncodeClearYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                              chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
 {
@@ -993,9 +921,6 @@ CHIP_ERROR EncodeClearYeardayScheduleCommand(chip::app::Command * ZCLcommand, ch
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command GetHolidaySchedule
- */
 CHIP_ERROR EncodeGetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                            chip::GroupId ZCLgroupId, const uint8_t scheduleId)
 {
@@ -1018,9 +943,6 @@ CHIP_ERROR EncodeGetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command GetLogRecord
- */
 CHIP_ERROR EncodeGetLogRecordCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                      const uint16_t logIndex)
 {
@@ -1043,9 +965,6 @@ CHIP_ERROR EncodeGetLogRecordCommand(chip::app::Command * ZCLcommand, chip::Endp
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command GetPin
- */
 CHIP_ERROR EncodeGetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                const uint16_t userId)
 {
@@ -1068,9 +987,6 @@ CHIP_ERROR EncodeGetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command GetRfid
- */
 CHIP_ERROR EncodeGetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                 const uint16_t userId)
 {
@@ -1093,9 +1009,6 @@ CHIP_ERROR EncodeGetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointI
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command GetUserType
- */
 CHIP_ERROR EncodeGetUserTypeCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                     const uint16_t userId)
 {
@@ -1118,9 +1031,6 @@ CHIP_ERROR EncodeGetUserTypeCommand(chip::app::Command * ZCLcommand, chip::Endpo
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command GetWeekdaySchedule
- */
 CHIP_ERROR EncodeGetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                            chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
 {
@@ -1145,9 +1055,6 @@ CHIP_ERROR EncodeGetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command GetYeardaySchedule
- */
 CHIP_ERROR EncodeGetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                            chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId)
 {
@@ -1172,9 +1079,6 @@ CHIP_ERROR EncodeGetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command LockDoor
- */
 CHIP_ERROR EncodeLockDoorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                  const char * pin)
 {
@@ -1197,9 +1101,6 @@ CHIP_ERROR EncodeLockDoorCommand(chip::app::Command * ZCLcommand, chip::Endpoint
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command SetHolidaySchedule
- */
 CHIP_ERROR EncodeSetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                            chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint32_t localStartTime,
                                            const uint32_t localEndTime, const uint8_t operatingModeDuringHoliday)
@@ -1229,9 +1130,6 @@ CHIP_ERROR EncodeSetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command SetPin
- */
 CHIP_ERROR EncodeSetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                const uint16_t userId, const uint8_t userStatus, const uint8_t userType, const char * pin)
 {
@@ -1260,9 +1158,6 @@ CHIP_ERROR EncodeSetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command SetRfid
- */
 CHIP_ERROR EncodeSetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                 const uint16_t userId, const uint8_t userStatus, const uint8_t userType, const char * id)
 {
@@ -1291,9 +1186,6 @@ CHIP_ERROR EncodeSetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointI
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command SetUserType
- */
 CHIP_ERROR EncodeSetUserTypeCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                     const uint16_t userId, const uint8_t userType)
 {
@@ -1318,9 +1210,6 @@ CHIP_ERROR EncodeSetUserTypeCommand(chip::app::Command * ZCLcommand, chip::Endpo
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command SetWeekdaySchedule
- */
 CHIP_ERROR EncodeSetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                            chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId,
                                            const uint8_t daysMask, const uint8_t startHour, const uint8_t startMinute,
@@ -1357,9 +1246,6 @@ CHIP_ERROR EncodeSetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command SetYeardaySchedule
- */
 CHIP_ERROR EncodeSetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                            chip::GroupId ZCLgroupId, const uint8_t scheduleId, const uint16_t userId,
                                            const uint32_t localStartTime, const uint32_t localEndTime)
@@ -1389,9 +1275,6 @@ CHIP_ERROR EncodeSetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command UnlockDoor
- */
 CHIP_ERROR EncodeUnlockDoorCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                    const char * pin)
 {
@@ -1414,9 +1297,6 @@ CHIP_ERROR EncodeUnlockDoorCommand(chip::app::Command * ZCLcommand, chip::Endpoi
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command UnlockWithTimeout
- */
 CHIP_ERROR EncodeUnlockWithTimeoutCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                           const uint16_t timeoutInSeconds, const char * pin)
 {
@@ -1561,9 +1441,6 @@ namespace Groups {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-/*
- * Command AddGroup
- */
 CHIP_ERROR EncodeAddGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                  const uint16_t groupId, const char * groupName)
 {
@@ -1588,9 +1465,6 @@ CHIP_ERROR EncodeAddGroupCommand(chip::app::Command * ZCLcommand, chip::Endpoint
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command AddGroupIfIdentifying
- */
 CHIP_ERROR EncodeAddGroupIfIdentifyingCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                               chip::GroupId ZCLgroupId, const uint16_t groupId, const char * groupName)
 {
@@ -1615,9 +1489,6 @@ CHIP_ERROR EncodeAddGroupIfIdentifyingCommand(chip::app::Command * ZCLcommand, c
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command GetGroupMembership
- */
 CHIP_ERROR EncodeGetGroupMembershipCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                            chip::GroupId ZCLgroupId, const uint8_t groupCount, const uint16_t groupList)
 {
@@ -1642,9 +1513,6 @@ CHIP_ERROR EncodeGetGroupMembershipCommand(chip::app::Command * ZCLcommand, chip
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command RemoveAllGroups
- */
 CHIP_ERROR EncodeRemoveAllGroupsCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Groups::kClusterId, Groups::kRemoveAllGroupsCommandId,
@@ -1664,9 +1532,6 @@ CHIP_ERROR EncodeRemoveAllGroupsCommand(chip::app::Command * ZCLcommand, chip::E
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command RemoveGroup
- */
 CHIP_ERROR EncodeRemoveGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                     const uint16_t groupId)
 {
@@ -1689,9 +1554,6 @@ CHIP_ERROR EncodeRemoveGroupCommand(chip::app::Command * ZCLcommand, chip::Endpo
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command ViewGroup
- */
 CHIP_ERROR EncodeViewGroupCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                   const uint16_t groupId)
 {
@@ -1783,9 +1645,6 @@ namespace Identify {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-/*
- * Command Identify
- */
 CHIP_ERROR EncodeIdentifyCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                  const uint16_t identifyTime)
 {
@@ -1808,9 +1667,6 @@ CHIP_ERROR EncodeIdentifyCommand(chip::app::Command * ZCLcommand, chip::Endpoint
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command IdentifyQuery
- */
 CHIP_ERROR EncodeIdentifyQueryCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, Identify::kClusterId, Identify::kIdentifyQueryCommandId,
@@ -1868,9 +1724,6 @@ namespace LevelControl {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-/*
- * Command Move
- */
 CHIP_ERROR EncodeMoveCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                              const uint8_t moveMode, const uint8_t rate, const uint8_t optionMask, const uint8_t optionOverride)
 {
@@ -1899,9 +1752,6 @@ CHIP_ERROR EncodeMoveCommand(chip::app::Command * ZCLcommand, chip::EndpointId Z
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveToLevel
- */
 CHIP_ERROR EncodeMoveToLevelCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                     const uint8_t level, const uint16_t transitionTime, const uint8_t optionMask,
                                     const uint8_t optionOverride)
@@ -1931,9 +1781,6 @@ CHIP_ERROR EncodeMoveToLevelCommand(chip::app::Command * ZCLcommand, chip::Endpo
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveToLevelWithOnOff
- */
 CHIP_ERROR EncodeMoveToLevelWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                              chip::GroupId ZCLgroupId, const uint8_t level, const uint16_t transitionTime)
 {
@@ -1959,9 +1806,6 @@ CHIP_ERROR EncodeMoveToLevelWithOnOffCommand(chip::app::Command * ZCLcommand, ch
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command MoveWithOnOff
- */
 CHIP_ERROR EncodeMoveWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                       const uint8_t moveMode, const uint8_t rate)
 {
@@ -1986,9 +1830,6 @@ CHIP_ERROR EncodeMoveWithOnOffCommand(chip::app::Command * ZCLcommand, chip::End
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command Step
- */
 CHIP_ERROR EncodeStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                              const uint8_t stepMode, const uint8_t stepSize, const uint16_t transitionTime,
                              const uint8_t optionMask, const uint8_t optionOverride)
@@ -2020,9 +1861,6 @@ CHIP_ERROR EncodeStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId Z
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command StepWithOnOff
- */
 CHIP_ERROR EncodeStepWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                       const uint8_t stepMode, const uint8_t stepSize, const uint16_t transitionTime)
 {
@@ -2049,9 +1887,6 @@ CHIP_ERROR EncodeStepWithOnOffCommand(chip::app::Command * ZCLcommand, chip::End
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command Stop
- */
 CHIP_ERROR EncodeStopCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                              const uint8_t optionMask, const uint8_t optionOverride)
 {
@@ -2076,9 +1911,6 @@ CHIP_ERROR EncodeStopCommand(chip::app::Command * ZCLcommand, chip::EndpointId Z
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command StopWithOnOff
- */
 CHIP_ERROR EncodeStopWithOnOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, LevelControl::kClusterId, LevelControl::kStopWithOnOffCommandId,
@@ -2155,9 +1987,6 @@ namespace OnOff {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-/*
- * Command Off
- */
 CHIP_ERROR EncodeOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, OnOff::kClusterId, OnOff::kOffCommandId,
@@ -2177,9 +2006,6 @@ CHIP_ERROR EncodeOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZC
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command On
- */
 CHIP_ERROR EncodeOnCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, OnOff::kClusterId, OnOff::kOnCommandId,
@@ -2199,9 +2025,6 @@ CHIP_ERROR EncodeOnCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCL
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command Toggle
- */
 CHIP_ERROR EncodeToggleCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, OnOff::kClusterId, OnOff::kToggleCommandId,
@@ -2263,9 +2086,6 @@ namespace Scenes {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-/*
- * Command AddScene
- */
 CHIP_ERROR EncodeAddSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                  const uint16_t groupId, const uint8_t sceneId, const uint16_t transitionTime,
                                  const char * sceneName, const chip::ClusterId clusterId, const uint8_t length, const uint8_t value)
@@ -2301,9 +2121,6 @@ CHIP_ERROR EncodeAddSceneCommand(chip::app::Command * ZCLcommand, chip::Endpoint
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command GetSceneMembership
- */
 CHIP_ERROR EncodeGetSceneMembershipCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId,
                                            chip::GroupId ZCLgroupId, const uint16_t groupId)
 {
@@ -2326,9 +2143,6 @@ CHIP_ERROR EncodeGetSceneMembershipCommand(chip::app::Command * ZCLcommand, chip
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command RecallScene
- */
 CHIP_ERROR EncodeRecallSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                     const uint16_t groupId, const uint8_t sceneId, const uint16_t transitionTime)
 {
@@ -2355,9 +2169,6 @@ CHIP_ERROR EncodeRecallSceneCommand(chip::app::Command * ZCLcommand, chip::Endpo
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command RemoveAllScenes
- */
 CHIP_ERROR EncodeRemoveAllScenesCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                         const uint16_t groupId)
 {
@@ -2380,9 +2191,6 @@ CHIP_ERROR EncodeRemoveAllScenesCommand(chip::app::Command * ZCLcommand, chip::E
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command RemoveScene
- */
 CHIP_ERROR EncodeRemoveSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                     const uint16_t groupId, const uint8_t sceneId)
 {
@@ -2407,9 +2215,6 @@ CHIP_ERROR EncodeRemoveSceneCommand(chip::app::Command * ZCLcommand, chip::Endpo
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command StoreScene
- */
 CHIP_ERROR EncodeStoreSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                    const uint16_t groupId, const uint8_t sceneId)
 {
@@ -2434,9 +2239,6 @@ CHIP_ERROR EncodeStoreSceneCommand(chip::app::Command * ZCLcommand, chip::Endpoi
     return CHIP_NO_ERROR;
 }
 
-/*
- * Command ViewScene
- */
 CHIP_ERROR EncodeViewSceneCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                   const uint16_t groupId, const uint8_t sceneId)
 {

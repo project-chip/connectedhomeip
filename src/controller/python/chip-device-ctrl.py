@@ -465,6 +465,7 @@ class DeviceMgrCmd(Cmd):
                 self.do_help("zcl")
                 return
         except ChipExceptions.ChipStackException as ex:
+            print("An exception occurred during process ZCL command:")
             print(str(ex))
             return
 

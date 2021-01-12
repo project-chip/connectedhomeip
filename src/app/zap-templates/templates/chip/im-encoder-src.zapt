@@ -21,9 +21,6 @@ namespace {{asCamelCased name false}} {
 {{> cluster_header}}
 
 {{#chip_server_cluster_commands}}
-/*
- * Command {{asCamelCased name false}}
- */
 CHIP_ERROR Encode{{asType name}}Command(chip::app::Command * ZCLcommand, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId{{#chip_server_cluster_command_arguments}}, const {{chipType}} {{asCamelCased label}}{{#if (isByteString type)}}, uint32_t {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}})
 {
     Command::CommandParams cmdParams = { ZCLendpointId, ZCLgroupId, {{asCamelCased clusterName false}}::kClusterId, {{asCamelCased clusterName false}}::k{{asCamelCased name false}}CommandId,
