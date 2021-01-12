@@ -424,7 +424,7 @@ class DeviceMgrCmd(Cmd):
                     return
                 for commands in cluster.items():
                     args = ", ".join(["{}: {}".format(argName, argType)
-                                      for argName, argType in commands[1]])
+                                      for argName, argType in commands[1].items()])
                     print(commands[0])
                     if commands[1]:
                         print("  ", args)
@@ -443,7 +443,7 @@ class DeviceMgrCmd(Cmd):
                         print("Argument should in key=value format")
                         return
                     key, value = kvPair.split("=", 1)
-                    valueType = command.find(key, None)
+                    valueType = command.get(key, None)
                     if valueType == 'int':
                         commandArgs[key] = int(value)
                     elif valueType == 'str':

@@ -34,9 +34,9 @@ class ChipCluster:
         }
 
     def PrepareCommand(self, cluster: str, command: str, endpoint: int, groupid: int, args):
-        func = getattr(self, "Cluster{}_Command{}".format(cluster, command))
+        func = getattr(self, "Cluster{}_Command{}".format(cluster, command), None)
         if not func:
-            raise UnknownCluster(cluster)
+            raise UnknownCommand(cluster, command)
         func(endpoint, groupid, **args)
 
 {{#chip_server_clusters}}
@@ -56,8 +56,8 @@ class ChipCluster:
 
 {{/chip_server_cluster_commands}}
 {{/chip_server_clusters}}
-    def InitLib(self, dmLib):
-        self._dmLib = dmLib
+    def InitLib(self, chipLib):
+        self._dmLib = chipLib
         self._dmLib.chip_ime_SendCommand.argtypes = [ctypes.c_uint64]
         self._dmLib.chip_ime_SendCommand.restype = ctypes.c_uint32
 {{#chip_server_clusters}}
