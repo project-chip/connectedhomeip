@@ -193,7 +193,15 @@ CHIP_ERROR StopBluezAdv(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezGattsAppRegister(BluezEndpoint * apEndpoint);
 CHIP_ERROR BluezAdvertisementSetup(BluezEndpoint * apEndpoint);
 
-CHIP_ERROR StartDiscovery(BluezEndpoint * apEndpoint, BluezDiscoveryRequest aRequest = {});
+/// Write to the CHIP RX characteristic on the remote peripheral device
+bool BluezSendWriteRequest(BLE_CONNECTION_OBJECT apConn, chip::System::PacketBufferHandle apBuf);
+/// Subscribe to the CHIP TX characteristic on the remote peripheral device
+bool BluezSubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
+/// Unsubscribe from the CHIP TX characteristic on the remote peripheral device
+bool BluezUnsubscribeCharacteristic(BLE_CONNECTION_OBJECT apConn);
+
+CHIP_ERROR
+StartDiscovery(BluezEndpoint * apEndpoint, BluezDiscoveryRequest aRequest = {});
 CHIP_ERROR StopDiscovery(BluezEndpoint * apEndpoint);
 
 CHIP_ERROR ConnectDevice(BluezDevice1 * apDevice);
