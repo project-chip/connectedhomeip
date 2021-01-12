@@ -69,10 +69,9 @@ ti_simplelink_executable("lock_app") {
   public_deps = [
     ":sdk",
     ":sysconfig",
-    "${openthread_root}:libopenthread-cli-mtd",
-    #"${openthread_root}:libopenthread-mtd",
     "${chip_root}/examples/lock-app/lock-common",
     "${chip_root}/src/lib",
+    "${openthread_root}:libopenthread-cli-mtd",
   ]
 
   sources = [
