@@ -13,10 +13,7 @@
 # limitations under the License.
 
 import("//build_overrides/chip.gni")
-
-declare_args() {
-  chip_devctrl_use_interation_model = false
-}
+import("${chip_root}/src/app/common_flags.gni")
 
 static_library("controller") {
   output_name = "libChipController"
@@ -47,7 +44,7 @@ static_library("controller") {
 
   defines = []
 
-  if (chip_devctrl_use_interation_model) {
-    defines += [ "CHIP_DEVCTRL_USE_INTERACTION_MODEL" ]
+  if (chip_app_use_interation_model) {
+    defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
   }
 }

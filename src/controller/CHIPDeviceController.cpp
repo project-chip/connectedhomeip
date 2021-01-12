@@ -141,7 +141,7 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     err = mSessionManager->Init(localDeviceId, mSystemLayer, mTransportMgr);
     SuccessOrExit(err);
 
-#ifdef CHIP_DEVCTRL_USE_INTERACTION_MODEL
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
     err = mExchangeManager->Init(mSessionManager);
     SuccessOrExit(err);
     err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager);
