@@ -132,9 +132,7 @@ CHIP_ERROR InitMdns()
     }
     else
     {
-        chip::Optional<uint16_t> vendorId;
-        chip::Optional<uint16_t> productId;
-        uint16_t discriminator;
+        auto advertiseParameters = Mdns::CommisioningAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
 
         uint16_t value;
         if (ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
@@ -143,7 +141,7 @@ CHIP_ERROR InitMdns()
         }
         else
         {
-            vendorId = Optional<uint16_t>::Value(value);
+            advertiseParameters.SetVendorId(chip::Optional<uint16_t>::Value(value));
         }
 
         if (ConfigurationMgr().GetProductId(value) != CHIP_NO_ERROR)
@@ -152,22 +150,15 @@ CHIP_ERROR InitMdns()
         }
         else
         {
-            productId = Optional<uint16_t>::Value(value);
+            advertiseParameters.SetProductId(chip::Optional<uint16_t>::Value(value));
         }
 
-        if (ConfigurationMgr().GetSetupDiscriminator(discriminator) != CHIP_NO_ERROR)
+        if (ConfigurationMgr().GetSetupDiscriminator(value) != CHIP_NO_ERROR)
         {
             ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
-            discriminator = 840;
+            value = 840;
         }
-
-        const auto advertiseParameters = Mdns::CommisioningAdvertisingParameters()
-                                             .SetPort(CHIP_PORT)
-                                             .EnableIpV4(true)
-                                             .SetShortDiscriminator(static_cast<uint8_t>(discriminator & 0xFF))
-                                             .SetLongDiscrimininator(discriminator)
-                                             .SetVendorId(vendorId)
-                                             .SetProductId(productId);
+        advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscrimininator(value);
 
         ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
     }
