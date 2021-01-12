@@ -273,7 +273,7 @@ CHIP_ERROR ReliableMessageContext::HandleNeedsAck(uint32_t MessageId, BitFlags<u
     mManager->ExpireTicks();
 
     // If the message IS a duplicate.
-    if (MsgFlags.Has(MessageFlagValues::kMessageFlag_DuplicateMessage))
+    if (MsgFlags.Has(MessageFlagValues::kDuplicateMessage))
     {
 #if !defined(NDEBUG)
         ChipLogProgress(ExchangeManager, "Forcing tx of solitary ack for duplicate MsgId:%08" PRIX32, MessageId);
@@ -352,7 +352,7 @@ CHIP_ERROR ReliableMessageContext::SendStandaloneAckMessage()
     {
         err = mExchange->SendMessage(Protocols::kProtocol_SecureChannel,
                                      static_cast<uint8_t>(Protocols::SecureChannel::MsgType::StandaloneAck), std::move(msgBuf),
-                                     BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kSendFlag_NoAutoRequestAck });
+                                     BitFlags<uint16_t, SendMessageFlags>{ SendMessageFlags::kNoAutoRequestAck });
     }
     else
     {

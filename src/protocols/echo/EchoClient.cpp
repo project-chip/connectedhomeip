@@ -72,7 +72,7 @@ CHIP_ERROR EchoClient::SendEchoRequest(System::PacketBufferHandle payload)
 
     // Send an Echo Request message.  Discard the exchange context if the send fails.
     err = mExchangeCtx->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(payload),
-                                    Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
+                                    Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
 
     if (err != CHIP_NO_ERROR)
     {
