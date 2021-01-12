@@ -51,20 +51,58 @@ public:
         mPort = port;
         return *this;
     }
-    uint64_t GetPort() const { return mPort; }
-
-    OperationalAdvertisingParameters & EnableIpV4(bool enable)
-    {
-        mEnableIPv4 = enable;
-        return *this;
-    }
-    bool IsIPv4Enabled() const { return mEnableIPv4; }
+    uint16_t GetPort() const { return mPort; }
 
 private:
     uint64_t mFabricId = 0;
     uint64_t mNodeId   = 0;
     uint16_t mPort     = CHIP_PORT;
-    bool mEnableIPv4   = true;
+};
+
+class CommissionAdvertisingParameters
+{
+public:
+    CommissionAdvertisingParameters & SetDiscriminator(uint16_t discriminator)
+    {
+        mDiscriminator = discriminator;
+        return *this;
+    }
+    uint16_t GetDiscriminator() const { return mDiscriminator; }
+
+    CommissionAdvertisingParameters & SetVendorId(uint16_t vendorId)
+    {
+        mVendorId = vendorId;
+        return *this;
+    }
+    uint16_t GetVendorId() const { return mVendorId; }
+
+    CommissionAdvertisingParameters & SetProductId(uint16_t productId)
+    {
+        mProductId = productId;
+        return *this;
+    }
+    uint16_t GetProductId() const { return mProductId; }
+
+    CommissionAdvertisingParameters & SetIdentifier(uint64_t identifier)
+    {
+        mIdentifier = identifier;
+        return *this;
+    }
+    uint64_t GetIdentifier() const { return mIdentifier; }
+
+    CommissionAdvertisingParameters & SetPort(uint16_t port)
+    {
+        mPort = port;
+        return *this;
+    }
+    uint16_t GetPort() const { return mPort; }
+
+private:
+    uint16_t mDiscriminator;
+    uint16_t mVendorId;
+    uint16_t mProductId;
+    uint64_t mIdentifier;
+    uint16_t mPort = CHIP_PORT;
 };
 
 /// Handles advertising of CHIP nodes
@@ -75,10 +113,13 @@ public:
 
     /// Starts the advertiser. Items 'Advertised' will become visible.
     /// May be called before OR after Advertise() calls.
-    virtual CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint16_t port) = 0;
+    virtual CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint64_t macAddress, uint16_t port, bool enableIPv4) = 0;
 
     /// Advertises the CHIP node as an operational node
-    virtual CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) = 0;
+    virtual CHIP_ERROR AdvertiseOperational(const OperationalAdvertisingParameters & params) = 0;
+
+    /// Advertises the CHIP node as a commission node
+    virtual CHIP_ERROR AdvertiseCommission(const CommissionAdvertisingParameters & params) = 0;
 
     /// Provides the system-wide implementation of the service advertiser
     static ServiceAdvertiser & Instance();

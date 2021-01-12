@@ -36,6 +36,7 @@
 #include <app/util/util.h>
 #include <lib/mdns/Advertiser.h>
 #include <support/CodeUtils.h>
+#include <support/ErrorStr.h>
 
 static const char * TAG = "app-devicecallbacks";
 
@@ -46,6 +47,41 @@ using namespace ::chip::DeviceLayer;
 
 uint32_t identifyTimerCount;
 constexpr uint32_t kIdentifyTimerDelayMS = 250;
+
+namespace {
+
+void StartMdnsAdvertise(bool isIpv4)
+{
+#if !INET_CONFIG_ENABLE_IPV4
+    if (isIpv4)
+    {
+        return;
+    }
+#endif
+
+    uint64_t macAddress;
+    CHIP_ERROR error = DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(macAddress);
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to start mdns advertiser: cannot get wifi mac address");
+        return;
+    }
+
+    error = Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort, macAddress,
+#if INET_CONFIG_ENABLE_IPV4
+                                                      true
+#else
+                                                      false
+#endif
+    );
+
+    if (error != CHIP_NO_ERROR)
+    {
+        ESP_LOGE(TAG, "Failed to start mdns advertiser: %s", chip::ErrorStr(error));
+    }
+}
+
+} // namespace
 
 void DeviceCallbacks::DeviceEventCallback(const ChipDeviceEvent * event, intptr_t arg)
 {
@@ -94,10 +130,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         ESP_LOGI(TAG, "Server ready at: %s:%d", event->InternetConnectivityChange.address, CHIP_PORT);
         wifiLED.Set(true);
 
-        if (chip::Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort) != CHIP_NO_ERROR)
-        {
-            ESP_LOGE(TAG, "Failed to start mDNS advertisement");
-        }
+        StartMdnsAdvertise(true);
     }
     else if (event->InternetConnectivityChange.IPv4 == kConnectivity_Lost)
     {
@@ -111,6 +144,7 @@ void DeviceCallbacks::OnInternetConnectivityChange(const ChipDeviceEvent * event
         {
             ESP_LOGE(TAG, "Failed to start mDNS advertisement");
         }
+        StartMdnsAdvertise(false);
     }
     else if (event->InternetConnectivityChange.IPv6 == kConnectivity_Lost)
     {

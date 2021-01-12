@@ -26,6 +26,7 @@
 #include <inet/InetError.h>
 #include <inet/InetLayer.h>
 #include <lib/mdns/DiscoveryManager.h>
+#include <lib/support/RandUtils.h>
 #include <mdns/Advertiser.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <setup_payload/SetupPayload.h>
@@ -163,21 +164,34 @@ void InitServer(AppDelegate * delegate)
     // TODO: advertise this only when really operational once we support both
     // operational and commisioning advertising is supported.
     {
-        constexpr uint64_t kTestFabricId = 5544332211;
-        err                              = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::OperationalAdvertisingParameters()
-                                                                .SetFabricId(kTestFabricId)
-                                                                .SetNodeId(chip::kTestDeviceNodeId)
-                                                                .SetPort(CHIP_PORT)
 #if INET_CONFIG_ENABLE_IPV4
-                                                                .EnableIpV4(true)
+        bool enableIPv4 = true;
 #else
-                                                                .EnableIpV4(false)
+        bool enableIPv4 = false;
 #endif
-        );
+        uint64_t macAddress;
+        uint16_t vendorId;
+        uint16_t productId;
+        uint16_t discriminator;
+        uint64_t identifier = GetRandU64();
+
+        SuccessOrExit(DeviceLayer::ConfigurationMgr().GetPrimaryWiFiMACAddress(macAddress));
+        SuccessOrExit(DeviceLayer::ConfigurationMgr().GetVendorId(vendorId));
+        SuccessOrExit(DeviceLayer::ConfigurationMgr().GetProductId(productId));
+        SuccessOrExit(DeviceLayer::ConfigurationMgr().GetSetupDiscriminator(discriminator));
+
+        err = Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, macAddress, chip::Mdns::kMdnsPort, enableIPv4);
+        SuccessOrExit(err);
+
+        err = Mdns::ServiceAdvertiser::Instance().AdvertiseCommission(Mdns::CommissionAdvertisingParameters()
+                                                                          .SetIdentifier(identifier)
+                                                                          .SetVendorId(vendorId)
+                                                                          .SetProductId(productId)
+                                                                          .SetDiscriminator(discriminator)
+                                                                          .SetPort(CHIP_PORT));
         SuccessOrExit(err);
     }
 
-    err = Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
     SuccessOrExit(err);
 #endif
 

@@ -26,15 +26,21 @@ namespace {
 class NoneAdvertiser : public ServiceAdvertiser
 {
 public:
-    CHIP_ERROR Start(chip::Inet::InetLayer * inetLayet, uint16_t port) override
+    CHIP_ERROR Start(chip::Inet::InetLayer * inetLayer, uint64_t macAddress, uint16_t port, bool enableIPv4) override
     {
         ChipLogError(Discovery, "mDNS advertising not available. mDNS start disabled.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 
-    CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override
+    CHIP_ERROR AdvertiseOperational(const OperationalAdvertisingParameters & params) override
     {
         ChipLogError(Discovery, "mDNS advertising not available. Operational Advertisement failed.");
+        return CHIP_ERROR_NOT_IMPLEMENTED;
+    }
+
+    CHIP_ERROR AdvertiseCommission(const CommissionAdvertisingParameters & params) override
+    {
+        ChipLogError(Discovery, "mDNS advertising not available. Commission Advertisement failed.");
         return CHIP_ERROR_NOT_IMPLEMENTED;
     }
 };
