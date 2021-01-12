@@ -569,7 +569,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (mRendezvousSession != nullptr)
+        // Delete the current rendezvous session only if a device is not currently being paired.
+        if (mDeviceBeingPaired == kNumMaxActiveDevices && mRendezvousSession != nullptr)
         {
             chip::Platform::Delete(mRendezvousSession);
             mRendezvousSession = nullptr;
