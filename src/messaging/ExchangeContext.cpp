@@ -37,7 +37,7 @@
 #include <messaging/ExchangeContext.h>
 #include <messaging/ExchangeMgr.h>
 #include <protocols/Protocols.h>
-#include <protocols/secure_channel/SecureChannelProtocol.h>
+#include <protocols/secure_channel/Constants.h>
 #include <support/logging/CHIPLogging.h>
 #include <system/SystemTimer.h>
 

@@ -31,7 +31,7 @@
 #include <messaging/Flags.h>
 #include <messaging/ReliableMessageManager.h>
 #include <protocols/Protocols.h>
-#include <protocols/secure_channel/SecureChannelProtocol.h>
+#include <protocols/secure_channel/Constants.h>
 #include <support/CodeUtils.h>
 
 namespace chip {
