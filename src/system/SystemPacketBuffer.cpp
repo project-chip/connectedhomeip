@@ -179,7 +179,7 @@ void PacketBuffer::AddToEnd_ForNow(PacketBuffer * aPacket)
 #endif // !CHIP_SYSTEM_CONFIG_USE_LWIP
 }
 
-void PacketBuffer::AddToEnd(PacketBufferHandle aPacketHandle)
+void PacketBuffer::AddToEnd(PacketBufferHandle && aPacketHandle)
 {
     AddToEnd_ForNow(aPacketHandle.Release_ForNow());
 }
