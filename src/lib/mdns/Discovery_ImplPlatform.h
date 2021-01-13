@@ -19,6 +19,7 @@
 
 #include "core/CHIPError.h"
 #include "inet/InetInterface.h"
+#include "lib/mdns/Advertiser.h"
 #include "lib/mdns/platform/Mdns.h"
 #include "platform/CHIPDeviceConfig.h"
 
@@ -32,7 +33,7 @@ public:
     virtual ~ResolveDelegate() {}
 };
 
-class DiscoveryManager
+class DiscoveryImplPlatform : public ServiceAdvertiser
 {
 public:
     /**
@@ -41,19 +42,13 @@ public:
      */
     CHIP_ERROR Init();
 
-    /**
-     * This method publishes the device on mDNS.
-     *
-     * This function will fetch device name and other information and publish them
-     * via mDNS. If device meta data has changed, you can call this function again
-     * to update the information.
-     *
-     * @param[in] addressType The protocol version of the IP address.
-     * @param[in] interface   The interface to send mDNS multicast.
-     *
-     */
-    CHIP_ERROR StartPublishDevice(chip::Inet::IPAddressType addressType = chip::Inet::kIPAddressType_Any,
-                                  chip::Inet::InterfaceId interface     = INET_NULL_INTERFACEID);
+    CHIP_ERROR Start(Inet::InetLayer * inetLayer, uint16_t port) override;
+
+    /// Advertises the CHIP node as an operational node
+    CHIP_ERROR Advertise(const OperationalAdvertisingParameters & params) override;
+
+    /// Advertises the CHIP node as a commisioning node
+    CHIP_ERROR Advertise(const CommisioningAdvertisingParameters & params) override;
 
     /**
      * This function stops publishing the device on mDNS.
@@ -73,13 +68,13 @@ public:
      */
     CHIP_ERROR ResolveNodeId(uint64_t nodeId, uint64_t fabricId, chip::Inet::IPAddressType type = chip::Inet::kIPAddressType_Any);
 
-    static DiscoveryManager & GetInstance() { return sManager; }
+    static DiscoveryImplPlatform & GetInstance() { return sManager; }
 
 private:
-    DiscoveryManager() = default;
+    DiscoveryImplPlatform();
 
-    DiscoveryManager(const DiscoveryManager &) = delete;
-    DiscoveryManager & operator=(const DiscoveryManager &) = delete;
+    DiscoveryImplPlatform(const DiscoveryImplPlatform &) = delete;
+    DiscoveryImplPlatform & operator=(const DiscoveryImplPlatform &) = delete;
 
     CHIP_ERROR PublishUnprovisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
     CHIP_ERROR PublishProvisionedDevice(chip::Inet::IPAddressType addressType, chip::Inet::InterfaceId interface);
@@ -89,15 +84,16 @@ private:
     static void HandleMdnsInit(void * context, CHIP_ERROR initError);
     static void HandleMdnsError(void * context, CHIP_ERROR initError);
 
-#if CHIP_ENABLE_MDNS
-    uint64_t mUnprovisionedInstanceName;
-    bool mMdnsInitialized               = false;
-    bool mIsPublishingProvisionedDevice = false;
-    bool mIsPublishing                  = false;
-#endif // CHIP_ENABLE_MDNS
+    OperationalAdvertisingParameters mOperationalAdvertisingParams;
+    bool mIsOperationalPublishing = false;
+    uint64_t mCommissionInstanceName;
+    CommisioningAdvertisingParameters mCommissioningdvertisingParams;
+    bool mIsCommissionalPublishing = false;
+
+    bool mMdnsInitialized              = false;
     ResolveDelegate * mResolveDelegate = nullptr;
 
-    static DiscoveryManager sManager;
+    static DiscoveryImplPlatform sManager;
 };
 
 } // namespace Mdns
