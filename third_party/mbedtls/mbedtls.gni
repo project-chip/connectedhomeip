@@ -103,6 +103,7 @@ template("mbedtls_target") {
       "${_mbedtls_root}/library/x509.c",
       "${_mbedtls_root}/library/x509_create.c",
       "${_mbedtls_root}/library/x509_crl.c",
+      "${_mbedtls_root}/library/x509_crt.c",
       "${_mbedtls_root}/library/x509_csr.c",
       "${_mbedtls_root}/library/x509write_crt.c",
       "${_mbedtls_root}/library/x509write_csr.c",

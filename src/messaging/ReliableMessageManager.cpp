@@ -64,7 +64,7 @@ void ReliableMessageManager::Shutdown()
     // Clear the retransmit table
     for (RetransTableEntry & rEntry : mRetransTable)
     {
-        ClearRetransmitTable(rEntry);
+        ClearRetransTable(rEntry);
     }
 }
 
@@ -161,7 +161,7 @@ void ReliableMessageManager::ExecuteActions()
                          mRetransTable[i].retainedBuf.GetMsgId(), sendCount, rc->mConfig.mMaxRetrans);
 
             // Remove from Table
-            ClearRetransmitTable(mRetransTable[i]);
+            ClearRetransTable(mRetransTable[i]);
         }
 
         // Resend from Table (if the operation fails, the entry is cleared)
@@ -340,7 +340,7 @@ void ReliableMessageManager::StartRetransmision(RetransTableEntry * entry)
     StartTimer();
 }
 
-void ReliableMessageManager::PauseRetransTable(ReliableMessageContext * rc, uint32_t PauseTimeMillis)
+void ReliableMessageManager::PauseRetransmision(ReliableMessageContext * rc, uint32_t PauseTimeMillis)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
@@ -353,7 +353,7 @@ void ReliableMessageManager::PauseRetransTable(ReliableMessageContext * rc, uint
     }
 }
 
-void ReliableMessageManager::ResumeRetransTable(ReliableMessageContext * rc)
+void ReliableMessageManager::ResumeRetransmision(ReliableMessageContext * rc)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
@@ -372,7 +372,7 @@ bool ReliableMessageManager::CheckAndRemRetransTable(ReliableMessageContext * rc
         if ((mRetransTable[i].rc == rc) && mRetransTable[i].retainedBuf.GetMsgId() == ackMsgId)
         {
             // Clear the entry from the retransmision table.
-            ClearRetransmitTable(mRetransTable[i]);
+            ClearRetransTable(mRetransTable[i]);
 
 #if !defined(NDEBUG)
             ChipLogProgress(ExchangeManager, "Rxd Ack; Removing MsgId:%08" PRIX32 " from Retrans Table", ackMsgId);
@@ -413,7 +413,7 @@ CHIP_ERROR ReliableMessageManager::SendFromRetransTable(RetransTableEntry * entr
             ChipLogError(ExchangeManager, "Crit-err %ld when sending CHIP MsgId:%08" PRIX32 ", send tries: %d", long(err),
                          entry->retainedBuf.GetMsgId(), entry->sendCount);
 
-            ClearRetransmitTable(*entry);
+            ClearRetransTable(*entry);
         }
     }
     else
@@ -430,14 +430,14 @@ CHIP_ERROR ReliableMessageManager::SendFromRetransTable(RetransTableEntry * entr
  *  @param[in]    rc    A pointer to the ExchangeContext object.
  *
  */
-void ReliableMessageManager::ClearRetransmitTable(ReliableMessageContext * rc)
+void ReliableMessageManager::ClearRetransTable(ReliableMessageContext * rc)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         if (mRetransTable[i].rc == rc)
         {
             // Clear the retransmit table entry.
-            ClearRetransmitTable(mRetransTable[i]);
+            ClearRetransTable(mRetransTable[i]);
         }
     }
 }
@@ -448,7 +448,7 @@ void ReliableMessageManager::ClearRetransmitTable(ReliableMessageContext * rc)
  *  @param[in]    rEntry   A reference to the RetransTableEntry object.
  *
  */
-void ReliableMessageManager::ClearRetransmitTable(RetransTableEntry & rEntry)
+void ReliableMessageManager::ClearRetransTable(RetransTableEntry & rEntry)
 {
     if (rEntry.rc)
     {
@@ -476,14 +476,14 @@ void ReliableMessageManager::ClearRetransmitTable(RetransTableEntry & rEntry)
  *  @param[in]    err   The error for failing table entries.
  *
  */
-void ReliableMessageManager::FailRetransmitTableEntries(ReliableMessageContext * rc, CHIP_ERROR err)
+void ReliableMessageManager::FailRetransTableEntries(ReliableMessageContext * rc, CHIP_ERROR err)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         if (mRetransTable[i].rc == rc)
         {
             // Remove the entry from the retransmission table.
-            ClearRetransmitTable(mRetransTable[i]);
+            ClearRetransTable(mRetransTable[i]);
 
             // Application callback OnSendError.
             rc->mDelegate->OnSendError(err);

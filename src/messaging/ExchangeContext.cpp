@@ -106,7 +106,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     state = mExchangeMgr->GetSessionMgr()->GetPeerConnectionState(mSecureSession);
     VerifyOrExit(state != nullptr, err = CHIP_ERROR_NOT_CONNECTED);
     if ((state->GetPeerAddress().GetTransportType() == Transport::Type::kUdp) && mReliableMessageContext.AutoRequestAck() &&
-        !sendFlags.Has(SendMessageFlags::kSendFlag_NoAutoRequestAck))
+        !sendFlags.Has(SendMessageFlags::kNoAutoRequestAck))
     {
         payloadHeader.SetNeedsAck(true);
     }
@@ -126,7 +126,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
     }
 
     // If a response message is expected...
-    if (sendFlags.Has(SendMessageFlags::kSendFlag_ExpectResponse))
+    if (sendFlags.Has(SendMessageFlags::kExpectResponse))
     {
         // Only one 'response expected' message can be outstanding at a time.
         VerifyOrExit(!IsResponseExpected(), err = CHIP_ERROR_INCORRECT_STATE);
@@ -156,7 +156,7 @@ CHIP_ERROR ExchangeContext::SendMessage(uint16_t protocolId, uint8_t msgType, Pa
         {
             // Remove from table
             ChipLogError(ExchangeManager, "Failed to send message with err %ld", long(err));
-            mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(*entry);
+            mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(*entry);
         }
         else
         {
@@ -205,7 +205,7 @@ void ExchangeContext::DoClose(bool clearRetransTable)
     // needs to clear the CRMP retransmission table immediately.
     if (clearRetransTable)
     {
-        mExchangeMgr->GetReliableMessageMgr()->ClearRetransmitTable(&mReliableMessageContext);
+        mExchangeMgr->GetReliableMessageMgr()->ClearRetransTable(&mReliableMessageContext);
     }
 
     // Cancel the response timer.
@@ -389,7 +389,7 @@ CHIP_ERROR ExchangeContext::HandleMessage(const PacketHeader & packetHeader, con
 
         // An acknowledgment needs to be sent back to the peer for this message on this exchange,
         // Set the flag in message header indicating an ack requested by peer;
-        msgFlags.Set(MessageFlagValues::kMessageFlag_PeerRequestedAck);
+        msgFlags.Set(MessageFlagValues::kPeerRequestedAck);
 
         // Also set the flag in the exchange context indicating an ack requested;
         mReliableMessageContext.SetPeerRequestedAck(true);

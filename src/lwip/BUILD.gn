@@ -28,8 +28,8 @@ if (lwip_platform == "") {
 }
 
 assert(lwip_platform == "external" || lwip_platform == "standalone" ||
-           lwip_platform == "efr32" || lwip_platform == "k32w" ||
-           lwip_platform == "qpg6100",
+           lwip_platform == "cc13x2_26x2" || lwip_platform == "efr32" ||
+           lwip_platform == "k32w" || lwip_platform == "qpg6100",
        "Unsupported lwIP platform: ${lwip_platform}")
 
 if (lwip_platform != "external") {
@@ -39,7 +39,9 @@ if (lwip_platform != "external") {
   }
 }
 
-if (lwip_platform == "efr32") {
+if (lwip_platform == "cc13x2_26x2") {
+  import("//build_overrides/ti_simplelink_sdk.gni")
+} else if (lwip_platform == "efr32") {
   import("//build_overrides/efr32_sdk.gni")
 } else if (lwip_platform == "qpg6100") {
   import("//build_overrides/qpg6100_sdk.gni")
@@ -105,7 +107,9 @@ if (current_os == "zephyr") {
     }
 
     public_deps = [ ":lwip_buildconfig" ]
-    if (lwip_platform == "efr32") {
+    if (lwip_platform == "cc13x2_26x2") {
+      public_deps += [ "${ti_simplelink_sdk_build_root}:ti_simplelink_sdk" ]
+    } else if (lwip_platform == "efr32") {
       public_deps += [ "${efr32_sdk_build_root}:efr32_sdk" ]
     } else if (lwip_platform == "qpg6100") {
       public_deps += [ "${qpg6100_sdk_build_root}:qpg6100_sdk" ]

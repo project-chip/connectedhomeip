@@ -68,7 +68,7 @@ void DriveIO(void)
     int selectRes;
 
     sleepTime.tv_sec  = 0;
-    sleepTime.tv_usec = NETWORK_SLEEP_TIME_MSECS;
+    sleepTime.tv_usec = kNetworkSleepTimeMsecs;
 
     FD_ZERO(&readFDs);
     FD_ZERO(&writeFDs);
