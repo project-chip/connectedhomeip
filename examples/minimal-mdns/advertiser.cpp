@@ -46,6 +46,8 @@ struct Options
     uint16_t longDiscriminator = 840;
     Optional<uint16_t> vendorId;
     Optional<uint16_t> productId;
+
+    // commisionable params
     Optional<const char *> pairingInstr;
     Optional<uint8_t> pairingHint;
 
@@ -64,8 +66,8 @@ constexpr uint16_t kOptionCommisioningShordDiscriminator = 's';
 constexpr uint16_t kOptionCommisioningLongDiscriminaotr  = 'l';
 constexpr uint16_t kOptionCommisioningVendorId           = 0x100; // v is used by 'version'
 constexpr uint16_t kOptionCommisioningProductId          = 'p';
-constexpr uint16_t kOptionCommisioningPairingInstr       = 'I';
-constexpr uint16_t kOptionCommisioningPairingHint        = 'H';
+constexpr uint16_t kOptionCommisioningPairingInstr       = 0x200; // Just use the long format
+constexpr uint16_t kOptionCommisioningPairingHint        = 0x300;
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
@@ -78,15 +80,15 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         gOptions.enableIpV4 = true;
         return true;
     case kOptionAdvertisingMode:
-        if ((strcmp(aValue, "operational") == 0) || (strcmp(aValue, "o") == 0))
+        if (strcmp(aValue, "operational") == 0)
         {
             gOptions.advertisingMode = AdvertisingMode::kOperational;
         }
-        else if ((strcmp(aValue, "commisioning") == 0) || (strcmp(aValue, "c") == 0))
+        else if (strcmp(aValue, "commisioning") == 0)
         {
             gOptions.advertisingMode = AdvertisingMode::kCommisioning;
         }
-        else if ((strcmp(aValue, "commisionable") == 0) || (strcmp(aValue, "d") == 0))
+        else if (strcmp(aValue, "commisionable") == 0)
         {
             gOptions.advertisingMode = AdvertisingMode::kCommisionable;
         }
@@ -153,7 +155,7 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
 #endif
                              "  -m <mode>\n"
                              "  --advertising-mode <mode>\n"
-                             "        Advertise in this mode (o/operational or c/commisioning or d/commisionable).\n"
+                             "        Advertise in this mode (operational or commisioning or commisionable).\n"
                              "  --short-discriminator <value>\n"
                              "  -s <value>\n"
                              "        Commisioning/commisionable short discriminator.\n"
@@ -166,10 +168,8 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  -p <value>\n"
                              "        Commisioning/commisionable product id.\n"
                              "  --pairing-instruction <value>\n"
-                             "  -I <value>\n"
                              "        Commisionable pairing instruction.\n"
                              "  --pairing-hint <value>\n"
-                             "  -H <value>\n"
                              "        Commisionable pairing hint.\n"
                              "  --fabrid-id <value>\n"
                              "  -f <value>\n"

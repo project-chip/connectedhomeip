@@ -695,9 +695,8 @@ FullQName AdvertiserMinMdns::GetCommisionableTextEntries(const CommisionableAdve
     }
 
     char txtPairingInstrHint[128];
-    if (params.GetPairingHint().HasValue())
+    if (params.GetPairingInstr().HasValue() && params.GetPairingHint().HasValue())
     {
-        // sprintf(txtPairingInstrHint, "P=%d", params.GetPairingHint().Value());
         sprintf(txtPairingInstrHint, "P=%s+%d", params.GetPairingInstr().Value(), params.GetPairingHint().Value());
     }
 
