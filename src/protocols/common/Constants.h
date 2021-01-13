@@ -42,7 +42,7 @@ namespace Common {
 /**
  * Common Profile Message Types
  */
-enum class MsgType
+enum class MsgType : uint8_t
 {
     // Status Report contians operation results that a responder sends as a reply for requests sent from an initiator.
     StatusReport = 1

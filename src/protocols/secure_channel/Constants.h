@@ -42,7 +42,7 @@ namespace SecureChannel {
 /**
  * SecureChannel Protocol Message Types
  */
-enum class MsgType
+enum class MsgType : uint8_t
 {
     // Message Counter Synchronization Protocol Message Types
     MsgCounterSyncReq = 0x00,

@@ -41,7 +41,7 @@ namespace Echo {
 /**
  * Echo Protocol Message Types
  */
-enum class MsgType
+enum class MsgType : uint8_t
 {
     EchoRequest  = 1,
     EchoResponse = 2
