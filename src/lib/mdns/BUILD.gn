@@ -31,7 +31,7 @@ static_library("mdns") {
     "${chip_root}/src/platform",
   ]
 
-  sources = [ "Advertiser.h", ]
+  sources = [ "Advertiser.h" ]
 
   if (chip_mdns_advertiser == "none") {
     sources += [ "Advertiser_ImplNone.cpp" ]
