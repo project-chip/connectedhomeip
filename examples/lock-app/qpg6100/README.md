@@ -93,6 +93,7 @@ export QPG6100_SDK_ROOT=${HOME}/qpg-connectedhomeip
 
 ```
 cd ~/connectedhomeip/examples/lock-app/qpg6100
+source third_party/connectedhomeip/scripts/activate.sh
 gn gen out/debug
 ninja -C out/debug
 ```
