@@ -90,7 +90,7 @@ public:
      *         Other CHIP_ERROR codes as returned by the lower layers.
      *
      */
-    CHIP_ERROR SendEchoRequest(System::PacketBufferHandle payload);
+    CHIP_ERROR SendEchoRequest(System::PacketBufferHandle && payload);
 
 private:
     Messaging::ExchangeManager * mExchangeMgr = nullptr;
