@@ -68,6 +68,20 @@ if platform.system() == 'Darwin':
 elif sys.platform.startswith('linux'):
     from chip.ChipBluezMgr import BluezManager as BleManager
 
+# The exceptions for CHIP Device Controller CLI
+
+
+class ChipDevCtrlException(ChipExceptions.ChipStackException):
+    pass
+
+
+class ParsingError(ChipDevCtrlException):
+    def __init__(self, msg=None):
+        self.msg = "Parsing Error: " + msg
+
+    def __str__(self):
+        return self.msg
+
 
 def DecodeBase64Option(option, opt, value):
     try:
@@ -82,6 +96,34 @@ def DecodeHexIntOption(option, opt, value):
         return int(value, 16)
     except ValueError:
         raise OptionValueError("option %s: invalid value: %r" % (opt, value))
+
+
+def ParseEncodedString(value):
+    if value.find(":") < 0:
+        raise ParsingError(
+            "value should be encoded in encoding:encodedvalue format")
+    enc, encValue = value.split(":", 1)
+    if enc == "str":
+        return encValue.encode("utf-8") + b'\x00'
+    elif enc == "hex":
+        return bytes.fromhex(encValue)
+    raise ParsingError("only str and hex encoding is supported")
+
+
+def FormatZCLArguments(args, command):
+    commandArgs = {}
+    for kvPair in args:
+        if kvPair.find("=") < 0:
+            raise ParsingError("Argument should in key=value format")
+        key, value = kvPair.split("=", 1)
+        valueType = command.get(key, None)
+        if valueType == 'int':
+            commandArgs[key] = int(value)
+        elif valueType == 'str':
+            commandArgs[key] = value
+        elif valueType == 'bytes':
+            commandArgs[key] = ParseEncodedString(value)
+    return commandArgs
 
 
 class DeviceMgrCmd(Cmd):
@@ -431,43 +473,19 @@ class DeviceMgrCmd(Cmd):
                     else:
                         print("  <no arguments>")
             elif len(args) > 4:
-                commandArgs = {}
                 cluster = self.devCtrl.ZCLList().get(args[0], None)
                 if not cluster:
                     raise ChipExceptions.UnknownCluster(args[0])
                 command = cluster.get(args[1], None)
-                if not cluster:
+                if not command:
                     raise ChipExceptions.UnknownCommand(args[0], args[1])
-                for kvPair in args[5:]:
-                    if kvPair.find("=") < 0:
-                        print("Argument should in key=value format")
-                        return
-                    key, value = kvPair.split("=", 1)
-                    valueType = command.get(key, None)
-                    if valueType == 'int':
-                        commandArgs[key] = int(value)
-                    elif valueType == 'str':
-                        commandArgs[key] = value
-                    elif valueType == 'bytes':
-                        enc, encValue = value.split(":", 1)
-                        if enc == "str":
-                            commandArgs[key] = encValue.encode(
-                                "utf-8") + b'\x00'
-                        elif enc == "hex":
-                            commandArgs[key] = bytes.fromhex(encValue)
-                        else:
-                            print(
-                                "Unsupported encoding, supported encoding: str, hex")
-                            return
                 self.devCtrl.ZCLSend(args[0], args[1], int(
-                    args[2]), int(args[3]), int(args[4]), commandArgs)
+                    args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command))
             else:
                 self.do_help("zcl")
-                return
         except ChipExceptions.ChipStackException as ex:
             print("An exception occurred during process ZCL command:")
             print(str(ex))
-            return
 
     def do_setpairingwificredential(self, line):
         """
