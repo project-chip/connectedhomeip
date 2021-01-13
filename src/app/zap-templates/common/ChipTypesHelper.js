@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -15,24 +15,25 @@
  *    limitations under the License.
  */
 
-function atomicType(arg)
+function asBasicType(type)
 {
-  switch (arg.name) {
-  case 'node_id':
-    return 'chip::NodeId';
-  case 'endpoint_id':
-    return 'chip::EndpointId';
-  case 'group_id':
-    return 'chip::GroupId';
-  case 'attribute_id':
-    return 'chip::AttributeId';
-  case 'cluster_id':
-    return 'chip::ClusterId';
-  case 'ieee_address':
+  switch (type) {
+  case 'chip::CommandId':
+  case 'chip::EndpointId':
+    return 'uint8_t';
+  case 'chip::AttributeId':
+  case 'chip::ClusterId':
+  case 'chip::EventId':
+  case 'chip::GroupId':
+    return 'uint16_t';
+  case 'chip::NodeId':
     return 'uint64_t';
   default:
-    throw 'not overriding';
+    return type;
   }
 }
 
-exports.atomicType = atomicType
+//
+// Module exports
+//
+exports.asBasicType = asBasicType;
