@@ -475,9 +475,9 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
             sstream << service.mSubTypes[i] << "._sub." << type;
 
             VerifyOrExit(avahi_entry_group_add_service_subtype(mGroup, interface, ToAvahiProtocol(service.mAddressType),
-                                                              static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(),
-                                                              nullptr, sstream.str().c_str()) == 0,
-                        error = CHIP_ERROR_INTERNAL);
+                                                               static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(),
+                                                               nullptr, sstream.str().c_str()) == 0,
+                         error = CHIP_ERROR_INTERNAL);
         }
     }
     else

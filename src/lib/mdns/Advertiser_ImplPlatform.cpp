@@ -33,8 +33,8 @@ private:
     static void HandleMdnsInit(void * context, CHIP_ERROR initError);
 };
 
-
-AdvertiserPlatform::AdvertiserPlatform() {
+AdvertiserPlatform::AdvertiserPlatform()
+{
    CHIP_ERROR error = ChipMdnsInit(
 }
 
