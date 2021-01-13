@@ -388,7 +388,7 @@ void AppTask::FunctionHandler(AppEvent * aEvent)
             {
                 EFR32_LOG("Device is commissioned to a Thread network.");
             }
-#elif
+#else
             EFR32_LOG("Thread is not defined.");
 #endif
         }

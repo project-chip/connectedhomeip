@@ -55,9 +55,11 @@ class ThreadStackManagerImpl final : public ThreadStackManager,
 
     // Allow the generic implementation base classes to call helper methods on
     // this class.
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend Internal::GenericThreadStackManagerImpl_OpenThread<ThreadStackManagerImpl>;
     friend Internal::GenericThreadStackManagerImpl_OpenThread_LwIP<ThreadStackManagerImpl>;
     friend Internal::GenericThreadStackManagerImpl_FreeRTOS<ThreadStackManagerImpl>;
+#endif
 
     // Allow glue functions called by OpenThread to call helper methods on this
     // class.

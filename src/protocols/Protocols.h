@@ -47,6 +47,7 @@ enum CHIPProtocolId
     kProtocol_InteractionModel    = (kChipVendor_Common << 16) | 0x0005, // Interaction Model Protocol
     kProtocol_FabricProvisioning  = (kChipVendor_Common << 16) | 0x0006, // Fabric Provisioning Protocol
     kProtocol_ServiceProvisioning = (kChipVendor_Common << 16) | 0x0007, // Service Provisioning Protocol
+    kProtocol_OpCredentials       = (kChipVendor_Common << 16) | 0x0008, // Operational Credentials
 
     // Protocols reserved for internal protocol use
 

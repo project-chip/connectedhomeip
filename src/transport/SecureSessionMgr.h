@@ -38,11 +38,29 @@
 #include <transport/SecureSession.h>
 #include <transport/TransportMgr.h>
 #include <transport/raw/Base.h>
+#include <transport/raw/PeerAddress.h>
 #include <transport/raw/Tuple.h>
 
 namespace chip {
 
 class SecureSessionMgr;
+
+class SecureSessionHandle
+{
+public:
+    SecureSessionHandle() : mPeerNodeId(kAnyNodeId), mPeerKeyId(0) {}
+    SecureSessionHandle(NodeId peerNodeId, uint16_t peerKeyId) : mPeerNodeId(peerNodeId), mPeerKeyId(peerKeyId) {}
+
+    bool operator==(const SecureSessionHandle & that) const
+    {
+        return mPeerNodeId == that.mPeerNodeId && mPeerKeyId == that.mPeerKeyId;
+    }
+
+private:
+    friend class SecureSessionMgr;
+    NodeId mPeerNodeId;
+    uint16_t mPeerKeyId;
+};
 
 /**
  * @brief
@@ -66,6 +84,15 @@ public:
     }
 
     uint32_t GetMsgId() const { return mMsgId; }
+
+    /**
+     * Creates a copy of the data in this packet.
+     *
+     * Does NOT support chained buffers.
+     *
+     * @returns empty handle on allocation failure.
+     */
+    EncryptedPacketBufferHandle CloneData() { return EncryptedPacketBufferHandle(PacketBufferHandle::CloneData()); }
 
 private:
     // Allow SecureSessionMgr to assign or construct us from a PacketBufferHandle
@@ -99,13 +126,12 @@ public:
      *
      * @param packetHeader  The message header
      * @param payloadHeader The payload header
-     * @param state         The connection state
+     * @param session       The handle to the secure session
      * @param msgBuf        The received message
      * @param mgr           A pointer to the SecureSessionMgr
      */
     virtual void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                                   const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
-                                   SecureSessionMgr * mgr)
+                                   SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
     {}
 
     /**
@@ -122,19 +148,19 @@ public:
      * @brief
      *   Called when a new pairing is being established
      *
-     * @param state   connection state
+     * @param session The handle to the secure session
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
+    virtual void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) {}
 
     /**
      * @brief
      *   Called when a new connection is closing
      *
-     * @param state   connection state
+     * @param session The handle to the secure session
      * @param mgr     A pointer to the SecureSessionMgr
      */
-    virtual void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) {}
+    virtual void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) {}
 
     virtual ~SecureSessionMgrDelegate() {}
 };
@@ -154,10 +180,13 @@ public:
      *   returns success, the encrypted data that was sent, as well as various other information needed
      *   to retransmit it, will be stored in *bufferRetainSlot.
      */
-    CHIP_ERROR SendMessage(NodeId peerNodeId, System::PacketBufferHandle msgBuf);
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
+    CHIP_ERROR SendMessage(SecureSessionHandle session, System::PacketBufferHandle msgBuf);
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf,
                            EncryptedPacketBufferHandle * bufferRetainSlot = nullptr);
-    CHIP_ERROR SendMessage(EncryptedPacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot);
+    CHIP_ERROR SendEncryptedMessage(SecureSessionHandle session, EncryptedPacketBufferHandle msgBuf,
+                                    EncryptedPacketBufferHandle * bufferRetainSlot);
+
+    Transport::PeerConnectionState * GetPeerConnectionState(SecureSessionHandle session);
 
     /**
      * @brief
@@ -195,6 +224,14 @@ public:
      */
     CHIP_ERROR Init(NodeId localNodeId, System::Layer * systemLayer, TransportMgrBase * transportMgr);
 
+    /**
+     * @brief
+     *   Return the transport type of current connection to the node with id peerNodeId.
+     *   'Transport::Type::kUndefined' will be returned if the connection to the specified
+     *   peer node does not exist.
+     */
+    Transport::Type GetTransportType(NodeId peerNodeId);
+
 protected:
     /**
      * @brief
@@ -217,6 +254,12 @@ private:
         kInitialized, /**< State when the object is ready connect to other peers. */
     };
 
+    enum class EncryptionState
+    {
+        kPayloadIsEncrypted,
+        kPayloadIsUnencrypted,
+    };
+
     System::Layer * mSystemLayer = nullptr;
     NodeId mLocalNodeId;                                                                // < Id of the current node
     Transport::PeerConnections<CHIP_CONFIG_PEER_CONNECTION_POOL_SIZE> mPeerConnections; // < Active connections to other peers
@@ -225,8 +268,12 @@ private:
     SecureSessionMgrDelegate * mCB   = nullptr;
     TransportMgrBase * mTransportMgr = nullptr;
 
-    CHIP_ERROR SendMessage(PayloadHeader & payloadHeader, NodeId peerNodeId, System::PacketBufferHandle msgBuf,
-                           EncryptedPacketBufferHandle * bufferRetainSlot, bool isEncrypted);
+    CHIP_ERROR EncryptPayload(Transport::PeerConnectionState * state, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                              System::PacketBufferHandle & msgBuf);
+
+    CHIP_ERROR SendMessage(SecureSessionHandle session, PayloadHeader & payloadHeader, PacketHeader & packetHeader,
+                           System::PacketBufferHandle msgBuf, EncryptedPacketBufferHandle * bufferRetainSlot,
+                           EncryptionState encryptionState);
 
     /** Schedules a new oneshot timer for checking connection expiry. */
     void ScheduleExpiryTimer();

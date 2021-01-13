@@ -119,8 +119,6 @@ public:
     ~ReliableMessageDelegateObject() override {}
 
     /* Application callbacks */
-    void OnThrottleRcvd(uint32_t pauseTime) override {}
-    void OnDelayedDeliveryRcvd(uint32_t pauseTime) override {}
     void OnSendError(CHIP_ERROR err) override { SendErrorCalled = true; }
     void OnAckRcvd() override {}
 
@@ -148,7 +146,8 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockAppDelegate;
 
-    ExchangeContext * exchange = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
+    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    ExchangeContext * exchange = exchangeMgr.NewContext({ kDestinationNodeId, kAnyKeyId }, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
@@ -160,7 +159,7 @@ void CheckAddClearRetrans(nlTestSuite * inSuite, void * inContext)
 
     rm->AddToRetransTable(rc, &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
-    rm->ClearRetransmitTable(*entry);
+    rm->ClearRetransTable(*entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
 }
 
@@ -185,7 +184,8 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockAppDelegate;
 
-    ExchangeContext * exchange = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
+    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    ExchangeContext * exchange = exchangeMgr.NewContext({ kDestinationNodeId, kAnyKeyId }, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
@@ -199,7 +199,7 @@ void CheckFailRetrans(nlTestSuite * inSuite, void * inContext)
     rm->AddToRetransTable(rc, &entry);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 1);
     NL_TEST_ASSERT(inSuite, !delegate.SendErrorCalled);
-    rm->FailRetransmitTableEntries(rc, CHIP_NO_ERROR);
+    rm->FailRetransTableEntries(rc, CHIP_NO_ERROR);
     NL_TEST_ASSERT(inSuite, rm->TestGetCountRetransTable() == 0);
     NL_TEST_ASSERT(inSuite, delegate.SendErrorCalled);
 }
@@ -246,7 +246,8 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockSender;
 
-    ExchangeContext * exchange = exchangeMgr.NewContext(kDestinationNodeId, &mockSender);
+    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    ExchangeContext * exchange = exchangeMgr.NewContext({ kDestinationNodeId, kAnyKeyId }, &mockSender);
     NL_TEST_ASSERT(inSuite, exchange != nullptr);
 
     ReliableMessageManager * rm = exchangeMgr.GetReliableMessageMgr();
@@ -264,7 +265,7 @@ void CheckResendMessage(nlTestSuite * inSuite, void * inContext)
     gSendMessageCount = 0;
 
     err = exchange->SendMessage(kProtocol_Echo, kEchoMessageType_EchoRequest, std::move(buffer),
-                                Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
+                                Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     // 1 tick is 64 ms, sleep 65 ms to trigger first re-transmit

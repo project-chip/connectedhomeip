@@ -22,7 +22,7 @@
 #import "CHIPDevice_Internal.h"
 #import "CHIPOnOff.h"
 
-#include <controller/OnOffCluster.h>
+#include <controller/CHIPClusters.h>
 
 @interface CHIPOnOff ()
 

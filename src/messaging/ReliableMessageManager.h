@@ -80,13 +80,13 @@ public:
 
     CHIP_ERROR AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry);
     void StartRetransmision(RetransTableEntry * entry);
-    void PauseRetransTable(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
-    void ResumeRetransTable(ReliableMessageContext * rc);
+    void PauseRetransmision(ReliableMessageContext * rc, uint32_t PauseTimeMillis);
+    void ResumeRetransmision(ReliableMessageContext * rc);
     bool CheckAndRemRetransTable(ReliableMessageContext * rc, uint32_t msgId);
     CHIP_ERROR SendFromRetransTable(RetransTableEntry * entry);
-    void ClearRetransmitTable(ReliableMessageContext * rc);
-    void ClearRetransmitTable(RetransTableEntry & rEntry);
-    void FailRetransmitTableEntries(ReliableMessageContext * rc, CHIP_ERROR err);
+    void ClearRetransTable(ReliableMessageContext * rc);
+    void ClearRetransTable(RetransTableEntry & rEntry);
+    void FailRetransTableEntries(ReliableMessageContext * rc, CHIP_ERROR err);
 
     void StartTimer();
     void StopTimer();
@@ -117,7 +117,7 @@ private:
     void TicklessDebugDumpRetransTable(const char * log);
 
     // ReliableMessageProtocol Global tables for timer context
-    RetransTableEntry RetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
+    RetransTableEntry mRetransTable[CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE];
 };
 
 } // namespace Messaging

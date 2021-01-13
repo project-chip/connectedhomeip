@@ -40,7 +40,25 @@ public:
 
     constexpr Optional(const Optional & other) = default;
     constexpr Optional(Optional && other)      = default;
-    Optional & operator=(const Optional & other) = default;
+
+    /**
+     * Assignment operator implementation.
+     *
+     * NOTE: Manually implemented instead of =default  since other::mValue may not be initialized
+     * if it has no value.
+     */
+    Optional & operator=(const Optional & other)
+    {
+        if (other.HasValue())
+        {
+            SetValue(other.Value());
+        }
+        else
+        {
+            ClearValue();
+        }
+        return *this;
+    }
 
     /** Make the optional contain a specific value */
     void SetValue(const T & value)

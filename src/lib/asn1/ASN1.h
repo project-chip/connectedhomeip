@@ -208,7 +208,7 @@ ASN1_ERROR DumpASN1(ASN1Reader & reader, const char * prefix, const char * inden
 
 inline OID GetOID(OIDCategory category, uint8_t id)
 {
-    return (category | id);
+    return static_cast<OID>(category | id);
 }
 
 inline uint8_t GetOIDEnum(OID oid)

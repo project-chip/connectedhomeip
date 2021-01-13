@@ -403,7 +403,10 @@ inline void chipDie(void)
 
 #endif // defined(__cplusplus) && (__cplusplus >= 201103L)
 
-#if defined(__GNUC__) && (__GNUC__ >= 4)
+#if defined(__cplusplus) &&                                                                                                        \
+    ((__cplusplus >= 201703L) || (defined(__GNUC__) && (__GNUC__ >= 7)) || (defined(__clang__)) && (__clang_major__ >= 4))
+#define CHECK_RETURN_VALUE [[nodiscard]]
+#elif defined(__GNUC__) && (__GNUC__ >= 4)
 #define CHECK_RETURN_VALUE __attribute__((warn_unused_result))
 #elif defined(_MSC_VER) && (_MSC_VER >= 1700)
 #define CHECK_RETURN_VALUE _Check_return_

@@ -25,6 +25,7 @@ source_set("all-clusters-common") {
   sources = [
     "${chip_root}/src/app/clusters/barrier-control-server/barrier-control-server.cpp",
     "${chip_root}/src/app/clusters/basic/basic.cpp",
+    "${chip_root}/src/app/clusters/bindings/bindings.cpp",
     "${chip_root}/src/app/clusters/color-control-server/color-control-server.cpp",
     "${chip_root}/src/app/clusters/door-lock-client/door-lock-client.cpp",
     "${chip_root}/src/app/clusters/door-lock-server/door-lock-server-core.cpp",

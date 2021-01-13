@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2019 Google LLC.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -27,6 +27,8 @@
 // #if CHIP_DEVICE_CONFIG_ENABLE_SOFTWARE_UPDATE_MANAGER
 
 #include <platform/SoftwareUpdateManager.h>
+
+#include <system/SystemPacketBuffer.h>
 
 namespace chip {
 namespace DeviceLayer {
@@ -82,7 +84,7 @@ private:
     void CheckImageIntegrity();
     void DriveState(SoftwareUpdateManager::State aNextState);
     void GetEventState(int32_t & aEventState);
-    void HandleImageQueryResponse(PacketBuffer * aPayload);
+    void HandleImageQueryResponse(chip::System::PacketBuffer * aPayload);
     void SendQuery();
     void StartImageInstall();
     void PrepareImageStorage();
@@ -107,7 +109,7 @@ private:
     SoftwareUpdateManager::EventCallback mEventHandlerCallback;
     SoftwareUpdateManager::RetryPolicyCallback mRetryPolicyCallback;
 
-    PacketBuffer * mImageQueryPacketBuffer;
+    chip::System::PacketBuffer * mImageQueryPacketBuffer;
 
     bool mScheduledCheckEnabled;
     bool mShouldRetry;
