@@ -71,8 +71,8 @@ constexpr uint16_t kOptionCommisioningLongDiscriminaotr  = 'l';
 constexpr uint16_t kOptionCommisioningVendorId           = 0x100; // v is used by 'version'
 constexpr uint16_t kOptionCommisioningProductId          = 'p';
 #if CHIP_ENABLE_COMMISIONABLE_DISCOVERY
-constexpr uint16_t kOptionCommisioningPairingInstr       = 0x200; // Just use the long format
-constexpr uint16_t kOptionCommisioningPairingHint        = 0x300;
+constexpr uint16_t kOptionCommisioningPairingInstr = 0x200; // Just use the long format
+constexpr uint16_t kOptionCommisioningPairingHint  = 0x300;
 #endif
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
