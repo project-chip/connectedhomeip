@@ -33,7 +33,9 @@ enum class AdvertisingMode
 {
     kCommisioning,
     kOperational,
+#if CHIP_ENABLE_COMMISIONABLE_DISCOVERY
     kCommisionable,
+#endif
 };
 
 struct Options
@@ -47,9 +49,11 @@ struct Options
     Optional<uint16_t> vendorId;
     Optional<uint16_t> productId;
 
+#if CHIP_ENABLE_COMMISIONABLE_DISCOVERY
     // commisionable params
     Optional<const char *> pairingInstr;
     Optional<uint8_t> pairingHint;
+#endif
 
     // operational params
     uint64_t fabricId = 12345;
@@ -66,8 +70,10 @@ constexpr uint16_t kOptionCommisioningShordDiscriminator = 's';
 constexpr uint16_t kOptionCommisioningLongDiscriminaotr  = 'l';
 constexpr uint16_t kOptionCommisioningVendorId           = 0x100; // v is used by 'version'
 constexpr uint16_t kOptionCommisioningProductId          = 'p';
+#if CHIP_ENABLE_COMMISIONABLE_DISCOVERY
 constexpr uint16_t kOptionCommisioningPairingInstr       = 0x200; // Just use the long format
 constexpr uint16_t kOptionCommisioningPairingHint        = 0x300;
+#endif
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
@@ -90,7 +96,12 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
         }
         else if (strcmp(aValue, "commisionable") == 0)
         {
+#if CHIP_ENABLE_COMMISIONABLE_DISCOVERY
             gOptions.advertisingMode = AdvertisingMode::kCommisionable;
+#else
+            PrintArgError("%s: Advertising mode %s is disabled\n", aProgram, aValue);
+            return false;
+#endif
         }
         else
         {
@@ -111,12 +122,14 @@ bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier,
     case kOptionCommisioningProductId:
         gOptions.productId = Optional<uint16_t>::Value(static_cast<uint16_t>(atoi(aValue)));
         return true;
+#if CHIP_ENABLE_COMMISIONABLE_DISCOVERY
     case kOptionCommisioningPairingInstr:
         gOptions.pairingInstr = Optional<const char *>::Value(static_cast<const char *>(aValue));
         return true;
     case kOptionCommisioningPairingHint:
         gOptions.pairingHint = Optional<uint8_t>::Value(static_cast<uint8_t>(atoi(aValue)));
         return true;
+#endif
     case kOptionOperationalFabricId:
         gOptions.fabricId = atoll(aValue);
         return true;
@@ -139,8 +152,10 @@ OptionDef cmdLineOptionsDef[] = {
     { "long-discriminator", kArgumentRequired, kOptionCommisioningLongDiscriminaotr },
     { "vendor-id", kArgumentRequired, kOptionCommisioningVendorId },
     { "product-id", kArgumentRequired, kOptionCommisioningProductId },
+#if CHIP_ENABLE_COMMISIONABLE_DISCOVERY
     { "pairing-instruction", kArgumentRequired, kOptionCommisioningPairingInstr },
     { "pairing-hint", kArgumentRequired, kOptionCommisioningPairingHint },
+#endif
 
     { "fabrid-id", kArgumentRequired, kOptionOperationalFabricId },
     { "node-id", kArgumentRequired, kOptionOperationalNodeId },
@@ -167,10 +182,12 @@ OptionSet cmdLineOptions = { HandleOptions, cmdLineOptionsDef, "PROGRAM OPTIONS"
                              "  --product-id <value>\n"
                              "  -p <value>\n"
                              "        Commisioning/commisionable product id.\n"
+#if CHIP_ENABLE_COMMISIONABLE_DISCOVERY
                              "  --pairing-instruction <value>\n"
                              "        Commisionable pairing instruction.\n"
                              "  --pairing-hint <value>\n"
                              "        Commisionable pairing hint.\n"
+#endif
                              "  --fabrid-id <value>\n"
                              "  -f <value>\n"
                              "        Operational fabric id.\n"
@@ -230,6 +247,7 @@ int main(int argc, char ** args)
                                                                       .SetFabricId(gOptions.fabricId)
                                                                       .SetNodeId(gOptions.nodeId));
     }
+#if CHIP_ENABLE_COMMISIONABLE_DISCOVERY
     else if (gOptions.advertisingMode == AdvertisingMode::kCommisionable)
     {
         err = chip::Mdns::ServiceAdvertiser::Instance().Advertise(chip::Mdns::CommisionableAdvertisingParameters()
@@ -242,6 +260,7 @@ int main(int argc, char ** args)
                                                                       .SetPairingInstr(gOptions.pairingInstr)
                                                                       .SetPairingHint(gOptions.pairingHint));
     }
+#endif
     else
     {
         fprintf(stderr, "FAILED to determine advertising type.\n");
