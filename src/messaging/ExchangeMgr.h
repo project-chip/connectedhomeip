@@ -156,21 +156,16 @@ public:
     ChannelHandle EstablishChannel(const ChannelBuilder & builder, ChannelDelegate * delegate);
 
     // Internal APIs used for channel
-    void ReleaseChannelContext(ChannelContext * channel)
-    {
-        mChannelContexts.ReleaseObject(channel);
-    }
+    void ReleaseChannelContext(ChannelContext * channel) { mChannelContexts.ReleaseObject(channel); }
 
-    void ReleaseChannelHandle(ChannelContextHandleAssociation * association)
-    {
-        mChannelHandles.ReleaseObject(association);
-    }
+    void ReleaseChannelHandle(ChannelContextHandleAssociation * association) { mChannelHandles.ReleaseObject(association); }
 
-    template<typename Event>
+    template <typename Event>
     void NotifyChannelEvent(ChannelContext * channel, Event event)
     {
         mChannelHandles.ForEachActiveObject([&](ChannelContextHandleAssociation * association) {
-            if (association->mChannelContext == channel) event(association->mChannelDelegate);
+            if (association->mChannelContext == channel)
+                event(association->mChannelDelegate);
             return true;
         });
     }
@@ -201,7 +196,7 @@ private:
         int16_t MessageType;
     };
 
-    NodeId mLocalNodeId;                                                                // < Id of the current node
+    NodeId mLocalNodeId; // < Id of the current node
     uint16_t mNextExchangeId;
     uint16_t mNextPaseKeyId;
     State mState;

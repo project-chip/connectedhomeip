@@ -43,7 +43,8 @@ public:
 class ChannelContext : public ReferenceCounted<ChannelContext, ChannelContextDeletor>, public SecurePairingSessionDelegate
 {
 public:
-    ChannelContext(ExchangeManager * exchangeManager) : mState(ChannelState::kChanneState_None), mExchangeManager(exchangeManager) {}
+    ChannelContext(ExchangeManager * exchangeManager) : mState(ChannelState::kChanneState_None), mExchangeManager(exchangeManager)
+    {}
 
     void Start(const ChannelBuilder & builder);
     ExchangeContext * NewExchange(ExchangeDelegate * delegate);
@@ -60,7 +61,8 @@ public:
     void OnNewConnection(SecureSessionHandle session);
     void OnConnectionExpired(SecureSessionHandle session);
 
-    CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress, System::PacketBufferHandle msgIn) override;
+    CHIP_ERROR SendPairingMessage(const PacketHeader & header, const Transport::PeerAddress & peerAddress,
+                                  System::PacketBufferHandle msgIn) override;
     void OnPairingError(CHIP_ERROR error) override;
     void OnPairingComplete() override;
 
@@ -71,7 +73,8 @@ private:
     ChannelState mState;
     ExchangeManager * mExchangeManager;
 
-    enum PrepareState {
+    enum PrepareState
+    {
         kPrepareState_WaitingForInterface,
         kPrepareState_AddressResolving,
         kPrepareState_PaseParing,
@@ -79,9 +82,11 @@ private:
         kPrepareState_CaseParing,
     };
 
-    union {
+    union
+    {
         // mPreparing is pretty big, consider move it outside
-        struct {
+        struct
+        {
             PrepareState mState;
             Inet::InterfaceId mInterface;
             Inet::IPAddressType mAddressType;
@@ -89,7 +94,8 @@ private:
             SecurePairingSession * mPairingSession;
             ChannelBuilder mBuilder;
         } mPreparing;
-        struct {
+        struct
+        {
             Inet::InterfaceId mInterface;
             SecureSessionHandle mSession;
         } mReady;
@@ -114,18 +120,22 @@ private:
     void EnterPaseParingState();
     void ExitPaseParingState();
 
-    void EnterCaseParingState() { /* not implemented */ }
-    void ExitCaseParingState() { /* not implemented */ }
-
+    void EnterCaseParingState()
+    { /* not implemented */
+    }
+    void ExitCaseParingState()
+    { /* not implemented */
+    }
 };
 
 class ChannelContextHandleAssociation
 {
 public:
     ChannelContextHandleAssociation(ChannelContext * channelContext, ChannelDelegate * channelDelegate) :
-        mChannelContext(channelContext), mChannelDelegate(channelDelegate) {
-            mChannelContext->Retain();
-        }
+        mChannelContext(channelContext), mChannelDelegate(channelDelegate)
+    {
+        mChannelContext->Retain();
+    }
     ~ChannelContextHandleAssociation() { mChannelContext->Release(); }
 
 private:

@@ -119,26 +119,34 @@ public:
     SessionType GetSessionType() const { return mSessionType; }
 
     uint16_t GetPeerKeyID() const { return mCaseParameters.mPeerKeyId; }
-    ChannelBuilder & SetPeerKeyID(uint16_t keyId) {
-        if (mSessionType == SessionType::kSession_CASE) mCaseParameters.mPeerKeyId = keyId;
+    ChannelBuilder & SetPeerKeyID(uint16_t keyId)
+    {
+        if (mSessionType == SessionType::kSession_CASE)
+            mCaseParameters.mPeerKeyId = keyId;
         return *this;
     }
 
     uint32_t GetPeerSetUpPINCode() const { return mPaseParameters.mPeerSetUpPINCode; }
-    ChannelBuilder & SetPeerSetUpPINCode(uint32_t peerPINCode) {
-        if (mSessionType == SessionType::kSession_PASE) mPaseParameters.mPeerSetUpPINCode = peerPINCode;
+    ChannelBuilder & SetPeerSetUpPINCode(uint32_t peerPINCode)
+    {
+        if (mSessionType == SessionType::kSession_PASE)
+            mPaseParameters.mPeerSetUpPINCode = peerPINCode;
         return *this;
     }
+
 private:
     NodeId mPeerNodeId                       = kUndefinedNodeId;
     NetworkPreference mNetworkPreference     = NetworkPreference::kNetwork_Default;
     TransportPreference mTransportPreference = TransportPreference::kTransport_Default;
     SessionType mSessionType                 = SessionType::kSession_Default;
-    union {
-        struct {
+    union
+    {
+        struct
+        {
             uint16_t mPeerKeyId;
         } mCaseParameters;
-        struct {
+        struct
+        {
             uint32_t mPeerSetUpPINCode;
         } mPaseParameters;
     };

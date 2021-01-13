@@ -36,7 +36,10 @@ template <class T, size_t N>
 size_t GetNumObjectsInUse(BitMapObjectPool<T, N> & pool)
 {
     size_t count = 0;
-    pool.ForEachActiveObject([&count](void *) { ++count; return true; });
+    pool.ForEachActiveObject([&count](void *) {
+        ++count;
+        return true;
+    });
     return count;
 }
 

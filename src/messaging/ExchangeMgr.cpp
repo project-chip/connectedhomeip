@@ -69,12 +69,12 @@ CHIP_ERROR ExchangeManager::Init(NodeId localNodeId, TransportMgrBase * transpor
     if (mState != State::kState_NotInitialized)
         return CHIP_ERROR_INCORRECT_STATE;
 
-    mLocalNodeId = localNodeId;
+    mLocalNodeId  = localNodeId;
     mTransportMgr = transportMgr;
-    mSessionMgr = sessionMgr;
+    mSessionMgr   = sessionMgr;
 
     mNextExchangeId = GetRandU16();
-    mNextPaseKeyId = 0;
+    mNextPaseKeyId  = 0;
 
     mContextsInUse = 0;
 
@@ -301,7 +301,7 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
     ChannelContext * channelContext = nullptr;
 
     // Find an existing Channel matching the builder
-    mChannelContexts.ForEachActiveObject([&](ChannelContext* context) {
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
         if (context->MatchesBuilder(builder, mSessionMgr))
         {
             channelContext = context;
@@ -314,7 +314,8 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
     {
         // create a new channel if not found
         channelContext = mChannelContexts.CreateObject(this);
-        if (channelContext == nullptr) return ChannelHandle{nullptr};
+        if (channelContext == nullptr)
+            return ChannelHandle{ nullptr };
         channelContext->Start(builder);
     }
     else
@@ -324,7 +325,7 @@ ChannelHandle ExchangeManager::EstablishChannel(const ChannelBuilder & builder, 
 
     auto association = mChannelHandles.CreateObject(channelContext, delegate);
     channelContext->Release();
-    return ChannelHandle{association};
+    return ChannelHandle{ association };
 }
 
 void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
@@ -335,7 +336,7 @@ void ExchangeManager::OnMessageReceived(const PacketHeader & packetHeader, const
 
 void ExchangeManager::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
-    mChannelContexts.ForEachActiveObject([&](ChannelContext* context) {
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
         if (context->MatchesSession(session, mgr))
         {
             context->OnNewConnection(session);
@@ -356,7 +357,7 @@ void ExchangeManager::OnConnectionExpired(SecureSessionHandle session, SecureSes
         }
     }
 
-    mChannelContexts.ForEachActiveObject([&](ChannelContext* context) {
+    mChannelContexts.ForEachActiveObject([&](ChannelContext * context) {
         if (context->MatchesSession(session, mgr))
         {
             context->OnConnectionExpired(session);

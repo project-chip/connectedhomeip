@@ -136,11 +136,13 @@ public:
             {
                 if ((value & (kBit1 << offset)) != 0)
                 {
-                    if (!f(static_cast<T*>(At(word * kBitChunkSize + offset)))) return;
+                    if (!f(static_cast<T *>(At(word * kBitChunkSize + offset))))
+                        return;
                 }
             }
         }
     }
+
 private:
     std::atomic<tBitChunkType> mUsage[(N + kBitChunkSize - 1) / kBitChunkSize];
     alignas(alignof(T)) uint8_t mMemory[N * sizeof(T)];
