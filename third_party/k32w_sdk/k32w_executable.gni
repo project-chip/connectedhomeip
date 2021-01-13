@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/toolchain/flashable_executable.gni")
+import("${chip_root}/build/toolchain/flashable_executable.gni")
 
 template("k32w_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")

@@ -12,9 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/config/linux/pkg_config.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nlio.gni")
+
+import("${chip_root}/build/config/linux/pkg_config.gni")
 
 import("${chip_root}/build/chip/buildconfig_header.gni")
 
@@ -22,7 +23,10 @@ import("device.gni")
 
 if (chip_enable_openthread) {
   import("//build_overrides/openthread.gni")
-  import("//build_overrides/ot_br_posix.gni")
+
+  if (chip_device_platform == "linux" || chip_device_platform == "Darwin") {
+    import("//build_overrides/ot_br_posix.gni")
+  }
 }
 
 if (chip_device_platform == "linux" && chip_enable_mdns) {

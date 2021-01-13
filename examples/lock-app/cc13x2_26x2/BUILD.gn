@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/config/defaults.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/openthread.gni")
 import("//build_overrides/ti_simplelink_sdk.gni")
+
+import("${chip_root}/build/config/defaults.gni")
+
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_executable.gni")
 import("${ti_simplelink_sdk_build_root}/ti_simplelink_sdk.gni")
 

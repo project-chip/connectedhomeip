@@ -14,7 +14,7 @@
 
 import("//build_overrides/chip.gni")
 
-import("//build/toolchain/arm_gcc/arm_toolchain.gni")
+import("${chip_root}/build/toolchain/arm_gcc/arm_toolchain.gni")
 
 arm_toolchain("efr32_lock_app") {
   toolchain_args = {

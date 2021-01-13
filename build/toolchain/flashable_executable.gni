@@ -37,7 +37,7 @@ template("objcopy_convert") {
       rebase_path(conversion_input, root_build_dir),
       rebase_path(conversion_output, root_build_dir),
     ]
-    script = "//build/gn_run_binary.py"
+    script = "${chip_root}/build/gn_run_binary.py"
   }
 }
 

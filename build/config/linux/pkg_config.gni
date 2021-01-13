@@ -47,6 +47,8 @@
 # when doing manual dynamic linking), set:
 #   ignore_libs = true
 
+import("//build_overrides/chip.gni")
+
 declare_args() {
   # A pkg-config wrapper to call instead of trying to find and call the right
   # pkg-config directly. Wrappers like this are common in cross-compilation
@@ -59,7 +61,7 @@ declare_args() {
   host_pkg_config = ""
 }
 
-pkg_config_script = "//build/config/linux/pkg-config.py"
+pkg_config_script = "${chip_root}/build/config/linux/pkg-config.py"
 
 # Define the args we pass to the pkg-config script for other build files that
 # need to invoke it manually.

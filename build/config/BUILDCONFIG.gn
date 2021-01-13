@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 declare_args() {
   # Debug build. Set this to false to remove development features.
   is_debug = true
@@ -32,16 +34,12 @@ if (current_os == "") {
   current_os = target_os
 }
 
-_chip_overrides = {
-  import("//build_overrides/chip.gni")
-}
-
 _pigweed_overrides = {
   import("//build_overrides/pigweed.gni")
 }
 
 _chip_defaults = {
-  import("//build/config/defaults.gni")
+  import("${chip_root}/build/config/defaults.gni")
 }
 
 declare_args() {
@@ -51,9 +49,9 @@ declare_args() {
 
 if (host_toolchain == "") {
   if (_chip_defaults.is_clang) {
-    host_toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_clang"
+    host_toolchain = "${chip_root}/build/toolchain/host:${host_os}_${host_cpu}_clang"
   } else {
-    host_toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_gcc"
+    host_toolchain = "${chip_root}/build/toolchain/host:${host_os}_${host_cpu}_gcc"
   }
 }
 
@@ -65,24 +63,24 @@ if (_chip_defaults.custom_toolchain != "") {
   _default_toolchain = "${_pigweed_overrides.dir_pw_toolchain}/dummy"
 } else if (target_os == "freertos") {
   if (target_cpu == "arm") {
-    _default_toolchain = "//build/toolchain/arm_gcc"
+    _default_toolchain = "${chip_root}/build/toolchain/arm_gcc"
   } else {
     assert(false, "Unsupported target_cpu: ${target_cpu}")
   }
 } else if (target_os == "android") {
   if (current_cpu == "arm") {
-    _default_toolchain = "//build/toolchain/android:android_arm"
+    _default_toolchain = "${chip_root}/build/toolchain/android:android_arm"
   } else if (current_cpu == "arm64") {
-    _default_toolchain = "//build/toolchain/android:android_arm64"
+    _default_toolchain = "${chip_root}/build/toolchain/android:android_arm64"
   } else if (current_cpu == "x64") {
-    _default_toolchain = "//build/toolchain/android:android_x64"
+    _default_toolchain = "${chip_root}/build/toolchain/android:android_x64"
   } else if (current_cpu == "x86") {
-    _default_toolchain = "//build/toolchain/android:android_x86"
+    _default_toolchain = "${chip_root}/build/toolchain/android:android_x86"
   } else {
     assert(false, "Unsupported target_cpu: ${current_cpu}")
   }
 } else if (target_os == "ios") {
-  _default_toolchain = "//build/toolchain/ios:ios_${target_cpu}"
+  _default_toolchain = "${chip_root}/build/toolchain/ios:ios_${target_cpu}"
 } else {
   assert(false, "No toolchain specified, please specify custom_toolchain")
 }

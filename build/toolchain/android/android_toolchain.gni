@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/config/android/config.gni")
-import("//build/toolchain/gcc_toolchain.gni")
+import("//build_overrides/chip.gni")
+
+import("${chip_root}/build/config/android/config.gni")
+import("${chip_root}/build/toolchain/gcc_toolchain.gni")
 
 template("android_clang_toolchain") {
   _invoker_toolchain_args = invoker.toolchain_args

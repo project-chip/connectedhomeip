@@ -178,13 +178,13 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
   if (enable_host_clang_build) {
     chip_build("host_clang") {
-      toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_clang"
+      toolchain = "${chip_root}/build/toolchain/host:${host_os}_${host_cpu}_clang"
     }
   }
 
   if (enable_host_gcc_build) {
     chip_build("host_gcc") {
-      toolchain = "//build/toolchain/host:${host_os}_${host_cpu}_gcc"
+      toolchain = "${chip_root}/build/toolchain/host:${host_os}_${host_cpu}_gcc"
     }
   }
 
@@ -196,19 +196,19 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
 
   if (enable_android_builds) {
     chip_build("android_arm") {
-      toolchain = "//build/toolchain/android:android_arm"
+      toolchain = "${chip_root}/build/toolchain/android:android_arm"
     }
 
     chip_build("android_arm64") {
-      toolchain = "//build/toolchain/android:android_arm64"
+      toolchain = "${chip_root}/build/toolchain/android:android_arm64"
     }
 
     chip_build("android_x64") {
-      toolchain = "//build/toolchain/android:android_x64"
+      toolchain = "${chip_root}/build/toolchain/android:android_x64"
     }
 
     chip_build("android_x86") {
-      toolchain = "//build/toolchain/android:android_x86"
+      toolchain = "${chip_root}/build/toolchain/android:android_x86"
     }
   }
 

@@ -14,7 +14,7 @@
 
 import("//build_overrides/chip.gni")
 
-import("//build/toolchain/gcc_toolchain.gni")
+import("${chip_root}/build/toolchain/gcc_toolchain.gni")
 
 gcc_toolchain("${host_os}_${host_cpu}_gcc_mbedtls") {
   toolchain_args = {

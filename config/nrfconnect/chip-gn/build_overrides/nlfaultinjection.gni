@@ -12,13 +12,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build_overrides/chip.gni")
+import("chip.gni")
 
-import("${chip_root}/build/toolchain/arm_gcc/arm_toolchain.gni")
-
-arm_toolchain("qpg6100_lock_app") {
-  toolchain_args = {
-    current_os = "freertos"
-    import("${chip_root}/examples/lock-app/qpg6100/args.gni")
-  }
+declare_args() {
+  # Root directory for nlfaultinjection.
+  nlfaultinjection_root = "${chip_root}/third_party/nlfaultinjection"
 }

@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
+
 if (current_cpu == "arm" || current_cpu == "arm64") {
   declare_args() {
     # Build file to import for ARM defaults.
@@ -20,7 +22,7 @@ if (current_cpu == "arm" || current_cpu == "arm64") {
 
   if (arm_platform_config == "") {
     if (current_os == "android") {
-      arm_platform_config = "//build/toolchain/android/android_arm.gni"
+      arm_platform_config = "${chip_root}/build/toolchain/android/android_arm.gni"
     }
   }
 
