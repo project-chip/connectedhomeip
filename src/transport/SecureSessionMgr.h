@@ -30,7 +30,6 @@
 #include <core/CHIPCore.h>
 #include <inet/IPAddress.h>
 #include <inet/IPEndPointBasis.h>
-#include <lib/mdns/DiscoveryManager.h>
 #include <support/CodeUtils.h>
 #include <support/DLLUtil.h>
 #include <transport/PeerConnections.h>
