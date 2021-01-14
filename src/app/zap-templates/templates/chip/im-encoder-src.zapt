@@ -58,6 +58,7 @@ CHIP_ERROR Encode{{asType name}}Command(chip::app::Command * ZCLcommand, chip::E
 
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
 {{#chip_server_cluster_commands}}
     ime->RegisterClusterCommandHandler(
         {{asCamelCased clusterName false}}::kClusterId,
@@ -70,6 +71,7 @@ void InitCluster(chip::app::InteractionModelEngine * ime)
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
 {{#chip_server_cluster_commands}}
     ime->DeregisterClusterCommandHandler(
         {{asCamelCased clusterName false}}::kClusterId,
@@ -85,6 +87,7 @@ void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 
 void InitClusters(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
 {{#chip_server_clusters}}
     {{asCamelCased name false}}::InitCluster(ime);
 {{/chip_server_clusters}}
@@ -92,6 +95,7 @@ void InitClusters(chip::app::InteractionModelEngine * ime)
 
 void ShutdownClusters(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
 {{#chip_server_clusters}}
     {{asCamelCased name false}}::ShutdownCluster(ime);
 {{/chip_server_clusters}}

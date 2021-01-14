@@ -92,6 +92,7 @@ CHIP_ERROR EncodeBarrierControlStopCommand(chip::app::Command * ZCLcommand, chip
 
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->RegisterClusterCommandHandler(BarrierControl::kClusterId, BarrierControl::kBarrierControlGoToPercentCommandId,
                                        Command::CommandRoleId::kCommandHandlerId, HandleBarrierControlGoToPercentCommandReceived);
     ime->RegisterClusterCommandHandler(BarrierControl::kClusterId, BarrierControl::kBarrierControlStopCommandId,
@@ -100,6 +101,7 @@ void InitCluster(chip::app::InteractionModelEngine * ime)
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->DeregisterClusterCommandHandler(BarrierControl::kClusterId, BarrierControl::kBarrierControlGoToPercentCommandId,
                                          Command::CommandRoleId::kCommandHandlerId);
     ime->DeregisterClusterCommandHandler(BarrierControl::kClusterId, BarrierControl::kBarrierControlStopCommandId,
@@ -144,12 +146,14 @@ CHIP_ERROR EncodeResetToFactoryDefaultsCommand(chip::app::Command * ZCLcommand, 
 
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->RegisterClusterCommandHandler(Basic::kClusterId, Basic::kResetToFactoryDefaultsCommandId,
                                        Command::CommandRoleId::kCommandHandlerId, HandleResetToFactoryDefaultsCommandReceived);
 }
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->DeregisterClusterCommandHandler(Basic::kClusterId, Basic::kResetToFactoryDefaultsCommandId,
                                          Command::CommandRoleId::kCommandHandlerId);
 }
@@ -668,6 +672,7 @@ CHIP_ERROR EncodeStopMoveStepCommand(chip::app::Command * ZCLcommand, chip::Endp
 
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveColorCommandId,
                                        Command::CommandRoleId::kCommandHandlerId, HandleMoveColorCommandReceived);
     ime->RegisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveColorTemperatureCommandId,
@@ -700,6 +705,7 @@ void InitCluster(chip::app::InteractionModelEngine * ime)
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveColorCommandId,
                                          Command::CommandRoleId::kCommandHandlerId);
     ime->DeregisterClusterCommandHandler(ColorControl::kClusterId, ColorControl::kMoveColorTemperatureCommandId,
@@ -1323,6 +1329,7 @@ CHIP_ERROR EncodeUnlockWithTimeoutCommand(chip::app::Command * ZCLcommand, chip:
 
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearAllPinsCommandId,
                                        Command::CommandRoleId::kCommandHandlerId, HandleClearAllPinsCommandReceived);
     ime->RegisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearAllRfidsCommandId,
@@ -1373,6 +1380,7 @@ void InitCluster(chip::app::InteractionModelEngine * ime)
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearAllPinsCommandId,
                                          Command::CommandRoleId::kCommandHandlerId);
     ime->DeregisterClusterCommandHandler(DoorLock::kClusterId, DoorLock::kClearAllRfidsCommandId,
@@ -1578,6 +1586,7 @@ CHIP_ERROR EncodeViewGroupCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->RegisterClusterCommandHandler(Groups::kClusterId, Groups::kAddGroupCommandId, Command::CommandRoleId::kCommandHandlerId,
                                        HandleAddGroupCommandReceived);
     ime->RegisterClusterCommandHandler(Groups::kClusterId, Groups::kAddGroupIfIdentifyingCommandId,
@@ -1594,6 +1603,7 @@ void InitCluster(chip::app::InteractionModelEngine * ime)
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->DeregisterClusterCommandHandler(Groups::kClusterId, Groups::kAddGroupCommandId, Command::CommandRoleId::kCommandHandlerId);
     ime->DeregisterClusterCommandHandler(Groups::kClusterId, Groups::kAddGroupIfIdentifyingCommandId,
                                          Command::CommandRoleId::kCommandHandlerId);
@@ -1625,9 +1635,15 @@ namespace IasZone {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-void InitCluster(chip::app::InteractionModelEngine * ime) {}
+void InitCluster(chip::app::InteractionModelEngine * ime)
+{
+    VerifyOrReturn(ime != nullptr);
+}
 
-void ShutdownCluster(chip::app::InteractionModelEngine * ime) {}
+void ShutdownCluster(chip::app::InteractionModelEngine * ime)
+{
+    VerifyOrReturn(ime != nullptr);
+}
 
 } // namespace IasZone
 
@@ -1688,6 +1704,7 @@ CHIP_ERROR EncodeIdentifyQueryCommand(chip::app::Command * ZCLcommand, chip::End
 
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->RegisterClusterCommandHandler(Identify::kClusterId, Identify::kIdentifyCommandId,
                                        Command::CommandRoleId::kCommandHandlerId, HandleIdentifyCommandReceived);
     ime->RegisterClusterCommandHandler(Identify::kClusterId, Identify::kIdentifyQueryCommandId,
@@ -1696,6 +1713,7 @@ void InitCluster(chip::app::InteractionModelEngine * ime)
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->DeregisterClusterCommandHandler(Identify::kClusterId, Identify::kIdentifyCommandId,
                                          Command::CommandRoleId::kCommandHandlerId);
     ime->DeregisterClusterCommandHandler(Identify::kClusterId, Identify::kIdentifyQueryCommandId,
@@ -1932,6 +1950,7 @@ CHIP_ERROR EncodeStopWithOnOffCommand(chip::app::Command * ZCLcommand, chip::End
 
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->RegisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveCommandId,
                                        Command::CommandRoleId::kCommandHandlerId, HandleMoveCommandReceived);
     ime->RegisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveToLevelCommandId,
@@ -1952,6 +1971,7 @@ void InitCluster(chip::app::InteractionModelEngine * ime)
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->DeregisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveCommandId,
                                          Command::CommandRoleId::kCommandHandlerId);
     ime->DeregisterClusterCommandHandler(LevelControl::kClusterId, LevelControl::kMoveToLevelCommandId,
@@ -2046,6 +2066,7 @@ CHIP_ERROR EncodeToggleCommand(chip::app::Command * ZCLcommand, chip::EndpointId
 
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->RegisterClusterCommandHandler(OnOff::kClusterId, OnOff::kOffCommandId, Command::CommandRoleId::kCommandHandlerId,
                                        HandleOffCommandReceived);
     ime->RegisterClusterCommandHandler(OnOff::kClusterId, OnOff::kOnCommandId, Command::CommandRoleId::kCommandHandlerId,
@@ -2056,6 +2077,7 @@ void InitCluster(chip::app::InteractionModelEngine * ime)
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->DeregisterClusterCommandHandler(OnOff::kClusterId, OnOff::kOffCommandId, Command::CommandRoleId::kCommandHandlerId);
     ime->DeregisterClusterCommandHandler(OnOff::kClusterId, OnOff::kOnCommandId, Command::CommandRoleId::kCommandHandlerId);
     ime->DeregisterClusterCommandHandler(OnOff::kClusterId, OnOff::kToggleCommandId, Command::CommandRoleId::kCommandHandlerId);
@@ -2265,6 +2287,7 @@ CHIP_ERROR EncodeViewSceneCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 
 void InitCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->RegisterClusterCommandHandler(Scenes::kClusterId, Scenes::kAddSceneCommandId, Command::CommandRoleId::kCommandHandlerId,
                                        HandleAddSceneCommandReceived);
     ime->RegisterClusterCommandHandler(Scenes::kClusterId, Scenes::kGetSceneMembershipCommandId,
@@ -2283,6 +2306,7 @@ void InitCluster(chip::app::InteractionModelEngine * ime)
 
 void ShutdownCluster(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     ime->DeregisterClusterCommandHandler(Scenes::kClusterId, Scenes::kAddSceneCommandId, Command::CommandRoleId::kCommandHandlerId);
     ime->DeregisterClusterCommandHandler(Scenes::kClusterId, Scenes::kGetSceneMembershipCommandId,
                                          Command::CommandRoleId::kCommandHandlerId);
@@ -2314,14 +2338,21 @@ namespace TemperatureMeasurement {
 | * ClusterRevision                                                   | 0xFFFD |
 \*----------------------------------------------------------------------------*/
 
-void InitCluster(chip::app::InteractionModelEngine * ime) {}
+void InitCluster(chip::app::InteractionModelEngine * ime)
+{
+    VerifyOrReturn(ime != nullptr);
+}
 
-void ShutdownCluster(chip::app::InteractionModelEngine * ime) {}
+void ShutdownCluster(chip::app::InteractionModelEngine * ime)
+{
+    VerifyOrReturn(ime != nullptr);
+}
 
 } // namespace TemperatureMeasurement
 
 void InitClusters(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     BarrierControl::InitCluster(ime);
     Basic::InitCluster(ime);
     ColorControl::InitCluster(ime);
@@ -2337,6 +2368,7 @@ void InitClusters(chip::app::InteractionModelEngine * ime)
 
 void ShutdownClusters(chip::app::InteractionModelEngine * ime)
 {
+    VerifyOrReturn(ime != nullptr);
     BarrierControl::ShutdownCluster(ime);
     Basic::ShutdownCluster(ime);
     ColorControl::ShutdownCluster(ime);
