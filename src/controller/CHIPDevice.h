@@ -58,15 +58,13 @@ class DLL_EXPORT Device
 public:
     Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected)
     {
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-        chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
-#endif
     }
     ~Device()
     {
-        if (mCommandSender)
+        if (mCommandSender != nullptr)
         {
             mCommandSender->Shutdown();
+            mCommandSender = nullptr;
         }
     }
 
