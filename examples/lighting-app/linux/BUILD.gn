@@ -31,7 +31,6 @@ config("includes") {
 executable("chip-tool-server") {
   sources = [
     "LightingManager.cpp",
-    "OnOffCluster.cpp",
     "Options.cpp",
     "include/LightingManager.h",
     "main.cpp",
