@@ -37,13 +37,14 @@
  * @param[in] flags    Pigweed logging flags, currently these are ignored.
  * @param[in] message  The printf style log string.
  */
-#define PW_LOG(level, flags, message, ...)                      \
-  do {                                                   \
-  if (level >= PW_LOG_LEVEL_INFO) {                             \
-    ::chip::Logging::Log(::chip::Logging::kLogModule_NotSpecified,  \
-                       (level <= PW_LOG_LEVEL_INFO)             \
-                           ? ::chip::Logging::kLogCategory_Detail \
-                           : ::chip::Logging::kLogCategory_Error, \
-                       message PW_COMMA_ARGS(__VA_ARGS__));     \
-  } \
-  } while (0)
+#define PW_LOG(level, flags, message, ...)                                                                                         \
+    do                                                                                                                             \
+    {                                                                                                                              \
+        if (level >= PW_LOG_LEVEL_INFO)                                                                                            \
+        {                                                                                                                          \
+            ::chip::Logging::Log(::chip::Logging::kLogModule_NotSpecified,                                                         \
+                                 (level <= PW_LOG_LEVEL_INFO) ? ::chip::Logging::kLogCategory_Detail                               \
+                                                              : ::chip::Logging::kLogCategory_Error,                               \
+                                 message PW_COMMA_ARGS(__VA_ARGS__));                                                              \
+        }                                                                                                                          \
+    } while (0)
