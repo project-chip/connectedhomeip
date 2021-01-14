@@ -59,6 +59,8 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_Init()
     SetFlag(mFlags, kFlag_OperationalDeviceCredentialsProvisioned,
             Impl()->ConfigValueExists(ImplClass::kConfigKey_OperationalDeviceCert));
 
+    mRotationPersistedCounter.Init(CHIP_DEVICE_CONFIG_ROTATION_COUNTER_NAME, CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH);
+
     return CHIP_NO_ERROR;
 }
 
@@ -660,6 +662,19 @@ template <class ImplClass>
 CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_StoreServiceConfig(const uint8_t * serviceConfig, size_t serviceConfigLen)
 {
     return Impl()->WriteConfigValueBin(ImplClass::kConfigKey_ServiceConfig, serviceConfig, serviceConfigLen);
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetRotationCounter(uint16_t & rotationCounter)
+{
+    rotationCounter = static_cast<uint16_t>(mRotationPersistedCounter.GetValue());
+    return CHIP_NO_ERROR;
+}
+
+template <class ImplClass>
+CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_IncrementRotationCounter()
+{
+    return mRotationPersistedCounter.Advance();
 }
 
 template <class ImplClass>

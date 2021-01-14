@@ -85,6 +85,7 @@ public:
     CHIP_ERROR GetFabricId(uint64_t & fabricId);
     CHIP_ERROR GetServiceConfig(uint8_t * buf, size_t bufSize, size_t & serviceConfigLen);
     CHIP_ERROR GetPairedAccountId(char * buf, size_t bufSize, size_t & accountIdLen);
+    CHIP_ERROR GetRotationCounter(uint16_t & rotationCounter);
 
     CHIP_ERROR StoreSerialNumber(const char * serialNum, size_t serialNumLen);
     CHIP_ERROR StorePrimaryWiFiMACAddress(const uint8_t * buf);
@@ -326,6 +327,11 @@ inline CHIP_ERROR ConfigurationManager::GetPairedAccountId(char * buf, size_t bu
     return static_cast<ImplClass *>(this)->_GetPairedAccountId(buf, bufSize, accountIdLen);
 }
 
+inline CHIP_ERROR ConfigurationManager::GetRotationCounter(uint16_t & rotationCouter)
+{
+    return static_cast<ImplClass *>(this)->_GetRotationCounter(rotationCouter);
+}
+
 inline CHIP_ERROR ConfigurationManager::StoreSerialNumber(const char * serialNum, size_t serialNumLen)
 {
     return static_cast<ImplClass *>(this)->_StoreSerialNumber(serialNum, serialNumLen);
@@ -481,6 +487,7 @@ inline bool ConfigurationManager::IsFullyProvisioned()
 inline void ConfigurationManager::InitiateFactoryReset()
 {
     static_cast<ImplClass *>(this)->_InitiateFactoryReset();
+    static_cast<ImplClass *>(this)->_IncrementRotationCounter();
 }
 
 #if !defined(NDEBUG)

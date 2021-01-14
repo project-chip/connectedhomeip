@@ -137,6 +137,16 @@
 #endif
 
 /**
+ * CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
+ *
+ * Enables the use of a hard-coded default serial number if none
+ * is found in Chip NV storage.
+ */
+#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
+#define CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER "DUMMY_SN"
+#endif
+
+/**
  * CHIP_DEVICE_CONFIG_DEVICE_PRODUCT_ID
  *
  * The unique id assigned by the device vendor to identify the product or device type.  This
@@ -161,6 +171,36 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION
 #define CHIP_DEVICE_CONFIG_DEFAULT_DEVICE_PRODUCT_REVISION 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_DEFAULT_ROTATION_COUNTER
+ *
+ * The default rotation counter assigned to the device or product by the device vendor.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_DEFAULT_ROTATION_COUNTER
+#define CHIP_DEVICE_CONFIG_DEFAULT_ROTATION_COUNTER 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH
+ *
+ * rotation counter epoch.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH
+#define CHIP_DEVICE_CONFIG_ROTATION_COUNTER_EPOCH 1
+#endif
+
+/**
+ * CHIP_DEVICE_CONFIG_ROTATION_COUNTER_NAME
+ *
+ * Rotation counter name.
+ *
+ */
+#ifndef CHIP_DEVICE_CONFIG_ROTATION_COUNTER_NAME
+#define CHIP_DEVICE_CONFIG_ROTATION_COUNTER_NAME "rotation-counter"
 #endif
 
 /**
@@ -936,13 +976,4 @@
  */
 #ifndef CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME
 #define CHIP_DEVICE_CONFIG_FIRMWARE_BUILD_TIME __TIME__
-#endif
-
-/**
- * CHIP_ROTATING_DEVICE_ID
- *
- * Sample Rotating Device Id.
- */
-#ifndef CHIP_ROTATING_DEVICE_ID
-#define CHIP_ROTATING_DEVICE_ID "1122334455667788"
 #endif

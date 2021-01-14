@@ -26,6 +26,7 @@
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
 #include "support/RandUtils.h"
+#include "setup_payload/AdditionalDataPayloadGenerator.h"
 
 #if CHIP_ENABLE_MDNS
 
@@ -164,9 +165,15 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
 #if CHIP_ENABLE_MDNS
     CHIP_ERROR error = CHIP_NO_ERROR;
     MdnsService service;
+    AdditionalDataPayloadGenerator additionDataPayloadGenerator;
     uint16_t discriminator;
     uint16_t vendorID;
     uint16_t productID;
+    char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
+    size_t serialNumberSize;
+    uint16_t rotationCounter;
+    std::string rotatingDeviceId;
+
     char discriminatorBuf[5];  // hex representation of 16-bit discriminator
     char vendorProductBuf[10]; // "FFFF+FFFF"
     // TODO: The text entry will be updated in the spec, update accordingly.
@@ -191,9 +198,19 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     entries[1].mDataSize = strnlen(discriminatorBuf, sizeof(vendorProductBuf));
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
+    // retrieve serial number
+    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    serialNumber[serialNumberSize] = '\0';
+
+    // retieve rotation counter
+    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetRotationCounter(rotationCounter));
+
+    // retrieve rotating device id
+    SuccessOrExit(error = additionDataPayloadGenerator.generateRotatingDeviceId(rotationCounter, std::string(serialNumber, serialNumberSize), rotatingDeviceId));
+
     // Rotating Device ID
-    entries[2].mData     = reinterpret_cast<const uint8_t *>(CHIP_ROTATING_DEVICE_ID);
-    entries[2].mDataSize = strnlen(CHIP_ROTATING_DEVICE_ID, sizeof(CHIP_ROTATING_DEVICE_ID));
+    entries[2].mData     = reinterpret_cast<const uint8_t *>(rotatingDeviceId.c_str());
+    entries[2].mDataSize = rotatingDeviceId.size();
 #endif
     service.mTextEntryies  = entries;
     service.mTextEntrySize = sizeof(entries) / sizeof(TextEntry);

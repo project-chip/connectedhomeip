@@ -48,11 +48,11 @@
  *          Provides Bluez dbus implementatioon for BLE
  */
 
-#include <AdditionalDataPayload.h>
 #include <ble/BleUUID.h>
 #include <ble/CHIPBleServiceData.h>
 #include <platform/CHIPDeviceLayer.h>
 #include <protocols/Protocols.h>
+#include <setup_payload/AdditionalDataPayloadGenerator.h>
 
 #if CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
 #include <errno.h>
@@ -67,7 +67,6 @@
 #include <support/CodeUtils.h>
 
 using namespace ::nl;
-using namespace chip::SetupPayload;
 using namespace chip::Protocols;
 
 namespace chip {
@@ -1276,24 +1275,24 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     // Construct the TLV for the additional data
     GVariant * cValue = nullptr;
     CHIP_ERROR err    = CHIP_NO_ERROR;
-    TLVWriter writer;
-    TLVWriter innerWriter;
     chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
     chip::System::PacketBuffer * buffer           = bufferHandle.Get_ForNow();
+    AdditionalDataPayloadGenerator additionDataPayloadGenerator;
 
-    writer.Init(buffer);
+    char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
+    size_t serialNumberSize;
+    uint16_t rotationCounter;
 
-    err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
+    // retrieve serial number
+    err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
+    SuccessOrExit(err);
+    serialNumber[serialNumberSize] = '\0';
+    // retieve rotation counter
+    err = ConfigurationMgr().GetRotationCounter(rotationCounter);
     SuccessOrExit(err);
 
-    // Adding the rotating device id to the TLV data
-    err = innerWriter.PutString(ContextTag(kRotatingDeviceIdTag), CHIP_ROTATING_DEVICE_ID);
+    err = additionDataPayloadGenerator.generateAdditionalDataPayload(rotationCounter, std::string(serialNumber, serialNumberSize), buffer);
     SuccessOrExit(err);
-
-    err = writer.CloseContainer(innerWriter);
-    SuccessOrExit(err);
-
-    writer.Finalize();
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), buffer->Start(), buffer->DataLength(), TRUE, g_free,
                                      g_memdup(buffer->Start(), buffer->DataLength()));
@@ -1638,7 +1637,9 @@ CHIP_ERROR ConfigureBluezAdv(BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEnd
     apEndpoint->mDuration         = aBleAdvConfig.mDuration;
     apEndpoint->mDuration         = aBleAdvConfig.mDuration;
 
+    ChipLogDetail(DeviceLayer, "Configuring BLEDEvice Id..........");
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(apEndpoint->mDeviceIdInfo);
+    ChipLogDetail(DeviceLayer, "Configuring BLEDEvice Id.........., err=%d", err);
     SuccessOrExit(err);
 
 exit:
