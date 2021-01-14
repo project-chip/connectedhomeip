@@ -23,6 +23,8 @@ chip_test_suite("tests") {
 
   sources = [
     "TestExchangeMgr.cpp",
+    "TestHelpers.cpp",
+    "TestHelpers.h",
     "TestMessagingLayer.h",
     "TestReliableMessageProtocol.cpp",
   ]
