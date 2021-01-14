@@ -57,7 +57,7 @@ using TestContext = chip::Test::MessagingContext;
 
 TestContext sContext;
 
-const char PAYLOAD[]                = "Hello!";
+const char PAYLOAD[] = "Hello!";
 
 int gSendMessageCount = 0;
 
