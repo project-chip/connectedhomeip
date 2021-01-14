@@ -42,7 +42,9 @@ class ConfigurationManagerImpl final : public ConfigurationManager,
 
     // Allow the GenericConfigurationManagerImpl base class to access helper methods and types
     // defined on this class.
+#ifndef DOXYGEN_SHOULD_SKIP_THIS
     friend class Internal::GenericConfigurationManagerImpl<ConfigurationManagerImpl>;
+#endif
 
 private:
     // ===== Members that implement the ConfigurationManager public interface.

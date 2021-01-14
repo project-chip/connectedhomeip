@@ -36,36 +36,36 @@
 namespace chip {
 namespace Messaging {
 
-ReliableMessageManager::RetransTableEntry::RetransTableEntry() :
-    rc(nullptr), msgBuf(nullptr), msgId(0), msgSendFlags(0), nextRetransTimeTick(0), sendCount(0)
-{}
+ReliableMessageManager::RetransTableEntry::RetransTableEntry() : rc(nullptr), nextRetransTimeTick(0), sendCount(0) {}
 
-ReliableMessageManager::ReliableMessageManager() :
-    mTimeStampBase(System::Timer::GetCurrentEpoch()), mCurrentTimerExpiry(0),
+ReliableMessageManager::ReliableMessageManager(std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> & contextPool) :
+    mContextPool(contextPool), mSystemLayer(nullptr), mSessionMgr(nullptr), mCurrentTimerExpiry(0),
     mTimerIntervalShift(CHIP_CONFIG_RMP_TIMER_DEFAULT_PERIOD_SHIFT)
 {}
 
 ReliableMessageManager::~ReliableMessageManager() {}
 
-void ReliableMessageManager::ProcessDelayedDeliveryMessage(ReliableMessageContext * rc, uint32_t PauseTimeMillis)
+void ReliableMessageManager::Init(chip::System::Layer * systemLayer, SecureSessionMgr * sessionMgr)
 {
-    // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
-    ExpireTicks();
+    mSystemLayer = systemLayer;
+    mSessionMgr  = sessionMgr;
 
-    // Go through the retrans table entries for that node and adjust the timer.
-    for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
+    mTimeStampBase      = System::Timer::GetCurrentEpoch();
+    mCurrentTimerExpiry = 0;
+}
+
+void ReliableMessageManager::Shutdown()
+{
+    mSystemLayer = nullptr;
+    mSessionMgr  = nullptr;
+
+    StopTimer();
+
+    // Clear the retransmit table
+    for (RetransTableEntry & rEntry : mRetransTable)
     {
-        // Exchcontext is the sentinel object to ascertain validity of the element
-        if (RetransTable[i].rc && RetransTable[i].rc == rc)
-        {
-            // Paustime is specified in milliseconds; Update retrans values
-            RetransTable[i].nextRetransTimeTick =
-                static_cast<uint16_t>(RetransTable[i].nextRetransTimeTick + (PauseTimeMillis >> mTimerIntervalShift));
-        } // exchContext
-    }     // for loop in table entry
-
-    // Schedule next physical wakeup
-    StartTimer();
+        ClearRetransTable(rEntry);
+    }
 }
 
 /**
@@ -99,10 +99,10 @@ void ReliableMessageManager::TicklessDebugDumpRetransTable(const char * log)
 
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        if (RetransTable[i].rc)
+        if (mRetransTable[i].rc)
         {
             ChipLogProgress(ExchangeManager, "EC:%04" PRIX16 " MsgId:%08" PRIX32 " NextRetransTimeCtr:%04" PRIX16,
-                            RetransTable[i].rc, RetransTable[i].msgId, RetransTable[i].nextRetransTimeTick);
+                            mRetransTable[i].rc, mRetransTable[i].msgId, mRetransTable[i].nextRetransTimeTick);
         }
     }
 }
@@ -132,57 +132,57 @@ void ReliableMessageManager::ExecuteActions()
 #if defined(RMP_TICKLESS_DEBUG)
                 ChipLogProgress(ExchangeManager, "ReliableMessageManager::ExecuteActions sending ACK");
 #endif
-                // Send the Ack in a Common::Null message
-                rc->SendCommonNullMessage();
+                // Send the Ack in a SecureChannel::StandaloneAck message
+                rc->SendStandaloneAckMessage();
                 rc->SetAckPending(false);
             }
         }
     });
 
-    TicklessDebugDumpRetransTable("ReliableMessageManager::ExecuteActions Dumping RetransTable entries before processing");
+    TicklessDebugDumpRetransTable("ReliableMessageManager::ExecuteActions Dumping mRetransTable entries before processing");
 
     // Retransmit / cancel anything in the retrans table whose retrans timeout
     // has expired
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        ReliableMessageContext * rc = RetransTable[i].rc;
+        ReliableMessageContext * rc = mRetransTable[i].rc;
         CHIP_ERROR err              = CHIP_NO_ERROR;
 
-        if (!rc || RetransTable[i].nextRetransTimeTick != 0)
+        if (!rc || mRetransTable[i].nextRetransTimeTick != 0)
             continue;
 
-        uint8_t sendCount = RetransTable[i].sendCount;
+        uint8_t sendCount = mRetransTable[i].sendCount;
 
         if (sendCount == rc->mConfig.mMaxRetrans)
         {
             err = CHIP_ERROR_MESSAGE_NOT_ACKNOWLEDGED;
 
             ChipLogError(ExchangeManager, "Failed to Send CHIP MsgId:%08" PRIX32 " sendCount: %" PRIu8 " max retries: %" PRIu8,
-                         RetransTable[i].msgId, sendCount, rc->mConfig.mMaxRetrans);
+                         mRetransTable[i].retainedBuf.GetMsgId(), sendCount, rc->mConfig.mMaxRetrans);
 
             // Remove from Table
-            ClearRetransmitTable(RetransTable[i]);
+            ClearRetransTable(mRetransTable[i]);
         }
 
         // Resend from Table (if the operation fails, the entry is cleared)
         if (err == CHIP_NO_ERROR)
-            err = SendFromRetransTable(&(RetransTable[i]));
+            err = SendFromRetransTable(&(mRetransTable[i]));
 
         if (err == CHIP_NO_ERROR)
         {
             // If the retransmission was successful, update the passive timer
-            RetransTable[i].nextRetransTimeTick = static_cast<uint16_t>(rc->GetCurrentRetransmitTimeoutTick());
+            mRetransTable[i].nextRetransTimeTick = static_cast<uint16_t>(rc->GetCurrentRetransmitTimeoutTick());
 #if !defined(NDEBUG)
-            ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", RetransTable[i].msgId,
-                            RetransTable[i].sendCount);
+            ChipLogProgress(ExchangeManager, "Retransmit MsgId:%08" PRIX32 " Send Cnt %d", mRetransTable[i].retainedBuf.GetMsgId(),
+                            mRetransTable[i].sendCount);
 #endif
         }
 
-        if (err != CHIP_NO_ERROR)
+        if (err != CHIP_NO_ERROR && rc->mDelegate)
             rc->mDelegate->OnSendError(err);
     }
 
-    TicklessDebugDumpRetransTable("ReliableMessageManager::ExecuteActions Dumping RetransTable entries after processing");
+    TicklessDebugDumpRetransTable("ReliableMessageManager::ExecuteActions Dumping mRetransTable entries after processing");
 }
 
 static void TickProceed(uint16_t & time, uint64_t ticks)
@@ -233,26 +233,16 @@ void ReliableMessageManager::ExpireTicks()
         }
     });
 
-    // Process Throttle Time
-    // Check Throttle timeout stored in EC to set/unset Throttle flag
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        ReliableMessageContext * rc = RetransTable[i].rc;
+        ReliableMessageContext * rc = mRetransTable[i].rc;
         if (rc)
         {
-            // Process Retransmit Table
-            // Decrement Throttle timeout by elapsed timeticks
-            TickProceed(rc->mThrottleTimeoutTick, deltaTicks);
-#if defined(RMP_TICKLESS_DEBUG)
-            ChipLogProgress(ExchangeManager, "ReliableMessageManager::ExpireTicks set mThrottleTimeoutTick to %u",
-                            RetransTable[i].nextRetransTimeTick);
-#endif
-
             // Decrement Retransmit timeout by elapsed timeticks
-            TickProceed(RetransTable[i].nextRetransTimeTick, deltaTicks);
+            TickProceed(mRetransTable[i].nextRetransTimeTick, deltaTicks);
 #if defined(RMP_TICKLESS_DEBUG)
             ChipLogProgress(ExchangeManager, "ReliableMessageManager::ExpireTicks set nextRetransTimeTick to %u",
-                            RetransTable[i].nextRetransTimeTick);
+                            mRetransTable[i].nextRetransTimeTick);
 #endif
         } // rc entry is allocated
     }
@@ -295,78 +285,81 @@ void ReliableMessageManager::Timeout(System::Layer * aSystemLayer, void * aAppSt
  *
  *  @param[in]    rc        A pointer to the ExchangeContext object.
  *
- *  @param[in]    msgBuf    A pointer to the message buffer holding the CHIP message to be retransmitted.
- *
- *  @param[in]    messageId The message identifier of the stored CHIP message.
- *
  *  @param[out]   rEntry    A pointer to a pointer of a retransmission table entry added into the table.
  *
  *  @retval  #CHIP_ERROR_RETRANS_TABLE_FULL If there is no empty slot left in the table for addition.
  *  @retval  #CHIP_NO_ERROR On success.
  *
  */
-CHIP_ERROR ReliableMessageManager::AddToRetransTable(ReliableMessageContext * rc, System::PacketBufferHandle msgBuf,
-                                                     uint32_t messageId, uint16_t msgSendFlags, RetransTableEntry ** rEntry)
+CHIP_ERROR ReliableMessageManager::AddToRetransTable(ReliableMessageContext * rc, RetransTableEntry ** rEntry)
 {
     bool added     = false;
     CHIP_ERROR err = CHIP_NO_ERROR;
 
+    VerifyOrDie(rc != nullptr && rc->mExchange != nullptr);
+
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
         // Check the exchContext pointer for finding an empty slot in Table
-        if (!RetransTable[i].rc)
+        if (!mRetransTable[i].rc)
         {
             // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
             ExpireTicks();
 
-            RetransTable[i].rc                  = rc;
-            RetransTable[i].msgId               = messageId;
-            RetransTable[i].msgBuf              = std::move(msgBuf);
-            RetransTable[i].msgSendFlags        = msgSendFlags;
-            RetransTable[i].sendCount           = 0;
-            RetransTable[i].nextRetransTimeTick = static_cast<uint16_t>(
-                rc->GetCurrentRetransmitTimeoutTick() + GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
+            mRetransTable[i].rc          = rc;
+            mRetransTable[i].sendCount   = 0;
+            mRetransTable[i].retainedBuf = EncryptedPacketBufferHandle();
 
-            *rEntry = &RetransTable[i];
+            *rEntry = &mRetransTable[i];
+
             // Increment the reference count
             rc->Retain();
             added = true;
 
-            // Check if the timer needs to be started and start it.
-            StartTimer();
             break;
         }
     }
 
     if (!added)
     {
-        ChipLogError(ExchangeManager, "RetransTable Already Full");
+        ChipLogError(ExchangeManager, "mRetransTable Already Full");
         err = CHIP_ERROR_RETRANS_TABLE_FULL;
     }
 
     return err;
 }
 
-void ReliableMessageManager::PauseRetransTable(ReliableMessageContext * rc, uint32_t PauseTimeMillis)
+void ReliableMessageManager::StartRetransmision(RetransTableEntry * entry)
+{
+    VerifyOrDie(entry != nullptr && entry->rc != nullptr);
+
+    entry->nextRetransTimeTick = static_cast<uint16_t>(entry->rc->GetCurrentRetransmitTimeoutTick() +
+                                                       GetTickCounterFromTimeDelta(System::Timer::GetCurrentEpoch()));
+
+    // Check if the timer needs to be started and start it.
+    StartTimer();
+}
+
+void ReliableMessageManager::PauseRetransmision(ReliableMessageContext * rc, uint32_t PauseTimeMillis)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        if (RetransTable[i].rc == rc)
+        if (mRetransTable[i].rc == rc)
         {
-            RetransTable[i].nextRetransTimeTick =
-                static_cast<uint16_t>(RetransTable[i].nextRetransTimeTick + (PauseTimeMillis >> mTimerIntervalShift));
+            mRetransTable[i].nextRetransTimeTick =
+                static_cast<uint16_t>(mRetransTable[i].nextRetransTimeTick + (PauseTimeMillis >> mTimerIntervalShift));
             break;
         }
     }
 }
 
-void ReliableMessageManager::ResumeRetransTable(ReliableMessageContext * rc)
+void ReliableMessageManager::ResumeRetransmision(ReliableMessageContext * rc)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        if (RetransTable[i].rc == rc)
+        if (mRetransTable[i].rc == rc)
         {
-            RetransTable[i].nextRetransTimeTick = 0;
+            mRetransTable[i].nextRetransTimeTick = 0;
             break;
         }
     }
@@ -376,10 +369,10 @@ bool ReliableMessageManager::CheckAndRemRetransTable(ReliableMessageContext * rc
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        if ((RetransTable[i].rc == rc) && RetransTable[i].msgId == ackMsgId)
+        if ((mRetransTable[i].rc == rc) && mRetransTable[i].retainedBuf.GetMsgId() == ackMsgId)
         {
             // Clear the entry from the retransmision table.
-            ClearRetransmitTable(RetransTable[i]);
+            ClearRetransTable(mRetransTable[i]);
 
 #if !defined(NDEBUG)
             ChipLogProgress(ExchangeManager, "Rxd Ack; Removing MsgId:%08" PRIX32 " from Retrans Table", ackMsgId);
@@ -404,56 +397,30 @@ CHIP_ERROR ReliableMessageManager::SendFromRetransTable(RetransTableEntry * entr
     CHIP_ERROR err              = CHIP_NO_ERROR;
     ReliableMessageContext * rc = entry->rc;
 
-    // To trigger a call to OnSendError, set the number of transmissions so
-    // that the next call to ExecuteActions will abort this entry,
-    // restart the timer immediately, and ExitNow.
-
-    CHIP_FAULT_INJECT(FaultInjection::kFault_RMPSendError, entry->sendCount = static_cast<uint8_t>(rc->mConfig.mMaxRetrans + 1);
-                      entry->nextRetransTimeTick = 0; StartTimer(); ExitNow());
-
     if (rc)
     {
-        // Locally store the start and length;
-        uint8_t * p  = entry->msgBuf->Start();
-        uint16_t len = entry->msgBuf->DataLength();
+        err = mSessionMgr->SendEncryptedMessage(entry->rc->mExchange->GetSecureSession(), std::move(entry->retainedBuf),
+                                                &entry->retainedBuf);
 
-        // Send the message through
-        uint16_t msgSendFlags = entry->msgSendFlags;
-        err                   = SendMessage(rc, entry->msgBuf.Retain(), msgSendFlags);
+        if (err == CHIP_NO_ERROR)
+        {
+            // Update the counters
+            entry->sendCount++;
+        }
+        else
+        {
+            // Remove from table
+            ChipLogError(ExchangeManager, "Crit-err %ld when sending CHIP MsgId:%08" PRIX32 ", send tries: %d", long(err),
+                         entry->retainedBuf.GetMsgId(), entry->sendCount);
 
-        // Reset the msgBuf start pointer and data length after sending
-        entry->msgBuf->SetStart(p);
-        entry->msgBuf->SetDataLength(len);
-
-        // Update the counters
-        entry->sendCount++;
+            ClearRetransTable(*entry);
+        }
     }
     else
     {
         ChipLogError(ExchangeManager, "Table entry invalid");
     }
 
-    VerifyOrExit(err != CHIP_NO_ERROR, err = CHIP_NO_ERROR);
-
-    // Any error generated during initial sending is evaluated for criticality which would
-    // qualify it to be reportable back to the caller. If it is non-critical then
-    // err is set to CHIP_NO_ERROR.
-    if (IsSendErrorNonCritical(err))
-    {
-        ChipLogError(ExchangeManager, "Non-crit err %ld sending CHIP MsgId:%08" PRIX32 " from retrans table", long(err),
-                     entry->msgId);
-        err = CHIP_NO_ERROR;
-    }
-    else
-    {
-        // Remove from table
-        ChipLogError(ExchangeManager, "Crit-err %ld when sending CHIP MsgId:%08" PRIX32 ", send tries: %d", long(err), entry->msgId,
-                     entry->sendCount);
-
-        ClearRetransmitTable(*entry);
-    }
-
-exit:
     return err;
 }
 
@@ -463,14 +430,14 @@ exit:
  *  @param[in]    rc    A pointer to the ExchangeContext object.
  *
  */
-void ReliableMessageManager::ClearRetransmitTable(ReliableMessageContext * rc)
+void ReliableMessageManager::ClearRetransTable(ReliableMessageContext * rc)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        if (RetransTable[i].rc == rc)
+        if (mRetransTable[i].rc == rc)
         {
             // Clear the retransmit table entry.
-            ClearRetransmitTable(RetransTable[i]);
+            ClearRetransTable(mRetransTable[i]);
         }
     }
 }
@@ -481,16 +448,17 @@ void ReliableMessageManager::ClearRetransmitTable(ReliableMessageContext * rc)
  *  @param[in]    rEntry   A reference to the RetransTableEntry object.
  *
  */
-void ReliableMessageManager::ClearRetransmitTable(RetransTableEntry & rEntry)
+void ReliableMessageManager::ClearRetransTable(RetransTableEntry & rEntry)
 {
     if (rEntry.rc)
     {
+        VerifyOrDie(rEntry.rc->mExchange != nullptr);
+
         // Expire any virtual ticks that have expired so all wakeup sources reflect the current time
         ExpireTicks();
 
         rEntry.rc->Release();
-        rEntry.rc     = nullptr;
-        rEntry.msgBuf = nullptr;
+        rEntry.rc = nullptr;
 
         // Clear all other fields
         rEntry = RetransTableEntry();
@@ -508,14 +476,14 @@ void ReliableMessageManager::ClearRetransmitTable(RetransTableEntry & rEntry)
  *  @param[in]    err   The error for failing table entries.
  *
  */
-void ReliableMessageManager::FailRetransmitTableEntries(ReliableMessageContext * rc, CHIP_ERROR err)
+void ReliableMessageManager::FailRetransTableEntries(ReliableMessageContext * rc, CHIP_ERROR err)
 {
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        if (RetransTable[i].rc == rc)
+        if (mRetransTable[i].rc == rc)
         {
             // Remove the entry from the retransmission table.
-            ClearRetransmitTable(RetransTable[i]);
+            ClearRetransTable(mRetransTable[i]);
 
             // Application callback OnSendError.
             rc->mDelegate->OnSendError(err);
@@ -550,23 +518,13 @@ void ReliableMessageManager::StartTimer()
 
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        ReliableMessageContext * rc = RetransTable[i].rc;
+        ReliableMessageContext * rc = mRetransTable[i].rc;
         if (rc)
         {
-            // When do we need to next wake up for throttle retransmission?
-            if (rc->mThrottleTimeoutTick != 0 && rc->mThrottleTimeoutTick < nextWakeTimeTick)
-            {
-                nextWakeTimeTick = rc->mThrottleTimeoutTick;
-                foundWake        = true;
-#if defined(RMP_TICKLESS_DEBUG)
-                ChipLogProgress(ExchangeManager, "ReliableMessageManager::StartTimer throttle timeout %u", nextWakeTimeTick);
-#endif
-            }
-
             // When do we need to next wake up for ReliableMessageProtocol retransmit?
-            if (RetransTable[i].nextRetransTimeTick < nextWakeTimeTick)
+            if (mRetransTable[i].nextRetransTimeTick < nextWakeTimeTick)
             {
-                nextWakeTimeTick = RetransTable[i].nextRetransTimeTick;
+                nextWakeTimeTick = mRetransTable[i].nextRetransTimeTick;
                 foundWake        = true;
 #if defined(RMP_TICKLESS_DEBUG)
                 ChipLogProgress(ExchangeManager, "ReliableMessageManager::StartTimer RetransTime %u", nextWakeTimeTick);
@@ -616,7 +574,7 @@ void ReliableMessageManager::StartTimer()
         StopTimer();
     }
 
-    TicklessDebugDumpRetransTable("ReliableMessageManager::StartTimer Dumping RetransTable entries after setting wakeup times");
+    TicklessDebugDumpRetransTable("ReliableMessageManager::StartTimer Dumping mRetransTable entries after setting wakeup times");
 }
 
 void ReliableMessageManager::StopTimer()
@@ -629,7 +587,7 @@ int ReliableMessageManager::TestGetCountRetransTable()
     int count = 0;
     for (int i = 0; i < CHIP_CONFIG_RMP_RETRANS_TABLE_SIZE; i++)
     {
-        ReliableMessageContext * rc = RetransTable[i].rc;
+        ReliableMessageContext * rc = mRetransTable[i].rc;
         if (rc)
             count++;
     }

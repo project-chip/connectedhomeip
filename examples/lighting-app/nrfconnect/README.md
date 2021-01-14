@@ -67,7 +67,9 @@ commissioner role.
 
 To start the rendezvous, the controller must get the commissioning information
 from the CHIP device. The data payload is encoded within a QR code, printed to
-the UART console, and shared using an NFC tag.
+the UART console, and shared using an NFC tag. For security reasons, you must
+start NFC tag emulation manually after powering up the device by pressing
+**Button 4**.
 
 #### Thread provisioning
 
@@ -143,8 +145,8 @@ opposite one.
 **Button 3** &mdash; Pressing the button once starts the Thread networking in
 the test mode using the default configuration.
 
-**Button 4** &mdash; Pressing the button once starts the Bluetooth LE
-advertising for the predefined period of time.
+**Button 4** &mdash; Pressing the button once starts the NFC tag emulation and
+enables Bluetooth LE advertising for the predefined period of time.
 
 **SEGGER J-Link USB port** can be used to get logs from the device or
 communicate with it using the

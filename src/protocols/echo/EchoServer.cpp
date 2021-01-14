@@ -64,7 +64,7 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
     if (OnEchoRequestReceived != nullptr)
     {
         response = payload.Retain();
-        OnEchoRequestReceived(ec->GetPeerNodeId(), std::move(payload));
+        OnEchoRequestReceived(ec, std::move(payload));
     }
     else
     {
@@ -79,7 +79,7 @@ void EchoServer::OnMessageReceived(Messaging::ExchangeContext * ec, const Packet
 
     // Send an Echo Response back to the sender.
     ec->SendMessage(kProtocol_Echo, kEchoMessageType_EchoResponse, std::move(response),
-                    Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
+                    Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
 
     // Discard the exchange context.
     ec->Close();

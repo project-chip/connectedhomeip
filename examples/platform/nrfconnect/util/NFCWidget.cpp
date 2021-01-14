@@ -24,6 +24,7 @@
 
 int NFCWidget::Init(chip::DeviceLayer::ConnectivityManager & mgr)
 {
+    mIsTagStarted = false;
     return nfc_t2t_setup(FieldDetectionHandler, &mgr);
 }
 
@@ -42,6 +43,8 @@ int NFCWidget::StartTagEmulation(const char * tagPayload, uint8_t tagPayloadLeng
     result = nfc_t2t_emulation_start();
     VerifyOrExit(result >= 0, ChipLogProgress(AppServer, "nfc_t2t_emulation_start failed: %d", result));
 
+    mIsTagStarted = true;
+
 exit:
     return result;
 }
@@ -50,28 +53,25 @@ int NFCWidget::StopTagEmulation()
 {
     int result = nfc_t2t_emulation_stop();
 
+    VerifyOrExit(result >= 0, ChipLogProgress(AppServer, "nfc_t2t_emulation_stop failed: %d", result));
+
     memset(mNdefBuffer, 0, sizeof(mNdefBuffer));
 
+    mIsTagStarted = false;
+
+exit:
     return result;
+}
+
+bool NFCWidget::IsTagEmulationStarted() const
+{
+    return mIsTagStarted;
 }
 
 void NFCWidget::FieldDetectionHandler(void * context, enum nfc_t2t_event event, const uint8_t * data, size_t data_length)
 {
+    ARG_UNUSED(context);
+    ARG_UNUSED(event);
     ARG_UNUSED(data);
     ARG_UNUSED(data_length);
-
-    switch (event)
-    {
-    case NFC_T2T_EVENT_FIELD_ON: {
-        chip::DeviceLayer::ConnectivityManager * connectivityMgr =
-            reinterpret_cast<chip::DeviceLayer::ConnectivityManager *>(context);
-        if (!connectivityMgr->IsBLEAdvertisingEnabled())
-        {
-            connectivityMgr->SetBLEAdvertisingEnabled(true);
-        }
-    }
-    break;
-    default:
-        break;
-    }
 }

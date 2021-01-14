@@ -99,7 +99,7 @@ protected:
      * This function is the application callback that is invoked when a message is received over a
      * Chip connection.
      *
-     * @param[in]    msgBuf        A pointer to the PacketBuffer object holding the message.
+     * @param[in]    msgBuf        A handle to the PacketBuffer object holding the message.
      *
      * Callback *MUST* free msgBuf as a result of handling.
      */

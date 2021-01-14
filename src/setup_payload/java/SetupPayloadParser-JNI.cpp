@@ -1,6 +1,9 @@
 #include "ManualSetupPayloadParser.h"
 #include "QRCodeSetupPayloadParser.h"
 
+#include <support/CHIPMem.h>
+#include <support/logging/CHIPLogging.h>
+
 #include <vector>
 
 #include <jni.h>
@@ -10,6 +13,13 @@ using namespace chip;
 #define JNI_METHOD(RETURN, METHOD_NAME) extern "C" JNIEXPORT RETURN JNICALL Java_chip_setuppayload_SetupPayloadParser_##METHOD_NAME
 
 static jobject TransformSetupPayload(JNIEnv * env, SetupPayload & payload);
+
+jint JNI_OnLoad(JavaVM * jvm, void * reserved)
+{
+    ChipLogProgress(SetupPayload, "JNI_OnLoad() called");
+    chip::Platform::MemoryInit();
+    return JNI_VERSION_1_6;
+}
 
 JNI_METHOD(jobject, fetchPayloadFromQrCode)(JNIEnv * env, jobject self, jstring qrCodeObj)
 {

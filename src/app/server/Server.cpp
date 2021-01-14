@@ -31,6 +31,7 @@
 #include <setup_payload/SetupPayload.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
 #include <sys/param.h>
 #include <system/SystemPacketBuffer.h>
@@ -61,10 +62,10 @@ bool isRendezvousBypassed()
 class ServerCallback : public SecureSessionMgrDelegate
 {
 public:
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBufferHandle buffer,
-                           SecureSessionMgr * mgr) override
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                           System::PacketBufferHandle buffer, SecureSessionMgr * mgr) override
     {
+        auto state            = mgr->GetPeerConnectionState(session);
         const size_t data_len = buffer->DataLength();
         char src_addr[PeerAddress::kMaxToStringSize];
 
@@ -92,7 +93,7 @@ public:
         }
     }
 
-    void OnNewConnection(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
     {
         ChipLogProgress(AppServer, "Received a new connection.");
     }
@@ -102,6 +103,69 @@ public:
 private:
     AppDelegate * mDelegate = nullptr;
 };
+
+#if CHIP_ENABLE_MDNS
+
+CHIP_ERROR InitMdns()
+{
+    auto & mdnsAdvertiser = Mdns::ServiceAdvertiser::Instance();
+
+    // TODO: advertise this only when really operational once we support both
+    // operational and commisioning advertising is supported.
+    if (ConfigurationMgr().IsFullyProvisioned())
+    {
+        uint64_t fabricId;
+
+        if (ConfigurationMgr().GetFabricId(fabricId) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Fabric ID not known. Using a default");
+            fabricId = 5544332211;
+        }
+
+        const auto advertiseParameters = Mdns::OperationalAdvertisingParameters()
+                                             .SetFabricId(fabricId)
+                                             .SetNodeId(chip::kTestDeviceNodeId)
+                                             .SetPort(CHIP_PORT)
+                                             .EnableIpV4(true);
+
+        ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
+    }
+    else
+    {
+        auto advertiseParameters = Mdns::CommisioningAdvertisingParameters().SetPort(CHIP_PORT).EnableIpV4(true);
+
+        uint16_t value;
+        if (ConfigurationMgr().GetVendorId(value) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "Vendor ID not known");
+        }
+        else
+        {
+            advertiseParameters.SetVendorId(chip::Optional<uint16_t>::Value(value));
+        }
+
+        if (ConfigurationMgr().GetProductId(value) != CHIP_NO_ERROR)
+        {
+            ChipLogProgress(Discovery, "Product ID not known");
+        }
+        else
+        {
+            advertiseParameters.SetProductId(chip::Optional<uint16_t>::Value(value));
+        }
+
+        if (ConfigurationMgr().GetSetupDiscriminator(value) != CHIP_NO_ERROR)
+        {
+            ChipLogError(Discovery, "Setup discriminator not known. Using a default.");
+            value = 840;
+        }
+        advertiseParameters.SetShortDiscriminator(static_cast<uint8_t>(value & 0xFF)).SetLongDiscrimininator(value);
+
+        ReturnErrorOnFailure(mdnsAdvertiser.Advertise(advertiseParameters));
+    }
+
+    return mdnsAdvertiser.Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+}
+#endif
 
 DemoTransportMgr gTransports;
 SecureSessionMgr gSessions;
@@ -153,38 +217,24 @@ void InitServer(AppDelegate * delegate)
         uint32_t pinCode;
 
         SuccessOrExit(err = DeviceLayer::ConfigurationMgr().GetSetupPinCode(pinCode));
+#if CONFIG_NETWORK_LAYER_BLE
         params.SetSetupPINCode(pinCode)
             .SetBleLayer(DeviceLayer::ConnectivityMgr().GetBleLayer())
             .SetPeerAddress(Transport::PeerAddress::BLE());
+#else
+        params.SetSetupPINCode(pinCode);
+#endif // CONFIG_NETWORK_LAYER_BLE
         SuccessOrExit(err = gRendezvousServer.Init(params, &gTransports));
     }
 
 #if CHIP_ENABLE_MDNS
-    // TODO: advertise this only when really operational once we support both
-    // operational and commisioning advertising is supported.
-    {
-        constexpr uint64_t kTestFabricId = 5544332211;
-        err                              = Mdns::ServiceAdvertiser::Instance().Advertise(Mdns::OperationalAdvertisingParameters()
-                                                                .SetFabricId(kTestFabricId)
-                                                                .SetNodeId(chip::kTestDeviceNodeId)
-                                                                .SetPort(CHIP_PORT)
-#if INET_CONFIG_ENABLE_IPV4
-                                                                .EnableIpV4(true)
-#else
-                                                                .EnableIpV4(false)
-#endif
-        );
-        SuccessOrExit(err);
-    }
-
-    err = Mdns::ServiceAdvertiser::Instance().Start(&DeviceLayer::InetLayer, chip::Mdns::kMdnsPort);
+    err = InitMdns();
     SuccessOrExit(err);
 #endif
-
-    err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
-    SuccessOrExit(err);
 
     gSessions.SetDelegate(&gCallbacks);
+    err = gSessions.NewPairing(peer, chip::kTestControllerNodeId, &gTestPairing);
+    SuccessOrExit(err);
 
 exit:
     if (err != CHIP_NO_ERROR)

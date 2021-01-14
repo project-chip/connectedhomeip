@@ -47,7 +47,7 @@ protected:
 
     /**
      * @brief
-     *   Send the command, constructed using the given encoder, to the device. Add a callback
+     *   Send the command, contained into the associate buffer, to the device. Add a callback
      *   handler, that'll be called when the response is received from the device.
      *
      * @param[in] payload           The payload of the encoded command
@@ -57,7 +57,7 @@ protected:
 
     /**
      * @brief
-     *   Request attribute reports from the device. The request constructed using the given encoder. Add a callback
+     *   Request attribute reports from the device. Add a callback
      *   handler, that'll be called when the reports are received from the device.
      *
      * @param[in] payload           The payload of the encoded command

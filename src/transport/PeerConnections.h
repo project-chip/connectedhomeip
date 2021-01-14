@@ -24,6 +24,11 @@
 namespace chip {
 namespace Transport {
 
+// TODO; use 0xffff to match any key id, this is a temporary solution for
+// InteractionModel, where key id is not obtainable. This will be removed when
+// InteractionModel is migrated to messaging layer
+constexpr const uint16_t kAnyKeyId = 0xffff;
+
 /**
  * Handles a set of peer connection states.
  *
@@ -219,7 +224,7 @@ public:
             {
                 continue;
             }
-            if (iter->GetPeerKeyID() == peerKeyId)
+            if (peerKeyId == kAnyKeyId || iter->GetPeerKeyID() == peerKeyId)
             {
                 if (!nodeId.HasValue() || iter->GetPeerNodeId() == kUndefinedNodeId || iter->GetPeerNodeId() == nodeId.Value())
                 {
