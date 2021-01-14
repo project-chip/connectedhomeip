@@ -38,6 +38,7 @@ COMPONENT_SRCDIRS :=                                                            
   ../third_party/connectedhomeip/src/app/clusters/temperature-measurement-server    \
   ../third_party/connectedhomeip/src/app/clusters/scenes                            \
   ../third_party/connectedhomeip/src/app/clusters/basic                             \
+  ../third_party/connectedhomeip/src/app/clusters/bindings                          \
   ../third_party/connectedhomeip/src/app/reporting                                  \
   ../third_party/connectedhomeip/src/app/clusters/door-lock-client                  \
   ../third_party/connectedhomeip/src/app/clusters/door-lock-server                  \

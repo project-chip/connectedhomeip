@@ -40,13 +40,14 @@ CHIP_ERROR CommandSender::SendCommandRequest(NodeId aNodeId)
     ClearExistingExchangeContext();
 
     // Create a new exchange context.
-    mpExchangeCtx = mpExchangeMgr->NewContext(aNodeId, this);
+    // TODO: temprary create a SecureSessionHandle from node id, will be fix in PR 3602
+    mpExchangeCtx = mpExchangeMgr->NewContext({ aNodeId, Transport::kAnyKeyId }, this);
     VerifyOrExit(mpExchangeCtx != nullptr, err = CHIP_ERROR_NO_MEMORY);
     mpExchangeCtx->SetResponseTimeout(CHIP_INVOKE_COMMAND_RSP_TIMEOUT);
 
     err = mpExchangeCtx->SendMessage(Protocols::kProtocol_InteractionModel, kMsgType_InvokeCommandRequest,
                                      std::move(mCommandMessageBuf),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_ExpectResponse));
+                                     Messaging::SendFlags(Messaging::SendMessageFlags::kExpectResponse));
     SuccessOrExit(err);
     MoveToState(kState_Sending);
 
@@ -96,7 +97,7 @@ exit:
 
 void CommandSender::OnResponseTimeout(Messaging::ExchangeContext * apEc)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Node: %llu", apEc->GetPeerNodeId());
+    ChipLogProgress(DataManagement, "Time out! failed to receive invoke command response from Exchange: %d", apEc->GetExchangeId());
     Reset();
 }
 

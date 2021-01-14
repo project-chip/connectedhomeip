@@ -102,6 +102,27 @@ void CheckSimpleInitTest(nlTestSuite * inSuite, void * inContext)
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 }
 
+class TestSessMgrCallback : public SecureSessionMgrDelegate
+{
+public:
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr) override
+    {
+        ReceiveHandlerCallCount++;
+    }
+
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr) override
+    {
+        mSecureSession = session;
+        NewConnectionHandlerCallCount++;
+    }
+    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override {}
+
+    SecureSessionHandle mSecureSession;
+    int ReceiveHandlerCallCount       = 0;
+    int NewConnectionHandlerCallCount = 0;
+};
+
 void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
@@ -110,6 +131,23 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
     SecureSessionMgr secureSessionMgr;
     CHIP_ERROR err;
 
+    TestSessMgrCallback callback;
+    secureSessionMgr.SetDelegate(&callback);
+
+    IPAddress addr;
+    IPAddress::FromString("127.0.0.1", addr);
+    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
+    Optional<Transport::PeerAddress> peer1(Transport::PeerAddress::UDP(addr, 1));
+    err = secureSessionMgr.NewPairing(peer1, kDestinationNodeId, &pairing1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    SecureSessionHandle sessionFromSourceToDestination = callback.mSecureSession;
+
+    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
+    Optional<Transport::PeerAddress> peer2(Transport::PeerAddress::UDP(addr, 2));
+    err = secureSessionMgr.NewPairing(peer2, kSourceNodeId, &pairing2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    SecureSessionHandle sessionFromDestinationToSource = callback.mSecureSession;
+
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
     err = transportMgr.Init("LOOPBACK");
@@ -123,48 +161,17 @@ void CheckNewContextTest(nlTestSuite * inSuite, void * inContext)
 
     MockAppDelegate mockAppDelegate;
 
-    ExchangeContext * ec1 = exchangeMgr.NewContext(kSourceNodeId, &mockAppDelegate);
+    ExchangeContext * ec1 = exchangeMgr.NewContext(sessionFromDestinationToSource, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec1 != nullptr);
     NL_TEST_ASSERT(inSuite, ec1->IsInitiator() == true);
     NL_TEST_ASSERT(inSuite, ec1->GetExchangeId() != 0);
-    NL_TEST_ASSERT(inSuite, ec1->GetPeerNodeId() == kSourceNodeId);
+    NL_TEST_ASSERT(inSuite, ec1->GetSecureSession() == sessionFromDestinationToSource);
     NL_TEST_ASSERT(inSuite, ec1->GetDelegate() == &mockAppDelegate);
 
-    ExchangeContext * ec2 = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
+    ExchangeContext * ec2 = exchangeMgr.NewContext(sessionFromSourceToDestination, &mockAppDelegate);
     NL_TEST_ASSERT(inSuite, ec2 != nullptr);
     NL_TEST_ASSERT(inSuite, ec2->GetExchangeId() > ec1->GetExchangeId());
-    NL_TEST_ASSERT(inSuite, ec2->GetPeerNodeId() == kDestinationNodeId);
-}
-
-void CheckFindContextTest(nlTestSuite * inSuite, void * inContext)
-{
-    TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-
-    TransportMgr<LoopbackTransport> transportMgr;
-    SecureSessionMgr secureSessionMgr;
-    CHIP_ERROR err;
-
-    ctx.GetInetLayer().SystemLayer()->Init(nullptr);
-
-    err = transportMgr.Init("LOOPBACK");
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    err = secureSessionMgr.Init(kSourceNodeId, ctx.GetInetLayer().SystemLayer(), &transportMgr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    ExchangeManager exchangeMgr;
-    err = exchangeMgr.Init(&secureSessionMgr);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
-    MockAppDelegate mockAppDelegate;
-
-    ExchangeContext * ec = exchangeMgr.NewContext(kDestinationNodeId, &mockAppDelegate);
-    NL_TEST_ASSERT(inSuite, ec != nullptr);
-
-    bool result = exchangeMgr.FindContext(kDestinationNodeId, &mockAppDelegate, true);
-    NL_TEST_ASSERT(inSuite, result == true);
-
-    result = exchangeMgr.FindContext(kDestinationNodeId, nullptr, false);
-    NL_TEST_ASSERT(inSuite, result == false);
+    NL_TEST_ASSERT(inSuite, ec2->GetSecureSession() == sessionFromSourceToDestination);
 }
 
 void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
@@ -210,12 +217,26 @@ void CheckUmhRegistrationTest(nlTestSuite * inSuite, void * inContext)
 void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
 {
     TestContext & ctx = *reinterpret_cast<TestContext *>(inContext);
-    CHIP_ERROR err;
 
     TransportMgr<LoopbackTransport> transportMgr;
     SecureSessionMgr secureSessionMgr;
+    CHIP_ERROR err;
+
+    TestSessMgrCallback callback;
+    secureSessionMgr.SetDelegate(&callback);
+
     IPAddress addr;
     IPAddress::FromString("127.0.0.1", addr);
+    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
+    Optional<Transport::PeerAddress> peer1(Transport::PeerAddress::UDP(addr, 1));
+    err = secureSessionMgr.NewPairing(peer1, kDestinationNodeId, &pairing1);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
+    SecureSessionHandle sessionFromSourceToDestination = callback.mSecureSession;
+
+    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
+    Optional<Transport::PeerAddress> peer2(Transport::PeerAddress::UDP(addr, 2));
+    err = secureSessionMgr.NewPairing(peer2, kSourceNodeId, &pairing2);
+    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
     ctx.GetInetLayer().SystemLayer()->Init(nullptr);
 
@@ -228,29 +249,20 @@ void CheckExchangeMessages(nlTestSuite * inSuite, void * inContext)
     err = exchangeMgr.Init(&secureSessionMgr);
     NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
 
-    SecurePairingUsingTestSecret pairing1(Optional<NodeId>::Value(kSourceNodeId), 1, 2);
-    Optional<Transport::PeerAddress> peer1(Transport::PeerAddress::UDP(addr, 1));
-    err = secureSessionMgr.NewPairing(peer1, kSourceNodeId, &pairing1);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-    SecurePairingUsingTestSecret pairing2(Optional<NodeId>::Value(kDestinationNodeId), 2, 1);
-    Optional<Transport::PeerAddress> peer2(Transport::PeerAddress::UDP(addr, 2));
-    err = secureSessionMgr.NewPairing(peer2, kDestinationNodeId, &pairing2);
-    NL_TEST_ASSERT(inSuite, err == CHIP_NO_ERROR);
-
     // create solicited exchange
     MockAppDelegate mockSolicitedAppDelegate;
-    ExchangeContext * ec1 = exchangeMgr.NewContext(kDestinationNodeId, &mockSolicitedAppDelegate);
+    ExchangeContext * ec1 = exchangeMgr.NewContext(sessionFromSourceToDestination, &mockSolicitedAppDelegate);
 
     // create unsolicited exchange
     MockAppDelegate mockUnsolicitedAppDelegate;
     err = exchangeMgr.RegisterUnsolicitedMessageHandler(0x0001, 0x0001, &mockUnsolicitedAppDelegate);
 
     // send a malicious packet
-    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
+    ec1->SendMessage(0x0001, 0x0002, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, !mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 
     // send a good packet
-    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
+    ec1->SendMessage(0x0001, 0x0001, System::PacketBuffer::New(), SendFlags(Messaging::SendMessageFlags::kNone));
     NL_TEST_ASSERT(inSuite, mockUnsolicitedAppDelegate.IsOnMessageReceivedCalled);
 }
 
@@ -264,7 +276,6 @@ const nlTest sTests[] =
 {
     NL_TEST_DEF("Test ExchangeMgr::Init",                     CheckSimpleInitTest),
     NL_TEST_DEF("Test ExchangeMgr::NewContext",               CheckNewContextTest),
-    NL_TEST_DEF("Test ExchangeMgr::FindContext",              CheckFindContextTest),
     NL_TEST_DEF("Test ExchangeMgr::CheckUmhRegistrationTest", CheckUmhRegistrationTest),
     NL_TEST_DEF("Test ExchangeMgr::CheckExchangeMessages",    CheckExchangeMessages),
 

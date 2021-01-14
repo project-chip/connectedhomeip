@@ -56,7 +56,7 @@ constexpr uint16_t kOptionEnableIpV4   = '4';
 constexpr uint16_t kOptionListenPort   = 'p';
 constexpr uint16_t kOptionInstanceName = 'i';
 
-bool HandleOptions(const char * aProgram, OptionSet * aOpotions, int aIdentifier, const char * aName, const char * aValue)
+bool HandleOptions(const char * aProgram, OptionSet * aOptions, int aIdentifier, const char * aName, const char * aValue)
 {
     switch (aIdentifier)
     {
@@ -202,8 +202,8 @@ int main(int argc, char ** args)
     mdns::Minimal::IPv4Responder ipv4Responder(serverName);
     mdns::Minimal::IPv6Responder ipv6Responder(serverName);
     mdns::Minimal::SrvResourceRecord srvRecord(tcpServerServiceName, serverName, CHIP_PORT);
-    mdns::Minimal::SrvResponder tcpSrvResponder(tcpServerServiceName, srvRecord);
-    mdns::Minimal::SrvResponder udpSrvResponder(udpServerServiceName, srvRecord);
+    mdns::Minimal::SrvResponder tcpSrvResponder(mdns::Minimal::SrvResourceRecord(tcpServerServiceName, serverName, CHIP_PORT));
+    mdns::Minimal::SrvResponder udpSrvResponder(mdns::Minimal::SrvResourceRecord(udpServerServiceName, serverName, CHIP_PORT));
     mdns::Minimal::PtrResponder ptrTcpResponder(tcpServiceName, tcpServerServiceName);
     mdns::Minimal::PtrResponder ptrUdpResponder(udpServiceName, udpServerServiceName);
     mdns::Minimal::PtrResponder ptrUdpDiscriminator1Responder(udpDiscriminator1, udpServerServiceName);

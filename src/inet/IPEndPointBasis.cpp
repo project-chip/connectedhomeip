@@ -683,7 +683,7 @@ System::Error IPEndPointBasis::PostPacketBufferEvent(chip::System::Layer & aLaye
     if (error != INET_NO_ERROR)
     {
         // If PostEvent() failed, it has not taken ownership of the buffer, so we need to retake it so that it will be freed.
-        aBuffer.Adopt(buf);
+        (void) System::PacketBufferHandle::Adopt(buf);
     }
     return error;
 }

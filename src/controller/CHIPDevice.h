@@ -158,18 +158,38 @@ public:
 
     /**
      * @brief
+     *   Called when a new pairing is being established
+     *
+     * @param session A handle to the secure session
+     * @param mgr     A pointer to the SecureSessionMgr
+     */
+    void OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr);
+
+    /**
+     * @brief
+     *   Called when a connection is closing.
+     *
+     *   The receiver should release all resources associated with the connection.
+     *
+     * @param session A handle to the secure session
+     * @param mgr     A pointer to the SecureSessionMgr
+     */
+    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr);
+
+    /**
+     * @brief
      *   This function is called when a message is received from the corresponding CHIP
      *   device. The message ownership is transferred to the function, and it is expected
      *   to release the message buffer before returning.
      *
      * @param[in] header        Reference to common packet header of the received message
      * @param[in] payloadHeader Reference to payload header in the message
-     * @param[in] state         Pointer to the peer connection state on which message is received
+     * @param[in] session       A handle to the secure session
      * @param[in] msgBuf        The message buffer
      * @param[in] mgr           Pointer to secure session manager which received the message
      */
-    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
+    void OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                           System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr);
 
     /**
      * @brief
@@ -179,6 +199,8 @@ public:
     bool IsActive() const { return mActive; }
 
     void SetActive(bool active) { mActive = active; }
+
+    bool IsSecureConnected() const { return IsActive() && mState == ConnectionState::SecureConnected; }
 
     void Reset()
     {
@@ -190,6 +212,8 @@ public:
     }
 
     NodeId GetDeviceId() const { return mDeviceId; }
+
+    bool MatchesSession(SecureSessionHandle session) const { return mSecureSession == session; }
 
     void SetAddress(const Inet::IPAddress & deviceAddr) { mDeviceAddr = deviceAddr; }
 
@@ -241,6 +265,8 @@ private:
     SecureSessionMgr * mSessionManager;
 
     DeviceTransportMgr * mTransportMgr;
+
+    SecureSessionHandle mSecureSession = {};
 
     /* Track all outstanding response callbacks for this device. The callbacks are
        registered when a command is sent to the device, to get notified with the results. */

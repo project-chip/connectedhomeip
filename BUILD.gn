@@ -48,6 +48,7 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
       "${chip_root}/src/app",
       "${chip_root}/src/ble",
       "${chip_root}/src/controller",
+      "${chip_root}/src/credentials",
       "${chip_root}/src/crypto",
       "${chip_root}/src/inet",
       "${chip_root}/src/lib",
@@ -122,6 +123,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Enable building for Android.
     enable_android_builds = false
 
+    # Set this to true to enable TI builds by default.
+    enable_cc13x2_26x2_builds = false
+
     # Set this to true to enable efr32 builds by default.
     enable_efr32_builds = false
 
@@ -155,6 +159,9 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
     # Build the Linux lighting app example.
     enable_linux_lighting_app_build =
         enable_default_builds && (host_os == "linux" || host_os == "mac")
+
+    # Build the cc13x2_26x2 lock app example.
+    enable_cc13x2_26x2_lock_app_build = enable_cc13x2_26x2_builds
 
     # Build the efr32 lock app example.
     enable_efr32_lock_app_build = enable_efr32_builds
@@ -211,6 +218,12 @@ if (current_toolchain != "${dir_pw_toolchain}/dummy:dummy") {
   if (enable_standalone_chip_tool_build) {
     group("standalone_chip_tool") {
       deps = [ "${chip_root}/examples/chip-tool(${standalone_toolchain})" ]
+    }
+  }
+
+  if (enable_cc13x2_26x2_lock_app_build) {
+    group("cc13x2_26x2_lock_app") {
+      deps = [ "${chip_root}/examples/lock-app/cc13x2_26x2(${chip_root}/config/cc13x2_26x2/toolchain:cc13x2_26x2_lock_app)" ]
     }
   }
 

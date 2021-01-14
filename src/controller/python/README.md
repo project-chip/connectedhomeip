@@ -26,7 +26,7 @@ Follow [BUILDING.md](/docs/BUILDING.md) to build CHIP on your platform.
 **For Linux**
 
 ```
-cd out/debug/linux_arm64_clang/controller/python
+cd out/debug/controller/python
 sudo pip3 install chip-0.0-cp38-cp38-linux_aarch64.whl
 ```
 

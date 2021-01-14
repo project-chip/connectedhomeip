@@ -27,6 +27,7 @@
 #include <array>
 
 #include <messaging/ExchangeContext.h>
+#include <messaging/ReliableMessageManager.h>
 #include <support/DLLUtil.h>
 #include <transport/SecureSessionMgr.h>
 
@@ -90,20 +91,7 @@ public:
      *  @return   A pointer to the created ExchangeContext object On success. Otherwise NULL if no object
      *            can be allocated or is available.
      */
-    ExchangeContext * NewContext(const NodeId & peerNodeId, ExchangeDelegate * delegate);
-
-    /**
-     *  Find the ExchangeContext from a pool matching a given set of parameters.
-     *
-     *  @param[in]    peerNodeId    The node identifier of the peer with which the ExchangeContext has been set up.
-     *
-     *  @param[in]    delegate      A pointer to ExchangeDelegate.
-     *
-     *  @param[in]    isInitiator   Boolean indicator of whether the local node is the initiator of the exchange.
-     *
-     *  @return   A pointer to the ExchangeContext object matching the provided parameters On success, NULL on no match.
-     */
-    ExchangeContext * FindContext(NodeId peerNodeId, ExchangeDelegate * delegate, bool isInitiator);
+    ExchangeContext * NewContext(SecureSessionHandle session, ExchangeDelegate * delegate);
 
     /**
      *  Register an unsolicited message handler for a given protocol identifier. This handler would be
@@ -165,6 +153,8 @@ public:
 
     SecureSessionMgr * GetSessionMgr() const { return mSessionMgr; }
 
+    ReliableMessageManager * GetReliableMessageMgr() { return &mReliableMessageMgr; };
+
     size_t GetContextsInUse() const { return mContextsInUse; }
 
 private:
@@ -184,27 +174,28 @@ private:
     uint16_t mNextExchangeId;
     State mState;
     SecureSessionMgr * mSessionMgr;
+    ReliableMessageManager mReliableMessageMgr;
 
-    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> ContextPool;
+    std::array<ExchangeContext, CHIP_CONFIG_MAX_EXCHANGE_CONTEXTS> mContextPool;
     size_t mContextsInUse;
 
     UnsolicitedMessageHandler UMHandlerPool[CHIP_CONFIG_MAX_UNSOLICITED_MESSAGE_HANDLERS];
     void (*OnExchangeContextChanged)(size_t numContextsInUse);
 
-    ExchangeContext * AllocContext(uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator, ExchangeDelegate * delegate);
+    ExchangeContext * AllocContext(uint16_t ExchangeId, SecureSessionHandle session, bool Initiator, ExchangeDelegate * delegate);
 
-    void DispatchMessage(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, System::PacketBufferHandle msgBuf);
+    void DispatchMessage(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
+                         System::PacketBufferHandle msgBuf);
 
     CHIP_ERROR RegisterUMH(uint32_t protocolId, int16_t msgType, ExchangeDelegate * delegate);
     CHIP_ERROR UnregisterUMH(uint32_t protocolId, int16_t msgType);
 
     void OnReceiveError(CHIP_ERROR error, const Transport::PeerAddress & source, SecureSessionMgr * msgLayer) override;
 
-    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader,
-                           const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
-                           SecureSessionMgr * msgLayer) override;
+    void OnMessageReceived(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader, SecureSessionHandle session,
+                           System::PacketBufferHandle msgBuf, SecureSessionMgr * msgLayer) override;
 
-    void OnConnectionExpired(const Transport::PeerConnectionState * state, SecureSessionMgr * mgr) override;
+    void OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr) override;
 };
 
 } // namespace Messaging

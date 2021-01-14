@@ -43,13 +43,13 @@ void CommandHandler::OnMessageReceived(Messaging::ExchangeContext * ec, const Pa
     err = ProcessCommandMessage(std::move(payload), kCommandHandlerId);
     SuccessOrExit(err);
 
-    SendCommandResponse(ec->GetPeerNodeId());
+    SendCommandResponse();
 
 exit:
     ChipLogFunctError(err);
 }
 
-CHIP_ERROR CommandHandler::SendCommandResponse(NodeId aNodeId)
+CHIP_ERROR CommandHandler::SendCommandResponse()
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
@@ -58,8 +58,7 @@ CHIP_ERROR CommandHandler::SendCommandResponse(NodeId aNodeId)
 
     VerifyOrExit(mpExchangeCtx != NULL, err = CHIP_ERROR_INCORRECT_STATE);
     err = mpExchangeCtx->SendMessage(Protocols::kProtocol_InteractionModel, kMsgType_InvokeCommandResponse,
-                                     std::move(mCommandMessageBuf),
-                                     Messaging::SendFlags(Messaging::SendMessageFlags::kSendFlag_None));
+                                     std::move(mCommandMessageBuf), Messaging::SendFlags(Messaging::SendMessageFlags::kNone));
     SuccessOrExit(err);
 
     MoveToState(kState_Sending);

@@ -36,6 +36,7 @@
 #include <protocols/Protocols.h>
 #include <support/CodeUtils.h>
 #include <support/RandUtils.h>
+#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/ScopedBuffer.h>
 
@@ -297,14 +298,14 @@ exit:
 
 CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, const vector<uint8_t> & buf, size_t & index)
 {
-    CHIP_ERROR err        = CHIP_NO_ERROR;
     size_t bitsLeftToRead = (buf.size() * 8) - index;
     size_t tlvBytesLength = (bitsLeftToRead + 7) / 8; // ceil(bitsLeftToRead/8)
     chip::Platform::ScopedMemoryBuffer<uint8_t> tlvArray;
 
-    SuccessOrExit(tlvBytesLength == 0);
+    ReturnErrorCodeIf(tlvBytesLength == 0, CHIP_NO_ERROR);
+
     tlvArray.Alloc(tlvBytesLength);
-    VerifyOrExit(tlvArray, err = CHIP_ERROR_NO_MEMORY);
+    ReturnErrorCodeIf(!tlvArray, CHIP_ERROR_NO_MEMORY);
 
     for (size_t i = 0; i < tlvBytesLength; i++)
     {
@@ -313,11 +314,7 @@ CHIP_ERROR QRCodeSetupPayloadParser::populateTLV(SetupPayload & outPayload, cons
         tlvArray[i] = static_cast<uint8_t>(dest);
     }
 
-    err = parseTLVFields(outPayload, tlvArray.Get(), tlvBytesLength);
-    SuccessOrExit(err);
-
-exit:
-    return err;
+    return parseTLVFields(outPayload, tlvArray.Get(), tlvBytesLength);
 }
 
 static string extractPayload(string inString)

@@ -36,20 +36,22 @@
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecurePairingSession.h>
 #include <transport/SecureSessionMgr.h>
+#include <transport/raw/TCP.h>
 #include <transport/raw/UDP.h>
 
 namespace {
 
 // The EchoServer object.
 chip::Protocols::EchoServer gEchoServer;
-chip::TransportMgr<chip::Transport::UDP> gTransportManager;
+chip::TransportMgr<chip::Transport::UDP> gUDPManager;
+chip::TransportMgr<chip::Transport::TCP<kMaxTcpActiveConnectionCount, kMaxTcpPendingPackets>> gTCPManager;
 chip::SecureSessionMgr gSessionManager;
 chip::SecurePairingUsingTestSecret gTestPairing;
 
 // Callback handler when a CHIP EchoRequest is received.
-void HandleEchoRequestReceived(chip::NodeId nodeId, chip::System::PacketBufferHandle payload)
+void HandleEchoRequestReceived(chip::Messaging::ExchangeContext * ec, chip::System::PacketBufferHandle payload)
 {
-    printf("Echo Request from node %" PRIu64 ", len=%u ... sending response.\n", nodeId, payload->DataLength());
+    printf("Echo Request, len=%u ... sending response.\n", payload->DataLength());
 }
 
 } // namespace
@@ -58,15 +60,39 @@ int main(int argc, char * argv[])
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     chip::Optional<chip::Transport::PeerAddress> peer(chip::Transport::Type::kUndefined);
+    bool useTCP = false;
+
+    if (argc > 2)
+    {
+        printf("Too many arguments specified!\n");
+        ExitNow(err = CHIP_ERROR_INVALID_ARGUMENT);
+    }
+
+    if ((argc == 2) && (strcmp(argv[1], "--tcp") == 0))
+    {
+        useTCP = true;
+    }
 
     InitializeChip();
 
-    err = gTransportManager.Init(
-        chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
-    SuccessOrExit(err);
+    if (useTCP)
+    {
+        err = gTCPManager.Init(
+            chip::Transport::TcpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
+        SuccessOrExit(err);
 
-    err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTransportManager);
-    SuccessOrExit(err);
+        err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gTCPManager);
+        SuccessOrExit(err);
+    }
+    else
+    {
+        err = gUDPManager.Init(
+            chip::Transport::UdpListenParameters(&chip::DeviceLayer::InetLayer).SetAddressType(chip::Inet::kIPAddressType_IPv4));
+        SuccessOrExit(err);
+
+        err = gSessionManager.Init(chip::kTestDeviceNodeId, &chip::DeviceLayer::SystemLayer, &gUDPManager);
+        SuccessOrExit(err);
+    }
 
     err = gExchangeManager.Init(&gSessionManager);
     SuccessOrExit(err);

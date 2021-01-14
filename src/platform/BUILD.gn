@@ -88,7 +88,12 @@ if (chip_device_platform != "none") {
       defines += [ "CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING=0" ]
     }
 
-    if (chip_device_platform == "darwin") {
+    if (chip_device_platform == "cc13x2_26x2") {
+      defines += [
+        "CHIP_DEVICE_LAYER_TARGET_CC13X2_26X2=1",
+        "CHIP_DEVICE_LAYER_TARGET=cc13x2_26x2",
+      ]
+    } else if (chip_device_platform == "darwin") {
       defines += [
         "CHIP_DEVICE_LAYER_TARGET_DARWIN=1",
         "CHIP_DEVICE_LAYER_TARGET=Darwin",
@@ -217,7 +222,39 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       public_deps += [ "${chip_root}/src/lib/mdns:platform_header" ]
     }
 
-    if (chip_device_platform == "darwin") {
+    if (chip_device_platform == "cc13x2_26x2") {
+      sources += [
+        "FreeRTOS/SystemTimeSupport.cpp",
+        "cc13x2_26x2/BlePlatformConfig.h",
+        "cc13x2_26x2/CC13X2_26X2Config.cpp",
+        "cc13x2_26x2/CC13X2_26X2Config.h",
+        "cc13x2_26x2/CHIPDevicePlatformConfig.h",
+        "cc13x2_26x2/CHIPDevicePlatformConfig.h",
+        "cc13x2_26x2/CHIPDevicePlatformEvent.h",
+        "cc13x2_26x2/ConfigurationManagerImpl.cpp",
+        "cc13x2_26x2/ConnectivityManagerImpl.cpp",
+        "cc13x2_26x2/ConnectivityManagerImpl.h",
+        "cc13x2_26x2/InetPlatformConfig.h",
+        "cc13x2_26x2/Logging.cpp",
+        "cc13x2_26x2/PlatformManagerImpl.cpp",
+        "cc13x2_26x2/PlatformManagerImpl.h",
+        "cc13x2_26x2/SystemPlatformConfig.h",
+      ]
+      if (chip_enable_openthread) {
+        public_deps += [
+          "${chip_root}/third_party/ti_simplelink_sdk:mbedtls",
+          "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sdk",
+          "${chip_root}/third_party/ti_simplelink_sdk:ti_simplelink_sysconfig",
+          "${openthread_root}:libopenthread-mtd",
+        ]
+
+        sources += [
+          "OpenThread/OpenThreadUtils.cpp",
+          "cc13x2_26x2/ThreadStackManagerImpl.cpp",
+          "cc13x2_26x2/ThreadStackManagerImpl.h",
+        ]
+      }
+    } else if (chip_device_platform == "darwin") {
       sources += [
         "Darwin/BLEManagerImpl.cpp",
         "Darwin/BLEManagerImpl.h",
@@ -404,32 +441,32 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
       public_deps += [ "${chip_root}/third_party/inipp" ]
     } else if (chip_device_platform == "nrfconnect") {
       sources += [
+        "Zephyr/BLEManagerImpl.cpp",
+        "Zephyr/ConfigurationManagerImpl.cpp",
+        "Zephyr/Logging.cpp",
+        "Zephyr/PlatformManagerImpl.cpp",
         "Zephyr/SystemTimeSupport.cpp",
-        "nrfconnect/BLEManagerImpl.cpp",
+        "Zephyr/ZephyrConfig.cpp",
+        "Zephyr/ZephyrConfig.h",
         "nrfconnect/BLEManagerImpl.h",
         "nrfconnect/BlePlatformConfig.h",
         "nrfconnect/CHIPDevicePlatformConfig.h",
         "nrfconnect/CHIPDevicePlatformEvent.h",
         "nrfconnect/CHIPPlatformConfig.h",
-        "nrfconnect/ConfigurationManagerImpl.cpp",
         "nrfconnect/ConfigurationManagerImpl.h",
         "nrfconnect/ConnectivityManagerImpl.cpp",
         "nrfconnect/ConnectivityManagerImpl.h",
         "nrfconnect/DeviceNetworkProvisioningDelegateImpl.cpp",
         "nrfconnect/DeviceNetworkProvisioningDelegateImpl.h",
         "nrfconnect/InetPlatformConfig.h",
-        "nrfconnect/Logging.cpp",
-        "nrfconnect/PlatformManagerImpl.cpp",
         "nrfconnect/PlatformManagerImpl.h",
         "nrfconnect/SystemPlatformConfig.h",
-        "nrfconnect/ZephyrConfig.cpp",
-        "nrfconnect/ZephyrConfig.h",
       ]
 
       if (chip_enable_openthread) {
         sources += [
           "OpenThread/OpenThreadUtils.cpp",
-          "nrfconnect/ThreadStackManagerImpl.cpp",
+          "Zephyr/ThreadStackManagerImpl.cpp",
           "nrfconnect/ThreadStackManagerImpl.h",
         ]
       }
@@ -446,6 +483,7 @@ if (chip_device_platform != "none" && chip_device_platform != "external") {
         "qpg6100/ConfigurationManagerImpl.h",
         "qpg6100/ConnectivityManagerImpl.cpp",
         "qpg6100/ConnectivityManagerImpl.h",
+        "qpg6100/DeviceNetworkProvisioningDelegateImpl.cpp",
         "qpg6100/DeviceNetworkProvisioningDelegateImpl.h",
         "qpg6100/InetPlatformConfig.h",
         "qpg6100/Logging.cpp",

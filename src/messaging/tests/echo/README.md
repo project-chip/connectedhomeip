@@ -40,12 +40,12 @@ EchoRequests and sends back EchoResponse messages.
 
 To start the Server in echo mode, run the built executable.
 
-    $ ./chip-echo-responder
+    $ ./chip-echo-responder [--tcp]
 
 To start the Client in echo mode, run the built executable and pass it the IP
 address of the server to talk to.
 
-    $ ./chip-echo-requester <Server's IPv4 address>
+    $ ./chip-echo-requester <Server's IPv4 address> [--tcp]
 
 If valid values are supplied, it will begin to periodically send messages to the
 server address provided for three times.

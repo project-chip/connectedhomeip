@@ -957,9 +957,7 @@ u8_t RawEndPoint::LwIPReceiveRawMessage(void * arg, struct raw_pcb * pcb, struct
     chip::System::Layer & lSystemLayer = ep->SystemLayer();
     IPPacketInfo * pktInfo             = NULL;
     uint8_t enqueue                    = 1;
-    System::PacketBufferHandle buf;
-
-    buf.Adopt(reinterpret_cast<PacketBuffer *>(static_cast<void *>(p)));
+    System::PacketBufferHandle buf     = System::PacketBufferHandle::Adopt(p);
 
     // Filtering based on the saved ICMP6 types (the only protocol currently supported.)
     if ((ep->IPVer == kIPVersion_6) && (ep->IPProto == kIPProtocol_ICMPv6))
