@@ -23,9 +23,8 @@ const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
 const cHelper      = require(zapPath + 'generator/helper-c.js')
 
-const StringHelper = require('../../common/StringHelper.js');
+const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
-
 
 /**
  * Check if the cluster (name) has any enabled manufacturer commands. This works only inside
@@ -188,63 +187,85 @@ function asChipUnderlyingType(label, type)
   }
 }
 
-/*  Endpoint-config specific helpers */
+//  Endpoint-config specific helpers
 // these helpers are a Hot fix for the "GENERATED_FUNCTIONS" problem
 // They should be removed or replace once issue #4369 is resolved
 // These helpers only works within the endpoint_config iterator
 
 // List of all cluster with generated functions
-const endpointClusterWithInit = ['Identify', 'Groups',  'Scenes', 'On/off', 'Level Control', 'Color Control', 'IAS Zone']
-const endpointClusterWithAttributeChanged = ['Identify', 'Door Lock',]
-const endpointClusterWithPreAttribute = ['IAS Zone',]
-const endpointClusterWithMessageSent = ['IAS Zone',]
+var endpointClusterWithInit = [   'Identify',
+                                  'Groups',
+                                  'Scenes',
+                                  'On/off',
+                                  'Level Control',
+                                  'Color Control',
+                                  'IAS Zone'
+                                ]
+var endpointClusterWithAttributeChanged = [ 'Identify', 'Door Lock' ]
+var endpointClusterWithPreAttribute = [ 'IAS Zone' ]
+var endpointClusterWithMessageSent = [ 'IAS Zone' ]
 
-function extract_cluster_name(comments) {
+/**
+ * extract the cluster name from the enpoint cluster comment
+ * @param {*} comments
+ */
+function extract_cluster_name(comments)
+{
   let secondPart = comments.split(": ").pop()
   return secondPart.split(" (")[0]
 }
-
-function chip_endpoint_generated_functions() {
+/**
+ * Populate the GENERATED_FUNCTIONS field
+ */
+function chip_endpoint_generated_functions()
+{
   let alreadySetCluster = []
-  let ret = '{ \\\n'
+  let ret = '\\\n'
   this.clusterList.forEach((c) => {
-    let clusterName = extract_cluster_name(c.comment)
+    let clusterName  = extract_cluster_name(c.comment)
     let functionList = ''
-    if (alreadySetCluster.includes(clusterName)) {
+    if (alreadySetCluster.includes(clusterName))
+    {
       // Only one array of Generated functions per cluster across all endpoints
       return
     }
     if (c.comment.includes('server')) {
       let hasFunctionArray = false
-      if (endpointClusterWithInit.includes(clusterName)) {
+      if (endpointClusterWithInit.includes(clusterName))
+      {
         hasFunctionArray = true
-        functionList = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+            cHelper.asCamelCased(clusterName, false)}ClusterServerInitCallback,\\\n`)
       }
 
       if (endpointClusterWithAttributeChanged.includes(clusterName)) {
-        functionList = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}AttributeChangedCallback,\\\n`)
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+            cHelper.asCamelCased(clusterName, false)}ClusterServerAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
 
       if (endpointClusterWithMessageSent.includes(clusterName)) {
-        functionList = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}PreAttributeChangedCallback,\\\n`)
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+            cHelper.asCamelCased(clusterName, false)}ClusterServerMessageSentCallback,\\\n`)
         hasFunctionArray = true
       }
 
       if (endpointClusterWithPreAttribute.includes(clusterName)) {
-        functionList = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${cHelper.asCamelCased(clusterName, false)}PreAttributeChangedCallback,\\\n`)
+        functionList     = functionList.concat(`  (EmberAfGenericClusterFunction) emberAf${
+            cHelper.asCamelCased(clusterName, false)}ClusterServerPreAttributeChangedCallback,\\\n`)
         hasFunctionArray = true
       }
 
       if (hasFunctionArray) {
-        ret = ret.concat(`const EmberAfGenericClusterFunction chipFuncArray${cHelper.asCamelCased(clusterName, false)}Server[] = {\\\n`)
+        ret = ret.concat(
+            `const EmberAfGenericClusterFunction chipFuncArray${cHelper.asCamelCased(clusterName, false)}Server[] = {\\\n`)
         ret = ret.concat(functionList)
         ret = ret.concat(`};\\\n`)
+        alreadySetCluster.push(clusterName)
       }
     }
   })
-  return ret.concat('}\n')
-
+  return ret.concat('\n')
 }
 
 /**
@@ -252,16 +273,19 @@ function chip_endpoint_generated_functions() {
  * To be used as a replacement of endpoint_cluster_list since this one
  * includes the GENERATED_FUNCTIONS array
  */
-function chip_endpoint_cluster_list() {
+function chip_endpoint_cluster_list()
+{
   let ret = '{ \\\n'
   this.clusterList.forEach((c) => {
-    let mask = ''
+    let mask          = ''
     let functionArray = c.functions
-    let clusterName = extract_cluster_name(c.comment)
+    let clusterName   = extract_cluster_name(c.comment)
 
-    if (c.comment.includes('server')) {
+    if (c.comment.includes('server'))
+    {
       let hasFunctionArray = false
-      if (endpointClusterWithInit.includes(clusterName)) {
+      if (endpointClusterWithInit.includes(clusterName))
+      {
         c.mask.push('INIT_FUNCTION')
         hasFunctionArray = true
       }
@@ -289,19 +313,15 @@ function chip_endpoint_cluster_list() {
     if (c.mask.length == 0) {
       mask = '0'
     } else {
-      mask = c.mask
-        .map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`)
-        .join(' | ')
+      mask = c.mask.map((m) => `ZAP_CLUSTER_MASK(${m.toUpperCase()})`).join(' | ')
     }
-    ret = ret.concat(
-      `  { ${c.clusterId}, ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), ${c.attributeCount}, ${c.attributeSize}, ${mask}, ${functionArray} }, /* ${c.comment} */ \\\n`
-    )
+    ret = ret.concat(`  { ${c.clusterId}, ZAP_ATTRIBUTE_INDEX(${c.attributeIndex}), ${c.attributeCount}, ${
+        c.attributeSize}, ${mask}, ${functionArray} }, /* ${c.comment} */ \\\n`)
   })
   return ret.concat('}\n')
 }
 
-
-/*  End of Endpoint-config specific helpers */
+//  End of Endpoint-config specific helpers
 
 //
 // Module exports
