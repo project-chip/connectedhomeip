@@ -314,13 +314,16 @@
             if (message.records.count == 1) {
                 for (NFCNDEFPayload *payload in message.records) {
                     NSString *payloadType = [[NSString alloc] initWithData:payload.type encoding:NSUTF8StringEncoding];
-                    if ([payloadType isEqualToString:@"T"]) {
-                        NSLocale *currentLocale;;
-                        NSString *payloadText = [payload wellKnownTypeTextPayloadWithLocale:&currentLocale];
-                        NSLog(@"Payload text:%@", payloadText);
-                        if (payloadText) {
-                            NSLog(@"Scanned code string:%@", payloadText);
-                            [self scannedQRCode:payloadText];
+                    if ([payloadType isEqualToString:@"U"]) {
+                        NSURL *payloadURI = [payload wellKnownTypeURIPayload];
+                        NSLog(@"Payload text:%@", payloadURI);
+                        if (payloadURI) {
+                            /* CHIP Issue #415
+                             Once #415 goes in, there will b no need to replace _ with spaces.
+                            */
+                            NSString *qrCode = [[payloadURI absoluteString]stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+                            NSLog(@"Scanned code string:%@", qrCode);
+                            [self scannedQRCode:qrCode];
                         }
                     } else {
                         errorMessage = @"Record must be of type text.";
