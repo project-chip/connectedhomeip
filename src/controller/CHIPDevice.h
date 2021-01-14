@@ -56,9 +56,7 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 class DLL_EXPORT Device
 {
 public:
-    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected)
-    {
-    }
+    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
     ~Device()
     {
         if (mCommandSender != nullptr)

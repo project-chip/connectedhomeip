@@ -859,8 +859,7 @@ CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Callback<> * onComple
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     (void) onCompletion;
     // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeClearWeekdayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId,
-                                                                    userId);
+    chip::app::cluster::DoorLock::EncodeClearWeekdayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId);
     return SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearWeekdayScheduleCommand(mEndpoint, scheduleId, userId);
@@ -873,8 +872,7 @@ CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Callback<> * onComple
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     (void) onCompletion;
     // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeClearYeardayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId,
-                                                                    userId);
+    chip::app::cluster::DoorLock::EncodeClearYeardayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId);
     return SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearYeardayScheduleCommand(mEndpoint, scheduleId, userId);
@@ -1008,8 +1006,7 @@ CHIP_ERROR DoorLockCluster::SetPin(Callback::Callback<> * onCompletion, uint16_t
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     (void) onCompletion;
     // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeSetPinCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId, userStatus, userType,
-                                                      pin);
+    chip::app::cluster::DoorLock::EncodeSetPinCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId, userStatus, userType, pin);
     return SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetPinCommand(mEndpoint, userId, userStatus, userType, pin);
@@ -1023,8 +1020,7 @@ CHIP_ERROR DoorLockCluster::SetRfid(Callback::Callback<> * onCompletion, uint16_
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     (void) onCompletion;
     // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeSetRfidCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId, userStatus, userType,
-                                                       id);
+    chip::app::cluster::DoorLock::EncodeSetRfidCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId, userStatus, userType, id);
     return SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetRfidCommand(mEndpoint, userId, userStatus, userType, id);
@@ -1096,8 +1092,7 @@ CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Callback<> * onCompletio
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
     (void) onCompletion;
     // TODO(@vivien-apple): onCompletion is not used by IM for now.
-    chip::app::cluster::DoorLock::EncodeUnlockWithTimeoutCommand(mDevice->GetCommandSender(), mEndpoint, 0, timeoutInSeconds,
-                                                                 pin);
+    chip::app::cluster::DoorLock::EncodeUnlockWithTimeoutCommand(mDevice->GetCommandSender(), mEndpoint, 0, timeoutInSeconds, pin);
     return SendCommands();
 #else
     System::PacketBufferHandle payload = encodeDoorLockClusterUnlockWithTimeoutCommand(mEndpoint, timeoutInSeconds, pin);
