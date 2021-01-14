@@ -241,8 +241,7 @@ class ChipDeviceController(object):
         self._ChipStack.Call(
             lambda: self._dmLib.nl_Chip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
         )
-        self._Cluster.PrepareCommand(device, cluster, command, endpoint, groupid, args)
-        self._Cluster.SendCommand(device)
+        self._Cluster.SendCommand(device, cluster, command, endpoint, groupid, args)
 
     def ZCLList(self):
         return self._Cluster.ListClusters()

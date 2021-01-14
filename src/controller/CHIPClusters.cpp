@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -17,21 +17,41 @@
 #include "CHIPClusters.h"
 
 #include <app/chip-zcl-zpro-codec-api.h>
+#include <app/im-encoder.h>
 
 namespace chip {
 namespace Controller {
 
+// TODO(@vivien-apple): onCompletion is not used by IM for now.
+// TODO: length should be passed to commands when byte string is in argument list.
+// TODO: Commands should take group id as an argument.
+
 // BarrierControl Cluster Commands
 CHIP_ERROR BarrierControlCluster::BarrierControlGoToPercent(Callback::Callback<> * onCompletion, uint8_t percentOpen)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::BarrierControl::EncodeBarrierControlGoToPercentCommand(mDevice->GetCommandSender(), mEndpoint, 0,
+                                                                               percentOpen);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeBarrierControlClusterBarrierControlGoToPercentCommand(mEndpoint, percentOpen);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR BarrierControlCluster::BarrierControlStop(Callback::Callback<> * onCompletion)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::BarrierControl::EncodeBarrierControlStopCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeBarrierControlClusterBarrierControlStopCommand(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 // BarrierControl Cluster Attributes
@@ -71,16 +91,17 @@ CHIP_ERROR BarrierControlCluster::ReadAttributeClusterRevision(Callback::Callbac
 }
 
 // Basic Cluster Commands
-CHIP_ERROR BasicCluster::MfgSpecificPing(Callback::Callback<> * onCompletion)
-{
-    System::PacketBufferHandle payload = encodeBasicClusterMfgSpecificPingCommand(mEndpoint);
-    return SendCommand(std::move(payload), onCompletion);
-}
-
 CHIP_ERROR BasicCluster::ResetToFactoryDefaults(Callback::Callback<> * onCompletion)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Basic::EncodeResetToFactoryDefaultsCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeBasicClusterResetToFactoryDefaultsCommand(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 // Basic Cluster Attributes
@@ -111,114 +132,228 @@ CHIP_ERROR BasicCluster::ReadAttributeClusterRevision(Callback::Callback<> * onC
 CHIP_ERROR ColorControlCluster::MoveColor(Callback::Callback<> * onCompletion, int16_t rateX, int16_t rateY, uint8_t optionsMask,
                                           uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeMoveColorCommand(mDevice->GetCommandSender(), mEndpoint, 0, rateX, rateY, optionsMask,
+                                                             optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeColorControlClusterMoveColorCommand(mEndpoint, rateX, rateY, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::MoveColorTemperature(Callback::Callback<> * onCompletion, uint8_t moveMode, uint16_t rate,
                                                      uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum,
                                                      uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeMoveColorTemperatureCommand(mDevice->GetCommandSender(), mEndpoint, 0, moveMode, rate,
+                                                                        colorTemperatureMinimum, colorTemperatureMaximum,
+                                                                        optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeColorControlClusterMoveColorTemperatureCommand(
         mEndpoint, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::MoveHue(Callback::Callback<> * onCompletion, uint8_t moveMode, uint8_t rate, uint8_t optionsMask,
                                         uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeMoveHueCommand(mDevice->GetCommandSender(), mEndpoint, 0, moveMode, rate, optionsMask,
+                                                           optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeColorControlClusterMoveHueCommand(mEndpoint, moveMode, rate, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::MoveSaturation(Callback::Callback<> * onCompletion, uint8_t moveMode, uint8_t rate,
                                                uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeMoveSaturationCommand(mDevice->GetCommandSender(), mEndpoint, 0, moveMode, rate,
+                                                                  optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeColorControlClusterMoveSaturationCommand(mEndpoint, moveMode, rate, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::MoveToColor(Callback::Callback<> * onCompletion, uint16_t colorX, uint16_t colorY,
                                             uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeMoveToColorCommand(mDevice->GetCommandSender(), mEndpoint, 0, colorX, colorY,
+                                                               transitionTime, optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeColorControlClusterMoveToColorCommand(mEndpoint, colorX, colorY, transitionTime, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::MoveToColorTemperature(Callback::Callback<> * onCompletion, uint16_t colorTemperature,
                                                        uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeMoveToColorTemperatureCommand(
+        mDevice->GetCommandSender(), mEndpoint, 0, colorTemperature, transitionTime, optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeColorControlClusterMoveToColorTemperatureCommand(
         mEndpoint, colorTemperature, transitionTime, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::MoveToHue(Callback::Callback<> * onCompletion, uint8_t hue, uint8_t direction,
                                           uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeMoveToHueCommand(mDevice->GetCommandSender(), mEndpoint, 0, hue, direction,
+                                                             transitionTime, optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeColorControlClusterMoveToHueCommand(mEndpoint, hue, direction, transitionTime, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::MoveToHueAndSaturation(Callback::Callback<> * onCompletion, uint8_t hue, uint8_t saturation,
                                                        uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeMoveToHueAndSaturationCommand(mDevice->GetCommandSender(), mEndpoint, 0, hue,
+                                                                          saturation, transitionTime, optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeColorControlClusterMoveToHueAndSaturationCommand(
         mEndpoint, hue, saturation, transitionTime, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::MoveToSaturation(Callback::Callback<> * onCompletion, uint8_t saturation, uint16_t transitionTime,
                                                  uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeMoveToSaturationCommand(mDevice->GetCommandSender(), mEndpoint, 0, saturation,
+                                                                    transitionTime, optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeColorControlClusterMoveToSaturationCommand(mEndpoint, saturation, transitionTime, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::StepColor(Callback::Callback<> * onCompletion, int16_t stepX, int16_t stepY,
                                           uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeStepColorCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepX, stepY,
+                                                             transitionTime, optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeColorControlClusterStepColorCommand(mEndpoint, stepX, stepY, transitionTime, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::StepColorTemperature(Callback::Callback<> * onCompletion, uint8_t stepMode, uint16_t stepSize,
                                                      uint16_t transitionTime, uint16_t colorTemperatureMinimum,
                                                      uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeStepColorTemperatureCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepMode,
+                                                                        stepSize, transitionTime, colorTemperatureMinimum,
+                                                                        colorTemperatureMaximum, optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeColorControlClusterStepColorTemperatureCommand(mEndpoint, stepMode, stepSize, transitionTime, colorTemperatureMinimum,
                                                              colorTemperatureMaximum, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::StepHue(Callback::Callback<> * onCompletion, uint8_t stepMode, uint8_t stepSize,
                                         uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeStepHueCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepMode, stepSize,
+                                                           transitionTime, optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeColorControlClusterStepHueCommand(mEndpoint, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::StepSaturation(Callback::Callback<> * onCompletion, uint8_t stepMode, uint8_t stepSize,
                                                uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeStepSaturationCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepMode, stepSize,
+                                                                  transitionTime, optionsMask, optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeColorControlClusterStepSaturationCommand(mEndpoint, stepMode, stepSize, transitionTime, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ColorControlCluster::StopMoveStep(Callback::Callback<> * onCompletion, uint8_t optionsMask, uint8_t optionsOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::ColorControl::EncodeStopMoveStepCommand(mDevice->GetCommandSender(), mEndpoint, 0, optionsMask,
+                                                                optionsOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeColorControlClusterStopMoveStepCommand(mEndpoint, optionsMask, optionsOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 // ColorControl Cluster Attributes
@@ -656,149 +791,318 @@ CHIP_ERROR ColorControlCluster::ReadAttributeClusterRevision(Callback::Callback<
 // DoorLock Cluster Commands
 CHIP_ERROR DoorLockCluster::ClearAllPins(Callback::Callback<> * onCompletion)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeClearAllPinsCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearAllPinsCommand(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::ClearAllRfids(Callback::Callback<> * onCompletion)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeClearAllRfidsCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearAllRfidsCommand(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::ClearHolidaySchedule(Callback::Callback<> * onCompletion, uint8_t scheduleId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeClearHolidayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearHolidayScheduleCommand(mEndpoint, scheduleId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::ClearPin(Callback::Callback<> * onCompletion, uint16_t userId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeClearPinCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearPinCommand(mEndpoint, userId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::ClearRfid(Callback::Callback<> * onCompletion, uint16_t userId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeClearRfidCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearRfidCommand(mEndpoint, userId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::ClearWeekdaySchedule(Callback::Callback<> * onCompletion, uint8_t scheduleId, uint16_t userId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeClearWeekdayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId,
+                                                                    userId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearWeekdayScheduleCommand(mEndpoint, scheduleId, userId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::ClearYeardaySchedule(Callback::Callback<> * onCompletion, uint8_t scheduleId, uint16_t userId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeClearYeardayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId,
+                                                                    userId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterClearYeardayScheduleCommand(mEndpoint, scheduleId, userId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::GetHolidaySchedule(Callback::Callback<> * onCompletion, uint8_t scheduleId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeGetHolidayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetHolidayScheduleCommand(mEndpoint, scheduleId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::GetLogRecord(Callback::Callback<> * onCompletion, uint16_t logIndex)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeGetLogRecordCommand(mDevice->GetCommandSender(), mEndpoint, 0, logIndex);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetLogRecordCommand(mEndpoint, logIndex);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::GetPin(Callback::Callback<> * onCompletion, uint16_t userId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeGetPinCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetPinCommand(mEndpoint, userId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::GetRfid(Callback::Callback<> * onCompletion, uint16_t userId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeGetRfidCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetRfidCommand(mEndpoint, userId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::GetUserType(Callback::Callback<> * onCompletion, uint16_t userId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeGetUserTypeCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetUserTypeCommand(mEndpoint, userId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::GetWeekdaySchedule(Callback::Callback<> * onCompletion, uint8_t scheduleId, uint16_t userId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeGetWeekdayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetWeekdayScheduleCommand(mEndpoint, scheduleId, userId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::GetYeardaySchedule(Callback::Callback<> * onCompletion, uint8_t scheduleId, uint16_t userId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeGetYeardayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterGetYeardayScheduleCommand(mEndpoint, scheduleId, userId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::LockDoor(Callback::Callback<> * onCompletion, char * pin)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeLockDoorCommand(mDevice->GetCommandSender(), mEndpoint, 0, pin);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterLockDoorCommand(mEndpoint, pin);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::SetHolidaySchedule(Callback::Callback<> * onCompletion, uint8_t scheduleId, uint32_t localStartTime,
                                                uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeSetHolidayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId,
+                                                                  localStartTime, localEndTime, operatingModeDuringHoliday);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetHolidayScheduleCommand(mEndpoint, scheduleId, localStartTime,
                                                                                         localEndTime, operatingModeDuringHoliday);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::SetPin(Callback::Callback<> * onCompletion, uint16_t userId, uint8_t userStatus, uint8_t userType,
                                    char * pin)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeSetPinCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId, userStatus, userType,
+                                                      pin);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetPinCommand(mEndpoint, userId, userStatus, userType, pin);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::SetRfid(Callback::Callback<> * onCompletion, uint16_t userId, uint8_t userStatus, uint8_t userType,
                                     char * id)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeSetRfidCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId, userStatus, userType,
+                                                       id);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetRfidCommand(mEndpoint, userId, userStatus, userType, id);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::SetUserType(Callback::Callback<> * onCompletion, uint16_t userId, uint8_t userType)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeSetUserTypeCommand(mDevice->GetCommandSender(), mEndpoint, 0, userId, userType);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetUserTypeCommand(mEndpoint, userId, userType);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::SetWeekdaySchedule(Callback::Callback<> * onCompletion, uint8_t scheduleId, uint16_t userId,
                                                uint8_t daysMask, uint8_t startHour, uint8_t startMinute, uint8_t endHour,
                                                uint8_t endMinute)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeSetWeekdayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId,
+                                                                  daysMask, startHour, startMinute, endHour, endMinute);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterSetWeekdayScheduleCommand(mEndpoint, scheduleId, userId, daysMask,
                                                                                         startHour, startMinute, endHour, endMinute);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::SetYeardaySchedule(Callback::Callback<> * onCompletion, uint8_t scheduleId, uint16_t userId,
                                                uint32_t localStartTime, uint32_t localEndTime)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeSetYeardayScheduleCommand(mDevice->GetCommandSender(), mEndpoint, 0, scheduleId, userId,
+                                                                  localStartTime, localEndTime);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeDoorLockClusterSetYeardayScheduleCommand(mEndpoint, scheduleId, userId, localStartTime, localEndTime);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::UnlockDoor(Callback::Callback<> * onCompletion, char * pin)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeUnlockDoorCommand(mDevice->GetCommandSender(), mEndpoint, 0, pin);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterUnlockDoorCommand(mEndpoint, pin);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR DoorLockCluster::UnlockWithTimeout(Callback::Callback<> * onCompletion, uint16_t timeoutInSeconds, char * pin)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::DoorLock::EncodeUnlockWithTimeoutCommand(mDevice->GetCommandSender(), mEndpoint, 0, timeoutInSeconds,
+                                                                 pin);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeDoorLockClusterUnlockWithTimeoutCommand(mEndpoint, timeoutInSeconds, pin);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 // DoorLock Cluster Attributes
@@ -841,38 +1145,80 @@ CHIP_ERROR DoorLockCluster::ReadAttributeClusterRevision(Callback::Callback<> * 
 // Groups Cluster Commands
 CHIP_ERROR GroupsCluster::AddGroup(Callback::Callback<> * onCompletion, uint16_t groupId, char * groupName)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Groups::EncodeAddGroupCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, groupName);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeGroupsClusterAddGroupCommand(mEndpoint, groupId, groupName);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR GroupsCluster::AddGroupIfIdentifying(Callback::Callback<> * onCompletion, uint16_t groupId, char * groupName)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Groups::EncodeAddGroupIfIdentifyingCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, groupName);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeGroupsClusterAddGroupIfIdentifyingCommand(mEndpoint, groupId, groupName);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR GroupsCluster::GetGroupMembership(Callback::Callback<> * onCompletion, uint8_t groupCount, uint16_t groupList)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Groups::EncodeGetGroupMembershipCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupCount, groupList);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeGroupsClusterGetGroupMembershipCommand(mEndpoint, groupCount, groupList);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR GroupsCluster::RemoveAllGroups(Callback::Callback<> * onCompletion)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Groups::EncodeRemoveAllGroupsCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeGroupsClusterRemoveAllGroupsCommand(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR GroupsCluster::RemoveGroup(Callback::Callback<> * onCompletion, uint16_t groupId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Groups::EncodeRemoveGroupCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeGroupsClusterRemoveGroupCommand(mEndpoint, groupId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR GroupsCluster::ViewGroup(Callback::Callback<> * onCompletion, uint16_t groupId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Groups::EncodeViewGroupCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeGroupsClusterViewGroupCommand(mEndpoint, groupId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 // Groups Cluster Attributes
@@ -945,14 +1291,28 @@ CHIP_ERROR IasZoneCluster::ReadAttributeClusterRevision(Callback::Callback<> * o
 // Identify Cluster Commands
 CHIP_ERROR IdentifyCluster::Identify(Callback::Callback<> * onCompletion, uint16_t identifyTime)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Identify::EncodeIdentifyCommand(mDevice->GetCommandSender(), mEndpoint, 0, identifyTime);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeIdentifyClusterIdentifyCommand(mEndpoint, identifyTime);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR IdentifyCluster::IdentifyQuery(Callback::Callback<> * onCompletion)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Identify::EncodeIdentifyQueryCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeIdentifyClusterIdentifyQueryCommand(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 // Identify Cluster Attributes
@@ -983,57 +1343,118 @@ CHIP_ERROR IdentifyCluster::ReadAttributeClusterRevision(Callback::Callback<> * 
 CHIP_ERROR LevelControlCluster::Move(Callback::Callback<> * onCompletion, uint8_t moveMode, uint8_t rate, uint8_t optionMask,
                                      uint8_t optionOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::LevelControl::EncodeMoveCommand(mDevice->GetCommandSender(), mEndpoint, 0, moveMode, rate, optionMask,
+                                                        optionOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeLevelControlClusterMoveCommand(mEndpoint, moveMode, rate, optionMask, optionOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR LevelControlCluster::MoveToLevel(Callback::Callback<> * onCompletion, uint8_t level, uint16_t transitionTime,
                                             uint8_t optionMask, uint8_t optionOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::LevelControl::EncodeMoveToLevelCommand(mDevice->GetCommandSender(), mEndpoint, 0, level, transitionTime,
+                                                               optionMask, optionOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeLevelControlClusterMoveToLevelCommand(mEndpoint, level, transitionTime, optionMask, optionOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR LevelControlCluster::MoveToLevelWithOnOff(Callback::Callback<> * onCompletion, uint8_t level, uint16_t transitionTime)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::LevelControl::EncodeMoveToLevelWithOnOffCommand(mDevice->GetCommandSender(), mEndpoint, 0, level,
+                                                                        transitionTime);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeLevelControlClusterMoveToLevelWithOnOffCommand(mEndpoint, level, transitionTime);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR LevelControlCluster::MoveWithOnOff(Callback::Callback<> * onCompletion, uint8_t moveMode, uint8_t rate)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::LevelControl::EncodeMoveWithOnOffCommand(mDevice->GetCommandSender(), mEndpoint, 0, moveMode, rate);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeLevelControlClusterMoveWithOnOffCommand(mEndpoint, moveMode, rate);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR LevelControlCluster::Step(Callback::Callback<> * onCompletion, uint8_t stepMode, uint8_t stepSize,
                                      uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::LevelControl::EncodeStepCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepMode, stepSize,
+                                                        transitionTime, optionMask, optionOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeLevelControlClusterStepCommand(mEndpoint, stepMode, stepSize, transitionTime, optionMask, optionOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR LevelControlCluster::StepWithOnOff(Callback::Callback<> * onCompletion, uint8_t stepMode, uint8_t stepSize,
                                               uint16_t transitionTime)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::LevelControl::EncodeStepWithOnOffCommand(mDevice->GetCommandSender(), mEndpoint, 0, stepMode, stepSize,
+                                                                 transitionTime);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeLevelControlClusterStepWithOnOffCommand(mEndpoint, stepMode, stepSize, transitionTime);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR LevelControlCluster::Stop(Callback::Callback<> * onCompletion, uint8_t optionMask, uint8_t optionOverride)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::LevelControl::EncodeStopCommand(mDevice->GetCommandSender(), mEndpoint, 0, optionMask, optionOverride);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeLevelControlClusterStopCommand(mEndpoint, optionMask, optionOverride);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR LevelControlCluster::StopWithOnOff(Callback::Callback<> * onCompletion)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::LevelControl::EncodeStopWithOnOffCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeLevelControlClusterStopWithOnOffCommand(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 // LevelControl Cluster Attributes
@@ -1065,20 +1486,41 @@ CHIP_ERROR LevelControlCluster::ReadAttributeClusterRevision(Callback::Callback<
 // OnOff Cluster Commands
 CHIP_ERROR OnOffCluster::Off(Callback::Callback<> * onCompletion)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::OnOff::EncodeOffCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeOnOffClusterOffCommand(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR OnOffCluster::On(Callback::Callback<> * onCompletion)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::OnOff::EncodeOnCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeOnOffClusterOnCommand(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR OnOffCluster::Toggle(Callback::Callback<> * onCompletion)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::OnOff::EncodeToggleCommand(mDevice->GetCommandSender(), mEndpoint, 0);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeOnOffClusterToggleCommand(mEndpoint);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 // OnOff Cluster Attributes
@@ -1110,46 +1552,97 @@ CHIP_ERROR OnOffCluster::ReadAttributeClusterRevision(Callback::Callback<> * onC
 CHIP_ERROR ScenesCluster::AddScene(Callback::Callback<> * onCompletion, uint16_t groupId, uint8_t sceneId, uint16_t transitionTime,
                                    char * sceneName, chip::ClusterId clusterId, uint8_t length, uint8_t value)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Scenes::EncodeAddSceneCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, sceneId, transitionTime,
+                                                      sceneName, clusterId, length, value);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload =
         encodeScenesClusterAddSceneCommand(mEndpoint, groupId, sceneId, transitionTime, sceneName, clusterId, length, value);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ScenesCluster::GetSceneMembership(Callback::Callback<> * onCompletion, uint16_t groupId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Scenes::EncodeGetSceneMembershipCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeScenesClusterGetSceneMembershipCommand(mEndpoint, groupId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ScenesCluster::RecallScene(Callback::Callback<> * onCompletion, uint16_t groupId, uint8_t sceneId,
                                       uint16_t transitionTime)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Scenes::EncodeRecallSceneCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, sceneId,
+                                                         transitionTime);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeScenesClusterRecallSceneCommand(mEndpoint, groupId, sceneId, transitionTime);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ScenesCluster::RemoveAllScenes(Callback::Callback<> * onCompletion, uint16_t groupId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Scenes::EncodeRemoveAllScenesCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeScenesClusterRemoveAllScenesCommand(mEndpoint, groupId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ScenesCluster::RemoveScene(Callback::Callback<> * onCompletion, uint16_t groupId, uint8_t sceneId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Scenes::EncodeRemoveSceneCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, sceneId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeScenesClusterRemoveSceneCommand(mEndpoint, groupId, sceneId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ScenesCluster::StoreScene(Callback::Callback<> * onCompletion, uint16_t groupId, uint8_t sceneId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Scenes::EncodeStoreSceneCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, sceneId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeScenesClusterStoreSceneCommand(mEndpoint, groupId, sceneId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 CHIP_ERROR ScenesCluster::ViewScene(Callback::Callback<> * onCompletion, uint16_t groupId, uint8_t sceneId)
 {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+    (void) onCompletion;
+    // TODO(@vivien-apple): onCompletion is not used by IM for now.
+    chip::app::cluster::Scenes::EncodeViewSceneCommand(mDevice->GetCommandSender(), mEndpoint, 0, groupId, sceneId);
+    return SendCommands();
+#else
     System::PacketBufferHandle payload = encodeScenesClusterViewSceneCommand(mEndpoint, groupId, sceneId);
     return SendCommand(std::move(payload), onCompletion);
+#endif
 }
 
 // Scenes Cluster Attributes

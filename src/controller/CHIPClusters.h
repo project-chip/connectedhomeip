@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2021 Project CHIP Authors
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
  *    you may not use this file except in compliance with the License.
@@ -62,7 +62,6 @@ public:
     ~BasicCluster() {}
 
     // Cluster Commands
-    CHIP_ERROR MfgSpecificPing(Callback::Callback<> * onCompletion);
     CHIP_ERROR ResetToFactoryDefaults(Callback::Callback<> * onCompletion);
 
     // Cluster Attributes

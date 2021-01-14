@@ -27,11 +27,6 @@ class ChipCluster:
     def __init__(self, chipstack):
         self._ChipStack = chipstack
 
-    def SendCommand(self, device: ctypes.c_void_p):
-        self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_SendCommand(device)
-        )
-
     def ListClusters(self):
         return {
             "BarrierControl": {
@@ -350,7 +345,7 @@ class ChipCluster:
             },
         }
 
-    def PrepareCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args):
+    def SendCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args):
         func = getattr(self, "Cluster{}_Command{}".format(cluster, command), None)
         if not func:
             raise UnknownCommand(cluster, command)
@@ -828,8 +823,6 @@ class ChipCluster:
 
     def InitLib(self, chipLib):
         self._chipLib = chipLib
-        self._chipLib.chip_ime_SendCommand.argtypes = [ctypes.c_void_p, ctypes.c_uint64]
-        self._chipLib.chip_ime_SendCommand.restype = ctypes.c_uint32
         # Cluster BarrierControl
         # Cluster BarrierControl Command BarrierControlGoToPercent
         self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent.argtypes = [ctypes.c_void_p, ctypes.c_uint8, ctypes.c_uint16, ctypes.c_uint8]

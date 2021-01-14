@@ -57,6 +57,12 @@ protected:
 
     /**
      * @brief
+     *   Send the commands via IM.
+     */
+    CHIP_ERROR SendCommands();
+
+    /**
+     * @brief
      *   Request attribute reports from the device. Add a callback
      *   handler, that'll be called when the reports are received from the device.
      *

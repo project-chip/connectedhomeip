@@ -93,7 +93,7 @@ public:
      * @brief
      *   Send the command in internal command sender.
      */
-    CHIP_ERROR SendCommand()
+    CHIP_ERROR SendCommands()
     {
         if (mCommandSender == nullptr)
         {

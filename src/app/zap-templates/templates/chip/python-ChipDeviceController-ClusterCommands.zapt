@@ -6,6 +6,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/im-encoder.h>
 
+#include <controller/CHIPClusters.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController_deprecated.h>
 
@@ -41,20 +42,14 @@ CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCa
     {
         return CHIP_ERROR_INCORRECT_STATE;
     }
-    return app::cluster::{{asCamelCased clusterName false}}::Encode{{asType name}}Command(device->GetCommandSender(), ZCLendpointId, ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}});
+    chip::Controller::{{asCamelCased clusterName false}}Cluster cluster{{asCamelCased clusterName false}};
+    (void) ZCLgroupId;
+    cluster{{asCamelCased clusterName false}}.Associate(device, ZCLendpointId);
+    return cluster{{asCamelCased clusterName false}}.{{asCamelCased name false}}(nullptr{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
 }
 {{/chip_server_cluster_commands}}
 // End of Cluster {{asCamelCased name false}}
 
 {{/chip_server_clusters}}
-
-CHIP_ERROR chip_ime_SendCommand(chip::Controller::Device * device, chip::NodeId nodeId)
-{
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
-    return device->SendCommand();
-}
 
 }
