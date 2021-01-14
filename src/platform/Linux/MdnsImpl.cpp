@@ -468,6 +468,17 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
                                                           static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(), nullptr,
                                                           nullptr, service.mPort, text) == 0,
                      error = CHIP_ERROR_INTERNAL);
+        for (size_t i = 0; i < service.mSubTypeSize; i++)
+        {
+            std::ostringstream sstream;
+
+            sstream << service.mSubTypes[i] << "._sub." << type;
+
+            VerifyOrExit(avahi_entry_group_add_service_subtype(mGroup, interface, ToAvahiProtocol(service.mAddressType),
+                                                               static_cast<AvahiPublishFlags>(0), service.mName, type.c_str(),
+                                                               nullptr, sstream.str().c_str()) == 0,
+                         error = CHIP_ERROR_INTERNAL);
+        }
     }
     else
     {
@@ -478,6 +489,7 @@ CHIP_ERROR MdnsAvahi::PublishService(const MdnsService & service)
                                                                  nullptr, text) == 0,
                      error = CHIP_ERROR_INTERNAL);
     }
+
     VerifyOrExit(avahi_entry_group_commit(mGroup) == 0, error = CHIP_ERROR_INTERNAL);
 
 exit:
