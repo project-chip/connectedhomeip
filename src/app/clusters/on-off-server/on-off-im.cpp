@@ -12,6 +12,7 @@ namespace app {
 namespace cluster {
 namespace OnOff {
 
+// TODO: Call handler in on-off.cpp here.
 void HandleOffCommandReceived(chip::TLV::TLVReader & aReader, chip::app::Command * apCommandObj)
 {
     EncodeOffCommand(apCommandObj, 1, 0);
