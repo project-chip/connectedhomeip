@@ -39,7 +39,6 @@
 #include <platform/CHIPDeviceLayer.h>
 #endif
 
-#include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <core/CHIPCore.h>
 #include <core/CHIPEncoding.h>
@@ -146,8 +145,6 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     err = mExchangeManager->Init(mSessionManager);
     SuccessOrExit(err);
     err = chip::app::InteractionModelEngine::GetInstance()->Init(mExchangeManager);
-    SuccessOrExit(err);
-    err = chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
     SuccessOrExit(err);
 #else
     mSessionManager->SetDelegate(this);

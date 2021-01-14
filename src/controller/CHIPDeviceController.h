@@ -28,7 +28,6 @@
 
 #pragma once
 
-#include <app/CommandSender.h>
 #include <controller/CHIPDevice.h>
 #include <controller/CHIPPersistentStorageDelegate.h>
 #include <core/CHIPCore.h>
@@ -150,8 +149,6 @@ public:
 
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
-    chip::app::CommandSender * GetCommandSender() { return mCommandSender; }
-
     virtual void ReleaseDevice(Device * device);
 
     // ----- IO -----
@@ -194,8 +191,6 @@ protected:
     Messaging::ExchangeManager * mExchangeManager;
     PersistentStorageDelegate * mStorageDelegate;
     Inet::InetLayer * mInetLayer;
-
-    chip::app::CommandSender * mCommandSender = nullptr;
 
     uint16_t mListenPort;
     uint16_t GetInactiveDeviceIndex();

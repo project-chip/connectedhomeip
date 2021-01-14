@@ -26,6 +26,8 @@
 
 #pragma once
 
+#include <app/CommandSender.h>
+#include <app/InteractionModelEngine.h>
 #include <app/util/basic-types.h>
 #include <core/CHIPCallback.h>
 #include <core/CHIPCore.h>
@@ -54,8 +56,19 @@ using DeviceTransportMgr = TransportMgr<Transport::UDP /* IPv6 */
 class DLL_EXPORT Device
 {
 public:
-    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected) {}
-    ~Device() {}
+    Device() : mInterface(INET_NULL_INTERFACEID), mActive(false), mState(ConnectionState::NotConnected)
+    {
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+        chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
+#endif
+    }
+    ~Device()
+    {
+        if (mCommandSender)
+        {
+            mCommandSender->Shutdown();
+        }
+    }
 
     /**
      * @brief
@@ -77,6 +90,24 @@ public:
      * @return CHIP_ERROR   CHIP_NO_ERROR on success, or corresponding error
      */
     CHIP_ERROR SendMessage(System::PacketBufferHandle message);
+
+    /**
+     * @brief
+     *   Send the command in internal command sender.
+     */
+    CHIP_ERROR SendCommand()
+    {
+        if (mCommandSender == nullptr)
+        {
+            return CHIP_ERROR_INCORRECT_STATE;
+        }
+        else
+        {
+            return mCommandSender->SendCommandRequest(mDeviceId);
+        }
+    }
+
+    app::CommandSender * GetCommandSender() { return mCommandSender; }
 
     /**
      * @brief
@@ -265,6 +296,8 @@ private:
     SecureSessionMgr * mSessionManager;
 
     DeviceTransportMgr * mTransportMgr;
+
+    app::CommandSender * mCommandSender;
 
     SecureSessionHandle mSecureSession = {};
 

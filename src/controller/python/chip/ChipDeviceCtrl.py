@@ -118,7 +118,7 @@ class ChipDeviceController(object):
         self.cbHandleBleWriteChar = None
         self.cbHandleBleSubscribeChar = None
         self.cbHandleBleClose = None
-        self._Cluster = ChipCluster(self._ChipStack, self.devCtrl)
+        self._Cluster = ChipCluster(self._ChipStack)
         self._Cluster.InitLib(self._dmLib)
 
         def DeviceCtrlHandleMessage(appReqState, buffer):
@@ -237,8 +237,12 @@ class ChipDeviceController(object):
         )
 
     def ZCLSend(self, cluster, command, nodeid, endpoint, groupid, args):
-        self._Cluster.PrepareCommand(cluster, command, endpoint, groupid, args)
-        self._Cluster.SendCommand(nodeid)
+        device = c_void_p(None)
+        self._ChipStack.Call(
+            lambda: self._dmLib.nl_Chip_GetDeviceByNodeId(self.devCtrl, nodeid, pointer(device))
+        )
+        self._Cluster.PrepareCommand(device, cluster, command, endpoint, groupid, args)
+        self._Cluster.SendCommand(device)
 
     def ZCLList(self):
         return self._Cluster.ListClusters()
@@ -350,3 +354,6 @@ class ChipDeviceController(object):
 
             self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate.argtypes = [c_void_p, c_void_p]
             self._dmLib.nl_Chip_DeviceController_SetDevicePairingDelegate.restype = c_uint32
+
+            self._dmLib.nl_Chip_GetDeviceByNodeId.argtypes = [c_void_p, c_uint64, POINTER(c_void_p)]
+            self._dmLib.nl_Chip_GetDeviceByNodeId.restype = c_uint32

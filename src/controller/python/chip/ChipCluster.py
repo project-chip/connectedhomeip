@@ -24,13 +24,12 @@ from .ChipExceptions import *
 __all__ = ["ChipCluster"]
 
 class ChipCluster:
-    def __init__(self, chipstack, devctl):
+    def __init__(self, chipstack):
         self._ChipStack = chipstack
-        self._devCtrl = devctl
 
-    def SendCommand(self, nodeId: int):
+    def SendCommand(self, device: ctypes.c_void_p):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_SendCommand(self._devCtrl, nodeId)
+            lambda: self._chipLib.chip_ime_SendCommand(device)
         )
 
     def ListClusters(self):
@@ -351,479 +350,479 @@ class ChipCluster:
             },
         }
 
-    def PrepareCommand(self, cluster: str, command: str, endpoint: int, groupid: int, args):
+    def PrepareCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args):
         func = getattr(self, "Cluster{}_Command{}".format(cluster, command), None)
         if not func:
             raise UnknownCommand(cluster, command)
         func(endpoint, groupid, **args)
 
-    def ClusterBarrierControl_CommandBarrierControlGoToPercent(self, ZCLendpoint: int, ZCLgroupid: int, percentOpen: int):
+    def ClusterBarrierControl_CommandBarrierControlGoToPercent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentOpen: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, percentOpen
+                device, ZCLendpoint, ZCLgroupid, percentOpen
             )
         )
 
-    def ClusterBarrierControl_CommandBarrierControlStop(self, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterBarrierControl_CommandBarrierControlStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_BarrierControl_BarrierControlStop(
-                self._devCtrl, ZCLendpoint, ZCLgroupid
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterBasic_CommandResetToFactoryDefaults(self, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterBasic_CommandResetToFactoryDefaults(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Basic_ResetToFactoryDefaults(
-                self._devCtrl, ZCLendpoint, ZCLgroupid
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterColorControl_CommandMoveColor(self, ZCLendpoint: int, ZCLgroupid: int, rateX: int, rateY: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, rateX: int, rateY: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColor(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, rateX, rateY, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, rateX, rateY, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandMoveColorTemperature(self, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, colorTemperatureMinimum: int, colorTemperatureMaximum: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, colorTemperatureMinimum: int, colorTemperatureMaximum: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveColorTemperature(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, moveMode, rate, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandMoveHue(self, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveHue(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandMoveSaturation(self, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveSaturation(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandMoveToColor(self, ZCLendpoint: int, ZCLgroupid: int, colorX: int, colorY: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveToColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, colorX: int, colorY: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColor(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, colorX, colorY, transitionTime, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, colorX, colorY, transitionTime, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandMoveToColorTemperature(self, ZCLendpoint: int, ZCLgroupid: int, colorTemperature: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveToColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, colorTemperature: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToColorTemperature(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, colorTemperature, transitionTime, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, colorTemperature, transitionTime, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandMoveToHue(self, ZCLendpoint: int, ZCLgroupid: int, hue: int, direction: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveToHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, hue: int, direction: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHue(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, hue, direction, transitionTime, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, hue, direction, transitionTime, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandMoveToHueAndSaturation(self, ZCLendpoint: int, ZCLgroupid: int, hue: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveToHueAndSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, hue: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToHueAndSaturation(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, hue, saturation, transitionTime, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, hue, saturation, transitionTime, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandMoveToSaturation(self, ZCLendpoint: int, ZCLgroupid: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandMoveToSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, saturation: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_MoveToSaturation(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, saturation, transitionTime, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, saturation, transitionTime, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandStepColor(self, ZCLendpoint: int, ZCLgroupid: int, stepX: int, stepY: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandStepColor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepX: int, stepY: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StepColor(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, stepX, stepY, transitionTime, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, stepX, stepY, transitionTime, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandStepColorTemperature(self, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, colorTemperatureMinimum: int, colorTemperatureMaximum: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandStepColorTemperature(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, colorTemperatureMinimum: int, colorTemperatureMaximum: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StepColorTemperature(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, colorTemperatureMinimum, colorTemperatureMaximum, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandStepHue(self, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandStepHue(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StepHue(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandStepSaturation(self, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandStepSaturation(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StepSaturation(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionsMask, optionsOverride
             )
         )
 
-    def ClusterColorControl_CommandStopMoveStep(self, ZCLendpoint: int, ZCLgroupid: int, optionsMask: int, optionsOverride: int):
+    def ClusterColorControl_CommandStopMoveStep(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, optionsMask: int, optionsOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_ColorControl_StopMoveStep(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, optionsMask, optionsOverride
+                device, ZCLendpoint, ZCLgroupid, optionsMask, optionsOverride
             )
         )
 
-    def ClusterDoorLock_CommandClearAllPins(self, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterDoorLock_CommandClearAllPins(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllPins(
-                self._devCtrl, ZCLendpoint, ZCLgroupid
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterDoorLock_CommandClearAllRfids(self, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterDoorLock_CommandClearAllRfids(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearAllRfids(
-                self._devCtrl, ZCLendpoint, ZCLgroupid
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterDoorLock_CommandClearHolidaySchedule(self, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int):
+    def ClusterDoorLock_CommandClearHolidaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearHolidaySchedule(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, scheduleId
+                device, ZCLendpoint, ZCLgroupid, scheduleId
             )
         )
 
-    def ClusterDoorLock_CommandClearPin(self, ZCLendpoint: int, ZCLgroupid: int, userId: int):
+    def ClusterDoorLock_CommandClearPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearPin(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, userId
+                device, ZCLendpoint, ZCLgroupid, userId
             )
         )
 
-    def ClusterDoorLock_CommandClearRfid(self, ZCLendpoint: int, ZCLgroupid: int, userId: int):
+    def ClusterDoorLock_CommandClearRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearRfid(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, userId
+                device, ZCLendpoint, ZCLgroupid, userId
             )
         )
 
-    def ClusterDoorLock_CommandClearWeekdaySchedule(self, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
+    def ClusterDoorLock_CommandClearWeekdaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearWeekdaySchedule(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, scheduleId, userId
+                device, ZCLendpoint, ZCLgroupid, scheduleId, userId
             )
         )
 
-    def ClusterDoorLock_CommandClearYeardaySchedule(self, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
+    def ClusterDoorLock_CommandClearYeardaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_ClearYeardaySchedule(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, scheduleId, userId
+                device, ZCLendpoint, ZCLgroupid, scheduleId, userId
             )
         )
 
-    def ClusterDoorLock_CommandGetHolidaySchedule(self, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int):
+    def ClusterDoorLock_CommandGetHolidaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetHolidaySchedule(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, scheduleId
+                device, ZCLendpoint, ZCLgroupid, scheduleId
             )
         )
 
-    def ClusterDoorLock_CommandGetLogRecord(self, ZCLendpoint: int, ZCLgroupid: int, logIndex: int):
+    def ClusterDoorLock_CommandGetLogRecord(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, logIndex: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetLogRecord(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, logIndex
+                device, ZCLendpoint, ZCLgroupid, logIndex
             )
         )
 
-    def ClusterDoorLock_CommandGetPin(self, ZCLendpoint: int, ZCLgroupid: int, userId: int):
+    def ClusterDoorLock_CommandGetPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetPin(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, userId
+                device, ZCLendpoint, ZCLgroupid, userId
             )
         )
 
-    def ClusterDoorLock_CommandGetRfid(self, ZCLendpoint: int, ZCLgroupid: int, userId: int):
+    def ClusterDoorLock_CommandGetRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetRfid(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, userId
+                device, ZCLendpoint, ZCLgroupid, userId
             )
         )
 
-    def ClusterDoorLock_CommandGetUserType(self, ZCLendpoint: int, ZCLgroupid: int, userId: int):
+    def ClusterDoorLock_CommandGetUserType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetUserType(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, userId
+                device, ZCLendpoint, ZCLgroupid, userId
             )
         )
 
-    def ClusterDoorLock_CommandGetWeekdaySchedule(self, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
+    def ClusterDoorLock_CommandGetWeekdaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetWeekdaySchedule(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, scheduleId, userId
+                device, ZCLendpoint, ZCLgroupid, scheduleId, userId
             )
         )
 
-    def ClusterDoorLock_CommandGetYeardaySchedule(self, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
+    def ClusterDoorLock_CommandGetYeardaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_GetYeardaySchedule(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, scheduleId, userId
+                device, ZCLendpoint, ZCLgroupid, scheduleId, userId
             )
         )
 
-    def ClusterDoorLock_CommandLockDoor(self, ZCLendpoint: int, ZCLgroupid: int, pin: str):
+    def ClusterDoorLock_CommandLockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: str):
         pin = pin.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_LockDoor(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, pin
+                device, ZCLendpoint, ZCLgroupid, pin
             )
         )
 
-    def ClusterDoorLock_CommandSetHolidaySchedule(self, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, localStartTime: int, localEndTime: int, operatingModeDuringHoliday: int):
+    def ClusterDoorLock_CommandSetHolidaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, localStartTime: int, localEndTime: int, operatingModeDuringHoliday: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetHolidaySchedule(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday
+                device, ZCLendpoint, ZCLgroupid, scheduleId, localStartTime, localEndTime, operatingModeDuringHoliday
             )
         )
 
-    def ClusterDoorLock_CommandSetPin(self, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, pin: str):
+    def ClusterDoorLock_CommandSetPin(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, pin: str):
         pin = pin.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetPin(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, pin
+                device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, pin
             )
         )
 
-    def ClusterDoorLock_CommandSetRfid(self, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, id: str):
+    def ClusterDoorLock_CommandSetRfid(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userStatus: int, userType: int, id: str):
         id = id.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetRfid(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, id
+                device, ZCLendpoint, ZCLgroupid, userId, userStatus, userType, id
             )
         )
 
-    def ClusterDoorLock_CommandSetUserType(self, ZCLendpoint: int, ZCLgroupid: int, userId: int, userType: int):
+    def ClusterDoorLock_CommandSetUserType(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, userId: int, userType: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetUserType(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, userId, userType
+                device, ZCLendpoint, ZCLgroupid, userId, userType
             )
         )
 
-    def ClusterDoorLock_CommandSetWeekdaySchedule(self, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int, daysMask: int, startHour: int, startMinute: int, endHour: int, endMinute: int):
+    def ClusterDoorLock_CommandSetWeekdaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int, daysMask: int, startHour: int, startMinute: int, endHour: int, endMinute: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetWeekdaySchedule(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute
+                device, ZCLendpoint, ZCLgroupid, scheduleId, userId, daysMask, startHour, startMinute, endHour, endMinute
             )
         )
 
-    def ClusterDoorLock_CommandSetYeardaySchedule(self, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int, localStartTime: int, localEndTime: int):
+    def ClusterDoorLock_CommandSetYeardaySchedule(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, scheduleId: int, userId: int, localStartTime: int, localEndTime: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_SetYeardaySchedule(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, scheduleId, userId, localStartTime, localEndTime
+                device, ZCLendpoint, ZCLgroupid, scheduleId, userId, localStartTime, localEndTime
             )
         )
 
-    def ClusterDoorLock_CommandUnlockDoor(self, ZCLendpoint: int, ZCLgroupid: int, pin: str):
+    def ClusterDoorLock_CommandUnlockDoor(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, pin: str):
         pin = pin.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockDoor(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, pin
+                device, ZCLendpoint, ZCLgroupid, pin
             )
         )
 
-    def ClusterDoorLock_CommandUnlockWithTimeout(self, ZCLendpoint: int, ZCLgroupid: int, timeoutInSeconds: int, pin: str):
+    def ClusterDoorLock_CommandUnlockWithTimeout(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, timeoutInSeconds: int, pin: str):
         pin = pin.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, timeoutInSeconds, pin
+                device, ZCLendpoint, ZCLgroupid, timeoutInSeconds, pin
             )
         )
 
-    def ClusterGroups_CommandAddGroup(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: str):
+    def ClusterGroups_CommandAddGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: str):
         groupName = groupName.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Groups_AddGroup(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId, groupName
+                device, ZCLendpoint, ZCLgroupid, groupId, groupName
             )
         )
 
-    def ClusterGroups_CommandAddGroupIfIdentifying(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: str):
+    def ClusterGroups_CommandAddGroupIfIdentifying(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, groupName: str):
         groupName = groupName.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Groups_AddGroupIfIdentifying(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId, groupName
+                device, ZCLendpoint, ZCLgroupid, groupId, groupName
             )
         )
 
-    def ClusterGroups_CommandGetGroupMembership(self, ZCLendpoint: int, ZCLgroupid: int, groupCount: int, groupList: int):
+    def ClusterGroups_CommandGetGroupMembership(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupCount: int, groupList: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Groups_GetGroupMembership(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupCount, groupList
+                device, ZCLendpoint, ZCLgroupid, groupCount, groupList
             )
         )
 
-    def ClusterGroups_CommandRemoveAllGroups(self, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterGroups_CommandRemoveAllGroups(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Groups_RemoveAllGroups(
-                self._devCtrl, ZCLendpoint, ZCLgroupid
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterGroups_CommandRemoveGroup(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
+    def ClusterGroups_CommandRemoveGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Groups_RemoveGroup(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId
+                device, ZCLendpoint, ZCLgroupid, groupId
             )
         )
 
-    def ClusterGroups_CommandViewGroup(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
+    def ClusterGroups_CommandViewGroup(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Groups_ViewGroup(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId
+                device, ZCLendpoint, ZCLgroupid, groupId
             )
         )
 
-    def ClusterIdentify_CommandIdentify(self, ZCLendpoint: int, ZCLgroupid: int, identifyTime: int):
+    def ClusterIdentify_CommandIdentify(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, identifyTime: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Identify_Identify(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, identifyTime
+                device, ZCLendpoint, ZCLgroupid, identifyTime
             )
         )
 
-    def ClusterIdentify_CommandIdentifyQuery(self, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterIdentify_CommandIdentifyQuery(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Identify_IdentifyQuery(
-                self._devCtrl, ZCLendpoint, ZCLgroupid
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterLevelControl_CommandMove(self, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionMask: int, optionOverride: int):
+    def ClusterLevelControl_CommandMove(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int, optionMask: int, optionOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_Move(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, moveMode, rate, optionMask, optionOverride
+                device, ZCLendpoint, ZCLgroupid, moveMode, rate, optionMask, optionOverride
             )
         )
 
-    def ClusterLevelControl_CommandMoveToLevel(self, ZCLendpoint: int, ZCLgroupid: int, level: int, transitionTime: int, optionMask: int, optionOverride: int):
+    def ClusterLevelControl_CommandMoveToLevel(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, level: int, transitionTime: int, optionMask: int, optionOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevel(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, level, transitionTime, optionMask, optionOverride
+                device, ZCLendpoint, ZCLgroupid, level, transitionTime, optionMask, optionOverride
             )
         )
 
-    def ClusterLevelControl_CommandMoveToLevelWithOnOff(self, ZCLendpoint: int, ZCLgroupid: int, level: int, transitionTime: int):
+    def ClusterLevelControl_CommandMoveToLevelWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, level: int, transitionTime: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_MoveToLevelWithOnOff(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, level, transitionTime
+                device, ZCLendpoint, ZCLgroupid, level, transitionTime
             )
         )
 
-    def ClusterLevelControl_CommandMoveWithOnOff(self, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int):
+    def ClusterLevelControl_CommandMoveWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, moveMode: int, rate: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_MoveWithOnOff(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, moveMode, rate
+                device, ZCLendpoint, ZCLgroupid, moveMode, rate
             )
         )
 
-    def ClusterLevelControl_CommandStep(self, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionMask: int, optionOverride: int):
+    def ClusterLevelControl_CommandStep(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int, optionMask: int, optionOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_Step(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionMask, optionOverride
+                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime, optionMask, optionOverride
             )
         )
 
-    def ClusterLevelControl_CommandStepWithOnOff(self, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int):
+    def ClusterLevelControl_CommandStepWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, stepMode: int, stepSize: int, transitionTime: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_StepWithOnOff(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime
+                device, ZCLendpoint, ZCLgroupid, stepMode, stepSize, transitionTime
             )
         )
 
-    def ClusterLevelControl_CommandStop(self, ZCLendpoint: int, ZCLgroupid: int, optionMask: int, optionOverride: int):
+    def ClusterLevelControl_CommandStop(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, optionMask: int, optionOverride: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_Stop(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, optionMask, optionOverride
+                device, ZCLendpoint, ZCLgroupid, optionMask, optionOverride
             )
         )
 
-    def ClusterLevelControl_CommandStopWithOnOff(self, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterLevelControl_CommandStopWithOnOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_LevelControl_StopWithOnOff(
-                self._devCtrl, ZCLendpoint, ZCLgroupid
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterOnOff_CommandOff(self, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterOnOff_CommandOff(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_OnOff_Off(
-                self._devCtrl, ZCLendpoint, ZCLgroupid
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterOnOff_CommandOn(self, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterOnOff_CommandOn(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_OnOff_On(
-                self._devCtrl, ZCLendpoint, ZCLgroupid
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterOnOff_CommandToggle(self, ZCLendpoint: int, ZCLgroupid: int):
+    def ClusterOnOff_CommandToggle(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_OnOff_Toggle(
-                self._devCtrl, ZCLendpoint, ZCLgroupid
+                device, ZCLendpoint, ZCLgroupid
             )
         )
 
-    def ClusterScenes_CommandAddScene(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: str, clusterId: int, length: int, value: int):
+    def ClusterScenes_CommandAddScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int, sceneName: str, clusterId: int, length: int, value: int):
         sceneName = sceneName.encode("utf-8") + b'\x00'
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Scenes_AddScene(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime, sceneName, clusterId, length, value
+                device, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime, sceneName, clusterId, length, value
             )
         )
 
-    def ClusterScenes_CommandGetSceneMembership(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
+    def ClusterScenes_CommandGetSceneMembership(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Scenes_GetSceneMembership(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId
+                device, ZCLendpoint, ZCLgroupid, groupId
             )
         )
 
-    def ClusterScenes_CommandRecallScene(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int):
+    def ClusterScenes_CommandRecallScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int, transitionTime: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Scenes_RecallScene(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime
+                device, ZCLendpoint, ZCLgroupid, groupId, sceneId, transitionTime
             )
         )
 
-    def ClusterScenes_CommandRemoveAllScenes(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
+    def ClusterScenes_CommandRemoveAllScenes(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Scenes_RemoveAllScenes(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId
+                device, ZCLendpoint, ZCLgroupid, groupId
             )
         )
 
-    def ClusterScenes_CommandRemoveScene(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
+    def ClusterScenes_CommandRemoveScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Scenes_RemoveScene(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId, sceneId
+                device, ZCLendpoint, ZCLgroupid, groupId, sceneId
             )
         )
 
-    def ClusterScenes_CommandStoreScene(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
+    def ClusterScenes_CommandStoreScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Scenes_StoreScene(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId, sceneId
+                device, ZCLendpoint, ZCLgroupid, groupId, sceneId
             )
         )
 
-    def ClusterScenes_CommandViewScene(self, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
+    def ClusterScenes_CommandViewScene(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, groupId: int, sceneId: int):
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_Scenes_ViewScene(
-                self._devCtrl, ZCLendpoint, ZCLgroupid, groupId, sceneId
+                device, ZCLendpoint, ZCLgroupid, groupId, sceneId
             )
         )
 

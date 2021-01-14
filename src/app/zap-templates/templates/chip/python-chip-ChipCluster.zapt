@@ -9,13 +9,12 @@ from .ChipExceptions import *
 __all__ = ["ChipCluster"]
 
 class ChipCluster:
-    def __init__(self, chipstack, devctl):
+    def __init__(self, chipstack):
         self._ChipStack = chipstack
-        self._devCtrl = devctl
 
-    def SendCommand(self, nodeId: int):
+    def SendCommand(self, device: ctypes.c_void_p):
         self._ChipStack.Call(
-            lambda: self._chipLib.chip_ime_SendCommand(self._devCtrl, nodeId)
+            lambda: self._chipLib.chip_ime_SendCommand(device)
         )
 
     def ListClusters(self):
@@ -33,7 +32,7 @@ class ChipCluster:
 {{/chip_server_clusters}}
         }
 
-    def PrepareCommand(self, cluster: str, command: str, endpoint: int, groupid: int, args):
+    def PrepareCommand(self, device: ctypes.c_void_p, cluster: str, command: str, endpoint: int, groupid: int, args):
         func = getattr(self, "Cluster{}_Command{}".format(cluster, command), None)
         if not func:
             raise UnknownCommand(cluster, command)
@@ -41,7 +40,7 @@ class ChipCluster:
 
 {{#chip_server_clusters}}
 {{#chip_server_cluster_commands}}
-    def Cluster{{asCamelCased clusterName false}}_Command{{asCamelCased name false}}(self, ZCLendpoint: int, ZCLgroupid: int{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}: {{asPythonType chipType}}{{/chip_server_cluster_command_arguments}}):
+    def Cluster{{asCamelCased clusterName false}}_Command{{asCamelCased name false}}(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}: {{asPythonType chipType}}{{/chip_server_cluster_command_arguments}}):
 {{#chip_server_cluster_command_arguments}}
 {{#if (isByteString type)}}
 {{else if (isString type)}}
@@ -50,7 +49,7 @@ class ChipCluster:
 {{/chip_server_cluster_command_arguments}}
         self._ChipStack.Call(
             lambda: self._chipLib.chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(
-                self._devCtrl, ZCLendpoint, ZCLgroupid{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, len({{asCamelCased label}}){{/if}}{{/chip_server_cluster_command_arguments}}
+                device, ZCLendpoint, ZCLgroupid{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, len({{asCamelCased label}}){{/if}}{{/chip_server_cluster_command_arguments}}
             )
         )
 

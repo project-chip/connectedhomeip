@@ -6,6 +6,7 @@
 #include <app/InteractionModelEngine.h>
 #include <app/im-encoder.h>
 
+#include <controller/CHIPDevice.h>
 #include <controller/CHIPDeviceController_deprecated.h>
 
 using namespace chip;
@@ -34,18 +35,26 @@ extern "C" {
 {{#chip_server_clusters}}
 // Cluster {{asCamelCased name false}}
 {{#chip_server_cluster_commands}}
-CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::DeviceController::ChipDeviceController * dc,chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{#if (isByteString type)}}, uint32_t {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}})
+CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{#if (isByteString type)}}, uint32_t {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}})
 {
-    return app::cluster::{{asCamelCased clusterName false}}::Encode{{asType name}}Command(dc->GetCommandSender(), ZCLendpointId, ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}});
+    if (device == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    return app::cluster::{{asCamelCased clusterName false}}::Encode{{asType name}}Command(device->GetCommandSender(), ZCLendpointId, ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}});
 }
 {{/chip_server_cluster_commands}}
 // End of Cluster {{asCamelCased name false}}
 
 {{/chip_server_clusters}}
 
-CHIP_ERROR chip_ime_SendCommand(chip::DeviceController::ChipDeviceController * dc, chip::NodeId nodeId)
+CHIP_ERROR chip_ime_SendCommand(chip::Controller::Device * device, chip::NodeId nodeId)
 {
-    return dc->GetCommandSender()->SendCommandRequest(nodeId);
+    if (device == nullptr)
+    {
+        return CHIP_ERROR_INCORRECT_STATE;
+    }
+    return device->SendCommand();
 }
 
 }
