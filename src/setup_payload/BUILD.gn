@@ -23,10 +23,10 @@ static_library("setup_payload") {
 
   sources = [
     "AdditionalDataPayload.h",
+    "AdditionalDataPayloadGenerator.cpp",
+    "AdditionalDataPayloadGenerator.h",
     "AdditionalDataPayloadParser.cpp",
     "AdditionalDataPayloadParser.h",
-    "AdditionalDataPayloadGenerator.h",
-    "AdditionalDataPayloadGenerator.cpp",
     "Base41.cpp",
     "Base41.h",
     "ManualSetupPayloadGenerator.cpp",

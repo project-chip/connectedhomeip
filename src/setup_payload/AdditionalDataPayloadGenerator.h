@@ -38,7 +38,8 @@ public:
     AdditionalDataPayloadGenerator() {}
 
     // Generate additional data payload (i.e. TLV encoded)
-    CHIP_ERROR generateAdditionalDataPayload(uint16_t rotationCounter, std::string serialNumber, chip::System::PacketBuffer * buffer);
+    CHIP_ERROR generateAdditionalDataPayload(uint16_t rotationCounter, std::string serialNumber,
+                                             chip::System::PacketBuffer * buffer);
     // Generate Device Rotating ID
     CHIP_ERROR generateRotatingDeviceId(uint16_t rotationCounter, std::string serialNumber, std::string & rotatingDeviceId);
 };

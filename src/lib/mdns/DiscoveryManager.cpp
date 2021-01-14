@@ -23,10 +23,10 @@
 #include "lib/support/logging/CHIPLogging.h"
 #include "platform/CHIPDeviceConfig.h"
 #include "platform/CHIPDeviceLayer.h"
+#include "setup_payload/AdditionalDataPayloadGenerator.h"
 #include "support/CodeUtils.h"
 #include "support/ErrorStr.h"
 #include "support/RandUtils.h"
-#include "setup_payload/AdditionalDataPayloadGenerator.h"
 
 #if CHIP_ENABLE_MDNS
 
@@ -199,14 +199,16 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
 
 #if CHIP_ENABLE_ADDITIONAL_DATA_ADVERTISING
     // retrieve serial number
-    SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
+    SuccessOrExit(error =
+                      chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     serialNumber[serialNumberSize] = '\0';
 
     // retieve rotation counter
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetRotationCounter(rotationCounter));
 
     // retrieve rotating device id
-    SuccessOrExit(error = additionDataPayloadGenerator.generateRotatingDeviceId(rotationCounter, std::string(serialNumber, serialNumberSize), rotatingDeviceId));
+    SuccessOrExit(error = additionDataPayloadGenerator.generateRotatingDeviceId(
+                      rotationCounter, std::string(serialNumber, serialNumberSize), rotatingDeviceId));
 
     // Rotating Device ID
     entries[2].mData     = reinterpret_cast<const uint8_t *>(rotatingDeviceId.c_str());

@@ -1273,8 +1273,8 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     }
 
     // Construct the TLV for the additional data
-    GVariant * cValue = nullptr;
-    CHIP_ERROR err    = CHIP_NO_ERROR;
+    GVariant * cValue                             = nullptr;
+    CHIP_ERROR err                                = CHIP_NO_ERROR;
     chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
     chip::System::PacketBuffer * buffer           = bufferHandle.Get_ForNow();
     AdditionalDataPayloadGenerator additionDataPayloadGenerator;
@@ -1291,7 +1291,8 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     err = ConfigurationMgr().GetRotationCounter(rotationCounter);
     SuccessOrExit(err);
 
-    err = additionDataPayloadGenerator.generateAdditionalDataPayload(rotationCounter, std::string(serialNumber, serialNumberSize), buffer);
+    err = additionDataPayloadGenerator.generateAdditionalDataPayload(rotationCounter, std::string(serialNumber, serialNumberSize),
+                                                                     buffer);
     SuccessOrExit(err);
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), buffer->Start(), buffer->DataLength(), TRUE, g_free,
