@@ -66,8 +66,8 @@ constexpr uint16_t kOptionCommisioningShordDiscriminator = 's';
 constexpr uint16_t kOptionCommisioningLongDiscriminaotr  = 'l';
 constexpr uint16_t kOptionCommisioningVendorId           = 0x100; // v is used by 'version'
 constexpr uint16_t kOptionCommisioningProductId          = 'p';
-constexpr uint16_t kOptionCommisioningPairingInstr = 0x200; // Just use the long format
-constexpr uint16_t kOptionCommisioningPairingHint  = 0x300;
+constexpr uint16_t kOptionCommisioningPairingInstr       = 0x200; // Just use the long format
+constexpr uint16_t kOptionCommisioningPairingHint        = 0x300;
 
 constexpr uint16_t kOptionOperationalFabricId = 'f';
 constexpr uint16_t kOptionOperationalNodeId   = 'n';
