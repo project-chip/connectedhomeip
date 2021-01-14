@@ -462,8 +462,7 @@ class DeviceMgrCmd(Cmd):
             elif len(args) == 2 and args[0] == '?':
                 cluster = self.devCtrl.ZCLList().get(args[1], None)
                 if not cluster:
-                    print("UnknownCluster: {}".format(cluster))
-                    return
+                    raise ChipExceptions.UnknownCluster(args[1])
                 for commands in cluster.items():
                     args = ", ".join(["{}: {}".format(argName, argType)
                                       for argName, argType in commands[1].items()])
@@ -477,7 +476,8 @@ class DeviceMgrCmd(Cmd):
                 if not cluster:
                     raise ChipExceptions.UnknownCluster(args[0])
                 command = cluster.get(args[1], None)
-                if not command:
+                # When command takes no arguments, (not command) is True
+                if command == None:
                     raise ChipExceptions.UnknownCommand(args[0], args[1])
                 self.devCtrl.ZCLSend(args[0], args[1], int(
                     args[2]), int(args[3]), int(args[4]), FormatZCLArguments(args[5:], command))

@@ -79,6 +79,8 @@ public:
 
     CHIP_ERROR SetUdpListenPort(uint16_t listenPort);
 
+    chip::app::CommandSender * GetCommandSender() { return mCommissioner.GetCommandSender(); }
+
     // ----- Connection Management -----
     /**
      * @brief

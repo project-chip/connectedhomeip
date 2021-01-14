@@ -56,12 +56,12 @@ CHIP_ERROR EncodeBarrierControlGoToPercentCommand(chip::app::Command * ZCLcomman
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // percentOpen: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), percentOpen));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -79,10 +79,10 @@ CHIP_ERROR EncodeBarrierControlStopCommand(chip::app::Command * ZCLcommand, chip
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -131,10 +131,10 @@ CHIP_ERROR EncodeResetToFactoryDefaultsCommand(chip::app::Command * ZCLcommand, 
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -241,10 +241,9 @@ CHIP_ERROR EncodeMoveColorCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // rateX: int16s
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rateX));
     // rateY: int16s
@@ -253,6 +252,7 @@ CHIP_ERROR EncodeMoveColorCommand(chip::app::Command * ZCLcommand, chip::Endpoin
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -272,10 +272,9 @@ CHIP_ERROR EncodeMoveColorTemperatureCommand(chip::app::Command * ZCLcommand, ch
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // moveMode: hueMoveMode
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int16u
@@ -288,6 +287,7 @@ CHIP_ERROR EncodeMoveColorTemperatureCommand(chip::app::Command * ZCLcommand, ch
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -305,10 +305,9 @@ CHIP_ERROR EncodeMoveHueCommand(chip::app::Command * ZCLcommand, chip::EndpointI
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // moveMode: hueMoveMode
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int8u
@@ -317,6 +316,7 @@ CHIP_ERROR EncodeMoveHueCommand(chip::app::Command * ZCLcommand, chip::EndpointI
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -335,10 +335,9 @@ CHIP_ERROR EncodeMoveSaturationCommand(chip::app::Command * ZCLcommand, chip::En
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // moveMode: saturationMoveMode
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int8u
@@ -347,6 +346,7 @@ CHIP_ERROR EncodeMoveSaturationCommand(chip::app::Command * ZCLcommand, chip::En
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -364,10 +364,9 @@ CHIP_ERROR EncodeMoveToColorCommand(chip::app::Command * ZCLcommand, chip::Endpo
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // colorX: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorX));
     // colorY: int16u
@@ -378,6 +377,7 @@ CHIP_ERROR EncodeMoveToColorCommand(chip::app::Command * ZCLcommand, chip::Endpo
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -397,10 +397,9 @@ CHIP_ERROR EncodeMoveToColorTemperatureCommand(chip::app::Command * ZCLcommand, 
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // colorTemperature: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), colorTemperature));
     // transitionTime: int16u
@@ -409,6 +408,7 @@ CHIP_ERROR EncodeMoveToColorTemperatureCommand(chip::app::Command * ZCLcommand, 
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -426,10 +426,9 @@ CHIP_ERROR EncodeMoveToHueCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // hue: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), hue));
     // direction: hueDirection
@@ -440,6 +439,7 @@ CHIP_ERROR EncodeMoveToHueCommand(chip::app::Command * ZCLcommand, chip::Endpoin
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -459,10 +459,9 @@ CHIP_ERROR EncodeMoveToHueAndSaturationCommand(chip::app::Command * ZCLcommand, 
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // hue: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), hue));
     // saturation: int8u
@@ -473,6 +472,7 @@ CHIP_ERROR EncodeMoveToHueAndSaturationCommand(chip::app::Command * ZCLcommand, 
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -491,10 +491,9 @@ CHIP_ERROR EncodeMoveToSaturationCommand(chip::app::Command * ZCLcommand, chip::
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // saturation: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), saturation));
     // transitionTime: int16u
@@ -503,6 +502,7 @@ CHIP_ERROR EncodeMoveToSaturationCommand(chip::app::Command * ZCLcommand, chip::
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -520,10 +520,9 @@ CHIP_ERROR EncodeStepColorCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // stepX: int16s
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepX));
     // stepY: int16s
@@ -534,6 +533,7 @@ CHIP_ERROR EncodeStepColorCommand(chip::app::Command * ZCLcommand, chip::Endpoin
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -554,10 +554,9 @@ CHIP_ERROR EncodeStepColorTemperatureCommand(chip::app::Command * ZCLcommand, ch
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // stepMode: hueStepMode
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int16u
@@ -572,6 +571,7 @@ CHIP_ERROR EncodeStepColorTemperatureCommand(chip::app::Command * ZCLcommand, ch
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -589,10 +589,9 @@ CHIP_ERROR EncodeStepHueCommand(chip::app::Command * ZCLcommand, chip::EndpointI
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // stepMode: hueStepMode
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int8u
@@ -603,6 +602,7 @@ CHIP_ERROR EncodeStepHueCommand(chip::app::Command * ZCLcommand, chip::EndpointI
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -621,10 +621,9 @@ CHIP_ERROR EncodeStepSaturationCommand(chip::app::Command * ZCLcommand, chip::En
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // stepMode: saturationStepMode
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int8u
@@ -635,6 +634,7 @@ CHIP_ERROR EncodeStepSaturationCommand(chip::app::Command * ZCLcommand, chip::En
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -651,14 +651,14 @@ CHIP_ERROR EncodeStopMoveStepCommand(chip::app::Command * ZCLcommand, chip::Endp
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // optionsMask: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsMask));
     // optionsOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionsOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -777,10 +777,10 @@ CHIP_ERROR EncodeClearAllPinsCommand(chip::app::Command * ZCLcommand, chip::Endp
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -796,10 +796,10 @@ CHIP_ERROR EncodeClearAllRfidsCommand(chip::app::Command * ZCLcommand, chip::End
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -816,12 +816,12 @@ CHIP_ERROR EncodeClearHolidayScheduleCommand(chip::app::Command * ZCLcommand, ch
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // scheduleId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -838,12 +838,12 @@ CHIP_ERROR EncodeClearPinCommand(chip::app::Command * ZCLcommand, chip::Endpoint
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -860,12 +860,12 @@ CHIP_ERROR EncodeClearRfidCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -882,14 +882,14 @@ CHIP_ERROR EncodeClearWeekdayScheduleCommand(chip::app::Command * ZCLcommand, ch
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // scheduleId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -906,14 +906,14 @@ CHIP_ERROR EncodeClearYeardayScheduleCommand(chip::app::Command * ZCLcommand, ch
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // scheduleId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -930,12 +930,12 @@ CHIP_ERROR EncodeGetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // scheduleId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -952,12 +952,12 @@ CHIP_ERROR EncodeGetLogRecordCommand(chip::app::Command * ZCLcommand, chip::Endp
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // logIndex: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), logIndex));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -974,12 +974,12 @@ CHIP_ERROR EncodeGetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -996,12 +996,12 @@ CHIP_ERROR EncodeGetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointI
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1018,12 +1018,12 @@ CHIP_ERROR EncodeGetUserTypeCommand(chip::app::Command * ZCLcommand, chip::Endpo
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1040,14 +1040,14 @@ CHIP_ERROR EncodeGetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // scheduleId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1064,14 +1064,14 @@ CHIP_ERROR EncodeGetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // scheduleId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1088,12 +1088,12 @@ CHIP_ERROR EncodeLockDoorCommand(chip::app::Command * ZCLcommand, chip::Endpoint
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // pin: char_string
     ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), pin));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1111,10 +1111,9 @@ CHIP_ERROR EncodeSetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // scheduleId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // localStartTime: int32u
@@ -1123,6 +1122,7 @@ CHIP_ERROR EncodeSetHolidayScheduleCommand(chip::app::Command * ZCLcommand, chip
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localEndTime));
     // operatingModeDuringHoliday: enum8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), operatingModeDuringHoliday));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1139,10 +1139,9 @@ CHIP_ERROR EncodeSetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
     // userStatus: doorLockUserStatus
@@ -1151,6 +1150,7 @@ CHIP_ERROR EncodeSetPinCommand(chip::app::Command * ZCLcommand, chip::EndpointId
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userType));
     // pin: char_string
     ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), pin));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1167,10 +1167,9 @@ CHIP_ERROR EncodeSetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointI
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
     // userStatus: doorLockUserStatus
@@ -1179,6 +1178,7 @@ CHIP_ERROR EncodeSetRfidCommand(chip::app::Command * ZCLcommand, chip::EndpointI
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userType));
     // id: char_string
     ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), id));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1195,14 +1195,14 @@ CHIP_ERROR EncodeSetUserTypeCommand(chip::app::Command * ZCLcommand, chip::Endpo
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // userId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userId));
     // userType: doorLockUserType
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), userType));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1221,10 +1221,9 @@ CHIP_ERROR EncodeSetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // scheduleId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
@@ -1239,6 +1238,7 @@ CHIP_ERROR EncodeSetWeekdayScheduleCommand(chip::app::Command * ZCLcommand, chip
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), endHour));
     // endMinute: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), endMinute));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1256,10 +1256,9 @@ CHIP_ERROR EncodeSetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // scheduleId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), scheduleId));
     // userId: int16u
@@ -1268,6 +1267,7 @@ CHIP_ERROR EncodeSetYeardayScheduleCommand(chip::app::Command * ZCLcommand, chip
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localStartTime));
     // localEndTime: int32u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), localEndTime));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1284,12 +1284,12 @@ CHIP_ERROR EncodeUnlockDoorCommand(chip::app::Command * ZCLcommand, chip::Endpoi
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // pin: char_string
     ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), pin));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1306,14 +1306,14 @@ CHIP_ERROR EncodeUnlockWithTimeoutCommand(chip::app::Command * ZCLcommand, chip:
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // timeoutInSeconds: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), timeoutInSeconds));
     // pin: char_string
     ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), pin));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1450,14 +1450,14 @@ CHIP_ERROR EncodeAddGroupCommand(chip::app::Command * ZCLcommand, chip::Endpoint
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
     // groupName: char_string
     ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), groupName));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1474,14 +1474,14 @@ CHIP_ERROR EncodeAddGroupIfIdentifyingCommand(chip::app::Command * ZCLcommand, c
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
     // groupName: char_string
     ReturnErrorOnFailure(writer.PutString(TLV::ContextTag(argSeqNumber++), groupName));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1498,14 +1498,14 @@ CHIP_ERROR EncodeGetGroupMembershipCommand(chip::app::Command * ZCLcommand, chip
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupCount: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupCount));
     // groupList: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupList));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1521,10 +1521,10 @@ CHIP_ERROR EncodeRemoveAllGroupsCommand(chip::app::Command * ZCLcommand, chip::E
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1541,12 +1541,12 @@ CHIP_ERROR EncodeRemoveGroupCommand(chip::app::Command * ZCLcommand, chip::Endpo
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1563,12 +1563,12 @@ CHIP_ERROR EncodeViewGroupCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1654,12 +1654,12 @@ CHIP_ERROR EncodeIdentifyCommand(chip::app::Command * ZCLcommand, chip::Endpoint
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // identifyTime: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), identifyTime));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1675,10 +1675,10 @@ CHIP_ERROR EncodeIdentifyQueryCommand(chip::app::Command * ZCLcommand, chip::End
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1733,10 +1733,9 @@ CHIP_ERROR EncodeMoveCommand(chip::app::Command * ZCLcommand, chip::EndpointId Z
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // moveMode: moveMode
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int8u
@@ -1745,6 +1744,7 @@ CHIP_ERROR EncodeMoveCommand(chip::app::Command * ZCLcommand, chip::EndpointId Z
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
     // optionOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1762,10 +1762,9 @@ CHIP_ERROR EncodeMoveToLevelCommand(chip::app::Command * ZCLcommand, chip::Endpo
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // level: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), level));
     // transitionTime: int16u
@@ -1774,6 +1773,7 @@ CHIP_ERROR EncodeMoveToLevelCommand(chip::app::Command * ZCLcommand, chip::Endpo
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
     // optionOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1791,14 +1791,14 @@ CHIP_ERROR EncodeMoveToLevelWithOnOffCommand(chip::app::Command * ZCLcommand, ch
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // level: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), level));
     // transitionTime: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1815,14 +1815,14 @@ CHIP_ERROR EncodeMoveWithOnOffCommand(chip::app::Command * ZCLcommand, chip::End
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // moveMode: moveMode
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), moveMode));
     // rate: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), rate));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1840,10 +1840,9 @@ CHIP_ERROR EncodeStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId Z
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // stepMode: stepMode
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int8u
@@ -1854,6 +1853,7 @@ CHIP_ERROR EncodeStepCommand(chip::app::Command * ZCLcommand, chip::EndpointId Z
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
     // optionOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1870,16 +1870,16 @@ CHIP_ERROR EncodeStepWithOnOffCommand(chip::app::Command * ZCLcommand, chip::End
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // stepMode: stepMode
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepMode));
     // stepSize: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), stepSize));
     // transitionTime: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1896,14 +1896,14 @@ CHIP_ERROR EncodeStopCommand(chip::app::Command * ZCLcommand, chip::EndpointId Z
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // optionMask: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionMask));
     // optionOverride: bitmap8
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), optionOverride));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1919,10 +1919,10 @@ CHIP_ERROR EncodeStopWithOnOffCommand(chip::app::Command * ZCLcommand, chip::End
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -1995,10 +1995,10 @@ CHIP_ERROR EncodeOffCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZC
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -2014,10 +2014,10 @@ CHIP_ERROR EncodeOnCommand(chip::app::Command * ZCLcommand, chip::EndpointId ZCL
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -2033,10 +2033,10 @@ CHIP_ERROR EncodeToggleCommand(chip::app::Command * ZCLcommand, chip::EndpointId
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    // Command takes no arguments.
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -2096,10 +2096,9 @@ CHIP_ERROR EncodeAddSceneCommand(chip::app::Command * ZCLcommand, chip::Endpoint
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
@@ -2114,6 +2113,7 @@ CHIP_ERROR EncodeAddSceneCommand(chip::app::Command * ZCLcommand, chip::Endpoint
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), length));
     // value: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), value));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -2130,12 +2130,12 @@ CHIP_ERROR EncodeGetSceneMembershipCommand(chip::app::Command * ZCLcommand, chip
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -2152,16 +2152,16 @@ CHIP_ERROR EncodeRecallSceneCommand(chip::app::Command * ZCLcommand, chip::Endpo
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
     // transitionTime: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), transitionTime));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -2178,12 +2178,12 @@ CHIP_ERROR EncodeRemoveAllScenesCommand(chip::app::Command * ZCLcommand, chip::E
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -2200,14 +2200,14 @@ CHIP_ERROR EncodeRemoveSceneCommand(chip::app::Command * ZCLcommand, chip::Endpo
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -2224,14 +2224,14 @@ CHIP_ERROR EncodeStoreSceneCommand(chip::app::Command * ZCLcommand, chip::Endpoi
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
@@ -2248,14 +2248,14 @@ CHIP_ERROR EncodeViewSceneCommand(chip::app::Command * ZCLcommand, chip::Endpoin
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void) argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
+    uint8_t argSeqNumber = 0;
     // groupId: int16u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), groupId));
     // sceneId: int8u
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), sceneId));
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));

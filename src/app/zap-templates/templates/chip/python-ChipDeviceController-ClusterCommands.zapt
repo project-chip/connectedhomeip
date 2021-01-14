@@ -6,6 +6,8 @@
 #include <app/InteractionModelEngine.h>
 #include <app/im-encoder.h>
 
+#include <controller/CHIPDeviceController_deprecated.h>
+
 using namespace chip;
 using namespace chip::app;
 
@@ -32,18 +34,18 @@ extern "C" {
 {{#chip_server_clusters}}
 // Cluster {{asCamelCased name false}}
 {{#chip_server_cluster_commands}}
-CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{#if (isByteString type)}}, uint32_t {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}})
+CHIP_ERROR chip_ime_AppendCommand_{{asCamelCased clusterName false}}_{{asCamelCased name false}}(chip::DeviceController::ChipDeviceController * dc,chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{#if (isByteString type)}}, uint32_t {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}})
 {
-    return app::cluster::{{asCamelCased clusterName false}}::Encode{{asType name}}Command(GetCommandSender(), ZCLendpointId, ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}});
+    return app::cluster::{{asCamelCased clusterName false}}::Encode{{asType name}}Command(dc->GetCommandSender(), ZCLendpointId, ZCLgroupId{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{#if (isByteString type)}}, {{asCamelCased label}}_Len{{/if}}{{/chip_server_cluster_command_arguments}});
 }
 {{/chip_server_cluster_commands}}
 // End of Cluster {{asCamelCased name false}}
 
 {{/chip_server_clusters}}
 
-CHIP_ERROR chip_ime_SendCommand(chip::NodeId nodeId)
+CHIP_ERROR chip_ime_SendCommand(chip::DeviceController::ChipDeviceController * dc, chip::NodeId nodeId)
 {
-    return GetCommandSender()->SendCommandRequest(nodeId);
+    return dc->GetCommandSender()->SendCommandRequest(nodeId);
 }
 
 }

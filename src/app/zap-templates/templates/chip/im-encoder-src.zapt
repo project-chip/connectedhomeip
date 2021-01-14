@@ -2,10 +2,10 @@
 
 #include "im-encoder.h"
 
-#include <app/util/basic-types.h>
 #include <app/CommandHandler.h>
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
+#include <app/util/basic-types.h>
 #include <support/ErrorStr.h>
 #include <support/ReturnMacros.h>
 #include <support/logging/CHIPLogging.h>
@@ -29,11 +29,12 @@ CHIP_ERROR Encode{{asType name}}Command(chip::app::Command * ZCLcommand, chip::E
 
     TLV::TLVType dummyType = TLV::kTLVType_NotSpecified;
 
-    uint8_t argSeqNumber = 0;
-    (void)argSeqNumber;
-
     ReturnErrorOnFailure(writer.StartContainer(TLV::AnonymousTag, TLV::kTLVType_Structure, dummyType));
+
 {{#chip_server_cluster_command_arguments}}
+{{#first}}
+    uint8_t argSeqNumber = 0;
+{{/first}}
     // {{asCamelCased label}}: {{asCamelCased type}}
 {{#if (isByteString type)}}
     ReturnErrorOnFailure(writer.PutBytes(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}, {{asCamelCased label}}_Len));
@@ -42,7 +43,10 @@ CHIP_ERROR Encode{{asType name}}Command(chip::app::Command * ZCLcommand, chip::E
 {{else}}
     ReturnErrorOnFailure(writer.Put(TLV::ContextTag(argSeqNumber++), {{asCamelCased label}}));
 {{/if}}
+{{else}}
+    // Command takes no arguments.
 {{/chip_server_cluster_command_arguments}}
+
     ReturnErrorOnFailure(writer.EndContainer(dummyType));
     ReturnErrorOnFailure(writer.Finalize());
     ReturnErrorOnFailure(ZCLcommand->AddCommand(cmdParams));
