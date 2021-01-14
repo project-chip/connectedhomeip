@@ -22,6 +22,8 @@ chip_test_suite("tests") {
   output_name = "libMessagingLayerTests"
 
   sources = [
+    "MessagingContext.cpp",
+    "MessagingContext.h",
     "TestExchangeMgr.cpp",
     "TestMessagingLayer.h",
     "TestReliableMessageProtocol.cpp",
