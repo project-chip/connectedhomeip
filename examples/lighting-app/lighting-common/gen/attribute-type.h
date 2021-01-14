@@ -76,5 +76,9 @@ enum
     ZCL_BACNET_OID_ATTRIBUTE_TYPE        = 0xEA, // BACnet OID
     ZCL_IEEE_ADDRESS_ATTRIBUTE_TYPE      = 0xF0, // IEEE address
     ZCL_SECURITY_KEY_ATTRIBUTE_TYPE      = 0xF1, // 128-bit security key
+    ZCL_ENDPOINT_ID_ATTRIBUTE_TYPE       = 0xF2, // Endpoint Id
+    ZCL_GROUP_ID_ATTRIBUTE_TYPE          = 0xF3, // Group Id
+    ZCL_COMMAND_ID_ATTRIBUTE_TYPE        = 0xF4, // Command Id
+    ZCL_NODE_ID_ATTRIBUTE_TYPE           = 0xF5, // Node Id
     ZCL_UNKNOWN_ATTRIBUTE_TYPE           = 0xFF, // Unknown
 };
