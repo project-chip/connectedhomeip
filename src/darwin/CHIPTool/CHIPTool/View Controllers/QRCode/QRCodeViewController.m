@@ -104,7 +104,7 @@
 
     // Title
     UILabel * titleLabel = [CHIPUIViewUtils addTitle:@"QR Code Parser" toView:self.view];
-    
+
     // stack view
     UIStackView * stackView = [UIStackView new];
     stackView.axis = UILayoutConstraintAxisVertical;
@@ -132,7 +132,7 @@
     [manualEntryView.leadingAnchor constraintEqualToAnchor:self.view.leadingAnchor constant:30].active = YES;
     [manualEntryView.trailingAnchor constraintEqualToAnchor:self.view.trailingAnchor constant:-30].active = YES;
     [manualEntryView.topAnchor constraintEqualToAnchor:titleLabel.bottomAnchor constant:30].active = YES;
-    
+
     _nfcScanButton = [UIButton new];
     [_nfcScanButton setTitle:@"Scan NFC Tag" forState:UIControlStateNormal];
     [_nfcScanButton addTarget:self action:@selector(startScanningNFCTags:) forControlEvents:UIControlEventTouchDown];
@@ -142,7 +142,7 @@
     _nfcScanButton.clipsToBounds = YES;
     _nfcScanButton.backgroundColor = UIColor.systemBlueColor;
     [stackView addArrangedSubview:_nfcScanButton];
-    
+
     _nfcScanButton.translatesAutoresizingMaskIntoConstraints = false;
     [_nfcScanButton.leadingAnchor constraintEqualToAnchor:stackView.leadingAnchor].active = YES;
     [_nfcScanButton.trailingAnchor constraintEqualToAnchor:stackView.trailingAnchor].active = YES;
