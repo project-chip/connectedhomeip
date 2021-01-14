@@ -75,7 +75,7 @@
             "output": "command-id.h"
         },
         {
-            "path": "endpoint_config.zapt",
+            "path": "templates/app/endpoint_config.zapt",
             "name": "ZCL endpoint configuration",
             "output": "endpoint_config.h"
         },
