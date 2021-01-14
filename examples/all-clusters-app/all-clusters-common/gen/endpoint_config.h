@@ -356,7 +356,7 @@
 #define ATTRIBUTE_SINGLETONS_SIZE (6)
 
 // Total size of attribute storage
-#define ATTRIBUTE_MAX_SIZE 150
+#define ATTRIBUTE_MAX_SIZE 155
 
 // Array of endpoints that are supported
 #define FIXED_ENDPOINT_ARRAY                                                                                                       \

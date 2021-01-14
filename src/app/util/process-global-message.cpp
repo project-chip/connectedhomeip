@@ -298,16 +298,16 @@ bool emAfProcessGlobalCommand(EmberAfClusterCommand * cmd)
         // Reset message back to start
         msgIndex          = cmd->payloadStartIndex;
         appResponseLength = (cmd->mfgSpecific ? 4 : 2);
-        /* fall through */
-    // DO NOT BREAK from this case
+        [[fallthrough]];
+        // DO NOT BREAK from this case
 
-    // the format of the write attributes cmd is:
-    // ([attr ID:2] [data type:1] [data:N]) * N
-    // the format of the write attributes response is:
-    // ([status 1] [attr ID 2]) * n
-    // ONLY errors are reported unless all are successful then a single success
-    // is sent. write attr no response is handled by just executing the same
-    // code but not setting the flag that sends the response at the end.
+        // the format of the write attributes cmd is:
+        // ([attr ID:2] [data type:1] [data:N]) * N
+        // the format of the write attributes response is:
+        // ([status 1] [attr ID 2]) * n
+        // ONLY errors are reported unless all are successful then a single success
+        // is sent. write attr no response is handled by just executing the same
+        // code but not setting the flag that sends the response at the end.
     case ZCL_WRITE_ATTRIBUTES_NO_RESPONSE_COMMAND_ID:
     case ZCL_WRITE_ATTRIBUTES_COMMAND_ID: {
         uint8_t numFailures = 0;

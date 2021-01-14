@@ -228,8 +228,27 @@ config("runtime_default") {
   }
 }
 
+# To use different sanitizer options, use `gn args .` in the out folder and
+# use settings like:
+#
+#   is_clang=true
+#   is_debug=true
+#   optimize_for_size=false
+#   default_configs_sanitize = [ "//build/config/compiler:sanitize_address" ]
+#
 config("sanitize_default") {
 }
+
+config("sanitize_address") {
+  cflags = [ "-fsanitize=address" ]
+  ldflags = cflags
+}
+
+config("sanitize_memory") {
+  cflags = [ "-fsanitize=memory" ]
+  ldflags = cflags
+}
+
 
 config("fuzzing_default") {
 }

@@ -523,6 +523,12 @@ EmberAfStatus emAfReadOrWriteAttribute(EmberAfAttributeSearchRecord * attRecord,
                                 uint8_t * attributeLocation =
                                     (am->mask & ATTRIBUTE_MASK_SINGLETON ? singletonAttributeLocation(am)
                                                                          : attributeData + attributeOffsetIndex);
+
+                                if (attributeOffsetIndex + readLength > sizeof(attributeData))
+                                {
+                                    return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+                                }
+
                                 uint8_t *src, *dst;
                                 if (write)
                                 {
