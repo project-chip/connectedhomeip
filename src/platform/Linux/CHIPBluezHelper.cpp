@@ -1639,9 +1639,7 @@ CHIP_ERROR ConfigureBluezAdv(BLEAdvConfig & aBleAdvConfig, BluezEndpoint * apEnd
     apEndpoint->mDuration         = aBleAdvConfig.mDuration;
     apEndpoint->mDuration         = aBleAdvConfig.mDuration;
 
-    ChipLogDetail(DeviceLayer, "Configuring BLEDEvice Id..........");
     err = ConfigurationMgr().GetBLEDeviceIdentificationInfo(apEndpoint->mDeviceIdInfo);
-    ChipLogDetail(DeviceLayer, "Configuring BLEDEvice Id.........., err=%d", err);
     SuccessOrExit(err);
 
 exit:
