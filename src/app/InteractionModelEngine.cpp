@@ -109,13 +109,6 @@ void InteractionModelEngine::OnUnknownMsgType(Messaging::ExchangeContext * apEc,
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
 
-    System::PacketBuffer * buffer = aPayload.Release_ForNow();
-    if (buffer != NULL)
-    {
-        System::PacketBuffer::Free(buffer);
-        buffer = nullptr;
-    }
-
     ChipLogDetail(DataManagement, "Msg type %d not supported", (int) aMsgType);
 
     // Todo: Add status report
@@ -197,7 +190,7 @@ void InteractionModelEngine::OnMessageReceived(Messaging::ExchangeContext * apEc
 
 void InteractionModelEngine::OnResponseTimeout(Messaging::ExchangeContext * ec)
 {
-    ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Node: %llu", ec->GetPeerNodeId());
+    ChipLogProgress(DataManagement, "Time out! failed to receive echo response from Exchange: %d", ec->GetExchangeId());
 }
 
 InteractionModelEngine::HandlerKey::HandlerKey(chip::ClusterId aClusterId, chip::CommandId aCommandId,

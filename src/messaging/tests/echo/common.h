@@ -26,8 +26,9 @@
 
 #include <messaging/ExchangeMgr.h>
 
-#define MAX_MESSAGE_SOURCE_STR_LENGTH (100)
-#define NETWORK_SLEEP_TIME_MSECS (100 * 1000)
+constexpr size_t kMaxTcpActiveConnectionCount = 4;
+constexpr size_t kMaxTcpPendingPackets        = 4;
+constexpr size_t kNetworkSleepTimeMsecs       = (100 * 1000);
 
 extern chip::Messaging::ExchangeManager gExchangeManager;
 

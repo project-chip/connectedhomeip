@@ -1,0 +1,53 @@
+{{> header}}
+#include "CHIPClusters.h"
+
+#include <app/chip-zcl-zpro-codec-api.h>
+
+namespace chip {
+namespace Controller {
+
+{{#chip_server_clusters}}
+
+// {{asCamelCased name false}} Cluster Commands
+{{#chip_server_cluster_commands}}
+CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}}(Callback::Callback<> * onCompletion{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
+{
+    System::PacketBufferHandle payload = encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(mEndpoint{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
+    return SendCommand(std::move(payload), onCompletion);
+}
+
+{{/chip_server_cluster_commands}}
+// {{asCamelCased name false}} Cluster Attributes
+CHIP_ERROR {{asCamelCased name false}}Cluster::DiscoverAttributes(Callback::Callback<> * onCompletion)
+{
+    System::PacketBufferHandle payload = encode{{asCamelCased name false}}ClusterDiscoverAttributes(mEndpoint);
+    return SendCommand(std::move(payload), onCompletion);
+}
+{{#chip_server_cluster_attributes}}
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReadAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion)
+{
+    System::PacketBufferHandle payload = encode{{asCamelCased parent.name false}}ClusterRead{{asCamelCased name false}}Attribute(mEndpoint);
+    return SendCommand(std::move(payload), onCompletion);
+}
+
+{{#if (isWritableAttribute)}}
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::WriteAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion, {{asUnderlyingZclType type}} value)
+{
+    System::PacketBufferHandle payload = encode{{asCamelCased parent.name false}}ClusterWrite{{asCamelCased name false}}Attribute(mEndpoint, value);
+    return SendCommand(std::move(payload), onCompletion);
+}
+
+{{/if}}
+{{#if (isReportableAttribute)}}
+CHIP_ERROR {{asCamelCased parent.name false}}Cluster::ReportAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion, Callback::Callback<> * onChange, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}})
+{
+    System::PacketBufferHandle payload = encode{{asCamelCased parent.name false}}ClusterReport{{asCamelCased name false}}Attribute(mEndpoint, minInterval, maxInterval{{#unless (isDiscreteType)}}, change{{/unless}});
+    return RequestAttributeReporting(std::move(payload), onCompletion, onChange);
+}
+
+{{/if}}
+{{/chip_server_cluster_attributes}}
+{{/chip_server_clusters}}
+
+} // namespace Controller
+} // namespace chip

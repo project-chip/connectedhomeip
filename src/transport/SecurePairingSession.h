@@ -27,7 +27,7 @@
 #pragma once
 
 #include <crypto/CHIPCryptoPAL.h>
-#include <protocols/secure_channel/SecureChannelProtocol.h>
+#include <protocols/secure_channel/Constants.h>
 #include <support/Base64.h>
 #include <system/SystemPacketBuffer.h>
 #include <transport/SecureSession.h>

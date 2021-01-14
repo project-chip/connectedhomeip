@@ -28,8 +28,13 @@ namespace Minimal {
 class QueryBuilder
 {
 public:
-    QueryBuilder(chip::System::PacketBuffer * packet) : mPacket(packet), mHeader(mPacket->Start())
+    QueryBuilder() : mHeader(nullptr) {}
+    QueryBuilder(chip::System::PacketBufferHandle && packet) : mHeader(nullptr) { Reset(std::move(packet)); }
+
+    QueryBuilder & Reset(chip::System::PacketBufferHandle && packet)
     {
+        mPacket = std::move(packet);
+        mHeader = HeaderRef(mPacket->Start());
 
         if (mPacket->AvailableDataLength() >= HeaderRef::kSizeBytes)
         {
@@ -38,17 +43,26 @@ public:
         }
         else
         {
-            mQueryBuidOk = false;
+            mQueryBuildOk = false;
         }
 
         mHeader.SetFlags(mHeader.GetFlags().SetQuery());
+        return *this;
+    }
+
+    CHECK_RETURN_VALUE
+    chip::System::PacketBufferHandle && ReleasePacket()
+    {
+        mHeader       = HeaderRef(nullptr);
+        mQueryBuildOk = false;
+        return std::move(mPacket);
     }
 
     HeaderRef & Header() { return mHeader; }
 
     QueryBuilder & AddQuery(const Query & query)
     {
-        if (!mQueryBuidOk)
+        if (!mQueryBuildOk)
         {
             return *this;
         }
@@ -57,7 +71,7 @@ public:
 
         if (!query.Append(mHeader, out))
         {
-            mQueryBuidOk = false;
+            mQueryBuildOk = false;
         }
         else
         {
@@ -66,12 +80,12 @@ public:
         return *this;
     }
 
-    bool Ok() const { return mQueryBuidOk; }
+    bool Ok() const { return mQueryBuildOk; }
 
 private:
-    chip::System::PacketBuffer * mPacket;
+    chip::System::PacketBufferHandle mPacket;
     HeaderRef mHeader;
-    bool mQueryBuidOk = true;
+    bool mQueryBuildOk = true;
 };
 
 } // namespace Minimal

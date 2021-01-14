@@ -18,16 +18,15 @@
 /**
  *    @file
  *          Platform-specific configuration overrides for the CHIP BLE
- *          Layer on Zephyr platforms.
+ *          Layer on nRF Connect SDK platform.
  *
  */
 
 #pragma once
 
-#include <bluetooth/bluetooth.h>
-
 // ==================== Platform Adaptations ====================
 
+struct bt_conn;
 #define BLE_CONNECTION_OBJECT bt_conn *
 #define BLE_CONNECTION_UNINITIALIZED nullptr
 #define BLE_MAX_RECEIVE_WINDOW_SIZE 5

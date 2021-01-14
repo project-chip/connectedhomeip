@@ -76,17 +76,10 @@ CHIP_ERROR ClusterBase::RequestAttributeReporting(chip::System::PacketBufferHand
     err = SendCommand(std::move(payload), responseHandler);
     SuccessOrExit(err);
 
-    if (reportHandler != nullptr)
-    {
-        mDevice->AddReportHandler(mEndpoint, mClusterId, reportHandler);
-    }
+    VerifyOrExit(reportHandler != nullptr, err = CHIP_ERROR_INVALID_ARGUMENT);
+    mDevice->AddReportHandler(mEndpoint, mClusterId, reportHandler);
 
 exit:
-    if (err != CHIP_NO_ERROR)
-    {
-        ChipLogError(Controller, "Failed in requesting attribute reporting. Err %d", err);
-    }
-
     return err;
 }
 

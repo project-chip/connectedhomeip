@@ -26,6 +26,7 @@
 #include <lib/core/ReferenceCounted.h>
 #include <messaging/ExchangeDelegate.h>
 #include <messaging/Flags.h>
+#include <messaging/ReliableMessageContext.h>
 #include <support/BitFlags.h>
 #include <support/DLLUtil.h>
 #include <system/SystemTimer.h>
@@ -88,7 +89,7 @@ public:
      *
      *  @param[in]    msgType       The message type of the corresponding protocol.
      *
-     *  @param[in]    msgPayload    A pointer to the PacketBuffer object holding the CHIP message.
+     *  @param[in]    msgPayload    A handle to the PacketBuffer object holding the CHIP message.
      *
      *  @param[in]    sendFlags     Flags set by the application for the CHIP message being sent.
      *
@@ -96,8 +97,6 @@ public:
      *                              with the message being sent.
 
      *  @retval  #CHIP_ERROR_INVALID_ARGUMENT               if an invalid argument was passed to this SendMessage API.
-     *  @retval  #CHIP_ERROR_SEND_THROTTLED                 if this exchange context has been throttled when using the
-     *                                                       CHIP reliable messaging protocol.
      *  @retval  #CHIP_ERROR_WRONG_MSG_VERSION_FOR_EXCHANGE if there is a mismatch in the specific send operation and the
      *                                                       CHIP message protocol version that is supported.
      *  @retval  #CHIP_ERROR_NOT_CONNECTED                  if the context was associated with a connection that is now
@@ -128,10 +127,13 @@ public:
 
     ExchangeDelegate * GetDelegate() const { return mDelegate; }
     void SetDelegate(ExchangeDelegate * delegate) { mDelegate = delegate; }
+    void SetReliableMessageDelegate(ReliableMessageDelegate * delegate) { mReliableMessageContext.SetDelegate(delegate); }
 
     ExchangeManager * GetExchangeMgr() const { return mExchangeMgr; }
 
-    uint64_t GetPeerNodeId() const { return mPeerNodeId; }
+    ReliableMessageContext * GetReliableMessageContext() { return &mReliableMessageContext; };
+
+    SecureSessionHandle GetSecureSession() { return mSecureSession; }
 
     uint16_t GetExchangeId() const { return mExchangeId; }
 
@@ -143,7 +145,7 @@ public:
     void Close();
     void Abort();
 
-    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, uint64_t PeerNodeId, bool Initiator,
+    ExchangeContext * Alloc(ExchangeManager * em, uint16_t ExchangeId, SecureSessionHandle session, bool Initiator,
                             ExchangeDelegate * delegate);
     void Free();
     void Reset();
@@ -158,16 +160,19 @@ private:
     };
 
     Timeout mResponseTimeout; // Maximum time to wait for response (in milliseconds); 0 disables response timeout.
+    ReliableMessageContext mReliableMessageContext;
     ExchangeDelegate * mDelegate   = nullptr;
     ExchangeManager * mExchangeMgr = nullptr;
 
-    uint64_t mPeerNodeId; // Node ID of peer node.
-    uint16_t mExchangeId; // Assigned exchange ID.
+    SecureSessionHandle mSecureSession; // The connection state
+    uint16_t mExchangeId;               // Assigned exchange ID.
 
     BitFlags<uint16_t, ExFlagValues> mFlags; // Internal state flags
 
     /**
      *  Search for an existing exchange that the message applies to.
+     *
+     *  @param[in]    session       The secure session of the received message.
      *
      *  @param[in]    packetHeader  A reference to the PacketHeader object.
      *
@@ -176,7 +181,7 @@ private:
      *  @retval  true                                       If a match is found.
      *  @retval  false                                      If a match is not found.
      */
-    bool MatchExchange(const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
+    bool MatchExchange(SecureSessionHandle session, const PacketHeader & packetHeader, const PayloadHeader & payloadHeader);
 
     CHIP_ERROR StartResponseTimer();
     void CancelResponseTimer();

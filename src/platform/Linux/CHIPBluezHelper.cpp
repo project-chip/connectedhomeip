@@ -65,6 +65,7 @@
 
 #include "CHIPBluezHelper.h"
 #include <support/CodeUtils.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 using namespace ::nl;
 using namespace chip::Protocols;

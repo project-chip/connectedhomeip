@@ -27,7 +27,6 @@
 
 #include "Server.h"
 #include "attribute-storage.h"
-#include "gen/cluster-id.h"
 
 #include <setup_payload/QRCodeSetupPayloadGenerator.h>
 #include <setup_payload/SetupPayload.h>

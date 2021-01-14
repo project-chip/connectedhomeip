@@ -57,3 +57,17 @@ executable("minimal-mdns-server") {
 
   output_dir = root_out_dir
 }
+
+executable("mdns-advertiser") {
+  sources = [ "advertiser.cpp" ]
+
+  cflags = [ "-Wconversion" ]
+
+  public_deps = [
+    ":minimal-mdns-example-common",
+    "${chip_root}/src/lib",
+    "${chip_root}/src/lib/mdns",
+  ]
+
+  output_dir = root_out_dir
+}

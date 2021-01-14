@@ -1,0 +1,49 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+#include <controller/CHIPCluster.h>
+#include <core/CHIPCallback.h>
+
+namespace chip {
+namespace Controller {
+
+{{#chip_server_clusters}}
+constexpr ClusterId k{{asCamelCased name false}}ClusterId = {{asHex code 4}};
+{{/chip_server_clusters}}
+
+{{#chip_server_clusters}}
+class DLL_EXPORT {{asCamelCased name false}}Cluster : public ClusterBase
+{
+public:
+    {{asCamelCased name false}}Cluster() : ClusterBase(k{{asCamelCased name false}}ClusterId) {}
+    ~{{asCamelCased name false}}Cluster() {}
+
+    {{#chip_server_cluster_commands}}
+    {{#first}}
+    // Cluster Commands
+    {{/first}}
+    CHIP_ERROR {{asCamelCased name false}}(Callback::Callback<> * onCompletion{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
+    {{/chip_server_cluster_commands}}
+
+    // Cluster Attributes
+    CHIP_ERROR DiscoverAttributes(Callback::Callback<> * onCompletion);
+    {{#chip_server_cluster_attributes}}
+    CHIP_ERROR ReadAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion);
+    {{/chip_server_cluster_attributes}}
+    {{#chip_server_cluster_attributes}}
+    {{#if (isWritableAttribute)}}
+    CHIP_ERROR WriteAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion, {{asUnderlyingZclType type}} value);
+    {{/if}}
+    {{/chip_server_cluster_attributes}}
+    {{#chip_server_cluster_attributes}}
+    {{#if (isReportableAttribute)}}
+    CHIP_ERROR ReportAttribute{{asCamelCased name false}}(Callback::Callback<> * onCompletion, Callback::Callback<> * onChange, uint16_t minInterval, uint16_t maxInterval{{#unless (isDiscreteType)}}, {{chipType}} change{{/unless}});
+    {{/if}}
+    {{/chip_server_cluster_attributes}}
+};
+
+{{/chip_server_clusters}}
+} // namespace Controller
+} // namespace chip
