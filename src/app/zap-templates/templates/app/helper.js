@@ -23,9 +23,8 @@ const zclHelper    = require(zapPath + 'generator/helper-zcl.js')
 const zclQuery     = require(zapPath + 'db/query-zcl.js')
 const cHelper      = require(zapPath + 'generator/helper-c.js')
 
-const StringHelper = require('../../common/StringHelper.js');
+const StringHelper    = require('../../common/StringHelper.js');
 const ChipTypesHelper = require('../../common/ChipTypesHelper.js');
-
 
 /**
  * Check if the cluster (name) has any enabled manufacturer commands. This works only inside
