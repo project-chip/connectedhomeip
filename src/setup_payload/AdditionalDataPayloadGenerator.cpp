@@ -32,20 +32,21 @@
 #include <stdlib.h>
 
 using namespace chip;
+using namespace chip::System;
 using namespace chip::TLV;
 using namespace chip::Crypto;
 using namespace chip::SetupPayload;
 
 CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t rotationCounter, std::string serialNumber,
-                                                                         chip::System::PacketBuffer * buffer)
+                                                                         PacketBufferHandle & bufferHandle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
-    TLVWriter writer;
+    System::PacketBufferTLVWriter writer;
     TLVWriter innerWriter;
     std::string rotatingDeviceId;
 
     // Initialize TLVWriter
-    writer.Init(buffer);
+    writer.Init(PacketBuffer::New());
 
     err = writer.OpenContainer(AnonymousTag, kTLVType_Structure, innerWriter);
     SuccessOrExit(err);
@@ -61,7 +62,7 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_
     err = writer.CloseContainer(innerWriter);
     SuccessOrExit(err);
 
-    writer.Finalize();
+    writer.Finalize(&bufferHandle);
 
 exit:
     return err;

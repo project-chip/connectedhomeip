@@ -25,7 +25,7 @@
 #pragma once
 
 #include <core/CHIPError.h>
-#include <system/SystemPacketBuffer.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 #include <string>
 
@@ -39,7 +39,7 @@ public:
 
     // Generate additional data payload (i.e. TLV encoded)
     CHIP_ERROR generateAdditionalDataPayload(uint16_t rotationCounter, std::string serialNumber,
-                                             chip::System::PacketBuffer * buffer);
+                                             chip::System::PacketBufferHandle & bufferHandle);
     // Generate Device Rotating ID
     CHIP_ERROR generateRotatingDeviceId(uint16_t rotationCounter, std::string serialNumber, std::string & rotatingDeviceId);
 };

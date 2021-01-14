@@ -1274,10 +1274,9 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     }
 
     // Construct the TLV for the additional data
-    GVariant * cValue                             = nullptr;
-    CHIP_ERROR err                                = CHIP_NO_ERROR;
-    chip::System::PacketBufferHandle bufferHandle = chip::System::PacketBuffer::New();
-    chip::System::PacketBuffer * buffer           = bufferHandle.Get_ForNow();
+    GVariant * cValue = nullptr;
+    CHIP_ERROR err    = CHIP_NO_ERROR;
+    chip::System::PacketBufferHandle bufferHandle;
     AdditionalDataPayloadGenerator additionDataPayloadGenerator;
 
     char serialNumber[ConfigurationManager::kMaxSerialNumberLength + 1];
@@ -1293,11 +1292,11 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
     SuccessOrExit(err);
 
     err = additionDataPayloadGenerator.generateAdditionalDataPayload(rotationCounter, std::string(serialNumber, serialNumberSize),
-                                                                     buffer);
+                                                                     bufferHandle);
     SuccessOrExit(err);
 
-    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), buffer->Start(), buffer->DataLength(), TRUE, g_free,
-                                     g_memdup(buffer->Start(), buffer->DataLength()));
+    cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,
+                                     g_memdup(bufferHandle->Start(), bufferHandle->DataLength()));
     bluez_gatt_characteristic1_set_value(characteristic, cValue);
 
     return;
