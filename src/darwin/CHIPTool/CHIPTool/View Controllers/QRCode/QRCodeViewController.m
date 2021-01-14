@@ -70,7 +70,7 @@
 @property (readwrite) CHIPDeviceController * chipController;
 @property (readonly) CHIPToolPersistentStorageDelegate * persistentStorage;
 
-@property (strong, nonatomic) NFCNDEFReaderSession *session;
+@property (strong, nonatomic) NFCNDEFReaderSession * session;
 @end
 
 @implementation QRCodeViewController {
@@ -306,22 +306,24 @@
 
 // MARK: NFCNDEFReaderSessionDelegate
 
-- (void) readerSession:(nonnull NFCNDEFReaderSession *)session didDetectNDEFs:(nonnull NSArray<NFCNDEFMessage *> *)messages {
+- (void)readerSession:(nonnull NFCNDEFReaderSession *)session didDetectNDEFs:(nonnull NSArray<NFCNDEFMessage *> *)messages
+{
     [_session invalidateSession];
-    NSString *errorMessage;
+    NSString * errorMessage;
     if (messages.count == 1) {
-        for (NFCNDEFMessage *message in messages) {
+        for (NFCNDEFMessage * message in messages) {
             if (message.records.count == 1) {
-                for (NFCNDEFPayload *payload in message.records) {
-                    NSString *payloadType = [[NSString alloc] initWithData:payload.type encoding:NSUTF8StringEncoding];
+                for (NFCNDEFPayload * payload in message.records) {
+                    NSString * payloadType = [[NSString alloc] initWithData:payload.type encoding:NSUTF8StringEncoding];
                     if ([payloadType isEqualToString:@"U"]) {
-                        NSURL *payloadURI = [payload wellKnownTypeURIPayload];
+                        NSURL * payloadURI = [payload wellKnownTypeURIPayload];
                         NSLog(@"Payload text:%@", payloadURI);
                         if (payloadURI) {
                             /* CHIP Issue #415
                              Once #415 goes in, there will b no need to replace _ with spaces.
                             */
-                            NSString *qrCode = [[payloadURI absoluteString]stringByReplacingOccurrencesOfString:@"_" withString:@" "];
+                            NSString * qrCode = [[payloadURI absoluteString] stringByReplacingOccurrencesOfString:@"_"
+                                                                                                       withString:@" "];
                             NSLog(@"Scanned code string:%@", qrCode);
                             [self scannedQRCode:qrCode];
                         }
@@ -337,19 +339,20 @@
         errorMessage = @"Only one message in NFC tag is accepted.";
     }
     if ([errorMessage length] > 0) {
-        NSError *error = [[NSError alloc] initWithDomain:@"com.chiptool.nfctagscanning"
-                                                    code:1
-                                                userInfo:@{NSLocalizedDescriptionKey:errorMessage}];
+        NSError * error = [[NSError alloc] initWithDomain:@"com.chiptool.nfctagscanning"
+                                                     code:1
+                                                 userInfo:@{ NSLocalizedDescriptionKey : errorMessage }];
         dispatch_after(dispatch_time(DISPATCH_TIME_NOW, DISPATCH_TIME_NOW), dispatch_get_main_queue(), ^{
             [self showError:error];
         });
     }
 }
 
-- (void)readerSession:(nonnull NFCNDEFReaderSession *)session didInvalidateWithError:(nonnull NSError *)error {
-    NSLog(@"If no NFC reading UI is appearing, target may me missing the appropriate capability. Turn on Near Field Communication Tag Reading under the Capabilities tab for the project’s target. A paid developer account is needed for this.");
+- (void)readerSession:(nonnull NFCNDEFReaderSession *)session didInvalidateWithError:(nonnull NSError *)error
+{
+    NSLog(@"If no NFC reading UI is appearing, target may me missing the appropriate capability. Turn on Near Field Communication "
+          @"Tag Reading under the Capabilities tab for the project’s target. A paid developer account is needed for this.");
     _session = nil;
-
 }
 
 // MARK: CHIPDeviceControllerDelegate
@@ -736,7 +739,9 @@
 - (IBAction)startScanningNFCTags:(id)sender
 {
     if (!_session) {
-        _session = [[NFCNDEFReaderSession alloc] initWithDelegate:self queue:dispatch_queue_create(NULL, DISPATCH_QUEUE_CONCURRENT) invalidateAfterFirstRead:NO];
+        _session = [[NFCNDEFReaderSession alloc] initWithDelegate:self
+                                                            queue:dispatch_queue_create(NULL, DISPATCH_QUEUE_CONCURRENT)
+                                         invalidateAfterFirstRead:NO];
     }
     [_session beginSession];
 }
