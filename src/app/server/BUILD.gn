@@ -38,7 +38,7 @@ static_library("server") {
 
   defines = []
 
-  if (chip_app_use_interation_model) {
+  if (chip_app_use_interaction_model) {
     defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
   }
 }

@@ -42,7 +42,7 @@ executable("chip-tool-server") {
     defines = [ "BUILD_RELEASE=1" ]
   }
 
-  if (chip_app_use_interation_model) {
+  if (chip_app_use_interaction_model) {
     defines += [ "CHIP_APP_USE_INTERACTION_MODEL" ]
   }
 
