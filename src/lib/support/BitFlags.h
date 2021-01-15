@@ -49,6 +49,8 @@ public:
 
     explicit BitFlags(FlagsEnum v) { Set(v); }
 
+    explicit BitFlags(StorageType value) { SetRaw(value); }
+
     BitFlags & Set(FlagsEnum v)
     {
         mValue = static_cast<StorageType>(mValue | static_cast<StorageType>(v));
@@ -64,6 +66,8 @@ public:
     BitFlags & Set(FlagsEnum v, bool isSet) { return isSet ? Set(v) : Clear(v); }
 
     bool Has(FlagsEnum v) const { return (mValue & static_cast<StorageType>(v)) != 0; }
+
+    bool Has(StorageType other) const { return (mValue & other) == other; }
 
     BitFlags & Set(const BitFlags & other)
     {

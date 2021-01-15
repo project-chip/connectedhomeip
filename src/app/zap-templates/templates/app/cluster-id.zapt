@@ -1,0 +1,11 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+{{#zcl_clusters}}
+
+// Definitions for cluster: {{label}}
+#define ZCL_{{asDelimitedMacro define}}_ID ({{asHex code 4}})
+
+{{/zcl_clusters}}

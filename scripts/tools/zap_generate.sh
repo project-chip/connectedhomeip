@@ -31,5 +31,11 @@ if [ ! -d "$OUTPUT_DIRECTORY" ]; then
     mkdir -p "$OUTPUT_DIRECTORY"
 fi
 
+ZAP_TEMPLATES=$PWD/src/app/zap-templates
 cd ./third_party/zap/repo/
-node ./src-script/zap-generate.js -z ./zcl-builtin/silabs/zcl.json -g ../../../src/app/zap-templates/chip-templates.json -i "$FILE_PATH" -o "$OUTPUT_DIRECTORY"
+node ./src-script/zap-generate.js -z "$ZAP_TEMPLATES"/zcl/zcl.json -g "$ZAP_TEMPLATES"/app-templates.json -i "$FILE_PATH" -o "$OUTPUT_DIRECTORY"
+
+# Check if clang-format is available
+if command -v clang-format &>/dev/null; then
+    clang-format -i "$OUTPUT_DIRECTORY"*
+fi

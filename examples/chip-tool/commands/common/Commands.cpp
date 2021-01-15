@@ -19,7 +19,6 @@
 #include "Commands.h"
 
 #include "Command.h"
-#include "Logging.h"
 
 #include <algorithm>
 #include <string>
@@ -38,13 +37,14 @@ int Commands::Run(NodeId localId, NodeId remoteId, int argc, char ** argv)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     PersistentStorage storage;
-    ConfigureChipLogging();
 
     err = chip::Platform::MemoryInit();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Memory failure: %s", chip::ErrorStr(err)));
 
     err = storage.Init();
     VerifyOrExit(err == CHIP_NO_ERROR, ChipLogError(Controller, "Init Storage failure: %s", chip::ErrorStr(err)));
+
+    chip::Logging::SetLogFilter(storage.GetLoggingLevel());
 
     err = RunCommand(storage, localId, remoteId, argc, argv);
     SuccessOrExit(err);

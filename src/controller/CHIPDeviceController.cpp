@@ -106,6 +106,12 @@ CHIP_ERROR DeviceController::Init(NodeId localDeviceId, PersistentStorageDelegat
     else
     {
 #if CONFIG_DEVICE_LAYER
+#if CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+        // By default, Linux device is configured as a BLE peripheral while the controller needs a BLE central.
+        err = DeviceLayer::Internal::BLEMgrImpl().ConfigureBle(/* BLE adapter ID */ 0, /* BLE central */ true);
+        SuccessOrExit(err);
+#endif // CHIP_DEVICE_LAYER_TARGET_LINUX && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE
+
         err = DeviceLayer::PlatformMgr().InitChipStack();
         SuccessOrExit(err);
 
@@ -334,24 +340,57 @@ exit:
     return err;
 }
 
-void DeviceController::OnNewConnection(const Transport::PeerConnectionState * peerConnection, SecureSessionMgr * mgr) {}
-
-void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
-                                         const Transport::PeerConnectionState * state, System::PacketBufferHandle msgBuf,
-                                         SecureSessionMgr * mgr)
+void DeviceController::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     uint16_t index = 0;
-    NodeId peer;
+
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+
+    index = FindDeviceIndex(mgr->GetPeerConnectionState(session)->GetPeerNodeId());
+    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+
+    mActiveDevices[index].OnNewConnection(session, mgr);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to process received message: err %d", err);
+    }
+}
+
+void DeviceController::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t index = 0;
+
+    VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
+
+    index = FindDeviceIndex(session);
+    VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
+
+    mActiveDevices[index].OnConnectionExpired(session, mgr);
+
+exit:
+    if (err != CHIP_NO_ERROR)
+    {
+        ChipLogError(Controller, "Failed to process received message: err %d", err);
+    }
+}
+
+void DeviceController::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader,
+                                         SecureSessionHandle session, System::PacketBufferHandle msgBuf, SecureSessionMgr * mgr)
+{
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    uint16_t index = 0;
 
     VerifyOrExit(mState == State::Initialized, err = CHIP_ERROR_INCORRECT_STATE);
     VerifyOrExit(header.GetSourceNodeId().HasValue(), err = CHIP_ERROR_INVALID_ARGUMENT);
 
-    peer  = header.GetSourceNodeId().Value();
-    index = FindDeviceIndex(peer);
+    index = FindDeviceIndex(session);
     VerifyOrExit(index < kNumMaxActiveDevices, err = CHIP_ERROR_INVALID_DEVICE_DESCRIPTOR);
 
-    mActiveDevices[index].OnMessageReceived(header, payloadHeader, state, std::move(msgBuf), mgr);
+    mActiveDevices[index].OnMessageReceived(header, payloadHeader, session, std::move(msgBuf), mgr);
 
 exit:
     if (err != CHIP_NO_ERROR)
@@ -393,6 +432,20 @@ void DeviceController::ReleaseAllDevices()
     {
         ReleaseDevice(&mActiveDevices[i]);
     }
+}
+
+uint16_t DeviceController::FindDeviceIndex(SecureSessionHandle session)
+{
+    uint16_t i = 0;
+    while (i < kNumMaxActiveDevices)
+    {
+        if (mActiveDevices[i].IsActive() && mActiveDevices[i].IsSecureConnected() && mActiveDevices[i].MatchesSession(session))
+        {
+            return i;
+        }
+        i++;
+    }
+    return i;
 }
 
 uint16_t DeviceController::FindDeviceIndex(NodeId id)
@@ -522,7 +575,8 @@ CHIP_ERROR DeviceCommissioner::PairDevice(NodeId remoteDeviceId, RendezvousParam
 exit:
     if (err != CHIP_NO_ERROR)
     {
-        if (mRendezvousSession != nullptr)
+        // Delete the current rendezvous session only if a device is not currently being paired.
+        if (mDeviceBeingPaired == kNumMaxActiveDevices && mRendezvousSession != nullptr)
         {
             chip::Platform::Delete(mRendezvousSession);
             mRendezvousSession = nullptr;
@@ -636,7 +690,8 @@ void DeviceCommissioner::RendezvousCleanup(CHIP_ERROR status)
         mPairingDelegate->OnPairingComplete(status);
     }
 
-    if (mDeviceBeingPaired != kNumMaxActiveDevices)
+    // TODO: make mStorageDelegate mandatory once all controller applications implement the interface.
+    if (mDeviceBeingPaired != kNumMaxActiveDevices && mStorageDelegate != nullptr)
     {
         // Let's release the device that's being paired.
         // If pairing was successful, its information is

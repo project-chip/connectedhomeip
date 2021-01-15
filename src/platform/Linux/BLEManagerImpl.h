@@ -94,7 +94,10 @@ public:
     CHIP_ERROR ConfigureBle(uint32_t aNodeId, bool aIsCentral);
 
     // Driven by BlueZ IO
-    static void CHIPoBluez_NewConnection(BLE_CONNECTION_OBJECT user_data);
+    static void HandleNewConnection(BLE_CONNECTION_OBJECT conId);
+    static void HandleWriteComplete(BLE_CONNECTION_OBJECT conId);
+    static void HandleSubscribeOpComplete(BLE_CONNECTION_OBJECT conId, bool subscribed);
+    static void HandleTXCharChanged(BLE_CONNECTION_OBJECT conId, const uint8_t * value, size_t len);
     static void HandleRXCharWrite(BLE_CONNECTION_OBJECT user_data, const uint8_t * value, size_t len);
     static void CHIPoBluez_ConnectionClosed(BLE_CONNECTION_OBJECT user_data);
     static void HandleTXCharCCCDWrite(BLE_CONNECTION_OBJECT user_data);

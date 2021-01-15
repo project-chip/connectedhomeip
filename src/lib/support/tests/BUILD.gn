@@ -32,6 +32,7 @@ chip_test_suite("tests") {
     "TestSafeInt.cpp",
     "TestScopedBuffer.cpp",
     "TestSerializableIntegerSet.cpp",
+    "TestStringBuilder.cpp",
     "TestTimeUtils.cpp",
   ]
   sources = []

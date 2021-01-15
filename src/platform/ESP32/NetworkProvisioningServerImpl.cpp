@@ -25,6 +25,7 @@
 #include <core/CHIPTLV.h>
 #include <platform/ESP32/ESP32Utils.h>
 #include <platform/internal/DeviceNetworkInfo.h>
+#include <system/TLVPacketBufferBackingStore.h>
 
 #include "esp_event.h"
 #include "esp_wifi.h"
@@ -232,7 +233,6 @@ void NetworkProvisioningServerImpl::HandleScanDone()
     wifi_ap_record_t * scanResults = NULL;
     uint16_t scanResultCount;
     uint16_t encodedResultCount;
-    PacketBuffer * respBuf = NULL;
 
     // If we receive a SCAN DONE event for a scan that we didn't initiate, simply ignore it.
     VerifyOrExit(mState == kState_ScanNetworks_InProgress, err = CHIP_NO_ERROR);
@@ -263,19 +263,19 @@ void NetworkProvisioningServerImpl::HandleScanDone()
     // If the ScanNetworks request is still outstanding...
     if (GetCurrentOp() == kMsgType_ScanNetworks)
     {
-        chip::TLV::TLVWriter writer;
+        System::PacketBufferTLVWriter writer;
         TLVType outerContainerType;
 
         // Sort results by rssi.
         qsort(scanResults, scanResultCount, sizeof(*scanResults), ESP32Utils::OrderScanResultsByRSSI);
 
         // Allocate a packet buffer to hold the encoded scan results.
-        respBuf = PacketBuffer::New(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE + 1);
-        VerifyOrExit(respBuf != NULL, err = CHIP_ERROR_NO_MEMORY);
+        PacketBufferHandle respBuf = PacketBuffer::New(CHIP_SYSTEM_CONFIG_HEADER_RESERVE_SIZE + 1);
+        VerifyOrExit(!respBuf.IsNull(), err = CHIP_ERROR_NO_MEMORY);
 
         // Encode the list of scan results into the response buffer.  If the encoded size of all
         // the results exceeds the size of the buffer, encode only what will fit.
-        writer.Init(respBuf, respBuf->AvailableDataLength() - 1);
+        writer.Init(std::move(respBuf));
         err = writer.StartContainer(AnonymousTag, kTLVType_Array, outerContainerType);
         SuccessOrExit(err);
         for (encodedResultCount = 0; encodedResultCount < scanResultCount; encodedResultCount++)
@@ -306,19 +306,16 @@ void NetworkProvisioningServerImpl::HandleScanDone()
         }
         err = writer.EndContainer(outerContainerType);
         SuccessOrExit(err);
-        err = writer.Finalize();
+        err = writer.Finalize(&respBuf);
         SuccessOrExit(err);
 
         // Send the scan results to the requestor.  Note that this method takes ownership of the
         // buffer, success or fail.
-        err     = SendNetworkScanComplete(encodedResultCount, respBuf);
-        respBuf = NULL;
+        err = SendNetworkScanComplete(encodedResultCount, std::move(respBuf));
         SuccessOrExit(err);
     }
 
 exit:
-    PacketBuffer::Free(respBuf);
-
     // If an error occurred and we haven't yet responded, send a Internal Error back to the
     // requestor.
     if (err != CHIP_NO_ERROR && GetCurrentOp() == kMsgType_ScanNetworks)

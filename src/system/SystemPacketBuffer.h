@@ -1,6 +1,6 @@
 /*
  *
- *    Copyright (c) 2020 Project CHIP Authors
+ *    Copyright (c) 2020-2021 Project CHIP Authors
  *    Copyright (c) 2016-2017 Nest Labs, Inc.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
@@ -185,7 +185,7 @@ public:
      *
      *  @return \c true if there is a chained buffer.
      */
-    bool HasChainedBuffer() const { return this->next != nullptr; }
+    bool HasChainedBuffer() const { return ChainedBuffer() != nullptr; }
 
     /**
      * Add the given packet buffer to the end of the buffer chain, adjusting the total length of each buffer in the chain
@@ -254,7 +254,7 @@ public:
     /**
      * Return the last buffer in a buffer chain.
      *
-     *  @return a handle to the next buffer in the buffer chain.
+     *  @return a handle to the last buffer in the buffer chain.
      */
     CHECK_RETURN_VALUE PacketBufferHandle Last();
 
@@ -308,13 +308,8 @@ public:
      */
     static PacketBufferHandle New();
 
-    // The following will shortly be removed or made private; do not use in new code.
-    PacketBuffer * Next_ForNow() const { return static_cast<PacketBuffer *>(this->next); }
-    void AddToEnd_ForNow(PacketBuffer * aPacket);
+    // DO NOT USE. Will be made private after #4094 merges.
     void AddRef();
-    static void Free(PacketBuffer * aPacket);
-    static PacketBuffer * FreeHead_ForNow(PacketBuffer * aPacket) { return FreeHead(aPacket); }
-    PacketBuffer * Consume(uint16_t aConsumeLength);
 
 private:
 #if !CHIP_SYSTEM_CONFIG_USE_LWIP && CHIP_SYSTEM_CONFIG_PACKETBUFFER_MAXALLOC
@@ -327,8 +322,11 @@ private:
     static PacketBuffer * RightSize(PacketBuffer * aPacket);
 #endif
 
+    static void Free(PacketBuffer * aPacket);
     static PacketBuffer * FreeHead(PacketBuffer * aPacket);
 
+    PacketBuffer * ChainedBuffer() const { return static_cast<PacketBuffer *>(this->next); }
+    PacketBuffer * Consume(uint16_t aConsumeLength);
     void Clear();
 
     friend class PacketBufferHandle;
@@ -449,7 +447,7 @@ public:
         aOther.mBuffer = nullptr;
     }
 
-    ~PacketBufferHandle() { Adopt(nullptr); }
+    ~PacketBufferHandle() { *this = nullptr; }
 
     /**
      * Take ownership of a PacketBuffer from another PacketBufferHandle, freeing any existing owned buffer.
@@ -470,7 +468,11 @@ public:
      */
     PacketBufferHandle & operator=(decltype(nullptr))
     {
-        Adopt(nullptr);
+        if (mBuffer != nullptr)
+        {
+            PacketBuffer::Free(mBuffer);
+        }
+        mBuffer = nullptr;
         return *this;
     }
 
@@ -489,7 +491,6 @@ public:
      * Access a PackerBuffer's public methods.
      */
     PacketBuffer * operator->() const { return mBuffer; }
-    PacketBuffer & operator*() const { return *mBuffer; }
 
     /**
      * Test whether this PacketBufferHandle is empty, or owns a PacketBuffer.
@@ -548,29 +549,16 @@ public:
     }
 
     /**
-     * Take ownership of a raw PacketBuffer pointer.
-     *
-     * @brief The caller's ownership is transferred to this. An existing owned buffer is freed.
-     *
-     * @note This should only be used in low-level code, e.g. to import buffers from LwIP or a similar stack.
-     */
-    void Adopt(PacketBuffer * buffer)
-    {
-        if (mBuffer != nullptr)
-        {
-            PacketBuffer::Free(mBuffer);
-        }
-        mBuffer = buffer;
-    }
-
-    /**
      * Get a new handle to a raw PacketBuffer pointer.
      *
      * @brief The caller's ownership is transferred to this.
      *
      * @note This should only be used in low-level code, e.g. to import buffers from LwIP or a similar stack.
      */
-    static PacketBufferHandle Create(PacketBuffer * buffer) { return PacketBufferHandle(buffer); }
+    static PacketBufferHandle Adopt(PacketBuffer * buffer) { return PacketBufferHandle(buffer); }
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    static PacketBufferHandle Adopt(pbuf * buffer) { return Adopt(reinterpret_cast<PacketBuffer *>(buffer)); }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
     /**
      * Export a raw PacketBuffer pointer.
@@ -591,10 +579,10 @@ public:
      *
      *  @note This differs from `FreeHead()` in that it does not touch any content in the currently referenced packet buffer;
      *      it only changes which buffer this handle owns. (Note that this could result in the previous buffer being freed,
-     *      if there is no other.) `Advance()` is designed to be used with an addition handle to traverse a buffer chain,
+     *      if there is no other owner.) `Advance()` is designed to be used with an additional handle to traverse a buffer chain,
      *      whereas `FreeHead()` modifies a chain.
      */
-    void Advance() { *this = Hold(mBuffer->Next_ForNow()); }
+    void Advance() { *this = Hold(mBuffer->ChainedBuffer()); }
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
     /**
@@ -607,10 +595,14 @@ public:
     struct pbuf * GetLwIPpbuf() { return static_cast<struct pbuf *>(mBuffer); }
 #endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
-    // DO NOT USE. This is intended to be used only to call existing TLV::Init() functions that have not yet been converted
-    // to take a PacketBufferHandle, and will be removed soon.
-    // The caller has access but no ownership.
-    PacketBuffer * Get_ForNow() const { return mBuffer; }
+    /**
+     * Creates a copy of the data in this packet.
+     *
+     * Does NOT support chained buffers.
+     *
+     * @returns empty handle on allocation failure.
+     */
+    PacketBufferHandle CloneData();
 
 private:
     PacketBufferHandle(const PacketBufferHandle &) = delete;
@@ -630,6 +622,8 @@ private:
 
     PacketBuffer * Get() const { return mBuffer; }
 
+    bool operator==(const PacketBufferHandle & aOther) { return mBuffer == aOther.mBuffer; }
+
     PacketBuffer * mBuffer;
 
     friend class PacketBuffer;
@@ -643,14 +637,14 @@ inline void PacketBuffer::SetDataLength(uint16_t aNewLen, const PacketBufferHand
 
 inline PacketBufferHandle PacketBuffer::Next()
 {
-    return PacketBufferHandle::Hold(Next_ForNow());
+    return PacketBufferHandle::Hold(ChainedBuffer());
 }
 
 inline PacketBufferHandle PacketBuffer::Last()
 {
     PacketBuffer * p = this;
-    while (p->Next_ForNow() != nullptr)
-        p = p->Next_ForNow();
+    while (p->HasChainedBuffer())
+        p = p->ChainedBuffer();
     return PacketBufferHandle::Hold(p);
 }
 

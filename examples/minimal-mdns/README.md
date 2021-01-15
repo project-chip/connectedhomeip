@@ -24,7 +24,7 @@ the network while running.
 
 ## Example client
 
-The file -client.cpp` contains an example of a mdns client. By default it
+The file `client.cpp` contains an example of a mdns client. By default it
 queries for **\_services.\_dns-sd.\_udp.local** (DNS-SD list services) and uses
 unicast queries.
 
@@ -46,6 +46,29 @@ see
 
 ```sh
 ./out/minimal_mdns/minimal-mdns-client --help
+```
+
+for full command line details.
+
+## Example advertiser
+
+This example uses the chip built-in advertiser, implemented in the file
+`advertiser.cpp`.
+
+Example runs:
+
+```sh
+./out/minimal_mdns/mdns-advertiser -4 -m operational
+```
+
+```sh
+./out/minimal_mdns/mdns-advertiser -4 -m commisioning --vendor-id 123 --product-id 456
+```
+
+see
+
+```sh
+./out/minimal_mdns/mdns-advertiser --help
 ```
 
 for full command line details.
@@ -76,7 +99,7 @@ DD200C20D25AE5F7._chipc._udp.local.  SRV   0 0 11111 B75AFB458ECD.local.
 B75AFB458ECD.local.                  AAAA  ba2a:b311:742e:b44c:f515:576f:9783:3f30
 ```
 
-#### Simulated commisionable node
+#### Simulated commisioning node
 
 ```sh
 dns-sd -R DD200C20D25AE5F7 _chipd._udp,S052,L0840,V123 . 11111 D=0840 VP=123+456 PH=3

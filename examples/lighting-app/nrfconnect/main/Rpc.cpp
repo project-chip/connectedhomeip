@@ -17,26 +17,24 @@
  */
 
 #include "Rpc.h"
-#ifdef CONFIG_CHIP_PW_RPC
 #include "AppTask.h"
+
 #include "main/pigweed_lighting.rpc.pb.h"
-#include "pw_hdlc_lite/encoder.h"
 #include "pw_hdlc_lite/rpc_channel.h"
 #include "pw_hdlc_lite/rpc_packets.h"
-#include "pw_hdlc_lite/sys_io_stream.h"
-#include "pw_rpc/echo_service_nanopb.h"
 #include "pw_rpc/server.h"
+#include "pw_stream/sys_io_stream.h"
 #include "pw_sys_io/sys_io.h"
 #include "pw_sys_io_nrfconnect/init.h"
+
+#include <logging/log.h>
+
 #include <array>
-#include <span>
-#include <string_view>
-#endif
+
+LOG_MODULE_DECLARE(app);
 
 namespace chip {
 namespace rpc {
-
-#ifdef CONFIG_CHIP_PW_RPC
 
 class LightingService final : public generated::LightingService<LightingService>
 {
@@ -80,18 +78,13 @@ void RegisterServices()
 
 void Start()
 {
-    // Send log messages to HDLC address 1. This prevents logs from interfering
-    // with pw_rpc communications.
-    pw::log_basic::SetOutput(
-        [](std::string_view log) { pw::hdlc_lite::WriteInformationFrame(1, std::as_bytes(std::span(log)), writer); });
-
     // Set up the server and start processing data.
     RegisterServices();
 
     // Buffer for decoding incoming HDLC frames.
     std::array<std::byte, kMaxTransmissionUnit> input_buffer;
 
-    PW_LOG_INFO("Starting pw_rpc server");
+    LOG_INF("Starting pw_rpc server");
     pw::hdlc_lite::ReadAndProcessPackets(server, hdlc_channel_output, input_buffer);
 }
 
@@ -109,18 +102,6 @@ void RunRpcService(void *, void *, void *)
 {
     Start();
 }
-
-#else // CONFIG_CHIP_PW_RPC
-class LightingService
-{
-};
-
-k_tid_t Init()
-{
-    return nullptr;
-}
-
-#endif
 
 } // namespace rpc
 } // namespace chip

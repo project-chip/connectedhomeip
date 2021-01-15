@@ -63,6 +63,8 @@ struct MdnsService
     chip::Inet::InterfaceId mInterface;
     TextEntry * mTextEntryies;
     size_t mTextEntrySize;
+    const char ** mSubTypes;
+    size_t mSubTypeSize;
     Optional<chip::Inet::IPAddress> mAddress;
 };
 

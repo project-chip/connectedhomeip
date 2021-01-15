@@ -1,0 +1,19 @@
+{{> header}}
+
+// Prevent multiple inclusion
+#pragma once
+
+// Global, non-cluster-specific commands
+{{#zcl_global_commands}}
+#define ZCL_{{asDelimitedMacro label}}_COMMAND_ID ({{asHex code 2}})
+{{/zcl_global_commands}}
+
+{{#zcl_clusters}}
+
+{{#zcl_commands}}
+{{#first}}
+// Commands for cluster: {{parent.label}}
+{{/first}}
+#define ZCL_{{asDelimitedMacro label}}_COMMAND_ID ({{asHex code 2}})
+{{/zcl_commands}}
+{{/zcl_clusters}}

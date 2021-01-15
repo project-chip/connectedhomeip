@@ -57,15 +57,6 @@ the ESP32 all-clusters-app:
 
     $ chip-tool pairing unpair
 
-## Using the Client to Request an Echo
-
-### Ping a device
-
-    $ chip-tool echo ip
-
-If valid values are supplied, it will send a message to the paired device and
-verify that the incoming echo from the server matches what was sent out.
-
 ## Using the Client to Send CHIP Commands
 
 To use the Client to send a CHIP commands, run the built executable and pass it
@@ -110,18 +101,25 @@ with the target cluster name and the target command name
 ### How to parse a setup code
 
 To parse a setup code, run the built executable with the `payload` cluster name
-and the `parse` command
+and the `parse-setup-payload` command
 
-    $ chip-tool payload parse code
+    $ chip-tool payload parse-setup-payload code
 
 #### QR Code
 
-    $ chip-tool payload parse "CH:#####"
+    $ chip-tool payload parse-setup-payload "CH:#####"
 
 #### QR Code with optional Vendor Info
 
-    $ chip-tool chip-tool payload parse "CH:#####"
+    $ chip-tool chip-tool payload parse-setup-payload "CH:#####"
 
 #### Manual Setup Code
 
-    $ chip-tool payload parse :#####"
+    $ chip-tool payload parse-setup-payload :#####"
+
+# Using the Client for Additional Data Payload
+
+To parse an additional data payload, run the built executable with the `payload`
+cluster name and the `parse-additional-data-payload` command
+
+    $ chip-tool payload parse-additional-data-payload "#####"

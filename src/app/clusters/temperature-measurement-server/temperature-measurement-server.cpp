@@ -52,6 +52,8 @@ EmberEventControl emberAfPluginTemperatureMeasurementServerReadEventControl;
 // https://github.com/project-chip/connectedhomeip/issues/3619
 void emberAfPluginTemperatureMeasurementServerReadEventHandler() {}
 
+void emberAfPluginTemperatureMeasurementServerStackStatusCallback(EmberStatus status) {}
+
 // -------------------------------------------------------------------------
 // ****** callback section *******
 
