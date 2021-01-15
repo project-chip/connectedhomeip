@@ -24,7 +24,6 @@
 
 #include <controller/CHIPClusters.h>
 #include <controller/CHIPDevice.h>
-#include <controller/CHIPDeviceController_deprecated.h>
 
 using namespace chip;
 using namespace chip::app;
