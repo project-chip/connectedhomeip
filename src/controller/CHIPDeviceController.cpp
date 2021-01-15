@@ -719,6 +719,9 @@ void DeviceCommissioner::OnRendezvousComplete()
     device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
+    // TODO: Adding new keys to session manager should be done by RendezvousSession or PairingSession
+    mSessionManager->NewPairing(Optional<Transport::PeerAddress>(mRendezvousSession->GetPeerAddress()), device->GetDeviceId(),
+                                &mRendezvousSession->GetPairingSession());
 
     // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
     // requires a valid storage delegate. However, test pairing usecase, that's used

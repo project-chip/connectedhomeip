@@ -723,9 +723,9 @@ const char * nl_Chip_Stack_StatusReportToString(uint32_t profileId, uint16_t sta
 }
 
 CHIP_ERROR nl_Chip_GetDeviceByNodeId(chip::DeviceController::ChipDeviceController * devCtrl, chip::NodeId nodeId,
-                                     chip::Controller::Device * device)
+                                     chip::Controller::Device ** device)
 {
-    return devCtrl->GetDeviceController()->GetDevice(nodeId, &device);
+    return devCtrl->GetDeviceController()->GetDevice(nodeId, device);
 }
 
 #if _CHIP_USE_LOGGING && CHIP_LOG_ENABLE_DYNAMIC_LOGING_FUNCTION
