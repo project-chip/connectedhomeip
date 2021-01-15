@@ -137,13 +137,13 @@
 #endif
 
 /**
- * CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
+ * CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
  *
  * Enables the use of a hard-coded default serial number if none
  * is found in Chip NV storage.
  */
-#ifndef CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
-#define CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER "DUMMY_SN"
+#ifndef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+#define CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER "DUMMY_SN"
 #endif
 
 /**

@@ -189,16 +189,16 @@ CHIP_ERROR GenericConfigurationManagerImpl<ImplClass>::_GetSerialNumber(char * b
     CHIP_ERROR err;
 
     err = Impl()->ReadConfigValueStr(ImplClass::kConfigKey_SerialNum, buf, bufSize, serialNumLen);
-#ifdef CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
-    if (CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
+#ifdef CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
+    if (CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER[0] != 0 && err == CHIP_DEVICE_ERROR_CONFIG_NOT_FOUND)
     {
-        VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
-        memcpy(buf, CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER));
-        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER) - 1;
-        ChipLogProgress(DeviceLayer, "Serial Number not found; using default: %s", CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER);
+        VerifyOrExit(sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) <= bufSize, err = CHIP_ERROR_BUFFER_TOO_SMALL);
+        memcpy(buf, CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER, sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER));
+        serialNumLen = sizeof(CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER) - 1;
+        ChipLogProgress(DeviceLayer, "Serial Number not found; using default: %s", CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER);
         err = CHIP_NO_ERROR;
     }
-#endif // CHIP_DEVICE_CONFIG_USE_TEST_SERIAL_NUMBER
+#endif // CHIP_DEVICE_CONFIG_TEST_SERIAL_NUMBER
     SuccessOrExit(err);
 
 exit:
