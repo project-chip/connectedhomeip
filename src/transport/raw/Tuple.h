@@ -100,9 +100,9 @@ public:
      * @param args initialization arguments, forwarded as-is to the underlying transports.
      */
     template <typename... Args, typename std::enable_if<(sizeof...(Args) == sizeof...(TransportTypes))>::type * = nullptr>
-    CHIP_ERROR Init(Args &&... args)
+    CHIP_ERROR Init(RawTransportDelegate * owner, Args &&... args)
     {
-        return InitImpl(std::forward<Args>(args)...);
+        return InitImpl(owner, std::forward<Args>(args)...);
     }
 
 private:
@@ -195,7 +195,7 @@ private:
      * @param rest tail arguments to be passed to the rest of transport Init methods.
      */
     template <typename InitArg, typename... Rest>
-    CHIP_ERROR InitImpl(InitArg && arg, Rest &&... rest)
+    CHIP_ERROR InitImpl(RawTransportDelegate * owner, InitArg && arg, Rest &&... rest)
     {
         auto transport = &std::get<sizeof...(TransportTypes) - sizeof...(Rest) - 1>(mTransports);
 
@@ -205,9 +205,9 @@ private:
             return err;
         }
 
-        transport->SetMessageReceiveHandler(&OnMessageReceive, this);
+        transport->SetOwner(owner);
 
-        return InitImpl(std::forward<Rest>(rest)...);
+        return InitImpl(owner, std::forward<Rest>(rest)...);
     }
 
     /**
@@ -215,7 +215,7 @@ private:
      *
      * Provided to ensure that recursive InitImpl finishes compiling.
      */
-    CHIP_ERROR InitImpl() { return CHIP_NO_ERROR; }
+    CHIP_ERROR InitImpl(RawTransportDelegate * owner) { return CHIP_NO_ERROR; }
 
     /**
      * Handler passed to all underlying transports at init time.
