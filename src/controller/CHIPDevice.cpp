@@ -106,11 +106,11 @@ exit:
 
 CHIP_ERROR Device::SendCommands()
 {
-    VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
     if (mState != ConnectionState::SecureConnected)
     {
         ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
     }
+    VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mCommandSender->SendCommandRequest(mDeviceId);
 }
 
