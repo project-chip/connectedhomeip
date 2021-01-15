@@ -172,7 +172,8 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize;
     uint16_t rotationCounter;
-    std::string rotatingDeviceId;
+    char rotatingDeviceIdBuffer [ROTATING_DEVICE_ID_LENGTH+1];
+    size_t rotatingDeviceIdBufferSize;
 
     char discriminatorBuf[5];  // hex representation of 16-bit discriminator
     char vendorProductBuf[10]; // "FFFF+FFFF"
@@ -202,11 +203,11 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
                       chip::DeviceLayer::ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize));
     SuccessOrExit(error = chip::DeviceLayer::ConfigurationMgr().GetRotationCounter(rotationCounter));
     SuccessOrExit(error = additionDataPayloadGenerator.generateRotatingDeviceId(
-                      rotationCounter, std::string(serialNumber, serialNumberSize), rotatingDeviceId));
+                      rotationCounter, serialNumber, serialNumberSize, rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize));
 
     // Rotating Device ID
-    entries[2].mData     = reinterpret_cast<const uint8_t *>(rotatingDeviceId.c_str());
-    entries[2].mDataSize = rotatingDeviceId.size();
+    entries[2].mData     = reinterpret_cast<const uint8_t *>(rotatingDeviceIdBuffer);
+    entries[2].mDataSize = rotatingDeviceIdBufferSize;
 #endif
     service.mTextEntryies  = entries;
     service.mTextEntrySize = sizeof(entries) / sizeof(TextEntry);

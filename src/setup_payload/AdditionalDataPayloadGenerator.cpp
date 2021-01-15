@@ -28,7 +28,6 @@
 #include <core/CHIPCore.h>
 #include <core/CHIPTLV.h>
 #include <crypto/CHIPCryptoPAL.h>
-#include <sstream>
 #include <stdlib.h>
 
 using namespace chip;
@@ -37,13 +36,16 @@ using namespace chip::TLV;
 using namespace chip::Crypto;
 using namespace chip::SetupPayload;
 
-CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t rotationCounter, std::string serialNumber,
-                                                                         PacketBufferHandle & bufferHandle)
+
+CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_t rotationCounter, char* serialNumberBuffer,
+                                                                        size_t serialNumberBufferSize,
+                                                                        PacketBufferHandle & bufferHandle)
 {
     CHIP_ERROR err = CHIP_NO_ERROR;
     System::PacketBufferTLVWriter writer;
     TLVWriter innerWriter;
-    std::string rotatingDeviceId;
+    char rotatingDeviceIdBuffer[ROTATING_DEVICE_ID_LENGTH+1];
+    size_t rotatingDeviceIdBufferSize;
 
     // Initialize TLVWriter
     writer.Init(PacketBuffer::New());
@@ -52,11 +54,11 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_
     SuccessOrExit(err);
 
     // Generating Device Rotating Id
-    err = generateRotatingDeviceId(rotationCounter, serialNumber, rotatingDeviceId);
+    err = generateRotatingDeviceId(rotationCounter, serialNumberBuffer, serialNumberBufferSize, rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize);
     SuccessOrExit(err);
 
     // Adding the rotating device id to the TLV data
-    err = innerWriter.PutString(ContextTag(kRotatingDeviceIdTag), rotatingDeviceId.c_str());
+    err = innerWriter.PutString(ContextTag(kRotatingDeviceIdTag), rotatingDeviceIdBuffer);
     SuccessOrExit(err);
 
     err = writer.CloseContainer(innerWriter);
@@ -69,32 +71,45 @@ exit:
     return err;
 }
 
-CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t rotationCounter, std::string serialNumber,
-                                                                    std::string & rotatingDeviceId)
+CHIP_ERROR AdditionalDataPayloadGenerator::generateRotatingDeviceId(uint16_t rotationCounter, char* serialNumberBuffer,
+                                                                size_t serialNumberBufferSize,
+                                                                char* rotatingDeviceIdBuffer,
+                                                                size_t & rotatingDeviceIdBufferSize)
 {
-    unsigned char * hashInput;
+    CHIP_ERROR err = CHIP_NO_ERROR;
+    char rotationCounterStr [ROTATING_DEVICE_ID_COUNTER_STR_LENGTH];
+    char hashInput[ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + serialNumberBufferSize];
+    char output [ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH];
     uint8_t hashOutputBuffer[kSHA256_Hash_Length];
-    std::ostringstream hashOutputStream;
-    std::string hashOutput;
-    std::string rotationCounterStr = std::to_string(rotationCounter);
+    uint8_t outputIndex = 0;
+    uint8_t hashOutputIndex = 0;
 
-    hashInput = reinterpret_cast<unsigned char *>(const_cast<char *>((serialNumber + rotationCounterStr).c_str()));
-    Hash_SHA256(hashInput, serialNumber.size() + rotationCounterStr.size(), hashOutputBuffer);
+    sprintf(rotationCounterStr, "%d", rotationCounter);
+    strcpy(hashInput, rotationCounterStr);
+    strcat(hashInput, serialNumberBuffer);
 
-    for (size_t i = 0; i < kSHA256_Hash_Length; i++)
-    {
-        hashOutputStream << std::uppercase << std::hex << (int) hashOutputBuffer[i];
-    }
+
+    err = Hash_SHA256(reinterpret_cast<unsigned char*>(const_cast<char*>(hashInput)), ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + serialNumberBufferSize, hashOutputBuffer);
+    SuccessOrExit(err);
 
     // Computing the Rotating Device Id
     // RDI = Rotation_Counter + SuffixBytes(HMAC_SHA256(Serial_Number + Rotation_Counter), 16)
-    hashOutput = hashOutputStream.str();
-    if (hashOutput.size() > 16)
+    while(outputIndex < ROTATING_DEVICE_ID_COUNTER_STR_LENGTH && rotationCounterStr[outputIndex] != '\0')
     {
-        hashOutput = hashOutput.substr(hashOutput.size() - 16, 16);
+        output[outputIndex] = rotationCounterStr[outputIndex];
+        outputIndex++;
     }
-    rotatingDeviceId = rotationCounterStr + hashOutput;
-    ChipLogDetail(DeviceLayer, "rotatingDeviceId: %s", rotatingDeviceId.c_str());
 
-    return CHIP_NO_ERROR;
+    while(hashOutputIndex < ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH)
+    {
+        output[outputIndex++] = hashOutputBuffer[kSHA256_Hash_Length - ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH - 1 + hashOutputIndex];
+        hashOutputIndex++;
+    }
+
+    memcpy(rotatingDeviceIdBuffer, output, ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH);
+    rotatingDeviceIdBufferSize = ROTATING_DEVICE_ID_COUNTER_STR_LENGTH + ROTATING_DEVICE_ID_HASH_SUFFIX_LENGTH;
+    ChipLogDetail(DeviceLayer, "rotatingDeviceId: %s", rotatingDeviceIdBuffer);
+
+exit:
+    return err;
 }
