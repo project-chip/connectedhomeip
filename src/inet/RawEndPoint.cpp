@@ -621,7 +621,7 @@ INET_ERROR RawEndPoint::SendMsg(const IPPacketInfo * pktInfo, chip::System::Pack
 #if LWIP_VERSION_MAJOR > 1 || LWIP_VERSION_MINOR >= 5
         ip_addr_t ipAddr = addr.ToLwIPAddr();
 
-        lwipErr = raw_sendto(mRaw, msg.UnsafeGetLwIPpbuf(), &ipAddr);
+        lwipErr = raw_sendto(mRaw, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &ipAddr);
 #else // LWIP_VERSION_MAJOR <= 1 && LWIP_VERSION_MINOR < 5
         if (PCB_ISIPV6(mRaw))
         {

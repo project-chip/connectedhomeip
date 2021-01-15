@@ -567,24 +567,15 @@ public:
      */
     void Advance() { *this = Hold(mBuffer->ChainedBuffer()); }
 
-#if CHIP_SYSTEM_CONFIG_USE_LWIP
-    /**
-     * Borrow a raw LwIP `pbuf *`.
-     *
-     * @brief The caller has access but no ownership.
-     *
-     * @note This should be used ONLY by low-level code interfacing with LwIP.
-     */
-    struct pbuf * UnsafeGetLwIPpbuf() { return static_cast<struct pbuf *>(mBuffer); }
-#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
-
     /**
      * Export a raw PacketBuffer pointer.
      *
      * @brief The PacketBufferHandle's ownership is transferred to the caller.
      *
-     * @note This should only be used in low-level code, e.g. to export buffers from LwIP or a similar stack.
-     *       The ref-qualifier `&&` requires the caller to use `std::move` to emphasize that ownership is
+     * @note This should only be used in low-level code. The caller owns one counted reference to the \c PacketBuffer
+     *       and is reponsible for managing it safely.
+     *
+     * @note The ref-qualifier `&&` requires the caller to use `std::move` to emphasize that ownership is
      *       moved out of this handle.
      */
     CHECK_RETURN_VALUE PacketBuffer * UnsafeRelease() &&
@@ -602,6 +593,11 @@ public:
      * @returns empty handle on allocation failure.
      */
     PacketBufferHandle CloneData();
+
+protected:
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+    static struct pbuf * GetLwIPpbuf(const PacketBufferHandle & handle) { return static_cast<struct pbuf *>(handle.mBuffer); }
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP
 
 private:
     PacketBufferHandle(const PacketBufferHandle &) = delete;
@@ -649,3 +645,39 @@ inline PacketBufferHandle PacketBuffer::Last()
 
 } // namespace System
 } // namespace chip
+
+#if CHIP_SYSTEM_CONFIG_USE_LWIP
+
+namespace chip {
+
+namespace Inet {
+class RawEndPoint;
+class UDPEndPoint;
+class IPEndPointBasis;
+} // namespace Inet
+
+namespace System {
+
+/**
+ * Provide low-level access to a raw `pbuf *`, limited to specific classes that interface with LwIP.
+ */
+class LwIPPacketBufferView : public PacketBufferHandle
+{
+private:
+    /**
+     * Borrow a raw LwIP `pbuf *`.
+     *
+     * @brief The caller has access but no ownership.
+     *
+     * @note This should be used ONLY by low-level code interfacing with LwIP.
+     */
+    static struct pbuf * UnsafeGetLwIPpbuf(const PacketBufferHandle & handle) { return PacketBufferHandle::GetLwIPpbuf(handle); }
+    friend class Inet::RawEndPoint;
+    friend class Inet::UDPEndPoint;
+    friend class Inet::IPEndPointBasis;
+};
+
+} // namespace System
+} // namespace chip
+
+#endif // CHIP_SYSTEM_CONFIG_USE_LWIP

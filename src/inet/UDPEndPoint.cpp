@@ -576,9 +576,9 @@ INET_ERROR UDPEndPoint::SendMsg(const IPPacketInfo * pktInfo, System::PacketBuff
         }
 
         if (intfId != INET_NULL_INTERFACEID)
-            lwipErr = udp_sendto_if(mUDP, msg.UnsafeGetLwIPpbuf(), &lwipDestAddr, destPort, intfId);
+            lwipErr = udp_sendto_if(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort, intfId);
         else
-            lwipErr = udp_sendto(mUDP, msg.UnsafeGetLwIPpbuf(), &lwipDestAddr, destPort);
+            lwipErr = udp_sendto(mUDP, System::LwIPPacketBufferView::UnsafeGetLwIPpbuf(msg), &lwipDestAddr, destPort);
 
         ip_addr_copy(mUDP->local_ip, boundAddr);
 
