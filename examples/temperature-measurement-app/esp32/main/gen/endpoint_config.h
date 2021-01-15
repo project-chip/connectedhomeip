@@ -135,7 +135,7 @@
 // Array of networks supported on each endpoint
 #define FIXED_NETWORKS                                                                                                             \
     {                                                                                                                              \
-        1                                                                                                                          \
+        0                                                                                                                          \
     }
 
 // Array of EmberAfCommandMetadata structs.
@@ -177,7 +177,6 @@
 #define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_##x
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
-// TODO Issue #3871 Reporting should only be enabled if there are reportable attributes
 // Use this macro to check if Reporting plugin is included
 #define EMBER_AF_PLUGIN_REPORTING
 // User options for plugin Reporting

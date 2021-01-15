@@ -5608,14 +5608,14 @@
       "endpointTypeIndex": 1,
       "profileId": "0x0103",
       "endpointId": 1,
-      "networkId": 1
+      "networkId": 0
     },
     {
       "endpointTypeName": "Anonymous Endpoint Type",
       "endpointTypeIndex": 0,
       "profileId": "0x0103",
       "endpointId": 2,
-      "networkId": 1
+      "networkId": 0
     }
   ]
 }
