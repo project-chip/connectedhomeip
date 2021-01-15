@@ -116,9 +116,16 @@ uint8_t emAfExtendedPanId[EXTENDED_PAN_ID_SIZE] = {
     0, 0, 0, 0, 0, 0, 0, 0,
 };
 
-#ifdef EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_DECLARATIONS
-EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_DECLARATIONS
+#ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
+void emberAfPluginTemperatureMeasurementServerInitCallback(void);
 #endif
+#ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
+void emberAfPluginBarrierControlServerInitCallback(void);
+#endif
+#ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
+void emberAfPluginDoorLockServerInitCallback(void);
+#endif
+
 #ifdef EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 EMBER_AF_GENERATED_PLUGIN_TICK_FUNCTION_DECLARATIONS
 #endif
@@ -265,8 +272,17 @@ void emberAfInit(void)
     // initialize event management system
     emAfInitEvents();
 
-#ifdef EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_CALLS
-    EMBER_AF_GENERATED_PLUGIN_INIT_FUNCTION_CALLS
+#ifdef EMBER_AF_PLUGIN_REPORTING
+    emberAfPluginReportingInitCallback();
+#endif
+#ifdef EMBER_AF_PLUGIN_TEMPERATURE_MEASUREMENT_SERVER
+    emberAfPluginTemperatureMeasurementServerInitCallback();
+#endif
+#ifdef EMBER_AF_PLUGIN_BARRIER_CONTROL_SERVER
+    emberAfPluginBarrierControlServerInitCallback();
+#endif
+#ifdef EMBER_AF_PLUGIN_DOOR_LOCK_SERVER
+    emberAfPluginDoorLockServerInitCallback();
 #endif
 
     emAfCallInits();
