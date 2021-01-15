@@ -365,33 +365,46 @@ static uint8_t * singletonAttributeLocation(EmberAfAttributeMetadata * am)
 // This function does mem copy, but smartly, which means that if the type is a
 // string, it will copy as much as it can.
 // If src == NULL, then this method will set memory to zeroes
+// See documentation for emAfReadOrWriteAttribute for the semantics of
+// readLength when reading and writing.
 static EmberAfStatus typeSensitiveMemCopy(uint8_t * dest, uint8_t * src, EmberAfAttributeMetadata * am, bool write,
                                           uint16_t readLength)
 {
     EmberAfAttributeType attributeType = am->attributeType;
-    uint16_t size                      = (readLength == 0) ? am->size : readLength;
+    // readLength == 0 for a read indicates that we should just trust that the
+    // caller has enough space for an attribute...
+    bool ignoreReadLength = write || (readLength == 0);
+    uint16_t bufferSize   = ignoreReadLength ? am->size : readLength;
 
     if (emberAfIsStringAttributeType(attributeType))
     {
-        emberAfCopyString(dest, src, static_cast<uint8_t>(size - 1));
+        if (bufferSize < 1)
+        {
+            return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        }
+        emberAfCopyString(dest, src, static_cast<uint8_t>(bufferSize - 1));
     }
     else if (emberAfIsLongStringAttributeType(attributeType))
     {
-        emberAfCopyLongString(dest, src, static_cast<uint16_t>(size - 2));
+        if (bufferSize < 2)
+        {
+            return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
+        }
+        emberAfCopyLongString(dest, src, static_cast<uint16_t>(bufferSize - 2));
     }
     else
     {
-        if (!write && readLength != 0 && readLength < am->size)
+        if (!ignoreReadLength && readLength < am->size)
         {
             return EMBER_ZCL_STATUS_INSUFFICIENT_SPACE;
         }
         if (src == NULL)
         {
-            memset(dest, 0, size);
+            memset(dest, 0, am->size);
         }
         else
         {
-            memmove(dest, src, size);
+            memmove(dest, src, am->size);
         }
     }
     return EMBER_ZCL_STATUS_SUCCESS;
