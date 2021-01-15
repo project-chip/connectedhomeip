@@ -1285,11 +1285,10 @@ static void UpdateAdditionalDataCharacteristic(BluezGattCharacteristic1 * charac
 
     err = ConfigurationMgr().GetSerialNumber(serialNumber, sizeof(serialNumber), serialNumberSize);
     SuccessOrExit(err);
-    err                            = ConfigurationMgr().GetRotationCounter(rotationCounter);
+    err = ConfigurationMgr().GetRotationCounter(rotationCounter);
     SuccessOrExit(err);
 
-    err = additionDataPayloadGenerator.generateAdditionalDataPayload(rotationCounter, serialNumber, serialNumberSize,
-                                                                     bufferHandle);
+    err = additionDataPayloadGenerator.generateAdditionalDataPayload(rotationCounter, serialNumber, serialNumberSize, bufferHandle);
     SuccessOrExit(err);
 
     cValue = g_variant_new_from_data(G_VARIANT_TYPE("ay"), bufferHandle->Start(), bufferHandle->DataLength(), TRUE, g_free,

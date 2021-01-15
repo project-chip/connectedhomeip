@@ -172,7 +172,7 @@ CHIP_ERROR DiscoveryManager::PublishUnprovisionedDevice(chip::Inet::IPAddressTyp
     char serialNumber[chip::DeviceLayer::ConfigurationManager::kMaxSerialNumberLength + 1];
     size_t serialNumberSize;
     uint16_t rotationCounter;
-    char rotatingDeviceIdBuffer [ROTATING_DEVICE_ID_LENGTH+1];
+    char rotatingDeviceIdBuffer[ROTATING_DEVICE_ID_LENGTH + 1];
     size_t rotatingDeviceIdBufferSize;
 
     char discriminatorBuf[5];  // hex representation of 16-bit discriminator

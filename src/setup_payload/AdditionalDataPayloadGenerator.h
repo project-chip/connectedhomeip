@@ -40,10 +40,11 @@ public:
     AdditionalDataPayloadGenerator() {}
 
     // Generate additional data payload (i.e. TLV encoded)
-    CHIP_ERROR generateAdditionalDataPayload(uint16_t rotationCounter, char* serialNumberBuffer, size_t serialNumberBufferSize,
+    CHIP_ERROR generateAdditionalDataPayload(uint16_t rotationCounter, char * serialNumberBuffer, size_t serialNumberBufferSize,
                                              chip::System::PacketBufferHandle & bufferHandle);
     // Generate Device Rotating ID
-    CHIP_ERROR generateRotatingDeviceId(uint16_t rotationCounter, char* serialNumberBuffer, size_t serialNumberBufferSize, char* rotatingDeviceIdBuffer, size_t & rotatingDeviceIdBufferSize);
+    CHIP_ERROR generateRotatingDeviceId(uint16_t rotationCounter, char * serialNumberBuffer, size_t serialNumberBufferSize,
+                                        char * rotatingDeviceIdBuffer, size_t & rotatingDeviceIdBufferSize);
 };
 
 } // namespace chip
