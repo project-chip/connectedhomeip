@@ -123,13 +123,14 @@ exit:
     return error;
 }
 
-CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommisioningAdvertisingParameters & params)
+CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommissionAdvertisingParameters & params)
 {
     CHIP_ERROR error = CHIP_NO_ERROR;
     MdnsService service;
     char discriminatorBuf[6];
     char vendorProductBuf[12];
-    TextEntry textEntries[3];
+    char pairingInstrBuf[128];
+    TextEntry textEntries[4];
     size_t textEntrySize = 0;
     char shortDiscriminatorSubtype[6];
     char longDiscriminatorSubtype[7];
@@ -142,7 +143,14 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommisioningAdvertisingParamet
         return CHIP_ERROR_INCORRECT_STATE;
     }
     snprintf(service.mName, sizeof(service.mName), "%016" PRIX64, mCommissionInstanceName);
-    strncpy(service.mType, "_chipc", sizeof(service.mType));
+    if (params.GetCommissionAdvertiseMode() == CommssionAdvertiseMode::kCommissioning)
+    {
+        strncpy(service.mType, "_chipc", sizeof(service.mType));
+    }
+    else
+    {
+        strncpy(service.mType, "_chipd", sizeof(service.mType));
+    }
     service.mProtocol = MdnsServiceProtocol::kMdnsProtocolUdp;
 
     snprintf(discriminatorBuf, sizeof(discriminatorBuf), "%04u", params.GetLongDiscriminator());
@@ -166,6 +174,13 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommisioningAdvertisingParamet
     textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(CHIP_ROTATING_DEVICE_ID),
                                      strlen(CHIP_ROTATING_DEVICE_ID) };
 #endif
+    if (params.GetPairingHint().HasValue() && params.GetPairingInstr().HasValue())
+    {
+        snprintf(pairingInstrBuf, sizeof(pairingInstrBuf), "%s+%u", params.GetPairingInstr().Value(),
+                 params.GetPairingHint().Value());
+        textEntries[textEntrySize++] = { "P", reinterpret_cast<const uint8_t *>(pairingInstrBuf),
+                                         strnlen(pairingInstrBuf, sizeof(pairingInstrBuf)) };
+    }
 
     snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());
     subTypes[subTypeSize++] = shortDiscriminatorSubtype;
