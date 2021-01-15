@@ -512,7 +512,7 @@ void RawEndPoint::Free()
  *  A synonym for <tt>SendTo(addr, INET_NULL_INTERFACEID, msg,
  *  sendFlags)</tt>.
  */
-INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
+INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBufferHandle && msg, uint16_t sendFlags)
 {
     return SendTo(addr, INET_NULL_INTERFACEID, std::move(msg), sendFlags);
 }
@@ -547,7 +547,8 @@ INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, chip::System::PacketBuffe
  * @details
  *      Send the ICMP message in \c msg to the destination given in \c addr.
  */
-INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle msg, uint16_t sendFlags)
+INET_ERROR RawEndPoint::SendTo(const IPAddress & addr, InterfaceId intfId, chip::System::PacketBufferHandle && msg,
+                               uint16_t sendFlags)
 {
     IPPacketInfo pktInfo;
     pktInfo.Clear();
@@ -829,7 +830,7 @@ InterfaceId RawEndPoint::GetBoundInterface()
 
 #if CHIP_SYSTEM_CONFIG_USE_LWIP
 
-void RawEndPoint::HandleDataReceived(System::PacketBufferHandle msg)
+void RawEndPoint::HandleDataReceived(System::PacketBufferHandle && msg)
 {
     IPEndPointBasis::HandleDataReceived(std::move(msg));
 }

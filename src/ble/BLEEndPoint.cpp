@@ -589,7 +589,7 @@ exit:
     return err;
 }
 
-BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle buf)
+BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle && buf)
 {
     BLE_ERROR err = BLE_NO_ERROR;
 
@@ -628,7 +628,7 @@ BLE_ERROR BLEEndPoint::SendCharacteristic(PacketBufferHandle buf)
  *  kType_Data(0)       - data packet
  *  kType_Control(1)    - control packet
  */
-void BLEEndPoint::QueueTx(PacketBufferHandle data, PacketType_t type)
+void BLEEndPoint::QueueTx(PacketBufferHandle && data, PacketType_t type)
 {
 #if CHIP_ENABLE_CHIPOBLE_TEST
     ChipLogDebugBleEndPoint(Ble, "%s: data->%p, type %d, len %d", __FUNCTION__, data, type, data->DataLength());
@@ -690,7 +690,7 @@ exit:
     return err;
 }
 
-bool BLEEndPoint::PrepareNextFragment(PacketBufferHandle data, bool & sentAck)
+bool BLEEndPoint::PrepareNextFragment(PacketBufferHandle && data, bool & sentAck)
 {
     // If we have a pending fragment acknowledgement to send, piggyback it on the fragment we're about to transmit.
     if (GetFlag(mTimerStateFlags, kTimerState_SendAckTimerRunning))
@@ -1451,14 +1451,14 @@ exit:
     return err;
 }
 
-bool BLEEndPoint::SendWrite(PacketBufferHandle buf)
+bool BLEEndPoint::SendWrite(PacketBufferHandle && buf)
 {
     SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, true);
 
     return mBle->mPlatformDelegate->SendWriteRequest(mConnObj, &CHIP_BLE_SVC_ID, &mBle->CHIP_BLE_CHAR_1_ID, std::move(buf));
 }
 
-bool BLEEndPoint::SendIndication(PacketBufferHandle buf)
+bool BLEEndPoint::SendIndication(PacketBufferHandle && buf)
 {
     SetFlag(mConnStateFlags, kConnState_GattOperationInFlight, true);
 
