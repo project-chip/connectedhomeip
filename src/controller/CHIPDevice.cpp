@@ -86,12 +86,6 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
     {
         mState = ConnectionState::NotConnected;
 
-        if (mCommandSender != nullptr)
-        {
-            mCommandSender->Shutdown();
-            mCommandSender = nullptr;
-        }
-
         err = LoadSecureSessionParameters(ResetTransport::kYes);
         SuccessOrExit(err);
 
@@ -106,10 +100,6 @@ exit:
 
 CHIP_ERROR Device::SendCommands()
 {
-    if (mState != ConnectionState::SecureConnected)
-    {
-        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
-    }
     VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
     return mCommandSender->SendCommandRequest(mDeviceId);
 }
@@ -197,25 +187,12 @@ void Device::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr
 {
     mState         = ConnectionState::SecureConnected;
     mSecureSession = session;
-    if (mCommandSender != nullptr)
-    {
-        mCommandSender->Shutdown();
-        mCommandSender = nullptr;
-    }
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
-    chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
-#endif
 }
 
 void Device::OnConnectionExpired(SecureSessionHandle session, SecureSessionMgr * mgr)
 {
     mState         = ConnectionState::NotConnected;
     mSecureSession = SecureSessionHandle{};
-    if (mCommandSender != nullptr)
-    {
-        mCommandSender->Shutdown();
-        mCommandSender = nullptr;
-    }
 }
 
 void Device::OnMessageReceived(const PacketHeader & header, const PayloadHeader & payloadHeader, SecureSessionHandle session,

@@ -92,7 +92,17 @@ public:
      *   Send the command in internal command sender.
      */
     CHIP_ERROR SendCommands();
-
+    void InitCommandSender()
+    {
+        if (mCommandSender != nullptr)
+        {
+            mCommandSender->Shutdown();
+            mCommandSender = nullptr;
+        }
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
+        chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
+#endif
+    }
     app::CommandSender * GetCommandSender() { return mCommandSender; }
 
     /**
