@@ -62,7 +62,8 @@ CHIP_ERROR AdditionalDataPayloadGenerator::generateAdditionalDataPayload(uint16_
     err = writer.CloseContainer(innerWriter);
     SuccessOrExit(err);
 
-    writer.Finalize(&bufferHandle);
+    err = writer.Finalize(&bufferHandle);
+    SuccessOrExit(err);
 
 exit:
     return err;
