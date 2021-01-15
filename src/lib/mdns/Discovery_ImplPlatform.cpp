@@ -176,8 +176,7 @@ CHIP_ERROR DiscoveryImplPlatform::Advertise(const CommisioningAdvertisingParamet
                       rotationCounter, serialNumber, serialNumberSize, rotatingDeviceIdBuffer, rotatingDeviceIdBufferSize));
 
     // Rotating Device ID
-    textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingDeviceIdBuffer),
-                                     rotatingDeviceIdBufferSize };
+    textEntries[textEntrySize++] = { "RI", reinterpret_cast<const uint8_t *>(rotatingDeviceIdBuffer), rotatingDeviceIdBufferSize };
 #endif
 
     snprintf(shortDiscriminatorSubtype, sizeof(shortDiscriminatorSubtype), "_S%03u", params.GetShortDiscriminator());
