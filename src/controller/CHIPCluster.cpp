@@ -69,12 +69,6 @@ exit:
     return err;
 }
 
-CHIP_ERROR ClusterBase::SendCommands()
-{
-    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
-    return mDevice->SendCommands();
-}
-
 CHIP_ERROR ClusterBase::RequestAttributeReporting(chip::System::PacketBufferHandle payload, Callback::Callback<> * responseHandler,
                                                   Callback::Callback<> * reportHandler)
 {

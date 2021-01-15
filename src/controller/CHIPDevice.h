@@ -91,17 +91,7 @@ public:
      * @brief
      *   Send the command in internal command sender.
      */
-    CHIP_ERROR SendCommands()
-    {
-        if (mCommandSender == nullptr)
-        {
-            return CHIP_ERROR_INCORRECT_STATE;
-        }
-        else
-        {
-            return mCommandSender->SendCommandRequest(mDeviceId);
-        }
-    }
+    CHIP_ERROR SendCommands();
 
     app::CommandSender * GetCommandSender() { return mCommandSender; }
 

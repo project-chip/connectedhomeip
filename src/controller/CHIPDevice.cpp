@@ -43,6 +43,7 @@
 #include <support/CHIPMem.h>
 #include <support/CodeUtils.h>
 #include <support/ErrorStr.h>
+#include <support/ReturnMacros.h>
 #include <support/SafeInt.h>
 #include <support/logging/CHIPLogging.h>
 
@@ -101,6 +102,16 @@ CHIP_ERROR Device::SendMessage(System::PacketBufferHandle buffer)
 
 exit:
     return err;
+}
+
+CHIP_ERROR Device::SendCommands()
+{
+    VerifyOrReturnError(mCommandSender != nullptr, CHIP_ERROR_INCORRECT_STATE);
+    if (mState != ConnectionState::SecureConnected)
+    {
+        ReturnErrorOnFailure(LoadSecureSessionParameters(ResetTransport::kNo));
+    }
+    return mCommandSender->SendCommandRequest(mDeviceId);
 }
 
 CHIP_ERROR Device::Serialize(SerializedDevice & output)
@@ -186,12 +197,12 @@ void Device::OnNewConnection(SecureSessionHandle session, SecureSessionMgr * mgr
 {
     mState         = ConnectionState::SecureConnected;
     mSecureSession = session;
-#ifdef CHIP_APP_USE_INTERACTION_MODEL
     if (mCommandSender != nullptr)
     {
         mCommandSender->Shutdown();
         mCommandSender = nullptr;
     }
+#ifdef CHIP_APP_USE_INTERACTION_MODEL
     chip::app::InteractionModelEngine::GetInstance()->NewCommandSender(&mCommandSender);
 #endif
 }

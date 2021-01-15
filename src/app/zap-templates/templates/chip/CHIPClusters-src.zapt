@@ -3,6 +3,7 @@
 
 #include <app/chip-zcl-zpro-codec-api.h>
 #include <app/im-encoder.h>
+#include <support/ReturnMacros.h>
 
 namespace chip {
 namespace Controller {
@@ -18,10 +19,11 @@ namespace Controller {
 CHIP_ERROR {{asCamelCased clusterName false}}Cluster::{{asCamelCased name false}}(Callback::Callback<> * onCompletion{{#chip_server_cluster_command_arguments}}, {{chipType}} {{asCamelCased label}}{{/chip_server_cluster_command_arguments}})
 {
 #ifdef CHIP_APP_USE_INTERACTION_MODEL
+    VerifyOrReturnError(mDevice != nullptr, CHIP_ERROR_INCORRECT_STATE);
     (void) onCompletion;
     // TODO(@vivien-apple): onCompletion is not used by IM for now.
     chip::app::cluster::{{asCamelCased clusterName false}}::Encode{{asType name}}Command(mDevice->GetCommandSender(), mEndpoint, 0{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
-    return SendCommands();
+    return mDevice->SendCommands();
 #else
     System::PacketBufferHandle payload = encode{{asCamelCased clusterName false}}Cluster{{asType name}}Command(mEndpoint{{#chip_server_cluster_command_arguments}}, {{asCamelCased label}}{{/chip_server_cluster_command_arguments}});
     return SendCommand(std::move(payload), onCompletion);

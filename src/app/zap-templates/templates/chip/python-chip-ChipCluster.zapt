@@ -31,7 +31,7 @@ class ChipCluster:
         func = getattr(self, "Cluster{}_Command{}".format(cluster, command), None)
         if not func:
             raise UnknownCommand(cluster, command)
-        func(endpoint, groupid, **args)
+        func(device, endpoint, groupid, **args)
 
 {{#chip_server_clusters}}
 {{#chip_server_cluster_commands}}

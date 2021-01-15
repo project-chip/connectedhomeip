@@ -719,8 +719,6 @@ void DeviceCommissioner::OnRendezvousComplete()
     device = &mActiveDevices[mDeviceBeingPaired];
     mPairedDevices.Insert(device->GetDeviceId());
     mPairedDevicesUpdated = true;
-    mSessionManager->NewPairing(Optional<Transport::PeerAddress>(mRendezvousSession->GetPeerAddress()), device->GetDeviceId(),
-                                &mRendezvousSession->GetPairingSession());
 
     // mStorageDelegate would not be null for a typical pairing scenario, as Pair()
     // requires a valid storage delegate. However, test pairing usecase, that's used

@@ -20,6 +20,7 @@
 #include <app/CommandSender.h>
 #include <app/InteractionModelEngine.h>
 #include <app/im-encoder.h>
+#include <support/ReturnMacros.h>
 
 #include <controller/CHIPClusters.h>
 #include <controller/CHIPDevice.h>
@@ -144,10 +145,7 @@ CHIP_ERROR chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent(chip:
                                                                            chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                                                            uint8_t percentOpen)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::BarrierControlCluster clusterBarrierControl;
     (void) ZCLgroupId;
     clusterBarrierControl.Associate(device, ZCLendpointId);
@@ -156,10 +154,7 @@ CHIP_ERROR chip_ime_AppendCommand_BarrierControl_BarrierControlGoToPercent(chip:
 CHIP_ERROR chip_ime_AppendCommand_BarrierControl_BarrierControlStop(chip::Controller::Device * device,
                                                                     chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::BarrierControlCluster clusterBarrierControl;
     (void) ZCLgroupId;
     clusterBarrierControl.Associate(device, ZCLendpointId);
@@ -171,10 +166,7 @@ CHIP_ERROR chip_ime_AppendCommand_BarrierControl_BarrierControlStop(chip::Contro
 CHIP_ERROR chip_ime_AppendCommand_Basic_ResetToFactoryDefaults(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                                chip::GroupId ZCLgroupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::BasicCluster clusterBasic;
     (void) ZCLgroupId;
     clusterBasic.Associate(device, ZCLendpointId);
@@ -187,10 +179,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveColor(chip::Controller::Devic
                                                          chip::GroupId ZCLgroupId, int16_t rateX, int16_t rateY,
                                                          uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -200,10 +189,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveColorTemperature(
     chip::Controller::Device * device, chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId, uint8_t moveMode, uint16_t rate,
     uint16_t colorTemperatureMinimum, uint16_t colorTemperatureMaximum, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -214,10 +200,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveHue(chip::Controller::Device 
                                                        chip::GroupId ZCLgroupId, uint8_t moveMode, uint8_t rate,
                                                        uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -227,10 +210,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveSaturation(chip::Controller::
                                                               chip::GroupId ZCLgroupId, uint8_t moveMode, uint8_t rate,
                                                               uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -240,10 +220,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveToColor(chip::Controller::Dev
                                                            chip::GroupId ZCLgroupId, uint16_t colorX, uint16_t colorY,
                                                            uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -254,10 +231,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveToColorTemperature(chip::Cont
                                                                       uint16_t colorTemperature, uint16_t transitionTime,
                                                                       uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -267,10 +241,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveToHue(chip::Controller::Devic
                                                          chip::GroupId ZCLgroupId, uint8_t hue, uint8_t direction,
                                                          uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -281,10 +252,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveToHueAndSaturation(chip::Cont
                                                                       uint8_t hue, uint8_t saturation, uint16_t transitionTime,
                                                                       uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -295,10 +263,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_MoveToSaturation(chip::Controller
                                                                 uint16_t transitionTime, uint8_t optionsMask,
                                                                 uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -308,10 +273,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_StepColor(chip::Controller::Devic
                                                          chip::GroupId ZCLgroupId, int16_t stepX, int16_t stepY,
                                                          uint16_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -324,10 +286,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_StepColorTemperature(chip::Contro
                                                                     uint16_t colorTemperatureMaximum, uint8_t optionsMask,
                                                                     uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -338,10 +297,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_StepHue(chip::Controller::Device 
                                                        chip::GroupId ZCLgroupId, uint8_t stepMode, uint8_t stepSize,
                                                        uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -351,10 +307,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_StepSaturation(chip::Controller::
                                                               chip::GroupId ZCLgroupId, uint8_t stepMode, uint8_t stepSize,
                                                               uint8_t transitionTime, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -363,10 +316,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_StepSaturation(chip::Controller::
 CHIP_ERROR chip_ime_AppendCommand_ColorControl_StopMoveStep(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                             chip::GroupId ZCLgroupId, uint8_t optionsMask, uint8_t optionsOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ColorControlCluster clusterColorControl;
     (void) ZCLgroupId;
     clusterColorControl.Associate(device, ZCLendpointId);
@@ -378,10 +328,7 @@ CHIP_ERROR chip_ime_AppendCommand_ColorControl_StopMoveStep(chip::Controller::De
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearAllPins(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                         chip::GroupId ZCLgroupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -390,10 +337,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearAllPins(chip::Controller::Device
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearAllRfids(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                          chip::GroupId ZCLgroupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -402,10 +346,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearAllRfids(chip::Controller::Devic
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearHolidaySchedule(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                                 chip::GroupId ZCLgroupId, uint8_t scheduleId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -414,10 +355,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearHolidaySchedule(chip::Controller
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearPin(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                     chip::GroupId ZCLgroupId, uint16_t userId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -426,10 +364,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearPin(chip::Controller::Device * d
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearRfid(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                      chip::GroupId ZCLgroupId, uint16_t userId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -438,10 +373,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearRfid(chip::Controller::Device * 
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearWeekdaySchedule(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                                 chip::GroupId ZCLgroupId, uint8_t scheduleId, uint16_t userId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -450,10 +382,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearWeekdaySchedule(chip::Controller
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearYeardaySchedule(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                                 chip::GroupId ZCLgroupId, uint8_t scheduleId, uint16_t userId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -462,10 +391,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_ClearYeardaySchedule(chip::Controller
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetHolidaySchedule(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                               chip::GroupId ZCLgroupId, uint8_t scheduleId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -474,10 +400,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetHolidaySchedule(chip::Controller::
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetLogRecord(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                         chip::GroupId ZCLgroupId, uint16_t logIndex)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -486,10 +409,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetLogRecord(chip::Controller::Device
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetPin(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                   chip::GroupId ZCLgroupId, uint16_t userId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -498,10 +418,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetPin(chip::Controller::Device * dev
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetRfid(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                    chip::GroupId ZCLgroupId, uint16_t userId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -510,10 +427,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetRfid(chip::Controller::Device * de
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetUserType(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                        chip::GroupId ZCLgroupId, uint16_t userId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -522,10 +436,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetUserType(chip::Controller::Device 
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetWeekdaySchedule(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                               chip::GroupId ZCLgroupId, uint8_t scheduleId, uint16_t userId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -534,10 +445,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetWeekdaySchedule(chip::Controller::
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetYeardaySchedule(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                               chip::GroupId ZCLgroupId, uint8_t scheduleId, uint16_t userId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -546,10 +454,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_GetYeardaySchedule(chip::Controller::
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_LockDoor(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                     chip::GroupId ZCLgroupId, char * pin)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -559,10 +464,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetHolidaySchedule(chip::Controller::
                                                               chip::GroupId ZCLgroupId, uint8_t scheduleId, uint32_t localStartTime,
                                                               uint32_t localEndTime, uint8_t operatingModeDuringHoliday)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -572,10 +474,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetPin(chip::Controller::Device * dev
                                                   chip::GroupId ZCLgroupId, uint16_t userId, uint8_t userStatus, uint8_t userType,
                                                   char * pin)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -585,10 +484,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetRfid(chip::Controller::Device * de
                                                    chip::GroupId ZCLgroupId, uint16_t userId, uint8_t userStatus, uint8_t userType,
                                                    char * id)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -597,10 +493,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetRfid(chip::Controller::Device * de
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetUserType(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                        chip::GroupId ZCLgroupId, uint16_t userId, uint8_t userType)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -611,10 +504,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetWeekdaySchedule(chip::Controller::
                                                               uint8_t daysMask, uint8_t startHour, uint8_t startMinute,
                                                               uint8_t endHour, uint8_t endMinute)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -624,10 +514,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetYeardaySchedule(chip::Controller::
                                                               chip::GroupId ZCLgroupId, uint8_t scheduleId, uint16_t userId,
                                                               uint32_t localStartTime, uint32_t localEndTime)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -636,10 +523,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_SetYeardaySchedule(chip::Controller::
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_UnlockDoor(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                       chip::GroupId ZCLgroupId, char * pin)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -648,10 +532,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_UnlockDoor(chip::Controller::Device *
 CHIP_ERROR chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                              chip::GroupId ZCLgroupId, uint16_t timeoutInSeconds, char * pin)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::DoorLockCluster clusterDoorLock;
     (void) ZCLgroupId;
     clusterDoorLock.Associate(device, ZCLendpointId);
@@ -663,10 +544,7 @@ CHIP_ERROR chip_ime_AppendCommand_DoorLock_UnlockWithTimeout(chip::Controller::D
 CHIP_ERROR chip_ime_AppendCommand_Groups_AddGroup(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                   chip::GroupId ZCLgroupId, uint16_t groupId, char * groupName)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::GroupsCluster clusterGroups;
     (void) ZCLgroupId;
     clusterGroups.Associate(device, ZCLendpointId);
@@ -675,10 +553,7 @@ CHIP_ERROR chip_ime_AppendCommand_Groups_AddGroup(chip::Controller::Device * dev
 CHIP_ERROR chip_ime_AppendCommand_Groups_AddGroupIfIdentifying(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                                chip::GroupId ZCLgroupId, uint16_t groupId, char * groupName)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::GroupsCluster clusterGroups;
     (void) ZCLgroupId;
     clusterGroups.Associate(device, ZCLendpointId);
@@ -687,10 +562,7 @@ CHIP_ERROR chip_ime_AppendCommand_Groups_AddGroupIfIdentifying(chip::Controller:
 CHIP_ERROR chip_ime_AppendCommand_Groups_GetGroupMembership(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                             chip::GroupId ZCLgroupId, uint8_t groupCount, uint16_t groupList)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::GroupsCluster clusterGroups;
     (void) ZCLgroupId;
     clusterGroups.Associate(device, ZCLendpointId);
@@ -699,10 +571,7 @@ CHIP_ERROR chip_ime_AppendCommand_Groups_GetGroupMembership(chip::Controller::De
 CHIP_ERROR chip_ime_AppendCommand_Groups_RemoveAllGroups(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                          chip::GroupId ZCLgroupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::GroupsCluster clusterGroups;
     (void) ZCLgroupId;
     clusterGroups.Associate(device, ZCLendpointId);
@@ -711,10 +580,7 @@ CHIP_ERROR chip_ime_AppendCommand_Groups_RemoveAllGroups(chip::Controller::Devic
 CHIP_ERROR chip_ime_AppendCommand_Groups_RemoveGroup(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                      chip::GroupId ZCLgroupId, uint16_t groupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::GroupsCluster clusterGroups;
     (void) ZCLgroupId;
     clusterGroups.Associate(device, ZCLendpointId);
@@ -723,10 +589,7 @@ CHIP_ERROR chip_ime_AppendCommand_Groups_RemoveGroup(chip::Controller::Device * 
 CHIP_ERROR chip_ime_AppendCommand_Groups_ViewGroup(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                    chip::GroupId ZCLgroupId, uint16_t groupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::GroupsCluster clusterGroups;
     (void) ZCLgroupId;
     clusterGroups.Associate(device, ZCLendpointId);
@@ -741,10 +604,7 @@ CHIP_ERROR chip_ime_AppendCommand_Groups_ViewGroup(chip::Controller::Device * de
 CHIP_ERROR chip_ime_AppendCommand_Identify_Identify(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                     chip::GroupId ZCLgroupId, uint16_t identifyTime)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::IdentifyCluster clusterIdentify;
     (void) ZCLgroupId;
     clusterIdentify.Associate(device, ZCLendpointId);
@@ -753,10 +613,7 @@ CHIP_ERROR chip_ime_AppendCommand_Identify_Identify(chip::Controller::Device * d
 CHIP_ERROR chip_ime_AppendCommand_Identify_IdentifyQuery(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                          chip::GroupId ZCLgroupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::IdentifyCluster clusterIdentify;
     (void) ZCLgroupId;
     clusterIdentify.Associate(device, ZCLendpointId);
@@ -769,10 +626,7 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_Move(chip::Controller::Device * d
                                                     chip::GroupId ZCLgroupId, uint8_t moveMode, uint8_t rate, uint8_t optionMask,
                                                     uint8_t optionOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::LevelControlCluster clusterLevelControl;
     (void) ZCLgroupId;
     clusterLevelControl.Associate(device, ZCLendpointId);
@@ -782,10 +636,7 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_MoveToLevel(chip::Controller::Dev
                                                            chip::GroupId ZCLgroupId, uint8_t level, uint16_t transitionTime,
                                                            uint8_t optionMask, uint8_t optionOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::LevelControlCluster clusterLevelControl;
     (void) ZCLgroupId;
     clusterLevelControl.Associate(device, ZCLendpointId);
@@ -795,10 +646,7 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_MoveToLevelWithOnOff(chip::Contro
                                                                     chip::EndpointId ZCLendpointId, chip::GroupId ZCLgroupId,
                                                                     uint8_t level, uint16_t transitionTime)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::LevelControlCluster clusterLevelControl;
     (void) ZCLgroupId;
     clusterLevelControl.Associate(device, ZCLendpointId);
@@ -807,10 +655,7 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_MoveToLevelWithOnOff(chip::Contro
 CHIP_ERROR chip_ime_AppendCommand_LevelControl_MoveWithOnOff(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                              chip::GroupId ZCLgroupId, uint8_t moveMode, uint8_t rate)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::LevelControlCluster clusterLevelControl;
     (void) ZCLgroupId;
     clusterLevelControl.Associate(device, ZCLendpointId);
@@ -820,10 +665,7 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_Step(chip::Controller::Device * d
                                                     chip::GroupId ZCLgroupId, uint8_t stepMode, uint8_t stepSize,
                                                     uint16_t transitionTime, uint8_t optionMask, uint8_t optionOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::LevelControlCluster clusterLevelControl;
     (void) ZCLgroupId;
     clusterLevelControl.Associate(device, ZCLendpointId);
@@ -833,10 +675,7 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_StepWithOnOff(chip::Controller::D
                                                              chip::GroupId ZCLgroupId, uint8_t stepMode, uint8_t stepSize,
                                                              uint16_t transitionTime)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::LevelControlCluster clusterLevelControl;
     (void) ZCLgroupId;
     clusterLevelControl.Associate(device, ZCLendpointId);
@@ -845,10 +684,7 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_StepWithOnOff(chip::Controller::D
 CHIP_ERROR chip_ime_AppendCommand_LevelControl_Stop(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                     chip::GroupId ZCLgroupId, uint8_t optionMask, uint8_t optionOverride)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::LevelControlCluster clusterLevelControl;
     (void) ZCLgroupId;
     clusterLevelControl.Associate(device, ZCLendpointId);
@@ -857,10 +693,7 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_Stop(chip::Controller::Device * d
 CHIP_ERROR chip_ime_AppendCommand_LevelControl_StopWithOnOff(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                              chip::GroupId ZCLgroupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::LevelControlCluster clusterLevelControl;
     (void) ZCLgroupId;
     clusterLevelControl.Associate(device, ZCLendpointId);
@@ -872,10 +705,7 @@ CHIP_ERROR chip_ime_AppendCommand_LevelControl_StopWithOnOff(chip::Controller::D
 CHIP_ERROR chip_ime_AppendCommand_OnOff_Off(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                             chip::GroupId ZCLgroupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OnOffCluster clusterOnOff;
     (void) ZCLgroupId;
     clusterOnOff.Associate(device, ZCLendpointId);
@@ -884,10 +714,7 @@ CHIP_ERROR chip_ime_AppendCommand_OnOff_Off(chip::Controller::Device * device, c
 CHIP_ERROR chip_ime_AppendCommand_OnOff_On(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                            chip::GroupId ZCLgroupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OnOffCluster clusterOnOff;
     (void) ZCLgroupId;
     clusterOnOff.Associate(device, ZCLendpointId);
@@ -896,10 +723,7 @@ CHIP_ERROR chip_ime_AppendCommand_OnOff_On(chip::Controller::Device * device, ch
 CHIP_ERROR chip_ime_AppendCommand_OnOff_Toggle(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                chip::GroupId ZCLgroupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::OnOffCluster clusterOnOff;
     (void) ZCLgroupId;
     clusterOnOff.Associate(device, ZCLendpointId);
@@ -913,10 +737,7 @@ CHIP_ERROR chip_ime_AppendCommand_Scenes_AddScene(chip::Controller::Device * dev
                                                   uint16_t transitionTime, char * sceneName, chip::ClusterId clusterId,
                                                   uint8_t length, uint8_t value)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ScenesCluster clusterScenes;
     (void) ZCLgroupId;
     clusterScenes.Associate(device, ZCLendpointId);
@@ -925,10 +746,7 @@ CHIP_ERROR chip_ime_AppendCommand_Scenes_AddScene(chip::Controller::Device * dev
 CHIP_ERROR chip_ime_AppendCommand_Scenes_GetSceneMembership(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                             chip::GroupId ZCLgroupId, uint16_t groupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ScenesCluster clusterScenes;
     (void) ZCLgroupId;
     clusterScenes.Associate(device, ZCLendpointId);
@@ -938,10 +756,7 @@ CHIP_ERROR chip_ime_AppendCommand_Scenes_RecallScene(chip::Controller::Device * 
                                                      chip::GroupId ZCLgroupId, uint16_t groupId, uint8_t sceneId,
                                                      uint16_t transitionTime)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ScenesCluster clusterScenes;
     (void) ZCLgroupId;
     clusterScenes.Associate(device, ZCLendpointId);
@@ -950,10 +765,7 @@ CHIP_ERROR chip_ime_AppendCommand_Scenes_RecallScene(chip::Controller::Device * 
 CHIP_ERROR chip_ime_AppendCommand_Scenes_RemoveAllScenes(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                          chip::GroupId ZCLgroupId, uint16_t groupId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ScenesCluster clusterScenes;
     (void) ZCLgroupId;
     clusterScenes.Associate(device, ZCLendpointId);
@@ -962,10 +774,7 @@ CHIP_ERROR chip_ime_AppendCommand_Scenes_RemoveAllScenes(chip::Controller::Devic
 CHIP_ERROR chip_ime_AppendCommand_Scenes_RemoveScene(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                      chip::GroupId ZCLgroupId, uint16_t groupId, uint8_t sceneId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ScenesCluster clusterScenes;
     (void) ZCLgroupId;
     clusterScenes.Associate(device, ZCLendpointId);
@@ -974,10 +783,7 @@ CHIP_ERROR chip_ime_AppendCommand_Scenes_RemoveScene(chip::Controller::Device * 
 CHIP_ERROR chip_ime_AppendCommand_Scenes_StoreScene(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                     chip::GroupId ZCLgroupId, uint16_t groupId, uint8_t sceneId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ScenesCluster clusterScenes;
     (void) ZCLgroupId;
     clusterScenes.Associate(device, ZCLendpointId);
@@ -986,10 +792,7 @@ CHIP_ERROR chip_ime_AppendCommand_Scenes_StoreScene(chip::Controller::Device * d
 CHIP_ERROR chip_ime_AppendCommand_Scenes_ViewScene(chip::Controller::Device * device, chip::EndpointId ZCLendpointId,
                                                    chip::GroupId ZCLgroupId, uint16_t groupId, uint8_t sceneId)
 {
-    if (device == nullptr)
-    {
-        return CHIP_ERROR_INCORRECT_STATE;
-    }
+    VerifyOrReturnError(device != nullptr, CHIP_ERROR_INVALID_ARGUMENT);
     chip::Controller::ScenesCluster clusterScenes;
     (void) ZCLgroupId;
     clusterScenes.Associate(device, ZCLendpointId);

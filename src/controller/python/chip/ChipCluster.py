@@ -349,7 +349,7 @@ class ChipCluster:
         func = getattr(self, "Cluster{}_Command{}".format(cluster, command), None)
         if not func:
             raise UnknownCommand(cluster, command)
-        func(endpoint, groupid, **args)
+        func(device, endpoint, groupid, **args)
 
     def ClusterBarrierControl_CommandBarrierControlGoToPercent(self, device: ctypes.c_void_p, ZCLendpoint: int, ZCLgroupid: int, percentOpen: int):
         self._ChipStack.Call(
