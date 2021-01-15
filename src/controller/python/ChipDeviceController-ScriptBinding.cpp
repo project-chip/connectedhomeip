@@ -207,7 +207,7 @@ const char * nl_Chip_Stack_StatusReportToString(uint32_t profileId, uint16_t sta
 void nl_Chip_Stack_SetLogFunct(LogMessageFunct logFunct);
 
 CHIP_ERROR nl_Chip_GetDeviceByNodeId(chip::DeviceController::ChipDeviceController * devCtrl, chip::NodeId nodeId,
-                                     chip::Controller::Device * device);
+                                     chip::Controller::Device ** device);
 }
 
 CHIP_ERROR nl_Chip_DeviceController_NewDeviceController(chip::DeviceController::ChipDeviceController ** outDevCtrl)
