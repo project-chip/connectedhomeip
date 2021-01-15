@@ -423,11 +423,16 @@
 
 // Array of EmberAfCommandMetadata structs.
 #define ZAP_COMMAND_MASK(mask) COMMAND_MASK_##mask
-#define EMBER_AF_GENERATED_COMMAND_COUNT (165)
+#define EMBER_AF_GENERATED_COMMAND_COUNT (167)
 #define GENERATED_COMMANDS                                                                                                         \
     {                                                                                                                              \
         { 0x0000, 0x00,                                                                                                            \
-          ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Basic (client): ResetToFactoryDefaults */    \
+          ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT) }, /* Basic (client): MfgSpecificPing */           \
+            {                                                                                                                      \
+                0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_CLIENT) | ZAP_COMMAND_MASK(OUTGOING_CLIENT)                                \
+            }, /* Basic (client): ResetToFactoryDefaults */                                                                        \
+            { 0x0000, 0x00,                                                                                                        \
+              ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER) }, /* Basic (server): MfgSpecificPing */       \
             {                                                                                                                      \
                 0x0000, 0x00, ZAP_COMMAND_MASK(INCOMING_SERVER) | ZAP_COMMAND_MASK(OUTGOING_SERVER)                                \
             }, /* Basic (server): ResetToFactoryDefaults */                                                                        \
@@ -695,12 +700,10 @@
     }
 
 // Array of EmberAfManufacturerCodeEntry structures for commands.
-#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (0)
+#define GENERATED_COMMAND_MANUFACTURER_CODE_COUNT (2)
 #define GENERATED_COMMAND_MANUFACTURER_CODES                                                                                       \
     {                                                                                                                              \
-        {                                                                                                                          \
-            0x00, 0x00                                                                                                             \
-        }                                                                                                                          \
+        { 0, 0x1002 }, { 2, 0x1002 },                                                                                              \
     }
 
 // This is an array of EmberAfManufacturerCodeEntry structures for clusters.
@@ -725,7 +728,6 @@
 #define ZRD(x) EMBER_ZCL_REPORTING_DIRECTION_##x
 #define ZAP_REPORT_DIRECTION(x) ZRD(x)
 
-// TODO Issue #3871 Reporting should only be enabled if there are reportable attributes
 // Use this macro to check if Reporting plugin is included
 #define EMBER_AF_PLUGIN_REPORTING
 // User options for plugin Reporting
